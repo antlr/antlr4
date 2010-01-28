@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tool" default="compile">
+  
+    <property file="build.properties"/>
+
+    <target name="compile">
+        <javac srcdir="src" destdir="../build/classes"/>
+    </target>
+    
+</project>

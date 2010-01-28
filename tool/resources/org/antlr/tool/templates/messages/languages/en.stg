@@ -1,0 +1,299 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005-2006 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+/*
+ New style messages. This file only contains the messages in English, but no
+ information about which file, line, or column it occurred in.
+ The location and message ids are taken out of the formats directory.
+														Kay Roepke
+*/
+group en_US;
+
+// TOOL ERRORS
+// file errors
+CANNOT_WRITE_FILE(arg,exception,stackTrace) ::= <<
+cannot write file <arg>: <exception>
+<stackTrace; separator="\n">
+>>
+CANNOT_CLOSE_FILE(arg,exception,stackTrace) ::= "cannot close file <arg>: <exception>"
+CANNOT_FIND_TOKENS_FILE(arg) ::= "cannot find tokens file <arg>"
+ERROR_READING_TOKENS_FILE(arg,exception,stackTrace) ::= <<
+problem reading token vocabulary file <arg>: <exception>
+<stackTrace; separator="\n">
+>>
+DIR_NOT_FOUND(arg,exception,stackTrace) ::= "directory not found: <arg>"
+OUTPUT_DIR_IS_FILE(arg,exception,stackTrace) ::= "output directory is a file: <arg>"
+CANNOT_OPEN_FILE(arg,exception,stackTrace) ::= "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>"
+CIRCULAR_DEPENDENCY() ::= "your grammars contain a circular dependency and cannot be sorted into a valid build order."
+
+INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
+internal error: <arg> <arg2><if(exception)>: <exception><endif>
+<stackTrace; separator="\n">
+>>
+INTERNAL_WARNING(arg) ::= "internal warning: <arg>"
+ERROR_CREATING_ARTIFICIAL_RULE(arg,exception,stackTrace) ::= <<
+problems creating lexer rule listing all tokens: <exception>
+<stackTrace; separator="\n">
+>>
+TOKENS_FILE_SYNTAX_ERROR(arg,arg2) ::=
+	"problems parsing token vocabulary file <arg> on line <arg2>"
+CANNOT_GEN_DOT_FILE(arg,exception,stackTrace) ::=
+	"cannot write DFA DOT file <arg>: <exception>"
+BAD_ACTION_AST_STRUCTURE(exception,stackTrace) ::=
+	"bad internal tree structure for action '<arg>': <exception>"
+BAD_AST_STRUCTURE(arg,exception,stackTrace) ::= <<
+bad internal tree structure '<arg>': <exception>
+<stackTrace; separator="\n">
+>>
+FILE_AND_GRAMMAR_NAME_DIFFER(arg,arg2) ::=
+  "file <arg2> contains grammar <arg>; names must be identical"
+FILENAME_EXTENSION_ERROR(arg) ::=
+  "file <arg> must end in a file extension, normally .g"
+
+// code gen errors
+MISSING_CODE_GEN_TEMPLATES(arg) ::=
+	"cannot find code generation templates <arg>.stg"
+MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES() ::=
+	"cannot find code generation cyclic DFA templates for language <arg>"
+CODE_GEN_TEMPLATES_INCOMPLETE(arg) ::=
+	"at least one code generation template missing for language <arg>"
+CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::=
+	"cannot create target <arg> code generator: <exception>"
+CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::=
+	"cannot generate a sample input sequence from lookahead DFA"
+
+// grammar interpretation errors
+/*
+NO_VIABLE_DFA_ALT(arg,arg2) ::=
+	"no viable transition from state <arg> on <arg2> while interpreting DFA"
+*/
+
+// GRAMMAR ERRORS
+SYNTAX_ERROR(arg) ::= "syntax error: <arg>"
+RULE_REDEFINITION(arg) ::=
+	"rule <arg> redefinition"
+LEXER_RULES_NOT_ALLOWED(arg) ::=
+	"lexer rule <arg> not allowed in parser"
+PARSER_RULES_NOT_ALLOWED(arg) ::=
+	"parser rule <arg> not allowed in lexer"
+CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(arg) ::=
+	"cannot find an attribute name in attribute declaration"
+NO_TOKEN_DEFINITION(arg) ::=
+	"no lexer rule corresponding to token: <arg>"
+UNDEFINED_RULE_REF(arg) ::=
+	"reference to undefined rule: <arg>"
+LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(arg) ::=
+	"literal has no associated lexer rule: <arg>"
+CANNOT_ALIAS_TOKENS_IN_LEXER(arg) ::=
+	"literals are illegal in lexer tokens{} section: <arg>"
+ATTRIBUTE_REF_NOT_IN_RULE(arg,arg2) ::=
+	"reference to attribute outside of a rule: <arg><if(arg2)>.<arg2><endif>"
+UNKNOWN_ATTRIBUTE_IN_SCOPE(arg,arg2) ::=
+	"unknown attribute for <arg>: <arg2>"
+UNKNOWN_RULE_ATTRIBUTE(arg,arg2) ::=
+	"unknown attribute for rule <arg>: <arg2>"
+UNKNOWN_SIMPLE_ATTRIBUTE(arg,args2) ::=
+	"attribute is not a token, parameter, or return value: <arg>"
+ISOLATED_RULE_SCOPE(arg) ::=
+	"missing attribute access on rule scope: <arg>"
+INVALID_RULE_PARAMETER_REF(arg,arg2) ::=
+	"cannot access rule <arg>'s parameter: <arg2>"
+INVALID_RULE_SCOPE_ATTRIBUTE_REF(arg,arg2) ::=
+	"cannot access rule <arg>'s dynamically-scoped attribute: <arg2>"
+SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(arg) ::=
+	"symbol <arg> conflicts with global dynamic scope with same name"
+WRITE_TO_READONLY_ATTR(arg,arg2,arg3) ::=
+	"cannot write to read only attribute: $<arg><if(arg2)>.<arg2><endif>"
+LABEL_CONFLICTS_WITH_RULE(arg) ::=
+	"label <arg> conflicts with rule with same name"
+LABEL_CONFLICTS_WITH_TOKEN(arg) ::=
+	"label <arg> conflicts with token with same name"
+LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE(arg,arg2) ::=
+	"label <arg> conflicts with rule <arg2>'s dynamically-scoped attribute with same name"
+LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL(arg,arg2) ::=
+	"label <arg> conflicts with rule <arg2>'s return value or parameter with same name"
+ATTRIBUTE_CONFLICTS_WITH_RULE(arg,arg2) ::=
+	"rule <arg2>'s dynamically-scoped attribute <arg> conflicts with the rule name"
+ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL(arg,arg2) ::=
+	"rule <arg2>'s dynamically-scoped attribute <arg> conflicts with<arg2>'s return value or parameter with same name"
+LABEL_TYPE_CONFLICT(arg,arg2) ::=
+	"label <arg> type mismatch with previous definition: <arg2>"
+ARG_RETVAL_CONFLICT(arg,arg2) ::=
+	"rule <arg2>'s argument <arg> conflicts a return value with same name"
+NONUNIQUE_REF(arg) ::=
+	"<arg> is a non-unique reference"
+FORWARD_ELEMENT_REF(arg) ::=
+	"illegal forward reference: <arg>"
+MISSING_RULE_ARGS(arg) ::=
+	"missing parameter(s) on rule reference: <arg>"
+RULE_HAS_NO_ARGS(arg) ::=
+	"rule <arg> has no defined parameters"
+ARGS_ON_TOKEN_REF(arg) ::=
+	"token reference <arg> may not have parameters"
+/*
+NONCHAR_RANGE() ::=
+	"range operator can only be used in the lexer"
+*/
+ILLEGAL_OPTION(arg) ::=
+	"illegal option <arg>"
+LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(arg) ::=
+	"rule '+=' list labels are not allowed w/o output option: <arg>"
+UNDEFINED_TOKEN_REF_IN_REWRITE(arg) ::=
+  "reference to undefined token in rewrite rule: <arg>"
+REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(arg) ::=
+  "reference to rewrite element <arg> without reference on left of ->"
+UNDEFINED_LABEL_REF_IN_REWRITE(arg) ::=
+  "reference to undefined label in rewrite rule: $<arg>"
+NO_GRAMMAR_START_RULE (arg) ::=
+  "grammar <arg>: no start rule (no rule can obviously be followed by EOF)"
+EMPTY_COMPLEMENT(arg) ::= <<
+<if(arg)>
+set complement ~<arg> is empty
+<else>
+set complement is empty
+<endif>
+>>
+UNKNOWN_DYNAMIC_SCOPE(arg) ::=
+  "unknown dynamic scope: <arg>"
+UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(arg,arg2) ::=
+  "unknown dynamically-scoped attribute for scope <arg>: <arg2>"
+RULE_REF_AMBIG_WITH_RULE_IN_ALT(arg) ::=
+  "reference $<arg> is ambiguous; rule <arg> is enclosing rule and referenced in the production (assuming enclosing rule)"
+ISOLATED_RULE_ATTRIBUTE(arg) ::=
+  "reference to locally-defined rule scope attribute without rule name: <arg>"
+INVALID_ACTION_SCOPE(arg,arg2) ::=
+  "unknown or invalid action scope for <arg2> grammar: <arg>"
+ACTION_REDEFINITION(arg) ::=
+  "redefinition of <arg> action"
+DOUBLE_QUOTES_ILLEGAL(arg) ::=
+  "string literals must use single quotes (such as \'begin\'): <arg>"
+INVALID_TEMPLATE_ACTION(arg) ::=
+  "invalid StringTemplate % shorthand syntax: '<arg>'"
+MISSING_ATTRIBUTE_NAME() ::=
+  "missing attribute name on $ reference"
+ARG_INIT_VALUES_ILLEGAL(arg) ::=
+  "rule parameters may not have init values: <arg>"
+REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(arg) ::=
+  "<if(arg)>rule <arg> uses <endif>rewrite syntax or operator with no output option; setting output=AST"
+AST_OP_WITH_NON_AST_OUTPUT_OPTION(arg) ::=
+  "AST operator with non-AST output option: <arg>"
+NO_RULES(arg) ::= "grammar file <arg> has no rules"
+MISSING_AST_TYPE_IN_TREE_GRAMMAR(arg) ::=
+  "tree grammar <arg> has no ASTLabelType option"
+REWRITE_FOR_MULTI_ELEMENT_ALT(arg) ::=
+  "with rewrite=true, alt <arg> not simple node or obvious tree element; text attribute for rule not guaranteed to be correct"
+RULE_INVALID_SET(arg) ::= 
+  "Cannot complement rule <arg>; not a simple set or element"
+HETERO_ILLEGAL_IN_REWRITE_ALT(arg) ::=
+  "alts with rewrites can't use heterogeneous types left of ->"
+NO_SUCH_GRAMMAR_SCOPE(arg,arg2) ::=
+  "reference to undefined grammar in rule reference: <arg>.<arg2>"
+NO_SUCH_RULE_IN_SCOPE(arg,arg2) ::=
+  "rule <arg2> is not defined in grammar <arg>"
+TOKEN_ALIAS_CONFLICT(arg,arg2) ::=
+  "cannot alias <arg>; string already assigned to <arg2>"
+TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
+  "cannot alias <arg>; token name already assigned to <arg2>"
+TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
+  "tokenVocab option ignored in imported grammar <arg>"
+INVALID_IMPORT(arg,arg2) ::=
+  "<arg.grammarTypeString> grammar <arg.name> cannot import <arg2.grammarTypeString> grammar <arg2.name>"
+IMPORTED_TOKENS_RULE_EMPTY(arg,arg2) ::=
+  "no lexer rules contributed to <arg> from imported grammar <arg2>"
+IMPORT_NAME_CLASH(arg,arg2) ::=
+  "combined grammar <arg.name> and imported <arg2.grammarTypeString> grammar <arg2.name> both generate <arg2.recognizerName>; import ignored"
+AST_OP_IN_ALT_WITH_REWRITE(arg,arg2) ::=
+  "rule <arg> alt <arg2> uses rewrite syntax and also an AST operator"
+WILDCARD_AS_ROOT(arg) ::= "Wildcard invalid as root; wildcard can itself be a tree"
+CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::= "option <arg>=<arg2> conflicts with tree grammar filter mode"
+
+// GRAMMAR WARNINGS
+
+GRAMMAR_NONDETERMINISM(input,conflictingAlts,paths,disabled,hasPredicateBlockedByAction) ::=
+<<
+<if(paths)>
+Decision can match input such as "<input>" using multiple alternatives:
+<paths:{  alt <it.alt> via NFA path <it.states; separator=","><\n>}>
+<else>
+Decision can match input such as "<input>" using multiple alternatives: <conflictingAlts; separator=", ">
+<endif>
+<if(disabled)><\n>As a result, alternative(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
+>>
+
+DANGLING_STATE(danglingAlts,input) ::= <<
+the decision cannot distinguish between alternative(s) <danglingAlts; separator=","> for input such as "<input>"
+>>
+
+UNREACHABLE_ALTS(alts) ::= <<
+The following alternatives can never be matched: <alts; separator=","><\n>
+>>
+
+INSUFFICIENT_PREDICATES(upon,altToLocations,hasPredicateBlockedByAction) ::= <<
+Input such as "<upon>" is insufficiently covered with predicates at locations: <altToLocations.keys:{alt|alt <alt>: <altToLocations.(alt):{loc| line <loc.line>:<loc.column> at <loc.text>}; separator=", ">}; separator=", "><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
+>>
+
+DUPLICATE_SET_ENTRY(arg) ::=
+	"duplicate token type <arg> when collapsing subrule into set"
+
+ANALYSIS_ABORTED(enclosingRule) ::= <<
+ANTLR could not analyze this decision in rule <enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and possibly adding a syntactic predicate.
+>>
+
+RECURSION_OVERLOW(alt,input,targetRules,callSiteStates) ::= <<
+Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule.name>};separator=", ">}; separator=" and ">
+>>
+
+LEFT_RECURSION(targetRules,alt,callSiteStates) ::= <<
+Alternative <alt> discovers infinite left-recursion <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule>};separator=", ">}; separator=" and ">
+>>
+
+UNREACHABLE_TOKENS(tokens) ::= <<
+The following token definitions can never be matched because prior tokens match the same input: <tokens; separator=",">
+>>
+
+TOKEN_NONDETERMINISM(input,conflictingTokens,paths,disabled,hasPredicateBlockedByAction) ::=
+<<
+<if(paths)>
+Decision can match input such as "<input>" using multiple alternatives:
+<paths:{  alt <it.alt> via NFA path <it.states; separator=","><\n>}>
+<else>
+Multiple token rules can match input such as "<input>": <conflictingTokens; separator=", "><\n>
+<endif>
+<if(disabled)><\n>As a result, token(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
+>>
+
+LEFT_RECURSION_CYCLES(listOfCycles) ::= <<
+The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r|<r.name>}; separator=", ">]}; separator=" and ">
+>>
+
+NONREGULAR_DECISION(ruleName,alts) ::= <<
+[fatal] rule <ruleName> has non-LL(*) decision due to recursive rule invocations reachable from alts <alts; separator=",">.  Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
+>>
+
+/* l10n for message levels */
+warning() ::= "warning"
+error() ::= "error"
