@@ -58,11 +58,11 @@ public class Tool {
     private static boolean exitNow = false;
 
     // The internal options are for my use on the command line during dev
-    //
     public static boolean internalOption_PrintGrammarTree = false;
     public static boolean internalOption_PrintDFA = false;
     public static boolean internalOption_ShowNFAConfigsInDFA = false;
     public static boolean internalOption_watchNFAConversion = false;
+    public static boolean internalOption_saveTempLexer = false;
 
     protected Map<String, Grammar> grammars = new HashMap<String, Grammar>();
 
@@ -207,6 +207,9 @@ public class Tool {
             else if (args[i].equals("-Xdfaverbose")) {
                 internalOption_ShowNFAConfigsInDFA = true;
             }
+            else if (args[i].equals("-Xsavelexer")) {
+                internalOption_saveTempLexer = true;
+            }
             else if (args[i].equals("-Xwatchconversion")) {
                 internalOption_watchNFAConversion = true;
             }
@@ -346,6 +349,7 @@ public class Tool {
         System.err.println("  -Xwatchconversion       print a message for each NFA before converting");
         System.err.println("  -XdbgST                 put tags at start/stop of all templates in output");
         System.err.println("  -Xnfastates             for nondeterminisms, list NFA states for each path");
+        System.err.println("  -Xsavelexer             save temp lexer file created for combined grammars");
         /*
         System.err.println("  -Xm m                   max number of rule invocations during conversion           [" + NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK + "]");
         System.err.println("  -Xmaxdfaedges m         max \"comfortable\" number of edges for single DFA state     [" + DFA.MAX_STATE_TRANSITIONS_FOR_TABLE + "]");
