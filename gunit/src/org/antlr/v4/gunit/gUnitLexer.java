@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 gUnit.g 2010-01-27 16:25:17
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 gUnit.g 2010-01-27 17:03:31
 
 package org.antlr.v4.gunit;
 
@@ -13,7 +13,7 @@ public class gUnitLexer extends Lexer {
     public static final int T__28=28;
     public static final int RETVAL=16;
     public static final int TEST_TREE=9;
-    public static final int T__27=27;
+    public static final int STRING_=22;
     public static final int NESTED_AST=21;
     public static final int ML_STRING=17;
     public static final int TEST_FAIL=6;
@@ -24,21 +24,22 @@ public class gUnitLexer extends Lexer {
     public static final int TEST_STDOUT=8;
     public static final int ACTION=15;
     public static final int TEST_OK=5;
-    public static final int ML_COMMENT=25;
+    public static final int ML_COMMENT=26;
     public static final int T__30=30;
     public static final int T__31=31;
     public static final int T__32=32;
     public static final int T__33=33;
-    public static final int WS=22;
+    public static final int WS=23;
     public static final int T__34=34;
     public static final int T__35=35;
     public static final int T__36=36;
     public static final int TREE=18;
     public static final int T__37=37;
+    public static final int T__38=38;
     public static final int FILENAME=19;
-    public static final int ID_=23;
-    public static final int XDIGIT=26;
-    public static final int SL_COMMENT=24;
+    public static final int ID_=24;
+    public static final int XDIGIT=27;
+    public static final int SL_COMMENT=25;
     public static final int DOC_COMMENT=11;
     public static final int TEST_ACTION=10;
     public static final int SUITE=4;
@@ -58,36 +59,16 @@ public class gUnitLexer extends Lexer {
     }
     public String getGrammarFileName() { return "gUnit.g"; }
 
-    // $ANTLR start "T__27"
-    public final void mT__27() throws RecognitionException {
+    // $ANTLR start "T__28"
+    public final void mT__28() throws RecognitionException {
         try {
-            int _type = T__27;
+            int _type = T__28;
             int _channel = DEFAULT_TOKEN_CHANNEL;
             // gUnit.g:7:7: ( 'gunit' )
             // gUnit.g:7:9: 'gunit'
             {
             match("gunit"); 
 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__27"
-
-    // $ANTLR start "T__28"
-    public final void mT__28() throws RecognitionException {
-        try {
-            int _type = T__28;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:8:7: ( ';' )
-            // gUnit.g:8:9: ';'
-            {
-            match(';'); 
 
             }
 
@@ -104,10 +85,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__29;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:9:7: ( '}' )
-            // gUnit.g:9:9: '}'
+            // gUnit.g:8:7: ( ';' )
+            // gUnit.g:8:9: ';'
             {
-            match('}'); 
+            match(';'); 
 
             }
 
@@ -124,10 +105,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__30;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:10:7: ( '=' )
-            // gUnit.g:10:9: '='
+            // gUnit.g:9:7: ( '}' )
+            // gUnit.g:9:9: '}'
             {
-            match('='); 
+            match('}'); 
 
             }
 
@@ -144,11 +125,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__31;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:11:7: ( '@header' )
-            // gUnit.g:11:9: '@header'
+            // gUnit.g:10:7: ( '=' )
+            // gUnit.g:10:9: '='
             {
-            match("@header"); 
-
+            match('='); 
 
             }
 
@@ -165,10 +145,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__32;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:12:7: ( 'walks' )
-            // gUnit.g:12:9: 'walks'
+            // gUnit.g:11:7: ( '@header' )
+            // gUnit.g:11:9: '@header'
             {
-            match("walks"); 
+            match("@header"); 
 
 
             }
@@ -186,10 +166,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__33;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:13:7: ( ':' )
-            // gUnit.g:13:9: ':'
+            // gUnit.g:12:7: ( 'walks' )
+            // gUnit.g:12:9: 'walks'
             {
-            match(':'); 
+            match("walks"); 
+
 
             }
 
@@ -206,11 +187,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__34;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:14:7: ( 'OK' )
-            // gUnit.g:14:9: 'OK'
+            // gUnit.g:13:7: ( ':' )
+            // gUnit.g:13:9: ':'
             {
-            match("OK"); 
-
+            match(':'); 
 
             }
 
@@ -227,10 +207,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__35;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:15:7: ( 'FAIL' )
-            // gUnit.g:15:9: 'FAIL'
+            // gUnit.g:14:7: ( 'OK' )
+            // gUnit.g:14:9: 'OK'
             {
-            match("FAIL"); 
+            match("OK"); 
 
 
             }
@@ -248,10 +228,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__36;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:16:7: ( 'returns' )
-            // gUnit.g:16:9: 'returns'
+            // gUnit.g:15:7: ( 'FAIL' )
+            // gUnit.g:15:9: 'FAIL'
             {
-            match("returns"); 
+            match("FAIL"); 
 
 
             }
@@ -269,6 +249,27 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__37;
             int _channel = DEFAULT_TOKEN_CHANNEL;
+            // gUnit.g:16:7: ( 'returns' )
+            // gUnit.g:16:9: 'returns'
+            {
+            match("returns"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "T__37"
+
+    // $ANTLR start "T__38"
+    public final void mT__38() throws RecognitionException {
+        try {
+            int _type = T__38;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
             // gUnit.g:17:7: ( '->' )
             // gUnit.g:17:9: '->'
             {
@@ -283,7 +284,7 @@ public class gUnitLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "T__37"
+    // $ANTLR end "T__38"
 
     // $ANTLR start "ACTION"
     public final void mACTION() throws RecognitionException {
@@ -364,6 +365,7 @@ public class gUnitLexer extends Lexer {
             } while (true);
 
             match('}'); 
+            setText(getText().substring(1, getText().length()-1));
 
             }
 
@@ -517,11 +519,11 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "NESTED_AST"
     public final void mNESTED_AST() throws RecognitionException {
         try {
-            // gUnit.g:80:2: ( '(' ( NESTED_AST | STRING | ~ ( '(' | ')' | '\"' ) )* ')' )
-            // gUnit.g:80:4: '(' ( NESTED_AST | STRING | ~ ( '(' | ')' | '\"' ) )* ')'
+            // gUnit.g:80:2: ( '(' ( NESTED_AST | STRING_ | ~ ( '(' | ')' | '\"' ) )* ')' )
+            // gUnit.g:80:4: '(' ( NESTED_AST | STRING_ | ~ ( '(' | ')' | '\"' ) )* ')'
             {
             match('('); 
-            // gUnit.g:81:3: ( NESTED_AST | STRING | ~ ( '(' | ')' | '\"' ) )*
+            // gUnit.g:81:3: ( NESTED_AST | STRING_ | ~ ( '(' | ')' | '\"' ) )*
             loop5:
             do {
                 int alt5=4;
@@ -547,9 +549,9 @@ public class gUnitLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // gUnit.g:82:7: STRING
+            	    // gUnit.g:82:7: STRING_
             	    {
-            	    mSTRING(); 
+            	    mSTRING_(); 
 
             	    }
             	    break;
@@ -972,11 +974,30 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:116:2: ( '\"' ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+ '\"' )
-            // gUnit.g:116:4: '\"' ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+ '\"'
+            // gUnit.g:115:8: ( STRING_ )
+            // gUnit.g:115:10: STRING_
+            {
+            mSTRING_(); 
+            setText(getText().substring(1, getText().length()-1));
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "STRING"
+
+    // $ANTLR start "STRING_"
+    public final void mSTRING_() throws RecognitionException {
+        try {
+            // gUnit.g:119:2: ( '\"' ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+ '\"' )
+            // gUnit.g:119:4: '\"' ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+ '\"'
             {
             match('\"'); 
-            // gUnit.g:116:8: ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+
+            // gUnit.g:119:8: ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+
             int cnt13=0;
             loop13:
             do {
@@ -1002,7 +1023,7 @@ public class gUnitLexer extends Lexer {
 
                 switch (alt13) {
             	case 1 :
-            	    // gUnit.g:116:9: '\\\\\"'
+            	    // gUnit.g:119:9: '\\\\\"'
             	    {
             	    match("\\\""); 
 
@@ -1010,7 +1031,7 @@ public class gUnitLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // gUnit.g:116:15: '\\\\' ~ '\"'
+            	    // gUnit.g:119:15: '\\\\' ~ '\"'
             	    {
             	    match('\\'); 
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFF') ) {
@@ -1026,7 +1047,7 @@ public class gUnitLexer extends Lexer {
             	    }
             	    break;
             	case 3 :
-            	    // gUnit.g:116:25: ~ ( '\\\\' | '\"' )
+            	    // gUnit.g:119:25: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1051,29 +1072,26 @@ public class gUnitLexer extends Lexer {
             } while (true);
 
             match('\"'); 
-            setText(getText().substring(1, getText().length()-1));
 
             }
 
-            state.type = _type;
-            state.channel = _channel;
         }
         finally {
         }
     }
-    // $ANTLR end "STRING"
+    // $ANTLR end "STRING_"
 
     // $ANTLR start "ML_STRING"
     public final void mML_STRING() throws RecognitionException {
         try {
             int _type = ML_STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:121:2: ( '<<' ( . )* '>>' )
-            // gUnit.g:121:4: '<<' ( . )* '>>'
+            // gUnit.g:123:2: ( '<<' ( . )* '>>' )
+            // gUnit.g:123:4: '<<' ( . )* '>>'
             {
             match("<<"); 
 
-            // gUnit.g:121:9: ( . )*
+            // gUnit.g:123:9: ( . )*
             loop14:
             do {
                 int alt14=2;
@@ -1098,7 +1116,7 @@ public class gUnitLexer extends Lexer {
 
                 switch (alt14) {
             	case 1 :
-            	    // gUnit.g:121:9: .
+            	    // gUnit.g:123:9: .
             	    {
             	    matchAny(); 
 
@@ -1129,7 +1147,7 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = FILENAME;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:125:2: ( '/' ID ( '/' ID )* | ID ( '/' ID )+ )
+            // gUnit.g:127:2: ( '/' ID ( '/' ID )* | ID ( '/' ID )+ )
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -1147,11 +1165,11 @@ public class gUnitLexer extends Lexer {
             }
             switch (alt17) {
                 case 1 :
-                    // gUnit.g:125:4: '/' ID ( '/' ID )*
+                    // gUnit.g:127:4: '/' ID ( '/' ID )*
                     {
                     match('/'); 
                     mID(); 
-                    // gUnit.g:125:11: ( '/' ID )*
+                    // gUnit.g:127:11: ( '/' ID )*
                     loop15:
                     do {
                         int alt15=2;
@@ -1164,7 +1182,7 @@ public class gUnitLexer extends Lexer {
 
                         switch (alt15) {
                     	case 1 :
-                    	    // gUnit.g:125:12: '/' ID
+                    	    // gUnit.g:127:12: '/' ID
                     	    {
                     	    match('/'); 
                     	    mID(); 
@@ -1181,10 +1199,10 @@ public class gUnitLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // gUnit.g:126:4: ID ( '/' ID )+
+                    // gUnit.g:128:4: ID ( '/' ID )+
                     {
                     mID(); 
-                    // gUnit.g:126:7: ( '/' ID )+
+                    // gUnit.g:128:7: ( '/' ID )+
                     int cnt16=0;
                     loop16:
                     do {
@@ -1198,7 +1216,7 @@ public class gUnitLexer extends Lexer {
 
                         switch (alt16) {
                     	case 1 :
-                    	    // gUnit.g:126:8: '/' ID
+                    	    // gUnit.g:128:8: '/' ID
                     	    {
                     	    match('/'); 
                     	    mID(); 
@@ -1231,7 +1249,7 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "XDIGIT"
     public final void mXDIGIT() throws RecognitionException {
         try {
-            // gUnit.g:148:8: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // gUnit.g:150:8: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
             // gUnit.g:
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f') ) {
@@ -1253,84 +1271,84 @@ public class gUnitLexer extends Lexer {
     // $ANTLR end "XDIGIT"
 
     public void mTokens() throws RecognitionException {
-        // gUnit.g:1:8: ( T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | ACTION | RETVAL | TREE | OPTIONS | ID | WS | SL_COMMENT | DOC_COMMENT | ML_COMMENT | STRING | ML_STRING | FILENAME )
+        // gUnit.g:1:8: ( T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | ACTION | RETVAL | TREE | OPTIONS | ID | WS | SL_COMMENT | DOC_COMMENT | ML_COMMENT | STRING | ML_STRING | FILENAME )
         int alt18=23;
         alt18 = dfa18.predict(input);
         switch (alt18) {
             case 1 :
-                // gUnit.g:1:10: T__27
-                {
-                mT__27(); 
-
-                }
-                break;
-            case 2 :
-                // gUnit.g:1:16: T__28
+                // gUnit.g:1:10: T__28
                 {
                 mT__28(); 
 
                 }
                 break;
-            case 3 :
-                // gUnit.g:1:22: T__29
+            case 2 :
+                // gUnit.g:1:16: T__29
                 {
                 mT__29(); 
 
                 }
                 break;
-            case 4 :
-                // gUnit.g:1:28: T__30
+            case 3 :
+                // gUnit.g:1:22: T__30
                 {
                 mT__30(); 
 
                 }
                 break;
-            case 5 :
-                // gUnit.g:1:34: T__31
+            case 4 :
+                // gUnit.g:1:28: T__31
                 {
                 mT__31(); 
 
                 }
                 break;
-            case 6 :
-                // gUnit.g:1:40: T__32
+            case 5 :
+                // gUnit.g:1:34: T__32
                 {
                 mT__32(); 
 
                 }
                 break;
-            case 7 :
-                // gUnit.g:1:46: T__33
+            case 6 :
+                // gUnit.g:1:40: T__33
                 {
                 mT__33(); 
 
                 }
                 break;
-            case 8 :
-                // gUnit.g:1:52: T__34
+            case 7 :
+                // gUnit.g:1:46: T__34
                 {
                 mT__34(); 
 
                 }
                 break;
-            case 9 :
-                // gUnit.g:1:58: T__35
+            case 8 :
+                // gUnit.g:1:52: T__35
                 {
                 mT__35(); 
 
                 }
                 break;
-            case 10 :
-                // gUnit.g:1:64: T__36
+            case 9 :
+                // gUnit.g:1:58: T__36
                 {
                 mT__36(); 
 
                 }
                 break;
-            case 11 :
-                // gUnit.g:1:70: T__37
+            case 10 :
+                // gUnit.g:1:64: T__37
                 {
                 mT__37(); 
+
+                }
+                break;
+            case 11 :
+                // gUnit.g:1:70: T__38
+                {
+                mT__38(); 
 
                 }
                 break;
@@ -1569,7 +1587,7 @@ public class gUnitLexer extends Lexer {
             this.transition = DFA18_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | ACTION | RETVAL | TREE | OPTIONS | ID | WS | SL_COMMENT | DOC_COMMENT | ML_COMMENT | STRING | ML_STRING | FILENAME );";
+            return "1:1: Tokens : ( T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | ACTION | RETVAL | TREE | OPTIONS | ID | WS | SL_COMMENT | DOC_COMMENT | ML_COMMENT | STRING | ML_STRING | FILENAME );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             IntStream input = _input;

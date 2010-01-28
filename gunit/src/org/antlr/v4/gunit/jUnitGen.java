@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 jUnitGen.g 2010-01-27 16:25:17
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 jUnitGen.g 2010-01-27 17:03:31
 
 package org.antlr.v4.gunit;
 
@@ -13,13 +13,13 @@ import org.antlr.stringtemplate.language.*;
 import java.util.HashMap;
 public class jUnitGen extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SUITE", "TEST_OK", "TEST_FAIL", "TEST_RETVAL", "TEST_STDOUT", "TEST_TREE", "TEST_ACTION", "DOC_COMMENT", "ID", "OPTIONS", "STRING", "ACTION", "RETVAL", "ML_STRING", "TREE", "FILENAME", "NESTED_RETVAL", "NESTED_AST", "WS", "ID_", "SL_COMMENT", "ML_COMMENT", "XDIGIT", "'gunit'", "';'", "'}'", "'='", "'@header'", "'walks'", "':'", "'OK'", "'FAIL'", "'returns'", "'->'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SUITE", "TEST_OK", "TEST_FAIL", "TEST_RETVAL", "TEST_STDOUT", "TEST_TREE", "TEST_ACTION", "DOC_COMMENT", "ID", "OPTIONS", "STRING", "ACTION", "RETVAL", "ML_STRING", "TREE", "FILENAME", "NESTED_RETVAL", "NESTED_AST", "STRING_", "WS", "ID_", "SL_COMMENT", "ML_COMMENT", "XDIGIT", "'gunit'", "';'", "'}'", "'='", "'@header'", "'walks'", "':'", "'OK'", "'FAIL'", "'returns'", "'->'"
     };
     public static final int T__29=29;
     public static final int T__28=28;
     public static final int RETVAL=16;
     public static final int TEST_TREE=9;
-    public static final int T__27=27;
+    public static final int STRING_=22;
     public static final int NESTED_AST=21;
     public static final int ML_STRING=17;
     public static final int TEST_FAIL=6;
@@ -30,21 +30,22 @@ public class jUnitGen extends TreeParser {
     public static final int TEST_STDOUT=8;
     public static final int ACTION=15;
     public static final int TEST_OK=5;
-    public static final int ML_COMMENT=25;
+    public static final int ML_COMMENT=26;
     public static final int T__30=30;
     public static final int T__31=31;
     public static final int T__32=32;
     public static final int T__33=33;
-    public static final int WS=22;
+    public static final int WS=23;
     public static final int T__34=34;
     public static final int T__35=35;
     public static final int T__36=36;
     public static final int TREE=18;
     public static final int T__37=37;
+    public static final int T__38=38;
     public static final int FILENAME=19;
-    public static final int ID_=23;
-    public static final int XDIGIT=26;
-    public static final int SL_COMMENT=24;
+    public static final int ID_=24;
+    public static final int XDIGIT=27;
+    public static final int SL_COMMENT=25;
     public static final int DOC_COMMENT=11;
     public static final int TEST_ACTION=10;
     public static final int SUITE=4;
@@ -97,19 +98,21 @@ public class jUnitGen extends TreeParser {
     };
 
     // $ANTLR start "gUnitDef"
-    // jUnitGen.g:13:1: gUnitDef : ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* (suites+= testsuite )+ ) -> jUnitClass(className=$ID.textsuites=$suites);
+    // jUnitGen.g:13:1: gUnitDef : ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* (suites+= testsuite )+ ) -> jUnitClass(className=$ID.textheader=$header.stsuites=$suites);
     public final jUnitGen.gUnitDef_return gUnitDef() throws RecognitionException {
         jUnitGen.gUnitDef_return retval = new jUnitGen.gUnitDef_return();
         retval.start = input.LT(1);
 
         CommonTree ID1=null;
         List list_suites=null;
+        jUnitGen.header_return header2 = null;
+
         RuleReturnScope suites = null;
         try {
-            // jUnitGen.g:14:2: ( ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* (suites+= testsuite )+ ) -> jUnitClass(className=$ID.textsuites=$suites))
+            // jUnitGen.g:14:2: ( ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* (suites+= testsuite )+ ) -> jUnitClass(className=$ID.textheader=$header.stsuites=$suites))
             // jUnitGen.g:14:4: ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* (suites+= testsuite )+ )
             {
-            match(input,27,FOLLOW_27_in_gUnitDef45); 
+            match(input,28,FOLLOW_28_in_gUnitDef45); 
 
             match(input, Token.DOWN, null); 
             ID1=(CommonTree)match(input,ID,FOLLOW_ID_in_gUnitDef47); 
@@ -140,7 +143,7 @@ public class jUnitGen extends TreeParser {
                 if ( (LA2_0==OPTIONS) ) {
                     alt2=1;
                 }
-                else if ( (LA2_0==31) ) {
+                else if ( (LA2_0==32) ) {
                     alt2=2;
                 }
 
@@ -161,7 +164,7 @@ public class jUnitGen extends TreeParser {
             	    // jUnitGen.g:14:43: header
             	    {
             	    pushFollow(FOLLOW_header_in_gUnitDef55);
-            	    header();
+            	    header2=header();
 
             	    state._fsp--;
 
@@ -216,10 +219,10 @@ public class jUnitGen extends TreeParser {
 
 
             // TEMPLATE REWRITE
-            // 15:3: -> jUnitClass(className=$ID.textsuites=$suites)
+            // 15:3: -> jUnitClass(className=$ID.textheader=$header.stsuites=$suites)
             {
                 retval.st = templateLib.getInstanceOf("jUnitClass",
-              new STAttrMap().put("className", (ID1!=null?ID1.getText():null)).put("suites", list_suites));
+              new STAttrMap().put("className", (ID1!=null?ID1.getText():null)).put("header", (header2!=null?header2.st:null)).put("suites", list_suites));
             }
 
 
@@ -252,7 +255,7 @@ public class jUnitGen extends TreeParser {
             // jUnitGen.g:19:2: ( ^( OPTIONS ( option )+ ) )
             // jUnitGen.g:19:4: ^( OPTIONS ( option )+ )
             {
-            match(input,OPTIONS,FOLLOW_OPTIONS_in_optionsSpec91); 
+            match(input,OPTIONS,FOLLOW_OPTIONS_in_optionsSpec96); 
 
             match(input, Token.DOWN, null); 
             // jUnitGen.g:19:14: ( option )+
@@ -262,7 +265,7 @@ public class jUnitGen extends TreeParser {
                 int alt4=2;
                 int LA4_0 = input.LA(1);
 
-                if ( (LA4_0==30) ) {
+                if ( (LA4_0==31) ) {
                     alt4=1;
                 }
 
@@ -271,7 +274,7 @@ public class jUnitGen extends TreeParser {
             	case 1 :
             	    // jUnitGen.g:19:14: option
             	    {
-            	    pushFollow(FOLLOW_option_in_optionsSpec93);
+            	    pushFollow(FOLLOW_option_in_optionsSpec98);
             	    option();
 
             	    state._fsp--;
@@ -322,7 +325,7 @@ public class jUnitGen extends TreeParser {
             int alt5=2;
             int LA5_0 = input.LA(1);
 
-            if ( (LA5_0==30) ) {
+            if ( (LA5_0==31) ) {
                 int LA5_1 = input.LA(2);
 
                 if ( (LA5_1==DOWN) ) {
@@ -368,11 +371,11 @@ public class jUnitGen extends TreeParser {
                 case 1 :
                     // jUnitGen.g:23:9: ^( '=' ID ID )
                     {
-                    match(input,30,FOLLOW_30_in_option112); 
+                    match(input,31,FOLLOW_31_in_option117); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_option114); 
-                    match(input,ID,FOLLOW_ID_in_option116); 
+                    match(input,ID,FOLLOW_ID_in_option119); 
+                    match(input,ID,FOLLOW_ID_in_option121); 
 
                     match(input, Token.UP, null); 
 
@@ -381,11 +384,11 @@ public class jUnitGen extends TreeParser {
                 case 2 :
                     // jUnitGen.g:24:9: ^( '=' ID STRING )
                     {
-                    match(input,30,FOLLOW_30_in_option128); 
+                    match(input,31,FOLLOW_31_in_option133); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_option130); 
-                    match(input,STRING,FOLLOW_STRING_in_option132); 
+                    match(input,ID,FOLLOW_ID_in_option135); 
+                    match(input,STRING,FOLLOW_STRING_in_option137); 
 
                     match(input, Token.UP, null); 
 
@@ -411,21 +414,32 @@ public class jUnitGen extends TreeParser {
     };
 
     // $ANTLR start "header"
-    // jUnitGen.g:27:1: header : ^( '@header' ACTION ) ;
+    // jUnitGen.g:27:1: header : ^( '@header' ACTION ) -> header(action=$ACTION.text);
     public final jUnitGen.header_return header() throws RecognitionException {
         jUnitGen.header_return retval = new jUnitGen.header_return();
         retval.start = input.LT(1);
 
+        CommonTree ACTION3=null;
+
         try {
-            // jUnitGen.g:27:8: ( ^( '@header' ACTION ) )
+            // jUnitGen.g:27:8: ( ^( '@header' ACTION ) -> header(action=$ACTION.text))
             // jUnitGen.g:27:10: ^( '@header' ACTION )
             {
-            match(input,31,FOLLOW_31_in_header149); 
+            match(input,32,FOLLOW_32_in_header154); 
 
             match(input, Token.DOWN, null); 
-            match(input,ACTION,FOLLOW_ACTION_in_header151); 
+            ACTION3=(CommonTree)match(input,ACTION,FOLLOW_ACTION_in_header156); 
 
             match(input, Token.UP, null); 
+
+
+            // TEMPLATE REWRITE
+            // 27:30: -> header(action=$ACTION.text)
+            {
+                retval.st = templateLib.getInstanceOf("header",
+              new STAttrMap().put("action", (ACTION3!=null?ACTION3.getText():null)));
+            }
+
 
             }
 
@@ -506,11 +520,11 @@ public class jUnitGen extends TreeParser {
                 case 1 :
                     // jUnitGen.g:30:4: ^( SUITE rule= ID ID ( DOC_COMMENT )? (cases+= testcase[$rule.text] )+ )
                     {
-                    match(input,SUITE,FOLLOW_SUITE_in_testsuite163); 
+                    match(input,SUITE,FOLLOW_SUITE_in_testsuite176); 
 
                     match(input, Token.DOWN, null); 
-                    rule=(CommonTree)match(input,ID,FOLLOW_ID_in_testsuite167); 
-                    match(input,ID,FOLLOW_ID_in_testsuite169); 
+                    rule=(CommonTree)match(input,ID,FOLLOW_ID_in_testsuite180); 
+                    match(input,ID,FOLLOW_ID_in_testsuite182); 
                     // jUnitGen.g:30:23: ( DOC_COMMENT )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
@@ -522,7 +536,7 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:30:23: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testsuite171); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testsuite184); 
 
                             }
                             break;
@@ -545,7 +559,7 @@ public class jUnitGen extends TreeParser {
                     	case 1 :
                     	    // jUnitGen.g:30:41: cases+= testcase[$rule.text]
                     	    {
-                    	    pushFollow(FOLLOW_testcase_in_testsuite176);
+                    	    pushFollow(FOLLOW_testcase_in_testsuite189);
                     	    cases=testcase((rule!=null?rule.getText():null));
 
                     	    state._fsp--;
@@ -574,10 +588,10 @@ public class jUnitGen extends TreeParser {
                 case 2 :
                     // jUnitGen.g:31:4: ^( SUITE rule= ID ( DOC_COMMENT )? (cases+= testcase[$rule.text] )+ )
                     {
-                    match(input,SUITE,FOLLOW_SUITE_in_testsuite185); 
+                    match(input,SUITE,FOLLOW_SUITE_in_testsuite198); 
 
                     match(input, Token.DOWN, null); 
-                    rule=(CommonTree)match(input,ID,FOLLOW_ID_in_testsuite189); 
+                    rule=(CommonTree)match(input,ID,FOLLOW_ID_in_testsuite202); 
                     // jUnitGen.g:31:23: ( DOC_COMMENT )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
@@ -589,7 +603,7 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:31:23: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testsuite194); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testsuite207); 
 
                             }
                             break;
@@ -612,7 +626,7 @@ public class jUnitGen extends TreeParser {
                     	case 1 :
                     	    // jUnitGen.g:31:41: cases+= testcase[$rule.text]
                     	    {
-                    	    pushFollow(FOLLOW_testcase_in_testsuite199);
+                    	    pushFollow(FOLLOW_testcase_in_testsuite212);
                     	    cases=testcase((rule!=null?rule.getText():null));
 
                     	    state._fsp--;
@@ -667,24 +681,24 @@ public class jUnitGen extends TreeParser {
     };
 
     // $ANTLR start "testcase"
-    // jUnitGen.g:35:1: testcase[String ruleName] : ( ^( TEST_OK ( DOC_COMMENT )? input ) | ^( TEST_FAIL ( DOC_COMMENT )? input ) | ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL ) | ^( TEST_STDOUT ( DOC_COMMENT )? input STRING ) | ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING ) | ^( TEST_TREE ( DOC_COMMENT )? input TREE ) -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=$TREE.textscriptLine=$input.start.getLine()) | ^( TEST_ACTION ( DOC_COMMENT )? input ACTION ) );
+    // jUnitGen.g:35:1: testcase[String ruleName] : ( ^( TEST_OK ( DOC_COMMENT )? input ) | ^( TEST_FAIL ( DOC_COMMENT )? input ) | ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL ) | ^( TEST_STDOUT ( DOC_COMMENT )? input STRING ) | ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING ) | ^( TEST_TREE ( DOC_COMMENT )? input TREE ) -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=Gen.normalizeTreeSpec($TREE.text)scriptLine=$input.start.getLine()) | ^( TEST_ACTION ( DOC_COMMENT )? input ACTION ) );
     public final jUnitGen.testcase_return testcase(String ruleName) throws RecognitionException {
         jUnitGen.testcase_return retval = new jUnitGen.testcase_return();
         retval.start = input.LT(1);
 
-        CommonTree TREE3=null;
-        jUnitGen.input_return input2 = null;
+        CommonTree TREE5=null;
+        jUnitGen.input_return input4 = null;
 
 
         try {
-            // jUnitGen.g:36:2: ( ^( TEST_OK ( DOC_COMMENT )? input ) | ^( TEST_FAIL ( DOC_COMMENT )? input ) | ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL ) | ^( TEST_STDOUT ( DOC_COMMENT )? input STRING ) | ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING ) | ^( TEST_TREE ( DOC_COMMENT )? input TREE ) -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=$TREE.textscriptLine=$input.start.getLine()) | ^( TEST_ACTION ( DOC_COMMENT )? input ACTION ) )
+            // jUnitGen.g:36:2: ( ^( TEST_OK ( DOC_COMMENT )? input ) | ^( TEST_FAIL ( DOC_COMMENT )? input ) | ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL ) | ^( TEST_STDOUT ( DOC_COMMENT )? input STRING ) | ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING ) | ^( TEST_TREE ( DOC_COMMENT )? input TREE ) -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=Gen.normalizeTreeSpec($TREE.text)scriptLine=$input.start.getLine()) | ^( TEST_ACTION ( DOC_COMMENT )? input ACTION ) )
             int alt18=7;
             alt18 = dfa18.predict(input);
             switch (alt18) {
                 case 1 :
                     // jUnitGen.g:36:4: ^( TEST_OK ( DOC_COMMENT )? input )
                     {
-                    match(input,TEST_OK,FOLLOW_TEST_OK_in_testcase231); 
+                    match(input,TEST_OK,FOLLOW_TEST_OK_in_testcase244); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:36:14: ( DOC_COMMENT )?
@@ -698,14 +712,14 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:36:14: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase233); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase246); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase236);
+                    pushFollow(FOLLOW_input_in_testcase249);
                     input();
 
                     state._fsp--;
@@ -718,7 +732,7 @@ public class jUnitGen extends TreeParser {
                 case 2 :
                     // jUnitGen.g:37:4: ^( TEST_FAIL ( DOC_COMMENT )? input )
                     {
-                    match(input,TEST_FAIL,FOLLOW_TEST_FAIL_in_testcase243); 
+                    match(input,TEST_FAIL,FOLLOW_TEST_FAIL_in_testcase256); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:37:16: ( DOC_COMMENT )?
@@ -732,14 +746,14 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:37:16: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase245); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase258); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase248);
+                    pushFollow(FOLLOW_input_in_testcase261);
                     input();
 
                     state._fsp--;
@@ -752,7 +766,7 @@ public class jUnitGen extends TreeParser {
                 case 3 :
                     // jUnitGen.g:38:4: ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL )
                     {
-                    match(input,TEST_RETVAL,FOLLOW_TEST_RETVAL_in_testcase255); 
+                    match(input,TEST_RETVAL,FOLLOW_TEST_RETVAL_in_testcase268); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:38:18: ( DOC_COMMENT )?
@@ -766,19 +780,19 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:38:18: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase257); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase270); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase260);
+                    pushFollow(FOLLOW_input_in_testcase273);
                     input();
 
                     state._fsp--;
 
-                    match(input,RETVAL,FOLLOW_RETVAL_in_testcase262); 
+                    match(input,RETVAL,FOLLOW_RETVAL_in_testcase275); 
 
                     match(input, Token.UP, null); 
 
@@ -787,7 +801,7 @@ public class jUnitGen extends TreeParser {
                 case 4 :
                     // jUnitGen.g:39:4: ^( TEST_STDOUT ( DOC_COMMENT )? input STRING )
                     {
-                    match(input,TEST_STDOUT,FOLLOW_TEST_STDOUT_in_testcase269); 
+                    match(input,TEST_STDOUT,FOLLOW_TEST_STDOUT_in_testcase282); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:39:18: ( DOC_COMMENT )?
@@ -801,19 +815,19 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:39:18: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase271); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase284); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase274);
+                    pushFollow(FOLLOW_input_in_testcase287);
                     input();
 
                     state._fsp--;
 
-                    match(input,STRING,FOLLOW_STRING_in_testcase276); 
+                    match(input,STRING,FOLLOW_STRING_in_testcase289); 
 
                     match(input, Token.UP, null); 
 
@@ -822,7 +836,7 @@ public class jUnitGen extends TreeParser {
                 case 5 :
                     // jUnitGen.g:40:4: ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING )
                     {
-                    match(input,TEST_STDOUT,FOLLOW_TEST_STDOUT_in_testcase283); 
+                    match(input,TEST_STDOUT,FOLLOW_TEST_STDOUT_in_testcase296); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:40:18: ( DOC_COMMENT )?
@@ -836,19 +850,19 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:40:18: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase285); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase298); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase288);
+                    pushFollow(FOLLOW_input_in_testcase301);
                     input();
 
                     state._fsp--;
 
-                    match(input,ML_STRING,FOLLOW_ML_STRING_in_testcase290); 
+                    match(input,ML_STRING,FOLLOW_ML_STRING_in_testcase303); 
 
                     match(input, Token.UP, null); 
 
@@ -857,7 +871,7 @@ public class jUnitGen extends TreeParser {
                 case 6 :
                     // jUnitGen.g:41:4: ^( TEST_TREE ( DOC_COMMENT )? input TREE )
                     {
-                    match(input,TEST_TREE,FOLLOW_TEST_TREE_in_testcase297); 
+                    match(input,TEST_TREE,FOLLOW_TEST_TREE_in_testcase310); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:41:16: ( DOC_COMMENT )?
@@ -871,28 +885,28 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:41:16: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase299); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase312); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase302);
-                    input2=input();
+                    pushFollow(FOLLOW_input_in_testcase315);
+                    input4=input();
 
                     state._fsp--;
 
-                    TREE3=(CommonTree)match(input,TREE,FOLLOW_TREE_in_testcase304); 
+                    TREE5=(CommonTree)match(input,TREE,FOLLOW_TREE_in_testcase317); 
 
                     match(input, Token.UP, null); 
 
 
                     // TEMPLATE REWRITE
-                    // 42:4: -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=$TREE.textscriptLine=$input.start.getLine())
+                    // 42:4: -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=Gen.normalizeTreeSpec($TREE.text)scriptLine=$input.start.getLine())
                     {
                         retval.st = templateLib.getInstanceOf("parserRuleTestAST",
-                      new STAttrMap().put("ruleName", ruleName).put("input", (input2!=null?input2.st:null)).put("expecting", (TREE3!=null?TREE3.getText():null)).put("scriptLine", (input2!=null?((CommonTree)input2.start):null).getLine()));
+                      new STAttrMap().put("ruleName", ruleName).put("input", (input4!=null?input4.st:null)).put("expecting", Gen.normalizeTreeSpec((TREE5!=null?TREE5.getText():null))).put("scriptLine", (input4!=null?((CommonTree)input4.start):null).getLine()));
                     }
 
 
@@ -901,7 +915,7 @@ public class jUnitGen extends TreeParser {
                 case 7 :
                     // jUnitGen.g:46:4: ^( TEST_ACTION ( DOC_COMMENT )? input ACTION )
                     {
-                    match(input,TEST_ACTION,FOLLOW_TEST_ACTION_in_testcase374); 
+                    match(input,TEST_ACTION,FOLLOW_TEST_ACTION_in_testcase387); 
 
                     match(input, Token.DOWN, null); 
                     // jUnitGen.g:46:18: ( DOC_COMMENT )?
@@ -915,19 +929,19 @@ public class jUnitGen extends TreeParser {
                         case 1 :
                             // jUnitGen.g:46:18: DOC_COMMENT
                             {
-                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase376); 
+                            match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_testcase389); 
 
                             }
                             break;
 
                     }
 
-                    pushFollow(FOLLOW_input_in_testcase379);
+                    pushFollow(FOLLOW_input_in_testcase392);
                     input();
 
                     state._fsp--;
 
-                    match(input,ACTION,FOLLOW_ACTION_in_testcase381); 
+                    match(input,ACTION,FOLLOW_ACTION_in_testcase394); 
 
                     match(input, Token.UP, null); 
 
@@ -953,16 +967,16 @@ public class jUnitGen extends TreeParser {
     };
 
     // $ANTLR start "input"
-    // jUnitGen.g:49:1: input : ( STRING -> {%{Gen.escapeForJava($STRING.text)}} | ML_STRING -> {%{Gen.escapeForJava($ML_STRING.text)}} | FILENAME );
+    // jUnitGen.g:49:1: input : ( STRING -> string(s=Gen.escapeForJava($STRING.text)) | ML_STRING -> string(s=Gen.escapeForJava($ML_STRING.text)) | FILENAME );
     public final jUnitGen.input_return input() throws RecognitionException {
         jUnitGen.input_return retval = new jUnitGen.input_return();
         retval.start = input.LT(1);
 
-        CommonTree STRING4=null;
-        CommonTree ML_STRING5=null;
+        CommonTree STRING6=null;
+        CommonTree ML_STRING7=null;
 
         try {
-            // jUnitGen.g:50:2: ( STRING -> {%{Gen.escapeForJava($STRING.text)}} | ML_STRING -> {%{Gen.escapeForJava($ML_STRING.text)}} | FILENAME )
+            // jUnitGen.g:50:2: ( STRING -> string(s=Gen.escapeForJava($STRING.text)) | ML_STRING -> string(s=Gen.escapeForJava($ML_STRING.text)) | FILENAME )
             int alt19=3;
             switch ( input.LA(1) ) {
             case STRING:
@@ -991,13 +1005,14 @@ public class jUnitGen extends TreeParser {
                 case 1 :
                     // jUnitGen.g:50:4: STRING
                     {
-                    STRING4=(CommonTree)match(input,STRING,FOLLOW_STRING_in_input393); 
+                    STRING6=(CommonTree)match(input,STRING,FOLLOW_STRING_in_input406); 
 
 
                     // TEMPLATE REWRITE
-                    // 50:12: -> {%{Gen.escapeForJava($STRING.text)}}
+                    // 50:12: -> string(s=Gen.escapeForJava($STRING.text))
                     {
-                        retval.st = new StringTemplate(templateLib,Gen.escapeForJava((STRING4!=null?STRING4.getText():null)));
+                        retval.st = templateLib.getInstanceOf("string",
+                      new STAttrMap().put("s", Gen.escapeForJava((STRING6!=null?STRING6.getText():null))));
                     }
 
 
@@ -1006,13 +1021,14 @@ public class jUnitGen extends TreeParser {
                 case 2 :
                     // jUnitGen.g:51:4: ML_STRING
                     {
-                    ML_STRING5=(CommonTree)match(input,ML_STRING,FOLLOW_ML_STRING_in_input403); 
+                    ML_STRING7=(CommonTree)match(input,ML_STRING,FOLLOW_ML_STRING_in_input421); 
 
 
                     // TEMPLATE REWRITE
-                    // 51:14: -> {%{Gen.escapeForJava($ML_STRING.text)}}
+                    // 51:14: -> string(s=Gen.escapeForJava($ML_STRING.text))
                     {
-                        retval.st = new StringTemplate(templateLib,Gen.escapeForJava((ML_STRING5!=null?ML_STRING5.getText():null)));
+                        retval.st = templateLib.getInstanceOf("string",
+                      new STAttrMap().put("s", Gen.escapeForJava((ML_STRING7!=null?ML_STRING7.getText():null))));
                     }
 
 
@@ -1021,7 +1037,7 @@ public class jUnitGen extends TreeParser {
                 case 3 :
                     // jUnitGen.g:52:4: FILENAME
                     {
-                    match(input,FILENAME,FOLLOW_FILENAME_in_input412); 
+                    match(input,FILENAME,FOLLOW_FILENAME_in_input435); 
 
                     }
                     break;
@@ -1101,64 +1117,64 @@ public class jUnitGen extends TreeParser {
             this.transition = DFA18_transition;
         }
         public String getDescription() {
-            return "35:1: testcase[String ruleName] : ( ^( TEST_OK ( DOC_COMMENT )? input ) | ^( TEST_FAIL ( DOC_COMMENT )? input ) | ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL ) | ^( TEST_STDOUT ( DOC_COMMENT )? input STRING ) | ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING ) | ^( TEST_TREE ( DOC_COMMENT )? input TREE ) -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=$TREE.textscriptLine=$input.start.getLine()) | ^( TEST_ACTION ( DOC_COMMENT )? input ACTION ) );";
+            return "35:1: testcase[String ruleName] : ( ^( TEST_OK ( DOC_COMMENT )? input ) | ^( TEST_FAIL ( DOC_COMMENT )? input ) | ^( TEST_RETVAL ( DOC_COMMENT )? input RETVAL ) | ^( TEST_STDOUT ( DOC_COMMENT )? input STRING ) | ^( TEST_STDOUT ( DOC_COMMENT )? input ML_STRING ) | ^( TEST_TREE ( DOC_COMMENT )? input TREE ) -> parserRuleTestAST(ruleName=$ruleNameinput=$input.stexpecting=Gen.normalizeTreeSpec($TREE.text)scriptLine=$input.start.getLine()) | ^( TEST_ACTION ( DOC_COMMENT )? input ACTION ) );";
         }
     }
  
 
-    public static final BitSet FOLLOW_27_in_gUnitDef45 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_gUnitDef47 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_gUnitDef49 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_optionsSpec_in_gUnitDef53 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_header_in_gUnitDef55 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_testsuite_in_gUnitDef61 = new BitSet(new long[]{0x0000000080002818L});
-    public static final BitSet FOLLOW_OPTIONS_in_optionsSpec91 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_option_in_optionsSpec93 = new BitSet(new long[]{0x0000000040000008L});
-    public static final BitSet FOLLOW_30_in_option112 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option114 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_option116 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_30_in_option128 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option130 = new BitSet(new long[]{0x0000000000004000L});
-    public static final BitSet FOLLOW_STRING_in_option132 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_31_in_header149 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ACTION_in_header151 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SUITE_in_testsuite163 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_testsuite167 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_testsuite169 = new BitSet(new long[]{0x0000000000000FE0L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testsuite171 = new BitSet(new long[]{0x0000000000000FE0L});
-    public static final BitSet FOLLOW_testcase_in_testsuite176 = new BitSet(new long[]{0x0000000000000FE8L});
-    public static final BitSet FOLLOW_SUITE_in_testsuite185 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_testsuite189 = new BitSet(new long[]{0x0000000000000FE0L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testsuite194 = new BitSet(new long[]{0x0000000000000FE0L});
-    public static final BitSet FOLLOW_testcase_in_testsuite199 = new BitSet(new long[]{0x0000000000000FE8L});
-    public static final BitSet FOLLOW_TEST_OK_in_testcase231 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase233 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase236 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEST_FAIL_in_testcase243 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase245 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase248 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEST_RETVAL_in_testcase255 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase257 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase260 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_RETVAL_in_testcase262 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEST_STDOUT_in_testcase269 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase271 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase274 = new BitSet(new long[]{0x0000000000004000L});
-    public static final BitSet FOLLOW_STRING_in_testcase276 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEST_STDOUT_in_testcase283 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase285 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase288 = new BitSet(new long[]{0x0000000000020000L});
-    public static final BitSet FOLLOW_ML_STRING_in_testcase290 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEST_TREE_in_testcase297 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase299 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase302 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_TREE_in_testcase304 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEST_ACTION_in_testcase374 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase376 = new BitSet(new long[]{0x00000000000A4000L});
-    public static final BitSet FOLLOW_input_in_testcase379 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_ACTION_in_testcase381 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_in_input393 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ML_STRING_in_input403 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FILENAME_in_input412 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_28_in_gUnitDef45 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_gUnitDef47 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_gUnitDef49 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_optionsSpec_in_gUnitDef53 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_header_in_gUnitDef55 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_testsuite_in_gUnitDef61 = new BitSet(new long[]{0x0000000100002818L});
+    public static final BitSet FOLLOW_OPTIONS_in_optionsSpec96 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_option_in_optionsSpec98 = new BitSet(new long[]{0x0000000080000008L});
+    public static final BitSet FOLLOW_31_in_option117 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_option119 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_option121 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_31_in_option133 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_option135 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_STRING_in_option137 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_32_in_header154 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ACTION_in_header156 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SUITE_in_testsuite176 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_testsuite180 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_testsuite182 = new BitSet(new long[]{0x0000000000000FE0L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testsuite184 = new BitSet(new long[]{0x0000000000000FE0L});
+    public static final BitSet FOLLOW_testcase_in_testsuite189 = new BitSet(new long[]{0x0000000000000FE8L});
+    public static final BitSet FOLLOW_SUITE_in_testsuite198 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_testsuite202 = new BitSet(new long[]{0x0000000000000FE0L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testsuite207 = new BitSet(new long[]{0x0000000000000FE0L});
+    public static final BitSet FOLLOW_testcase_in_testsuite212 = new BitSet(new long[]{0x0000000000000FE8L});
+    public static final BitSet FOLLOW_TEST_OK_in_testcase244 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase246 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase249 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEST_FAIL_in_testcase256 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase258 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase261 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEST_RETVAL_in_testcase268 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase270 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase273 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_RETVAL_in_testcase275 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEST_STDOUT_in_testcase282 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase284 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase287 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_STRING_in_testcase289 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEST_STDOUT_in_testcase296 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase298 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase301 = new BitSet(new long[]{0x0000000000020000L});
+    public static final BitSet FOLLOW_ML_STRING_in_testcase303 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEST_TREE_in_testcase310 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase312 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase315 = new BitSet(new long[]{0x0000000000040000L});
+    public static final BitSet FOLLOW_TREE_in_testcase317 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEST_ACTION_in_testcase387 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_testcase389 = new BitSet(new long[]{0x00000000000A4000L});
+    public static final BitSet FOLLOW_input_in_testcase392 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_ACTION_in_testcase394 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_in_input406 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ML_STRING_in_input421 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FILENAME_in_input435 = new BitSet(new long[]{0x0000000000000002L});
 
 }

@@ -21,7 +21,7 @@ public class jUnitBaseTest {
         Class lexerClass = Class.forName(lexerClassName);
         Class[] lexArgTypes = new Class[]{CharStream.class};
         Constructor lexConstructor = lexerClass.getConstructor(lexArgTypes);
-        Object[] lexArgs = new Object[]{input};
+        Object[] lexArgs = new Object[]{is};
         Lexer lexer = (Lexer)lexConstructor.newInstance(lexArgs);
         is.setLine(scriptLine);
 

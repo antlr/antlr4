@@ -9,6 +9,8 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Gen {
     public static final String TEMPLATE_FILE =
@@ -79,7 +81,70 @@ public class Gen {
         return inputString;
     }
 
+    public static String normalizeTreeSpec(String t) {
+        List<String> words = new ArrayList<String>();
+        int i = 0;
+        StringBuilder word = new StringBuilder();
+        while ( i<t.length() ) {
+            if ( t.charAt(i)=='(' || t.charAt(i)==')' ) {
+                if ( word.length()>0 ) {
+                    words.add(word.toString());
+                    word.setLength(0);
+                }
+                words.add(String.valueOf(t.charAt(i)));
+                i++;
+                continue;
+            }
+            if ( Character.isWhitespace(t.charAt(i)) ) {
+                // upon WS, save word
+                if ( word.length()>0 ) {
+                    words.add(word.toString());
+                    word.setLength(0);
+                }
+                i++;
+                continue;
+            }
+
+            // ... "x" or ...("x"
+            if ( t.charAt(i)=='"' && (i-1)>=0 &&
+                 (t.charAt(i-1)=='(' || Character.isWhitespace(t.charAt(i-1))) )
+            {
+                i++;
+                while ( i<t.length() && t.charAt(i)!='"' ) {
+                    if ( t.charAt(i)=='\\' &&
+                         (i+1)<t.length() && t.charAt(i+1)=='"' ) // handle \"
+                    {
+                        word.append('"');
+                        i+=2;
+                        continue;
+                    }
+                    word.append(t.charAt(i));
+                    i++;
+                }
+                i++; // skip final "
+                words.add(word.toString());
+                word.setLength(0);
+                continue;
+            }
+            word.append(t.charAt(i));
+            i++;
+        }
+        if ( word.length()>0 ) {
+            words.add(word.toString());
+        }
+        //System.out.println("words="+words);
+        StringBuilder buf = new StringBuilder();
+        for (int j=0; j<words.size(); j++) {
+            if ( j>0 && !words.get(j).equals(")") &&
+                 !words.get(j-1).equals("(") ) {
+                buf.append(' ');
+            }
+            buf.append(words.get(j));
+        }
+        return buf.toString();
+    }
+
     public static void help() {
-        System.err.println("org.antlr.v4.gunit.Gen [-o output-file] gunit-file");
+        System.err.println("org.antlr.v4.gunit.Gen [-o output-dir] gunit-file");
     }
 }

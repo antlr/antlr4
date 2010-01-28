@@ -12,7 +12,7 @@ package org.antlr.v4.gunit;
 
 gUnitDef
 	:	^('gunit' ID DOC_COMMENT? (optionsSpec|header)* suites+=testsuite+)
-		-> jUnitClass(className={$ID.text}, suites={$suites})
+		-> jUnitClass(className={$ID.text}, header={$header.st}, suites={$suites})
 	;
 
 optionsSpec
@@ -24,7 +24,7 @@ option
     |   ^('=' ID STRING)
     ;
  	
-header : ^('@header' ACTION) ;
+header : ^('@header' ACTION) -> header(action={$ACTION.text});
 
 testsuite
 	:	^(SUITE rule=ID ID DOC_COMMENT? cases+=testcase[$rule.text]+)
@@ -41,13 +41,13 @@ testcase[String ruleName]
 	|	^(TEST_TREE DOC_COMMENT? input TREE)
 			-> parserRuleTestAST(ruleName={$ruleName},
 							     input={$input.st},
-							     expecting={$TREE.text},
+							     expecting={Gen.normalizeTreeSpec($TREE.text)},
 							     scriptLine={$input.start.getLine()})
 	|	^(TEST_ACTION DOC_COMMENT? input ACTION)
 	;
 
 input
-	:	STRING		-> {%{Gen.escapeForJava($STRING.text)}}
-	|	ML_STRING	-> {%{Gen.escapeForJava($ML_STRING.text)}}
+	:	STRING		-> string(s={Gen.escapeForJava($STRING.text)})
+	|	ML_STRING	-> string(s={Gen.escapeForJava($ML_STRING.text)})
 	|	FILENAME
 	;

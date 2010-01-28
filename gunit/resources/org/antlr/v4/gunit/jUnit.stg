@@ -1,7 +1,7 @@
 group jUnit;
 
-jUnitClass(className, suites, options) ::= <<
-package org.antlr.v4.test;
+jUnitClass(className, header, options, suites) ::= <<
+<header>
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
@@ -21,6 +21,8 @@ public class <className> extends org.antlr.v4.gunit.jUnitBaseTest {
 }
 >>
 
+header(action) ::= "<action>"
+
 testSuite(name,cases) ::= <<
 <cases:{c | <c>}; separator="\n\n"> <! use {...} iterator to get <i> !>
 >>
@@ -31,9 +33,11 @@ parserRuleTestSuccess(input,expecting) ::= <<
 parserRuleTestAST(ruleName,scriptLine,input,expecting) ::= <<
 @Test public void test_<name><i>() throws Exception {
 	// gunit test on line <scriptLine>
-	Object retval = execParser("<ruleName>", "<input>", <scriptLine>);
-	Object actual = retval.toString();
+	RuleReturnScope rstruct = (RuleReturnScope)execParser("<ruleName>", "<input>", <scriptLine>);
+	Object actual = ((Tree)rstruct.getTree()).toStringTree();
 	Object expecting = "<expecting>";
 	assertEquals("testing rule <ruleName>", expecting, actual);
 }
 >>
+
+string(s) ::= "<s>"

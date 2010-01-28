@@ -56,7 +56,7 @@ input
 	;
 
 ACTION
-	:	'{' ('\\}'|'\\' ~'}'|~('\\'|'}'))* '}'
+	:	'{' ('\\}'|'\\' ~'}'|~('\\'|'}'))* '}' {setText(getText().substring(1, getText().length()-1));}
     ;
 
 RETVAL
@@ -79,7 +79,7 @@ fragment
 NESTED_AST
 	:	'('
 		(	NESTED_AST
-		|   STRING
+		|   STRING_
 		|	~('('|')'|'"')
 		)*
 		')'
@@ -112,9 +112,11 @@ ML_COMMENT
 	:	'/*' ~'*' (options {greedy=false;}:.)* '*/' {$channel=HIDDEN;}
 	;
 
-STRING
-	:	'"' ('\\"'|'\\' ~'"'|~('\\'|'"'))+ '"'
-		{setText(getText().substring(1, getText().length()-1));}
+STRING : STRING_ {setText(getText().substring(1, getText().length()-1));} ;
+
+fragment
+STRING_
+	:	'"' ('\\"'|'\\' ~'"'|~('\\'|'"'))+ '"'		
 	;
 
 ML_STRING

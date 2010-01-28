@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-01-27 16:25:17
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-01-27 17:03:31
 
 package org.antlr.v4.gunit;
 
@@ -10,13 +10,13 @@ import java.util.ArrayList;
 
 public class ASTVerifier extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SUITE", "TEST_OK", "TEST_FAIL", "TEST_RETVAL", "TEST_STDOUT", "TEST_TREE", "TEST_ACTION", "DOC_COMMENT", "ID", "OPTIONS", "STRING", "ACTION", "RETVAL", "ML_STRING", "TREE", "FILENAME", "NESTED_RETVAL", "NESTED_AST", "WS", "ID_", "SL_COMMENT", "ML_COMMENT", "XDIGIT", "'gunit'", "';'", "'}'", "'='", "'@header'", "'walks'", "':'", "'OK'", "'FAIL'", "'returns'", "'->'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SUITE", "TEST_OK", "TEST_FAIL", "TEST_RETVAL", "TEST_STDOUT", "TEST_TREE", "TEST_ACTION", "DOC_COMMENT", "ID", "OPTIONS", "STRING", "ACTION", "RETVAL", "ML_STRING", "TREE", "FILENAME", "NESTED_RETVAL", "NESTED_AST", "STRING_", "WS", "ID_", "SL_COMMENT", "ML_COMMENT", "XDIGIT", "'gunit'", "';'", "'}'", "'='", "'@header'", "'walks'", "':'", "'OK'", "'FAIL'", "'returns'", "'->'"
     };
     public static final int T__29=29;
     public static final int T__28=28;
     public static final int RETVAL=16;
     public static final int TEST_TREE=9;
-    public static final int T__27=27;
+    public static final int STRING_=22;
     public static final int NESTED_AST=21;
     public static final int ML_STRING=17;
     public static final int TEST_FAIL=6;
@@ -27,21 +27,22 @@ public class ASTVerifier extends TreeParser {
     public static final int TEST_STDOUT=8;
     public static final int ACTION=15;
     public static final int TEST_OK=5;
-    public static final int ML_COMMENT=25;
+    public static final int ML_COMMENT=26;
     public static final int T__30=30;
     public static final int T__31=31;
     public static final int T__32=32;
     public static final int T__33=33;
-    public static final int WS=22;
+    public static final int WS=23;
     public static final int T__34=34;
     public static final int T__35=35;
     public static final int T__36=36;
     public static final int TREE=18;
     public static final int T__37=37;
+    public static final int T__38=38;
     public static final int FILENAME=19;
-    public static final int ID_=23;
-    public static final int XDIGIT=26;
-    public static final int SL_COMMENT=24;
+    public static final int ID_=24;
+    public static final int XDIGIT=27;
+    public static final int SL_COMMENT=25;
     public static final int DOC_COMMENT=11;
     public static final int TEST_ACTION=10;
     public static final int SUITE=4;
@@ -73,7 +74,7 @@ public class ASTVerifier extends TreeParser {
             // ASTVerifier.g:13:2: ( ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* ( testsuite )+ ) )
             // ASTVerifier.g:13:4: ^( 'gunit' ID ( DOC_COMMENT )? ( optionsSpec | header )* ( testsuite )+ )
             {
-            match(input,27,FOLLOW_27_in_gUnitDef39); 
+            match(input,28,FOLLOW_28_in_gUnitDef39); 
 
             match(input, Token.DOWN, null); 
             match(input,ID,FOLLOW_ID_in_gUnitDef41); 
@@ -104,7 +105,7 @@ public class ASTVerifier extends TreeParser {
                 if ( (LA2_0==OPTIONS) ) {
                     alt2=1;
                 }
-                else if ( (LA2_0==31) ) {
+                else if ( (LA2_0==32) ) {
                     alt2=2;
                 }
 
@@ -206,7 +207,7 @@ public class ASTVerifier extends TreeParser {
                 int alt4=2;
                 int LA4_0 = input.LA(1);
 
-                if ( (LA4_0==30) ) {
+                if ( (LA4_0==31) ) {
                     alt4=1;
                 }
 
@@ -258,7 +259,7 @@ public class ASTVerifier extends TreeParser {
             int alt5=2;
             int LA5_0 = input.LA(1);
 
-            if ( (LA5_0==30) ) {
+            if ( (LA5_0==31) ) {
                 int LA5_1 = input.LA(2);
 
                 if ( (LA5_1==DOWN) ) {
@@ -304,7 +305,7 @@ public class ASTVerifier extends TreeParser {
                 case 1 :
                     // ASTVerifier.g:21:9: ^( '=' ID ID )
                     {
-                    match(input,30,FOLLOW_30_in_option88); 
+                    match(input,31,FOLLOW_31_in_option88); 
 
                     match(input, Token.DOWN, null); 
                     match(input,ID,FOLLOW_ID_in_option90); 
@@ -317,7 +318,7 @@ public class ASTVerifier extends TreeParser {
                 case 2 :
                     // ASTVerifier.g:22:9: ^( '=' ID STRING )
                     {
-                    match(input,30,FOLLOW_30_in_option104); 
+                    match(input,31,FOLLOW_31_in_option104); 
 
                     match(input, Token.DOWN, null); 
                     match(input,ID,FOLLOW_ID_in_option106); 
@@ -348,7 +349,7 @@ public class ASTVerifier extends TreeParser {
             // ASTVerifier.g:25:8: ( ^( '@header' ACTION ) )
             // ASTVerifier.g:25:10: ^( '@header' ACTION )
             {
-            match(input,31,FOLLOW_31_in_header125); 
+            match(input,32,FOLLOW_32_in_header125); 
 
             match(input, Token.DOWN, null); 
             match(input,ACTION,FOLLOW_ACTION_in_header127); 
@@ -924,21 +925,21 @@ public class ASTVerifier extends TreeParser {
     }
  
 
-    public static final BitSet FOLLOW_27_in_gUnitDef39 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_gUnitDef41 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_gUnitDef43 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_optionsSpec_in_gUnitDef47 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_header_in_gUnitDef49 = new BitSet(new long[]{0x0000000080002810L});
-    public static final BitSet FOLLOW_testsuite_in_gUnitDef53 = new BitSet(new long[]{0x0000000080002818L});
+    public static final BitSet FOLLOW_28_in_gUnitDef39 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_gUnitDef41 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_gUnitDef43 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_optionsSpec_in_gUnitDef47 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_header_in_gUnitDef49 = new BitSet(new long[]{0x0000000100002810L});
+    public static final BitSet FOLLOW_testsuite_in_gUnitDef53 = new BitSet(new long[]{0x0000000100002818L});
     public static final BitSet FOLLOW_OPTIONS_in_optionsSpec67 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_option_in_optionsSpec69 = new BitSet(new long[]{0x0000000040000008L});
-    public static final BitSet FOLLOW_30_in_option88 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_option_in_optionsSpec69 = new BitSet(new long[]{0x0000000080000008L});
+    public static final BitSet FOLLOW_31_in_option88 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_option90 = new BitSet(new long[]{0x0000000000001000L});
     public static final BitSet FOLLOW_ID_in_option92 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_30_in_option104 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_31_in_option104 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_option106 = new BitSet(new long[]{0x0000000000004000L});
     public static final BitSet FOLLOW_STRING_in_option108 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_31_in_header125 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_32_in_header125 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ACTION_in_header127 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_SUITE_in_testsuite138 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_testsuite140 = new BitSet(new long[]{0x0000000000001000L});
