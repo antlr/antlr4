@@ -31,7 +31,7 @@ tree grammar ASTVerifier;
 options {
 	language      = Java;
 	tokenVocab    = ANTLRParser;
-	ASTLabelType  = ASTGrammar;
+	ASTLabelType  = GrammarAST;
 }
 
 // Include the copyright in this source and also the generated source
@@ -63,6 +63,7 @@ options {
 */
 package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
 }
 
 @members {

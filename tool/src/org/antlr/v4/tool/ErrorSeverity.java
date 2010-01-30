@@ -34,7 +34,7 @@ package org.antlr.v4.tool;
  *
  * @author Jim Idle - Temporal Wave LLC (jimi@temporal-wave.com)
  */
-public enum MessageSeverity {
+public enum ErrorSeverity {
 
     /**
      * How to describe informational messages
@@ -72,7 +72,7 @@ public enum MessageSeverity {
      *
      * @param text The human readable string representing the serverity level
      */
-    private MessageSeverity(String text) {
+    private ErrorSeverity(String text) {
         this.text = text;
     }
 }

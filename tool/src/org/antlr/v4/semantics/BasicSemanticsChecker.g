@@ -25,7 +25,6 @@
 */
 
 /** Check the basic semantics of the input.  We check for:
-
 	FILE_AND_GRAMMAR_NAME_DIFFER
 	RULE_REDEFINITION(MessageSeverity.ERROR, true, true),
 	LEXER_RULES_NOT_ALLOWED(MessageSeverity.ERROR, true, true),
@@ -68,7 +67,7 @@ tree grammar BasicSemanticsChecker;
 options {
 	language      = Java;
 	tokenVocab    = ANTLRParser;
-	ASTLabelType  = ASTGrammar;
+	ASTLabelType  = GrammarAST;
 	filter        = true;
 }
 
@@ -99,28 +98,25 @@ options {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.v4.parse;
+package org.antlr.v4.semantics;
 import org.antlr.v4.tool.*;
 }
 
 topdown
-	:
+	:	grammarSpec
+	|	optionsSpec
+	|	tokensSpec
 	;
 
 grammarSpec
-    :   ^(grammarType ID DOC_COMMENT? prequelConstruct* rules)
+    :   ^(grammarType ID .*)
+    	{
+    	System.out.println("gname = "+$ID.text);
+    	}
 	;
 	
 grammarType
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
-    ;
-
-prequelConstruct
-	:   optionsSpec
-    |   delegateGrammars
-    |   tokensSpec
-    |   attrScope
-    |   action
     ;
 
 optionsSpec
@@ -139,15 +135,6 @@ optionValue
     |   STAR
     ;
 
-delegateGrammars
-	:   ^(IMPORT delegateGrammar+)
-	;
-
-delegateGrammar
-    :   ^(ASSIGN ID ID)
-    |   ID
-    ;
-
 tokensSpec
 	:   ^(TOKENS tokenSpec+)
 	;
@@ -159,257 +146,5 @@ tokenSpec
 	|	RULE_REF
 	;
 
-attrScope
-	:	^(SCOPE ID ACTION)
-	;
-
-action
-	:	^(AT ID? ID ACTION)
-	;
-
-rules
-    : ^(RULES rule*)
+rule:   ^( RULE ID .*)
     ;
-
-rule:   ^( RULE ID DOC_COMMENT? ruleModifiers? ARG_ACTION?
-      	   ruleReturns? rulePrequel* altListAsBlock exceptionGroup
-      	 )
-    ;
-
-exceptionGroup
-    : exceptionHandler* finallyClause?
-    ;
-
-exceptionHandler
-	: ^(CATCH ARG_ACTION ACTION)
-	;
-
-finallyClause
-	: ^(FINALLY ACTION)
-	;
-
-rulePrequel
-    :   throwsSpec
-    |   ruleScopeSpec
-    |   optionsSpec
-    |   ruleAction
-    ;
-
-ruleReturns
-	: ^(RETURNS ARG_ACTION)
-	;
-throwsSpec
-    : ^(THROWS ID+)
-    ;
-
-ruleScopeSpec
-	:	^(SCOPE ACTION)
-	|	^(SCOPE ID+)
-	;
-
-ruleAction
-	:	^(AT ID ACTION)
-	;
-
-ruleModifiers
-    : ^(RULEMODIFIERS ruleModifier+)
-    ;
-
-ruleModifier
-    : PUBLIC
-    | PRIVATE
-    | PROTECTED
-    | FRAGMENT
-    ;
-
-altList
-    : alternative+
-    ;
-
-altListAsBlock
-    : ^(BLOCK altList)
-    ;
-
-alternative
-    :	^(ALT_REWRITE alternative rewrite)
-    |	^(ALT EPSILON)
-    |   elements
-    ;
-
-elements
-    : ^(ALT element+)
-    ;
-
-element
-	:	labeledElement
-	|	atom
-	|	ebnf
-	|   ACTION
-	|   SEMPRED
-	|	GATED_SEMPRED
-	|	treeSpec
-	;
-	
-labeledElement
-	:	^(ASSIGN ID (atom|block))
-	|	^(PLUS_ASSIGN ID (atom|block))
-	;
-
-treeSpec
-    : ^(TREE_BEGIN element+)
-    ;
-
-ebnf:	^(blockSuffix block)
-	| 	block
-    ;
-
-blockSuffix
-    : ebnfSuffix
-    | ROOT
-    | IMPLIES
-    | BANG
-    ;
-
-ebnfSuffix
-	:	OPTIONAL
-  	|	CLOSURE
-   	|	POSITIVE_CLOSURE
-	;
-	
-atom:	^(ROOT range)
-	|	^(BANG range)
-	|	^(ROOT notSet)
-	|	^(BANG notSet)
-	|	range
-	|	^(DOT ID terminal)
-	|	^(DOT ID ruleref)
-    |   terminal
-    |   ruleref
-    ;
-
-notSet
-    : ^(NOT notTerminal)
-    | ^(NOT block)
-    ;
-
-notTerminal
-    : CHAR_LITERAL
-    | TOKEN_REF
-    | STRING_LITERAL
-    ;
-
-block
-    :	^(BLOCK optionsSpec? ruleAction* ACTION? altList)
-    ;
-
-ruleref
-    :	^(ROOT RULE_REF ARG_ACTION?)
-    |	^(BANG RULE_REF ARG_ACTION?)
-    |	^(RULE_REF ARG_ACTION?)
-    ;
-
-range
-    : ^(RANGE rangeElement rangeElement)
-    ;
-
-rangeElement
-    : CHAR_LITERAL
-    | STRING_LITERAL
-    | RULE_REF
-    | TOKEN_REF
-    ;
-
-terminal
-    :   ^(CHAR_LITERAL elementOptions)
-    |   CHAR_LITERAL
-    |	^(STRING_LITERAL elementOptions)
-    |	STRING_LITERAL
-    |	^(TOKEN_REF elementOptions)
-    |	TOKEN_REF
-    |	^(WILDCARD elementOptions)
-    |	WILDCARD
-    |	^(ROOT terminal)
-    |	^(BANG terminal)
-    ;
-
-elementOptions
-    :	^(ELEMENT_OPTIONS elementOption+)
-    ;
-
-elementOption
-    :	ID
-    |   ^(ASSIGN ID ID)
-    |   ^(ASSIGN ID STRING_LITERAL)
-    ;
-
-rewrite
-	:	predicatedRewrite* nakedRewrite
-	;
-
-predicatedRewrite
-	:	^(ST_RESULT SEMPRED rewriteAlt)
-	|	^(RESULT SEMPRED rewriteAlt)
-	;
-	
-nakedRewrite
-	:	^(ST_RESULT rewriteAlt)
-	|	^(RESULT rewriteAlt)
-	;
-	
-rewriteAlt
-    :	rewriteTemplate
-    |	rewriteTreeAlt
-    |	ETC
-    |	EPSILON
-    ;
-	
-rewriteTreeAlt
-    :	^(ALT rewriteTreeElement+)
-    ;
-
-rewriteTreeElement
-	:	rewriteTreeAtom
-	|	rewriteTree
-	|   rewriteTreeEbnf
-	;
-
-rewriteTreeAtom
-    :   CHAR_LITERAL
-	|   ^(TOKEN_REF ARG_ACTION)
-	|   TOKEN_REF
-    |   RULE_REF
-	|   STRING_LITERAL
-	|   LABEL
-	|	ACTION
-	;
-
-rewriteTreeEbnf
-	:	^(ebnfSuffix ^(BLOCK rewriteTreeAlt))
-	;
-rewriteTree
-	:	^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )
-	;
-
-rewriteTemplate
-	:	^(TEMPLATE rewriteTemplateArgs? DOUBLE_QUOTE_STRING_LITERAL)
-	|	^(TEMPLATE rewriteTemplateArgs? DOUBLE_ANGLE_STRING_LITERAL)
-	|	rewriteTemplateRef
-	|	rewriteIndirectTemplateHead
-	|	ACTION
-	;
-
-rewriteTemplateRef
-	:	^(TEMPLATE ID rewriteTemplateArgs?)
-	;
-
-rewriteIndirectTemplateHead
-	:	^(TEMPLATE ACTION rewriteTemplateArgs?)
-	;
-
-rewriteTemplateArgs
-	:	^(ARGLIST rewriteTemplateArg+)
-	;
-
-rewriteTemplateArg
-	:   ^(ARG ID ACTION)
-	;

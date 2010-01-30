@@ -65,9 +65,8 @@ CANNOT_GEN_DOT_FILE(arg,exception,stackTrace) ::=
 	"cannot write DFA DOT file <arg>: <exception>"
 BAD_ACTION_AST_STRUCTURE(exception,stackTrace) ::=
 	"bad internal tree structure for action '<arg>': <exception>"
-BAD_AST_STRUCTURE(arg,exception,stackTrace) ::= <<
-bad internal tree structure '<arg>': <exception>
-<stackTrace; separator="\n">
+BAD_AST_STRUCTURE(arg,msg) ::= <<
+bad internal tree structure '<arg>': <msg>
 >>
 FILE_AND_GRAMMAR_NAME_DIFFER(arg,arg2) ::=
   "file <arg2> contains grammar <arg>; names must be identical"
@@ -206,7 +205,7 @@ MISSING_AST_TYPE_IN_TREE_GRAMMAR(arg) ::=
   "tree grammar <arg> has no ASTLabelType option"
 REWRITE_FOR_MULTI_ELEMENT_ALT(arg) ::=
   "with rewrite=true, alt <arg> not simple node or obvious tree element; text attribute for rule not guaranteed to be correct"
-RULE_INVALID_SET(arg) ::= 
+RULE_INVALID_SET(arg) ::=
   "Cannot complement rule <arg>; not a simple set or element"
 HETERO_ILLEGAL_IN_REWRITE_ALT(arg) ::=
   "alts with rewrites can't use heterogeneous types left of ->"

@@ -16,13 +16,14 @@ public class Grammar {
     public String name;
     public GrammarAST ast;
     public String text; // testing only
+    public String fileName;
 
     protected List<Grammar> importedGrammars;
     protected Map<String, Rule> rules = new HashMap<String, Rule>();
 
-    public Grammar(Tool tool, String name, GrammarAST ast) {
+    public Grammar(Tool tool, GrammarAST ast) {
         this.tool = tool;
-        this.name = name;
+        this.name = ast.getChild(0).getText();
         this.ast = ast;
     }
     

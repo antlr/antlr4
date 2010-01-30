@@ -2,11 +2,8 @@ package org.antlr.v4;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
-import org.antlr.v4.gui.ASTViewer;
-import org.antlr.v4.parse.ANTLRLexer;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.ASTVerifier;
-import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.semantics.SemanticsPipeline;
 import org.antlr.v4.tool.*;
 
 import java.io.File;
@@ -117,7 +114,7 @@ public class Tool {
                     File outDir = new File(outputDirectory);
                     haveOutputDir = true;
                     if (outDir.exists() && !outDir.isDirectory()) {
-                        ErrorManager.msg(Msg.OUTPUT_DIR_IS_FILE, outputDirectory);
+                        ErrorManager.error(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
                         libDirectory = ".";
                     }
                 }
@@ -135,7 +132,7 @@ public class Tool {
                     }
                     File outDir = new File(libDirectory);
                     if (!outDir.exists()) {
-                        ErrorManager.msg(Msg.DIR_NOT_FOUND, libDirectory);
+                        ErrorManager.error(ErrorType.DIR_NOT_FOUND, libDirectory);
                         libDirectory = ".";
                     }
                 }
@@ -294,9 +291,9 @@ public class Tool {
         ParserRuleReturnScope r = p.grammarSpec();
         GrammarAST t = (GrammarAST) r.getTree();
         System.out.println(t.toStringTree());
-        String name = t.getChild(0).getText();
-        Grammar g = new Grammar(this, name, t);
-        grammars.put(name, g);
+        Grammar g = new Grammar(this, t);
+        g.fileName = fileName;
+        grammars.put(g.name, g);
         return g;
     }
     
@@ -305,11 +302,8 @@ public class Tool {
         Grammar g = load(grammarFileNames.get(0));
         g.loadImportedGrammars();
         //g.ast.inspect();
-        // use buffered node stream as we will look around in stream
-        // to give good error messages.
-        BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(astAdaptor,g.ast);
-        ASTVerifier walker = new ASTVerifier(nodes);
-        walker.grammarSpec();
+        SemanticsPipeline sem = new SemanticsPipeline();
+        sem.process(g);
     }
 
     private static void version() {
