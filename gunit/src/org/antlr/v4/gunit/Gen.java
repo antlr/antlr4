@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Gen {
+    // TODO: don't hardcode
     public static final String TEMPLATE_FILE =
         "/Users/parrt/antlr/code/antlr4/main/gunit/resources/org/antlr/v4/gunit/jUnit.stg";
 
