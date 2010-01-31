@@ -1,10 +1,13 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.Tool;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 
 /** */
@@ -23,7 +26,7 @@ public class SemanticsPipeline {
 
         // DO BASIC / EASY SEMANTIC CHECKS
         nodes.reset();
-        BasicSemanticsChecker basics = new BasicSemanticsChecker(nodes,g.fileName);
+        BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g.fileName);
         basics.downup(g.ast);
     }
 }

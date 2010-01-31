@@ -63,7 +63,7 @@
     CONFLICTING_OPTION_IN_TREE_FILTER(MessageSeverity.ERROR, true, true),
  * 
  */
-tree grammar BasicSemanticsChecker;
+tree grammar BasicSemanticTriggers;
 options {
 	language      = Java;
 	tokenVocab    = ANTLRParser;
@@ -108,7 +108,7 @@ public String fileName;
 public Map<String,String> options = new HashMap<String,String>();
 protected int gtype;
 //Grammar g; // which grammar are we checking
-public BasicSemanticsChecker(TreeNodeStream input, String fileName) {
+public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
 	this(input);
 	this.fileName = fileName;
 }
@@ -155,29 +155,19 @@ optionValue returns [String v]
     |   STAR
     ;
 
-rule:   ^( RULE r=ID .*)
+rule:   ^( RULE r=ID .*) {BasicSemanticChecks.checkInvalidRuleDef(gtype, fileName, $r.token);}
+    ;
+
+ruleref
+    :	
+    	(	^((ROOT|BANG) r=RULE_REF ARG_ACTION?)
+	    |	^(r=RULE_REF ARG_ACTION?)
+	    )
 	    {
 	    if ( gtype==LEXER_GRAMMAR && Character.isLowerCase($r.text.charAt(0)) ) {
 	    	ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
     							      fileName, $r.token, $r.text);
 		}
-	    if ( (gtype==PARSER_GRAMMAR||gtype==PARSER_GRAMMAR) &&
-	         Character.isUpperCase($r.text.charAt(0)) )
-	    {
-	    	ErrorManager.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
-    							      fileName, $r.token, $r.text);
-		}
-		}
-    ;
-
-ruleref
-    :	{gtype==LEXER_GRAMMAR}?
-    	(	^((ROOT|BANG) r=RULE_REF ARG_ACTION?)
-	    |	^(r=RULE_REF ARG_ACTION?)
-	    )
-	    {
-	    ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
-    						      fileName, $r.token, $r.text);
 		}
     ;
 

@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticsChecker.g 2010-01-31 13:57:42
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-01-31 14:26:26
 
 /*
  [The "BSD license"]
@@ -74,7 +74,7 @@ import java.util.HashMap;
     CONFLICTING_OPTION_IN_TREE_FILTER(MessageSeverity.ERROR, true, true),
  * 
  */
-public class BasicSemanticsChecker extends TreeFilter {
+public class BasicSemanticTriggers extends TreeFilter {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "WILDCARD", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "STRING_LITERAL", "ESC_SEQ", "CHAR_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "LEXER_GRAMMAR", "PARSER_GRAMMAR", "TREE_GRAMMAR", "COMBINED_GRAMMAR", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "DOT", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE", "'='"
     };
@@ -186,17 +186,17 @@ public class BasicSemanticsChecker extends TreeFilter {
     // delegators
 
 
-        public BasicSemanticsChecker(TreeNodeStream input) {
+        public BasicSemanticTriggers(TreeNodeStream input) {
             this(input, new RecognizerSharedState());
         }
-        public BasicSemanticsChecker(TreeNodeStream input, RecognizerSharedState state) {
+        public BasicSemanticTriggers(TreeNodeStream input, RecognizerSharedState state) {
             super(input, state);
              
         }
         
 
-    public String[] getTokenNames() { return BasicSemanticsChecker.tokenNames; }
-    public String getGrammarFileName() { return "BasicSemanticsChecker.g"; }
+    public String[] getTokenNames() { return BasicSemanticTriggers.tokenNames; }
+    public String getGrammarFileName() { return "BasicSemanticTriggers.g"; }
 
 
     public String name;
@@ -204,7 +204,7 @@ public class BasicSemanticsChecker extends TreeFilter {
     public Map<String,String> options = new HashMap<String,String>();
     protected int gtype;
     //Grammar g; // which grammar are we checking
-    public BasicSemanticsChecker(TreeNodeStream input, String fileName) {
+    public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
     	this(input);
     	this.fileName = fileName;
     }
@@ -212,10 +212,10 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
     // $ANTLR start "topdown"
-    // BasicSemanticsChecker.g:117:1: topdown : ( grammarSpec | optionsSpec | rule | ruleref );
+    // BasicSemanticTriggers.g:117:1: topdown : ( grammarSpec | optionsSpec | rule | ruleref );
     public final void topdown() throws RecognitionException {
         try {
-            // BasicSemanticsChecker.g:118:2: ( grammarSpec | optionsSpec | rule | ruleref )
+            // BasicSemanticTriggers.g:118:2: ( grammarSpec | optionsSpec | rule | ruleref )
             int alt1=4;
             switch ( input.LA(1) ) {
             case LEXER_GRAMMAR:
@@ -253,7 +253,7 @@ public class BasicSemanticsChecker extends TreeFilter {
 
             switch (alt1) {
                 case 1 :
-                    // BasicSemanticsChecker.g:118:4: grammarSpec
+                    // BasicSemanticTriggers.g:118:4: grammarSpec
                     {
                     pushFollow(FOLLOW_grammarSpec_in_topdown83);
                     grammarSpec();
@@ -264,7 +264,7 @@ public class BasicSemanticsChecker extends TreeFilter {
                     }
                     break;
                 case 2 :
-                    // BasicSemanticsChecker.g:119:4: optionsSpec
+                    // BasicSemanticTriggers.g:119:4: optionsSpec
                     {
                     pushFollow(FOLLOW_optionsSpec_in_topdown88);
                     optionsSpec();
@@ -275,7 +275,7 @@ public class BasicSemanticsChecker extends TreeFilter {
                     }
                     break;
                 case 3 :
-                    // BasicSemanticsChecker.g:120:4: rule
+                    // BasicSemanticTriggers.g:120:4: rule
                     {
                     pushFollow(FOLLOW_rule_in_topdown93);
                     rule();
@@ -286,7 +286,7 @@ public class BasicSemanticsChecker extends TreeFilter {
                     }
                     break;
                 case 4 :
-                    // BasicSemanticsChecker.g:121:4: ruleref
+                    // BasicSemanticTriggers.g:121:4: ruleref
                     {
                     pushFollow(FOLLOW_ruleref_in_topdown98);
                     ruleref();
@@ -311,13 +311,13 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
     // $ANTLR start "grammarSpec"
-    // BasicSemanticsChecker.g:125:1: grammarSpec : ^( grammarType ID ( . )* ) ;
+    // BasicSemanticTriggers.g:125:1: grammarSpec : ^( grammarType ID ( . )* ) ;
     public final void grammarSpec() throws RecognitionException {
         GrammarAST ID1=null;
 
         try {
-            // BasicSemanticsChecker.g:126:5: ( ^( grammarType ID ( . )* ) )
-            // BasicSemanticsChecker.g:126:9: ^( grammarType ID ( . )* )
+            // BasicSemanticTriggers.g:126:5: ( ^( grammarType ID ( . )* ) )
+            // BasicSemanticTriggers.g:126:9: ^( grammarType ID ( . )* )
             {
             pushFollow(FOLLOW_grammarType_in_grammarSpec116);
             grammarType();
@@ -327,7 +327,7 @@ public class BasicSemanticsChecker extends TreeFilter {
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             ID1=(GrammarAST)match(input,ID,FOLLOW_ID_in_grammarSpec118); if (state.failed) return ;
-            // BasicSemanticsChecker.g:126:26: ( . )*
+            // BasicSemanticTriggers.g:126:26: ( . )*
             loop2:
             do {
                 int alt2=2;
@@ -343,7 +343,7 @@ public class BasicSemanticsChecker extends TreeFilter {
 
                 switch (alt2) {
             	case 1 :
-            	    // BasicSemanticsChecker.g:126:26: .
+            	    // BasicSemanticTriggers.g:126:26: .
             	    {
             	    matchAny(input); if (state.failed) return ;
 
@@ -384,15 +384,15 @@ public class BasicSemanticsChecker extends TreeFilter {
     };
 
     // $ANTLR start "grammarType"
-    // BasicSemanticsChecker.g:136:1: grammarType : ( LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR );
-    public final BasicSemanticsChecker.grammarType_return grammarType() throws RecognitionException {
-        BasicSemanticsChecker.grammarType_return retval = new BasicSemanticsChecker.grammarType_return();
+    // BasicSemanticTriggers.g:136:1: grammarType : ( LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR );
+    public final BasicSemanticTriggers.grammarType_return grammarType() throws RecognitionException {
+        BasicSemanticTriggers.grammarType_return retval = new BasicSemanticTriggers.grammarType_return();
         retval.start = input.LT(1);
 
         gtype = ((GrammarAST)retval.start).getType();
         try {
-            // BasicSemanticsChecker.g:138:5: ( LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR )
-            // BasicSemanticsChecker.g:
+            // BasicSemanticTriggers.g:138:5: ( LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR )
+            // BasicSemanticTriggers.g:
             {
             if ( (input.LA(1)>=LEXER_GRAMMAR && input.LA(1)<=COMBINED_GRAMMAR) ) {
                 input.consume();
@@ -420,16 +420,16 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
     // $ANTLR start "optionsSpec"
-    // BasicSemanticsChecker.g:141:1: optionsSpec : ^( OPTIONS ( option )+ ) ;
+    // BasicSemanticTriggers.g:141:1: optionsSpec : ^( OPTIONS ( option )+ ) ;
     public final void optionsSpec() throws RecognitionException {
         try {
-            // BasicSemanticsChecker.g:142:2: ( ^( OPTIONS ( option )+ ) )
-            // BasicSemanticsChecker.g:142:4: ^( OPTIONS ( option )+ )
+            // BasicSemanticTriggers.g:142:2: ( ^( OPTIONS ( option )+ ) )
+            // BasicSemanticTriggers.g:142:4: ^( OPTIONS ( option )+ )
             {
             match(input,OPTIONS,FOLLOW_OPTIONS_in_optionsSpec179); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            // BasicSemanticsChecker.g:142:14: ( option )+
+            // BasicSemanticTriggers.g:142:14: ( option )+
             int cnt3=0;
             loop3:
             do {
@@ -443,7 +443,7 @@ public class BasicSemanticsChecker extends TreeFilter {
 
                 switch (alt3) {
             	case 1 :
-            	    // BasicSemanticsChecker.g:142:14: option
+            	    // BasicSemanticTriggers.g:142:14: option
             	    {
             	    pushFollow(FOLLOW_option_in_optionsSpec181);
             	    option();
@@ -482,15 +482,15 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
     // $ANTLR start "option"
-    // BasicSemanticsChecker.g:145:1: option : ^( '=' o= ID optionValue ) ;
+    // BasicSemanticTriggers.g:145:1: option : ^( '=' o= ID optionValue ) ;
     public final void option() throws RecognitionException {
         GrammarAST o=null;
-        BasicSemanticsChecker.optionValue_return optionValue2 = null;
+        BasicSemanticTriggers.optionValue_return optionValue2 = null;
 
 
         try {
-            // BasicSemanticsChecker.g:146:5: ( ^( '=' o= ID optionValue ) )
-            // BasicSemanticsChecker.g:146:9: ^( '=' o= ID optionValue )
+            // BasicSemanticTriggers.g:146:5: ( ^( '=' o= ID optionValue ) )
+            // BasicSemanticTriggers.g:146:9: ^( '=' o= ID optionValue )
             {
             match(input,105,FOLLOW_105_in_option203); if (state.failed) return ;
 
@@ -525,15 +525,15 @@ public class BasicSemanticsChecker extends TreeFilter {
     };
 
     // $ANTLR start "optionValue"
-    // BasicSemanticsChecker.g:149:1: optionValue returns [String v] : ( ID | STRING_LITERAL | CHAR_LITERAL | INT | STAR );
-    public final BasicSemanticsChecker.optionValue_return optionValue() throws RecognitionException {
-        BasicSemanticsChecker.optionValue_return retval = new BasicSemanticsChecker.optionValue_return();
+    // BasicSemanticTriggers.g:149:1: optionValue returns [String v] : ( ID | STRING_LITERAL | CHAR_LITERAL | INT | STAR );
+    public final BasicSemanticTriggers.optionValue_return optionValue() throws RecognitionException {
+        BasicSemanticTriggers.optionValue_return retval = new BasicSemanticTriggers.optionValue_return();
         retval.start = input.LT(1);
 
         retval.v = ((GrammarAST)retval.start).token.getText();
         try {
-            // BasicSemanticsChecker.g:151:5: ( ID | STRING_LITERAL | CHAR_LITERAL | INT | STAR )
-            // BasicSemanticsChecker.g:
+            // BasicSemanticTriggers.g:151:5: ( ID | STRING_LITERAL | CHAR_LITERAL | INT | STAR )
+            // BasicSemanticTriggers.g:
             {
             if ( input.LA(1)==STAR||input.LA(1)==INT||input.LA(1)==STRING_LITERAL||input.LA(1)==CHAR_LITERAL||input.LA(1)==ID ) {
                 input.consume();
@@ -561,19 +561,19 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
     // $ANTLR start "rule"
-    // BasicSemanticsChecker.g:158:1: rule : ^( RULE r= ID ( . )* ) ;
+    // BasicSemanticTriggers.g:158:1: rule : ^( RULE r= ID ( . )* ) ;
     public final void rule() throws RecognitionException {
         GrammarAST r=null;
 
         try {
-            // BasicSemanticsChecker.g:158:5: ( ^( RULE r= ID ( . )* ) )
-            // BasicSemanticsChecker.g:158:9: ^( RULE r= ID ( . )* )
+            // BasicSemanticTriggers.g:158:5: ( ^( RULE r= ID ( . )* ) )
+            // BasicSemanticTriggers.g:158:9: ^( RULE r= ID ( . )* )
             {
             match(input,RULE,FOLLOW_RULE_in_rule297); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             r=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule301); if (state.failed) return ;
-            // BasicSemanticsChecker.g:158:22: ( . )*
+            // BasicSemanticTriggers.g:158:22: ( . )*
             loop4:
             do {
                 int alt4=2;
@@ -589,7 +589,7 @@ public class BasicSemanticsChecker extends TreeFilter {
 
                 switch (alt4) {
             	case 1 :
-            	    // BasicSemanticsChecker.g:158:22: .
+            	    // BasicSemanticTriggers.g:158:22: .
             	    {
             	    matchAny(input); if (state.failed) return ;
 
@@ -604,17 +604,22 @@ public class BasicSemanticsChecker extends TreeFilter {
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
+              BasicSemanticChecks.checkInvalidRuleDef(gtype, fileName, r.token);
+            }
+            if ( state.backtracking==1 ) {
 
+              	    /*
               	    if ( gtype==LEXER_GRAMMAR && Character.isLowerCase((r!=null?r.getText():null).charAt(0)) ) {
               	    	ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
                   							      fileName, r.token, (r!=null?r.getText():null));
               		}
-              	    if ( (gtype==PARSER_GRAMMAR||gtype==PARSER_GRAMMAR) &&
+              	    if ( (gtype==PARSER_GRAMMAR||gtype==TREE_GRAMMAR) &&
               	         Character.isUpperCase((r!=null?r.getText():null).charAt(0)) )
               	    {
               	    	ErrorManager.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
                   							      fileName, r.token, (r!=null?r.getText():null));
               		}
+              		*/
               		
             }
 
@@ -633,19 +638,15 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
     // $ANTLR start "ruleref"
-    // BasicSemanticsChecker.g:173:1: ruleref : {...}? ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) ) ;
+    // BasicSemanticTriggers.g:175:1: ruleref : ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) ) ;
     public final void ruleref() throws RecognitionException {
         GrammarAST r=null;
 
         try {
-            // BasicSemanticsChecker.g:174:5: ({...}? ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) ) )
-            // BasicSemanticsChecker.g:174:7: {...}? ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) )
+            // BasicSemanticTriggers.g:176:5: ( ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) ) )
+            // BasicSemanticTriggers.g:177:6: ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) )
             {
-            if ( !((gtype==LEXER_GRAMMAR)) ) {
-                if (state.backtracking>0) {state.failed=true; return ;}
-                throw new FailedPredicateException(input, "ruleref", "gtype==LEXER_GRAMMAR");
-            }
-            // BasicSemanticsChecker.g:175:6: ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) )
+            // BasicSemanticTriggers.g:177:6: ( ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? ) | ^(r= RULE_REF ( ARG_ACTION )? ) )
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -664,7 +665,7 @@ public class BasicSemanticsChecker extends TreeFilter {
             }
             switch (alt7) {
                 case 1 :
-                    // BasicSemanticsChecker.g:175:8: ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? )
+                    // BasicSemanticTriggers.g:177:8: ^( ( ROOT | BANG ) r= RULE_REF ( ARG_ACTION )? )
                     {
                     if ( input.LA(1)==BANG||input.LA(1)==ROOT ) {
                         input.consume();
@@ -678,8 +679,8 @@ public class BasicSemanticsChecker extends TreeFilter {
 
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
-                    r=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref347); if (state.failed) return ;
-                    // BasicSemanticsChecker.g:175:33: ( ARG_ACTION )?
+                    r=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref348); if (state.failed) return ;
+                    // BasicSemanticTriggers.g:177:33: ( ARG_ACTION )?
                     int alt5=2;
                     int LA5_0 = input.LA(1);
 
@@ -688,9 +689,9 @@ public class BasicSemanticsChecker extends TreeFilter {
                     }
                     switch (alt5) {
                         case 1 :
-                            // BasicSemanticsChecker.g:175:33: ARG_ACTION
+                            // BasicSemanticTriggers.g:177:33: ARG_ACTION
                             {
-                            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref349); if (state.failed) return ;
+                            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref350); if (state.failed) return ;
 
                             }
                             break;
@@ -703,13 +704,13 @@ public class BasicSemanticsChecker extends TreeFilter {
                     }
                     break;
                 case 2 :
-                    // BasicSemanticsChecker.g:176:8: ^(r= RULE_REF ( ARG_ACTION )? )
+                    // BasicSemanticTriggers.g:178:8: ^(r= RULE_REF ( ARG_ACTION )? )
                     {
-                    r=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref363); if (state.failed) return ;
+                    r=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref364); if (state.failed) return ;
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); if (state.failed) return ;
-                        // BasicSemanticsChecker.g:176:21: ( ARG_ACTION )?
+                        // BasicSemanticTriggers.g:178:21: ( ARG_ACTION )?
                         int alt6=2;
                         int LA6_0 = input.LA(1);
 
@@ -718,9 +719,9 @@ public class BasicSemanticsChecker extends TreeFilter {
                         }
                         switch (alt6) {
                             case 1 :
-                                // BasicSemanticsChecker.g:176:21: ARG_ACTION
+                                // BasicSemanticTriggers.g:178:21: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref365); if (state.failed) return ;
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref366); if (state.failed) return ;
 
                                 }
                                 break;
@@ -738,8 +739,10 @@ public class BasicSemanticsChecker extends TreeFilter {
 
             if ( state.backtracking==1 ) {
 
-              	    ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
-                  						      fileName, r.token, (r!=null?r.getText():null));
+              	    if ( gtype==LEXER_GRAMMAR && Character.isLowerCase((r!=null?r.getText():null).charAt(0)) ) {
+              	    	ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
+                  							      fileName, r.token, (r!=null?r.getText():null));
+              		}
               		
             }
 
@@ -776,10 +779,10 @@ public class BasicSemanticsChecker extends TreeFilter {
     public static final BitSet FOLLOW_set_in_optionValue0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_in_rule297 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_rule301 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x000003FFFFFFFFFFL});
-    public static final BitSet FOLLOW_set_in_ruleref339 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref347 = new BitSet(new long[]{0x0000000000004008L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref349 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref363 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref365 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_set_in_ruleref340 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref348 = new BitSet(new long[]{0x0000000000004008L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref350 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref364 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref366 = new BitSet(new long[]{0x0000000000000008L});
 
 }
