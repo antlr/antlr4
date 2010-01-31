@@ -7,6 +7,7 @@ import org.antlr.v4.semantics.SemanticsPipeline;
 import org.antlr.v4.tool.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Tool {
@@ -66,18 +67,18 @@ public class Tool {
     /** An adaptor that tells ANTLR to build CymbalAST nodes */
     public static TreeAdaptor astAdaptor = new GrammarASTAdaptor();
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Tool antlr = new Tool(args);
 
         if (!exitNow) {
             antlr.process();
             if (ErrorManager.getNumErrors() > 0) {
-                System.exit(1);
+                antlr.exit(1);
             }
-//            System.exit(0);
+            antlr.exit(0);
         }
     }
-    
+
     public Tool() {
     }
 
@@ -85,6 +86,14 @@ public class Tool {
         processArgs(args);
     }
 
+    public void exit(int e) {
+        System.exit(e);
+    }
+
+    public void panic() {
+        throw new Error("ANTLR panic");
+    }
+    
     public void processArgs(String[] args) {
         if (verbose) {
             ErrorManager.info("ANTLR Parser Generator  Version " + VERSION);
@@ -114,7 +123,7 @@ public class Tool {
                     File outDir = new File(outputDirectory);
                     haveOutputDir = true;
                     if (outDir.exists() && !outDir.isDirectory()) {
-                        ErrorManager.error(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
+                        ErrorManager.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
                         libDirectory = ".";
                     }
                 }
@@ -132,7 +141,7 @@ public class Tool {
                     }
                     File outDir = new File(libDirectory);
                     if (!outDir.exists()) {
-                        ErrorManager.error(ErrorType.DIR_NOT_FOUND, libDirectory);
+                        ErrorManager.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
                         libDirectory = ".";
                     }
                 }
@@ -282,22 +291,32 @@ public class Tool {
         }
     }
 
-    public Grammar load(String fileName) throws Exception {
-        ANTLRFileStream in = new ANTLRFileStream(fileName);
-        ANTLRLexer lexer = new ANTLRLexer(in);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        ANTLRParser p = new ANTLRParser(tokens);
-        p.setTreeAdaptor(astAdaptor);
-        ParserRuleReturnScope r = p.grammarSpec();
-        GrammarAST t = (GrammarAST) r.getTree();
-        System.out.println(t.toStringTree());
-        Grammar g = new Grammar(this, t);
-        g.fileName = fileName;
-        grammars.put(g.name, g);
+    public Grammar load(String fileName) {
+        Grammar g = null;
+        try {
+            ANTLRFileStream in = new ANTLRFileStream(fileName);
+            ANTLRLexer lexer = new ANTLRLexer(in);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            ANTLRParser p = new ANTLRParser(tokens);
+            p.setTreeAdaptor(astAdaptor);
+            ParserRuleReturnScope r = p.grammarSpec();
+            GrammarAST t = (GrammarAST) r.getTree();
+            System.out.println(t.toStringTree());
+            g = new Grammar(this, t);
+            g.fileName = fileName;
+            grammars.put(g.name, g);
+        }
+        catch (IOException ioe) {
+            ErrorManager.toolError(ErrorType.CANNOT_OPEN_FILE, fileName, ioe);
+        }
+        catch (RecognitionException re) {
+            // TODO: do we gen errors now?
+            ErrorManager.internalError("can't generate this message at moment; antlr recovers");
+        }
         return g;
     }
-    
-    public void process() throws Exception {
+
+    public void process() {
         // testing parser
         Grammar g = load(grammarFileNames.get(0));
         g.loadImportedGrammars();

@@ -40,7 +40,7 @@ import org.antlr.v4.tool.Message;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Assert;
-import org.stringtemplate.ST;
+import org.stringtemplate.v4.ST;
 
 import java.io.*;
 import java.util.*;

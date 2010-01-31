@@ -1,19 +1,12 @@
 package org.antlr.v4.tool;
 
-import org.stringtemplate.ST;
+import org.stringtemplate.v4.ST;
 
-/** */
 public class Message {
-    // msgST is the actual text of the message
-    public ST msgST;
-    // these are for supporting different output formats
-    public ST locationST;
-    public ST reportST;
-    public ST messageFormatST;
-
     public ErrorType errorType;
     public Object[] args;
     public Throwable e;
+
     // used for location template
     public String file;
     public int line = -1;
@@ -40,19 +33,16 @@ public class Message {
      *  a Message.
      */
     public ST getMessageTemplate() {
-        return ErrorManager.getMessageTemplate(errorType);
-    }
-
-    public String toString() {
-        // setup the location
-        locationST = ErrorManager.getLocationFormat();
-        reportST = ErrorManager.getReportFormat();
-        messageFormatST = ErrorManager.getMessageFormat();
-        ST messageST = getMessageTemplate();
+        ST messageST = ErrorManager.getMessageTemplate(errorType);
+        ST locationST = ErrorManager.getLocationFormat();
+        ST reportST = ErrorManager.getReportFormat();
+        ST messageFormatST = ErrorManager.getMessageFormat();
 
         if ( args!=null ) { // fill in arg1, arg2, ...
             for (int i=0; i<args.length; i++) {
-                messageST.add("args"+(i+1), args[i]);
+                String attr = "arg";
+                if ( i>0 ) attr += i + 1;
+                messageST.add(attr, args[i]);
             }
         }
         if ( e!=null ) {
@@ -82,8 +72,10 @@ public class Message {
         }
         reportST.add("message", messageFormatST);
         reportST.add("type", errorType.getSeverity());
-
-        return reportST.toString();
+        return messageST;
     }
 
+    public String toString() {
+        return getMessageTemplate().render();
+    }
 }

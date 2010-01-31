@@ -54,7 +54,6 @@ public enum ErrorType {
 	ERROR_CREATING_ARTIFICIAL_RULE(ErrorSeverity.ERROR, true, true),
 	TOKENS_FILE_SYNTAX_ERROR(ErrorSeverity.ERROR, true, true),
 	CANNOT_GEN_DOT_FILE(ErrorSeverity.ERROR, true, true),
-	BAD_AST_STRUCTURE(ErrorSeverity.ERROR, true, true),
 
 	// Code generation errors
 	MISSING_CODE_GEN_TEMPLATES(ErrorSeverity.ERROR, false, true),
@@ -125,7 +124,7 @@ public enum ErrorType {
     WILDCARD_AS_ROOT(ErrorSeverity.ERROR, true, true),
     CONFLICTING_OPTION_IN_TREE_FILTER(ErrorSeverity.ERROR, true, true),
     /** Documentation comment is unterminated */
-    UNTERMINATED_DOC_COMMENT(ErrorSeverity.ERROR, true, true),
+    //UNTERMINATED_DOC_COMMENT(ErrorSeverity.ERROR, true, true),
 
     // Dependency sorting errors
     //
@@ -135,33 +134,33 @@ public enum ErrorType {
     // Simple informational messages
     //
     /** A standby generic message that jsut spits out the arguments it is given */
-    GENERIC_INFO(ErrorSeverity.INFO, false, false),
-    /** How to print out the version of the ANTLR tool that we are */
-    ANTLR_VERSION(ErrorSeverity.INFO, false, false),
-
-    // Command line tool errors/warnings
-    /** -fo option was incorrectly formed */
-    MISSING_OUTPUT_FO(ErrorSeverity.WARNING, false, false),
-    /** -lib option is missing a directory argument */
-    MISSING_LIBDIR(ErrorSeverity.WARNING, false, false),
-    /** -format option was not given the name of a message format */
-    MISSING_FORMAT(ErrorSeverity.WARNING, false, false),
-    /** Max state count missing from the option */
-    MISSING_MAXSTATES(ErrorSeverity.WARNING, false, false),
-    /** Max labels in a switch argument is missing */
-    MISSING_MAXSWITCH(ErrorSeverity.WARNING, false, false),
-    /** Min labels in a switch argument is missing */
-    MISSING_MINSWITCH(ErrorSeverity.WARNING, false, false),
-    /** Missing recursion limit argument */
-    MISSING_MAXRECUR(ErrorSeverity.WARNING, false, false),
-    /** Missing max edges argument */
-    MISSING_MAXEDGE(ErrorSeverity.WARNING, false, false),
-    /** Misng ms timeout argument */
-    MISSING_MAXTIME(ErrorSeverity.WARNING, false, false),
-
-    // Help messages
-    HELP_USAGE(ErrorSeverity.INFO, false, false),
-    HELP_EXTENDED(ErrorSeverity.INFO, false, false),
+//    GENERIC_INFO(ErrorSeverity.INFO, false, false),
+//    /** How to print out the version of the ANTLR tool that we are */
+//    ANTLR_VERSION(ErrorSeverity.INFO, false, false),
+//
+//    // Command line tool errors/warnings
+//    /** -fo option was incorrectly formed */
+//    MISSING_OUTPUT_FO(ErrorSeverity.WARNING, false, false),
+//    /** -lib option is missing a directory argument */
+//    MISSING_LIBDIR(ErrorSeverity.WARNING, false, false),
+//    /** -format option was not given the name of a message format */
+//    MISSING_FORMAT(ErrorSeverity.WARNING, false, false),
+//    /** Max state count missing from the option */
+//    MISSING_MAXSTATES(ErrorSeverity.WARNING, false, false),
+//    /** Max labels in a switch argument is missing */
+//    MISSING_MAXSWITCH(ErrorSeverity.WARNING, false, false),
+//    /** Min labels in a switch argument is missing */
+//    MISSING_MINSWITCH(ErrorSeverity.WARNING, false, false),
+//    /** Missing recursion limit argument */
+//    MISSING_MAXRECUR(ErrorSeverity.WARNING, false, false),
+//    /** Missing max edges argument */
+//    MISSING_MAXEDGE(ErrorSeverity.WARNING, false, false),
+//    /** Misng ms timeout argument */
+//    MISSING_MAXTIME(ErrorSeverity.WARNING, false, false),
+//
+//    // Help messages
+//    HELP_USAGE(ErrorSeverity.INFO, false, false),
+//    HELP_EXTENDED(ErrorSeverity.INFO, false, false),
 
     ;
 

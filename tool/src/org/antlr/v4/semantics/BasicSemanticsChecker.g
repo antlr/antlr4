@@ -102,6 +102,14 @@ package org.antlr.v4.semantics;
 import org.antlr.v4.tool.*;
 }
 
+@members {
+Grammar g; // which grammar are we checking
+public BasicSemanticsChecker(TreeNodeStream input, Grammar g) {
+	this(input);
+	this.g = g;
+}
+}
+
 topdown
 	:	grammarSpec
 	|	optionsSpec
@@ -111,7 +119,10 @@ topdown
 grammarSpec
     :   ^(grammarType ID .*)
     	{
-    	System.out.println("gname = "+$ID.text);
+    	if ( !g.fileName.equals($ID.text) ) {
+    		ErrorManager.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,
+    							      g, $ID.token, $ID.text, g.fileName);
+    	}
     	}
 	;
 	

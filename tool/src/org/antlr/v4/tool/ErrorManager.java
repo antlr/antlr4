@@ -1,11 +1,15 @@
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.tree.CommonTree;
-import org.stringtemplate.ST;
-import org.stringtemplate.STGroup;
+import org.antlr.Tool;
+import org.antlr.runtime.Token;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.misc.ErrorBuffer;
+import org.stringtemplate.v4.misc.STMessage;
 
-import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.Locale;
 
 /** Defines all the errors ANTLR can generator for both the tool and for
@@ -53,11 +57,6 @@ public class ErrorManager {
     private static Locale locale;
     private static String formatName;
 
-    /** From a msgID how can I get the name of the template that describes
-     *  the error or warning?
-     */
-    private static String[] idToMessageTemplateName = new String[ErrorType.values().length];
-
     static ANTLRErrorListener theDefaultErrorListener = new ANTLRErrorListener() {
         public void info(String msg) {
             if (formatWantsSingleLineMessage()) {
@@ -83,6 +82,44 @@ public class ErrorManager {
         }
     };
 
+    static ErrorBuffer initSTListener = new ErrorBuffer();
+
+    static STErrorListener theDefaultSTListener =
+        new STErrorListener() {
+            public void compileTimeError(STMessage msg) {
+                ErrorManager.internalError(msg.toString());
+            }
+
+            public void runTimeError(STMessage msg) {
+                ErrorManager.internalError(msg.toString());
+            }
+
+            public void IOError(STMessage msg) {
+                ErrorManager.internalError(msg.toString());
+            }
+
+            public void internalError(STMessage msg) {
+                ErrorManager.internalError(msg.toString());
+            }
+        };
+    public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
+    public static final String MESSAGES_DIR = "org/antlr/v4/tool/templates/messages/languages/";
+
+    // make sure that this class is ready to use after loading
+    static {
+        org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
+        // it is inefficient to set the default locale here if another
+        // piece of code is going to set the locale, but that would
+        // require that a user call an init() function or something.  I prefer
+        // that this class be ready to go when loaded as I'm absentminded ;)
+        setLocale(Locale.getDefault());
+        // try to load the message format group
+        // the user might have specified one on the command line
+        // if not, or if the user has given an illegal value, we will fall back to "antlr"
+        setFormat("antlr");
+        org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);        
+    }
+  
     public static ANTLRErrorListener getErrorListener() {
         return theDefaultErrorListener;
     }    
@@ -103,7 +140,7 @@ public class ErrorManager {
         return format.getInstanceOf("wantsSingleLineMessage").toString().equals("true");
     }
     public static ST getMessageTemplate(ErrorType etype) {
-        String msgName = idToMessageTemplateName[etype.ordinal()];
+        String msgName = etype.toString();
 		return messages.getInstanceOf(msgName);
     }
 
@@ -117,16 +154,15 @@ public class ErrorManager {
     public static void internalError(String error, Throwable e) {
         StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
         String msg = "Exception "+e+"@"+location+": "+error;
-        theDefaultErrorListener.error(new ToolMessage(ErrorType.INTERNAL_ERROR, msg));
+        System.err.println("internal error: "+msg);
     }
 
     public static void internalError(String error) {
         StackTraceElement location =
             getLastNonErrorManagerCodeLocation(new Exception());
         String msg = location+": "+error;
-        theDefaultErrorListener.error(new ToolMessage(ErrorType.INTERNAL_ERROR, msg));
+        System.err.println("internal error: "+msg);
     }
-
 
     /**
      * Raise a predefined message with some number of paramters for the StringTemplate but for which there
@@ -134,7 +170,8 @@ public class ErrorManager {
      * @param errorType The Message Descriptor
      * @param args The arguments to pass to the StringTemplate
      */
-	public static void error(ErrorType errorType, Object... args) {
+	public static void toolError(ErrorType errorType, Object... args) {
+        theDefaultErrorListener.error(new ToolMessage(errorType, args));
 	}
 
     /**
@@ -143,9 +180,9 @@ public class ErrorManager {
      *
      * @param errorType The Message Descriptor
      * @param args The arguments to pass to the StringTemplate
-     */
-	public static void error(ErrorType errorType, int line, int column, int absOffset, int endLine, int endColumn, int endAbsOffset, Object... args) {
+	public static void toolError(ErrorType errorType, int line, int column, int absOffset, int endLine, int endColumn, int endAbsOffset, Object... args) {
 	}
+     */
 
     /**
      * Raise a predefined message with some number of paramters for the StringTemplate, for which there is a CommonToken
@@ -153,20 +190,25 @@ public class ErrorManager {
      * @param errorType The message descriptor.
      * @param t     The token that contains our location information
      * @param args  The varargs array of values that will be set in the StrngTemplate as arg0, arg1, ... argn
-     */
     public static void error(ErrorType errorType, CommonToken t, Object... args) {
 	}
+     */
 
     /**
      * Construct a message when we have a node stream and AST node that we can extract location
      * from and possbily some arguments for the StringTemplate that will construct this message.
-     *
-     * @param errorType The message descriptor
-     * @param node  The node that gives us the information we need
-     * @param args  The varargs array of values that will be set in the StrngTemplate as arg0, arg1, ... argn
-     */
     public static void error(ErrorType errorType, CommonTree node, Object... args) {
 	}
+     */
+
+    public static void grammarError(ErrorType etype,
+                                    Grammar g,
+                                    Token token,
+                                    Object... args)
+    {
+        Message msg = new GrammarSemanticsMessage(etype,g,token,args);
+        theDefaultErrorListener.error(msg);
+    }
 
     /** Process a new message by sending it on to the error listener associated with the current thread
      *  and recording any information we need in the error state for the current thread.
@@ -194,35 +236,88 @@ public class ErrorManager {
 
     // S U P P O R T  C O D E
 
-    protected static boolean initIdToMessageNameMapping() {
-        // make sure a message exists, even if it's just to indicate a problem
-        for (int i = 0; i < idToMessageTemplateName.length; i++) {
-            idToMessageTemplateName[i] = "INVALID MESSAGE ID: "+i;
+    /** We really only need a single locale for entire running ANTLR code
+     *  in a single VM.  Only pay attention to the language, not the country
+     *  so that French Canadians and French Frenchies all get the same
+     *  template file, fr.stg.  Just easier this way.
+     */
+    public static void setLocale(Locale locale) {
+        ErrorManager.locale = locale;
+        String language = locale.getLanguage();
+        String fileName = MESSAGES_DIR +language+".stg";
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        URL url = cl.getResource(fileName);
+        if ( url==null ) {
+            cl = ErrorManager.class.getClassLoader();
+            url = cl.getResource(fileName);
         }
-        // get list of fields and use it to fill in idToMessageTemplateName mapping
-        Field[] fields = ErrorManager.class.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            Field f = fields[i];
-            String fieldName = f.getName();
-            if ( !fieldName.startsWith("MSG_") ) {
-                continue;
-            }
-            String templateName =
-                fieldName.substring("MSG_".length(),fieldName.length());
-            int msgID = 0;
-            try {
-                // get the constant value from this class object
-                msgID = f.getInt(ErrorManager.class);
-            }
-            catch (IllegalAccessException iae) {
-                System.err.println("cannot get const value for "+f.getName());
-                continue;
-            }
-            if ( fieldName.startsWith("MSG_") ) {
-                idToMessageTemplateName[msgID] = templateName;
-            }
+        if ( url==null && language.equals(Locale.US.getLanguage()) ) {
+            rawError("ANTLR installation corrupted; cannot find English messages file "+fileName);
+            panic();
         }
-        return true;
+        else if ( url==null ) {
+            //rawError("no such locale file "+fileName+" retrying with English locale");
+            setLocale(Locale.US); // recurse on this rule, trying the US locale
+            return;
+        }
+
+        messages = new STGroupFile(fileName, "UTF-8");
+        messages.load();
+        if ( initSTListener.errors.size()>0 ) {
+            rawError("ANTLR installation corrupted; can't load messages format file:\n"+
+                     initSTListener.toString());
+            panic();
+        }
+
+        boolean messagesOK = verifyMessages();
+        if ( !messagesOK && language.equals(Locale.US.getLanguage()) ) {
+            rawError("ANTLR installation corrupted; English messages file "+language+".stg incomplete");
+            panic();
+        }
+        else if ( !messagesOK ) {
+            setLocale(Locale.US); // try US to see if that will work
+        }
+    }
+
+    /** The format gets reset either from the Tool if the user supplied a command line option to that effect
+     *  Otherwise we just use the default "antlr".
+     */
+    public static void setFormat(String formatName) {
+        ErrorManager.formatName = formatName;
+        String fileName = FORMATS_DIR +formatName+".stg";
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        URL url = cl.getResource(fileName);
+        if ( url==null ) {
+            cl = ErrorManager.class.getClassLoader();
+            url = cl.getResource(fileName);
+        }
+        if ( url==null && formatName.equals("antlr") ) {
+            rawError("ANTLR installation corrupted; cannot find ANTLR messages format file "+fileName);
+            panic();
+        }
+        else if ( url==null ) {
+            rawError("no such message format file "+fileName+" retrying with default ANTLR format");
+            setFormat("antlr"); // recurse on this rule, trying the default message format
+            return;
+        }
+
+        format = new STGroupFile(fileName, "UTF-8");
+        format.load();
+
+        if ( initSTListener.errors.size()>0 ) {
+            rawError("ANTLR installation corrupted; can't load messages format file:\n"+
+                     initSTListener.toString());
+            panic();
+        }
+
+        boolean formatOK = verifyFormat();
+        if ( !formatOK && formatName.equals("antlr") ) {
+            rawError("ANTLR installation corrupted; ANTLR messages format file "+formatName+".stg incomplete");
+            panic();
+        }
+        else if ( !formatOK ) {
+            setFormat("antlr"); // recurse on this rule, trying the default message format
+        }
     }
 
     /** Use reflection to find list of MSG_ fields and then verify a
@@ -230,18 +325,13 @@ public class ErrorManager {
      */
     protected static boolean verifyMessages() {
         boolean ok = true;
-        Field[] fields = ErrorManager.class.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            Field f = fields[i];
-            String fieldName = f.getName();
-            String templateName =
-                fieldName.substring("MSG_".length(),fieldName.length());
-            if ( fieldName.startsWith("MSG_") ) {
-                if ( !messages.isDefined(templateName) ) {
-                    System.err.println("Message "+templateName+" in locale "+
-                                       locale+" not found");
-                    ok = false;
-                }
+        ErrorType[] errors = ErrorType.values();
+        for (int i = 0; i < errors.length; i++) {
+            ErrorType e = errors[i];
+            if ( !messages.isDefined(e.toString()) ) {
+                System.err.println("Message "+e.toString()+" in locale "+
+                                   locale+" not found");
+                ok = false;
             }
         }
         // check for special templates
@@ -287,6 +377,8 @@ public class ErrorManager {
     }
 
     public static void panic() {
+        // can't call tool.panic since there may be multiple tools; just
+        // one error manager
         throw new Error("ANTLR ErrorManager panic");
     }
 }

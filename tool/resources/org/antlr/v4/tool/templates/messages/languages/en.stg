@@ -26,13 +26,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
- New style messages. This file only contains the messages in English, but no
+ This file only contains the messages in English, but no
  information about which file, line, or column it occurred in.
  The location and message ids are taken out of the formats directory.
 														Kay Roepke
 */
-group en_US;
-
 // TOOL ERRORS
 // file errors
 CANNOT_WRITE_FILE(arg,exception,stackTrace) ::= <<
@@ -46,8 +44,8 @@ problem reading token vocabulary file <arg>: <exception>
 <stackTrace; separator="\n">
 >>
 DIR_NOT_FOUND(arg,exception,stackTrace) ::= "directory not found: <arg>"
-OUTPUT_DIR_IS_FILE(arg,exception,stackTrace) ::= "output directory is a file: <arg>"
-CANNOT_OPEN_FILE(arg,exception,stackTrace) ::= "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>"
+OUTPUT_DIR_IS_FILE(arg,arg2) ::= "output directory is a file: <arg>"
+CANNOT_OPEN_FILE(arg,exception) ::= "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>"
 CIRCULAR_DEPENDENCY() ::= "your grammars contain a circular dependency and cannot be sorted into a valid build order."
 
 INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
