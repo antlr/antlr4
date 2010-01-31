@@ -19,11 +19,25 @@ public class GrammarSemanticsMessage extends Message {
     {
         super(etype,args);
         this.g = g;
-        if ( g!=null ) file = g.fileName;
+        if ( g!=null ) fileName = g.fileName;
         this.offendingToken = offendingToken;
         if ( offendingToken!=null ) {
             line = offendingToken.getLine();
-            column = offendingToken.getCharPositionInLine();
+            charPosition = offendingToken.getCharPositionInLine();
+        }
+    }
+
+    public GrammarSemanticsMessage(ErrorType etype,
+                                   String fileName,
+                                   Token offendingToken,
+                                   Object... args)
+    {
+        super(etype,args);
+        this.fileName = fileName;
+        this.offendingToken = offendingToken;
+        if ( offendingToken!=null ) {
+            line = offendingToken.getLine();
+            charPosition = offendingToken.getCharPositionInLine();
         }
     }
 }

@@ -57,6 +57,10 @@ public class ErrorManager {
     private static Locale locale;
     private static String formatName;
 
+    // TODO: make thread local to hold this state
+    public static int errors;
+    public static int warnings;
+
     static ANTLRErrorListener theDefaultErrorListener = new ANTLRErrorListener() {
         public void info(String msg) {
             if (formatWantsSingleLineMessage()) {
@@ -130,14 +134,18 @@ public class ErrorManager {
     public static ST getLocationFormat() {
         return format.getInstanceOf("location");
     }
-    public static ST getReportFormat() {
-        return format.getInstanceOf("report");
+    public static ST getReportFormat(ErrorSeverity severity) {
+        ST st = format.getInstanceOf("report");
+        ST type = messages.getInstanceOf(severity.toString());
+        st.add("type", type);
+        return st;
+
     }
     public static ST getMessageFormat() {
         return format.getInstanceOf("message");
     }
     public static boolean formatWantsSingleLineMessage() {
-        return format.getInstanceOf("wantsSingleLineMessage").toString().equals("true");
+        return format.getInstanceOf("wantsSingleLineMessage").render().equals("true");
     }
     public static ST getMessageTemplate(ErrorType etype) {
         String msgName = etype.toString();
@@ -152,12 +160,14 @@ public class ErrorManager {
     }
 
     public static void internalError(String error, Throwable e) {
+        errors++;
         StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
         String msg = "Exception "+e+"@"+location+": "+error;
         System.err.println("internal error: "+msg);
     }
 
     public static void internalError(String error) {
+        errors++;
         StackTraceElement location =
             getLastNonErrorManagerCodeLocation(new Exception());
         String msg = location+": "+error;
@@ -171,6 +181,7 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public static void toolError(ErrorType errorType, Object... args) {
+        errors++;
         theDefaultErrorListener.error(new ToolMessage(errorType, args));
 	}
 
@@ -206,7 +217,18 @@ public class ErrorManager {
                                     Token token,
                                     Object... args)
     {
+        errors++;
         Message msg = new GrammarSemanticsMessage(etype,g,token,args);
+        theDefaultErrorListener.error(msg);
+    }
+
+    public static void grammarError(ErrorType etype,
+                                    String fileName,
+                                    Token token,
+                                    Object... args)
+    {
+        errors++;
+        Message msg = new GrammarSemanticsMessage(etype,fileName,token,args);
         theDefaultErrorListener.error(msg);
     }
 
@@ -217,7 +239,7 @@ public class ErrorManager {
     }
 
     public static int getNumErrors() {
-        return 0;
+        return errors;
     }
 
     /** Return first non ErrorManager code location for generating messages */
@@ -335,11 +357,11 @@ public class ErrorManager {
             }
         }
         // check for special templates
-        if (!messages.isDefined("warning")) {
+        if (!messages.isDefined("WARNING")) {
             System.err.println("Message template 'warning' not found in locale "+ locale);
             ok = false;
         }
-        if (!messages.isDefined("error")) {
+        if (!messages.isDefined("ERROR")) {
             System.err.println("Message template 'error' not found in locale "+ locale);
             ok = false;
         }

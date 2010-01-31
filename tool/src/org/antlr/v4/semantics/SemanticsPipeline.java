@@ -23,7 +23,7 @@ public class SemanticsPipeline {
 
         // DO BASIC / EASY SEMANTIC CHECKS
         nodes.reset();
-        BasicSemanticsChecker basics = new BasicSemanticsChecker(nodes,g);
+        BasicSemanticsChecker basics = new BasicSemanticsChecker(nodes,g.fileName);
         basics.downup(g.ast);
     }
 }

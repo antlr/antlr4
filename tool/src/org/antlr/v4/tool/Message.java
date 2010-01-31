@@ -8,9 +8,9 @@ public class Message {
     public Throwable e;
 
     // used for location template
-    public String file;
+    public String fileName;
     public int line = -1;
-    public int column = -1;
+    public int charPosition = -1;
 
     public Message() {
     }
@@ -35,7 +35,7 @@ public class Message {
     public ST getMessageTemplate() {
         ST messageST = ErrorManager.getMessageTemplate(errorType);
         ST locationST = ErrorManager.getLocationFormat();
-        ST reportST = ErrorManager.getReportFormat();
+        ST reportST = ErrorManager.getReportFormat(errorType.getSeverity());
         ST messageFormatST = ErrorManager.getMessageFormat();
 
         if ( args!=null ) { // fill in arg1, arg2, ...
@@ -55,24 +55,21 @@ public class Message {
             locationST.add("line", line);
             locationValid = true;
         }
-        if (column != -1) {
-            locationST.add("column", column);
+        if (charPosition != -1) {
+            locationST.add("column", charPosition);
             locationValid = true;
         }
-        if (file != null) {
-            locationST.add("file", file);
+        if (fileName != null) {
+            locationST.add("file", fileName);
             locationValid = true;
         }
 
-        messageFormatST.add("id", errorType);
+        messageFormatST.add("id", errorType.ordinal());
         messageFormatST.add("text", messageST);
 
-        if (locationValid) {
-            reportST.add("location", locationST);
-        }
+        if (locationValid) reportST.add("location", locationST);
         reportST.add("message", messageFormatST);
-        reportST.add("type", errorType.getSeverity());
-        return messageST;
+        return reportST;
     }
 
     public String toString() {

@@ -131,12 +131,13 @@ option
     :   ^(ASSIGN ID optionValue)
     ;
 
-optionValue
-    :   ID
+optionValue returns [String v]
+@init {$v = $start.token.getText();}
+    :   ID				
     |   STRING_LITERAL
     |   CHAR_LITERAL
-    |   INT
-    |   STAR
+    |   INT			
+    |   STAR		
     ;
 
 delegateGrammars

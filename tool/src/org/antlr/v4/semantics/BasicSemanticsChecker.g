@@ -103,30 +103,38 @@ import org.antlr.v4.tool.*;
 }
 
 @members {
-Grammar g; // which grammar are we checking
-public BasicSemanticsChecker(TreeNodeStream input, Grammar g) {
+public String name;
+public String fileName;
+public Map<String,String> options = new HashMap<String,String>();
+protected int gtype;
+//Grammar g; // which grammar are we checking
+public BasicSemanticsChecker(TreeNodeStream input, String fileName) {
 	this(input);
-	this.g = g;
+	this.fileName = fileName;
 }
 }
 
 topdown
 	:	grammarSpec
 	|	optionsSpec
-	|	tokensSpec
+	|	rule
+	|	ruleref
+//	|	tokensSpec
 	;
 
 grammarSpec
     :   ^(grammarType ID .*)
     	{
-    	if ( !g.fileName.equals($ID.text) ) {
+    	name = $ID.text;
+    	if ( !fileName.equals(name+".g") ) {
     		ErrorManager.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,
-    							      g, $ID.token, $ID.text, g.fileName);
+    							      fileName, $ID.token, name, fileName);
     	}
     	}
 	;
 	
 grammarType
+@init {gtype = $start.getType();}
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
 
@@ -135,10 +143,11 @@ optionsSpec
     ;
 
 option
-    :   ^(ASSIGN ID optionValue)
+    :   ^('=' o=ID optionValue)	 {options.put($o.text, $optionValue.v);}
     ;
 
-optionValue
+optionValue returns [String v]
+@init {$v = $start.token.getText();}
     :   ID
     |   STRING_LITERAL
     |   CHAR_LITERAL
@@ -146,6 +155,33 @@ optionValue
     |   STAR
     ;
 
+rule:   ^( RULE r=ID .*)
+	    {
+	    if ( gtype==LEXER_GRAMMAR && Character.isLowerCase($r.text.charAt(0)) ) {
+	    	ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
+    							      fileName, $r.token, $r.text);
+		}
+	    if ( (gtype==PARSER_GRAMMAR||gtype==PARSER_GRAMMAR) &&
+	         Character.isUpperCase($r.text.charAt(0)) )
+	    {
+	    	ErrorManager.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
+    							      fileName, $r.token, $r.text);
+		}
+		}
+    ;
+
+ruleref
+    :	{gtype==LEXER_GRAMMAR}?
+    	(	^((ROOT|BANG) r=RULE_REF ARG_ACTION?)
+	    |	^(r=RULE_REF ARG_ACTION?)
+	    )
+	    {
+	    ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
+    						      fileName, $r.token, $r.text);
+		}
+    ;
+
+/*
 tokensSpec
 	:   ^(TOKENS tokenSpec+)
 	;
@@ -157,5 +193,4 @@ tokenSpec
 	|	RULE_REF
 	;
 
-rule:   ^( RULE ID .*)
-    ;
+*/

@@ -292,5 +292,5 @@ NONREGULAR_DECISION(ruleName,alts) ::= <<
 >>
 
 /* l10n for message levels */
-warning() ::= "warning"
-error() ::= "error"
+WARNING() ::= "warning"
+ERROR() ::= "error"

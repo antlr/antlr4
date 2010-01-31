@@ -53,6 +53,8 @@ public class Tool {
      */
      private boolean make = false;
     private boolean showBanner = true;
+
+    /** Exit after showing version or whatever */ 
     private static boolean exitNow = false;
 
     // The internal options are for my use on the command line during dev
@@ -301,7 +303,7 @@ public class Tool {
             p.setTreeAdaptor(astAdaptor);
             ParserRuleReturnScope r = p.grammarSpec();
             GrammarAST t = (GrammarAST) r.getTree();
-            System.out.println(t.toStringTree());
+            if ( internalOption_PrintGrammarTree ) System.out.println(t.toStringTree());
             g = new Grammar(this, t);
             g.fileName = fileName;
             grammars.put(g.name, g);

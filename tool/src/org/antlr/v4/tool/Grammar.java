@@ -23,7 +23,6 @@ public class Grammar {
 
     public Grammar(Tool tool, GrammarAST ast) {
         this.tool = tool;
-        this.name = ast.getChild(0).getText();
         this.ast = ast;
     }
     
