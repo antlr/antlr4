@@ -6,12 +6,24 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Grammar {
+    public static final Set doNotCopyOptionsToLexer =
+        new HashSet() {
+            {
+                add("output"); add("ASTLabelType"); add("superClass");
+                add("k"); add("backtrack"); add("memoize"); add("rewrite");
+            }
+        };
+
+    public static final Map defaultOptions =
+            new HashMap() {
+                {
+                    put("language","Java");
+                }
+            };
+
     public Tool tool;
     public String name;
     public GrammarAST ast;
@@ -20,6 +32,9 @@ public class Grammar {
 
     protected List<Grammar> importedGrammars;
     protected Map<String, Rule> rules = new HashMap<String, Rule>();
+
+    /** A list of options specified at the grammar level such as language=Java. */
+    protected Map<String, String> options;    
 
     public Grammar(Tool tool, GrammarAST ast) {
         this.tool = tool;

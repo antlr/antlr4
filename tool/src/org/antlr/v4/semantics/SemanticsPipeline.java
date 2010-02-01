@@ -6,6 +6,7 @@ import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ASTVerifier;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -17,7 +18,8 @@ public class SemanticsPipeline {
         // use buffered node stream as we will look around in stream
         // to give good error messages.
         // TODO: send parse errors to buffer not stderr
-        BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(Tool.astAdaptor,g.ast);
+        BufferedTreeNodeStream nodes =
+            new BufferedTreeNodeStream(new GrammarASTAdaptor(null),g.ast);
         ASTVerifier walker = new ASTVerifier(nodes);
         try {walker.grammarSpec();}
         catch (RecognitionException re) {

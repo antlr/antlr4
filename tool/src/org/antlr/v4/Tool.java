@@ -65,10 +65,7 @@ public class Tool {
     public static boolean internalOption_saveTempLexer = false;
 
     protected Map<String, Grammar> grammars = new HashMap<String, Grammar>();
-
-    /** An adaptor that tells ANTLR to build CymbalAST nodes */
-    public static TreeAdaptor astAdaptor = new GrammarASTAdaptor();
-
+    
     public static void main(String[] args) {
         Tool antlr = new Tool(args);
 
@@ -300,7 +297,8 @@ public class Tool {
             ANTLRLexer lexer = new ANTLRLexer(in);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             ANTLRParser p = new ANTLRParser(tokens);
-            p.setTreeAdaptor(astAdaptor);
+
+            p.setTreeAdaptor(new GrammarASTAdaptor(in));
             ParserRuleReturnScope r = p.grammarSpec();
             GrammarAST t = (GrammarAST) r.getTree();
             if ( internalOption_PrintGrammarTree ) System.out.println(t.toStringTree());

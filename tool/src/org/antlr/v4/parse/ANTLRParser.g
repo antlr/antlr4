@@ -906,7 +906,7 @@ id
     | TOKEN_REF ->ID[$TOKEN_REF]
     ;
     
-qid :	id (WILDCARD id)* -> ID[$text] ;
+qid :	id (WILDCARD id)* -> ID[$qid.start, $text] ;
 
 alternativeEntry : alternative EOF ; // allow gunit to call alternative and see EOF afterwards
 elementEntry : element EOF ;

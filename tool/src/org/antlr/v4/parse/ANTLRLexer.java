@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-01-31 17:56:15
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-02-01 14:18:31
 
 /*
  [The "BSD licence"]
@@ -268,7 +268,7 @@ public class ANTLRLexer extends Lexer {
                         if ( (( input.LA(2) != '/')) ) {
                             alt3=1;
                         }
-                        else if ( ((( true )||(( true )&&(    !(input.LA(1) == '*' && input.LA(2) == '/') )))) ) {
+                        else if ( (((( true )&&(    !(input.LA(1) == '*' && input.LA(2) == '/') ))||( true ))) ) {
                             alt3=2;
                         }
                         else {

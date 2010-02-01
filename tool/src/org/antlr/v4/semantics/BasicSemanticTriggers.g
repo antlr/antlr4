@@ -24,7 +24,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Check the basic semantics of the input.  We check for: */
+/** Triggers for the basic semantics of the input.  Side-effects:
+ *  Set token, block, rule options in the tree.  Load field option
+ *  with grammar options. Only legal options are set.
+ */
 tree grammar BasicSemanticTriggers;
 options {
 	language      = Java;
@@ -66,6 +69,9 @@ import org.antlr.v4.tool.*;
 }
 
 @members {
+// TODO: SHOULD we fix up grammar AST to remove errors?  Like kill refs to bad rules?
+// that is, rewrite tree?  maybe all passes are filters until code gen, which needs
+// tree grammar. 'course we won't try codegen if errors.
 public String name;
 public String fileName;
 public Map<String,String> options = new HashMap<String,String>();
@@ -77,16 +83,14 @@ public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
 }
 }
 
-// TODO: SHOULD we fix up grammar AST to remove errors?  Like kill refs to bad rules?
-// that is, rewrite tree?  maybe all passes are filters until code gen, which needs
-// tree grammar. 'course we won't try codegen if errors.
 topdown
 	:	grammarSpec
 	|	option
 	|	rule
 	|	ruleref
 	|	tokenAlias
-	|	tokenRef
+	|	tokenRefWithArgs
+	|	elementOption
 	;
 
 grammarSpec
@@ -102,9 +106,15 @@ grammarType
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
 
-option
-    :   {inContext("OPTIONS")}? ^('=' o=ID optionValue)
-    	{options.put($o.text, $optionValue.v);}
+option // TODO: put in grammar, or rule, or block
+    :   {inContext("OPTIONS")}? ^(ASSIGN o=ID optionValue)
+    	{
+   	    GrammarAST parent = (GrammarAST)$start.getParent();   // OPTION
+   		GrammarAST parentWithOptionKind = (GrammarAST)parent.getParent();
+    	boolean ok = BasicSemanticChecks.checkOptions(gtype, parentWithOptionKind,
+    												  $ID.token, $optionValue.v);
+    	if ( ok ) options.put($o.text, $optionValue.v);
+    	}
     ;
 
 optionValue returns [String v]
@@ -127,7 +137,25 @@ tokenAlias
 		{BasicSemanticChecks.checkTokenAlias(gtype, $TOKEN_REF.token);}
 	;
 
-tokenRef
-	:	^(TOKEN_REF ARG_ACTION .*)
+tokenRefWithArgs
+	:	^(TOKEN_REF ARG_ACTION)
 		{BasicSemanticChecks.checkTokenArgs(gtype, $TOKEN_REF.token);}
 	;
+	
+elementOption
+    :	^(	ELEMENT_OPTIONS
+	    	(	o=ID
+	    	|   ^(ASSIGN o=ID value=ID)
+		   	|   ^(ASSIGN o=ID value=STRING_LITERAL)
+		   	)
+		)
+	   	{
+    	boolean ok = BasicSemanticChecks.checkTokenOptions(gtype, (GrammarAST)$o.getParent(),
+    												       $o.token, $value.text);
+    	if ( ok ) {
+    	    GrammarAST parent = (GrammarAST)$start.getParent();   // ELEMENT_OPTIONS
+    		TerminalAST terminal = (TerminalAST)parent.getParent();
+    		terminal.options.put($o.text, $value.text);
+    	}
+    	}
+    ;
