@@ -269,10 +269,6 @@ optionValue
       //
       STRING_LITERAL
 
-    | // The value was a single character
-      //
-      CHAR_LITERAL
-      
     | // The value was an integer number
       //
       INT
@@ -307,8 +303,8 @@ tokensSpec
 
 tokenSpec
 	:	TOKEN_REF
-		(	ASSIGN (lit=STRING_LITERAL|lit=CHAR_LITERAL)	-> ^(ASSIGN TOKEN_REF $lit)
-		|													-> TOKEN_REF
+		(	ASSIGN STRING_LITERAL	-> ^(ASSIGN TOKEN_REF STRING_LITERAL)
+		|							-> TOKEN_REF
 		)
 		SEMI
 	|	RULE_REF // INVALID! (an error alt)
@@ -659,8 +655,7 @@ notSet
 // matching anything BUT these)
 //
 notTerminal
-    : CHAR_LITERAL
-    | TOKEN_REF
+    : TOKEN_REF
     | STRING_LITERAL
     ;
 
@@ -733,21 +728,19 @@ range
 // Atoms for a range
 //  
 // All the things that we are going to allow syntactically as the subject of a range
-// operator. We do not want to restrict this just to CHAR_LITERAL as then
+// operator. We do not want to restrict this just to STRING_LITERAL as then
 // we will issue a syntax error that is perhaps none too obvious, even though we
-// say 'expecting CHAR_LITERAL'. Instead we will check these semantically
+// say 'expecting STRING_LITERAL'. Instead we will check these semantically
 //
 rangeElement
-    : CHAR_LITERAL    // Valid
-    | STRING_LITERAL  // Invalid
+    : STRING_LITERAL
     | RULE_REF        // Invalid
     | TOKEN_REF       // Invalid
     ;
     
 terminal
-    :   (	CHAR_LITERAL elementOptions?    	  -> ^(CHAR_LITERAL elementOptions?)
-	    	// Args are only valid for lexer rules
-		|   TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF ARG_ACTION? elementOptions?)
+    :   (	// Args are only valid for lexer rules
+		    TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF ARG_ACTION? elementOptions?)
 		|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL elementOptions?)
 		|   // Wildcard '.' means any character in a lexer, any
 			// token in parser and any token or node in a tree parser
@@ -833,8 +826,7 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
-    :   CHAR_LITERAL
-	|   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF ARG_ACTION?) // for imaginary nodes
+    :   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF ARG_ACTION?) // for imaginary nodes
     |   RULE_REF
 	|   STRING_LITERAL
 	|   DOLLAR id -> LABEL[$DOLLAR,$id.text] // reference to a label in a rewrite rule

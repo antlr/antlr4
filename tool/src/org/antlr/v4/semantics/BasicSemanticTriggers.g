@@ -24,51 +24,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Check the basic semantics of the input.  We check for:
-	FILE_AND_GRAMMAR_NAME_DIFFER
-	RULE_REDEFINITION(MessageSeverity.ERROR, true, true),
-	LEXER_RULES_NOT_ALLOWED(MessageSeverity.ERROR, true, true),
-	PARSER_RULES_NOT_ALLOWED(MessageSeverity.ERROR, true, true),
-	UNDEFINED_RULE_REF(MessageSeverity.ERROR, true, true),
-	CANNOT_ALIAS_TOKENS_IN_LEXER(MessageSeverity.ERROR, true, true),
-	INVALID_RULE_PARAMETER_REF(MessageSeverity.ERROR, true, true),
-	SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(MessageSeverity.ERROR, true, true),
-	LABEL_CONFLICTS_WITH_RULE(MessageSeverity.ERROR, true, true),
-	LABEL_CONFLICTS_WITH_TOKEN(MessageSeverity.ERROR, true, true),
-	LABEL_TYPE_CONFLICT(MessageSeverity.ERROR, true, true),
-	MISSING_RULE_ARGS(MessageSeverity.ERROR, true, true),
-	RULE_HAS_NO_ARGS(MessageSeverity.ERROR, true, true),
-	ARGS_ON_TOKEN_REF(MessageSeverity.ERROR, true, true),
-	ILLEGAL_OPTION(MessageSeverity.ERROR, true, true),
-	UNDEFINED_TOKEN_REF_IN_REWRITE(MessageSeverity.ERROR, true, true),
-	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(MessageSeverity.ERROR, true, true),
-	UNDEFINED_LABEL_REF_IN_REWRITE(MessageSeverity.ERROR, true, true),
-	EMPTY_COMPLEMENT(MessageSeverity.ERROR, true, true),
-	ACTION_REDEFINITION(MessageSeverity.ERROR, true, true),
-	REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(MessageSeverity.ERROR, true, true),
-	NO_RULES(MessageSeverity.ERROR, true, true),
-	REWRITE_FOR_MULTI_ELEMENT_ALT(MessageSeverity.ERROR, true, true),
-	RULE_INVALID_SET(MessageSeverity.ERROR, true, true),
-	HETERO_ILLEGAL_IN_REWRITE_ALT(MessageSeverity.ERROR, true, true),
-	NO_SUCH_RULE_IN_SCOPE(MessageSeverity.ERROR, true, true),
-	TOKEN_ALIAS_CONFLICT(MessageSeverity.ERROR, true, true),
-	TOKEN_ALIAS_REASSIGNMENT(MessageSeverity.ERROR, true, true),
-	TOKEN_VOCAB_IN_DELEGATE(MessageSeverity.ERROR, true, true),
-	INVALID_IMPORT(MessageSeverity.ERROR, true, true),
-	IMPORTED_TOKENS_RULE_EMPTY(MessageSeverity.ERROR, true, true),
-	IMPORT_NAME_CLASH(MessageSeverity.ERROR, true, true),
-	AST_OP_WITH_NON_AST_OUTPUT_OPTION(MessageSeverity.ERROR, true, true),
-	AST_OP_IN_ALT_WITH_REWRITE(MessageSeverity.ERROR, true, true),
-    WILDCARD_AS_ROOT(MessageSeverity.ERROR, true, true),
-    CONFLICTING_OPTION_IN_TREE_FILTER(MessageSeverity.ERROR, true, true),
- * 
- */
+/** Check the basic semantics of the input.  We check for: */
 tree grammar BasicSemanticTriggers;
 options {
 	language      = Java;
 	tokenVocab    = ANTLRParser;
 	ASTLabelType  = GrammarAST;
 	filter        = true;
+	superClass	  = 'org.antlr.v4.runtime.tree.TreeFilter';
 }
 
 // Include the copyright in this source and also the generated source
@@ -114,22 +77,22 @@ public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
 }
 }
 
+// TODO: SHOULD we fix up grammar AST to remove errors?  Like kill refs to bad rules?
+// that is, rewrite tree?  maybe all passes are filters until code gen, which needs
+// tree grammar. 'course we won't try codegen if errors.
 topdown
 	:	grammarSpec
 	|	optionsSpec
 	|	rule
 	|	ruleref
-//	|	tokensSpec
+	|	tokenAlias
 	;
 
 grammarSpec
     :   ^(grammarType ID .*)
     	{
     	name = $ID.text;
-    	if ( !fileName.equals(name+".g") ) {
-    		ErrorManager.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,
-    							      fileName, $ID.token, name, fileName);
-    	}
+    	BasicSemanticChecks.checkGrammarName($ID.token);
     	}
 	;
 	
@@ -150,37 +113,18 @@ optionValue returns [String v]
 @init {$v = $start.token.getText();}
     :   ID
     |   STRING_LITERAL
-    |   CHAR_LITERAL
     |   INT
     |   STAR
     ;
 
-rule:   ^( RULE r=ID .*) {BasicSemanticChecks.checkInvalidRuleDef(gtype, fileName, $r.token);}
+rule:   ^( RULE r=ID .*) {BasicSemanticChecks.checkInvalidRuleDef(gtype, $r.token);}
     ;
 
 ruleref
-    :	
-    	(	^((ROOT|BANG) r=RULE_REF ARG_ACTION?)
-	    |	^(r=RULE_REF ARG_ACTION?)
-	    )
-	    {
-	    if ( gtype==LEXER_GRAMMAR && Character.isLowerCase($r.text.charAt(0)) ) {
-	    	ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
-    							      fileName, $r.token, $r.text);
-		}
-		}
+    :	RULE_REF {BasicSemanticChecks.checkInvalidRuleRef(gtype, $RULE_REF.token);}
     ;
 
-/*
-tokensSpec
-	:   ^(TOKENS tokenSpec+)
+tokenAlias
+	:	{inContext("TOKENS")}? ^(ASSIGN TOKEN_REF STRING_LITERAL)
+		{BasicSemanticChecks.checkTokenAlias(gtype, $TOKEN_REF.token);}
 	;
-
-tokenSpec
-	:	^(ASSIGN TOKEN_REF STRING_LITERAL)
-    |   ^(ASSIGN TOKEN_REF CHAR_LITERAL)
-	|   TOKEN_REF
-	|	RULE_REF
-	;
-
-*/

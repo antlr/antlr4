@@ -135,7 +135,6 @@ optionValue returns [String v]
 @init {$v = $start.token.getText();}
     :   ID				
     |   STRING_LITERAL
-    |   CHAR_LITERAL
     |   INT			
     |   STAR		
     ;
@@ -155,7 +154,6 @@ tokensSpec
 
 tokenSpec
 	:	^(ASSIGN TOKEN_REF STRING_LITERAL)
-    |   ^(ASSIGN TOKEN_REF CHAR_LITERAL)
 	|   TOKEN_REF
 	|	RULE_REF
 	;
@@ -294,8 +292,7 @@ notSet
     ;
 
 notTerminal
-    : CHAR_LITERAL
-    | TOKEN_REF
+    : TOKEN_REF
     | STRING_LITERAL
     ;
 
@@ -314,16 +311,13 @@ range
     ;
 
 rangeElement
-    : CHAR_LITERAL
-    | STRING_LITERAL
+    : STRING_LITERAL
     | RULE_REF
     | TOKEN_REF
     ;
 
 terminal
-    :   ^(CHAR_LITERAL elementOptions)
-    |   CHAR_LITERAL
-    |	^(STRING_LITERAL elementOptions)
+    :  ^(STRING_LITERAL elementOptions)
     |	STRING_LITERAL
     |	^(TOKEN_REF elementOptions)
     |	TOKEN_REF
@@ -375,8 +369,7 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
-    :   CHAR_LITERAL
-	|   ^(TOKEN_REF ARG_ACTION)
+    :   ^(TOKEN_REF ARG_ACTION)
 	|   TOKEN_REF
     |   RULE_REF
 	|   STRING_LITERAL

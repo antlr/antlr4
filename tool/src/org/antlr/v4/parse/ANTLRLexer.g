@@ -556,24 +556,11 @@ SRC : 'src' WSCHARS+ file=ACTION_STRING_LITERAL WSCHARS+ line=INT
 // multi-character string. All literals are single quote delimited and
 // may contain unicode escape sequences of the form \uxxxx, where x
 // is a valid hexadecimal number (as per Java basically).
-// If we have just the one character, then this is a CHAR_LITERAL and
-// is of type STRING_LITERAL at > 1
-//
-fragment STRING_LITERAL : ;
-CHAR_LITERAL
+STRING_LITERAL
 @init {
    int len = 0;
 }
     :  '\'' ( ( ESC_SEQ | ~('\\'|'\'') ) {len++;} )* '\''
-    
-    	{
-    	   // Change the token type if we have more than one character
-    	   //
-    	   if (len > 1) {
-    	   
-    	       $type = STRING_LITERAL;
-    	   }
-    	}
     ;
 
 // A valid hex digit specification
