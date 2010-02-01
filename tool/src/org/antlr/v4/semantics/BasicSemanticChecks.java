@@ -50,6 +50,18 @@ public class BasicSemanticChecks {
         }
     }
 
+    /** At this point, we can only rule out obvious problems like ID[3]
+     *  in parser.  Might be illegal too in later stage when we see ID
+     *  isn't a fragment.
+     */
+    protected static void checkTokenArgs(int gtype, Token tokenID) {
+        String fileName = tokenID.getInputStream().getSourceName();
+        if ( gtype!=ANTLRParser.LEXER_GRAMMAR ) {
+            ErrorManager.grammarError(ErrorType.ARGS_ON_TOKEN_REF,
+                                      fileName, tokenID, tokenID.getText());
+        }
+    }
+
     protected static void checkFOO(int gtype, Token ID) {
     }
 }

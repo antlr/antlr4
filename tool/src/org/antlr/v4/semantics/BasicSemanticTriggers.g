@@ -82,10 +82,11 @@ public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
 // tree grammar. 'course we won't try codegen if errors.
 topdown
 	:	grammarSpec
-	|	optionsSpec
+	|	option
 	|	rule
 	|	ruleref
 	|	tokenAlias
+	|	tokenRef
 	;
 
 grammarSpec
@@ -101,12 +102,9 @@ grammarType
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
 
-optionsSpec
-	:	^(OPTIONS option+)
-    ;
-
 option
-    :   ^('=' o=ID optionValue)	 {options.put($o.text, $optionValue.v);}
+    :   {inContext("OPTIONS")}? ^('=' o=ID optionValue)
+    	{options.put($o.text, $optionValue.v);}
     ;
 
 optionValue returns [String v]
@@ -127,4 +125,9 @@ ruleref
 tokenAlias
 	:	{inContext("TOKENS")}? ^(ASSIGN TOKEN_REF STRING_LITERAL)
 		{BasicSemanticChecks.checkTokenAlias(gtype, $TOKEN_REF.token);}
+	;
+
+tokenRef
+	:	^(TOKEN_REF ARG_ACTION .*)
+		{BasicSemanticChecks.checkTokenArgs(gtype, $TOKEN_REF.token);}
 	;
