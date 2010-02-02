@@ -85,6 +85,7 @@ public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
 
 topdown
 	:	grammarSpec
+	|	rules
 	|	option
 	|	rule
 	|	ruleref
@@ -94,7 +95,7 @@ topdown
 	;
 
 grammarSpec
-    :   ^(grammarType ID .*)
+    :   ^(grammarType ID DOC_COMMENT? prequelConstructs (^(RULE .*))*)
     	{
     	name = $ID.text;
     	BasicSemanticChecks.checkGrammarName($ID.token);
@@ -105,6 +106,16 @@ grammarType
 @init {gtype = $start.getType();}
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
+
+prequelConstructs
+	:	(	^(o+=OPTIONS .*)
+		|	^(i+=IMPORT .*)
+		|	^(t+=TOKENS .*)
+		)*
+		{BasicSemanticChecks.checkNumPrequels(gtype, $o, $i, $t);}
+	;
+
+rules : RULES {BasicSemanticChecks.checkNumRules(gtype, fileName, $RULES);} ;
 
 option // TODO: put in grammar, or rule, or block
     :   {inContext("OPTIONS")}? ^(ASSIGN o=ID optionValue)

@@ -8,6 +8,7 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /** No side-effects */
@@ -83,6 +84,41 @@ public class BasicSemanticChecks {
                                       fileName, nameToken, nameToken.getText(), fileName);
         }
     }
+
+    protected static void checkNumRules(int gtype, String fileName,
+                                        GrammarAST rulesNode)
+    {
+        if ( rulesNode.getChildCount()==0 ) {
+            GrammarAST root = (GrammarAST)rulesNode.getParent();
+            GrammarAST IDNode = (GrammarAST)root.getChild(0);
+            ErrorManager.grammarError(ErrorType.NO_RULES, fileName, null, IDNode.getText());
+        }
+    }
+
+    protected static void checkNumPrequels(int gtype, List<GrammarAST> options,
+                                           List<GrammarAST> imports,
+                                           List<GrammarAST> tokens)
+    {
+        if ( options!=null && options.size()>1 ) {
+            Token secondOptionToken = options.get(1).token;
+            String fileName = secondOptionToken.getInputStream().getSourceName();
+            ErrorManager.grammarError(ErrorType.REPEATED_PREQUEL,
+                                      fileName, secondOptionToken);
+        }
+        if ( imports!=null && imports.size()>1 ) {
+            Token secondOptionToken = imports.get(1).token;
+            String fileName = secondOptionToken.getInputStream().getSourceName();
+            ErrorManager.grammarError(ErrorType.REPEATED_PREQUEL,
+                                      fileName, secondOptionToken);
+        }
+        if ( tokens!=null && tokens.size()>1 ) {
+            Token secondOptionToken = tokens.get(1).token;
+            String fileName = secondOptionToken.getInputStream().getSourceName();
+            ErrorManager.grammarError(ErrorType.REPEATED_PREQUEL,
+                                      fileName, secondOptionToken);
+        }
+    }
+
 
     protected static void checkInvalidRuleDef(int gtype, Token ruleID) {
         String fileName = ruleID.getInputStream().getSourceName();

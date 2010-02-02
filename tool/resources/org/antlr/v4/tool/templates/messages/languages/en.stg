@@ -176,6 +176,8 @@ set complement ~<arg> is empty
 set complement is empty
 <endif>
 >>
+REPEATED_PREQUEL(arg) ::=
+  "repeated grammar prequel spec (option, token, or import); please merge"
 UNKNOWN_DYNAMIC_SCOPE(arg) ::=
   "unknown dynamic scope: <arg>"
 UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(arg,arg2) ::=

@@ -154,8 +154,7 @@ tokensSpec
 
 tokenSpec
 	:	^(ASSIGN ID STRING_LITERAL)
-	|   TOKEN_REF
-	|	RULE_REF
+	|	ID
 	;
 
 attrScope

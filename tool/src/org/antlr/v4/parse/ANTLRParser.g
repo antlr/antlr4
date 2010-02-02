@@ -247,7 +247,7 @@ prequelConstruct
 
 // A list of options that affect analysis and/or code generation
 optionsSpec
-	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS["OPTIONS"] option+)
+	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "options"] option+)
     ;
         
 option
