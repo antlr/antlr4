@@ -74,7 +74,7 @@ import org.antlr.v4.tool.*;
 // tree grammar. 'course we won't try codegen if errors.
 public String name;
 public String fileName;
-public Map<String,String> options = new HashMap<String,String>();
+//public Map<String,String> options = new HashMap<String,String>();
 protected int gtype;
 //Grammar g; // which grammar are we checking
 public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
@@ -113,7 +113,10 @@ option // TODO: put in grammar, or rule, or block
    		GrammarAST parentWithOptionKind = (GrammarAST)parent.getParent();
     	boolean ok = BasicSemanticChecks.checkOptions(gtype, parentWithOptionKind,
     												  $ID.token, $optionValue.v);
-    	if ( ok ) options.put($o.text, $optionValue.v);
+		//  store options into XXX_GRAMMAR, RULE, BLOCK nodes
+    	if ( ok ) {
+    		((GrammarASTWithOptions)parentWithOptionKind).setOption($o.text, $optionValue.v);
+    	}
     	}
     ;
 
@@ -133,8 +136,8 @@ ruleref
     ;
 
 tokenAlias
-	:	{inContext("TOKENS")}? ^(ASSIGN TOKEN_REF STRING_LITERAL)
-		{BasicSemanticChecks.checkTokenAlias(gtype, $TOKEN_REF.token);}
+	:	{inContext("TOKENS")}? ^(ASSIGN ID STRING_LITERAL)
+		{BasicSemanticChecks.checkTokenAlias(gtype, $ID.token);}
 	;
 
 tokenRefWithArgs
@@ -144,8 +147,7 @@ tokenRefWithArgs
 	
 elementOption
     :	^(	ELEMENT_OPTIONS
-	    	(	o=ID
-	    	|   ^(ASSIGN o=ID value=ID)
+	    	(	^(ASSIGN o=ID value=ID)
 		   	|   ^(ASSIGN o=ID value=STRING_LITERAL)
 		   	)
 		)
@@ -155,7 +157,7 @@ elementOption
     	if ( ok ) {
     	    GrammarAST parent = (GrammarAST)$start.getParent();   // ELEMENT_OPTIONS
     		TerminalAST terminal = (TerminalAST)parent.getParent();
-    		terminal.options.put($o.text, $value.text);
+    		terminal.setOption($o.text, $value.text);
     	}
     	}
     ;

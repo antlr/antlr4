@@ -39,6 +39,7 @@ package org.antlr.v4.tool;
  * @since 4.0
  */
 public enum ErrorType {
+    // TODO: set all of the true, true appropriately
 	CANNOT_WRITE_FILE(ErrorSeverity.ERROR, true, true),
 	CANNOT_CLOSE_FILE(ErrorSeverity.ERROR, true, true),
 	CANNOT_FIND_TOKENS_FILE(ErrorSeverity.ERROR, true, true),
@@ -69,6 +70,7 @@ public enum ErrorType {
 	UNDEFINED_RULE_REF(ErrorSeverity.ERROR, true, true),
 	LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(ErrorSeverity.ERROR, true, true),
 	CANNOT_ALIAS_TOKENS_IN_LEXER(ErrorSeverity.ERROR, true, true),
+    TOKEN_NAMES_MUST_START_UPPER(ErrorSeverity.ERROR, true, true),
 	ATTRIBUTE_REF_NOT_IN_RULE(ErrorSeverity.ERROR, true, true),
 	INVALID_RULE_SCOPE_ATTRIBUTE_REF(ErrorSeverity.ERROR, true, true),
 	UNKNOWN_SIMPLE_ATTRIBUTE(ErrorSeverity.ERROR, true, true),

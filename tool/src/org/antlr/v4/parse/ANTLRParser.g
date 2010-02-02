@@ -63,6 +63,7 @@ tokens {
     RULEMODIFIERS;
     RULEACTIONS;
     BLOCK;
+    REWRITE_BLOCK;
     OPTIONAL;
     CLOSURE;
     POSITIVE_CLOSURE;
@@ -200,18 +201,18 @@ grammarSpec
 //
 grammarType
     : (	  // A standalone lexer specification
-          LEXER   -> LEXER_GRAMMAR
+          LEXER GRAMMAR  -> LEXER_GRAMMAR<GrammarRootAST>[$LEXER, "LEXER_GRAMMAR"]
           
         | // A standalone parser specification
-          PARSER  -> PARSER_GRAMMAR
+          PARSER GRAMMAR -> PARSER_GRAMMAR<GrammarRootAST>[$PARSER, "PARSER_GRAMMAR"]
           
         | // A standalone tree parser specification
-          TREE    -> TREE_GRAMMAR
+          TREE GRAMMAR   -> TREE_GRAMMAR<GrammarRootAST>[$TREE, "TREE_GRAMMAR"]
           
-        | // A combined lexer and parser specification
-                  -> COMBINED_GRAMMAR
+        // A combined lexer and parser specification
+        | g=GRAMMAR        -> COMBINED_GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
+                  
        )
-       GRAMMAR
     ;
     
 // This is the list of all constructs that can be declared before
@@ -267,7 +268,7 @@ optionValue
  
     | // The value is a long string
       //
-      STRING_LITERAL
+      STRING_LITERAL<TerminalAST>
 
     | // The value was an integer number
       //
@@ -302,9 +303,9 @@ tokensSpec
 	;
 
 tokenSpec
-	:	TOKEN_REF
-		(	ASSIGN STRING_LITERAL	-> ^(ASSIGN TOKEN_REF STRING_LITERAL)
-		|							-> TOKEN_REF
+	:	id
+		(	ASSIGN STRING_LITERAL	-> ^(ASSIGN id STRING_LITERAL<TerminalAST>)
+		|							-> id
 		)
 		SEMI
 	|	RULE_REF // INVALID! (an error alt)
@@ -402,7 +403,7 @@ rule
 
       exceptionGroup
             
-      -> ^( RULE id DOC_COMMENT? ruleModifiers? ARG_ACTION?
+      -> ^( RULE<RuleAST> id DOC_COMMENT? ruleModifiers? ARG_ACTION?
       		ruleReturns? rulePrequel* altListAsBlock exceptionGroup*
       	  )
     ;
@@ -519,7 +520,7 @@ altList
 // use a separate rule so that the BLOCK node has start and stop
 // boundaries set correctly by rule post processing of rewrites.
 altListAsBlock
-    : altList -> ^(BLOCK altList)
+    : altList -> ^(BLOCK<BlockAST> altList)
     ;
 
 // An individual alt with an optional rewrite clause for the
@@ -539,11 +540,11 @@ elements
   
 element
 	:	labeledElement
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] labeledElement ) ))
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT labeledElement ) ))
 		|				-> labeledElement
 		)
 	|	atom
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] atom ) ) )
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT atom ) ) )
 		|				-> atom
 		)
 	|	ebnf
@@ -553,7 +554,7 @@ element
 		|				-> SEMPRED
 		)
 	|   treeSpec
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] treeSpec ) ) )
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT treeSpec ) ) )
 		|				-> treeSpec
 		)
 	;
@@ -655,8 +656,8 @@ notSet
 // matching anything BUT these)
 //
 notTerminal
-    : TOKEN_REF
-    | STRING_LITERAL
+    : TOKEN_REF<TerminalAST>
+    | STRING_LITERAL<TerminalAST>
     ;
 
 // -------------
@@ -695,7 +696,7 @@ block
       
       // Rewrite as a block
       //
-      -> ^(BLOCK optionsSpec? $ra* ACTION? altList )
+      -> ^(BLOCK<BlockAST> optionsSpec? $ra* ACTION? altList )
     ; 
 
 // ----------------    
@@ -733,21 +734,21 @@ range
 // say 'expecting STRING_LITERAL'. Instead we will check these semantically
 //
 rangeElement
-    : STRING_LITERAL
+    : STRING_LITERAL<TerminalAST>
     | RULE_REF        // Invalid
-    | TOKEN_REF       // Invalid
+    | TOKEN_REF<TerminalAST>       // Invalid
     ;
     
 terminal
     :   (	// Args are only valid for lexer rules
-		    TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF ARG_ACTION? elementOptions?)
-		|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL elementOptions?)
+		    TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION? elementOptions?)
+		|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 		|   // Wildcard '.' means any character in a lexer, any
 			// token in parser and any token or node in a tree parser
 			// Because the terminal rule is allowed to be the node
 			// specification for the start of a tree rule, we must
 			// later check that wildcard was not used for that.
-		    DOT elementOptions?		 			  -> ^(WILDCARD[$DOT] elementOptions?)
+		    DOT elementOptions?		 			  -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
 		)
 		(	ROOT								  -> ^(ROOT $terminal)
 		|	BANG								  -> ^(BANG $terminal)
@@ -773,7 +774,7 @@ elementOption
       qid
       
     | // This format indicates option assignment
-      id ASSIGN^ (qid | STRING_LITERAL)
+      id ASSIGN^ (qid | STRING_LITERAL<TerminalAST>)
     ;
 
 rewrite
@@ -810,25 +811,25 @@ options {backtrack=true;}
     ;
 	
 rewriteTreeAlt
-    :	rewriteTreeElement+ -> ^(ALT["ALT"] rewriteTreeElement+)
+    :	rewriteTreeElement+ -> ^(ALT rewriteTreeElement+)
     ;
 
 rewriteTreeElement
 	:	rewriteTreeAtom
 	|	rewriteTreeAtom ebnfSuffix
-		-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] rewriteTreeAtom)) )
+		-> ^( ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTreeAtom)) )
 	|   rewriteTree
 		(	ebnfSuffix
-			-> ^(ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] rewriteTree)) )
+			-> ^(ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTree)) )
 		|	-> rewriteTree
 		)
 	|   rewriteTreeEbnf
 	;
 
 rewriteTreeAtom
-    :   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF ARG_ACTION?) // for imaginary nodes
+    :   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION?) // for imaginary nodes
     |   RULE_REF
-	|   STRING_LITERAL
+	|   STRING_LITERAL<TerminalAST>
 	|   DOLLAR id -> LABEL[$DOLLAR,$id.text] // reference to a label in a rewrite rule
 	|	ACTION
 	;
@@ -841,7 +842,7 @@ rewriteTreeEbnf
 	$rewriteTreeEbnf.tree.getToken().setLine(firstToken.getLine());
 	$rewriteTreeEbnf.tree.getToken().setCharPositionInLine(firstToken.getCharPositionInLine());
 }
-	:	lp=LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^(ebnfSuffix ^(BLOCK[$lp,"BLOCK"] rewriteTreeAlt))
+	:	lp=LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^(ebnfSuffix ^(REWRITE_BLOCK[$lp] rewriteTreeAlt))
 	;
 
 rewriteTree

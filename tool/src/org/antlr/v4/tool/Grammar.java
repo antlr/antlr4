@@ -17,13 +17,6 @@ public class Grammar {
             }
         };
 
-    public static final Map defaultOptions =
-            new HashMap() {
-                {
-                    put("language","Java");
-                }
-            };
-
     public Tool tool;
     public String name;
     public GrammarAST ast;

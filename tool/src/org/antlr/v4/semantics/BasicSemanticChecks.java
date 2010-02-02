@@ -109,6 +109,12 @@ public class BasicSemanticChecks {
 
     protected static void checkTokenAlias(int gtype, Token tokenID) {
         String fileName = tokenID.getInputStream().getSourceName();
+        if ( Character.isLowerCase(tokenID.getText().charAt(0)) ) {
+            ErrorManager.grammarError(ErrorType.TOKEN_NAMES_MUST_START_UPPER,
+                                      fileName,
+                                      tokenID,
+                                      tokenID.getText());
+        }
         if ( gtype==ANTLRParser.LEXER_GRAMMAR ) {
             ErrorManager.grammarError(ErrorType.CANNOT_ALIAS_TOKENS_IN_LEXER,
                                       fileName,
@@ -135,10 +141,24 @@ public class BasicSemanticChecks {
     {
         String fileName = optionID.getInputStream().getSourceName();
         if ( parent.getType()==ANTLRParser.BLOCK ) {
+            if ( !legalBlockOptions.contains(optionID.getText()) ) { // grammar
+                ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
+                                          fileName,
+                                          optionID,
+                                          optionID.getText());
+                return false;
+            }
         }
-        if ( parent.getType()==ANTLRParser.RULE ) {
+        else if ( parent.getType()==ANTLRParser.RULE ) {
+            if ( !legalRuleOptions.contains(optionID.getText()) ) { // grammar
+                ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
+                                          fileName,
+                                          optionID,
+                                          optionID.getText());
+                return false;
+            }
         }
-        if ( !legalGrammarOption(gtype, optionID.getText()) ) { // grammar
+        else if ( !legalGrammarOption(gtype, optionID.getText()) ) { // grammar
             ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                       fileName,
                                       optionID,

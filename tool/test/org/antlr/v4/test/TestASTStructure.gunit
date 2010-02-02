@@ -127,7 +127,7 @@ alternative:
 	"x+=ID* -> $x*" ->
 	    (ALT_REWRITE
 		    (ALT (* (BLOCK (ALT (+= x ID)))))
-            (-> (ALT (* (BLOCK (ALT x))))))
+            (-> (ALT (* (REWRITE_BLOCK (ALT x))))))
 
 	"A -> ..." -> (ALT_REWRITE (ALT A) (-> ...))
 	"A -> "	   -> (ALT_REWRITE (ALT A) (-> EPSILON))
@@ -166,15 +166,15 @@ alternative:
             (ALT a A (? (BLOCK (ALT X))) (* (BLOCK (ALT Y))))
             (-> (ALT
                 A a
-                (? (BLOCK (ALT ("^(" TOP X))))
-                (* (BLOCK (ALT Y))))))
+                (? (REWRITE_BLOCK (ALT ("^(" TOP X))))
+                (* (REWRITE_BLOCK (ALT Y))))))
 
 	"A -> A[33]" -> (ALT_REWRITE (ALT A) (-> (ALT (A 33))))
 
 	"A -> 'int' ^(A A)*" ->
         (ALT_REWRITE
             (ALT A)
-            (-> (ALT 'int' (* (BLOCK (ALT ("^(" A A)))))))
+            (-> (ALT 'int' (* (REWRITE_BLOCK (ALT ("^(" A A)))))))
 
     <<
     A -> {p1}? A

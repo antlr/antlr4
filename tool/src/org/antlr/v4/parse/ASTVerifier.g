@@ -153,7 +153,7 @@ tokensSpec
 	;
 
 tokenSpec
-	:	^(ASSIGN TOKEN_REF STRING_LITERAL)
+	:	^(ASSIGN ID STRING_LITERAL)
 	|   TOKEN_REF
 	|	RULE_REF
 	;
@@ -380,7 +380,7 @@ rewriteTreeAtom
 	;
 
 rewriteTreeEbnf
-	:	^(ebnfSuffix ^(BLOCK rewriteTreeAlt))
+	:	^(ebnfSuffix ^(REWRITE_BLOCK rewriteTreeAlt))
 	;
 rewriteTree
 	:	^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )

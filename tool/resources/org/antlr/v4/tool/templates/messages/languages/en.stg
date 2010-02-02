@@ -97,6 +97,8 @@ LEXER_RULES_NOT_ALLOWED(arg) ::=
 	"lexer rule <arg> not allowed in parser"
 PARSER_RULES_NOT_ALLOWED(arg) ::=
 	"parser rule <arg> not allowed in lexer"
+TOKEN_NAMES_MUST_START_UPPER(arg) ::=
+	"token names must start with an uppercase letter: <arg>"
 CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(arg) ::=
 	"cannot find an attribute name in attribute declaration"
 NO_TOKEN_DEFINITION(arg) ::=
