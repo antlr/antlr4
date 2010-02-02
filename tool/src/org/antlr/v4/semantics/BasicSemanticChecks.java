@@ -235,10 +235,7 @@ public class BasicSemanticChecks {
     /** Rules in tree grammar that use -> rewrites and are spitting out
      *  templates via output=template and then use rewrite=true must only
      *  use -> on alts that are simple nodes or trees or single rule refs
-     *  that match either nodes or trees.  The altAST is the ALT node
-     *  for an ALT.  Verify that its first child is simple.  Must be either
-     *  ( ALT ^( A B ) <end-of-alt> ) or ( ALT A <end-of-alt> ) or
-     *  other element.
+     *  that match either nodes or trees.
      */
     public static void checkRewriteForMultiRootAltInTreeGrammar(int gtype,
                                                                 Map<String, String> options,
