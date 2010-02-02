@@ -232,6 +232,16 @@ public class ErrorManager {
         theDefaultErrorListener.error(msg);
     }
 
+    public static void grammarWarning(ErrorType etype,
+                                      String fileName,
+                                      Token token,
+                                      Object... args)
+    {
+        warnings++;
+        Message msg = new GrammarSemanticsMessage(etype,fileName,token,args);
+        theDefaultErrorListener.warning(msg);
+    }
+
     /** Process a new message by sending it on to the error listener associated with the current thread
      *  and recording any information we need in the error state for the current thread.
      */

@@ -905,6 +905,7 @@ rewriteTemplateArg
 id
     : RULE_REF  ->ID[$RULE_REF]
     | TOKEN_REF ->ID[$TOKEN_REF]
+    | TEMPLATE  ->ID[$TEMPLATE] // keyword
     ;
     
 qid :	id (WILDCARD id)* -> ID[$qid.start, $text] ;

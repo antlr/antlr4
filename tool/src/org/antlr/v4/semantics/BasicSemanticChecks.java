@@ -7,9 +7,7 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.GrammarAST;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** No side-effects */
 public class BasicSemanticChecks {
@@ -99,26 +97,22 @@ public class BasicSemanticChecks {
                                            List<GrammarAST> imports,
                                            List<GrammarAST> tokens)
     {
+        List<Token> secondOptionTokens = new ArrayList<Token>();
         if ( options!=null && options.size()>1 ) {
-            Token secondOptionToken = options.get(1).token;
-            String fileName = secondOptionToken.getInputStream().getSourceName();
-            ErrorManager.grammarError(ErrorType.REPEATED_PREQUEL,
-                                      fileName, secondOptionToken);
+            secondOptionTokens.add(options.get(1).token);
         }
         if ( imports!=null && imports.size()>1 ) {
-            Token secondOptionToken = imports.get(1).token;
-            String fileName = secondOptionToken.getInputStream().getSourceName();
-            ErrorManager.grammarError(ErrorType.REPEATED_PREQUEL,
-                                      fileName, secondOptionToken);
+            secondOptionTokens.add(imports.get(1).token);
         }
         if ( tokens!=null && tokens.size()>1 ) {
-            Token secondOptionToken = tokens.get(1).token;
-            String fileName = secondOptionToken.getInputStream().getSourceName();
+            secondOptionTokens.add(tokens.get(1).token);
+        }
+        for (Token t : secondOptionTokens) {
+            String fileName = t.getInputStream().getSourceName();
             ErrorManager.grammarError(ErrorType.REPEATED_PREQUEL,
-                                      fileName, secondOptionToken);
+                                      fileName, t);
         }
     }
-
 
     protected static void checkInvalidRuleDef(int gtype, Token ruleID) {
         String fileName = ruleID.getInputStream().getSourceName();
@@ -235,6 +229,31 @@ public class BasicSemanticChecks {
                 return legalTreeParserOptions.contains(key);
             default :
                 return legalParserOptions.contains(key);
+        }
+    }
+
+    /** Rules in tree grammar that use -> rewrites and are spitting out
+     *  templates via output=template and then use rewrite=true must only
+     *  use -> on alts that are simple nodes or trees or single rule refs
+     *  that match either nodes or trees.  The altAST is the ALT node
+     *  for an ALT.  Verify that its first child is simple.  Must be either
+     *  ( ALT ^( A B ) <end-of-alt> ) or ( ALT A <end-of-alt> ) or
+     *  other element.
+     */
+    public static void checkRewriteForMultiRootAltInTreeGrammar(int gtype,
+                                                                Map<String, String> options,
+                                                                Token altStart,
+                                                                int alt)
+    {
+        if ( gtype==ANTLRParser.TREE_GRAMMAR &&
+             options!=null && options.get("output").equals("template") &&
+             options.get("rewrite").equals("true") )
+        {
+            String fileName = altStart.getInputStream().getSourceName();
+            ErrorManager.grammarWarning(ErrorType.REWRITE_FOR_MULTI_ELEMENT_ALT,
+                                        fileName,
+                                        altStart,
+                                        alt);
         }
     }
 

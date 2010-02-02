@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRParser.g 2010-02-01 18:48:02
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRParser.g 2010-02-02 14:32:55
 
 /*
  [The "BSD licence"]
@@ -292,7 +292,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: grammarType, prequelConstruct, DOC_COMMENT, rules, id
+            // elements: DOC_COMMENT, id, prequelConstruct, rules, grammarType
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -767,7 +767,7 @@ public class ANTLRParser extends Parser {
                 int alt5=2;
                 int LA5_0 = input.LA(1);
 
-                if ( ((LA5_0>=TOKEN_REF && LA5_0<=RULE_REF)) ) {
+                if ( (LA5_0==TEMPLATE||(LA5_0>=TOKEN_REF && LA5_0<=RULE_REF)) ) {
                     alt5=1;
                 }
 
@@ -949,6 +949,7 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:263:5: ( qid | STRING_LITERAL | INT | STAR )
             int alt6=4;
             switch ( input.LA(1) ) {
+            case TEMPLATE:
             case TOKEN_REF:
             case RULE_REF:
                 {
@@ -1215,9 +1216,9 @@ public class ANTLRParser extends Parser {
         try {
             // ANTLRParser.g:291:5: ( id ASSIGN id | id )
             int alt8=2;
-            int LA8_0 = input.LA(1);
-
-            if ( (LA8_0==RULE_REF) ) {
+            switch ( input.LA(1) ) {
+            case RULE_REF:
+                {
                 int LA8_1 = input.LA(2);
 
                 if ( (LA8_1==ASSIGN) ) {
@@ -1233,8 +1234,10 @@ public class ANTLRParser extends Parser {
 
                     throw nvae;
                 }
-            }
-            else if ( (LA8_0==TOKEN_REF) ) {
+                }
+                break;
+            case TOKEN_REF:
+                {
                 int LA8_2 = input.LA(2);
 
                 if ( (LA8_2==ASSIGN) ) {
@@ -1250,14 +1253,35 @@ public class ANTLRParser extends Parser {
 
                     throw nvae;
                 }
-            }
-            else {
+                }
+                break;
+            case TEMPLATE:
+                {
+                int LA8_3 = input.LA(2);
+
+                if ( ((LA8_3>=COMMA && LA8_3<=SEMI)) ) {
+                    alt8=2;
+                }
+                else if ( (LA8_3==ASSIGN) ) {
+                    alt8=1;
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return retval;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 8, 3, input);
+
+                    throw nvae;
+                }
+                }
+                break;
+            default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 8, 0, input);
 
                 throw nvae;
             }
+
             switch (alt8) {
                 case 1 :
                     // ANTLRParser.g:291:9: id ASSIGN id
@@ -1357,7 +1381,7 @@ public class ANTLRParser extends Parser {
                 int alt9=2;
                 int LA9_0 = input.LA(1);
 
-                if ( ((LA9_0>=TOKEN_REF && LA9_0<=RULE_REF)) ) {
+                if ( (LA9_0==TEMPLATE||(LA9_0>=TOKEN_REF && LA9_0<=RULE_REF)) ) {
                     alt9=1;
                 }
 
@@ -1392,7 +1416,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: tokenSpec, TOKENS
+            // elements: TOKENS, tokenSpec
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1486,7 +1510,7 @@ public class ANTLRParser extends Parser {
                 if ( (LA11_1==SEMI||LA11_1==ASSIGN) ) {
                     alt11=1;
                 }
-                else if ( ((LA11_1>=RBRACE && LA11_1<=RULE_REF)) ) {
+                else if ( (LA11_1==TEMPLATE||(LA11_1>=RBRACE && LA11_1<=RULE_REF)) ) {
                     alt11=2;
                 }
                 else {
@@ -1497,7 +1521,7 @@ public class ANTLRParser extends Parser {
                     throw nvae;
                 }
             }
-            else if ( (LA11_0==TOKEN_REF) ) {
+            else if ( (LA11_0==TEMPLATE||LA11_0==TOKEN_REF) ) {
                 alt11=1;
             }
             else {
@@ -1547,7 +1571,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: ASSIGN, STRING_LITERAL, id
+                            // elements: id, ASSIGN, STRING_LITERAL
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -1793,6 +1817,15 @@ public class ANTLRParser extends Parser {
                     }
                     }
                     break;
+                case TEMPLATE:
+                    {
+                    int LA12_3 = input.LA(2);
+
+                    if ( (LA12_3==COLONCOLON) ) {
+                        alt12=1;
+                    }
+                    }
+                    break;
                 case LEXER:
                 case PARSER:
                     {
@@ -1832,7 +1865,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ACTION, AT, id, actionScopeName
+            // elements: id, ACTION, actionScopeName, AT
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1914,6 +1947,7 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:333:2: ( id | LEXER -> ID[$LEXER] | PARSER -> ID[$PARSER] )
             int alt13=3;
             switch ( input.LA(1) ) {
+            case TEMPLATE:
             case TOKEN_REF:
             case RULE_REF:
                 {
@@ -2060,7 +2094,7 @@ public class ANTLRParser extends Parser {
                 int alt14=2;
                 int LA14_0 = input.LA(1);
 
-                if ( (LA14_0==DOC_COMMENT||LA14_0==FRAGMENT||(LA14_0>=PROTECTED && LA14_0<=PRIVATE)||(LA14_0>=TOKEN_REF && LA14_0<=RULE_REF)) ) {
+                if ( (LA14_0==DOC_COMMENT||LA14_0==FRAGMENT||(LA14_0>=PROTECTED && LA14_0<=PRIVATE)||LA14_0==TEMPLATE||(LA14_0>=TOKEN_REF && LA14_0<=RULE_REF)) ) {
                     alt14=1;
                 }
 
@@ -2331,7 +2365,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: exceptionGroup, rulePrequel, ruleModifiers, DOC_COMMENT, id, ruleReturns, ARG_ACTION, altListAsBlock
+            // elements: DOC_COMMENT, exceptionGroup, rulePrequel, altListAsBlock, id, ruleReturns, ARG_ACTION, ruleModifiers
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2557,7 +2591,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: CATCH, ACTION, ARG_ACTION
+            // elements: ARG_ACTION, ACTION, CATCH
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2954,7 +2988,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: qid, THROWS
+            // elements: THROWS, qid
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3053,7 +3087,7 @@ public class ANTLRParser extends Parser {
                 if ( (LA25_1==ACTION) ) {
                     alt25=1;
                 }
-                else if ( ((LA25_1>=TOKEN_REF && LA25_1<=RULE_REF)) ) {
+                else if ( (LA25_1==TEMPLATE||(LA25_1>=TOKEN_REF && LA25_1<=RULE_REF)) ) {
                     alt25=2;
                 }
                 else {
@@ -3084,7 +3118,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: SCOPE, ACTION
+                    // elements: ACTION, SCOPE
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -3262,7 +3296,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: id, ACTION, AT
+            // elements: ACTION, id, AT
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3705,6 +3739,7 @@ public class ANTLRParser extends Parser {
             switch ( input.LA(1) ) {
             case SEMPRED:
             case ACTION:
+            case TEMPLATE:
             case LPAREN:
             case TREE_BEGIN:
             case NOT:
@@ -3777,7 +3812,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: elements, rewrite
+                            // elements: rewrite, elements
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -3968,7 +4003,7 @@ public class ANTLRParser extends Parser {
                 int alt30=2;
                 int LA30_0 = input.LA(1);
 
-                if ( (LA30_0==SEMPRED||LA30_0==ACTION||LA30_0==LPAREN||LA30_0==TREE_BEGIN||LA30_0==NOT||(LA30_0>=TOKEN_REF && LA30_0<=RULE_REF)||LA30_0==STRING_LITERAL||LA30_0==DOT) ) {
+                if ( (LA30_0==SEMPRED||LA30_0==ACTION||LA30_0==TEMPLATE||LA30_0==LPAREN||LA30_0==TREE_BEGIN||LA30_0==NOT||(LA30_0>=TOKEN_REF && LA30_0<=RULE_REF)||LA30_0==STRING_LITERAL||LA30_0==DOT) ) {
                     alt30=1;
                 }
 
@@ -4101,80 +4136,7 @@ public class ANTLRParser extends Parser {
         try {
             // ANTLRParser.g:542:2: ( labeledElement ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT labeledElement ) ) ) | -> labeledElement ) | atom ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT atom ) ) ) | -> atom ) | ebnf | ACTION | SEMPRED ( IMPLIES -> GATED_SEMPRED[$IMPLIES] | -> SEMPRED ) | treeSpec ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT treeSpec ) ) ) | -> treeSpec ) )
             int alt35=6;
-            switch ( input.LA(1) ) {
-            case RULE_REF:
-                {
-                int LA35_1 = input.LA(2);
-
-                if ( (LA35_1==EOF||LA35_1==SEMPRED||LA35_1==ARG_ACTION||LA35_1==ACTION||(LA35_1>=SEMI && LA35_1<=RPAREN)||(LA35_1>=QUESTION && LA35_1<=PLUS)||(LA35_1>=OR && LA35_1<=ROOT)||(LA35_1>=WILDCARD && LA35_1<=RANGE)||(LA35_1>=RARROW && LA35_1<=TREE_BEGIN)||LA35_1==NOT||(LA35_1>=TOKEN_REF && LA35_1<=RULE_REF)||LA35_1==STRING_LITERAL||LA35_1==DOT) ) {
-                    alt35=2;
-                }
-                else if ( (LA35_1==ASSIGN||LA35_1==PLUS_ASSIGN) ) {
-                    alt35=1;
-                }
-                else {
-                    if (state.backtracking>0) {state.failed=true; return retval;}
-                    NoViableAltException nvae =
-                        new NoViableAltException("", 35, 1, input);
-
-                    throw nvae;
-                }
-                }
-                break;
-            case TOKEN_REF:
-                {
-                int LA35_2 = input.LA(2);
-
-                if ( (LA35_2==ASSIGN||LA35_2==PLUS_ASSIGN) ) {
-                    alt35=1;
-                }
-                else if ( (LA35_2==EOF||LA35_2==SEMPRED||LA35_2==ARG_ACTION||LA35_2==ACTION||(LA35_2>=SEMI && LA35_2<=RPAREN)||LA35_2==LT||(LA35_2>=QUESTION && LA35_2<=PLUS)||(LA35_2>=OR && LA35_2<=ROOT)||(LA35_2>=WILDCARD && LA35_2<=RANGE)||(LA35_2>=RARROW && LA35_2<=TREE_BEGIN)||LA35_2==NOT||(LA35_2>=TOKEN_REF && LA35_2<=RULE_REF)||LA35_2==STRING_LITERAL||LA35_2==DOT) ) {
-                    alt35=2;
-                }
-                else {
-                    if (state.backtracking>0) {state.failed=true; return retval;}
-                    NoViableAltException nvae =
-                        new NoViableAltException("", 35, 2, input);
-
-                    throw nvae;
-                }
-                }
-                break;
-            case NOT:
-            case STRING_LITERAL:
-            case DOT:
-                {
-                alt35=2;
-                }
-                break;
-            case LPAREN:
-                {
-                alt35=3;
-                }
-                break;
-            case ACTION:
-                {
-                alt35=4;
-                }
-                break;
-            case SEMPRED:
-                {
-                alt35=5;
-                }
-                break;
-            case TREE_BEGIN:
-                {
-                alt35=6;
-                }
-                break;
-            default:
-                if (state.backtracking>0) {state.failed=true; return retval;}
-                NoViableAltException nvae =
-                    new NoViableAltException("", 35, 0, input);
-
-                throw nvae;
-            }
-
+            alt35 = dfa35.predict(input);
             switch (alt35) {
                 case 1 :
                     // ANTLRParser.g:542:4: labeledElement ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT labeledElement ) ) ) | -> labeledElement )
@@ -4192,7 +4154,7 @@ public class ANTLRParser extends Parser {
                     if ( (LA31_0==QUESTION||(LA31_0>=STAR && LA31_0<=PLUS)) ) {
                         alt31=1;
                     }
-                    else if ( (LA31_0==EOF||LA31_0==SEMPRED||LA31_0==ACTION||(LA31_0>=SEMI && LA31_0<=RPAREN)||LA31_0==OR||(LA31_0>=RARROW && LA31_0<=TREE_BEGIN)||LA31_0==NOT||(LA31_0>=TOKEN_REF && LA31_0<=RULE_REF)||LA31_0==STRING_LITERAL||LA31_0==DOT) ) {
+                    else if ( (LA31_0==EOF||LA31_0==SEMPRED||LA31_0==ACTION||LA31_0==TEMPLATE||(LA31_0>=SEMI && LA31_0<=RPAREN)||LA31_0==OR||(LA31_0>=RARROW && LA31_0<=TREE_BEGIN)||LA31_0==NOT||(LA31_0>=TOKEN_REF && LA31_0<=RULE_REF)||LA31_0==STRING_LITERAL||LA31_0==DOT) ) {
                         alt31=2;
                     }
                     else {
@@ -4306,7 +4268,7 @@ public class ANTLRParser extends Parser {
                     if ( (LA32_0==QUESTION||(LA32_0>=STAR && LA32_0<=PLUS)) ) {
                         alt32=1;
                     }
-                    else if ( (LA32_0==EOF||LA32_0==SEMPRED||LA32_0==ACTION||(LA32_0>=SEMI && LA32_0<=RPAREN)||LA32_0==OR||(LA32_0>=RARROW && LA32_0<=TREE_BEGIN)||LA32_0==NOT||(LA32_0>=TOKEN_REF && LA32_0<=RULE_REF)||LA32_0==STRING_LITERAL||LA32_0==DOT) ) {
+                    else if ( (LA32_0==EOF||LA32_0==SEMPRED||LA32_0==ACTION||LA32_0==TEMPLATE||(LA32_0>=SEMI && LA32_0<=RPAREN)||LA32_0==OR||(LA32_0>=RARROW && LA32_0<=TREE_BEGIN)||LA32_0==NOT||(LA32_0>=TOKEN_REF && LA32_0<=RULE_REF)||LA32_0==STRING_LITERAL||LA32_0==DOT) ) {
                         alt32=2;
                     }
                     else {
@@ -4329,7 +4291,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: ebnfSuffix, atom
+                            // elements: atom, ebnfSuffix
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -4444,7 +4406,7 @@ public class ANTLRParser extends Parser {
                     if ( (LA33_0==IMPLIES) ) {
                         alt33=1;
                     }
-                    else if ( (LA33_0==EOF||LA33_0==SEMPRED||LA33_0==ACTION||(LA33_0>=SEMI && LA33_0<=RPAREN)||LA33_0==OR||(LA33_0>=RARROW && LA33_0<=TREE_BEGIN)||LA33_0==NOT||(LA33_0>=TOKEN_REF && LA33_0<=RULE_REF)||LA33_0==STRING_LITERAL||LA33_0==DOT) ) {
+                    else if ( (LA33_0==EOF||LA33_0==SEMPRED||LA33_0==ACTION||LA33_0==TEMPLATE||(LA33_0>=SEMI && LA33_0<=RPAREN)||LA33_0==OR||(LA33_0>=RARROW && LA33_0<=TREE_BEGIN)||LA33_0==NOT||(LA33_0>=TOKEN_REF && LA33_0<=RULE_REF)||LA33_0==STRING_LITERAL||LA33_0==DOT) ) {
                         alt33=2;
                     }
                     else {
@@ -4531,7 +4493,7 @@ public class ANTLRParser extends Parser {
                     if ( (LA34_0==QUESTION||(LA34_0>=STAR && LA34_0<=PLUS)) ) {
                         alt34=1;
                     }
-                    else if ( (LA34_0==EOF||LA34_0==SEMPRED||LA34_0==ACTION||(LA34_0>=SEMI && LA34_0<=RPAREN)||LA34_0==OR||(LA34_0>=RARROW && LA34_0<=TREE_BEGIN)||LA34_0==NOT||(LA34_0>=TOKEN_REF && LA34_0<=RULE_REF)||LA34_0==STRING_LITERAL||LA34_0==DOT) ) {
+                    else if ( (LA34_0==EOF||LA34_0==SEMPRED||LA34_0==ACTION||LA34_0==TEMPLATE||(LA34_0>=SEMI && LA34_0<=RPAREN)||LA34_0==OR||(LA34_0>=RARROW && LA34_0<=TREE_BEGIN)||LA34_0==NOT||(LA34_0>=TOKEN_REF && LA34_0<=RULE_REF)||LA34_0==STRING_LITERAL||LA34_0==DOT) ) {
                         alt34=2;
                     }
                     else {
@@ -4735,7 +4697,7 @@ public class ANTLRParser extends Parser {
             int alt37=2;
             int LA37_0 = input.LA(1);
 
-            if ( (LA37_0==NOT||(LA37_0>=TOKEN_REF && LA37_0<=RULE_REF)||LA37_0==STRING_LITERAL||LA37_0==DOT) ) {
+            if ( (LA37_0==TEMPLATE||LA37_0==NOT||(LA37_0>=TOKEN_REF && LA37_0<=RULE_REF)||LA37_0==STRING_LITERAL||LA37_0==DOT) ) {
                 alt37=1;
             }
             else if ( (LA37_0==LPAREN) ) {
@@ -4844,7 +4806,7 @@ public class ANTLRParser extends Parser {
                 int alt38=2;
                 int LA38_0 = input.LA(1);
 
-                if ( (LA38_0==SEMPRED||LA38_0==ACTION||LA38_0==LPAREN||LA38_0==TREE_BEGIN||LA38_0==NOT||(LA38_0>=TOKEN_REF && LA38_0<=RULE_REF)||LA38_0==STRING_LITERAL||LA38_0==DOT) ) {
+                if ( (LA38_0==SEMPRED||LA38_0==ACTION||LA38_0==TEMPLATE||LA38_0==LPAREN||LA38_0==TREE_BEGIN||LA38_0==NOT||(LA38_0>=TOKEN_REF && LA38_0<=RULE_REF)||LA38_0==STRING_LITERAL||LA38_0==DOT) ) {
                     alt38=1;
                 }
 
@@ -4879,7 +4841,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: TREE_BEGIN, element
+            // elements: element, TREE_BEGIN
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -4971,7 +4933,7 @@ public class ANTLRParser extends Parser {
             if ( (LA39_0==IMPLIES||(LA39_0>=QUESTION && LA39_0<=PLUS)||LA39_0==ROOT) ) {
                 alt39=1;
             }
-            else if ( (LA39_0==EOF||LA39_0==SEMPRED||LA39_0==ACTION||(LA39_0>=SEMI && LA39_0<=RPAREN)||LA39_0==OR||(LA39_0>=RARROW && LA39_0<=TREE_BEGIN)||LA39_0==NOT||(LA39_0>=TOKEN_REF && LA39_0<=RULE_REF)||LA39_0==STRING_LITERAL||LA39_0==DOT) ) {
+            else if ( (LA39_0==EOF||LA39_0==SEMPRED||LA39_0==ACTION||LA39_0==TEMPLATE||(LA39_0>=SEMI && LA39_0<=RPAREN)||LA39_0==OR||(LA39_0>=RARROW && LA39_0<=TREE_BEGIN)||LA39_0==NOT||(LA39_0>=TOKEN_REF && LA39_0<=RULE_REF)||LA39_0==STRING_LITERAL||LA39_0==DOT) ) {
                 alt39=2;
             }
             else {
@@ -4994,7 +4956,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: block, blockSuffixe
+                    // elements: blockSuffixe, block
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5757,7 +5719,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: NOT, notTerminal
+                    // elements: notTerminal, NOT
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6064,7 +6026,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: optionsSpec, altList, ACTION, ra
+            // elements: ra, altList, ACTION, optionsSpec
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -6189,7 +6151,7 @@ public class ANTLRParser extends Parser {
             if ( (LA52_0==BANG||LA52_0==ROOT) ) {
                 alt52=1;
             }
-            else if ( (LA52_0==EOF||LA52_0==SEMPRED||LA52_0==ACTION||(LA52_0>=SEMI && LA52_0<=RPAREN)||LA52_0==QUESTION||(LA52_0>=STAR && LA52_0<=PLUS)||LA52_0==OR||(LA52_0>=RARROW && LA52_0<=TREE_BEGIN)||LA52_0==NOT||(LA52_0>=TOKEN_REF && LA52_0<=RULE_REF)||LA52_0==STRING_LITERAL||LA52_0==DOT) ) {
+            else if ( (LA52_0==EOF||LA52_0==SEMPRED||LA52_0==ACTION||LA52_0==TEMPLATE||(LA52_0>=SEMI && LA52_0<=RPAREN)||LA52_0==QUESTION||(LA52_0>=STAR && LA52_0<=PLUS)||LA52_0==OR||(LA52_0>=RARROW && LA52_0<=TREE_BEGIN)||LA52_0==NOT||(LA52_0>=TOKEN_REF && LA52_0<=RULE_REF)||LA52_0==STRING_LITERAL||LA52_0==DOT) ) {
                 alt52=2;
             }
             else {
@@ -6245,7 +6207,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: RULE_REF, op, ARG_ACTION
+                    // elements: RULE_REF, ARG_ACTION, op
                     // token labels: op
                     // rule labels: retval
                     // token list labels: 
@@ -6591,7 +6553,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ARG_ACTION, elementOptions, TOKEN_REF
+                    // elements: elementOptions, TOKEN_REF, ARG_ACTION
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6783,7 +6745,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ROOT, terminal
+                    // elements: terminal, ROOT
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -7037,9 +6999,9 @@ public class ANTLRParser extends Parser {
         try {
             // ANTLRParser.g:773:5: ( qid | id ASSIGN ( qid | STRING_LITERAL ) )
             int alt61=2;
-            int LA61_0 = input.LA(1);
-
-            if ( (LA61_0==RULE_REF) ) {
+            switch ( input.LA(1) ) {
+            case RULE_REF:
+                {
                 int LA61_1 = input.LA(2);
 
                 if ( (LA61_1==ASSIGN) ) {
@@ -7055,8 +7017,10 @@ public class ANTLRParser extends Parser {
 
                     throw nvae;
                 }
-            }
-            else if ( (LA61_0==TOKEN_REF) ) {
+                }
+                break;
+            case TOKEN_REF:
+                {
                 int LA61_2 = input.LA(2);
 
                 if ( (LA61_2==ASSIGN) ) {
@@ -7072,14 +7036,35 @@ public class ANTLRParser extends Parser {
 
                     throw nvae;
                 }
-            }
-            else {
+                }
+                break;
+            case TEMPLATE:
+                {
+                int LA61_3 = input.LA(2);
+
+                if ( (LA61_3==ASSIGN) ) {
+                    alt61=2;
+                }
+                else if ( (LA61_3==COMMA||LA61_3==GT||LA61_3==WILDCARD) ) {
+                    alt61=1;
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return retval;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 61, 3, input);
+
+                    throw nvae;
+                }
+                }
+                break;
+            default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 61, 0, input);
 
                 throw nvae;
             }
+
             switch (alt61) {
                 case 1 :
                     // ANTLRParser.g:774:7: qid
@@ -7115,7 +7100,7 @@ public class ANTLRParser extends Parser {
                     int alt60=2;
                     int LA60_0 = input.LA(1);
 
-                    if ( ((LA60_0>=TOKEN_REF && LA60_0<=RULE_REF)) ) {
+                    if ( (LA60_0==TEMPLATE||(LA60_0>=TOKEN_REF && LA60_0<=RULE_REF)) ) {
                         alt60=1;
                     }
                     else if ( (LA60_0==STRING_LITERAL) ) {
@@ -7337,7 +7322,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: rewriteAlt, SEMPRED, SEMPRED, rewriteAlt
+            // elements: SEMPRED, SEMPRED, rewriteAlt, rewriteAlt
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -7796,7 +7781,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: rewriteTreeAtom, ebnfSuffix
+                    // elements: ebnfSuffix, rewriteTreeAtom
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -8272,7 +8257,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ebnfSuffix, rewriteTreeAlt
+            // elements: rewriteTreeAlt, ebnfSuffix
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8409,7 +8394,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: rewriteTreeAtom, rewriteTreeElement, TREE_BEGIN
+            // elements: rewriteTreeAtom, TREE_BEGIN, rewriteTreeElement
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8502,36 +8487,7 @@ public class ANTLRParser extends Parser {
         try {
             // ANTLRParser.g:864:2: ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION )
             int alt71=4;
-            switch ( input.LA(1) ) {
-            case TEMPLATE:
-                {
-                alt71=1;
-                }
-                break;
-            case TOKEN_REF:
-            case RULE_REF:
-                {
-                alt71=2;
-                }
-                break;
-            case LPAREN:
-                {
-                alt71=3;
-                }
-                break;
-            case ACTION:
-                {
-                alt71=4;
-                }
-                break;
-            default:
-                if (state.backtracking>0) {state.failed=true; return retval;}
-                NoViableAltException nvae =
-                    new NoViableAltException("", 71, 0, input);
-
-                throw nvae;
-            }
-
+            alt71 = dfa71.predict(input);
             switch (alt71) {
                 case 1 :
                     // ANTLRParser.g:865:3: TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL )
@@ -8593,7 +8549,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: rewriteTemplateArgs, str, TEMPLATE
+                    // elements: str, TEMPLATE, rewriteTemplateArgs
                     // token labels: str
                     // rule labels: retval
                     // token list labels: 
@@ -8742,7 +8698,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: rewriteTemplateArgs, id
+            // elements: id, rewriteTemplateArgs
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8854,7 +8810,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ACTION, rewriteTemplateArgs
+            // elements: rewriteTemplateArgs, ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8935,7 +8891,7 @@ public class ANTLRParser extends Parser {
             int alt73=2;
             int LA73_0 = input.LA(1);
 
-            if ( ((LA73_0>=TOKEN_REF && LA73_0<=RULE_REF)) ) {
+            if ( (LA73_0==TEMPLATE||(LA73_0>=TOKEN_REF && LA73_0<=RULE_REF)) ) {
                 alt73=1;
             }
             else if ( (LA73_0==RPAREN) ) {
@@ -9100,7 +9056,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ACTION, id
+            // elements: id, ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -9155,7 +9111,7 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "id"
-    // ANTLRParser.g:905:1: id : ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] );
+    // ANTLRParser.g:905:1: id : ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] | TEMPLATE -> ID[$TEMPLATE] );
     public final ANTLRParser.id_return id() throws RecognitionException {
         ANTLRParser.id_return retval = new ANTLRParser.id_return();
         retval.start = input.LT(1);
@@ -9164,30 +9120,42 @@ public class ANTLRParser extends Parser {
 
         Token RULE_REF236=null;
         Token TOKEN_REF237=null;
+        Token TEMPLATE238=null;
 
         GrammarAST RULE_REF236_tree=null;
         GrammarAST TOKEN_REF237_tree=null;
+        GrammarAST TEMPLATE238_tree=null;
+        RewriteRuleTokenStream stream_TEMPLATE=new RewriteRuleTokenStream(adaptor,"token TEMPLATE");
         RewriteRuleTokenStream stream_RULE_REF=new RewriteRuleTokenStream(adaptor,"token RULE_REF");
         RewriteRuleTokenStream stream_TOKEN_REF=new RewriteRuleTokenStream(adaptor,"token TOKEN_REF");
 
         try {
-            // ANTLRParser.g:906:5: ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] )
-            int alt74=2;
-            int LA74_0 = input.LA(1);
-
-            if ( (LA74_0==RULE_REF) ) {
+            // ANTLRParser.g:906:5: ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] | TEMPLATE -> ID[$TEMPLATE] )
+            int alt74=3;
+            switch ( input.LA(1) ) {
+            case RULE_REF:
+                {
                 alt74=1;
-            }
-            else if ( (LA74_0==TOKEN_REF) ) {
+                }
+                break;
+            case TOKEN_REF:
+                {
                 alt74=2;
-            }
-            else {
+                }
+                break;
+            case TEMPLATE:
+                {
+                alt74=3;
+                }
+                break;
+            default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 74, 0, input);
 
                 throw nvae;
             }
+
             switch (alt74) {
                 case 1 :
                     // ANTLRParser.g:906:7: RULE_REF
@@ -9247,6 +9215,35 @@ public class ANTLRParser extends Parser {
                     retval.tree = root_0;}
                     }
                     break;
+                case 3 :
+                    // ANTLRParser.g:908:7: TEMPLATE
+                    {
+                    TEMPLATE238=(Token)match(input,TEMPLATE,FOLLOW_TEMPLATE_in_id4967); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_TEMPLATE.add(TEMPLATE238);
+
+
+
+                    // AST REWRITE
+                    // elements: 
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    if ( state.backtracking==0 ) {
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (GrammarAST)adaptor.nil();
+                    // 908:17: -> ID[$TEMPLATE]
+                    {
+                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, TEMPLATE238));
+
+                    }
+
+                    retval.tree = root_0;}
+                    }
+                    break;
 
             }
             retval.stop = input.LT(-1);
@@ -9275,33 +9272,33 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "qid"
-    // ANTLRParser.g:910:1: qid : id ( WILDCARD id )* -> ID[$qid.start, $text] ;
+    // ANTLRParser.g:911:1: qid : id ( WILDCARD id )* -> ID[$qid.start, $text] ;
     public final ANTLRParser.qid_return qid() throws RecognitionException {
         ANTLRParser.qid_return retval = new ANTLRParser.qid_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token WILDCARD239=null;
-        ANTLRParser.id_return id238 = null;
+        Token WILDCARD240=null;
+        ANTLRParser.id_return id239 = null;
 
-        ANTLRParser.id_return id240 = null;
+        ANTLRParser.id_return id241 = null;
 
 
-        GrammarAST WILDCARD239_tree=null;
+        GrammarAST WILDCARD240_tree=null;
         RewriteRuleTokenStream stream_WILDCARD=new RewriteRuleTokenStream(adaptor,"token WILDCARD");
         RewriteRuleSubtreeStream stream_id=new RewriteRuleSubtreeStream(adaptor,"rule id");
         try {
-            // ANTLRParser.g:910:5: ( id ( WILDCARD id )* -> ID[$qid.start, $text] )
-            // ANTLRParser.g:910:7: id ( WILDCARD id )*
+            // ANTLRParser.g:911:5: ( id ( WILDCARD id )* -> ID[$qid.start, $text] )
+            // ANTLRParser.g:911:7: id ( WILDCARD id )*
             {
-            pushFollow(FOLLOW_id_in_qid4976);
-            id238=id();
+            pushFollow(FOLLOW_id_in_qid4990);
+            id239=id();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_id.add(id238.getTree());
-            // ANTLRParser.g:910:10: ( WILDCARD id )*
+            if ( state.backtracking==0 ) stream_id.add(id239.getTree());
+            // ANTLRParser.g:911:10: ( WILDCARD id )*
             loop75:
             do {
                 int alt75=2;
@@ -9314,17 +9311,17 @@ public class ANTLRParser extends Parser {
 
                 switch (alt75) {
             	case 1 :
-            	    // ANTLRParser.g:910:11: WILDCARD id
+            	    // ANTLRParser.g:911:11: WILDCARD id
             	    {
-            	    WILDCARD239=(Token)match(input,WILDCARD,FOLLOW_WILDCARD_in_qid4979); if (state.failed) return retval; 
-            	    if ( state.backtracking==0 ) stream_WILDCARD.add(WILDCARD239);
+            	    WILDCARD240=(Token)match(input,WILDCARD,FOLLOW_WILDCARD_in_qid4993); if (state.failed) return retval; 
+            	    if ( state.backtracking==0 ) stream_WILDCARD.add(WILDCARD240);
 
-            	    pushFollow(FOLLOW_id_in_qid4981);
-            	    id240=id();
+            	    pushFollow(FOLLOW_id_in_qid4995);
+            	    id241=id();
 
             	    state._fsp--;
             	    if (state.failed) return retval;
-            	    if ( state.backtracking==0 ) stream_id.add(id240.getTree());
+            	    if ( state.backtracking==0 ) stream_id.add(id241.getTree());
 
             	    }
             	    break;
@@ -9348,7 +9345,7 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 910:25: -> ID[$qid.start, $text]
+            // 911:25: -> ID[$qid.start, $text]
             {
                 adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, ((Token)retval.start), input.toString(retval.start,input.LT(-1))));
 
@@ -9383,35 +9380,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "alternativeEntry"
-    // ANTLRParser.g:912:1: alternativeEntry : alternative EOF ;
+    // ANTLRParser.g:913:1: alternativeEntry : alternative EOF ;
     public final ANTLRParser.alternativeEntry_return alternativeEntry() throws RecognitionException {
         ANTLRParser.alternativeEntry_return retval = new ANTLRParser.alternativeEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF242=null;
-        ANTLRParser.alternative_return alternative241 = null;
+        Token EOF243=null;
+        ANTLRParser.alternative_return alternative242 = null;
 
 
-        GrammarAST EOF242_tree=null;
+        GrammarAST EOF243_tree=null;
 
         try {
-            // ANTLRParser.g:912:18: ( alternative EOF )
-            // ANTLRParser.g:912:20: alternative EOF
+            // ANTLRParser.g:913:18: ( alternative EOF )
+            // ANTLRParser.g:913:20: alternative EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_alternative_in_alternativeEntry4997);
-            alternative241=alternative();
+            pushFollow(FOLLOW_alternative_in_alternativeEntry5011);
+            alternative242=alternative();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, alternative241.getTree());
-            EOF242=(Token)match(input,EOF,FOLLOW_EOF_in_alternativeEntry4999); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, alternative242.getTree());
+            EOF243=(Token)match(input,EOF,FOLLOW_EOF_in_alternativeEntry5013); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF242_tree = (GrammarAST)adaptor.create(EOF242);
-            adaptor.addChild(root_0, EOF242_tree);
+            EOF243_tree = (GrammarAST)adaptor.create(EOF243);
+            adaptor.addChild(root_0, EOF243_tree);
             }
 
             }
@@ -9442,35 +9439,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "elementEntry"
-    // ANTLRParser.g:913:1: elementEntry : element EOF ;
+    // ANTLRParser.g:914:1: elementEntry : element EOF ;
     public final ANTLRParser.elementEntry_return elementEntry() throws RecognitionException {
         ANTLRParser.elementEntry_return retval = new ANTLRParser.elementEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF244=null;
-        ANTLRParser.element_return element243 = null;
+        Token EOF245=null;
+        ANTLRParser.element_return element244 = null;
 
 
-        GrammarAST EOF244_tree=null;
+        GrammarAST EOF245_tree=null;
 
         try {
-            // ANTLRParser.g:913:14: ( element EOF )
-            // ANTLRParser.g:913:16: element EOF
+            // ANTLRParser.g:914:14: ( element EOF )
+            // ANTLRParser.g:914:16: element EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_element_in_elementEntry5008);
-            element243=element();
+            pushFollow(FOLLOW_element_in_elementEntry5022);
+            element244=element();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, element243.getTree());
-            EOF244=(Token)match(input,EOF,FOLLOW_EOF_in_elementEntry5010); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, element244.getTree());
+            EOF245=(Token)match(input,EOF,FOLLOW_EOF_in_elementEntry5024); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF244_tree = (GrammarAST)adaptor.create(EOF244);
-            adaptor.addChild(root_0, EOF244_tree);
+            EOF245_tree = (GrammarAST)adaptor.create(EOF245);
+            adaptor.addChild(root_0, EOF245_tree);
             }
 
             }
@@ -9501,35 +9498,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "ruleEntry"
-    // ANTLRParser.g:914:1: ruleEntry : rule EOF ;
+    // ANTLRParser.g:915:1: ruleEntry : rule EOF ;
     public final ANTLRParser.ruleEntry_return ruleEntry() throws RecognitionException {
         ANTLRParser.ruleEntry_return retval = new ANTLRParser.ruleEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF246=null;
-        ANTLRParser.rule_return rule245 = null;
+        Token EOF247=null;
+        ANTLRParser.rule_return rule246 = null;
 
 
-        GrammarAST EOF246_tree=null;
+        GrammarAST EOF247_tree=null;
 
         try {
-            // ANTLRParser.g:914:11: ( rule EOF )
-            // ANTLRParser.g:914:13: rule EOF
+            // ANTLRParser.g:915:11: ( rule EOF )
+            // ANTLRParser.g:915:13: rule EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_rule_in_ruleEntry5018);
-            rule245=rule();
+            pushFollow(FOLLOW_rule_in_ruleEntry5032);
+            rule246=rule();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, rule245.getTree());
-            EOF246=(Token)match(input,EOF,FOLLOW_EOF_in_ruleEntry5020); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, rule246.getTree());
+            EOF247=(Token)match(input,EOF,FOLLOW_EOF_in_ruleEntry5034); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF246_tree = (GrammarAST)adaptor.create(EOF246);
-            adaptor.addChild(root_0, EOF246_tree);
+            EOF247_tree = (GrammarAST)adaptor.create(EOF247);
+            adaptor.addChild(root_0, EOF247_tree);
             }
 
             }
@@ -9560,35 +9557,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "blockEntry"
-    // ANTLRParser.g:915:1: blockEntry : block EOF ;
+    // ANTLRParser.g:916:1: blockEntry : block EOF ;
     public final ANTLRParser.blockEntry_return blockEntry() throws RecognitionException {
         ANTLRParser.blockEntry_return retval = new ANTLRParser.blockEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF248=null;
-        ANTLRParser.block_return block247 = null;
+        Token EOF249=null;
+        ANTLRParser.block_return block248 = null;
 
 
-        GrammarAST EOF248_tree=null;
+        GrammarAST EOF249_tree=null;
 
         try {
-            // ANTLRParser.g:915:12: ( block EOF )
-            // ANTLRParser.g:915:14: block EOF
+            // ANTLRParser.g:916:12: ( block EOF )
+            // ANTLRParser.g:916:14: block EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_block_in_blockEntry5028);
-            block247=block();
+            pushFollow(FOLLOW_block_in_blockEntry5042);
+            block248=block();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, block247.getTree());
-            EOF248=(Token)match(input,EOF,FOLLOW_EOF_in_blockEntry5030); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, block248.getTree());
+            EOF249=(Token)match(input,EOF,FOLLOW_EOF_in_blockEntry5044); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF248_tree = (GrammarAST)adaptor.create(EOF248);
-            adaptor.addChild(root_0, EOF248_tree);
+            EOF249_tree = (GrammarAST)adaptor.create(EOF249);
+            adaptor.addChild(root_0, EOF249_tree);
             }
 
             }
@@ -9675,36 +9672,102 @@ public class ANTLRParser extends Parser {
     }
 
 
+    protected DFA35 dfa35 = new DFA35(this);
     protected DFA44 dfa44 = new DFA44(this);
     protected DFA63 dfa63 = new DFA63(this);
     protected DFA66 dfa66 = new DFA66(this);
+    protected DFA71 dfa71 = new DFA71(this);
+    static final String DFA35_eotS =
+        "\12\uffff";
+    static final String DFA35_eofS =
+        "\1\uffff\2\4\7\uffff";
+    static final String DFA35_minS =
+        "\3\4\1\55\6\uffff";
+    static final String DFA35_maxS =
+        "\3\144\1\66\6\uffff";
+    static final String DFA35_acceptS =
+        "\4\uffff\1\2\1\3\1\4\1\5\1\6\1\1";
+    static final String DFA35_specialS =
+        "\12\uffff}>";
+    static final String[] DFA35_transitionS = {
+            "\1\7\13\uffff\1\6\22\uffff\1\3\4\uffff\1\5\21\uffff\1\10\1\uffff"+
+            "\1\4\1\uffff\1\2\1\1\3\uffff\1\4\40\uffff\1\4",
+            "\1\4\11\uffff\1\4\1\uffff\1\4\22\uffff\1\4\3\uffff\3\4\3\uffff"+
+            "\1\11\4\4\1\11\2\4\1\uffff\2\4\1\uffff\2\4\1\uffff\1\4\1\uffff"+
+            "\2\4\3\uffff\1\4\40\uffff\1\4",
+            "\1\4\11\uffff\1\4\1\uffff\1\4\22\uffff\1\4\3\uffff\3\4\1\uffff"+
+            "\1\4\1\uffff\1\11\4\4\1\11\2\4\1\uffff\2\4\1\uffff\2\4\1\uffff"+
+            "\1\4\1\uffff\2\4\3\uffff\1\4\40\uffff\1\4",
+            "\1\11\4\uffff\1\11\3\uffff\1\4",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+    };
+
+    static final short[] DFA35_eot = DFA.unpackEncodedString(DFA35_eotS);
+    static final short[] DFA35_eof = DFA.unpackEncodedString(DFA35_eofS);
+    static final char[] DFA35_min = DFA.unpackEncodedStringToUnsignedChars(DFA35_minS);
+    static final char[] DFA35_max = DFA.unpackEncodedStringToUnsignedChars(DFA35_maxS);
+    static final short[] DFA35_accept = DFA.unpackEncodedString(DFA35_acceptS);
+    static final short[] DFA35_special = DFA.unpackEncodedString(DFA35_specialS);
+    static final short[][] DFA35_transition;
+
+    static {
+        int numStates = DFA35_transitionS.length;
+        DFA35_transition = new short[numStates][];
+        for (int i=0; i<numStates; i++) {
+            DFA35_transition[i] = DFA.unpackEncodedString(DFA35_transitionS[i]);
+        }
+    }
+
+    class DFA35 extends DFA {
+
+        public DFA35(BaseRecognizer recognizer) {
+            this.recognizer = recognizer;
+            this.decisionNumber = 35;
+            this.eot = DFA35_eot;
+            this.eof = DFA35_eof;
+            this.min = DFA35_min;
+            this.max = DFA35_max;
+            this.accept = DFA35_accept;
+            this.special = DFA35_special;
+            this.transition = DFA35_transition;
+        }
+        public String getDescription() {
+            return "541:1: element : ( labeledElement ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT labeledElement ) ) ) | -> labeledElement ) | atom ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT atom ) ) ) | -> atom ) | ebnf | ACTION | SEMPRED ( IMPLIES -> GATED_SEMPRED[$IMPLIES] | -> SEMPRED ) | treeSpec ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT treeSpec ) ) ) | -> treeSpec ) );";
+        }
+    }
     static final String DFA44_eotS =
-        "\13\uffff";
+        "\14\uffff";
     static final String DFA44_eofS =
-        "\1\uffff\1\6\2\4\7\uffff";
+        "\1\uffff\1\7\2\5\10\uffff";
     static final String DFA44_minS =
-        "\1\74\3\4\3\uffff\1\76\3\uffff";
+        "\1\43\3\4\1\66\3\uffff\1\76\3\uffff";
     static final String DFA44_maxS =
-        "\4\144\3\uffff\1\144\3\uffff";
+        "\4\144\1\66\3\uffff\1\144\3\uffff";
     static final String DFA44_acceptS =
-        "\4\uffff\1\4\1\6\1\5\1\uffff\1\1\1\3\1\2";
+        "\5\uffff\1\4\1\6\1\5\1\uffff\1\1\1\3\1\2";
     static final String DFA44_specialS =
-        "\13\uffff}>";
+        "\14\uffff}>";
     static final String[] DFA44_transitionS = {
-            "\1\5\1\uffff\1\2\1\1\3\uffff\1\3\40\uffff\1\4",
-            "\1\6\11\uffff\1\6\1\uffff\1\6\26\uffff\3\6\4\uffff\4\6\1\uffff"+
-            "\2\6\1\uffff\1\7\1\10\1\uffff\2\6\1\uffff\1\6\1\uffff\2\6\3"+
-            "\uffff\1\6\40\uffff\1\6",
-            "\1\4\11\uffff\1\4\1\uffff\1\4\26\uffff\3\4\1\uffff\1\4\2\uffff"+
-            "\4\4\1\uffff\2\4\1\uffff\1\7\1\10\1\uffff\2\4\1\uffff\1\4\1"+
-            "\uffff\2\4\3\uffff\1\4\40\uffff\1\4",
-            "\1\4\13\uffff\1\4\26\uffff\3\4\1\uffff\1\4\2\uffff\4\4\1\uffff"+
-            "\2\4\2\uffff\1\10\1\uffff\2\4\1\uffff\1\4\1\uffff\2\4\3\uffff"+
-            "\1\4\40\uffff\1\4",
+            "\1\4\30\uffff\1\6\1\uffff\1\2\1\1\3\uffff\1\3\40\uffff\1\5",
+            "\1\7\11\uffff\1\7\1\uffff\1\7\22\uffff\1\7\3\uffff\3\7\4\uffff"+
+            "\4\7\1\uffff\2\7\1\uffff\1\10\1\11\1\uffff\2\7\1\uffff\1\7\1"+
+            "\uffff\2\7\3\uffff\1\7\40\uffff\1\7",
+            "\1\5\11\uffff\1\5\1\uffff\1\5\22\uffff\1\5\3\uffff\3\5\1\uffff"+
+            "\1\5\2\uffff\4\5\1\uffff\2\5\1\uffff\1\10\1\11\1\uffff\2\5\1"+
+            "\uffff\1\5\1\uffff\2\5\3\uffff\1\5\40\uffff\1\5",
+            "\1\5\13\uffff\1\5\22\uffff\1\5\3\uffff\3\5\1\uffff\1\5\2\uffff"+
+            "\4\5\1\uffff\2\5\2\uffff\1\11\1\uffff\2\5\1\uffff\1\5\1\uffff"+
+            "\2\5\3\uffff\1\5\40\uffff\1\5",
+            "\1\10",
             "",
             "",
             "",
-            "\1\11\1\12\3\uffff\1\11\40\uffff\1\11",
+            "\1\12\1\13\3\uffff\1\12\40\uffff\1\12",
             "",
             "",
             ""
@@ -9770,8 +9833,8 @@ public class ANTLRParser extends Parser {
             "",
             "",
             "",
-            "\1\6\27\uffff\1\6\1\1\13\uffff\1\6\4\uffff\1\6\3\uffff\1\13"+
-            "\1\14\3\uffff\1\6",
+            "\1\6\22\uffff\1\1\4\uffff\1\6\1\1\13\uffff\1\6\4\uffff\1\6"+
+            "\3\uffff\1\13\1\14\3\uffff\1\6",
             "\1\6\27\uffff\1\6\1\15\4\uffff\1\6\1\uffff\2\6\3\uffff\1\6"+
             "\4\uffff\1\6\3\uffff\2\6\3\uffff\1\6",
             "\1\6\1\uffff\1\6\27\uffff\2\6\3\uffff\1\1\1\6\1\uffff\2\6\3"+
@@ -9841,17 +9904,17 @@ public class ANTLRParser extends Parser {
         }
     }
     static final String DFA66_eotS =
-        "\15\uffff";
+        "\16\uffff";
     static final String DFA66_eofS =
-        "\1\uffff\3\12\1\uffff\1\12\2\uffff\1\12\2\uffff\2\12";
+        "\1\uffff\3\12\1\uffff\1\12\2\uffff\1\12\2\uffff\3\12";
     static final String DFA66_minS =
-        "\1\20\1\16\2\20\1\76\1\20\2\uffff\1\20\2\uffff\2\20";
+        "\1\20\1\16\2\20\1\43\1\20\2\uffff\1\20\2\uffff\3\20";
     static final String DFA66_maxS =
-        "\4\103\1\77\1\103\2\uffff\1\103\2\uffff\2\103";
+        "\4\103\1\77\1\103\2\uffff\1\103\2\uffff\3\103";
     static final String DFA66_acceptS =
-        "\6\uffff\1\3\1\4\1\uffff\1\2\1\1\2\uffff";
+        "\6\uffff\1\3\1\4\1\uffff\1\2\1\1\3\uffff";
     static final String DFA66_specialS =
-        "\15\uffff}>";
+        "\16\uffff}>";
     static final String[] DFA66_transitionS = {
             "\1\5\27\uffff\1\7\14\uffff\1\4\4\uffff\1\6\3\uffff\1\1\1\2\3"+
             "\uffff\1\3",
@@ -9862,7 +9925,7 @@ public class ANTLRParser extends Parser {
             "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "\1\12\26\uffff\3\12\4\uffff\1\11\1\uffff\2\11\1\uffff\1\12"+
             "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
-            "\1\14\1\13",
+            "\1\15\32\uffff\1\14\1\13",
             "\1\12\26\uffff\3\12\4\uffff\1\11\1\uffff\2\11\1\uffff\1\12"+
             "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "",
@@ -9871,6 +9934,8 @@ public class ANTLRParser extends Parser {
             "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "",
             "",
+            "\1\12\26\uffff\3\12\4\uffff\1\11\1\uffff\2\11\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "\1\12\26\uffff\3\12\4\uffff\1\11\1\uffff\2\11\1\uffff\1\12"+
             "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "\1\12\26\uffff\3\12\4\uffff\1\11\1\uffff\2\11\1\uffff\1\12"+
@@ -9910,13 +9975,82 @@ public class ANTLRParser extends Parser {
             return "817:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf );";
         }
     }
+    static final String DFA71_eotS =
+        "\23\uffff";
+    static final String DFA71_eofS =
+        "\11\uffff\1\2\11\uffff";
+    static final String DFA71_minS =
+        "\1\20\1\50\3\uffff\1\43\3\55\1\12\1\20\1\uffff\1\46\1\43\3\55\1"+
+        "\20\1\46";
+    static final String DFA71_maxS =
+        "\1\77\1\50\3\uffff\1\77\3\55\1\71\1\20\1\uffff\1\51\1\77\3\55\1"+
+        "\20\1\51";
+    static final String DFA71_acceptS =
+        "\2\uffff\1\2\1\3\1\4\6\uffff\1\1\7\uffff";
+    static final String DFA71_specialS =
+        "\23\uffff}>";
+    static final String[] DFA71_transitionS = {
+            "\1\4\22\uffff\1\1\4\uffff\1\3\25\uffff\2\2",
+            "\1\5",
+            "",
+            "",
+            "",
+            "\1\10\5\uffff\1\11\24\uffff\1\7\1\6",
+            "\1\12",
+            "\1\12",
+            "\1\12",
+            "\2\13\33\uffff\1\2\1\uffff\1\2\11\uffff\1\2\5\uffff\1\2",
+            "\1\14",
+            "",
+            "\1\15\2\uffff\1\11",
+            "\1\20\32\uffff\1\17\1\16",
+            "\1\21",
+            "\1\21",
+            "\1\21",
+            "\1\22",
+            "\1\15\2\uffff\1\11"
+    };
+
+    static final short[] DFA71_eot = DFA.unpackEncodedString(DFA71_eotS);
+    static final short[] DFA71_eof = DFA.unpackEncodedString(DFA71_eofS);
+    static final char[] DFA71_min = DFA.unpackEncodedStringToUnsignedChars(DFA71_minS);
+    static final char[] DFA71_max = DFA.unpackEncodedStringToUnsignedChars(DFA71_maxS);
+    static final short[] DFA71_accept = DFA.unpackEncodedString(DFA71_acceptS);
+    static final short[] DFA71_special = DFA.unpackEncodedString(DFA71_specialS);
+    static final short[][] DFA71_transition;
+
+    static {
+        int numStates = DFA71_transitionS.length;
+        DFA71_transition = new short[numStates][];
+        for (int i=0; i<numStates; i++) {
+            DFA71_transition[i] = DFA.unpackEncodedString(DFA71_transitionS[i]);
+        }
+    }
+
+    class DFA71 extends DFA {
+
+        public DFA71(BaseRecognizer recognizer) {
+            this.recognizer = recognizer;
+            this.decisionNumber = 71;
+            this.eot = DFA71_eot;
+            this.eof = DFA71_eof;
+            this.min = DFA71_min;
+            this.max = DFA71_max;
+            this.accept = DFA71_accept;
+            this.special = DFA71_special;
+            this.transition = DFA71_transition;
+        }
+        public String getDescription() {
+            return "853:1: rewriteTemplate : ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );";
+        }
+    }
  
 
     public static final BitSet FOLLOW_DOC_COMMENT_in_grammarSpec483 = new BitSet(new long[]{0x000000000F000000L});
-    public static final BitSet FOLLOW_grammarType_in_grammarSpec520 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_grammarType_in_grammarSpec520 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_grammarSpec522 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_SEMI_in_grammarSpec524 = new BitSet(new long[]{0xC800000070F80040L});
-    public static final BitSet FOLLOW_prequelConstruct_in_grammarSpec568 = new BitSet(new long[]{0xC800000070F80040L});
+    public static final BitSet FOLLOW_SEMI_in_grammarSpec524 = new BitSet(new long[]{0xC800000870F80040L});
+    public static final BitSet FOLLOW_prequelConstruct_in_grammarSpec568 = new BitSet(new long[]{0xC800000870F80040L});
     public static final BitSet FOLLOW_rules_in_grammarSpec596 = new BitSet(new long[]{0x0000000000000000L});
     public static final BitSet FOLLOW_EOF_in_grammarSpec639 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_LEXER_in_grammarType837 = new BitSet(new long[]{0x0000000008000000L});
@@ -9931,53 +10065,53 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_tokensSpec_in_prequelConstruct1116 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_attrScope_in_prequelConstruct1152 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_action_in_prequelConstruct1195 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OPTIONS_in_optionsSpec1212 = new BitSet(new long[]{0xE000000000000000L});
+    public static final BitSet FOLLOW_OPTIONS_in_optionsSpec1212 = new BitSet(new long[]{0xE000000800000000L});
     public static final BitSet FOLLOW_option_in_optionsSpec1215 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_SEMI_in_optionsSpec1217 = new BitSet(new long[]{0xE000000000000000L});
+    public static final BitSet FOLLOW_SEMI_in_optionsSpec1217 = new BitSet(new long[]{0xE000000800000000L});
     public static final BitSet FOLLOW_RBRACE_in_optionsSpec1221 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_option1258 = new BitSet(new long[]{0x0000200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_option1260 = new BitSet(new long[]{0xC001000000000000L,0x0000000000000009L});
+    public static final BitSet FOLLOW_ASSIGN_in_option1260 = new BitSet(new long[]{0xC001000800000000L,0x0000000000000009L});
     public static final BitSet FOLLOW_optionValue_in_option1263 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_qid_in_optionValue1313 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_optionValue1337 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_INT_in_optionValue1363 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STAR_in_optionValue1392 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPORT_in_delegateGrammars1408 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_IMPORT_in_delegateGrammars1408 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_delegateGrammar_in_delegateGrammars1410 = new BitSet(new long[]{0x000000C000000000L});
-    public static final BitSet FOLLOW_COMMA_in_delegateGrammars1413 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_COMMA_in_delegateGrammars1413 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_delegateGrammar_in_delegateGrammars1415 = new BitSet(new long[]{0x000000C000000000L});
     public static final BitSet FOLLOW_SEMI_in_delegateGrammars1419 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_delegateGrammar1446 = new BitSet(new long[]{0x0000200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_delegateGrammar1448 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_ASSIGN_in_delegateGrammar1448 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_delegateGrammar1451 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_delegateGrammar1461 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKENS_in_tokensSpec1477 = new BitSet(new long[]{0xC000000000000000L});
-    public static final BitSet FOLLOW_tokenSpec_in_tokensSpec1479 = new BitSet(new long[]{0xE000000000000000L});
+    public static final BitSet FOLLOW_TOKENS_in_tokensSpec1477 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_tokenSpec_in_tokensSpec1479 = new BitSet(new long[]{0xE000000800000000L});
     public static final BitSet FOLLOW_RBRACE_in_tokensSpec1482 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_tokenSpec1502 = new BitSet(new long[]{0x0000208000000000L});
     public static final BitSet FOLLOW_ASSIGN_in_tokenSpec1508 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_tokenSpec1510 = new BitSet(new long[]{0x0000008000000000L});
     public static final BitSet FOLLOW_SEMI_in_tokenSpec1545 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_REF_in_tokenSpec1550 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCOPE_in_attrScope1565 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_SCOPE_in_attrScope1565 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_attrScope1567 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_attrScope1569 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_AT_in_action1595 = new BitSet(new long[]{0xC000000003000000L});
+    public static final BitSet FOLLOW_AT_in_action1595 = new BitSet(new long[]{0xC000000803000000L});
     public static final BitSet FOLLOW_actionScopeName_in_action1598 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_COLONCOLON_in_action1600 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_COLONCOLON_in_action1600 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_action1604 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_action1606 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_actionScopeName1634 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_LEXER_in_actionScopeName1639 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_PARSER_in_actionScopeName1654 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule_in_rules1673 = new BitSet(new long[]{0xC000000070800042L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_rule1752 = new BitSet(new long[]{0xC000000070800000L});
-    public static final BitSet FOLLOW_ruleModifiers_in_rule1796 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_rule_in_rules1673 = new BitSet(new long[]{0xC000000870800042L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_rule1752 = new BitSet(new long[]{0xC000000870800000L});
+    public static final BitSet FOLLOW_ruleModifiers_in_rule1796 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_rule1819 = new BitSet(new long[]{0x0800001180284000L});
     public static final BitSet FOLLOW_ARG_ACTION_in_rule1852 = new BitSet(new long[]{0x0800001180280000L});
     public static final BitSet FOLLOW_ruleReturns_in_rule1862 = new BitSet(new long[]{0x0800001100280000L});
     public static final BitSet FOLLOW_rulePrequel_in_rule1900 = new BitSet(new long[]{0x0800001100280000L});
-    public static final BitSet FOLLOW_COLON_in_rule1916 = new BitSet(new long[]{0xD608010000010010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_COLON_in_rule1916 = new BitSet(new long[]{0xD608010800010010L,0x0000001000000008L});
     public static final BitSet FOLLOW_altListAsBlock_in_rule1945 = new BitSet(new long[]{0x0000008000000000L});
     public static final BitSet FOLLOW_SEMI_in_rule1960 = new BitSet(new long[]{0x0000000600000000L});
     public static final BitSet FOLLOW_exceptionGroup_in_rule1969 = new BitSet(new long[]{0x0000000000000002L});
@@ -9994,30 +10128,30 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_ruleAction_in_rulePrequel2161 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RETURNS_in_ruleReturns2181 = new BitSet(new long[]{0x0000000000004000L});
     public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns2184 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_THROWS_in_throwsSpec2209 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_THROWS_in_throwsSpec2209 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_qid_in_throwsSpec2211 = new BitSet(new long[]{0x0000004000000002L});
-    public static final BitSet FOLLOW_COMMA_in_throwsSpec2214 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_COMMA_in_throwsSpec2214 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_qid_in_throwsSpec2216 = new BitSet(new long[]{0x0000004000000002L});
     public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2247 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec2249 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2262 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2262 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_ruleScopeSpec2264 = new BitSet(new long[]{0x000000C000000000L});
-    public static final BitSet FOLLOW_COMMA_in_ruleScopeSpec2267 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_COMMA_in_ruleScopeSpec2267 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_ruleScopeSpec2269 = new BitSet(new long[]{0x000000C000000000L});
     public static final BitSet FOLLOW_SEMI_in_ruleScopeSpec2273 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_AT_in_ruleAction2303 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_AT_in_ruleAction2303 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_ruleAction2305 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_ruleAction2307 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ruleModifier_in_ruleModifiers2345 = new BitSet(new long[]{0x0000000070800002L});
     public static final BitSet FOLLOW_set_in_ruleModifier0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_alternative_in_altList2421 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_OR_in_altList2424 = new BitSet(new long[]{0xD608010000010010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_OR_in_altList2424 = new BitSet(new long[]{0xD608010800010010L,0x0000001000000008L});
     public static final BitSet FOLLOW_alternative_in_altList2426 = new BitSet(new long[]{0x0008000000000002L});
     public static final BitSet FOLLOW_altList_in_altListAsBlock2456 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_elements_in_alternative2486 = new BitSet(new long[]{0x0200000000000002L});
     public static final BitSet FOLLOW_rewrite_in_alternative2495 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rewrite_in_alternative2533 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_element_in_elements2586 = new BitSet(new long[]{0xD400010000010012L,0x0000001000000008L});
+    public static final BitSet FOLLOW_element_in_elements2586 = new BitSet(new long[]{0xD400010800010012L,0x0000001000000008L});
     public static final BitSet FOLLOW_labeledElement_in_element2613 = new BitSet(new long[]{0x0003400000000002L});
     public static final BitSet FOLLOW_ebnfSuffix_in_element2619 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_atom_in_element2661 = new BitSet(new long[]{0x0003400000000002L});
@@ -10029,13 +10163,13 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_treeSpec_in_element2758 = new BitSet(new long[]{0x0003400000000002L});
     public static final BitSet FOLLOW_ebnfSuffix_in_element2764 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_labeledElement2813 = new BitSet(new long[]{0x0004200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement2816 = new BitSet(new long[]{0xD000010000000000L,0x0000001000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement2819 = new BitSet(new long[]{0xD000010000000000L,0x0000001000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement2816 = new BitSet(new long[]{0xD000010800000000L,0x0000001000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement2819 = new BitSet(new long[]{0xD000010800000000L,0x0000001000000008L});
     public static final BitSet FOLLOW_atom_in_labeledElement2824 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_block_in_labeledElement2826 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec2848 = new BitSet(new long[]{0xD400010000010010L,0x0000001000000008L});
-    public static final BitSet FOLLOW_element_in_treeSpec2889 = new BitSet(new long[]{0xD400010000010010L,0x0000001000000008L});
-    public static final BitSet FOLLOW_element_in_treeSpec2920 = new BitSet(new long[]{0xD400030000010010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec2848 = new BitSet(new long[]{0xD400010800010010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_element_in_treeSpec2889 = new BitSet(new long[]{0xD400010800010010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_element_in_treeSpec2920 = new BitSet(new long[]{0xD400030800010010L,0x0000001000000008L});
     public static final BitSet FOLLOW_RPAREN_in_treeSpec2929 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_block_in_ebnf2963 = new BitSet(new long[]{0x0013C40000000002L});
     public static final BitSet FOLLOW_blockSuffixe_in_ebnf2998 = new BitSet(new long[]{0x0000000000000002L});
@@ -10065,11 +10199,11 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_NOT_in_notSet3344 = new BitSet(new long[]{0x0000010000000000L});
     public static final BitSet FOLLOW_block_in_notSet3346 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_notTerminal0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_block3420 = new BitSet(new long[]{0xDE08011100290010L,0x0000001000000008L});
-    public static final BitSet FOLLOW_optionsSpec_in_block3466 = new BitSet(new long[]{0xDE08011100290010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_LPAREN_in_block3420 = new BitSet(new long[]{0xDE08011900290010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_optionsSpec_in_block3466 = new BitSet(new long[]{0xDE08011900290010L,0x0000001000000008L});
     public static final BitSet FOLLOW_ruleAction_in_block3561 = new BitSet(new long[]{0x0800001100290000L});
     public static final BitSet FOLLOW_ACTION_in_block3577 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_COLON_in_block3628 = new BitSet(new long[]{0xD608010000010010L,0x0000001000000008L});
+    public static final BitSet FOLLOW_COLON_in_block3628 = new BitSet(new long[]{0xD608010800010010L,0x0000001000000008L});
     public static final BitSet FOLLOW_altList_in_block3681 = new BitSet(new long[]{0x0000020000000000L});
     public static final BitSet FOLLOW_RPAREN_in_block3699 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_REF_in_ruleref3772 = new BitSet(new long[]{0x0010800000004002L});
@@ -10089,14 +10223,14 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_elementOptions_in_terminal4030 = new BitSet(new long[]{0x0010800000000002L});
     public static final BitSet FOLLOW_ROOT_in_terminal4061 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_BANG_in_terminal4085 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LT_in_elementOptions4149 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_LT_in_elementOptions4149 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_elementOption_in_elementOptions4151 = new BitSet(new long[]{0x0000104000000000L});
-    public static final BitSet FOLLOW_COMMA_in_elementOptions4154 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_COMMA_in_elementOptions4154 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_elementOption_in_elementOptions4156 = new BitSet(new long[]{0x0000104000000000L});
     public static final BitSet FOLLOW_GT_in_elementOptions4160 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_qid_in_elementOption4195 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_elementOption4217 = new BitSet(new long[]{0x0000200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_elementOption4219 = new BitSet(new long[]{0xC000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_elementOption4219 = new BitSet(new long[]{0xC000000800000000L,0x0000000000000008L});
     public static final BitSet FOLLOW_qid_in_elementOption4223 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption4227 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_predicatedRewrite_in_rewrite4245 = new BitSet(new long[]{0x0200000000000000L});
@@ -10120,7 +10254,7 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_ARG_ACTION_in_rewriteTreeAtom4582 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_REF_in_rewriteTreeAtom4606 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_rewriteTreeAtom4613 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOLLAR_in_rewriteTreeAtom4623 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_DOLLAR_in_rewriteTreeAtom4623 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_rewriteTreeAtom4625 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ACTION_in_rewriteTreeAtom4636 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_LPAREN_in_rewriteTreeEbnf4659 = new BitSet(new long[]{0xC420010000010000L,0x0000000000000008L});
@@ -10132,7 +10266,7 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTree4693 = new BitSet(new long[]{0xC420030000010000L,0x0000000000000008L});
     public static final BitSet FOLLOW_RPAREN_in_rewriteTree4696 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate4728 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplate4730 = new BitSet(new long[]{0xC000020000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplate4730 = new BitSet(new long[]{0xC000020800000000L});
     public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate4732 = new BitSet(new long[]{0x0000020000000000L});
     public static final BitSet FOLLOW_RPAREN_in_rewriteTemplate4734 = new BitSet(new long[]{0x0000000000000C00L});
     public static final BitSet FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate4742 = new BitSet(new long[]{0x0000000000000002L});
@@ -10141,34 +10275,35 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate4783 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ACTION_in_rewriteTemplate4792 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_id_in_rewriteTemplateRef4805 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplateRef4807 = new BitSet(new long[]{0xC000020000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplateRef4807 = new BitSet(new long[]{0xC000020800000000L});
     public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef4809 = new BitSet(new long[]{0x0000020000000000L});
     public static final BitSet FOLLOW_RPAREN_in_rewriteTemplateRef4811 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4840 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_rewriteIndirectTemplateHead4842 = new BitSet(new long[]{0x0000020000000000L});
     public static final BitSet FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4844 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4846 = new BitSet(new long[]{0xC000020000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4846 = new BitSet(new long[]{0xC000020800000000L});
     public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead4848 = new BitSet(new long[]{0x0000020000000000L});
     public static final BitSet FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4850 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4875 = new BitSet(new long[]{0x0000004000000002L});
-    public static final BitSet FOLLOW_COMMA_in_rewriteTemplateArgs4878 = new BitSet(new long[]{0xC000000000000000L});
+    public static final BitSet FOLLOW_COMMA_in_rewriteTemplateArgs4878 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4880 = new BitSet(new long[]{0x0000004000000002L});
     public static final BitSet FOLLOW_id_in_rewriteTemplateArg4909 = new BitSet(new long[]{0x0000200000000000L});
     public static final BitSet FOLLOW_ASSIGN_in_rewriteTemplateArg4911 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_rewriteTemplateArg4913 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_REF_in_id4942 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_TOKEN_REF_in_id4955 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_qid4976 = new BitSet(new long[]{0x0040000000000002L});
-    public static final BitSet FOLLOW_WILDCARD_in_qid4979 = new BitSet(new long[]{0xC000000000000000L});
-    public static final BitSet FOLLOW_id_in_qid4981 = new BitSet(new long[]{0x0040000000000002L});
-    public static final BitSet FOLLOW_alternative_in_alternativeEntry4997 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_alternativeEntry4999 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_element_in_elementEntry5008 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_elementEntry5010 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule_in_ruleEntry5018 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_ruleEntry5020 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_blockEntry5028 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_blockEntry5030 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TEMPLATE_in_id4967 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_qid4990 = new BitSet(new long[]{0x0040000000000002L});
+    public static final BitSet FOLLOW_WILDCARD_in_qid4993 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_qid4995 = new BitSet(new long[]{0x0040000000000002L});
+    public static final BitSet FOLLOW_alternative_in_alternativeEntry5011 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_alternativeEntry5013 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_element_in_elementEntry5022 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_elementEntry5024 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rule_in_ruleEntry5032 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_ruleEntry5034 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_blockEntry5042 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_blockEntry5044 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rewriteTemplate_in_synpred1_ANTLRParser4376 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rewriteTreeAlt_in_synpred2_ANTLRParser4415 = new BitSet(new long[]{0x0000000000000002L});
 

@@ -74,7 +74,7 @@ import org.antlr.v4.tool.*;
 // tree grammar. 'course we won't try codegen if errors.
 public String name;
 public String fileName;
-//public Map<String,String> options = new HashMap<String,String>();
+GrammarASTWithOptions root;
 protected int gtype;
 //Grammar g; // which grammar are we checking
 public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
@@ -92,6 +92,7 @@ topdown
 	|	tokenAlias
 	|	tokenRefWithArgs
 	|	elementOption
+	|	multiElementAltInTreeGrammar
 	;
 
 grammarSpec
@@ -103,7 +104,7 @@ grammarSpec
 	;
 	
 grammarType
-@init {gtype = $start.getType();}
+@init {gtype = $start.getType(); root = (GrammarASTWithOptions)$start;}
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
 
@@ -126,7 +127,7 @@ option // TODO: put in grammar, or rule, or block
     												  $ID.token, $optionValue.v);
 		//  store options into XXX_GRAMMAR, RULE, BLOCK nodes
     	if ( ok ) {
-    		((GrammarASTWithOptions)parentWithOptionKind).setOption($o.text, $optionValue.v);
+    		((GrammarASTWithOptions)parentWithOptionKind).setOption($o.text, $optionValue.v); 
     	}
     	}
     ;
@@ -172,3 +173,17 @@ elementOption
     	}
     	}
     ;
+
+// (ALT_REWRITE (ALT A B)   ^( ALT ^( A B ) ) or ( ALT A )
+multiElementAltInTreeGrammar
+	:	{inContext("ALT_REWRITE") &&
+		 root.getOption("output")!=null && root.getOption("output").equals("template")}?
+		^( ALT ~(SEMPRED|ACTION) ~(SEMPRED|ACTION)+ ) // > 1 element at outer level
+		{
+		int altNum = $start.getParent().getChildIndex() + 1; // alts are 1..n
+		GrammarAST firstNode = (GrammarAST)$start.getChild(0);
+		BasicSemanticChecks.checkRewriteForMultiRootAltInTreeGrammar(gtype,root.getOptions(),
+																	 firstNode.token,
+																	 altNum);
+		}
+	;
