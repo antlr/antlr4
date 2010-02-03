@@ -452,7 +452,7 @@ PLUS_ASSIGN  : '+='                   ;
 OR           : '|'                    ;
 ROOT         : '^'                    ;
 DOLLAR       : '$'                    ;
-WILDCARD     : '.'                    ;
+DOT		     : '.'                    ; // can be WILDCARD or DOT in qid or imported rule ref
 RANGE        : '..'                   ;
 ETC          : '...'                  ;
 RARROW       : '->'                   ;

@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-02-02 18:26:03
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-02-03 11:08:45
 
 /*
  [The "BSD licence"]
@@ -82,11 +82,11 @@ public class ANTLRLexer extends Lexer {
     public static final int TREE=26;
     public static final int ETC=56;
     public static final int COMMA=38;
-    public static final int WILDCARD=54;
     public static final int ARG_ACTION=14;
     public static final int DOC_COMMENT=6;
     public static final int PLUS=49;
     public static final int DOUBLE_QUOTE_STRING_LITERAL=10;
+    public static final int DOT=54;
     public static final int COMMENT=9;
     public static final int ACTION_CHAR_LITERAL=13;
     public static final int GRAMMAR=27;
@@ -1688,13 +1688,13 @@ public class ANTLRLexer extends Lexer {
     }
     // $ANTLR end "DOLLAR"
 
-    // $ANTLR start "WILDCARD"
-    public final void mWILDCARD() throws RecognitionException {
+    // $ANTLR start "DOT"
+    public final void mDOT() throws RecognitionException {
         try {
-            int _type = WILDCARD;
+            int _type = DOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:455:14: ( '.' )
-            // ANTLRLexer.g:455:16: '.'
+            // ANTLRLexer.g:455:11: ( '.' )
+            // ANTLRLexer.g:455:13: '.'
             {
             match('.'); if (state.failed) return ;
 
@@ -1706,7 +1706,7 @@ public class ANTLRLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "WILDCARD"
+    // $ANTLR end "DOT"
 
     // $ANTLR start "RANGE"
     public final void mRANGE() throws RecognitionException {
@@ -2185,9 +2185,9 @@ public class ANTLRLexer extends Lexer {
                 cnt21++;
             } while (true);
 
-            int fileStart3565 = getCharIndex();
+            int fileStart3568 = getCharIndex();
             mACTION_STRING_LITERAL(); if (state.failed) return ;
-            file = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, fileStart3565, getCharIndex()-1);
+            file = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, fileStart3568, getCharIndex()-1);
             // ANTLRLexer.g:545:49: ( WSCHARS )+
             int cnt22=0;
             loop22:
@@ -2219,9 +2219,9 @@ public class ANTLRLexer extends Lexer {
                 cnt22++;
             } while (true);
 
-            int lineStart3572 = getCharIndex();
+            int lineStart3575 = getCharIndex();
             mINT(); if (state.failed) return ;
-            line = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, lineStart3572, getCharIndex()-1);
+            line = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, lineStart3575, getCharIndex()-1);
             if ( state.backtracking==0 ) {
 
                        // TODO: Add target specific code to change the source file name and current line number
@@ -2772,7 +2772,7 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR end "ERRCHAR"
 
     public void mTokens() throws RecognitionException {
-        // ANTLRLexer.g:1:8: ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | WILDCARD | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR )
+        // ANTLRLexer.g:1:8: ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | DOT | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR )
         int alt31=54;
         alt31 = dfa31.predict(input);
         switch (alt31) {
@@ -3057,98 +3057,98 @@ public class ANTLRLexer extends Lexer {
                 }
                 break;
             case 41 :
-                // ANTLRLexer.g:1:332: WILDCARD
+                // ANTLRLexer.g:1:332: DOT
                 {
-                mWILDCARD(); if (state.failed) return ;
+                mDOT(); if (state.failed) return ;
 
                 }
                 break;
             case 42 :
-                // ANTLRLexer.g:1:341: RANGE
+                // ANTLRLexer.g:1:336: RANGE
                 {
                 mRANGE(); if (state.failed) return ;
 
                 }
                 break;
             case 43 :
-                // ANTLRLexer.g:1:347: ETC
+                // ANTLRLexer.g:1:342: ETC
                 {
                 mETC(); if (state.failed) return ;
 
                 }
                 break;
             case 44 :
-                // ANTLRLexer.g:1:351: RARROW
+                // ANTLRLexer.g:1:346: RARROW
                 {
                 mRARROW(); if (state.failed) return ;
 
                 }
                 break;
             case 45 :
-                // ANTLRLexer.g:1:358: TREE_BEGIN
+                // ANTLRLexer.g:1:353: TREE_BEGIN
                 {
                 mTREE_BEGIN(); if (state.failed) return ;
 
                 }
                 break;
             case 46 :
-                // ANTLRLexer.g:1:369: AT
+                // ANTLRLexer.g:1:364: AT
                 {
                 mAT(); if (state.failed) return ;
 
                 }
                 break;
             case 47 :
-                // ANTLRLexer.g:1:372: NOT
+                // ANTLRLexer.g:1:367: NOT
                 {
                 mNOT(); if (state.failed) return ;
 
                 }
                 break;
             case 48 :
-                // ANTLRLexer.g:1:376: RBRACE
+                // ANTLRLexer.g:1:371: RBRACE
                 {
                 mRBRACE(); if (state.failed) return ;
 
                 }
                 break;
             case 49 :
-                // ANTLRLexer.g:1:383: TOKEN_REF
+                // ANTLRLexer.g:1:378: TOKEN_REF
                 {
                 mTOKEN_REF(); if (state.failed) return ;
 
                 }
                 break;
             case 50 :
-                // ANTLRLexer.g:1:393: RULE_REF
+                // ANTLRLexer.g:1:388: RULE_REF
                 {
                 mRULE_REF(); if (state.failed) return ;
 
                 }
                 break;
             case 51 :
-                // ANTLRLexer.g:1:402: INT
+                // ANTLRLexer.g:1:397: INT
                 {
                 mINT(); if (state.failed) return ;
 
                 }
                 break;
             case 52 :
-                // ANTLRLexer.g:1:406: STRING_LITERAL
+                // ANTLRLexer.g:1:401: STRING_LITERAL
                 {
                 mSTRING_LITERAL(); if (state.failed) return ;
 
                 }
                 break;
             case 53 :
-                // ANTLRLexer.g:1:421: WS
+                // ANTLRLexer.g:1:416: WS
                 {
                 mWS(); if (state.failed) return ;
 
                 }
                 break;
             case 54 :
-                // ANTLRLexer.g:1:424: ERRCHAR
+                // ANTLRLexer.g:1:419: ERRCHAR
                 {
                 mERRCHAR(); if (state.failed) return ;
 
@@ -6301,7 +6301,7 @@ public class ANTLRLexer extends Lexer {
             this.transition = DFA31_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | WILDCARD | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR );";
+            return "1:1: Tokens : ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | DOT | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             IntStream input = _input;

@@ -88,7 +88,7 @@ tokens {
     GATED_SEMPRED;        // {p}? =>
     SYN_SEMPRED;          // (...) =>   it's a manually-specified synpred converted to sempred
     BACKTRACK_SEMPRED;    // auto backtracking mode syn pred converted to sempred
-    DOT;
+    WILDCARD;
     // A generic node indicating a list of something when we don't
     // really need to distinguish what we have a list of as the AST
     // will 'kinow' by context.
@@ -639,16 +639,16 @@ atom:	range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
 	        input.LT(2).getCharPositionInLine() &&
 	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
 	    }?
-	    id WILDCARD ruleref 
-	    -> ^(DOT[$WILDCARD] id ruleref)
+	    id DOT ruleref 
+	    -> ^(DOT id ruleref)
 	|	// Qualified reference delegate.token.
 	    {
 	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
 	        input.LT(2).getCharPositionInLine() &&
 	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
 	    }?
-	    id WILDCARD terminal
-	    -> ^(DOT[$WILDCARD] id terminal)
+	    id DOT terminal
+	    -> ^(DOT id terminal)
     |   terminal
     |   ruleref
     |	notSet (ROOT^|BANG^)?
@@ -926,7 +926,7 @@ id
     | TEMPLATE  ->ID[$TEMPLATE] // keyword
     ;
     
-qid :	id (WILDCARD id)* -> ID[$qid.start, $text] ;
+qid :	id (DOT id)* -> ID[$qid.start, $text] ;
 
 alternativeEntry : alternative EOF ; // allow gunit to call alternative and see EOF afterwards
 elementEntry : element EOF ;

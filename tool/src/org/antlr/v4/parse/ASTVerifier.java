@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-02-02 18:26:06
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-02-03 11:08:48
 
 /*
  [The "BSD license"]
@@ -40,7 +40,7 @@ import java.util.ArrayList;
  */
 public class ASTVerifier extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "WILDCARD", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "DOT", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
     };
     public static final int LT=43;
     public static final int STAR=48;
@@ -105,11 +105,11 @@ public class ASTVerifier extends TreeParser {
     public static final int SCOPE=21;
     public static final int ETC=56;
     public static final int COMMA=38;
-    public static final int WILDCARD=54;
+    public static final int WILDCARD=96;
     public static final int DOC_COMMENT=6;
     public static final int PLUS=49;
     public static final int REWRITE_BLOCK=77;
-    public static final int DOT=96;
+    public static final int DOT=54;
     public static final int RETURNS=31;
     public static final int RULES=73;
     public static final int RARROW=57;
@@ -1682,7 +1682,7 @@ public class ASTVerifier extends TreeParser {
                     if ( (LA24_3==EPSILON) ) {
                         alt24=2;
                     }
-                    else if ( (LA24_3==SEMPRED||LA24_3==ACTION||LA24_3==IMPLIES||LA24_3==ASSIGN||LA24_3==BANG||LA24_3==PLUS_ASSIGN||LA24_3==ROOT||(LA24_3>=WILDCARD && LA24_3<=RANGE)||LA24_3==TREE_BEGIN||(LA24_3>=TOKEN_REF && LA24_3<=RULE_REF)||LA24_3==STRING_LITERAL||LA24_3==BLOCK||(LA24_3>=OPTIONAL && LA24_3<=POSITIVE_CLOSURE)||LA24_3==GATED_SEMPRED||LA24_3==DOT) ) {
+                    else if ( (LA24_3==SEMPRED||LA24_3==ACTION||LA24_3==IMPLIES||LA24_3==ASSIGN||LA24_3==BANG||LA24_3==PLUS_ASSIGN||LA24_3==ROOT||(LA24_3>=DOT && LA24_3<=RANGE)||LA24_3==TREE_BEGIN||(LA24_3>=TOKEN_REF && LA24_3<=RULE_REF)||LA24_3==STRING_LITERAL||LA24_3==BLOCK||(LA24_3>=OPTIONAL && LA24_3<=POSITIVE_CLOSURE)||LA24_3==GATED_SEMPRED||LA24_3==WILDCARD) ) {
                         alt24=3;
                     }
                     else {
@@ -1781,7 +1781,7 @@ public class ASTVerifier extends TreeParser {
                 int alt25=2;
                 int LA25_0 = input.LA(1);
 
-                if ( (LA25_0==SEMPRED||LA25_0==ACTION||LA25_0==IMPLIES||LA25_0==ASSIGN||LA25_0==BANG||LA25_0==PLUS_ASSIGN||LA25_0==ROOT||(LA25_0>=WILDCARD && LA25_0<=RANGE)||LA25_0==TREE_BEGIN||(LA25_0>=TOKEN_REF && LA25_0<=RULE_REF)||LA25_0==STRING_LITERAL||LA25_0==BLOCK||(LA25_0>=OPTIONAL && LA25_0<=POSITIVE_CLOSURE)||LA25_0==GATED_SEMPRED||LA25_0==DOT) ) {
+                if ( (LA25_0==SEMPRED||LA25_0==ACTION||LA25_0==IMPLIES||LA25_0==ASSIGN||LA25_0==BANG||LA25_0==PLUS_ASSIGN||LA25_0==ROOT||(LA25_0>=DOT && LA25_0<=RANGE)||LA25_0==TREE_BEGIN||(LA25_0>=TOKEN_REF && LA25_0<=RULE_REF)||LA25_0==STRING_LITERAL||LA25_0==BLOCK||(LA25_0>=OPTIONAL && LA25_0<=POSITIVE_CLOSURE)||LA25_0==GATED_SEMPRED||LA25_0==WILDCARD) ) {
                     alt25=1;
                 }
 
@@ -1944,7 +1944,7 @@ public class ASTVerifier extends TreeParser {
                     int alt27=2;
                     int LA27_0 = input.LA(1);
 
-                    if ( (LA27_0==BANG||LA27_0==ROOT||(LA27_0>=WILDCARD && LA27_0<=RANGE)||(LA27_0>=TOKEN_REF && LA27_0<=RULE_REF)||LA27_0==STRING_LITERAL||LA27_0==DOT) ) {
+                    if ( (LA27_0==BANG||LA27_0==ROOT||(LA27_0>=DOT && LA27_0<=RANGE)||(LA27_0>=TOKEN_REF && LA27_0<=RULE_REF)||LA27_0==STRING_LITERAL||LA27_0==WILDCARD) ) {
                         alt27=1;
                     }
                     else if ( (LA27_0==BLOCK) ) {
@@ -1998,7 +1998,7 @@ public class ASTVerifier extends TreeParser {
                     int alt28=2;
                     int LA28_0 = input.LA(1);
 
-                    if ( (LA28_0==BANG||LA28_0==ROOT||(LA28_0>=WILDCARD && LA28_0<=RANGE)||(LA28_0>=TOKEN_REF && LA28_0<=RULE_REF)||LA28_0==STRING_LITERAL||LA28_0==DOT) ) {
+                    if ( (LA28_0==BANG||LA28_0==ROOT||(LA28_0>=DOT && LA28_0<=RANGE)||(LA28_0>=TOKEN_REF && LA28_0<=RULE_REF)||LA28_0==STRING_LITERAL||LA28_0==WILDCARD) ) {
                         alt28=1;
                     }
                     else if ( (LA28_0==BLOCK) ) {
@@ -2072,7 +2072,7 @@ public class ASTVerifier extends TreeParser {
                 int alt30=2;
                 int LA30_0 = input.LA(1);
 
-                if ( (LA30_0==SEMPRED||LA30_0==ACTION||LA30_0==IMPLIES||LA30_0==ASSIGN||LA30_0==BANG||LA30_0==PLUS_ASSIGN||LA30_0==ROOT||(LA30_0>=WILDCARD && LA30_0<=RANGE)||LA30_0==TREE_BEGIN||(LA30_0>=TOKEN_REF && LA30_0<=RULE_REF)||LA30_0==STRING_LITERAL||LA30_0==BLOCK||(LA30_0>=OPTIONAL && LA30_0<=POSITIVE_CLOSURE)||LA30_0==GATED_SEMPRED||LA30_0==DOT) ) {
+                if ( (LA30_0==SEMPRED||LA30_0==ACTION||LA30_0==IMPLIES||LA30_0==ASSIGN||LA30_0==BANG||LA30_0==PLUS_ASSIGN||LA30_0==ROOT||(LA30_0>=DOT && LA30_0<=RANGE)||LA30_0==TREE_BEGIN||(LA30_0>=TOKEN_REF && LA30_0<=RULE_REF)||LA30_0==STRING_LITERAL||LA30_0==BLOCK||(LA30_0>=OPTIONAL && LA30_0<=POSITIVE_CLOSURE)||LA30_0==GATED_SEMPRED||LA30_0==WILDCARD) ) {
                     alt30=1;
                 }
 
@@ -4172,7 +4172,7 @@ public class ASTVerifier extends TreeParser {
     static final String DFA26_minS =
         "\1\4\1\uffff\2\2\6\uffff\2\57";
     static final String DFA26_maxS =
-        "\1\140\1\uffff\2\2\6\uffff\2\114";
+        "\1\140\1\uffff\2\2\6\uffff\2\140";
     static final String DFA26_acceptS =
         "\1\uffff\1\1\2\uffff\1\2\1\3\1\4\1\5\1\6\1\7\2\uffff";
     static final String DFA26_specialS =
@@ -4190,10 +4190,10 @@ public class ASTVerifier extends TreeParser {
             "",
             "",
             "",
-            "\1\4\4\uffff\1\4\1\uffff\2\4\4\uffff\1\4\1\uffff\2\4\3\uffff"+
-            "\1\4\10\uffff\1\5",
-            "\1\4\4\uffff\1\4\1\uffff\2\4\4\uffff\1\4\1\uffff\2\4\3\uffff"+
-            "\1\4\10\uffff\1\5"
+            "\1\4\4\uffff\1\4\2\uffff\1\4\4\uffff\1\4\1\uffff\2\4\3\uffff"+
+            "\1\4\10\uffff\1\5\23\uffff\1\4",
+            "\1\4\4\uffff\1\4\2\uffff\1\4\4\uffff\1\4\1\uffff\2\4\3\uffff"+
+            "\1\4\10\uffff\1\5\23\uffff\1\4"
     };
 
     static final short[] DFA26_eot = DFA.unpackEncodedString(DFA26_eotS);
@@ -4237,41 +4237,41 @@ public class ASTVerifier extends TreeParser {
         "\1\57\2\2\1\uffff\1\2\2\uffff\2\57\1\127\4\uffff\1\57\1\uffff\2"+
         "\2\1\uffff\2\57";
     static final String DFA33_maxS =
-        "\1\140\2\2\1\uffff\1\2\2\uffff\2\103\1\127\4\uffff\1\103\1\uffff"+
-        "\2\2\1\uffff\2\103";
+        "\1\140\2\2\1\uffff\1\2\2\uffff\2\140\1\127\4\uffff\1\140\1\uffff"+
+        "\2\2\1\uffff\2\140";
     static final String DFA33_acceptS =
         "\3\uffff\1\5\1\uffff\1\10\1\11\3\uffff\1\1\1\3\1\2\1\4\1\uffff\1"+
         "\6\2\uffff\1\7\2\uffff";
     static final String DFA33_specialS =
         "\25\uffff}>";
     static final String[] DFA33_transitionS = {
-            "\1\2\4\uffff\1\1\1\uffff\1\5\1\3\6\uffff\1\5\1\6\3\uffff\1\5"+
-            "\34\uffff\1\4",
+            "\1\2\4\uffff\1\1\1\uffff\1\4\1\3\6\uffff\1\5\1\6\3\uffff\1\5"+
+            "\34\uffff\1\5",
             "\1\7",
             "\1\10",
             "",
             "\1\11",
             "",
             "",
-            "\1\5\4\uffff\1\5\1\uffff\1\5\1\12\4\uffff\1\13\1\uffff\1\5"+
-            "\1\6\3\uffff\1\5",
-            "\1\5\4\uffff\1\5\1\uffff\1\5\1\14\4\uffff\1\15\1\uffff\1\5"+
-            "\1\6\3\uffff\1\5",
+            "\1\5\4\uffff\1\5\2\uffff\1\12\4\uffff\1\13\1\uffff\1\5\1\6"+
+            "\3\uffff\1\5\34\uffff\1\5",
+            "\1\5\4\uffff\1\5\2\uffff\1\14\4\uffff\1\15\1\uffff\1\5\1\6"+
+            "\3\uffff\1\5\34\uffff\1\5",
             "\1\16",
             "",
             "",
             "",
             "",
-            "\1\21\4\uffff\1\20\1\uffff\1\17\7\uffff\1\17\1\22\3\uffff\1"+
-            "\17",
+            "\1\21\4\uffff\1\20\11\uffff\1\17\1\22\3\uffff\1\17\34\uffff"+
+            "\1\17",
             "",
             "\1\23",
             "\1\24",
             "",
-            "\1\17\4\uffff\1\17\1\uffff\1\17\7\uffff\1\17\1\22\3\uffff\1"+
-            "\17",
-            "\1\17\4\uffff\1\17\1\uffff\1\17\7\uffff\1\17\1\22\3\uffff\1"+
-            "\17"
+            "\1\17\4\uffff\1\17\11\uffff\1\17\1\22\3\uffff\1\17\34\uffff"+
+            "\1\17",
+            "\1\17\4\uffff\1\17\11\uffff\1\17\1\22\3\uffff\1\17\34\uffff"+
+            "\1\17"
     };
 
     static final short[] DFA33_eot = DFA.unpackEncodedString(DFA33_eotS);
@@ -4314,14 +4314,14 @@ public class ASTVerifier extends TreeParser {
     static final String DFA42_minS =
         "\1\57\3\2\4\uffff\1\16\3\uffff\1\3\3\uffff";
     static final String DFA42_maxS =
-        "\1\103\3\140\4\uffff\1\142\3\uffff\1\142\3\uffff";
+        "\4\140\4\uffff\1\142\3\uffff\1\142\3\uffff";
     static final String DFA42_acceptS =
         "\4\uffff\1\11\1\12\1\1\1\2\1\uffff\1\6\1\7\1\10\1\uffff\1\5\1\4"+
         "\1\3";
     static final String DFA42_specialS =
         "\20\uffff}>";
     static final String[] DFA42_transitionS = {
-            "\1\5\4\uffff\1\4\1\uffff\1\3\7\uffff\1\2\4\uffff\1\1",
+            "\1\5\4\uffff\1\4\11\uffff\1\2\4\uffff\1\1\34\uffff\1\3",
             "\1\6\2\7\13\uffff\1\7\31\uffff\1\7\2\uffff\1\7\1\uffff\1\7"+
             "\2\uffff\1\7\1\uffff\1\7\1\uffff\2\7\2\uffff\1\7\3\uffff\2\7"+
             "\3\uffff\1\7\10\uffff\1\7\1\uffff\3\7\14\uffff\1\7\2\uffff\1"+
@@ -4566,7 +4566,7 @@ public class ASTVerifier extends TreeParser {
     public static final BitSet FOLLOW_notSet_in_atom1047 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_range_in_atom1053 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_DOT_in_atom1059 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom1061 = new BitSet(new long[]{0x4050800000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_atom1061 = new BitSet(new long[]{0x4010800000000000L,0x0000000100000008L});
     public static final BitSet FOLLOW_terminal_in_atom1063 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_DOT_in_atom1070 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_atom1072 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});

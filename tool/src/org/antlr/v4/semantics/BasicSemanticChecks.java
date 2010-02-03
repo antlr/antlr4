@@ -320,6 +320,14 @@ public class BasicSemanticChecks {
         }
     }
 
+    protected static void checkWildcardRoot(int gtype, Token wild) {
+        String fileName = wild.getInputStream().getSourceName();
+        ErrorManager.grammarError(ErrorType.WILDCARD_AS_ROOT,
+                                  fileName,
+                                  wild);
+    }
+
+
     protected static void checkFOO(int gtype, Token ID) {
     }
 }

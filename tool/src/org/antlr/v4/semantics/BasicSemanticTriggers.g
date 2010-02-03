@@ -98,6 +98,7 @@ bottomup // do these "inside to outside" of expressions.
 	|	tokenRefWithArgs
 	|	elementOption
 	|	checkGrammarOptions // do after we see everything
+	|	wildcardRoot
 	;
 
 grammarSpec
@@ -214,3 +215,7 @@ astOps
 	:	^(ROOT el=.) {BasicSemanticChecks.checkASTOps(gtype, root.getOptions(), $start, $el);}
 	|	^(BANG el=.) {BasicSemanticChecks.checkASTOps(gtype, root.getOptions(), $start, $el);}
 	;
+	
+wildcardRoot
+    : ^(TREE_BEGIN WILDCARD .*) {BasicSemanticChecks.checkWildcardRoot(gtype, $WILDCARD.token);}
+    ;

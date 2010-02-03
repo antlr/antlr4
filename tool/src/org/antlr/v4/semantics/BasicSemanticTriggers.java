@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-02 18:26:07
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-03 11:09:38
 
 /*
  [The "BSD license"]
@@ -41,7 +41,7 @@ import java.util.HashMap;
  */
 public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "WILDCARD", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "DOT", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
     };
     public static final int LT=43;
     public static final int STAR=48;
@@ -106,11 +106,11 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int SCOPE=21;
     public static final int ETC=56;
     public static final int COMMA=38;
-    public static final int WILDCARD=54;
+    public static final int WILDCARD=96;
     public static final int DOC_COMMENT=6;
     public static final int PLUS=49;
     public static final int REWRITE_BLOCK=77;
-    public static final int DOT=96;
+    public static final int DOT=54;
     public static final int RETURNS=31;
     public static final int RULES=73;
     public static final int RARROW=57;
@@ -252,11 +252,11 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "bottomup"
-    // BasicSemanticTriggers.g:94:1: bottomup : ( multiElementAltInTreeGrammar | astOps | ruleref | tokenRefWithArgs | elementOption | checkGrammarOptions );
+    // BasicSemanticTriggers.g:94:1: bottomup : ( multiElementAltInTreeGrammar | astOps | ruleref | tokenRefWithArgs | elementOption | checkGrammarOptions | wildcardRoot );
     public final void bottomup() throws RecognitionException {
         try {
-            // BasicSemanticTriggers.g:95:2: ( multiElementAltInTreeGrammar | astOps | ruleref | tokenRefWithArgs | elementOption | checkGrammarOptions )
-            int alt2=6;
+            // BasicSemanticTriggers.g:95:2: ( multiElementAltInTreeGrammar | astOps | ruleref | tokenRefWithArgs | elementOption | checkGrammarOptions | wildcardRoot )
+            int alt2=7;
             switch ( input.LA(1) ) {
             case ALT:
                 {
@@ -287,6 +287,11 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             case GRAMMAR:
                 {
                 alt2=6;
+                }
+                break;
+            case TREE_BEGIN:
+                {
+                alt2=7;
                 }
                 break;
             default:
@@ -364,6 +369,17 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
                     }
                     break;
+                case 7 :
+                    // BasicSemanticTriggers.g:101:4: wildcardRoot
+                    {
+                    pushFollow(FOLLOW_wildcardRoot_in_bottomup159);
+                    wildcardRoot();
+
+                    state._fsp--;
+                    if (state.failed) return ;
+
+                    }
+                    break;
 
             }
         }
@@ -381,7 +397,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     };
 
     // $ANTLR start "grammarSpec"
-    // BasicSemanticTriggers.g:103:1: grammarSpec : ^( GRAMMAR ID ( DOC_COMMENT )? prequelConstructs ^( RULES ( . )* ) ) ;
+    // BasicSemanticTriggers.g:104:1: grammarSpec : ^( GRAMMAR ID ( DOC_COMMENT )? prequelConstructs ^( RULES ( . )* ) ) ;
     public final BasicSemanticTriggers.grammarSpec_return grammarSpec() throws RecognitionException {
         BasicSemanticTriggers.grammarSpec_return retval = new BasicSemanticTriggers.grammarSpec_return();
         retval.start = input.LT(1);
@@ -389,14 +405,14 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
         GrammarAST ID1=null;
 
         try {
-            // BasicSemanticTriggers.g:104:5: ( ^( GRAMMAR ID ( DOC_COMMENT )? prequelConstructs ^( RULES ( . )* ) ) )
-            // BasicSemanticTriggers.g:104:9: ^( GRAMMAR ID ( DOC_COMMENT )? prequelConstructs ^( RULES ( . )* ) )
+            // BasicSemanticTriggers.g:105:5: ( ^( GRAMMAR ID ( DOC_COMMENT )? prequelConstructs ^( RULES ( . )* ) ) )
+            // BasicSemanticTriggers.g:105:9: ^( GRAMMAR ID ( DOC_COMMENT )? prequelConstructs ^( RULES ( . )* ) )
             {
-            match(input,GRAMMAR,FOLLOW_GRAMMAR_in_grammarSpec171); if (state.failed) return retval;
+            match(input,GRAMMAR,FOLLOW_GRAMMAR_in_grammarSpec176); if (state.failed) return retval;
 
             match(input, Token.DOWN, null); if (state.failed) return retval;
-            ID1=(GrammarAST)match(input,ID,FOLLOW_ID_in_grammarSpec173); if (state.failed) return retval;
-            // BasicSemanticTriggers.g:104:22: ( DOC_COMMENT )?
+            ID1=(GrammarAST)match(input,ID,FOLLOW_ID_in_grammarSpec178); if (state.failed) return retval;
+            // BasicSemanticTriggers.g:105:22: ( DOC_COMMENT )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -405,25 +421,25 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             }
             switch (alt3) {
                 case 1 :
-                    // BasicSemanticTriggers.g:104:22: DOC_COMMENT
+                    // BasicSemanticTriggers.g:105:22: DOC_COMMENT
                     {
-                    match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_grammarSpec175); if (state.failed) return retval;
+                    match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_grammarSpec180); if (state.failed) return retval;
 
                     }
                     break;
 
             }
 
-            pushFollow(FOLLOW_prequelConstructs_in_grammarSpec178);
+            pushFollow(FOLLOW_prequelConstructs_in_grammarSpec183);
             prequelConstructs();
 
             state._fsp--;
             if (state.failed) return retval;
-            match(input,RULES,FOLLOW_RULES_in_grammarSpec181); if (state.failed) return retval;
+            match(input,RULES,FOLLOW_RULES_in_grammarSpec186); if (state.failed) return retval;
 
             if ( input.LA(1)==Token.DOWN ) {
                 match(input, Token.DOWN, null); if (state.failed) return retval;
-                // BasicSemanticTriggers.g:104:61: ( . )*
+                // BasicSemanticTriggers.g:105:61: ( . )*
                 loop4:
                 do {
                     int alt4=2;
@@ -439,7 +455,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
                     switch (alt4) {
                 	case 1 :
-                	    // BasicSemanticTriggers.g:104:61: .
+                	    // BasicSemanticTriggers.g:105:61: .
                 	    {
                 	    matchAny(input); if (state.failed) return retval;
 
@@ -480,15 +496,15 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "checkGrammarOptions"
-    // BasicSemanticTriggers.g:113:1: checkGrammarOptions : GRAMMAR ;
+    // BasicSemanticTriggers.g:114:1: checkGrammarOptions : GRAMMAR ;
     public final void checkGrammarOptions() throws RecognitionException {
         GrammarAST GRAMMAR2=null;
 
         try {
-            // BasicSemanticTriggers.g:114:2: ( GRAMMAR )
-            // BasicSemanticTriggers.g:114:4: GRAMMAR
+            // BasicSemanticTriggers.g:115:2: ( GRAMMAR )
+            // BasicSemanticTriggers.g:115:4: GRAMMAR
             {
-            GRAMMAR2=(GrammarAST)match(input,GRAMMAR,FOLLOW_GRAMMAR_in_checkGrammarOptions205); if (state.failed) return ;
+            GRAMMAR2=(GrammarAST)match(input,GRAMMAR,FOLLOW_GRAMMAR_in_checkGrammarOptions210); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               BasicSemanticChecks.checkTreeFilterOptions(gtype, (GrammarRootAST)GRAMMAR2,
               												    root.getOptions());
@@ -509,7 +525,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "prequelConstructs"
-    // BasicSemanticTriggers.g:126:1: prequelConstructs : ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )* ;
+    // BasicSemanticTriggers.g:127:1: prequelConstructs : ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )* ;
     public final void prequelConstructs() throws RecognitionException {
         GrammarAST o=null;
         GrammarAST i=null;
@@ -519,10 +535,10 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
         List list_t=null;
 
         try {
-            // BasicSemanticTriggers.g:127:2: ( ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )* )
-            // BasicSemanticTriggers.g:127:4: ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )*
+            // BasicSemanticTriggers.g:128:2: ( ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )* )
+            // BasicSemanticTriggers.g:128:4: ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )*
             {
-            // BasicSemanticTriggers.g:127:4: ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )*
+            // BasicSemanticTriggers.g:128:4: ( ^(o+= OPTIONS ( . )* ) | ^(i+= IMPORT ( . )* ) | ^(t+= TOKENS ( . )* ) )*
             loop8:
             do {
                 int alt8=4;
@@ -547,16 +563,16 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
                 switch (alt8) {
             	case 1 :
-            	    // BasicSemanticTriggers.g:127:6: ^(o+= OPTIONS ( . )* )
+            	    // BasicSemanticTriggers.g:128:6: ^(o+= OPTIONS ( . )* )
             	    {
-            	    o=(GrammarAST)match(input,OPTIONS,FOLLOW_OPTIONS_in_prequelConstructs228); if (state.failed) return ;
+            	    o=(GrammarAST)match(input,OPTIONS,FOLLOW_OPTIONS_in_prequelConstructs233); if (state.failed) return ;
             	    if (list_o==null) list_o=new ArrayList();
             	    list_o.add(o);
 
 
             	    if ( input.LA(1)==Token.DOWN ) {
             	        match(input, Token.DOWN, null); if (state.failed) return ;
-            	        // BasicSemanticTriggers.g:127:19: ( . )*
+            	        // BasicSemanticTriggers.g:128:19: ( . )*
             	        loop5:
             	        do {
             	            int alt5=2;
@@ -572,7 +588,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
             	            switch (alt5) {
             	        	case 1 :
-            	        	    // BasicSemanticTriggers.g:127:19: .
+            	        	    // BasicSemanticTriggers.g:128:19: .
             	        	    {
             	        	    matchAny(input); if (state.failed) return ;
 
@@ -591,16 +607,16 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             	    }
             	    break;
             	case 2 :
-            	    // BasicSemanticTriggers.g:128:5: ^(i+= IMPORT ( . )* )
+            	    // BasicSemanticTriggers.g:129:5: ^(i+= IMPORT ( . )* )
             	    {
-            	    i=(GrammarAST)match(input,IMPORT,FOLLOW_IMPORT_in_prequelConstructs241); if (state.failed) return ;
+            	    i=(GrammarAST)match(input,IMPORT,FOLLOW_IMPORT_in_prequelConstructs246); if (state.failed) return ;
             	    if (list_i==null) list_i=new ArrayList();
             	    list_i.add(i);
 
 
             	    if ( input.LA(1)==Token.DOWN ) {
             	        match(input, Token.DOWN, null); if (state.failed) return ;
-            	        // BasicSemanticTriggers.g:128:17: ( . )*
+            	        // BasicSemanticTriggers.g:129:17: ( . )*
             	        loop6:
             	        do {
             	            int alt6=2;
@@ -616,7 +632,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
             	            switch (alt6) {
             	        	case 1 :
-            	        	    // BasicSemanticTriggers.g:128:17: .
+            	        	    // BasicSemanticTriggers.g:129:17: .
             	        	    {
             	        	    matchAny(input); if (state.failed) return ;
 
@@ -635,16 +651,16 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             	    }
             	    break;
             	case 3 :
-            	    // BasicSemanticTriggers.g:129:5: ^(t+= TOKENS ( . )* )
+            	    // BasicSemanticTriggers.g:130:5: ^(t+= TOKENS ( . )* )
             	    {
-            	    t=(GrammarAST)match(input,TOKENS,FOLLOW_TOKENS_in_prequelConstructs254); if (state.failed) return ;
+            	    t=(GrammarAST)match(input,TOKENS,FOLLOW_TOKENS_in_prequelConstructs259); if (state.failed) return ;
             	    if (list_t==null) list_t=new ArrayList();
             	    list_t.add(t);
 
 
             	    if ( input.LA(1)==Token.DOWN ) {
             	        match(input, Token.DOWN, null); if (state.failed) return ;
-            	        // BasicSemanticTriggers.g:129:17: ( . )*
+            	        // BasicSemanticTriggers.g:130:17: ( . )*
             	        loop7:
             	        do {
             	            int alt7=2;
@@ -660,7 +676,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
             	            switch (alt7) {
             	        	case 1 :
-            	        	    // BasicSemanticTriggers.g:129:17: .
+            	        	    // BasicSemanticTriggers.g:130:17: .
             	        	    {
             	        	    matchAny(input); if (state.failed) return ;
 
@@ -703,15 +719,15 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "rules"
-    // BasicSemanticTriggers.g:134:1: rules : RULES ;
+    // BasicSemanticTriggers.g:135:1: rules : RULES ;
     public final void rules() throws RecognitionException {
         GrammarAST RULES3=null;
 
         try {
-            // BasicSemanticTriggers.g:134:7: ( RULES )
-            // BasicSemanticTriggers.g:134:9: RULES
+            // BasicSemanticTriggers.g:135:7: ( RULES )
+            // BasicSemanticTriggers.g:135:9: RULES
             {
-            RULES3=(GrammarAST)match(input,RULES,FOLLOW_RULES_in_rules277); if (state.failed) return ;
+            RULES3=(GrammarAST)match(input,RULES,FOLLOW_RULES_in_rules282); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               BasicSemanticChecks.checkNumRules(gtype, fileName, RULES3);
             }
@@ -733,7 +749,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     };
 
     // $ANTLR start "option"
-    // BasicSemanticTriggers.g:136:1: option : {...}? ^( ASSIGN o= ID optionValue ) ;
+    // BasicSemanticTriggers.g:137:1: option : {...}? ^( ASSIGN o= ID optionValue ) ;
     public final BasicSemanticTriggers.option_return option() throws RecognitionException {
         BasicSemanticTriggers.option_return retval = new BasicSemanticTriggers.option_return();
         retval.start = input.LT(1);
@@ -743,18 +759,18 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
         try {
-            // BasicSemanticTriggers.g:137:5: ({...}? ^( ASSIGN o= ID optionValue ) )
-            // BasicSemanticTriggers.g:137:9: {...}? ^( ASSIGN o= ID optionValue )
+            // BasicSemanticTriggers.g:138:5: ({...}? ^( ASSIGN o= ID optionValue ) )
+            // BasicSemanticTriggers.g:138:9: {...}? ^( ASSIGN o= ID optionValue )
             {
             if ( !((inContext("OPTIONS"))) ) {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 throw new FailedPredicateException(input, "option", "inContext(\"OPTIONS\")");
             }
-            match(input,ASSIGN,FOLLOW_ASSIGN_in_option298); if (state.failed) return retval;
+            match(input,ASSIGN,FOLLOW_ASSIGN_in_option303); if (state.failed) return retval;
 
             match(input, Token.DOWN, null); if (state.failed) return retval;
-            o=(GrammarAST)match(input,ID,FOLLOW_ID_in_option302); if (state.failed) return retval;
-            pushFollow(FOLLOW_optionValue_in_option304);
+            o=(GrammarAST)match(input,ID,FOLLOW_ID_in_option307); if (state.failed) return retval;
+            pushFollow(FOLLOW_optionValue_in_option309);
             optionValue4=optionValue();
 
             state._fsp--;
@@ -792,14 +808,14 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     };
 
     // $ANTLR start "optionValue"
-    // BasicSemanticTriggers.g:150:1: optionValue returns [String v] : ( ID | STRING_LITERAL | INT | STAR );
+    // BasicSemanticTriggers.g:151:1: optionValue returns [String v] : ( ID | STRING_LITERAL | INT | STAR );
     public final BasicSemanticTriggers.optionValue_return optionValue() throws RecognitionException {
         BasicSemanticTriggers.optionValue_return retval = new BasicSemanticTriggers.optionValue_return();
         retval.start = input.LT(1);
 
         retval.v = ((GrammarAST)retval.start).token.getText();
         try {
-            // BasicSemanticTriggers.g:152:5: ( ID | STRING_LITERAL | INT | STAR )
+            // BasicSemanticTriggers.g:153:5: ( ID | STRING_LITERAL | INT | STAR )
             // BasicSemanticTriggers.g:
             {
             if ( input.LA(1)==STAR||input.LA(1)==INT||input.LA(1)==STRING_LITERAL||input.LA(1)==ID ) {
@@ -828,19 +844,19 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "rule"
-    // BasicSemanticTriggers.g:158:1: rule : ^( RULE r= ID ( . )* ) ;
+    // BasicSemanticTriggers.g:159:1: rule : ^( RULE r= ID ( . )* ) ;
     public final void rule() throws RecognitionException {
         GrammarAST r=null;
 
         try {
-            // BasicSemanticTriggers.g:158:5: ( ^( RULE r= ID ( . )* ) )
-            // BasicSemanticTriggers.g:158:9: ^( RULE r= ID ( . )* )
+            // BasicSemanticTriggers.g:159:5: ( ^( RULE r= ID ( . )* ) )
+            // BasicSemanticTriggers.g:159:9: ^( RULE r= ID ( . )* )
             {
-            match(input,RULE,FOLLOW_RULE_in_rule386); if (state.failed) return ;
+            match(input,RULE,FOLLOW_RULE_in_rule391); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            r=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule390); if (state.failed) return ;
-            // BasicSemanticTriggers.g:158:22: ( . )*
+            r=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule395); if (state.failed) return ;
+            // BasicSemanticTriggers.g:159:22: ( . )*
             loop9:
             do {
                 int alt9=2;
@@ -856,7 +872,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
                 switch (alt9) {
             	case 1 :
-            	    // BasicSemanticTriggers.g:158:22: .
+            	    // BasicSemanticTriggers.g:159:22: .
             	    {
             	    matchAny(input); if (state.failed) return ;
 
@@ -889,15 +905,15 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "ruleref"
-    // BasicSemanticTriggers.g:161:1: ruleref : RULE_REF ;
+    // BasicSemanticTriggers.g:162:1: ruleref : RULE_REF ;
     public final void ruleref() throws RecognitionException {
         GrammarAST RULE_REF5=null;
 
         try {
-            // BasicSemanticTriggers.g:162:5: ( RULE_REF )
-            // BasicSemanticTriggers.g:162:7: RULE_REF
+            // BasicSemanticTriggers.g:163:5: ( RULE_REF )
+            // BasicSemanticTriggers.g:163:7: RULE_REF
             {
-            RULE_REF5=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref413); if (state.failed) return ;
+            RULE_REF5=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref418); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               BasicSemanticChecks.checkInvalidRuleRef(gtype, RULE_REF5.token);
             }
@@ -917,23 +933,23 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "tokenAlias"
-    // BasicSemanticTriggers.g:165:1: tokenAlias : {...}? ^( ASSIGN ID STRING_LITERAL ) ;
+    // BasicSemanticTriggers.g:166:1: tokenAlias : {...}? ^( ASSIGN ID STRING_LITERAL ) ;
     public final void tokenAlias() throws RecognitionException {
         GrammarAST ID6=null;
 
         try {
-            // BasicSemanticTriggers.g:166:2: ({...}? ^( ASSIGN ID STRING_LITERAL ) )
-            // BasicSemanticTriggers.g:166:4: {...}? ^( ASSIGN ID STRING_LITERAL )
+            // BasicSemanticTriggers.g:167:2: ({...}? ^( ASSIGN ID STRING_LITERAL ) )
+            // BasicSemanticTriggers.g:167:4: {...}? ^( ASSIGN ID STRING_LITERAL )
             {
             if ( !((inContext("TOKENS"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "tokenAlias", "inContext(\"TOKENS\")");
             }
-            match(input,ASSIGN,FOLLOW_ASSIGN_in_tokenAlias432); if (state.failed) return ;
+            match(input,ASSIGN,FOLLOW_ASSIGN_in_tokenAlias437); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            ID6=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokenAlias434); if (state.failed) return ;
-            match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokenAlias436); if (state.failed) return ;
+            ID6=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokenAlias439); if (state.failed) return ;
+            match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokenAlias441); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
@@ -955,18 +971,18 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
 
     // $ANTLR start "tokenRefWithArgs"
-    // BasicSemanticTriggers.g:170:1: tokenRefWithArgs : ^( TOKEN_REF ARG_ACTION ) ;
+    // BasicSemanticTriggers.g:171:1: tokenRefWithArgs : ^( TOKEN_REF ARG_ACTION ) ;
     public final void tokenRefWithArgs() throws RecognitionException {
         GrammarAST TOKEN_REF7=null;
 
         try {
-            // BasicSemanticTriggers.g:171:2: ( ^( TOKEN_REF ARG_ACTION ) )
-            // BasicSemanticTriggers.g:171:4: ^( TOKEN_REF ARG_ACTION )
+            // BasicSemanticTriggers.g:172:2: ( ^( TOKEN_REF ARG_ACTION ) )
+            // BasicSemanticTriggers.g:172:4: ^( TOKEN_REF ARG_ACTION )
             {
-            TOKEN_REF7=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_tokenRefWithArgs453); if (state.failed) return ;
+            TOKEN_REF7=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_tokenRefWithArgs458); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_tokenRefWithArgs455); if (state.failed) return ;
+            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_tokenRefWithArgs460); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
@@ -990,7 +1006,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     };
 
     // $ANTLR start "elementOption"
-    // BasicSemanticTriggers.g:175:1: elementOption : ^( ELEMENT_OPTIONS ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID ) ) ;
+    // BasicSemanticTriggers.g:176:1: elementOption : ^( ELEMENT_OPTIONS ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID ) ) ;
     public final BasicSemanticTriggers.elementOption_return elementOption() throws RecognitionException {
         BasicSemanticTriggers.elementOption_return retval = new BasicSemanticTriggers.elementOption_return();
         retval.start = input.LT(1);
@@ -999,13 +1015,13 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
         GrammarAST value=null;
 
         try {
-            // BasicSemanticTriggers.g:176:5: ( ^( ELEMENT_OPTIONS ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID ) ) )
-            // BasicSemanticTriggers.g:176:7: ^( ELEMENT_OPTIONS ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID ) )
+            // BasicSemanticTriggers.g:177:5: ( ^( ELEMENT_OPTIONS ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID ) ) )
+            // BasicSemanticTriggers.g:177:7: ^( ELEMENT_OPTIONS ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID ) )
             {
-            match(input,ELEMENT_OPTIONS,FOLLOW_ELEMENT_OPTIONS_in_elementOption477); if (state.failed) return retval;
+            match(input,ELEMENT_OPTIONS,FOLLOW_ELEMENT_OPTIONS_in_elementOption482); if (state.failed) return retval;
 
             match(input, Token.DOWN, null); if (state.failed) return retval;
-            // BasicSemanticTriggers.g:177:7: ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID )
+            // BasicSemanticTriggers.g:178:7: ( ^( ASSIGN o= ID value= ID ) | ^( ASSIGN o= ID value= STRING_LITERAL ) | o= ID )
             int alt10=3;
             int LA10_0 = input.LA(1);
 
@@ -1060,35 +1076,35 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             }
             switch (alt10) {
                 case 1 :
-                    // BasicSemanticTriggers.g:177:9: ^( ASSIGN o= ID value= ID )
+                    // BasicSemanticTriggers.g:178:9: ^( ASSIGN o= ID value= ID )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption488); if (state.failed) return retval;
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption493); if (state.failed) return retval;
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
-                    o=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption492); if (state.failed) return retval;
-                    value=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption496); if (state.failed) return retval;
+                    o=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption497); if (state.failed) return retval;
+                    value=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption501); if (state.failed) return retval;
 
                     match(input, Token.UP, null); if (state.failed) return retval;
 
                     }
                     break;
                 case 2 :
-                    // BasicSemanticTriggers.g:178:11: ^( ASSIGN o= ID value= STRING_LITERAL )
+                    // BasicSemanticTriggers.g:179:11: ^( ASSIGN o= ID value= STRING_LITERAL )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption510); if (state.failed) return retval;
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption515); if (state.failed) return retval;
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
-                    o=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption514); if (state.failed) return retval;
-                    value=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_elementOption518); if (state.failed) return retval;
+                    o=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption519); if (state.failed) return retval;
+                    value=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_elementOption523); if (state.failed) return retval;
 
                     match(input, Token.UP, null); if (state.failed) return retval;
 
                     }
                     break;
                 case 3 :
-                    // BasicSemanticTriggers.g:179:10: o= ID
+                    // BasicSemanticTriggers.g:180:10: o= ID
                     {
-                    o=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption532); if (state.failed) return retval;
+                    o=(GrammarAST)match(input,ID,FOLLOW_ID_in_elementOption537); if (state.failed) return retval;
 
                     }
                     break;
@@ -1131,21 +1147,21 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     };
 
     // $ANTLR start "multiElementAltInTreeGrammar"
-    // BasicSemanticTriggers.g:199:1: multiElementAltInTreeGrammar : {...}? ^( ALT ~ ( SEMPRED | ACTION ) (~ ( SEMPRED | ACTION ) )+ ) ;
+    // BasicSemanticTriggers.g:200:1: multiElementAltInTreeGrammar : {...}? ^( ALT ~ ( SEMPRED | ACTION ) (~ ( SEMPRED | ACTION ) )+ ) ;
     public final BasicSemanticTriggers.multiElementAltInTreeGrammar_return multiElementAltInTreeGrammar() throws RecognitionException {
         BasicSemanticTriggers.multiElementAltInTreeGrammar_return retval = new BasicSemanticTriggers.multiElementAltInTreeGrammar_return();
         retval.start = input.LT(1);
 
         try {
-            // BasicSemanticTriggers.g:200:2: ({...}? ^( ALT ~ ( SEMPRED | ACTION ) (~ ( SEMPRED | ACTION ) )+ ) )
-            // BasicSemanticTriggers.g:200:4: {...}? ^( ALT ~ ( SEMPRED | ACTION ) (~ ( SEMPRED | ACTION ) )+ )
+            // BasicSemanticTriggers.g:201:2: ({...}? ^( ALT ~ ( SEMPRED | ACTION ) (~ ( SEMPRED | ACTION ) )+ ) )
+            // BasicSemanticTriggers.g:201:4: {...}? ^( ALT ~ ( SEMPRED | ACTION ) (~ ( SEMPRED | ACTION ) )+ )
             {
             if ( !((inContext("ALT_REWRITE") &&
             		 root.getOption("output")!=null && root.getOption("output").equals("template"))) ) {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 throw new FailedPredicateException(input, "multiElementAltInTreeGrammar", "inContext(\"ALT_REWRITE\") &&\n\t\t root.getOption(\"output\")!=null && root.getOption(\"output\").equals(\"template\")");
             }
-            match(input,ALT,FOLLOW_ALT_in_multiElementAltInTreeGrammar572); if (state.failed) return retval;
+            match(input,ALT,FOLLOW_ALT_in_multiElementAltInTreeGrammar577); if (state.failed) return retval;
 
             match(input, Token.DOWN, null); if (state.failed) return retval;
             if ( (input.LA(1)>=FORCED_ACTION && input.LA(1)<=NESTED_ACTION)||(input.LA(1)>=ACTION_ESC && input.LA(1)<=ALT_REWRITE) ) {
@@ -1158,7 +1174,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
                 throw mse;
             }
 
-            // BasicSemanticTriggers.g:202:28: (~ ( SEMPRED | ACTION ) )+
+            // BasicSemanticTriggers.g:203:28: (~ ( SEMPRED | ACTION ) )+
             int cnt11=0;
             loop11:
             do {
@@ -1172,7 +1188,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
                 switch (alt11) {
             	case 1 :
-            	    // BasicSemanticTriggers.g:202:28: ~ ( SEMPRED | ACTION )
+            	    // BasicSemanticTriggers.g:203:28: ~ ( SEMPRED | ACTION )
             	    {
             	    if ( (input.LA(1)>=FORCED_ACTION && input.LA(1)<=NESTED_ACTION)||(input.LA(1)>=ACTION_ESC && input.LA(1)<=ALT_REWRITE) ) {
             	        input.consume();
@@ -1227,7 +1243,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     };
 
     // $ANTLR start "astOps"
-    // BasicSemanticTriggers.g:213:1: astOps : ( ^( ROOT el= . ) | ^( BANG el= . ) );
+    // BasicSemanticTriggers.g:214:1: astOps : ( ^( ROOT el= . ) | ^( BANG el= . ) );
     public final BasicSemanticTriggers.astOps_return astOps() throws RecognitionException {
         BasicSemanticTriggers.astOps_return retval = new BasicSemanticTriggers.astOps_return();
         retval.start = input.LT(1);
@@ -1235,7 +1251,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
         GrammarAST el=null;
 
         try {
-            // BasicSemanticTriggers.g:214:2: ( ^( ROOT el= . ) | ^( BANG el= . ) )
+            // BasicSemanticTriggers.g:215:2: ( ^( ROOT el= . ) | ^( BANG el= . ) )
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -1254,9 +1270,9 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             }
             switch (alt12) {
                 case 1 :
-                    // BasicSemanticTriggers.g:214:4: ^( ROOT el= . )
+                    // BasicSemanticTriggers.g:215:4: ^( ROOT el= . )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_astOps607); if (state.failed) return retval;
+                    match(input,ROOT,FOLLOW_ROOT_in_astOps612); if (state.failed) return retval;
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
                     el=(GrammarAST)input.LT(1);
@@ -1270,9 +1286,9 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
                     }
                     break;
                 case 2 :
-                    // BasicSemanticTriggers.g:215:4: ^( BANG el= . )
+                    // BasicSemanticTriggers.g:216:4: ^( BANG el= . )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_astOps620); if (state.failed) return retval;
+                    match(input,BANG,FOLLOW_BANG_in_astOps625); if (state.failed) return retval;
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
                     el=(GrammarAST)input.LT(1);
@@ -1297,6 +1313,67 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
         return retval;
     }
     // $ANTLR end "astOps"
+
+
+    // $ANTLR start "wildcardRoot"
+    // BasicSemanticTriggers.g:219:1: wildcardRoot : ^( TREE_BEGIN WILDCARD ( . )* ) ;
+    public final void wildcardRoot() throws RecognitionException {
+        GrammarAST WILDCARD8=null;
+
+        try {
+            // BasicSemanticTriggers.g:220:5: ( ^( TREE_BEGIN WILDCARD ( . )* ) )
+            // BasicSemanticTriggers.g:220:7: ^( TREE_BEGIN WILDCARD ( . )* )
+            {
+            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_wildcardRoot648); if (state.failed) return ;
+
+            match(input, Token.DOWN, null); if (state.failed) return ;
+            WILDCARD8=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_wildcardRoot650); if (state.failed) return ;
+            // BasicSemanticTriggers.g:220:29: ( . )*
+            loop13:
+            do {
+                int alt13=2;
+                int LA13_0 = input.LA(1);
+
+                if ( ((LA13_0>=SEMPRED && LA13_0<=ALT_REWRITE)) ) {
+                    alt13=1;
+                }
+                else if ( (LA13_0==UP) ) {
+                    alt13=2;
+                }
+
+
+                switch (alt13) {
+            	case 1 :
+            	    // BasicSemanticTriggers.g:220:29: .
+            	    {
+            	    matchAny(input); if (state.failed) return ;
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop13;
+                }
+            } while (true);
+
+
+            match(input, Token.UP, null); if (state.failed) return ;
+            if ( state.backtracking==1 ) {
+              BasicSemanticChecks.checkWildcardRoot(gtype, WILDCARD8.token);
+            }
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return ;
+    }
+    // $ANTLR end "wildcardRoot"
 
     // Delegated rules
 
@@ -1400,40 +1477,43 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final BitSet FOLLOW_tokenRefWithArgs_in_bottomup143 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_elementOption_in_bottomup148 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_checkGrammarOptions_in_bottomup153 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GRAMMAR_in_grammarSpec171 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_grammarSpec173 = new BitSet(new long[]{0x0000000000580040L,0x0000000000000200L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_grammarSpec175 = new BitSet(new long[]{0x0000000000580000L,0x0000000000000200L});
-    public static final BitSet FOLLOW_prequelConstructs_in_grammarSpec178 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000200L});
-    public static final BitSet FOLLOW_RULES_in_grammarSpec181 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_GRAMMAR_in_checkGrammarOptions205 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OPTIONS_in_prequelConstructs228 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_IMPORT_in_prequelConstructs241 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TOKENS_in_prequelConstructs254 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULES_in_rules277 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_option298 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option302 = new BitSet(new long[]{0x0001000000000000L,0x0000000000800009L});
-    public static final BitSet FOLLOW_optionValue_in_option304 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_wildcardRoot_in_bottomup159 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GRAMMAR_in_grammarSpec176 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_grammarSpec178 = new BitSet(new long[]{0x0000000000580040L,0x0000000000000200L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_grammarSpec180 = new BitSet(new long[]{0x0000000000580000L,0x0000000000000200L});
+    public static final BitSet FOLLOW_prequelConstructs_in_grammarSpec183 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000200L});
+    public static final BitSet FOLLOW_RULES_in_grammarSpec186 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_GRAMMAR_in_checkGrammarOptions210 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OPTIONS_in_prequelConstructs233 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_IMPORT_in_prequelConstructs246 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TOKENS_in_prequelConstructs259 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULES_in_rules282 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_option303 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_option307 = new BitSet(new long[]{0x0001000000000000L,0x0000000000800009L});
+    public static final BitSet FOLLOW_optionValue_in_option309 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_optionValue0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_in_rule386 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule390 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000001FFFFFFFFFL});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref413 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_tokenAlias432 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_tokenAlias434 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_tokenAlias436 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_tokenRefWithArgs453 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_tokenRefWithArgs455 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ELEMENT_OPTIONS_in_elementOption477 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ASSIGN_in_elementOption488 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_elementOption492 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_elementOption496 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ASSIGN_in_elementOption510 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_elementOption514 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption518 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ID_in_elementOption532 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ALT_in_multiElementAltInTreeGrammar572 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar574 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE0L,0x0000001FFFFFFFFFL});
-    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar581 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE8L,0x0000001FFFFFFFFFL});
-    public static final BitSet FOLLOW_ROOT_in_astOps607 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_BANG_in_astOps620 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_in_rule391 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_rule395 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000001FFFFFFFFFL});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref418 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_tokenAlias437 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_tokenAlias439 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_tokenAlias441 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_tokenRefWithArgs458 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_tokenRefWithArgs460 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ELEMENT_OPTIONS_in_elementOption482 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ASSIGN_in_elementOption493 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_elementOption497 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_elementOption501 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_elementOption515 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_elementOption519 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption523 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_elementOption537 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ALT_in_multiElementAltInTreeGrammar577 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar579 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE0L,0x0000001FFFFFFFFFL});
+    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar586 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE8L,0x0000001FFFFFFFFFL});
+    public static final BitSet FOLLOW_ROOT_in_astOps612 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_BANG_in_astOps625 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_wildcardRoot648 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_WILDCARD_in_wildcardRoot650 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000001FFFFFFFFFL});
 
 }
