@@ -199,6 +199,7 @@ grammarSpec
 // not valid for certain grammar types, such as rule parameters and
 // returns specified for lexer rules.
 //
+/*
 grammarType
     : (	  // A standalone lexer specification
           LEXER GRAMMAR  -> LEXER_GRAMMAR<GrammarRootAST>[$LEXER, "LEXER_GRAMMAR"]
@@ -214,6 +215,8 @@ grammarType
                   
        )
     ;
+    */
+    
     
 // This is the list of all constructs that can be declared before
 // the set of rules that compose the grammar, and is invoked 0..n

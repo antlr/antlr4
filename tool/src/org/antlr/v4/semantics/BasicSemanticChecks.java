@@ -6,6 +6,7 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.RuleAST;
 
 import java.util.*;
 
@@ -198,17 +199,25 @@ public class BasicSemanticChecks {
         return true;
     }
 
-    /** Check option is appropriate for token */
+    /** Check option is appropriate for token; parent is ELEMENT_OPTIONS */
     protected static boolean checkTokenOptions(int gtype, GrammarAST parent,
                                                Token optionID, String value)
     {
         String fileName = optionID.getInputStream().getSourceName();
-        if ( !legalTokenOptions.contains(optionID.getText()) ) {
+        // don't care about ID<ASTNodeName> options
+        if ( value!=null && !legalTokenOptions.contains(optionID.getText()) ) {
             ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                       fileName,
                                       optionID,
                                       optionID.getText());
             return false;
+        }
+        // example (ALT_REWRITE (ALT (ID (ELEMENT_OPTIONS Foo))) (-> (ALT ID))
+        if ( parent.hasAncestor(ANTLRParser.ALT_REWRITE) ) {
+            ErrorManager.grammarError(ErrorType.HETERO_ILLEGAL_IN_REWRITE_ALT,
+                                      fileName,
+                                      optionID);
+
         }
         // TODO: extra checks depending on terminal kind?
         switch ( parent.getType() ) {
@@ -254,6 +263,66 @@ public class BasicSemanticChecks {
         }
     }
 
+    protected static void checkASTOps(int gtype, Map<String, String> options,
+                                      GrammarAST op,
+                                      GrammarAST elementRoot)
+    {
+        String fileName = elementRoot.token.getInputStream().getSourceName();
+        if ( options==null || !options.get("output").equals("AST") ) {
+            ErrorManager.grammarWarning(ErrorType.AST_OP_WITH_NON_AST_OUTPUT_OPTION,
+                                        fileName,
+                                        elementRoot.token,
+                                        op.getText());
+        }
+        if ( op.hasAncestor(ANTLRParser.ALT_REWRITE) ) {
+            RuleAST rule = (RuleAST)op.getAncestor(ANTLRParser.RULE);
+            String ruleName = rule.getChild(0).getText();
+            GrammarAST rew = (GrammarAST)op.getAncestor(ANTLRParser.ALT_REWRITE);
+            int altNum = rew.getChildIndex() + 1; // alts are 1..n
+            ErrorManager.grammarWarning(ErrorType.AST_OP_IN_ALT_WITH_REWRITE,
+                                        fileName,
+                                        elementRoot.token,
+                                        ruleName,
+                                        altNum);
+        }
+    }
+
+    /*
+    protected static void checkTreeFilterOptions(int gtype, Map<String, String> options) {
+        String filter = options.get("filter");
+        if ( gtype==ANTLRParser.TREE_GRAMMAR && filter!=null && filter.equals("true") ) {
+            // check for conflicting options
+            // filter => backtrack=true
+            // filter&&output=AST => rewrite=true
+            // filter&&output!=AST => error
+            // any deviation from valid option set is an error
+            String backtrack = options.get("backtrack");
+            String output = options.get("output");
+            String rewrite = options.get("rewrite");
+            if ( backtrack!=null && !backtrack.toString().equals("true") ) {
+                ErrorManager.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
+                                          fileName,
+                                          "backtrack", backtrack);
+            }
+            if ( output!=null && !output.toString().equals("AST") ) {
+                ErrorManager.error(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
+                                   "output", output);
+                setOption("output", "", null);
+            }
+            if ( rewrite!=null && !rewrite.toString().equals("true") ) {
+                ErrorManager.error(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
+                                   "rewrite", rewrite);
+            }
+            // set options properly
+            setOption("backtrack", "true", null);
+            if ( output!=null && output.toString().equals("AST") ) {
+                setOption("rewrite", "true", null);
+            }
+            // @synpredgate set to state.backtracking==1 by code gen when filter=true
+            // superClass set in template target::treeParser
+        }
+    }
+*/
     protected static void checkFOO(int gtype, Token ID) {
     }
 }

@@ -33,7 +33,8 @@ package org.antlr.v4.tool;
  * When adding error messages, also add a description of the message to the
  * Wiki with a location under the Wiki page
  * <a href="http://www.antlr.org/wiki/display/ANTLR3/Errors+Reported+by+the+ANTLR+Tool">Errors Reported by the ANTLR Tool</a>.
- * 
+ *
+ * TODO: add notion of single issuance of an error; some don't need to be repeated; AST_OP_IN_ALT_WITH_REWRITE and option issues
  *
  * @author Jim Idle <jimi@temporal-wave.com>
  * @since 4.0

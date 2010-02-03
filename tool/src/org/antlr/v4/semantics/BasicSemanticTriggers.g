@@ -83,16 +83,21 @@ public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
 }
 }
 
-topdown
+topdown  // do these on way down so options and such are set first
 	:	grammarSpec
 	|	rules
 	|	option
 	|	rule
-	|	ruleref
 	|	tokenAlias
+	;
+	
+bottomup // do these "inside to outside" of expressions.
+	:	multiElementAltInTreeGrammar
+	|	astOps
+	|	ruleref
 	|	tokenRefWithArgs
 	|	elementOption
-	|	multiElementAltInTreeGrammar
+	|	checkGrammarOptions // do after we see all options
 	;
 
 grammarSpec
@@ -101,6 +106,10 @@ grammarSpec
     	name = $ID.text;
     	BasicSemanticChecks.checkGrammarName($ID.token);
     	}
+	;
+
+checkGrammarOptions //(COMBINED_GRAMMAR A (options 
+	:	OPTIONS
 	;
 	
 grammarType
@@ -161,15 +170,21 @@ elementOption
     :	^(	ELEMENT_OPTIONS
 	    	(	^(ASSIGN o=ID value=ID)
 		   	|   ^(ASSIGN o=ID value=STRING_LITERAL)
+ 		   	|	o=ID
 		   	)
 		)
 	   	{
     	boolean ok = BasicSemanticChecks.checkTokenOptions(gtype, (GrammarAST)$o.getParent(),
     												       $o.token, $value.text);
     	if ( ok ) {
-    	    GrammarAST parent = (GrammarAST)$start.getParent();   // ELEMENT_OPTIONS
-    		TerminalAST terminal = (TerminalAST)parent.getParent();
-    		terminal.setOption($o.text, $value.text);
+			if ( value!=null ) {
+	    		TerminalAST terminal = (TerminalAST)$start.getParent();
+	    		terminal.setOption($o.text, $value.text);
+    		}
+    		else {
+	    		TerminalAST terminal = (TerminalAST)$start.getParent();
+	    		terminal.setOption(TerminalAST.defaultTokenOption, $o.text);
+    		}
     	}
     	}
     ;
@@ -186,4 +201,10 @@ multiElementAltInTreeGrammar
 																	 firstNode.token,
 																	 altNum);
 		}
+	;
+
+// Check stuff like (^ A) (! r)
+astOps
+	:	^(ROOT el=.) {BasicSemanticChecks.checkASTOps(gtype, root.getOptions(), $start, $el);}
+	|	^(BANG el=.) {BasicSemanticChecks.checkASTOps(gtype, root.getOptions(), $start, $el);}
 	;
