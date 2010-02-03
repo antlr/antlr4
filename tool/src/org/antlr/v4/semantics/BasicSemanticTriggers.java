@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-03 12:12:52
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-03 13:08:25
 
 /*
  [The "BSD license"]
@@ -859,7 +859,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
 
                  	    GrammarAST parent = (GrammarAST)((GrammarAST)retval.start).getParent();   // OPTION
                  		GrammarAST parentWithOptionKind = (GrammarAST)parent.getParent();
-                  	boolean ok = BasicSemanticChecks.checkOptions(g.getType(), parentWithOptionKind,
+                  	boolean ok = BasicSemanticChecks.checkOptions(g, parentWithOptionKind,
                   												  o.token, (optionValue4!=null?optionValue4.v:null));
               		//  store options into XXX_GRAMMAR, RULE, BLOCK nodes
                   	if ( ok ) {

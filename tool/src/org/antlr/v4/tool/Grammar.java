@@ -141,7 +141,6 @@ public class Grammar {
     public String getRecognizerName() {
         String suffix = "";
         List<Grammar> grammarsFromRootToMe = getOutermostGrammar().getDelegationAncestors();
-        System.out.println("grammarsFromRootToMe for "+name+"="+grammarsFromRootToMe);
         String qualifiedName = name;
         if ( grammarsFromRootToMe!=null ) {
             StringBuffer buf = new StringBuffer();

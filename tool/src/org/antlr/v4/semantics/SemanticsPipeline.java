@@ -35,7 +35,7 @@ public class SemanticsPipeline {
         BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
         basics.downup(g.ast);
 
-        // NO DO DELEGATES
+        // NOW DO DELEGATES (IF ANY)
         if ( g.getImportedGrammars()!=null ) {
             for (Grammar d : g.getImportedGrammars()) {
                 process(d);

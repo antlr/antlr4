@@ -2,9 +2,13 @@ package org.antlr.v4.semantics;
 
 import org.antlr.misc.MultiMap;
 import org.antlr.runtime.Token;
+import org.antlr.tool.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.*;
 
@@ -185,37 +189,48 @@ public class BasicSemanticChecks {
     }
 
     /** Check option is appropriate for grammar, rule, subrule */
-    protected static boolean checkOptions(int gtype, GrammarAST parent,
+    protected static boolean checkOptions(Grammar g, GrammarAST parent,
                                           Token optionID, String value)
     {
-        String fileName = optionID.getInputStream().getSourceName();
+        boolean ok = true;
+        if ( optionID.getText().equals("tokenVocab") &&
+             g.parent!=null ) // only allow tokenVocab option in root grammar
+        {
+            ErrorManager.grammarWarning(ErrorType.TOKEN_VOCAB_IN_DELEGATE,
+                                        g.fileName,
+                                        optionID,
+                                        g.name);
+            ok = false;
+        }
+
         if ( parent.getType()==ANTLRParser.BLOCK ) {
             if ( !legalBlockOptions.contains(optionID.getText()) ) { // block
                 ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
-                                          fileName,
+                                          g.fileName,
                                           optionID,
                                           optionID.getText());
-                return false;
+                ok = false;
             }
         }
         else if ( parent.getType()==ANTLRParser.RULE ) {
             if ( !legalRuleOptions.contains(optionID.getText()) ) { // rule
                 ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
-                                          fileName,
+                                          g.fileName,
                                           optionID,
                                           optionID.getText());
-                return false;
+                ok = false;
             }
         }
         else if ( parent.getType()==ANTLRParser.GRAMMAR &&
-                  !legalGrammarOption(gtype, optionID.getText()) ) { // grammar
+                  !legalGrammarOption(g.getType(), optionID.getText()) ) { // grammar
             ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
-                                      fileName,
+                                      g.fileName,
                                       optionID,
                                       optionID.getText());
-            return false;
+            ok = false;
         }
-        return true;
+
+        return ok;
     }
 
     /** Check option is appropriate for token; parent is ELEMENT_OPTIONS */
@@ -368,8 +383,6 @@ public class BasicSemanticChecks {
                                       importID,
                                       g, delegate);
         }
-
-
     }
 
     protected static void checkFOO(int gtype, Token ID) {

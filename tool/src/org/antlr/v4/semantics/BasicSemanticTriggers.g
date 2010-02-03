@@ -145,7 +145,7 @@ option // TODO: put in grammar, or rule, or block
     	{
    	    GrammarAST parent = (GrammarAST)$start.getParent();   // OPTION
    		GrammarAST parentWithOptionKind = (GrammarAST)parent.getParent();
-    	boolean ok = BasicSemanticChecks.checkOptions(g.getType(), parentWithOptionKind,
+    	boolean ok = BasicSemanticChecks.checkOptions(g, parentWithOptionKind,
     												  $ID.token, $optionValue.v);
 		//  store options into XXX_GRAMMAR, RULE, BLOCK nodes
     	if ( ok ) {
