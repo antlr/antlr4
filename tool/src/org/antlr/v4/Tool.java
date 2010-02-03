@@ -300,7 +300,7 @@ public class Tool {
 
             p.setTreeAdaptor(new GrammarASTAdaptor(in));
             ParserRuleReturnScope r = p.grammarSpec();
-            GrammarAST t = (GrammarAST) r.getTree();
+            GrammarRootAST t = (GrammarRootAST) r.getTree();
             if ( internalOption_PrintGrammarTree ) System.out.println(t.toStringTree());
             g = new Grammar(this, t);
             g.fileName = fileName;

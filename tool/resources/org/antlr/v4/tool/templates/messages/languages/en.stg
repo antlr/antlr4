@@ -45,7 +45,7 @@ problem reading token vocabulary file <arg>: <exception>
 >>
 DIR_NOT_FOUND(arg,exception,stackTrace) ::= "directory not found: <arg>"
 OUTPUT_DIR_IS_FILE(arg,arg2) ::= "output directory is a file: <arg>"
-CANNOT_OPEN_FILE(arg,exception) ::= "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>"
+CANNOT_OPEN_FILE(arg,arg2) ::= "cannot find or open file: <arg><if(arg2)>; reason: <arg2><endif>"
 CIRCULAR_DEPENDENCY() ::= "your grammars contain a circular dependency and cannot be sorted into a valid build order."
 
 INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
@@ -222,15 +222,16 @@ TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
 TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
   "tokenVocab option ignored in imported grammar <arg>"
 INVALID_IMPORT(arg,arg2) ::=
-  "<arg.grammarTypeString> grammar <arg.name> cannot import <arg2.grammarTypeString> grammar <arg2.name>"
+  "<arg.typeString> grammar <arg.name> cannot import <arg2.typeString> grammar <arg2.name>"
 IMPORTED_TOKENS_RULE_EMPTY(arg,arg2) ::=
   "no lexer rules contributed to <arg> from imported grammar <arg2>"
 IMPORT_NAME_CLASH(arg,arg2) ::=
-  "combined grammar <arg.name> and imported <arg2.grammarTypeString> grammar <arg2.name> both generate <arg2.recognizerName>; import ignored"
+  "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>"
 AST_OP_IN_ALT_WITH_REWRITE(arg,arg2) ::=
   "rule <arg> alt <arg2> uses rewrite syntax and also an AST operator"
 WILDCARD_AS_ROOT(arg) ::= "Wildcard invalid as root; wildcard can itself be a tree"
-CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::= "option <arg>=<arg2> conflicts with tree grammar filter mode"
+CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::=
+  "option <arg>=<arg2> conflicts with tree grammar filter mode"
 
 // GRAMMAR WARNINGS
 

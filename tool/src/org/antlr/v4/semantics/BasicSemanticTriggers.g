@@ -73,13 +73,11 @@ import org.antlr.v4.tool.*;
 // that is, rewrite tree?  maybe all passes are filters until code gen, which needs
 // tree grammar. 'course we won't try codegen if errors.
 public String name;
-public String fileName;
 GrammarASTWithOptions root;
-protected int gtype;
-//Grammar g; // which grammar are we checking
-public BasicSemanticTriggers(TreeNodeStream input, String fileName) {
+Grammar g; // which grammar are we checking
+public BasicSemanticTriggers(TreeNodeStream input, Grammar g) {
 	this(input);
-	this.fileName = fileName;
+	this.g = g;
 }
 }
 
@@ -102,18 +100,19 @@ bottomup // do these "inside to outside" of expressions.
 	;
 
 grammarSpec
-    :   ^(GRAMMAR ID DOC_COMMENT? prequelConstructs ^(RULES .*))
-    	{
-    	name = $ID.text;
-    	BasicSemanticChecks.checkGrammarName($ID.token);
-    	gtype = ((GrammarRootAST)$start).grammarType;
-    	root = (GrammarRootAST)$start;
-    	}
+    :   ^(	GRAMMAR ID DOC_COMMENT? 
+	    	{
+	    	name = $ID.text;
+	    	BasicSemanticChecks.checkGrammarName($ID.token);
+	    	root = (GrammarRootAST)$start;
+	    	}
+    		prequelConstructs ^(RULES .*)
+    	)
 	;
 
 checkGrammarOptions // when we get back to root
 	:	GRAMMAR
-		{BasicSemanticChecks.checkTreeFilterOptions(gtype, (GrammarRootAST)$GRAMMAR,
+		{BasicSemanticChecks.checkTreeFilterOptions(g.getType(), (GrammarRootAST)$GRAMMAR,
 												    root.getOptions());}
 	;
 
@@ -125,21 +124,28 @@ grammarType
     */
 
 prequelConstructs
-	:	(	^(o+=OPTIONS .*)
-		|	^(i+=IMPORT .*)
-		|	^(t+=TOKENS .*)
+	:	(	^(o+=OPTIONS .+)
+		|	^(i+=IMPORT delegateGrammar+)
+		|	^(t+=TOKENS .+)
 		)*
-		{BasicSemanticChecks.checkNumPrequels(gtype, $o, $i, $t);}
+		{BasicSemanticChecks.checkNumPrequels(g.getType(), $o, $i, $t);}
 	;
+	
+delegateGrammar
+    :   (	^(ASSIGN ID id=ID)
+	    |   id=ID
+	    )
+	    {BasicSemanticChecks.checkImport(g, $id.token);}
+    ;
 
-rules : RULES {BasicSemanticChecks.checkNumRules(gtype, fileName, $RULES);} ;
+rules : RULES {BasicSemanticChecks.checkNumRules(g.getType(), g.fileName, $RULES);} ;
 
 option // TODO: put in grammar, or rule, or block
     :   {inContext("OPTIONS")}? ^(ASSIGN o=ID optionValue)
     	{
    	    GrammarAST parent = (GrammarAST)$start.getParent();   // OPTION
    		GrammarAST parentWithOptionKind = (GrammarAST)parent.getParent();
-    	boolean ok = BasicSemanticChecks.checkOptions(gtype, parentWithOptionKind,
+    	boolean ok = BasicSemanticChecks.checkOptions(g.getType(), parentWithOptionKind,
     												  $ID.token, $optionValue.v);
 		//  store options into XXX_GRAMMAR, RULE, BLOCK nodes
     	if ( ok ) {
@@ -156,21 +162,21 @@ optionValue returns [String v]
     |   STAR
     ;
 
-rule:   ^( RULE r=ID .*) {BasicSemanticChecks.checkInvalidRuleDef(gtype, $r.token);}
+rule:   ^( RULE r=ID .*) {BasicSemanticChecks.checkInvalidRuleDef(g.getType(), $r.token);}
     ;
 
 ruleref
-    :	RULE_REF {BasicSemanticChecks.checkInvalidRuleRef(gtype, $RULE_REF.token);}
+    :	RULE_REF {BasicSemanticChecks.checkInvalidRuleRef(g.getType(), $RULE_REF.token);}
     ;
 
 tokenAlias
 	:	{inContext("TOKENS")}? ^(ASSIGN ID STRING_LITERAL)
-		{BasicSemanticChecks.checkTokenAlias(gtype, $ID.token);}
+		{BasicSemanticChecks.checkTokenAlias(g.getType(), $ID.token);}
 	;
 
 tokenRefWithArgs
 	:	^(TOKEN_REF ARG_ACTION)
-		{BasicSemanticChecks.checkTokenArgs(gtype, $TOKEN_REF.token);}
+		{BasicSemanticChecks.checkTokenArgs(g.getType(), $TOKEN_REF.token);}
 	;
 	
 elementOption
@@ -181,7 +187,7 @@ elementOption
 		   	)
 		)
 	   	{
-    	boolean ok = BasicSemanticChecks.checkTokenOptions(gtype, (GrammarAST)$o.getParent(),
+    	boolean ok = BasicSemanticChecks.checkTokenOptions(g.getType(), (GrammarAST)$o.getParent(),
     												       $o.token, $value.text);
     	if ( ok ) {
 			if ( value!=null ) {
@@ -204,7 +210,7 @@ multiElementAltInTreeGrammar
 		{
 		int altNum = $start.getParent().getChildIndex() + 1; // alts are 1..n
 		GrammarAST firstNode = (GrammarAST)$start.getChild(0);
-		BasicSemanticChecks.checkRewriteForMultiRootAltInTreeGrammar(gtype,root.getOptions(),
+		BasicSemanticChecks.checkRewriteForMultiRootAltInTreeGrammar(g.getType(),root.getOptions(),
 																	 firstNode.token,
 																	 altNum);
 		}
@@ -212,10 +218,11 @@ multiElementAltInTreeGrammar
 
 // Check stuff like (^ A) (! r)
 astOps
-	:	^(ROOT el=.) {BasicSemanticChecks.checkASTOps(gtype, root.getOptions(), $start, $el);}
-	|	^(BANG el=.) {BasicSemanticChecks.checkASTOps(gtype, root.getOptions(), $start, $el);}
+	:	^(ROOT el=.) {BasicSemanticChecks.checkASTOps(g.getType(), root.getOptions(), $start, $el);}
+	|	^(BANG el=.) {BasicSemanticChecks.checkASTOps(g.getType(), root.getOptions(), $start, $el);}
 	;
 	
 wildcardRoot
-    : ^(TREE_BEGIN WILDCARD .*) {BasicSemanticChecks.checkWildcardRoot(gtype, $WILDCARD.token);}
+    :	^(TREE_BEGIN WILDCARD .*)
+    	{BasicSemanticChecks.checkWildcardRoot(g.getType(), $WILDCARD.token);}
     ;

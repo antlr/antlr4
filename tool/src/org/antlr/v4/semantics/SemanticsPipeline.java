@@ -32,9 +32,17 @@ public class SemanticsPipeline {
 
         // DO BASIC / EASY SEMANTIC CHECKS
         nodes.reset();
-        BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g.fileName);
+        BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
         basics.downup(g.ast);
 
+        // NO DO DELEGATES
+        if ( g.getImportedGrammars()!=null ) {
+            for (Grammar d : g.getImportedGrammars()) {
+                process(d);
+            }
+        }
+
+        /* dump options
         TreeVisitor v = new TreeVisitor(adaptor);
         v.visit(g.ast,
                 new TreeVisitorAction() {
@@ -49,5 +57,6 @@ public class SemanticsPipeline {
                     }
                     public Object post(Object t) { return t; }
                 });
+                */
     }
 }

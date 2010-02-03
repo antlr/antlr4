@@ -1,5 +1,6 @@
 package org.antlr.v4.semantics;
 
+import org.antlr.misc.MultiMap;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
@@ -64,12 +65,32 @@ public class BasicSemanticChecks {
     public static final Set legalTokenOptions =
             new HashSet() {
                 {
-                add(defaultTokenOption);
+                add(TerminalAST.defaultTokenOption);
                 add("associativity");
                 }
             };
 
-    public static final String defaultTokenOption = "node";
+    /** Set of valid imports.  E.g., can only import a tree parser into
+     *  another tree parser.  Maps delegate to set of delegator grammar types.
+     *  validDelegations.get(LEXER) gives list of the kinds of delegators
+     *  that can import lexers.
+     */
+    public static MultiMap<Integer,Integer> validImportTypes =
+        new MultiMap<Integer,Integer>() {
+            {
+                map(ANTLRParser.LEXER, ANTLRParser.LEXER);
+                map(ANTLRParser.LEXER, ANTLRParser.PARSER);
+                map(ANTLRParser.LEXER, ANTLRParser.GRAMMAR);
+
+                map(ANTLRParser.PARSER, ANTLRParser.PARSER);
+                map(ANTLRParser.PARSER, ANTLRParser.GRAMMAR);
+
+                map(ANTLRParser.TREE, ANTLRParser.TREE);
+
+                // TODO: allow COMBINED
+                // map(ANTLRParser.GRAMMAR, ANTLRParser.GRAMMAR);
+            }
+        };
 
     // TODO: track errors?
     
@@ -288,6 +309,7 @@ public class BasicSemanticChecks {
     protected static void checkTreeFilterOptions(int gtype, GrammarRootAST root,
                                                  Map<String, String> options)
     {
+        if ( options==null ) return;
         String fileName = root.token.getInputStream().getSourceName();
         String filter = options.get("filter");
         if ( gtype==ANTLRParser.TREE && filter!=null && filter.equals("true") ) {
@@ -327,7 +349,30 @@ public class BasicSemanticChecks {
                                   wild);
     }
 
+    protected static void checkImport(Grammar g, Token importID) {
+        Grammar delegate = g.getImportedGrammar(importID.getText());
+        if ( delegate==null ) return;
+        List<Integer> validDelegators = validImportTypes.get(delegate.getType());
+        if ( validDelegators!=null && !validDelegators.contains(g.getType()) ) {
+            ErrorManager.grammarError(ErrorType.INVALID_IMPORT,
+                                      g.fileName,
+                                      importID,
+                                      g, delegate);
+        }
+        if ( g.getType()==ANTLRParser.GRAMMAR &&
+             (delegate.name.equals(g.name+Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.LEXER))||
+              delegate.name.equals(g.name+Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.PARSER))) )
+        {
+            ErrorManager.grammarError(ErrorType.IMPORT_NAME_CLASH,
+                                      g.fileName,
+                                      importID,
+                                      g, delegate);
+        }
+
+
+    }
 
     protected static void checkFOO(int gtype, Token ID) {
+
     }
 }
