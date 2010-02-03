@@ -14,9 +14,11 @@ public class GrammarRootAST extends GrammarASTWithOptions {
                     put("language","Java");
                 }
             };
-    
+    public int grammarType; // LEXER, PARSER, TREE, GRAMMAR (combined)
     public GrammarRootAST(int type) { super(type); }
     public GrammarRootAST(Token t) { super(t); }
     public GrammarRootAST(int type, Token t) { super(type, t); }
-    public GrammarRootAST(int type, Token t, String text) { super(type,t,text); }
+    public GrammarRootAST(int type, Token t, String text) {
+        super(type,t,text);
+    }
 }

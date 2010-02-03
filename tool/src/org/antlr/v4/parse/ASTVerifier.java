@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-02-02 16:48:09
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-02-02 18:26:06
 
 /*
  [The "BSD license"]
@@ -40,14 +40,13 @@ import java.util.ArrayList;
  */
 public class ASTVerifier extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "WILDCARD", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "LEXER_GRAMMAR", "PARSER_GRAMMAR", "TREE_GRAMMAR", "COMBINED_GRAMMAR", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "DOT", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "WILDCARD", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "DOT", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
     };
     public static final int LT=43;
     public static final int STAR=48;
-    public static final int BACKTRACK_SEMPRED=99;
+    public static final int BACKTRACK_SEMPRED=95;
     public static final int DOUBLE_ANGLE_STRING_LITERAL=11;
     public static final int FORCED_ACTION=5;
-    public static final int LEXER_GRAMMAR=91;
     public static final int ARGLIST=89;
     public static final int ALTLIST=85;
     public static final int NOT=60;
@@ -56,7 +55,7 @@ public class ASTVerifier extends TreeParser {
     public static final int ACTION=16;
     public static final int TOKEN_REF=62;
     public static final int RULEMODIFIERS=74;
-    public static final int ST_RESULT=103;
+    public static final int ST_RESULT=99;
     public static final int RPAREN=41;
     public static final int RET=90;
     public static final int IMPORT=22;
@@ -69,34 +68,31 @@ public class ASTVerifier extends TreeParser {
     public static final int GRAMMAR=27;
     public static final int RULEACTIONS=75;
     public static final int WSCHARS=65;
-    public static final int INITACTION=95;
-    public static final int ALT_REWRITE=104;
+    public static final int INITACTION=91;
+    public static final int ALT_REWRITE=100;
     public static final int IMPLIES=42;
     public static final int RULE=72;
     public static final int RBRACE=61;
     public static final int ACTION_ESC=17;
-    public static final int PARSER_GRAMMAR=92;
     public static final int PRIVATE=30;
     public static final int SRC=7;
     public static final int THROWS=32;
     public static final int CHAR_RANGE=82;
     public static final int INT=64;
     public static final int EPSILON=83;
-    public static final int LIST=101;
+    public static final int LIST=97;
     public static final int COLONCOLON=37;
     public static final int WSNLCHARS=18;
     public static final int WS=70;
-    public static final int COMBINED_GRAMMAR=94;
     public static final int LEXER=24;
     public static final int OR=51;
     public static final int GT=44;
-    public static final int TREE_GRAMMAR=93;
     public static final int CATCH=33;
     public static final int CLOSURE=79;
     public static final int PARSER=25;
     public static final int DOLLAR=53;
     public static final int PROTECTED=28;
-    public static final int ELEMENT_OPTIONS=102;
+    public static final int ELEMENT_OPTIONS=98;
     public static final int NESTED_ACTION=15;
     public static final int FRAGMENT=23;
     public static final int ID=87;
@@ -113,7 +109,7 @@ public class ASTVerifier extends TreeParser {
     public static final int DOC_COMMENT=6;
     public static final int PLUS=49;
     public static final int REWRITE_BLOCK=77;
-    public static final int DOT=100;
+    public static final int DOT=96;
     public static final int RETURNS=31;
     public static final int RULES=73;
     public static final int RARROW=57;
@@ -121,7 +117,7 @@ public class ASTVerifier extends TreeParser {
     public static final int HEX_DIGIT=68;
     public static final int RANGE=55;
     public static final int TOKENS=20;
-    public static final int GATED_SEMPRED=97;
+    public static final int GATED_SEMPRED=93;
     public static final int RESULT=86;
     public static final int BANG=47;
     public static final int ACTION_STRING_LITERAL=12;
@@ -135,8 +131,8 @@ public class ASTVerifier extends TreeParser {
     public static final int QUESTION=46;
     public static final int FINALLY=34;
     public static final int TEMPLATE=35;
-    public static final int LABEL=96;
-    public static final int SYN_SEMPRED=98;
+    public static final int LABEL=92;
+    public static final int SYN_SEMPRED=94;
     public static final int ERRCHAR=71;
     public static final int BLOCK=76;
     public static final int ASSIGN=45;
@@ -204,21 +200,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "grammarSpec"
-    // ASTVerifier.g:110:1: grammarSpec : ^( grammarType ID ( DOC_COMMENT )? ( prequelConstruct )* rules ) ;
+    // ASTVerifier.g:110:1: grammarSpec : ^( GRAMMAR ID ( DOC_COMMENT )? ( prequelConstruct )* rules ) ;
     public final void grammarSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:111:5: ( ^( grammarType ID ( DOC_COMMENT )? ( prequelConstruct )* rules ) )
-            // ASTVerifier.g:111:9: ^( grammarType ID ( DOC_COMMENT )? ( prequelConstruct )* rules )
+            // ASTVerifier.g:111:5: ( ^( GRAMMAR ID ( DOC_COMMENT )? ( prequelConstruct )* rules ) )
+            // ASTVerifier.g:111:9: ^( GRAMMAR ID ( DOC_COMMENT )? ( prequelConstruct )* rules )
             {
-            pushFollow(FOLLOW_grammarType_in_grammarSpec74);
-            grammarType();
-
-            state._fsp--;
-
+            match(input,GRAMMAR,FOLLOW_GRAMMAR_in_grammarSpec74); 
 
             match(input, Token.DOWN, null); 
             match(input,ID,FOLLOW_ID_in_grammarSpec76); 
-            // ASTVerifier.g:111:26: ( DOC_COMMENT )?
+            // ASTVerifier.g:111:22: ( DOC_COMMENT )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -227,7 +219,7 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt1) {
                 case 1 :
-                    // ASTVerifier.g:111:26: DOC_COMMENT
+                    // ASTVerifier.g:111:22: DOC_COMMENT
                     {
                     match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_grammarSpec78); 
 
@@ -236,7 +228,7 @@ public class ASTVerifier extends TreeParser {
 
             }
 
-            // ASTVerifier.g:111:39: ( prequelConstruct )*
+            // ASTVerifier.g:111:35: ( prequelConstruct )*
             loop2:
             do {
                 int alt2=2;
@@ -249,7 +241,7 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt2) {
             	case 1 :
-            	    // ASTVerifier.g:111:39: prequelConstruct
+            	    // ASTVerifier.g:111:35: prequelConstruct
             	    {
             	    pushFollow(FOLLOW_prequelConstruct_in_grammarSpec81);
             	    prequelConstruct();
@@ -287,42 +279,11 @@ public class ASTVerifier extends TreeParser {
     // $ANTLR end "grammarSpec"
 
 
-    // $ANTLR start "grammarType"
-    // ASTVerifier.g:114:1: grammarType : ( LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR );
-    public final void grammarType() throws RecognitionException {
-        try {
-            // ASTVerifier.g:115:5: ( LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR )
-            // ASTVerifier.g:
-            {
-            if ( (input.LA(1)>=LEXER_GRAMMAR && input.LA(1)<=COMBINED_GRAMMAR) ) {
-                input.consume();
-                state.errorRecovery=false;
-            }
-            else {
-                MismatchedSetException mse = new MismatchedSetException(null,input);
-                throw mse;
-            }
-
-
-            }
-
-        }
-        catch (RecognitionException re) {
-            reportError(re);
-            recover(input,re);
-        }
-        finally {
-        }
-        return ;
-    }
-    // $ANTLR end "grammarType"
-
-
     // $ANTLR start "prequelConstruct"
-    // ASTVerifier.g:118:1: prequelConstruct : ( optionsSpec | delegateGrammars | tokensSpec | attrScope | action );
+    // ASTVerifier.g:120:1: prequelConstruct : ( optionsSpec | delegateGrammars | tokensSpec | attrScope | action );
     public final void prequelConstruct() throws RecognitionException {
         try {
-            // ASTVerifier.g:119:2: ( optionsSpec | delegateGrammars | tokensSpec | attrScope | action )
+            // ASTVerifier.g:121:2: ( optionsSpec | delegateGrammars | tokensSpec | attrScope | action )
             int alt3=5;
             switch ( input.LA(1) ) {
             case OPTIONS:
@@ -359,9 +320,9 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt3) {
                 case 1 :
-                    // ASTVerifier.g:119:6: optionsSpec
+                    // ASTVerifier.g:121:6: optionsSpec
                     {
-                    pushFollow(FOLLOW_optionsSpec_in_prequelConstruct131);
+                    pushFollow(FOLLOW_optionsSpec_in_prequelConstruct102);
                     optionsSpec();
 
                     state._fsp--;
@@ -370,9 +331,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:120:9: delegateGrammars
+                    // ASTVerifier.g:122:9: delegateGrammars
                     {
-                    pushFollow(FOLLOW_delegateGrammars_in_prequelConstruct141);
+                    pushFollow(FOLLOW_delegateGrammars_in_prequelConstruct112);
                     delegateGrammars();
 
                     state._fsp--;
@@ -381,9 +342,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:121:9: tokensSpec
+                    // ASTVerifier.g:123:9: tokensSpec
                     {
-                    pushFollow(FOLLOW_tokensSpec_in_prequelConstruct151);
+                    pushFollow(FOLLOW_tokensSpec_in_prequelConstruct122);
                     tokensSpec();
 
                     state._fsp--;
@@ -392,9 +353,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:122:9: attrScope
+                    // ASTVerifier.g:124:9: attrScope
                     {
-                    pushFollow(FOLLOW_attrScope_in_prequelConstruct161);
+                    pushFollow(FOLLOW_attrScope_in_prequelConstruct132);
                     attrScope();
 
                     state._fsp--;
@@ -403,9 +364,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // ASTVerifier.g:123:9: action
+                    // ASTVerifier.g:125:9: action
                     {
-                    pushFollow(FOLLOW_action_in_prequelConstruct171);
+                    pushFollow(FOLLOW_action_in_prequelConstruct142);
                     action();
 
                     state._fsp--;
@@ -428,16 +389,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "optionsSpec"
-    // ASTVerifier.g:126:1: optionsSpec : ^( OPTIONS ( option )+ ) ;
+    // ASTVerifier.g:128:1: optionsSpec : ^( OPTIONS ( option )+ ) ;
     public final void optionsSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:127:2: ( ^( OPTIONS ( option )+ ) )
-            // ASTVerifier.g:127:4: ^( OPTIONS ( option )+ )
+            // ASTVerifier.g:129:2: ( ^( OPTIONS ( option )+ ) )
+            // ASTVerifier.g:129:4: ^( OPTIONS ( option )+ )
             {
-            match(input,OPTIONS,FOLLOW_OPTIONS_in_optionsSpec186); 
+            match(input,OPTIONS,FOLLOW_OPTIONS_in_optionsSpec157); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:127:14: ( option )+
+            // ASTVerifier.g:129:14: ( option )+
             int cnt4=0;
             loop4:
             do {
@@ -451,9 +412,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt4) {
             	case 1 :
-            	    // ASTVerifier.g:127:14: option
+            	    // ASTVerifier.g:129:14: option
             	    {
-            	    pushFollow(FOLLOW_option_in_optionsSpec188);
+            	    pushFollow(FOLLOW_option_in_optionsSpec159);
             	    option();
 
             	    state._fsp--;
@@ -489,17 +450,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "option"
-    // ASTVerifier.g:130:1: option : ^( ASSIGN ID optionValue ) ;
+    // ASTVerifier.g:132:1: option : ^( ASSIGN ID optionValue ) ;
     public final void option() throws RecognitionException {
         try {
-            // ASTVerifier.g:131:5: ( ^( ASSIGN ID optionValue ) )
-            // ASTVerifier.g:131:9: ^( ASSIGN ID optionValue )
+            // ASTVerifier.g:133:5: ( ^( ASSIGN ID optionValue ) )
+            // ASTVerifier.g:133:9: ^( ASSIGN ID optionValue )
             {
-            match(input,ASSIGN,FOLLOW_ASSIGN_in_option210); 
+            match(input,ASSIGN,FOLLOW_ASSIGN_in_option181); 
 
             match(input, Token.DOWN, null); 
-            match(input,ID,FOLLOW_ID_in_option212); 
-            pushFollow(FOLLOW_optionValue_in_option214);
+            match(input,ID,FOLLOW_ID_in_option183); 
+            pushFollow(FOLLOW_optionValue_in_option185);
             optionValue();
 
             state._fsp--;
@@ -525,14 +486,14 @@ public class ASTVerifier extends TreeParser {
     };
 
     // $ANTLR start "optionValue"
-    // ASTVerifier.g:134:1: optionValue returns [String v] : ( ID | STRING_LITERAL | INT | STAR );
+    // ASTVerifier.g:136:1: optionValue returns [String v] : ( ID | STRING_LITERAL | INT | STAR );
     public final ASTVerifier.optionValue_return optionValue() throws RecognitionException {
         ASTVerifier.optionValue_return retval = new ASTVerifier.optionValue_return();
         retval.start = input.LT(1);
 
         retval.v = ((GrammarAST)retval.start).token.getText();
         try {
-            // ASTVerifier.g:136:5: ( ID | STRING_LITERAL | INT | STAR )
+            // ASTVerifier.g:138:5: ( ID | STRING_LITERAL | INT | STAR )
             // ASTVerifier.g:
             {
             if ( input.LA(1)==STAR||input.LA(1)==INT||input.LA(1)==STRING_LITERAL||input.LA(1)==ID ) {
@@ -560,16 +521,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "delegateGrammars"
-    // ASTVerifier.g:142:1: delegateGrammars : ^( IMPORT ( delegateGrammar )+ ) ;
+    // ASTVerifier.g:144:1: delegateGrammars : ^( IMPORT ( delegateGrammar )+ ) ;
     public final void delegateGrammars() throws RecognitionException {
         try {
-            // ASTVerifier.g:143:2: ( ^( IMPORT ( delegateGrammar )+ ) )
-            // ASTVerifier.g:143:6: ^( IMPORT ( delegateGrammar )+ )
+            // ASTVerifier.g:145:2: ( ^( IMPORT ( delegateGrammar )+ ) )
+            // ASTVerifier.g:145:6: ^( IMPORT ( delegateGrammar )+ )
             {
-            match(input,IMPORT,FOLLOW_IMPORT_in_delegateGrammars299); 
+            match(input,IMPORT,FOLLOW_IMPORT_in_delegateGrammars270); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:143:15: ( delegateGrammar )+
+            // ASTVerifier.g:145:15: ( delegateGrammar )+
             int cnt5=0;
             loop5:
             do {
@@ -583,9 +544,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt5) {
             	case 1 :
-            	    // ASTVerifier.g:143:15: delegateGrammar
+            	    // ASTVerifier.g:145:15: delegateGrammar
             	    {
-            	    pushFollow(FOLLOW_delegateGrammar_in_delegateGrammars301);
+            	    pushFollow(FOLLOW_delegateGrammar_in_delegateGrammars272);
             	    delegateGrammar();
 
             	    state._fsp--;
@@ -621,10 +582,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "delegateGrammar"
-    // ASTVerifier.g:146:1: delegateGrammar : ( ^( ASSIGN ID ID ) | ID );
+    // ASTVerifier.g:148:1: delegateGrammar : ( ^( ASSIGN ID ID ) | ID );
     public final void delegateGrammar() throws RecognitionException {
         try {
-            // ASTVerifier.g:147:5: ( ^( ASSIGN ID ID ) | ID )
+            // ASTVerifier.g:149:5: ( ^( ASSIGN ID ID ) | ID )
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -642,22 +603,22 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt6) {
                 case 1 :
-                    // ASTVerifier.g:147:9: ^( ASSIGN ID ID )
+                    // ASTVerifier.g:149:9: ^( ASSIGN ID ID )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_delegateGrammar320); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_delegateGrammar291); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_delegateGrammar322); 
-                    match(input,ID,FOLLOW_ID_in_delegateGrammar324); 
+                    match(input,ID,FOLLOW_ID_in_delegateGrammar293); 
+                    match(input,ID,FOLLOW_ID_in_delegateGrammar295); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:148:9: ID
+                    // ASTVerifier.g:150:9: ID
                     {
-                    match(input,ID,FOLLOW_ID_in_delegateGrammar335); 
+                    match(input,ID,FOLLOW_ID_in_delegateGrammar306); 
 
                     }
                     break;
@@ -676,16 +637,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "tokensSpec"
-    // ASTVerifier.g:151:1: tokensSpec : ^( TOKENS ( tokenSpec )+ ) ;
+    // ASTVerifier.g:153:1: tokensSpec : ^( TOKENS ( tokenSpec )+ ) ;
     public final void tokensSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:152:2: ( ^( TOKENS ( tokenSpec )+ ) )
-            // ASTVerifier.g:152:6: ^( TOKENS ( tokenSpec )+ )
+            // ASTVerifier.g:154:2: ( ^( TOKENS ( tokenSpec )+ ) )
+            // ASTVerifier.g:154:6: ^( TOKENS ( tokenSpec )+ )
             {
-            match(input,TOKENS,FOLLOW_TOKENS_in_tokensSpec352); 
+            match(input,TOKENS,FOLLOW_TOKENS_in_tokensSpec323); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:152:15: ( tokenSpec )+
+            // ASTVerifier.g:154:15: ( tokenSpec )+
             int cnt7=0;
             loop7:
             do {
@@ -699,9 +660,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt7) {
             	case 1 :
-            	    // ASTVerifier.g:152:15: tokenSpec
+            	    // ASTVerifier.g:154:15: tokenSpec
             	    {
-            	    pushFollow(FOLLOW_tokenSpec_in_tokensSpec354);
+            	    pushFollow(FOLLOW_tokenSpec_in_tokensSpec325);
             	    tokenSpec();
 
             	    state._fsp--;
@@ -737,10 +698,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "tokenSpec"
-    // ASTVerifier.g:155:1: tokenSpec : ( ^( ASSIGN ID STRING_LITERAL ) | ID );
+    // ASTVerifier.g:157:1: tokenSpec : ( ^( ASSIGN ID STRING_LITERAL ) | ID );
     public final void tokenSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:156:2: ( ^( ASSIGN ID STRING_LITERAL ) | ID )
+            // ASTVerifier.g:158:2: ( ^( ASSIGN ID STRING_LITERAL ) | ID )
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -758,22 +719,22 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt8) {
                 case 1 :
-                    // ASTVerifier.g:156:4: ^( ASSIGN ID STRING_LITERAL )
+                    // ASTVerifier.g:158:4: ^( ASSIGN ID STRING_LITERAL )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_tokenSpec368); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_tokenSpec339); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_tokenSpec370); 
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokenSpec372); 
+                    match(input,ID,FOLLOW_ID_in_tokenSpec341); 
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokenSpec343); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:157:4: ID
+                    // ASTVerifier.g:159:4: ID
                     {
-                    match(input,ID,FOLLOW_ID_in_tokenSpec378); 
+                    match(input,ID,FOLLOW_ID_in_tokenSpec349); 
 
                     }
                     break;
@@ -792,17 +753,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "attrScope"
-    // ASTVerifier.g:160:1: attrScope : ^( SCOPE ID ACTION ) ;
+    // ASTVerifier.g:162:1: attrScope : ^( SCOPE ID ACTION ) ;
     public final void attrScope() throws RecognitionException {
         try {
-            // ASTVerifier.g:161:2: ( ^( SCOPE ID ACTION ) )
-            // ASTVerifier.g:161:4: ^( SCOPE ID ACTION )
+            // ASTVerifier.g:163:2: ( ^( SCOPE ID ACTION ) )
+            // ASTVerifier.g:163:4: ^( SCOPE ID ACTION )
             {
-            match(input,SCOPE,FOLLOW_SCOPE_in_attrScope390); 
+            match(input,SCOPE,FOLLOW_SCOPE_in_attrScope361); 
 
             match(input, Token.DOWN, null); 
-            match(input,ID,FOLLOW_ID_in_attrScope392); 
-            match(input,ACTION,FOLLOW_ACTION_in_attrScope394); 
+            match(input,ID,FOLLOW_ID_in_attrScope363); 
+            match(input,ACTION,FOLLOW_ACTION_in_attrScope365); 
 
             match(input, Token.UP, null); 
 
@@ -821,16 +782,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "action"
-    // ASTVerifier.g:164:1: action : ^( AT ( ID )? ID ACTION ) ;
+    // ASTVerifier.g:166:1: action : ^( AT ( ID )? ID ACTION ) ;
     public final void action() throws RecognitionException {
         try {
-            // ASTVerifier.g:165:2: ( ^( AT ( ID )? ID ACTION ) )
-            // ASTVerifier.g:165:4: ^( AT ( ID )? ID ACTION )
+            // ASTVerifier.g:167:2: ( ^( AT ( ID )? ID ACTION ) )
+            // ASTVerifier.g:167:4: ^( AT ( ID )? ID ACTION )
             {
-            match(input,AT,FOLLOW_AT_in_action407); 
+            match(input,AT,FOLLOW_AT_in_action378); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:165:9: ( ID )?
+            // ASTVerifier.g:167:9: ( ID )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -843,17 +804,17 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt9) {
                 case 1 :
-                    // ASTVerifier.g:165:9: ID
+                    // ASTVerifier.g:167:9: ID
                     {
-                    match(input,ID,FOLLOW_ID_in_action409); 
+                    match(input,ID,FOLLOW_ID_in_action380); 
 
                     }
                     break;
 
             }
 
-            match(input,ID,FOLLOW_ID_in_action412); 
-            match(input,ACTION,FOLLOW_ACTION_in_action414); 
+            match(input,ID,FOLLOW_ID_in_action383); 
+            match(input,ACTION,FOLLOW_ACTION_in_action385); 
 
             match(input, Token.UP, null); 
 
@@ -872,17 +833,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rules"
-    // ASTVerifier.g:168:1: rules : ^( RULES ( rule )* ) ;
+    // ASTVerifier.g:170:1: rules : ^( RULES ( rule )* ) ;
     public final void rules() throws RecognitionException {
         try {
-            // ASTVerifier.g:169:5: ( ^( RULES ( rule )* ) )
-            // ASTVerifier.g:169:7: ^( RULES ( rule )* )
+            // ASTVerifier.g:171:5: ( ^( RULES ( rule )* ) )
+            // ASTVerifier.g:171:7: ^( RULES ( rule )* )
             {
-            match(input,RULES,FOLLOW_RULES_in_rules430); 
+            match(input,RULES,FOLLOW_RULES_in_rules401); 
 
             if ( input.LA(1)==Token.DOWN ) {
                 match(input, Token.DOWN, null); 
-                // ASTVerifier.g:169:15: ( rule )*
+                // ASTVerifier.g:171:15: ( rule )*
                 loop10:
                 do {
                     int alt10=2;
@@ -895,9 +856,9 @@ public class ASTVerifier extends TreeParser {
 
                     switch (alt10) {
                 	case 1 :
-                	    // ASTVerifier.g:169:15: rule
+                	    // ASTVerifier.g:171:15: rule
                 	    {
-                	    pushFollow(FOLLOW_rule_in_rules432);
+                	    pushFollow(FOLLOW_rule_in_rules403);
                 	    rule();
 
                 	    state._fsp--;
@@ -930,17 +891,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rule"
-    // ASTVerifier.g:172:1: rule : ^( RULE ID ( DOC_COMMENT )? ( ruleModifiers )? ( ARG_ACTION )? ( ruleReturns )? ( rulePrequel )* altListAsBlock exceptionGroup ) ;
+    // ASTVerifier.g:174:1: rule : ^( RULE ID ( DOC_COMMENT )? ( ruleModifiers )? ( ARG_ACTION )? ( ruleReturns )? ( rulePrequel )* altListAsBlock exceptionGroup ) ;
     public final void rule() throws RecognitionException {
         try {
-            // ASTVerifier.g:172:5: ( ^( RULE ID ( DOC_COMMENT )? ( ruleModifiers )? ( ARG_ACTION )? ( ruleReturns )? ( rulePrequel )* altListAsBlock exceptionGroup ) )
-            // ASTVerifier.g:172:9: ^( RULE ID ( DOC_COMMENT )? ( ruleModifiers )? ( ARG_ACTION )? ( ruleReturns )? ( rulePrequel )* altListAsBlock exceptionGroup )
+            // ASTVerifier.g:174:5: ( ^( RULE ID ( DOC_COMMENT )? ( ruleModifiers )? ( ARG_ACTION )? ( ruleReturns )? ( rulePrequel )* altListAsBlock exceptionGroup ) )
+            // ASTVerifier.g:174:9: ^( RULE ID ( DOC_COMMENT )? ( ruleModifiers )? ( ARG_ACTION )? ( ruleReturns )? ( rulePrequel )* altListAsBlock exceptionGroup )
             {
-            match(input,RULE,FOLLOW_RULE_in_rule450); 
+            match(input,RULE,FOLLOW_RULE_in_rule421); 
 
             match(input, Token.DOWN, null); 
-            match(input,ID,FOLLOW_ID_in_rule452); 
-            // ASTVerifier.g:172:20: ( DOC_COMMENT )?
+            match(input,ID,FOLLOW_ID_in_rule423); 
+            // ASTVerifier.g:174:20: ( DOC_COMMENT )?
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -949,16 +910,16 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt11) {
                 case 1 :
-                    // ASTVerifier.g:172:20: DOC_COMMENT
+                    // ASTVerifier.g:174:20: DOC_COMMENT
                     {
-                    match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_rule454); 
+                    match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_rule425); 
 
                     }
                     break;
 
             }
 
-            // ASTVerifier.g:172:33: ( ruleModifiers )?
+            // ASTVerifier.g:174:33: ( ruleModifiers )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -967,9 +928,9 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt12) {
                 case 1 :
-                    // ASTVerifier.g:172:33: ruleModifiers
+                    // ASTVerifier.g:174:33: ruleModifiers
                     {
-                    pushFollow(FOLLOW_ruleModifiers_in_rule457);
+                    pushFollow(FOLLOW_ruleModifiers_in_rule428);
                     ruleModifiers();
 
                     state._fsp--;
@@ -980,7 +941,7 @@ public class ASTVerifier extends TreeParser {
 
             }
 
-            // ASTVerifier.g:172:48: ( ARG_ACTION )?
+            // ASTVerifier.g:174:48: ( ARG_ACTION )?
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -989,16 +950,16 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt13) {
                 case 1 :
-                    // ASTVerifier.g:172:48: ARG_ACTION
+                    // ASTVerifier.g:174:48: ARG_ACTION
                     {
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rule460); 
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rule431); 
 
                     }
                     break;
 
             }
 
-            // ASTVerifier.g:173:11: ( ruleReturns )?
+            // ASTVerifier.g:175:11: ( ruleReturns )?
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -1007,9 +968,9 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt14) {
                 case 1 :
-                    // ASTVerifier.g:173:11: ruleReturns
+                    // ASTVerifier.g:175:11: ruleReturns
                     {
-                    pushFollow(FOLLOW_ruleReturns_in_rule473);
+                    pushFollow(FOLLOW_ruleReturns_in_rule444);
                     ruleReturns();
 
                     state._fsp--;
@@ -1020,7 +981,7 @@ public class ASTVerifier extends TreeParser {
 
             }
 
-            // ASTVerifier.g:173:24: ( rulePrequel )*
+            // ASTVerifier.g:175:24: ( rulePrequel )*
             loop15:
             do {
                 int alt15=2;
@@ -1033,9 +994,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt15) {
             	case 1 :
-            	    // ASTVerifier.g:173:24: rulePrequel
+            	    // ASTVerifier.g:175:24: rulePrequel
             	    {
-            	    pushFollow(FOLLOW_rulePrequel_in_rule476);
+            	    pushFollow(FOLLOW_rulePrequel_in_rule447);
             	    rulePrequel();
 
             	    state._fsp--;
@@ -1049,12 +1010,12 @@ public class ASTVerifier extends TreeParser {
                 }
             } while (true);
 
-            pushFollow(FOLLOW_altListAsBlock_in_rule479);
+            pushFollow(FOLLOW_altListAsBlock_in_rule450);
             altListAsBlock();
 
             state._fsp--;
 
-            pushFollow(FOLLOW_exceptionGroup_in_rule481);
+            pushFollow(FOLLOW_exceptionGroup_in_rule452);
             exceptionGroup();
 
             state._fsp--;
@@ -1077,13 +1038,13 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "exceptionGroup"
-    // ASTVerifier.g:177:1: exceptionGroup : ( exceptionHandler )* ( finallyClause )? ;
+    // ASTVerifier.g:179:1: exceptionGroup : ( exceptionHandler )* ( finallyClause )? ;
     public final void exceptionGroup() throws RecognitionException {
         try {
-            // ASTVerifier.g:178:5: ( ( exceptionHandler )* ( finallyClause )? )
-            // ASTVerifier.g:178:7: ( exceptionHandler )* ( finallyClause )?
+            // ASTVerifier.g:180:5: ( ( exceptionHandler )* ( finallyClause )? )
+            // ASTVerifier.g:180:7: ( exceptionHandler )* ( finallyClause )?
             {
-            // ASTVerifier.g:178:7: ( exceptionHandler )*
+            // ASTVerifier.g:180:7: ( exceptionHandler )*
             loop16:
             do {
                 int alt16=2;
@@ -1096,9 +1057,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt16) {
             	case 1 :
-            	    // ASTVerifier.g:178:7: exceptionHandler
+            	    // ASTVerifier.g:180:7: exceptionHandler
             	    {
-            	    pushFollow(FOLLOW_exceptionHandler_in_exceptionGroup508);
+            	    pushFollow(FOLLOW_exceptionHandler_in_exceptionGroup479);
             	    exceptionHandler();
 
             	    state._fsp--;
@@ -1112,7 +1073,7 @@ public class ASTVerifier extends TreeParser {
                 }
             } while (true);
 
-            // ASTVerifier.g:178:25: ( finallyClause )?
+            // ASTVerifier.g:180:25: ( finallyClause )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -1121,9 +1082,9 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt17) {
                 case 1 :
-                    // ASTVerifier.g:178:25: finallyClause
+                    // ASTVerifier.g:180:25: finallyClause
                     {
-                    pushFollow(FOLLOW_finallyClause_in_exceptionGroup511);
+                    pushFollow(FOLLOW_finallyClause_in_exceptionGroup482);
                     finallyClause();
 
                     state._fsp--;
@@ -1150,17 +1111,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "exceptionHandler"
-    // ASTVerifier.g:181:1: exceptionHandler : ^( CATCH ARG_ACTION ACTION ) ;
+    // ASTVerifier.g:183:1: exceptionHandler : ^( CATCH ARG_ACTION ACTION ) ;
     public final void exceptionHandler() throws RecognitionException {
         try {
-            // ASTVerifier.g:182:2: ( ^( CATCH ARG_ACTION ACTION ) )
-            // ASTVerifier.g:182:4: ^( CATCH ARG_ACTION ACTION )
+            // ASTVerifier.g:184:2: ( ^( CATCH ARG_ACTION ACTION ) )
+            // ASTVerifier.g:184:4: ^( CATCH ARG_ACTION ACTION )
             {
-            match(input,CATCH,FOLLOW_CATCH_in_exceptionHandler527); 
+            match(input,CATCH,FOLLOW_CATCH_in_exceptionHandler498); 
 
             match(input, Token.DOWN, null); 
-            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_exceptionHandler529); 
-            match(input,ACTION,FOLLOW_ACTION_in_exceptionHandler531); 
+            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_exceptionHandler500); 
+            match(input,ACTION,FOLLOW_ACTION_in_exceptionHandler502); 
 
             match(input, Token.UP, null); 
 
@@ -1179,16 +1140,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "finallyClause"
-    // ASTVerifier.g:185:1: finallyClause : ^( FINALLY ACTION ) ;
+    // ASTVerifier.g:187:1: finallyClause : ^( FINALLY ACTION ) ;
     public final void finallyClause() throws RecognitionException {
         try {
-            // ASTVerifier.g:186:2: ( ^( FINALLY ACTION ) )
-            // ASTVerifier.g:186:4: ^( FINALLY ACTION )
+            // ASTVerifier.g:188:2: ( ^( FINALLY ACTION ) )
+            // ASTVerifier.g:188:4: ^( FINALLY ACTION )
             {
-            match(input,FINALLY,FOLLOW_FINALLY_in_finallyClause544); 
+            match(input,FINALLY,FOLLOW_FINALLY_in_finallyClause515); 
 
             match(input, Token.DOWN, null); 
-            match(input,ACTION,FOLLOW_ACTION_in_finallyClause546); 
+            match(input,ACTION,FOLLOW_ACTION_in_finallyClause517); 
 
             match(input, Token.UP, null); 
 
@@ -1207,10 +1168,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rulePrequel"
-    // ASTVerifier.g:189:1: rulePrequel : ( throwsSpec | ruleScopeSpec | optionsSpec | ruleAction );
+    // ASTVerifier.g:191:1: rulePrequel : ( throwsSpec | ruleScopeSpec | optionsSpec | ruleAction );
     public final void rulePrequel() throws RecognitionException {
         try {
-            // ASTVerifier.g:190:5: ( throwsSpec | ruleScopeSpec | optionsSpec | ruleAction )
+            // ASTVerifier.g:192:5: ( throwsSpec | ruleScopeSpec | optionsSpec | ruleAction )
             int alt18=4;
             switch ( input.LA(1) ) {
             case THROWS:
@@ -1242,9 +1203,9 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt18) {
                 case 1 :
-                    // ASTVerifier.g:190:9: throwsSpec
+                    // ASTVerifier.g:192:9: throwsSpec
                     {
-                    pushFollow(FOLLOW_throwsSpec_in_rulePrequel563);
+                    pushFollow(FOLLOW_throwsSpec_in_rulePrequel534);
                     throwsSpec();
 
                     state._fsp--;
@@ -1253,9 +1214,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:191:9: ruleScopeSpec
+                    // ASTVerifier.g:193:9: ruleScopeSpec
                     {
-                    pushFollow(FOLLOW_ruleScopeSpec_in_rulePrequel573);
+                    pushFollow(FOLLOW_ruleScopeSpec_in_rulePrequel544);
                     ruleScopeSpec();
 
                     state._fsp--;
@@ -1264,9 +1225,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:192:9: optionsSpec
+                    // ASTVerifier.g:194:9: optionsSpec
                     {
-                    pushFollow(FOLLOW_optionsSpec_in_rulePrequel583);
+                    pushFollow(FOLLOW_optionsSpec_in_rulePrequel554);
                     optionsSpec();
 
                     state._fsp--;
@@ -1275,9 +1236,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:193:9: ruleAction
+                    // ASTVerifier.g:195:9: ruleAction
                     {
-                    pushFollow(FOLLOW_ruleAction_in_rulePrequel593);
+                    pushFollow(FOLLOW_ruleAction_in_rulePrequel564);
                     ruleAction();
 
                     state._fsp--;
@@ -1300,16 +1261,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ruleReturns"
-    // ASTVerifier.g:196:1: ruleReturns : ^( RETURNS ARG_ACTION ) ;
+    // ASTVerifier.g:198:1: ruleReturns : ^( RETURNS ARG_ACTION ) ;
     public final void ruleReturns() throws RecognitionException {
         try {
-            // ASTVerifier.g:197:2: ( ^( RETURNS ARG_ACTION ) )
-            // ASTVerifier.g:197:4: ^( RETURNS ARG_ACTION )
+            // ASTVerifier.g:199:2: ( ^( RETURNS ARG_ACTION ) )
+            // ASTVerifier.g:199:4: ^( RETURNS ARG_ACTION )
             {
-            match(input,RETURNS,FOLLOW_RETURNS_in_ruleReturns608); 
+            match(input,RETURNS,FOLLOW_RETURNS_in_ruleReturns579); 
 
             match(input, Token.DOWN, null); 
-            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns610); 
+            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns581); 
 
             match(input, Token.UP, null); 
 
@@ -1328,16 +1289,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "throwsSpec"
-    // ASTVerifier.g:199:1: throwsSpec : ^( THROWS ( ID )+ ) ;
+    // ASTVerifier.g:201:1: throwsSpec : ^( THROWS ( ID )+ ) ;
     public final void throwsSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:200:5: ( ^( THROWS ( ID )+ ) )
-            // ASTVerifier.g:200:7: ^( THROWS ( ID )+ )
+            // ASTVerifier.g:202:5: ( ^( THROWS ( ID )+ ) )
+            // ASTVerifier.g:202:7: ^( THROWS ( ID )+ )
             {
-            match(input,THROWS,FOLLOW_THROWS_in_throwsSpec625); 
+            match(input,THROWS,FOLLOW_THROWS_in_throwsSpec596); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:200:16: ( ID )+
+            // ASTVerifier.g:202:16: ( ID )+
             int cnt19=0;
             loop19:
             do {
@@ -1351,9 +1312,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt19) {
             	case 1 :
-            	    // ASTVerifier.g:200:16: ID
+            	    // ASTVerifier.g:202:16: ID
             	    {
-            	    match(input,ID,FOLLOW_ID_in_throwsSpec627); 
+            	    match(input,ID,FOLLOW_ID_in_throwsSpec598); 
 
             	    }
             	    break;
@@ -1385,10 +1346,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ruleScopeSpec"
-    // ASTVerifier.g:203:1: ruleScopeSpec : ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) );
+    // ASTVerifier.g:205:1: ruleScopeSpec : ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) );
     public final void ruleScopeSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:204:2: ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) )
+            // ASTVerifier.g:206:2: ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) )
             int alt21=2;
             int LA21_0 = input.LA(1);
 
@@ -1426,24 +1387,24 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt21) {
                 case 1 :
-                    // ASTVerifier.g:204:4: ^( SCOPE ACTION )
+                    // ASTVerifier.g:206:4: ^( SCOPE ACTION )
                     {
-                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec644); 
+                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec615); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec646); 
+                    match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec617); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:205:4: ^( SCOPE ( ID )+ )
+                    // ASTVerifier.g:207:4: ^( SCOPE ( ID )+ )
                     {
-                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec653); 
+                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec624); 
 
                     match(input, Token.DOWN, null); 
-                    // ASTVerifier.g:205:12: ( ID )+
+                    // ASTVerifier.g:207:12: ( ID )+
                     int cnt20=0;
                     loop20:
                     do {
@@ -1457,9 +1418,9 @@ public class ASTVerifier extends TreeParser {
 
                         switch (alt20) {
                     	case 1 :
-                    	    // ASTVerifier.g:205:12: ID
+                    	    // ASTVerifier.g:207:12: ID
                     	    {
-                    	    match(input,ID,FOLLOW_ID_in_ruleScopeSpec655); 
+                    	    match(input,ID,FOLLOW_ID_in_ruleScopeSpec626); 
 
                     	    }
                     	    break;
@@ -1493,17 +1454,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ruleAction"
-    // ASTVerifier.g:208:1: ruleAction : ^( AT ID ACTION ) ;
+    // ASTVerifier.g:210:1: ruleAction : ^( AT ID ACTION ) ;
     public final void ruleAction() throws RecognitionException {
         try {
-            // ASTVerifier.g:209:2: ( ^( AT ID ACTION ) )
-            // ASTVerifier.g:209:4: ^( AT ID ACTION )
+            // ASTVerifier.g:211:2: ( ^( AT ID ACTION ) )
+            // ASTVerifier.g:211:4: ^( AT ID ACTION )
             {
-            match(input,AT,FOLLOW_AT_in_ruleAction669); 
+            match(input,AT,FOLLOW_AT_in_ruleAction640); 
 
             match(input, Token.DOWN, null); 
-            match(input,ID,FOLLOW_ID_in_ruleAction671); 
-            match(input,ACTION,FOLLOW_ACTION_in_ruleAction673); 
+            match(input,ID,FOLLOW_ID_in_ruleAction642); 
+            match(input,ACTION,FOLLOW_ACTION_in_ruleAction644); 
 
             match(input, Token.UP, null); 
 
@@ -1522,16 +1483,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ruleModifiers"
-    // ASTVerifier.g:212:1: ruleModifiers : ^( RULEMODIFIERS ( ruleModifier )+ ) ;
+    // ASTVerifier.g:214:1: ruleModifiers : ^( RULEMODIFIERS ( ruleModifier )+ ) ;
     public final void ruleModifiers() throws RecognitionException {
         try {
-            // ASTVerifier.g:213:5: ( ^( RULEMODIFIERS ( ruleModifier )+ ) )
-            // ASTVerifier.g:213:7: ^( RULEMODIFIERS ( ruleModifier )+ )
+            // ASTVerifier.g:215:5: ( ^( RULEMODIFIERS ( ruleModifier )+ ) )
+            // ASTVerifier.g:215:7: ^( RULEMODIFIERS ( ruleModifier )+ )
             {
-            match(input,RULEMODIFIERS,FOLLOW_RULEMODIFIERS_in_ruleModifiers689); 
+            match(input,RULEMODIFIERS,FOLLOW_RULEMODIFIERS_in_ruleModifiers660); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:213:23: ( ruleModifier )+
+            // ASTVerifier.g:215:23: ( ruleModifier )+
             int cnt22=0;
             loop22:
             do {
@@ -1545,9 +1506,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt22) {
             	case 1 :
-            	    // ASTVerifier.g:213:23: ruleModifier
+            	    // ASTVerifier.g:215:23: ruleModifier
             	    {
-            	    pushFollow(FOLLOW_ruleModifier_in_ruleModifiers691);
+            	    pushFollow(FOLLOW_ruleModifier_in_ruleModifiers662);
             	    ruleModifier();
 
             	    state._fsp--;
@@ -1583,10 +1544,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ruleModifier"
-    // ASTVerifier.g:216:1: ruleModifier : ( PUBLIC | PRIVATE | PROTECTED | FRAGMENT );
+    // ASTVerifier.g:218:1: ruleModifier : ( PUBLIC | PRIVATE | PROTECTED | FRAGMENT );
     public final void ruleModifier() throws RecognitionException {
         try {
-            // ASTVerifier.g:217:5: ( PUBLIC | PRIVATE | PROTECTED | FRAGMENT )
+            // ASTVerifier.g:219:5: ( PUBLIC | PRIVATE | PROTECTED | FRAGMENT )
             // ASTVerifier.g:
             {
             if ( input.LA(1)==FRAGMENT||(input.LA(1)>=PROTECTED && input.LA(1)<=PRIVATE) ) {
@@ -1614,13 +1575,13 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "altList"
-    // ASTVerifier.g:223:1: altList : ( alternative )+ ;
+    // ASTVerifier.g:225:1: altList : ( alternative )+ ;
     public final void altList() throws RecognitionException {
         try {
-            // ASTVerifier.g:224:5: ( ( alternative )+ )
-            // ASTVerifier.g:224:7: ( alternative )+
+            // ASTVerifier.g:226:5: ( ( alternative )+ )
+            // ASTVerifier.g:226:7: ( alternative )+
             {
-            // ASTVerifier.g:224:7: ( alternative )+
+            // ASTVerifier.g:226:7: ( alternative )+
             int cnt23=0;
             loop23:
             do {
@@ -1634,9 +1595,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt23) {
             	case 1 :
-            	    // ASTVerifier.g:224:7: alternative
+            	    // ASTVerifier.g:226:7: alternative
             	    {
-            	    pushFollow(FOLLOW_alternative_in_altList751);
+            	    pushFollow(FOLLOW_alternative_in_altList722);
             	    alternative();
 
             	    state._fsp--;
@@ -1670,16 +1631,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "altListAsBlock"
-    // ASTVerifier.g:227:1: altListAsBlock : ^( BLOCK altList ) ;
+    // ASTVerifier.g:229:1: altListAsBlock : ^( BLOCK altList ) ;
     public final void altListAsBlock() throws RecognitionException {
         try {
-            // ASTVerifier.g:228:5: ( ^( BLOCK altList ) )
-            // ASTVerifier.g:228:7: ^( BLOCK altList )
+            // ASTVerifier.g:230:5: ( ^( BLOCK altList ) )
+            // ASTVerifier.g:230:7: ^( BLOCK altList )
             {
-            match(input,BLOCK,FOLLOW_BLOCK_in_altListAsBlock770); 
+            match(input,BLOCK,FOLLOW_BLOCK_in_altListAsBlock741); 
 
             match(input, Token.DOWN, null); 
-            pushFollow(FOLLOW_altList_in_altListAsBlock772);
+            pushFollow(FOLLOW_altList_in_altListAsBlock743);
             altList();
 
             state._fsp--;
@@ -1702,10 +1663,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "alternative"
-    // ASTVerifier.g:231:1: alternative : ( ^( ALT_REWRITE alternative rewrite ) | ^( ALT EPSILON ) | elements );
+    // ASTVerifier.g:233:1: alternative : ( ^( ALT_REWRITE alternative rewrite ) | ^( ALT EPSILON ) | elements );
     public final void alternative() throws RecognitionException {
         try {
-            // ASTVerifier.g:232:5: ( ^( ALT_REWRITE alternative rewrite ) | ^( ALT EPSILON ) | elements )
+            // ASTVerifier.g:234:5: ( ^( ALT_REWRITE alternative rewrite ) | ^( ALT EPSILON ) | elements )
             int alt24=3;
             int LA24_0 = input.LA(1);
 
@@ -1746,17 +1707,17 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt24) {
                 case 1 :
-                    // ASTVerifier.g:232:7: ^( ALT_REWRITE alternative rewrite )
+                    // ASTVerifier.g:234:7: ^( ALT_REWRITE alternative rewrite )
                     {
-                    match(input,ALT_REWRITE,FOLLOW_ALT_REWRITE_in_alternative791); 
+                    match(input,ALT_REWRITE,FOLLOW_ALT_REWRITE_in_alternative762); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_alternative_in_alternative793);
+                    pushFollow(FOLLOW_alternative_in_alternative764);
                     alternative();
 
                     state._fsp--;
 
-                    pushFollow(FOLLOW_rewrite_in_alternative795);
+                    pushFollow(FOLLOW_rewrite_in_alternative766);
                     rewrite();
 
                     state._fsp--;
@@ -1767,21 +1728,21 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:233:7: ^( ALT EPSILON )
+                    // ASTVerifier.g:235:7: ^( ALT EPSILON )
                     {
-                    match(input,ALT,FOLLOW_ALT_in_alternative805); 
+                    match(input,ALT,FOLLOW_ALT_in_alternative776); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,EPSILON,FOLLOW_EPSILON_in_alternative807); 
+                    match(input,EPSILON,FOLLOW_EPSILON_in_alternative778); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:234:9: elements
+                    // ASTVerifier.g:236:9: elements
                     {
-                    pushFollow(FOLLOW_elements_in_alternative818);
+                    pushFollow(FOLLOW_elements_in_alternative789);
                     elements();
 
                     state._fsp--;
@@ -1804,16 +1765,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "elements"
-    // ASTVerifier.g:237:1: elements : ^( ALT ( element )+ ) ;
+    // ASTVerifier.g:239:1: elements : ^( ALT ( element )+ ) ;
     public final void elements() throws RecognitionException {
         try {
-            // ASTVerifier.g:238:5: ( ^( ALT ( element )+ ) )
-            // ASTVerifier.g:238:7: ^( ALT ( element )+ )
+            // ASTVerifier.g:240:5: ( ^( ALT ( element )+ ) )
+            // ASTVerifier.g:240:7: ^( ALT ( element )+ )
             {
-            match(input,ALT,FOLLOW_ALT_in_elements836); 
+            match(input,ALT,FOLLOW_ALT_in_elements807); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:238:13: ( element )+
+            // ASTVerifier.g:240:13: ( element )+
             int cnt25=0;
             loop25:
             do {
@@ -1827,9 +1788,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt25) {
             	case 1 :
-            	    // ASTVerifier.g:238:13: element
+            	    // ASTVerifier.g:240:13: element
             	    {
-            	    pushFollow(FOLLOW_element_in_elements838);
+            	    pushFollow(FOLLOW_element_in_elements809);
             	    element();
 
             	    state._fsp--;
@@ -1865,17 +1826,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "element"
-    // ASTVerifier.g:241:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
+    // ASTVerifier.g:243:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
     public final void element() throws RecognitionException {
         try {
-            // ASTVerifier.g:242:2: ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
+            // ASTVerifier.g:244:2: ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
             int alt26=7;
             alt26 = dfa26.predict(input);
             switch (alt26) {
                 case 1 :
-                    // ASTVerifier.g:242:4: labeledElement
+                    // ASTVerifier.g:244:4: labeledElement
                     {
-                    pushFollow(FOLLOW_labeledElement_in_element854);
+                    pushFollow(FOLLOW_labeledElement_in_element825);
                     labeledElement();
 
                     state._fsp--;
@@ -1884,9 +1845,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:243:4: atom
+                    // ASTVerifier.g:245:4: atom
                     {
-                    pushFollow(FOLLOW_atom_in_element859);
+                    pushFollow(FOLLOW_atom_in_element830);
                     atom();
 
                     state._fsp--;
@@ -1895,9 +1856,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:244:4: ebnf
+                    // ASTVerifier.g:246:4: ebnf
                     {
-                    pushFollow(FOLLOW_ebnf_in_element864);
+                    pushFollow(FOLLOW_ebnf_in_element835);
                     ebnf();
 
                     state._fsp--;
@@ -1906,30 +1867,30 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:245:6: ACTION
+                    // ASTVerifier.g:247:6: ACTION
                     {
-                    match(input,ACTION,FOLLOW_ACTION_in_element871); 
+                    match(input,ACTION,FOLLOW_ACTION_in_element842); 
 
                     }
                     break;
                 case 5 :
-                    // ASTVerifier.g:246:6: SEMPRED
+                    // ASTVerifier.g:248:6: SEMPRED
                     {
-                    match(input,SEMPRED,FOLLOW_SEMPRED_in_element878); 
+                    match(input,SEMPRED,FOLLOW_SEMPRED_in_element849); 
 
                     }
                     break;
                 case 6 :
-                    // ASTVerifier.g:247:4: GATED_SEMPRED
+                    // ASTVerifier.g:249:4: GATED_SEMPRED
                     {
-                    match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element883); 
+                    match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element854); 
 
                     }
                     break;
                 case 7 :
-                    // ASTVerifier.g:248:4: treeSpec
+                    // ASTVerifier.g:250:4: treeSpec
                     {
-                    pushFollow(FOLLOW_treeSpec_in_element888);
+                    pushFollow(FOLLOW_treeSpec_in_element859);
                     treeSpec();
 
                     state._fsp--;
@@ -1952,10 +1913,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "labeledElement"
-    // ASTVerifier.g:251:1: labeledElement : ( ^( ASSIGN ID ( atom | block ) ) | ^( PLUS_ASSIGN ID ( atom | block ) ) );
+    // ASTVerifier.g:253:1: labeledElement : ( ^( ASSIGN ID ( atom | block ) ) | ^( PLUS_ASSIGN ID ( atom | block ) ) );
     public final void labeledElement() throws RecognitionException {
         try {
-            // ASTVerifier.g:252:2: ( ^( ASSIGN ID ( atom | block ) ) | ^( PLUS_ASSIGN ID ( atom | block ) ) )
+            // ASTVerifier.g:254:2: ( ^( ASSIGN ID ( atom | block ) ) | ^( PLUS_ASSIGN ID ( atom | block ) ) )
             int alt29=2;
             int LA29_0 = input.LA(1);
 
@@ -1973,13 +1934,13 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt29) {
                 case 1 :
-                    // ASTVerifier.g:252:4: ^( ASSIGN ID ( atom | block ) )
+                    // ASTVerifier.g:254:4: ^( ASSIGN ID ( atom | block ) )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement901); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement872); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_labeledElement903); 
-                    // ASTVerifier.g:252:16: ( atom | block )
+                    match(input,ID,FOLLOW_ID_in_labeledElement874); 
+                    // ASTVerifier.g:254:16: ( atom | block )
                     int alt27=2;
                     int LA27_0 = input.LA(1);
 
@@ -1997,9 +1958,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     switch (alt27) {
                         case 1 :
-                            // ASTVerifier.g:252:17: atom
+                            // ASTVerifier.g:254:17: atom
                             {
-                            pushFollow(FOLLOW_atom_in_labeledElement906);
+                            pushFollow(FOLLOW_atom_in_labeledElement877);
                             atom();
 
                             state._fsp--;
@@ -2008,9 +1969,9 @@ public class ASTVerifier extends TreeParser {
                             }
                             break;
                         case 2 :
-                            // ASTVerifier.g:252:22: block
+                            // ASTVerifier.g:254:22: block
                             {
-                            pushFollow(FOLLOW_block_in_labeledElement908);
+                            pushFollow(FOLLOW_block_in_labeledElement879);
                             block();
 
                             state._fsp--;
@@ -2027,13 +1988,13 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:253:4: ^( PLUS_ASSIGN ID ( atom | block ) )
+                    // ASTVerifier.g:255:4: ^( PLUS_ASSIGN ID ( atom | block ) )
                     {
-                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement916); 
+                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement887); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_labeledElement918); 
-                    // ASTVerifier.g:253:21: ( atom | block )
+                    match(input,ID,FOLLOW_ID_in_labeledElement889); 
+                    // ASTVerifier.g:255:21: ( atom | block )
                     int alt28=2;
                     int LA28_0 = input.LA(1);
 
@@ -2051,9 +2012,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     switch (alt28) {
                         case 1 :
-                            // ASTVerifier.g:253:22: atom
+                            // ASTVerifier.g:255:22: atom
                             {
-                            pushFollow(FOLLOW_atom_in_labeledElement921);
+                            pushFollow(FOLLOW_atom_in_labeledElement892);
                             atom();
 
                             state._fsp--;
@@ -2062,9 +2023,9 @@ public class ASTVerifier extends TreeParser {
                             }
                             break;
                         case 2 :
-                            // ASTVerifier.g:253:27: block
+                            // ASTVerifier.g:255:27: block
                             {
-                            pushFollow(FOLLOW_block_in_labeledElement923);
+                            pushFollow(FOLLOW_block_in_labeledElement894);
                             block();
 
                             state._fsp--;
@@ -2095,16 +2056,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "treeSpec"
-    // ASTVerifier.g:256:1: treeSpec : ^( TREE_BEGIN ( element )+ ) ;
+    // ASTVerifier.g:258:1: treeSpec : ^( TREE_BEGIN ( element )+ ) ;
     public final void treeSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:257:5: ( ^( TREE_BEGIN ( element )+ ) )
-            // ASTVerifier.g:257:7: ^( TREE_BEGIN ( element )+ )
+            // ASTVerifier.g:259:5: ( ^( TREE_BEGIN ( element )+ ) )
+            // ASTVerifier.g:259:7: ^( TREE_BEGIN ( element )+ )
             {
-            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec940); 
+            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec911); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:257:20: ( element )+
+            // ASTVerifier.g:259:20: ( element )+
             int cnt30=0;
             loop30:
             do {
@@ -2118,9 +2079,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt30) {
             	case 1 :
-            	    // ASTVerifier.g:257:20: element
+            	    // ASTVerifier.g:259:20: element
             	    {
-            	    pushFollow(FOLLOW_element_in_treeSpec942);
+            	    pushFollow(FOLLOW_element_in_treeSpec913);
             	    element();
 
             	    state._fsp--;
@@ -2156,10 +2117,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ebnf"
-    // ASTVerifier.g:260:1: ebnf : ( ^( blockSuffix block ) | block );
+    // ASTVerifier.g:262:1: ebnf : ( ^( blockSuffix block ) | block );
     public final void ebnf() throws RecognitionException {
         try {
-            // ASTVerifier.g:260:5: ( ^( blockSuffix block ) | block )
+            // ASTVerifier.g:262:5: ( ^( blockSuffix block ) | block )
             int alt31=2;
             int LA31_0 = input.LA(1);
 
@@ -2177,16 +2138,16 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt31) {
                 case 1 :
-                    // ASTVerifier.g:260:7: ^( blockSuffix block )
+                    // ASTVerifier.g:262:7: ^( blockSuffix block )
                     {
-                    pushFollow(FOLLOW_blockSuffix_in_ebnf957);
+                    pushFollow(FOLLOW_blockSuffix_in_ebnf928);
                     blockSuffix();
 
                     state._fsp--;
 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf959);
+                    pushFollow(FOLLOW_block_in_ebnf930);
                     block();
 
                     state._fsp--;
@@ -2197,9 +2158,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:261:5: block
+                    // ASTVerifier.g:263:5: block
                     {
-                    pushFollow(FOLLOW_block_in_ebnf966);
+                    pushFollow(FOLLOW_block_in_ebnf937);
                     block();
 
                     state._fsp--;
@@ -2222,10 +2183,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "blockSuffix"
-    // ASTVerifier.g:264:1: blockSuffix : ( ebnfSuffix | ROOT | IMPLIES | BANG );
+    // ASTVerifier.g:266:1: blockSuffix : ( ebnfSuffix | ROOT | IMPLIES | BANG );
     public final void blockSuffix() throws RecognitionException {
         try {
-            // ASTVerifier.g:265:5: ( ebnfSuffix | ROOT | IMPLIES | BANG )
+            // ASTVerifier.g:267:5: ( ebnfSuffix | ROOT | IMPLIES | BANG )
             int alt32=4;
             switch ( input.LA(1) ) {
             case OPTIONAL:
@@ -2259,9 +2220,9 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt32) {
                 case 1 :
-                    // ASTVerifier.g:265:7: ebnfSuffix
+                    // ASTVerifier.g:267:7: ebnfSuffix
                     {
-                    pushFollow(FOLLOW_ebnfSuffix_in_blockSuffix983);
+                    pushFollow(FOLLOW_ebnfSuffix_in_blockSuffix954);
                     ebnfSuffix();
 
                     state._fsp--;
@@ -2270,23 +2231,23 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:266:7: ROOT
+                    // ASTVerifier.g:268:7: ROOT
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_blockSuffix991); 
+                    match(input,ROOT,FOLLOW_ROOT_in_blockSuffix962); 
 
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:267:7: IMPLIES
+                    // ASTVerifier.g:269:7: IMPLIES
                     {
-                    match(input,IMPLIES,FOLLOW_IMPLIES_in_blockSuffix999); 
+                    match(input,IMPLIES,FOLLOW_IMPLIES_in_blockSuffix970); 
 
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:268:7: BANG
+                    // ASTVerifier.g:270:7: BANG
                     {
-                    match(input,BANG,FOLLOW_BANG_in_blockSuffix1007); 
+                    match(input,BANG,FOLLOW_BANG_in_blockSuffix978); 
 
                     }
                     break;
@@ -2305,10 +2266,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ebnfSuffix"
-    // ASTVerifier.g:271:1: ebnfSuffix : ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE );
+    // ASTVerifier.g:273:1: ebnfSuffix : ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE );
     public final void ebnfSuffix() throws RecognitionException {
         try {
-            // ASTVerifier.g:272:2: ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE )
+            // ASTVerifier.g:274:2: ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE )
             // ASTVerifier.g:
             {
             if ( (input.LA(1)>=OPTIONAL && input.LA(1)<=POSITIVE_CLOSURE) ) {
@@ -2336,20 +2297,20 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "atom"
-    // ASTVerifier.g:277:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );
+    // ASTVerifier.g:279:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );
     public final void atom() throws RecognitionException {
         try {
-            // ASTVerifier.g:277:5: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref )
+            // ASTVerifier.g:279:5: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref )
             int alt33=9;
             alt33 = dfa33.predict(input);
             switch (alt33) {
                 case 1 :
-                    // ASTVerifier.g:277:7: ^( ROOT range )
+                    // ASTVerifier.g:279:7: ^( ROOT range )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom1047); 
+                    match(input,ROOT,FOLLOW_ROOT_in_atom1018); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_range_in_atom1049);
+                    pushFollow(FOLLOW_range_in_atom1020);
                     range();
 
                     state._fsp--;
@@ -2360,12 +2321,12 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:278:4: ^( BANG range )
+                    // ASTVerifier.g:280:4: ^( BANG range )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom1056); 
+                    match(input,BANG,FOLLOW_BANG_in_atom1027); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_range_in_atom1058);
+                    pushFollow(FOLLOW_range_in_atom1029);
                     range();
 
                     state._fsp--;
@@ -2376,12 +2337,12 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:279:4: ^( ROOT notSet )
+                    // ASTVerifier.g:281:4: ^( ROOT notSet )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom1065); 
+                    match(input,ROOT,FOLLOW_ROOT_in_atom1036); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notSet_in_atom1067);
+                    pushFollow(FOLLOW_notSet_in_atom1038);
                     notSet();
 
                     state._fsp--;
@@ -2392,12 +2353,12 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:280:4: ^( BANG notSet )
+                    // ASTVerifier.g:282:4: ^( BANG notSet )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom1074); 
+                    match(input,BANG,FOLLOW_BANG_in_atom1045); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notSet_in_atom1076);
+                    pushFollow(FOLLOW_notSet_in_atom1047);
                     notSet();
 
                     state._fsp--;
@@ -2408,9 +2369,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // ASTVerifier.g:281:4: range
+                    // ASTVerifier.g:283:4: range
                     {
-                    pushFollow(FOLLOW_range_in_atom1082);
+                    pushFollow(FOLLOW_range_in_atom1053);
                     range();
 
                     state._fsp--;
@@ -2419,13 +2380,13 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 6 :
-                    // ASTVerifier.g:282:4: ^( DOT ID terminal )
+                    // ASTVerifier.g:284:4: ^( DOT ID terminal )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom1088); 
+                    match(input,DOT,FOLLOW_DOT_in_atom1059); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom1090); 
-                    pushFollow(FOLLOW_terminal_in_atom1092);
+                    match(input,ID,FOLLOW_ID_in_atom1061); 
+                    pushFollow(FOLLOW_terminal_in_atom1063);
                     terminal();
 
                     state._fsp--;
@@ -2436,13 +2397,13 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 7 :
-                    // ASTVerifier.g:283:4: ^( DOT ID ruleref )
+                    // ASTVerifier.g:285:4: ^( DOT ID ruleref )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom1099); 
+                    match(input,DOT,FOLLOW_DOT_in_atom1070); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom1101); 
-                    pushFollow(FOLLOW_ruleref_in_atom1103);
+                    match(input,ID,FOLLOW_ID_in_atom1072); 
+                    pushFollow(FOLLOW_ruleref_in_atom1074);
                     ruleref();
 
                     state._fsp--;
@@ -2453,9 +2414,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 8 :
-                    // ASTVerifier.g:284:9: terminal
+                    // ASTVerifier.g:286:9: terminal
                     {
-                    pushFollow(FOLLOW_terminal_in_atom1114);
+                    pushFollow(FOLLOW_terminal_in_atom1085);
                     terminal();
 
                     state._fsp--;
@@ -2464,9 +2425,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 9 :
-                    // ASTVerifier.g:285:9: ruleref
+                    // ASTVerifier.g:287:9: ruleref
                     {
-                    pushFollow(FOLLOW_ruleref_in_atom1124);
+                    pushFollow(FOLLOW_ruleref_in_atom1095);
                     ruleref();
 
                     state._fsp--;
@@ -2489,10 +2450,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "notSet"
-    // ASTVerifier.g:288:1: notSet : ( ^( NOT notTerminal ) | ^( NOT block ) );
+    // ASTVerifier.g:290:1: notSet : ( ^( NOT notTerminal ) | ^( NOT block ) );
     public final void notSet() throws RecognitionException {
         try {
-            // ASTVerifier.g:289:5: ( ^( NOT notTerminal ) | ^( NOT block ) )
+            // ASTVerifier.g:291:5: ( ^( NOT notTerminal ) | ^( NOT block ) )
             int alt34=2;
             int LA34_0 = input.LA(1);
 
@@ -2530,12 +2491,12 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt34) {
                 case 1 :
-                    // ASTVerifier.g:289:7: ^( NOT notTerminal )
+                    // ASTVerifier.g:291:7: ^( NOT notTerminal )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet1142); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet1113); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notTerminal_in_notSet1144);
+                    pushFollow(FOLLOW_notTerminal_in_notSet1115);
                     notTerminal();
 
                     state._fsp--;
@@ -2546,12 +2507,12 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:290:7: ^( NOT block )
+                    // ASTVerifier.g:292:7: ^( NOT block )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet1154); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet1125); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_notSet1156);
+                    pushFollow(FOLLOW_block_in_notSet1127);
                     block();
 
                     state._fsp--;
@@ -2576,10 +2537,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "notTerminal"
-    // ASTVerifier.g:293:1: notTerminal : ( TOKEN_REF | STRING_LITERAL );
+    // ASTVerifier.g:295:1: notTerminal : ( TOKEN_REF | STRING_LITERAL );
     public final void notTerminal() throws RecognitionException {
         try {
-            // ASTVerifier.g:294:5: ( TOKEN_REF | STRING_LITERAL )
+            // ASTVerifier.g:296:5: ( TOKEN_REF | STRING_LITERAL )
             // ASTVerifier.g:
             {
             if ( input.LA(1)==TOKEN_REF||input.LA(1)==STRING_LITERAL ) {
@@ -2607,16 +2568,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "block"
-    // ASTVerifier.g:298:1: block : ^( BLOCK ( optionsSpec )? ( ruleAction )* ( ACTION )? altList ) ;
+    // ASTVerifier.g:300:1: block : ^( BLOCK ( optionsSpec )? ( ruleAction )* ( ACTION )? altList ) ;
     public final void block() throws RecognitionException {
         try {
-            // ASTVerifier.g:299:5: ( ^( BLOCK ( optionsSpec )? ( ruleAction )* ( ACTION )? altList ) )
-            // ASTVerifier.g:299:7: ^( BLOCK ( optionsSpec )? ( ruleAction )* ( ACTION )? altList )
+            // ASTVerifier.g:301:5: ( ^( BLOCK ( optionsSpec )? ( ruleAction )* ( ACTION )? altList ) )
+            // ASTVerifier.g:301:7: ^( BLOCK ( optionsSpec )? ( ruleAction )* ( ACTION )? altList )
             {
-            match(input,BLOCK,FOLLOW_BLOCK_in_block1200); 
+            match(input,BLOCK,FOLLOW_BLOCK_in_block1171); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:299:15: ( optionsSpec )?
+            // ASTVerifier.g:301:15: ( optionsSpec )?
             int alt35=2;
             int LA35_0 = input.LA(1);
 
@@ -2625,9 +2586,9 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt35) {
                 case 1 :
-                    // ASTVerifier.g:299:15: optionsSpec
+                    // ASTVerifier.g:301:15: optionsSpec
                     {
-                    pushFollow(FOLLOW_optionsSpec_in_block1202);
+                    pushFollow(FOLLOW_optionsSpec_in_block1173);
                     optionsSpec();
 
                     state._fsp--;
@@ -2638,7 +2599,7 @@ public class ASTVerifier extends TreeParser {
 
             }
 
-            // ASTVerifier.g:299:28: ( ruleAction )*
+            // ASTVerifier.g:301:28: ( ruleAction )*
             loop36:
             do {
                 int alt36=2;
@@ -2651,9 +2612,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt36) {
             	case 1 :
-            	    // ASTVerifier.g:299:28: ruleAction
+            	    // ASTVerifier.g:301:28: ruleAction
             	    {
-            	    pushFollow(FOLLOW_ruleAction_in_block1205);
+            	    pushFollow(FOLLOW_ruleAction_in_block1176);
             	    ruleAction();
 
             	    state._fsp--;
@@ -2667,7 +2628,7 @@ public class ASTVerifier extends TreeParser {
                 }
             } while (true);
 
-            // ASTVerifier.g:299:40: ( ACTION )?
+            // ASTVerifier.g:301:40: ( ACTION )?
             int alt37=2;
             int LA37_0 = input.LA(1);
 
@@ -2676,16 +2637,16 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt37) {
                 case 1 :
-                    // ASTVerifier.g:299:40: ACTION
+                    // ASTVerifier.g:301:40: ACTION
                     {
-                    match(input,ACTION,FOLLOW_ACTION_in_block1208); 
+                    match(input,ACTION,FOLLOW_ACTION_in_block1179); 
 
                     }
                     break;
 
             }
 
-            pushFollow(FOLLOW_altList_in_block1211);
+            pushFollow(FOLLOW_altList_in_block1182);
             altList();
 
             state._fsp--;
@@ -2708,10 +2669,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "ruleref"
-    // ASTVerifier.g:302:1: ruleref : ( ^( ROOT RULE_REF ( ARG_ACTION )? ) | ^( BANG RULE_REF ( ARG_ACTION )? ) | ^( RULE_REF ( ARG_ACTION )? ) );
+    // ASTVerifier.g:304:1: ruleref : ( ^( ROOT RULE_REF ( ARG_ACTION )? ) | ^( BANG RULE_REF ( ARG_ACTION )? ) | ^( RULE_REF ( ARG_ACTION )? ) );
     public final void ruleref() throws RecognitionException {
         try {
-            // ASTVerifier.g:303:5: ( ^( ROOT RULE_REF ( ARG_ACTION )? ) | ^( BANG RULE_REF ( ARG_ACTION )? ) | ^( RULE_REF ( ARG_ACTION )? ) )
+            // ASTVerifier.g:305:5: ( ^( ROOT RULE_REF ( ARG_ACTION )? ) | ^( BANG RULE_REF ( ARG_ACTION )? ) | ^( RULE_REF ( ARG_ACTION )? ) )
             int alt41=3;
             switch ( input.LA(1) ) {
             case ROOT:
@@ -2738,13 +2699,13 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt41) {
                 case 1 :
-                    // ASTVerifier.g:303:7: ^( ROOT RULE_REF ( ARG_ACTION )? )
+                    // ASTVerifier.g:305:7: ^( ROOT RULE_REF ( ARG_ACTION )? )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_ruleref1230); 
+                    match(input,ROOT,FOLLOW_ROOT_in_ruleref1201); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref1232); 
-                    // ASTVerifier.g:303:23: ( ARG_ACTION )?
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref1203); 
+                    // ASTVerifier.g:305:23: ( ARG_ACTION )?
                     int alt38=2;
                     int LA38_0 = input.LA(1);
 
@@ -2753,9 +2714,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     switch (alt38) {
                         case 1 :
-                            // ASTVerifier.g:303:23: ARG_ACTION
+                            // ASTVerifier.g:305:23: ARG_ACTION
                             {
-                            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref1234); 
+                            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref1205); 
 
                             }
                             break;
@@ -2768,13 +2729,13 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:304:7: ^( BANG RULE_REF ( ARG_ACTION )? )
+                    // ASTVerifier.g:306:7: ^( BANG RULE_REF ( ARG_ACTION )? )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_ruleref1245); 
+                    match(input,BANG,FOLLOW_BANG_in_ruleref1216); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref1247); 
-                    // ASTVerifier.g:304:23: ( ARG_ACTION )?
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref1218); 
+                    // ASTVerifier.g:306:23: ( ARG_ACTION )?
                     int alt39=2;
                     int LA39_0 = input.LA(1);
 
@@ -2783,9 +2744,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     switch (alt39) {
                         case 1 :
-                            // ASTVerifier.g:304:23: ARG_ACTION
+                            // ASTVerifier.g:306:23: ARG_ACTION
                             {
-                            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref1249); 
+                            match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref1220); 
 
                             }
                             break;
@@ -2798,13 +2759,13 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:305:7: ^( RULE_REF ( ARG_ACTION )? )
+                    // ASTVerifier.g:307:7: ^( RULE_REF ( ARG_ACTION )? )
                     {
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref1260); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref1231); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // ASTVerifier.g:305:18: ( ARG_ACTION )?
+                        // ASTVerifier.g:307:18: ( ARG_ACTION )?
                         int alt40=2;
                         int LA40_0 = input.LA(1);
 
@@ -2813,9 +2774,9 @@ public class ASTVerifier extends TreeParser {
                         }
                         switch (alt40) {
                             case 1 :
-                                // ASTVerifier.g:305:18: ARG_ACTION
+                                // ASTVerifier.g:307:18: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref1262); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref1233); 
 
                                 }
                                 break;
@@ -2843,21 +2804,21 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "range"
-    // ASTVerifier.g:308:1: range : ^( RANGE rangeElement rangeElement ) ;
+    // ASTVerifier.g:310:1: range : ^( RANGE rangeElement rangeElement ) ;
     public final void range() throws RecognitionException {
         try {
-            // ASTVerifier.g:309:5: ( ^( RANGE rangeElement rangeElement ) )
-            // ASTVerifier.g:309:7: ^( RANGE rangeElement rangeElement )
+            // ASTVerifier.g:311:5: ( ^( RANGE rangeElement rangeElement ) )
+            // ASTVerifier.g:311:7: ^( RANGE rangeElement rangeElement )
             {
-            match(input,RANGE,FOLLOW_RANGE_in_range1282); 
+            match(input,RANGE,FOLLOW_RANGE_in_range1253); 
 
             match(input, Token.DOWN, null); 
-            pushFollow(FOLLOW_rangeElement_in_range1284);
+            pushFollow(FOLLOW_rangeElement_in_range1255);
             rangeElement();
 
             state._fsp--;
 
-            pushFollow(FOLLOW_rangeElement_in_range1286);
+            pushFollow(FOLLOW_rangeElement_in_range1257);
             rangeElement();
 
             state._fsp--;
@@ -2880,10 +2841,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rangeElement"
-    // ASTVerifier.g:312:1: rangeElement : ( STRING_LITERAL | RULE_REF | TOKEN_REF );
+    // ASTVerifier.g:314:1: rangeElement : ( STRING_LITERAL | RULE_REF | TOKEN_REF );
     public final void rangeElement() throws RecognitionException {
         try {
-            // ASTVerifier.g:313:5: ( STRING_LITERAL | RULE_REF | TOKEN_REF )
+            // ASTVerifier.g:315:5: ( STRING_LITERAL | RULE_REF | TOKEN_REF )
             // ASTVerifier.g:
             {
             if ( (input.LA(1)>=TOKEN_REF && input.LA(1)<=RULE_REF)||input.LA(1)==STRING_LITERAL ) {
@@ -2911,20 +2872,20 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "terminal"
-    // ASTVerifier.g:318:1: terminal : ( ^( STRING_LITERAL elementOptions ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION elementOptions ) | ^( TOKEN_REF ARG_ACTION ) | ^( TOKEN_REF elementOptions ) | TOKEN_REF | ^( WILDCARD elementOptions ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );
+    // ASTVerifier.g:320:1: terminal : ( ^( STRING_LITERAL elementOptions ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION elementOptions ) | ^( TOKEN_REF ARG_ACTION ) | ^( TOKEN_REF elementOptions ) | TOKEN_REF | ^( WILDCARD elementOptions ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );
     public final void terminal() throws RecognitionException {
         try {
-            // ASTVerifier.g:319:5: ( ^( STRING_LITERAL elementOptions ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION elementOptions ) | ^( TOKEN_REF ARG_ACTION ) | ^( TOKEN_REF elementOptions ) | TOKEN_REF | ^( WILDCARD elementOptions ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) )
+            // ASTVerifier.g:321:5: ( ^( STRING_LITERAL elementOptions ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION elementOptions ) | ^( TOKEN_REF ARG_ACTION ) | ^( TOKEN_REF elementOptions ) | TOKEN_REF | ^( WILDCARD elementOptions ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) )
             int alt42=10;
             alt42 = dfa42.predict(input);
             switch (alt42) {
                 case 1 :
-                    // ASTVerifier.g:319:8: ^( STRING_LITERAL elementOptions )
+                    // ASTVerifier.g:321:8: ^( STRING_LITERAL elementOptions )
                     {
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal1339); 
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal1310); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_elementOptions_in_terminal1341);
+                    pushFollow(FOLLOW_elementOptions_in_terminal1312);
                     elementOptions();
 
                     state._fsp--;
@@ -2935,20 +2896,20 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:320:7: STRING_LITERAL
+                    // ASTVerifier.g:322:7: STRING_LITERAL
                     {
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal1350); 
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal1321); 
 
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:321:7: ^( TOKEN_REF ARG_ACTION elementOptions )
+                    // ASTVerifier.g:323:7: ^( TOKEN_REF ARG_ACTION elementOptions )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1359); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1330); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal1361); 
-                    pushFollow(FOLLOW_elementOptions_in_terminal1363);
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal1332); 
+                    pushFollow(FOLLOW_elementOptions_in_terminal1334);
                     elementOptions();
 
                     state._fsp--;
@@ -2959,24 +2920,24 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:322:7: ^( TOKEN_REF ARG_ACTION )
+                    // ASTVerifier.g:324:7: ^( TOKEN_REF ARG_ACTION )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1373); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1344); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal1375); 
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal1346); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 5 :
-                    // ASTVerifier.g:323:7: ^( TOKEN_REF elementOptions )
+                    // ASTVerifier.g:325:7: ^( TOKEN_REF elementOptions )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1385); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1356); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_elementOptions_in_terminal1387);
+                    pushFollow(FOLLOW_elementOptions_in_terminal1358);
                     elementOptions();
 
                     state._fsp--;
@@ -2987,19 +2948,19 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 6 :
-                    // ASTVerifier.g:324:7: TOKEN_REF
+                    // ASTVerifier.g:326:7: TOKEN_REF
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1396); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal1367); 
 
                     }
                     break;
                 case 7 :
-                    // ASTVerifier.g:325:7: ^( WILDCARD elementOptions )
+                    // ASTVerifier.g:327:7: ^( WILDCARD elementOptions )
                     {
-                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal1405); 
+                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal1376); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_elementOptions_in_terminal1407);
+                    pushFollow(FOLLOW_elementOptions_in_terminal1378);
                     elementOptions();
 
                     state._fsp--;
@@ -3010,19 +2971,19 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 8 :
-                    // ASTVerifier.g:326:7: WILDCARD
+                    // ASTVerifier.g:328:7: WILDCARD
                     {
-                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal1416); 
+                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal1387); 
 
                     }
                     break;
                 case 9 :
-                    // ASTVerifier.g:327:7: ^( ROOT terminal )
+                    // ASTVerifier.g:329:7: ^( ROOT terminal )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_terminal1425); 
+                    match(input,ROOT,FOLLOW_ROOT_in_terminal1396); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal1427);
+                    pushFollow(FOLLOW_terminal_in_terminal1398);
                     terminal();
 
                     state._fsp--;
@@ -3033,12 +2994,12 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 10 :
-                    // ASTVerifier.g:328:7: ^( BANG terminal )
+                    // ASTVerifier.g:330:7: ^( BANG terminal )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_terminal1437); 
+                    match(input,BANG,FOLLOW_BANG_in_terminal1408); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal1439);
+                    pushFollow(FOLLOW_terminal_in_terminal1410);
                     terminal();
 
                     state._fsp--;
@@ -3063,16 +3024,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "elementOptions"
-    // ASTVerifier.g:331:1: elementOptions : ^( ELEMENT_OPTIONS ( elementOption )+ ) ;
+    // ASTVerifier.g:333:1: elementOptions : ^( ELEMENT_OPTIONS ( elementOption )+ ) ;
     public final void elementOptions() throws RecognitionException {
         try {
-            // ASTVerifier.g:332:5: ( ^( ELEMENT_OPTIONS ( elementOption )+ ) )
-            // ASTVerifier.g:332:7: ^( ELEMENT_OPTIONS ( elementOption )+ )
+            // ASTVerifier.g:334:5: ( ^( ELEMENT_OPTIONS ( elementOption )+ ) )
+            // ASTVerifier.g:334:7: ^( ELEMENT_OPTIONS ( elementOption )+ )
             {
-            match(input,ELEMENT_OPTIONS,FOLLOW_ELEMENT_OPTIONS_in_elementOptions1458); 
+            match(input,ELEMENT_OPTIONS,FOLLOW_ELEMENT_OPTIONS_in_elementOptions1429); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:332:25: ( elementOption )+
+            // ASTVerifier.g:334:25: ( elementOption )+
             int cnt43=0;
             loop43:
             do {
@@ -3086,9 +3047,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt43) {
             	case 1 :
-            	    // ASTVerifier.g:332:25: elementOption
+            	    // ASTVerifier.g:334:25: elementOption
             	    {
-            	    pushFollow(FOLLOW_elementOption_in_elementOptions1460);
+            	    pushFollow(FOLLOW_elementOption_in_elementOptions1431);
             	    elementOption();
 
             	    state._fsp--;
@@ -3124,10 +3085,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "elementOption"
-    // ASTVerifier.g:335:1: elementOption : ( ID | ^( ASSIGN ID ID ) | ^( ASSIGN ID STRING_LITERAL ) );
+    // ASTVerifier.g:337:1: elementOption : ( ID | ^( ASSIGN ID ID ) | ^( ASSIGN ID STRING_LITERAL ) );
     public final void elementOption() throws RecognitionException {
         try {
-            // ASTVerifier.g:336:5: ( ID | ^( ASSIGN ID ID ) | ^( ASSIGN ID STRING_LITERAL ) )
+            // ASTVerifier.g:338:5: ( ID | ^( ASSIGN ID ID ) | ^( ASSIGN ID STRING_LITERAL ) )
             int alt44=3;
             int LA44_0 = input.LA(1);
 
@@ -3178,33 +3139,33 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt44) {
                 case 1 :
-                    // ASTVerifier.g:336:7: ID
+                    // ASTVerifier.g:338:7: ID
                     {
-                    match(input,ID,FOLLOW_ID_in_elementOption1479); 
+                    match(input,ID,FOLLOW_ID_in_elementOption1450); 
 
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:337:9: ^( ASSIGN ID ID )
+                    // ASTVerifier.g:339:9: ^( ASSIGN ID ID )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption1490); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption1461); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_elementOption1492); 
-                    match(input,ID,FOLLOW_ID_in_elementOption1494); 
+                    match(input,ID,FOLLOW_ID_in_elementOption1463); 
+                    match(input,ID,FOLLOW_ID_in_elementOption1465); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:338:9: ^( ASSIGN ID STRING_LITERAL )
+                    // ASTVerifier.g:340:9: ^( ASSIGN ID STRING_LITERAL )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption1506); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption1477); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_elementOption1508); 
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_elementOption1510); 
+                    match(input,ID,FOLLOW_ID_in_elementOption1479); 
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_elementOption1481); 
 
                     match(input, Token.UP, null); 
 
@@ -3225,13 +3186,13 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewrite"
-    // ASTVerifier.g:341:1: rewrite : ( predicatedRewrite )* nakedRewrite ;
+    // ASTVerifier.g:343:1: rewrite : ( predicatedRewrite )* nakedRewrite ;
     public final void rewrite() throws RecognitionException {
         try {
-            // ASTVerifier.g:342:2: ( ( predicatedRewrite )* nakedRewrite )
-            // ASTVerifier.g:342:4: ( predicatedRewrite )* nakedRewrite
+            // ASTVerifier.g:344:2: ( ( predicatedRewrite )* nakedRewrite )
+            // ASTVerifier.g:344:4: ( predicatedRewrite )* nakedRewrite
             {
-            // ASTVerifier.g:342:4: ( predicatedRewrite )*
+            // ASTVerifier.g:344:4: ( predicatedRewrite )*
             loop45:
             do {
                 int alt45=2;
@@ -3271,9 +3232,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt45) {
             	case 1 :
-            	    // ASTVerifier.g:342:4: predicatedRewrite
+            	    // ASTVerifier.g:344:4: predicatedRewrite
             	    {
-            	    pushFollow(FOLLOW_predicatedRewrite_in_rewrite1525);
+            	    pushFollow(FOLLOW_predicatedRewrite_in_rewrite1496);
             	    predicatedRewrite();
 
             	    state._fsp--;
@@ -3287,7 +3248,7 @@ public class ASTVerifier extends TreeParser {
                 }
             } while (true);
 
-            pushFollow(FOLLOW_nakedRewrite_in_rewrite1528);
+            pushFollow(FOLLOW_nakedRewrite_in_rewrite1499);
             nakedRewrite();
 
             state._fsp--;
@@ -3308,10 +3269,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "predicatedRewrite"
-    // ASTVerifier.g:345:1: predicatedRewrite : ( ^( ST_RESULT SEMPRED rewriteAlt ) | ^( RESULT SEMPRED rewriteAlt ) );
+    // ASTVerifier.g:347:1: predicatedRewrite : ( ^( ST_RESULT SEMPRED rewriteAlt ) | ^( RESULT SEMPRED rewriteAlt ) );
     public final void predicatedRewrite() throws RecognitionException {
         try {
-            // ASTVerifier.g:346:2: ( ^( ST_RESULT SEMPRED rewriteAlt ) | ^( RESULT SEMPRED rewriteAlt ) )
+            // ASTVerifier.g:348:2: ( ^( ST_RESULT SEMPRED rewriteAlt ) | ^( RESULT SEMPRED rewriteAlt ) )
             int alt46=2;
             int LA46_0 = input.LA(1);
 
@@ -3329,13 +3290,13 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt46) {
                 case 1 :
-                    // ASTVerifier.g:346:4: ^( ST_RESULT SEMPRED rewriteAlt )
+                    // ASTVerifier.g:348:4: ^( ST_RESULT SEMPRED rewriteAlt )
                     {
-                    match(input,ST_RESULT,FOLLOW_ST_RESULT_in_predicatedRewrite1540); 
+                    match(input,ST_RESULT,FOLLOW_ST_RESULT_in_predicatedRewrite1511); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,SEMPRED,FOLLOW_SEMPRED_in_predicatedRewrite1542); 
-                    pushFollow(FOLLOW_rewriteAlt_in_predicatedRewrite1544);
+                    match(input,SEMPRED,FOLLOW_SEMPRED_in_predicatedRewrite1513); 
+                    pushFollow(FOLLOW_rewriteAlt_in_predicatedRewrite1515);
                     rewriteAlt();
 
                     state._fsp--;
@@ -3346,13 +3307,13 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:347:4: ^( RESULT SEMPRED rewriteAlt )
+                    // ASTVerifier.g:349:4: ^( RESULT SEMPRED rewriteAlt )
                     {
-                    match(input,RESULT,FOLLOW_RESULT_in_predicatedRewrite1551); 
+                    match(input,RESULT,FOLLOW_RESULT_in_predicatedRewrite1522); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,SEMPRED,FOLLOW_SEMPRED_in_predicatedRewrite1553); 
-                    pushFollow(FOLLOW_rewriteAlt_in_predicatedRewrite1555);
+                    match(input,SEMPRED,FOLLOW_SEMPRED_in_predicatedRewrite1524); 
+                    pushFollow(FOLLOW_rewriteAlt_in_predicatedRewrite1526);
                     rewriteAlt();
 
                     state._fsp--;
@@ -3377,10 +3338,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "nakedRewrite"
-    // ASTVerifier.g:350:1: nakedRewrite : ( ^( ST_RESULT rewriteAlt ) | ^( RESULT rewriteAlt ) );
+    // ASTVerifier.g:352:1: nakedRewrite : ( ^( ST_RESULT rewriteAlt ) | ^( RESULT rewriteAlt ) );
     public final void nakedRewrite() throws RecognitionException {
         try {
-            // ASTVerifier.g:351:2: ( ^( ST_RESULT rewriteAlt ) | ^( RESULT rewriteAlt ) )
+            // ASTVerifier.g:353:2: ( ^( ST_RESULT rewriteAlt ) | ^( RESULT rewriteAlt ) )
             int alt47=2;
             int LA47_0 = input.LA(1);
 
@@ -3398,12 +3359,12 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt47) {
                 case 1 :
-                    // ASTVerifier.g:351:4: ^( ST_RESULT rewriteAlt )
+                    // ASTVerifier.g:353:4: ^( ST_RESULT rewriteAlt )
                     {
-                    match(input,ST_RESULT,FOLLOW_ST_RESULT_in_nakedRewrite1569); 
+                    match(input,ST_RESULT,FOLLOW_ST_RESULT_in_nakedRewrite1540); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_rewriteAlt_in_nakedRewrite1571);
+                    pushFollow(FOLLOW_rewriteAlt_in_nakedRewrite1542);
                     rewriteAlt();
 
                     state._fsp--;
@@ -3414,12 +3375,12 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:352:4: ^( RESULT rewriteAlt )
+                    // ASTVerifier.g:354:4: ^( RESULT rewriteAlt )
                     {
-                    match(input,RESULT,FOLLOW_RESULT_in_nakedRewrite1578); 
+                    match(input,RESULT,FOLLOW_RESULT_in_nakedRewrite1549); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_rewriteAlt_in_nakedRewrite1580);
+                    pushFollow(FOLLOW_rewriteAlt_in_nakedRewrite1551);
                     rewriteAlt();
 
                     state._fsp--;
@@ -3444,10 +3405,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteAlt"
-    // ASTVerifier.g:355:1: rewriteAlt : ( rewriteTemplate | rewriteTreeAlt | ETC | EPSILON );
+    // ASTVerifier.g:357:1: rewriteAlt : ( rewriteTemplate | rewriteTreeAlt | ETC | EPSILON );
     public final void rewriteAlt() throws RecognitionException {
         try {
-            // ASTVerifier.g:356:5: ( rewriteTemplate | rewriteTreeAlt | ETC | EPSILON )
+            // ASTVerifier.g:358:5: ( rewriteTemplate | rewriteTreeAlt | ETC | EPSILON )
             int alt48=4;
             switch ( input.LA(1) ) {
             case ACTION:
@@ -3480,9 +3441,9 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt48) {
                 case 1 :
-                    // ASTVerifier.g:356:7: rewriteTemplate
+                    // ASTVerifier.g:358:7: rewriteTemplate
                     {
-                    pushFollow(FOLLOW_rewriteTemplate_in_rewriteAlt1596);
+                    pushFollow(FOLLOW_rewriteTemplate_in_rewriteAlt1567);
                     rewriteTemplate();
 
                     state._fsp--;
@@ -3491,9 +3452,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:357:7: rewriteTreeAlt
+                    // ASTVerifier.g:359:7: rewriteTreeAlt
                     {
-                    pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteAlt1604);
+                    pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteAlt1575);
                     rewriteTreeAlt();
 
                     state._fsp--;
@@ -3502,16 +3463,16 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:358:7: ETC
+                    // ASTVerifier.g:360:7: ETC
                     {
-                    match(input,ETC,FOLLOW_ETC_in_rewriteAlt1612); 
+                    match(input,ETC,FOLLOW_ETC_in_rewriteAlt1583); 
 
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:359:7: EPSILON
+                    // ASTVerifier.g:361:7: EPSILON
                     {
-                    match(input,EPSILON,FOLLOW_EPSILON_in_rewriteAlt1620); 
+                    match(input,EPSILON,FOLLOW_EPSILON_in_rewriteAlt1591); 
 
                     }
                     break;
@@ -3530,16 +3491,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTreeAlt"
-    // ASTVerifier.g:362:1: rewriteTreeAlt : ^( ALT ( rewriteTreeElement )+ ) ;
+    // ASTVerifier.g:364:1: rewriteTreeAlt : ^( ALT ( rewriteTreeElement )+ ) ;
     public final void rewriteTreeAlt() throws RecognitionException {
         try {
-            // ASTVerifier.g:363:5: ( ^( ALT ( rewriteTreeElement )+ ) )
-            // ASTVerifier.g:363:7: ^( ALT ( rewriteTreeElement )+ )
+            // ASTVerifier.g:365:5: ( ^( ALT ( rewriteTreeElement )+ ) )
+            // ASTVerifier.g:365:7: ^( ALT ( rewriteTreeElement )+ )
             {
-            match(input,ALT,FOLLOW_ALT_in_rewriteTreeAlt1639); 
+            match(input,ALT,FOLLOW_ALT_in_rewriteTreeAlt1610); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:363:13: ( rewriteTreeElement )+
+            // ASTVerifier.g:365:13: ( rewriteTreeElement )+
             int cnt49=0;
             loop49:
             do {
@@ -3553,9 +3514,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt49) {
             	case 1 :
-            	    // ASTVerifier.g:363:13: rewriteTreeElement
+            	    // ASTVerifier.g:365:13: rewriteTreeElement
             	    {
-            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTreeAlt1641);
+            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTreeAlt1612);
             	    rewriteTreeElement();
 
             	    state._fsp--;
@@ -3591,10 +3552,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTreeElement"
-    // ASTVerifier.g:366:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTree | rewriteTreeEbnf );
+    // ASTVerifier.g:368:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTree | rewriteTreeEbnf );
     public final void rewriteTreeElement() throws RecognitionException {
         try {
-            // ASTVerifier.g:367:2: ( rewriteTreeAtom | rewriteTree | rewriteTreeEbnf )
+            // ASTVerifier.g:369:2: ( rewriteTreeAtom | rewriteTree | rewriteTreeEbnf )
             int alt50=3;
             switch ( input.LA(1) ) {
             case ACTION:
@@ -3627,9 +3588,9 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt50) {
                 case 1 :
-                    // ASTVerifier.g:367:4: rewriteTreeAtom
+                    // ASTVerifier.g:369:4: rewriteTreeAtom
                     {
-                    pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTreeElement1657);
+                    pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTreeElement1628);
                     rewriteTreeAtom();
 
                     state._fsp--;
@@ -3638,9 +3599,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:368:4: rewriteTree
+                    // ASTVerifier.g:370:4: rewriteTree
                     {
-                    pushFollow(FOLLOW_rewriteTree_in_rewriteTreeElement1662);
+                    pushFollow(FOLLOW_rewriteTree_in_rewriteTreeElement1633);
                     rewriteTree();
 
                     state._fsp--;
@@ -3649,9 +3610,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:369:6: rewriteTreeEbnf
+                    // ASTVerifier.g:371:6: rewriteTreeEbnf
                     {
-                    pushFollow(FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement1669);
+                    pushFollow(FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement1640);
                     rewriteTreeEbnf();
 
                     state._fsp--;
@@ -3674,10 +3635,10 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTreeAtom"
-    // ASTVerifier.g:372:1: rewriteTreeAtom : ( ^( TOKEN_REF ARG_ACTION ) | TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL | ACTION );
+    // ASTVerifier.g:374:1: rewriteTreeAtom : ( ^( TOKEN_REF ARG_ACTION ) | TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL | ACTION );
     public final void rewriteTreeAtom() throws RecognitionException {
         try {
-            // ASTVerifier.g:373:5: ( ^( TOKEN_REF ARG_ACTION ) | TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL | ACTION )
+            // ASTVerifier.g:375:5: ( ^( TOKEN_REF ARG_ACTION ) | TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL | ACTION )
             int alt51=6;
             switch ( input.LA(1) ) {
             case TOKEN_REF:
@@ -3727,49 +3688,49 @@ public class ASTVerifier extends TreeParser {
 
             switch (alt51) {
                 case 1 :
-                    // ASTVerifier.g:373:9: ^( TOKEN_REF ARG_ACTION )
+                    // ASTVerifier.g:375:9: ^( TOKEN_REF ARG_ACTION )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_rewriteTreeAtom1686); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_rewriteTreeAtom1657); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rewriteTreeAtom1688); 
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rewriteTreeAtom1659); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:374:6: TOKEN_REF
+                    // ASTVerifier.g:376:6: TOKEN_REF
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_rewriteTreeAtom1696); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_rewriteTreeAtom1667); 
 
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:375:9: RULE_REF
+                    // ASTVerifier.g:377:9: RULE_REF
                     {
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_rewriteTreeAtom1706); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_rewriteTreeAtom1677); 
 
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:376:6: STRING_LITERAL
+                    // ASTVerifier.g:378:6: STRING_LITERAL
                     {
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_rewriteTreeAtom1713); 
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_rewriteTreeAtom1684); 
 
                     }
                     break;
                 case 5 :
-                    // ASTVerifier.g:377:6: LABEL
+                    // ASTVerifier.g:379:6: LABEL
                     {
-                    match(input,LABEL,FOLLOW_LABEL_in_rewriteTreeAtom1720); 
+                    match(input,LABEL,FOLLOW_LABEL_in_rewriteTreeAtom1691); 
 
                     }
                     break;
                 case 6 :
-                    // ASTVerifier.g:378:4: ACTION
+                    // ASTVerifier.g:380:4: ACTION
                     {
-                    match(input,ACTION,FOLLOW_ACTION_in_rewriteTreeAtom1725); 
+                    match(input,ACTION,FOLLOW_ACTION_in_rewriteTreeAtom1696); 
 
                     }
                     break;
@@ -3788,23 +3749,23 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTreeEbnf"
-    // ASTVerifier.g:381:1: rewriteTreeEbnf : ^( ebnfSuffix ^( REWRITE_BLOCK rewriteTreeAlt ) ) ;
+    // ASTVerifier.g:383:1: rewriteTreeEbnf : ^( ebnfSuffix ^( REWRITE_BLOCK rewriteTreeAlt ) ) ;
     public final void rewriteTreeEbnf() throws RecognitionException {
         try {
-            // ASTVerifier.g:382:2: ( ^( ebnfSuffix ^( REWRITE_BLOCK rewriteTreeAlt ) ) )
-            // ASTVerifier.g:382:4: ^( ebnfSuffix ^( REWRITE_BLOCK rewriteTreeAlt ) )
+            // ASTVerifier.g:384:2: ( ^( ebnfSuffix ^( REWRITE_BLOCK rewriteTreeAlt ) ) )
+            // ASTVerifier.g:384:4: ^( ebnfSuffix ^( REWRITE_BLOCK rewriteTreeAlt ) )
             {
-            pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeEbnf1737);
+            pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeEbnf1708);
             ebnfSuffix();
 
             state._fsp--;
 
 
             match(input, Token.DOWN, null); 
-            match(input,REWRITE_BLOCK,FOLLOW_REWRITE_BLOCK_in_rewriteTreeEbnf1740); 
+            match(input,REWRITE_BLOCK,FOLLOW_REWRITE_BLOCK_in_rewriteTreeEbnf1711); 
 
             match(input, Token.DOWN, null); 
-            pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf1742);
+            pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf1713);
             rewriteTreeAlt();
 
             state._fsp--;
@@ -3829,21 +3790,21 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTree"
-    // ASTVerifier.g:384:1: rewriteTree : ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) ;
+    // ASTVerifier.g:386:1: rewriteTree : ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) ;
     public final void rewriteTree() throws RecognitionException {
         try {
-            // ASTVerifier.g:385:2: ( ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) )
-            // ASTVerifier.g:385:4: ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* )
+            // ASTVerifier.g:387:2: ( ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) )
+            // ASTVerifier.g:387:4: ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* )
             {
-            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_rewriteTree1755); 
+            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_rewriteTree1726); 
 
             match(input, Token.DOWN, null); 
-            pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTree1757);
+            pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTree1728);
             rewriteTreeAtom();
 
             state._fsp--;
 
-            // ASTVerifier.g:385:33: ( rewriteTreeElement )*
+            // ASTVerifier.g:387:33: ( rewriteTreeElement )*
             loop52:
             do {
                 int alt52=2;
@@ -3856,9 +3817,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt52) {
             	case 1 :
-            	    // ASTVerifier.g:385:33: rewriteTreeElement
+            	    // ASTVerifier.g:387:33: rewriteTreeElement
             	    {
-            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTree1759);
+            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTree1730);
             	    rewriteTreeElement();
 
             	    state._fsp--;
@@ -3890,20 +3851,20 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTemplate"
-    // ASTVerifier.g:388:1: rewriteTemplate : ( ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL ) | ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL ) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );
+    // ASTVerifier.g:390:1: rewriteTemplate : ( ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL ) | ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL ) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );
     public final void rewriteTemplate() throws RecognitionException {
         try {
-            // ASTVerifier.g:389:2: ( ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL ) | ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL ) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION )
+            // ASTVerifier.g:391:2: ( ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL ) | ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL ) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION )
             int alt55=5;
             alt55 = dfa55.predict(input);
             switch (alt55) {
                 case 1 :
-                    // ASTVerifier.g:389:4: ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL )
+                    // ASTVerifier.g:391:4: ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL )
                     {
-                    match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplate1774); 
+                    match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplate1745); 
 
                     match(input, Token.DOWN, null); 
-                    // ASTVerifier.g:389:15: ( rewriteTemplateArgs )?
+                    // ASTVerifier.g:391:15: ( rewriteTemplateArgs )?
                     int alt53=2;
                     int LA53_0 = input.LA(1);
 
@@ -3912,9 +3873,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     switch (alt53) {
                         case 1 :
-                            // ASTVerifier.g:389:15: rewriteTemplateArgs
+                            // ASTVerifier.g:391:15: rewriteTemplateArgs
                             {
-                            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1776);
+                            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1747);
                             rewriteTemplateArgs();
 
                             state._fsp--;
@@ -3925,19 +3886,19 @@ public class ASTVerifier extends TreeParser {
 
                     }
 
-                    match(input,DOUBLE_QUOTE_STRING_LITERAL,FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate1779); 
+                    match(input,DOUBLE_QUOTE_STRING_LITERAL,FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate1750); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 2 :
-                    // ASTVerifier.g:390:4: ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL )
+                    // ASTVerifier.g:392:4: ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL )
                     {
-                    match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplate1786); 
+                    match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplate1757); 
 
                     match(input, Token.DOWN, null); 
-                    // ASTVerifier.g:390:15: ( rewriteTemplateArgs )?
+                    // ASTVerifier.g:392:15: ( rewriteTemplateArgs )?
                     int alt54=2;
                     int LA54_0 = input.LA(1);
 
@@ -3946,9 +3907,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     switch (alt54) {
                         case 1 :
-                            // ASTVerifier.g:390:15: rewriteTemplateArgs
+                            // ASTVerifier.g:392:15: rewriteTemplateArgs
                             {
-                            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1788);
+                            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1759);
                             rewriteTemplateArgs();
 
                             state._fsp--;
@@ -3959,16 +3920,16 @@ public class ASTVerifier extends TreeParser {
 
                     }
 
-                    match(input,DOUBLE_ANGLE_STRING_LITERAL,FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate1791); 
+                    match(input,DOUBLE_ANGLE_STRING_LITERAL,FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate1762); 
 
                     match(input, Token.UP, null); 
 
                     }
                     break;
                 case 3 :
-                    // ASTVerifier.g:391:4: rewriteTemplateRef
+                    // ASTVerifier.g:393:4: rewriteTemplateRef
                     {
-                    pushFollow(FOLLOW_rewriteTemplateRef_in_rewriteTemplate1797);
+                    pushFollow(FOLLOW_rewriteTemplateRef_in_rewriteTemplate1768);
                     rewriteTemplateRef();
 
                     state._fsp--;
@@ -3977,9 +3938,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // ASTVerifier.g:392:4: rewriteIndirectTemplateHead
+                    // ASTVerifier.g:394:4: rewriteIndirectTemplateHead
                     {
-                    pushFollow(FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate1802);
+                    pushFollow(FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate1773);
                     rewriteIndirectTemplateHead();
 
                     state._fsp--;
@@ -3988,9 +3949,9 @@ public class ASTVerifier extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // ASTVerifier.g:393:4: ACTION
+                    // ASTVerifier.g:395:4: ACTION
                     {
-                    match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplate1807); 
+                    match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplate1778); 
 
                     }
                     break;
@@ -4009,17 +3970,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTemplateRef"
-    // ASTVerifier.g:396:1: rewriteTemplateRef : ^( TEMPLATE ID ( rewriteTemplateArgs )? ) ;
+    // ASTVerifier.g:398:1: rewriteTemplateRef : ^( TEMPLATE ID ( rewriteTemplateArgs )? ) ;
     public final void rewriteTemplateRef() throws RecognitionException {
         try {
-            // ASTVerifier.g:397:2: ( ^( TEMPLATE ID ( rewriteTemplateArgs )? ) )
-            // ASTVerifier.g:397:4: ^( TEMPLATE ID ( rewriteTemplateArgs )? )
+            // ASTVerifier.g:399:2: ( ^( TEMPLATE ID ( rewriteTemplateArgs )? ) )
+            // ASTVerifier.g:399:4: ^( TEMPLATE ID ( rewriteTemplateArgs )? )
             {
-            match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplateRef1819); 
+            match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplateRef1790); 
 
             match(input, Token.DOWN, null); 
-            match(input,ID,FOLLOW_ID_in_rewriteTemplateRef1821); 
-            // ASTVerifier.g:397:18: ( rewriteTemplateArgs )?
+            match(input,ID,FOLLOW_ID_in_rewriteTemplateRef1792); 
+            // ASTVerifier.g:399:18: ( rewriteTemplateArgs )?
             int alt56=2;
             int LA56_0 = input.LA(1);
 
@@ -4028,9 +3989,9 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt56) {
                 case 1 :
-                    // ASTVerifier.g:397:18: rewriteTemplateArgs
+                    // ASTVerifier.g:399:18: rewriteTemplateArgs
                     {
-                    pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef1823);
+                    pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef1794);
                     rewriteTemplateArgs();
 
                     state._fsp--;
@@ -4059,17 +4020,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteIndirectTemplateHead"
-    // ASTVerifier.g:400:1: rewriteIndirectTemplateHead : ^( TEMPLATE ACTION ( rewriteTemplateArgs )? ) ;
+    // ASTVerifier.g:402:1: rewriteIndirectTemplateHead : ^( TEMPLATE ACTION ( rewriteTemplateArgs )? ) ;
     public final void rewriteIndirectTemplateHead() throws RecognitionException {
         try {
-            // ASTVerifier.g:401:2: ( ^( TEMPLATE ACTION ( rewriteTemplateArgs )? ) )
-            // ASTVerifier.g:401:4: ^( TEMPLATE ACTION ( rewriteTemplateArgs )? )
+            // ASTVerifier.g:403:2: ( ^( TEMPLATE ACTION ( rewriteTemplateArgs )? ) )
+            // ASTVerifier.g:403:4: ^( TEMPLATE ACTION ( rewriteTemplateArgs )? )
             {
-            match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteIndirectTemplateHead1837); 
+            match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteIndirectTemplateHead1808); 
 
             match(input, Token.DOWN, null); 
-            match(input,ACTION,FOLLOW_ACTION_in_rewriteIndirectTemplateHead1839); 
-            // ASTVerifier.g:401:22: ( rewriteTemplateArgs )?
+            match(input,ACTION,FOLLOW_ACTION_in_rewriteIndirectTemplateHead1810); 
+            // ASTVerifier.g:403:22: ( rewriteTemplateArgs )?
             int alt57=2;
             int LA57_0 = input.LA(1);
 
@@ -4078,9 +4039,9 @@ public class ASTVerifier extends TreeParser {
             }
             switch (alt57) {
                 case 1 :
-                    // ASTVerifier.g:401:22: rewriteTemplateArgs
+                    // ASTVerifier.g:403:22: rewriteTemplateArgs
                     {
-                    pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead1841);
+                    pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead1812);
                     rewriteTemplateArgs();
 
                     state._fsp--;
@@ -4109,16 +4070,16 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTemplateArgs"
-    // ASTVerifier.g:404:1: rewriteTemplateArgs : ^( ARGLIST ( rewriteTemplateArg )+ ) ;
+    // ASTVerifier.g:406:1: rewriteTemplateArgs : ^( ARGLIST ( rewriteTemplateArg )+ ) ;
     public final void rewriteTemplateArgs() throws RecognitionException {
         try {
-            // ASTVerifier.g:405:2: ( ^( ARGLIST ( rewriteTemplateArg )+ ) )
-            // ASTVerifier.g:405:4: ^( ARGLIST ( rewriteTemplateArg )+ )
+            // ASTVerifier.g:407:2: ( ^( ARGLIST ( rewriteTemplateArg )+ ) )
+            // ASTVerifier.g:407:4: ^( ARGLIST ( rewriteTemplateArg )+ )
             {
-            match(input,ARGLIST,FOLLOW_ARGLIST_in_rewriteTemplateArgs1855); 
+            match(input,ARGLIST,FOLLOW_ARGLIST_in_rewriteTemplateArgs1826); 
 
             match(input, Token.DOWN, null); 
-            // ASTVerifier.g:405:14: ( rewriteTemplateArg )+
+            // ASTVerifier.g:407:14: ( rewriteTemplateArg )+
             int cnt58=0;
             loop58:
             do {
@@ -4132,9 +4093,9 @@ public class ASTVerifier extends TreeParser {
 
                 switch (alt58) {
             	case 1 :
-            	    // ASTVerifier.g:405:14: rewriteTemplateArg
+            	    // ASTVerifier.g:407:14: rewriteTemplateArg
             	    {
-            	    pushFollow(FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs1857);
+            	    pushFollow(FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs1828);
             	    rewriteTemplateArg();
 
             	    state._fsp--;
@@ -4170,17 +4131,17 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "rewriteTemplateArg"
-    // ASTVerifier.g:408:1: rewriteTemplateArg : ^( ARG ID ACTION ) ;
+    // ASTVerifier.g:410:1: rewriteTemplateArg : ^( ARG ID ACTION ) ;
     public final void rewriteTemplateArg() throws RecognitionException {
         try {
-            // ASTVerifier.g:409:2: ( ^( ARG ID ACTION ) )
-            // ASTVerifier.g:409:6: ^( ARG ID ACTION )
+            // ASTVerifier.g:411:2: ( ^( ARG ID ACTION ) )
+            // ASTVerifier.g:411:6: ^( ARG ID ACTION )
             {
-            match(input,ARG,FOLLOW_ARG_in_rewriteTemplateArg1873); 
+            match(input,ARG,FOLLOW_ARG_in_rewriteTemplateArg1844); 
 
             match(input, Token.DOWN, null); 
-            match(input,ID,FOLLOW_ID_in_rewriteTemplateArg1875); 
-            match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplateArg1877); 
+            match(input,ID,FOLLOW_ID_in_rewriteTemplateArg1846); 
+            match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplateArg1848); 
 
             match(input, Token.UP, null); 
 
@@ -4211,7 +4172,7 @@ public class ASTVerifier extends TreeParser {
     static final String DFA26_minS =
         "\1\4\1\uffff\2\2\6\uffff\2\57";
     static final String DFA26_maxS =
-        "\1\144\1\uffff\2\2\6\uffff\2\114";
+        "\1\140\1\uffff\2\2\6\uffff\2\114";
     static final String DFA26_acceptS =
         "\1\uffff\1\1\2\uffff\1\2\1\3\1\4\1\5\1\6\1\7\2\uffff";
     static final String DFA26_specialS =
@@ -4219,7 +4180,7 @@ public class ASTVerifier extends TreeParser {
     static final String[] DFA26_transitionS = {
             "\1\7\13\uffff\1\6\31\uffff\1\5\2\uffff\1\1\1\uffff\1\3\2\uffff"+
             "\1\1\1\uffff\1\2\1\uffff\2\4\2\uffff\1\11\3\uffff\2\4\3\uffff"+
-            "\1\4\10\uffff\1\5\1\uffff\3\5\20\uffff\1\10\2\uffff\1\4",
+            "\1\4\10\uffff\1\5\1\uffff\3\5\14\uffff\1\10\2\uffff\1\4",
             "",
             "\1\12",
             "\1\13",
@@ -4265,7 +4226,7 @@ public class ASTVerifier extends TreeParser {
             this.transition = DFA26_transition;
         }
         public String getDescription() {
-            return "241:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
+            return "243:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
         }
     }
     static final String DFA33_eotS =
@@ -4273,26 +4234,26 @@ public class ASTVerifier extends TreeParser {
     static final String DFA33_eofS =
         "\25\uffff";
     static final String DFA33_minS =
-        "\1\57\2\2\1\uffff\1\2\2\uffff\2\57\1\127\4\uffff\1\57\2\2\2\uffff"+
-        "\2\57";
+        "\1\57\2\2\1\uffff\1\2\2\uffff\2\57\1\127\4\uffff\1\57\1\uffff\2"+
+        "\2\1\uffff\2\57";
     static final String DFA33_maxS =
-        "\1\144\2\2\1\uffff\1\2\2\uffff\2\103\1\127\4\uffff\1\103\2\2\2\uffff"+
-        "\2\103";
+        "\1\140\2\2\1\uffff\1\2\2\uffff\2\103\1\127\4\uffff\1\103\1\uffff"+
+        "\2\2\1\uffff\2\103";
     static final String DFA33_acceptS =
-        "\3\uffff\1\5\1\uffff\1\10\1\11\3\uffff\1\3\1\1\1\2\1\4\3\uffff\1"+
-        "\7\1\6\2\uffff";
+        "\3\uffff\1\5\1\uffff\1\10\1\11\3\uffff\1\1\1\3\1\2\1\4\1\uffff\1"+
+        "\6\2\uffff\1\7\2\uffff";
     static final String DFA33_specialS =
         "\25\uffff}>";
     static final String[] DFA33_transitionS = {
             "\1\2\4\uffff\1\1\1\uffff\1\5\1\3\6\uffff\1\5\1\6\3\uffff\1\5"+
-            "\40\uffff\1\4",
+            "\34\uffff\1\4",
             "\1\7",
             "\1\10",
             "",
             "\1\11",
             "",
             "",
-            "\1\5\4\uffff\1\5\1\uffff\1\5\1\13\4\uffff\1\12\1\uffff\1\5"+
+            "\1\5\4\uffff\1\5\1\uffff\1\5\1\12\4\uffff\1\13\1\uffff\1\5"+
             "\1\6\3\uffff\1\5",
             "\1\5\4\uffff\1\5\1\uffff\1\5\1\14\4\uffff\1\15\1\uffff\1\5"+
             "\1\6\3\uffff\1\5",
@@ -4301,16 +4262,16 @@ public class ASTVerifier extends TreeParser {
             "",
             "",
             "",
-            "\1\20\4\uffff\1\17\1\uffff\1\22\7\uffff\1\22\1\21\3\uffff\1"+
-            "\22",
+            "\1\21\4\uffff\1\20\1\uffff\1\17\7\uffff\1\17\1\22\3\uffff\1"+
+            "\17",
+            "",
             "\1\23",
             "\1\24",
             "",
-            "",
-            "\1\22\4\uffff\1\22\1\uffff\1\22\7\uffff\1\22\1\21\3\uffff\1"+
-            "\22",
-            "\1\22\4\uffff\1\22\1\uffff\1\22\7\uffff\1\22\1\21\3\uffff\1"+
-            "\22"
+            "\1\17\4\uffff\1\17\1\uffff\1\17\7\uffff\1\17\1\22\3\uffff\1"+
+            "\17",
+            "\1\17\4\uffff\1\17\1\uffff\1\17\7\uffff\1\17\1\22\3\uffff\1"+
+            "\17"
     };
 
     static final short[] DFA33_eot = DFA.unpackEncodedString(DFA33_eotS);
@@ -4343,7 +4304,7 @@ public class ASTVerifier extends TreeParser {
             this.transition = DFA33_transition;
         }
         public String getDescription() {
-            return "277:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );";
+            return "279:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );";
         }
     }
     static final String DFA42_eotS =
@@ -4353,7 +4314,7 @@ public class ASTVerifier extends TreeParser {
     static final String DFA42_minS =
         "\1\57\3\2\4\uffff\1\16\3\uffff\1\3\3\uffff";
     static final String DFA42_maxS =
-        "\1\103\3\144\4\uffff\1\146\3\uffff\1\146\3\uffff";
+        "\1\103\3\140\4\uffff\1\142\3\uffff\1\142\3\uffff";
     static final String DFA42_acceptS =
         "\4\uffff\1\11\1\12\1\1\1\2\1\uffff\1\6\1\7\1\10\1\uffff\1\5\1\4"+
         "\1\3";
@@ -4363,25 +4324,25 @@ public class ASTVerifier extends TreeParser {
             "\1\5\4\uffff\1\4\1\uffff\1\3\7\uffff\1\2\4\uffff\1\1",
             "\1\6\2\7\13\uffff\1\7\31\uffff\1\7\2\uffff\1\7\1\uffff\1\7"+
             "\2\uffff\1\7\1\uffff\1\7\1\uffff\2\7\2\uffff\1\7\3\uffff\2\7"+
-            "\3\uffff\1\7\10\uffff\1\7\1\uffff\3\7\20\uffff\1\7\2\uffff\1"+
+            "\3\uffff\1\7\10\uffff\1\7\1\uffff\3\7\14\uffff\1\7\2\uffff\1"+
             "\7",
             "\1\10\2\11\13\uffff\1\11\31\uffff\1\11\2\uffff\1\11\1\uffff"+
             "\1\11\2\uffff\1\11\1\uffff\1\11\1\uffff\2\11\2\uffff\1\11\3"+
-            "\uffff\2\11\3\uffff\1\11\10\uffff\1\11\1\uffff\3\11\20\uffff"+
+            "\uffff\2\11\3\uffff\1\11\10\uffff\1\11\1\uffff\3\11\14\uffff"+
             "\1\11\2\uffff\1\11",
             "\1\12\2\13\13\uffff\1\13\31\uffff\1\13\2\uffff\1\13\1\uffff"+
             "\1\13\2\uffff\1\13\1\uffff\1\13\1\uffff\2\13\2\uffff\1\13\3"+
-            "\uffff\2\13\3\uffff\1\13\10\uffff\1\13\1\uffff\3\13\20\uffff"+
+            "\uffff\2\13\3\uffff\1\13\10\uffff\1\13\1\uffff\3\13\14\uffff"+
             "\1\13\2\uffff\1\13",
             "",
             "",
             "",
             "",
-            "\1\14\127\uffff\1\15",
+            "\1\14\123\uffff\1\15",
             "",
             "",
             "",
-            "\1\16\142\uffff\1\17",
+            "\1\16\136\uffff\1\17",
             "",
             "",
             ""
@@ -4417,7 +4378,7 @@ public class ASTVerifier extends TreeParser {
             this.transition = DFA42_transition;
         }
         public String getDescription() {
-            return "318:1: terminal : ( ^( STRING_LITERAL elementOptions ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION elementOptions ) | ^( TOKEN_REF ARG_ACTION ) | ^( TOKEN_REF elementOptions ) | TOKEN_REF | ^( WILDCARD elementOptions ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );";
+            return "320:1: terminal : ( ^( STRING_LITERAL elementOptions ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION elementOptions ) | ^( TOKEN_REF ARG_ACTION ) | ^( TOKEN_REF elementOptions ) | TOKEN_REF | ^( WILDCARD elementOptions ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );";
         }
     }
     static final String DFA55_eotS =
@@ -4483,238 +4444,237 @@ public class ASTVerifier extends TreeParser {
             this.transition = DFA55_transition;
         }
         public String getDescription() {
-            return "388:1: rewriteTemplate : ( ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL ) | ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL ) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );";
+            return "390:1: rewriteTemplate : ( ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_QUOTE_STRING_LITERAL ) | ^( TEMPLATE ( rewriteTemplateArgs )? DOUBLE_ANGLE_STRING_LITERAL ) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );";
         }
     }
  
 
-    public static final BitSet FOLLOW_grammarType_in_grammarSpec74 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_GRAMMAR_in_grammarSpec74 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_grammarSpec76 = new BitSet(new long[]{0x0800000000780040L,0x0000000000000200L});
     public static final BitSet FOLLOW_DOC_COMMENT_in_grammarSpec78 = new BitSet(new long[]{0x0800000000780040L,0x0000000000000200L});
     public static final BitSet FOLLOW_prequelConstruct_in_grammarSpec81 = new BitSet(new long[]{0x0800000000780040L,0x0000000000000200L});
     public static final BitSet FOLLOW_rules_in_grammarSpec84 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_set_in_grammarType0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_optionsSpec_in_prequelConstruct131 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_delegateGrammars_in_prequelConstruct141 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tokensSpec_in_prequelConstruct151 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_attrScope_in_prequelConstruct161 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_action_in_prequelConstruct171 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_OPTIONS_in_optionsSpec186 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_option_in_optionsSpec188 = new BitSet(new long[]{0x0000200000000008L});
-    public static final BitSet FOLLOW_ASSIGN_in_option210 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option212 = new BitSet(new long[]{0x0001000000000000L,0x0000000000800009L});
-    public static final BitSet FOLLOW_optionValue_in_option214 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_optionsSpec_in_prequelConstruct102 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_delegateGrammars_in_prequelConstruct112 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tokensSpec_in_prequelConstruct122 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_attrScope_in_prequelConstruct132 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_action_in_prequelConstruct142 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_OPTIONS_in_optionsSpec157 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_option_in_optionsSpec159 = new BitSet(new long[]{0x0000200000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_option181 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_option183 = new BitSet(new long[]{0x0001000000000000L,0x0000000000800009L});
+    public static final BitSet FOLLOW_optionValue_in_option185 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_optionValue0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPORT_in_delegateGrammars299 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_delegateGrammar_in_delegateGrammars301 = new BitSet(new long[]{0x0000200000000008L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ASSIGN_in_delegateGrammar320 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_delegateGrammar322 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_delegateGrammar324 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ID_in_delegateGrammar335 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKENS_in_tokensSpec352 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_tokenSpec_in_tokensSpec354 = new BitSet(new long[]{0x0000200000000008L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ASSIGN_in_tokenSpec368 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_tokenSpec370 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_tokenSpec372 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ID_in_tokenSpec378 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCOPE_in_attrScope390 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_attrScope392 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_attrScope394 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_AT_in_action407 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_action409 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_action412 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_action414 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULES_in_rules430 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rule_in_rules432 = new BitSet(new long[]{0x0000000000000008L,0x0000000000000100L});
-    public static final BitSet FOLLOW_RULE_in_rule450 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule452 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_rule454 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
-    public static final BitSet FOLLOW_ruleModifiers_in_rule457 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_rule460 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
-    public static final BitSet FOLLOW_ruleReturns_in_rule473 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
-    public static final BitSet FOLLOW_rulePrequel_in_rule476 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
-    public static final BitSet FOLLOW_altListAsBlock_in_rule479 = new BitSet(new long[]{0x0000000600000008L});
-    public static final BitSet FOLLOW_exceptionGroup_in_rule481 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_exceptionHandler_in_exceptionGroup508 = new BitSet(new long[]{0x0000000600000002L});
-    public static final BitSet FOLLOW_finallyClause_in_exceptionGroup511 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CATCH_in_exceptionHandler527 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_exceptionHandler529 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_exceptionHandler531 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_FINALLY_in_finallyClause544 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ACTION_in_finallyClause546 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_throwsSpec_in_rulePrequel563 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleScopeSpec_in_rulePrequel573 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_optionsSpec_in_rulePrequel583 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleAction_in_rulePrequel593 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RETURNS_in_ruleReturns608 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns610 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_THROWS_in_throwsSpec625 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_throwsSpec627 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec644 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec646 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec653 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_ruleScopeSpec655 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
-    public static final BitSet FOLLOW_AT_in_ruleAction669 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_ruleAction671 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_ruleAction673 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULEMODIFIERS_in_ruleModifiers689 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ruleModifier_in_ruleModifiers691 = new BitSet(new long[]{0x0000000070800008L});
+    public static final BitSet FOLLOW_IMPORT_in_delegateGrammars270 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_delegateGrammar_in_delegateGrammars272 = new BitSet(new long[]{0x0000200000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ASSIGN_in_delegateGrammar291 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_delegateGrammar293 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_delegateGrammar295 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_delegateGrammar306 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKENS_in_tokensSpec323 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_tokenSpec_in_tokensSpec325 = new BitSet(new long[]{0x0000200000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ASSIGN_in_tokenSpec339 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_tokenSpec341 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_tokenSpec343 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_tokenSpec349 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SCOPE_in_attrScope361 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_attrScope363 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_attrScope365 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_AT_in_action378 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_action380 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_action383 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_action385 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULES_in_rules401 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rule_in_rules403 = new BitSet(new long[]{0x0000000000000008L,0x0000000000000100L});
+    public static final BitSet FOLLOW_RULE_in_rule421 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_rule423 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_rule425 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
+    public static final BitSet FOLLOW_ruleModifiers_in_rule428 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_rule431 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
+    public static final BitSet FOLLOW_ruleReturns_in_rule444 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
+    public static final BitSet FOLLOW_rulePrequel_in_rule447 = new BitSet(new long[]{0x0800000180284040L,0x0000000000001400L});
+    public static final BitSet FOLLOW_altListAsBlock_in_rule450 = new BitSet(new long[]{0x0000000600000008L});
+    public static final BitSet FOLLOW_exceptionGroup_in_rule452 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_exceptionHandler_in_exceptionGroup479 = new BitSet(new long[]{0x0000000600000002L});
+    public static final BitSet FOLLOW_finallyClause_in_exceptionGroup482 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CATCH_in_exceptionHandler498 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_exceptionHandler500 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_exceptionHandler502 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_FINALLY_in_finallyClause515 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ACTION_in_finallyClause517 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_throwsSpec_in_rulePrequel534 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleScopeSpec_in_rulePrequel544 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_optionsSpec_in_rulePrequel554 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleAction_in_rulePrequel564 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RETURNS_in_ruleReturns579 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns581 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_THROWS_in_throwsSpec596 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_throwsSpec598 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec615 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec617 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec624 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_ruleScopeSpec626 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_AT_in_ruleAction640 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_ruleAction642 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_ruleAction644 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULEMODIFIERS_in_ruleModifiers660 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ruleModifier_in_ruleModifiers662 = new BitSet(new long[]{0x0000000070800008L});
     public static final BitSet FOLLOW_set_in_ruleModifier0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_alternative_in_altList751 = new BitSet(new long[]{0x0000000000000002L,0x0000010000100000L});
-    public static final BitSet FOLLOW_BLOCK_in_altListAsBlock770 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_altList_in_altListAsBlock772 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ALT_REWRITE_in_alternative791 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_alternative_in_alternative793 = new BitSet(new long[]{0x0000000000000000L,0x0000008000400000L});
-    public static final BitSet FOLLOW_rewrite_in_alternative795 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ALT_in_alternative805 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_EPSILON_in_alternative807 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_elements_in_alternative818 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ALT_in_elements836 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_element_in_elements838 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000120001D008L});
-    public static final BitSet FOLLOW_labeledElement_in_element854 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_atom_in_element859 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnf_in_element864 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_element871 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEMPRED_in_element878 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GATED_SEMPRED_in_element883 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_treeSpec_in_element888 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement901 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement903 = new BitSet(new long[]{0xC0D0840000000000L,0x000000100001D008L});
-    public static final BitSet FOLLOW_atom_in_labeledElement906 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_block_in_labeledElement908 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement916 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement918 = new BitSet(new long[]{0xC0D0840000000000L,0x000000100001D008L});
-    public static final BitSet FOLLOW_atom_in_labeledElement921 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_block_in_labeledElement923 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec940 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_element_in_treeSpec942 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000120001D008L});
-    public static final BitSet FOLLOW_blockSuffix_in_ebnf957 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf959 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_block_in_ebnf966 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_blockSuffix983 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_blockSuffix991 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPLIES_in_blockSuffix999 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_blockSuffix1007 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_alternative_in_altList722 = new BitSet(new long[]{0x0000000000000002L,0x0000001000100000L});
+    public static final BitSet FOLLOW_BLOCK_in_altListAsBlock741 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_altList_in_altListAsBlock743 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ALT_REWRITE_in_alternative762 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_alternative_in_alternative764 = new BitSet(new long[]{0x0000000000000000L,0x0000000800400000L});
+    public static final BitSet FOLLOW_rewrite_in_alternative766 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ALT_in_alternative776 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_EPSILON_in_alternative778 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_elements_in_alternative789 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ALT_in_elements807 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_element_in_elements809 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000012001D008L});
+    public static final BitSet FOLLOW_labeledElement_in_element825 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_atom_in_element830 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnf_in_element835 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_element842 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEMPRED_in_element849 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GATED_SEMPRED_in_element854 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_treeSpec_in_element859 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement872 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement874 = new BitSet(new long[]{0xC0D0840000000000L,0x000000010001D008L});
+    public static final BitSet FOLLOW_atom_in_labeledElement877 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_block_in_labeledElement879 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement887 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement889 = new BitSet(new long[]{0xC0D0840000000000L,0x000000010001D008L});
+    public static final BitSet FOLLOW_atom_in_labeledElement892 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_block_in_labeledElement894 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec911 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_element_in_treeSpec913 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000012001D008L});
+    public static final BitSet FOLLOW_blockSuffix_in_ebnf928 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf930 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_block_in_ebnf937 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_blockSuffix954 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_blockSuffix962 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IMPLIES_in_blockSuffix970 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_blockSuffix978 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_ebnfSuffix0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_atom1047 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom1049 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom1056 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom1058 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_atom1065 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom1067 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom1074 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom1076 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_range_in_atom1082 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_atom1088 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom1090 = new BitSet(new long[]{0x4050800000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_terminal_in_atom1092 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOT_in_atom1099 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom1101 = new BitSet(new long[]{0xC0D0800000000000L,0x0000001000000008L});
-    public static final BitSet FOLLOW_ruleref_in_atom1103 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_terminal_in_atom1114 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_atom1124 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet1142 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notTerminal_in_notSet1144 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOT_in_notSet1154 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_notSet1156 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom1018 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom1020 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom1027 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom1029 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom1036 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom1038 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom1045 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom1047 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_range_in_atom1053 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_atom1059 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom1061 = new BitSet(new long[]{0x4050800000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_terminal_in_atom1063 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOT_in_atom1070 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom1072 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
+    public static final BitSet FOLLOW_ruleref_in_atom1074 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_terminal_in_atom1085 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_atom1095 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet1113 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notTerminal_in_notSet1115 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOT_in_notSet1125 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_notSet1127 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_notTerminal0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BLOCK_in_block1200 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_optionsSpec_in_block1202 = new BitSet(new long[]{0x0800000100290000L,0x0000010000100000L});
-    public static final BitSet FOLLOW_ruleAction_in_block1205 = new BitSet(new long[]{0x0800000100290000L,0x0000010000100000L});
-    public static final BitSet FOLLOW_ACTION_in_block1208 = new BitSet(new long[]{0x0800000100290000L,0x0000010000100000L});
-    public static final BitSet FOLLOW_altList_in_block1211 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_ruleref1230 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref1232 = new BitSet(new long[]{0x0000000000004008L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref1234 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_ruleref1245 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref1247 = new BitSet(new long[]{0x0000000000004008L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref1249 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref1260 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref1262 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RANGE_in_range1282 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rangeElement_in_range1284 = new BitSet(new long[]{0xC000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rangeElement_in_range1286 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BLOCK_in_block1171 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_optionsSpec_in_block1173 = new BitSet(new long[]{0x0800000100290000L,0x0000001000100000L});
+    public static final BitSet FOLLOW_ruleAction_in_block1176 = new BitSet(new long[]{0x0800000100290000L,0x0000001000100000L});
+    public static final BitSet FOLLOW_ACTION_in_block1179 = new BitSet(new long[]{0x0800000100290000L,0x0000001000100000L});
+    public static final BitSet FOLLOW_altList_in_block1182 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_ruleref1201 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref1203 = new BitSet(new long[]{0x0000000000004008L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref1205 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_ruleref1216 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref1218 = new BitSet(new long[]{0x0000000000004008L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref1220 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref1231 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref1233 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RANGE_in_range1253 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rangeElement_in_range1255 = new BitSet(new long[]{0xC000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rangeElement_in_range1257 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_rangeElement0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal1339 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal1341 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal1350 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1359 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal1361 = new BitSet(new long[]{0x0000000000000000L,0x0000004000000000L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal1363 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1373 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal1375 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1385 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal1387 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1396 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_WILDCARD_in_terminal1405 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal1407 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_WILDCARD_in_terminal1416 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal1425 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal1427 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_terminal1437 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal1439 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ELEMENT_OPTIONS_in_elementOptions1458 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_elementOption_in_elementOptions1460 = new BitSet(new long[]{0x0000200000000008L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_elementOption1479 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_elementOption1490 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_elementOption1492 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_elementOption1494 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ASSIGN_in_elementOption1506 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_elementOption1508 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption1510 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_predicatedRewrite_in_rewrite1525 = new BitSet(new long[]{0x0000000000000000L,0x0000008000400000L});
-    public static final BitSet FOLLOW_nakedRewrite_in_rewrite1528 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ST_RESULT_in_predicatedRewrite1540 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_SEMPRED_in_predicatedRewrite1542 = new BitSet(new long[]{0x0100000800010000L,0x0000000000180000L});
-    public static final BitSet FOLLOW_rewriteAlt_in_predicatedRewrite1544 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RESULT_in_predicatedRewrite1551 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_SEMPRED_in_predicatedRewrite1553 = new BitSet(new long[]{0x0100000800010000L,0x0000000000180000L});
-    public static final BitSet FOLLOW_rewriteAlt_in_predicatedRewrite1555 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ST_RESULT_in_nakedRewrite1569 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteAlt_in_nakedRewrite1571 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RESULT_in_nakedRewrite1578 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteAlt_in_nakedRewrite1580 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteTemplate_in_rewriteAlt1596 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteAlt1604 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ETC_in_rewriteAlt1612 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_EPSILON_in_rewriteAlt1620 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ALT_in_rewriteTreeAlt1639 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTreeAlt1641 = new BitSet(new long[]{0xC400000000010008L,0x000000010001C008L});
-    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTreeElement1657 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTree_in_rewriteTreeElement1662 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement1669 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_rewriteTreeAtom1686 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_rewriteTreeAtom1688 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_rewriteTreeAtom1696 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_REF_in_rewriteTreeAtom1706 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_rewriteTreeAtom1713 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LABEL_in_rewriteTreeAtom1720 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteTreeAtom1725 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeEbnf1737 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_REWRITE_BLOCK_in_rewriteTreeEbnf1740 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf1742 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_rewriteTree1755 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTree1757 = new BitSet(new long[]{0xC400000000010008L,0x000000010001C008L});
-    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTree1759 = new BitSet(new long[]{0xC400000000010008L,0x000000010001C008L});
-    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate1774 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1776 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate1779 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate1786 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1788 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate1791 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteTemplateRef_in_rewriteTemplate1797 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate1802 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteTemplate1807 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplateRef1819 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rewriteTemplateRef1821 = new BitSet(new long[]{0x0000000000000008L,0x0000000002000000L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef1823 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TEMPLATE_in_rewriteIndirectTemplateHead1837 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteIndirectTemplateHead1839 = new BitSet(new long[]{0x0000000000000008L,0x0000000002000000L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead1841 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ARGLIST_in_rewriteTemplateArgs1855 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs1857 = new BitSet(new long[]{0x0000000000000008L,0x0000000001000000L});
-    public static final BitSet FOLLOW_ARG_in_rewriteTemplateArg1873 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rewriteTemplateArg1875 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteTemplateArg1877 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal1310 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal1312 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal1321 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1330 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal1332 = new BitSet(new long[]{0x0000000000000000L,0x0000000400000000L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal1334 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1344 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal1346 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1356 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal1358 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal1367 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WILDCARD_in_terminal1376 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal1378 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_WILDCARD_in_terminal1387 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_terminal1396 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal1398 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_terminal1408 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal1410 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ELEMENT_OPTIONS_in_elementOptions1429 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_elementOption_in_elementOptions1431 = new BitSet(new long[]{0x0000200000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_elementOption1450 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_elementOption1461 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_elementOption1463 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_elementOption1465 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_elementOption1477 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_elementOption1479 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption1481 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_predicatedRewrite_in_rewrite1496 = new BitSet(new long[]{0x0000000000000000L,0x0000000800400000L});
+    public static final BitSet FOLLOW_nakedRewrite_in_rewrite1499 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ST_RESULT_in_predicatedRewrite1511 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_SEMPRED_in_predicatedRewrite1513 = new BitSet(new long[]{0x0100000800010000L,0x0000000000180000L});
+    public static final BitSet FOLLOW_rewriteAlt_in_predicatedRewrite1515 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RESULT_in_predicatedRewrite1522 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_SEMPRED_in_predicatedRewrite1524 = new BitSet(new long[]{0x0100000800010000L,0x0000000000180000L});
+    public static final BitSet FOLLOW_rewriteAlt_in_predicatedRewrite1526 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ST_RESULT_in_nakedRewrite1540 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteAlt_in_nakedRewrite1542 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RESULT_in_nakedRewrite1549 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteAlt_in_nakedRewrite1551 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteTemplate_in_rewriteAlt1567 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteAlt1575 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ETC_in_rewriteAlt1583 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_EPSILON_in_rewriteAlt1591 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ALT_in_rewriteTreeAlt1610 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTreeAlt1612 = new BitSet(new long[]{0xC400000000010008L,0x000000001001C008L});
+    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTreeElement1628 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTree_in_rewriteTreeElement1633 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement1640 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_rewriteTreeAtom1657 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_rewriteTreeAtom1659 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_rewriteTreeAtom1667 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_REF_in_rewriteTreeAtom1677 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_rewriteTreeAtom1684 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LABEL_in_rewriteTreeAtom1691 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteTreeAtom1696 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeEbnf1708 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_REWRITE_BLOCK_in_rewriteTreeEbnf1711 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf1713 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_rewriteTree1726 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTree1728 = new BitSet(new long[]{0xC400000000010008L,0x000000001001C008L});
+    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTree1730 = new BitSet(new long[]{0xC400000000010008L,0x000000001001C008L});
+    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate1745 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1747 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate1750 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate1757 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate1759 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate1762 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteTemplateRef_in_rewriteTemplate1768 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate1773 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteTemplate1778 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplateRef1790 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_rewriteTemplateRef1792 = new BitSet(new long[]{0x0000000000000008L,0x0000000002000000L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef1794 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TEMPLATE_in_rewriteIndirectTemplateHead1808 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteIndirectTemplateHead1810 = new BitSet(new long[]{0x0000000000000008L,0x0000000002000000L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead1812 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ARGLIST_in_rewriteTemplateArgs1826 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs1828 = new BitSet(new long[]{0x0000000000000008L,0x0000000001000000L});
+    public static final BitSet FOLLOW_ARG_in_rewriteTemplateArg1844 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_rewriteTemplateArg1846 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteTemplateArg1848 = new BitSet(new long[]{0x0000000000000008L});
 
 }

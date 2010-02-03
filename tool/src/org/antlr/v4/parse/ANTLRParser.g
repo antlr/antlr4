@@ -78,10 +78,10 @@ tokens {
     ARG;
     ARGLIST;
     RET;
-    LEXER_GRAMMAR;
-    PARSER_GRAMMAR;
-    TREE_GRAMMAR;
-    COMBINED_GRAMMAR;
+    //LEXER_GRAMMAR;
+ //   PARSER_GRAMMAR;
+//    TREE_GRAMMAR;
+//    COMBINED_GRAMMAR;
     INITACTION;
     LABEL;                // $x used in rewrite rules
     TEMPLATE;
@@ -216,7 +216,22 @@ grammarType
        )
     ;
     */
-    
+grammarType
+@after {
+	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
+	else ((GrammarRootAST)$tree).grammarType=GRAMMAR;
+}
+    :	(	t=LEXER g=GRAMMAR  -> GRAMMAR<GrammarRootAST>[$g, "LEXER_GRAMMAR"]          
+		| // A standalone parser specification
+		  	t=PARSER g=GRAMMAR -> GRAMMAR<GrammarRootAST>[$g, "PARSER_GRAMMAR"]
+		  
+		| // A standalone tree parser specification
+		  	t=TREE g=GRAMMAR   -> GRAMMAR<GrammarRootAST>[$g, "TREE_GRAMMAR"]
+		  
+		// A combined lexer and parser specification
+		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]                  
+		)
+    ;
     
 // This is the list of all constructs that can be declared before
 // the set of rules that compose the grammar, and is invoked 0..n
@@ -250,7 +265,7 @@ prequelConstruct
 
 // A list of options that affect analysis and/or code generation
 optionsSpec
-	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "options"] option+)
+	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "OPTIONS"] option+)
     ;
         
 option

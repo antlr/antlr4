@@ -97,25 +97,31 @@ bottomup // do these "inside to outside" of expressions.
 	|	ruleref
 	|	tokenRefWithArgs
 	|	elementOption
-	|	checkGrammarOptions // do after we see all options
+	|	checkGrammarOptions // do after we see everything
 	;
 
 grammarSpec
-    :   ^(grammarType ID DOC_COMMENT? prequelConstructs (^(RULE .*))*)
+    :   ^(GRAMMAR ID DOC_COMMENT? prequelConstructs ^(RULES .*))
     	{
     	name = $ID.text;
     	BasicSemanticChecks.checkGrammarName($ID.token);
+    	gtype = ((GrammarRootAST)$start).grammarType;
+    	root = (GrammarRootAST)$start;
     	}
 	;
 
-checkGrammarOptions //(COMBINED_GRAMMAR A (options 
-	:	OPTIONS
+checkGrammarOptions // when we get back to root
+	:	GRAMMAR
+		{BasicSemanticChecks.checkTreeFilterOptions(gtype, (GrammarRootAST)$GRAMMAR,
+												    root.getOptions());}
 	;
-	
+
+/*
 grammarType
 @init {gtype = $start.getType(); root = (GrammarASTWithOptions)$start;}
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
+    */
 
 prequelConstructs
 	:	(	^(o+=OPTIONS .*)

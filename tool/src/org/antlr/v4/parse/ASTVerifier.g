@@ -108,12 +108,14 @@ public void traceIn(String ruleName, int ruleIndex)  {
 }
 
 grammarSpec
-    :   ^(grammarType ID DOC_COMMENT? prequelConstruct* rules)
+    :   ^(GRAMMAR ID DOC_COMMENT? prequelConstruct* rules)
 	;
 	
+/*
 grammarType
     :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
     ;
+    */
 
 prequelConstruct
 	:   optionsSpec

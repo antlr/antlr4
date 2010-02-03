@@ -3,10 +3,7 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.RuleAST;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
@@ -117,11 +114,11 @@ public class BasicSemanticChecks {
 
     protected static void checkInvalidRuleDef(int gtype, Token ruleID) {
         String fileName = ruleID.getInputStream().getSourceName();
-        if ( gtype==ANTLRParser.LEXER_GRAMMAR && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
+        if ( gtype==ANTLRParser.LEXER && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
             ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
                                       fileName, ruleID, ruleID.getText());
         }
-        if ( (gtype==ANTLRParser.PARSER_GRAMMAR||gtype==ANTLRParser.TREE_GRAMMAR) &&
+        if ( (gtype==ANTLRParser.PARSER||gtype==ANTLRParser.TREE) &&
              Character.isUpperCase(ruleID.getText().charAt(0)) )
         {
             ErrorManager.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
@@ -132,7 +129,7 @@ public class BasicSemanticChecks {
     // todo: get filename from stream via token?
     protected static void checkInvalidRuleRef(int gtype, Token ruleID) {
         String fileName = ruleID.getInputStream().getSourceName();
-        if ( gtype==ANTLRParser.LEXER_GRAMMAR && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
+        if ( gtype==ANTLRParser.LEXER && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
             ErrorManager.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
                                       fileName, ruleID, ruleID.getText());
         }
@@ -146,7 +143,7 @@ public class BasicSemanticChecks {
                                       tokenID,
                                       tokenID.getText());
         }
-        if ( gtype==ANTLRParser.LEXER_GRAMMAR ) {
+        if ( gtype==ANTLRParser.LEXER ) {
             ErrorManager.grammarError(ErrorType.CANNOT_ALIAS_TOKENS_IN_LEXER,
                                       fileName,
                                       tokenID,
@@ -160,7 +157,7 @@ public class BasicSemanticChecks {
      */
     protected static void checkTokenArgs(int gtype, Token tokenID) {
         String fileName = tokenID.getInputStream().getSourceName();
-        if ( gtype!=ANTLRParser.LEXER_GRAMMAR ) {
+        if ( gtype!=ANTLRParser.LEXER ) {
             ErrorManager.grammarError(ErrorType.ARGS_ON_TOKEN_REF,
                                       fileName, tokenID, tokenID.getText());
         }
@@ -172,7 +169,7 @@ public class BasicSemanticChecks {
     {
         String fileName = optionID.getInputStream().getSourceName();
         if ( parent.getType()==ANTLRParser.BLOCK ) {
-            if ( !legalBlockOptions.contains(optionID.getText()) ) { // grammar
+            if ( !legalBlockOptions.contains(optionID.getText()) ) { // block
                 ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                           fileName,
                                           optionID,
@@ -181,7 +178,7 @@ public class BasicSemanticChecks {
             }
         }
         else if ( parent.getType()==ANTLRParser.RULE ) {
-            if ( !legalRuleOptions.contains(optionID.getText()) ) { // grammar
+            if ( !legalRuleOptions.contains(optionID.getText()) ) { // rule
                 ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                           fileName,
                                           optionID,
@@ -189,7 +186,8 @@ public class BasicSemanticChecks {
                 return false;
             }
         }
-        else if ( !legalGrammarOption(gtype, optionID.getText()) ) { // grammar
+        else if ( parent.getType()==ANTLRParser.GRAMMAR &&
+                  !legalGrammarOption(gtype, optionID.getText()) ) { // grammar
             ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                       fileName,
                                       optionID,
@@ -230,11 +228,11 @@ public class BasicSemanticChecks {
 
     public static boolean legalGrammarOption(int gtype, String key) {
         switch ( gtype ) {
-            case ANTLRParser.LEXER_GRAMMAR :
+            case ANTLRParser.LEXER :
                 return legalLexerOptions.contains(key);
-            case ANTLRParser.PARSER_GRAMMAR :
+            case ANTLRParser.PARSER :
                 return legalParserOptions.contains(key);
-            case ANTLRParser.TREE_GRAMMAR :
+            case ANTLRParser.TREE :
                 return legalTreeParserOptions.contains(key);
             default :
                 return legalParserOptions.contains(key);
@@ -251,7 +249,7 @@ public class BasicSemanticChecks {
                                                                 Token altStart,
                                                                 int alt)
     {
-        if ( gtype==ANTLRParser.TREE_GRAMMAR &&
+        if ( gtype==ANTLRParser.TREE &&
              options!=null && options.get("output").equals("template") &&
              options.get("rewrite").equals("true") )
         {
@@ -287,14 +285,16 @@ public class BasicSemanticChecks {
         }
     }
 
-    /*
-    protected static void checkTreeFilterOptions(int gtype, Map<String, String> options) {
+    protected static void checkTreeFilterOptions(int gtype, GrammarRootAST root,
+                                                 Map<String, String> options)
+    {
+        String fileName = root.token.getInputStream().getSourceName();
         String filter = options.get("filter");
-        if ( gtype==ANTLRParser.TREE_GRAMMAR && filter!=null && filter.equals("true") ) {
+        if ( gtype==ANTLRParser.TREE && filter!=null && filter.equals("true") ) {
             // check for conflicting options
-            // filter => backtrack=true
-            // filter&&output=AST => rewrite=true
+            // filter => backtrack=true (can't be false)
             // filter&&output!=AST => error
+            // filter&&output=AST => rewrite=true
             // any deviation from valid option set is an error
             String backtrack = options.get("backtrack");
             String output = options.get("output");
@@ -302,27 +302,24 @@ public class BasicSemanticChecks {
             if ( backtrack!=null && !backtrack.toString().equals("true") ) {
                 ErrorManager.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
                                           fileName,
+                                          root.token,
                                           "backtrack", backtrack);
             }
-            if ( output!=null && !output.toString().equals("AST") ) {
-                ErrorManager.error(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
-                                   "output", output);
-                setOption("output", "", null);
+            if ( output!=null && !output.equals("AST") ) {
+                ErrorManager.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
+                                          fileName,
+                                          root.token,
+                                          "output", output);
             }
-            if ( rewrite!=null && !rewrite.toString().equals("true") ) {
-                ErrorManager.error(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
-                                   "rewrite", rewrite);
+            else if ( rewrite!=null && !rewrite.equals("true") ) { // && AST output
+                ErrorManager.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
+                                          fileName,
+                                          root.token,
+                                          "rewrite", rewrite);
             }
-            // set options properly
-            setOption("backtrack", "true", null);
-            if ( output!=null && output.toString().equals("AST") ) {
-                setOption("rewrite", "true", null);
-            }
-            // @synpredgate set to state.backtracking==1 by code gen when filter=true
-            // superClass set in template target::treeParser
         }
     }
-*/
+
     protected static void checkFOO(int gtype, Token ID) {
     }
 }
