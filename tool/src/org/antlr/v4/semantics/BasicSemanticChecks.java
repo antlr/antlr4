@@ -2,17 +2,35 @@ package org.antlr.v4.semantics;
 
 import org.antlr.misc.MultiMap;
 import org.antlr.runtime.Token;
-import org.antlr.tool.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
 
+import java.io.File;
 import java.util.*;
 
-/** No side-effects */
+/** No side-effects; BasicSemanticTriggers.g invokes check rules for these:
+ *
+ * FILE_AND_GRAMMAR_NAME_DIFFER
+ * LEXER_RULES_NOT_ALLOWED
+ * PARSER_RULES_NOT_ALLOWED
+ * CANNOT_ALIAS_TOKENS_IN_LEXER
+ * ARGS_ON_TOKEN_REF
+ * ILLEGAL_OPTION
+ * REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION
+ * NO_RULES
+ * REWRITE_FOR_MULTI_ELEMENT_ALT
+ * HETERO_ILLEGAL_IN_REWRITE_ALT
+ * AST_OP_WITH_NON_AST_OUTPUT_OPTION
+ * AST_OP_IN_ALT_WITH_REWRITE
+ * CONFLICTING_OPTION_IN_TREE_FILTER
+ * WILDCARD_AS_ROOT
+ * INVALID_IMPORT
+ * TOKEN_VOCAB_IN_DELEGATE
+ * IMPORT_NAME_CLASH
+ * REPEATED_PREQUEL
+ * TOKEN_NAMES_MUST_START_UPPER
+ */
 public class BasicSemanticChecks {
     public static final Set legalLexerOptions =
             new HashSet() {
@@ -99,7 +117,9 @@ public class BasicSemanticChecks {
     // TODO: track errors?
     
     protected static void checkGrammarName(Token nameToken) {
-        String fileName = nameToken.getInputStream().getSourceName();
+        String fullyQualifiedName = nameToken.getInputStream().getSourceName();
+        File f = new File(fullyQualifiedName);
+        String fileName = f.getName();
         if ( !Utils.stripFileExtension(fileName).equals(nameToken.getText()) ) {
             ErrorManager.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,
                                       fileName, nameToken, nameToken.getText(), fileName);
@@ -383,9 +403,5 @@ public class BasicSemanticChecks {
                                       importID,
                                       g, delegate);
         }
-    }
-
-    protected static void checkFOO(int gtype, Token ID) {
-
     }
 }

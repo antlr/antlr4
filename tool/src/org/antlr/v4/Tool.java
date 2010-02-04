@@ -1,10 +1,14 @@
 package org.antlr.v4;
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRLexer;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.semantics.SemanticsPipeline;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarRootAST;
 
 import java.io.File;
 import java.io.IOException;
@@ -291,23 +295,33 @@ public class Tool {
     }
 
     public Grammar load(String fileName) {
-        Grammar g = null;
+        ANTLRFileStream in = null;
         try {
-            ANTLRFileStream in = new ANTLRFileStream(fileName);
-            ANTLRLexer lexer = new ANTLRLexer(in);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            ANTLRParser p = new ANTLRParser(tokens);
-
-            p.setTreeAdaptor(new GrammarASTAdaptor(in));
-            ParserRuleReturnScope r = p.grammarSpec();
-            GrammarRootAST t = (GrammarRootAST) r.getTree();
-            if ( internalOption_PrintGrammarTree ) System.out.println(t.toStringTree());
-            g = new Grammar(this, t);
-            g.fileName = fileName;
-            grammars.put(g.name, g);
+            in = new ANTLRFileStream(fileName);
         }
         catch (IOException ioe) {
             ErrorManager.toolError(ErrorType.CANNOT_OPEN_FILE, fileName, ioe);
+        }
+        Grammar g = load(in);
+        g.fileName = fileName;
+        return g;
+    }
+
+    public Grammar loadFromString(String grammar) {
+        Grammar g = load(new ANTLRStringStream(grammar));
+        g.fileName = "<string>";
+        return g;
+    }
+
+    public Grammar load(CharStream in) {
+        Grammar g = null;
+        try {
+            ANTLRLexer lexer = new ANTLRLexer(in);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            ANTLRParser p = new ANTLRParser(tokens);
+            p.setTreeAdaptor(new GrammarASTAdaptor(in));
+            ParserRuleReturnScope r = p.grammarSpec();
+            g = new Grammar(this, (GrammarRootAST)r.getTree());
         }
         catch (RecognitionException re) {
             // TODO: do we gen errors now?
@@ -319,7 +333,9 @@ public class Tool {
     public void process() {
         // testing parser
         Grammar g = load(grammarFileNames.get(0));
+        grammars.put(g.name, g);        
         g.loadImportedGrammars();
+        if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
         //g.ast.inspect();
         SemanticsPipeline sem = new SemanticsPipeline();
         sem.process(g);

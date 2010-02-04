@@ -27,17 +27,19 @@
  */
 package org.antlr.v4.test;
 
-import org.antlr.tool.ANTLRErrorListener;
-import org.antlr.tool.Message;
-import org.antlr.tool.ToolMessage;
+import org.antlr.v4.misc.Utils;
+import org.antlr.v4.tool.ANTLRErrorListener;
+import org.antlr.v4.tool.Message;
+import org.antlr.v4.tool.ToolMessage;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.LinkedList;
 
 public class ErrorQueue implements ANTLRErrorListener {
-	List infos = new LinkedList();
-	List errors = new LinkedList();
-	List warnings = new LinkedList();
+	public List<String> infos = new ArrayList<String>();
+	public List<Message> errors = new ArrayList<Message>();
+	public List<Message> warnings = new ArrayList<Message>();
+    public List<Message> all = new ArrayList<Message>();
 
 	public void info(String msg) {
 		infos.add(msg);
@@ -45,24 +47,23 @@ public class ErrorQueue implements ANTLRErrorListener {
 
 	public void error(Message msg) {
 		errors.add(msg);
+        all.add(msg);
 	}
 
 	public void warning(Message msg) {
 		warnings.add(msg);
+        all.add(msg);
 	}
 
 	public void error(ToolMessage msg) {
 		errors.add(msg);
+        all.add(msg);
 	}
 
 	public int size() {
-		return infos.size() + errors.size() + warnings.size();
+		return all.size() + infos.size();
 	}
 
-	public String toString() {
-		return "infos: "+infos+
-			"errors: "+errors+
-			"warnings: "+warnings;
-	}
+	public String toString() { return Utils.join(all.iterator(), "\n"); }
 }
 

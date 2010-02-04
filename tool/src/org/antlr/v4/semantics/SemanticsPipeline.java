@@ -1,18 +1,11 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
-import org.antlr.runtime.tree.TreeVisitor;
-import org.antlr.runtime.tree.TreeVisitorAction;
-import org.antlr.v4.Tool;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarASTWithOptions;
 
 /** */
 public class SemanticsPipeline {
@@ -35,12 +28,16 @@ public class SemanticsPipeline {
         BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
         basics.downup(g.ast);
 
-        // NOW DO DELEGATES (IF ANY)
+        // NOW DO BASIC / EASY SEMANTIC CHECKS FOR DELEGATES (IF ANY)
         if ( g.getImportedGrammars()!=null ) {
             for (Grammar d : g.getImportedGrammars()) {
                 process(d);
             }
         }
+
+        // DEFINE SYMBOLS
+
+        // ASSIGN TOKEN TYPES
 
         /* dump options
         TreeVisitor v = new TreeVisitor(adaptor);

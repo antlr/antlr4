@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-02-03 11:08:45
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-02-03 15:37:27
 
 /*
  [The "BSD licence"]
@@ -31,11 +31,6 @@ package org.antlr.v4.parse;
 
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 /** Read in an ANTLR grammar and build an AST.  Try not to do
  *  any actions, just build the tree.
  *

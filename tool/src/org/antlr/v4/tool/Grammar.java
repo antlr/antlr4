@@ -1,9 +1,13 @@
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 
 import java.util.*;
 
@@ -41,15 +45,18 @@ public class Grammar {
     }
     
     /** For testing */
-    public Grammar(String grammarText) throws RecognitionException {
+    public Grammar(String fileName, String grammarText) throws RecognitionException {
         this.text = grammarText;
         ANTLRStringStream in = new ANTLRStringStream(grammarText);
+        in.name = fileName;
         ANTLRLexer lexer = new ANTLRLexer(in);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ANTLRParser p = new ANTLRParser(tokens);
+        p.setTreeAdaptor(new GrammarASTAdaptor(in));
         ParserRuleReturnScope r = p.grammarSpec();
-        ast = (GrammarRootAST) r.getTree();
-        System.out.println(ast.toStringTree());
+        ast = (GrammarRootAST)r.getTree();
+        this.name = ((GrammarAST)ast.getChild(0)).getText();
+        this.fileName = fileName;
     }
 
     public void loadImportedGrammars() {

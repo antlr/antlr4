@@ -1,6 +1,5 @@
 package org.antlr.v4.tool;
 
-import org.antlr.Tool;
 import org.antlr.runtime.Token;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
@@ -57,10 +56,6 @@ public class ErrorManager {
     private static Locale locale;
     private static String formatName;
 
-    // TODO: make thread local to hold this state
-    public static int errors;
-    public static int warnings;
-
     static ANTLRErrorListener theDefaultErrorListener = new ANTLRErrorListener() {
         public void info(String msg) {
             if (formatWantsSingleLineMessage()) {
@@ -109,8 +104,18 @@ public class ErrorManager {
     public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
     public static final String MESSAGES_DIR = "org/antlr/v4/tool/templates/messages/languages/";
 
+    private static class ErrorState {
+        public ANTLRErrorListener listener;
+        public int errors;
+        public int warnings;
+    }
+
+    private static ThreadLocal<ErrorState> state = new ThreadLocal<ErrorState>();
+
     // make sure that this class is ready to use after loading
     static {
+        state.set(new ErrorState());
+        setErrorListener(theDefaultErrorListener);
         org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
         // it is inefficient to set the default locale here if another
         // piece of code is going to set the locale, but that would
@@ -123,9 +128,11 @@ public class ErrorManager {
         setFormat("antlr");
         org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);        
     }
+
+
   
     public static ANTLRErrorListener getErrorListener() {
-        return theDefaultErrorListener;
+        return state.get().listener;
     }    
 
     /** Return a StringTemplate that refers to the current format used for
@@ -160,14 +167,14 @@ public class ErrorManager {
     }
 
     public static void internalError(String error, Throwable e) {
-        errors++;
+        state.get().errors++;
         StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
         String msg = "Exception "+e+"@"+location+": "+error;
         System.err.println("internal error: "+msg);
     }
 
     public static void internalError(String error) {
-        errors++;
+        state.get().errors++;
         StackTraceElement location =
             getLastNonErrorManagerCodeLocation(new Exception());
         String msg = location+": "+error;
@@ -181,8 +188,8 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public static void toolError(ErrorType errorType, Object... args) {
-        errors++;
-        theDefaultErrorListener.error(new ToolMessage(errorType, args));
+        state.get().errors++;
+        state.get().listener.error(new ToolMessage(errorType, args));
 	}
 
     /**
@@ -217,9 +224,9 @@ public class ErrorManager {
                                     Token token,
                                     Object... args)
     {
-        errors++;
+        state.get().errors++;
         Message msg = new GrammarSemanticsMessage(etype,g,token,args);
-        theDefaultErrorListener.error(msg);
+        state.get().listener.error(msg);
     }
 
     public static void grammarError(ErrorType etype,
@@ -227,9 +234,9 @@ public class ErrorManager {
                                     Token token,
                                     Object... args)
     {
-        errors++;
+        state.get().errors++;
         Message msg = new GrammarSemanticsMessage(etype,fileName,token,args);
-        theDefaultErrorListener.error(msg);
+        state.get().listener.error(msg);
     }
 
     public static void grammarWarning(ErrorType etype,
@@ -237,9 +244,9 @@ public class ErrorManager {
                                       Token token,
                                       Object... args)
     {
-        warnings++;
+        state.get().warnings++;
         Message msg = new GrammarSemanticsMessage(etype,fileName,token,args);
-        theDefaultErrorListener.warning(msg);
+        state.get().listener.warning(msg);
     }
 
     /** Process a new message by sending it on to the error listener associated with the current thread
@@ -249,7 +256,7 @@ public class ErrorManager {
     }
 
     public static int getNumErrors() {
-        return errors;
+        return state.get().errors;
     }
 
     /** Return first non ErrorManager code location for generating messages */
@@ -264,6 +271,17 @@ public class ErrorManager {
         }
         StackTraceElement location = stack[i];
         return location;
+    }
+
+    /** In general, you'll want all errors to go to a single spot.
+     *  However, in a GUI, you might have two frames up with two
+     *  different grammars.  Two threads might launch to process the
+     *  grammars--you would want errors to go to different objects
+     *  depending on the thread.  I store a single listener per
+     *  thread.
+     */
+    public static void setErrorListener(ANTLRErrorListener l) {
+        state.get().listener = l;
     }
 
     // S U P P O R T  C O D E

@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-03 13:08:25
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-03 15:37:39
 
 /*
  [The "BSD license"]
@@ -26,15 +26,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.semantics;
-import org.antlr.v4.tool.*;
-
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;import java.util.Stack;
-import java.util.List;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
+import org.antlr.v4.tool.*;
+
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.List;
 /** Triggers for the basic semantics of the input.  Side-effects:
  *  Set token, block, rule options in the tree.  Load field option
  *  with grammar options. Only legal options are set.
