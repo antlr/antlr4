@@ -36,6 +36,9 @@ public class SemanticsPipeline {
         }
 
         // DEFINE SYMBOLS
+        nodes.reset();
+        DefineSymbolTriggers sym = new DefineSymbolTriggers(nodes,g);
+        sym.downup(g.ast);
 
         // ASSIGN TOKEN TYPES
 

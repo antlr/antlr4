@@ -372,10 +372,13 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
-    :   ^(TOKEN_REF ARG_ACTION)
+    :   ^(TOKEN_REF elementOptions ARG_ACTION)
+    |   ^(TOKEN_REF elementOptions)
+    |   ^(TOKEN_REF ARG_ACTION)
 	|   TOKEN_REF
     |   RULE_REF
-	|   STRING_LITERAL
+	|   ^(STRING_LITERAL elementOptions)
+	|   STRING_LITERAL 
 	|   LABEL
 	|	ACTION
 	;

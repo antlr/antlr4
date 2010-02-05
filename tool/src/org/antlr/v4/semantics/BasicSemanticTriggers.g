@@ -175,12 +175,14 @@ tokenAlias
 	;
 
 tokenRefWithArgs
-	:	^(TOKEN_REF ARG_ACTION)
+	:	{!inContext("RESULT ...")}? // if not on right side of ->
+    	^(TOKEN_REF ARG_ACTION)
 		{BasicSemanticChecks.checkTokenArgs(g.getType(), $TOKEN_REF.token);}
 	;
 	
 elementOption
-    :	^(	ELEMENT_OPTIONS
+    :	{!inContext("RESULT ...")}? // not on right side of ->
+    	^(	ELEMENT_OPTIONS
 	    	(	^(ASSIGN o=ID value=ID)
 		   	|   ^(ASSIGN o=ID value=STRING_LITERAL)
  		   	|	o=ID

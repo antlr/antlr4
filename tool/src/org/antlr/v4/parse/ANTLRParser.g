@@ -834,8 +834,7 @@ rewriteTreeAlt
 
 rewriteTreeElement
 	:	rewriteTreeAtom
-	|	rewriteTreeAtom ebnfSuffix
-		-> ^( ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTreeAtom)) )
+	|	rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTreeAtom)) )
 	|   rewriteTree
 		(	ebnfSuffix
 			-> ^(ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTree)) )
@@ -845,9 +844,9 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
-    :   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION?) // for imaginary nodes
+    :   TOKEN_REF elementOptions? ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> elementOptions? ARG_ACTION?) // for imaginary nodes
     |   RULE_REF
-	|   STRING_LITERAL<TerminalAST>
+	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	|   DOLLAR id -> LABEL[$DOLLAR,$id.text] // reference to a label in a rewrite rule
 	|	ACTION
 	;
