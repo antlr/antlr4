@@ -28,6 +28,9 @@ public class SemanticsPipeline {
         BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
         basics.downup(g.ast);
 
+        // don't continue if we get errors in this basic check
+        if ( false ) return;
+
         // NOW DO BASIC / EASY SEMANTIC CHECKS FOR DELEGATES (IF ANY)
         if ( g.getImportedGrammars()!=null ) {
             for (Grammar d : g.getImportedGrammars()) {
@@ -35,10 +38,15 @@ public class SemanticsPipeline {
             }
         }
 
+        // CHECK FOR SYMBOL COLLISIONS
         // DEFINE SYMBOLS
         nodes.reset();
-        DefineSymbolTriggers sym = new DefineSymbolTriggers(nodes,g);
+        CollectSymbols sym = new CollectSymbols(nodes,g);
         sym.downup(g.ast);
+        System.out.println("rules="+sym.rules);
+        System.out.println("terminals="+sym.terminals);
+        System.out.println("aliases="+sym.aliases);
+        System.out.println("aliases="+sym.actions);
 
         // ASSIGN TOKEN TYPES
 

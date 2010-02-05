@@ -27,7 +27,7 @@
 /** Triggers for defining rules, tokens, scopes, and actions.
  *  Side-effects: ...
  */
-tree grammar DefineSymbolTriggers;
+tree grammar CollectSymbols;
 options {
 	language      = Java;
 	tokenVocab    = ANTLRParser;
@@ -68,31 +68,79 @@ import org.antlr.v4.tool.*;
 }
 
 @members {
+Rule currentRule = null;
+public List<Rule> rules = new ArrayList<Rule>();
+public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
+public List<GrammarAST> aliases = new ArrayList<GrammarAST>();
+public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
+public List<GrammarAST> actions = new ArrayList<GrammarAST>();
 Grammar g; // which grammar are we checking
-public DefineSymbolTriggers(TreeNodeStream input, Grammar g) {
+public CollectSymbols(TreeNodeStream input, Grammar g) {
 	this(input);
 	this.g = g;
 }
 }
 
 topdown
-    :	tokenAlias
+    :	globalScope
+    |	action
+    |	tokenAlias
     |	rule
+    |	ruleArg
+    |	ruleReturns
     |	terminal
 	;
 
-tokenAlias
-	:	{inContext("TOKENS")}? ^(ASSIGN ID STRING_LITERAL)
-		{System.out.println("token alias "+$ID.text+"="+$STRING_LITERAL.token);}
+bottomup
+	:	finishRule
 	;
 
-rule:   ^( RULE r=ID .*) {System.out.println("rule "+$r.token);} //{DefineSymbols.checkInvalidRuleDef(g.getType(), $r.token);}
+globalScope
+	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION) {scopes.add($ID);}
+	;
+
+action
+	:	{inContext("GRAMMAR")}? ^(AT sc=ID? ID ACTION)
+		{actions.add($AT);}
+	;
+
+tokenAlias
+	:	{inContext("TOKENS")}?
+		(	^(ASSIGN t=ID STRING_LITERAL) {terminals.add($t); aliases.add($ASSIGN);}
+		|	t=ID						  {terminals.add($t);}
+		)
+	;
+
+rule:   ^( RULE name=ID .+)
+		{
+		Rule r = new Rule($name.text, (GrammarASTWithOptions)$RULE);
+		rules.add(r);
+		currentRule = r;
+		}
     ;
 
+finishRule
+	:	RULE {currentRule = null;}
+	;
+
+ruleArg
+	:	{inContext("RULE")}? ARG_ACTION {currentRule.arg = $ARG_ACTION;}
+	;
+	
+ruleReturns
+	:	^(RETURNS ARG_ACTION) {currentRule.ret = $ARG_ACTION;}
+	;
+
+ruleScopeSpec
+	:	{inContext("RULE")}?
+		(	^(SCOPE ACTION)
+		|	^(SCOPE ID+)
+		)
+	;
+
 terminal
-    :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL
-    	{System.out.println("terminal "+$STRING_LITERAL.token);}
-    |	TOKEN_REF		{System.out.println("terminal "+$TOKEN_REF.token);}
+    :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL	{terminals.add($start);}
+    |	TOKEN_REF										{terminals.add($start);}
     ;
 
 /*
