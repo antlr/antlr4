@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-05 14:20:12
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 BasicSemanticTriggers.g 2010-02-06 14:39:36
 
 /*
  [The "BSD license"]
@@ -40,11 +40,12 @@ import java.util.List;
  */
 public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
     };
+    public static final int COMBINED=91;
     public static final int LT=43;
     public static final int STAR=48;
-    public static final int BACKTRACK_SEMPRED=95;
+    public static final int BACKTRACK_SEMPRED=96;
     public static final int DOUBLE_ANGLE_STRING_LITERAL=11;
     public static final int FORCED_ACTION=5;
     public static final int ARGLIST=89;
@@ -55,7 +56,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int ACTION=16;
     public static final int TOKEN_REF=62;
     public static final int RULEMODIFIERS=74;
-    public static final int ST_RESULT=99;
+    public static final int ST_RESULT=100;
     public static final int RPAREN=41;
     public static final int RET=90;
     public static final int IMPORT=22;
@@ -68,8 +69,8 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int GRAMMAR=27;
     public static final int RULEACTIONS=75;
     public static final int WSCHARS=65;
-    public static final int INITACTION=91;
-    public static final int ALT_REWRITE=100;
+    public static final int INITACTION=92;
+    public static final int ALT_REWRITE=101;
     public static final int IMPLIES=42;
     public static final int RULE=72;
     public static final int RBRACE=61;
@@ -80,7 +81,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int CHAR_RANGE=82;
     public static final int INT=64;
     public static final int EPSILON=83;
-    public static final int LIST=97;
+    public static final int LIST=98;
     public static final int COLONCOLON=37;
     public static final int WSNLCHARS=18;
     public static final int WS=70;
@@ -92,7 +93,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int PARSER=25;
     public static final int DOLLAR=53;
     public static final int PROTECTED=28;
-    public static final int ELEMENT_OPTIONS=98;
+    public static final int ELEMENT_OPTIONS=99;
     public static final int NESTED_ACTION=15;
     public static final int FRAGMENT=23;
     public static final int ID=87;
@@ -105,7 +106,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int SCOPE=21;
     public static final int ETC=56;
     public static final int COMMA=38;
-    public static final int WILDCARD=96;
+    public static final int WILDCARD=97;
     public static final int DOC_COMMENT=6;
     public static final int PLUS=49;
     public static final int REWRITE_BLOCK=77;
@@ -117,7 +118,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int HEX_DIGIT=68;
     public static final int RANGE=55;
     public static final int TOKENS=20;
-    public static final int GATED_SEMPRED=93;
+    public static final int GATED_SEMPRED=94;
     public static final int RESULT=86;
     public static final int BANG=47;
     public static final int ACTION_STRING_LITERAL=12;
@@ -131,8 +132,8 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final int QUESTION=46;
     public static final int FINALLY=34;
     public static final int TEMPLATE=35;
-    public static final int LABEL=92;
-    public static final int SYN_SEMPRED=94;
+    public static final int LABEL=93;
+    public static final int SYN_SEMPRED=95;
     public static final int ERRCHAR=71;
     public static final int BLOCK=76;
     public static final int ASSIGN=45;
@@ -430,7 +431,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             if ( state.backtracking==1 ) {
 
               	    	name = (ID1!=null?ID1.getText():null);
-              	    	BasicSemanticChecks.checkGrammarName(ID1.token);
+              	    	BasicSemanticChecks.checkGrammarName(g,ID1.token);
               	    	root = (GrammarRootAST)((GrammarAST)retval.start);
               	    	
             }
@@ -1583,7 +1584,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final BitSet FOLLOW_optionValue_in_option381 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_optionValue0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_in_rule463 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule467 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000001FFFFFFFFFL});
+    public static final BitSet FOLLOW_ID_in_rule467 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000003FFFFFFFFFL});
     public static final BitSet FOLLOW_RULE_REF_in_ruleref490 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ASSIGN_in_tokenAlias509 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_tokenAlias511 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
@@ -1599,11 +1600,11 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption611 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ID_in_elementOption625 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ALT_in_multiElementAltInTreeGrammar665 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar667 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE0L,0x0000001FFFFFFFFFL});
-    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar674 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE8L,0x0000001FFFFFFFFFL});
+    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar667 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar674 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE8L,0x0000003FFFFFFFFFL});
     public static final BitSet FOLLOW_ROOT_in_astOps700 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_BANG_in_astOps713 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_TREE_BEGIN_in_wildcardRoot736 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_WILDCARD_in_wildcardRoot738 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000001FFFFFFFFFL});
+    public static final BitSet FOLLOW_WILDCARD_in_wildcardRoot738 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000003FFFFFFFFFL});
 
 }

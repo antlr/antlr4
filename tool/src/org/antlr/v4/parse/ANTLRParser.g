@@ -78,10 +78,7 @@ tokens {
     ARG;
     ARGLIST;
     RET;
-    //LEXER_GRAMMAR;
- //   PARSER_GRAMMAR;
-//    TREE_GRAMMAR;
-//    COMBINED_GRAMMAR;
+	COMBINED;
     INITACTION;
     LABEL;                // $x used in rewrite rules
     TEMPLATE;
@@ -219,7 +216,7 @@ grammarType
 grammarType
 @after {
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
-	else ((GrammarRootAST)$tree).grammarType=GRAMMAR;
+	else ((GrammarRootAST)$tree).grammarType=COMBINED;
 }
     :	(	t=LEXER g=GRAMMAR  -> GRAMMAR<GrammarRootAST>[$g, "LEXER_GRAMMAR"]          
 		| // A standalone parser specification

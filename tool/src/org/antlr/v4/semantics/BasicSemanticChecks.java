@@ -102,10 +102,10 @@ public class BasicSemanticChecks {
             {
                 map(ANTLRParser.LEXER, ANTLRParser.LEXER);
                 map(ANTLRParser.LEXER, ANTLRParser.PARSER);
-                map(ANTLRParser.LEXER, ANTLRParser.GRAMMAR);
+                map(ANTLRParser.LEXER, ANTLRParser.COMBINED);
 
                 map(ANTLRParser.PARSER, ANTLRParser.PARSER);
-                map(ANTLRParser.PARSER, ANTLRParser.GRAMMAR);
+                map(ANTLRParser.PARSER, ANTLRParser.COMBINED);
 
                 map(ANTLRParser.TREE, ANTLRParser.TREE);
 
@@ -116,7 +116,8 @@ public class BasicSemanticChecks {
 
     // TODO: track errors?
     
-    protected static void checkGrammarName(Token nameToken) {
+    protected static void checkGrammarName(Grammar g, Token nameToken) {
+        if ( g.implicitLexer ) return;
         String fullyQualifiedName = nameToken.getInputStream().getSourceName();
         File f = new File(fullyQualifiedName);
         String fileName = f.getName();
@@ -241,7 +242,7 @@ public class BasicSemanticChecks {
                 ok = false;
             }
         }
-        else if ( parent.getType()==ANTLRParser.GRAMMAR &&
+        else if ( parent.getType()==ANTLRParser.COMBINED &&
                   !legalGrammarOption(g.getType(), optionID.getText()) ) { // grammar
             ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                       g.fileName,
@@ -394,7 +395,7 @@ public class BasicSemanticChecks {
                                       importID,
                                       g, delegate);
         }
-        if ( g.getType()==ANTLRParser.GRAMMAR &&
+        if ( g.getType()==ANTLRParser.COMBINED &&
              (delegate.name.equals(g.name+Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.LEXER))||
               delegate.name.equals(g.name+Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.PARSER))) )
         {

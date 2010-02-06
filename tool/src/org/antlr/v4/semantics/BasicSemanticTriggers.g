@@ -103,7 +103,7 @@ grammarSpec
     :   ^(	GRAMMAR ID DOC_COMMENT? 
 	    	{
 	    	name = $ID.text;
-	    	BasicSemanticChecks.checkGrammarName($ID.token);
+	    	BasicSemanticChecks.checkGrammarName(g,$ID.token);
 	    	root = (GrammarRootAST)$start;
 	    	}
     		prequelConstructs ^(RULES .*)

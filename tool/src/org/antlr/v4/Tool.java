@@ -5,10 +5,7 @@ import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.semantics.SemanticsPipeline;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarRootAST;
+import org.antlr.v4.tool.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -294,7 +291,7 @@ public class Tool {
         }
     }
 
-    public Grammar load(String fileName) {
+    public GrammarRootAST load(String fileName) {
         ANTLRFileStream in = null;
         try {
             in = new ANTLRFileStream(fileName);
@@ -302,43 +299,133 @@ public class Tool {
         catch (IOException ioe) {
             ErrorManager.toolError(ErrorType.CANNOT_OPEN_FILE, fileName, ioe);
         }
-        Grammar g = load(in);
-        g.fileName = fileName;
-        return g;
+        return load(in);
     }
 
-    public Grammar loadFromString(String grammar) {
-        Grammar g = load(new ANTLRStringStream(grammar));
-        g.fileName = "<string>";
-        return g;
+    public GrammarRootAST loadFromString(String grammar) {
+        return load(new ANTLRStringStream(grammar));
     }
 
-    public Grammar load(CharStream in) {
-        Grammar g = null;
+    public GrammarRootAST load(CharStream in) {
         try {
             ANTLRLexer lexer = new ANTLRLexer(in);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             ANTLRParser p = new ANTLRParser(tokens);
             p.setTreeAdaptor(new GrammarASTAdaptor(in));
             ParserRuleReturnScope r = p.grammarSpec();
-            g = new Grammar(this, (GrammarRootAST)r.getTree());
+            return (GrammarRootAST)r.getTree();
         }
         catch (RecognitionException re) {
             // TODO: do we gen errors now?
             ErrorManager.internalError("can't generate this message at moment; antlr recovers");
         }
-        return g;
+        return null;
     }
 
     public void process() {
         // testing parser
-        Grammar g = load(grammarFileNames.get(0));
-        grammars.put(g.name, g);        
+        GrammarRootAST ast = load(grammarFileNames.get(0));
+        GrammarRootAST lexerAST = null;
+        if ( ast.grammarType==ANTLRParser.COMBINED ) {
+            lexerAST = extractImplicitLexer(ast); // alters ast
+        }
+        Grammar g = new Grammar(this, ast);
+        process(g);
+        if ( lexerAST!=null ) {
+            // todo: don't process if errors in parser
+            Grammar g2 = new Grammar(this, lexerAST);
+            g2.implicitLexer = true;
+            process(g2);
+        }
+    }
+
+    protected void process(Grammar g) {
+        grammars.put(g.name, g);
         g.loadImportedGrammars();
         if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
         //g.ast.inspect();
         SemanticsPipeline sem = new SemanticsPipeline();
         sem.process(g);
+    }
+
+    // TODO: Move to ast manipulation class?
+
+    /** Build lexer grammar from combined grammar that looks like:
+     *
+     *  (COMBINED_GRAMMAR A
+     *      (tokens { X (= Y 'y'))
+     *      (OPTIONS (= x 'y'))
+     *      (scope Blort { int x; })
+     *      (@ members {foo})
+     *      (@ lexer header {package jj;})
+     *      (RULES (RULE .+)))
+     *
+     *  Move rules and actions to new tree, don't dup. Split AST apart.
+     *  We'll have this Grammar share token symbols later; don't generate
+     *  tokenVocab or tokens{} section.
+     *
+     *  Side-effects: it removes children from GRAMMAR & RULES nodes
+     *                in combined AST. Careful: nodes are shared between
+     *                trees after this call.
+     */
+    public GrammarRootAST extractImplicitLexer(GrammarRootAST combinedAST) {
+        //System.out.println("before="+combinedAST.toStringTree());
+        GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
+
+        // MAKE A GRAMMAR ROOT and ID
+        String lexerName = combinedAST.getChild(0).getText()+"Lexer";
+        GrammarRootAST lexerAST =
+            new GrammarRootAST(new CommonToken(ANTLRParser.GRAMMAR,"LEXER_GRAMMAR"));
+        lexerAST.token.setInputStream(combinedAST.token.getInputStream());
+        lexerAST.addChild((GrammarAST)adaptor.create(ANTLRParser.ID, lexerName));
+
+        // MOVE OPTIONS
+        GrammarAST optionsRoot =
+            (GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
+        if ( optionsRoot!=null ) {
+            GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
+            lexerAST.addChild(lexerOptionsRoot);
+            List<GrammarAST> options = optionsRoot.getChildren();
+            for (GrammarAST o : options) {
+                String optionName = o.getChild(0).getText();
+                if ( !Grammar.doNotCopyOptionsToLexer.contains(optionName) ) {
+                    lexerOptionsRoot.addChild(o);
+                }
+            }
+        }
+
+        // MOVE lexer:: actions
+        List<GrammarAST> elements = combinedAST.getChildren();
+        for (GrammarAST e : elements) {
+            if ( e.getType()==ANTLRParser.AT ) {
+                if ( e.getChild(0).getText().equals("lexer") ) {
+                    lexerAST.addChild(e);
+                    elements.remove(e);
+                }
+            }
+        }
+        GrammarAST combinedRulesRoot =
+            (GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.RULES);
+        if ( combinedRulesRoot==null ) return lexerAST;
+
+        // MOVE lexer rules
+        GrammarAST lexerRulesRoot =
+            (GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
+        lexerAST.addChild(lexerRulesRoot);
+        List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
+        List<GrammarASTWithOptions> rules = combinedRulesRoot.getChildren();
+        for (GrammarASTWithOptions r : rules) {
+            String ruleName = r.getChild(0).getText();
+            if ( Character.isUpperCase(ruleName.charAt(0)) ) {
+                lexerRulesRoot.addChild(r);
+                rulesWeMoved.add(r);
+            }
+        }
+        rules.removeAll(rulesWeMoved);
+
+        //System.out.println("after ="+combinedAST.toStringTree());
+        //System.out.println("lexer ="+lexerAST.toStringTree());
+        return lexerAST;
     }
 
     private static void version() {

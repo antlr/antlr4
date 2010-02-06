@@ -27,8 +27,8 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.*;
 
@@ -89,7 +89,7 @@ public class TreeFilter extends TreeParser {
     }
     public TreeFilter(TreeNodeStream input, RecognizerSharedState state) {
         super(input, state);
-        originalAdaptor = input.getTreeAdaptor();
+        originalAdaptor = (TreeAdaptor) input.getTreeAdaptor();
         originalTokenStream = input.getTokenStream();
     }
 

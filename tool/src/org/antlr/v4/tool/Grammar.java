@@ -75,7 +75,8 @@ public class Grammar {
                 System.out.println("import "+t.getText());
             }
             try {
-                Grammar g = tool.load(importedGrammarName+".g");
+                GrammarRootAST ast = tool.load(importedGrammarName+".g");
+                Grammar g = new Grammar(tool, ast);
                 g.parent = this;
                 importedGrammars.add(g);
             }
@@ -158,7 +159,7 @@ public class Grammar {
             buf.append(name);
             qualifiedName = buf.toString();
         }
-        if ( getType()==ANTLRParser.GRAMMAR ||
+        if ( getType()==ANTLRParser.COMBINED ||
              (getType()==ANTLRParser.LEXER && implicitLexer) )
         {
             suffix = Grammar.getGrammarTypeToFileNameSuffix(getType());
@@ -182,7 +183,6 @@ public class Grammar {
 
     public String getTypeString() {
         if ( ast==null ) return null;
-        if ( getType()==ANTLRParser.GRAMMAR ) return "combined";
         return ANTLRParser.tokenNames[getType()].toLowerCase();
     }
 
@@ -192,7 +192,8 @@ public class Grammar {
             case ANTLRParser.PARSER : return "Parser";
             case ANTLRParser.TREE : return "";
             // if combined grammar, gen Parser and Lexer will be done later
-            case ANTLRParser.GRAMMAR : return "Parser";
+            // TODO: we are separate now right?
+            case ANTLRParser.COMBINED : return "Parser";
             default :
                 return "<invalid>";
         }
