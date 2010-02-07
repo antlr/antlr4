@@ -117,7 +117,7 @@ public class BasicSemanticChecks {
     // TODO: track errors?
     
     protected static void checkGrammarName(Grammar g, Token nameToken) {
-        if ( g.implicitLexer ) return;
+        if ( g.implicitLexer==null ) return;
         String fullyQualifiedName = nameToken.getInputStream().getSourceName();
         File f = new File(fullyQualifiedName);
         String fileName = f.getName();

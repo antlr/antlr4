@@ -4,7 +4,7 @@ import org.antlr.runtime.*;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.semantics.SemanticsPipeline;
+import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
 import java.io.File;
@@ -330,12 +330,15 @@ public class Tool {
             lexerAST = extractImplicitLexer(ast); // alters ast
         }
         Grammar g = new Grammar(this, ast);
+        g.fileName = grammarFileNames.get(0);
         process(g);
         if ( lexerAST!=null ) {
             // todo: don't process if errors in parser
-            Grammar g2 = new Grammar(this, lexerAST);
-            g2.implicitLexer = true;
-            process(g2);
+            Grammar lexerg = new Grammar(this, lexerAST);
+            lexerg.fileName = grammarFileNames.get(0);
+            g.implicitLexer = lexerg;
+            lexerg.implicitLexerOwner = g;
+            process(lexerg);
         }
     }
 
@@ -344,8 +347,10 @@ public class Tool {
         g.loadImportedGrammars();
         if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
         //g.ast.inspect();
-        SemanticsPipeline sem = new SemanticsPipeline();
+        SemanticPipeline sem = new SemanticPipeline();
         sem.process(g);
+
+        // todo: add strings we collected to lexer?        
     }
 
     // TODO: Move to ast manipulation class?
@@ -371,6 +376,7 @@ public class Tool {
     public GrammarRootAST extractImplicitLexer(GrammarRootAST combinedAST) {
         //System.out.println("before="+combinedAST.toStringTree());
         GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
+        List<GrammarAST> elements = combinedAST.getChildren();
 
         // MAKE A GRAMMAR ROOT and ID
         String lexerName = combinedAST.getChild(0).getText()+"Lexer";
@@ -395,15 +401,16 @@ public class Tool {
         }
 
         // MOVE lexer:: actions
-        List<GrammarAST> elements = combinedAST.getChildren();
+        List<GrammarAST> actionsWeMoved = new ArrayList<GrammarAST>();
         for (GrammarAST e : elements) {
             if ( e.getType()==ANTLRParser.AT ) {
                 if ( e.getChild(0).getText().equals("lexer") ) {
                     lexerAST.addChild(e);
-                    elements.remove(e);
+                    actionsWeMoved.add(e);
                 }
             }
         }
+        elements.removeAll(actionsWeMoved);
         GrammarAST combinedRulesRoot =
             (GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.RULES);
         if ( combinedRulesRoot==null ) return lexerAST;

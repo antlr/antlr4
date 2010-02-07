@@ -722,7 +722,7 @@ block
 //
 ruleref
     :	RULE_REF ARG_ACTION?
-		(	(op=ROOT|op=BANG)	-> ^($op RULE_REF ARG_ACTION?)
+		(	(op=ROOT|op=BANG)	-> ^($op ^(RULE_REF ARG_ACTION?))
 		|						-> ^(RULE_REF ARG_ACTION?)
 		)
     ;

@@ -1,7 +1,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.semantics.SemanticsPipeline;
+import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
@@ -93,7 +93,7 @@ public class TestBasicSemanticErrors extends BaseTest {
                 String fileName = lines[0].substring(lastSpace+1, semi)+".g";
                 Grammar g = new Grammar(fileName, input);
                 g.loadImportedGrammars();
-                SemanticsPipeline sem = new SemanticsPipeline();
+                SemanticPipeline sem = new SemanticPipeline();
                 sem.process(g);
             }
             catch (RecognitionException re) {

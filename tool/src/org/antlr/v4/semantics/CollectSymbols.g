@@ -24,8 +24,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Triggers for defining rules, tokens, scopes, and actions.
- *  Side-effects: ...
+/** Collects rules, terminals, strings, actions, scopes etc... from AST
+ *  Side-effects: None
  */
 tree grammar CollectSymbols;
 options {
@@ -70,7 +70,9 @@ import org.antlr.v4.tool.*;
 @members {
 Rule currentRule = null;
 public List<Rule> rules = new ArrayList<Rule>();
+public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
+public List<GrammarAST> strings = new ArrayList<GrammarAST>();
 public List<GrammarAST> aliases = new ArrayList<GrammarAST>();
 public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
@@ -88,6 +90,7 @@ topdown
     |	rule
     |	ruleArg
     |	ruleReturns
+    |	ruleref
     |	terminal
 	;
 
@@ -100,14 +103,16 @@ globalScope
 	;
 
 action
-	:	{inContext("GRAMMAR")}? ^(AT sc=ID? ID ACTION)
+	:	{inContext("GRAMMAR")}? ^(AT ID? ID ACTION)
 		{actions.add($AT);}
 	;
 
 tokenAlias
 	:	{inContext("TOKENS")}?
-		(	^(ASSIGN t=ID STRING_LITERAL) {terminals.add($t); aliases.add($ASSIGN);}
-		|	t=ID						  {terminals.add($t);}
+		(	^(ASSIGN t=ID STRING_LITERAL)
+			{terminals.add($t); aliases.add($ASSIGN); strings.add($STRING_LITERAL);}
+		|	t=ID
+			{terminals.add($t);}
 		)
 	;
 
@@ -139,14 +144,11 @@ ruleScopeSpec
 	;
 
 terminal
-    :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL	{terminals.add($start);}
+    :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL	{terminals.add($start);
+    												     strings.add($STRING_LITERAL);}
     |	TOKEN_REF										{terminals.add($start);}
     ;
 
-/*
 ruleref
-    :	^(ROOT RULE_REF ARG_ACTION?)
-    |	^(BANG RULE_REF ARG_ACTION?)
-    |	^(RULE_REF ARG_ACTION?)
+    :	^(RULE_REF ARG_ACTION?)							{rulerefs.add($RULE_REF);}
     ;
-*/

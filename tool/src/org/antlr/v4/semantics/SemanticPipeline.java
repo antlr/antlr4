@@ -8,7 +8,7 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 
 /** */
-public class SemanticsPipeline {
+public class SemanticPipeline {
     public void process(Grammar g) {
         // VALIDATE AST STRUCTURE
         // use buffered node stream as we will look around in stream
@@ -38,15 +38,18 @@ public class SemanticsPipeline {
             }
         }
 
-        // CHECK FOR SYMBOL COLLISIONS
-        // DEFINE SYMBOLS
+        // COLLECT SYMBOLS: RULES, ACTIONS, TERMINALS, ...
         nodes.reset();
-        CollectSymbols sym = new CollectSymbols(nodes,g);
-        sym.downup(g.ast);
-        System.out.println("rules="+sym.rules);
-        System.out.println("terminals="+sym.terminals);
-        System.out.println("aliases="+sym.aliases);
-        System.out.println("aliases="+sym.actions);
+        CollectSymbols collector = new CollectSymbols(nodes,g);
+        collector.downup(g.ast); // no side-effects; compute lists
+
+        // DEFINE RULES, ACTIONS
+//        DefineSymbols def = new DefineSymbols(g, collector);
+//        def.define(); // updates g
+
+        // CHECK FOR SYMBOL COLLISIONS
+        SymbolChecks symcheck = new SymbolChecks(g, collector);
+        symcheck.examine();
 
         // ASSIGN TOKEN TYPES
 

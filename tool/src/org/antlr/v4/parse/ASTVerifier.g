@@ -302,8 +302,8 @@ block
     ;
 
 ruleref
-    :	^(ROOT RULE_REF ARG_ACTION?)
-    |	^(BANG RULE_REF ARG_ACTION?)
+    :	^(ROOT ^(RULE_REF ARG_ACTION?))
+    |	^(BANG ^(RULE_REF ARG_ACTION?))
     |	^(RULE_REF ARG_ACTION?)
     ;
 

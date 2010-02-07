@@ -27,12 +27,20 @@ public class Grammar {
     public String fileName;
 
     /** Was this created from a COMBINED grammar? */
-    public boolean implicitLexer;    
+    public Grammar implicitLexer;
+    public Grammar implicitLexerOwner;
 
     /** If we're imported, who imported us? If null, implies grammar is root */
     public Grammar parent;
     protected List<Grammar> importedGrammars;
-    protected Map<String, Rule> rules = new HashMap<String, Rule>();
+    protected Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
+
+    /** Map a scope to a map of name:action pairs.
+     *  The code generator will use this to fill holes in the output files.
+     *  I track the AST node for the action in case I need the line number
+     *  for errors.
+     */
+    Map<String, Map<String,GrammarAST>> actions = new HashMap<String, Map<String,GrammarAST>>();
 
     /** A list of options specified at the grammar level such as language=Java. */
     protected Map<String, String> options;    
@@ -86,9 +94,22 @@ public class Grammar {
         }
     }
 
-    public Rule getRule(String name) {
-        return null;
+    public void defineAction(GrammarAST ampersandAST) {
+        String scope = null;
+        String name = null;
+        if ( ampersandAST.getChildCount()==1 ) {
+            name = ampersandAST.getChild(0).getText();
+        }
+        else {
+            scope = ampersandAST.getChild(0).getText();
+            name = ampersandAST.getChild(1).getText();            
+            Map<String,GrammarAST> f = actions.get(scope);
+        }
     }
+
+    public void defineRule(Rule r) { rules.put(r.name, r); }
+    
+    public Rule getRule(String name) { return rules.get(name); }
 
     /** Get list of all delegates from all grammars in the delegate subtree of g.
      *  The grammars are in delegation tree preorder.  Don't include ourselves
@@ -160,7 +181,7 @@ public class Grammar {
             qualifiedName = buf.toString();
         }
         if ( getType()==ANTLRParser.COMBINED ||
-             (getType()==ANTLRParser.LEXER && implicitLexer) )
+             (getType()==ANTLRParser.LEXER && implicitLexer!=null) )
         {
             suffix = Grammar.getGrammarTypeToFileNameSuffix(getType());
         }
@@ -172,6 +193,23 @@ public class Grammar {
         for (int i = 0; i < importedGrammars.size(); i++) {
             Grammar g = importedGrammars.get(i);
             if ( g.name.equals(name) ) return g;
+        }
+        return null;
+    }
+
+    /** Given a grammar type, what should be the default action scope?
+     *  If I say @members in a COMBINED grammar, for example, the
+     *  default scope should be "parser".
+     */
+    public String getDefaultActionScope() {
+        switch ( getType() ) {
+            case ANTLRParser.LEXER :
+                return "lexer";
+            case ANTLRParser.PARSER :
+            case ANTLRParser.COMBINED :
+                return "parser";
+            case ANTLRParser.TREE :
+                return "treeparser";
         }
         return null;
     }
