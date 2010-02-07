@@ -73,7 +73,7 @@ public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
-public List<GrammarAST> aliases = new ArrayList<GrammarAST>();
+public List<GrammarAST> tokensDef = new ArrayList<GrammarAST>();
 public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
 Grammar g; // which grammar are we checking
@@ -86,7 +86,7 @@ public CollectSymbols(TreeNodeStream input, Grammar g) {
 topdown
     :	globalScope
     |	action
-    |	tokenAlias
+    |	tokensSection
     |	rule
     |	ruleArg
     |	ruleReturns
@@ -99,7 +99,7 @@ bottomup
 	;
 
 globalScope
-	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION) {scopes.add($ID);}
+	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION) {scopes.add($SCOPE);}
 	;
 
 action
@@ -107,12 +107,12 @@ action
 		{actions.add($AT);}
 	;
 
-tokenAlias
+tokensSection
 	:	{inContext("TOKENS")}?
 		(	^(ASSIGN t=ID STRING_LITERAL)
-			{terminals.add($t); aliases.add($ASSIGN); strings.add($STRING_LITERAL);}
+			{terminals.add($t); tokensDef.add($ASSIGN); strings.add($STRING_LITERAL);}
 		|	t=ID
-			{terminals.add($t);}
+			{terminals.add($t); tokensDef.add($t);}
 		)
 	;
 

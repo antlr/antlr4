@@ -93,6 +93,8 @@ NO_VIABLE_DFA_ALT(arg,arg2) ::=
 SYNTAX_ERROR(arg) ::= "syntax error: <arg>"
 RULE_REDEFINITION(arg) ::=
 	"rule <arg> redefinition"
+SCOPE_REDEFINITION(arg) ::=
+	"scope <arg> redefinition"
 LEXER_RULES_NOT_ALLOWED(arg) ::=
 	"lexer rule <arg> not allowed in parser"
 PARSER_RULES_NOT_ALLOWED(arg) ::=
@@ -218,7 +220,7 @@ NO_SUCH_RULE_IN_SCOPE(arg,arg2) ::=
 TOKEN_ALIAS_CONFLICT(arg,arg2) ::=
   "cannot alias <arg>; string already assigned to <arg2>"
 TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
-  "cannot alias <arg>; token name already assigned to <arg2>"
+  "cannot alias <arg>; token name already assigned<if(arg2)> to <arg2><endif>"
 TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
   "tokenVocab option ignored in imported grammar <arg>"
 INVALID_IMPORT(arg,arg2) ::=

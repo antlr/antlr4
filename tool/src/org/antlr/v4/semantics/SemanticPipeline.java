@@ -31,6 +31,7 @@ public class SemanticPipeline {
         // don't continue if we get errors in this basic check
         if ( false ) return;
 
+        // TODO: can i move to Tool.process? why recurse here?
         // NOW DO BASIC / EASY SEMANTIC CHECKS FOR DELEGATES (IF ANY)
         if ( g.getImportedGrammars()!=null ) {
             for (Grammar d : g.getImportedGrammars()) {

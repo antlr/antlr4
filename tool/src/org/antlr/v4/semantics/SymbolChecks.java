@@ -1,5 +1,6 @@
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -12,7 +13,7 @@ public class SymbolChecks {
     Grammar g;
     CollectSymbols collector;    
     Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
-    Map<String, Set<String>> scopeToActionNames = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 
     public SymbolChecks(Grammar g, CollectSymbols collector) {
         this.g = g;
@@ -21,18 +22,21 @@ public class SymbolChecks {
         System.out.println("rulerefs="+collector.rulerefs);
         System.out.println("terminals="+collector.terminals);
         System.out.println("strings="+collector.strings);
-        System.out.println("aliases="+collector.aliases);
+        System.out.println("tokensDef="+collector.tokensDef);
         System.out.println("actions="+collector.actions);
+        System.out.println("scopes="+collector.scopes);
     }
 
     public void examine() {
         checkRuleRedefinitions(collector.rules);
+        checkScopeRedefinitions(collector.scopes);
         checkActionRedefinitions(collector.actions);
+        checkTokenAliasRedefinitions(collector.tokensDef);
         checkRuleArgs(collector.rulerefs);
     }
 
     public void checkRuleRedefinitions(List<Rule> rules) {
-        if ( rules==null ) return;        
+        if ( rules==null ) return;
         for (Rule r : collector.rules) {
             if ( nameToRuleMap.get(r.name)==null ) {
                 nameToRuleMap.put(r.name, r);
@@ -41,6 +45,46 @@ public class SymbolChecks {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 ErrorManager.grammarError(ErrorType.RULE_REDEFINITION,
                                           g.fileName, idNode.token, r.name);
+            }
+        }
+    }
+
+    public void checkScopeRedefinitions(List<GrammarAST> scopes) {
+        if ( scopes==null ) return;
+        Set<String> scopeNames = new HashSet<String>();
+        for (int i=0; i< scopes.size(); i++) {
+            GrammarAST s = scopes.get(i);
+            GrammarAST idNode = (GrammarAST)s.getChild(0);
+            if ( !scopeNames.contains(idNode.getText()) ) {
+                scopeNames.add(idNode.getText());
+            }
+            else {
+                ErrorManager.grammarError(ErrorType.SCOPE_REDEFINITION,
+                                          g.fileName, idNode.token, idNode.getText());
+            }
+        }
+    }
+
+
+    public void checkTokenAliasRedefinitions(List<GrammarAST> aliases) {
+        if ( aliases==null ) return;
+        Map<String, GrammarAST> aliasTokenNames = new HashMap<String, GrammarAST>();
+        for (int i=0; i< aliases.size(); i++) {
+            GrammarAST a = aliases.get(i);
+            GrammarAST idNode = a;
+            if ( a.getType()== ANTLRParser.ASSIGN ) {
+                idNode = (GrammarAST)a.getChild(0);
+            }
+            GrammarAST prev = aliasTokenNames.get(idNode.getText());
+            if ( prev==null ) {
+                aliasTokenNames.put(idNode.getText(), a);
+            }
+            else {
+                GrammarAST value = (GrammarAST)prev.getChild(1);
+                String valueText = null;
+                if ( value!=null ) valueText = value.getText();
+                ErrorManager.grammarError(ErrorType.TOKEN_ALIAS_REASSIGNMENT,
+                                          g.fileName, idNode.token, idNode.getText(), valueText);
             }
         }
     }
@@ -81,10 +125,10 @@ public class SymbolChecks {
                 scope = nameNode.getText();
                 name = ampersandAST.getChild(1).getText();
             }
-            Set<String> scopeActions = scopeToActionNames.get(scope);
+            Set<String> scopeActions = actionScopeToActionNames.get(scope);
             if ( scopeActions==null ) { // init scope
                 scopeActions = new HashSet<String>();
-                scopeToActionNames.put(scope, scopeActions);
+                actionScopeToActionNames.put(scope, scopeActions);
             }
             if ( !scopeActions.contains(name) ) {
                 scopeActions.add(name);
