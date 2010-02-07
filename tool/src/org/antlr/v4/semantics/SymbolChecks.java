@@ -4,6 +4,10 @@ import org.antlr.v4.tool.*;
 
 import java.util.*;
 
+/** Check for symbol problems; no side-effects.  Inefficient to walk rules
+ *  and such multiple times, but I like isolating all error checking outside
+ *  of code that actually defines symbols etc...
+ */
 public class SymbolChecks {
     Grammar g;
     CollectSymbols collector;    
@@ -24,9 +28,11 @@ public class SymbolChecks {
     public void examine() {
         checkRuleRedefinitions(collector.rules);
         checkActionRedefinitions(collector.actions);
+        checkRuleArgs(collector.rulerefs);
     }
 
     public void checkRuleRedefinitions(List<Rule> rules) {
+        if ( rules==null ) return;        
         for (Rule r : collector.rules) {
             if ( nameToRuleMap.get(r.name)==null ) {
                 nameToRuleMap.put(r.name, r);
@@ -39,7 +45,30 @@ public class SymbolChecks {
         }
     }
 
+    public void checkRuleArgs(List<GrammarAST> rulerefs) {
+        if ( rulerefs==null ) return;
+        for (GrammarAST ref : rulerefs) {
+            String ruleName = ref.getText();
+            Rule r = nameToRuleMap.get(ruleName);
+            if ( r==null ) {
+                ErrorManager.grammarError(ErrorType.UNDEFINED_RULE_REF,
+                                          g.fileName, ref.token, ruleName);
+            }
+            GrammarAST arg = (GrammarAST)ref.getChild(0);
+            if ( arg!=null && r.arg==null ) {
+                ErrorManager.grammarError(ErrorType.RULE_HAS_NO_ARGS,
+                                          g.fileName, ref.token, ruleName);
+
+            }
+            else if ( arg==null && (r!=null&&r.arg!=null) ) {
+                ErrorManager.grammarError(ErrorType.MISSING_RULE_ARGS,
+                                          g.fileName, ref.token, ruleName);
+            }
+        }
+    }
+
     public void checkActionRedefinitions(List<GrammarAST> actions) {
+        if ( actions==null ) return;
         String scope = g.getDefaultActionScope();
         String name = null;
         GrammarAST nameNode = null;
