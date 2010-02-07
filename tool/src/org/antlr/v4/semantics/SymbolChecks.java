@@ -3,6 +3,7 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
+import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -11,16 +12,17 @@ import java.util.*;
  *  of code that actually defines symbols etc...
  */
 public class SymbolChecks {
-    Grammar g;
-    CollectSymbols collector;    
-    Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
-    Set<String> tokenIDs = new HashSet<String>();
-    Set<String> globalScopeNames = new HashSet<String>();
-    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+    protected Grammar g;
+    protected CollectSymbols collector;
+    protected Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
+    protected Set<String> tokenIDs = new HashSet<String>();
+    protected Set<String> globalScopeNames = new HashSet<String>();
+    protected Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 
     public SymbolChecks(Grammar g, CollectSymbols collector) {
         this.g = g;
         this.collector = collector;
+        /*
         System.out.println("rules="+collector.rules);
         System.out.println("rulerefs="+collector.rulerefs);
         System.out.println("tokenIDRefs="+collector.tokenIDRefs);
@@ -29,6 +31,7 @@ public class SymbolChecks {
         System.out.println("tokensDef="+collector.tokensDefs);
         System.out.println("actions="+collector.actions);
         System.out.println("scopes="+collector.scopes);
+         */
     }
 
     public void examine() {
@@ -40,7 +43,7 @@ public class SymbolChecks {
         checkTokenAliasRedefinitions(collector.tokensDefs);
         checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
-        checkForLabelConflicts(collector.rules);
+        checkForLabelConflicts(collector.ruleToLabelSpace, collector.rules);
     }
 
     public void checkForRuleConflicts(List<Rule> rules) {
@@ -168,18 +171,43 @@ public class SymbolChecks {
      *  return values, parameters, and rule-scope dynamic attributes
      *  defined in surrounding rule.
      */
-    public void checkForLabelConflicts(List<Rule> rules) {
+    public void checkForLabelConflicts(MultiMap<String, LabelElementPair> ruleToLabelSpace,
+                                       List<Rule> rules) {
         for (Rule r : rules) {
-            for (GrammarAST label : r.labelNameSpace.values()) {
-                checkForLabelConflict(r, label);
+            Map<String, LabelElementPair> labelNameSpace =
+                new HashMap<String, LabelElementPair>();
+
+            List<LabelElementPair> pairs = ruleToLabelSpace.get(r.name);
+            if ( pairs==null ) continue;
+            
+            for (LabelElementPair labelPair : pairs) {
+                checkForLabelConflict(r, labelPair.label);
+
+                String name = labelPair.label.getText();
+                LabelElementPair prevLabelPair = labelNameSpace.get(name);
+                if ( prevLabelPair==null ) {
+                    labelNameSpace.put(name, labelPair);
+                }
+                else {
+                    // label already defined; if same type, no problem
+                    if ( prevLabelPair.type != labelPair.type ) {
+                        String typeMismatchExpr = labelPair.type+"!="+prevLabelPair.type;
+                        ErrorManager.grammarError(
+                            ErrorType.LABEL_TYPE_CONFLICT,
+                            g.fileName,
+                            labelPair.label.token,
+                            name,
+                            typeMismatchExpr);
+                    }
+                }
             }
         }
     }
 
-    public void checkForLabelConflict(Rule r, GrammarAST labelAssign) {
+    public void checkForLabelConflict(Rule r, GrammarAST labelID) {
         ErrorType etype = ErrorType.INVALID;
         Object arg2 = null;
-        String name = labelAssign.getChild(0).getText();
+        String name = labelID.getText();
         if ( globalScopeNames.contains(name) ) {
             etype = ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
         }
@@ -189,6 +217,7 @@ public class SymbolChecks {
         else if ( tokenIDs.contains(name) ) {
             etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
         }
+
 //        else if ( r.ruleScope!=null && r.ruleScope.getAttribute(label.getText())!=null ) {
 //            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
 //            arg2 = r.name;
@@ -200,7 +229,7 @@ public class SymbolChecks {
 //            arg2 = r.name;
 //        }
         if ( etype!=ErrorType.INVALID ) {
-            ErrorManager.grammarError(etype,g,labelAssign.token,name,arg2);
+            ErrorManager.grammarError(etype,g,labelID.token,name,arg2);
         }
     }
 }

@@ -67,6 +67,7 @@ package org.antlr.v4.semantics;
 import org.antlr.v4.tool.*;
 import java.util.Set;
 import java.util.HashSet;
+import org.stringtemplate.v4.misc.MultiMap;
 }
 
 @members {
@@ -79,6 +80,8 @@ public List<GrammarAST> strings = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
+public MultiMap<String, LabelElementPair> ruleToLabelSpace =
+	new MultiMap<String, LabelElementPair>();
 Grammar g; // which grammar are we checking
 public CollectSymbols(TreeNodeStream input, Grammar g) {
 	this(input);
@@ -150,8 +153,12 @@ ruleScopeSpec
 	;
 
 labeledElement
-	:	^(ASSIGN ID e=.)		{currentRule.labelNameSpace.put($ID.text, $start);}
-	|	^(PLUS_ASSIGN ID e=.)	{currentRule.labelNameSpace.put($ID.text, $start);}
+@after {
+LabelElementPair lp = new LabelElementPair(g, $id, $e, $start.getType());
+ruleToLabelSpace.map(currentRule.name, lp);
+}
+	:	^(ASSIGN id=ID e=.)
+	|	^(PLUS_ASSIGN id=ID e=.)
 	;
 	
 terminal
