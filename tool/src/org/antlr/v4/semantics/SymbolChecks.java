@@ -1,5 +1,6 @@
 package org.antlr.v4.semantics;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
@@ -13,6 +14,8 @@ public class SymbolChecks {
     Grammar g;
     CollectSymbols collector;    
     Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
+    Set<String> tokenIDs = new HashSet<String>();
+    Set<String> globalScopeNames = new HashSet<String>();
     Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 
     public SymbolChecks(Grammar g, CollectSymbols collector) {
@@ -20,22 +23,27 @@ public class SymbolChecks {
         this.collector = collector;
         System.out.println("rules="+collector.rules);
         System.out.println("rulerefs="+collector.rulerefs);
+        System.out.println("tokenIDRefs="+collector.tokenIDRefs);
         System.out.println("terminals="+collector.terminals);
         System.out.println("strings="+collector.strings);
-        System.out.println("tokensDef="+collector.tokensDef);
+        System.out.println("tokensDef="+collector.tokensDefs);
         System.out.println("actions="+collector.actions);
         System.out.println("scopes="+collector.scopes);
     }
 
     public void examine() {
-        checkRuleRedefinitions(collector.rules);
-        checkScopeRedefinitions(collector.scopes);
-        checkActionRedefinitions(collector.actions);
-        checkTokenAliasRedefinitions(collector.tokensDef);
+        // methods affect fields, but no side-effects outside this object
+        // So, call order sensitive
+        checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames 
+        checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
+        checkActionRedefinitions(collector.actions);    // sets actionScopeToActionNames
+        checkTokenAliasRedefinitions(collector.tokensDefs);
         checkRuleArgs(collector.rulerefs);
+        checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
+        checkForLabelConflicts(collector.rules);
     }
 
-    public void checkRuleRedefinitions(List<Rule> rules) {
+    public void checkForRuleConflicts(List<Rule> rules) {
         if ( rules==null ) return;
         for (Rule r : collector.rules) {
             if ( nameToRuleMap.get(r.name)==null ) {
@@ -46,17 +54,21 @@ public class SymbolChecks {
                 ErrorManager.grammarError(ErrorType.RULE_REDEFINITION,
                                           g.fileName, idNode.token, r.name);
             }
+            if ( globalScopeNames.contains(r.name) ) {
+                GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
+                ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
+                                          g.fileName, idNode.token, r.name);                
+            }
         }
     }
 
     public void checkScopeRedefinitions(List<GrammarAST> scopes) {
         if ( scopes==null ) return;
-        Set<String> scopeNames = new HashSet<String>();
         for (int i=0; i< scopes.size(); i++) {
             GrammarAST s = scopes.get(i);
             GrammarAST idNode = (GrammarAST)s.getChild(0);
-            if ( !scopeNames.contains(idNode.getText()) ) {
-                scopeNames.add(idNode.getText());
+            if ( !globalScopeNames.contains(idNode.getText()) ) {
+                globalScopeNames.add(idNode.getText());
             }
             else {
                 ErrorManager.grammarError(ErrorType.SCOPE_REDEFINITION,
@@ -64,7 +76,6 @@ public class SymbolChecks {
             }
         }
     }
-
 
     public void checkTokenAliasRedefinitions(List<GrammarAST> aliases) {
         if ( aliases==null ) return;
@@ -85,6 +96,18 @@ public class SymbolChecks {
                 if ( value!=null ) valueText = value.getText();
                 ErrorManager.grammarError(ErrorType.TOKEN_ALIAS_REASSIGNMENT,
                                           g.fileName, idNode.token, idNode.getText(), valueText);
+            }
+        }
+    }
+
+    public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
+        for (GrammarAST a : tokenIDRefs) {
+            Token t = a.token;
+            String ID = t.getText();
+            tokenIDs.add(ID);
+            if ( globalScopeNames.contains(t.getText()) ) {
+                ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
+                                          g.fileName, t, ID);
             }
         }
     }
@@ -137,6 +160,47 @@ public class SymbolChecks {
                 ErrorManager.grammarError(ErrorType.ACTION_REDEFINITION,
                                           g.fileName, nameNode.token, name);
             }
+        }
+    }
+
+    /** Make sure a label doesn't conflict with another symbol.
+     *  Labels must not conflict with: rules, tokens, scope names,
+     *  return values, parameters, and rule-scope dynamic attributes
+     *  defined in surrounding rule.
+     */
+    public void checkForLabelConflicts(List<Rule> rules) {
+        for (Rule r : rules) {
+            for (GrammarAST label : r.labelNameSpace.values()) {
+                checkForLabelConflict(r, label);
+            }
+        }
+    }
+
+    public void checkForLabelConflict(Rule r, GrammarAST labelAssign) {
+        ErrorType etype = ErrorType.INVALID;
+        Object arg2 = null;
+        String name = labelAssign.getChild(0).getText();
+        if ( globalScopeNames.contains(name) ) {
+            etype = ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
+        }
+        else if ( nameToRuleMap.containsKey(name) ) {
+            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE;
+        }
+        else if ( tokenIDs.contains(name) ) {
+            etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
+        }
+//        else if ( r.ruleScope!=null && r.ruleScope.getAttribute(label.getText())!=null ) {
+//            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
+//            arg2 = r.name;
+//        }
+//        else if ( (r.returnScope!=null&&r.returnScope.getAttribute(label.getText())!=null) ||
+//                  (r.parameterScope!=null&&r.parameterScope.getAttribute(label.getText())!=null) )
+//        {
+//            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
+//            arg2 = r.name;
+//        }
+        if ( etype!=ErrorType.INVALID ) {
+            ErrorManager.grammarError(etype,g,labelAssign.token,name,arg2);
         }
     }
 }

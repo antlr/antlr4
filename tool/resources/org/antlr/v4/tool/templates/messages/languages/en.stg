@@ -31,6 +31,9 @@
  The location and message ids are taken out of the formats directory.
 														Kay Roepke
 */
+
+INVALID() ::= <<this can never be printed>>
+
 // TOOL ERRORS
 // file errors
 CANNOT_WRITE_FILE(arg,exception,stackTrace) ::= <<
@@ -220,7 +223,7 @@ NO_SUCH_RULE_IN_SCOPE(arg,arg2) ::=
 TOKEN_ALIAS_CONFLICT(arg,arg2) ::=
   "cannot alias <arg>; string already assigned to <arg2>"
 TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
-  "cannot alias <arg>; token name already assigned<if(arg2)> to <arg2><endif>"
+  "cannot alias <arg>; token name already <if(arg2)>assigned to <arg2><else>defined<endif>"
 TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
   "tokenVocab option ignored in imported grammar <arg>"
 INVALID_IMPORT(arg,arg2) ::=

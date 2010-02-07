@@ -1,13 +1,8 @@
 package org.antlr.v4.test;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
 
 public class TestBasicSemanticErrors extends BaseTest {
-    public static class InOutPair { String in, out; }
     static String[] pairs = {
         // INPUT
         "grammar A;\n" +
@@ -80,27 +75,5 @@ public class TestBasicSemanticErrors extends BaseTest {
         "error(66): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct",
     };
 
-    @Test public void testErrors() {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String input = pairs[i];
-            String expect = pairs[i+1];
-            ErrorQueue equeue = new ErrorQueue();
-            ErrorManager.setErrorListener(equeue);
-            try {
-                String[] lines = input.split("\n");
-                int lastSpace = lines[0].lastIndexOf(' ');
-                int semi = lines[0].lastIndexOf(';');
-                String fileName = lines[0].substring(lastSpace+1, semi)+".g";
-                Grammar g = new Grammar(fileName, input);
-                g.loadImportedGrammars();
-                SemanticPipeline sem = new SemanticPipeline();
-                sem.process(g);
-            }
-            catch (RecognitionException re) {
-                re.printStackTrace(System.err);
-            }
-            String actual = equeue.toString();
-            assertEquals(expect,actual);
-        }
-    }
+    @Test public void testErrors() { super.testErrors(pairs); }
 }

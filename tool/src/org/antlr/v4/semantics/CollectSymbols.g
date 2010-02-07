@@ -65,6 +65,8 @@ options {
 */
 package org.antlr.v4.semantics;
 import org.antlr.v4.tool.*;
+import java.util.Set;
+import java.util.HashSet;
 }
 
 @members {
@@ -72,8 +74,9 @@ Rule currentRule = null;
 public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
+public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
-public List<GrammarAST> tokensDef = new ArrayList<GrammarAST>();
+public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
 Grammar g; // which grammar are we checking
@@ -90,8 +93,10 @@ topdown
     |	rule
     |	ruleArg
     |	ruleReturns
+    |	ruleScopeSpec
     |	ruleref
     |	terminal
+    |	labeledElement
 	;
 
 bottomup
@@ -110,9 +115,10 @@ action
 tokensSection
 	:	{inContext("TOKENS")}?
 		(	^(ASSIGN t=ID STRING_LITERAL)
-			{terminals.add($t); tokensDef.add($ASSIGN); strings.add($STRING_LITERAL);}
+			{terminals.add($t); tokenIDRefs.add($t);
+			 tokensDefs.add($ASSIGN); strings.add($STRING_LITERAL);}
 		|	t=ID
-			{terminals.add($t); tokensDef.add($t);}
+			{terminals.add($t); tokenIDRefs.add($t); tokensDefs.add($t);}
 		)
 	;
 
@@ -143,10 +149,15 @@ ruleScopeSpec
 		)
 	;
 
+labeledElement
+	:	^(ASSIGN ID e=.)		{currentRule.labelNameSpace.put($ID.text, $start);}
+	|	^(PLUS_ASSIGN ID e=.)	{currentRule.labelNameSpace.put($ID.text, $start);}
+	;
+	
 terminal
     :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL	{terminals.add($start);
     												     strings.add($STRING_LITERAL);}
-    |	TOKEN_REF										{terminals.add($start);}
+    |	TOKEN_REF {terminals.add($start); tokenIDRefs.add($TOKEN_REF);}
     ;
 
 ruleref

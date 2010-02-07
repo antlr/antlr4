@@ -40,6 +40,8 @@ package org.antlr.v4.tool;
  * @since 4.0
  */
 public enum ErrorType {
+    INVALID(ErrorSeverity.ERROR,true,true),
+    
     // TODO: set all of the true, true appropriately
 	CANNOT_WRITE_FILE(ErrorSeverity.ERROR, true, true),
 	CANNOT_CLOSE_FILE(ErrorSeverity.ERROR, true, true),

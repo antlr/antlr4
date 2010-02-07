@@ -40,6 +40,9 @@ public class Message {
 
         if ( args!=null ) { // fill in arg1, arg2, ...
             for (int i=0; i<args.length; i++) {
+                if ( i==(args.length-1) && args[i]==null ) { // don't set last if null
+                    continue;
+                }
                 String attr = "arg";
                 if ( i>0 ) attr += i + 1;
                 messageST.add(attr, args[i]);

@@ -28,18 +28,19 @@
 package org.antlr.v4.test;
 
 
-import org.antlr.v4.Tool;
 import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.TokenSource;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
-
-
+import org.antlr.runtime.TokenSource;
+import org.antlr.v4.Tool;
+import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRErrorListener;
 import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Message;
-import org.junit.Before;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.stringtemplate.v4.ST;
 
 import java.io.*;
@@ -47,6 +48,7 @@ import java.util.*;
 
 
 public abstract class BaseTest {
+    public static class InOutPair { String in, out; }
 
 	public static final String jikes = null;//"/usr/bin/jikes";
 	public static final String pathSep = System.getProperty("path.separator");
@@ -417,6 +419,30 @@ public abstract class BaseTest {
 		}
 		return null;
 	}
+
+    public void testErrors(String[] pairs) {
+        for (int i = 0; i < pairs.length; i+=2) {
+            String input = pairs[i];
+            String expect = pairs[i+1];
+            ErrorQueue equeue = new ErrorQueue();
+            ErrorManager.setErrorListener(equeue);
+            try {
+                String[] lines = input.split("\n");
+                int lastSpace = lines[0].lastIndexOf(' ');
+                int semi = lines[0].lastIndexOf(';');
+                String fileName = lines[0].substring(lastSpace+1, semi)+".g";
+                Grammar g = new Grammar(fileName, input);
+                g.loadImportedGrammars();
+                SemanticPipeline sem = new SemanticPipeline();
+                sem.process(g);
+            }
+            catch (RecognitionException re) {
+                re.printStackTrace(System.err);
+            }
+            String actual = equeue.toString();
+            assertEquals(expect,actual);
+        }
+    }
 
     public static class StreamVacuum implements Runnable {
 		StringBuffer buf = new StringBuffer();

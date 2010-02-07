@@ -251,8 +251,10 @@ element
 	;
 	
 labeledElement
-	:	^(ASSIGN ID (atom|block))
-	|	^(PLUS_ASSIGN ID (atom|block))
+	:	^(ASSIGN ID atom)
+	|	^(ASSIGN ID block)
+	|	^(PLUS_ASSIGN ID atom)
+	|	^(PLUS_ASSIGN ID block)
 	;
 
 treeSpec
