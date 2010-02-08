@@ -219,6 +219,7 @@ public class ErrorManager {
 	}
      */
 
+    /*
     public static void grammarError(ErrorType etype,
                                     Grammar g,
                                     Token token,
@@ -228,6 +229,7 @@ public class ErrorManager {
         Message msg = new GrammarSemanticsMessage(etype,g,token,args);
         state.get().listener.error(msg);
     }
+     */
 
     public static void grammarError(ErrorType etype,
                                     String fileName,

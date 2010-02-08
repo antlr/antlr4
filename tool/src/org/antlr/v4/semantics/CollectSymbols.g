@@ -76,6 +76,7 @@ public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
+public List<GrammarAST> tokenNameRefsInRewrite = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
@@ -100,6 +101,7 @@ topdown
     |	ruleref
     |	terminal
     |	labeledElement
+    |	tokenRefInRewrite
 	;
 
 bottomup
@@ -152,13 +154,19 @@ ruleScopeSpec
 		)
 	;
 
+tokenRefInRewrite
+	:	{inContext("RESULT ...")}? TOKEN_REF {tokenNameRefsInRewrite.add($TOKEN_REF);}
+	;
+	
 labeledElement
 @after {
 LabelElementPair lp = new LabelElementPair(g, $id, $e, $start.getType());
 ruleToLabelSpace.map(currentRule.name, lp);
 }
-	:	^(ASSIGN id=ID e=.)
-	|	^(PLUS_ASSIGN id=ID e=.)
+	:	{inContext("RULE ...")}?
+		(	^(ASSIGN id=ID e=.)
+		|	^(PLUS_ASSIGN id=ID e=.)
+		)
 	;
 	
 terminal

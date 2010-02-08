@@ -24,16 +24,33 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
-        "error(17): A.g:15:0: rule a redefinition\n" +
-        "error(60): A.g:11:6: scope Blort redefinition\n" +
-        "error(59): A.g:7:1: redefinition of members action\n" +
-        "error(59): A.g:9:1: redefinition of header action\n" +
-        "error(73): A.g:3:19: cannot alias X; token name already defined\n" +
-        "error(73): A.g:3:26: cannot alias Y; token name already assigned to 'y'\n" +
-        "error(73): A.g:3:36: cannot alias Z; token name already defined\n" +
-        "error(45): A.g:13:37: rule b has no defined parameters\n" +
-        "error(23): A.g:13:43: reference to undefined rule: q\n" +
-        "error(44): A.g:14:31: missing parameter(s) on rule reference: a",
+        "error(61): A.g:11:6: scope Blort redefinition\n" +
+        "error(18): A.g:15:0: rule a redefinition\n" +
+        "error(60): A.g:7:1: redefinition of members action\n" +
+        "error(60): A.g:9:1: redefinition of header action\n" +
+        "error(74): A.g:3:19: cannot alias X; token name already defined\n" +
+        "error(74): A.g:3:26: cannot alias Y; token name already assigned to 'y'\n" +
+        "error(74): A.g:3:36: cannot alias Z; token name already defined\n" +
+        "error(46): A.g:13:37: rule b has no defined parameters\n" +
+        "error(24): A.g:13:43: reference to undefined rule: q\n" +
+        "error(45): A.g:14:31: missing parameter(s) on rule reference: a",
+
+        // INPUT
+        "parser grammar B;\n" +
+        "tokens { X='x'; Y; }\n" +
+        "scope s { int i; }\n" +
+        "\n" +
+        "a : s=ID b+=ID X=ID '.' ;\n" +
+        "\n" +
+        "b : x=ID x+=ID ;\n" +
+        "\n" +
+        "s : FOO ;",
+        // YIELDS
+        "error(34): B.g:9:0: symbol s conflicts with global dynamic scope with same name\n" +
+        "error(34): B.g:5:4: symbol s conflicts with global dynamic scope with same name\n" +
+        "error(35): B.g:5:9: label b conflicts with rule with same name\n" +
+        "error(36): B.g:5:15: label X conflicts with token with same name\n" +
+        "error(41): B.g:7:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL"
     };
 
     @Test public void testErrors() { super.testErrors(pairs); }

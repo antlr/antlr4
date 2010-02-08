@@ -44,6 +44,7 @@ public class SymbolChecks {
         checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
         checkForLabelConflicts(collector.ruleToLabelSpace, collector.rules);
+        checkTokenNameRefsInRewrite(collector.tokenNameRefsInRewrite);
     }
 
     public void checkForRuleConflicts(List<Rule> rules) {
@@ -229,7 +230,14 @@ public class SymbolChecks {
 //            arg2 = r.name;
 //        }
         if ( etype!=ErrorType.INVALID ) {
-            ErrorManager.grammarError(etype,g,labelID.token,name,arg2);
+            ErrorManager.grammarError(etype,g.fileName,labelID.token,name,arg2);
+        }
+    }
+
+    public void checkTokenNameRefsInRewrite(List<GrammarAST> tokenNameRefsInRewrite) {
+        for (GrammarAST t : tokenNameRefsInRewrite) {
+            ErrorManager.grammarError(ErrorType.UNDEFINED_TOKEN_REF_IN_REWRITE,
+                                      g.fileName, t.token, t.getText());
         }
     }
 }
