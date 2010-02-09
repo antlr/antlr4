@@ -98,9 +98,9 @@ public enum ErrorType {
 	RULE_REF_AMBIG_WITH_RULE_IN_ALT(ErrorSeverity.ERROR, true, true),
 	ILLEGAL_OPTION(ErrorSeverity.ERROR, true, true),
 	LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(ErrorSeverity.ERROR, true, true),
-	UNDEFINED_TOKEN_REF_IN_REWRITE(ErrorSeverity.ERROR, true, true),
 	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(ErrorSeverity.ERROR, true, true),
-	UNDEFINED_LABEL_REF_IN_REWRITE(ErrorSeverity.ERROR, true, true),
+    //UNDEFINED_TOKEN_REF_IN_REWRITE(ErrorSeverity.ERROR, true, true),
+	///UNDEFINED_LABEL_REF_IN_REWRITE(ErrorSeverity.ERROR, true, true), use previous
 	NO_GRAMMAR_START_RULE(ErrorSeverity.ERROR, true, true),
 	EMPTY_COMPLEMENT(ErrorSeverity.ERROR, true, true),
 	UNKNOWN_DYNAMIC_SCOPE(ErrorSeverity.ERROR, true, true),

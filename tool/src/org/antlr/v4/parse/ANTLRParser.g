@@ -819,7 +819,7 @@ options {backtrack=true;}
       // have output=AST; options. If that is the case, we will issue
       // errors/warnings in the next phase, so we just eat them here
       rewriteTreeAlt
-      
+
     | ETC
 
     | /* empty rewrite */ -> EPSILON

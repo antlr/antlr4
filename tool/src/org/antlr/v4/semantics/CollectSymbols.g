@@ -72,17 +72,15 @@ import org.stringtemplate.v4.misc.MultiMap;
 
 @members {
 Rule currentRule = null;
+int currentAlt = 1; // 1..n
 public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
-public List<GrammarAST> tokenNameRefsInRewrite = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
-public MultiMap<String, LabelElementPair> ruleToLabelSpace =
-	new MultiMap<String, LabelElementPair>();
 Grammar g; // which grammar are we checking
 public CollectSymbols(TreeNodeStream input, Grammar g) {
 	this(input);
@@ -91,6 +89,7 @@ public CollectSymbols(TreeNodeStream input, Grammar g) {
 }
 
 topdown
+//@init {System.out.println("topdown: "+((Tree)input.LT(1)).getText());}
     :	globalScope
     |	action
     |	tokensSection
@@ -99,9 +98,11 @@ topdown
     |	ruleReturns
     |	ruleScopeSpec
     |	ruleref
+    |	rewriteElement // make sure we check this before terminal etc... 
+    				   // want to match rewrite stuff all here
     |	terminal
     |	labeledElement
-    |	tokenRefInRewrite
+    |	setAlt
 	;
 
 bottomup
@@ -129,12 +130,19 @@ tokensSection
 
 rule:   ^( RULE name=ID .+)
 		{
-		Rule r = new Rule($name.text, (GrammarASTWithOptions)$RULE);
+		int numAlts = $RULE.getFirstChildWithType(BLOCK).getChildCount();
+		Rule r = new Rule($name.text, (GrammarASTWithOptions)$RULE, numAlts);
 		rules.add(r);
 		currentRule = r;
+		currentAlt = 1;
 		}
     ;
 
+setAlt
+	:	{inContext("RULE BLOCK")}? ( ALT | ALT_REWRITE )
+		{currentAlt = $start.getChildIndex()+1;}
+	;
+	
 finishRule
 	:	RULE {currentRule = null;}
 	;
@@ -154,14 +162,18 @@ ruleScopeSpec
 		)
 	;
 
-tokenRefInRewrite
-	:	{inContext("RESULT ...")}? TOKEN_REF {tokenNameRefsInRewrite.add($TOKEN_REF);}
+rewriteElement
+//@init {System.out.println("rewriteElement: "+((Tree)input.LT(1)).getText());}
+	:	
+    	{inContext("RESULT ...")}? (TOKEN_REF|RULE_REF|STRING_LITERAL|LABEL)
+		{currentRule.alt[currentAlt].rewriteElements.add($start);}
 	;
 	
 labeledElement
 @after {
 LabelElementPair lp = new LabelElementPair(g, $id, $e, $start.getType());
-ruleToLabelSpace.map(currentRule.name, lp);
+currentRule.labelDefs.map($id.text, lp);
+currentRule.alt[currentAlt].labelRefs.map($id.text, $id);
 }
 	:	{inContext("RULE ...")}?
 		(	^(ASSIGN id=ID e=.)
@@ -170,11 +182,31 @@ ruleToLabelSpace.map(currentRule.name, lp);
 	;
 	
 terminal
-    :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL	{terminals.add($start);
-    												     strings.add($STRING_LITERAL);}
-    |	TOKEN_REF {terminals.add($start); tokenIDRefs.add($TOKEN_REF);}
+    :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL
+    	{
+    	terminals.add($start);
+    	strings.add($STRING_LITERAL);
+    	if ( currentRule!=null ) {
+    		currentRule.alt[currentAlt].tokenRefs.map($STRING_LITERAL.text, $STRING_LITERAL);
+    	}
+    	}
+    |	TOKEN_REF
+    	{
+    	terminals.add($TOKEN_REF);
+    	tokenIDRefs.add($TOKEN_REF);
+    	if ( currentRule!=null ) {
+    		currentRule.alt[currentAlt].tokenRefs.map($TOKEN_REF.text, $TOKEN_REF);
+    	}
+    	}
     ;
 
 ruleref
-    :	^(RULE_REF ARG_ACTION?)							{rulerefs.add($RULE_REF);}
+//@init {System.out.println("ruleref: "+((Tree)input.LT(1)).getText());}
+    :	RULE_REF
+    	{
+    	rulerefs.add($RULE_REF);
+    	if ( currentRule!=null ) {
+    		currentRule.alt[currentAlt].ruleRefs.map($RULE_REF.text, $RULE_REF);
+    	}
+    	}
     ;

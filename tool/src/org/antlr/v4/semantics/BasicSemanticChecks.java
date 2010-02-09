@@ -242,7 +242,7 @@ public class BasicSemanticChecks {
                 ok = false;
             }
         }
-        else if ( parent.getType()==ANTLRParser.COMBINED &&
+        else if ( parent.getType()==ANTLRParser.GRAMMAR &&
                   !legalGrammarOption(g.getType(), optionID.getText()) ) { // grammar
             ErrorManager.grammarError(ErrorType.ILLEGAL_OPTION,
                                       g.fileName,

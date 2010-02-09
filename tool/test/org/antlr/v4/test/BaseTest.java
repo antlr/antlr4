@@ -48,8 +48,6 @@ import java.util.*;
 
 
 public abstract class BaseTest {
-    public static class InOutPair { String in, out; }
-
 	public static final String jikes = null;//"/usr/bin/jikes";
 	public static final String pathSep = System.getProperty("path.separator");
     

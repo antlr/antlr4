@@ -166,12 +166,12 @@ ILLEGAL_OPTION(arg) ::=
 	"illegal option <arg>"
 LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(arg) ::=
 	"rule '+=' list labels are not allowed w/o output option: <arg>"
-UNDEFINED_TOKEN_REF_IN_REWRITE(arg) ::=
-  "reference to undefined token in rewrite rule: <arg>"
 REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(arg) ::=
-  "reference to rewrite element <arg> without reference on left of ->"
-UNDEFINED_LABEL_REF_IN_REWRITE(arg) ::=
-  "reference to undefined label in rewrite rule: $<arg>"
+  "reference to rewrite element <arg> not found to left of ->"
+//UNDEFINED_TOKEN_REF_IN_REWRITE(arg) ::=
+//  "reference to undefined token in rewrite rule: <arg>"
+//UNDEFINED_LABEL_REF_IN_REWRITE(arg) ::=
+//  "reference to undefined label in rewrite rule: $<arg>"
 NO_GRAMMAR_START_RULE (arg) ::=
   "grammar <arg>: no start rule (no rule can obviously be followed by EOF)"
 EMPTY_COMPLEMENT(arg) ::= <<

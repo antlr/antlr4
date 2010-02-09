@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 CollectSymbols.g 2010-02-07 16:55:18
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 CollectSymbols.g 2010-02-08 17:57:03
 
 /*
  [The "BSD license"]
@@ -31,7 +31,6 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.runtime.tree.TreeRuleReturnScope;
 import org.antlr.v4.tool.*;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,17 +159,15 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     Rule currentRule = null;
+    int currentAlt = 1; // 1..n
     public List<Rule> rules = new ArrayList<Rule>();
     public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
     public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
     public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
-    public List<GrammarAST> tokenNameRefsInRewrite = new ArrayList<GrammarAST>();
     public List<GrammarAST> strings = new ArrayList<GrammarAST>();
     public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
     public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
     public List<GrammarAST> actions = new ArrayList<GrammarAST>();
-    public MultiMap<String, LabelElementPair> ruleToLabelSpace =
-    	new MultiMap<String, LabelElementPair>();
     Grammar g; // which grammar are we checking
     public CollectSymbols(TreeNodeStream input, Grammar g) {
     	this(input);
@@ -180,17 +177,17 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "topdown"
-    // CollectSymbols.g:93:1: topdown : ( globalScope | action | tokensSection | rule | ruleArg | ruleReturns | ruleScopeSpec | ruleref | terminal | labeledElement | tokenRefInRewrite );
+    // CollectSymbols.g:91:1: topdown : ( globalScope | action | tokensSection | rule | ruleArg | ruleReturns | ruleScopeSpec | ruleref | rewriteElement | terminal | labeledElement | setAlt );
     public final void topdown() throws RecognitionException {
         try {
-            // CollectSymbols.g:94:5: ( globalScope | action | tokensSection | rule | ruleArg | ruleReturns | ruleScopeSpec | ruleref | terminal | labeledElement | tokenRefInRewrite )
-            int alt1=11;
+            // CollectSymbols.g:93:5: ( globalScope | action | tokensSection | rule | ruleArg | ruleReturns | ruleScopeSpec | ruleref | rewriteElement | terminal | labeledElement | setAlt )
+            int alt1=12;
             alt1 = dfa1.predict(input);
             switch (alt1) {
                 case 1 :
-                    // CollectSymbols.g:94:7: globalScope
+                    // CollectSymbols.g:93:7: globalScope
                     {
-                    pushFollow(FOLLOW_globalScope_in_topdown96);
+                    pushFollow(FOLLOW_globalScope_in_topdown97);
                     globalScope();
 
                     state._fsp--;
@@ -199,9 +196,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 2 :
-                    // CollectSymbols.g:95:7: action
+                    // CollectSymbols.g:94:7: action
                     {
-                    pushFollow(FOLLOW_action_in_topdown104);
+                    pushFollow(FOLLOW_action_in_topdown105);
                     action();
 
                     state._fsp--;
@@ -210,9 +207,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 3 :
-                    // CollectSymbols.g:96:7: tokensSection
+                    // CollectSymbols.g:95:7: tokensSection
                     {
-                    pushFollow(FOLLOW_tokensSection_in_topdown112);
+                    pushFollow(FOLLOW_tokensSection_in_topdown113);
                     tokensSection();
 
                     state._fsp--;
@@ -221,9 +218,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 4 :
-                    // CollectSymbols.g:97:7: rule
+                    // CollectSymbols.g:96:7: rule
                     {
-                    pushFollow(FOLLOW_rule_in_topdown120);
+                    pushFollow(FOLLOW_rule_in_topdown121);
                     rule();
 
                     state._fsp--;
@@ -232,9 +229,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 5 :
-                    // CollectSymbols.g:98:7: ruleArg
+                    // CollectSymbols.g:97:7: ruleArg
                     {
-                    pushFollow(FOLLOW_ruleArg_in_topdown128);
+                    pushFollow(FOLLOW_ruleArg_in_topdown129);
                     ruleArg();
 
                     state._fsp--;
@@ -243,9 +240,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 6 :
-                    // CollectSymbols.g:99:7: ruleReturns
+                    // CollectSymbols.g:98:7: ruleReturns
                     {
-                    pushFollow(FOLLOW_ruleReturns_in_topdown136);
+                    pushFollow(FOLLOW_ruleReturns_in_topdown137);
                     ruleReturns();
 
                     state._fsp--;
@@ -254,9 +251,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 7 :
-                    // CollectSymbols.g:100:7: ruleScopeSpec
+                    // CollectSymbols.g:99:7: ruleScopeSpec
                     {
-                    pushFollow(FOLLOW_ruleScopeSpec_in_topdown144);
+                    pushFollow(FOLLOW_ruleScopeSpec_in_topdown145);
                     ruleScopeSpec();
 
                     state._fsp--;
@@ -265,9 +262,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 8 :
-                    // CollectSymbols.g:101:7: ruleref
+                    // CollectSymbols.g:100:7: ruleref
                     {
-                    pushFollow(FOLLOW_ruleref_in_topdown152);
+                    pushFollow(FOLLOW_ruleref_in_topdown153);
                     ruleref();
 
                     state._fsp--;
@@ -276,10 +273,10 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 9 :
-                    // CollectSymbols.g:102:7: terminal
+                    // CollectSymbols.g:101:7: rewriteElement
                     {
-                    pushFollow(FOLLOW_terminal_in_topdown160);
-                    terminal();
+                    pushFollow(FOLLOW_rewriteElement_in_topdown161);
+                    rewriteElement();
 
                     state._fsp--;
                     if (state.failed) return ;
@@ -287,10 +284,10 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 10 :
-                    // CollectSymbols.g:103:7: labeledElement
+                    // CollectSymbols.g:103:7: terminal
                     {
-                    pushFollow(FOLLOW_labeledElement_in_topdown168);
-                    labeledElement();
+                    pushFollow(FOLLOW_terminal_in_topdown182);
+                    terminal();
 
                     state._fsp--;
                     if (state.failed) return ;
@@ -298,10 +295,21 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 11 :
-                    // CollectSymbols.g:104:7: tokenRefInRewrite
+                    // CollectSymbols.g:104:7: labeledElement
                     {
-                    pushFollow(FOLLOW_tokenRefInRewrite_in_topdown176);
-                    tokenRefInRewrite();
+                    pushFollow(FOLLOW_labeledElement_in_topdown190);
+                    labeledElement();
+
+                    state._fsp--;
+                    if (state.failed) return ;
+
+                    }
+                    break;
+                case 12 :
+                    // CollectSymbols.g:105:7: setAlt
+                    {
+                    pushFollow(FOLLOW_setAlt_in_topdown198);
+                    setAlt();
 
                     state._fsp--;
                     if (state.failed) return ;
@@ -323,13 +331,13 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "bottomup"
-    // CollectSymbols.g:107:1: bottomup : finishRule ;
+    // CollectSymbols.g:108:1: bottomup : finishRule ;
     public final void bottomup() throws RecognitionException {
         try {
-            // CollectSymbols.g:108:2: ( finishRule )
-            // CollectSymbols.g:108:4: finishRule
+            // CollectSymbols.g:109:2: ( finishRule )
+            // CollectSymbols.g:109:4: finishRule
             {
-            pushFollow(FOLLOW_finishRule_in_bottomup187);
+            pushFollow(FOLLOW_finishRule_in_bottomup209);
             finishRule();
 
             state._fsp--;
@@ -350,23 +358,23 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "globalScope"
-    // CollectSymbols.g:111:1: globalScope : {...}? ^( SCOPE ID ACTION ) ;
+    // CollectSymbols.g:112:1: globalScope : {...}? ^( SCOPE ID ACTION ) ;
     public final void globalScope() throws RecognitionException {
         GrammarAST SCOPE1=null;
 
         try {
-            // CollectSymbols.g:112:2: ({...}? ^( SCOPE ID ACTION ) )
-            // CollectSymbols.g:112:4: {...}? ^( SCOPE ID ACTION )
+            // CollectSymbols.g:113:2: ({...}? ^( SCOPE ID ACTION ) )
+            // CollectSymbols.g:113:4: {...}? ^( SCOPE ID ACTION )
             {
             if ( !((inContext("GRAMMAR"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "globalScope", "inContext(\"GRAMMAR\")");
             }
-            SCOPE1=(GrammarAST)match(input,SCOPE,FOLLOW_SCOPE_in_globalScope201); if (state.failed) return ;
+            SCOPE1=(GrammarAST)match(input,SCOPE,FOLLOW_SCOPE_in_globalScope223); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            match(input,ID,FOLLOW_ID_in_globalScope203); if (state.failed) return ;
-            match(input,ACTION,FOLLOW_ACTION_in_globalScope205); if (state.failed) return ;
+            match(input,ID,FOLLOW_ID_in_globalScope225); if (state.failed) return ;
+            match(input,ACTION,FOLLOW_ACTION_in_globalScope227); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
@@ -388,22 +396,22 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "action"
-    // CollectSymbols.g:115:1: action : {...}? ^( AT ( ID )? ID ACTION ) ;
+    // CollectSymbols.g:116:1: action : {...}? ^( AT ( ID )? ID ACTION ) ;
     public final void action() throws RecognitionException {
         GrammarAST AT2=null;
 
         try {
-            // CollectSymbols.g:116:2: ({...}? ^( AT ( ID )? ID ACTION ) )
-            // CollectSymbols.g:116:4: {...}? ^( AT ( ID )? ID ACTION )
+            // CollectSymbols.g:117:2: ({...}? ^( AT ( ID )? ID ACTION ) )
+            // CollectSymbols.g:117:4: {...}? ^( AT ( ID )? ID ACTION )
             {
             if ( !((inContext("GRAMMAR"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "action", "inContext(\"GRAMMAR\")");
             }
-            AT2=(GrammarAST)match(input,AT,FOLLOW_AT_in_action222); if (state.failed) return ;
+            AT2=(GrammarAST)match(input,AT,FOLLOW_AT_in_action244); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            // CollectSymbols.g:116:33: ( ID )?
+            // CollectSymbols.g:117:33: ( ID )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -416,17 +424,17 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             }
             switch (alt2) {
                 case 1 :
-                    // CollectSymbols.g:116:33: ID
+                    // CollectSymbols.g:117:33: ID
                     {
-                    match(input,ID,FOLLOW_ID_in_action224); if (state.failed) return ;
+                    match(input,ID,FOLLOW_ID_in_action246); if (state.failed) return ;
 
                     }
                     break;
 
             }
 
-            match(input,ID,FOLLOW_ID_in_action227); if (state.failed) return ;
-            match(input,ACTION,FOLLOW_ACTION_in_action229); if (state.failed) return ;
+            match(input,ID,FOLLOW_ID_in_action249); if (state.failed) return ;
+            match(input,ACTION,FOLLOW_ACTION_in_action251); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
@@ -448,21 +456,21 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "tokensSection"
-    // CollectSymbols.g:120:1: tokensSection : {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID ) ;
+    // CollectSymbols.g:121:1: tokensSection : {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID ) ;
     public final void tokensSection() throws RecognitionException {
         GrammarAST t=null;
         GrammarAST ASSIGN3=null;
         GrammarAST STRING_LITERAL4=null;
 
         try {
-            // CollectSymbols.g:121:2: ({...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID ) )
-            // CollectSymbols.g:121:4: {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID )
+            // CollectSymbols.g:122:2: ({...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID ) )
+            // CollectSymbols.g:122:4: {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID )
             {
             if ( !((inContext("TOKENS"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "tokensSection", "inContext(\"TOKENS\")");
             }
-            // CollectSymbols.g:122:3: ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID )
+            // CollectSymbols.g:123:3: ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID )
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -481,13 +489,13 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             }
             switch (alt3) {
                 case 1 :
-                    // CollectSymbols.g:122:5: ^( ASSIGN t= ID STRING_LITERAL )
+                    // CollectSymbols.g:123:5: ^( ASSIGN t= ID STRING_LITERAL )
                     {
-                    ASSIGN3=(GrammarAST)match(input,ASSIGN,FOLLOW_ASSIGN_in_tokensSection252); if (state.failed) return ;
+                    ASSIGN3=(GrammarAST)match(input,ASSIGN,FOLLOW_ASSIGN_in_tokensSection274); if (state.failed) return ;
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
-                    t=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokensSection256); if (state.failed) return ;
-                    STRING_LITERAL4=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokensSection258); if (state.failed) return ;
+                    t=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokensSection278); if (state.failed) return ;
+                    STRING_LITERAL4=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokensSection280); if (state.failed) return ;
 
                     match(input, Token.UP, null); if (state.failed) return ;
                     if ( state.backtracking==1 ) {
@@ -498,9 +506,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 2 :
-                    // CollectSymbols.g:125:5: t= ID
+                    // CollectSymbols.g:126:5: t= ID
                     {
-                    t=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokensSection272); if (state.failed) return ;
+                    t=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokensSection294); if (state.failed) return ;
                     if ( state.backtracking==1 ) {
                       terminals.add(t); tokenIDRefs.add(t); tokensDefs.add(t);
                     }
@@ -526,20 +534,20 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "rule"
-    // CollectSymbols.g:130:1: rule : ^( RULE name= ID ( . )+ ) ;
+    // CollectSymbols.g:131:1: rule : ^( RULE name= ID ( . )+ ) ;
     public final void rule() throws RecognitionException {
         GrammarAST name=null;
         GrammarAST RULE5=null;
 
         try {
-            // CollectSymbols.g:130:5: ( ^( RULE name= ID ( . )+ ) )
-            // CollectSymbols.g:130:9: ^( RULE name= ID ( . )+ )
+            // CollectSymbols.g:131:5: ( ^( RULE name= ID ( . )+ ) )
+            // CollectSymbols.g:131:9: ^( RULE name= ID ( . )+ )
             {
-            RULE5=(GrammarAST)match(input,RULE,FOLLOW_RULE_in_rule294); if (state.failed) return ;
+            RULE5=(GrammarAST)match(input,RULE,FOLLOW_RULE_in_rule316); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            name=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule298); if (state.failed) return ;
-            // CollectSymbols.g:130:25: ( . )+
+            name=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule320); if (state.failed) return ;
+            // CollectSymbols.g:131:25: ( . )+
             int cnt4=0;
             loop4:
             do {
@@ -556,7 +564,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
                 switch (alt4) {
             	case 1 :
-            	    // CollectSymbols.g:130:25: .
+            	    // CollectSymbols.g:131:25: .
             	    {
             	    matchAny(input); if (state.failed) return ;
 
@@ -577,9 +585,11 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
 
-              		Rule r = new Rule((name!=null?name.getText():null), (GrammarASTWithOptions)RULE5);
+              		int numAlts = RULE5.getFirstChildWithType(BLOCK).getChildCount();
+              		Rule r = new Rule((name!=null?name.getText():null), (GrammarASTWithOptions)RULE5, numAlts);
               		rules.add(r);
               		currentRule = r;
+              		currentAlt = 1;
               		
             }
 
@@ -596,15 +606,59 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     }
     // $ANTLR end "rule"
 
+    public static class setAlt_return extends TreeRuleReturnScope {
+    };
+
+    // $ANTLR start "setAlt"
+    // CollectSymbols.g:141:1: setAlt : {...}? ( ALT | ALT_REWRITE ) ;
+    public final CollectSymbols.setAlt_return setAlt() throws RecognitionException {
+        CollectSymbols.setAlt_return retval = new CollectSymbols.setAlt_return();
+        retval.start = input.LT(1);
+
+        try {
+            // CollectSymbols.g:142:2: ({...}? ( ALT | ALT_REWRITE ) )
+            // CollectSymbols.g:142:4: {...}? ( ALT | ALT_REWRITE )
+            {
+            if ( !((inContext("RULE BLOCK"))) ) {
+                if (state.backtracking>0) {state.failed=true; return retval;}
+                throw new FailedPredicateException(input, "setAlt", "inContext(\"RULE BLOCK\")");
+            }
+            if ( input.LA(1)==ALT||input.LA(1)==ALT_REWRITE ) {
+                input.consume();
+                state.errorRecovery=false;state.failed=false;
+            }
+            else {
+                if (state.backtracking>0) {state.failed=true; return retval;}
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                throw mse;
+            }
+
+            if ( state.backtracking==1 ) {
+              currentAlt = ((GrammarAST)retval.start).getChildIndex()+1;
+            }
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+        }
+        return retval;
+    }
+    // $ANTLR end "setAlt"
+
 
     // $ANTLR start "finishRule"
-    // CollectSymbols.g:138:1: finishRule : RULE ;
+    // CollectSymbols.g:146:1: finishRule : RULE ;
     public final void finishRule() throws RecognitionException {
         try {
-            // CollectSymbols.g:139:2: ( RULE )
-            // CollectSymbols.g:139:4: RULE
+            // CollectSymbols.g:147:2: ( RULE )
+            // CollectSymbols.g:147:4: RULE
             {
-            match(input,RULE,FOLLOW_RULE_in_finishRule320); if (state.failed) return ;
+            match(input,RULE,FOLLOW_RULE_in_finishRule368); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               currentRule = null;
             }
@@ -624,19 +678,19 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "ruleArg"
-    // CollectSymbols.g:142:1: ruleArg : {...}? ARG_ACTION ;
+    // CollectSymbols.g:150:1: ruleArg : {...}? ARG_ACTION ;
     public final void ruleArg() throws RecognitionException {
         GrammarAST ARG_ACTION6=null;
 
         try {
-            // CollectSymbols.g:143:2: ({...}? ARG_ACTION )
-            // CollectSymbols.g:143:4: {...}? ARG_ACTION
+            // CollectSymbols.g:151:2: ({...}? ARG_ACTION )
+            // CollectSymbols.g:151:4: {...}? ARG_ACTION
             {
             if ( !((inContext("RULE"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "ruleArg", "inContext(\"RULE\")");
             }
-            ARG_ACTION6=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleArg335); if (state.failed) return ;
+            ARG_ACTION6=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleArg383); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               currentRule.arg = ARG_ACTION6;
             }
@@ -656,18 +710,18 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "ruleReturns"
-    // CollectSymbols.g:146:1: ruleReturns : ^( RETURNS ARG_ACTION ) ;
+    // CollectSymbols.g:154:1: ruleReturns : ^( RETURNS ARG_ACTION ) ;
     public final void ruleReturns() throws RecognitionException {
         GrammarAST ARG_ACTION7=null;
 
         try {
-            // CollectSymbols.g:147:2: ( ^( RETURNS ARG_ACTION ) )
-            // CollectSymbols.g:147:4: ^( RETURNS ARG_ACTION )
+            // CollectSymbols.g:155:2: ( ^( RETURNS ARG_ACTION ) )
+            // CollectSymbols.g:155:4: ^( RETURNS ARG_ACTION )
             {
-            match(input,RETURNS,FOLLOW_RETURNS_in_ruleReturns350); if (state.failed) return ;
+            match(input,RETURNS,FOLLOW_RETURNS_in_ruleReturns398); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
-            ARG_ACTION7=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns352); if (state.failed) return ;
+            ARG_ACTION7=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns400); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
@@ -689,17 +743,17 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "ruleScopeSpec"
-    // CollectSymbols.g:150:1: ruleScopeSpec : {...}? ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) ) ;
+    // CollectSymbols.g:158:1: ruleScopeSpec : {...}? ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) ) ;
     public final void ruleScopeSpec() throws RecognitionException {
         try {
-            // CollectSymbols.g:151:2: ({...}? ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) ) )
-            // CollectSymbols.g:151:4: {...}? ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) )
+            // CollectSymbols.g:159:2: ({...}? ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) ) )
+            // CollectSymbols.g:159:4: {...}? ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) )
             {
             if ( !((inContext("RULE"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "ruleScopeSpec", "inContext(\"RULE\")");
             }
-            // CollectSymbols.g:152:3: ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) )
+            // CollectSymbols.g:160:3: ( ^( SCOPE ACTION ) | ^( SCOPE ( ID )+ ) )
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -740,24 +794,24 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             }
             switch (alt6) {
                 case 1 :
-                    // CollectSymbols.g:152:5: ^( SCOPE ACTION )
+                    // CollectSymbols.g:160:5: ^( SCOPE ACTION )
                     {
-                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec373); if (state.failed) return ;
+                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec421); if (state.failed) return ;
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec375); if (state.failed) return ;
+                    match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec423); if (state.failed) return ;
 
                     match(input, Token.UP, null); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // CollectSymbols.g:153:5: ^( SCOPE ( ID )+ )
+                    // CollectSymbols.g:161:5: ^( SCOPE ( ID )+ )
                     {
-                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec383); if (state.failed) return ;
+                    match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec431); if (state.failed) return ;
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
-                    // CollectSymbols.g:153:13: ( ID )+
+                    // CollectSymbols.g:161:13: ( ID )+
                     int cnt5=0;
                     loop5:
                     do {
@@ -771,9 +825,9 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
                         switch (alt5) {
                     	case 1 :
-                    	    // CollectSymbols.g:153:13: ID
+                    	    // CollectSymbols.g:161:13: ID
                     	    {
-                    	    match(input,ID,FOLLOW_ID_in_ruleScopeSpec385); if (state.failed) return ;
+                    	    match(input,ID,FOLLOW_ID_in_ruleScopeSpec433); if (state.failed) return ;
 
                     	    }
                     	    break;
@@ -810,23 +864,35 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     }
     // $ANTLR end "ruleScopeSpec"
 
+    public static class rewriteElement_return extends TreeRuleReturnScope {
+    };
 
-    // $ANTLR start "tokenRefInRewrite"
-    // CollectSymbols.g:157:1: tokenRefInRewrite : {...}? TOKEN_REF ;
-    public final void tokenRefInRewrite() throws RecognitionException {
-        GrammarAST TOKEN_REF8=null;
+    // $ANTLR start "rewriteElement"
+    // CollectSymbols.g:165:1: rewriteElement : {...}? ( TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL ) ;
+    public final CollectSymbols.rewriteElement_return rewriteElement() throws RecognitionException {
+        CollectSymbols.rewriteElement_return retval = new CollectSymbols.rewriteElement_return();
+        retval.start = input.LT(1);
 
         try {
-            // CollectSymbols.g:158:2: ({...}? TOKEN_REF )
-            // CollectSymbols.g:158:4: {...}? TOKEN_REF
+            // CollectSymbols.g:167:2: ({...}? ( TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL ) )
+            // CollectSymbols.g:168:6: {...}? ( TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL )
             {
             if ( !((inContext("RESULT ..."))) ) {
-                if (state.backtracking>0) {state.failed=true; return ;}
-                throw new FailedPredicateException(input, "tokenRefInRewrite", "inContext(\"RESULT ...\")");
+                if (state.backtracking>0) {state.failed=true; return retval;}
+                throw new FailedPredicateException(input, "rewriteElement", "inContext(\"RESULT ...\")");
             }
-            TOKEN_REF8=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_tokenRefInRewrite404); if (state.failed) return ;
+            if ( (input.LA(1)>=TOKEN_REF && input.LA(1)<=RULE_REF)||input.LA(1)==STRING_LITERAL||input.LA(1)==LABEL ) {
+                input.consume();
+                state.errorRecovery=false;state.failed=false;
+            }
+            else {
+                if (state.backtracking>0) {state.failed=true; return retval;}
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                throw mse;
+            }
+
             if ( state.backtracking==1 ) {
-              tokenNameRefsInRewrite.add(TOKEN_REF8);
+              currentRule.alt[currentAlt].rewriteElements.add(((GrammarAST)retval.start));
             }
 
             }
@@ -838,15 +904,15 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
         }
         finally {
         }
-        return ;
+        return retval;
     }
-    // $ANTLR end "tokenRefInRewrite"
+    // $ANTLR end "rewriteElement"
 
     public static class labeledElement_return extends TreeRuleReturnScope {
     };
 
     // $ANTLR start "labeledElement"
-    // CollectSymbols.g:161:1: labeledElement : {...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) ) ;
+    // CollectSymbols.g:172:1: labeledElement : {...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) ) ;
     public final CollectSymbols.labeledElement_return labeledElement() throws RecognitionException {
         CollectSymbols.labeledElement_return retval = new CollectSymbols.labeledElement_return();
         retval.start = input.LT(1);
@@ -855,14 +921,14 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
         GrammarAST e=null;
 
         try {
-            // CollectSymbols.g:166:2: ({...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) ) )
-            // CollectSymbols.g:166:4: {...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) )
+            // CollectSymbols.g:178:2: ({...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) ) )
+            // CollectSymbols.g:178:4: {...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) )
             {
             if ( !((inContext("RULE ..."))) ) {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 throw new FailedPredicateException(input, "labeledElement", "inContext(\"RULE ...\")");
             }
-            // CollectSymbols.g:167:3: ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) )
+            // CollectSymbols.g:179:3: ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) )
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -881,12 +947,12 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             }
             switch (alt7) {
                 case 1 :
-                    // CollectSymbols.g:167:5: ^( ASSIGN id= ID e= . )
+                    // CollectSymbols.g:179:5: ^( ASSIGN id= ID e= . )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement430); if (state.failed) return retval;
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement495); if (state.failed) return retval;
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
-                    id=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement434); if (state.failed) return retval;
+                    id=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement499); if (state.failed) return retval;
                     e=(GrammarAST)input.LT(1);
                     matchAny(input); if (state.failed) return retval;
 
@@ -895,12 +961,12 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                     }
                     break;
                 case 2 :
-                    // CollectSymbols.g:168:5: ^( PLUS_ASSIGN id= ID e= . )
+                    // CollectSymbols.g:180:5: ^( PLUS_ASSIGN id= ID e= . )
                     {
-                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement446); if (state.failed) return retval;
+                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement511); if (state.failed) return retval;
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
-                    id=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement450); if (state.failed) return retval;
+                    id=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement515); if (state.failed) return retval;
                     e=(GrammarAST)input.LT(1);
                     matchAny(input); if (state.failed) return retval;
 
@@ -917,7 +983,8 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             if ( state.backtracking==1 ) {
 
               LabelElementPair lp = new LabelElementPair(g, id, e, ((GrammarAST)retval.start).getType());
-              ruleToLabelSpace.map(currentRule.name, lp);
+              currentRule.labelDefs.map((id!=null?id.getText():null), lp);
+              currentRule.alt[currentAlt].labelRefs.map((id!=null?id.getText():null), id);
 
             }
         }
@@ -935,16 +1002,16 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     };
 
     // $ANTLR start "terminal"
-    // CollectSymbols.g:172:1: terminal : ({...}? STRING_LITERAL | TOKEN_REF );
+    // CollectSymbols.g:184:1: terminal : ({...}? STRING_LITERAL | TOKEN_REF );
     public final CollectSymbols.terminal_return terminal() throws RecognitionException {
         CollectSymbols.terminal_return retval = new CollectSymbols.terminal_return();
         retval.start = input.LT(1);
 
-        GrammarAST STRING_LITERAL9=null;
-        GrammarAST TOKEN_REF10=null;
+        GrammarAST STRING_LITERAL8=null;
+        GrammarAST TOKEN_REF9=null;
 
         try {
-            // CollectSymbols.g:173:5: ({...}? STRING_LITERAL | TOKEN_REF )
+            // CollectSymbols.g:185:5: ({...}? STRING_LITERAL | TOKEN_REF )
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -963,26 +1030,37 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             }
             switch (alt8) {
                 case 1 :
-                    // CollectSymbols.g:173:7: {...}? STRING_LITERAL
+                    // CollectSymbols.g:185:7: {...}? STRING_LITERAL
                     {
                     if ( !((!inContext("TOKENS ASSIGN"))) ) {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         throw new FailedPredicateException(input, "terminal", "!inContext(\"TOKENS ASSIGN\")");
                     }
-                    STRING_LITERAL9=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal476); if (state.failed) return retval;
+                    STRING_LITERAL8=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal541); if (state.failed) return retval;
                     if ( state.backtracking==1 ) {
-                      terminals.add(((GrammarAST)retval.start));
-                          												     strings.add(STRING_LITERAL9);
+
+                          	terminals.add(((GrammarAST)retval.start));
+                          	strings.add(STRING_LITERAL8);
+                          	if ( currentRule!=null ) {
+                          		currentRule.alt[currentAlt].tokenRefs.map((STRING_LITERAL8!=null?STRING_LITERAL8.getText():null), STRING_LITERAL8);
+                          	}
+                          	
                     }
 
                     }
                     break;
                 case 2 :
-                    // CollectSymbols.g:175:7: TOKEN_REF
+                    // CollectSymbols.g:193:7: TOKEN_REF
                     {
-                    TOKEN_REF10=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal486); if (state.failed) return retval;
+                    TOKEN_REF9=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal556); if (state.failed) return retval;
                     if ( state.backtracking==1 ) {
-                      terminals.add(((GrammarAST)retval.start)); tokenIDRefs.add(TOKEN_REF10);
+
+                          	terminals.add(TOKEN_REF9);
+                          	tokenIDRefs.add(TOKEN_REF9);
+                          	if ( currentRule!=null ) {
+                          		currentRule.alt[currentAlt].tokenRefs.map((TOKEN_REF9!=null?TOKEN_REF9.getText():null), TOKEN_REF9);
+                          	}
+                          	
                     }
 
                     }
@@ -1002,41 +1080,22 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
 
     // $ANTLR start "ruleref"
-    // CollectSymbols.g:178:1: ruleref : ^( RULE_REF ( ARG_ACTION )? ) ;
+    // CollectSymbols.g:203:1: ruleref : RULE_REF ;
     public final void ruleref() throws RecognitionException {
-        GrammarAST RULE_REF11=null;
+        GrammarAST RULE_REF10=null;
 
         try {
-            // CollectSymbols.g:179:5: ( ^( RULE_REF ( ARG_ACTION )? ) )
-            // CollectSymbols.g:179:7: ^( RULE_REF ( ARG_ACTION )? )
+            // CollectSymbols.g:205:5: ( RULE_REF )
+            // CollectSymbols.g:205:7: RULE_REF
             {
-            RULE_REF11=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref506); if (state.failed) return ;
-
-            if ( input.LA(1)==Token.DOWN ) {
-                match(input, Token.DOWN, null); if (state.failed) return ;
-                // CollectSymbols.g:179:18: ( ARG_ACTION )?
-                int alt9=2;
-                int LA9_0 = input.LA(1);
-
-                if ( (LA9_0==ARG_ACTION) ) {
-                    alt9=1;
-                }
-                switch (alt9) {
-                    case 1 :
-                        // CollectSymbols.g:179:18: ARG_ACTION
-                        {
-                        match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref508); if (state.failed) return ;
-
-                        }
-                        break;
-
-                }
-
-
-                match(input, Token.UP, null); if (state.failed) return ;
-            }
+            RULE_REF10=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref581); if (state.failed) return ;
             if ( state.backtracking==1 ) {
-              rulerefs.add(RULE_REF11);
+
+                  	rulerefs.add(RULE_REF10);
+                  	if ( currentRule!=null ) {
+                  		currentRule.alt[currentAlt].ruleRefs.map((RULE_REF10!=null?RULE_REF10.getText():null), RULE_REF10);
+                  	}
+                  	
             }
 
             }
@@ -1057,42 +1116,46 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
     protected DFA1 dfa1 = new DFA1(this);
     static final String DFA1_eotS =
-        "\25\uffff";
+        "\30\uffff";
     static final String DFA1_eofS =
-        "\25\uffff";
+        "\30\uffff";
     static final String DFA1_minS =
-        "\1\16\1\2\1\uffff\1\2\6\uffff\1\0\1\uffff\1\20\1\127\1\uffff\1\3"+
+        "\1\16\1\2\1\uffff\1\2\4\uffff\3\0\3\uffff\1\20\1\127\2\uffff\1\3"+
         "\1\uffff\1\4\1\uffff\1\2\1\0";
     static final String DFA1_maxS =
-        "\1\127\1\2\1\uffff\1\2\6\uffff\1\0\1\uffff\2\127\1\uffff\1\127\1"+
+        "\1\145\1\2\1\uffff\1\2\4\uffff\3\0\3\uffff\2\127\2\uffff\1\127\1"+
         "\uffff\1\145\1\uffff\1\3\1\0";
     static final String DFA1_acceptS =
-        "\2\uffff\1\2\1\uffff\1\3\1\4\1\5\1\6\1\10\1\11\1\uffff\1\12\2\uffff"+
-        "\1\13\1\uffff\1\7\1\uffff\1\1\2\uffff";
+        "\2\uffff\1\2\1\uffff\1\3\1\4\1\5\1\6\3\uffff\1\11\1\13\1\14\2\uffff"+
+        "\1\10\1\12\1\uffff\1\7\1\uffff\1\1\2\uffff";
     static final String DFA1_specialS =
-        "\12\uffff\1\0\11\uffff\1\1}>";
+        "\10\uffff\1\2\1\1\1\0\14\uffff\1\3}>";
     static final String[] DFA1_transitionS = {
-            "\1\6\6\uffff\1\1\11\uffff\1\7\15\uffff\1\3\4\uffff\1\13\10\uffff"+
-            "\1\2\2\uffff\1\12\1\10\3\uffff\1\11\4\uffff\1\5\16\uffff\1\4",
-            "\1\14",
+            "\1\6\6\uffff\1\1\11\uffff\1\7\15\uffff\1\3\4\uffff\1\14\10\uffff"+
+            "\1\2\2\uffff\1\12\1\10\3\uffff\1\11\4\uffff\1\5\13\uffff\1\15"+
+            "\2\uffff\1\4\5\uffff\1\13\7\uffff\1\15",
+            "\1\16",
             "",
-            "\1\15",
-            "",
-            "",
+            "\1\17",
             "",
             "",
             "",
             "",
             "\1\uffff",
+            "\1\uffff",
+            "\1\uffff",
             "",
-            "\1\20\106\uffff\1\17",
-            "\1\21",
             "",
-            "\1\20\14\uffff\1\22\106\uffff\1\20",
             "",
-            "\77\13\1\23\42\13",
+            "\1\23\106\uffff\1\22",
+            "\1\24",
             "",
-            "\1\13\1\24",
+            "",
+            "\1\23\14\uffff\1\25\106\uffff\1\23",
+            "",
+            "\77\14\1\26\42\14",
+            "",
+            "\1\14\1\27",
             "\1\uffff"
     };
 
@@ -1126,7 +1189,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             this.transition = DFA1_transition;
         }
         public String getDescription() {
-            return "93:1: topdown : ( globalScope | action | tokensSection | rule | ruleArg | ruleReturns | ruleScopeSpec | ruleref | terminal | labeledElement | tokenRefInRewrite );";
+            return "91:1: topdown : ( globalScope | action | tokensSection | rule | ruleArg | ruleReturns | ruleScopeSpec | ruleref | rewriteElement | terminal | labeledElement | setAlt );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TreeNodeStream input = (TreeNodeStream)_input;
@@ -1139,27 +1202,57 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
                         int index1_10 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (!(((inContext("RESULT ..."))))) ) {s = 9;}
+                        if ( ((inContext("RESULT ..."))) ) {s = 11;}
 
-                        else if ( ((inContext("RESULT ..."))) ) {s = 14;}
+                        else if ( (true) ) {s = 17;}
 
                          
                         input.seek(index1_10);
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA1_20 = input.LA(1);
+                        int LA1_9 = input.LA(1);
 
                          
-                        int index1_20 = input.index();
+                        int index1_9 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((inContext("RESULT ..."))) ) {s = 11;}
+
+                        else if ( ((!inContext("TOKENS ASSIGN"))) ) {s = 17;}
+
+                         
+                        input.seek(index1_9);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 2 : 
+                        int LA1_8 = input.LA(1);
+
+                         
+                        int index1_8 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (!(((inContext("RESULT ..."))))) ) {s = 16;}
+
+                        else if ( ((inContext("RESULT ..."))) ) {s = 11;}
+
+                         
+                        input.seek(index1_8);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 3 : 
+                        int LA1_23 = input.LA(1);
+
+                         
+                        int index1_23 = input.index();
                         input.rewind();
                         s = -1;
                         if ( ((inContext("TOKENS"))) ) {s = 4;}
 
-                        else if ( ((inContext("RULE ..."))) ) {s = 11;}
+                        else if ( ((inContext("RULE ..."))) ) {s = 12;}
 
                          
-                        input.seek(index1_20);
+                        input.seek(index1_23);
                         if ( s>=0 ) return s;
                         break;
             }
@@ -1172,47 +1265,48 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     }
  
 
-    public static final BitSet FOLLOW_globalScope_in_topdown96 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_action_in_topdown104 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tokensSection_in_topdown112 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule_in_topdown120 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleArg_in_topdown128 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleReturns_in_topdown136 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleScopeSpec_in_topdown144 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_topdown152 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_terminal_in_topdown160 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_labeledElement_in_topdown168 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tokenRefInRewrite_in_topdown176 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_finishRule_in_bottomup187 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCOPE_in_globalScope201 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_globalScope203 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_globalScope205 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_AT_in_action222 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_action224 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_action227 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_action229 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ASSIGN_in_tokensSection252 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_tokensSection256 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_tokensSection258 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ID_in_tokensSection272 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_in_rule294 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule298 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_RULE_in_finishRule320 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleArg335 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RETURNS_in_ruleReturns350 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns352 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec373 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec375 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec383 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_ruleScopeSpec385 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_tokenRefInRewrite404 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement430 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement434 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement446 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement450 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal476 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal486 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref506 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref508 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_globalScope_in_topdown97 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_action_in_topdown105 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tokensSection_in_topdown113 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rule_in_topdown121 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleArg_in_topdown129 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleReturns_in_topdown137 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleScopeSpec_in_topdown145 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_topdown153 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteElement_in_topdown161 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_terminal_in_topdown182 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_labeledElement_in_topdown190 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_setAlt_in_topdown198 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_finishRule_in_bottomup209 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SCOPE_in_globalScope223 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_globalScope225 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_globalScope227 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_AT_in_action244 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_action246 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_action249 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_action251 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_tokensSection274 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_tokensSection278 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_tokensSection280 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_tokensSection294 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_in_rule316 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_rule320 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_set_in_setAlt344 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_in_finishRule368 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleArg383 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RETURNS_in_ruleReturns398 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns400 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec421 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec423 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec431 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_ruleScopeSpec433 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_set_in_rewriteElement459 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement495 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement499 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement511 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement515 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal541 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal556 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref581 = new BitSet(new long[]{0x0000000000000002L});
 
 }

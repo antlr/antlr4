@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-02-07 13:10:29
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ASTVerifier.g 2010-02-07 17:00:06
 
 /*
  [The "BSD license"]
@@ -391,51 +391,48 @@ public class ASTVerifier extends TreeParser {
 
 
     // $ANTLR start "optionsSpec"
-    // ASTVerifier.g:128:1: optionsSpec : ^( OPTIONS ( option )+ ) ;
+    // ASTVerifier.g:128:1: optionsSpec : ^( OPTIONS ( option )* ) ;
     public final void optionsSpec() throws RecognitionException {
         try {
-            // ASTVerifier.g:129:2: ( ^( OPTIONS ( option )+ ) )
-            // ASTVerifier.g:129:4: ^( OPTIONS ( option )+ )
+            // ASTVerifier.g:129:2: ( ^( OPTIONS ( option )* ) )
+            // ASTVerifier.g:129:4: ^( OPTIONS ( option )* )
             {
             match(input,OPTIONS,FOLLOW_OPTIONS_in_optionsSpec157); 
 
-            match(input, Token.DOWN, null); 
-            // ASTVerifier.g:129:14: ( option )+
-            int cnt4=0;
-            loop4:
-            do {
-                int alt4=2;
-                int LA4_0 = input.LA(1);
+            if ( input.LA(1)==Token.DOWN ) {
+                match(input, Token.DOWN, null); 
+                // ASTVerifier.g:129:14: ( option )*
+                loop4:
+                do {
+                    int alt4=2;
+                    int LA4_0 = input.LA(1);
 
-                if ( (LA4_0==ASSIGN) ) {
-                    alt4=1;
-                }
-
-
-                switch (alt4) {
-            	case 1 :
-            	    // ASTVerifier.g:129:14: option
-            	    {
-            	    pushFollow(FOLLOW_option_in_optionsSpec159);
-            	    option();
-
-            	    state._fsp--;
+                    if ( (LA4_0==ASSIGN) ) {
+                        alt4=1;
+                    }
 
 
-            	    }
-            	    break;
+                    switch (alt4) {
+                	case 1 :
+                	    // ASTVerifier.g:129:14: option
+                	    {
+                	    pushFollow(FOLLOW_option_in_optionsSpec159);
+                	    option();
 
-            	default :
-            	    if ( cnt4 >= 1 ) break loop4;
-                        EarlyExitException eee =
-                            new EarlyExitException(4, input);
-                        throw eee;
-                }
-                cnt4++;
-            } while (true);
+                	    state._fsp--;
 
 
-            match(input, Token.UP, null); 
+                	    }
+                	    break;
+
+                	default :
+                	    break loop4;
+                    }
+                } while (true);
+
+
+                match(input, Token.UP, null); 
+            }
 
             }
 
@@ -4268,7 +4265,7 @@ public class ASTVerifier extends TreeParser {
         "\1\141\2\2\1\uffff\1\2\2\uffff\2\141\1\127\4\uffff\1\141\2\2\2\uffff"+
         "\2\141";
     static final String DFA31_acceptS =
-        "\3\uffff\1\5\1\uffff\1\10\1\11\3\uffff\1\3\1\1\1\4\1\2\3\uffff\1"+
+        "\3\uffff\1\5\1\uffff\1\10\1\11\3\uffff\1\1\1\3\1\4\1\2\3\uffff\1"+
         "\7\1\6\2\uffff";
     static final String DFA31_specialS =
         "\25\uffff}>";
@@ -4281,7 +4278,7 @@ public class ASTVerifier extends TreeParser {
             "\1\11",
             "",
             "",
-            "\1\5\4\uffff\1\5\2\uffff\1\13\4\uffff\1\12\1\uffff\1\5\1\6"+
+            "\1\5\4\uffff\1\5\2\uffff\1\12\4\uffff\1\13\1\uffff\1\5\1\6"+
             "\3\uffff\1\5\35\uffff\1\5",
             "\1\5\4\uffff\1\5\2\uffff\1\15\4\uffff\1\14\1\uffff\1\5\1\6"+
             "\3\uffff\1\5\35\uffff\1\5",

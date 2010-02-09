@@ -126,7 +126,7 @@ prequelConstruct
     ;
 
 optionsSpec
-	:	^(OPTIONS option+)
+	:	^(OPTIONS option*)
     ;
 
 option

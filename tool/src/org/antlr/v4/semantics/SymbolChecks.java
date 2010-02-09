@@ -3,7 +3,6 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -43,8 +42,8 @@ public class SymbolChecks {
         checkTokenAliasRedefinitions(collector.tokensDefs);
         checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
-        checkForLabelConflicts(collector.ruleToLabelSpace, collector.rules);
-        checkTokenNameRefsInRewrite(collector.tokenNameRefsInRewrite);
+        checkForLabelConflicts(collector.rules);
+        checkRewriteElementsPresentOnLeftSide(collector.rules);
     }
 
     public void checkForRuleConflicts(List<Rule> rules) {
@@ -170,38 +169,37 @@ public class SymbolChecks {
     /** Make sure a label doesn't conflict with another symbol.
      *  Labels must not conflict with: rules, tokens, scope names,
      *  return values, parameters, and rule-scope dynamic attributes
-     *  defined in surrounding rule.
+     *  defined in surrounding rule.  Also they must have same type
+     *  for repeated defs.
      */
-    public void checkForLabelConflicts(MultiMap<String, LabelElementPair> ruleToLabelSpace,
-                                       List<Rule> rules) {
+    public void checkForLabelConflicts(List<Rule> rules) {
         for (Rule r : rules) {
             Map<String, LabelElementPair> labelNameSpace =
                 new HashMap<String, LabelElementPair>();
-
-            List<LabelElementPair> pairs = ruleToLabelSpace.get(r.name);
-            if ( pairs==null ) continue;
-            
-            for (LabelElementPair labelPair : pairs) {
-                checkForLabelConflict(r, labelPair.label);
-
-                String name = labelPair.label.getText();
-                LabelElementPair prevLabelPair = labelNameSpace.get(name);
-                if ( prevLabelPair==null ) {
-                    labelNameSpace.put(name, labelPair);
-                }
-                else {
-                    // label already defined; if same type, no problem
-                    if ( prevLabelPair.type != labelPair.type ) {
-                        String typeMismatchExpr = labelPair.type+"!="+prevLabelPair.type;
-                        ErrorManager.grammarError(
-                            ErrorType.LABEL_TYPE_CONFLICT,
-                            g.fileName,
-                            labelPair.label.token,
-                            name,
-                            typeMismatchExpr);
-                    }
+            for (List<LabelElementPair> pairs : r.labelDefs.values() ) {
+                for (LabelElementPair p : pairs) {
+                    checkForLabelConflict(r, p.label);
+                    String name = p.label.getText();
+                    LabelElementPair prev = labelNameSpace.get(name);
+                    if ( prev==null ) labelNameSpace.put(name, p);
+                    else checkForTypeMismatch(prev, p);
                 }
             }
+        }
+    }
+
+    protected void checkForTypeMismatch(LabelElementPair prevLabelPair,
+                                        LabelElementPair labelPair)
+    {
+        // label already defined; if same type, no problem
+        if ( prevLabelPair.type != labelPair.type ) {
+            String typeMismatchExpr = labelPair.type+"!="+prevLabelPair.type;
+            ErrorManager.grammarError(
+                ErrorType.LABEL_TYPE_CONFLICT,
+                g.fileName,
+                labelPair.label.token,
+                labelPair.label.getText(),
+                typeMismatchExpr);
         }
     }
 
@@ -234,10 +232,19 @@ public class SymbolChecks {
         }
     }
 
-    public void checkTokenNameRefsInRewrite(List<GrammarAST> tokenNameRefsInRewrite) {
-        for (GrammarAST t : tokenNameRefsInRewrite) {
-            ErrorManager.grammarError(ErrorType.UNDEFINED_TOKEN_REF_IN_REWRITE,
-                                      g.fileName, t.token, t.getText());
+    public void checkRewriteElementsPresentOnLeftSide(List<Rule> rules) {
+        for (Rule r : rules) {
+            for (int a=1; a<=r.numberOfAlts; a++) {
+                Alternative alt = r.alt[a];
+                for (GrammarAST e : alt.rewriteElements) {
+                    if ( !(alt.ruleRefs.containsKey(e.getText()) ||
+                           alt.tokenRefs.containsKey(e.getText()) ||
+                           alt.labelRefs.containsKey(e.getText())) ) {
+                        ErrorManager.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
+                                                  g.fileName, e.token, e.getText());
+                    }
+                }
+            }
         }
     }
 }
