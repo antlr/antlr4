@@ -143,7 +143,7 @@ LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL(arg,arg2) ::=
 ATTRIBUTE_CONFLICTS_WITH_RULE(arg,arg2) ::=
 	"rule <arg2>'s dynamically-scoped attribute <arg> conflicts with the rule name"
 ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL(arg,arg2) ::=
-	"rule <arg2>'s dynamically-scoped attribute <arg> conflicts with<arg2>'s return value or parameter with same name"
+	"rule <arg2>'s dynamically-scoped attribute <arg> conflicts with <arg2>'s return value or parameter with same name"
 LABEL_TYPE_CONFLICT(arg,arg2) ::=
 	"label <arg> type mismatch with previous definition: <arg2>"
 ARG_RETVAL_CONFLICT(arg,arg2) ::=

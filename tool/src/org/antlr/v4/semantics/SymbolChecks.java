@@ -125,12 +125,12 @@ public class SymbolChecks {
                                           g.fileName, ref.token, ruleName);
             }
             GrammarAST arg = (GrammarAST)ref.getChild(0);
-            if ( arg!=null && r.arg==null ) {
+            if ( arg!=null && r.args==null ) {
                 ErrorManager.grammarError(ErrorType.RULE_HAS_NO_ARGS,
                                           g.fileName, ref.token, ruleName);
 
             }
-            else if ( arg==null && (r!=null&&r.arg!=null) ) {
+            else if ( arg==null && (r!=null&&r.args!=null) ) {
                 ErrorManager.grammarError(ErrorType.MISSING_RULE_ARGS,
                                           g.fileName, ref.token, ruleName);
             }
@@ -174,6 +174,8 @@ public class SymbolChecks {
      */
     public void checkForLabelConflicts(List<Rule> rules) {
         for (Rule r : rules) {
+            checkForRuleArgumentAndReturnValueConflicts(r);
+            checkForRuleScopeAttributeConflict(r);
             Map<String, LabelElementPair> labelNameSpace =
                 new HashMap<String, LabelElementPair>();
             for (List<LabelElementPair> pairs : r.labelDefs.values() ) {
@@ -216,19 +218,62 @@ public class SymbolChecks {
         else if ( tokenIDs.contains(name) ) {
             etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
         }
-
-//        else if ( r.ruleScope!=null && r.ruleScope.getAttribute(label.getText())!=null ) {
-//            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
-//            arg2 = r.name;
-//        }
-//        else if ( (r.returnScope!=null&&r.returnScope.getAttribute(label.getText())!=null) ||
-//                  (r.parameterScope!=null&&r.parameterScope.getAttribute(label.getText())!=null) )
-//        {
-//            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
-//            arg2 = r.name;
-//        }
+        else if ( r.scope!=null && r.scope.get(name)!=null ) {
+            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
+            arg2 = r.name;
+        }
+        else if ( (r.retvals!=null&&r.retvals.get(name)!=null) ||
+                  (r.args!=null&&r.args.get(name)!=null) )
+        {
+            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
+            arg2 = r.name;
+        }
         if ( etype!=ErrorType.INVALID ) {
             ErrorManager.grammarError(etype,g.fileName,labelID.token,name,arg2);
+        }
+    }
+
+    public void checkForRuleArgumentAndReturnValueConflicts(Rule r) {
+        if ( r.retvals!=null ) {
+            Set conflictingKeys = r.retvals.intersection(r.args);
+            if (conflictingKeys!=null) {
+                for (Iterator it = conflictingKeys.iterator(); it.hasNext();) {
+                    String key = (String) it.next();
+                    ErrorManager.grammarError(
+                        ErrorType.ARG_RETVAL_CONFLICT,
+                        g.fileName,
+                        ((GrammarAST)r.ast.getChild(0)).token,
+                        key,
+                        r.name);
+                }
+            }
+        }
+    }
+
+    /** Check for collision of a rule-scope dynamic attribute with:
+     *  arg, return value, rule name itself.  Labels are checked elsewhere.
+     */
+    public void checkForRuleScopeAttributeConflict(Rule r) {
+        if ( r.scope==null ) return;
+        for (Attribute a : r.scope.attributes.values()) {
+            ErrorType msgID = ErrorType.INVALID;
+            Object arg2 = null;
+            String attrName = a.name;
+            if ( r.name.equals(attrName) ) {
+                msgID = ErrorType.ATTRIBUTE_CONFLICTS_WITH_RULE;
+                arg2 = r.name;
+            }
+            else if ( (r.retvals!=null&&r.retvals.get(attrName)!=null) ||
+                      (r.args!=null&&r.args.get(attrName)!=null) )
+            {
+                msgID = ErrorType.ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL;
+                arg2 = r.name;
+            }
+            if ( msgID!=ErrorType.INVALID ) {
+                ErrorManager.grammarError(msgID,g.fileName,
+                                          r.scope.ast.token,
+                                          attrName,arg2);
+            }
         }
     }
 

@@ -69,7 +69,6 @@ public enum ErrorType {
 	LEXER_RULES_NOT_ALLOWED(ErrorSeverity.ERROR, true, true),
 	PARSER_RULES_NOT_ALLOWED(ErrorSeverity.ERROR, true, true),
     REPEATED_PREQUEL(ErrorSeverity.ERROR, true, true),
-	CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(ErrorSeverity.ERROR, true, true),
 	NO_TOKEN_DEFINITION(ErrorSeverity.ERROR, true, true),
 	UNDEFINED_RULE_REF(ErrorSeverity.ERROR, true, true),
 	LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(ErrorSeverity.ERROR, true, true),

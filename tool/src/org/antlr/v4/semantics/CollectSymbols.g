@@ -65,6 +65,7 @@ options {
 */
 package org.antlr.v4.semantics;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.parse.*;
 import java.util.Set;
 import java.util.HashSet;
 import org.stringtemplate.v4.misc.MultiMap;
@@ -148,17 +149,29 @@ finishRule
 	;
 
 ruleArg
-	:	{inContext("RULE")}? ARG_ACTION {currentRule.arg = $ARG_ACTION;}
+	:	{inContext("RULE")}? ARG_ACTION
+		{
+		currentRule.args = ScopeParser.parseTypeList($ARG_ACTION.text);
+		currentRule.args.ast = $ARG_ACTION;
+		}
 	;
 	
 ruleReturns
-	:	^(RETURNS ARG_ACTION) {currentRule.ret = $ARG_ACTION;}
+	:	^(RETURNS ARG_ACTION)
+		{
+		currentRule.retvals = ScopeParser.parseTypeList($ARG_ACTION.text);
+		currentRule.retvals.ast = $ARG_ACTION;
+		}
 	;
 
 ruleScopeSpec
 	:	{inContext("RULE")}?
 		(	^(SCOPE ACTION)
-		|	^(SCOPE ID+)
+			{
+			currentRule.scope = ScopeParser.parseDynamicScope($ACTION.text);
+			currentRule.scope.ast = $ACTION;
+			}
+		|	^(SCOPE ids+=ID+) {currentRule.useScopes = $ids;}
 		)
 	;
 

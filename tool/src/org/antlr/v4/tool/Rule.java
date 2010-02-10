@@ -1,12 +1,19 @@
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.Token;
 import org.stringtemplate.v4.misc.MultiMap;
+
+import java.util.List;
 
 public class Rule {
     public String name;
     public GrammarASTWithOptions ast;
-    public GrammarAST arg;
-    public GrammarAST ret;
+    public AttributeScope args;
+    public AttributeScope retvals;
+    public AttributeScope scope;
+    /** A list of scope names used by this rule */
+    public List<Token> useScopes;
+
     public int numberOfAlts;
 
     /** Labels are visible to all alts in a rule. Record all defs here.
@@ -30,9 +37,10 @@ public class Rule {
     public String toString() {
         return "Rule{" +
                "name='" + name + '\'' +
-               ", arg=" + arg +
-               ", ret=" + ret +
+               ", args=" + args +
+               ", retvals=" + retvals +
                ", labels=" + labelDefs +
+               ", scope=" + scope +
                '}';
     }
 }
