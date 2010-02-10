@@ -15,10 +15,10 @@ public class TestBasicSemanticErrors extends BaseTest {
         "\n" +
         "b : A^ | ((B!|C)) -> C;",
         // YIELDS
-        "error(68): A.g:7:7: alts with rewrites can't use heterogeneous types left of ->\n" +
-        "error(77): A.g:9:4: AST operator with non-AST output option: ^\n" +
-        "error(77): A.g:9:11: AST operator with non-AST output option: !\n" +
-        "error(78): A.g:9:11: rule b alt 2 uses rewrite syntax and also an AST operator",
+        "error(67): A.g:7:7: alts with rewrites can't use heterogeneous types left of ->\n" +
+        "error(76): A.g:9:4: AST operator with non-AST output option: ^\n" +
+        "error(76): A.g:9:11: AST operator with non-AST output option: !\n" +
+        "error(77): A.g:9:11: rule b alt 2 uses rewrite syntax and also an AST operator",
 
         // INPUT
         "tree grammar B;\n" +
@@ -32,9 +32,9 @@ public class TestBasicSemanticErrors extends BaseTest {
         "\n" +
         "b : ^(. A) ;",
         // YIELDS
-        "error(79): B.g:10:6: Wildcard invalid as root; wildcard can itself be a tree\n" +
-        "error(80): B.g:1:5: option backtrack=false conflicts with tree grammar filter mode\n" +
-        "error(80): B.g:1:5: option output=template conflicts with tree grammar filter mode"
+        "error(78): B.g:10:6: Wildcard invalid as root; wildcard can itself be a tree\n" +
+        "error(79): B.g:1:5: option backtrack=false conflicts with tree grammar filter mode\n" +
+        "error(79): B.g:1:5: option output=template conflicts with tree grammar filter mode"
     };
 
     static String[] U = {
@@ -57,12 +57,12 @@ public class TestBasicSemanticErrors extends BaseTest {
         // YIELDS
         "error(21): U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
         "error(21): U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-        "error(49): U.g:2:10: illegal option foo\n" +
-        "error(27): U.g:4:8: token names must start with an uppercase letter: f\n" +
-        "error(49): U.g:8:10: illegal option x\n" +
-        "error(49): U.g:11:10: illegal option blech\n" +
-        "error(49): U.g:14:16: illegal option ick\n" +
-        "error(49): U.g:15:16: illegal option x",
+        "error(48): U.g:2:10: illegal option foo\n" +
+        "error(26): U.g:4:8: token names must start with an uppercase letter: f\n" +
+        "error(48): U.g:8:10: illegal option x\n" +
+        "error(48): U.g:11:10: illegal option blech\n" +
+        "error(48): U.g:14:16: illegal option ick\n" +
+        "error(48): U.g:15:16: illegal option x",
 
         // INPUT
         "tree grammar V;\n" +
@@ -74,9 +74,9 @@ public class TestBasicSemanticErrors extends BaseTest {
         "  | A B -> template() \"kjsfdkdsj\" \n" +
         "  ;",
         // YIELDS
-        "error(66): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct",
+        "error(65): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct",
     };
 
     @Test public void testA() { super.testErrors(A); }
-    @Test public void testB() { super.testErrors(U); }
+    @Test public void testU() { super.testErrors(U); }
 }
