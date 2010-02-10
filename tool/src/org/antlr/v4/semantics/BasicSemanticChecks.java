@@ -307,7 +307,9 @@ public class BasicSemanticChecks {
                                                                 int alt)
     {
         if ( gtype==ANTLRParser.TREE &&
-             options!=null && options.get("output").equals("template") &&
+             options!=null && options.get("output")!=null &&
+             options.get("output").equals("template") &&
+             options.get("rewrite")!=null &&
              options.get("rewrite").equals("true") )
         {
             String fileName = altStart.getInputStream().getSourceName();
@@ -322,6 +324,8 @@ public class BasicSemanticChecks {
                                       GrammarAST op,
                                       GrammarAST elementRoot)
     {
+        RuleAST rule = (RuleAST)op.getAncestor(ANTLRParser.RULE);
+        String ruleName = rule.getChild(0).getText();
         String fileName = elementRoot.token.getInputStream().getSourceName();
         if ( options==null || !options.get("output").equals("AST") ) {
             ErrorManager.grammarWarning(ErrorType.AST_OP_WITH_NON_AST_OUTPUT_OPTION,
@@ -329,9 +333,13 @@ public class BasicSemanticChecks {
                                         elementRoot.token,
                                         op.getText());
         }
+        if ( options!=null && options.get("output")==null ) {
+            ErrorManager.grammarWarning(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+                                        fileName,
+                                        elementRoot.token,
+                                        ruleName);
+        }
         if ( op.hasAncestor(ANTLRParser.ALT_REWRITE) ) {
-            RuleAST rule = (RuleAST)op.getAncestor(ANTLRParser.RULE);
-            String ruleName = rule.getChild(0).getText();
             GrammarAST rew = (GrammarAST)op.getAncestor(ANTLRParser.ALT_REWRITE);
             int altNum = rew.getChildIndex() + 1; // alts are 1..n
             ErrorManager.grammarWarning(ErrorType.AST_OP_IN_ALT_WITH_REWRITE,
@@ -339,6 +347,18 @@ public class BasicSemanticChecks {
                                         elementRoot.token,
                                         ruleName,
                                         altNum);
+        }
+    }
+
+    protected static void checkRewriteOk(Map<String, String> options, GrammarAST elementRoot) {
+        RuleAST rule = (RuleAST)elementRoot.getAncestor(ANTLRParser.RULE);
+        String ruleName = rule.getChild(0).getText();
+        String fileName = elementRoot.token.getInputStream().getSourceName();
+        if ( options!=null && options.get("output")==null ) {
+            ErrorManager.grammarWarning(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+                                        fileName,
+                                        elementRoot.token,
+                                        ruleName);
         }
     }
 

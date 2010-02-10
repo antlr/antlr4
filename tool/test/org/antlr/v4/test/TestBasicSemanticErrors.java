@@ -75,6 +75,15 @@ public class TestBasicSemanticErrors extends BaseTest {
         "  ;",
         // YIELDS
         "error(65): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct",
+
+        // INPUT
+        "tree grammar V;\n" +
+        "options { rewrite=true; }\n" +
+        "a : A\n" +
+        "  | A B -> template() \"kjsfdkdsj\" \n" +
+        "  ;",
+        // YIELDS
+        "error(61): V.g:4:8: rule a uses rewrite syntax or operator with no output option",
     };
 
     @Test public void testA() { super.testErrors(A); }

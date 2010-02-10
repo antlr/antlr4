@@ -204,7 +204,7 @@ MISSING_ATTRIBUTE_NAME() ::=
 ARG_INIT_VALUES_ILLEGAL(arg) ::=
   "rule parameters may not have init values: <arg>"
 REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(arg) ::=
-  "<if(arg)>rule <arg> uses <endif>rewrite syntax or operator with no output option; setting output=AST"
+  "<if(arg)>rule <arg> uses <endif>rewrite syntax or operator with no output option"
 AST_OP_WITH_NON_AST_OUTPUT_OPTION(arg) ::=
   "AST operator with non-AST output option: <arg>"
 NO_RULES(arg) ::= "grammar file <arg> has no rules"

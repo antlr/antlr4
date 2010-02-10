@@ -87,6 +87,7 @@ topdown  // do these on way down so options and such are set first
 	|	option
 	|	rule
 	|	tokenAlias
+	|	rewrite
 	;
 	
 bottomup // do these "inside to outside" of expressions.
@@ -206,8 +207,7 @@ elementOption
 
 // (ALT_REWRITE (ALT A B)   ^( ALT ^( A B ) ) or ( ALT A )
 multiElementAltInTreeGrammar
-	:	{inContext("ALT_REWRITE") &&
-		 root.getOption("output")!=null && root.getOption("output").equals("template")}?
+	:	{inContext("ALT_REWRITE")}?
 		^( ALT ~(SEMPRED|ACTION) ~(SEMPRED|ACTION)+ ) // > 1 element at outer level
 		{
 		int altNum = $start.getParent().getChildIndex() + 1; // alts are 1..n
@@ -222,6 +222,11 @@ multiElementAltInTreeGrammar
 astOps
 	:	^(ROOT el=.) {BasicSemanticChecks.checkASTOps(g.getType(), root.getOptions(), $start, $el);}
 	|	^(BANG el=.) {BasicSemanticChecks.checkASTOps(g.getType(), root.getOptions(), $start, $el);}
+	;
+
+rewrite
+	:	(RESULT|ST_RESULT)
+		{BasicSemanticChecks.checkRewriteOk(root.getOptions(),$start);}
 	;
 	
 wildcardRoot
