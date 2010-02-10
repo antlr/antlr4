@@ -19,20 +19,6 @@ import java.util.List;
  *  use "int i" but ruby/python would use "i".
  */
 public class ScopeParser {
-    public static void main(String[] args) {
-        System.out.println(parseTypeList("int i"));
-        System.out.println(parseTypeList("int[] i, int j[]"));
-        System.out.println(parseTypeList("Map<A\\,B>[] i, int j[]"));
-        System.out.println(parseTypeList("int i = 34+a[3], int j[] = new int[34]"));
-        System.out.println(parseTypeList("char *foo32[3] = {1\\,2\\,3}"));
-        System.out.println();
-        System.out.println(parseDynamicScope("int i;"));
-        System.out.println(parseDynamicScope("int[] i; int j[];"));
-        System.out.println(parseDynamicScope("Map<A,B>[] i; int j[];"));
-        System.out.println(parseDynamicScope("int i = 34+a[3]; int j[] = new int[34];"));
-        System.out.println(parseDynamicScope("char *foo32[] = {1,2,3};"));        
-    }
-
     /** Given an arg or retval scope definition list like
      *
      *  Map<String, String>, int[] j3, char *foo32[3]
@@ -67,7 +53,7 @@ public class ScopeParser {
                 i++;
             }
             i++; // skip separator
-            System.out.println("def="+buf.toString());
+//            System.out.println("def="+buf.toString());
             Attribute a = parseAttributeDef(buf.toString());
             scope.attributes.put(a.name, a);
         }
