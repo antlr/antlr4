@@ -59,12 +59,12 @@ public class SemanticPipeline {
     public void checkAttributeExpressions(Grammar g, CollectSymbols collector) {
         for (Rule r : collector.rules) {
             for (GrammarAST a : r.namedActions.values()) {
-                AttributeChecks extractor = new AttributeChecks(g, a.getText());
-                extractor.getActionChunks(); // forces eval, fills extractor
+                AttributeChecks checker = new AttributeChecks(g, r, a, a.getText());
+                checker.examine();
             }
             for (GrammarAST a : r.inlineActions) {
-                AttributeChecks extractor = new AttributeChecks(g, a.getText());
-                extractor.getActionChunks(); // forces eval, fills extractor
+                AttributeChecks checker = new AttributeChecks(g, r, a, a.getText());
+                checker.examine(); 
             }
         }
     }

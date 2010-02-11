@@ -182,6 +182,7 @@ public class CommonTree extends BaseTree {
     }
 
     // TODO: move to basetree when i settle on how runtime works
+    // TODO: don't include this node!!
     /** include this node */
     public CommonTree getFirstDescendantWithType(int type) {
         if ( getType()==type ) return this;

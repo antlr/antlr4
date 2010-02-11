@@ -8,25 +8,34 @@ import org.antlr.v4.tool.*;
 }
 
 @members {
+/*
 public void setQualifiedAttr(Token x, Token y, Token expr) { }
 public void qualifiedAttr(Token x, Token y) { }
-public void setDynamicScopeAttr() { }
-public void dynamicScopeAttr() { }
-public void setDynamicNegativeIndexedScopeAttr() { }
-public void dynamicNegativeIndexedScopeAttr() { }
-public void setDynamicAbsoluteIndexedScopeAttr() { }
-public void dynamicAbsoluteIndexedScopeAttr() { }
-public void setAttr() { }
-public void attr() { }
+public void setDynamicScopeAttr(Token x, Token y, Token expr) { }
+public void dynamicScopeAttr(Token x, Token y) { }
+public void setDynamicNegativeIndexedScopeAttr(Token x, Token y, Token index, Token expr) { }
+public void dynamicNegativeIndexedScopeAttr(Token x, Token y, Token index) { }
+public void setDynamicAbsoluteIndexedScopeAttr(Token x, Token y, Token index, Token expr) { }
+public void dynamicAbsoluteIndexedScopeAttr(Token x, Token y, Token index) { }
+public void setAttr(Token x, Token expr) { }
+public void attr(Token x) { }
 public void templateInstance() { }
 public void indirectTemplateInstance() { }
 public void setExprAttribute() { }
 public void setAttribute() { }
 public void templateExpr() { }
-public void unknownSyntax() { }
-public void text() { }
+public void unknownSyntax(String text) { }
+public void text(String text) { }
+*/
+ActionSplitterListener delegate;
 
-public List<Token> getActionChunks() {
+public ActionSplitter(CharStream input, ActionSplitterListener delegate) {
+    this(input, new RecognizerSharedState());
+    this.delegate = delegate;
+}
+
+/** force filtering (and return tokens). triggers all above actions. */
+public List<Token> getActionChunks() { 
     List<Token> chunks = new ArrayList<Token>();
     Token t = nextToken();
     while ( t.getType()!=Token.EOF ) {
@@ -37,21 +46,32 @@ public List<Token> getActionChunks() {
 }
 }
 
+// ignore comments right away
+
+COMMENT
+    :   '/*' ( options {greedy=false;} : . )* '*/' {delegate.text($text);}
+    ;
+
+LINE_COMMENT
+    : '//' ~('\n'|'\r')* '\r'? '\n' {delegate.text($text);}
+    ;
+
 SET_QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{setQualifiedAttr($x, $y, $expr);}
+		{delegate.setQualifiedAttr($x, $y, $expr);}
 	;
 
 QUALIFIED_ATTR
-	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {qualifiedAttr($x, $y);}
+	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {delegate.qualifiedAttr($x, $y);}
 	;
 
 SET_DYNAMIC_SCOPE_ATTR
 	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
+		{delegate.setDynamicScopeAttr($x, $y, $expr);}
 	;
 
 DYNAMIC_SCOPE_ATTR
-	:	'$' x=ID '::' y=ID
+	:	'$' x=ID '::' y=ID {delegate.dynamicScopeAttr($x, $y);}
 	;
 
 /**		To access deeper (than top of stack) scopes, use the notation:
@@ -63,29 +83,33 @@ DYNAMIC_SCOPE_ATTR
  * 		$x[0]::y  is the absolute 0 indexed element (bottom of the stack)
  */
 SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' '-' expr=SCOPE_INDEX_EXPR ']' '::' y=ID
+	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
 		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
+		{delegate.setDynamicNegativeIndexedScopeAttr($x, $y, $index, $expr);}
 	;
 
 DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' '-' expr=SCOPE_INDEX_EXPR ']' '::' y=ID
+	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
+		{delegate.dynamicNegativeIndexedScopeAttr($x, $y, $index);}
 	;
 
 SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' expr=SCOPE_INDEX_EXPR ']' '::' y=ID
+	:	'$' x=ID '[' index=SCOPE_INDEX_EXPR ']' '::' y=ID
 		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
+		{delegate.setDynamicAbsoluteIndexedScopeAttr($x, $y, $index, $expr);}
 	;
 
 DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' expr=SCOPE_INDEX_EXPR ']' '::' y=ID
+	:	'$' x=ID '[' index=SCOPE_INDEX_EXPR ']' '::' y=ID
+		{delegate.dynamicAbsoluteIndexedScopeAttr($x, $y, $index);}
 	;
 
 SET_ATTR
-	:	ATTR WS? '=' expr=ATTR_VALUE_EXPR ';'
+	:	'$' x=ID WS? '=' expr=ATTR_VALUE_EXPR ';' {delegate.setAttr($x, $expr);}
 	;
 
 ATTR
-	:	'$' ID
+	:	'$' x=ID {delegate.attr($x);}
 	;
 
 /** %foo(a={},b={},...) ctor */
@@ -117,26 +141,15 @@ TEMPLATE_EXPR
 	;
 
 UNKNOWN_SYNTAX
-	:	'$'
-		{
-//		chunks.add(getText());
-		// shouldn't need an error here.  Just accept \$ if it doesn't look like anything
-		}
-	|	'%' (ID|'.'|'('|')'|','|'{'|'}'|'"')*
-		{
-/*
-		chunks.add(getText());
-		ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
-								  grammar,
-								  actionToken,
-								  getText());
-*/
-		}
+@after {delegate.unknownSyntax($text);}
+	:	'%' (ID|'.'|'('|')'|','|'{'|'}'|'"')*
 	;
 
-TEXT:	(	'\\$'
+// Anything else is just random text
+TEXT
+@after {delegate.text($text);}
+	:	(	'\\$'
 		|	'\\%'
-		|	~('$'|'%')
 		)+
 	;
 	
