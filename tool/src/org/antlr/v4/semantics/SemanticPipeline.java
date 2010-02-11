@@ -3,6 +3,7 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.ASTVerifier;
+import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
