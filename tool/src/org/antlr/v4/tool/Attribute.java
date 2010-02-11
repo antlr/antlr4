@@ -17,7 +17,9 @@ public class Attribute {
     public String initValue;
 
     public Attribute() {;}
-    
+
+    public Attribute(String name) { this(name,null); }
+
     public Attribute(String name, String decl) {
         this.name = name;
         this.decl = decl;

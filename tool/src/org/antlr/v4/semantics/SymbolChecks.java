@@ -284,7 +284,7 @@ public class SymbolChecks {
                 for (GrammarAST e : alt.rewriteElements) {
                     if ( !(alt.ruleRefs.containsKey(e.getText()) ||
                            alt.tokenRefs.containsKey(e.getText()) ||
-                           alt.labelRefs.containsKey(e.getText())) ) {
+                           alt.labelDefs.containsKey(e.getText())) ) {
                         ErrorManager.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
                                                   g.fileName, e.token, e.getText());
                     }

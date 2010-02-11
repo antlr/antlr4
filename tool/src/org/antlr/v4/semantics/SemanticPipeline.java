@@ -4,10 +4,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 /** */
 public class SemanticPipeline {
@@ -59,12 +56,16 @@ public class SemanticPipeline {
     public void checkAttributeExpressions(Grammar g, CollectSymbols collector) {
         for (Rule r : collector.rules) {
             for (GrammarAST a : r.namedActions.values()) {
-                AttributeChecks checker = new AttributeChecks(g, r, a, a.getText());
+                AttributeChecks checker = new AttributeChecks(g, r, null, a, a.getText());
                 checker.examine();
             }
-            for (GrammarAST a : r.inlineActions) {
-                AttributeChecks checker = new AttributeChecks(g, r, a, a.getText());
-                checker.examine(); 
+            for (int i=1; i<=r.numberOfAlts; i++) {
+                Alternative alt = r.alt[i];
+                for (GrammarAST a : alt.actions) {
+                    AttributeChecks checker =
+                        new AttributeChecks(g, r, alt, a, a.getText());
+                    checker.examine();
+                }
             }
         }
     }

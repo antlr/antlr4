@@ -135,7 +135,7 @@ tokensSection
 rule:   ^( RULE name=ID .+)
 		{
 		int numAlts = $RULE.getFirstChildWithType(BLOCK).getChildCount();
-		Rule r = new Rule($name.text, (GrammarASTWithOptions)$RULE, numAlts);
+		Rule r = new Rule(g, $name.text, (GrammarASTWithOptions)$RULE, numAlts);
 		rules.add(r);
 		currentRule = r;
 		currentAlt = 1;
@@ -157,15 +157,15 @@ rulelNamedAction
 	;
 
 ruleAction
-	:	{inContext("RULE ...")}? ACTION {currentRule.inlineActions.add($ACTION);}
+	:	{inContext("RULE ...")}? ACTION {currentRule.alt[currentAlt].actions.add($ACTION);}
 	;
 
 exceptionHandler
-	: ^(CATCH ARG_ACTION ACTION)	{currentRule.inlineActions.add($ACTION);}
+	: ^(CATCH ARG_ACTION ACTION)	{currentRule.exceptionActions.add($ACTION);}
 	;
 
 finallyClause
-	: ^(FINALLY ACTION)				{currentRule.inlineActions.add($ACTION);}
+	: ^(FINALLY ACTION)				{currentRule.exceptionActions.add($ACTION);}
 	;
 	
 ruleArg
@@ -206,7 +206,7 @@ labeledElement
 @after {
 LabelElementPair lp = new LabelElementPair(g, $id, $e, $start.getType());
 currentRule.labelDefs.map($id.text, lp);
-currentRule.alt[currentAlt].labelRefs.map($id.text, $id);
+currentRule.alt[currentAlt].labelDefs.map($id.text, $id);
 }
 	:	{inContext("RULE ...")}?
 		(	^(ASSIGN id=ID e=.)

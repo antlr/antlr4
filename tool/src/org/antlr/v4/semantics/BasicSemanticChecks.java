@@ -1,10 +1,10 @@
 package org.antlr.v4.semantics;
 
-import org.antlr.misc.MultiMap;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
+import org.stringtemplate.v4.misc.MultiMap;
 
 import java.io.File;
 import java.util.*;
@@ -114,8 +114,6 @@ public class BasicSemanticChecks {
             }
         };
 
-    // TODO: track errors?
-    
     protected static void checkGrammarName(Grammar g, Token nameToken) {
         if ( g.implicitLexer==null ) return;
         String fullyQualifiedName = nameToken.getInputStream().getSourceName();

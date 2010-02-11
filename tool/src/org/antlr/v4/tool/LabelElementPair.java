@@ -32,7 +32,7 @@ public class LabelElementPair {
         // now reset if lexer and string
         if ( g.getType() == ANTLRParser.LEXER ) {
             if ( element.getFirstDescendantWithType(ANTLRParser.STRING_LITERAL)!=null ) {
-                if ( labelOp==ANTLRParser.ASSIGN ) type = LabelType.CHAR_LABEL;
+                if ( labelOp==ANTLRParser.ASSIGN ) type = LabelType.LEXER_STRING_LABEL;
             }
         }
         else if ( g.getType() == ANTLRParser.TREE ) {

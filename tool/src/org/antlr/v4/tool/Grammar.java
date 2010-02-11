@@ -8,6 +8,7 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -20,6 +21,19 @@ public class Grammar {
             }
         };
 
+    public static Map<String, AttributeScope> grammarAndLabelRefTypeToScope =
+        new HashMap<String, AttributeScope>() {{
+            put("lexer:RULE_LABEL", Rule.predefinedLexerRulePropertiesScope);
+            put("lexer:LEXER_STRING_LABEL", Rule.predefinedLexerRulePropertiesScope);
+            put("parser:RULE_LABEL", Rule.predefinedRulePropertiesScope);
+            put("parser:TOKEN_LABEL", AttributeScope.predefinedTokenScope);
+            put("tree:RULE_LABEL", Rule.predefinedTreeRulePropertiesScope);
+            put("tree:TOKEN_LABEL", AttributeScope.predefinedTokenScope);
+            put("tree:WILDCARD_TREE_LABEL", AttributeScope.predefinedTokenScope);
+            put("combined:RULE_LABEL", Rule.predefinedRulePropertiesScope);
+            put("combined:TOKEN_LABEL", AttributeScope.predefinedTokenScope);
+        }};
+    
     public Tool tool;
     public String name;
     public GrammarRootAST ast;

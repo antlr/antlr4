@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 CollectSymbols.g 2010-02-11 11:14:49
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 CollectSymbols.g 2010-02-11 12:59:15
 
 /*
  [The "BSD license"]
@@ -26,15 +26,19 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.semantics;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.parse.*;
+import java.util.Set;
+import java.util.HashSet;
+import org.stringtemplate.v4.misc.MultiMap;
+
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.TreeNodeStream;
-import org.antlr.runtime.tree.TreeRuleReturnScope;
-import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.*;
-
-import java.util.ArrayList;
+import org.antlr.runtime.tree.*;import java.util.Stack;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 /** Collects rules, terminals, strings, actions, scopes etc... from AST
  *  Side-effects: None
  */
@@ -620,7 +624,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             if ( state.backtracking==1 ) {
 
               		int numAlts = RULE5.getFirstChildWithType(BLOCK).getChildCount();
-              		Rule r = new Rule((name!=null?name.getText():null), (GrammarASTWithOptions)RULE5, numAlts);
+              		Rule r = new Rule(g, (name!=null?name.getText():null), (GrammarASTWithOptions)RULE5, numAlts);
               		rules.add(r);
               		currentRule = r;
               		currentAlt = 1;
@@ -765,7 +769,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             }
             ACTION8=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_ruleAction430); if (state.failed) return ;
             if ( state.backtracking==1 ) {
-              currentRule.inlineActions.add(ACTION8);
+              currentRule.alt[currentAlt].actions.add(ACTION8);
             }
 
             }
@@ -799,7 +803,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
-              currentRule.inlineActions.add(ACTION9);
+              currentRule.exceptionActions.add(ACTION9);
             }
 
             }
@@ -832,7 +836,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
-              currentRule.inlineActions.add(ACTION10);
+              currentRule.exceptionActions.add(ACTION10);
             }
 
             }
@@ -1178,7 +1182,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
 
               LabelElementPair lp = new LabelElementPair(g, id, e, ((GrammarAST)retval.start).getType());
               currentRule.labelDefs.map((id!=null?id.getText():null), lp);
-              currentRule.alt[currentAlt].labelRefs.map((id!=null?id.getText():null), id);
+              currentRule.alt[currentAlt].labelDefs.map((id!=null?id.getText():null), id);
 
             }
         }

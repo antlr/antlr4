@@ -4,34 +4,21 @@ options { filter=true; }
 
 @header {
 package org.antlr.v4.parse;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.tool.*;
 }
 
 @members {
-/*
-public void setQualifiedAttr(Token x, Token y, Token expr) { }
-public void qualifiedAttr(Token x, Token y) { }
-public void setDynamicScopeAttr(Token x, Token y, Token expr) { }
-public void dynamicScopeAttr(Token x, Token y) { }
-public void setDynamicNegativeIndexedScopeAttr(Token x, Token y, Token index, Token expr) { }
-public void dynamicNegativeIndexedScopeAttr(Token x, Token y, Token index) { }
-public void setDynamicAbsoluteIndexedScopeAttr(Token x, Token y, Token index, Token expr) { }
-public void dynamicAbsoluteIndexedScopeAttr(Token x, Token y, Token index) { }
-public void setAttr(Token x, Token expr) { }
-public void attr(Token x) { }
-public void templateInstance() { }
-public void indirectTemplateInstance() { }
-public void setExprAttribute() { }
-public void setAttribute() { }
-public void templateExpr() { }
-public void unknownSyntax(String text) { }
-public void text(String text) { }
-*/
 ActionSplitterListener delegate;
 
 public ActionSplitter(CharStream input, ActionSplitterListener delegate) {
     this(input, new RecognizerSharedState());
     this.delegate = delegate;
+}
+
+public void emit(Token token) {
+	super.emit(token);
+	
 }
 
 /** force filtering (and return tokens). triggers all above actions. */

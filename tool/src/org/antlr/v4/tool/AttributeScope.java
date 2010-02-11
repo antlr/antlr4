@@ -16,6 +16,21 @@ public class AttributeScope {
     protected String name;
     public GrammarAST ast;
 
+    /** All token scopes (token labels) share the same fixed scope of
+     *  of predefined attributes.  I keep this out of the runtime.Token
+     *  object to avoid a runtime type leakage.
+     */
+    public static AttributeScope predefinedTokenScope = new AttributeScope() {{
+        add(new Attribute("text"));
+        add(new Attribute("type"));
+        add(new Attribute("line"));
+        add(new Attribute("index"));
+        add(new Attribute("pos"));
+        add(new Attribute("channel"));
+        add(new Attribute("tree"));
+        add(new Attribute("int"));
+    }};
+
     public static enum Type {
         ARG, RET, TOKEN, PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
         GLOBAL_SCOPE,   // scope symbols { ...}
@@ -27,6 +42,7 @@ public class AttributeScope {
     public LinkedHashMap<String, Attribute> attributes =
         new LinkedHashMap<String, Attribute>();
 
+    public Attribute add(Attribute a) { return attributes.put(a.name, a); }
     public Attribute get(String name) { return attributes.get(name); }
 
     public String getName() {
