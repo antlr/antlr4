@@ -92,7 +92,7 @@ public CollectSymbols(TreeNodeStream input, Grammar g) {
 topdown
 //@init {System.out.println("topdown: "+((Tree)input.LT(1)).getText());}
     :	globalScope
-    |	action
+    |	globalNamedAction
     |	tokensSection
     |	rule
     |	ruleArg
@@ -104,6 +104,9 @@ topdown
     |	terminal
     |	labeledElement
     |	setAlt
+    |	ruleAction
+    |	finallyClause
+    |	exceptionHandler
 	;
 
 bottomup
@@ -114,7 +117,7 @@ globalScope
 	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION) {scopes.add($SCOPE);}
 	;
 
-action
+globalNamedAction
 	:	{inContext("GRAMMAR")}? ^(AT ID? ID ACTION)
 		{actions.add($AT);}
 	;
@@ -148,6 +151,23 @@ finishRule
 	:	RULE {currentRule = null;}
 	;
 
+rulelNamedAction
+	:	{inContext("RULE")}? ^(AT ID ACTION)
+		{currentRule.namedActions.put($ID.text,$ACTION);}
+	;
+
+ruleAction
+	:	{inContext("RULE ...")}? ACTION {currentRule.inlineActions.add($ACTION);}
+	;
+
+exceptionHandler
+	: ^(CATCH ARG_ACTION ACTION)	{currentRule.inlineActions.add($ACTION);}
+	;
+
+finallyClause
+	: ^(FINALLY ACTION)				{currentRule.inlineActions.add($ACTION);}
+	;
+	
 ruleArg
 	:	{inContext("RULE")}? ARG_ACTION
 		{

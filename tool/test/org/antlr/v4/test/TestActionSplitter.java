@@ -5,7 +5,6 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ActionSplitter;
 import org.junit.Test;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +20,12 @@ public class TestActionSplitter extends BaseTest {
         "$ID.text = \"test\";",		"['$ID.text = \"test\";'<7>]",
         "$a.line == $b.line",		"['$a.line'<8>, ' == '<26>, '$b.line'<8>]",
         "$r.tree",		"['$r.tree'<8>]",
-        "foo $a::n bar",		"['foo '<26>, '$a::n'<9>, ' bar'<26>]",
+        "foo $a::n bar",		"['foo '<26>, '$a::n'<10>, ' bar'<26>]",
         "$Symbols[-1]::names.add($id.text);",		"['$Symbols[-1]::names'<12>, '.add('<26>, '$id.text'<8>, ');'<26>]",
-        "$Symbols[0]::names.add($id.text);",		"['$Symbols[0]::names'<15>, '.add('<26>, '$id.text'<8>, ');'<26>]",
-        "$Symbols::x;",		"['$Symbols::x'<9>, ';'<26>]",
+        "$Symbols[0]::names.add($id.text);",		"['$Symbols[0]::names'<14>, '.add('<26>, '$id.text'<8>, ');'<26>]",
+        "$Symbols::x;",		"['$Symbols::x'<10>, ';'<26>]",
         "$Symbols.size()>0",		"['$Symbols'<16>, '.size()>0'<26>]",
-        "$field::x = $field.st;",		"['$field::x = $field.st;'<10>]",
+        "$field::x = $field.st;",		"['$field::x = $field.st;'<9>]",
         "$foo.get(\"ick\");",		"['$foo'<16>, '.get(\"ick\");'<26>]",
     };
 

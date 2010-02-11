@@ -1,18 +1,14 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ActionSplitter.g 2010-02-10 15:47:23
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ActionSplitter.g 2010-02-10 17:19:39
 
 package org.antlr.v4.parse;
-import org.antlr.v4.tool.*;
-
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
+
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.List;
 public class ActionSplitter extends Lexer {
     public static final int INDIRECT_TEMPLATE_INSTANCE=21;
-    public static final int DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR=11;
+    public static final int DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR=13;
     public static final int SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR=12;
     public static final int SET_ATTRIBUTE=23;
     public static final int TEMPLATE_EXPR=24;
@@ -23,20 +19,21 @@ public class ActionSplitter extends Lexer {
     public static final int ACTION=20;
     public static final int UNKNOWN_SYNTAX=25;
     public static final int SET_QUALIFIED_ATTR=7;
-    public static final int SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR=15;
+    public static final int SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR=14;
     public static final int WS=5;
     public static final int ARG=18;
     public static final int TEMPLATE_INSTANCE=19;
     public static final int SET_EXPR_ATTRIBUTE=22;
     public static final int ATTR_VALUE_EXPR=6;
-    public static final int SET_DYNAMIC_SCOPE_ATTR=10;
-    public static final int SCOPE_INDEX_EXPR=13;
-    public static final int DYNAMIC_SCOPE_ATTR=9;
+    public static final int SET_DYNAMIC_SCOPE_ATTR=9;
+    public static final int SCOPE_INDEX_EXPR=11;
+    public static final int DYNAMIC_SCOPE_ATTR=10;
     public static final int SET_ATTR=17;
     public static final int ATTR=16;
-    public static final int DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR=14;
+    public static final int DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR=15;
 
-    public void setQualifiedAttr() { }
+    public void setQualifiedAttr(Token x, Token y, Token expr) { }
+    public void qualifiedAttr(Token x, Token y) { }
     public void setDynamicScopeAttr() { }
     public void dynamicScopeAttr() { }
     public void setDynamicNegativeIndexedScopeAttr() { }
@@ -52,6 +49,16 @@ public class ActionSplitter extends Lexer {
     public void templateExpr() { }
     public void unknownSyntax() { }
     public void text() { }
+
+    public List<Token> getActionChunks() {
+        List<Token> chunks = new ArrayList<Token>();
+        Token t = nextToken();
+        while ( t.getType()!=Token.EOF ) {
+            chunks.add(t);
+            t = nextToken();
+        }
+        return chunks;
+    }
 
 
     // delegates
@@ -126,8 +133,8 @@ public class ActionSplitter extends Lexer {
             CommonToken y=null;
             CommonToken expr=null;
 
-            // ActionSplitter.g:30:2: ( '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionSplitter.g:30:4: '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionSplitter.g:41:2: ( '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionSplitter.g:41:4: '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
             int xStart39 = getCharIndex();
@@ -137,7 +144,7 @@ public class ActionSplitter extends Lexer {
             int yStart45 = getCharIndex();
             mID(); if (state.failed) return ;
             y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart45, getCharIndex()-1);
-            // ActionSplitter.g:30:22: ( WS )?
+            // ActionSplitter.g:41:22: ( WS )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -146,7 +153,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // ActionSplitter.g:30:22: WS
+                    // ActionSplitter.g:41:22: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -160,6 +167,9 @@ public class ActionSplitter extends Lexer {
             mATTR_VALUE_EXPR(); if (state.failed) return ;
             expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart54, getCharIndex()-1);
             match(';'); if (state.failed) return ;
+            if ( state.backtracking==1 ) {
+              setQualifiedAttr(x, y, expr);
+            }
 
             }
 
@@ -179,20 +189,23 @@ public class ActionSplitter extends Lexer {
             CommonToken x=null;
             CommonToken y=null;
 
-            // ActionSplitter.g:34:2: ( '$' x= ID '.' y= ID {...}?)
-            // ActionSplitter.g:34:4: '$' x= ID '.' y= ID {...}?
+            // ActionSplitter.g:46:2: ( '$' x= ID '.' y= ID {...}?)
+            // ActionSplitter.g:46:4: '$' x= ID '.' y= ID {...}?
             {
             match('$'); if (state.failed) return ;
-            int xStart71 = getCharIndex();
+            int xStart75 = getCharIndex();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart71, getCharIndex()-1);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart75, getCharIndex()-1);
             match('.'); if (state.failed) return ;
-            int yStart77 = getCharIndex();
+            int yStart81 = getCharIndex();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart77, getCharIndex()-1);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart81, getCharIndex()-1);
             if ( !((input.LA(1)!='(')) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "QUALIFIED_ATTR", "input.LA(1)!='('");
+            }
+            if ( state.backtracking==1 ) {
+              qualifiedAttr(x, y);
             }
 
             }
@@ -210,13 +223,23 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = SET_DYNAMIC_SCOPE_ATTR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
+            CommonToken x=null;
+            CommonToken y=null;
             CommonToken expr=null;
 
-            // ActionSplitter.g:38:2: ( DYNAMIC_SCOPE_ATTR ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionSplitter.g:38:4: DYNAMIC_SCOPE_ATTR ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionSplitter.g:50:2: ( '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionSplitter.g:50:4: '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
-            mDYNAMIC_SCOPE_ATTR(); if (state.failed) return ;
-            // ActionSplitter.g:38:23: ( WS )?
+            match('$'); if (state.failed) return ;
+            int xStart100 = getCharIndex();
+            mID(); if (state.failed) return ;
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart100, getCharIndex()-1);
+            match("::"); if (state.failed) return ;
+
+            int yStart106 = getCharIndex();
+            mID(); if (state.failed) return ;
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart106, getCharIndex()-1);
+            // ActionSplitter.g:50:23: ( WS )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -225,7 +248,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt2) {
                 case 1 :
-                    // ActionSplitter.g:38:23: WS
+                    // ActionSplitter.g:50:23: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -235,9 +258,9 @@ public class ActionSplitter extends Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart99 = getCharIndex();
+            int exprStart115 = getCharIndex();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart99, getCharIndex()-1);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart115, getCharIndex()-1);
             match(';'); if (state.failed) return ;
 
             }
@@ -258,18 +281,18 @@ public class ActionSplitter extends Lexer {
             CommonToken x=null;
             CommonToken y=null;
 
-            // ActionSplitter.g:42:2: ( '$' x= ID '::' y= ID )
-            // ActionSplitter.g:42:4: '$' x= ID '::' y= ID
+            // ActionSplitter.g:54:2: ( '$' x= ID '::' y= ID )
+            // ActionSplitter.g:54:4: '$' x= ID '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart116 = getCharIndex();
+            int xStart132 = getCharIndex();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart116, getCharIndex()-1);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart132, getCharIndex()-1);
             match("::"); if (state.failed) return ;
 
-            int yStart122 = getCharIndex();
+            int yStart138 = getCharIndex();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart122, getCharIndex()-1);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart138, getCharIndex()-1);
 
             }
 
@@ -286,13 +309,29 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
+            CommonToken x=null;
             CommonToken expr=null;
+            CommonToken y=null;
 
-            // ActionSplitter.g:54:2: ( DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )? )
-            // ActionSplitter.g:54:4: DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )?
+            // ActionSplitter.g:66:2: ( '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )? )
+            // ActionSplitter.g:66:4: '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )?
             {
-            mDYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR(); if (state.failed) return ;
-            // ActionSplitter.g:55:3: ( WS )?
+            match('$'); if (state.failed) return ;
+            int xStart155 = getCharIndex();
+            mID(); if (state.failed) return ;
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart155, getCharIndex()-1);
+            match('['); if (state.failed) return ;
+            match('-'); if (state.failed) return ;
+            int exprStart163 = getCharIndex();
+            mSCOPE_INDEX_EXPR(); if (state.failed) return ;
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart163, getCharIndex()-1);
+            match(']'); if (state.failed) return ;
+            match("::"); if (state.failed) return ;
+
+            int yStart171 = getCharIndex();
+            mID(); if (state.failed) return ;
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart171, getCharIndex()-1);
+            // ActionSplitter.g:67:3: ( WS )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -301,7 +340,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt3) {
                 case 1 :
-                    // ActionSplitter.g:55:3: WS
+                    // ActionSplitter.g:67:3: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -310,7 +349,7 @@ public class ActionSplitter extends Lexer {
 
             }
 
-            // ActionSplitter.g:55:7: ( '=' expr= ATTR_VALUE_EXPR ';' )?
+            // ActionSplitter.g:67:7: ( '=' expr= ATTR_VALUE_EXPR ';' )?
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -319,12 +358,12 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt4) {
                 case 1 :
-                    // ActionSplitter.g:55:8: '=' expr= ATTR_VALUE_EXPR ';'
+                    // ActionSplitter.g:67:8: '=' expr= ATTR_VALUE_EXPR ';'
                     {
                     match('='); if (state.failed) return ;
-                    int exprStart147 = getCharIndex();
+                    int exprStart183 = getCharIndex();
                     mATTR_VALUE_EXPR(); if (state.failed) return ;
-                    expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart147, getCharIndex()-1);
+                    expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart183, getCharIndex()-1);
                     match(';'); if (state.failed) return ;
 
                     }
@@ -352,24 +391,24 @@ public class ActionSplitter extends Lexer {
             CommonToken expr=null;
             CommonToken y=null;
 
-            // ActionSplitter.g:59:2: ( '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
-            // ActionSplitter.g:59:4: '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
+            // ActionSplitter.g:71:2: ( '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
+            // ActionSplitter.g:71:4: '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart166 = getCharIndex();
+            int xStart202 = getCharIndex();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart166, getCharIndex()-1);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart202, getCharIndex()-1);
             match('['); if (state.failed) return ;
             match('-'); if (state.failed) return ;
-            int exprStart174 = getCharIndex();
+            int exprStart210 = getCharIndex();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart174, getCharIndex()-1);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart210, getCharIndex()-1);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart182 = getCharIndex();
+            int yStart218 = getCharIndex();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart182, getCharIndex()-1);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart218, getCharIndex()-1);
 
             }
 
@@ -386,13 +425,28 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
+            CommonToken x=null;
             CommonToken expr=null;
+            CommonToken y=null;
 
-            // ActionSplitter.g:63:2: ( DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )? )
-            // ActionSplitter.g:63:4: DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )?
+            // ActionSplitter.g:75:2: ( '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )? )
+            // ActionSplitter.g:75:4: '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )?
             {
-            mDYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR(); if (state.failed) return ;
-            // ActionSplitter.g:64:3: ( WS )?
+            match('$'); if (state.failed) return ;
+            int xStart233 = getCharIndex();
+            mID(); if (state.failed) return ;
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart233, getCharIndex()-1);
+            match('['); if (state.failed) return ;
+            int exprStart239 = getCharIndex();
+            mSCOPE_INDEX_EXPR(); if (state.failed) return ;
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart239, getCharIndex()-1);
+            match(']'); if (state.failed) return ;
+            match("::"); if (state.failed) return ;
+
+            int yStart247 = getCharIndex();
+            mID(); if (state.failed) return ;
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart247, getCharIndex()-1);
+            // ActionSplitter.g:76:3: ( WS )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -401,7 +455,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt5) {
                 case 1 :
-                    // ActionSplitter.g:64:3: WS
+                    // ActionSplitter.g:76:3: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -410,7 +464,7 @@ public class ActionSplitter extends Lexer {
 
             }
 
-            // ActionSplitter.g:64:7: ( '=' expr= ATTR_VALUE_EXPR ';' )?
+            // ActionSplitter.g:76:7: ( '=' expr= ATTR_VALUE_EXPR ';' )?
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -419,12 +473,12 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt6) {
                 case 1 :
-                    // ActionSplitter.g:64:8: '=' expr= ATTR_VALUE_EXPR ';'
+                    // ActionSplitter.g:76:8: '=' expr= ATTR_VALUE_EXPR ';'
                     {
                     match('='); if (state.failed) return ;
-                    int exprStart205 = getCharIndex();
+                    int exprStart259 = getCharIndex();
                     mATTR_VALUE_EXPR(); if (state.failed) return ;
-                    expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart205, getCharIndex()-1);
+                    expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart259, getCharIndex()-1);
                     match(';'); if (state.failed) return ;
 
                     }
@@ -452,23 +506,23 @@ public class ActionSplitter extends Lexer {
             CommonToken expr=null;
             CommonToken y=null;
 
-            // ActionSplitter.g:68:2: ( '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
-            // ActionSplitter.g:68:4: '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
+            // ActionSplitter.g:80:2: ( '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
+            // ActionSplitter.g:80:4: '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart224 = getCharIndex();
+            int xStart278 = getCharIndex();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart224, getCharIndex()-1);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart278, getCharIndex()-1);
             match('['); if (state.failed) return ;
-            int exprStart230 = getCharIndex();
+            int exprStart284 = getCharIndex();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart230, getCharIndex()-1);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart284, getCharIndex()-1);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart238 = getCharIndex();
+            int yStart292 = getCharIndex();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart238, getCharIndex()-1);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart292, getCharIndex()-1);
 
             }
 
@@ -487,11 +541,11 @@ public class ActionSplitter extends Lexer {
             int _channel = DEFAULT_TOKEN_CHANNEL;
             CommonToken expr=null;
 
-            // ActionSplitter.g:72:2: ( ATTR ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionSplitter.g:72:4: ATTR ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionSplitter.g:84:2: ( ATTR ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionSplitter.g:84:4: ATTR ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             mATTR(); if (state.failed) return ;
-            // ActionSplitter.g:72:9: ( WS )?
+            // ActionSplitter.g:84:9: ( WS )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -500,7 +554,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt7) {
                 case 1 :
-                    // ActionSplitter.g:72:9: WS
+                    // ActionSplitter.g:84:9: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -510,9 +564,9 @@ public class ActionSplitter extends Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart258 = getCharIndex();
+            int exprStart312 = getCharIndex();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart258, getCharIndex()-1);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart312, getCharIndex()-1);
             match(';'); if (state.failed) return ;
 
             }
@@ -530,8 +584,8 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = ATTR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ActionSplitter.g:76:2: ( '$' ID )
-            // ActionSplitter.g:76:4: '$' ID
+            // ActionSplitter.g:88:2: ( '$' ID )
+            // ActionSplitter.g:88:4: '$' ID
             {
             match('$'); if (state.failed) return ;
             mID(); if (state.failed) return ;
@@ -551,13 +605,13 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = TEMPLATE_INSTANCE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ActionSplitter.g:81:2: ( '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
-            // ActionSplitter.g:81:4: '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
+            // ActionSplitter.g:93:2: ( '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
+            // ActionSplitter.g:93:4: '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
             {
             match('%'); if (state.failed) return ;
             mID(); if (state.failed) return ;
             match('('); if (state.failed) return ;
-            // ActionSplitter.g:81:15: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
+            // ActionSplitter.g:93:15: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -566,9 +620,9 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt12) {
                 case 1 :
-                    // ActionSplitter.g:81:17: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
+                    // ActionSplitter.g:93:17: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
                     {
-                    // ActionSplitter.g:81:17: ( WS )?
+                    // ActionSplitter.g:93:17: ( WS )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
 
@@ -577,7 +631,7 @@ public class ActionSplitter extends Lexer {
                     }
                     switch (alt8) {
                         case 1 :
-                            // ActionSplitter.g:81:17: WS
+                            // ActionSplitter.g:93:17: WS
                             {
                             mWS(); if (state.failed) return ;
 
@@ -587,7 +641,7 @@ public class ActionSplitter extends Lexer {
                     }
 
                     mARG(); if (state.failed) return ;
-                    // ActionSplitter.g:81:25: ( ',' ( WS )? ARG )*
+                    // ActionSplitter.g:93:25: ( ',' ( WS )? ARG )*
                     loop10:
                     do {
                         int alt10=2;
@@ -600,10 +654,10 @@ public class ActionSplitter extends Lexer {
 
                         switch (alt10) {
                     	case 1 :
-                    	    // ActionSplitter.g:81:26: ',' ( WS )? ARG
+                    	    // ActionSplitter.g:93:26: ',' ( WS )? ARG
                     	    {
                     	    match(','); if (state.failed) return ;
-                    	    // ActionSplitter.g:81:30: ( WS )?
+                    	    // ActionSplitter.g:93:30: ( WS )?
                     	    int alt9=2;
                     	    int LA9_0 = input.LA(1);
 
@@ -612,7 +666,7 @@ public class ActionSplitter extends Lexer {
                     	    }
                     	    switch (alt9) {
                     	        case 1 :
-                    	            // ActionSplitter.g:81:30: WS
+                    	            // ActionSplitter.g:93:30: WS
                     	            {
                     	            mWS(); if (state.failed) return ;
 
@@ -631,7 +685,7 @@ public class ActionSplitter extends Lexer {
                         }
                     } while (true);
 
-                    // ActionSplitter.g:81:40: ( WS )?
+                    // ActionSplitter.g:93:40: ( WS )?
                     int alt11=2;
                     int LA11_0 = input.LA(1);
 
@@ -640,7 +694,7 @@ public class ActionSplitter extends Lexer {
                     }
                     switch (alt11) {
                         case 1 :
-                            // ActionSplitter.g:81:40: WS
+                            // ActionSplitter.g:93:40: WS
                             {
                             mWS(); if (state.failed) return ;
 
@@ -672,15 +726,15 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = INDIRECT_TEMPLATE_INSTANCE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ActionSplitter.g:86:2: ( '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
-            // ActionSplitter.g:86:4: '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
+            // ActionSplitter.g:98:2: ( '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
+            // ActionSplitter.g:98:4: '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
             {
             match('%'); if (state.failed) return ;
             match('('); if (state.failed) return ;
             mACTION(); if (state.failed) return ;
             match(')'); if (state.failed) return ;
             match('('); if (state.failed) return ;
-            // ActionSplitter.g:86:27: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
+            // ActionSplitter.g:98:27: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -689,9 +743,9 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt17) {
                 case 1 :
-                    // ActionSplitter.g:86:29: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
+                    // ActionSplitter.g:98:29: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
                     {
-                    // ActionSplitter.g:86:29: ( WS )?
+                    // ActionSplitter.g:98:29: ( WS )?
                     int alt13=2;
                     int LA13_0 = input.LA(1);
 
@@ -700,7 +754,7 @@ public class ActionSplitter extends Lexer {
                     }
                     switch (alt13) {
                         case 1 :
-                            // ActionSplitter.g:86:29: WS
+                            // ActionSplitter.g:98:29: WS
                             {
                             mWS(); if (state.failed) return ;
 
@@ -710,7 +764,7 @@ public class ActionSplitter extends Lexer {
                     }
 
                     mARG(); if (state.failed) return ;
-                    // ActionSplitter.g:86:37: ( ',' ( WS )? ARG )*
+                    // ActionSplitter.g:98:37: ( ',' ( WS )? ARG )*
                     loop15:
                     do {
                         int alt15=2;
@@ -723,10 +777,10 @@ public class ActionSplitter extends Lexer {
 
                         switch (alt15) {
                     	case 1 :
-                    	    // ActionSplitter.g:86:38: ',' ( WS )? ARG
+                    	    // ActionSplitter.g:98:38: ',' ( WS )? ARG
                     	    {
                     	    match(','); if (state.failed) return ;
-                    	    // ActionSplitter.g:86:42: ( WS )?
+                    	    // ActionSplitter.g:98:42: ( WS )?
                     	    int alt14=2;
                     	    int LA14_0 = input.LA(1);
 
@@ -735,7 +789,7 @@ public class ActionSplitter extends Lexer {
                     	    }
                     	    switch (alt14) {
                     	        case 1 :
-                    	            // ActionSplitter.g:86:42: WS
+                    	            // ActionSplitter.g:98:42: WS
                     	            {
                     	            mWS(); if (state.failed) return ;
 
@@ -754,7 +808,7 @@ public class ActionSplitter extends Lexer {
                         }
                     } while (true);
 
-                    // ActionSplitter.g:86:52: ( WS )?
+                    // ActionSplitter.g:98:52: ( WS )?
                     int alt16=2;
                     int LA16_0 = input.LA(1);
 
@@ -763,7 +817,7 @@ public class ActionSplitter extends Lexer {
                     }
                     switch (alt16) {
                         case 1 :
-                            // ActionSplitter.g:86:52: WS
+                            // ActionSplitter.g:98:52: WS
                             {
                             mWS(); if (state.failed) return ;
 
@@ -798,16 +852,16 @@ public class ActionSplitter extends Lexer {
             CommonToken a=null;
             CommonToken expr=null;
 
-            // ActionSplitter.g:91:2: ( '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionSplitter.g:91:4: '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionSplitter.g:103:2: ( '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionSplitter.g:103:4: '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
-            int aStart378 = getCharIndex();
+            int aStart432 = getCharIndex();
             mACTION(); if (state.failed) return ;
-            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart378, getCharIndex()-1);
+            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart432, getCharIndex()-1);
             match('.'); if (state.failed) return ;
             mID(); if (state.failed) return ;
-            // ActionSplitter.g:91:24: ( WS )?
+            // ActionSplitter.g:103:24: ( WS )?
             int alt18=2;
             int LA18_0 = input.LA(1);
 
@@ -816,7 +870,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt18) {
                 case 1 :
-                    // ActionSplitter.g:91:24: WS
+                    // ActionSplitter.g:103:24: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -826,9 +880,9 @@ public class ActionSplitter extends Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart391 = getCharIndex();
+            int exprStart445 = getCharIndex();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart391, getCharIndex()-1);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart445, getCharIndex()-1);
             match(';'); if (state.failed) return ;
 
             }
@@ -850,18 +904,18 @@ public class ActionSplitter extends Lexer {
             CommonToken y=null;
             CommonToken expr=null;
 
-            // ActionSplitter.g:99:2: ( '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionSplitter.g:99:4: '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionSplitter.g:111:2: ( '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionSplitter.g:111:4: '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
-            int xStart411 = getCharIndex();
+            int xStart465 = getCharIndex();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart411, getCharIndex()-1);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart465, getCharIndex()-1);
             match('.'); if (state.failed) return ;
-            int yStart417 = getCharIndex();
+            int yStart471 = getCharIndex();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart417, getCharIndex()-1);
-            // ActionSplitter.g:99:22: ( WS )?
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart471, getCharIndex()-1);
+            // ActionSplitter.g:111:22: ( WS )?
             int alt19=2;
             int LA19_0 = input.LA(1);
 
@@ -870,7 +924,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt19) {
                 case 1 :
-                    // ActionSplitter.g:99:22: WS
+                    // ActionSplitter.g:111:22: WS
                     {
                     mWS(); if (state.failed) return ;
 
@@ -880,9 +934,9 @@ public class ActionSplitter extends Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart426 = getCharIndex();
+            int exprStart480 = getCharIndex();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart426, getCharIndex()-1);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart480, getCharIndex()-1);
             match(';'); if (state.failed) return ;
 
             }
@@ -902,13 +956,13 @@ public class ActionSplitter extends Lexer {
             int _channel = DEFAULT_TOKEN_CHANNEL;
             CommonToken a=null;
 
-            // ActionSplitter.g:104:2: ( '%' a= ACTION )
-            // ActionSplitter.g:104:4: '%' a= ACTION
+            // ActionSplitter.g:116:2: ( '%' a= ACTION )
+            // ActionSplitter.g:116:4: '%' a= ACTION
             {
             match('%'); if (state.failed) return ;
-            int aStart445 = getCharIndex();
+            int aStart499 = getCharIndex();
             mACTION(); if (state.failed) return ;
-            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart445, getCharIndex()-1);
+            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart499, getCharIndex()-1);
 
             }
 
@@ -925,7 +979,7 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = UNKNOWN_SYNTAX;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ActionSplitter.g:108:2: ( '$' | '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )* )
+            // ActionSplitter.g:120:2: ( '$' | '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )* )
             int alt21=2;
             int LA21_0 = input.LA(1);
 
@@ -944,7 +998,7 @@ public class ActionSplitter extends Lexer {
             }
             switch (alt21) {
                 case 1 :
-                    // ActionSplitter.g:108:4: '$'
+                    // ActionSplitter.g:120:4: '$'
                     {
                     match('$'); if (state.failed) return ;
                     if ( state.backtracking==1 ) {
@@ -957,66 +1011,66 @@ public class ActionSplitter extends Lexer {
                     }
                     break;
                 case 2 :
-                    // ActionSplitter.g:113:4: '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
+                    // ActionSplitter.g:125:4: '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
                     {
                     match('%'); if (state.failed) return ;
-                    // ActionSplitter.g:113:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
+                    // ActionSplitter.g:125:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
                     loop20:
                     do {
                         int alt20=9;
                         alt20 = dfa20.predict(input);
                         switch (alt20) {
                     	case 1 :
-                    	    // ActionSplitter.g:113:9: ID
+                    	    // ActionSplitter.g:125:9: ID
                     	    {
                     	    mID(); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 2 :
-                    	    // ActionSplitter.g:113:12: '.'
+                    	    // ActionSplitter.g:125:12: '.'
                     	    {
                     	    match('.'); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 3 :
-                    	    // ActionSplitter.g:113:16: '('
+                    	    // ActionSplitter.g:125:16: '('
                     	    {
                     	    match('('); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 4 :
-                    	    // ActionSplitter.g:113:20: ')'
+                    	    // ActionSplitter.g:125:20: ')'
                     	    {
                     	    match(')'); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 5 :
-                    	    // ActionSplitter.g:113:24: ','
+                    	    // ActionSplitter.g:125:24: ','
                     	    {
                     	    match(','); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 6 :
-                    	    // ActionSplitter.g:113:28: '{'
+                    	    // ActionSplitter.g:125:28: '{'
                     	    {
                     	    match('{'); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 7 :
-                    	    // ActionSplitter.g:113:32: '}'
+                    	    // ActionSplitter.g:125:32: '}'
                     	    {
                     	    match('}'); if (state.failed) return ;
 
                     	    }
                     	    break;
                     	case 8 :
-                    	    // ActionSplitter.g:113:36: '\"'
+                    	    // ActionSplitter.g:125:36: '\"'
                     	    {
                     	    match('\"'); if (state.failed) return ;
 
@@ -1057,10 +1111,10 @@ public class ActionSplitter extends Lexer {
         try {
             int _type = TEXT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ActionSplitter.g:125:5: ( ( '\\\\$' | '\\\\%' | ~ ( '$' | '%' ) )+ )
-            // ActionSplitter.g:125:7: ( '\\\\$' | '\\\\%' | ~ ( '$' | '%' ) )+
+            // ActionSplitter.g:137:5: ( ( '\\\\$' | '\\\\%' | ~ ( '$' | '%' ) )+ )
+            // ActionSplitter.g:137:7: ( '\\\\$' | '\\\\%' | ~ ( '$' | '%' ) )+
             {
-            // ActionSplitter.g:125:7: ( '\\\\$' | '\\\\%' | ~ ( '$' | '%' ) )+
+            // ActionSplitter.g:137:7: ( '\\\\$' | '\\\\%' | ~ ( '$' | '%' ) )+
             int cnt22=0;
             loop22:
             do {
@@ -1093,7 +1147,7 @@ public class ActionSplitter extends Lexer {
 
                 switch (alt22) {
             	case 1 :
-            	    // ActionSplitter.g:125:9: '\\\\$'
+            	    // ActionSplitter.g:137:9: '\\\\$'
             	    {
             	    match("\\$"); if (state.failed) return ;
 
@@ -1101,7 +1155,7 @@ public class ActionSplitter extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // ActionSplitter.g:126:5: '\\\\%'
+            	    // ActionSplitter.g:138:5: '\\\\%'
             	    {
             	    match("\\%"); if (state.failed) return ;
 
@@ -1109,7 +1163,7 @@ public class ActionSplitter extends Lexer {
             	    }
             	    break;
             	case 3 :
-            	    // ActionSplitter.g:127:5: ~ ( '$' | '%' )
+            	    // ActionSplitter.g:139:5: ~ ( '$' | '%' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='#')||(input.LA(1)>='&' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1149,11 +1203,11 @@ public class ActionSplitter extends Lexer {
     // $ANTLR start "ACTION"
     public final void mACTION() throws RecognitionException {
         try {
-            // ActionSplitter.g:133:2: ( '{' ( '\\\\}' | ~ '}' )* '}' )
-            // ActionSplitter.g:133:4: '{' ( '\\\\}' | ~ '}' )* '}'
+            // ActionSplitter.g:145:2: ( '{' ( '\\\\}' | ~ '}' )* '}' )
+            // ActionSplitter.g:145:4: '{' ( '\\\\}' | ~ '}' )* '}'
             {
             match('{'); if (state.failed) return ;
-            // ActionSplitter.g:133:8: ( '\\\\}' | ~ '}' )*
+            // ActionSplitter.g:145:8: ( '\\\\}' | ~ '}' )*
             loop23:
             do {
                 int alt23=3;
@@ -1187,7 +1241,7 @@ public class ActionSplitter extends Lexer {
 
                 switch (alt23) {
             	case 1 :
-            	    // ActionSplitter.g:133:9: '\\\\}'
+            	    // ActionSplitter.g:145:9: '\\\\}'
             	    {
             	    match("\\}"); if (state.failed) return ;
 
@@ -1195,7 +1249,7 @@ public class ActionSplitter extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // ActionSplitter.g:133:15: ~ '}'
+            	    // ActionSplitter.g:145:15: ~ '}'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='|')||(input.LA(1)>='~' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1229,8 +1283,8 @@ public class ActionSplitter extends Lexer {
     // $ANTLR start "ARG"
     public final void mARG() throws RecognitionException {
         try {
-            // ActionSplitter.g:137:5: ( ID '=' ACTION )
-            // ActionSplitter.g:137:7: ID '=' ACTION
+            // ActionSplitter.g:149:5: ( ID '=' ACTION )
+            // ActionSplitter.g:149:7: ID '=' ACTION
             {
             mID(); if (state.failed) return ;
             match('='); if (state.failed) return ;
@@ -1247,8 +1301,8 @@ public class ActionSplitter extends Lexer {
     // $ANTLR start "ID"
     public final void mID() throws RecognitionException {
         try {
-            // ActionSplitter.g:141:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-            // ActionSplitter.g:141:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // ActionSplitter.g:153:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+            // ActionSplitter.g:153:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             {
             if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -1260,7 +1314,7 @@ public class ActionSplitter extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // ActionSplitter.g:141:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // ActionSplitter.g:153:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             loop24:
             do {
                 int alt24=2;
@@ -1306,8 +1360,8 @@ public class ActionSplitter extends Lexer {
     // $ANTLR start "ATTR_VALUE_EXPR"
     public final void mATTR_VALUE_EXPR() throws RecognitionException {
         try {
-            // ActionSplitter.g:147:2: (~ '=' (~ ';' )* )
-            // ActionSplitter.g:147:4: ~ '=' (~ ';' )*
+            // ActionSplitter.g:159:2: (~ '=' (~ ';' )* )
+            // ActionSplitter.g:159:4: ~ '=' (~ ';' )*
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='<')||(input.LA(1)>='>' && input.LA(1)<='\uFFFF') ) {
                 input.consume();
@@ -1319,7 +1373,7 @@ public class ActionSplitter extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // ActionSplitter.g:147:9: (~ ';' )*
+            // ActionSplitter.g:159:9: (~ ';' )*
             loop25:
             do {
                 int alt25=2;
@@ -1332,7 +1386,7 @@ public class ActionSplitter extends Lexer {
 
                 switch (alt25) {
             	case 1 :
-            	    // ActionSplitter.g:147:10: ~ ';'
+            	    // ActionSplitter.g:159:10: ~ ';'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<=':')||(input.LA(1)>='<' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1365,10 +1419,10 @@ public class ActionSplitter extends Lexer {
     // $ANTLR start "SCOPE_INDEX_EXPR"
     public final void mSCOPE_INDEX_EXPR() throws RecognitionException {
         try {
-            // ActionSplitter.g:152:2: ( ( '\\\\]' | ~ ']' )+ )
-            // ActionSplitter.g:152:4: ( '\\\\]' | ~ ']' )+
+            // ActionSplitter.g:164:2: ( ( '\\\\]' | ~ ']' )+ )
+            // ActionSplitter.g:164:4: ( '\\\\]' | ~ ']' )+
             {
-            // ActionSplitter.g:152:4: ( '\\\\]' | ~ ']' )+
+            // ActionSplitter.g:164:4: ( '\\\\]' | ~ ']' )+
             int cnt26=0;
             loop26:
             do {
@@ -1394,7 +1448,7 @@ public class ActionSplitter extends Lexer {
 
                 switch (alt26) {
             	case 1 :
-            	    // ActionSplitter.g:152:5: '\\\\]'
+            	    // ActionSplitter.g:164:5: '\\\\]'
             	    {
             	    match("\\]"); if (state.failed) return ;
 
@@ -1402,7 +1456,7 @@ public class ActionSplitter extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // ActionSplitter.g:152:11: ~ ']'
+            	    // ActionSplitter.g:164:11: ~ ']'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\\')||(input.LA(1)>='^' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1440,10 +1494,10 @@ public class ActionSplitter extends Lexer {
     // $ANTLR start "WS"
     public final void mWS() throws RecognitionException {
         try {
-            // ActionSplitter.g:156:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
-            // ActionSplitter.g:156:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
+            // ActionSplitter.g:168:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
+            // ActionSplitter.g:168:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
             {
-            // ActionSplitter.g:156:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
+            // ActionSplitter.g:168:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
             int cnt27=0;
             loop27:
             do {
@@ -2081,7 +2135,7 @@ public class ActionSplitter extends Lexer {
             this.transition = DFA20_transition;
         }
         public String getDescription() {
-            return "()* loopback of 113:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*";
+            return "()* loopback of 125:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*";
         }
     }
     static final String DFA28_eotS =
@@ -2089,17 +2143,16 @@ public class ActionSplitter extends Lexer {
     static final String DFA28_eofS =
         "\24\uffff";
     static final String DFA28_minS =
-        "\1\0\1\uffff\1\0\13\uffff\1\0\5\uffff";
+        "\2\0\13\uffff\1\0\6\uffff";
     static final String DFA28_maxS =
-        "\1\uffff\1\uffff\1\0\13\uffff\1\0\5\uffff";
+        "\1\uffff\1\0\13\uffff\1\0\6\uffff";
     static final String DFA28_acceptS =
-        "\1\uffff\1\21\1\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\12"+
-        "\1\20\1\uffff\1\13\1\14\1\15\1\16\1\17";
+        "\2\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\20\1\uffff"+
+        "\1\13\1\14\1\15\1\16\1\17\1\21";
     static final String DFA28_specialS =
-        "\1\0\1\uffff\1\1\13\uffff\1\2\5\uffff}>";
+        "\1\0\1\1\13\uffff\1\2\6\uffff}>";
     static final String[] DFA28_transitionS = {
-            "\44\1\1\2\1\16\uffda\1",
-            "",
+            "\44\23\1\1\1\15\uffda\23",
             "\1\uffff",
             "",
             "",
@@ -2113,6 +2166,7 @@ public class ActionSplitter extends Lexer {
             "",
             "",
             "\1\uffff",
+            "",
             "",
             "",
             "",
@@ -2160,68 +2214,68 @@ public class ActionSplitter extends Lexer {
                         int LA28_0 = input.LA(1);
 
                         s = -1;
-                        if ( ((LA28_0>='\u0000' && LA28_0<='#')||(LA28_0>='&' && LA28_0<='\uFFFF')) ) {s = 1;}
+                        if ( (LA28_0=='$') ) {s = 1;}
 
-                        else if ( (LA28_0=='$') ) {s = 2;}
+                        else if ( (LA28_0=='%') ) {s = 13;}
 
-                        else if ( (LA28_0=='%') ) {s = 14;}
+                        else if ( ((LA28_0>='\u0000' && LA28_0<='#')||(LA28_0>='&' && LA28_0<='\uFFFF')) ) {s = 19;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA28_2 = input.LA(1);
+                        int LA28_1 = input.LA(1);
 
                          
-                        int index28_2 = input.index();
+                        int index28_1 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred1_ActionSplitter()) ) {s = 3;}
+                        if ( (synpred1_ActionSplitter()) ) {s = 2;}
 
-                        else if ( (synpred2_ActionSplitter()) ) {s = 4;}
+                        else if ( (synpred2_ActionSplitter()) ) {s = 3;}
 
-                        else if ( (synpred3_ActionSplitter()) ) {s = 5;}
+                        else if ( (synpred3_ActionSplitter()) ) {s = 4;}
 
-                        else if ( (synpred4_ActionSplitter()) ) {s = 6;}
+                        else if ( (synpred4_ActionSplitter()) ) {s = 5;}
 
-                        else if ( (synpred5_ActionSplitter()) ) {s = 7;}
+                        else if ( (synpred5_ActionSplitter()) ) {s = 6;}
 
-                        else if ( (synpred6_ActionSplitter()) ) {s = 8;}
+                        else if ( (synpred6_ActionSplitter()) ) {s = 7;}
 
-                        else if ( (synpred7_ActionSplitter()) ) {s = 9;}
+                        else if ( (synpred7_ActionSplitter()) ) {s = 8;}
 
-                        else if ( (synpred8_ActionSplitter()) ) {s = 10;}
+                        else if ( (synpred8_ActionSplitter()) ) {s = 9;}
 
-                        else if ( (synpred9_ActionSplitter()) ) {s = 11;}
+                        else if ( (synpred9_ActionSplitter()) ) {s = 10;}
 
-                        else if ( (synpred10_ActionSplitter()) ) {s = 12;}
+                        else if ( (synpred10_ActionSplitter()) ) {s = 11;}
 
-                        else if ( (synpred16_ActionSplitter()) ) {s = 13;}
+                        else if ( (synpred16_ActionSplitter()) ) {s = 12;}
 
                          
-                        input.seek(index28_2);
+                        input.seek(index28_1);
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
-                        int LA28_14 = input.LA(1);
+                        int LA28_13 = input.LA(1);
 
                          
-                        int index28_14 = input.index();
+                        int index28_13 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred11_ActionSplitter()) ) {s = 15;}
+                        if ( (synpred11_ActionSplitter()) ) {s = 14;}
 
-                        else if ( (synpred12_ActionSplitter()) ) {s = 16;}
+                        else if ( (synpred12_ActionSplitter()) ) {s = 15;}
 
-                        else if ( (synpred13_ActionSplitter()) ) {s = 17;}
+                        else if ( (synpred13_ActionSplitter()) ) {s = 16;}
 
-                        else if ( (synpred14_ActionSplitter()) ) {s = 18;}
+                        else if ( (synpred14_ActionSplitter()) ) {s = 17;}
 
-                        else if ( (synpred15_ActionSplitter()) ) {s = 19;}
+                        else if ( (synpred15_ActionSplitter()) ) {s = 18;}
 
-                        else if ( (synpred16_ActionSplitter()) ) {s = 13;}
+                        else if ( (synpred16_ActionSplitter()) ) {s = 12;}
 
                          
-                        input.seek(index28_14);
+                        input.seek(index28_13);
                         if ( s>=0 ) return s;
                         break;
             }

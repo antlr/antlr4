@@ -3,10 +3,11 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.ASTVerifier;
-import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.Rule;
 
 /** */
 public class SemanticPipeline {
@@ -45,31 +46,26 @@ public class SemanticPipeline {
         CollectSymbols collector = new CollectSymbols(nodes,g);
         collector.downup(g.ast); // no side-effects; compute lists
 
-        // DEFINE RULES, ACTIONS
-//        DefineSymbols def = new DefineSymbols(g, collector);
-//        def.define(); // updates g
-
         // CHECK FOR SYMBOL COLLISIONS
         SymbolChecks symcheck = new SymbolChecks(g, collector);
         symcheck.examine();
 
-        // ASSIGN TOKEN TYPES
+        // CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
+        checkAttributeExpressions(g, collector);
 
-        /* dump options
-        TreeVisitor v = new TreeVisitor(adaptor);
-        v.visit(g.ast,
-                new TreeVisitorAction() {
-                    public Object pre(Object t) {
-                        if ( t instanceof GrammarASTWithOptions ) {
-                            GrammarASTWithOptions gt = (GrammarASTWithOptions)t;
-                            if ( gt.getOptions()!=null ) {
-                                System.out.println("options @ "+gt.toStringTree()+"="+gt.getOptions());
-                            }
-                        }
-                        return t;
-                    }
-                    public Object post(Object t) { return t; }
-                });
-                */
+        // ASSIGN TOKEN TYPES
+    }
+
+    public void checkAttributeExpressions(Grammar g, CollectSymbols collector) {
+        for (Rule r : collector.rules) {
+            for (GrammarAST a : r.namedActions.values()) {
+                AttributeChecks extractor = new AttributeChecks(g, a.getText());
+                extractor.getActionChunks(); // forces eval, fills extractor
+            }
+            for (GrammarAST a : r.inlineActions) {
+                AttributeChecks extractor = new AttributeChecks(g, a.getText());
+                extractor.getActionChunks(); // forces eval, fills extractor
+            }
+        }
     }
 }

@@ -8,7 +8,8 @@ import org.antlr.v4.tool.*;
 }
 
 @members {
-public void setQualifiedAttr() { }
+public void setQualifiedAttr(Token x, Token y, Token expr) { }
+public void qualifiedAttr(Token x, Token y) { }
 public void setDynamicScopeAttr() { }
 public void dynamicScopeAttr() { }
 public void setDynamicNegativeIndexedScopeAttr() { }
@@ -24,18 +25,29 @@ public void setAttribute() { }
 public void templateExpr() { }
 public void unknownSyntax() { }
 public void text() { }
+
+public List<Token> getActionChunks() {
+    List<Token> chunks = new ArrayList<Token>();
+    Token t = nextToken();
+    while ( t.getType()!=Token.EOF ) {
+        chunks.add(t);
+        t = nextToken();
+    }
+    return chunks;
+}
 }
 
 SET_QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
+		{setQualifiedAttr($x, $y, $expr);}
 	;
 
 QUALIFIED_ATTR
-	:	'$' x=ID '.' y=ID {input.LA(1)!='('}?
+	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {qualifiedAttr($x, $y);}
 	;
 
 SET_DYNAMIC_SCOPE_ATTR
-	:	DYNAMIC_SCOPE_ATTR WS? '=' expr=ATTR_VALUE_EXPR ';'
+	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
 	;
 
 DYNAMIC_SCOPE_ATTR
@@ -51,7 +63,7 @@ DYNAMIC_SCOPE_ATTR
  * 		$x[0]::y  is the absolute 0 indexed element (bottom of the stack)
  */
 SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-	:	DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
+	:	'$' x=ID '[' '-' expr=SCOPE_INDEX_EXPR ']' '::' y=ID
 		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
 	;
 
@@ -60,7 +72,7 @@ DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
 	;
 
 SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-	:	DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
+	:	'$' x=ID '[' expr=SCOPE_INDEX_EXPR ']' '::' y=ID
 		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
 	;
 
