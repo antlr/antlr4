@@ -11,20 +11,7 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
     public GrammarASTAdaptor(CharStream input) { this.input = input; }
 
     public Object create(Token token) {
-        if ( token==null ) return new GrammarAST(token);
-        switch ( token.getType() ) {
-//            case ANTLRParser.BLOCK :
-//                return new BlockAST(token);
-//            case ANTLRParser.RULE :
-//                return new RuleAST(token);
-//            case ANTLRParser.PARSER_GRAMMAR :
-//            case ANTLRParser.COMBINED_GRAMMAR :
-//            case ANTLRParser.TREE_GRAMMAR :
-//            case ANTLRParser.LEXER_GRAMMAR :
-//                return new GrammarRootAST(token);
-            default :
-                return new GrammarAST(token);
-        }
+        return new GrammarAST(token);
     }
 
     @Override

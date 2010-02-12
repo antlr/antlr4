@@ -4,7 +4,9 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 /** */
 public class SemanticPipeline {
@@ -45,28 +47,14 @@ public class SemanticPipeline {
 
         // CHECK FOR SYMBOL COLLISIONS
         SymbolChecks symcheck = new SymbolChecks(g, collector);
-        symcheck.examine();
+        symcheck.examine(); // side-effect: strip away redef'd rules.
+
+        // STORE RULES IN GRAMMAR
+        for (Rule r : collector.rules) g.defineRule(r);
 
         // CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
-        checkAttributeExpressions(g, collector);
+        AttributeChecks.checkAllAttributeExpressions(g, collector.rules);
 
         // ASSIGN TOKEN TYPES
-    }
-
-    public void checkAttributeExpressions(Grammar g, CollectSymbols collector) {
-        for (Rule r : collector.rules) {
-            for (GrammarAST a : r.namedActions.values()) {
-                AttributeChecks checker = new AttributeChecks(g, r, null, a, a.getText());
-                checker.examine();
-            }
-            for (int i=1; i<=r.numberOfAlts; i++) {
-                Alternative alt = r.alt[i];
-                for (GrammarAST a : alt.actions) {
-                    AttributeChecks checker =
-                        new AttributeChecks(g, r, alt, a, a.getText());
-                    checker.examine();
-                }
-            }
-        }
     }
 }

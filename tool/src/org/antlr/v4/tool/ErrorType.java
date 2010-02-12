@@ -79,6 +79,7 @@ public enum ErrorType {
 	UNKNOWN_SIMPLE_ATTRIBUTE(ErrorSeverity.ERROR, true, true),
 	INVALID_RULE_PARAMETER_REF(ErrorSeverity.ERROR, true, true),
 	UNKNOWN_RULE_ATTRIBUTE(ErrorSeverity.ERROR, true, true),
+    UNKNOWN_ATTRIBUTE_IN_SCOPE(ErrorSeverity.ERROR, true, true),
 	ISOLATED_RULE_SCOPE(ErrorSeverity.ERROR, true, true),
 	SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(ErrorSeverity.ERROR, true, true),
 	LABEL_CONFLICTS_WITH_RULE(ErrorSeverity.ERROR, true, true),

@@ -45,20 +45,20 @@ LINE_COMMENT
 
 SET_QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setQualifiedAttr($x, $y, $expr);}
+		{delegate.setQualifiedAttr($text, $x, $y, $expr);}
 	;
 
 QUALIFIED_ATTR
-	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {delegate.qualifiedAttr($x, $y);}
+	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {delegate.qualifiedAttr($text, $x, $y);}
 	;
 
 SET_DYNAMIC_SCOPE_ATTR
 	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setDynamicScopeAttr($x, $y, $expr);}
+		{delegate.setDynamicScopeAttr($text, $x, $y, $expr);}
 	;
 
 DYNAMIC_SCOPE_ATTR
-	:	'$' x=ID '::' y=ID {delegate.dynamicScopeAttr($x, $y);}
+	:	'$' x=ID '::' y=ID {delegate.dynamicScopeAttr($text, $x, $y);}
 	;
 
 /**		To access deeper (than top of stack) scopes, use the notation:
@@ -72,31 +72,31 @@ DYNAMIC_SCOPE_ATTR
 SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
 	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
 		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
-		{delegate.setDynamicNegativeIndexedScopeAttr($x, $y, $index, $expr);}
+		{delegate.setDynamicNegativeIndexedScopeAttr($text, $x, $y, $index, $expr);}
 	;
 
 DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
 	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		{delegate.dynamicNegativeIndexedScopeAttr($x, $y, $index);}
+		{delegate.dynamicNegativeIndexedScopeAttr($text, $x, $y, $index);}
 	;
 
 SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
 	:	'$' x=ID '[' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
-		{delegate.setDynamicAbsoluteIndexedScopeAttr($x, $y, $index, $expr);}
+		WS? '=' expr=ATTR_VALUE_EXPR ';'
+		{delegate.setDynamicAbsoluteIndexedScopeAttr($text, $x, $y, $index, $expr);}
 	;
 
 DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
 	:	'$' x=ID '[' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		{delegate.dynamicAbsoluteIndexedScopeAttr($x, $y, $index);}
+		{delegate.dynamicAbsoluteIndexedScopeAttr($text, $x, $y, $index);}
 	;
 
 SET_ATTR
-	:	'$' x=ID WS? '=' expr=ATTR_VALUE_EXPR ';' {delegate.setAttr($x, $expr);}
+	:	'$' x=ID WS? '=' expr=ATTR_VALUE_EXPR ';' {delegate.setAttr($text, $x, $expr);}
 	;
 
 ATTR
-	:	'$' x=ID {delegate.attr($x);}
+	:	'$' x=ID {delegate.attr($text, $x);}
 	;
 
 /** %foo(a={},b={},...) ctor */

@@ -4,23 +4,23 @@ import org.antlr.runtime.Token;
 
 /** */
 public interface ActionSplitterListener {
-    void setQualifiedAttr(Token x, Token y, Token expr);
-    void qualifiedAttr(Token x, Token y);
-    void setAttr(Token x, Token expr);
-    void attr(Token x);
+    void setQualifiedAttr(String expr, Token x, Token y, Token rhs);
+    void qualifiedAttr(String expr, Token x, Token y);
+    void setAttr(String expr, Token x, Token rhs);
+    void attr(String expr, Token x);
     
-    void setDynamicScopeAttr(Token x, Token y, Token expr);
-    void dynamicScopeAttr(Token x, Token y);
-    void setDynamicNegativeIndexedScopeAttr(Token x, Token y, Token index, Token expr);
-    void dynamicNegativeIndexedScopeAttr(Token x, Token y, Token index);
-    void setDynamicAbsoluteIndexedScopeAttr(Token x, Token y, Token index, Token expr);
-    void dynamicAbsoluteIndexedScopeAttr(Token x, Token y, Token index);
+    void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs);
+    void dynamicScopeAttr(String expr, Token x, Token y);
+    void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs);
+    void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index);
+    void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs);
+    void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index);
 
-    void templateInstance();
-    void indirectTemplateInstance();
-    void setExprAttribute();
-    void setAttribute();
-    void templateExpr();
+    void templateInstance(String expr);
+    void indirectTemplateInstance(String expr);
+    void setExprAttribute(String expr);
+    void setAttribute(String expr);
+    void templateExpr(String expr);
 
     void unknownSyntax(String text);
     void text(String text);

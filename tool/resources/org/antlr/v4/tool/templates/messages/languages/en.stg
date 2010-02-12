@@ -117,13 +117,13 @@ CANNOT_ALIAS_TOKENS_IN_LEXER(arg) ::=
 ATTRIBUTE_REF_NOT_IN_RULE(arg,arg2) ::=
 	"reference to attribute outside of a rule: <arg><if(arg2)>.<arg2><endif>"
 UNKNOWN_ATTRIBUTE_IN_SCOPE(arg,arg2) ::=
-	"unknown attribute for <arg>: <arg2>"
+	"attribute <arg> isn't a valid property in <arg2>"
 UNKNOWN_RULE_ATTRIBUTE(arg,arg2) ::=
 	"unknown attribute for rule <arg>: <arg2>"
-UNKNOWN_SIMPLE_ATTRIBUTE(arg,args2) ::=
-	"attribute is not a token, parameter, or return value: <arg>"
-ISOLATED_RULE_SCOPE(arg) ::=
-	"missing attribute access on rule scope: <arg>"
+UNKNOWN_SIMPLE_ATTRIBUTE(arg,arg2) ::=
+	"unknown attribute reference <arg> in <arg2>"
+ISOLATED_RULE_SCOPE(arg,arg2) ::=
+	"missing attribute access on rule reference <arg> in <arg2>"
 INVALID_RULE_PARAMETER_REF(arg,arg2) ::=
 	"cannot access rule <arg>'s parameter: <arg2>"
 INVALID_RULE_SCOPE_ATTRIBUTE_REF(arg,arg2) ::=
@@ -199,8 +199,6 @@ DOUBLE_QUOTES_ILLEGAL(arg) ::=
   "string literals must use single quotes (such as \'begin\'): <arg>"
 INVALID_TEMPLATE_ACTION(arg) ::=
   "invalid StringTemplate % shorthand syntax: '<arg>'"
-MISSING_ATTRIBUTE_NAME() ::=
-  "missing attribute name on $ reference"
 ARG_INIT_VALUES_ILLEGAL(arg) ::=
   "rule parameters may not have init values: <arg>"
 REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(arg) ::=

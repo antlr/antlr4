@@ -153,19 +153,36 @@ finishRule
 
 rulelNamedAction
 	:	{inContext("RULE")}? ^(AT ID ACTION)
-		{currentRule.namedActions.put($ID.text,$ACTION);}
+		{
+		currentRule.namedActions.put($ID.text,(ActionAST)$ACTION);
+		((ActionAST)$ACTION).space = currentRule;
+		}
 	;
 
 ruleAction
-	:	{inContext("RULE ...")}? ACTION {currentRule.alt[currentAlt].actions.add($ACTION);}
+	:	{inContext("RULE ...")&&!inContext("SCOPE")&&
+		 !inContext("CATCH")&&!inContext("FINALLY")}?
+		ACTION
+		{
+		currentRule.alt[currentAlt].actions.add((ActionAST)$ACTION);
+		((ActionAST)$ACTION).space = currentRule.alt[currentAlt];
+		}
 	;
 
 exceptionHandler
-	: ^(CATCH ARG_ACTION ACTION)	{currentRule.exceptionActions.add($ACTION);}
+	:	^(CATCH ARG_ACTION ACTION)
+		{
+		currentRule.exceptionActions.add((ActionAST)$ACTION);
+		((ActionAST)$ACTION).space = currentRule;
+		}
 	;
 
 finallyClause
-	: ^(FINALLY ACTION)				{currentRule.exceptionActions.add($ACTION);}
+	:	^(FINALLY ACTION)	
+		{
+		currentRule.exceptionActions.add((ActionAST)$ACTION);
+		((ActionAST)$ACTION).space = currentRule;
+		}
 	;
 	
 ruleArg
@@ -205,8 +222,8 @@ rewriteElement
 labeledElement
 @after {
 LabelElementPair lp = new LabelElementPair(g, $id, $e, $start.getType());
-currentRule.labelDefs.map($id.text, lp);
-currentRule.alt[currentAlt].labelDefs.map($id.text, $id);
+//currentRule.labelDefs.map($id.text, lp);
+currentRule.alt[currentAlt].labelDefs.map($id.text, lp);
 }
 	:	{inContext("RULE ...")}?
 		(	^(ASSIGN id=ID e=.)

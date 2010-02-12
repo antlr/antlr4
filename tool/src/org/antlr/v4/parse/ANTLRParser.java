@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRParser.g 2010-02-11 11:14:47
+// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRParser.g 2010-02-12 14:08:49
 
 /*
  [The "BSD licence"]
@@ -284,7 +284,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: DOC_COMMENT, id, grammarType, rules, prequelConstruct
+            // elements: rules, DOC_COMMENT, id, grammarType, prequelConstruct
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1209,11 +1209,11 @@ public class ANTLRParser extends Parser {
                 {
                 int LA8_1 = input.LA(2);
 
-                if ( ((LA8_1>=COMMA && LA8_1<=SEMI)) ) {
-                    alt8=2;
-                }
-                else if ( (LA8_1==ASSIGN) ) {
+                if ( (LA8_1==ASSIGN) ) {
                     alt8=1;
+                }
+                else if ( ((LA8_1>=COMMA && LA8_1<=SEMI)) ) {
+                    alt8=2;
                 }
                 else {
                     if (state.backtracking>0) {state.failed=true; return retval;}
@@ -1228,11 +1228,11 @@ public class ANTLRParser extends Parser {
                 {
                 int LA8_2 = input.LA(2);
 
-                if ( ((LA8_2>=COMMA && LA8_2<=SEMI)) ) {
-                    alt8=2;
-                }
-                else if ( (LA8_2==ASSIGN) ) {
+                if ( (LA8_2==ASSIGN) ) {
                     alt8=1;
+                }
+                else if ( ((LA8_2>=COMMA && LA8_2<=SEMI)) ) {
+                    alt8=2;
                 }
                 else {
                     if (state.backtracking>0) {state.failed=true; return retval;}
@@ -1404,7 +1404,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: TOKENS, tokenSpec
+            // elements: tokenSpec, TOKENS
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1495,11 +1495,11 @@ public class ANTLRParser extends Parser {
             if ( (LA11_0==RULE_REF) ) {
                 int LA11_1 = input.LA(2);
 
-                if ( (LA11_1==SEMI||LA11_1==ASSIGN) ) {
-                    alt11=1;
-                }
-                else if ( (LA11_1==TEMPLATE||(LA11_1>=RBRACE && LA11_1<=RULE_REF)) ) {
+                if ( (LA11_1==TEMPLATE||(LA11_1>=RBRACE && LA11_1<=RULE_REF)) ) {
                     alt11=2;
+                }
+                else if ( (LA11_1==SEMI||LA11_1==ASSIGN) ) {
+                    alt11=1;
                 }
                 else {
                     if (state.backtracking>0) {state.failed=true; return retval;}
@@ -1559,7 +1559,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: STRING_LITERAL, id, ASSIGN
+                            // elements: id, ASSIGN, STRING_LITERAL
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -1699,7 +1699,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ACTION, id, SCOPE
+            // elements: SCOPE, ACTION, id
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1718,7 +1718,7 @@ public class ANTLRParser extends Parser {
                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_SCOPE.nextNode(), root_1);
 
                 adaptor.addChild(root_1, stream_id.nextTree());
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -1781,7 +1781,7 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:341:2: ( AT ( actionScopeName COLONCOLON )? id ACTION -> ^( AT ( actionScopeName )? id ACTION ) )
             // ANTLRParser.g:341:4: AT ( actionScopeName COLONCOLON )? id ACTION
             {
-            AT44=(Token)match(input,AT,FOLLOW_AT_in_action1527); if (state.failed) return retval; 
+            AT44=(Token)match(input,AT,FOLLOW_AT_in_action1530); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_AT.add(AT44);
 
             // ANTLRParser.g:341:7: ( actionScopeName COLONCOLON )?
@@ -1826,13 +1826,13 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:341:8: actionScopeName COLONCOLON
                     {
-                    pushFollow(FOLLOW_actionScopeName_in_action1530);
+                    pushFollow(FOLLOW_actionScopeName_in_action1533);
                     actionScopeName45=actionScopeName();
 
                     state._fsp--;
                     if (state.failed) return retval;
                     if ( state.backtracking==0 ) stream_actionScopeName.add(actionScopeName45.getTree());
-                    COLONCOLON46=(Token)match(input,COLONCOLON,FOLLOW_COLONCOLON_in_action1532); if (state.failed) return retval; 
+                    COLONCOLON46=(Token)match(input,COLONCOLON,FOLLOW_COLONCOLON_in_action1535); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_COLONCOLON.add(COLONCOLON46);
 
 
@@ -1841,19 +1841,19 @@ public class ANTLRParser extends Parser {
 
             }
 
-            pushFollow(FOLLOW_id_in_action1536);
+            pushFollow(FOLLOW_id_in_action1539);
             id47=id();
 
             state._fsp--;
             if (state.failed) return retval;
             if ( state.backtracking==0 ) stream_id.add(id47.getTree());
-            ACTION48=(Token)match(input,ACTION,FOLLOW_ACTION_in_action1538); if (state.failed) return retval; 
+            ACTION48=(Token)match(input,ACTION,FOLLOW_ACTION_in_action1541); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_ACTION.add(ACTION48);
 
 
 
             // AST REWRITE
-            // elements: ACTION, AT, id, actionScopeName
+            // elements: AT, ACTION, id, actionScopeName
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1878,7 +1878,7 @@ public class ANTLRParser extends Parser {
                 }
                 stream_actionScopeName.reset();
                 adaptor.addChild(root_1, stream_id.nextTree());
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -1966,7 +1966,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_id_in_actionScopeName1566);
+                    pushFollow(FOLLOW_id_in_actionScopeName1572);
                     id49=id();
 
                     state._fsp--;
@@ -1978,7 +1978,7 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:349:4: LEXER
                     {
-                    LEXER50=(Token)match(input,LEXER,FOLLOW_LEXER_in_actionScopeName1571); if (state.failed) return retval; 
+                    LEXER50=(Token)match(input,LEXER,FOLLOW_LEXER_in_actionScopeName1577); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_LEXER.add(LEXER50);
 
 
@@ -2007,7 +2007,7 @@ public class ANTLRParser extends Parser {
                 case 3 :
                     // ANTLRParser.g:350:9: PARSER
                     {
-                    PARSER51=(Token)match(input,PARSER,FOLLOW_PARSER_in_actionScopeName1586); if (state.failed) return retval; 
+                    PARSER51=(Token)match(input,PARSER,FOLLOW_PARSER_in_actionScopeName1592); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_PARSER.add(PARSER51);
 
 
@@ -2091,7 +2091,7 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:354:7: rule
             	    {
-            	    pushFollow(FOLLOW_rule_in_rules1605);
+            	    pushFollow(FOLLOW_rule_in_rules1611);
             	    rule52=rule();
 
             	    state._fsp--;
@@ -2221,7 +2221,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:372:7: DOC_COMMENT
                     {
-                    DOC_COMMENT53=(Token)match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_rule1684); if (state.failed) return retval; 
+                    DOC_COMMENT53=(Token)match(input,DOC_COMMENT,FOLLOW_DOC_COMMENT_in_rule1690); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_DOC_COMMENT.add(DOC_COMMENT53);
 
 
@@ -2241,7 +2241,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:378:7: ruleModifiers
                     {
-                    pushFollow(FOLLOW_ruleModifiers_in_rule1728);
+                    pushFollow(FOLLOW_ruleModifiers_in_rule1734);
                     ruleModifiers54=ruleModifiers();
 
                     state._fsp--;
@@ -2253,7 +2253,7 @@ public class ANTLRParser extends Parser {
 
             }
 
-            pushFollow(FOLLOW_id_in_rule1751);
+            pushFollow(FOLLOW_id_in_rule1757);
             id55=id();
 
             state._fsp--;
@@ -2270,7 +2270,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:392:4: ARG_ACTION
                     {
-                    ARG_ACTION56=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rule1784); if (state.failed) return retval; 
+                    ARG_ACTION56=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rule1790); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION56);
 
 
@@ -2290,7 +2290,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:394:4: ruleReturns
                     {
-                    pushFollow(FOLLOW_ruleReturns_in_rule1794);
+                    pushFollow(FOLLOW_ruleReturns_in_rule1800);
                     ruleReturns57=ruleReturns();
 
                     state._fsp--;
@@ -2317,7 +2317,7 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:409:7: rulePrequel
             	    {
-            	    pushFollow(FOLLOW_rulePrequel_in_rule1832);
+            	    pushFollow(FOLLOW_rulePrequel_in_rule1838);
             	    rulePrequel58=rulePrequel();
 
             	    state._fsp--;
@@ -2332,19 +2332,19 @@ public class ANTLRParser extends Parser {
                 }
             } while (true);
 
-            COLON59=(Token)match(input,COLON,FOLLOW_COLON_in_rule1848); if (state.failed) return retval; 
+            COLON59=(Token)match(input,COLON,FOLLOW_COLON_in_rule1854); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_COLON.add(COLON59);
 
-            pushFollow(FOLLOW_altListAsBlock_in_rule1877);
+            pushFollow(FOLLOW_altListAsBlock_in_rule1883);
             altListAsBlock60=altListAsBlock();
 
             state._fsp--;
             if (state.failed) return retval;
             if ( state.backtracking==0 ) stream_altListAsBlock.add(altListAsBlock60.getTree());
-            SEMI61=(Token)match(input,SEMI,FOLLOW_SEMI_in_rule1892); if (state.failed) return retval; 
+            SEMI61=(Token)match(input,SEMI,FOLLOW_SEMI_in_rule1898); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_SEMI.add(SEMI61);
 
-            pushFollow(FOLLOW_exceptionGroup_in_rule1901);
+            pushFollow(FOLLOW_exceptionGroup_in_rule1907);
             exceptionGroup62=exceptionGroup();
 
             state._fsp--;
@@ -2353,7 +2353,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: exceptionGroup, ruleReturns, rulePrequel, ARG_ACTION, DOC_COMMENT, ruleModifiers, altListAsBlock, id
+            // elements: ARG_ACTION, ruleModifiers, DOC_COMMENT, rulePrequel, altListAsBlock, ruleReturns, exceptionGroup, id
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2478,7 +2478,7 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:433:7: exceptionHandler
             	    {
-            	    pushFollow(FOLLOW_exceptionHandler_in_exceptionGroup1993);
+            	    pushFollow(FOLLOW_exceptionHandler_in_exceptionGroup1999);
             	    exceptionHandler63=exceptionHandler();
 
             	    state._fsp--;
@@ -2504,7 +2504,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:433:25: finallyClause
                     {
-                    pushFollow(FOLLOW_finallyClause_in_exceptionGroup1996);
+                    pushFollow(FOLLOW_finallyClause_in_exceptionGroup2002);
                     finallyClause64=finallyClause();
 
                     state._fsp--;
@@ -2567,19 +2567,19 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:439:2: ( CATCH ARG_ACTION ACTION -> ^( CATCH ARG_ACTION ACTION ) )
             // ANTLRParser.g:439:4: CATCH ARG_ACTION ACTION
             {
-            CATCH65=(Token)match(input,CATCH,FOLLOW_CATCH_in_exceptionHandler2013); if (state.failed) return retval; 
+            CATCH65=(Token)match(input,CATCH,FOLLOW_CATCH_in_exceptionHandler2019); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_CATCH.add(CATCH65);
 
-            ARG_ACTION66=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_exceptionHandler2015); if (state.failed) return retval; 
+            ARG_ACTION66=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_exceptionHandler2021); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION66);
 
-            ACTION67=(Token)match(input,ACTION,FOLLOW_ACTION_in_exceptionHandler2017); if (state.failed) return retval; 
+            ACTION67=(Token)match(input,ACTION,FOLLOW_ACTION_in_exceptionHandler2023); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_ACTION.add(ACTION67);
 
 
 
             // AST REWRITE
-            // elements: CATCH, ACTION, ARG_ACTION
+            // elements: ACTION, CATCH, ARG_ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2598,7 +2598,7 @@ public class ANTLRParser extends Parser {
                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_CATCH.nextNode(), root_1);
 
                 adaptor.addChild(root_1, stream_ARG_ACTION.nextNode());
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -2653,16 +2653,16 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:445:2: ( FINALLY ACTION -> ^( FINALLY ACTION ) )
             // ANTLRParser.g:445:4: FINALLY ACTION
             {
-            FINALLY68=(Token)match(input,FINALLY,FOLLOW_FINALLY_in_finallyClause2040); if (state.failed) return retval; 
+            FINALLY68=(Token)match(input,FINALLY,FOLLOW_FINALLY_in_finallyClause2049); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_FINALLY.add(FINALLY68);
 
-            ACTION69=(Token)match(input,ACTION,FOLLOW_ACTION_in_finallyClause2042); if (state.failed) return retval; 
+            ACTION69=(Token)match(input,ACTION,FOLLOW_ACTION_in_finallyClause2051); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_ACTION.add(ACTION69);
 
 
 
             // AST REWRITE
-            // elements: ACTION, FINALLY
+            // elements: FINALLY, ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2680,7 +2680,7 @@ public class ANTLRParser extends Parser {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_FINALLY.nextNode(), root_1);
 
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -2771,7 +2771,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_throwsSpec_in_rulePrequel2069);
+                    pushFollow(FOLLOW_throwsSpec_in_rulePrequel2081);
                     throwsSpec70=throwsSpec();
 
                     state._fsp--;
@@ -2785,7 +2785,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_ruleScopeSpec_in_rulePrequel2077);
+                    pushFollow(FOLLOW_ruleScopeSpec_in_rulePrequel2089);
                     ruleScopeSpec71=ruleScopeSpec();
 
                     state._fsp--;
@@ -2799,7 +2799,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_optionsSpec_in_rulePrequel2085);
+                    pushFollow(FOLLOW_optionsSpec_in_rulePrequel2097);
                     optionsSpec72=optionsSpec();
 
                     state._fsp--;
@@ -2813,7 +2813,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_ruleAction_in_rulePrequel2093);
+                    pushFollow(FOLLOW_ruleAction_in_rulePrequel2105);
                     ruleAction73=ruleAction();
 
                     state._fsp--;
@@ -2869,12 +2869,12 @@ public class ANTLRParser extends Parser {
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            RETURNS74=(Token)match(input,RETURNS,FOLLOW_RETURNS_in_ruleReturns2113); if (state.failed) return retval;
+            RETURNS74=(Token)match(input,RETURNS,FOLLOW_RETURNS_in_ruleReturns2125); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
             RETURNS74_tree = (GrammarAST)adaptor.create(RETURNS74);
             root_0 = (GrammarAST)adaptor.becomeRoot(RETURNS74_tree, root_0);
             }
-            ARG_ACTION75=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns2116); if (state.failed) return retval;
+            ARG_ACTION75=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns2128); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
             ARG_ACTION75_tree = (GrammarAST)adaptor.create(ARG_ACTION75);
             adaptor.addChild(root_0, ARG_ACTION75_tree);
@@ -2931,10 +2931,10 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:480:5: ( THROWS qid ( COMMA qid )* -> ^( THROWS ( qid )+ ) )
             // ANTLRParser.g:480:7: THROWS qid ( COMMA qid )*
             {
-            THROWS76=(Token)match(input,THROWS,FOLLOW_THROWS_in_throwsSpec2141); if (state.failed) return retval; 
+            THROWS76=(Token)match(input,THROWS,FOLLOW_THROWS_in_throwsSpec2153); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_THROWS.add(THROWS76);
 
-            pushFollow(FOLLOW_qid_in_throwsSpec2143);
+            pushFollow(FOLLOW_qid_in_throwsSpec2155);
             qid77=qid();
 
             state._fsp--;
@@ -2955,10 +2955,10 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:480:19: COMMA qid
             	    {
-            	    COMMA78=(Token)match(input,COMMA,FOLLOW_COMMA_in_throwsSpec2146); if (state.failed) return retval; 
+            	    COMMA78=(Token)match(input,COMMA,FOLLOW_COMMA_in_throwsSpec2158); if (state.failed) return retval; 
             	    if ( state.backtracking==0 ) stream_COMMA.add(COMMA78);
 
-            	    pushFollow(FOLLOW_qid_in_throwsSpec2148);
+            	    pushFollow(FOLLOW_qid_in_throwsSpec2160);
             	    qid79=qid();
 
             	    state._fsp--;
@@ -3097,10 +3097,10 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:488:4: SCOPE ACTION
                     {
-                    SCOPE80=(Token)match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec2179); if (state.failed) return retval; 
+                    SCOPE80=(Token)match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec2191); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_SCOPE.add(SCOPE80);
 
-                    ACTION81=(Token)match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec2181); if (state.failed) return retval; 
+                    ACTION81=(Token)match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec2193); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_ACTION.add(ACTION81);
 
 
@@ -3137,10 +3137,10 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:489:4: SCOPE id ( COMMA id )* SEMI
                     {
-                    SCOPE82=(Token)match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec2194); if (state.failed) return retval; 
+                    SCOPE82=(Token)match(input,SCOPE,FOLLOW_SCOPE_in_ruleScopeSpec2206); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_SCOPE.add(SCOPE82);
 
-                    pushFollow(FOLLOW_id_in_ruleScopeSpec2196);
+                    pushFollow(FOLLOW_id_in_ruleScopeSpec2208);
                     id83=id();
 
                     state._fsp--;
@@ -3161,10 +3161,10 @@ public class ANTLRParser extends Parser {
                     	case 1 :
                     	    // ANTLRParser.g:489:14: COMMA id
                     	    {
-                    	    COMMA84=(Token)match(input,COMMA,FOLLOW_COMMA_in_ruleScopeSpec2199); if (state.failed) return retval; 
+                    	    COMMA84=(Token)match(input,COMMA,FOLLOW_COMMA_in_ruleScopeSpec2211); if (state.failed) return retval; 
                     	    if ( state.backtracking==0 ) stream_COMMA.add(COMMA84);
 
-                    	    pushFollow(FOLLOW_id_in_ruleScopeSpec2201);
+                    	    pushFollow(FOLLOW_id_in_ruleScopeSpec2213);
                     	    id85=id();
 
                     	    state._fsp--;
@@ -3179,13 +3179,13 @@ public class ANTLRParser extends Parser {
                         }
                     } while (true);
 
-                    SEMI86=(Token)match(input,SEMI,FOLLOW_SEMI_in_ruleScopeSpec2205); if (state.failed) return retval; 
+                    SEMI86=(Token)match(input,SEMI,FOLLOW_SEMI_in_ruleScopeSpec2217); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_SEMI.add(SEMI86);
 
 
 
                     // AST REWRITE
-                    // elements: id, SCOPE
+                    // elements: SCOPE, id
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -3269,22 +3269,22 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:502:2: ( AT id ACTION -> ^( AT id ACTION ) )
             // ANTLRParser.g:502:4: AT id ACTION
             {
-            AT87=(Token)match(input,AT,FOLLOW_AT_in_ruleAction2235); if (state.failed) return retval; 
+            AT87=(Token)match(input,AT,FOLLOW_AT_in_ruleAction2247); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_AT.add(AT87);
 
-            pushFollow(FOLLOW_id_in_ruleAction2237);
+            pushFollow(FOLLOW_id_in_ruleAction2249);
             id88=id();
 
             state._fsp--;
             if (state.failed) return retval;
             if ( state.backtracking==0 ) stream_id.add(id88.getTree());
-            ACTION89=(Token)match(input,ACTION,FOLLOW_ACTION_in_ruleAction2239); if (state.failed) return retval; 
+            ACTION89=(Token)match(input,ACTION,FOLLOW_ACTION_in_ruleAction2251); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_ACTION.add(ACTION89);
 
 
 
             // AST REWRITE
-            // elements: ACTION, AT, id
+            // elements: AT, ACTION, id
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3303,7 +3303,7 @@ public class ANTLRParser extends Parser {
                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_AT.nextNode(), root_1);
 
                 adaptor.addChild(root_1, stream_id.nextTree());
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -3370,7 +3370,7 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:511:7: ruleModifier
             	    {
-            	    pushFollow(FOLLOW_ruleModifier_in_ruleModifiers2277);
+            	    pushFollow(FOLLOW_ruleModifier_in_ruleModifiers2292);
             	    ruleModifier90=ruleModifier();
 
             	    state._fsp--;
@@ -3532,7 +3532,7 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:528:5: ( alternative ( OR alternative )* -> ( alternative )+ )
             // ANTLRParser.g:528:7: alternative ( OR alternative )*
             {
-            pushFollow(FOLLOW_alternative_in_altList2353);
+            pushFollow(FOLLOW_alternative_in_altList2368);
             alternative92=alternative();
 
             state._fsp--;
@@ -3553,10 +3553,10 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:528:20: OR alternative
             	    {
-            	    OR93=(Token)match(input,OR,FOLLOW_OR_in_altList2356); if (state.failed) return retval; 
+            	    OR93=(Token)match(input,OR,FOLLOW_OR_in_altList2371); if (state.failed) return retval; 
             	    if ( state.backtracking==0 ) stream_OR.add(OR93);
 
-            	    pushFollow(FOLLOW_alternative_in_altList2358);
+            	    pushFollow(FOLLOW_alternative_in_altList2373);
             	    alternative94=alternative();
 
             	    state._fsp--;
@@ -3642,7 +3642,7 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:538:5: ( altList -> ^( BLOCK altList ) )
             // ANTLRParser.g:538:7: altList
             {
-            pushFollow(FOLLOW_altList_in_altListAsBlock2388);
+            pushFollow(FOLLOW_altList_in_altListAsBlock2403);
             altList95=altList();
 
             state._fsp--;
@@ -3764,7 +3764,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:544:7: elements ( rewrite -> ^( ALT_REWRITE elements rewrite ) | -> elements )
                     {
-                    pushFollow(FOLLOW_elements_in_alternative2418);
+                    pushFollow(FOLLOW_elements_in_alternative2433);
                     elements96=elements();
 
                     state._fsp--;
@@ -3791,7 +3791,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:545:8: rewrite
                             {
-                            pushFollow(FOLLOW_rewrite_in_alternative2427);
+                            pushFollow(FOLLOW_rewrite_in_alternative2442);
                             rewrite97=rewrite();
 
                             state._fsp--;
@@ -3863,7 +3863,7 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:548:7: rewrite
                     {
-                    pushFollow(FOLLOW_rewrite_in_alternative2465);
+                    pushFollow(FOLLOW_rewrite_in_alternative2480);
                     rewrite98=rewrite();
 
                     state._fsp--;
@@ -4000,7 +4000,7 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:553:8: e+= element
             	    {
-            	    pushFollow(FOLLOW_element_in_elements2518);
+            	    pushFollow(FOLLOW_element_in_elements2533);
             	    e=element();
 
             	    state._fsp--;
@@ -4129,7 +4129,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:557:4: labeledElement ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT labeledElement ) ) ) | -> labeledElement )
                     {
-                    pushFollow(FOLLOW_labeledElement_in_element2545);
+                    pushFollow(FOLLOW_labeledElement_in_element2560);
                     labeledElement99=labeledElement();
 
                     state._fsp--;
@@ -4156,7 +4156,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:558:5: ebnfSuffix
                             {
-                            pushFollow(FOLLOW_ebnfSuffix_in_element2551);
+                            pushFollow(FOLLOW_ebnfSuffix_in_element2566);
                             ebnfSuffix100=ebnfSuffix();
 
                             state._fsp--;
@@ -4165,7 +4165,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: labeledElement, ebnfSuffix
+                            // elements: ebnfSuffix, labeledElement
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -4243,7 +4243,7 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:561:4: atom ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT atom ) ) ) | -> atom )
                     {
-                    pushFollow(FOLLOW_atom_in_element2593);
+                    pushFollow(FOLLOW_atom_in_element2608);
                     atom101=atom();
 
                     state._fsp--;
@@ -4270,7 +4270,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:562:5: ebnfSuffix
                             {
-                            pushFollow(FOLLOW_ebnfSuffix_in_element2599);
+                            pushFollow(FOLLOW_ebnfSuffix_in_element2614);
                             ebnfSuffix102=ebnfSuffix();
 
                             state._fsp--;
@@ -4279,7 +4279,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: ebnfSuffix, atom
+                            // elements: atom, ebnfSuffix
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -4359,7 +4359,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_ebnf_in_element2642);
+                    pushFollow(FOLLOW_ebnf_in_element2657);
                     ebnf103=ebnf();
 
                     state._fsp--;
@@ -4373,9 +4373,9 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    ACTION104=(Token)match(input,ACTION,FOLLOW_ACTION_in_element2649); if (state.failed) return retval;
+                    ACTION104=(Token)match(input,ACTION,FOLLOW_ACTION_in_element2664); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    ACTION104_tree = (GrammarAST)adaptor.create(ACTION104);
+                    ACTION104_tree = new ActionAST(ACTION104) ;
                     adaptor.addChild(root_0, ACTION104_tree);
                     }
 
@@ -4384,7 +4384,7 @@ public class ANTLRParser extends Parser {
                 case 5 :
                     // ANTLRParser.g:567:6: SEMPRED ( IMPLIES -> GATED_SEMPRED[$IMPLIES] | -> SEMPRED )
                     {
-                    SEMPRED105=(Token)match(input,SEMPRED,FOLLOW_SEMPRED_in_element2656); if (state.failed) return retval; 
+                    SEMPRED105=(Token)match(input,SEMPRED,FOLLOW_SEMPRED_in_element2674); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_SEMPRED.add(SEMPRED105);
 
                     // ANTLRParser.g:568:3: ( IMPLIES -> GATED_SEMPRED[$IMPLIES] | -> SEMPRED )
@@ -4408,7 +4408,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:568:5: IMPLIES
                             {
-                            IMPLIES106=(Token)match(input,IMPLIES,FOLLOW_IMPLIES_in_element2662); if (state.failed) return retval; 
+                            IMPLIES106=(Token)match(input,IMPLIES,FOLLOW_IMPLIES_in_element2680); if (state.failed) return retval; 
                             if ( state.backtracking==0 ) stream_IMPLIES.add(IMPLIES106);
 
 
@@ -4468,7 +4468,7 @@ public class ANTLRParser extends Parser {
                 case 6 :
                     // ANTLRParser.g:571:6: treeSpec ( ebnfSuffix -> ^( ebnfSuffix ^( BLOCK ^( ALT treeSpec ) ) ) | -> treeSpec )
                     {
-                    pushFollow(FOLLOW_treeSpec_in_element2690);
+                    pushFollow(FOLLOW_treeSpec_in_element2708);
                     treeSpec107=treeSpec();
 
                     state._fsp--;
@@ -4495,7 +4495,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:572:5: ebnfSuffix
                             {
-                            pushFollow(FOLLOW_ebnfSuffix_in_element2696);
+                            pushFollow(FOLLOW_ebnfSuffix_in_element2714);
                             ebnfSuffix108=ebnfSuffix();
 
                             state._fsp--;
@@ -4632,7 +4632,7 @@ public class ANTLRParser extends Parser {
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_id_in_labeledElement2745);
+            pushFollow(FOLLOW_id_in_labeledElement2763);
             id109=id();
 
             state._fsp--;
@@ -4659,7 +4659,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:577:22: ASSIGN
                     {
-                    ASSIGN110=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement2748); if (state.failed) return retval;
+                    ASSIGN110=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement2766); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     ASSIGN110_tree = (GrammarAST)adaptor.create(ASSIGN110);
                     root_0 = (GrammarAST)adaptor.becomeRoot(ASSIGN110_tree, root_0);
@@ -4670,7 +4670,7 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:577:30: PLUS_ASSIGN
                     {
-                    PLUS_ASSIGN111=(Token)match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement2751); if (state.failed) return retval;
+                    PLUS_ASSIGN111=(Token)match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement2769); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     PLUS_ASSIGN111_tree = (GrammarAST)adaptor.create(PLUS_ASSIGN111);
                     root_0 = (GrammarAST)adaptor.becomeRoot(PLUS_ASSIGN111_tree, root_0);
@@ -4702,7 +4702,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:577:45: atom
                     {
-                    pushFollow(FOLLOW_atom_in_labeledElement2756);
+                    pushFollow(FOLLOW_atom_in_labeledElement2774);
                     atom112=atom();
 
                     state._fsp--;
@@ -4714,7 +4714,7 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:577:50: block
                     {
-                    pushFollow(FOLLOW_block_in_labeledElement2758);
+                    pushFollow(FOLLOW_block_in_labeledElement2776);
                     block113=block();
 
                     state._fsp--;
@@ -4778,10 +4778,10 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:584:5: ( TREE_BEGIN element ( element )+ RPAREN -> ^( TREE_BEGIN ( element )+ ) )
             // ANTLRParser.g:584:7: TREE_BEGIN element ( element )+ RPAREN
             {
-            TREE_BEGIN114=(Token)match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec2780); if (state.failed) return retval; 
+            TREE_BEGIN114=(Token)match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec2798); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_TREE_BEGIN.add(TREE_BEGIN114);
 
-            pushFollow(FOLLOW_element_in_treeSpec2821);
+            pushFollow(FOLLOW_element_in_treeSpec2839);
             element115=element();
 
             state._fsp--;
@@ -4803,7 +4803,7 @@ public class ANTLRParser extends Parser {
             	case 1 :
             	    // ANTLRParser.g:591:10: element
             	    {
-            	    pushFollow(FOLLOW_element_in_treeSpec2852);
+            	    pushFollow(FOLLOW_element_in_treeSpec2870);
             	    element116=element();
 
             	    state._fsp--;
@@ -4823,13 +4823,13 @@ public class ANTLRParser extends Parser {
                 cnt38++;
             } while (true);
 
-            RPAREN117=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_treeSpec2861); if (state.failed) return retval; 
+            RPAREN117=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_treeSpec2879); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN117);
 
 
 
             // AST REWRITE
-            // elements: TREE_BEGIN, element
+            // elements: element, TREE_BEGIN
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -4908,7 +4908,7 @@ public class ANTLRParser extends Parser {
             // ANTLRParser.g:599:5: ( block ( blockSuffixe -> ^( blockSuffixe block ) | -> block ) )
             // ANTLRParser.g:599:7: block ( blockSuffixe -> ^( blockSuffixe block ) | -> block )
             {
-            pushFollow(FOLLOW_block_in_ebnf2895);
+            pushFollow(FOLLOW_block_in_ebnf2913);
             block118=block();
 
             state._fsp--;
@@ -4935,7 +4935,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:603:9: blockSuffixe
                     {
-                    pushFollow(FOLLOW_blockSuffixe_in_ebnf2930);
+                    pushFollow(FOLLOW_blockSuffixe_in_ebnf2948);
                     blockSuffixe119=blockSuffixe();
 
                     state._fsp--;
@@ -4944,7 +4944,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: block, blockSuffixe
+                    // elements: blockSuffixe, block
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5086,7 +5086,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_ebnfSuffix_in_blockSuffixe2981);
+                    pushFollow(FOLLOW_ebnfSuffix_in_blockSuffixe2999);
                     ebnfSuffix120=ebnfSuffix();
 
                     state._fsp--;
@@ -5100,7 +5100,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    ROOT121=(Token)match(input,ROOT,FOLLOW_ROOT_in_blockSuffixe2995); if (state.failed) return retval;
+                    ROOT121=(Token)match(input,ROOT,FOLLOW_ROOT_in_blockSuffixe3013); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     ROOT121_tree = (GrammarAST)adaptor.create(ROOT121);
                     adaptor.addChild(root_0, ROOT121_tree);
@@ -5113,7 +5113,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    IMPLIES122=(Token)match(input,IMPLIES,FOLLOW_IMPLIES_in_blockSuffixe3003); if (state.failed) return retval;
+                    IMPLIES122=(Token)match(input,IMPLIES,FOLLOW_IMPLIES_in_blockSuffixe3021); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     IMPLIES122_tree = (GrammarAST)adaptor.create(IMPLIES122);
                     adaptor.addChild(root_0, IMPLIES122_tree);
@@ -5126,7 +5126,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    BANG123=(Token)match(input,BANG,FOLLOW_BANG_in_blockSuffixe3014); if (state.failed) return retval;
+                    BANG123=(Token)match(input,BANG,FOLLOW_BANG_in_blockSuffixe3032); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
                     BANG123_tree = (GrammarAST)adaptor.create(BANG123);
                     adaptor.addChild(root_0, BANG123_tree);
@@ -5214,7 +5214,7 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:623:4: QUESTION
                     {
-                    QUESTION124=(Token)match(input,QUESTION,FOLLOW_QUESTION_in_ebnfSuffix3033); if (state.failed) return retval; 
+                    QUESTION124=(Token)match(input,QUESTION,FOLLOW_QUESTION_in_ebnfSuffix3051); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_QUESTION.add(QUESTION124);
 
 
@@ -5243,7 +5243,7 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:624:6: STAR
                     {
-                    STAR125=(Token)match(input,STAR,FOLLOW_STAR_in_ebnfSuffix3045); if (state.failed) return retval; 
+                    STAR125=(Token)match(input,STAR,FOLLOW_STAR_in_ebnfSuffix3063); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_STAR.add(STAR125);
 
 
@@ -5272,7 +5272,7 @@ public class ANTLRParser extends Parser {
                 case 3 :
                     // ANTLRParser.g:625:7: PLUS
                     {
-                    PLUS126=(Token)match(input,PLUS,FOLLOW_PLUS_in_ebnfSuffix3060); if (state.failed) return retval; 
+                    PLUS126=(Token)match(input,PLUS,FOLLOW_PLUS_in_ebnfSuffix3078); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_PLUS.add(PLUS126);
 
 
@@ -5376,7 +5376,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_range_in_atom3077);
+                    pushFollow(FOLLOW_range_in_atom3095);
                     range127=range();
 
                     state._fsp--;
@@ -5396,7 +5396,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:628:14: ROOT
                             {
-                            ROOT128=(Token)match(input,ROOT,FOLLOW_ROOT_in_atom3080); if (state.failed) return retval;
+                            ROOT128=(Token)match(input,ROOT,FOLLOW_ROOT_in_atom3098); if (state.failed) return retval;
                             if ( state.backtracking==0 ) {
                             ROOT128_tree = (GrammarAST)adaptor.create(ROOT128);
                             root_0 = (GrammarAST)adaptor.becomeRoot(ROOT128_tree, root_0);
@@ -5407,7 +5407,7 @@ public class ANTLRParser extends Parser {
                         case 2 :
                             // ANTLRParser.g:628:22: BANG
                             {
-                            BANG129=(Token)match(input,BANG,FOLLOW_BANG_in_atom3085); if (state.failed) return retval;
+                            BANG129=(Token)match(input,BANG,FOLLOW_BANG_in_atom3103); if (state.failed) return retval;
                             if ( state.backtracking==0 ) {
                             BANG129_tree = (GrammarAST)adaptor.create(BANG129);
                             root_0 = (GrammarAST)adaptor.becomeRoot(BANG129_tree, root_0);
@@ -5432,16 +5432,16 @@ public class ANTLRParser extends Parser {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         throw new FailedPredicateException(input, "atom", "\n\t    \tinput.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==\n\t        input.LT(2).getCharPositionInLine() &&\n\t        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()\n\t    ");
                     }
-                    pushFollow(FOLLOW_id_in_atom3132);
+                    pushFollow(FOLLOW_id_in_atom3150);
                     id130=id();
 
                     state._fsp--;
                     if (state.failed) return retval;
                     if ( state.backtracking==0 ) stream_id.add(id130.getTree());
-                    DOT131=(Token)match(input,DOT,FOLLOW_DOT_in_atom3134); if (state.failed) return retval; 
+                    DOT131=(Token)match(input,DOT,FOLLOW_DOT_in_atom3152); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_DOT.add(DOT131);
 
-                    pushFollow(FOLLOW_ruleref_in_atom3136);
+                    pushFollow(FOLLOW_ruleref_in_atom3154);
                     ruleref132=ruleref();
 
                     state._fsp--;
@@ -5450,7 +5450,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: id, DOT, ruleref
+                    // elements: ruleref, DOT, id
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5490,16 +5490,16 @@ public class ANTLRParser extends Parser {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         throw new FailedPredicateException(input, "atom", "\n\t    \tinput.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==\n\t        input.LT(2).getCharPositionInLine() &&\n\t        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()\n\t    ");
                     }
-                    pushFollow(FOLLOW_id_in_atom3170);
+                    pushFollow(FOLLOW_id_in_atom3188);
                     id133=id();
 
                     state._fsp--;
                     if (state.failed) return retval;
                     if ( state.backtracking==0 ) stream_id.add(id133.getTree());
-                    DOT134=(Token)match(input,DOT,FOLLOW_DOT_in_atom3172); if (state.failed) return retval; 
+                    DOT134=(Token)match(input,DOT,FOLLOW_DOT_in_atom3190); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_DOT.add(DOT134);
 
-                    pushFollow(FOLLOW_terminal_in_atom3174);
+                    pushFollow(FOLLOW_terminal_in_atom3192);
                     terminal135=terminal();
 
                     state._fsp--;
@@ -5508,7 +5508,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: id, terminal, DOT
+                    // elements: id, DOT, terminal
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5542,7 +5542,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_terminal_in_atom3199);
+                    pushFollow(FOLLOW_terminal_in_atom3217);
                     terminal136=terminal();
 
                     state._fsp--;
@@ -5556,7 +5556,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_ruleref_in_atom3209);
+                    pushFollow(FOLLOW_ruleref_in_atom3227);
                     ruleref137=ruleref();
 
                     state._fsp--;
@@ -5570,7 +5570,7 @@ public class ANTLRParser extends Parser {
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_notSet_in_atom3217);
+                    pushFollow(FOLLOW_notSet_in_atom3235);
                     notSet138=notSet();
 
                     state._fsp--;
@@ -5590,7 +5590,7 @@ public class ANTLRParser extends Parser {
                         case 1 :
                             // ANTLRParser.g:651:15: ROOT
                             {
-                            ROOT139=(Token)match(input,ROOT,FOLLOW_ROOT_in_atom3220); if (state.failed) return retval;
+                            ROOT139=(Token)match(input,ROOT,FOLLOW_ROOT_in_atom3238); if (state.failed) return retval;
                             if ( state.backtracking==0 ) {
                             ROOT139_tree = (GrammarAST)adaptor.create(ROOT139);
                             root_0 = (GrammarAST)adaptor.becomeRoot(ROOT139_tree, root_0);
@@ -5601,7 +5601,7 @@ public class ANTLRParser extends Parser {
                         case 2 :
                             // ANTLRParser.g:651:21: BANG
                             {
-                            BANG140=(Token)match(input,BANG,FOLLOW_BANG_in_atom3223); if (state.failed) return retval;
+                            BANG140=(Token)match(input,BANG,FOLLOW_BANG_in_atom3241); if (state.failed) return retval;
                             if ( state.backtracking==0 ) {
                             BANG140_tree = (GrammarAST)adaptor.create(BANG140);
                             root_0 = (GrammarAST)adaptor.becomeRoot(BANG140_tree, root_0);
@@ -5695,10 +5695,10 @@ public class ANTLRParser extends Parser {
                 case 1 :
                     // ANTLRParser.g:663:7: NOT notTerminal
                     {
-                    NOT141=(Token)match(input,NOT,FOLLOW_NOT_in_notSet3256); if (state.failed) return retval; 
+                    NOT141=(Token)match(input,NOT,FOLLOW_NOT_in_notSet3274); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_NOT.add(NOT141);
 
-                    pushFollow(FOLLOW_notTerminal_in_notSet3258);
+                    pushFollow(FOLLOW_notTerminal_in_notSet3276);
                     notTerminal142=notTerminal();
 
                     state._fsp--;
@@ -5738,10 +5738,10 @@ public class ANTLRParser extends Parser {
                 case 2 :
                     // ANTLRParser.g:664:7: NOT block
                     {
-                    NOT143=(Token)match(input,NOT,FOLLOW_NOT_in_notSet3274); if (state.failed) return retval; 
+                    NOT143=(Token)match(input,NOT,FOLLOW_NOT_in_notSet3292); if (state.failed) return retval; 
                     if ( state.backtracking==0 ) stream_NOT.add(NOT143);
 
-                    pushFollow(FOLLOW_block_in_notSet3276);
+                    pushFollow(FOLLOW_block_in_notSet3294);
                     block144=block();
 
                     state._fsp--;
@@ -5750,7 +5750,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: block, NOT
+                    // elements: NOT, block
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5864,7 +5864,7 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "block"
-    // ANTLRParser.g:685:1: block : LPAREN ( optionsSpec )? ( (ra+= ruleAction )* ( ACTION )? COLON )? altList RPAREN -> ^( BLOCK ( optionsSpec )? ( $ra)* ( ACTION )? altList ) ;
+    // ANTLRParser.g:685:1: block : LPAREN ( ( optionsSpec )? (ra+= ruleAction )* COLON )? altList RPAREN -> ^( BLOCK ( optionsSpec )? ( $ra)* altList ) ;
     public final ANTLRParser.block_return block() throws RecognitionException {
         ANTLRParser.block_return retval = new ANTLRParser.block_return();
         retval.start = input.LT(1);
@@ -5872,75 +5872,65 @@ public class ANTLRParser extends Parser {
         GrammarAST root_0 = null;
 
         Token LPAREN146=null;
-        Token ACTION148=null;
-        Token COLON149=null;
-        Token RPAREN151=null;
+        Token COLON148=null;
+        Token RPAREN150=null;
         List list_ra=null;
         ANTLRParser.optionsSpec_return optionsSpec147 = null;
 
-        ANTLRParser.altList_return altList150 = null;
+        ANTLRParser.altList_return altList149 = null;
 
         RuleReturnScope ra = null;
         GrammarAST LPAREN146_tree=null;
-        GrammarAST ACTION148_tree=null;
-        GrammarAST COLON149_tree=null;
-        GrammarAST RPAREN151_tree=null;
+        GrammarAST COLON148_tree=null;
+        GrammarAST RPAREN150_tree=null;
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
-        RewriteRuleTokenStream stream_ACTION=new RewriteRuleTokenStream(adaptor,"token ACTION");
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_optionsSpec=new RewriteRuleSubtreeStream(adaptor,"rule optionsSpec");
         RewriteRuleSubtreeStream stream_altList=new RewriteRuleSubtreeStream(adaptor,"rule altList");
         RewriteRuleSubtreeStream stream_ruleAction=new RewriteRuleSubtreeStream(adaptor,"rule ruleAction");
         try {
-            // ANTLRParser.g:686:5: ( LPAREN ( optionsSpec )? ( (ra+= ruleAction )* ( ACTION )? COLON )? altList RPAREN -> ^( BLOCK ( optionsSpec )? ( $ra)* ( ACTION )? altList ) )
-            // ANTLRParser.g:686:7: LPAREN ( optionsSpec )? ( (ra+= ruleAction )* ( ACTION )? COLON )? altList RPAREN
+            // ANTLRParser.g:686:5: ( LPAREN ( ( optionsSpec )? (ra+= ruleAction )* COLON )? altList RPAREN -> ^( BLOCK ( optionsSpec )? ( $ra)* altList ) )
+            // ANTLRParser.g:686:7: LPAREN ( ( optionsSpec )? (ra+= ruleAction )* COLON )? altList RPAREN
             {
-            LPAREN146=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_block3350); if (state.failed) return retval; 
+            LPAREN146=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_block3368); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN146);
 
-            // ANTLRParser.g:691:10: ( optionsSpec )?
-            int alt46=2;
-            int LA46_0 = input.LA(1);
+            // ANTLRParser.g:689:10: ( ( optionsSpec )? (ra+= ruleAction )* COLON )?
+            int alt48=2;
+            int LA48_0 = input.LA(1);
 
-            if ( (LA46_0==OPTIONS) ) {
-                alt46=1;
+            if ( (LA48_0==OPTIONS||LA48_0==COLON||LA48_0==AT) ) {
+                alt48=1;
             }
-            switch (alt46) {
+            switch (alt48) {
                 case 1 :
-                    // ANTLRParser.g:691:10: optionsSpec
+                    // ANTLRParser.g:689:12: ( optionsSpec )? (ra+= ruleAction )* COLON
                     {
-                    pushFollow(FOLLOW_optionsSpec_in_block3396);
-                    optionsSpec147=optionsSpec();
+                    // ANTLRParser.g:689:12: ( optionsSpec )?
+                    int alt46=2;
+                    int LA46_0 = input.LA(1);
 
-                    state._fsp--;
-                    if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_optionsSpec.add(optionsSpec147.getTree());
+                    if ( (LA46_0==OPTIONS) ) {
+                        alt46=1;
+                    }
+                    switch (alt46) {
+                        case 1 :
+                            // ANTLRParser.g:689:12: optionsSpec
+                            {
+                            pushFollow(FOLLOW_optionsSpec_in_block3405);
+                            optionsSpec147=optionsSpec();
+
+                            state._fsp--;
+                            if (state.failed) return retval;
+                            if ( state.backtracking==0 ) stream_optionsSpec.add(optionsSpec147.getTree());
+
+                            }
+                            break;
 
                     }
-                    break;
 
-            }
-
-            // ANTLRParser.g:693:10: ( (ra+= ruleAction )* ( ACTION )? COLON )?
-            int alt49=2;
-            int LA49_0 = input.LA(1);
-
-            if ( (LA49_0==COLON||LA49_0==AT) ) {
-                alt49=1;
-            }
-            else if ( (LA49_0==ACTION) ) {
-                int LA49_2 = input.LA(2);
-
-                if ( (LA49_2==COLON) ) {
-                    alt49=1;
-                }
-            }
-            switch (alt49) {
-                case 1 :
-                    // ANTLRParser.g:698:14: (ra+= ruleAction )* ( ACTION )? COLON
-                    {
-                    // ANTLRParser.g:698:16: (ra+= ruleAction )*
+                    // ANTLRParser.g:689:27: (ra+= ruleAction )*
                     loop47:
                     do {
                         int alt47=2;
@@ -5953,9 +5943,9 @@ public class ANTLRParser extends Parser {
 
                         switch (alt47) {
                     	case 1 :
-                    	    // ANTLRParser.g:698:16: ra+= ruleAction
+                    	    // ANTLRParser.g:689:27: ra+= ruleAction
                     	    {
-                    	    pushFollow(FOLLOW_ruleAction_in_block3491);
+                    	    pushFollow(FOLLOW_ruleAction_in_block3410);
                     	    ra=ruleAction();
 
                     	    state._fsp--;
@@ -5973,28 +5963,8 @@ public class ANTLRParser extends Parser {
                         }
                     } while (true);
 
-                    // ANTLRParser.g:699:14: ( ACTION )?
-                    int alt48=2;
-                    int LA48_0 = input.LA(1);
-
-                    if ( (LA48_0==ACTION) ) {
-                        alt48=1;
-                    }
-                    switch (alt48) {
-                        case 1 :
-                            // ANTLRParser.g:699:14: ACTION
-                            {
-                            ACTION148=(Token)match(input,ACTION,FOLLOW_ACTION_in_block3507); if (state.failed) return retval; 
-                            if ( state.backtracking==0 ) stream_ACTION.add(ACTION148);
-
-
-                            }
-                            break;
-
-                    }
-
-                    COLON149=(Token)match(input,COLON,FOLLOW_COLON_in_block3558); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_COLON.add(COLON149);
+                    COLON148=(Token)match(input,COLON,FOLLOW_COLON_in_block3413); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_COLON.add(COLON148);
 
 
                     }
@@ -6002,19 +5972,19 @@ public class ANTLRParser extends Parser {
 
             }
 
-            pushFollow(FOLLOW_altList_in_block3611);
-            altList150=altList();
+            pushFollow(FOLLOW_altList_in_block3427);
+            altList149=altList();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_altList.add(altList150.getTree());
-            RPAREN151=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_block3629); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN151);
+            if ( state.backtracking==0 ) stream_altList.add(altList149.getTree());
+            RPAREN150=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_block3444); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN150);
 
 
 
             // AST REWRITE
-            // elements: ACTION, altList, ra, optionsSpec
+            // elements: ra, optionsSpec, altList
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -6025,31 +5995,25 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
             RewriteRuleSubtreeStream stream_ra=new RewriteRuleSubtreeStream(adaptor,"token ra",list_ra);
             root_0 = (GrammarAST)adaptor.nil();
-            // 714:7: -> ^( BLOCK ( optionsSpec )? ( $ra)* ( ACTION )? altList )
+            // 692:7: -> ^( BLOCK ( optionsSpec )? ( $ra)* altList )
             {
-                // ANTLRParser.g:714:10: ^( BLOCK ( optionsSpec )? ( $ra)* ( ACTION )? altList )
+                // ANTLRParser.g:692:10: ^( BLOCK ( optionsSpec )? ( $ra)* altList )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot(new BlockAST(BLOCK), root_1);
 
-                // ANTLRParser.g:714:28: ( optionsSpec )?
+                // ANTLRParser.g:692:28: ( optionsSpec )?
                 if ( stream_optionsSpec.hasNext() ) {
                     adaptor.addChild(root_1, stream_optionsSpec.nextTree());
 
                 }
                 stream_optionsSpec.reset();
-                // ANTLRParser.g:714:41: ( $ra)*
+                // ANTLRParser.g:692:41: ( $ra)*
                 while ( stream_ra.hasNext() ) {
                     adaptor.addChild(root_1, stream_ra.nextTree());
 
                 }
                 stream_ra.reset();
-                // ANTLRParser.g:714:46: ( ACTION )?
-                if ( stream_ACTION.hasNext() ) {
-                    adaptor.addChild(root_1, stream_ACTION.nextNode());
-
-                }
-                stream_ACTION.reset();
                 adaptor.addChild(root_1, stream_altList.nextTree());
 
                 adaptor.addChild(root_0, root_1);
@@ -6086,7 +6050,7 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "ruleref"
-    // ANTLRParser.g:723:1: ruleref : RULE_REF ( ARG_ACTION )? ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) ) ;
+    // ANTLRParser.g:701:1: ruleref : RULE_REF ( ARG_ACTION )? ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) ) ;
     public final ANTLRParser.ruleref_return ruleref() throws RecognitionException {
         ANTLRParser.ruleref_return retval = new ANTLRParser.ruleref_return();
         retval.start = input.LT(1);
@@ -6094,37 +6058,37 @@ public class ANTLRParser extends Parser {
         GrammarAST root_0 = null;
 
         Token op=null;
-        Token RULE_REF152=null;
-        Token ARG_ACTION153=null;
+        Token RULE_REF151=null;
+        Token ARG_ACTION152=null;
 
         GrammarAST op_tree=null;
-        GrammarAST RULE_REF152_tree=null;
-        GrammarAST ARG_ACTION153_tree=null;
+        GrammarAST RULE_REF151_tree=null;
+        GrammarAST ARG_ACTION152_tree=null;
         RewriteRuleTokenStream stream_BANG=new RewriteRuleTokenStream(adaptor,"token BANG");
         RewriteRuleTokenStream stream_ROOT=new RewriteRuleTokenStream(adaptor,"token ROOT");
         RewriteRuleTokenStream stream_RULE_REF=new RewriteRuleTokenStream(adaptor,"token RULE_REF");
         RewriteRuleTokenStream stream_ARG_ACTION=new RewriteRuleTokenStream(adaptor,"token ARG_ACTION");
 
         try {
-            // ANTLRParser.g:724:5: ( RULE_REF ( ARG_ACTION )? ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) ) )
-            // ANTLRParser.g:724:7: RULE_REF ( ARG_ACTION )? ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) )
+            // ANTLRParser.g:702:5: ( RULE_REF ( ARG_ACTION )? ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) ) )
+            // ANTLRParser.g:702:7: RULE_REF ( ARG_ACTION )? ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) )
             {
-            RULE_REF152=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref3702); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RULE_REF.add(RULE_REF152);
+            RULE_REF151=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref3493); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RULE_REF.add(RULE_REF151);
 
-            // ANTLRParser.g:724:16: ( ARG_ACTION )?
-            int alt50=2;
-            int LA50_0 = input.LA(1);
+            // ANTLRParser.g:702:16: ( ARG_ACTION )?
+            int alt49=2;
+            int LA49_0 = input.LA(1);
 
-            if ( (LA50_0==ARG_ACTION) ) {
-                alt50=1;
+            if ( (LA49_0==ARG_ACTION) ) {
+                alt49=1;
             }
-            switch (alt50) {
+            switch (alt49) {
                 case 1 :
-                    // ANTLRParser.g:724:16: ARG_ACTION
+                    // ANTLRParser.g:702:16: ARG_ACTION
                     {
-                    ARG_ACTION153=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref3704); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION153);
+                    ARG_ACTION152=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref3495); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION152);
 
 
                     }
@@ -6132,58 +6096,58 @@ public class ANTLRParser extends Parser {
 
             }
 
-            // ANTLRParser.g:725:3: ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) )
-            int alt52=2;
-            int LA52_0 = input.LA(1);
+            // ANTLRParser.g:703:3: ( (op= ROOT | op= BANG ) -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) ) | -> ^( RULE_REF ( ARG_ACTION )? ) )
+            int alt51=2;
+            int LA51_0 = input.LA(1);
 
-            if ( (LA52_0==BANG||LA52_0==ROOT) ) {
-                alt52=1;
+            if ( (LA51_0==BANG||LA51_0==ROOT) ) {
+                alt51=1;
             }
-            else if ( (LA52_0==EOF||LA52_0==SEMPRED||LA52_0==ACTION||LA52_0==TEMPLATE||(LA52_0>=SEMI && LA52_0<=RPAREN)||LA52_0==QUESTION||(LA52_0>=STAR && LA52_0<=PLUS)||LA52_0==OR||LA52_0==DOT||(LA52_0>=RARROW && LA52_0<=TREE_BEGIN)||LA52_0==NOT||(LA52_0>=TOKEN_REF && LA52_0<=RULE_REF)||LA52_0==STRING_LITERAL) ) {
-                alt52=2;
+            else if ( (LA51_0==EOF||LA51_0==SEMPRED||LA51_0==ACTION||LA51_0==TEMPLATE||(LA51_0>=SEMI && LA51_0<=RPAREN)||LA51_0==QUESTION||(LA51_0>=STAR && LA51_0<=PLUS)||LA51_0==OR||LA51_0==DOT||(LA51_0>=RARROW && LA51_0<=TREE_BEGIN)||LA51_0==NOT||(LA51_0>=TOKEN_REF && LA51_0<=RULE_REF)||LA51_0==STRING_LITERAL) ) {
+                alt51=2;
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 52, 0, input);
+                    new NoViableAltException("", 51, 0, input);
 
                 throw nvae;
             }
-            switch (alt52) {
+            switch (alt51) {
                 case 1 :
-                    // ANTLRParser.g:725:5: (op= ROOT | op= BANG )
+                    // ANTLRParser.g:703:5: (op= ROOT | op= BANG )
                     {
-                    // ANTLRParser.g:725:5: (op= ROOT | op= BANG )
-                    int alt51=2;
-                    int LA51_0 = input.LA(1);
+                    // ANTLRParser.g:703:5: (op= ROOT | op= BANG )
+                    int alt50=2;
+                    int LA50_0 = input.LA(1);
 
-                    if ( (LA51_0==ROOT) ) {
-                        alt51=1;
+                    if ( (LA50_0==ROOT) ) {
+                        alt50=1;
                     }
-                    else if ( (LA51_0==BANG) ) {
-                        alt51=2;
+                    else if ( (LA50_0==BANG) ) {
+                        alt50=2;
                     }
                     else {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         NoViableAltException nvae =
-                            new NoViableAltException("", 51, 0, input);
+                            new NoViableAltException("", 50, 0, input);
 
                         throw nvae;
                     }
-                    switch (alt51) {
+                    switch (alt50) {
                         case 1 :
-                            // ANTLRParser.g:725:6: op= ROOT
+                            // ANTLRParser.g:703:6: op= ROOT
                             {
-                            op=(Token)match(input,ROOT,FOLLOW_ROOT_in_ruleref3714); if (state.failed) return retval; 
+                            op=(Token)match(input,ROOT,FOLLOW_ROOT_in_ruleref3505); if (state.failed) return retval; 
                             if ( state.backtracking==0 ) stream_ROOT.add(op);
 
 
                             }
                             break;
                         case 2 :
-                            // ANTLRParser.g:725:14: op= BANG
+                            // ANTLRParser.g:703:14: op= BANG
                             {
-                            op=(Token)match(input,BANG,FOLLOW_BANG_in_ruleref3718); if (state.failed) return retval; 
+                            op=(Token)match(input,BANG,FOLLOW_BANG_in_ruleref3509); if (state.failed) return retval; 
                             if ( state.backtracking==0 ) stream_BANG.add(op);
 
 
@@ -6195,7 +6159,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ARG_ACTION, RULE_REF, op
+                    // elements: RULE_REF, op, ARG_ACTION
                     // token labels: op
                     // rule labels: retval
                     // token list labels: 
@@ -6207,19 +6171,19 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 725:23: -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) )
+                    // 703:23: -> ^( $op ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                        // ANTLRParser.g:725:26: ^( $op ^( RULE_REF ( ARG_ACTION )? ) )
+                        // ANTLRParser.g:703:26: ^( $op ^( RULE_REF ( ARG_ACTION )? ) )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(stream_op.nextNode(), root_1);
 
-                        // ANTLRParser.g:725:32: ^( RULE_REF ( ARG_ACTION )? )
+                        // ANTLRParser.g:703:32: ^( RULE_REF ( ARG_ACTION )? )
                         {
                         GrammarAST root_2 = (GrammarAST)adaptor.nil();
                         root_2 = (GrammarAST)adaptor.becomeRoot(stream_RULE_REF.nextNode(), root_2);
 
-                        // ANTLRParser.g:725:43: ( ARG_ACTION )?
+                        // ANTLRParser.g:703:43: ( ARG_ACTION )?
                         if ( stream_ARG_ACTION.hasNext() ) {
                             adaptor.addChild(root_2, stream_ARG_ACTION.nextNode());
 
@@ -6238,7 +6202,7 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:726:10: 
+                    // ANTLRParser.g:704:10: 
                     {
 
                     // AST REWRITE
@@ -6253,14 +6217,14 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 726:10: -> ^( RULE_REF ( ARG_ACTION )? )
+                    // 704:10: -> ^( RULE_REF ( ARG_ACTION )? )
                     {
-                        // ANTLRParser.g:726:13: ^( RULE_REF ( ARG_ACTION )? )
+                        // ANTLRParser.g:704:13: ^( RULE_REF ( ARG_ACTION )? )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(stream_RULE_REF.nextNode(), root_1);
 
-                        // ANTLRParser.g:726:24: ( ARG_ACTION )?
+                        // ANTLRParser.g:704:24: ( ARG_ACTION )?
                         if ( stream_ARG_ACTION.hasNext() ) {
                             adaptor.addChild(root_1, stream_ARG_ACTION.nextNode());
 
@@ -6307,44 +6271,44 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "range"
-    // ANTLRParser.g:739:1: range : rangeElement RANGE rangeElement ;
+    // ANTLRParser.g:717:1: range : rangeElement RANGE rangeElement ;
     public final ANTLRParser.range_return range() throws RecognitionException {
         ANTLRParser.range_return retval = new ANTLRParser.range_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token RANGE155=null;
-        ANTLRParser.rangeElement_return rangeElement154 = null;
+        Token RANGE154=null;
+        ANTLRParser.rangeElement_return rangeElement153 = null;
 
-        ANTLRParser.rangeElement_return rangeElement156 = null;
+        ANTLRParser.rangeElement_return rangeElement155 = null;
 
 
-        GrammarAST RANGE155_tree=null;
+        GrammarAST RANGE154_tree=null;
 
         try {
-            // ANTLRParser.g:740:5: ( rangeElement RANGE rangeElement )
-            // ANTLRParser.g:740:7: rangeElement RANGE rangeElement
+            // ANTLRParser.g:718:5: ( rangeElement RANGE rangeElement )
+            // ANTLRParser.g:718:7: rangeElement RANGE rangeElement
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_rangeElement_in_range3783);
-            rangeElement154=rangeElement();
+            pushFollow(FOLLOW_rangeElement_in_range3574);
+            rangeElement153=rangeElement();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, rangeElement154.getTree());
-            RANGE155=(Token)match(input,RANGE,FOLLOW_RANGE_in_range3785); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, rangeElement153.getTree());
+            RANGE154=(Token)match(input,RANGE,FOLLOW_RANGE_in_range3576); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            RANGE155_tree = (GrammarAST)adaptor.create(RANGE155);
-            root_0 = (GrammarAST)adaptor.becomeRoot(RANGE155_tree, root_0);
+            RANGE154_tree = (GrammarAST)adaptor.create(RANGE154);
+            root_0 = (GrammarAST)adaptor.becomeRoot(RANGE154_tree, root_0);
             }
-            pushFollow(FOLLOW_rangeElement_in_range3788);
-            rangeElement156=rangeElement();
+            pushFollow(FOLLOW_rangeElement_in_range3579);
+            rangeElement155=rangeElement();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, rangeElement156.getTree());
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, rangeElement155.getTree());
 
             }
 
@@ -6374,27 +6338,27 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rangeElement"
-    // ANTLRParser.g:751:1: rangeElement : ( STRING_LITERAL | RULE_REF | TOKEN_REF );
+    // ANTLRParser.g:729:1: rangeElement : ( STRING_LITERAL | RULE_REF | TOKEN_REF );
     public final ANTLRParser.rangeElement_return rangeElement() throws RecognitionException {
         ANTLRParser.rangeElement_return retval = new ANTLRParser.rangeElement_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token set157=null;
+        Token set156=null;
 
-        GrammarAST set157_tree=null;
+        GrammarAST set156_tree=null;
 
         try {
-            // ANTLRParser.g:752:5: ( STRING_LITERAL | RULE_REF | TOKEN_REF )
+            // ANTLRParser.g:730:5: ( STRING_LITERAL | RULE_REF | TOKEN_REF )
             // ANTLRParser.g:
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            set157=(Token)input.LT(1);
+            set156=(Token)input.LT(1);
             if ( (input.LA(1)>=TOKEN_REF && input.LA(1)<=RULE_REF)||input.LA(1)==STRING_LITERAL ) {
                 input.consume();
-                if ( state.backtracking==0 ) adaptor.addChild(root_0, (GrammarAST)adaptor.create(set157));
+                if ( state.backtracking==0 ) adaptor.addChild(root_0, (GrammarAST)adaptor.create(set156));
                 state.errorRecovery=false;state.failed=false;
             }
             else {
@@ -6432,32 +6396,32 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "terminal"
-    // ANTLRParser.g:757:1: terminal : ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) ) ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )? ;
+    // ANTLRParser.g:735:1: terminal : ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) ) ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )? ;
     public final ANTLRParser.terminal_return terminal() throws RecognitionException {
         ANTLRParser.terminal_return retval = new ANTLRParser.terminal_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token TOKEN_REF158=null;
-        Token ARG_ACTION159=null;
-        Token STRING_LITERAL161=null;
-        Token DOT163=null;
-        Token ROOT165=null;
-        Token BANG166=null;
-        ANTLRParser.elementOptions_return elementOptions160 = null;
+        Token TOKEN_REF157=null;
+        Token ARG_ACTION158=null;
+        Token STRING_LITERAL160=null;
+        Token DOT162=null;
+        Token ROOT164=null;
+        Token BANG165=null;
+        ANTLRParser.elementOptions_return elementOptions159 = null;
 
-        ANTLRParser.elementOptions_return elementOptions162 = null;
+        ANTLRParser.elementOptions_return elementOptions161 = null;
 
-        ANTLRParser.elementOptions_return elementOptions164 = null;
+        ANTLRParser.elementOptions_return elementOptions163 = null;
 
 
-        GrammarAST TOKEN_REF158_tree=null;
-        GrammarAST ARG_ACTION159_tree=null;
-        GrammarAST STRING_LITERAL161_tree=null;
-        GrammarAST DOT163_tree=null;
-        GrammarAST ROOT165_tree=null;
-        GrammarAST BANG166_tree=null;
+        GrammarAST TOKEN_REF157_tree=null;
+        GrammarAST ARG_ACTION158_tree=null;
+        GrammarAST STRING_LITERAL160_tree=null;
+        GrammarAST DOT162_tree=null;
+        GrammarAST ROOT164_tree=null;
+        GrammarAST BANG165_tree=null;
         RewriteRuleTokenStream stream_STRING_LITERAL=new RewriteRuleTokenStream(adaptor,"token STRING_LITERAL");
         RewriteRuleTokenStream stream_BANG=new RewriteRuleTokenStream(adaptor,"token BANG");
         RewriteRuleTokenStream stream_DOT=new RewriteRuleTokenStream(adaptor,"token DOT");
@@ -6466,55 +6430,55 @@ public class ANTLRParser extends Parser {
         RewriteRuleTokenStream stream_ARG_ACTION=new RewriteRuleTokenStream(adaptor,"token ARG_ACTION");
         RewriteRuleSubtreeStream stream_elementOptions=new RewriteRuleSubtreeStream(adaptor,"rule elementOptions");
         try {
-            // ANTLRParser.g:758:5: ( ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) ) ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )? )
-            // ANTLRParser.g:758:9: ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) ) ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )?
+            // ANTLRParser.g:736:5: ( ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) ) ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )? )
+            // ANTLRParser.g:736:9: ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) ) ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )?
             {
-            // ANTLRParser.g:758:9: ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) )
-            int alt57=3;
+            // ANTLRParser.g:736:9: ( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? ) | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOT ( elementOptions )? -> ^( WILDCARD[$DOT] ( elementOptions )? ) )
+            int alt56=3;
             switch ( input.LA(1) ) {
             case TOKEN_REF:
                 {
-                alt57=1;
+                alt56=1;
                 }
                 break;
             case STRING_LITERAL:
                 {
-                alt57=2;
+                alt56=2;
                 }
                 break;
             case DOT:
                 {
-                alt57=3;
+                alt56=3;
                 }
                 break;
             default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 57, 0, input);
+                    new NoViableAltException("", 56, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt57) {
+            switch (alt56) {
                 case 1 :
-                    // ANTLRParser.g:759:7: TOKEN_REF ( ARG_ACTION )? ( elementOptions )?
+                    // ANTLRParser.g:737:7: TOKEN_REF ( ARG_ACTION )? ( elementOptions )?
                     {
-                    TOKEN_REF158=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal3882); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_TOKEN_REF.add(TOKEN_REF158);
+                    TOKEN_REF157=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal3673); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_TOKEN_REF.add(TOKEN_REF157);
 
-                    // ANTLRParser.g:759:17: ( ARG_ACTION )?
-                    int alt53=2;
-                    int LA53_0 = input.LA(1);
+                    // ANTLRParser.g:737:17: ( ARG_ACTION )?
+                    int alt52=2;
+                    int LA52_0 = input.LA(1);
 
-                    if ( (LA53_0==ARG_ACTION) ) {
-                        alt53=1;
+                    if ( (LA52_0==ARG_ACTION) ) {
+                        alt52=1;
                     }
-                    switch (alt53) {
+                    switch (alt52) {
                         case 1 :
-                            // ANTLRParser.g:759:17: ARG_ACTION
+                            // ANTLRParser.g:737:17: ARG_ACTION
                             {
-                            ARG_ACTION159=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal3884); if (state.failed) return retval; 
-                            if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION159);
+                            ARG_ACTION158=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal3675); if (state.failed) return retval; 
+                            if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION158);
 
 
                             }
@@ -6522,23 +6486,23 @@ public class ANTLRParser extends Parser {
 
                     }
 
-                    // ANTLRParser.g:759:29: ( elementOptions )?
-                    int alt54=2;
-                    int LA54_0 = input.LA(1);
+                    // ANTLRParser.g:737:29: ( elementOptions )?
+                    int alt53=2;
+                    int LA53_0 = input.LA(1);
 
-                    if ( (LA54_0==LT) ) {
-                        alt54=1;
+                    if ( (LA53_0==LT) ) {
+                        alt53=1;
                     }
-                    switch (alt54) {
+                    switch (alt53) {
                         case 1 :
-                            // ANTLRParser.g:759:29: elementOptions
+                            // ANTLRParser.g:737:29: elementOptions
                             {
-                            pushFollow(FOLLOW_elementOptions_in_terminal3887);
-                            elementOptions160=elementOptions();
+                            pushFollow(FOLLOW_elementOptions_in_terminal3678);
+                            elementOptions159=elementOptions();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions160.getTree());
+                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions159.getTree());
 
                             }
                             break;
@@ -6548,7 +6512,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: elementOptions, ARG_ACTION, TOKEN_REF
+                    // elements: ARG_ACTION, TOKEN_REF, elementOptions
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6559,20 +6523,20 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 759:45: -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? )
+                    // 737:45: -> ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? )
                     {
-                        // ANTLRParser.g:759:48: ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? )
+                        // ANTLRParser.g:737:48: ^( TOKEN_REF ( ARG_ACTION )? ( elementOptions )? )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(new TerminalAST(stream_TOKEN_REF.nextToken()), root_1);
 
-                        // ANTLRParser.g:759:73: ( ARG_ACTION )?
+                        // ANTLRParser.g:737:73: ( ARG_ACTION )?
                         if ( stream_ARG_ACTION.hasNext() ) {
                             adaptor.addChild(root_1, stream_ARG_ACTION.nextNode());
 
                         }
                         stream_ARG_ACTION.reset();
-                        // ANTLRParser.g:759:85: ( elementOptions )?
+                        // ANTLRParser.g:737:85: ( elementOptions )?
                         if ( stream_elementOptions.hasNext() ) {
                             adaptor.addChild(root_1, stream_elementOptions.nextTree());
 
@@ -6588,28 +6552,28 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:760:7: STRING_LITERAL ( elementOptions )?
+                    // ANTLRParser.g:738:7: STRING_LITERAL ( elementOptions )?
                     {
-                    STRING_LITERAL161=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal3911); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_STRING_LITERAL.add(STRING_LITERAL161);
+                    STRING_LITERAL160=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal3702); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_STRING_LITERAL.add(STRING_LITERAL160);
 
-                    // ANTLRParser.g:760:22: ( elementOptions )?
-                    int alt55=2;
-                    int LA55_0 = input.LA(1);
+                    // ANTLRParser.g:738:22: ( elementOptions )?
+                    int alt54=2;
+                    int LA54_0 = input.LA(1);
 
-                    if ( (LA55_0==LT) ) {
-                        alt55=1;
+                    if ( (LA54_0==LT) ) {
+                        alt54=1;
                     }
-                    switch (alt55) {
+                    switch (alt54) {
                         case 1 :
-                            // ANTLRParser.g:760:22: elementOptions
+                            // ANTLRParser.g:738:22: elementOptions
                             {
-                            pushFollow(FOLLOW_elementOptions_in_terminal3913);
-                            elementOptions162=elementOptions();
+                            pushFollow(FOLLOW_elementOptions_in_terminal3704);
+                            elementOptions161=elementOptions();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions162.getTree());
+                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions161.getTree());
 
                             }
                             break;
@@ -6619,7 +6583,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: elementOptions, STRING_LITERAL
+                    // elements: STRING_LITERAL, elementOptions
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6630,14 +6594,14 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 760:41: -> ^( STRING_LITERAL ( elementOptions )? )
+                    // 738:41: -> ^( STRING_LITERAL ( elementOptions )? )
                     {
-                        // ANTLRParser.g:760:44: ^( STRING_LITERAL ( elementOptions )? )
+                        // ANTLRParser.g:738:44: ^( STRING_LITERAL ( elementOptions )? )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(new TerminalAST(stream_STRING_LITERAL.nextToken()), root_1);
 
-                        // ANTLRParser.g:760:74: ( elementOptions )?
+                        // ANTLRParser.g:738:74: ( elementOptions )?
                         if ( stream_elementOptions.hasNext() ) {
                             adaptor.addChild(root_1, stream_elementOptions.nextTree());
 
@@ -6653,28 +6617,28 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // ANTLRParser.g:766:7: DOT ( elementOptions )?
+                    // ANTLRParser.g:744:7: DOT ( elementOptions )?
                     {
-                    DOT163=(Token)match(input,DOT,FOLLOW_DOT_in_terminal3960); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_DOT.add(DOT163);
+                    DOT162=(Token)match(input,DOT,FOLLOW_DOT_in_terminal3751); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_DOT.add(DOT162);
 
-                    // ANTLRParser.g:766:11: ( elementOptions )?
-                    int alt56=2;
-                    int LA56_0 = input.LA(1);
+                    // ANTLRParser.g:744:11: ( elementOptions )?
+                    int alt55=2;
+                    int LA55_0 = input.LA(1);
 
-                    if ( (LA56_0==LT) ) {
-                        alt56=1;
+                    if ( (LA55_0==LT) ) {
+                        alt55=1;
                     }
-                    switch (alt56) {
+                    switch (alt55) {
                         case 1 :
-                            // ANTLRParser.g:766:11: elementOptions
+                            // ANTLRParser.g:744:11: elementOptions
                             {
-                            pushFollow(FOLLOW_elementOptions_in_terminal3962);
-                            elementOptions164=elementOptions();
+                            pushFollow(FOLLOW_elementOptions_in_terminal3753);
+                            elementOptions163=elementOptions();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions164.getTree());
+                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions163.getTree());
 
                             }
                             break;
@@ -6695,14 +6659,14 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 766:34: -> ^( WILDCARD[$DOT] ( elementOptions )? )
+                    // 744:34: -> ^( WILDCARD[$DOT] ( elementOptions )? )
                     {
-                        // ANTLRParser.g:766:37: ^( WILDCARD[$DOT] ( elementOptions )? )
+                        // ANTLRParser.g:744:37: ^( WILDCARD[$DOT] ( elementOptions )? )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                        root_1 = (GrammarAST)adaptor.becomeRoot(new TerminalAST(WILDCARD, DOT163), root_1);
+                        root_1 = (GrammarAST)adaptor.becomeRoot(new TerminalAST(WILDCARD, DOT162), root_1);
 
-                        // ANTLRParser.g:766:67: ( elementOptions )?
+                        // ANTLRParser.g:744:67: ( elementOptions )?
                         if ( stream_elementOptions.hasNext() ) {
                             adaptor.addChild(root_1, stream_elementOptions.nextTree());
 
@@ -6720,22 +6684,22 @@ public class ANTLRParser extends Parser {
 
             }
 
-            // ANTLRParser.g:768:3: ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )?
-            int alt58=3;
-            int LA58_0 = input.LA(1);
+            // ANTLRParser.g:746:3: ( ROOT -> ^( ROOT $terminal) | BANG -> ^( BANG $terminal) )?
+            int alt57=3;
+            int LA57_0 = input.LA(1);
 
-            if ( (LA58_0==ROOT) ) {
-                alt58=1;
+            if ( (LA57_0==ROOT) ) {
+                alt57=1;
             }
-            else if ( (LA58_0==BANG) ) {
-                alt58=2;
+            else if ( (LA57_0==BANG) ) {
+                alt57=2;
             }
-            switch (alt58) {
+            switch (alt57) {
                 case 1 :
-                    // ANTLRParser.g:768:5: ROOT
+                    // ANTLRParser.g:746:5: ROOT
                     {
-                    ROOT165=(Token)match(input,ROOT,FOLLOW_ROOT_in_terminal3993); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_ROOT.add(ROOT165);
+                    ROOT164=(Token)match(input,ROOT,FOLLOW_ROOT_in_terminal3784); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_ROOT.add(ROOT164);
 
 
 
@@ -6751,9 +6715,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 768:19: -> ^( ROOT $terminal)
+                    // 746:19: -> ^( ROOT $terminal)
                     {
-                        // ANTLRParser.g:768:22: ^( ROOT $terminal)
+                        // ANTLRParser.g:746:22: ^( ROOT $terminal)
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(stream_ROOT.nextNode(), root_1);
@@ -6769,15 +6733,15 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:769:5: BANG
+                    // ANTLRParser.g:747:5: BANG
                     {
-                    BANG166=(Token)match(input,BANG,FOLLOW_BANG_in_terminal4017); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_BANG.add(BANG166);
+                    BANG165=(Token)match(input,BANG,FOLLOW_BANG_in_terminal3808); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_BANG.add(BANG165);
 
 
 
                     // AST REWRITE
-                    // elements: BANG, terminal
+                    // elements: terminal, BANG
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6788,9 +6752,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 769:19: -> ^( BANG $terminal)
+                    // 747:19: -> ^( BANG $terminal)
                     {
-                        // ANTLRParser.g:769:22: ^( BANG $terminal)
+                        // ANTLRParser.g:747:22: ^( BANG $terminal)
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(stream_BANG.nextNode(), root_1);
@@ -6837,76 +6801,76 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "elementOptions"
-    // ANTLRParser.g:779:2: elementOptions : LT elementOption ( COMMA elementOption )* GT -> ^( ELEMENT_OPTIONS ( elementOption )+ ) ;
+    // ANTLRParser.g:757:2: elementOptions : LT elementOption ( COMMA elementOption )* GT -> ^( ELEMENT_OPTIONS ( elementOption )+ ) ;
     public final ANTLRParser.elementOptions_return elementOptions() throws RecognitionException {
         ANTLRParser.elementOptions_return retval = new ANTLRParser.elementOptions_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token LT167=null;
-        Token COMMA169=null;
-        Token GT171=null;
-        ANTLRParser.elementOption_return elementOption168 = null;
+        Token LT166=null;
+        Token COMMA168=null;
+        Token GT170=null;
+        ANTLRParser.elementOption_return elementOption167 = null;
 
-        ANTLRParser.elementOption_return elementOption170 = null;
+        ANTLRParser.elementOption_return elementOption169 = null;
 
 
-        GrammarAST LT167_tree=null;
-        GrammarAST COMMA169_tree=null;
-        GrammarAST GT171_tree=null;
+        GrammarAST LT166_tree=null;
+        GrammarAST COMMA168_tree=null;
+        GrammarAST GT170_tree=null;
         RewriteRuleTokenStream stream_GT=new RewriteRuleTokenStream(adaptor,"token GT");
         RewriteRuleTokenStream stream_LT=new RewriteRuleTokenStream(adaptor,"token LT");
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_elementOption=new RewriteRuleSubtreeStream(adaptor,"rule elementOption");
         try {
-            // ANTLRParser.g:780:5: ( LT elementOption ( COMMA elementOption )* GT -> ^( ELEMENT_OPTIONS ( elementOption )+ ) )
-            // ANTLRParser.g:782:7: LT elementOption ( COMMA elementOption )* GT
+            // ANTLRParser.g:758:5: ( LT elementOption ( COMMA elementOption )* GT -> ^( ELEMENT_OPTIONS ( elementOption )+ ) )
+            // ANTLRParser.g:760:7: LT elementOption ( COMMA elementOption )* GT
             {
-            LT167=(Token)match(input,LT,FOLLOW_LT_in_elementOptions4081); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_LT.add(LT167);
+            LT166=(Token)match(input,LT,FOLLOW_LT_in_elementOptions3872); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_LT.add(LT166);
 
-            pushFollow(FOLLOW_elementOption_in_elementOptions4083);
-            elementOption168=elementOption();
+            pushFollow(FOLLOW_elementOption_in_elementOptions3874);
+            elementOption167=elementOption();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_elementOption.add(elementOption168.getTree());
-            // ANTLRParser.g:782:24: ( COMMA elementOption )*
-            loop59:
+            if ( state.backtracking==0 ) stream_elementOption.add(elementOption167.getTree());
+            // ANTLRParser.g:760:24: ( COMMA elementOption )*
+            loop58:
             do {
-                int alt59=2;
-                int LA59_0 = input.LA(1);
+                int alt58=2;
+                int LA58_0 = input.LA(1);
 
-                if ( (LA59_0==COMMA) ) {
-                    alt59=1;
+                if ( (LA58_0==COMMA) ) {
+                    alt58=1;
                 }
 
 
-                switch (alt59) {
+                switch (alt58) {
             	case 1 :
-            	    // ANTLRParser.g:782:25: COMMA elementOption
+            	    // ANTLRParser.g:760:25: COMMA elementOption
             	    {
-            	    COMMA169=(Token)match(input,COMMA,FOLLOW_COMMA_in_elementOptions4086); if (state.failed) return retval; 
-            	    if ( state.backtracking==0 ) stream_COMMA.add(COMMA169);
+            	    COMMA168=(Token)match(input,COMMA,FOLLOW_COMMA_in_elementOptions3877); if (state.failed) return retval; 
+            	    if ( state.backtracking==0 ) stream_COMMA.add(COMMA168);
 
-            	    pushFollow(FOLLOW_elementOption_in_elementOptions4088);
-            	    elementOption170=elementOption();
+            	    pushFollow(FOLLOW_elementOption_in_elementOptions3879);
+            	    elementOption169=elementOption();
 
             	    state._fsp--;
             	    if (state.failed) return retval;
-            	    if ( state.backtracking==0 ) stream_elementOption.add(elementOption170.getTree());
+            	    if ( state.backtracking==0 ) stream_elementOption.add(elementOption169.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop59;
+            	    break loop58;
                 }
             } while (true);
 
-            GT171=(Token)match(input,GT,FOLLOW_GT_in_elementOptions4092); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_GT.add(GT171);
+            GT170=(Token)match(input,GT,FOLLOW_GT_in_elementOptions3883); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_GT.add(GT170);
 
 
 
@@ -6922,9 +6886,9 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 782:50: -> ^( ELEMENT_OPTIONS ( elementOption )+ )
+            // 760:50: -> ^( ELEMENT_OPTIONS ( elementOption )+ )
             {
-                // ANTLRParser.g:782:53: ^( ELEMENT_OPTIONS ( elementOption )+ )
+                // ANTLRParser.g:760:53: ^( ELEMENT_OPTIONS ( elementOption )+ )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ELEMENT_OPTIONS, "ELEMENT_OPTIONS"), root_1);
@@ -6972,43 +6936,43 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "elementOption"
-    // ANTLRParser.g:787:1: elementOption : ( qid | id ASSIGN ( qid | STRING_LITERAL ) );
+    // ANTLRParser.g:765:1: elementOption : ( qid | id ASSIGN ( qid | STRING_LITERAL ) );
     public final ANTLRParser.elementOption_return elementOption() throws RecognitionException {
         ANTLRParser.elementOption_return retval = new ANTLRParser.elementOption_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token ASSIGN174=null;
-        Token STRING_LITERAL176=null;
-        ANTLRParser.qid_return qid172 = null;
+        Token ASSIGN173=null;
+        Token STRING_LITERAL175=null;
+        ANTLRParser.qid_return qid171 = null;
 
-        ANTLRParser.id_return id173 = null;
+        ANTLRParser.id_return id172 = null;
 
-        ANTLRParser.qid_return qid175 = null;
+        ANTLRParser.qid_return qid174 = null;
 
 
-        GrammarAST ASSIGN174_tree=null;
-        GrammarAST STRING_LITERAL176_tree=null;
+        GrammarAST ASSIGN173_tree=null;
+        GrammarAST STRING_LITERAL175_tree=null;
 
         try {
-            // ANTLRParser.g:788:5: ( qid | id ASSIGN ( qid | STRING_LITERAL ) )
-            int alt61=2;
+            // ANTLRParser.g:766:5: ( qid | id ASSIGN ( qid | STRING_LITERAL ) )
+            int alt60=2;
             switch ( input.LA(1) ) {
             case RULE_REF:
                 {
-                int LA61_1 = input.LA(2);
+                int LA60_1 = input.LA(2);
 
-                if ( (LA61_1==COMMA||LA61_1==GT||LA61_1==DOT) ) {
-                    alt61=1;
+                if ( (LA60_1==ASSIGN) ) {
+                    alt60=2;
                 }
-                else if ( (LA61_1==ASSIGN) ) {
-                    alt61=2;
+                else if ( (LA60_1==COMMA||LA60_1==GT||LA60_1==DOT) ) {
+                    alt60=1;
                 }
                 else {
                     if (state.backtracking>0) {state.failed=true; return retval;}
                     NoViableAltException nvae =
-                        new NoViableAltException("", 61, 1, input);
+                        new NoViableAltException("", 60, 1, input);
 
                     throw nvae;
                 }
@@ -7016,18 +6980,18 @@ public class ANTLRParser extends Parser {
                 break;
             case TOKEN_REF:
                 {
-                int LA61_2 = input.LA(2);
+                int LA60_2 = input.LA(2);
 
-                if ( (LA61_2==ASSIGN) ) {
-                    alt61=2;
+                if ( (LA60_2==ASSIGN) ) {
+                    alt60=2;
                 }
-                else if ( (LA61_2==COMMA||LA61_2==GT||LA61_2==DOT) ) {
-                    alt61=1;
+                else if ( (LA60_2==COMMA||LA60_2==GT||LA60_2==DOT) ) {
+                    alt60=1;
                 }
                 else {
                     if (state.backtracking>0) {state.failed=true; return retval;}
                     NoViableAltException nvae =
-                        new NoViableAltException("", 61, 2, input);
+                        new NoViableAltException("", 60, 2, input);
 
                     throw nvae;
                 }
@@ -7035,18 +6999,18 @@ public class ANTLRParser extends Parser {
                 break;
             case TEMPLATE:
                 {
-                int LA61_3 = input.LA(2);
+                int LA60_3 = input.LA(2);
 
-                if ( (LA61_3==ASSIGN) ) {
-                    alt61=2;
+                if ( (LA60_3==COMMA||LA60_3==GT||LA60_3==DOT) ) {
+                    alt60=1;
                 }
-                else if ( (LA61_3==COMMA||LA61_3==GT||LA61_3==DOT) ) {
-                    alt61=1;
+                else if ( (LA60_3==ASSIGN) ) {
+                    alt60=2;
                 }
                 else {
                     if (state.backtracking>0) {state.failed=true; return retval;}
                     NoViableAltException nvae =
-                        new NoViableAltException("", 61, 3, input);
+                        new NoViableAltException("", 60, 3, input);
 
                     throw nvae;
                 }
@@ -7055,79 +7019,79 @@ public class ANTLRParser extends Parser {
             default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 61, 0, input);
+                    new NoViableAltException("", 60, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt61) {
+            switch (alt60) {
                 case 1 :
-                    // ANTLRParser.g:789:7: qid
+                    // ANTLRParser.g:767:7: qid
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_qid_in_elementOption4127);
-                    qid172=qid();
+                    pushFollow(FOLLOW_qid_in_elementOption3918);
+                    qid171=qid();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, qid172.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, qid171.getTree());
 
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:792:7: id ASSIGN ( qid | STRING_LITERAL )
+                    // ANTLRParser.g:770:7: id ASSIGN ( qid | STRING_LITERAL )
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_id_in_elementOption4149);
-                    id173=id();
+                    pushFollow(FOLLOW_id_in_elementOption3940);
+                    id172=id();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, id173.getTree());
-                    ASSIGN174=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption4151); if (state.failed) return retval;
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, id172.getTree());
+                    ASSIGN173=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_elementOption3942); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    ASSIGN174_tree = (GrammarAST)adaptor.create(ASSIGN174);
-                    root_0 = (GrammarAST)adaptor.becomeRoot(ASSIGN174_tree, root_0);
+                    ASSIGN173_tree = (GrammarAST)adaptor.create(ASSIGN173);
+                    root_0 = (GrammarAST)adaptor.becomeRoot(ASSIGN173_tree, root_0);
                     }
-                    // ANTLRParser.g:792:18: ( qid | STRING_LITERAL )
-                    int alt60=2;
-                    int LA60_0 = input.LA(1);
+                    // ANTLRParser.g:770:18: ( qid | STRING_LITERAL )
+                    int alt59=2;
+                    int LA59_0 = input.LA(1);
 
-                    if ( (LA60_0==TEMPLATE||(LA60_0>=TOKEN_REF && LA60_0<=RULE_REF)) ) {
-                        alt60=1;
+                    if ( (LA59_0==TEMPLATE||(LA59_0>=TOKEN_REF && LA59_0<=RULE_REF)) ) {
+                        alt59=1;
                     }
-                    else if ( (LA60_0==STRING_LITERAL) ) {
-                        alt60=2;
+                    else if ( (LA59_0==STRING_LITERAL) ) {
+                        alt59=2;
                     }
                     else {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         NoViableAltException nvae =
-                            new NoViableAltException("", 60, 0, input);
+                            new NoViableAltException("", 59, 0, input);
 
                         throw nvae;
                     }
-                    switch (alt60) {
+                    switch (alt59) {
                         case 1 :
-                            // ANTLRParser.g:792:19: qid
+                            // ANTLRParser.g:770:19: qid
                             {
-                            pushFollow(FOLLOW_qid_in_elementOption4155);
-                            qid175=qid();
+                            pushFollow(FOLLOW_qid_in_elementOption3946);
+                            qid174=qid();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) adaptor.addChild(root_0, qid175.getTree());
+                            if ( state.backtracking==0 ) adaptor.addChild(root_0, qid174.getTree());
 
                             }
                             break;
                         case 2 :
-                            // ANTLRParser.g:792:25: STRING_LITERAL
+                            // ANTLRParser.g:770:25: STRING_LITERAL
                             {
-                            STRING_LITERAL176=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_elementOption4159); if (state.failed) return retval;
+                            STRING_LITERAL175=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_elementOption3950); if (state.failed) return retval;
                             if ( state.backtracking==0 ) {
-                            STRING_LITERAL176_tree = new TerminalAST(STRING_LITERAL176) ;
-                            adaptor.addChild(root_0, STRING_LITERAL176_tree);
+                            STRING_LITERAL175_tree = new TerminalAST(STRING_LITERAL175) ;
+                            adaptor.addChild(root_0, STRING_LITERAL175_tree);
                             }
 
                             }
@@ -7166,66 +7130,66 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewrite"
-    // ANTLRParser.g:795:1: rewrite : ( predicatedRewrite )* nakedRewrite -> ( predicatedRewrite )* nakedRewrite ;
+    // ANTLRParser.g:773:1: rewrite : ( predicatedRewrite )* nakedRewrite -> ( predicatedRewrite )* nakedRewrite ;
     public final ANTLRParser.rewrite_return rewrite() throws RecognitionException {
         ANTLRParser.rewrite_return retval = new ANTLRParser.rewrite_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        ANTLRParser.predicatedRewrite_return predicatedRewrite177 = null;
+        ANTLRParser.predicatedRewrite_return predicatedRewrite176 = null;
 
-        ANTLRParser.nakedRewrite_return nakedRewrite178 = null;
+        ANTLRParser.nakedRewrite_return nakedRewrite177 = null;
 
 
         RewriteRuleSubtreeStream stream_predicatedRewrite=new RewriteRuleSubtreeStream(adaptor,"rule predicatedRewrite");
         RewriteRuleSubtreeStream stream_nakedRewrite=new RewriteRuleSubtreeStream(adaptor,"rule nakedRewrite");
         try {
-            // ANTLRParser.g:796:2: ( ( predicatedRewrite )* nakedRewrite -> ( predicatedRewrite )* nakedRewrite )
-            // ANTLRParser.g:796:4: ( predicatedRewrite )* nakedRewrite
+            // ANTLRParser.g:774:2: ( ( predicatedRewrite )* nakedRewrite -> ( predicatedRewrite )* nakedRewrite )
+            // ANTLRParser.g:774:4: ( predicatedRewrite )* nakedRewrite
             {
-            // ANTLRParser.g:796:4: ( predicatedRewrite )*
-            loop62:
+            // ANTLRParser.g:774:4: ( predicatedRewrite )*
+            loop61:
             do {
-                int alt62=2;
-                int LA62_0 = input.LA(1);
+                int alt61=2;
+                int LA61_0 = input.LA(1);
 
-                if ( (LA62_0==RARROW) ) {
-                    int LA62_1 = input.LA(2);
+                if ( (LA61_0==RARROW) ) {
+                    int LA61_1 = input.LA(2);
 
-                    if ( (LA62_1==SEMPRED) ) {
-                        alt62=1;
+                    if ( (LA61_1==SEMPRED) ) {
+                        alt61=1;
                     }
 
 
                 }
 
 
-                switch (alt62) {
+                switch (alt61) {
             	case 1 :
-            	    // ANTLRParser.g:796:4: predicatedRewrite
+            	    // ANTLRParser.g:774:4: predicatedRewrite
             	    {
-            	    pushFollow(FOLLOW_predicatedRewrite_in_rewrite4177);
-            	    predicatedRewrite177=predicatedRewrite();
+            	    pushFollow(FOLLOW_predicatedRewrite_in_rewrite3968);
+            	    predicatedRewrite176=predicatedRewrite();
 
             	    state._fsp--;
             	    if (state.failed) return retval;
-            	    if ( state.backtracking==0 ) stream_predicatedRewrite.add(predicatedRewrite177.getTree());
+            	    if ( state.backtracking==0 ) stream_predicatedRewrite.add(predicatedRewrite176.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop62;
+            	    break loop61;
                 }
             } while (true);
 
-            pushFollow(FOLLOW_nakedRewrite_in_rewrite4180);
-            nakedRewrite178=nakedRewrite();
+            pushFollow(FOLLOW_nakedRewrite_in_rewrite3971);
+            nakedRewrite177=nakedRewrite();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_nakedRewrite.add(nakedRewrite178.getTree());
+            if ( state.backtracking==0 ) stream_nakedRewrite.add(nakedRewrite177.getTree());
 
 
             // AST REWRITE
@@ -7240,9 +7204,9 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 796:36: -> ( predicatedRewrite )* nakedRewrite
+            // 774:36: -> ( predicatedRewrite )* nakedRewrite
             {
-                // ANTLRParser.g:796:39: ( predicatedRewrite )*
+                // ANTLRParser.g:774:39: ( predicatedRewrite )*
                 while ( stream_predicatedRewrite.hasNext() ) {
                     adaptor.addChild(root_0, stream_predicatedRewrite.nextTree());
 
@@ -7281,43 +7245,43 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "predicatedRewrite"
-    // ANTLRParser.g:799:1: predicatedRewrite : RARROW SEMPRED rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt ) -> ^( RESULT[$RARROW] SEMPRED rewriteAlt ) ;
+    // ANTLRParser.g:777:1: predicatedRewrite : RARROW SEMPRED rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt ) -> ^( RESULT[$RARROW] SEMPRED rewriteAlt ) ;
     public final ANTLRParser.predicatedRewrite_return predicatedRewrite() throws RecognitionException {
         ANTLRParser.predicatedRewrite_return retval = new ANTLRParser.predicatedRewrite_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token RARROW179=null;
-        Token SEMPRED180=null;
-        ANTLRParser.rewriteAlt_return rewriteAlt181 = null;
+        Token RARROW178=null;
+        Token SEMPRED179=null;
+        ANTLRParser.rewriteAlt_return rewriteAlt180 = null;
 
 
-        GrammarAST RARROW179_tree=null;
-        GrammarAST SEMPRED180_tree=null;
+        GrammarAST RARROW178_tree=null;
+        GrammarAST SEMPRED179_tree=null;
         RewriteRuleTokenStream stream_SEMPRED=new RewriteRuleTokenStream(adaptor,"token SEMPRED");
         RewriteRuleTokenStream stream_RARROW=new RewriteRuleTokenStream(adaptor,"token RARROW");
         RewriteRuleSubtreeStream stream_rewriteAlt=new RewriteRuleSubtreeStream(adaptor,"rule rewriteAlt");
         try {
-            // ANTLRParser.g:800:2: ( RARROW SEMPRED rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt ) -> ^( RESULT[$RARROW] SEMPRED rewriteAlt ) )
-            // ANTLRParser.g:800:4: RARROW SEMPRED rewriteAlt
+            // ANTLRParser.g:778:2: ( RARROW SEMPRED rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt ) -> ^( RESULT[$RARROW] SEMPRED rewriteAlt ) )
+            // ANTLRParser.g:778:4: RARROW SEMPRED rewriteAlt
             {
-            RARROW179=(Token)match(input,RARROW,FOLLOW_RARROW_in_predicatedRewrite4198); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RARROW.add(RARROW179);
+            RARROW178=(Token)match(input,RARROW,FOLLOW_RARROW_in_predicatedRewrite3989); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RARROW.add(RARROW178);
 
-            SEMPRED180=(Token)match(input,SEMPRED,FOLLOW_SEMPRED_in_predicatedRewrite4200); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_SEMPRED.add(SEMPRED180);
+            SEMPRED179=(Token)match(input,SEMPRED,FOLLOW_SEMPRED_in_predicatedRewrite3991); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_SEMPRED.add(SEMPRED179);
 
-            pushFollow(FOLLOW_rewriteAlt_in_predicatedRewrite4202);
-            rewriteAlt181=rewriteAlt();
+            pushFollow(FOLLOW_rewriteAlt_in_predicatedRewrite3993);
+            rewriteAlt180=rewriteAlt();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_rewriteAlt.add(rewriteAlt181.getTree());
+            if ( state.backtracking==0 ) stream_rewriteAlt.add(rewriteAlt180.getTree());
 
 
             // AST REWRITE
-            // elements: rewriteAlt, SEMPRED, SEMPRED, rewriteAlt
+            // elements: rewriteAlt, rewriteAlt, SEMPRED, SEMPRED
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -7328,12 +7292,12 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 801:3: -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt )
-            if ((rewriteAlt181!=null?rewriteAlt181.isTemplate:false)) {
-                // ANTLRParser.g:801:32: ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt )
+            // 779:3: -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt )
+            if ((rewriteAlt180!=null?rewriteAlt180.isTemplate:false)) {
+                // ANTLRParser.g:779:32: ^( ST_RESULT[$RARROW] SEMPRED rewriteAlt )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ST_RESULT, RARROW179), root_1);
+                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ST_RESULT, RARROW178), root_1);
 
                 adaptor.addChild(root_1, stream_SEMPRED.nextNode());
                 adaptor.addChild(root_1, stream_rewriteAlt.nextTree());
@@ -7342,12 +7306,12 @@ public class ANTLRParser extends Parser {
                 }
 
             }
-            else // 802:3: -> ^( RESULT[$RARROW] SEMPRED rewriteAlt )
+            else // 780:3: -> ^( RESULT[$RARROW] SEMPRED rewriteAlt )
             {
-                // ANTLRParser.g:802:6: ^( RESULT[$RARROW] SEMPRED rewriteAlt )
+                // ANTLRParser.g:780:6: ^( RESULT[$RARROW] SEMPRED rewriteAlt )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(RESULT, RARROW179), root_1);
+                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(RESULT, RARROW178), root_1);
 
                 adaptor.addChild(root_1, stream_SEMPRED.nextNode());
                 adaptor.addChild(root_1, stream_rewriteAlt.nextTree());
@@ -7386,33 +7350,33 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "nakedRewrite"
-    // ANTLRParser.g:805:1: nakedRewrite : RARROW rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] rewriteAlt ) -> ^( RESULT[$RARROW] rewriteAlt ) ;
+    // ANTLRParser.g:783:1: nakedRewrite : RARROW rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] rewriteAlt ) -> ^( RESULT[$RARROW] rewriteAlt ) ;
     public final ANTLRParser.nakedRewrite_return nakedRewrite() throws RecognitionException {
         ANTLRParser.nakedRewrite_return retval = new ANTLRParser.nakedRewrite_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token RARROW182=null;
-        ANTLRParser.rewriteAlt_return rewriteAlt183 = null;
+        Token RARROW181=null;
+        ANTLRParser.rewriteAlt_return rewriteAlt182 = null;
 
 
-        GrammarAST RARROW182_tree=null;
+        GrammarAST RARROW181_tree=null;
         RewriteRuleTokenStream stream_RARROW=new RewriteRuleTokenStream(adaptor,"token RARROW");
         RewriteRuleSubtreeStream stream_rewriteAlt=new RewriteRuleSubtreeStream(adaptor,"rule rewriteAlt");
         try {
-            // ANTLRParser.g:806:2: ( RARROW rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] rewriteAlt ) -> ^( RESULT[$RARROW] rewriteAlt ) )
-            // ANTLRParser.g:806:4: RARROW rewriteAlt
+            // ANTLRParser.g:784:2: ( RARROW rewriteAlt -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] rewriteAlt ) -> ^( RESULT[$RARROW] rewriteAlt ) )
+            // ANTLRParser.g:784:4: RARROW rewriteAlt
             {
-            RARROW182=(Token)match(input,RARROW,FOLLOW_RARROW_in_nakedRewrite4242); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RARROW.add(RARROW182);
+            RARROW181=(Token)match(input,RARROW,FOLLOW_RARROW_in_nakedRewrite4033); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RARROW.add(RARROW181);
 
-            pushFollow(FOLLOW_rewriteAlt_in_nakedRewrite4244);
-            rewriteAlt183=rewriteAlt();
+            pushFollow(FOLLOW_rewriteAlt_in_nakedRewrite4035);
+            rewriteAlt182=rewriteAlt();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_rewriteAlt.add(rewriteAlt183.getTree());
+            if ( state.backtracking==0 ) stream_rewriteAlt.add(rewriteAlt182.getTree());
 
 
             // AST REWRITE
@@ -7427,12 +7391,12 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 806:22: -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] rewriteAlt )
-            if ((rewriteAlt183!=null?rewriteAlt183.isTemplate:false)) {
-                // ANTLRParser.g:806:51: ^( ST_RESULT[$RARROW] rewriteAlt )
+            // 784:22: -> {$rewriteAlt.isTemplate}? ^( ST_RESULT[$RARROW] rewriteAlt )
+            if ((rewriteAlt182!=null?rewriteAlt182.isTemplate:false)) {
+                // ANTLRParser.g:784:51: ^( ST_RESULT[$RARROW] rewriteAlt )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ST_RESULT, RARROW182), root_1);
+                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ST_RESULT, RARROW181), root_1);
 
                 adaptor.addChild(root_1, stream_rewriteAlt.nextTree());
 
@@ -7440,12 +7404,12 @@ public class ANTLRParser extends Parser {
                 }
 
             }
-            else // 807:10: -> ^( RESULT[$RARROW] rewriteAlt )
+            else // 785:10: -> ^( RESULT[$RARROW] rewriteAlt )
             {
-                // ANTLRParser.g:807:13: ^( RESULT[$RARROW] rewriteAlt )
+                // ANTLRParser.g:785:13: ^( RESULT[$RARROW] rewriteAlt )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(RESULT, RARROW182), root_1);
+                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(RESULT, RARROW181), root_1);
 
                 adaptor.addChild(root_1, stream_rewriteAlt.nextTree());
 
@@ -7484,37 +7448,37 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteAlt"
-    // ANTLRParser.g:812:1: rewriteAlt returns [boolean isTemplate] options {backtrack=true; } : ( rewriteTemplate | rewriteTreeAlt | ETC | -> EPSILON );
+    // ANTLRParser.g:790:1: rewriteAlt returns [boolean isTemplate] options {backtrack=true; } : ( rewriteTemplate | rewriteTreeAlt | ETC | -> EPSILON );
     public final ANTLRParser.rewriteAlt_return rewriteAlt() throws RecognitionException {
         ANTLRParser.rewriteAlt_return retval = new ANTLRParser.rewriteAlt_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token ETC186=null;
-        ANTLRParser.rewriteTemplate_return rewriteTemplate184 = null;
+        Token ETC185=null;
+        ANTLRParser.rewriteTemplate_return rewriteTemplate183 = null;
 
-        ANTLRParser.rewriteTreeAlt_return rewriteTreeAlt185 = null;
+        ANTLRParser.rewriteTreeAlt_return rewriteTreeAlt184 = null;
 
 
-        GrammarAST ETC186_tree=null;
+        GrammarAST ETC185_tree=null;
 
         try {
-            // ANTLRParser.g:814:5: ( rewriteTemplate | rewriteTreeAlt | ETC | -> EPSILON )
-            int alt63=4;
-            alt63 = dfa63.predict(input);
-            switch (alt63) {
+            // ANTLRParser.g:792:5: ( rewriteTemplate | rewriteTreeAlt | ETC | -> EPSILON )
+            int alt62=4;
+            alt62 = dfa62.predict(input);
+            switch (alt62) {
                 case 1 :
-                    // ANTLRParser.g:815:7: rewriteTemplate
+                    // ANTLRParser.g:793:7: rewriteTemplate
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_rewriteTemplate_in_rewriteAlt4308);
-                    rewriteTemplate184=rewriteTemplate();
+                    pushFollow(FOLLOW_rewriteTemplate_in_rewriteAlt4099);
+                    rewriteTemplate183=rewriteTemplate();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTemplate184.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTemplate183.getTree());
                     if ( state.backtracking==0 ) {
                       retval.isTemplate =true;
                     }
@@ -7522,34 +7486,34 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:821:7: rewriteTreeAlt
+                    // ANTLRParser.g:799:7: rewriteTreeAlt
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteAlt4347);
-                    rewriteTreeAlt185=rewriteTreeAlt();
+                    pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteAlt4138);
+                    rewriteTreeAlt184=rewriteTreeAlt();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTreeAlt185.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTreeAlt184.getTree());
 
                     }
                     break;
                 case 3 :
-                    // ANTLRParser.g:823:7: ETC
+                    // ANTLRParser.g:801:7: ETC
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    ETC186=(Token)match(input,ETC,FOLLOW_ETC_in_rewriteAlt4356); if (state.failed) return retval;
+                    ETC185=(Token)match(input,ETC,FOLLOW_ETC_in_rewriteAlt4147); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    ETC186_tree = (GrammarAST)adaptor.create(ETC186);
-                    adaptor.addChild(root_0, ETC186_tree);
+                    ETC185_tree = (GrammarAST)adaptor.create(ETC185);
+                    adaptor.addChild(root_0, ETC185_tree);
                     }
 
                     }
                     break;
                 case 4 :
-                    // ANTLRParser.g:825:27: 
+                    // ANTLRParser.g:803:27: 
                     {
 
                     // AST REWRITE
@@ -7564,7 +7528,7 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 825:27: -> EPSILON
+                    // 803:27: -> EPSILON
                     {
                         adaptor.addChild(root_0, (GrammarAST)adaptor.create(EPSILON, "EPSILON"));
 
@@ -7601,55 +7565,55 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTreeAlt"
-    // ANTLRParser.g:828:1: rewriteTreeAlt : ( rewriteTreeElement )+ -> ^( ALT ( rewriteTreeElement )+ ) ;
+    // ANTLRParser.g:806:1: rewriteTreeAlt : ( rewriteTreeElement )+ -> ^( ALT ( rewriteTreeElement )+ ) ;
     public final ANTLRParser.rewriteTreeAlt_return rewriteTreeAlt() throws RecognitionException {
         ANTLRParser.rewriteTreeAlt_return retval = new ANTLRParser.rewriteTreeAlt_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        ANTLRParser.rewriteTreeElement_return rewriteTreeElement187 = null;
+        ANTLRParser.rewriteTreeElement_return rewriteTreeElement186 = null;
 
 
         RewriteRuleSubtreeStream stream_rewriteTreeElement=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTreeElement");
         try {
-            // ANTLRParser.g:829:5: ( ( rewriteTreeElement )+ -> ^( ALT ( rewriteTreeElement )+ ) )
-            // ANTLRParser.g:829:7: ( rewriteTreeElement )+
+            // ANTLRParser.g:807:5: ( ( rewriteTreeElement )+ -> ^( ALT ( rewriteTreeElement )+ ) )
+            // ANTLRParser.g:807:7: ( rewriteTreeElement )+
             {
-            // ANTLRParser.g:829:7: ( rewriteTreeElement )+
-            int cnt64=0;
-            loop64:
+            // ANTLRParser.g:807:7: ( rewriteTreeElement )+
+            int cnt63=0;
+            loop63:
             do {
-                int alt64=2;
-                int LA64_0 = input.LA(1);
+                int alt63=2;
+                int LA63_0 = input.LA(1);
 
-                if ( (LA64_0==ACTION||LA64_0==LPAREN||LA64_0==DOLLAR||LA64_0==TREE_BEGIN||(LA64_0>=TOKEN_REF && LA64_0<=RULE_REF)||LA64_0==STRING_LITERAL) ) {
-                    alt64=1;
+                if ( (LA63_0==ACTION||LA63_0==LPAREN||LA63_0==DOLLAR||LA63_0==TREE_BEGIN||(LA63_0>=TOKEN_REF && LA63_0<=RULE_REF)||LA63_0==STRING_LITERAL) ) {
+                    alt63=1;
                 }
 
 
-                switch (alt64) {
+                switch (alt63) {
             	case 1 :
-            	    // ANTLRParser.g:829:7: rewriteTreeElement
+            	    // ANTLRParser.g:807:7: rewriteTreeElement
             	    {
-            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTreeAlt4387);
-            	    rewriteTreeElement187=rewriteTreeElement();
+            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTreeAlt4178);
+            	    rewriteTreeElement186=rewriteTreeElement();
 
             	    state._fsp--;
             	    if (state.failed) return retval;
-            	    if ( state.backtracking==0 ) stream_rewriteTreeElement.add(rewriteTreeElement187.getTree());
+            	    if ( state.backtracking==0 ) stream_rewriteTreeElement.add(rewriteTreeElement186.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    if ( cnt64 >= 1 ) break loop64;
+            	    if ( cnt63 >= 1 ) break loop63;
             	    if (state.backtracking>0) {state.failed=true; return retval;}
                         EarlyExitException eee =
-                            new EarlyExitException(64, input);
+                            new EarlyExitException(63, input);
                         throw eee;
                 }
-                cnt64++;
+                cnt63++;
             } while (true);
 
 
@@ -7666,9 +7630,9 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 829:27: -> ^( ALT ( rewriteTreeElement )+ )
+            // 807:27: -> ^( ALT ( rewriteTreeElement )+ )
             {
-                // ANTLRParser.g:829:30: ^( ALT ( rewriteTreeElement )+ )
+                // ANTLRParser.g:807:30: ^( ALT ( rewriteTreeElement )+ )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ALT, "ALT"), root_1);
@@ -7716,67 +7680,67 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTreeElement"
-    // ANTLRParser.g:832:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf );
+    // ANTLRParser.g:810:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf );
     public final ANTLRParser.rewriteTreeElement_return rewriteTreeElement() throws RecognitionException {
         ANTLRParser.rewriteTreeElement_return retval = new ANTLRParser.rewriteTreeElement_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
+        ANTLRParser.rewriteTreeAtom_return rewriteTreeAtom187 = null;
+
         ANTLRParser.rewriteTreeAtom_return rewriteTreeAtom188 = null;
 
-        ANTLRParser.rewriteTreeAtom_return rewriteTreeAtom189 = null;
+        ANTLRParser.ebnfSuffix_return ebnfSuffix189 = null;
 
-        ANTLRParser.ebnfSuffix_return ebnfSuffix190 = null;
+        ANTLRParser.rewriteTree_return rewriteTree190 = null;
 
-        ANTLRParser.rewriteTree_return rewriteTree191 = null;
+        ANTLRParser.ebnfSuffix_return ebnfSuffix191 = null;
 
-        ANTLRParser.ebnfSuffix_return ebnfSuffix192 = null;
-
-        ANTLRParser.rewriteTreeEbnf_return rewriteTreeEbnf193 = null;
+        ANTLRParser.rewriteTreeEbnf_return rewriteTreeEbnf192 = null;
 
 
         RewriteRuleSubtreeStream stream_rewriteTree=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTree");
         RewriteRuleSubtreeStream stream_rewriteTreeAtom=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTreeAtom");
         RewriteRuleSubtreeStream stream_ebnfSuffix=new RewriteRuleSubtreeStream(adaptor,"rule ebnfSuffix");
         try {
-            // ANTLRParser.g:833:2: ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf )
-            int alt66=4;
-            alt66 = dfa66.predict(input);
-            switch (alt66) {
+            // ANTLRParser.g:811:2: ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf )
+            int alt65=4;
+            alt65 = dfa65.predict(input);
+            switch (alt65) {
                 case 1 :
-                    // ANTLRParser.g:833:4: rewriteTreeAtom
+                    // ANTLRParser.g:811:4: rewriteTreeAtom
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4411);
-                    rewriteTreeAtom188=rewriteTreeAtom();
+                    pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4202);
+                    rewriteTreeAtom187=rewriteTreeAtom();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTreeAtom188.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTreeAtom187.getTree());
 
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:834:4: rewriteTreeAtom ebnfSuffix
+                    // ANTLRParser.g:812:4: rewriteTreeAtom ebnfSuffix
                     {
-                    pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4416);
-                    rewriteTreeAtom189=rewriteTreeAtom();
+                    pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4207);
+                    rewriteTreeAtom188=rewriteTreeAtom();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_rewriteTreeAtom.add(rewriteTreeAtom189.getTree());
-                    pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeElement4418);
-                    ebnfSuffix190=ebnfSuffix();
+                    if ( state.backtracking==0 ) stream_rewriteTreeAtom.add(rewriteTreeAtom188.getTree());
+                    pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeElement4209);
+                    ebnfSuffix189=ebnfSuffix();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_ebnfSuffix.add(ebnfSuffix190.getTree());
+                    if ( state.backtracking==0 ) stream_ebnfSuffix.add(ebnfSuffix189.getTree());
 
 
                     // AST REWRITE
-                    // elements: rewriteTreeAtom, ebnfSuffix
+                    // elements: ebnfSuffix, rewriteTreeAtom
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -7787,19 +7751,19 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 834:31: -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) )
+                    // 812:31: -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) )
                     {
-                        // ANTLRParser.g:834:34: ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) )
+                        // ANTLRParser.g:812:34: ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(stream_ebnfSuffix.nextNode(), root_1);
 
-                        // ANTLRParser.g:834:48: ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) )
+                        // ANTLRParser.g:812:48: ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) )
                         {
                         GrammarAST root_2 = (GrammarAST)adaptor.nil();
                         root_2 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(REWRITE_BLOCK, "REWRITE_BLOCK"), root_2);
 
-                        // ANTLRParser.g:834:64: ^( ALT rewriteTreeAtom )
+                        // ANTLRParser.g:812:64: ^( ALT rewriteTreeAtom )
                         {
                         GrammarAST root_3 = (GrammarAST)adaptor.nil();
                         root_3 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ALT, "ALT"), root_3);
@@ -7821,41 +7785,41 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // ANTLRParser.g:835:6: rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree )
+                    // ANTLRParser.g:813:6: rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree )
                     {
-                    pushFollow(FOLLOW_rewriteTree_in_rewriteTreeElement4443);
-                    rewriteTree191=rewriteTree();
+                    pushFollow(FOLLOW_rewriteTree_in_rewriteTreeElement4234);
+                    rewriteTree190=rewriteTree();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_rewriteTree.add(rewriteTree191.getTree());
-                    // ANTLRParser.g:836:3: ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree )
-                    int alt65=2;
-                    int LA65_0 = input.LA(1);
+                    if ( state.backtracking==0 ) stream_rewriteTree.add(rewriteTree190.getTree());
+                    // ANTLRParser.g:814:3: ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree )
+                    int alt64=2;
+                    int LA64_0 = input.LA(1);
 
-                    if ( (LA65_0==QUESTION||(LA65_0>=STAR && LA65_0<=PLUS)) ) {
-                        alt65=1;
+                    if ( (LA64_0==QUESTION||(LA64_0>=STAR && LA64_0<=PLUS)) ) {
+                        alt64=1;
                     }
-                    else if ( (LA65_0==EOF||LA65_0==ACTION||(LA65_0>=SEMI && LA65_0<=RPAREN)||LA65_0==OR||LA65_0==DOLLAR||(LA65_0>=RARROW && LA65_0<=TREE_BEGIN)||(LA65_0>=TOKEN_REF && LA65_0<=RULE_REF)||LA65_0==STRING_LITERAL) ) {
-                        alt65=2;
+                    else if ( (LA64_0==EOF||LA64_0==ACTION||(LA64_0>=SEMI && LA64_0<=RPAREN)||LA64_0==OR||LA64_0==DOLLAR||(LA64_0>=RARROW && LA64_0<=TREE_BEGIN)||(LA64_0>=TOKEN_REF && LA64_0<=RULE_REF)||LA64_0==STRING_LITERAL) ) {
+                        alt64=2;
                     }
                     else {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         NoViableAltException nvae =
-                            new NoViableAltException("", 65, 0, input);
+                            new NoViableAltException("", 64, 0, input);
 
                         throw nvae;
                     }
-                    switch (alt65) {
+                    switch (alt64) {
                         case 1 :
-                            // ANTLRParser.g:836:5: ebnfSuffix
+                            // ANTLRParser.g:814:5: ebnfSuffix
                             {
-                            pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeElement4449);
-                            ebnfSuffix192=ebnfSuffix();
+                            pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeElement4240);
+                            ebnfSuffix191=ebnfSuffix();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) stream_ebnfSuffix.add(ebnfSuffix192.getTree());
+                            if ( state.backtracking==0 ) stream_ebnfSuffix.add(ebnfSuffix191.getTree());
 
 
                             // AST REWRITE
@@ -7870,19 +7834,19 @@ public class ANTLRParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (GrammarAST)adaptor.nil();
-                            // 837:4: -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) )
+                            // 815:4: -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) )
                             {
-                                // ANTLRParser.g:837:7: ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) )
+                                // ANTLRParser.g:815:7: ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) )
                                 {
                                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_ebnfSuffix.nextNode(), root_1);
 
-                                // ANTLRParser.g:837:20: ^( REWRITE_BLOCK ^( ALT rewriteTree ) )
+                                // ANTLRParser.g:815:20: ^( REWRITE_BLOCK ^( ALT rewriteTree ) )
                                 {
                                 GrammarAST root_2 = (GrammarAST)adaptor.nil();
                                 root_2 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(REWRITE_BLOCK, "REWRITE_BLOCK"), root_2);
 
-                                // ANTLRParser.g:837:36: ^( ALT rewriteTree )
+                                // ANTLRParser.g:815:36: ^( ALT rewriteTree )
                                 {
                                 GrammarAST root_3 = (GrammarAST)adaptor.nil();
                                 root_3 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ALT, "ALT"), root_3);
@@ -7904,7 +7868,7 @@ public class ANTLRParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // ANTLRParser.g:838:5: 
+                            // ANTLRParser.g:816:5: 
                             {
 
                             // AST REWRITE
@@ -7919,7 +7883,7 @@ public class ANTLRParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (GrammarAST)adaptor.nil();
-                            // 838:5: -> rewriteTree
+                            // 816:5: -> rewriteTree
                             {
                                 adaptor.addChild(root_0, stream_rewriteTree.nextTree());
 
@@ -7935,16 +7899,16 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // ANTLRParser.g:840:6: rewriteTreeEbnf
+                    // ANTLRParser.g:818:6: rewriteTreeEbnf
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement4488);
-                    rewriteTreeEbnf193=rewriteTreeEbnf();
+                    pushFollow(FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement4279);
+                    rewriteTreeEbnf192=rewriteTreeEbnf();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTreeEbnf193.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTreeEbnf192.getTree());
 
                     }
                     break;
@@ -7976,32 +7940,32 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTreeAtom"
-    // ANTLRParser.g:843:1: rewriteTreeAtom : ( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? -> ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? ) | RULE_REF | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOLLAR id -> LABEL[$DOLLAR,$id.text] | ACTION );
+    // ANTLRParser.g:821:1: rewriteTreeAtom : ( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? -> ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? ) | RULE_REF | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOLLAR id -> LABEL[$DOLLAR,$id.text] | ACTION );
     public final ANTLRParser.rewriteTreeAtom_return rewriteTreeAtom() throws RecognitionException {
         ANTLRParser.rewriteTreeAtom_return retval = new ANTLRParser.rewriteTreeAtom_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token TOKEN_REF194=null;
-        Token ARG_ACTION196=null;
-        Token RULE_REF197=null;
-        Token STRING_LITERAL198=null;
-        Token DOLLAR200=null;
-        Token ACTION202=null;
-        ANTLRParser.elementOptions_return elementOptions195 = null;
+        Token TOKEN_REF193=null;
+        Token ARG_ACTION195=null;
+        Token RULE_REF196=null;
+        Token STRING_LITERAL197=null;
+        Token DOLLAR199=null;
+        Token ACTION201=null;
+        ANTLRParser.elementOptions_return elementOptions194 = null;
 
-        ANTLRParser.elementOptions_return elementOptions199 = null;
+        ANTLRParser.elementOptions_return elementOptions198 = null;
 
-        ANTLRParser.id_return id201 = null;
+        ANTLRParser.id_return id200 = null;
 
 
-        GrammarAST TOKEN_REF194_tree=null;
-        GrammarAST ARG_ACTION196_tree=null;
-        GrammarAST RULE_REF197_tree=null;
-        GrammarAST STRING_LITERAL198_tree=null;
-        GrammarAST DOLLAR200_tree=null;
-        GrammarAST ACTION202_tree=null;
+        GrammarAST TOKEN_REF193_tree=null;
+        GrammarAST ARG_ACTION195_tree=null;
+        GrammarAST RULE_REF196_tree=null;
+        GrammarAST STRING_LITERAL197_tree=null;
+        GrammarAST DOLLAR199_tree=null;
+        GrammarAST ACTION201_tree=null;
         RewriteRuleTokenStream stream_DOLLAR=new RewriteRuleTokenStream(adaptor,"token DOLLAR");
         RewriteRuleTokenStream stream_STRING_LITERAL=new RewriteRuleTokenStream(adaptor,"token STRING_LITERAL");
         RewriteRuleTokenStream stream_TOKEN_REF=new RewriteRuleTokenStream(adaptor,"token TOKEN_REF");
@@ -8009,85 +7973,85 @@ public class ANTLRParser extends Parser {
         RewriteRuleSubtreeStream stream_id=new RewriteRuleSubtreeStream(adaptor,"rule id");
         RewriteRuleSubtreeStream stream_elementOptions=new RewriteRuleSubtreeStream(adaptor,"rule elementOptions");
         try {
-            // ANTLRParser.g:844:5: ( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? -> ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? ) | RULE_REF | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOLLAR id -> LABEL[$DOLLAR,$id.text] | ACTION )
-            int alt70=5;
+            // ANTLRParser.g:822:5: ( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? -> ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? ) | RULE_REF | STRING_LITERAL ( elementOptions )? -> ^( STRING_LITERAL ( elementOptions )? ) | DOLLAR id -> LABEL[$DOLLAR,$id.text] | ACTION )
+            int alt69=5;
             switch ( input.LA(1) ) {
             case TOKEN_REF:
                 {
-                alt70=1;
+                alt69=1;
                 }
                 break;
             case RULE_REF:
                 {
-                alt70=2;
+                alt69=2;
                 }
                 break;
             case STRING_LITERAL:
                 {
-                alt70=3;
+                alt69=3;
                 }
                 break;
             case DOLLAR:
                 {
-                alt70=4;
+                alt69=4;
                 }
                 break;
             case ACTION:
                 {
-                alt70=5;
+                alt69=5;
                 }
                 break;
             default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 70, 0, input);
+                    new NoViableAltException("", 69, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt70) {
+            switch (alt69) {
                 case 1 :
-                    // ANTLRParser.g:844:9: TOKEN_REF ( elementOptions )? ( ARG_ACTION )?
+                    // ANTLRParser.g:822:9: TOKEN_REF ( elementOptions )? ( ARG_ACTION )?
                     {
-                    TOKEN_REF194=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_rewriteTreeAtom4504); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_TOKEN_REF.add(TOKEN_REF194);
+                    TOKEN_REF193=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_rewriteTreeAtom4295); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_TOKEN_REF.add(TOKEN_REF193);
 
-                    // ANTLRParser.g:844:19: ( elementOptions )?
-                    int alt67=2;
-                    int LA67_0 = input.LA(1);
+                    // ANTLRParser.g:822:19: ( elementOptions )?
+                    int alt66=2;
+                    int LA66_0 = input.LA(1);
 
-                    if ( (LA67_0==LT) ) {
-                        alt67=1;
+                    if ( (LA66_0==LT) ) {
+                        alt66=1;
                     }
-                    switch (alt67) {
+                    switch (alt66) {
                         case 1 :
-                            // ANTLRParser.g:844:19: elementOptions
+                            // ANTLRParser.g:822:19: elementOptions
                             {
-                            pushFollow(FOLLOW_elementOptions_in_rewriteTreeAtom4506);
-                            elementOptions195=elementOptions();
+                            pushFollow(FOLLOW_elementOptions_in_rewriteTreeAtom4297);
+                            elementOptions194=elementOptions();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions195.getTree());
+                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions194.getTree());
 
                             }
                             break;
 
                     }
 
-                    // ANTLRParser.g:844:35: ( ARG_ACTION )?
-                    int alt68=2;
-                    int LA68_0 = input.LA(1);
+                    // ANTLRParser.g:822:35: ( ARG_ACTION )?
+                    int alt67=2;
+                    int LA67_0 = input.LA(1);
 
-                    if ( (LA68_0==ARG_ACTION) ) {
-                        alt68=1;
+                    if ( (LA67_0==ARG_ACTION) ) {
+                        alt67=1;
                     }
-                    switch (alt68) {
+                    switch (alt67) {
                         case 1 :
-                            // ANTLRParser.g:844:35: ARG_ACTION
+                            // ANTLRParser.g:822:35: ARG_ACTION
                             {
-                            ARG_ACTION196=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rewriteTreeAtom4509); if (state.failed) return retval; 
-                            if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION196);
+                            ARG_ACTION195=(Token)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_rewriteTreeAtom4300); if (state.failed) return retval; 
+                            if ( state.backtracking==0 ) stream_ARG_ACTION.add(ARG_ACTION195);
 
 
                             }
@@ -8109,20 +8073,20 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 844:47: -> ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? )
+                    // 822:47: -> ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? )
                     {
-                        // ANTLRParser.g:844:50: ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? )
+                        // ANTLRParser.g:822:50: ^( TOKEN_REF ( elementOptions )? ( ARG_ACTION )? )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(new TerminalAST(stream_TOKEN_REF.nextToken()), root_1);
 
-                        // ANTLRParser.g:844:75: ( elementOptions )?
+                        // ANTLRParser.g:822:75: ( elementOptions )?
                         if ( stream_elementOptions.hasNext() ) {
                             adaptor.addChild(root_1, stream_elementOptions.nextTree());
 
                         }
                         stream_elementOptions.reset();
-                        // ANTLRParser.g:844:91: ( ARG_ACTION )?
+                        // ANTLRParser.g:822:91: ( ARG_ACTION )?
                         if ( stream_ARG_ACTION.hasNext() ) {
                             adaptor.addChild(root_1, stream_ARG_ACTION.nextNode());
 
@@ -8138,41 +8102,41 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:845:9: RULE_REF
+                    // ANTLRParser.g:823:9: RULE_REF
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    RULE_REF197=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_rewriteTreeAtom4536); if (state.failed) return retval;
+                    RULE_REF196=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_rewriteTreeAtom4327); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    RULE_REF197_tree = (GrammarAST)adaptor.create(RULE_REF197);
-                    adaptor.addChild(root_0, RULE_REF197_tree);
+                    RULE_REF196_tree = (GrammarAST)adaptor.create(RULE_REF196);
+                    adaptor.addChild(root_0, RULE_REF196_tree);
                     }
 
                     }
                     break;
                 case 3 :
-                    // ANTLRParser.g:846:6: STRING_LITERAL ( elementOptions )?
+                    // ANTLRParser.g:824:6: STRING_LITERAL ( elementOptions )?
                     {
-                    STRING_LITERAL198=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_rewriteTreeAtom4543); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_STRING_LITERAL.add(STRING_LITERAL198);
+                    STRING_LITERAL197=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_rewriteTreeAtom4334); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_STRING_LITERAL.add(STRING_LITERAL197);
 
-                    // ANTLRParser.g:846:21: ( elementOptions )?
-                    int alt69=2;
-                    int LA69_0 = input.LA(1);
+                    // ANTLRParser.g:824:21: ( elementOptions )?
+                    int alt68=2;
+                    int LA68_0 = input.LA(1);
 
-                    if ( (LA69_0==LT) ) {
-                        alt69=1;
+                    if ( (LA68_0==LT) ) {
+                        alt68=1;
                     }
-                    switch (alt69) {
+                    switch (alt68) {
                         case 1 :
-                            // ANTLRParser.g:846:21: elementOptions
+                            // ANTLRParser.g:824:21: elementOptions
                             {
-                            pushFollow(FOLLOW_elementOptions_in_rewriteTreeAtom4545);
-                            elementOptions199=elementOptions();
+                            pushFollow(FOLLOW_elementOptions_in_rewriteTreeAtom4336);
+                            elementOptions198=elementOptions();
 
                             state._fsp--;
                             if (state.failed) return retval;
-                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions199.getTree());
+                            if ( state.backtracking==0 ) stream_elementOptions.add(elementOptions198.getTree());
 
                             }
                             break;
@@ -8193,14 +8157,14 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 846:40: -> ^( STRING_LITERAL ( elementOptions )? )
+                    // 824:40: -> ^( STRING_LITERAL ( elementOptions )? )
                     {
-                        // ANTLRParser.g:846:43: ^( STRING_LITERAL ( elementOptions )? )
+                        // ANTLRParser.g:824:43: ^( STRING_LITERAL ( elementOptions )? )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot(new TerminalAST(stream_STRING_LITERAL.nextToken()), root_1);
 
-                        // ANTLRParser.g:846:73: ( elementOptions )?
+                        // ANTLRParser.g:824:73: ( elementOptions )?
                         if ( stream_elementOptions.hasNext() ) {
                             adaptor.addChild(root_1, stream_elementOptions.nextTree());
 
@@ -8216,17 +8180,17 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // ANTLRParser.g:847:6: DOLLAR id
+                    // ANTLRParser.g:825:6: DOLLAR id
                     {
-                    DOLLAR200=(Token)match(input,DOLLAR,FOLLOW_DOLLAR_in_rewriteTreeAtom4568); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_DOLLAR.add(DOLLAR200);
+                    DOLLAR199=(Token)match(input,DOLLAR,FOLLOW_DOLLAR_in_rewriteTreeAtom4359); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_DOLLAR.add(DOLLAR199);
 
-                    pushFollow(FOLLOW_id_in_rewriteTreeAtom4570);
-                    id201=id();
+                    pushFollow(FOLLOW_id_in_rewriteTreeAtom4361);
+                    id200=id();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_id.add(id201.getTree());
+                    if ( state.backtracking==0 ) stream_id.add(id200.getTree());
 
 
                     // AST REWRITE
@@ -8241,9 +8205,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 847:16: -> LABEL[$DOLLAR,$id.text]
+                    // 825:16: -> LABEL[$DOLLAR,$id.text]
                     {
-                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(LABEL, DOLLAR200, (id201!=null?input.toString(id201.start,id201.stop):null)));
+                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(LABEL, DOLLAR199, (id200!=null?input.toString(id200.start,id200.stop):null)));
 
                     }
 
@@ -8251,14 +8215,14 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // ANTLRParser.g:848:4: ACTION
+                    // ANTLRParser.g:826:4: ACTION
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    ACTION202=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteTreeAtom4581); if (state.failed) return retval;
+                    ACTION201=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteTreeAtom4372); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    ACTION202_tree = (GrammarAST)adaptor.create(ACTION202);
-                    adaptor.addChild(root_0, ACTION202_tree);
+                    ACTION201_tree = new ActionAST(ACTION201) ;
+                    adaptor.addChild(root_0, ACTION201_tree);
                     }
 
                     }
@@ -8291,7 +8255,7 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTreeEbnf"
-    // ANTLRParser.g:851:1: rewriteTreeEbnf : lp= LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) ) ;
+    // ANTLRParser.g:829:1: rewriteTreeEbnf : lp= LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) ) ;
     public final ANTLRParser.rewriteTreeEbnf_return rewriteTreeEbnf() throws RecognitionException {
         ANTLRParser.rewriteTreeEbnf_return retval = new ANTLRParser.rewriteTreeEbnf_return();
         retval.start = input.LT(1);
@@ -8299,14 +8263,14 @@ public class ANTLRParser extends Parser {
         GrammarAST root_0 = null;
 
         Token lp=null;
-        Token RPAREN204=null;
-        ANTLRParser.rewriteTreeAlt_return rewriteTreeAlt203 = null;
+        Token RPAREN203=null;
+        ANTLRParser.rewriteTreeAlt_return rewriteTreeAlt202 = null;
 
-        ANTLRParser.ebnfSuffix_return ebnfSuffix205 = null;
+        ANTLRParser.ebnfSuffix_return ebnfSuffix204 = null;
 
 
         GrammarAST lp_tree=null;
-        GrammarAST RPAREN204_tree=null;
+        GrammarAST RPAREN203_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_rewriteTreeAlt=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTreeAlt");
@@ -8315,31 +8279,31 @@ public class ANTLRParser extends Parser {
             Token firstToken = input.LT(1);
 
         try {
-            // ANTLRParser.g:859:2: (lp= LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) ) )
-            // ANTLRParser.g:859:4: lp= LPAREN rewriteTreeAlt RPAREN ebnfSuffix
+            // ANTLRParser.g:837:2: (lp= LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) ) )
+            // ANTLRParser.g:837:4: lp= LPAREN rewriteTreeAlt RPAREN ebnfSuffix
             {
-            lp=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteTreeEbnf4604); if (state.failed) return retval; 
+            lp=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteTreeEbnf4398); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_LPAREN.add(lp);
 
-            pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf4606);
-            rewriteTreeAlt203=rewriteTreeAlt();
+            pushFollow(FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf4400);
+            rewriteTreeAlt202=rewriteTreeAlt();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_rewriteTreeAlt.add(rewriteTreeAlt203.getTree());
-            RPAREN204=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTreeEbnf4608); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN204);
+            if ( state.backtracking==0 ) stream_rewriteTreeAlt.add(rewriteTreeAlt202.getTree());
+            RPAREN203=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTreeEbnf4402); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN203);
 
-            pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeEbnf4610);
-            ebnfSuffix205=ebnfSuffix();
+            pushFollow(FOLLOW_ebnfSuffix_in_rewriteTreeEbnf4404);
+            ebnfSuffix204=ebnfSuffix();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_ebnfSuffix.add(ebnfSuffix205.getTree());
+            if ( state.backtracking==0 ) stream_ebnfSuffix.add(ebnfSuffix204.getTree());
 
 
             // AST REWRITE
-            // elements: ebnfSuffix, rewriteTreeAlt
+            // elements: rewriteTreeAlt, ebnfSuffix
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8350,14 +8314,14 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 859:47: -> ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) )
+            // 837:47: -> ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) )
             {
-                // ANTLRParser.g:859:50: ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) )
+                // ANTLRParser.g:837:50: ^( ebnfSuffix ^( REWRITE_BLOCK[$lp] rewriteTreeAlt ) )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_ebnfSuffix.nextNode(), root_1);
 
-                // ANTLRParser.g:859:63: ^( REWRITE_BLOCK[$lp] rewriteTreeAlt )
+                // ANTLRParser.g:837:63: ^( REWRITE_BLOCK[$lp] rewriteTreeAlt )
                 {
                 GrammarAST root_2 = (GrammarAST)adaptor.nil();
                 root_2 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(REWRITE_BLOCK, lp), root_2);
@@ -8407,76 +8371,76 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTree"
-    // ANTLRParser.g:862:1: rewriteTree : TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* RPAREN -> ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) ;
+    // ANTLRParser.g:840:1: rewriteTree : TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* RPAREN -> ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) ;
     public final ANTLRParser.rewriteTree_return rewriteTree() throws RecognitionException {
         ANTLRParser.rewriteTree_return retval = new ANTLRParser.rewriteTree_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token TREE_BEGIN206=null;
-        Token RPAREN209=null;
-        ANTLRParser.rewriteTreeAtom_return rewriteTreeAtom207 = null;
+        Token TREE_BEGIN205=null;
+        Token RPAREN208=null;
+        ANTLRParser.rewriteTreeAtom_return rewriteTreeAtom206 = null;
 
-        ANTLRParser.rewriteTreeElement_return rewriteTreeElement208 = null;
+        ANTLRParser.rewriteTreeElement_return rewriteTreeElement207 = null;
 
 
-        GrammarAST TREE_BEGIN206_tree=null;
-        GrammarAST RPAREN209_tree=null;
+        GrammarAST TREE_BEGIN205_tree=null;
+        GrammarAST RPAREN208_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_TREE_BEGIN=new RewriteRuleTokenStream(adaptor,"token TREE_BEGIN");
         RewriteRuleSubtreeStream stream_rewriteTreeAtom=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTreeAtom");
         RewriteRuleSubtreeStream stream_rewriteTreeElement=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTreeElement");
         try {
-            // ANTLRParser.g:863:2: ( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* RPAREN -> ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) )
-            // ANTLRParser.g:863:4: TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* RPAREN
+            // ANTLRParser.g:841:2: ( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* RPAREN -> ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* ) )
+            // ANTLRParser.g:841:4: TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* RPAREN
             {
-            TREE_BEGIN206=(Token)match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_rewriteTree4634); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_TREE_BEGIN.add(TREE_BEGIN206);
+            TREE_BEGIN205=(Token)match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_rewriteTree4428); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_TREE_BEGIN.add(TREE_BEGIN205);
 
-            pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTree4636);
-            rewriteTreeAtom207=rewriteTreeAtom();
+            pushFollow(FOLLOW_rewriteTreeAtom_in_rewriteTree4430);
+            rewriteTreeAtom206=rewriteTreeAtom();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_rewriteTreeAtom.add(rewriteTreeAtom207.getTree());
-            // ANTLRParser.g:863:31: ( rewriteTreeElement )*
-            loop71:
+            if ( state.backtracking==0 ) stream_rewriteTreeAtom.add(rewriteTreeAtom206.getTree());
+            // ANTLRParser.g:841:31: ( rewriteTreeElement )*
+            loop70:
             do {
-                int alt71=2;
-                int LA71_0 = input.LA(1);
+                int alt70=2;
+                int LA70_0 = input.LA(1);
 
-                if ( (LA71_0==ACTION||LA71_0==LPAREN||LA71_0==DOLLAR||LA71_0==TREE_BEGIN||(LA71_0>=TOKEN_REF && LA71_0<=RULE_REF)||LA71_0==STRING_LITERAL) ) {
-                    alt71=1;
+                if ( (LA70_0==ACTION||LA70_0==LPAREN||LA70_0==DOLLAR||LA70_0==TREE_BEGIN||(LA70_0>=TOKEN_REF && LA70_0<=RULE_REF)||LA70_0==STRING_LITERAL) ) {
+                    alt70=1;
                 }
 
 
-                switch (alt71) {
+                switch (alt70) {
             	case 1 :
-            	    // ANTLRParser.g:863:31: rewriteTreeElement
+            	    // ANTLRParser.g:841:31: rewriteTreeElement
             	    {
-            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTree4638);
-            	    rewriteTreeElement208=rewriteTreeElement();
+            	    pushFollow(FOLLOW_rewriteTreeElement_in_rewriteTree4432);
+            	    rewriteTreeElement207=rewriteTreeElement();
 
             	    state._fsp--;
             	    if (state.failed) return retval;
-            	    if ( state.backtracking==0 ) stream_rewriteTreeElement.add(rewriteTreeElement208.getTree());
+            	    if ( state.backtracking==0 ) stream_rewriteTreeElement.add(rewriteTreeElement207.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop71;
+            	    break loop70;
                 }
             } while (true);
 
-            RPAREN209=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTree4641); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN209);
+            RPAREN208=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTree4435); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN208);
 
 
 
             // AST REWRITE
-            // elements: rewriteTreeElement, rewriteTreeAtom, TREE_BEGIN
+            // elements: TREE_BEGIN, rewriteTreeElement, rewriteTreeAtom
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8487,15 +8451,15 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 864:3: -> ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* )
+            // 842:3: -> ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* )
             {
-                // ANTLRParser.g:864:6: ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* )
+                // ANTLRParser.g:842:6: ^( TREE_BEGIN rewriteTreeAtom ( rewriteTreeElement )* )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot(stream_TREE_BEGIN.nextNode(), root_1);
 
                 adaptor.addChild(root_1, stream_rewriteTreeAtom.nextTree());
-                // ANTLRParser.g:864:35: ( rewriteTreeElement )*
+                // ANTLRParser.g:842:35: ( rewriteTreeElement )*
                 while ( stream_rewriteTreeElement.hasNext() ) {
                     adaptor.addChild(root_1, stream_rewriteTreeElement.nextTree());
 
@@ -8536,7 +8500,7 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTemplate"
-    // ANTLRParser.g:867:1: rewriteTemplate : ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );
+    // ANTLRParser.g:845:1: rewriteTemplate : ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );
     public final ANTLRParser.rewriteTemplate_return rewriteTemplate() throws RecognitionException {
         ANTLRParser.rewriteTemplate_return retval = new ANTLRParser.rewriteTemplate_return();
         retval.start = input.LT(1);
@@ -8544,22 +8508,22 @@ public class ANTLRParser extends Parser {
         GrammarAST root_0 = null;
 
         Token str=null;
-        Token TEMPLATE210=null;
-        Token LPAREN211=null;
-        Token RPAREN213=null;
-        Token ACTION216=null;
-        ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs212 = null;
+        Token TEMPLATE209=null;
+        Token LPAREN210=null;
+        Token RPAREN212=null;
+        Token ACTION215=null;
+        ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs211 = null;
 
-        ANTLRParser.rewriteTemplateRef_return rewriteTemplateRef214 = null;
+        ANTLRParser.rewriteTemplateRef_return rewriteTemplateRef213 = null;
 
-        ANTLRParser.rewriteIndirectTemplateHead_return rewriteIndirectTemplateHead215 = null;
+        ANTLRParser.rewriteIndirectTemplateHead_return rewriteIndirectTemplateHead214 = null;
 
 
         GrammarAST str_tree=null;
-        GrammarAST TEMPLATE210_tree=null;
-        GrammarAST LPAREN211_tree=null;
-        GrammarAST RPAREN213_tree=null;
-        GrammarAST ACTION216_tree=null;
+        GrammarAST TEMPLATE209_tree=null;
+        GrammarAST LPAREN210_tree=null;
+        GrammarAST RPAREN212_tree=null;
+        GrammarAST ACTION215_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_DOUBLE_QUOTE_STRING_LITERAL=new RewriteRuleTokenStream(adaptor,"token DOUBLE_QUOTE_STRING_LITERAL");
         RewriteRuleTokenStream stream_TEMPLATE=new RewriteRuleTokenStream(adaptor,"token TEMPLATE");
@@ -8567,59 +8531,59 @@ public class ANTLRParser extends Parser {
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_rewriteTemplateArgs=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTemplateArgs");
         try {
-            // ANTLRParser.g:878:2: ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION )
-            int alt73=4;
-            alt73 = dfa73.predict(input);
-            switch (alt73) {
+            // ANTLRParser.g:856:2: ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION )
+            int alt72=4;
+            alt72 = dfa72.predict(input);
+            switch (alt72) {
                 case 1 :
-                    // ANTLRParser.g:879:3: TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL )
+                    // ANTLRParser.g:857:3: TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL )
                     {
-                    TEMPLATE210=(Token)match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplate4673); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_TEMPLATE.add(TEMPLATE210);
+                    TEMPLATE209=(Token)match(input,TEMPLATE,FOLLOW_TEMPLATE_in_rewriteTemplate4467); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_TEMPLATE.add(TEMPLATE209);
 
-                    LPAREN211=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteTemplate4675); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN211);
+                    LPAREN210=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteTemplate4469); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN210);
 
-                    pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplate4677);
-                    rewriteTemplateArgs212=rewriteTemplateArgs();
+                    pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplate4471);
+                    rewriteTemplateArgs211=rewriteTemplateArgs();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_rewriteTemplateArgs.add(rewriteTemplateArgs212.getTree());
-                    RPAREN213=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTemplate4679); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN213);
+                    if ( state.backtracking==0 ) stream_rewriteTemplateArgs.add(rewriteTemplateArgs211.getTree());
+                    RPAREN212=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTemplate4473); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN212);
 
-                    // ANTLRParser.g:880:3: (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL )
-                    int alt72=2;
-                    int LA72_0 = input.LA(1);
+                    // ANTLRParser.g:858:3: (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL )
+                    int alt71=2;
+                    int LA71_0 = input.LA(1);
 
-                    if ( (LA72_0==DOUBLE_QUOTE_STRING_LITERAL) ) {
-                        alt72=1;
+                    if ( (LA71_0==DOUBLE_QUOTE_STRING_LITERAL) ) {
+                        alt71=1;
                     }
-                    else if ( (LA72_0==DOUBLE_ANGLE_STRING_LITERAL) ) {
-                        alt72=2;
+                    else if ( (LA71_0==DOUBLE_ANGLE_STRING_LITERAL) ) {
+                        alt71=2;
                     }
                     else {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         NoViableAltException nvae =
-                            new NoViableAltException("", 72, 0, input);
+                            new NoViableAltException("", 71, 0, input);
 
                         throw nvae;
                     }
-                    switch (alt72) {
+                    switch (alt71) {
                         case 1 :
-                            // ANTLRParser.g:880:5: str= DOUBLE_QUOTE_STRING_LITERAL
+                            // ANTLRParser.g:858:5: str= DOUBLE_QUOTE_STRING_LITERAL
                             {
-                            str=(Token)match(input,DOUBLE_QUOTE_STRING_LITERAL,FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate4687); if (state.failed) return retval; 
+                            str=(Token)match(input,DOUBLE_QUOTE_STRING_LITERAL,FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate4481); if (state.failed) return retval; 
                             if ( state.backtracking==0 ) stream_DOUBLE_QUOTE_STRING_LITERAL.add(str);
 
 
                             }
                             break;
                         case 2 :
-                            // ANTLRParser.g:880:39: str= DOUBLE_ANGLE_STRING_LITERAL
+                            // ANTLRParser.g:858:39: str= DOUBLE_ANGLE_STRING_LITERAL
                             {
-                            str=(Token)match(input,DOUBLE_ANGLE_STRING_LITERAL,FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate4693); if (state.failed) return retval; 
+                            str=(Token)match(input,DOUBLE_ANGLE_STRING_LITERAL,FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate4487); if (state.failed) return retval; 
                             if ( state.backtracking==0 ) stream_DOUBLE_ANGLE_STRING_LITERAL.add(str);
 
 
@@ -8643,14 +8607,14 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 881:3: -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str)
+                    // 859:3: -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str)
                     {
-                        // ANTLRParser.g:881:6: ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str)
+                        // ANTLRParser.g:859:6: ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str)
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                        root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(TEMPLATE, TEMPLATE210, "TEMPLATE"), root_1);
+                        root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(TEMPLATE, TEMPLATE209, "TEMPLATE"), root_1);
 
-                        // ANTLRParser.g:881:39: ( rewriteTemplateArgs )?
+                        // ANTLRParser.g:859:39: ( rewriteTemplateArgs )?
                         if ( stream_rewriteTemplateArgs.hasNext() ) {
                             adaptor.addChild(root_1, stream_rewriteTemplateArgs.nextTree());
 
@@ -8667,42 +8631,42 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:884:3: rewriteTemplateRef
+                    // ANTLRParser.g:862:3: rewriteTemplateRef
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_rewriteTemplateRef_in_rewriteTemplate4719);
-                    rewriteTemplateRef214=rewriteTemplateRef();
+                    pushFollow(FOLLOW_rewriteTemplateRef_in_rewriteTemplate4513);
+                    rewriteTemplateRef213=rewriteTemplateRef();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTemplateRef214.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteTemplateRef213.getTree());
 
                     }
                     break;
                 case 3 :
-                    // ANTLRParser.g:887:3: rewriteIndirectTemplateHead
+                    // ANTLRParser.g:865:3: rewriteIndirectTemplateHead
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    pushFollow(FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate4728);
-                    rewriteIndirectTemplateHead215=rewriteIndirectTemplateHead();
+                    pushFollow(FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate4522);
+                    rewriteIndirectTemplateHead214=rewriteIndirectTemplateHead();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteIndirectTemplateHead215.getTree());
+                    if ( state.backtracking==0 ) adaptor.addChild(root_0, rewriteIndirectTemplateHead214.getTree());
 
                     }
                     break;
                 case 4 :
-                    // ANTLRParser.g:890:3: ACTION
+                    // ANTLRParser.g:868:3: ACTION
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
-                    ACTION216=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplate4737); if (state.failed) return retval;
+                    ACTION215=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplate4531); if (state.failed) return retval;
                     if ( state.backtracking==0 ) {
-                    ACTION216_tree = (GrammarAST)adaptor.create(ACTION216);
-                    adaptor.addChild(root_0, ACTION216_tree);
+                    ACTION215_tree = new ActionAST(ACTION215) ;
+                    adaptor.addChild(root_0, ACTION215_tree);
                     }
 
                     }
@@ -8735,52 +8699,52 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTemplateRef"
-    // ANTLRParser.g:893:1: rewriteTemplateRef : id LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? ) ;
+    // ANTLRParser.g:871:1: rewriteTemplateRef : id LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? ) ;
     public final ANTLRParser.rewriteTemplateRef_return rewriteTemplateRef() throws RecognitionException {
         ANTLRParser.rewriteTemplateRef_return retval = new ANTLRParser.rewriteTemplateRef_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token LPAREN218=null;
-        Token RPAREN220=null;
-        ANTLRParser.id_return id217 = null;
+        Token LPAREN217=null;
+        Token RPAREN219=null;
+        ANTLRParser.id_return id216 = null;
 
-        ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs219 = null;
+        ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs218 = null;
 
 
-        GrammarAST LPAREN218_tree=null;
-        GrammarAST RPAREN220_tree=null;
+        GrammarAST LPAREN217_tree=null;
+        GrammarAST RPAREN219_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_id=new RewriteRuleSubtreeStream(adaptor,"rule id");
         RewriteRuleSubtreeStream stream_rewriteTemplateArgs=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTemplateArgs");
         try {
-            // ANTLRParser.g:895:2: ( id LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? ) )
-            // ANTLRParser.g:895:4: id LPAREN rewriteTemplateArgs RPAREN
+            // ANTLRParser.g:873:2: ( id LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? ) )
+            // ANTLRParser.g:873:4: id LPAREN rewriteTemplateArgs RPAREN
             {
-            pushFollow(FOLLOW_id_in_rewriteTemplateRef4750);
-            id217=id();
+            pushFollow(FOLLOW_id_in_rewriteTemplateRef4547);
+            id216=id();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_id.add(id217.getTree());
-            LPAREN218=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteTemplateRef4752); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN218);
+            if ( state.backtracking==0 ) stream_id.add(id216.getTree());
+            LPAREN217=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteTemplateRef4549); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN217);
 
-            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef4754);
-            rewriteTemplateArgs219=rewriteTemplateArgs();
+            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef4551);
+            rewriteTemplateArgs218=rewriteTemplateArgs();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_rewriteTemplateArgs.add(rewriteTemplateArgs219.getTree());
-            RPAREN220=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTemplateRef4756); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN220);
+            if ( state.backtracking==0 ) stream_rewriteTemplateArgs.add(rewriteTemplateArgs218.getTree());
+            RPAREN219=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteTemplateRef4553); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN219);
 
 
 
             // AST REWRITE
-            // elements: rewriteTemplateArgs, id
+            // elements: id, rewriteTemplateArgs
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8791,15 +8755,15 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 896:3: -> ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? )
+            // 874:3: -> ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? )
             {
-                // ANTLRParser.g:896:6: ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? )
+                // ANTLRParser.g:874:6: ^( TEMPLATE[$LPAREN,\"TEMPLATE\"] id ( rewriteTemplateArgs )? )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(TEMPLATE, LPAREN218, "TEMPLATE"), root_1);
+                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(TEMPLATE, LPAREN217, "TEMPLATE"), root_1);
 
                 adaptor.addChild(root_1, stream_id.nextTree());
-                // ANTLRParser.g:896:40: ( rewriteTemplateArgs )?
+                // ANTLRParser.g:874:40: ( rewriteTemplateArgs )?
                 if ( stream_rewriteTemplateArgs.hasNext() ) {
                     adaptor.addChild(root_1, stream_rewriteTemplateArgs.nextTree());
 
@@ -8840,7 +8804,7 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteIndirectTemplateHead"
-    // ANTLRParser.g:899:1: rewriteIndirectTemplateHead : lp= LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? ) ;
+    // ANTLRParser.g:877:1: rewriteIndirectTemplateHead : lp= LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? ) ;
     public final ANTLRParser.rewriteIndirectTemplateHead_return rewriteIndirectTemplateHead() throws RecognitionException {
         ANTLRParser.rewriteIndirectTemplateHead_return retval = new ANTLRParser.rewriteIndirectTemplateHead_return();
         retval.start = input.LT(1);
@@ -8848,46 +8812,46 @@ public class ANTLRParser extends Parser {
         GrammarAST root_0 = null;
 
         Token lp=null;
-        Token ACTION221=null;
-        Token RPAREN222=null;
-        Token LPAREN223=null;
-        Token RPAREN225=null;
-        ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs224 = null;
+        Token ACTION220=null;
+        Token RPAREN221=null;
+        Token LPAREN222=null;
+        Token RPAREN224=null;
+        ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs223 = null;
 
 
         GrammarAST lp_tree=null;
-        GrammarAST ACTION221_tree=null;
-        GrammarAST RPAREN222_tree=null;
-        GrammarAST LPAREN223_tree=null;
-        GrammarAST RPAREN225_tree=null;
+        GrammarAST ACTION220_tree=null;
+        GrammarAST RPAREN221_tree=null;
+        GrammarAST LPAREN222_tree=null;
+        GrammarAST RPAREN224_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_ACTION=new RewriteRuleTokenStream(adaptor,"token ACTION");
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_rewriteTemplateArgs=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTemplateArgs");
         try {
-            // ANTLRParser.g:901:2: (lp= LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? ) )
-            // ANTLRParser.g:901:4: lp= LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN
+            // ANTLRParser.g:879:2: (lp= LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN -> ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? ) )
+            // ANTLRParser.g:879:4: lp= LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN
             {
-            lp=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4785); if (state.failed) return retval; 
+            lp=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4582); if (state.failed) return retval; 
             if ( state.backtracking==0 ) stream_LPAREN.add(lp);
 
-            ACTION221=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteIndirectTemplateHead4787); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_ACTION.add(ACTION221);
+            ACTION220=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteIndirectTemplateHead4584); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_ACTION.add(ACTION220);
 
-            RPAREN222=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4789); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN222);
+            RPAREN221=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4586); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN221);
 
-            LPAREN223=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4791); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN223);
+            LPAREN222=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4588); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN222);
 
-            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead4793);
-            rewriteTemplateArgs224=rewriteTemplateArgs();
+            pushFollow(FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead4590);
+            rewriteTemplateArgs223=rewriteTemplateArgs();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_rewriteTemplateArgs.add(rewriteTemplateArgs224.getTree());
-            RPAREN225=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4795); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN225);
+            if ( state.backtracking==0 ) stream_rewriteTemplateArgs.add(rewriteTemplateArgs223.getTree());
+            RPAREN224=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4592); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN224);
 
 
 
@@ -8903,15 +8867,15 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 902:3: -> ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? )
+            // 880:3: -> ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? )
             {
-                // ANTLRParser.g:902:6: ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? )
+                // ANTLRParser.g:880:6: ^( TEMPLATE[$lp,\"TEMPLATE\"] ACTION ( rewriteTemplateArgs )? )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
                 root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(TEMPLATE, lp, "TEMPLATE"), root_1);
 
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
-                // ANTLRParser.g:902:40: ( rewriteTemplateArgs )?
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
+                // ANTLRParser.g:880:51: ( rewriteTemplateArgs )?
                 if ( stream_rewriteTemplateArgs.hasNext() ) {
                     adaptor.addChild(root_1, stream_rewriteTemplateArgs.nextTree());
 
@@ -8952,80 +8916,80 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTemplateArgs"
-    // ANTLRParser.g:905:1: rewriteTemplateArgs : ( rewriteTemplateArg ( COMMA rewriteTemplateArg )* -> ^( ARGLIST ( rewriteTemplateArg )+ ) | );
+    // ANTLRParser.g:883:1: rewriteTemplateArgs : ( rewriteTemplateArg ( COMMA rewriteTemplateArg )* -> ^( ARGLIST ( rewriteTemplateArg )+ ) | );
     public final ANTLRParser.rewriteTemplateArgs_return rewriteTemplateArgs() throws RecognitionException {
         ANTLRParser.rewriteTemplateArgs_return retval = new ANTLRParser.rewriteTemplateArgs_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token COMMA227=null;
-        ANTLRParser.rewriteTemplateArg_return rewriteTemplateArg226 = null;
+        Token COMMA226=null;
+        ANTLRParser.rewriteTemplateArg_return rewriteTemplateArg225 = null;
 
-        ANTLRParser.rewriteTemplateArg_return rewriteTemplateArg228 = null;
+        ANTLRParser.rewriteTemplateArg_return rewriteTemplateArg227 = null;
 
 
-        GrammarAST COMMA227_tree=null;
+        GrammarAST COMMA226_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_rewriteTemplateArg=new RewriteRuleSubtreeStream(adaptor,"rule rewriteTemplateArg");
         try {
-            // ANTLRParser.g:906:2: ( rewriteTemplateArg ( COMMA rewriteTemplateArg )* -> ^( ARGLIST ( rewriteTemplateArg )+ ) | )
-            int alt75=2;
-            int LA75_0 = input.LA(1);
+            // ANTLRParser.g:884:2: ( rewriteTemplateArg ( COMMA rewriteTemplateArg )* -> ^( ARGLIST ( rewriteTemplateArg )+ ) | )
+            int alt74=2;
+            int LA74_0 = input.LA(1);
 
-            if ( (LA75_0==TEMPLATE||(LA75_0>=TOKEN_REF && LA75_0<=RULE_REF)) ) {
-                alt75=1;
+            if ( (LA74_0==TEMPLATE||(LA74_0>=TOKEN_REF && LA74_0<=RULE_REF)) ) {
+                alt74=1;
             }
-            else if ( (LA75_0==RPAREN) ) {
-                alt75=2;
+            else if ( (LA74_0==RPAREN) ) {
+                alt74=2;
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 75, 0, input);
+                    new NoViableAltException("", 74, 0, input);
 
                 throw nvae;
             }
-            switch (alt75) {
+            switch (alt74) {
                 case 1 :
-                    // ANTLRParser.g:906:4: rewriteTemplateArg ( COMMA rewriteTemplateArg )*
+                    // ANTLRParser.g:884:4: rewriteTemplateArg ( COMMA rewriteTemplateArg )*
                     {
-                    pushFollow(FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4820);
-                    rewriteTemplateArg226=rewriteTemplateArg();
+                    pushFollow(FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4620);
+                    rewriteTemplateArg225=rewriteTemplateArg();
 
                     state._fsp--;
                     if (state.failed) return retval;
-                    if ( state.backtracking==0 ) stream_rewriteTemplateArg.add(rewriteTemplateArg226.getTree());
-                    // ANTLRParser.g:906:23: ( COMMA rewriteTemplateArg )*
-                    loop74:
+                    if ( state.backtracking==0 ) stream_rewriteTemplateArg.add(rewriteTemplateArg225.getTree());
+                    // ANTLRParser.g:884:23: ( COMMA rewriteTemplateArg )*
+                    loop73:
                     do {
-                        int alt74=2;
-                        int LA74_0 = input.LA(1);
+                        int alt73=2;
+                        int LA73_0 = input.LA(1);
 
-                        if ( (LA74_0==COMMA) ) {
-                            alt74=1;
+                        if ( (LA73_0==COMMA) ) {
+                            alt73=1;
                         }
 
 
-                        switch (alt74) {
+                        switch (alt73) {
                     	case 1 :
-                    	    // ANTLRParser.g:906:24: COMMA rewriteTemplateArg
+                    	    // ANTLRParser.g:884:24: COMMA rewriteTemplateArg
                     	    {
-                    	    COMMA227=(Token)match(input,COMMA,FOLLOW_COMMA_in_rewriteTemplateArgs4823); if (state.failed) return retval; 
-                    	    if ( state.backtracking==0 ) stream_COMMA.add(COMMA227);
+                    	    COMMA226=(Token)match(input,COMMA,FOLLOW_COMMA_in_rewriteTemplateArgs4623); if (state.failed) return retval; 
+                    	    if ( state.backtracking==0 ) stream_COMMA.add(COMMA226);
 
-                    	    pushFollow(FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4825);
-                    	    rewriteTemplateArg228=rewriteTemplateArg();
+                    	    pushFollow(FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4625);
+                    	    rewriteTemplateArg227=rewriteTemplateArg();
 
                     	    state._fsp--;
                     	    if (state.failed) return retval;
-                    	    if ( state.backtracking==0 ) stream_rewriteTemplateArg.add(rewriteTemplateArg228.getTree());
+                    	    if ( state.backtracking==0 ) stream_rewriteTemplateArg.add(rewriteTemplateArg227.getTree());
 
                     	    }
                     	    break;
 
                     	default :
-                    	    break loop74;
+                    	    break loop73;
                         }
                     } while (true);
 
@@ -9043,9 +9007,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 907:3: -> ^( ARGLIST ( rewriteTemplateArg )+ )
+                    // 885:3: -> ^( ARGLIST ( rewriteTemplateArg )+ )
                     {
-                        // ANTLRParser.g:907:6: ^( ARGLIST ( rewriteTemplateArg )+ )
+                        // ANTLRParser.g:885:6: ^( ARGLIST ( rewriteTemplateArg )+ )
                         {
                         GrammarAST root_1 = (GrammarAST)adaptor.nil();
                         root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ARGLIST, "ARGLIST"), root_1);
@@ -9068,7 +9032,7 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:909:2: 
+                    // ANTLRParser.g:887:2: 
                     {
                     root_0 = (GrammarAST)adaptor.nil();
 
@@ -9102,43 +9066,43 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "rewriteTemplateArg"
-    // ANTLRParser.g:911:1: rewriteTemplateArg : id ASSIGN ACTION -> ^( ARG[$ASSIGN] id ACTION ) ;
+    // ANTLRParser.g:889:1: rewriteTemplateArg : id ASSIGN ACTION -> ^( ARG[$ASSIGN] id ACTION ) ;
     public final ANTLRParser.rewriteTemplateArg_return rewriteTemplateArg() throws RecognitionException {
         ANTLRParser.rewriteTemplateArg_return retval = new ANTLRParser.rewriteTemplateArg_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token ASSIGN230=null;
-        Token ACTION231=null;
-        ANTLRParser.id_return id229 = null;
+        Token ASSIGN229=null;
+        Token ACTION230=null;
+        ANTLRParser.id_return id228 = null;
 
 
-        GrammarAST ASSIGN230_tree=null;
-        GrammarAST ACTION231_tree=null;
+        GrammarAST ASSIGN229_tree=null;
+        GrammarAST ACTION230_tree=null;
         RewriteRuleTokenStream stream_ACTION=new RewriteRuleTokenStream(adaptor,"token ACTION");
         RewriteRuleTokenStream stream_ASSIGN=new RewriteRuleTokenStream(adaptor,"token ASSIGN");
         RewriteRuleSubtreeStream stream_id=new RewriteRuleSubtreeStream(adaptor,"rule id");
         try {
-            // ANTLRParser.g:912:2: ( id ASSIGN ACTION -> ^( ARG[$ASSIGN] id ACTION ) )
-            // ANTLRParser.g:912:6: id ASSIGN ACTION
+            // ANTLRParser.g:890:2: ( id ASSIGN ACTION -> ^( ARG[$ASSIGN] id ACTION ) )
+            // ANTLRParser.g:890:6: id ASSIGN ACTION
             {
-            pushFollow(FOLLOW_id_in_rewriteTemplateArg4854);
-            id229=id();
+            pushFollow(FOLLOW_id_in_rewriteTemplateArg4654);
+            id228=id();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_id.add(id229.getTree());
-            ASSIGN230=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_rewriteTemplateArg4856); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_ASSIGN.add(ASSIGN230);
+            if ( state.backtracking==0 ) stream_id.add(id228.getTree());
+            ASSIGN229=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_rewriteTemplateArg4656); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_ASSIGN.add(ASSIGN229);
 
-            ACTION231=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplateArg4858); if (state.failed) return retval; 
-            if ( state.backtracking==0 ) stream_ACTION.add(ACTION231);
+            ACTION230=(Token)match(input,ACTION,FOLLOW_ACTION_in_rewriteTemplateArg4658); if (state.failed) return retval; 
+            if ( state.backtracking==0 ) stream_ACTION.add(ACTION230);
 
 
 
             // AST REWRITE
-            // elements: ACTION, id
+            // elements: id, ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -9149,15 +9113,15 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 912:23: -> ^( ARG[$ASSIGN] id ACTION )
+            // 890:23: -> ^( ARG[$ASSIGN] id ACTION )
             {
-                // ANTLRParser.g:912:26: ^( ARG[$ASSIGN] id ACTION )
+                // ANTLRParser.g:890:26: ^( ARG[$ASSIGN] id ACTION )
                 {
                 GrammarAST root_1 = (GrammarAST)adaptor.nil();
-                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ARG, ASSIGN230), root_1);
+                root_1 = (GrammarAST)adaptor.becomeRoot((GrammarAST)adaptor.create(ARG, ASSIGN229), root_1);
 
                 adaptor.addChild(root_1, stream_id.nextTree());
-                adaptor.addChild(root_1, stream_ACTION.nextNode());
+                adaptor.addChild(root_1, new ActionAST(stream_ACTION.nextToken()));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -9193,57 +9157,57 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "id"
-    // ANTLRParser.g:919:1: id : ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] | TEMPLATE -> ID[$TEMPLATE] );
+    // ANTLRParser.g:897:1: id : ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] | TEMPLATE -> ID[$TEMPLATE] );
     public final ANTLRParser.id_return id() throws RecognitionException {
         ANTLRParser.id_return retval = new ANTLRParser.id_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token RULE_REF232=null;
-        Token TOKEN_REF233=null;
-        Token TEMPLATE234=null;
+        Token RULE_REF231=null;
+        Token TOKEN_REF232=null;
+        Token TEMPLATE233=null;
 
-        GrammarAST RULE_REF232_tree=null;
-        GrammarAST TOKEN_REF233_tree=null;
-        GrammarAST TEMPLATE234_tree=null;
+        GrammarAST RULE_REF231_tree=null;
+        GrammarAST TOKEN_REF232_tree=null;
+        GrammarAST TEMPLATE233_tree=null;
         RewriteRuleTokenStream stream_TEMPLATE=new RewriteRuleTokenStream(adaptor,"token TEMPLATE");
         RewriteRuleTokenStream stream_RULE_REF=new RewriteRuleTokenStream(adaptor,"token RULE_REF");
         RewriteRuleTokenStream stream_TOKEN_REF=new RewriteRuleTokenStream(adaptor,"token TOKEN_REF");
 
         try {
-            // ANTLRParser.g:920:5: ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] | TEMPLATE -> ID[$TEMPLATE] )
-            int alt76=3;
+            // ANTLRParser.g:898:5: ( RULE_REF -> ID[$RULE_REF] | TOKEN_REF -> ID[$TOKEN_REF] | TEMPLATE -> ID[$TEMPLATE] )
+            int alt75=3;
             switch ( input.LA(1) ) {
             case RULE_REF:
                 {
-                alt76=1;
+                alt75=1;
                 }
                 break;
             case TOKEN_REF:
                 {
-                alt76=2;
+                alt75=2;
                 }
                 break;
             case TEMPLATE:
                 {
-                alt76=3;
+                alt75=3;
                 }
                 break;
             default:
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 NoViableAltException nvae =
-                    new NoViableAltException("", 76, 0, input);
+                    new NoViableAltException("", 75, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt76) {
+            switch (alt75) {
                 case 1 :
-                    // ANTLRParser.g:920:7: RULE_REF
+                    // ANTLRParser.g:898:7: RULE_REF
                     {
-                    RULE_REF232=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_id4887); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_RULE_REF.add(RULE_REF232);
+                    RULE_REF231=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_id4690); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_RULE_REF.add(RULE_REF231);
 
 
 
@@ -9259,9 +9223,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 920:17: -> ID[$RULE_REF]
+                    // 898:17: -> ID[$RULE_REF]
                     {
-                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, RULE_REF232));
+                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, RULE_REF231));
 
                     }
 
@@ -9269,10 +9233,10 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // ANTLRParser.g:921:7: TOKEN_REF
+                    // ANTLRParser.g:899:7: TOKEN_REF
                     {
-                    TOKEN_REF233=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_id4900); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_TOKEN_REF.add(TOKEN_REF233);
+                    TOKEN_REF232=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_id4703); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_TOKEN_REF.add(TOKEN_REF232);
 
 
 
@@ -9288,9 +9252,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 921:17: -> ID[$TOKEN_REF]
+                    // 899:17: -> ID[$TOKEN_REF]
                     {
-                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, TOKEN_REF233));
+                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, TOKEN_REF232));
 
                     }
 
@@ -9298,10 +9262,10 @@ public class ANTLRParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // ANTLRParser.g:922:7: TEMPLATE
+                    // ANTLRParser.g:900:7: TEMPLATE
                     {
-                    TEMPLATE234=(Token)match(input,TEMPLATE,FOLLOW_TEMPLATE_in_id4912); if (state.failed) return retval; 
-                    if ( state.backtracking==0 ) stream_TEMPLATE.add(TEMPLATE234);
+                    TEMPLATE233=(Token)match(input,TEMPLATE,FOLLOW_TEMPLATE_in_id4715); if (state.failed) return retval; 
+                    if ( state.backtracking==0 ) stream_TEMPLATE.add(TEMPLATE233);
 
 
 
@@ -9317,9 +9281,9 @@ public class ANTLRParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (GrammarAST)adaptor.nil();
-                    // 922:17: -> ID[$TEMPLATE]
+                    // 900:17: -> ID[$TEMPLATE]
                     {
-                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, TEMPLATE234));
+                        adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, TEMPLATE233));
 
                     }
 
@@ -9354,62 +9318,62 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "qid"
-    // ANTLRParser.g:925:1: qid : id ( DOT id )* -> ID[$qid.start, $text] ;
+    // ANTLRParser.g:903:1: qid : id ( DOT id )* -> ID[$qid.start, $text] ;
     public final ANTLRParser.qid_return qid() throws RecognitionException {
         ANTLRParser.qid_return retval = new ANTLRParser.qid_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token DOT236=null;
-        ANTLRParser.id_return id235 = null;
+        Token DOT235=null;
+        ANTLRParser.id_return id234 = null;
 
-        ANTLRParser.id_return id237 = null;
+        ANTLRParser.id_return id236 = null;
 
 
-        GrammarAST DOT236_tree=null;
+        GrammarAST DOT235_tree=null;
         RewriteRuleTokenStream stream_DOT=new RewriteRuleTokenStream(adaptor,"token DOT");
         RewriteRuleSubtreeStream stream_id=new RewriteRuleSubtreeStream(adaptor,"rule id");
         try {
-            // ANTLRParser.g:925:5: ( id ( DOT id )* -> ID[$qid.start, $text] )
-            // ANTLRParser.g:925:7: id ( DOT id )*
+            // ANTLRParser.g:903:5: ( id ( DOT id )* -> ID[$qid.start, $text] )
+            // ANTLRParser.g:903:7: id ( DOT id )*
             {
-            pushFollow(FOLLOW_id_in_qid4935);
-            id235=id();
+            pushFollow(FOLLOW_id_in_qid4738);
+            id234=id();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) stream_id.add(id235.getTree());
-            // ANTLRParser.g:925:10: ( DOT id )*
-            loop77:
+            if ( state.backtracking==0 ) stream_id.add(id234.getTree());
+            // ANTLRParser.g:903:10: ( DOT id )*
+            loop76:
             do {
-                int alt77=2;
-                int LA77_0 = input.LA(1);
+                int alt76=2;
+                int LA76_0 = input.LA(1);
 
-                if ( (LA77_0==DOT) ) {
-                    alt77=1;
+                if ( (LA76_0==DOT) ) {
+                    alt76=1;
                 }
 
 
-                switch (alt77) {
+                switch (alt76) {
             	case 1 :
-            	    // ANTLRParser.g:925:11: DOT id
+            	    // ANTLRParser.g:903:11: DOT id
             	    {
-            	    DOT236=(Token)match(input,DOT,FOLLOW_DOT_in_qid4938); if (state.failed) return retval; 
-            	    if ( state.backtracking==0 ) stream_DOT.add(DOT236);
+            	    DOT235=(Token)match(input,DOT,FOLLOW_DOT_in_qid4741); if (state.failed) return retval; 
+            	    if ( state.backtracking==0 ) stream_DOT.add(DOT235);
 
-            	    pushFollow(FOLLOW_id_in_qid4940);
-            	    id237=id();
+            	    pushFollow(FOLLOW_id_in_qid4743);
+            	    id236=id();
 
             	    state._fsp--;
             	    if (state.failed) return retval;
-            	    if ( state.backtracking==0 ) stream_id.add(id237.getTree());
+            	    if ( state.backtracking==0 ) stream_id.add(id236.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop77;
+            	    break loop76;
                 }
             } while (true);
 
@@ -9427,7 +9391,7 @@ public class ANTLRParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (GrammarAST)adaptor.nil();
-            // 925:20: -> ID[$qid.start, $text]
+            // 903:20: -> ID[$qid.start, $text]
             {
                 adaptor.addChild(root_0, (GrammarAST)adaptor.create(ID, ((Token)retval.start), input.toString(retval.start,input.LT(-1))));
 
@@ -9462,35 +9426,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "alternativeEntry"
-    // ANTLRParser.g:927:1: alternativeEntry : alternative EOF ;
+    // ANTLRParser.g:905:1: alternativeEntry : alternative EOF ;
     public final ANTLRParser.alternativeEntry_return alternativeEntry() throws RecognitionException {
         ANTLRParser.alternativeEntry_return retval = new ANTLRParser.alternativeEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF239=null;
-        ANTLRParser.alternative_return alternative238 = null;
+        Token EOF238=null;
+        ANTLRParser.alternative_return alternative237 = null;
 
 
-        GrammarAST EOF239_tree=null;
+        GrammarAST EOF238_tree=null;
 
         try {
-            // ANTLRParser.g:927:18: ( alternative EOF )
-            // ANTLRParser.g:927:20: alternative EOF
+            // ANTLRParser.g:905:18: ( alternative EOF )
+            // ANTLRParser.g:905:20: alternative EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_alternative_in_alternativeEntry4956);
-            alternative238=alternative();
+            pushFollow(FOLLOW_alternative_in_alternativeEntry4759);
+            alternative237=alternative();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, alternative238.getTree());
-            EOF239=(Token)match(input,EOF,FOLLOW_EOF_in_alternativeEntry4958); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, alternative237.getTree());
+            EOF238=(Token)match(input,EOF,FOLLOW_EOF_in_alternativeEntry4761); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF239_tree = (GrammarAST)adaptor.create(EOF239);
-            adaptor.addChild(root_0, EOF239_tree);
+            EOF238_tree = (GrammarAST)adaptor.create(EOF238);
+            adaptor.addChild(root_0, EOF238_tree);
             }
 
             }
@@ -9521,35 +9485,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "elementEntry"
-    // ANTLRParser.g:928:1: elementEntry : element EOF ;
+    // ANTLRParser.g:906:1: elementEntry : element EOF ;
     public final ANTLRParser.elementEntry_return elementEntry() throws RecognitionException {
         ANTLRParser.elementEntry_return retval = new ANTLRParser.elementEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF241=null;
-        ANTLRParser.element_return element240 = null;
+        Token EOF240=null;
+        ANTLRParser.element_return element239 = null;
 
 
-        GrammarAST EOF241_tree=null;
+        GrammarAST EOF240_tree=null;
 
         try {
-            // ANTLRParser.g:928:14: ( element EOF )
-            // ANTLRParser.g:928:16: element EOF
+            // ANTLRParser.g:906:14: ( element EOF )
+            // ANTLRParser.g:906:16: element EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_element_in_elementEntry4967);
-            element240=element();
+            pushFollow(FOLLOW_element_in_elementEntry4770);
+            element239=element();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, element240.getTree());
-            EOF241=(Token)match(input,EOF,FOLLOW_EOF_in_elementEntry4969); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, element239.getTree());
+            EOF240=(Token)match(input,EOF,FOLLOW_EOF_in_elementEntry4772); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF241_tree = (GrammarAST)adaptor.create(EOF241);
-            adaptor.addChild(root_0, EOF241_tree);
+            EOF240_tree = (GrammarAST)adaptor.create(EOF240);
+            adaptor.addChild(root_0, EOF240_tree);
             }
 
             }
@@ -9580,35 +9544,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "ruleEntry"
-    // ANTLRParser.g:929:1: ruleEntry : rule EOF ;
+    // ANTLRParser.g:907:1: ruleEntry : rule EOF ;
     public final ANTLRParser.ruleEntry_return ruleEntry() throws RecognitionException {
         ANTLRParser.ruleEntry_return retval = new ANTLRParser.ruleEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF243=null;
-        ANTLRParser.rule_return rule242 = null;
+        Token EOF242=null;
+        ANTLRParser.rule_return rule241 = null;
 
 
-        GrammarAST EOF243_tree=null;
+        GrammarAST EOF242_tree=null;
 
         try {
-            // ANTLRParser.g:929:11: ( rule EOF )
-            // ANTLRParser.g:929:13: rule EOF
+            // ANTLRParser.g:907:11: ( rule EOF )
+            // ANTLRParser.g:907:13: rule EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_rule_in_ruleEntry4977);
-            rule242=rule();
+            pushFollow(FOLLOW_rule_in_ruleEntry4780);
+            rule241=rule();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, rule242.getTree());
-            EOF243=(Token)match(input,EOF,FOLLOW_EOF_in_ruleEntry4979); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, rule241.getTree());
+            EOF242=(Token)match(input,EOF,FOLLOW_EOF_in_ruleEntry4782); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF243_tree = (GrammarAST)adaptor.create(EOF243);
-            adaptor.addChild(root_0, EOF243_tree);
+            EOF242_tree = (GrammarAST)adaptor.create(EOF242);
+            adaptor.addChild(root_0, EOF242_tree);
             }
 
             }
@@ -9639,35 +9603,35 @@ public class ANTLRParser extends Parser {
     };
 
     // $ANTLR start "blockEntry"
-    // ANTLRParser.g:930:1: blockEntry : block EOF ;
+    // ANTLRParser.g:908:1: blockEntry : block EOF ;
     public final ANTLRParser.blockEntry_return blockEntry() throws RecognitionException {
         ANTLRParser.blockEntry_return retval = new ANTLRParser.blockEntry_return();
         retval.start = input.LT(1);
 
         GrammarAST root_0 = null;
 
-        Token EOF245=null;
-        ANTLRParser.block_return block244 = null;
+        Token EOF244=null;
+        ANTLRParser.block_return block243 = null;
 
 
-        GrammarAST EOF245_tree=null;
+        GrammarAST EOF244_tree=null;
 
         try {
-            // ANTLRParser.g:930:12: ( block EOF )
-            // ANTLRParser.g:930:14: block EOF
+            // ANTLRParser.g:908:12: ( block EOF )
+            // ANTLRParser.g:908:14: block EOF
             {
             root_0 = (GrammarAST)adaptor.nil();
 
-            pushFollow(FOLLOW_block_in_blockEntry4987);
-            block244=block();
+            pushFollow(FOLLOW_block_in_blockEntry4790);
+            block243=block();
 
             state._fsp--;
             if (state.failed) return retval;
-            if ( state.backtracking==0 ) adaptor.addChild(root_0, block244.getTree());
-            EOF245=(Token)match(input,EOF,FOLLOW_EOF_in_blockEntry4989); if (state.failed) return retval;
+            if ( state.backtracking==0 ) adaptor.addChild(root_0, block243.getTree());
+            EOF244=(Token)match(input,EOF,FOLLOW_EOF_in_blockEntry4792); if (state.failed) return retval;
             if ( state.backtracking==0 ) {
-            EOF245_tree = (GrammarAST)adaptor.create(EOF245);
-            adaptor.addChild(root_0, EOF245_tree);
+            EOF244_tree = (GrammarAST)adaptor.create(EOF244);
+            adaptor.addChild(root_0, EOF244_tree);
             }
 
             }
@@ -9694,10 +9658,10 @@ public class ANTLRParser extends Parser {
 
     // $ANTLR start synpred1_ANTLRParser
     public final void synpred1_ANTLRParser_fragment() throws RecognitionException {   
-        // ANTLRParser.g:815:7: ( rewriteTemplate )
-        // ANTLRParser.g:815:7: rewriteTemplate
+        // ANTLRParser.g:793:7: ( rewriteTemplate )
+        // ANTLRParser.g:793:7: rewriteTemplate
         {
-        pushFollow(FOLLOW_rewriteTemplate_in_synpred1_ANTLRParser4308);
+        pushFollow(FOLLOW_rewriteTemplate_in_synpred1_ANTLRParser4099);
         rewriteTemplate();
 
         state._fsp--;
@@ -9709,10 +9673,10 @@ public class ANTLRParser extends Parser {
 
     // $ANTLR start synpred2_ANTLRParser
     public final void synpred2_ANTLRParser_fragment() throws RecognitionException {   
-        // ANTLRParser.g:821:7: ( rewriteTreeAlt )
-        // ANTLRParser.g:821:7: rewriteTreeAlt
+        // ANTLRParser.g:799:7: ( rewriteTreeAlt )
+        // ANTLRParser.g:799:7: rewriteTreeAlt
         {
-        pushFollow(FOLLOW_rewriteTreeAlt_in_synpred2_ANTLRParser4347);
+        pushFollow(FOLLOW_rewriteTreeAlt_in_synpred2_ANTLRParser4138);
         rewriteTreeAlt();
 
         state._fsp--;
@@ -9756,9 +9720,9 @@ public class ANTLRParser extends Parser {
 
     protected DFA35 dfa35 = new DFA35(this);
     protected DFA44 dfa44 = new DFA44(this);
-    protected DFA63 dfa63 = new DFA63(this);
-    protected DFA66 dfa66 = new DFA66(this);
-    protected DFA73 dfa73 = new DFA73(this);
+    protected DFA62 dfa62 = new DFA62(this);
+    protected DFA65 dfa65 = new DFA65(this);
+    protected DFA72 dfa72 = new DFA72(this);
     static final String DFA35_eotS =
         "\12\uffff";
     static final String DFA35_eofS =
@@ -9833,7 +9797,7 @@ public class ANTLRParser extends Parser {
     static final String DFA44_acceptS =
         "\5\uffff\1\4\1\6\1\uffff\1\5\1\1\12\uffff\1\3\1\2";
     static final String DFA44_specialS =
-        "\14\uffff\1\7\1\6\1\5\1\3\1\4\1\1\1\2\1\0\2\uffff}>";
+        "\14\uffff\1\4\1\5\1\1\1\7\1\6\1\3\1\0\1\2\2\uffff}>";
     static final String[] DFA44_transitionS = {
             "\1\4\22\uffff\1\5\5\uffff\1\6\1\uffff\1\2\1\1\3\uffff\1\3",
             "\1\10\11\uffff\1\10\1\uffff\1\10\22\uffff\1\10\3\uffff\3\10"+
@@ -9849,13 +9813,13 @@ public class ANTLRParser extends Parser {
             "",
             "",
             "\1\10\13\uffff\1\10\22\uffff\1\10\3\uffff\3\10\1\uffff\1\10"+
-            "\2\uffff\4\10\1\uffff\2\10\1\uffff\1\17\2\uffff\2\10\1\uffff"+
-            "\1\10\1\uffff\1\15\1\14\3\uffff\1\16",
+            "\2\uffff\4\10\1\uffff\2\10\1\uffff\1\16\2\uffff\2\10\1\uffff"+
+            "\1\10\1\uffff\1\14\1\17\3\uffff\1\15",
             "",
             "",
             "\1\5\13\uffff\1\5\22\uffff\1\5\3\uffff\3\5\1\uffff\1\5\2\uffff"+
-            "\4\5\1\uffff\2\5\1\uffff\1\23\2\uffff\2\5\1\uffff\1\5\1\uffff"+
-            "\1\21\1\20\3\uffff\1\22",
+            "\4\5\1\uffff\2\5\1\uffff\1\22\2\uffff\2\5\1\uffff\1\5\1\uffff"+
+            "\1\20\1\23\3\uffff\1\21",
             "\1\24\7\uffff\1\24\1\25\3\uffff\1\24",
             "\1\uffff",
             "\1\uffff",
@@ -9906,44 +9870,6 @@ public class ANTLRParser extends Parser {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA44_19 = input.LA(1);
-
-                         
-                        int index44_19 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((
-                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
-                        	        input.LT(2).getCharPositionInLine() &&
-                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
-                        	    )) ) {s = 20;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index44_19);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
-                        int LA44_17 = input.LA(1);
-
-                         
-                        int index44_17 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((
-                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
-                        	        input.LT(2).getCharPositionInLine() &&
-                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
-                        	    )) ) {s = 20;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index44_17);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 2 : 
                         int LA44_18 = input.LA(1);
 
                          
@@ -9962,45 +9888,7 @@ public class ANTLRParser extends Parser {
                         input.seek(index44_18);
                         if ( s>=0 ) return s;
                         break;
-                    case 3 : 
-                        int LA44_15 = input.LA(1);
-
-                         
-                        int index44_15 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((
-                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
-                        	        input.LT(2).getCharPositionInLine() &&
-                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
-                        	    )) ) {s = 20;}
-
-                        else if ( (true) ) {s = 8;}
-
-                         
-                        input.seek(index44_15);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
-                        int LA44_16 = input.LA(1);
-
-                         
-                        int index44_16 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((
-                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
-                        	        input.LT(2).getCharPositionInLine() &&
-                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
-                        	    )) ) {s = 21;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index44_16);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 5 : 
+                    case 1 : 
                         int LA44_14 = input.LA(1);
 
                          
@@ -10019,7 +9907,64 @@ public class ANTLRParser extends Parser {
                         input.seek(index44_14);
                         if ( s>=0 ) return s;
                         break;
-                    case 6 : 
+                    case 2 : 
+                        int LA44_19 = input.LA(1);
+
+                         
+                        int index44_19 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((
+                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
+                        	        input.LT(2).getCharPositionInLine() &&
+                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
+                        	    )) ) {s = 21;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index44_19);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 3 : 
+                        int LA44_17 = input.LA(1);
+
+                         
+                        int index44_17 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((
+                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
+                        	        input.LT(2).getCharPositionInLine() &&
+                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
+                        	    )) ) {s = 20;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index44_17);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 4 : 
+                        int LA44_12 = input.LA(1);
+
+                         
+                        int index44_12 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((
+                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
+                        	        input.LT(2).getCharPositionInLine() &&
+                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
+                        	    )) ) {s = 20;}
+
+                        else if ( (true) ) {s = 8;}
+
+                         
+                        input.seek(index44_12);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 5 : 
                         int LA44_13 = input.LA(1);
 
                          
@@ -10038,11 +9983,30 @@ public class ANTLRParser extends Parser {
                         input.seek(index44_13);
                         if ( s>=0 ) return s;
                         break;
-                    case 7 : 
-                        int LA44_12 = input.LA(1);
+                    case 6 : 
+                        int LA44_16 = input.LA(1);
 
                          
-                        int index44_12 = input.index();
+                        int index44_16 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((
+                        	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
+                        	        input.LT(2).getCharPositionInLine() &&
+                        	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
+                        	    )) ) {s = 20;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index44_16);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 7 : 
+                        int LA44_15 = input.LA(1);
+
+                         
+                        int index44_15 = input.index();
                         input.rewind();
                         s = -1;
                         if ( ((
@@ -10054,7 +10018,7 @@ public class ANTLRParser extends Parser {
                         else if ( (true) ) {s = 8;}
 
                          
-                        input.seek(index44_12);
+                        input.seek(index44_15);
                         if ( s>=0 ) return s;
                         break;
             }
@@ -10065,19 +10029,19 @@ public class ANTLRParser extends Parser {
             throw nvae;
         }
     }
-    static final String DFA63_eotS =
+    static final String DFA62_eotS =
         "\16\uffff";
-    static final String DFA63_eofS =
+    static final String DFA62_eofS =
         "\1\10\1\uffff\2\6\12\uffff";
-    static final String DFA63_minS =
+    static final String DFA62_minS =
         "\1\20\1\uffff\1\20\1\16\1\20\1\0\3\uffff\3\20\1\16\1\50";
-    static final String DFA63_maxS =
+    static final String DFA62_maxS =
         "\1\103\1\uffff\3\103\1\0\3\uffff\4\103\1\61";
-    static final String DFA63_acceptS =
+    static final String DFA62_acceptS =
         "\1\uffff\1\1\4\uffff\1\2\1\3\1\4\5\uffff";
-    static final String DFA63_specialS =
+    static final String DFA62_specialS =
         "\5\uffff\1\0\10\uffff}>";
-    static final String[] DFA63_transitionS = {
+    static final String[] DFA62_transitionS = {
             "\1\5\22\uffff\1\1\3\uffff\1\10\1\4\1\10\11\uffff\1\10\1\uffff"+
             "\1\6\2\uffff\1\7\1\10\1\6\3\uffff\1\3\1\2\3\uffff\1\6",
             "",
@@ -10103,47 +10067,47 @@ public class ANTLRParser extends Parser {
             "\1\1\5\uffff\1\6\1\uffff\2\6"
     };
 
-    static final short[] DFA63_eot = DFA.unpackEncodedString(DFA63_eotS);
-    static final short[] DFA63_eof = DFA.unpackEncodedString(DFA63_eofS);
-    static final char[] DFA63_min = DFA.unpackEncodedStringToUnsignedChars(DFA63_minS);
-    static final char[] DFA63_max = DFA.unpackEncodedStringToUnsignedChars(DFA63_maxS);
-    static final short[] DFA63_accept = DFA.unpackEncodedString(DFA63_acceptS);
-    static final short[] DFA63_special = DFA.unpackEncodedString(DFA63_specialS);
-    static final short[][] DFA63_transition;
+    static final short[] DFA62_eot = DFA.unpackEncodedString(DFA62_eotS);
+    static final short[] DFA62_eof = DFA.unpackEncodedString(DFA62_eofS);
+    static final char[] DFA62_min = DFA.unpackEncodedStringToUnsignedChars(DFA62_minS);
+    static final char[] DFA62_max = DFA.unpackEncodedStringToUnsignedChars(DFA62_maxS);
+    static final short[] DFA62_accept = DFA.unpackEncodedString(DFA62_acceptS);
+    static final short[] DFA62_special = DFA.unpackEncodedString(DFA62_specialS);
+    static final short[][] DFA62_transition;
 
     static {
-        int numStates = DFA63_transitionS.length;
-        DFA63_transition = new short[numStates][];
+        int numStates = DFA62_transitionS.length;
+        DFA62_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA63_transition[i] = DFA.unpackEncodedString(DFA63_transitionS[i]);
+            DFA62_transition[i] = DFA.unpackEncodedString(DFA62_transitionS[i]);
         }
     }
 
-    class DFA63 extends DFA {
+    class DFA62 extends DFA {
 
-        public DFA63(BaseRecognizer recognizer) {
+        public DFA62(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 63;
-            this.eot = DFA63_eot;
-            this.eof = DFA63_eof;
-            this.min = DFA63_min;
-            this.max = DFA63_max;
-            this.accept = DFA63_accept;
-            this.special = DFA63_special;
-            this.transition = DFA63_transition;
+            this.decisionNumber = 62;
+            this.eot = DFA62_eot;
+            this.eof = DFA62_eof;
+            this.min = DFA62_min;
+            this.max = DFA62_max;
+            this.accept = DFA62_accept;
+            this.special = DFA62_special;
+            this.transition = DFA62_transition;
         }
         public String getDescription() {
-            return "812:1: rewriteAlt returns [boolean isTemplate] options {backtrack=true; } : ( rewriteTemplate | rewriteTreeAlt | ETC | -> EPSILON );";
+            return "790:1: rewriteAlt returns [boolean isTemplate] options {backtrack=true; } : ( rewriteTemplate | rewriteTreeAlt | ETC | -> EPSILON );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TokenStream input = (TokenStream)_input;
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA63_5 = input.LA(1);
+                        int LA62_5 = input.LA(1);
 
                          
-                        int index63_5 = input.index();
+                        int index62_5 = input.index();
                         input.rewind();
                         s = -1;
                         if ( (synpred1_ANTLRParser()) ) {s = 1;}
@@ -10151,88 +10115,88 @@ public class ANTLRParser extends Parser {
                         else if ( (synpred2_ANTLRParser()) ) {s = 6;}
 
                          
-                        input.seek(index63_5);
+                        input.seek(index62_5);
                         if ( s>=0 ) return s;
                         break;
             }
             if (state.backtracking>0) {state.failed=true; return -1;}
             NoViableAltException nvae =
-                new NoViableAltException(getDescription(), 63, _s, input);
+                new NoViableAltException(getDescription(), 62, _s, input);
             error(nvae);
             throw nvae;
         }
     }
-    static final String DFA66_eotS =
+    static final String DFA65_eotS =
         "\124\uffff";
-    static final String DFA66_eofS =
-        "\1\uffff\3\13\1\uffff\1\13\3\uffff\1\13\3\uffff\3\13\10\uffff\1"+
-        "\13\4\uffff\1\13\66\uffff";
-    static final String DFA66_minS =
+    static final String DFA65_eofS =
+        "\1\uffff\3\12\1\uffff\1\12\3\uffff\1\12\3\uffff\3\12\11\uffff\1"+
+        "\12\3\uffff\1\12\66\uffff";
+    static final String DFA65_minS =
         "\1\20\1\16\2\20\1\43\1\20\2\uffff\1\43\1\20\2\uffff\1\43\3\20\6"+
-        "\46\2\43\1\16\4\43\1\20\24\46\6\43\24\46\2\43\6\46";
-    static final String DFA66_maxS =
-        "\4\103\1\77\1\103\2\uffff\1\77\1\103\2\uffff\1\77\3\103\6\66\2\77"+
-        "\3\103\2\77\1\103\11\66\1\54\3\66\1\54\6\66\1\77\1\103\3\77\1\103"+
-        "\6\66\1\54\14\66\1\54\2\77\6\66";
-    static final String DFA66_acceptS =
-        "\6\uffff\1\3\1\4\2\uffff\1\2\1\1\110\uffff";
-    static final String DFA66_specialS =
+        "\46\3\43\1\16\3\43\1\20\24\46\6\43\24\46\2\43\6\46";
+    static final String DFA65_maxS =
+        "\4\103\1\77\1\103\2\uffff\1\77\1\103\2\uffff\1\77\3\103\6\66\1\103"+
+        "\2\77\2\103\2\77\1\103\3\66\1\54\11\66\1\54\6\66\1\77\1\103\2\77"+
+        "\1\103\1\77\6\66\1\54\11\66\1\54\3\66\2\77\6\66";
+    static final String DFA65_acceptS =
+        "\6\uffff\1\3\1\4\2\uffff\1\1\1\2\110\uffff";
+    static final String DFA65_specialS =
         "\124\uffff}>";
-    static final String[] DFA66_transitionS = {
+    static final String[] DFA65_transitionS = {
             "\1\5\27\uffff\1\7\14\uffff\1\4\4\uffff\1\6\3\uffff\1\1\1\2\3"+
             "\uffff\1\3",
-            "\1\11\1\uffff\1\13\26\uffff\3\13\1\uffff\1\10\2\uffff\1\12"+
-            "\1\uffff\2\12\1\uffff\1\13\1\uffff\1\13\3\uffff\2\13\3\uffff"+
-            "\2\13\3\uffff\1\13",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
-            "\1\13\26\uffff\3\13\1\uffff\1\14\2\uffff\1\12\1\uffff\2\12"+
-            "\1\uffff\1\13\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff"+
-            "\1\13",
+            "\1\11\1\uffff\1\12\26\uffff\3\12\1\uffff\1\10\2\uffff\1\13"+
+            "\1\uffff\2\13\1\uffff\1\12\1\uffff\1\12\3\uffff\2\12\3\uffff"+
+            "\2\12\3\uffff\1\12",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
+            "\1\12\26\uffff\3\12\1\uffff\1\14\2\uffff\1\13\1\uffff\2\13"+
+            "\1\uffff\1\12\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff"+
+            "\1\12",
             "\1\17\32\uffff\1\16\1\15",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "",
             "",
             "\1\22\32\uffff\1\21\1\20",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
             "",
             "",
             "\1\25\32\uffff\1\24\1\23",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
-            "\1\27\5\uffff\1\30\1\31\10\uffff\1\26",
-            "\1\27\5\uffff\1\30\1\31\10\uffff\1\26",
-            "\1\27\5\uffff\1\30\1\31\10\uffff\1\26",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
+            "\1\30\5\uffff\1\31\1\26\10\uffff\1\27",
+            "\1\30\5\uffff\1\31\1\26\10\uffff\1\27",
+            "\1\30\5\uffff\1\31\1\26\10\uffff\1\27",
             "\1\34\5\uffff\1\35\1\32\10\uffff\1\33",
             "\1\34\5\uffff\1\35\1\32\10\uffff\1\33",
             "\1\34\5\uffff\1\35\1\32\10\uffff\1\33",
-            "\1\40\32\uffff\1\37\1\36",
-            "\1\43\32\uffff\1\42\1\41",
-            "\1\11\1\uffff\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12"+
-            "\1\uffff\1\13\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff"+
-            "\1\13",
-            "\1\46\32\uffff\1\45\1\44\3\uffff\1\47",
+            "\1\40\32\uffff\1\37\1\36\3\uffff\1\41",
+            "\1\44\32\uffff\1\43\1\42",
+            "\1\47\32\uffff\1\46\1\45",
+            "\1\11\1\uffff\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13"+
+            "\1\uffff\1\12\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff"+
+            "\1\12",
             "\1\52\32\uffff\1\51\1\50\3\uffff\1\53",
             "\1\56\32\uffff\1\55\1\54",
             "\1\61\32\uffff\1\60\1\57",
-            "\1\13\26\uffff\3\13\4\uffff\1\12\1\uffff\2\12\1\uffff\1\13"+
-            "\1\uffff\1\13\3\uffff\2\13\3\uffff\2\13\3\uffff\1\13",
-            "\1\27\5\uffff\1\30\11\uffff\1\26",
-            "\1\27\5\uffff\1\30\11\uffff\1\26",
-            "\1\27\5\uffff\1\30\11\uffff\1\26",
-            "\1\27\5\uffff\1\30\1\63\10\uffff\1\62",
-            "\1\27\5\uffff\1\30\1\63\10\uffff\1\62",
-            "\1\27\5\uffff\1\30\1\63\10\uffff\1\62",
-            "\1\27\5\uffff\1\30\11\uffff\1\64",
-            "\1\27\5\uffff\1\30\11\uffff\1\64",
-            "\1\27\5\uffff\1\30\11\uffff\1\64",
-            "\1\27\5\uffff\1\30",
+            "\1\12\26\uffff\3\12\4\uffff\1\13\1\uffff\2\13\1\uffff\1\12"+
+            "\1\uffff\1\12\3\uffff\2\12\3\uffff\2\12\3\uffff\1\12",
+            "\1\30\5\uffff\1\31\11\uffff\1\62",
+            "\1\30\5\uffff\1\31\11\uffff\1\62",
+            "\1\30\5\uffff\1\31\11\uffff\1\62",
+            "\1\30\5\uffff\1\31",
+            "\1\30\5\uffff\1\31\11\uffff\1\27",
+            "\1\30\5\uffff\1\31\11\uffff\1\27",
+            "\1\30\5\uffff\1\31\11\uffff\1\27",
+            "\1\30\5\uffff\1\31\1\63\10\uffff\1\64",
+            "\1\30\5\uffff\1\31\1\63\10\uffff\1\64",
+            "\1\30\5\uffff\1\31\1\63\10\uffff\1\64",
             "\1\34\5\uffff\1\35\11\uffff\1\65",
             "\1\34\5\uffff\1\35\11\uffff\1\65",
             "\1\34\5\uffff\1\35\11\uffff\1\65",
@@ -10240,93 +10204,93 @@ public class ANTLRParser extends Parser {
             "\1\34\5\uffff\1\35\11\uffff\1\33",
             "\1\34\5\uffff\1\35\11\uffff\1\33",
             "\1\34\5\uffff\1\35\11\uffff\1\33",
-            "\1\34\5\uffff\1\35\1\67\10\uffff\1\66",
-            "\1\34\5\uffff\1\35\1\67\10\uffff\1\66",
-            "\1\34\5\uffff\1\35\1\67\10\uffff\1\66",
+            "\1\34\5\uffff\1\35\1\66\10\uffff\1\67",
+            "\1\34\5\uffff\1\35\1\66\10\uffff\1\67",
+            "\1\34\5\uffff\1\35\1\66\10\uffff\1\67",
             "\1\72\32\uffff\1\71\1\70",
             "\1\75\32\uffff\1\74\1\73\3\uffff\1\76",
             "\1\101\32\uffff\1\100\1\77",
             "\1\104\32\uffff\1\103\1\102",
-            "\1\107\32\uffff\1\106\1\105",
-            "\1\112\32\uffff\1\111\1\110\3\uffff\1\113",
-            "\1\27\5\uffff\1\30\11\uffff\1\62",
-            "\1\27\5\uffff\1\30\11\uffff\1\62",
-            "\1\27\5\uffff\1\30\11\uffff\1\62",
-            "\1\27\5\uffff\1\30\11\uffff\1\114",
-            "\1\27\5\uffff\1\30\11\uffff\1\114",
-            "\1\27\5\uffff\1\30\11\uffff\1\114",
-            "\1\27\5\uffff\1\30",
-            "\1\27\5\uffff\1\30\11\uffff\1\64",
-            "\1\27\5\uffff\1\30\11\uffff\1\64",
-            "\1\27\5\uffff\1\30\11\uffff\1\64",
+            "\1\107\32\uffff\1\106\1\105\3\uffff\1\110",
+            "\1\113\32\uffff\1\112\1\111",
+            "\1\30\5\uffff\1\31\11\uffff\1\62",
+            "\1\30\5\uffff\1\31\11\uffff\1\62",
+            "\1\30\5\uffff\1\31\11\uffff\1\62",
+            "\1\30\5\uffff\1\31\11\uffff\1\114",
+            "\1\30\5\uffff\1\31\11\uffff\1\114",
+            "\1\30\5\uffff\1\31\11\uffff\1\114",
+            "\1\30\5\uffff\1\31",
+            "\1\30\5\uffff\1\31\11\uffff\1\64",
+            "\1\30\5\uffff\1\31\11\uffff\1\64",
+            "\1\30\5\uffff\1\31\11\uffff\1\64",
             "\1\34\5\uffff\1\35\11\uffff\1\65",
             "\1\34\5\uffff\1\35\11\uffff\1\65",
             "\1\34\5\uffff\1\35\11\uffff\1\65",
-            "\1\34\5\uffff\1\35\11\uffff\1\66",
-            "\1\34\5\uffff\1\35\11\uffff\1\66",
-            "\1\34\5\uffff\1\35\11\uffff\1\66",
             "\1\34\5\uffff\1\35\11\uffff\1\115",
             "\1\34\5\uffff\1\35\11\uffff\1\115",
             "\1\34\5\uffff\1\35\11\uffff\1\115",
             "\1\34\5\uffff\1\35",
+            "\1\34\5\uffff\1\35\11\uffff\1\67",
+            "\1\34\5\uffff\1\35\11\uffff\1\67",
+            "\1\34\5\uffff\1\35\11\uffff\1\67",
             "\1\120\32\uffff\1\117\1\116",
             "\1\123\32\uffff\1\122\1\121",
-            "\1\27\5\uffff\1\30\11\uffff\1\114",
-            "\1\27\5\uffff\1\30\11\uffff\1\114",
-            "\1\27\5\uffff\1\30\11\uffff\1\114",
+            "\1\30\5\uffff\1\31\11\uffff\1\114",
+            "\1\30\5\uffff\1\31\11\uffff\1\114",
+            "\1\30\5\uffff\1\31\11\uffff\1\114",
             "\1\34\5\uffff\1\35\11\uffff\1\115",
             "\1\34\5\uffff\1\35\11\uffff\1\115",
             "\1\34\5\uffff\1\35\11\uffff\1\115"
     };
 
-    static final short[] DFA66_eot = DFA.unpackEncodedString(DFA66_eotS);
-    static final short[] DFA66_eof = DFA.unpackEncodedString(DFA66_eofS);
-    static final char[] DFA66_min = DFA.unpackEncodedStringToUnsignedChars(DFA66_minS);
-    static final char[] DFA66_max = DFA.unpackEncodedStringToUnsignedChars(DFA66_maxS);
-    static final short[] DFA66_accept = DFA.unpackEncodedString(DFA66_acceptS);
-    static final short[] DFA66_special = DFA.unpackEncodedString(DFA66_specialS);
-    static final short[][] DFA66_transition;
+    static final short[] DFA65_eot = DFA.unpackEncodedString(DFA65_eotS);
+    static final short[] DFA65_eof = DFA.unpackEncodedString(DFA65_eofS);
+    static final char[] DFA65_min = DFA.unpackEncodedStringToUnsignedChars(DFA65_minS);
+    static final char[] DFA65_max = DFA.unpackEncodedStringToUnsignedChars(DFA65_maxS);
+    static final short[] DFA65_accept = DFA.unpackEncodedString(DFA65_acceptS);
+    static final short[] DFA65_special = DFA.unpackEncodedString(DFA65_specialS);
+    static final short[][] DFA65_transition;
 
     static {
-        int numStates = DFA66_transitionS.length;
-        DFA66_transition = new short[numStates][];
+        int numStates = DFA65_transitionS.length;
+        DFA65_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA66_transition[i] = DFA.unpackEncodedString(DFA66_transitionS[i]);
+            DFA65_transition[i] = DFA.unpackEncodedString(DFA65_transitionS[i]);
         }
     }
 
-    class DFA66 extends DFA {
+    class DFA65 extends DFA {
 
-        public DFA66(BaseRecognizer recognizer) {
+        public DFA65(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 66;
-            this.eot = DFA66_eot;
-            this.eof = DFA66_eof;
-            this.min = DFA66_min;
-            this.max = DFA66_max;
-            this.accept = DFA66_accept;
-            this.special = DFA66_special;
-            this.transition = DFA66_transition;
+            this.decisionNumber = 65;
+            this.eot = DFA65_eot;
+            this.eof = DFA65_eof;
+            this.min = DFA65_min;
+            this.max = DFA65_max;
+            this.accept = DFA65_accept;
+            this.special = DFA65_special;
+            this.transition = DFA65_transition;
         }
         public String getDescription() {
-            return "832:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf );";
+            return "810:1: rewriteTreeElement : ( rewriteTreeAtom | rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTreeAtom ) ) ) | rewriteTree ( ebnfSuffix -> ^( ebnfSuffix ^( REWRITE_BLOCK ^( ALT rewriteTree ) ) ) | -> rewriteTree ) | rewriteTreeEbnf );";
         }
     }
-    static final String DFA73_eotS =
+    static final String DFA72_eotS =
         "\23\uffff";
-    static final String DFA73_eofS =
+    static final String DFA72_eofS =
         "\11\uffff\1\2\11\uffff";
-    static final String DFA73_minS =
+    static final String DFA72_minS =
         "\1\20\1\50\3\uffff\1\43\3\55\1\12\1\20\1\uffff\1\46\1\43\3\55\1"+
         "\20\1\46";
-    static final String DFA73_maxS =
+    static final String DFA72_maxS =
         "\1\77\1\50\3\uffff\1\77\3\55\1\71\1\20\1\uffff\1\51\1\77\3\55\1"+
         "\20\1\51";
-    static final String DFA73_acceptS =
+    static final String DFA72_acceptS =
         "\2\uffff\1\2\1\3\1\4\6\uffff\1\1\7\uffff";
-    static final String DFA73_specialS =
+    static final String DFA72_specialS =
         "\23\uffff}>";
-    static final String[] DFA73_transitionS = {
+    static final String[] DFA72_transitionS = {
             "\1\4\22\uffff\1\1\4\uffff\1\3\25\uffff\2\2",
             "\1\5",
             "",
@@ -10348,37 +10312,37 @@ public class ANTLRParser extends Parser {
             "\1\15\2\uffff\1\11"
     };
 
-    static final short[] DFA73_eot = DFA.unpackEncodedString(DFA73_eotS);
-    static final short[] DFA73_eof = DFA.unpackEncodedString(DFA73_eofS);
-    static final char[] DFA73_min = DFA.unpackEncodedStringToUnsignedChars(DFA73_minS);
-    static final char[] DFA73_max = DFA.unpackEncodedStringToUnsignedChars(DFA73_maxS);
-    static final short[] DFA73_accept = DFA.unpackEncodedString(DFA73_acceptS);
-    static final short[] DFA73_special = DFA.unpackEncodedString(DFA73_specialS);
-    static final short[][] DFA73_transition;
+    static final short[] DFA72_eot = DFA.unpackEncodedString(DFA72_eotS);
+    static final short[] DFA72_eof = DFA.unpackEncodedString(DFA72_eofS);
+    static final char[] DFA72_min = DFA.unpackEncodedStringToUnsignedChars(DFA72_minS);
+    static final char[] DFA72_max = DFA.unpackEncodedStringToUnsignedChars(DFA72_maxS);
+    static final short[] DFA72_accept = DFA.unpackEncodedString(DFA72_acceptS);
+    static final short[] DFA72_special = DFA.unpackEncodedString(DFA72_specialS);
+    static final short[][] DFA72_transition;
 
     static {
-        int numStates = DFA73_transitionS.length;
-        DFA73_transition = new short[numStates][];
+        int numStates = DFA72_transitionS.length;
+        DFA72_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA73_transition[i] = DFA.unpackEncodedString(DFA73_transitionS[i]);
+            DFA72_transition[i] = DFA.unpackEncodedString(DFA72_transitionS[i]);
         }
     }
 
-    class DFA73 extends DFA {
+    class DFA72 extends DFA {
 
-        public DFA73(BaseRecognizer recognizer) {
+        public DFA72(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 73;
-            this.eot = DFA73_eot;
-            this.eof = DFA73_eof;
-            this.min = DFA73_min;
-            this.max = DFA73_max;
-            this.accept = DFA73_accept;
-            this.special = DFA73_special;
-            this.transition = DFA73_transition;
+            this.decisionNumber = 72;
+            this.eot = DFA72_eot;
+            this.eof = DFA72_eof;
+            this.min = DFA72_min;
+            this.max = DFA72_max;
+            this.accept = DFA72_accept;
+            this.special = DFA72_special;
+            this.transition = DFA72_transition;
         }
         public String getDescription() {
-            return "867:1: rewriteTemplate : ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );";
+            return "845:1: rewriteTemplate : ( TEMPLATE LPAREN rewriteTemplateArgs RPAREN (str= DOUBLE_QUOTE_STRING_LITERAL | str= DOUBLE_ANGLE_STRING_LITERAL ) -> ^( TEMPLATE[$TEMPLATE,\"TEMPLATE\"] ( rewriteTemplateArgs )? $str) | rewriteTemplateRef | rewriteIndirectTemplateHead | ACTION );";
         }
     }
  
@@ -10433,217 +10397,216 @@ public class ANTLRParser extends Parser {
     public static final BitSet FOLLOW_SCOPE_in_attrScope1497 = new BitSet(new long[]{0xC000000800000000L});
     public static final BitSet FOLLOW_id_in_attrScope1499 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_attrScope1501 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_AT_in_action1527 = new BitSet(new long[]{0xC000000803000000L});
-    public static final BitSet FOLLOW_actionScopeName_in_action1530 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_COLONCOLON_in_action1532 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_action1536 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_action1538 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_actionScopeName1566 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LEXER_in_actionScopeName1571 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PARSER_in_actionScopeName1586 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule_in_rules1605 = new BitSet(new long[]{0xC000000870800042L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_rule1684 = new BitSet(new long[]{0xC000000870800000L});
-    public static final BitSet FOLLOW_ruleModifiers_in_rule1728 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_rule1751 = new BitSet(new long[]{0x0800001180284000L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_rule1784 = new BitSet(new long[]{0x0800001180280000L});
-    public static final BitSet FOLLOW_ruleReturns_in_rule1794 = new BitSet(new long[]{0x0800001100280000L});
-    public static final BitSet FOLLOW_rulePrequel_in_rule1832 = new BitSet(new long[]{0x0800001100280000L});
-    public static final BitSet FOLLOW_COLON_in_rule1848 = new BitSet(new long[]{0xD648010800010010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_altListAsBlock_in_rule1877 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_SEMI_in_rule1892 = new BitSet(new long[]{0x0000000600000000L});
-    public static final BitSet FOLLOW_exceptionGroup_in_rule1901 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_exceptionHandler_in_exceptionGroup1993 = new BitSet(new long[]{0x0000000600000002L});
-    public static final BitSet FOLLOW_finallyClause_in_exceptionGroup1996 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CATCH_in_exceptionHandler2013 = new BitSet(new long[]{0x0000000000004000L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_exceptionHandler2015 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_exceptionHandler2017 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FINALLY_in_finallyClause2040 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_finallyClause2042 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_throwsSpec_in_rulePrequel2069 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleScopeSpec_in_rulePrequel2077 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_optionsSpec_in_rulePrequel2085 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleAction_in_rulePrequel2093 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RETURNS_in_ruleReturns2113 = new BitSet(new long[]{0x0000000000004000L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns2116 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_THROWS_in_throwsSpec2141 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_qid_in_throwsSpec2143 = new BitSet(new long[]{0x0000004000000002L});
-    public static final BitSet FOLLOW_COMMA_in_throwsSpec2146 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_qid_in_throwsSpec2148 = new BitSet(new long[]{0x0000004000000002L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2179 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec2181 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2194 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_ruleScopeSpec2196 = new BitSet(new long[]{0x000000C000000000L});
-    public static final BitSet FOLLOW_COMMA_in_ruleScopeSpec2199 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_ruleScopeSpec2201 = new BitSet(new long[]{0x000000C000000000L});
-    public static final BitSet FOLLOW_SEMI_in_ruleScopeSpec2205 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_AT_in_ruleAction2235 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_ruleAction2237 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_ruleAction2239 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleModifier_in_ruleModifiers2277 = new BitSet(new long[]{0x0000000070800002L});
+    public static final BitSet FOLLOW_AT_in_action1530 = new BitSet(new long[]{0xC000000803000000L});
+    public static final BitSet FOLLOW_actionScopeName_in_action1533 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_COLONCOLON_in_action1535 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_action1539 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_action1541 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_actionScopeName1572 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LEXER_in_actionScopeName1577 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PARSER_in_actionScopeName1592 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rule_in_rules1611 = new BitSet(new long[]{0xC000000870800042L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_rule1690 = new BitSet(new long[]{0xC000000870800000L});
+    public static final BitSet FOLLOW_ruleModifiers_in_rule1734 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_rule1757 = new BitSet(new long[]{0x0800001180284000L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_rule1790 = new BitSet(new long[]{0x0800001180280000L});
+    public static final BitSet FOLLOW_ruleReturns_in_rule1800 = new BitSet(new long[]{0x0800001100280000L});
+    public static final BitSet FOLLOW_rulePrequel_in_rule1838 = new BitSet(new long[]{0x0800001100280000L});
+    public static final BitSet FOLLOW_COLON_in_rule1854 = new BitSet(new long[]{0xD648010800010010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_altListAsBlock_in_rule1883 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_SEMI_in_rule1898 = new BitSet(new long[]{0x0000000600000000L});
+    public static final BitSet FOLLOW_exceptionGroup_in_rule1907 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_exceptionHandler_in_exceptionGroup1999 = new BitSet(new long[]{0x0000000600000002L});
+    public static final BitSet FOLLOW_finallyClause_in_exceptionGroup2002 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CATCH_in_exceptionHandler2019 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_exceptionHandler2021 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_exceptionHandler2023 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FINALLY_in_finallyClause2049 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_finallyClause2051 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_throwsSpec_in_rulePrequel2081 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleScopeSpec_in_rulePrequel2089 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_optionsSpec_in_rulePrequel2097 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleAction_in_rulePrequel2105 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RETURNS_in_ruleReturns2125 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleReturns2128 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_THROWS_in_throwsSpec2153 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_qid_in_throwsSpec2155 = new BitSet(new long[]{0x0000004000000002L});
+    public static final BitSet FOLLOW_COMMA_in_throwsSpec2158 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_qid_in_throwsSpec2160 = new BitSet(new long[]{0x0000004000000002L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2191 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec2193 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec2206 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_ruleScopeSpec2208 = new BitSet(new long[]{0x000000C000000000L});
+    public static final BitSet FOLLOW_COMMA_in_ruleScopeSpec2211 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_ruleScopeSpec2213 = new BitSet(new long[]{0x000000C000000000L});
+    public static final BitSet FOLLOW_SEMI_in_ruleScopeSpec2217 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_AT_in_ruleAction2247 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_ruleAction2249 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_ruleAction2251 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleModifier_in_ruleModifiers2292 = new BitSet(new long[]{0x0000000070800002L});
     public static final BitSet FOLLOW_set_in_ruleModifier0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_alternative_in_altList2353 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_OR_in_altList2356 = new BitSet(new long[]{0xD648010800010010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_alternative_in_altList2358 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_altList_in_altListAsBlock2388 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_elements_in_alternative2418 = new BitSet(new long[]{0x0200000000000002L});
-    public static final BitSet FOLLOW_rewrite_in_alternative2427 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewrite_in_alternative2465 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_element_in_elements2518 = new BitSet(new long[]{0xD440010800010012L,0x0000000000000008L});
-    public static final BitSet FOLLOW_labeledElement_in_element2545 = new BitSet(new long[]{0x0003400000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_element2551 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_atom_in_element2593 = new BitSet(new long[]{0x0003400000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_element2599 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnf_in_element2642 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_element2649 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEMPRED_in_element2656 = new BitSet(new long[]{0x0000040000000002L});
-    public static final BitSet FOLLOW_IMPLIES_in_element2662 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_treeSpec_in_element2690 = new BitSet(new long[]{0x0003400000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_element2696 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_labeledElement2745 = new BitSet(new long[]{0x0004200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement2748 = new BitSet(new long[]{0xD040010800000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement2751 = new BitSet(new long[]{0xD040010800000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_atom_in_labeledElement2756 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_labeledElement2758 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec2780 = new BitSet(new long[]{0xD440010800010010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_element_in_treeSpec2821 = new BitSet(new long[]{0xD440010800010010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_element_in_treeSpec2852 = new BitSet(new long[]{0xD440030800010010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_RPAREN_in_treeSpec2861 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_ebnf2895 = new BitSet(new long[]{0x0013C40000000002L});
-    public static final BitSet FOLLOW_blockSuffixe_in_ebnf2930 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_blockSuffixe2981 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_blockSuffixe2995 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPLIES_in_blockSuffixe3003 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_blockSuffixe3014 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QUESTION_in_ebnfSuffix3033 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STAR_in_ebnfSuffix3045 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUS_in_ebnfSuffix3060 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_range_in_atom3077 = new BitSet(new long[]{0x0010800000000002L});
-    public static final BitSet FOLLOW_ROOT_in_atom3080 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_atom3085 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_atom3132 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_DOT_in_atom3134 = new BitSet(new long[]{0x8000000000000000L});
-    public static final BitSet FOLLOW_ruleref_in_atom3136 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_atom3170 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_DOT_in_atom3172 = new BitSet(new long[]{0x4040000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_terminal_in_atom3174 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_terminal_in_atom3199 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_atom3209 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_notSet_in_atom3217 = new BitSet(new long[]{0x0010800000000002L});
-    public static final BitSet FOLLOW_ROOT_in_atom3220 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_atom3223 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet3256 = new BitSet(new long[]{0x4000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_notTerminal_in_notSet3258 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet3274 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_block_in_notSet3276 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_alternative_in_altList2368 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_OR_in_altList2371 = new BitSet(new long[]{0xD648010800010010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_alternative_in_altList2373 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_altList_in_altListAsBlock2403 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_elements_in_alternative2433 = new BitSet(new long[]{0x0200000000000002L});
+    public static final BitSet FOLLOW_rewrite_in_alternative2442 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewrite_in_alternative2480 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_element_in_elements2533 = new BitSet(new long[]{0xD440010800010012L,0x0000000000000008L});
+    public static final BitSet FOLLOW_labeledElement_in_element2560 = new BitSet(new long[]{0x0003400000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_element2566 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_atom_in_element2608 = new BitSet(new long[]{0x0003400000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_element2614 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnf_in_element2657 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_element2664 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEMPRED_in_element2674 = new BitSet(new long[]{0x0000040000000002L});
+    public static final BitSet FOLLOW_IMPLIES_in_element2680 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_treeSpec_in_element2708 = new BitSet(new long[]{0x0003400000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_element2714 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_labeledElement2763 = new BitSet(new long[]{0x0004200000000000L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement2766 = new BitSet(new long[]{0xD040010800000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement2769 = new BitSet(new long[]{0xD040010800000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_atom_in_labeledElement2774 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_labeledElement2776 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec2798 = new BitSet(new long[]{0xD440010800010010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_element_in_treeSpec2839 = new BitSet(new long[]{0xD440010800010010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_element_in_treeSpec2870 = new BitSet(new long[]{0xD440030800010010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_RPAREN_in_treeSpec2879 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_ebnf2913 = new BitSet(new long[]{0x0013C40000000002L});
+    public static final BitSet FOLLOW_blockSuffixe_in_ebnf2948 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_blockSuffixe2999 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_blockSuffixe3013 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IMPLIES_in_blockSuffixe3021 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_blockSuffixe3032 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QUESTION_in_ebnfSuffix3051 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STAR_in_ebnfSuffix3063 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PLUS_in_ebnfSuffix3078 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_range_in_atom3095 = new BitSet(new long[]{0x0010800000000002L});
+    public static final BitSet FOLLOW_ROOT_in_atom3098 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_atom3103 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_atom3150 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_DOT_in_atom3152 = new BitSet(new long[]{0x8000000000000000L});
+    public static final BitSet FOLLOW_ruleref_in_atom3154 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_atom3188 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_DOT_in_atom3190 = new BitSet(new long[]{0x4040000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_terminal_in_atom3192 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_terminal_in_atom3217 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_atom3227 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_notSet_in_atom3235 = new BitSet(new long[]{0x0010800000000002L});
+    public static final BitSet FOLLOW_ROOT_in_atom3238 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_atom3241 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet3274 = new BitSet(new long[]{0x4000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_notTerminal_in_notSet3276 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet3292 = new BitSet(new long[]{0x0000010000000000L});
+    public static final BitSet FOLLOW_block_in_notSet3294 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_notTerminal0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_block3350 = new BitSet(new long[]{0xDE48011900290010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_optionsSpec_in_block3396 = new BitSet(new long[]{0xDE48011900290010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_ruleAction_in_block3491 = new BitSet(new long[]{0x0800001100290000L});
-    public static final BitSet FOLLOW_ACTION_in_block3507 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_COLON_in_block3558 = new BitSet(new long[]{0xD648010800010010L,0x0000000000000008L});
-    public static final BitSet FOLLOW_altList_in_block3611 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_block3629 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref3702 = new BitSet(new long[]{0x0010800000004002L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref3704 = new BitSet(new long[]{0x0010800000000002L});
-    public static final BitSet FOLLOW_ROOT_in_ruleref3714 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_ruleref3718 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rangeElement_in_range3783 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_RANGE_in_range3785 = new BitSet(new long[]{0xC000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rangeElement_in_range3788 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_block3368 = new BitSet(new long[]{0xDE48011900290010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_optionsSpec_in_block3405 = new BitSet(new long[]{0x0800001100280000L});
+    public static final BitSet FOLLOW_ruleAction_in_block3410 = new BitSet(new long[]{0x0800001100280000L});
+    public static final BitSet FOLLOW_COLON_in_block3413 = new BitSet(new long[]{0xD648010800010010L,0x0000000000000008L});
+    public static final BitSet FOLLOW_altList_in_block3427 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_block3444 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref3493 = new BitSet(new long[]{0x0010800000004002L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref3495 = new BitSet(new long[]{0x0010800000000002L});
+    public static final BitSet FOLLOW_ROOT_in_ruleref3505 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_ruleref3509 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rangeElement_in_range3574 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_RANGE_in_range3576 = new BitSet(new long[]{0xC000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rangeElement_in_range3579 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_rangeElement0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal3882 = new BitSet(new long[]{0x0010880000004002L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal3884 = new BitSet(new long[]{0x0010880000000002L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal3887 = new BitSet(new long[]{0x0010800000000002L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal3911 = new BitSet(new long[]{0x0010880000000002L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal3913 = new BitSet(new long[]{0x0010800000000002L});
-    public static final BitSet FOLLOW_DOT_in_terminal3960 = new BitSet(new long[]{0x0010880000000002L});
-    public static final BitSet FOLLOW_elementOptions_in_terminal3962 = new BitSet(new long[]{0x0010800000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal3993 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_terminal4017 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LT_in_elementOptions4081 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_elementOption_in_elementOptions4083 = new BitSet(new long[]{0x0000104000000000L});
-    public static final BitSet FOLLOW_COMMA_in_elementOptions4086 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_elementOption_in_elementOptions4088 = new BitSet(new long[]{0x0000104000000000L});
-    public static final BitSet FOLLOW_GT_in_elementOptions4092 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_qid_in_elementOption4127 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_elementOption4149 = new BitSet(new long[]{0x0000200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_elementOption4151 = new BitSet(new long[]{0xC000000800000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_qid_in_elementOption4155 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption4159 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_predicatedRewrite_in_rewrite4177 = new BitSet(new long[]{0x0200000000000000L});
-    public static final BitSet FOLLOW_nakedRewrite_in_rewrite4180 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RARROW_in_predicatedRewrite4198 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_SEMPRED_in_predicatedRewrite4200 = new BitSet(new long[]{0xC520010800010000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteAlt_in_predicatedRewrite4202 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RARROW_in_nakedRewrite4242 = new BitSet(new long[]{0xC520010800010000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteAlt_in_nakedRewrite4244 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTemplate_in_rewriteAlt4308 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteAlt4347 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ETC_in_rewriteAlt4356 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTreeAlt4387 = new BitSet(new long[]{0xC420010000010002L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4411 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4416 = new BitSet(new long[]{0x0003400000000000L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeElement4418 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTree_in_rewriteTreeElement4443 = new BitSet(new long[]{0x0003400000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeElement4449 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement4488 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_rewriteTreeAtom4504 = new BitSet(new long[]{0x0000080000004002L});
-    public static final BitSet FOLLOW_elementOptions_in_rewriteTreeAtom4506 = new BitSet(new long[]{0x0000000000004002L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_rewriteTreeAtom4509 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_REF_in_rewriteTreeAtom4536 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_rewriteTreeAtom4543 = new BitSet(new long[]{0x0000080000000002L});
-    public static final BitSet FOLLOW_elementOptions_in_rewriteTreeAtom4545 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOLLAR_in_rewriteTreeAtom4568 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_rewriteTreeAtom4570 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteTreeAtom4581 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteTreeEbnf4604 = new BitSet(new long[]{0xC420010000010000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf4606 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_rewriteTreeEbnf4608 = new BitSet(new long[]{0x0003400000000000L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeEbnf4610 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_rewriteTree4634 = new BitSet(new long[]{0xC020000000010000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTree4636 = new BitSet(new long[]{0xC420030000010000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTree4638 = new BitSet(new long[]{0xC420030000010000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_RPAREN_in_rewriteTree4641 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate4673 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplate4675 = new BitSet(new long[]{0xC000020800000000L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate4677 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_rewriteTemplate4679 = new BitSet(new long[]{0x0000000000000C00L});
-    public static final BitSet FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate4687 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate4693 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTemplateRef_in_rewriteTemplate4719 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate4728 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteTemplate4737 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_rewriteTemplateRef4750 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplateRef4752 = new BitSet(new long[]{0xC000020800000000L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef4754 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_rewriteTemplateRef4756 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4785 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteIndirectTemplateHead4787 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4789 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4791 = new BitSet(new long[]{0xC000020800000000L});
-    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead4793 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4795 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4820 = new BitSet(new long[]{0x0000004000000002L});
-    public static final BitSet FOLLOW_COMMA_in_rewriteTemplateArgs4823 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4825 = new BitSet(new long[]{0x0000004000000002L});
-    public static final BitSet FOLLOW_id_in_rewriteTemplateArg4854 = new BitSet(new long[]{0x0000200000000000L});
-    public static final BitSet FOLLOW_ASSIGN_in_rewriteTemplateArg4856 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_ACTION_in_rewriteTemplateArg4858 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_REF_in_id4887 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_id4900 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TEMPLATE_in_id4912 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_id_in_qid4935 = new BitSet(new long[]{0x0040000000000002L});
-    public static final BitSet FOLLOW_DOT_in_qid4938 = new BitSet(new long[]{0xC000000800000000L});
-    public static final BitSet FOLLOW_id_in_qid4940 = new BitSet(new long[]{0x0040000000000002L});
-    public static final BitSet FOLLOW_alternative_in_alternativeEntry4956 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_alternativeEntry4958 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_element_in_elementEntry4967 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_elementEntry4969 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule_in_ruleEntry4977 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_ruleEntry4979 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_blockEntry4987 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_blockEntry4989 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTemplate_in_synpred1_ANTLRParser4308 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rewriteTreeAlt_in_synpred2_ANTLRParser4347 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal3673 = new BitSet(new long[]{0x0010880000004002L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal3675 = new BitSet(new long[]{0x0010880000000002L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal3678 = new BitSet(new long[]{0x0010800000000002L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal3702 = new BitSet(new long[]{0x0010880000000002L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal3704 = new BitSet(new long[]{0x0010800000000002L});
+    public static final BitSet FOLLOW_DOT_in_terminal3751 = new BitSet(new long[]{0x0010880000000002L});
+    public static final BitSet FOLLOW_elementOptions_in_terminal3753 = new BitSet(new long[]{0x0010800000000002L});
+    public static final BitSet FOLLOW_ROOT_in_terminal3784 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_terminal3808 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LT_in_elementOptions3872 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_elementOption_in_elementOptions3874 = new BitSet(new long[]{0x0000104000000000L});
+    public static final BitSet FOLLOW_COMMA_in_elementOptions3877 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_elementOption_in_elementOptions3879 = new BitSet(new long[]{0x0000104000000000L});
+    public static final BitSet FOLLOW_GT_in_elementOptions3883 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_qid_in_elementOption3918 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_elementOption3940 = new BitSet(new long[]{0x0000200000000000L});
+    public static final BitSet FOLLOW_ASSIGN_in_elementOption3942 = new BitSet(new long[]{0xC000000800000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_qid_in_elementOption3946 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption3950 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_predicatedRewrite_in_rewrite3968 = new BitSet(new long[]{0x0200000000000000L});
+    public static final BitSet FOLLOW_nakedRewrite_in_rewrite3971 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RARROW_in_predicatedRewrite3989 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_SEMPRED_in_predicatedRewrite3991 = new BitSet(new long[]{0xC520010800010000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteAlt_in_predicatedRewrite3993 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RARROW_in_nakedRewrite4033 = new BitSet(new long[]{0xC520010800010000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteAlt_in_nakedRewrite4035 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTemplate_in_rewriteAlt4099 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteAlt4138 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ETC_in_rewriteAlt4147 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTreeAlt4178 = new BitSet(new long[]{0xC420010000010002L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4202 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTreeElement4207 = new BitSet(new long[]{0x0003400000000000L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeElement4209 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTree_in_rewriteTreeElement4234 = new BitSet(new long[]{0x0003400000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeElement4240 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeEbnf_in_rewriteTreeElement4279 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_rewriteTreeAtom4295 = new BitSet(new long[]{0x0000080000004002L});
+    public static final BitSet FOLLOW_elementOptions_in_rewriteTreeAtom4297 = new BitSet(new long[]{0x0000000000004002L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_rewriteTreeAtom4300 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_REF_in_rewriteTreeAtom4327 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_rewriteTreeAtom4334 = new BitSet(new long[]{0x0000080000000002L});
+    public static final BitSet FOLLOW_elementOptions_in_rewriteTreeAtom4336 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOLLAR_in_rewriteTreeAtom4359 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_rewriteTreeAtom4361 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteTreeAtom4372 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteTreeEbnf4398 = new BitSet(new long[]{0xC420010000010000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteTreeAlt_in_rewriteTreeEbnf4400 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_rewriteTreeEbnf4402 = new BitSet(new long[]{0x0003400000000000L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_rewriteTreeEbnf4404 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_rewriteTree4428 = new BitSet(new long[]{0xC020000000010000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteTreeAtom_in_rewriteTree4430 = new BitSet(new long[]{0xC420030000010000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_rewriteTreeElement_in_rewriteTree4432 = new BitSet(new long[]{0xC420030000010000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_RPAREN_in_rewriteTree4435 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TEMPLATE_in_rewriteTemplate4467 = new BitSet(new long[]{0x0000010000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplate4469 = new BitSet(new long[]{0xC000020800000000L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplate4471 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_rewriteTemplate4473 = new BitSet(new long[]{0x0000000000000C00L});
+    public static final BitSet FOLLOW_DOUBLE_QUOTE_STRING_LITERAL_in_rewriteTemplate4481 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOUBLE_ANGLE_STRING_LITERAL_in_rewriteTemplate4487 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTemplateRef_in_rewriteTemplate4513 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteIndirectTemplateHead_in_rewriteTemplate4522 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteTemplate4531 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_rewriteTemplateRef4547 = new BitSet(new long[]{0x0000010000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteTemplateRef4549 = new BitSet(new long[]{0xC000020800000000L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteTemplateRef4551 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_rewriteTemplateRef4553 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4582 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteIndirectTemplateHead4584 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4586 = new BitSet(new long[]{0x0000010000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_rewriteIndirectTemplateHead4588 = new BitSet(new long[]{0xC000020800000000L});
+    public static final BitSet FOLLOW_rewriteTemplateArgs_in_rewriteIndirectTemplateHead4590 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_rewriteIndirectTemplateHead4592 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4620 = new BitSet(new long[]{0x0000004000000002L});
+    public static final BitSet FOLLOW_COMMA_in_rewriteTemplateArgs4623 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_rewriteTemplateArg_in_rewriteTemplateArgs4625 = new BitSet(new long[]{0x0000004000000002L});
+    public static final BitSet FOLLOW_id_in_rewriteTemplateArg4654 = new BitSet(new long[]{0x0000200000000000L});
+    public static final BitSet FOLLOW_ASSIGN_in_rewriteTemplateArg4656 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ACTION_in_rewriteTemplateArg4658 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_REF_in_id4690 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_id4703 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TEMPLATE_in_id4715 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_id_in_qid4738 = new BitSet(new long[]{0x0040000000000002L});
+    public static final BitSet FOLLOW_DOT_in_qid4741 = new BitSet(new long[]{0xC000000800000000L});
+    public static final BitSet FOLLOW_id_in_qid4743 = new BitSet(new long[]{0x0040000000000002L});
+    public static final BitSet FOLLOW_alternative_in_alternativeEntry4759 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_alternativeEntry4761 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_element_in_elementEntry4770 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_elementEntry4772 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rule_in_ruleEntry4780 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_ruleEntry4782 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_blockEntry4790 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_blockEntry4792 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTemplate_in_synpred1_ANTLRParser4099 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rewriteTreeAlt_in_synpred2_ANTLRParser4138 = new BitSet(new long[]{0x0000000000000002L});
 
 }

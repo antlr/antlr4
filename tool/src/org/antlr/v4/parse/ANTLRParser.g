@@ -330,7 +330,7 @@ tokenSpec
 // the grammar spec, rather than being declared within and therefore associated
 // with, a specific rule.
 attrScope
-	:	SCOPE id ACTION -> ^(SCOPE id ACTION)
+	:	SCOPE id ACTION -> ^(SCOPE id ACTION<ActionAST>)
 	;
 
 // A declaration of a language target specifc section,
@@ -338,7 +338,7 @@ attrScope
 // sections, they are just passed on to the language target.
 /** Match stuff like @parser::members {int i;} */
 action
-	:	AT (actionScopeName COLONCOLON)? id ACTION -> ^(AT actionScopeName? id ACTION)
+	:	AT (actionScopeName COLONCOLON)? id ACTION -> ^(AT actionScopeName? id ACTION<ActionAST>)
 	;
   
 /** Sometimes the scope names will collide with keywords; allow them as
@@ -436,13 +436,13 @@ exceptionGroup
 // Specifies a handler for a particular type of exception
 // thrown by a rule
 exceptionHandler
-	: CATCH ARG_ACTION ACTION -> ^(CATCH ARG_ACTION ACTION)
+	: CATCH ARG_ACTION ACTION -> ^(CATCH ARG_ACTION ACTION<ActionAST>)
 	;
 
 // Specifies a block of code to run after the rule and any
 // expcetion blocks have exceuted.
 finallyClause
-	: FINALLY ACTION -> ^(FINALLY ACTION)
+	: FINALLY ACTION -> ^(FINALLY ACTION<ActionAST>)
 	;
   
 // An individual rule level configuration as referenced by the ruleActions
@@ -499,7 +499,7 @@ ruleScopeSpec
 //
 /** Match stuff like @init {int i;} */
 ruleAction
-	:	AT id ACTION -> ^(AT id ACTION)
+	:	AT id ACTION -> ^(AT id ACTION<ActionAST>)
 	;
          
 // A set of access modifiers that may be applied to rule declarations
@@ -563,7 +563,7 @@ element
 		|				-> atom
 		)
 	|	ebnf
-	|   ACTION
+	|   ACTION<ActionAST>
 	|   SEMPRED
 		(	IMPLIES		-> GATED_SEMPRED[$IMPLIES]
 		|				-> SEMPRED
@@ -683,35 +683,13 @@ notTerminal
 // of options, which apply only to that block.
 //
 block
-    : LPAREN
-    
+    : LPAREN    
          // A new blocked altlist may have a set of options set sepcifically
          // for it.
-         //
-         optionsSpec?
-         
-         (
-             // Optional @ sections OR an action, however we allow both
-             // to be present and will let the semantic checking phase determine
-             // what is allowable.
-             //
-             ra+=ruleAction*
-             ACTION?
-         
-            // COLON is optional with a block
-            //
-            COLON
-         )?
-         
-         // List of alts for this Paren block
-         //
-         altList
-         
+         ( optionsSpec? ra+=ruleAction* COLON )?
+         altList         
       RPAREN
-      
-      // Rewrite as a block
-      //
-      -> ^(BLOCK<BlockAST> optionsSpec? $ra* ACTION? altList )
+      -> ^(BLOCK<BlockAST> optionsSpec? $ra* altList )
     ; 
 
 // ----------------    
@@ -845,7 +823,7 @@ rewriteTreeAtom
     |   RULE_REF
 	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	|   DOLLAR id -> LABEL[$DOLLAR,$id.text] // reference to a label in a rewrite rule
-	|	ACTION
+	|	ACTION<ActionAST>
 	;
 
 rewriteTreeEbnf
@@ -887,7 +865,7 @@ rewriteTemplate
 		rewriteIndirectTemplateHead
 
 	|	// -> {...}
-		ACTION
+		ACTION<ActionAST>
 	;
 
 /** -> foo(a={...}, ...) */
@@ -899,7 +877,7 @@ rewriteTemplateRef
 /** -> ({expr})(a={...}, ...) */
 rewriteIndirectTemplateHead
 	:	lp=LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN
-		-> ^(TEMPLATE[$lp,"TEMPLATE"] ACTION rewriteTemplateArgs?)
+		-> ^(TEMPLATE[$lp,"TEMPLATE"] ACTION<ActionAST> rewriteTemplateArgs?)
 	;
 
 rewriteTemplateArgs
@@ -909,7 +887,7 @@ rewriteTemplateArgs
 	;
 
 rewriteTemplateArg
-	:   id ASSIGN ACTION -> ^(ARG[$ASSIGN] id ACTION)
+	:   id ASSIGN ACTION -> ^(ARG[$ASSIGN] id ACTION<ActionAST>)
 	;
 
 // The name of the grammar, and indeed some other grammar elements may

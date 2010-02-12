@@ -9,6 +9,8 @@ import java.util.*;
 /** Check for symbol problems; no side-effects.  Inefficient to walk rules
  *  and such multiple times, but I like isolating all error checking outside
  *  of code that actually defines symbols etc...
+ *
+ *  Side-effect: strip away redef'd rules.
  */
 public class SymbolChecks {
     protected Grammar g;
@@ -48,6 +50,8 @@ public class SymbolChecks {
 
     public void checkForRuleConflicts(List<Rule> rules) {
         if ( rules==null ) return;
+        int i = 0;
+        List<Integer> toRemove = new ArrayList<Integer>();
         for (Rule r : collector.rules) {
             if ( nameToRuleMap.get(r.name)==null ) {
                 nameToRuleMap.put(r.name, r);
@@ -56,13 +60,16 @@ public class SymbolChecks {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 ErrorManager.grammarError(ErrorType.RULE_REDEFINITION,
                                           g.fileName, idNode.token, r.name);
+                toRemove.add(i);
             }
             if ( globalScopeNames.contains(r.name) ) {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
                                           g.fileName, idNode.token, r.name);                
             }
+            i++;
         }
+        collector.rules.removeAll(toRemove);
     }
 
     public void checkScopeRedefinitions(List<GrammarAST> scopes) {
@@ -178,13 +185,16 @@ public class SymbolChecks {
             checkForRuleScopeAttributeConflict(r);
             Map<String, LabelElementPair> labelNameSpace =
                 new HashMap<String, LabelElementPair>();
-            for (List<LabelElementPair> pairs : r.labelDefs.values() ) {
-                for (LabelElementPair p : pairs) {
-                    checkForLabelConflict(r, p.label);
-                    String name = p.label.getText();
-                    LabelElementPair prev = labelNameSpace.get(name);
-                    if ( prev==null ) labelNameSpace.put(name, p);
-                    else checkForTypeMismatch(prev, p);
+            for (int i=1; i<=r.numberOfAlts; i++) {
+                Alternative a = r.alt[i];
+                for (List<LabelElementPair> pairs : a.labelDefs.values() ) {
+                    for (LabelElementPair p : pairs) {
+                        checkForLabelConflict(r, p.label);
+                        String name = p.label.getText();
+                        LabelElementPair prev = labelNameSpace.get(name);
+                        if ( prev==null ) labelNameSpace.put(name, p);
+                        else checkForTypeMismatch(prev, p);
+                    }
                 }
             }
         }

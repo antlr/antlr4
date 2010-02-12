@@ -8,11 +8,10 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
-public class Grammar {
+public class Grammar implements SymbolSpace {
     public static final Set doNotCopyOptionsToLexer =
         new HashSet() {
             {
@@ -46,8 +45,8 @@ public class Grammar {
 
     /** If we're imported, who imported us? If null, implies grammar is root */
     public Grammar parent;
-    protected List<Grammar> importedGrammars;
-    protected Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
+    public List<Grammar> importedGrammars;
+    public Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
 
     /** Map a scope to a map of name:action pairs.
      *  The code generator will use this to fill holes in the output files.
@@ -122,7 +121,7 @@ public class Grammar {
     }
 
     public void defineRule(Rule r) { rules.put(r.name, r); }
-    
+
     public Rule getRule(String name) { return rules.get(name); }
 
     /** Get list of all delegates from all grammars in the delegate subtree of g.
@@ -209,6 +208,20 @@ public class Grammar {
             if ( g.name.equals(name) ) return g;
         }
         return null;
+    }
+
+    public SymbolSpace getParent() { return null; }
+
+    public boolean resolves(String x, ActionAST node) {
+        return false;
+    }
+
+    public boolean resolves(String x, String y, ActionAST node) {
+        return false;
+    }
+
+    public boolean resolveToRuleRef(String x, ActionAST node) {
+        return false;
     }
 
     /** Given a grammar type, what should be the default action scope?
