@@ -64,8 +64,8 @@ public class Rule implements AttributeResolver {
     /** Labels are visible to all alts in a rule. Record all defs here.
      *  We need to ensure labels are used to track same kind of symbols.
      *  Tracks all label defs for a label.
-    public MultiMap<String, LabelElementPair> labelDefs =
-        new MultiMap<String, LabelElementPair>();
+     public MultiMap<String, LabelElementPair> labelDefs =
+     new MultiMap<String, LabelElementPair>();
      */
 
     public Alternative[] alt;
@@ -86,51 +86,51 @@ public class Rule implements AttributeResolver {
         if ( resolvesAsRetvalOrProperty(x) ) return true;
         if ( args.get(x)!=null ) return true;
         // resolve outside of an alt?
-        if ( node.space instanceof Alternative ) return getParent().resolves(x, node);
-        return getLabelNames().contains(x); // can see all labels if not in alt
+        if ( node.resolver instanceof Alternative ) return getParent().resolves(x, node);
+        if ( getLabelNames().contains(x) ) return true; // can see all labels if not in alt
+        return getParent().resolves(x, node);
     }
 
     /** For $x.y, is x an arg, retval, predefined prop, token/rule/label ref?
      *  If so, make sure y resolves within that perspective.
      */
     public boolean resolves(String x, String y, ActionAST node) {
-        if ( x.equals(this.name) ) { // $x.y ref in rule x is same as $y
-            return resolves(y, node);
-        }
+        Rule r = resolveRefToRule(x, node);
+        if ( r!=null ) r.resolvesAsRetvalOrProperty(y);
+        return getParent().resolves(x,y,node);
 
-        MultiMap<String, LabelElementPair> labelDefs = null;
-        if ( node.space instanceof Alternative) {
-            labelDefs = ((Alternative)node.space).labelDefs; 
-        }
-        else labelDefs = getLabelDefs();
-
-        List<LabelElementPair> labels = labelDefs.get(x); // label?
-        if ( labels!=null ) {
-            // it's a label ref, compute scope from label type and grammar type
-            LabelElementPair anyLabelDef = labels.get(0);
-            // predefined?
-            if ( getPredefinedScope(anyLabelDef.type).get(y)!=null) return true;
-            if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-                Rule ref = g.getRule(anyLabelDef.element.getText());
-                return ref.resolvesAsRetvalOrProperty(y);
-            }
-        }
-        return false;
+//        if ( x.equals(this.name) ) { // $x.y ref in rule x is same as $y
+//            return resolves(y, node);
+//        }
+//
+//        if ( node.resolver == this ) { // action not in alt (attr space is this rule)
+//            List<LabelElementPair> labels = getLabelDefs().get(x);
+//            if ( labels!=null ) {
+//                // it's a label ref, compute scope from label type and grammar type
+//                LabelElementPair anyLabelDef = labels.get(0);
+//                // predefined?
+//                if ( getPredefinedScope(anyLabelDef.type).get(y)!=null) return true;
+//                if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+//                    Rule ref = g.getRule(anyLabelDef.element.getText());
+//                    return ref.resolvesAsRetvalOrProperty(y);
+//                }
+//            }
+//        }
+//        return false;
     }
 
-    public boolean resolveToRuleRef(String x, ActionAST node) {
-        if ( x.equals(this.name) ) return true;
-        MultiMap<String, LabelElementPair> labelDefs = null;
-        if ( node.space instanceof Alternative) {
-            labelDefs = ((Alternative)node.space).labelDefs;
+    public Rule resolveRefToRule(String x, ActionAST node) {
+        if ( x.equals(this.name) ) return this;
+        if ( node.resolver == this ) { // action not in alt (attr space is this rule)
+            List<LabelElementPair> labels = getLabelDefs().get(x);
+            if ( labels!=null ) {  // it's a label ref. is it a rule label?
+                LabelElementPair anyLabelDef = labels.get(0);
+                if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+                    return g.getRule(anyLabelDef.element.getText());
+                }
+            }
         }
-        else labelDefs = getLabelDefs();
-        List<LabelElementPair> labels = labelDefs.get(x);
-        if ( labels!=null ) {  // it's a label ref. is it a rule label?
-            LabelElementPair anyLabelDef = labels.get(0);
-            if ( anyLabelDef.type==LabelType.RULE_LABEL ) return true;
-        }
-        return false;
+        return null; // don't look for general rule (not one ref'd in this rule)
     }
 
     public boolean resolvesAsRetvalOrProperty(String y) {

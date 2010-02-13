@@ -33,9 +33,7 @@ public class Alternative implements AttributeResolver {
 
     public Alternative(Rule r) { this.rule = r; }
 
-    public AttributeResolver getParent() {
-        return null;
-    }
+    public AttributeResolver getParent() { return rule; }
 
     /** Is isolated x a token/rule/label ref? */
     public boolean resolves(String x, ActionAST node) {
@@ -44,7 +42,7 @@ public class Alternative implements AttributeResolver {
             ruleRefs.get(x)!=null ||
             labelDefs.get(x)!=null;
         if ( inAlt ) return inAlt;
-        return rule.resolves(x, node);
+        return getParent().resolves(x, node);
     }
 
     /** Find x as token/rule/label ref then find y in properties list. */
@@ -56,26 +54,32 @@ public class Alternative implements AttributeResolver {
             // look up rule, ask it to resolve y (must be retval or predefined)
             return rule.g.getRule(x).resolvesAsRetvalOrProperty(y);
         }
-        List<LabelElementPair> labels = labelDefs.get(x); // label?
-        if ( labels!=null ) {
-            // it's a label ref, compute scope from label type and grammar type
-            LabelElementPair anyLabelDef = labels.get(0);
-            if ( rule.getPredefinedScope(anyLabelDef.type).get(y)!=null) return true;
-            if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-                Rule ref = rule.g.getRule(anyLabelDef.element.getText());
-                return ref.resolvesAsRetvalOrProperty(y);
-            }
-        }
-        return false;
+        Rule r = resolveRefToRule(x, node);
+        if ( r!=null ) return r.resolvesAsRetvalOrProperty(y);
+        return getParent().resolves(x, y, node);
+//
+//        List<LabelElementPair> labels = labelDefs.get(x); // label?
+//        if ( labels!=null ) {
+//            // it's a label ref, compute scope from label type and grammar type
+//            LabelElementPair anyLabelDef = labels.get(0);
+//            if ( rule.getPredefinedScope(anyLabelDef.type).get(y)!=null) return true;
+//            if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+//                Rule ref = rule.g.getRule(anyLabelDef.element.getText());
+//                return ref.resolvesAsRetvalOrProperty(y);
+//            }
+//        }
+//        return false;
     }
 
-    public boolean resolveToRuleRef(String x, ActionAST node) {
-        if ( ruleRefs.get(x)!=null ) return true;
+    public Rule resolveRefToRule(String x, ActionAST node) {
+        if ( ruleRefs.get(x)!=null ) return rule.g.getRule(x);
         List<LabelElementPair> labels = labelDefs.get(x);
         if ( labels!=null ) { // it's a label ref. is it a rule label?
             LabelElementPair anyLabelDef = labels.get(0);
-            if ( anyLabelDef.type==LabelType.RULE_LABEL ) return true;
+            if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+                return rule.g.getRule(anyLabelDef.element.getText());
+            }
         }
-        return false;
+        return getParent().resolveRefToRule(x, node);
     }
 }

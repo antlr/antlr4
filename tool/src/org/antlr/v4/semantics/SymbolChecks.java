@@ -50,8 +50,6 @@ public class SymbolChecks {
 
     public void checkForRuleConflicts(List<Rule> rules) {
         if ( rules==null ) return;
-        int i = 0;
-        List<Integer> toRemove = new ArrayList<Integer>();
         for (Rule r : collector.rules) {
             if ( nameToRuleMap.get(r.name)==null ) {
                 nameToRuleMap.put(r.name, r);
@@ -60,29 +58,27 @@ public class SymbolChecks {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 ErrorManager.grammarError(ErrorType.RULE_REDEFINITION,
                                           g.fileName, idNode.token, r.name);
-                toRemove.add(i);
             }
             if ( globalScopeNames.contains(r.name) ) {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
                                           g.fileName, idNode.token, r.name);                
             }
-            i++;
         }
-        collector.rules.removeAll(toRemove);
     }
 
-    public void checkScopeRedefinitions(List<GrammarAST> scopes) {
+    public void checkScopeRedefinitions(List<AttributeScope> scopes) {
         if ( scopes==null ) return;
         for (int i=0; i< scopes.size(); i++) {
-            GrammarAST s = scopes.get(i);
-            GrammarAST idNode = (GrammarAST)s.getChild(0);
-            if ( !globalScopeNames.contains(idNode.getText()) ) {
-                globalScopeNames.add(idNode.getText());
+            AttributeScope s = scopes.get(i);
+            //GrammarAST idNode = (GrammarAST)s.getChild(0);
+            if ( !globalScopeNames.contains(s.getName()) ) {
+                globalScopeNames.add(s.getName());
             }
             else {
+                Token idNode = ((GrammarAST) s.ast.getChild(0)).token;
                 ErrorManager.grammarError(ErrorType.SCOPE_REDEFINITION,
-                                          g.fileName, idNode.token, idNode.getText());
+                                          g.fileName, idNode, s.getName());
             }
         }
     }

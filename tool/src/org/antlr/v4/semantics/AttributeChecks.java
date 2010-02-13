@@ -24,8 +24,13 @@ public class AttributeChecks implements ActionSplitterListener {
         this.action = action;
     }
 
-    public static void checkAllAttributeExpressions(Grammar g, List<Rule> rules) {
-        for (Rule r : rules) {
+    public static void checkAllAttributeExpressions(Grammar g) {
+        for (ActionAST act : g.actions.values()) {
+            AttributeChecks checker = new AttributeChecks(g, null, null, act, act.getText());
+            checker.examineAction();
+        }
+
+        for (Rule r : g.rules.values()) {
             for (ActionAST a : r.namedActions.values()) {
                 AttributeChecks checker = new AttributeChecks(g, r, null, a, a.getText());
                 checker.examineAction();
@@ -57,7 +62,7 @@ public class AttributeChecks implements ActionSplitterListener {
     // LISTENER METHODS
     
     public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-        if ( !node.space.resolves(x.getText(), y.getText(), node) ) {
+        if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
             ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE, // TODO; not right error
                                       g.fileName, x, x.getText(), expr);
         }
@@ -65,7 +70,7 @@ public class AttributeChecks implements ActionSplitterListener {
     }
 
     public void qualifiedAttr(String expr, Token x, Token y) {
-        if ( !node.space.resolves(x.getText(), node) ) {
+        if ( !node.resolver.resolves(x.getText(), node) ) {
             ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
                                       g.fileName, x, x.getText(), expr);
             return;
@@ -73,8 +78,8 @@ public class AttributeChecks implements ActionSplitterListener {
 
         // ???if y is not prop of x, we don't care; we'll ignore and leave as simple attr
 
-        if ( !node.space.resolves(x.getText(), y.getText(), node) ) {
-            if ( node.space.resolveToRuleRef(x.getText(), node) ) {
+        if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
+            if ( node.resolver.resolveRefToRule(x.getText(), node)!=null ) {
                 ErrorManager.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
                                           g.fileName, y, y.getText(), expr);
             }
@@ -86,7 +91,7 @@ public class AttributeChecks implements ActionSplitterListener {
     }
 
     public void setAttr(String expr, Token x, Token rhs) {
-        if ( !node.space.resolves(x.getText(), node) ) {
+        if ( !node.resolver.resolves(x.getText(), node) ) {
             ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
                                       g.fileName, x, x.getText(), expr);
         }
@@ -95,12 +100,12 @@ public class AttributeChecks implements ActionSplitterListener {
 
     public void attr(String expr, Token x) { // arg, retval, predefined, token ref, rule ref, current rule
         // TODO: check for isolated rule ref "+x+" in "+expr);
-        if ( node.space.resolveToRuleRef(x.getText(), node) ) {
+        if ( node.resolver.resolveRefToRule(x.getText(), node)!=null ) {
             ErrorManager.grammarError(ErrorType.ISOLATED_RULE_SCOPE,
                                       g.fileName, x, x.getText(), expr);
             return;
         }
-        if ( !node.space.resolves(x.getText(), node) ) {
+        if ( !node.resolver.resolves(x.getText(), node) ) {
             ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
                                       g.fileName, x, x.getText(), expr);
         }

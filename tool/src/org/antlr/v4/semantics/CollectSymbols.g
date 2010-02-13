@@ -80,7 +80,7 @@ public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
-public List<GrammarAST> scopes = new ArrayList<GrammarAST>();
+public List<AttributeScope> scopes = new ArrayList<AttributeScope>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
 Grammar g; // which grammar are we checking
 public CollectSymbols(TreeNodeStream input, Grammar g) {
@@ -114,12 +114,17 @@ bottomup
 	;
 
 globalScope
-	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION) {scopes.add($SCOPE);}
+	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION)
+		{
+		AttributeScope s = ScopeParser.parseDynamicScope($ACTION.text);
+		s.ast = $ACTION;		
+		scopes.add(s);
+		}
 	;
 
 globalNamedAction
 	:	{inContext("GRAMMAR")}? ^(AT ID? ID ACTION)
-		{actions.add($AT);}
+		{actions.add($AT); ((ActionAST)$ACTION).resolver = g;}
 	;
 
 tokensSection
@@ -151,11 +156,11 @@ finishRule
 	:	RULE {currentRule = null;}
 	;
 
-rulelNamedAction
+ruleNamedAction
 	:	{inContext("RULE")}? ^(AT ID ACTION)
 		{
 		currentRule.namedActions.put($ID.text,(ActionAST)$ACTION);
-		((ActionAST)$ACTION).space = currentRule;
+		((ActionAST)$ACTION).resolver = currentRule;
 		}
 	;
 
@@ -165,7 +170,7 @@ ruleAction
 		ACTION
 		{
 		currentRule.alt[currentAlt].actions.add((ActionAST)$ACTION);
-		((ActionAST)$ACTION).space = currentRule.alt[currentAlt];
+		((ActionAST)$ACTION).resolver = currentRule.alt[currentAlt];
 		}
 	;
 
@@ -173,7 +178,7 @@ exceptionHandler
 	:	^(CATCH ARG_ACTION ACTION)
 		{
 		currentRule.exceptionActions.add((ActionAST)$ACTION);
-		((ActionAST)$ACTION).space = currentRule;
+		((ActionAST)$ACTION).resolver = currentRule;
 		}
 	;
 
@@ -181,7 +186,7 @@ finallyClause
 	:	^(FINALLY ACTION)	
 		{
 		currentRule.exceptionActions.add((ActionAST)$ACTION);
-		((ActionAST)$ACTION).space = currentRule;
+		((ActionAST)$ACTION).resolver = currentRule;
 		}
 	;
 	

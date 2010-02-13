@@ -4,9 +4,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 /** */
 public class SemanticPipeline {
@@ -49,11 +47,17 @@ public class SemanticPipeline {
         SymbolChecks symcheck = new SymbolChecks(g, collector);
         symcheck.examine(); // side-effect: strip away redef'd rules.
 
-        // STORE RULES IN GRAMMAR
+        // don't continue if we get symbol errors
+        if ( false ) return;
+
+        // STORE RULES/ACTIONS/SCOPES IN GRAMMAR
         for (Rule r : collector.rules) g.defineRule(r);
+        for (AttributeScope s : collector.scopes) g.defineScope(s);
+        for (GrammarAST a : collector.actions) g.defineAction(a);
+        // TODO: named actions
 
         // CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
-        AttributeChecks.checkAllAttributeExpressions(g, collector.rules);
+        AttributeChecks.checkAllAttributeExpressions(g);
 
         // ASSIGN TOKEN TYPES
     }

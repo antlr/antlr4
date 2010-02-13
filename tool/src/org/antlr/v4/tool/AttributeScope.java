@@ -31,11 +31,11 @@ public class AttributeScope {
         add(new Attribute("int"));
     }};
 
-    public static enum Type {
-        ARG, RET, TOKEN, PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
-        GLOBAL_SCOPE,   // scope symbols { ...}
-        RULE_SCOPE;     // scope { int i; int j; }
-    }
+//    public static enum Type {
+//        ARG, RET, TOKEN, PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
+//        GLOBAL_SCOPE,   // scope symbols { ...}
+//        RULE_SCOPE;     // scope { int i; int j; }
+//    }
 
     /** The list of Attribute objects */
 

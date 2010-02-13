@@ -48,15 +48,17 @@ public class Grammar implements AttributeResolver {
     public List<Grammar> importedGrammars;
     public Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
 
-    /** Map a scope to a map of name:action pairs.
+    /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
      *  I track the AST node for the action in case I need the line number
      *  for errors.
      */
-    Map<String, Map<String,GrammarAST>> actions = new HashMap<String, Map<String,GrammarAST>>();
+    public Map<String,ActionAST> actions = new HashMap<String,ActionAST>();
 
     /** A list of options specified at the grammar level such as language=Java. */
-    protected Map<String, String> options;    
+    public Map<String, String> options;
+
+    public Map<String, AttributeScope> scopes = new LinkedHashMap<String, AttributeScope>();    
 
     public Grammar(Tool tool, GrammarRootAST ast) {
         if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
@@ -107,22 +109,22 @@ public class Grammar implements AttributeResolver {
         }
     }
 
-    public void defineAction(GrammarAST ampersandAST) {
-        String scope = null;
-        String name = null;
-        if ( ampersandAST.getChildCount()==1 ) {
-            name = ampersandAST.getChild(0).getText();
+    public void defineAction(GrammarAST atAST) {
+        if ( atAST.getChildCount()==2 ) {
+            String name = atAST.getChild(0).getText();
+            actions.put(name, (ActionAST)atAST.getChild(1));
         }
         else {
-            scope = ampersandAST.getChild(0).getText();
-            name = ampersandAST.getChild(1).getText();            
-            Map<String,GrammarAST> f = actions.get(scope);
+            String name = atAST.getChild(1).getText();
+            actions.put(name, (ActionAST)atAST.getChild(2));
         }
     }
 
     public void defineRule(Rule r) { rules.put(r.name, r); }
 
     public Rule getRule(String name) { return rules.get(name); }
+
+    public void defineScope(AttributeScope s) { scopes.put(s.getName(), s); }
 
     /** Get list of all delegates from all grammars in the delegate subtree of g.
      *  The grammars are in delegation tree preorder.  Don't include ourselves
@@ -212,17 +214,17 @@ public class Grammar implements AttributeResolver {
 
     public AttributeResolver getParent() { return null; }
 
+    /** $x in grammar action can only be scope name */
     public boolean resolves(String x, ActionAST node) {
-        return false;
+        return scopes.get(x)!=null;
     }
 
-    public boolean resolves(String x, String y, ActionAST node) {
-        return false;
-    }
+    /** $x.y makes no sense in grammar action; Rule.resolves()
+     *  shouldn't call this.
+     */
+    public boolean resolves(String x, String y, ActionAST node) { return false; }
 
-    public boolean resolveToRuleRef(String x, ActionAST node) {
-        return false;
-    }
+    public Rule resolveRefToRule(String x, ActionAST node) { return getRule(x); }
 
     /** Given a grammar type, what should be the default action scope?
      *  If I say @members in a COMBINED grammar, for example, the
