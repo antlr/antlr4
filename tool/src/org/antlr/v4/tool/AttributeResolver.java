@@ -5,8 +5,8 @@ package org.antlr.v4.tool;
  *  then ask space to resolve.  If not found in one space we look
  *  at parent.  Alt's parent is rule; rule's parent is grammar.
  */
-public interface SymbolSpace {
-    public SymbolSpace getParent();
+public interface AttributeResolver {
+    public AttributeResolver getParent();
     public boolean resolves(String x, ActionAST node);
     public boolean resolves(String x, String y, ActionAST node);
     public boolean resolveToRuleRef(String x, ActionAST node);

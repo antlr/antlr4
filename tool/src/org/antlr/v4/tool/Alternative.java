@@ -9,7 +9,7 @@ import java.util.List;
 /** Record use/def information about an outermost alternative in a subrule
  *  or rule of a grammar.
  */
-public class Alternative implements SymbolSpace {
+public class Alternative implements AttributeResolver {
     Rule rule;
 
     // token IDs, string literals in this alt
@@ -33,7 +33,7 @@ public class Alternative implements SymbolSpace {
 
     public Alternative(Rule r) { this.rule = r; }
 
-    public SymbolSpace getParent() {
+    public AttributeResolver getParent() {
         return null;
     }
 

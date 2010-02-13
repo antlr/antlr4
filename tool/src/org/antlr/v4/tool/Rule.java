@@ -5,7 +5,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
-public class Rule implements SymbolSpace {
+public class Rule implements AttributeResolver {
     /** Rule refs have a predefined set of attributes as well as
      *  the return values and args.
      */
@@ -79,7 +79,7 @@ public class Rule implements SymbolSpace {
         for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this);
     }
 
-    public SymbolSpace getParent() { return g; }
+    public AttributeResolver getParent() { return g; }
 
     /** Is isolated x an arg, retval, predefined prop? */
     public boolean resolves(String x, ActionAST node) {

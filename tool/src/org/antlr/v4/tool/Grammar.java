@@ -11,7 +11,7 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 
 import java.util.*;
 
-public class Grammar implements SymbolSpace {
+public class Grammar implements AttributeResolver {
     public static final Set doNotCopyOptionsToLexer =
         new HashSet() {
             {
@@ -210,7 +210,7 @@ public class Grammar implements SymbolSpace {
         return null;
     }
 
-    public SymbolSpace getParent() { return null; }
+    public AttributeResolver getParent() { return null; }
 
     public boolean resolves(String x, ActionAST node) {
         return false;
