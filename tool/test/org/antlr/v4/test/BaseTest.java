@@ -426,9 +426,13 @@ public abstract class BaseTest {
             ErrorManager.setErrorListener(equeue);
             try {
                 String[] lines = input.split("\n");
-                int lastSpace = lines[0].lastIndexOf(' ');
-                int semi = lines[0].lastIndexOf(';');
-                String fileName = lines[0].substring(lastSpace+1, semi)+".g";
+                String fileName = "<string>";
+                int grIndex = lines[0].indexOf("grammar");
+                if ( grIndex>=0 ) {
+                    int space = lines[0].indexOf(' ', grIndex);
+                    int semi = lines[0].lastIndexOf(';');
+                    fileName = lines[0].substring(space+1, semi)+".g";
+                }
                 Grammar g = new Grammar(fileName, input);
                 g.loadImportedGrammars();
                 SemanticPipeline sem = new SemanticPipeline();
