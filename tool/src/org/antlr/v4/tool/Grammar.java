@@ -53,14 +53,14 @@ public class Grammar implements AttributeResolver {
      *  I track the AST node for the action in case I need the line number
      *  for errors.
      */
-    public Map<String,ActionAST> actions = new HashMap<String,ActionAST>();
+    public Map<String,ActionAST> namedActions = new HashMap<String,ActionAST>();
 
     /** A list of options specified at the grammar level such as language=Java. */
     public Map<String, String> options;
 
-    public Map<String, AttributeScope> scopes = new LinkedHashMap<String, AttributeScope>();    
+    public Map<String, AttributeScope> scopes = new LinkedHashMap<String, AttributeScope>();
 
-    public Grammar(Tool tool, GrammarRootAST ast) {
+	public Grammar(Tool tool, GrammarRootAST ast) {
         if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
         this.tool = tool;
         this.ast = ast;
@@ -112,11 +112,11 @@ public class Grammar implements AttributeResolver {
     public void defineAction(GrammarAST atAST) {
         if ( atAST.getChildCount()==2 ) {
             String name = atAST.getChild(0).getText();
-            actions.put(name, (ActionAST)atAST.getChild(1));
+            namedActions.put(name, (ActionAST)atAST.getChild(1));
         }
         else {
             String name = atAST.getChild(1).getText();
-            actions.put(name, (ActionAST)atAST.getChild(2));
+            namedActions.put(name, (ActionAST)atAST.getChild(2));
         }
     }
 
@@ -224,7 +224,8 @@ public class Grammar implements AttributeResolver {
      */
     public boolean resolves(String x, String y, ActionAST node) { return false; }
 
-    public Rule resolveRefToRule(String x, ActionAST node) { return getRule(x); }
+	/** Can't be a rule ref in grammar named action */
+    public Rule resolveRefToRule(String x, ActionAST node) { return null; }
 
     /** Given a grammar type, what should be the default action scope?
      *  If I say @members in a COMBINED grammar, for example, the

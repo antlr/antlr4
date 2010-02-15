@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRParser.g 2010-02-12 16:46:36
+// $ANTLR ${project.version} ${buildNumber} ANTLRParser.g 2010-02-15 12:12:17
 
 /*
  [The "BSD licence"]
@@ -29,12 +29,17 @@
 */
 package org.antlr.v4.parse;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
 import org.antlr.v4.tool.*;
 
-import java.util.ArrayList;
+
+import org.antlr.runtime.*;
+import java.util.Stack;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
+import org.antlr.runtime.tree.*;
 
 /** The definitive ANTLR v3 grammar to parse ANTLR v4 grammars.
  *  The grammar builds ASTs that are sniffed by subsequent stages.
@@ -284,7 +289,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: rules, DOC_COMMENT, id, grammarType, prequelConstruct
+            // elements: id, grammarType, prequelConstruct, DOC_COMMENT, rules
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1404,7 +1409,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: TOKENS, tokenSpec
+            // elements: tokenSpec, TOKENS
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1559,7 +1564,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: STRING_LITERAL, id, ASSIGN
+                            // elements: id, ASSIGN, STRING_LITERAL
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -1853,7 +1858,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: AT, actionScopeName, id, ACTION
+            // elements: actionScopeName, id, AT, ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2353,7 +2358,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: exceptionGroup, DOC_COMMENT, id, ARG_ACTION, rulePrequel, altListAsBlock, ruleReturns, ruleModifiers
+            // elements: id, ruleReturns, DOC_COMMENT, rulePrequel, ARG_ACTION, ruleModifiers, altListAsBlock, exceptionGroup
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2579,7 +2584,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ARG_ACTION, CATCH, ACTION
+            // elements: CATCH, ARG_ACTION, ACTION
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2976,7 +2981,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: qid, THROWS
+            // elements: THROWS, qid
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3106,7 +3111,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ACTION, SCOPE
+                    // elements: SCOPE, ACTION
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -3185,7 +3190,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: SCOPE, id
+                    // elements: id, SCOPE
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -3284,7 +3289,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: AT, ACTION, id
+            // elements: ACTION, id, AT
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -4279,7 +4284,7 @@ public class ANTLRParser extends Parser {
 
 
                             // AST REWRITE
-                            // elements: ebnfSuffix, atom
+                            // elements: atom, ebnfSuffix
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -5450,7 +5455,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ruleref, DOT, id
+                    // elements: ruleref, id, DOT
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5508,7 +5513,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: terminal, id, DOT
+                    // elements: id, terminal, DOT
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5707,7 +5712,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: NOT, notTerminal
+                    // elements: notTerminal, NOT
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5750,7 +5755,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: block, NOT
+                    // elements: NOT, block
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -5984,7 +5989,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: altList, ra, optionsSpec
+            // elements: optionsSpec, altList, ra
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -6159,7 +6164,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: RULE_REF, op, ARG_ACTION
+                    // elements: ARG_ACTION, RULE_REF, op
                     // token labels: op
                     // rule labels: retval
                     // token list labels: 
@@ -6206,7 +6211,7 @@ public class ANTLRParser extends Parser {
                     {
 
                     // AST REWRITE
-                    // elements: RULE_REF, ARG_ACTION
+                    // elements: ARG_ACTION, RULE_REF
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6512,7 +6517,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ARG_ACTION, elementOptions, TOKEN_REF
+                    // elements: TOKEN_REF, elementOptions, ARG_ACTION
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6704,7 +6709,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ROOT, terminal
+                    // elements: terminal, ROOT
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6741,7 +6746,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: terminal, BANG
+                    // elements: BANG, terminal
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -7193,7 +7198,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: nakedRewrite, predicatedRewrite
+            // elements: predicatedRewrite, nakedRewrite
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8062,7 +8067,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: elementOptions, TOKEN_REF, ARG_ACTION
+                    // elements: TOKEN_REF, elementOptions, ARG_ACTION
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -8146,7 +8151,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: elementOptions, STRING_LITERAL
+                    // elements: STRING_LITERAL, elementOptions
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -8303,7 +8308,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: ebnfSuffix, rewriteTreeAlt
+            // elements: rewriteTreeAlt, ebnfSuffix
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8440,7 +8445,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: TREE_BEGIN, rewriteTreeElement, rewriteTreeAtom
+            // elements: rewriteTreeAtom, TREE_BEGIN, rewriteTreeElement
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8595,7 +8600,7 @@ public class ANTLRParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: rewriteTemplateArgs, str, TEMPLATE
+                    // elements: str, rewriteTemplateArgs, TEMPLATE
                     // token labels: str
                     // rule labels: retval
                     // token list labels: 
@@ -8856,7 +8861,7 @@ public class ANTLRParser extends Parser {
 
 
             // AST REWRITE
-            // elements: rewriteTemplateArgs, ACTION
+            // elements: ACTION, rewriteTemplateArgs
             // token labels: 
             // rule labels: retval
             // token list labels: 

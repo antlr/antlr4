@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 ANTLRLexer.g 2010-02-12 16:46:34
+// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-15 12:12:15
 
 /*
  [The "BSD licence"]
@@ -31,6 +31,11 @@ package org.antlr.v4.parse;
 
 
 import org.antlr.runtime.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 /** Read in an ANTLR grammar and build an AST.  Try not to do
  *  any actions, just build the tree.
  *
@@ -640,8 +645,12 @@ public class ANTLRLexer extends Lexer {
             	    // ANTLRLexer.g:263:14: ( '\"' )=>as= ACTION_STRING_LITERAL
             	    {
             	    int asStart1319 = getCharIndex();
+            	    int asStartLine1319 = getLine();
+            	    int asStartCharPos1319 = getCharPositionInLine();
             	    mACTION_STRING_LITERAL(); if (state.failed) return ;
             	    as = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, asStart1319, getCharIndex()-1);
+            	    as.setLine(asStartLine1319);
+            	    as.setCharPositionInLine(asStartCharPos1319);
             	    if ( state.backtracking==0 ) {
 
             	                          // Append the embedded string literal test
@@ -656,8 +665,12 @@ public class ANTLRLexer extends Lexer {
             	    // ANTLRLexer.g:270:14: ( '\\'' )=>ac= ACTION_CHAR_LITERAL
             	    {
             	    int acStart1370 = getCharIndex();
+            	    int acStartLine1370 = getLine();
+            	    int acStartCharPos1370 = getCharPositionInLine();
             	    mACTION_CHAR_LITERAL(); if (state.failed) return ;
             	    ac = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, acStart1370, getCharIndex()-1);
+            	    ac.setLine(acStartLine1370);
+            	    ac.setCharPositionInLine(acStartCharPos1370);
             	    if ( state.backtracking==0 ) {
 
             	                          // Append the embedded chracter literal text
@@ -2181,8 +2194,12 @@ public class ANTLRLexer extends Lexer {
             } while (true);
 
             int fileStart3568 = getCharIndex();
+            int fileStartLine3568 = getLine();
+            int fileStartCharPos3568 = getCharPositionInLine();
             mACTION_STRING_LITERAL(); if (state.failed) return ;
             file = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, fileStart3568, getCharIndex()-1);
+            file.setLine(fileStartLine3568);
+            file.setCharPositionInLine(fileStartCharPos3568);
             // ANTLRLexer.g:545:49: ( WSCHARS )+
             int cnt22=0;
             loop22:
@@ -2215,8 +2232,12 @@ public class ANTLRLexer extends Lexer {
             } while (true);
 
             int lineStart3575 = getCharIndex();
+            int lineStartLine3575 = getLine();
+            int lineStartCharPos3575 = getCharPositionInLine();
             mINT(); if (state.failed) return ;
             line = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, lineStart3575, getCharIndex()-1);
+            line.setLine(lineStartLine3575);
+            line.setCharPositionInLine(lineStartCharPos3575);
             if ( state.backtracking==0 ) {
 
                        // TODO: Add target specific code to change the source file name and current line number

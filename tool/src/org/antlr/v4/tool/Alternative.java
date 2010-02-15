@@ -57,18 +57,6 @@ public class Alternative implements AttributeResolver {
         Rule r = resolveRefToRule(x, node);
         if ( r!=null ) return r.resolvesAsRetvalOrProperty(y);
         return getParent().resolves(x, y, node);
-//
-//        List<LabelElementPair> labels = labelDefs.get(x); // label?
-//        if ( labels!=null ) {
-//            // it's a label ref, compute scope from label type and grammar type
-//            LabelElementPair anyLabelDef = labels.get(0);
-//            if ( rule.getPredefinedScope(anyLabelDef.type).get(y)!=null) return true;
-//            if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-//                Rule ref = rule.g.getRule(anyLabelDef.element.getText());
-//                return ref.resolvesAsRetvalOrProperty(y);
-//            }
-//        }
-//        return false;
     }
 
     public Rule resolveRefToRule(String x, ActionAST node) {
