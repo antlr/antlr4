@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-15 12:12:15
+// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-15 13:04:55
 
 /*
  [The "BSD licence"]
@@ -31,11 +31,6 @@ package org.antlr.v4.parse;
 
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 /** Read in an ANTLR grammar and build an AST.  Try not to do
  *  any actions, just build the tree.
  *
@@ -268,7 +263,7 @@ public class ANTLRLexer extends Lexer {
                         if ( (( input.LA(2) != '/')) ) {
                             alt3=1;
                         }
-                        else if ( (((( true )&&(    !(input.LA(1) == '*' && input.LA(2) == '/') ))||( true ))) ) {
+                        else if ( ((( true )||(( true )&&(    !(input.LA(1) == '*' && input.LA(2) == '/') )))) ) {
                             alt3=2;
                         }
                         else {

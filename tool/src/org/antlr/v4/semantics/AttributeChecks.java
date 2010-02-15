@@ -95,7 +95,6 @@ public class AttributeChecks implements ActionSplitterListener {
 	}
 
 	public void setAttr(String expr, Token x, Token rhs) {
-		System.out.println("setAttr x="+x+" = "+rhs+"; expr="+expr);
 		if ( !node.resolver.resolves(x.getText(), node) ) {
             ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
                                       g.fileName, x, x.getText(), expr);
@@ -115,19 +114,42 @@ public class AttributeChecks implements ActionSplitterListener {
         }
     }
 
-    public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) { }
+    public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
+		System.out.println("SET "+x+" :: "+y);
+	}
 
     public void dynamicScopeAttr(String expr, Token x, Token y) {
-        
+		System.out.println(x+" :: "+y);
+		if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
+			if ( !node.resolver.resolves(x.getText(), node) &&
+				 (r==null || !r.name.equals(x.getText())) )
+			{
+				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+										  g.fileName, x, x.getText(), expr);
+			}
+			else {
+				ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
+										  g.fileName, y, x.getText(), y.getText(), expr);
+			}
+		}
     }
 
-    public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) { }
+    public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
+												   Token index, Token rhs) {
 
-    public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index) { }
+	}
 
-    public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) { }
+    public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
+												Token index) {
+	}
 
-    public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index) { }
+    public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
+												   Token index, Token rhs) {
+	}
+
+    public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
+												Token index) {
+	}
 
     public void unknownSyntax(String text) {
         System.err.println("unknown: "+text);

@@ -43,6 +43,10 @@ LINE_COMMENT
     : '//' ~('\n'|'\r')* '\r'? '\n' {delegate.text($text);}
     ;
 
+ESC	:	'\\$'
+	|	'\\%'
+	;
+	
 SET_QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
 		{delegate.setQualifiedAttr($text, $x, $y, $expr);}
@@ -135,9 +139,7 @@ UNKNOWN_SYNTAX
 // Anything else is just random text
 TEXT
 @after {delegate.text($text);}
-	:	(	'\\$'
-		|	'\\%'
-		)+
+	:	~('$'|'%')+
 	;
 	
 fragment

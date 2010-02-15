@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-02-15 12:12:19
+// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-02-15 13:05:00
 
 /*
  [The "BSD license"]
@@ -26,19 +26,15 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.semantics;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.parse.*;
-import java.util.Set;
-import java.util.HashSet;
-import org.stringtemplate.v4.misc.MultiMap;
-
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;import java.util.Stack;
-import java.util.List;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
+import org.antlr.v4.parse.ScopeParser;
+import org.antlr.v4.tool.*;
+
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.List;
 /** Collects rules, terminals, strings, actions, scopes etc... from AST
  *  Side-effects: None
  */

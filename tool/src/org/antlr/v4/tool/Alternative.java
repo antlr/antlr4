@@ -59,7 +59,15 @@ public class Alternative implements AttributeResolver {
         return getParent().resolves(x, y, node);
     }
 
-    public Rule resolveRefToRule(String x, ActionAST node) {
+	public boolean dynScopeResolves(String x, ActionAST node) {
+		return getParent().dynScopeResolves(x,node);
+	}
+
+	public boolean dynScopeResolves(String x, String y, ActionAST node) {
+		return getParent().dynScopeResolves(x,y,node);
+	}
+
+	public Rule resolveRefToRule(String x, ActionAST node) {
         if ( ruleRefs.get(x)!=null ) return rule.g.getRule(x);
         List<LabelElementPair> labels = labelDefs.get(x);
         if ( labels!=null ) { // it's a label ref. is it a rule label?

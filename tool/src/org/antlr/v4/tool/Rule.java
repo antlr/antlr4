@@ -93,33 +93,23 @@ public class Rule implements AttributeResolver {
 
     /** For $x.y, is x an arg, retval, predefined prop, token/rule/label ref?
      *  If so, make sure y resolves within that perspective.
+	 *  For $x::y, is x this rule or another? If so, is y in that scope?
      */
     public boolean resolves(String x, String y, ActionAST node) {
         Rule r = resolveRefToRule(x, node);
-        if ( r!=null ) r.resolvesAsRetvalOrProperty(y);
+        if ( r!=null ) return r.resolvesAsRetvalOrProperty(y);
         return getParent().resolves(x,y,node);
-
-//        if ( x.equals(this.name) ) { // $x.y ref in rule x is same as $y
-//            return resolves(y, node);
-//        }
-//
-//        if ( node.resolver == this ) { // action not in alt (attr space is this rule)
-//            List<LabelElementPair> labels = getLabelDefs().get(x);
-//            if ( labels!=null ) {
-//                // it's a label ref, compute scope from label type and grammar type
-//                LabelElementPair anyLabelDef = labels.get(0);
-//                // predefined?
-//                if ( getPredefinedScope(anyLabelDef.type).get(y)!=null) return true;
-//                if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-//                    Rule ref = g.getRule(anyLabelDef.element.getText());
-//                    return ref.resolvesAsRetvalOrProperty(y);
-//                }
-//            }
-//        }
-//        return false;
     }
 
-    public Rule resolveRefToRule(String x, ActionAST node) {
+	public boolean dynScopeResolves(String x, ActionAST node) {
+		return x.equals(this.name);
+	}
+
+	public boolean dynScopeResolves(String x, String y, ActionAST node) {
+		return x.equals(this.name) && scope.get(y)!=null;
+	}
+
+	public Rule resolveRefToRule(String x, ActionAST node) {
         if ( x.equals(this.name) ) return this;
         if ( node.resolver == this ) { // action not in alt (attr space is this rule)
             List<LabelElementPair> labels = getLabelDefs().get(x);

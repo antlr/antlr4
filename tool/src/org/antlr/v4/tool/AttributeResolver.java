@@ -7,7 +7,9 @@ package org.antlr.v4.tool;
  */
 public interface AttributeResolver {
     public AttributeResolver getParent();
-    public boolean resolves(String x, ActionAST node);
-    public boolean resolves(String x, String y, ActionAST node);
+	public boolean resolves(String x, ActionAST node);
+	public boolean resolves(String x, String y, ActionAST node);
+	public boolean dynScopeResolves(String x, ActionAST node);
+	public boolean dynScopeResolves(String x, String y, ActionAST node);
     public Rule resolveRefToRule(String x, ActionAST node);
 }

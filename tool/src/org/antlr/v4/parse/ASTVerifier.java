@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ASTVerifier.g 2010-02-15 12:12:18
+// $ANTLR ${project.version} ${buildNumber} ASTVerifier.g 2010-02-15 13:04:59
 
 /*
  [The "BSD license"]
@@ -26,14 +26,15 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.parse;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
-
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;import java.util.Stack;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeParser;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
+import org.antlr.v4.runtime.tree.CommonTree;
+import org.antlr.v4.tool.GrammarAST;
+
 import java.util.List;
-import java.util.ArrayList;
 
 /** The definitive ANTLR v3 tree grammar to parse ANTLR v4 grammars. 
  *  Parses trees created in ANTLRParser.g.

@@ -224,6 +224,21 @@ public class Grammar implements AttributeResolver {
      */
     public boolean resolves(String x, String y, ActionAST node) { return false; }
 
+	public boolean dynScopeResolves(String x, ActionAST node) {
+		if ( scopes.get(x)!=null ) return true;
+		// resolve inside of a rule? x can be any rule ref
+		if ( !(node.resolver instanceof Grammar) ) {
+			Rule r = getRule(x);
+			if ( r!=null && r.scope!=null ) return true;
+		}
+		return false;
+	}
+
+	public boolean dynScopeResolves(String x, String y, ActionAST node) {
+		AttributeScope s = scopes.get(x);
+		return s.get(y)!=null;
+	}
+
 	/** Can't be a rule ref in grammar named action */
     public Rule resolveRefToRule(String x, ActionAST node) { return null; }
 
