@@ -13,8 +13,9 @@ import java.util.Set;
  */
 public class AttributeScope {
     /** The scope name */
-    protected String name;
+    public String name;
     public GrammarAST ast;
+//	public Type type;
 
     /** All token scopes (token labels) share the same fixed scope of
      *  of predefined attributes.  I keep this out of the runtime.Token

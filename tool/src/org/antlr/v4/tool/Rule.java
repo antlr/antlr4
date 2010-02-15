@@ -79,49 +79,25 @@ public class Rule implements AttributeResolver {
         for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this);
     }
 
-    public AttributeResolver getParent() { return g; }
-
     /** Is isolated x an arg, retval, predefined prop? */
-    public boolean resolves(String x, ActionAST node) {
-        if ( resolvesAsRetvalOrProperty(x) ) return true;
-        if ( args.get(x)!=null ) return true;
-        // resolve outside of an alt?
-        if ( node.resolver instanceof Alternative ) return getParent().resolves(x, node);
-        if ( getLabelNames().contains(x) ) return true; // can see all labels if not in alt
-        return getParent().resolves(x, node);
-    }
-
-    /** For $x.y, is x an arg, retval, predefined prop, token/rule/label ref?
-     *  If so, make sure y resolves within that perspective.
-	 *  For $x::y, is x this rule or another? If so, is y in that scope?
-     */
-    public boolean resolves(String x, String y, ActionAST node) {
-        Rule r = resolveRefToRule(x, node);
-        if ( r!=null ) return r.resolvesAsRetvalOrProperty(y);
-        return getParent().resolves(x,y,node);
-    }
-
-	public boolean dynScopeResolves(String x, ActionAST node) {
-		return x.equals(this.name);
-	}
-
-	public boolean dynScopeResolves(String x, String y, ActionAST node) {
-		return x.equals(this.name) && scope.get(y)!=null;
-	}
-
-	public Rule resolveRefToRule(String x, ActionAST node) {
-        if ( x.equals(this.name) ) return this;
-        if ( node.resolver == this ) { // action not in alt (attr space is this rule)
-            List<LabelElementPair> labels = getLabelDefs().get(x);
-            if ( labels!=null ) {  // it's a label ref. is it a rule label?
-                LabelElementPair anyLabelDef = labels.get(0);
-                if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-                    return g.getRule(anyLabelDef.element.getText());
-                }
-            }
-        }
-        return null; // don't look for general rule (not one ref'd in this rule)
-    }
+//    public boolean resolves(String x, ActionAST node) {
+//        if ( resolvesAsRetvalOrProperty(x) ) return true;
+//        if ( args.get(x)!=null ) return true;
+//        // resolve outside of an alt?
+//        if ( node.resolver instanceof Alternative ) return getParent().resolves(x, node);
+//        if ( getLabelNames().contains(x) ) return true; // can see all labels if not in alt
+//        return getParent().resolves(x, node);
+//    }
+//
+//    /** For $x.y, is x an arg, retval, predefined prop, token/rule/label ref?
+//     *  If so, make sure y resolves within that perspective.
+//	 *  For $x::y, is x this rule or another? If so, is y in that scope?
+//     */
+//    public boolean resolves(String x, String y, ActionAST node) {
+//        Rule r = resolveRule(x, node);
+//        if ( r!=null ) return r.resolvesAsRetvalOrProperty(y);
+//        return getParent().resolves(x,y,node);
+//    }
 
     public boolean resolvesAsRetvalOrProperty(String y) {
         if ( retvals.get(y)!=null ) return true;
@@ -156,7 +132,56 @@ public class Rule implements AttributeResolver {
         return defs;
     }
 
-    /** Look up name from context of this rule and an alternative.
+	public AttributeResolver getParent() { return g; }
+
+	public Attribute resolveToAttribute(String x, ActionAST node) {
+        Attribute a = args.get(name);   if ( a!=null ) return a;
+        a = retvals.get(name);          if ( a!=null ) return a;
+        AttributeScope properties = getPredefinedScope(LabelType.RULE_LABEL);
+        a = properties.get(name);
+        if ( a!=null ) return a;
+		// not here? look in grammar for global scope
+		return getParent().resolveToAttribute(x, node);
+	}
+
+	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
+		AttributeScope s = resolveToScope(x, node);
+		return s.get(y);
+	}
+
+	/** $r ref in rule r? if not, look for x in grammar's perspective
+     */
+	public AttributeScope resolveToScope(String x, ActionAST node) {
+        if ( this.name.equals(x) ) {
+			return getPredefinedScope(LabelType.RULE_LABEL);
+		}
+		if ( node.resolver == this ) { // action not in alt (attr space is this rule)
+			List<LabelElementPair> labels = getLabelDefs().get(x);
+			if ( labels!=null ) {  // it's a label ref. is it a rule label?
+				LabelElementPair anyLabelDef = labels.get(0);
+				if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+					return getPredefinedScope(LabelType.RULE_LABEL);
+				}
+			}
+		}
+		return getParent().resolveToScope(x, node);
+	}
+
+	public Rule resolveToRule(String x, ActionAST node) {
+        if ( x.equals(this.name) ) return this;
+        if ( node.resolver == this ) { // action not in alt (attr space is this rule)
+            List<LabelElementPair> labels = getLabelDefs().get(x);
+            if ( labels!=null ) {  // it's a label ref. is it a rule label?
+                LabelElementPair anyLabelDef = labels.get(0);
+                if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+                    return g.getRule(anyLabelDef.element.getText());
+                }
+            }
+        }
+        return null; // don't look for general rule (not one ref'd in this rule)
+    }
+	
+	/** Look up name from context of this rule and an alternative.
      *  Find an arg, retval, predefined property, or label/rule/token ref.
      */
 //    public Attribute resolve(String name) {

@@ -214,33 +214,35 @@ public class Grammar implements AttributeResolver {
 
     public AttributeResolver getParent() { return null; }
 
-    /** $x in grammar action can only be scope name */
-    public boolean resolves(String x, ActionAST node) {
-        return scopes.get(x)!=null;
-    }
-
-    /** $x.y makes no sense in grammar action; Rule.resolves()
-     *  shouldn't call this.
-     */
-    public boolean resolves(String x, String y, ActionAST node) { return false; }
-
-	public boolean dynScopeResolves(String x, ActionAST node) {
-		if ( scopes.get(x)!=null ) return true;
-		// resolve inside of a rule? x can be any rule ref
-		if ( !(node.resolver instanceof Grammar) ) {
-			Rule r = getRule(x);
-			if ( r!=null && r.scope!=null ) return true;
-		}
-		return false;
+	// no isolated attr at grammar action level
+	public Attribute resolveToAttribute(String x, ActionAST node) {
+		return null;
 	}
 
-	public boolean dynScopeResolves(String x, String y, ActionAST node) {
+	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
+		AttributeScope s = resolveToScope(x, node);
+		return s.get(y);
+	}
+
+	// $x can be scope (but not rule with scope)
+	public AttributeScope resolveToScope(String x, ActionAST node) {
 		AttributeScope s = scopes.get(x);
-		return s.get(y)!=null;
+		if ( s!=null ) return s;
+		return null;
 	}
+
+	//	/** $x in grammar action can only be scope name */
+//    public boolean resolves(String x, ActionAST node) {
+//        return scopes.get(x)!=null;
+//    }
+//
+//    /** $x.y makes no sense in grammar action; Rule.resolves()
+//     *  shouldn't call this.
+//     */
+//    public boolean resolves(String x, String y, ActionAST node) { return false; }
 
 	/** Can't be a rule ref in grammar named action */
-    public Rule resolveRefToRule(String x, ActionAST node) { return null; }
+    public Rule resolveToRule(String x, ActionAST node) { return null; }
 
     /** Given a grammar type, what should be the default action scope?
      *  If I say @members in a COMBINED grammar, for example, the

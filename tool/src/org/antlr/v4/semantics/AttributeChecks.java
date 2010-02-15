@@ -68,16 +68,15 @@ public class AttributeChecks implements ActionSplitterListener {
         new AttributeChecks(g, r, alt, node, rhs).examineAction();
     }
 
-    public void qualifiedAttr(String expr, Token x, Token y) {
-		if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
-			if ( !node.resolver.resolves(x.getText(), node) &&
-				 (r==null || !r.name.equals(x.getText())) )
-			{
-				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-										  g.fileName, x, x.getText(), expr);
-				return;
-			}
-			if ( node.resolver.resolveRefToRule(x.getText(), node)!=null ) {
+	public void qualifiedAttr(String expr, Token x, Token y) {
+		if ( node.resolver.resolveToScope(x.getText(), node)==null ) {
+			ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+									  g.fileName, x, x.getText(), expr);
+			return;
+		}
+
+		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
+			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) {
 				Rule rref = g.getRule(x.getText());
 				if ( rref!=null && rref.args!=null && rref.args.get(y.getText())!=null ) {
 					ErrorManager.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
@@ -95,7 +94,7 @@ public class AttributeChecks implements ActionSplitterListener {
 	}
 
 	public void setAttr(String expr, Token x, Token rhs) {
-		if ( !node.resolver.resolves(x.getText(), node) ) {
+		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
             ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
                                       g.fileName, x, x.getText(), expr);
         }
@@ -103,15 +102,15 @@ public class AttributeChecks implements ActionSplitterListener {
     }
 
     public void attr(String expr, Token x) { // arg, retval, predefined, token ref, rule ref, current rule
-        if ( node.resolver.resolveRefToRule(x.getText(), node)!=null ) { // or in rule and is rule ref
-            ErrorManager.grammarError(ErrorType.ISOLATED_RULE_SCOPE,
-                                      g.fileName, x, x.getText(), expr);
-            return;
-        }
-        if ( !node.resolver.resolves(x.getText(), node) ) {
-            ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-                                      g.fileName, x, x.getText(), expr);
-        }
+		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
+			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) { // or in rule and is rule ref
+				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_SCOPE,
+										  g.fileName, x, x.getText(), expr);
+				return;
+			}
+			ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+									  g.fileName, x, x.getText(), expr);
+		}
     }
 
     public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
@@ -120,18 +119,18 @@ public class AttributeChecks implements ActionSplitterListener {
 
     public void dynamicScopeAttr(String expr, Token x, Token y) {
 		System.out.println(x+" :: "+y);
-		if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
-			if ( !node.resolver.resolves(x.getText(), node) &&
-				 (r==null || !r.name.equals(x.getText())) )
-			{
-				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-										  g.fileName, x, x.getText(), expr);
-			}
-			else {
-				ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
-										  g.fileName, y, x.getText(), y.getText(), expr);
-			}
-		}
+//		if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
+//			if ( !node.resolver.resolves(x.getText(), node) &&
+//				 (r==null || !r.name.equals(x.getText())) )
+//			{
+//				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+//										  g.fileName, x, x.getText(), expr);
+//			}
+//			else {
+//				ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
+//										  g.fileName, y, x.getText(), y.getText(), expr);
+//			}
+//		}
     }
 
     public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
