@@ -2,7 +2,7 @@ package org.antlr.v4.parse;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.AttributeScope;
+import org.antlr.v4.tool.AttributeDict;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,9 @@ public class ScopeParser {
      *
      *  convert to an attribute scope.
      */
-    public static AttributeScope parseTypeList(String s) { return parse(s, ','); }
+    public static AttributeDict parseTypeList(String s) { return parse(s, ','); }
 
-    public static AttributeScope parseDynamicScope(String s) {
+    public static AttributeDict parseDynamicScope(String s) {
         // ignore outer {..} if present
         s = s.trim();
         if ( s.startsWith("{") ) {
@@ -41,10 +41,10 @@ public class ScopeParser {
         return parse(s, ';');
     }
 
-    public static AttributeScope parse(String s, char separator) {
+    public static AttributeDict parse(String s, char separator) {
         int i = 0;
         int n = s.length();
-        AttributeScope scope = new AttributeScope();
+        AttributeDict dict = new AttributeDict();
         while ( i<n ) {
             StringBuilder buf = new StringBuilder();
             while ( i<n && s.charAt(i)!=separator ) {
@@ -65,10 +65,10 @@ public class ScopeParser {
             //System.out.println("def="+ def);
             if ( def.trim().length()>0 ) {
                 Attribute a = parseAttributeDef(def);
-                scope.attributes.put(a.name, a);
+                dict.attributes.put(a.name, a);
             }
         }
-        return scope;
+        return dict;
     }
 
     /** For decls like "String foo" or "char *foo32[]" compute the ID

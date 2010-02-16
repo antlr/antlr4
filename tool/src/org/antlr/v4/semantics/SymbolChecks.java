@@ -38,7 +38,7 @@ public class SymbolChecks {
     public void examine() {
         // methods affect fields, but no side-effects outside this object
         // So, call order sensitive
-        checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames 
+        checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames
         checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
         checkActionRedefinitions(collector.actions);    // sets actionScopeToActionNames
         checkTokenAliasRedefinitions(collector.tokensDefs);
@@ -67,10 +67,10 @@ public class SymbolChecks {
         }
     }
 
-    public void checkScopeRedefinitions(List<AttributeScope> scopes) {
-        if ( scopes==null ) return;
-        for (int i=0; i< scopes.size(); i++) {
-            AttributeScope s = scopes.get(i);
+    public void checkScopeRedefinitions(List<AttributeDict> dicts) {
+        if ( dicts ==null ) return;
+        for (int i=0; i< dicts.size(); i++) {
+            AttributeDict s = dicts.get(i);
             //GrammarAST idNode = (GrammarAST)s.getChild(0);
             if ( !globalScopeNames.contains(s.getName()) ) {
                 globalScopeNames.add(s.getName());
@@ -224,7 +224,7 @@ public class SymbolChecks {
         else if ( tokenIDs.contains(name) ) {
             etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
         }
-        else if ( r.scope!=null && r.scope.get(name)!=null ) {
+        else if ( r.scope !=null && r.scope.get(name)!=null ) {
             etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
             arg2 = r.name;
         }
@@ -260,7 +260,7 @@ public class SymbolChecks {
      *  arg, return value, rule name itself.  Labels are checked elsewhere.
      */
     public void checkForRuleScopeAttributeConflict(Rule r) {
-        if ( r.scope==null ) return;
+        if ( r.scope ==null ) return;
         for (Attribute a : r.scope.attributes.values()) {
             ErrorType msgID = ErrorType.INVALID;
             Object arg2 = null;

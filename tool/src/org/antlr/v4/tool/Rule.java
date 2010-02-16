@@ -9,8 +9,8 @@ public class Rule implements AttributeResolver {
     /** Rule refs have a predefined set of attributes as well as
      *  the return values and args.
      */
-    public static AttributeScope predefinedRulePropertiesScope =
-        new AttributeScope() {{
+    public static AttributeDict predefinedRulePropertiesDict =
+        new AttributeDict() {{
             add(new Attribute("text"));
             add(new Attribute("start"));
             add(new Attribute("stop"));
@@ -18,16 +18,16 @@ public class Rule implements AttributeResolver {
             add(new Attribute("st"));
         }};
 
-    public static AttributeScope predefinedTreeRulePropertiesScope =
-        new AttributeScope() {{
+    public static AttributeDict predefinedTreeRulePropertiesDict =
+        new AttributeDict() {{
             add(new Attribute("text"));
             add(new Attribute("start")); // note: no stop; not meaningful
             add(new Attribute("tree"));
             add(new Attribute("st"));
         }};
 
-    public static AttributeScope predefinedLexerRulePropertiesScope =
-        new AttributeScope() {{
+    public static AttributeDict predefinedLexerRulePropertiesDict =
+        new AttributeDict() {{
             add(new Attribute("text"));
             add(new Attribute("type"));
             add(new Attribute("line"));
@@ -41,9 +41,9 @@ public class Rule implements AttributeResolver {
 
     public String name;
     public GrammarASTWithOptions ast;
-    public AttributeScope args;
-    public AttributeScope retvals;
-    public AttributeScope scope;
+    public AttributeDict args;
+    public AttributeDict retvals;
+    public AttributeDict scope; // scope { int i; }
     /** A list of scope names used by this rule */
     public List<Token> useScopes;
     public Grammar g;
@@ -70,7 +70,7 @@ public class Rule implements AttributeResolver {
 
     public Alternative[] alt;
 
-    public Rule(Grammar g, String name, GrammarASTWithOptions ast, int numberOfAlts) {
+	public Rule(Grammar g, String name, GrammarASTWithOptions ast, int numberOfAlts) {
         this.g = g;
         this.name = name;
         this.ast = ast;
@@ -99,13 +99,16 @@ public class Rule implements AttributeResolver {
 //        return getParent().resolves(x,y,node);
 //    }
 
-    public boolean resolvesAsRetvalOrProperty(String y) {
-        if ( retvals.get(y)!=null ) return true;
-        AttributeScope s = getPredefinedScope(LabelType.RULE_LABEL);
-        return s.get(y)!=null;
-    }
+	public Attribute resolveRetvalOrProperty(String y) {
+		if ( retvals!=null ) {
+			Attribute a = retvals.get(y);
+			if ( a!=null ) return retvals.get(y);
+		}
+		AttributeDict d = getPredefinedScope(LabelType.RULE_LABEL);
+		return d.get(y);
+	}
 
-    public Set<String> getRuleRefs() {
+	public Set<String> getRuleRefs() {
         Set<String> refs = new HashSet<String>();
         for (Alternative a : alt) refs.addAll(a.ruleRefs.keySet());
         return refs;
@@ -132,44 +135,53 @@ public class Rule implements AttributeResolver {
         return defs;
     }
 
-	public AttributeResolver getParent() { return g; }
+	private AttributeResolver getParent() { return g; }
 
+	/**  $x		Attribute: rule arguments, return values, predefined rule prop. */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
-        Attribute a = args.get(name);   if ( a!=null ) return a;
-        a = retvals.get(name);          if ( a!=null ) return a;
-        AttributeScope properties = getPredefinedScope(LabelType.RULE_LABEL);
-        a = properties.get(name);
-        if ( a!=null ) return a;
-		// not here? look in grammar for global scope
-		return getParent().resolveToAttribute(x, node);
+		Attribute a = args.get(x);   if ( a!=null ) return a;
+		a = retvals.get(x);          if ( a!=null ) return a;
+		AttributeDict properties = getPredefinedScope(LabelType.RULE_LABEL);
+		return properties.get(x);
 	}
 
+	/** $x.y	Attribute: x is surrounding rule, label ref (in any alts) */
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
-		AttributeScope s = resolveToScope(x, node);
-		return s.get(y);
-	}
-
-	/** $r ref in rule r? if not, look for x in grammar's perspective
-     */
-	public AttributeScope resolveToScope(String x, ActionAST node) {
-        if ( this.name.equals(x) ) {
-			return getPredefinedScope(LabelType.RULE_LABEL);
+		if ( this.name.equals(x) ) { // x is this rule?
+			AttributeDict d = getPredefinedScope(LabelType.RULE_LABEL);
+			return d.get(y);
 		}
-		if ( node.resolver == this ) { // action not in alt (attr space is this rule)
-			List<LabelElementPair> labels = getLabelDefs().get(x);
-			if ( labels!=null ) {  // it's a label ref. is it a rule label?
-				LabelElementPair anyLabelDef = labels.get(0);
-				if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-					return getPredefinedScope(LabelType.RULE_LABEL);
-				}
+		List<LabelElementPair> labels = getLabelDefs().get(x);
+		if ( labels!=null ) { // it's a label ref. is it a rule label?
+			LabelElementPair anyLabelDef = labels.get(0);
+			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+				return g.getRule(anyLabelDef.element.getText()).resolveRetvalOrProperty(y);
 			}
+			return getPredefinedScope(anyLabelDef.type).get(y);
 		}
-		return getParent().resolveToScope(x, node);
+		return null;
+
 	}
 
-	public AttributeScope resolveToDynamicScope(String x, ActionAST node) {
+	/** $x		AttributeDict: references to token labels in *any* alt. x can
+ 	 * 			be any rule with scope or global scope or surrounding rule x.
+	 */
+	public boolean resolvesToAttributeDict(String x, ActionAST node) {
+		List<LabelElementPair> labels = getLabelDefs().get(x);
+		if ( labels!=null ) { // it's a label ref. is it a token label?
+			LabelElementPair anyLabelDef = labels.get(0);
+			if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
+		}
+		if ( x.equals(this.name) ) return true; // $r for action in rule r, $r is a dict
+		Rule r = g.getRule(x);
+		if ( r!=null && r.scope!=null ) return true;
+		if ( g.scopes.get(x)!=null ) return true;
+		return false;
+	}
+
+	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
 		Rule r = resolveToRule(x, node);
-		if ( r!=null && r.scope!=null ) return r.scope;
+		if ( r!=null && r.scope !=null ) return r.scope;
 		return getParent().resolveToDynamicScope(x, node);
 	}
 
@@ -239,7 +251,7 @@ public class Rule implements AttributeResolver {
 //        return null;
 //    }
 
-    public AttributeScope getPredefinedScope(LabelType ltype) {
+    public AttributeDict getPredefinedScope(LabelType ltype) {
         String grammarLabelKey = g.getTypeString() + ":" + ltype;
         return Grammar.grammarAndLabelRefTypeToScope.get(grammarLabelKey);
     }

@@ -52,7 +52,7 @@ public class SemanticPipeline {
 
         // STORE RULES/ACTIONS/SCOPES IN GRAMMAR
         for (Rule r : collector.rules) g.defineRule(r);
-        for (AttributeScope s : collector.scopes) g.defineScope(s);
+        for (AttributeDict s : collector.scopes) g.defineScope(s);
         for (GrammarAST a : collector.actions) g.defineAction(a);
         // TODO: named actions
 

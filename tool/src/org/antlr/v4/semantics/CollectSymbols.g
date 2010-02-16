@@ -80,7 +80,7 @@ public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
-public List<AttributeScope> scopes = new ArrayList<AttributeScope>();
+public List<AttributeDict> scopes = new ArrayList<AttributeDict>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
 Grammar g; // which grammar are we checking
 public CollectSymbols(TreeNodeStream input, Grammar g) {
@@ -97,6 +97,7 @@ topdown
     |	rule
     |	ruleArg
     |	ruleReturns
+    |	ruleNamedAction
     |	ruleScopeSpec
     |	ruleref
     |	rewriteElement // make sure we check this before terminal etc... 
@@ -116,7 +117,7 @@ bottomup
 globalScope
 	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION)
 		{
-		AttributeScope s = ScopeParser.parseDynamicScope($ACTION.text);
+		AttributeDict s = ScopeParser.parseDynamicScope($ACTION.text);
 		s.name = $ID.text;
 		s.ast = $ACTION;
 		scopes.add(s);
@@ -167,7 +168,7 @@ ruleNamedAction
 
 ruleAction
 	:	{inContext("RULE ...")&&!inContext("SCOPE")&&
-		 !inContext("CATCH")&&!inContext("FINALLY")}?
+		 !inContext("CATCH")&&!inContext("FINALLY")&&!inContext("AT")}?
 		ACTION
 		{
 		currentRule.alt[currentAlt].actions.add((ActionAST)$ACTION);

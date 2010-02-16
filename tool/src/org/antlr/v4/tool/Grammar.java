@@ -20,17 +20,17 @@ public class Grammar implements AttributeResolver {
             }
         };
 
-    public static Map<String, AttributeScope> grammarAndLabelRefTypeToScope =
-        new HashMap<String, AttributeScope>() {{
-            put("lexer:RULE_LABEL", Rule.predefinedLexerRulePropertiesScope);
-            put("lexer:LEXER_STRING_LABEL", Rule.predefinedLexerRulePropertiesScope);
-            put("parser:RULE_LABEL", Rule.predefinedRulePropertiesScope);
-            put("parser:TOKEN_LABEL", AttributeScope.predefinedTokenScope);
-            put("tree:RULE_LABEL", Rule.predefinedTreeRulePropertiesScope);
-            put("tree:TOKEN_LABEL", AttributeScope.predefinedTokenScope);
-            put("tree:WILDCARD_TREE_LABEL", AttributeScope.predefinedTokenScope);
-            put("combined:RULE_LABEL", Rule.predefinedRulePropertiesScope);
-            put("combined:TOKEN_LABEL", AttributeScope.predefinedTokenScope);
+    public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
+        new HashMap<String, AttributeDict>() {{
+            put("lexer:RULE_LABEL", Rule.predefinedLexerRulePropertiesDict);
+            put("lexer:LEXER_STRING_LABEL", Rule.predefinedLexerRulePropertiesDict);
+            put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
+            put("parser:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
+            put("tree:RULE_LABEL", Rule.predefinedTreeRulePropertiesDict);
+            put("tree:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
+            put("tree:WILDCARD_TREE_LABEL", AttributeDict.predefinedTokenDict);
+            put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
+            put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
         }};
     
     public Tool tool;
@@ -58,7 +58,7 @@ public class Grammar implements AttributeResolver {
     /** A list of options specified at the grammar level such as language=Java. */
     public Map<String, String> options;
 
-    public Map<String, AttributeScope> scopes = new LinkedHashMap<String, AttributeScope>();
+    public Map<String, AttributeDict> scopes = new LinkedHashMap<String, AttributeDict>();
 
 	public Grammar(Tool tool, GrammarRootAST ast) {
         if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
@@ -124,7 +124,7 @@ public class Grammar implements AttributeResolver {
 
     public Rule getRule(String name) { return rules.get(name); }
 
-    public void defineScope(AttributeScope s) { scopes.put(s.getName(), s); }
+    public void defineScope(AttributeDict s) { scopes.put(s.getName(), s); }
 
     /** Get list of all delegates from all grammars in the delegate subtree of g.
      *  The grammars are in delegation tree preorder.  Don't include ourselves
@@ -212,25 +212,23 @@ public class Grammar implements AttributeResolver {
         return null;
     }
 
-    public AttributeResolver getParent() { return null; }
-
 	// no isolated attr at grammar action level
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		return null;
 	}
 
+	// no $x.y makes sense here
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
-		AttributeScope s = resolveToScope(x, node);
-		return s.get(y);
+		return null;
 	}
 
-	// $x can be scope (but not rule with scope)
-	public AttributeScope resolveToScope(String x, ActionAST node) {
-		return resolveToDynamicScope(x, node);
+	/** $s		AttributeDict: s is a global scope */
+	public boolean resolvesToAttributeDict(String x, ActionAST node) {
+		return scopes.get(x)!=null;
 	}
 
-	public AttributeScope resolveToDynamicScope(String x, ActionAST node) {
-		AttributeScope s = scopes.get(x);
+	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
+		AttributeDict s = scopes.get(x);
 		if ( s !=null ) return s;
 		if ( node.resolver != this ) { // if not member action, can ref rule
 			Rule r = rules.get(x);

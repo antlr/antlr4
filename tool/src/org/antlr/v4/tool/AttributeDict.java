@@ -5,14 +5,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-/** Track the attributes within a scope.  A named scoped has just its list
- *  of attributes.  Each rule has potentially 3 scopes: return values,
+/** Track the attributes within retval, arg lists etc...
+ *
+ *  Each rule has potentially 3 scopes: return values,
  *  parameters, and an implicitly-named scope (i.e., a scope defined in a rule).
  *  Implicitly-defined scopes are named after the rule; rules and scopes then
  *  must live in the same name space--no collisions allowed.
  */
-public class AttributeScope {
-    /** The scope name */
+public class AttributeDict {
     public String name;
     public GrammarAST ast;
 //	public Type type;
@@ -21,7 +21,7 @@ public class AttributeScope {
      *  of predefined attributes.  I keep this out of the runtime.Token
      *  object to avoid a runtime type leakage.
      */
-    public static AttributeScope predefinedTokenScope = new AttributeScope() {{
+    public static AttributeDict predefinedTokenDict = new AttributeDict() {{
         add(new Attribute("text"));
         add(new Attribute("type"));
         add(new Attribute("line"));
@@ -43,7 +43,9 @@ public class AttributeScope {
     public LinkedHashMap<String, Attribute> attributes =
         new LinkedHashMap<String, Attribute>();
 
-    public Attribute add(Attribute a) { return attributes.put(a.name, a); }
+	public AttributeDict() {;}
+
+	public Attribute add(Attribute a) { return attributes.put(a.name, a); }
     public Attribute get(String name) { return attributes.get(name); }
 
     public String getName() {
@@ -61,7 +63,7 @@ public class AttributeScope {
     /** Return the set of keys that collide from
      *  this and other.
      */
-    public Set intersection(AttributeScope other) {
+    public Set intersection(AttributeDict other) {
         if ( other==null || other.size()==0 || size()==0 ) {
             return null;
         }

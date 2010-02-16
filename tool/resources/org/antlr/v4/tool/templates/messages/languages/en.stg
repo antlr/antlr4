@@ -118,8 +118,8 @@ ATTRIBUTE_REF_NOT_IN_RULE(arg,arg2) ::=
 	"reference to attribute outside of a rule: <arg><if(arg2)>.<arg2><endif>"
 UNKNOWN_ATTRIBUTE_IN_SCOPE(arg,arg2) ::=
 	"attribute <arg> isn't a valid property in <arg2>"
-UNKNOWN_RULE_ATTRIBUTE(arg,arg2) ::=
-	"unknown attribute rule <arg> in <arg2>"
+UNKNOWN_RULE_ATTRIBUTE(arg,arg2,arg3) ::=
+	"unknown attribute <arg> for rule <arg2> in <arg3>"
 UNKNOWN_SIMPLE_ATTRIBUTE(arg,arg2) ::=
 	"unknown attribute reference <arg> in <arg2>"
 ISOLATED_RULE_SCOPE(arg,arg2) ::=

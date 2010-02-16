@@ -68,28 +68,29 @@ public class AttributeChecks implements ActionSplitterListener {
         new AttributeChecks(g, r, alt, node, rhs).examineAction();
     }
 
+	// $x.y
 	public void qualifiedAttr(String expr, Token x, Token y) {
-		if ( node.resolver.resolveToScope(x.getText(), node)==null ) {
-			ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-									  g.fileName, x, x.getText(), expr);
-			return;
-		}
-
 		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
-			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) {
+			Rule r = node.resolver.resolveToRule(x.getText(), node);
+			if ( r!=null ) {
 				Rule rref = g.getRule(x.getText());
 				if ( rref!=null && rref.args!=null && rref.args.get(y.getText())!=null ) {
 					ErrorManager.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
 											  g.fileName, y, y.getText(), expr);
-					return;
 				}
-				ErrorManager.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
-										  g.fileName, y, y.getText(), expr);
-				return;
+				else {
+					ErrorManager.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
+											  g.fileName, y, y.getText(), r.name, expr);
+				}
 			}
-			ErrorManager.grammarError(ErrorType.UNKNOWN_ATTRIBUTE_IN_SCOPE,
-									  g.fileName, y, y.getText(), expr);
-			return;
+			else if ( !node.resolver.resolvesToAttributeDict(x.getText(), node) ) {
+				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+										  g.fileName, x, x.getText(), expr);
+			}
+			else {
+				ErrorManager.grammarError(ErrorType.UNKNOWN_ATTRIBUTE_IN_SCOPE,
+										  g.fileName, y, y.getText(), expr);
+			}
 		}
 	}
 
@@ -101,12 +102,12 @@ public class AttributeChecks implements ActionSplitterListener {
         new AttributeChecks(g, r, alt, node, rhs).examineAction();
     }
 
-    public void attr(String expr, Token x) { // arg, retval, predefined, token ref, rule ref, current rule
+    public void attr(String expr, Token x) {
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-			if ( node.resolver.resolveToScope(x.getText(), node)!=null ) {
+			if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
 				return; // $S for scope S is ok
 			}
-			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) { // or in rule and is rule ref
+			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) {
 				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_SCOPE,
 										  g.fileName, x, x.getText(), expr);
 				return;
@@ -124,7 +125,7 @@ public class AttributeChecks implements ActionSplitterListener {
 
     public void dynamicScopeAttr(String expr, Token x, Token y) {
 		//System.out.println(x+" :: "+y);
-		AttributeScope s = node.resolver.resolveToDynamicScope(x.getText(), node);
+		AttributeDict s = node.resolver.resolveToDynamicScope(x.getText(), node);
 		if ( s==null ) {
 			ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE,
 									  g.fileName, x, x.getText(), expr);
