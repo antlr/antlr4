@@ -226,8 +226,16 @@ public class Grammar implements AttributeResolver {
 
 	// $x can be scope (but not rule with scope)
 	public AttributeScope resolveToScope(String x, ActionAST node) {
+		return resolveToDynamicScope(x, node);
+	}
+
+	public AttributeScope resolveToDynamicScope(String x, ActionAST node) {
 		AttributeScope s = scopes.get(x);
-		if ( s!=null ) return s;
+		if ( s !=null ) return s;
+		if ( node.resolver != this ) { // if not member action, can ref rule
+			Rule r = rules.get(x);
+			if ( r!=null ) return r.scope;
+		}
 		return null;
 	}
 

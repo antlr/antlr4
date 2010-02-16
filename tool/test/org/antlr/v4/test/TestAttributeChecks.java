@@ -24,18 +24,19 @@ public class TestAttributeChecks extends BaseTest {
     String scopeTemplate =
         "parser grammar A;\n"+
         "@members {\n" +
+		"<members>\n" +
         "}\n" +
         "scope S { int i; }\n" +
         "a[int x] returns [int y]\n" +
         "scope { int z; }\n" +
         "scope S;\n" +
-        "@init {}\n" +
-        "    :   {}\n" +
+        "@init {<init>}\n" +
+        "    :   {<inline>}\n" +
         "    ;\n" +
-        "    finally {}\n" +
+        "    finally {<finally>}\n" +
         "b[int d] returns [int e]\n" +
         "scope { int f; }\n" +
-        "    :   {}\n" +
+        "    :   {<inline2>}\n" +
         "    ;\n" +
         "c   :   ;";
 
@@ -85,6 +86,38 @@ public class TestAttributeChecks extends BaseTest {
 		"$lab.d",		"error(31): A.g:8:18: unknown attribute rule d in $lab.d",
 	};
 
+	String[] dynMembersChecks = {
+		"$b::f",		"error(54): A.g:3:1: unknown dynamic scope: b in $b::f",
+		"$S::j",		"error(55): A.g:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j",
+		"$S::j = 3;",	"error(55): A.g:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;",
+		"$S::j = $S::k;",	"error(55): A.g:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g:3:12: unknown dynamically-scoped attribute for scope S: k in $S::k",
+	};
+
+	String[] dynInitChecks = {
+		"$b::f",		"",
+		"$S::j",		"error(55): A.g:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j",
+		"$S::j = 3;",	"error(55): A.g:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;",
+		"$S::j = $S::k;",	"error(55): A.g:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g:8:19: unknown dynamically-scoped attribute for scope S: k in $S::k",
+	};
+
+	String[] dynInlineChecks = {
+		"$b::f",		"",
+		"$S::j",		"error(55): A.g:9:13: unknown dynamically-scoped attribute for scope S: j in $S::j",
+		"$S::j = 3;",	"error(55): A.g:9:13: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;",
+		"$S::j = $S::k;",	"error(55): A.g:9:13: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g:9:21: unknown dynamically-scoped attribute for scope S: k in $S::k",
+	};
+
+	String[] dynFinallyChecks = {
+		"$b::f",		"",
+		"$S::j",		"error(55): A.g:11:17: unknown dynamically-scoped attribute for scope S: j in $S::j",
+		"$S::j = 3;",	"error(55): A.g:11:17: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;",
+		"$S::j = $S::k;",	"error(55): A.g:11:17: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g:11:25: unknown dynamically-scoped attribute for scope S: k in $S::k",
+	};
+
     @Test public void testMembersActions() throws RecognitionException {
         testActions("members", membersChecks, attributeTemplate);
     }
@@ -99,6 +132,22 @@ public class TestAttributeChecks extends BaseTest {
 
 	@Test public void testFinallyActions() throws RecognitionException {
 		testActions("finally", finallyChecks, attributeTemplate);
+	}
+
+	@Test public void testDynMembersActions() throws RecognitionException {
+		testActions("members", dynMembersChecks, scopeTemplate);
+	}
+
+	@Test public void testDynInitActions() throws RecognitionException {
+		testActions("init", dynInitChecks, scopeTemplate);
+	}
+
+	@Test public void testDynInlineActions() throws RecognitionException {
+		testActions("inline", dynInlineChecks, scopeTemplate);
+	}
+
+	@Test public void testDynFinallyActions() throws RecognitionException {
+		testActions("finally", dynFinallyChecks, scopeTemplate);
 	}
 
     public void testActions(String location, String[] pairs, String template) {

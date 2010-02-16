@@ -75,7 +75,7 @@ DYNAMIC_SCOPE_ATTR
  */
 SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
 	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		WS? ('=' expr=ATTR_VALUE_EXPR ';')?
+		WS? '=' expr=ATTR_VALUE_EXPR ';'
 		{delegate.setDynamicNegativeIndexedScopeAttr($text, $x, $y, $index, $expr);}
 	;
 

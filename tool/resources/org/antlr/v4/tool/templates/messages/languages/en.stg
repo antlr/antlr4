@@ -183,8 +183,8 @@ set complement is empty
 >>
 REPEATED_PREQUEL(arg) ::=
   "repeated grammar prequel spec (option, token, or import); please merge"
-UNKNOWN_DYNAMIC_SCOPE(arg) ::=
-  "unknown dynamic scope: <arg>"
+UNKNOWN_DYNAMIC_SCOPE(arg, arg2) ::=
+  "unknown dynamic scope: <arg> in <arg2>"
 UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(arg,arg2,arg3) ::=
   "unknown dynamically-scoped attribute for scope <arg>: <arg2> in <arg3>"
 RULE_REF_AMBIG_WITH_RULE_IN_ALT(arg) ::=

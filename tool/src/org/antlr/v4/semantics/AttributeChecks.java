@@ -114,40 +114,44 @@ public class AttributeChecks implements ActionSplitterListener {
     }
 
     public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
-		System.out.println("SET "+x+" :: "+y);
+		//System.out.println("SET "+x+" :: "+y);
+		dynamicScopeAttr(expr, x, y);
+		new AttributeChecks(g, r, alt, node, rhs).examineAction();
 	}
 
     public void dynamicScopeAttr(String expr, Token x, Token y) {
-		System.out.println(x+" :: "+y);
-//		if ( !node.resolver.resolves(x.getText(), y.getText(), node) ) {
-//			if ( !node.resolver.resolves(x.getText(), node) &&
-//				 (r==null || !r.name.equals(x.getText())) )
-//			{
-//				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-//										  g.fileName, x, x.getText(), expr);
-//			}
-//			else {
-//				ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
-//										  g.fileName, y, x.getText(), y.getText(), expr);
-//			}
-//		}
-    }
-
-    public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
-												   Token index, Token rhs) {
-
+		//System.out.println(x+" :: "+y);
+		AttributeScope s = node.resolver.resolveToDynamicScope(x.getText(), node);
+		if ( s==null ) {
+			ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE,
+									  g.fileName, x, x.getText(), expr);
+			return;
+		}
+		Attribute a = s.get(y.getText());
+		if ( a==null ) {
+			ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
+									  g.fileName, y, x.getText(), y.getText(), expr);
+		}
 	}
 
-    public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
+	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
+												   Token index, Token rhs) {
+		setDynamicScopeAttr(expr, x, y, rhs);
+	}
+
+	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
 												Token index) {
+		dynamicScopeAttr(expr, x, y);
 	}
 
-    public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
+	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
 												   Token index, Token rhs) {
+		setDynamicScopeAttr(expr, x, y, rhs);
 	}
 
     public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
 												Token index) {
+		dynamicScopeAttr(expr, x, y);
 	}
 
     public void unknownSyntax(String text) {

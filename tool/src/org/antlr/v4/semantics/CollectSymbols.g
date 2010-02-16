@@ -117,7 +117,8 @@ globalScope
 	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION)
 		{
 		AttributeScope s = ScopeParser.parseDynamicScope($ACTION.text);
-		s.ast = $ACTION;		
+		s.name = $ID.text;
+		s.ast = $ACTION;
 		scopes.add(s);
 		}
 	;
@@ -211,6 +212,7 @@ ruleScopeSpec
 		(	^(SCOPE ACTION)
 			{
 			currentRule.scope = ScopeParser.parseDynamicScope($ACTION.text);
+			currentRule.scope.name = currentRule.name;
 			currentRule.scope.ast = $ACTION;
 			}
 		|	^(SCOPE ids+=ID+) {currentRule.useScopes = $ids;}

@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-15 13:04:55
+// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-15 16:36:15
 
 /*
  [The "BSD licence"]

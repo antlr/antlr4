@@ -82,6 +82,13 @@ public class Alternative implements AttributeResolver {
 //        return getParent().resolves(x, y, node);
 //    }
 
+
+	public AttributeScope resolveToDynamicScope(String x, ActionAST node) {
+		Rule r = resolveToRule(x, node);
+		if ( r!=null && r.scope!=null ) return r.scope;
+		return getParent().resolveToDynamicScope(x, node);
+	}
+
 	public Rule resolveToRule(String x, ActionAST node) {
         if ( ruleRefs.get(x)!=null ) return rule.g.getRule(x);
         List<LabelElementPair> labels = labelDefs.get(x);

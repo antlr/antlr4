@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} BasicSemanticTriggers.g 2010-02-15 13:05:00
+// $ANTLR ${project.version} ${buildNumber} BasicSemanticTriggers.g 2010-02-15 16:36:20
 
 /*
  [The "BSD license"]

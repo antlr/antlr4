@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ActionSplitter.g 2010-02-15 13:04:58
+// $ANTLR ${project.version} ${buildNumber} ActionSplitter.g 2010-02-15 16:36:19
 
 package org.antlr.v4.parse;
 
@@ -559,8 +559,8 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             CommonToken y=null;
             CommonToken expr=null;
 
-            // ActionSplitter.g:77:2: ( '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )? )
-            // ActionSplitter.g:77:4: '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? ( '=' expr= ATTR_VALUE_EXPR ';' )?
+            // ActionSplitter.g:77:2: ( '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionSplitter.g:77:4: '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
             int xStart255 = getCharIndex();
@@ -607,32 +607,15 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
 
             }
 
-            // ActionSplitter.g:78:7: ( '=' expr= ATTR_VALUE_EXPR ';' )?
-            int alt8=2;
-            int LA8_0 = input.LA(1);
-
-            if ( (LA8_0=='=') ) {
-                alt8=1;
-            }
-            switch (alt8) {
-                case 1 :
-                    // ActionSplitter.g:78:8: '=' expr= ATTR_VALUE_EXPR ';'
-                    {
-                    match('='); if (state.failed) return ;
-                    int exprStart283 = getCharIndex();
-                    int exprStartLine283 = getLine();
-                    int exprStartCharPos283 = getCharPositionInLine();
-                    mATTR_VALUE_EXPR(); if (state.failed) return ;
-                    expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart283, getCharIndex()-1);
-                    expr.setLine(exprStartLine283);
-                    expr.setCharPositionInLine(exprStartCharPos283);
-                    match(';'); if (state.failed) return ;
-
-                    }
-                    break;
-
-            }
-
+            match('='); if (state.failed) return ;
+            int exprStart282 = getCharIndex();
+            int exprStartLine282 = getLine();
+            int exprStartCharPos282 = getCharPositionInLine();
+            mATTR_VALUE_EXPR(); if (state.failed) return ;
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart282, getCharIndex()-1);
+            expr.setLine(exprStartLine282);
+            expr.setCharPositionInLine(exprStartCharPos282);
+            match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setDynamicNegativeIndexedScopeAttr(getText(), x, y, index, expr);
             }
@@ -660,32 +643,32 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:83:4: '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart306 = getCharIndex();
-            int xStartLine306 = getLine();
-            int xStartCharPos306 = getCharPositionInLine();
+            int xStart303 = getCharIndex();
+            int xStartLine303 = getLine();
+            int xStartCharPos303 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart306, getCharIndex()-1);
-            x.setLine(xStartLine306);
-            x.setCharPositionInLine(xStartCharPos306);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart303, getCharIndex()-1);
+            x.setLine(xStartLine303);
+            x.setCharPositionInLine(xStartCharPos303);
             match('['); if (state.failed) return ;
             match('-'); if (state.failed) return ;
-            int indexStart314 = getCharIndex();
-            int indexStartLine314 = getLine();
-            int indexStartCharPos314 = getCharPositionInLine();
+            int indexStart311 = getCharIndex();
+            int indexStartLine311 = getLine();
+            int indexStartCharPos311 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart314, getCharIndex()-1);
-            index.setLine(indexStartLine314);
-            index.setCharPositionInLine(indexStartCharPos314);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart311, getCharIndex()-1);
+            index.setLine(indexStartLine311);
+            index.setCharPositionInLine(indexStartCharPos311);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart322 = getCharIndex();
-            int yStartLine322 = getLine();
-            int yStartCharPos322 = getCharPositionInLine();
+            int yStart319 = getCharIndex();
+            int yStartLine319 = getLine();
+            int yStartCharPos319 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart322, getCharIndex()-1);
-            y.setLine(yStartLine322);
-            y.setCharPositionInLine(yStartCharPos322);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart319, getCharIndex()-1);
+            y.setLine(yStartLine319);
+            y.setCharPositionInLine(yStartCharPos319);
             if ( state.backtracking==1 ) {
               delegate.dynamicNegativeIndexedScopeAttr(getText(), x, y, index);
             }
@@ -714,39 +697,39 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:88:4: '$' x= ID '[' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart341 = getCharIndex();
-            int xStartLine341 = getLine();
-            int xStartCharPos341 = getCharPositionInLine();
+            int xStart338 = getCharIndex();
+            int xStartLine338 = getLine();
+            int xStartCharPos338 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart341, getCharIndex()-1);
-            x.setLine(xStartLine341);
-            x.setCharPositionInLine(xStartCharPos341);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart338, getCharIndex()-1);
+            x.setLine(xStartLine338);
+            x.setCharPositionInLine(xStartCharPos338);
             match('['); if (state.failed) return ;
-            int indexStart347 = getCharIndex();
-            int indexStartLine347 = getLine();
-            int indexStartCharPos347 = getCharPositionInLine();
+            int indexStart344 = getCharIndex();
+            int indexStartLine344 = getLine();
+            int indexStartCharPos344 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart347, getCharIndex()-1);
-            index.setLine(indexStartLine347);
-            index.setCharPositionInLine(indexStartCharPos347);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart344, getCharIndex()-1);
+            index.setLine(indexStartLine344);
+            index.setCharPositionInLine(indexStartCharPos344);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart355 = getCharIndex();
-            int yStartLine355 = getLine();
-            int yStartCharPos355 = getCharPositionInLine();
+            int yStart352 = getCharIndex();
+            int yStartLine352 = getLine();
+            int yStartCharPos352 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart355, getCharIndex()-1);
-            y.setLine(yStartLine355);
-            y.setCharPositionInLine(yStartCharPos355);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart352, getCharIndex()-1);
+            y.setLine(yStartLine352);
+            y.setCharPositionInLine(yStartCharPos352);
             // ActionSplitter.g:89:3: ( WS )?
-            int alt9=2;
-            int LA9_0 = input.LA(1);
+            int alt8=2;
+            int LA8_0 = input.LA(1);
 
-            if ( ((LA9_0>='\t' && LA9_0<='\n')||LA9_0=='\r'||LA9_0==' ') ) {
-                alt9=1;
+            if ( ((LA8_0>='\t' && LA8_0<='\n')||LA8_0=='\r'||LA8_0==' ') ) {
+                alt8=1;
             }
-            switch (alt9) {
+            switch (alt8) {
                 case 1 :
                     // ActionSplitter.g:89:3: WS
                     {
@@ -758,13 +741,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart366 = getCharIndex();
-            int exprStartLine366 = getLine();
-            int exprStartCharPos366 = getCharPositionInLine();
+            int exprStart363 = getCharIndex();
+            int exprStartLine363 = getLine();
+            int exprStartCharPos363 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart366, getCharIndex()-1);
-            expr.setLine(exprStartLine366);
-            expr.setCharPositionInLine(exprStartCharPos366);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart363, getCharIndex()-1);
+            expr.setLine(exprStartLine363);
+            expr.setCharPositionInLine(exprStartCharPos363);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setDynamicAbsoluteIndexedScopeAttr(getText(), x, y, index, expr);
@@ -793,31 +776,31 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:94:4: '$' x= ID '[' index= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart387 = getCharIndex();
-            int xStartLine387 = getLine();
-            int xStartCharPos387 = getCharPositionInLine();
+            int xStart384 = getCharIndex();
+            int xStartLine384 = getLine();
+            int xStartCharPos384 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart387, getCharIndex()-1);
-            x.setLine(xStartLine387);
-            x.setCharPositionInLine(xStartCharPos387);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart384, getCharIndex()-1);
+            x.setLine(xStartLine384);
+            x.setCharPositionInLine(xStartCharPos384);
             match('['); if (state.failed) return ;
-            int indexStart393 = getCharIndex();
-            int indexStartLine393 = getLine();
-            int indexStartCharPos393 = getCharPositionInLine();
+            int indexStart390 = getCharIndex();
+            int indexStartLine390 = getLine();
+            int indexStartCharPos390 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart393, getCharIndex()-1);
-            index.setLine(indexStartLine393);
-            index.setCharPositionInLine(indexStartCharPos393);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart390, getCharIndex()-1);
+            index.setLine(indexStartLine390);
+            index.setCharPositionInLine(indexStartCharPos390);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart401 = getCharIndex();
-            int yStartLine401 = getLine();
-            int yStartCharPos401 = getCharPositionInLine();
+            int yStart398 = getCharIndex();
+            int yStartLine398 = getLine();
+            int yStartCharPos398 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart401, getCharIndex()-1);
-            y.setLine(yStartLine401);
-            y.setCharPositionInLine(yStartCharPos401);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart398, getCharIndex()-1);
+            y.setLine(yStartLine398);
+            y.setCharPositionInLine(yStartCharPos398);
             if ( state.backtracking==1 ) {
               delegate.dynamicAbsoluteIndexedScopeAttr(getText(), x, y, index);
             }
@@ -844,21 +827,21 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:99:4: '$' x= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart420 = getCharIndex();
-            int xStartLine420 = getLine();
-            int xStartCharPos420 = getCharPositionInLine();
+            int xStart417 = getCharIndex();
+            int xStartLine417 = getLine();
+            int xStartCharPos417 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart420, getCharIndex()-1);
-            x.setLine(xStartLine420);
-            x.setCharPositionInLine(xStartCharPos420);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart417, getCharIndex()-1);
+            x.setLine(xStartLine417);
+            x.setCharPositionInLine(xStartCharPos417);
             // ActionSplitter.g:99:13: ( WS )?
-            int alt10=2;
-            int LA10_0 = input.LA(1);
+            int alt9=2;
+            int LA9_0 = input.LA(1);
 
-            if ( ((LA10_0>='\t' && LA10_0<='\n')||LA10_0=='\r'||LA10_0==' ') ) {
-                alt10=1;
+            if ( ((LA9_0>='\t' && LA9_0<='\n')||LA9_0=='\r'||LA9_0==' ') ) {
+                alt9=1;
             }
-            switch (alt10) {
+            switch (alt9) {
                 case 1 :
                     // ActionSplitter.g:99:13: WS
                     {
@@ -870,13 +853,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart429 = getCharIndex();
-            int exprStartLine429 = getLine();
-            int exprStartCharPos429 = getCharPositionInLine();
+            int exprStart426 = getCharIndex();
+            int exprStartLine426 = getLine();
+            int exprStartCharPos426 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart429, getCharIndex()-1);
-            expr.setLine(exprStartLine429);
-            expr.setCharPositionInLine(exprStartCharPos429);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart426, getCharIndex()-1);
+            expr.setLine(exprStartLine426);
+            expr.setCharPositionInLine(exprStartCharPos426);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setAttr(getText(), x, expr);
@@ -903,13 +886,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:103:4: '$' x= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart448 = getCharIndex();
-            int xStartLine448 = getLine();
-            int xStartCharPos448 = getCharPositionInLine();
+            int xStart445 = getCharIndex();
+            int xStartLine445 = getLine();
+            int xStartCharPos445 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart448, getCharIndex()-1);
-            x.setLine(xStartLine448);
-            x.setCharPositionInLine(xStartCharPos448);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart445, getCharIndex()-1);
+            x.setLine(xStartLine445);
+            x.setCharPositionInLine(xStartCharPos445);
             if ( state.backtracking==1 ) {
               delegate.attr(getText(), x);
             }
@@ -936,24 +919,24 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             mID(); if (state.failed) return ;
             match('('); if (state.failed) return ;
             // ActionSplitter.g:108:15: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
-            int alt15=2;
-            int LA15_0 = input.LA(1);
+            int alt14=2;
+            int LA14_0 = input.LA(1);
 
-            if ( ((LA15_0>='\t' && LA15_0<='\n')||LA15_0=='\r'||LA15_0==' '||(LA15_0>='A' && LA15_0<='Z')||LA15_0=='_'||(LA15_0>='a' && LA15_0<='z')) ) {
-                alt15=1;
+            if ( ((LA14_0>='\t' && LA14_0<='\n')||LA14_0=='\r'||LA14_0==' '||(LA14_0>='A' && LA14_0<='Z')||LA14_0=='_'||(LA14_0>='a' && LA14_0<='z')) ) {
+                alt14=1;
             }
-            switch (alt15) {
+            switch (alt14) {
                 case 1 :
                     // ActionSplitter.g:108:17: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
                     {
                     // ActionSplitter.g:108:17: ( WS )?
-                    int alt11=2;
-                    int LA11_0 = input.LA(1);
+                    int alt10=2;
+                    int LA10_0 = input.LA(1);
 
-                    if ( ((LA11_0>='\t' && LA11_0<='\n')||LA11_0=='\r'||LA11_0==' ') ) {
-                        alt11=1;
+                    if ( ((LA10_0>='\t' && LA10_0<='\n')||LA10_0=='\r'||LA10_0==' ') ) {
+                        alt10=1;
                     }
-                    switch (alt11) {
+                    switch (alt10) {
                         case 1 :
                             // ActionSplitter.g:108:17: WS
                             {
@@ -966,29 +949,29 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
 
                     mARG(); if (state.failed) return ;
                     // ActionSplitter.g:108:25: ( ',' ( WS )? ARG )*
-                    loop13:
+                    loop12:
                     do {
-                        int alt13=2;
-                        int LA13_0 = input.LA(1);
+                        int alt12=2;
+                        int LA12_0 = input.LA(1);
 
-                        if ( (LA13_0==',') ) {
-                            alt13=1;
+                        if ( (LA12_0==',') ) {
+                            alt12=1;
                         }
 
 
-                        switch (alt13) {
+                        switch (alt12) {
                     	case 1 :
                     	    // ActionSplitter.g:108:26: ',' ( WS )? ARG
                     	    {
                     	    match(','); if (state.failed) return ;
                     	    // ActionSplitter.g:108:30: ( WS )?
-                    	    int alt12=2;
-                    	    int LA12_0 = input.LA(1);
+                    	    int alt11=2;
+                    	    int LA11_0 = input.LA(1);
 
-                    	    if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0=='\r'||LA12_0==' ') ) {
-                    	        alt12=1;
+                    	    if ( ((LA11_0>='\t' && LA11_0<='\n')||LA11_0=='\r'||LA11_0==' ') ) {
+                    	        alt11=1;
                     	    }
-                    	    switch (alt12) {
+                    	    switch (alt11) {
                     	        case 1 :
                     	            // ActionSplitter.g:108:30: WS
                     	            {
@@ -1005,18 +988,18 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                     	    break;
 
                     	default :
-                    	    break loop13;
+                    	    break loop12;
                         }
                     } while (true);
 
                     // ActionSplitter.g:108:40: ( WS )?
-                    int alt14=2;
-                    int LA14_0 = input.LA(1);
+                    int alt13=2;
+                    int LA13_0 = input.LA(1);
 
-                    if ( ((LA14_0>='\t' && LA14_0<='\n')||LA14_0=='\r'||LA14_0==' ') ) {
-                        alt14=1;
+                    if ( ((LA13_0>='\t' && LA13_0<='\n')||LA13_0=='\r'||LA13_0==' ') ) {
+                        alt13=1;
                     }
-                    switch (alt14) {
+                    switch (alt13) {
                         case 1 :
                             // ActionSplitter.g:108:40: WS
                             {
@@ -1059,24 +1042,24 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             match(')'); if (state.failed) return ;
             match('('); if (state.failed) return ;
             // ActionSplitter.g:113:27: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
-            int alt20=2;
-            int LA20_0 = input.LA(1);
+            int alt19=2;
+            int LA19_0 = input.LA(1);
 
-            if ( ((LA20_0>='\t' && LA20_0<='\n')||LA20_0=='\r'||LA20_0==' '||(LA20_0>='A' && LA20_0<='Z')||LA20_0=='_'||(LA20_0>='a' && LA20_0<='z')) ) {
-                alt20=1;
+            if ( ((LA19_0>='\t' && LA19_0<='\n')||LA19_0=='\r'||LA19_0==' '||(LA19_0>='A' && LA19_0<='Z')||LA19_0=='_'||(LA19_0>='a' && LA19_0<='z')) ) {
+                alt19=1;
             }
-            switch (alt20) {
+            switch (alt19) {
                 case 1 :
                     // ActionSplitter.g:113:29: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
                     {
                     // ActionSplitter.g:113:29: ( WS )?
-                    int alt16=2;
-                    int LA16_0 = input.LA(1);
+                    int alt15=2;
+                    int LA15_0 = input.LA(1);
 
-                    if ( ((LA16_0>='\t' && LA16_0<='\n')||LA16_0=='\r'||LA16_0==' ') ) {
-                        alt16=1;
+                    if ( ((LA15_0>='\t' && LA15_0<='\n')||LA15_0=='\r'||LA15_0==' ') ) {
+                        alt15=1;
                     }
-                    switch (alt16) {
+                    switch (alt15) {
                         case 1 :
                             // ActionSplitter.g:113:29: WS
                             {
@@ -1089,29 +1072,29 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
 
                     mARG(); if (state.failed) return ;
                     // ActionSplitter.g:113:37: ( ',' ( WS )? ARG )*
-                    loop18:
+                    loop17:
                     do {
-                        int alt18=2;
-                        int LA18_0 = input.LA(1);
+                        int alt17=2;
+                        int LA17_0 = input.LA(1);
 
-                        if ( (LA18_0==',') ) {
-                            alt18=1;
+                        if ( (LA17_0==',') ) {
+                            alt17=1;
                         }
 
 
-                        switch (alt18) {
+                        switch (alt17) {
                     	case 1 :
                     	    // ActionSplitter.g:113:38: ',' ( WS )? ARG
                     	    {
                     	    match(','); if (state.failed) return ;
                     	    // ActionSplitter.g:113:42: ( WS )?
-                    	    int alt17=2;
-                    	    int LA17_0 = input.LA(1);
+                    	    int alt16=2;
+                    	    int LA16_0 = input.LA(1);
 
-                    	    if ( ((LA17_0>='\t' && LA17_0<='\n')||LA17_0=='\r'||LA17_0==' ') ) {
-                    	        alt17=1;
+                    	    if ( ((LA16_0>='\t' && LA16_0<='\n')||LA16_0=='\r'||LA16_0==' ') ) {
+                    	        alt16=1;
                     	    }
-                    	    switch (alt17) {
+                    	    switch (alt16) {
                     	        case 1 :
                     	            // ActionSplitter.g:113:42: WS
                     	            {
@@ -1128,18 +1111,18 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                     	    break;
 
                     	default :
-                    	    break loop18;
+                    	    break loop17;
                         }
                     } while (true);
 
                     // ActionSplitter.g:113:52: ( WS )?
-                    int alt19=2;
-                    int LA19_0 = input.LA(1);
+                    int alt18=2;
+                    int LA18_0 = input.LA(1);
 
-                    if ( ((LA19_0>='\t' && LA19_0<='\n')||LA19_0=='\r'||LA19_0==' ') ) {
-                        alt19=1;
+                    if ( ((LA18_0>='\t' && LA18_0<='\n')||LA18_0=='\r'||LA18_0==' ') ) {
+                        alt18=1;
                     }
-                    switch (alt19) {
+                    switch (alt18) {
                         case 1 :
                             // ActionSplitter.g:113:52: WS
                             {
@@ -1180,23 +1163,23 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:118:4: '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
-            int aStart555 = getCharIndex();
-            int aStartLine555 = getLine();
-            int aStartCharPos555 = getCharPositionInLine();
+            int aStart552 = getCharIndex();
+            int aStartLine552 = getLine();
+            int aStartCharPos552 = getCharPositionInLine();
             mACTION(); if (state.failed) return ;
-            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart555, getCharIndex()-1);
-            a.setLine(aStartLine555);
-            a.setCharPositionInLine(aStartCharPos555);
+            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart552, getCharIndex()-1);
+            a.setLine(aStartLine552);
+            a.setCharPositionInLine(aStartCharPos552);
             match('.'); if (state.failed) return ;
             mID(); if (state.failed) return ;
             // ActionSplitter.g:118:24: ( WS )?
-            int alt21=2;
-            int LA21_0 = input.LA(1);
+            int alt20=2;
+            int LA20_0 = input.LA(1);
 
-            if ( ((LA21_0>='\t' && LA21_0<='\n')||LA21_0=='\r'||LA21_0==' ') ) {
-                alt21=1;
+            if ( ((LA20_0>='\t' && LA20_0<='\n')||LA20_0=='\r'||LA20_0==' ') ) {
+                alt20=1;
             }
-            switch (alt21) {
+            switch (alt20) {
                 case 1 :
                     // ActionSplitter.g:118:24: WS
                     {
@@ -1208,13 +1191,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart568 = getCharIndex();
-            int exprStartLine568 = getLine();
-            int exprStartCharPos568 = getCharPositionInLine();
+            int exprStart565 = getCharIndex();
+            int exprStartLine565 = getLine();
+            int exprStartCharPos565 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart568, getCharIndex()-1);
-            expr.setLine(exprStartLine568);
-            expr.setCharPositionInLine(exprStartCharPos568);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart565, getCharIndex()-1);
+            expr.setLine(exprStartLine565);
+            expr.setCharPositionInLine(exprStartCharPos565);
             match(';'); if (state.failed) return ;
 
             }
@@ -1240,29 +1223,29 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:126:4: '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
-            int xStart588 = getCharIndex();
-            int xStartLine588 = getLine();
-            int xStartCharPos588 = getCharPositionInLine();
+            int xStart585 = getCharIndex();
+            int xStartLine585 = getLine();
+            int xStartCharPos585 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart588, getCharIndex()-1);
-            x.setLine(xStartLine588);
-            x.setCharPositionInLine(xStartCharPos588);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart585, getCharIndex()-1);
+            x.setLine(xStartLine585);
+            x.setCharPositionInLine(xStartCharPos585);
             match('.'); if (state.failed) return ;
-            int yStart594 = getCharIndex();
-            int yStartLine594 = getLine();
-            int yStartCharPos594 = getCharPositionInLine();
+            int yStart591 = getCharIndex();
+            int yStartLine591 = getLine();
+            int yStartCharPos591 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart594, getCharIndex()-1);
-            y.setLine(yStartLine594);
-            y.setCharPositionInLine(yStartCharPos594);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart591, getCharIndex()-1);
+            y.setLine(yStartLine591);
+            y.setCharPositionInLine(yStartCharPos591);
             // ActionSplitter.g:126:22: ( WS )?
-            int alt22=2;
-            int LA22_0 = input.LA(1);
+            int alt21=2;
+            int LA21_0 = input.LA(1);
 
-            if ( ((LA22_0>='\t' && LA22_0<='\n')||LA22_0=='\r'||LA22_0==' ') ) {
-                alt22=1;
+            if ( ((LA21_0>='\t' && LA21_0<='\n')||LA21_0=='\r'||LA21_0==' ') ) {
+                alt21=1;
             }
-            switch (alt22) {
+            switch (alt21) {
                 case 1 :
                     // ActionSplitter.g:126:22: WS
                     {
@@ -1274,13 +1257,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart603 = getCharIndex();
-            int exprStartLine603 = getLine();
-            int exprStartCharPos603 = getCharPositionInLine();
+            int exprStart600 = getCharIndex();
+            int exprStartLine600 = getLine();
+            int exprStartCharPos600 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart603, getCharIndex()-1);
-            expr.setLine(exprStartLine603);
-            expr.setCharPositionInLine(exprStartCharPos603);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart600, getCharIndex()-1);
+            expr.setLine(exprStartLine600);
+            expr.setCharPositionInLine(exprStartCharPos600);
             match(';'); if (state.failed) return ;
 
             }
@@ -1304,13 +1287,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:131:4: '%' a= ACTION
             {
             match('%'); if (state.failed) return ;
-            int aStart622 = getCharIndex();
-            int aStartLine622 = getLine();
-            int aStartCharPos622 = getCharPositionInLine();
+            int aStart619 = getCharIndex();
+            int aStartLine619 = getLine();
+            int aStartCharPos619 = getCharPositionInLine();
             mACTION(); if (state.failed) return ;
-            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart622, getCharIndex()-1);
-            a.setLine(aStartLine622);
-            a.setCharPositionInLine(aStartCharPos622);
+            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart619, getCharIndex()-1);
+            a.setLine(aStartLine619);
+            a.setCharPositionInLine(aStartCharPos619);
 
             }
 
@@ -1332,11 +1315,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             {
             match('%'); if (state.failed) return ;
             // ActionSplitter.g:136:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
-            loop23:
+            loop22:
             do {
-                int alt23=9;
-                alt23 = dfa23.predict(input);
-                switch (alt23) {
+                int alt22=9;
+                alt22 = dfa22.predict(input);
+                switch (alt22) {
             	case 1 :
             	    // ActionSplitter.g:136:9: ID
             	    {
@@ -1395,7 +1378,7 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             	    break;
 
             	default :
-            	    break loop23;
+            	    break loop22;
                 }
             } while (true);
 
@@ -1421,18 +1404,18 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:142:4: (~ ( '$' | '%' ) )+
             {
             // ActionSplitter.g:142:4: (~ ( '$' | '%' ) )+
-            int cnt24=0;
-            loop24:
+            int cnt23=0;
+            loop23:
             do {
-                int alt24=2;
-                int LA24_0 = input.LA(1);
+                int alt23=2;
+                int LA23_0 = input.LA(1);
 
-                if ( ((LA24_0>='\u0000' && LA24_0<='#')||(LA24_0>='&' && LA24_0<='\uFFFF')) ) {
-                    alt24=1;
+                if ( ((LA23_0>='\u0000' && LA23_0<='#')||(LA23_0>='&' && LA23_0<='\uFFFF')) ) {
+                    alt23=1;
                 }
 
 
-                switch (alt24) {
+                switch (alt23) {
             	case 1 :
             	    // ActionSplitter.g:142:4: ~ ( '$' | '%' )
             	    {
@@ -1451,13 +1434,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             	    break;
 
             	default :
-            	    if ( cnt24 >= 1 ) break loop24;
+            	    if ( cnt23 >= 1 ) break loop23;
             	    if (state.backtracking>0) {state.failed=true; return ;}
                         EarlyExitException eee =
-                            new EarlyExitException(24, input);
+                            new EarlyExitException(23, input);
                         throw eee;
                 }
-                cnt24++;
+                cnt23++;
             } while (true);
 
 
@@ -1481,38 +1464,38 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             {
             match('{'); if (state.failed) return ;
             // ActionSplitter.g:147:8: ( '\\\\}' | ~ '}' )*
-            loop25:
+            loop24:
             do {
-                int alt25=3;
-                int LA25_0 = input.LA(1);
+                int alt24=3;
+                int LA24_0 = input.LA(1);
 
-                if ( (LA25_0=='\\') ) {
-                    int LA25_2 = input.LA(2);
+                if ( (LA24_0=='\\') ) {
+                    int LA24_2 = input.LA(2);
 
-                    if ( (LA25_2=='}') ) {
-                        int LA25_4 = input.LA(3);
+                    if ( (LA24_2=='}') ) {
+                        int LA24_4 = input.LA(3);
 
-                        if ( ((LA25_4>='\u0000' && LA25_4<='\uFFFF')) ) {
-                            alt25=1;
+                        if ( ((LA24_4>='\u0000' && LA24_4<='\uFFFF')) ) {
+                            alt24=1;
                         }
 
                         else {
-                            alt25=2;
+                            alt24=2;
                         }
 
                     }
-                    else if ( ((LA25_2>='\u0000' && LA25_2<='|')||(LA25_2>='~' && LA25_2<='\uFFFF')) ) {
-                        alt25=2;
+                    else if ( ((LA24_2>='\u0000' && LA24_2<='|')||(LA24_2>='~' && LA24_2<='\uFFFF')) ) {
+                        alt24=2;
                     }
 
 
                 }
-                else if ( ((LA25_0>='\u0000' && LA25_0<='[')||(LA25_0>=']' && LA25_0<='|')||(LA25_0>='~' && LA25_0<='\uFFFF')) ) {
-                    alt25=2;
+                else if ( ((LA24_0>='\u0000' && LA24_0<='[')||(LA24_0>=']' && LA24_0<='|')||(LA24_0>='~' && LA24_0<='\uFFFF')) ) {
+                    alt24=2;
                 }
 
 
-                switch (alt25) {
+                switch (alt24) {
             	case 1 :
             	    // ActionSplitter.g:147:9: '\\\\}'
             	    {
@@ -1539,7 +1522,7 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             	    break;
 
             	default :
-            	    break loop25;
+            	    break loop24;
                 }
             } while (true);
 
@@ -1588,17 +1571,17 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                 throw mse;}
 
             // ActionSplitter.g:155:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
-            loop26:
+            loop25:
             do {
-                int alt26=2;
-                int LA26_0 = input.LA(1);
+                int alt25=2;
+                int LA25_0 = input.LA(1);
 
-                if ( ((LA26_0>='0' && LA26_0<='9')||(LA26_0>='A' && LA26_0<='Z')||LA26_0=='_'||(LA26_0>='a' && LA26_0<='z')) ) {
-                    alt26=1;
+                if ( ((LA25_0>='0' && LA25_0<='9')||(LA25_0>='A' && LA25_0<='Z')||LA25_0=='_'||(LA25_0>='a' && LA25_0<='z')) ) {
+                    alt25=1;
                 }
 
 
-                switch (alt26) {
+                switch (alt25) {
             	case 1 :
             	    // ActionSplitter.g:
             	    {
@@ -1617,7 +1600,7 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             	    break;
 
             	default :
-            	    break loop26;
+            	    break loop25;
                 }
             } while (true);
 
@@ -1647,17 +1630,17 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                 throw mse;}
 
             // ActionSplitter.g:161:9: (~ ';' )*
-            loop27:
+            loop26:
             do {
-                int alt27=2;
-                int LA27_0 = input.LA(1);
+                int alt26=2;
+                int LA26_0 = input.LA(1);
 
-                if ( ((LA27_0>='\u0000' && LA27_0<=':')||(LA27_0>='<' && LA27_0<='\uFFFF')) ) {
-                    alt27=1;
+                if ( ((LA26_0>='\u0000' && LA26_0<=':')||(LA26_0>='<' && LA26_0<='\uFFFF')) ) {
+                    alt26=1;
                 }
 
 
-                switch (alt27) {
+                switch (alt26) {
             	case 1 :
             	    // ActionSplitter.g:161:10: ~ ';'
             	    {
@@ -1676,7 +1659,7 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             	    break;
 
             	default :
-            	    break loop27;
+            	    break loop26;
                 }
             } while (true);
 
@@ -1696,30 +1679,30 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:166:4: ( '\\\\]' | ~ ']' )+
             {
             // ActionSplitter.g:166:4: ( '\\\\]' | ~ ']' )+
-            int cnt28=0;
-            loop28:
+            int cnt27=0;
+            loop27:
             do {
-                int alt28=3;
-                int LA28_0 = input.LA(1);
+                int alt27=3;
+                int LA27_0 = input.LA(1);
 
-                if ( (LA28_0=='\\') ) {
-                    int LA28_2 = input.LA(2);
+                if ( (LA27_0=='\\') ) {
+                    int LA27_2 = input.LA(2);
 
-                    if ( (LA28_2==']') ) {
-                        alt28=1;
+                    if ( (LA27_2==']') ) {
+                        alt27=1;
                     }
 
                     else {
-                        alt28=2;
+                        alt27=2;
                     }
 
                 }
-                else if ( ((LA28_0>='\u0000' && LA28_0<='[')||(LA28_0>='^' && LA28_0<='\uFFFF')) ) {
-                    alt28=2;
+                else if ( ((LA27_0>='\u0000' && LA27_0<='[')||(LA27_0>='^' && LA27_0<='\uFFFF')) ) {
+                    alt27=2;
                 }
 
 
-                switch (alt28) {
+                switch (alt27) {
             	case 1 :
             	    // ActionSplitter.g:166:5: '\\\\]'
             	    {
@@ -1732,6 +1715,61 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             	    // ActionSplitter.g:166:11: ~ ']'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\\')||(input.LA(1)>='^' && input.LA(1)<='\uFFFF') ) {
+            	        input.consume();
+            	    state.failed=false;
+            	    }
+            	    else {
+            	        if (state.backtracking>0) {state.failed=true; return ;}
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    if ( cnt27 >= 1 ) break loop27;
+            	    if (state.backtracking>0) {state.failed=true; return ;}
+                        EarlyExitException eee =
+                            new EarlyExitException(27, input);
+                        throw eee;
+                }
+                cnt27++;
+            } while (true);
+
+
+            }
+
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "SCOPE_INDEX_EXPR"
+
+    // $ANTLR start "WS"
+    public final void mWS() throws RecognitionException {
+        try {
+            // ActionSplitter.g:170:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
+            // ActionSplitter.g:170:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
+            {
+            // ActionSplitter.g:170:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
+            int cnt28=0;
+            loop28:
+            do {
+                int alt28=2;
+                int LA28_0 = input.LA(1);
+
+                if ( ((LA28_0>='\t' && LA28_0<='\n')||LA28_0=='\r'||LA28_0==' ') ) {
+                    alt28=1;
+                }
+
+
+                switch (alt28) {
+            	case 1 :
+            	    // ActionSplitter.g:
+            	    {
+            	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
             	        input.consume();
             	    state.failed=false;
             	    }
@@ -1762,68 +1800,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         finally {
         }
     }
-    // $ANTLR end "SCOPE_INDEX_EXPR"
-
-    // $ANTLR start "WS"
-    public final void mWS() throws RecognitionException {
-        try {
-            // ActionSplitter.g:170:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
-            // ActionSplitter.g:170:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
-            {
-            // ActionSplitter.g:170:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
-            int cnt29=0;
-            loop29:
-            do {
-                int alt29=2;
-                int LA29_0 = input.LA(1);
-
-                if ( ((LA29_0>='\t' && LA29_0<='\n')||LA29_0=='\r'||LA29_0==' ') ) {
-                    alt29=1;
-                }
-
-
-                switch (alt29) {
-            	case 1 :
-            	    // ActionSplitter.g:
-            	    {
-            	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
-            	        input.consume();
-            	    state.failed=false;
-            	    }
-            	    else {
-            	        if (state.backtracking>0) {state.failed=true; return ;}
-            	        MismatchedSetException mse = new MismatchedSetException(null,input);
-            	        recover(mse);
-            	        throw mse;}
-
-
-            	    }
-            	    break;
-
-            	default :
-            	    if ( cnt29 >= 1 ) break loop29;
-            	    if (state.backtracking>0) {state.failed=true; return ;}
-                        EarlyExitException eee =
-                            new EarlyExitException(29, input);
-                        throw eee;
-                }
-                cnt29++;
-            } while (true);
-
-
-            }
-
-        }
-        finally {
-        }
-    }
     // $ANTLR end "WS"
 
     public void mTokens() throws RecognitionException {
         // ActionSplitter.g:1:39: ( COMMENT | LINE_COMMENT | ESC | SET_QUALIFIED_ATTR | QUALIFIED_ATTR | SET_DYNAMIC_SCOPE_ATTR | DYNAMIC_SCOPE_ATTR | SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR | DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR | SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR | DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR | SET_ATTR | ATTR | TEMPLATE_INSTANCE | INDIRECT_TEMPLATE_INSTANCE | SET_EXPR_ATTRIBUTE | SET_ATTRIBUTE | TEMPLATE_EXPR | UNKNOWN_SYNTAX | TEXT )
-        int alt30=20;
-        alt30 = dfa30.predict(input);
-        switch (alt30) {
+        int alt29=20;
+        alt29 = dfa29.predict(input);
+        switch (alt29) {
             case 1 :
                 // ActionSplitter.g:1:41: COMMENT
                 {
@@ -2346,11 +2329,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred8_ActionSplitter() {
+    public final boolean synpred2_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred8_ActionSplitter_fragment(); // can never throw exception
+            synpred2_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2360,11 +2343,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred2_ActionSplitter() {
+    public final boolean synpred8_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred2_ActionSplitter_fragment(); // can never throw exception
+            synpred8_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2416,20 +2399,6 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred15_ActionSplitter() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred15_ActionSplitter_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
     public final boolean synpred3_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
@@ -2444,23 +2413,37 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
+    public final boolean synpred15_ActionSplitter() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred15_ActionSplitter_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
 
 
-    protected DFA23 dfa23 = new DFA23(this);
-    protected DFA30 dfa30 = new DFA30(this);
-    static final String DFA23_eotS =
+    protected DFA22 dfa22 = new DFA22(this);
+    protected DFA29 dfa29 = new DFA29(this);
+    static final String DFA22_eotS =
         "\1\1\11\uffff";
-    static final String DFA23_eofS =
+    static final String DFA22_eofS =
         "\12\uffff";
-    static final String DFA23_minS =
+    static final String DFA22_minS =
         "\1\42\11\uffff";
-    static final String DFA23_maxS =
+    static final String DFA22_maxS =
         "\1\175\11\uffff";
-    static final String DFA23_acceptS =
+    static final String DFA22_acceptS =
         "\1\uffff\1\11\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10";
-    static final String DFA23_specialS =
+    static final String DFA22_specialS =
         "\12\uffff}>";
-    static final String[] DFA23_transitionS = {
+    static final String[] DFA22_transitionS = {
             "\1\11\5\uffff\1\4\1\5\2\uffff\1\6\1\uffff\1\3\22\uffff\32\2"+
             "\4\uffff\1\2\1\uffff\32\2\1\7\1\uffff\1\10",
             "",
@@ -2474,54 +2457,54 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             ""
     };
 
-    static final short[] DFA23_eot = DFA.unpackEncodedString(DFA23_eotS);
-    static final short[] DFA23_eof = DFA.unpackEncodedString(DFA23_eofS);
-    static final char[] DFA23_min = DFA.unpackEncodedStringToUnsignedChars(DFA23_minS);
-    static final char[] DFA23_max = DFA.unpackEncodedStringToUnsignedChars(DFA23_maxS);
-    static final short[] DFA23_accept = DFA.unpackEncodedString(DFA23_acceptS);
-    static final short[] DFA23_special = DFA.unpackEncodedString(DFA23_specialS);
-    static final short[][] DFA23_transition;
+    static final short[] DFA22_eot = DFA.unpackEncodedString(DFA22_eotS);
+    static final short[] DFA22_eof = DFA.unpackEncodedString(DFA22_eofS);
+    static final char[] DFA22_min = DFA.unpackEncodedStringToUnsignedChars(DFA22_minS);
+    static final char[] DFA22_max = DFA.unpackEncodedStringToUnsignedChars(DFA22_maxS);
+    static final short[] DFA22_accept = DFA.unpackEncodedString(DFA22_acceptS);
+    static final short[] DFA22_special = DFA.unpackEncodedString(DFA22_specialS);
+    static final short[][] DFA22_transition;
 
     static {
-        int numStates = DFA23_transitionS.length;
-        DFA23_transition = new short[numStates][];
+        int numStates = DFA22_transitionS.length;
+        DFA22_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA23_transition[i] = DFA.unpackEncodedString(DFA23_transitionS[i]);
+            DFA22_transition[i] = DFA.unpackEncodedString(DFA22_transitionS[i]);
         }
     }
 
-    class DFA23 extends DFA {
+    class DFA22 extends DFA {
 
-        public DFA23(BaseRecognizer recognizer) {
+        public DFA22(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 23;
-            this.eot = DFA23_eot;
-            this.eof = DFA23_eof;
-            this.min = DFA23_min;
-            this.max = DFA23_max;
-            this.accept = DFA23_accept;
-            this.special = DFA23_special;
-            this.transition = DFA23_transition;
+            this.decisionNumber = 22;
+            this.eot = DFA22_eot;
+            this.eof = DFA22_eof;
+            this.min = DFA22_min;
+            this.max = DFA22_max;
+            this.accept = DFA22_accept;
+            this.special = DFA22_special;
+            this.transition = DFA22_transition;
         }
         public String getDescription() {
             return "()* loopback of 136:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*";
         }
     }
-    static final String DFA30_eotS =
+    static final String DFA29_eotS =
         "\32\uffff";
-    static final String DFA30_eofS =
+    static final String DFA29_eofS =
         "\32\uffff";
-    static final String DFA30_minS =
-        "\2\0\3\uffff\1\0\6\uffff\1\0\2\uffff\1\0\12\uffff";
-    static final String DFA30_maxS =
-        "\1\uffff\1\0\3\uffff\1\0\6\uffff\1\0\2\uffff\1\0\12\uffff";
-    static final String DFA30_acceptS =
+    static final String DFA29_minS =
+        "\2\0\3\uffff\1\0\6\uffff\1\0\12\uffff\1\0\2\uffff";
+    static final String DFA29_maxS =
+        "\1\uffff\1\0\3\uffff\1\0\6\uffff\1\0\12\uffff\1\0\2\uffff";
+    static final String DFA29_acceptS =
         "\2\uffff\1\1\1\2\1\24\1\uffff\1\16\1\17\1\20\1\21\1\22\1\23\1\uffff"+
-        "\1\3\1\24\1\uffff\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\15";
-    static final String DFA30_specialS =
-        "\1\0\1\1\3\uffff\1\2\6\uffff\1\3\2\uffff\1\4\12\uffff}>";
-    static final String[] DFA30_transitionS = {
-            "\44\16\1\17\1\5\11\16\1\1\54\16\1\14\uffa3\16",
+        "\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\15\1\uffff\1\3\1\24";
+    static final String DFA29_specialS =
+        "\1\0\1\1\3\uffff\1\2\6\uffff\1\3\12\uffff\1\4\2\uffff}>";
+    static final String[] DFA29_transitionS = {
+            "\44\31\1\14\1\5\11\31\1\1\54\31\1\27\uffa3\31",
             "\1\uffff",
             "",
             "",
@@ -2536,47 +2519,47 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             "\1\uffff",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\uffff",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
             "",
             ""
     };
 
-    static final short[] DFA30_eot = DFA.unpackEncodedString(DFA30_eotS);
-    static final short[] DFA30_eof = DFA.unpackEncodedString(DFA30_eofS);
-    static final char[] DFA30_min = DFA.unpackEncodedStringToUnsignedChars(DFA30_minS);
-    static final char[] DFA30_max = DFA.unpackEncodedStringToUnsignedChars(DFA30_maxS);
-    static final short[] DFA30_accept = DFA.unpackEncodedString(DFA30_acceptS);
-    static final short[] DFA30_special = DFA.unpackEncodedString(DFA30_specialS);
-    static final short[][] DFA30_transition;
+    static final short[] DFA29_eot = DFA.unpackEncodedString(DFA29_eotS);
+    static final short[] DFA29_eof = DFA.unpackEncodedString(DFA29_eofS);
+    static final char[] DFA29_min = DFA.unpackEncodedStringToUnsignedChars(DFA29_minS);
+    static final char[] DFA29_max = DFA.unpackEncodedStringToUnsignedChars(DFA29_maxS);
+    static final short[] DFA29_accept = DFA.unpackEncodedString(DFA29_acceptS);
+    static final short[] DFA29_special = DFA.unpackEncodedString(DFA29_specialS);
+    static final short[][] DFA29_transition;
 
     static {
-        int numStates = DFA30_transitionS.length;
-        DFA30_transition = new short[numStates][];
+        int numStates = DFA29_transitionS.length;
+        DFA29_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA30_transition[i] = DFA.unpackEncodedString(DFA30_transitionS[i]);
+            DFA29_transition[i] = DFA.unpackEncodedString(DFA29_transitionS[i]);
         }
     }
 
-    class DFA30 extends DFA {
+    class DFA29 extends DFA {
 
-        public DFA30(BaseRecognizer recognizer) {
+        public DFA29(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 30;
-            this.eot = DFA30_eot;
-            this.eof = DFA30_eof;
-            this.min = DFA30_min;
-            this.max = DFA30_max;
-            this.accept = DFA30_accept;
-            this.special = DFA30_special;
-            this.transition = DFA30_transition;
+            this.decisionNumber = 29;
+            this.eot = DFA29_eot;
+            this.eof = DFA29_eof;
+            this.min = DFA29_min;
+            this.max = DFA29_max;
+            this.accept = DFA29_accept;
+            this.special = DFA29_special;
+            this.transition = DFA29_transition;
         }
         public String getDescription() {
             return "1:1: Tokens options {k=1; backtrack=true; } : ( COMMENT | LINE_COMMENT | ESC | SET_QUALIFIED_ATTR | QUALIFIED_ATTR | SET_DYNAMIC_SCOPE_ATTR | DYNAMIC_SCOPE_ATTR | SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR | DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR | SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR | DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR | SET_ATTR | ATTR | TEMPLATE_INSTANCE | INDIRECT_TEMPLATE_INSTANCE | SET_EXPR_ATTRIBUTE | SET_ATTRIBUTE | TEMPLATE_EXPR | UNKNOWN_SYNTAX | TEXT );";
@@ -2586,26 +2569,26 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA30_0 = input.LA(1);
+                        int LA29_0 = input.LA(1);
 
                         s = -1;
-                        if ( (LA30_0=='/') ) {s = 1;}
+                        if ( (LA29_0=='/') ) {s = 1;}
 
-                        else if ( (LA30_0=='%') ) {s = 5;}
+                        else if ( (LA29_0=='%') ) {s = 5;}
 
-                        else if ( (LA30_0=='\\') ) {s = 12;}
+                        else if ( (LA29_0=='$') ) {s = 12;}
 
-                        else if ( ((LA30_0>='\u0000' && LA30_0<='#')||(LA30_0>='&' && LA30_0<='.')||(LA30_0>='0' && LA30_0<='[')||(LA30_0>=']' && LA30_0<='\uFFFF')) ) {s = 14;}
+                        else if ( (LA29_0=='\\') ) {s = 23;}
 
-                        else if ( (LA30_0=='$') ) {s = 15;}
+                        else if ( ((LA29_0>='\u0000' && LA29_0<='#')||(LA29_0>='&' && LA29_0<='.')||(LA29_0>='0' && LA29_0<='[')||(LA29_0>=']' && LA29_0<='\uFFFF')) ) {s = 25;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA30_1 = input.LA(1);
+                        int LA29_1 = input.LA(1);
 
                          
-                        int index30_1 = input.index();
+                        int index29_1 = input.index();
                         input.rewind();
                         s = -1;
                         if ( (synpred1_ActionSplitter()) ) {s = 2;}
@@ -2615,14 +2598,14 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                         else if ( (true) ) {s = 4;}
 
                          
-                        input.seek(index30_1);
+                        input.seek(index29_1);
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
-                        int LA30_5 = input.LA(1);
+                        int LA29_5 = input.LA(1);
 
                          
-                        int index30_5 = input.index();
+                        int index29_5 = input.index();
                         input.rewind();
                         s = -1;
                         if ( (synpred14_ActionSplitter()) ) {s = 6;}
@@ -2638,59 +2621,59 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                         else if ( (synpred19_ActionSplitter()) ) {s = 11;}
 
                          
-                        input.seek(index30_5);
+                        input.seek(index29_5);
                         if ( s>=0 ) return s;
                         break;
                     case 3 : 
-                        int LA30_12 = input.LA(1);
+                        int LA29_12 = input.LA(1);
 
                          
-                        int index30_12 = input.index();
+                        int index29_12 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred3_ActionSplitter()) ) {s = 13;}
+                        if ( (synpred4_ActionSplitter()) ) {s = 13;}
+
+                        else if ( (synpred5_ActionSplitter()) ) {s = 14;}
+
+                        else if ( (synpred6_ActionSplitter()) ) {s = 15;}
+
+                        else if ( (synpred7_ActionSplitter()) ) {s = 16;}
+
+                        else if ( (synpred8_ActionSplitter()) ) {s = 17;}
+
+                        else if ( (synpred9_ActionSplitter()) ) {s = 18;}
+
+                        else if ( (synpred10_ActionSplitter()) ) {s = 19;}
+
+                        else if ( (synpred11_ActionSplitter()) ) {s = 20;}
+
+                        else if ( (synpred12_ActionSplitter()) ) {s = 21;}
+
+                        else if ( (synpred13_ActionSplitter()) ) {s = 22;}
+
+                         
+                        input.seek(index29_12);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 4 : 
+                        int LA29_23 = input.LA(1);
+
+                         
+                        int index29_23 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred3_ActionSplitter()) ) {s = 24;}
 
                         else if ( (true) ) {s = 4;}
 
                          
-                        input.seek(index30_12);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
-                        int LA30_15 = input.LA(1);
-
-                         
-                        int index30_15 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred4_ActionSplitter()) ) {s = 16;}
-
-                        else if ( (synpred5_ActionSplitter()) ) {s = 17;}
-
-                        else if ( (synpred6_ActionSplitter()) ) {s = 18;}
-
-                        else if ( (synpred7_ActionSplitter()) ) {s = 19;}
-
-                        else if ( (synpred8_ActionSplitter()) ) {s = 20;}
-
-                        else if ( (synpred9_ActionSplitter()) ) {s = 21;}
-
-                        else if ( (synpred10_ActionSplitter()) ) {s = 22;}
-
-                        else if ( (synpred11_ActionSplitter()) ) {s = 23;}
-
-                        else if ( (synpred12_ActionSplitter()) ) {s = 24;}
-
-                        else if ( (synpred13_ActionSplitter()) ) {s = 25;}
-
-                         
-                        input.seek(index30_15);
+                        input.seek(index29_23);
                         if ( s>=0 ) return s;
                         break;
             }
             if (state.backtracking>0) {state.failed=true; return -1;}
             NoViableAltException nvae =
-                new NoViableAltException(getDescription(), 30, _s, input);
+                new NoViableAltException(getDescription(), 29, _s, input);
             error(nvae);
             throw nvae;
         }

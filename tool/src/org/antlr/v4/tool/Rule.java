@@ -167,6 +167,12 @@ public class Rule implements AttributeResolver {
 		return getParent().resolveToScope(x, node);
 	}
 
+	public AttributeScope resolveToDynamicScope(String x, ActionAST node) {
+		Rule r = resolveToRule(x, node);
+		if ( r!=null && r.scope!=null ) return r.scope;
+		return getParent().resolveToDynamicScope(x, node);
+	}
+
 	public Rule resolveToRule(String x, ActionAST node) {
         if ( x.equals(this.name) ) return this;
         if ( node.resolver == this ) { // action not in alt (attr space is this rule)
