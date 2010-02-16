@@ -103,6 +103,9 @@ public class AttributeChecks implements ActionSplitterListener {
 
     public void attr(String expr, Token x) { // arg, retval, predefined, token ref, rule ref, current rule
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
+			if ( node.resolver.resolveToScope(x.getText(), node)!=null ) {
+				return; // $S for scope S is ok
+			}
 			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) { // or in rule and is rule ref
 				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_SCOPE,
 										  g.fileName, x, x.getText(), expr);
@@ -137,21 +140,25 @@ public class AttributeChecks implements ActionSplitterListener {
 	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
 												   Token index, Token rhs) {
 		setDynamicScopeAttr(expr, x, y, rhs);
+		new AttributeChecks(g, r, alt, node, index).examineAction();
 	}
 
 	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
 												Token index) {
 		dynamicScopeAttr(expr, x, y);
+		new AttributeChecks(g, r, alt, node, index).examineAction();
 	}
 
 	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
 												   Token index, Token rhs) {
 		setDynamicScopeAttr(expr, x, y, rhs);
+		new AttributeChecks(g, r, alt, node, index).examineAction();
 	}
 
     public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
 												Token index) {
 		dynamicScopeAttr(expr, x, y);
+		new AttributeChecks(g, r, alt, node, index).examineAction();
 	}
 
     public void unknownSyntax(String text) {
