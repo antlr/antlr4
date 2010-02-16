@@ -71,19 +71,18 @@ public class AttributeChecks implements ActionSplitterListener {
 	// $x.y
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
-			Rule r = node.resolver.resolveToRule(x.getText(), node);
-			if ( r!=null ) {
-				Rule rref = g.getRule(x.getText());
+			Rule rref = isolatedRuleRef(x.getText());
+			if ( rref!=null ) {
 				if ( rref!=null && rref.args!=null && rref.args.get(y.getText())!=null ) {
 					ErrorManager.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
 											  g.fileName, y, y.getText(), expr);
 				}
 				else {
 					ErrorManager.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
-											  g.fileName, y, y.getText(), r.name, expr);
+											  g.fileName, y, y.getText(), rref.name, expr);
 				}
 			}
-			else if ( !node.resolver.resolvesToAttributeDict(x.getText(), node) ) {
+			else if ( !resolvesToAttributeDict(x.getText()) ) {
 				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
 										  g.fileName, x, x.getText(), expr);
 			}
@@ -107,8 +106,8 @@ public class AttributeChecks implements ActionSplitterListener {
 			if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
 				return; // $S for scope S is ok
 			}
-			if ( node.resolver.resolveToRule(x.getText(), node)!=null ) {
-				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_SCOPE,
+			if ( isolatedRuleRef(x.getText())!=null ) {
+				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_REF,
 										  g.fileName, x, x.getText(), expr);
 				return;
 			}
@@ -174,4 +173,53 @@ public class AttributeChecks implements ActionSplitterListener {
     public void setExprAttribute(String expr) {   }
     public void setAttribute(String expr) {  }
     public void templateExpr(String expr) {  }
+
+	// SUPPORT
+
+	public Rule isolatedRuleRef(String x) {
+		if ( node.resolver instanceof Grammar ) return null;
+		
+		if ( x.equals(r.name) ) return r;
+		List<LabelElementPair> labels = null;
+		if ( node.resolver instanceof Rule ) {
+			labels = r.getLabelDefs().get(x);
+		}
+		else if ( node.resolver instanceof Alternative ) {
+			labels = ((Alternative)node.resolver).labelDefs.get(x);
+		}
+		if ( labels!=null ) {  // it's a label ref. is it a rule label?
+			LabelElementPair anyLabelDef = labels.get(0);
+			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
+				return g.getRule(anyLabelDef.element.getText());
+			}
+		}
+		if ( node.resolver instanceof Alternative ) {
+			if ( ((Alternative)node.resolver).ruleRefs.get(x)!=null ) {
+				return g.getRule(x);
+			}
+		}
+        return null;
+    }
+
+	public boolean resolvesToAttributeDict(String x) {
+		if ( node.resolver instanceof Grammar ) return g.scopes.get(x)!=null;
+
+		List<LabelElementPair> labels = null;
+		if ( node.resolver instanceof Rule ) {
+			labels = r.getLabelDefs().get(x);
+		}
+		else if ( node.resolver instanceof Alternative ) {
+			labels = ((Alternative)node.resolver).labelDefs.get(x);
+		}
+		if ( labels!=null ) { // it's a label ref. is it a token label?
+			LabelElementPair anyLabelDef = labels.get(0);
+			if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
+		}
+		if ( x.equals(r.name) ) return true; // $r for action in rule r, $r is a dict
+		Rule r = g.getRule(x);
+		if ( r!=null && r.scope!=null ) return true;
+		if ( g.scopes.get(x)!=null ) return true;
+		return false;
+	}	
+
 }

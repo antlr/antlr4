@@ -222,19 +222,8 @@ public class Grammar implements AttributeResolver {
 		return null;
 	}
 
-	/** $s		AttributeDict: s is a global scope */
-	public boolean resolvesToAttributeDict(String x, ActionAST node) {
-		return scopes.get(x)!=null;
-	}
-
 	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
-		AttributeDict s = scopes.get(x);
-		if ( s !=null ) return s;
-		if ( node.resolver != this ) { // if not member action, can ref rule
-			Rule r = rules.get(x);
-			if ( r!=null ) return r.scope;
-		}
-		return null;
+		return scopes.get(x);
 	}
 
 	//	/** $x in grammar action can only be scope name */
@@ -246,9 +235,6 @@ public class Grammar implements AttributeResolver {
 //     *  shouldn't call this.
 //     */
 //    public boolean resolves(String x, String y, ActionAST node) { return false; }
-
-	/** Can't be a rule ref in grammar named action */
-    public Rule resolveToRule(String x, ActionAST node) { return null; }
 
     /** Given a grammar type, what should be the default action scope?
      *  If I say @members in a COMBINED grammar, for example, the

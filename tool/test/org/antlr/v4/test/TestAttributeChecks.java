@@ -73,7 +73,7 @@ public class TestAttributeChecks extends BaseTest {
         "$a.ick = 3;",  "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick = 3;",
         "$b.d",         "error(30): A.g:6:6: cannot access rule d's parameter: $b.d",  // can't see rule ref's arg
 		"$d.text",      "error(29): A.g:6:4: unknown attribute reference d in $d.text", // valid rule, but no ref
-		"$lab.d",		"error(31): A.g:6:8: unknown attribute d for rule b in $lab.d",
+		"$lab.d",		"error(30): A.g:6:8: cannot access rule d's parameter: $lab.d",
     };
 
 	String[] finallyChecks = {
@@ -91,7 +91,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$b",           "error(29): A.g:9:14: unknown attribute reference b in $b",
 		"$b.d",         "error(29): A.g:9:14: unknown attribute reference b in $b.d",
 		"$c.text",      "error(29): A.g:9:14: unknown attribute reference c in $c.text",
-		"$lab.d",		"error(31): A.g:9:18: unknown attribute d for rule b in $lab.d",
+		"$lab.d",		"error(30): A.g:9:18: cannot access rule d's parameter: $lab.d",
 	};
 
 	String[] dynMembersChecks = {

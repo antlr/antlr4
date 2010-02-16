@@ -30,10 +30,5 @@ package org.antlr.v4.tool;
 public interface AttributeResolver {
 	public Attribute resolveToAttribute(String x, ActionAST node);
 	public Attribute resolveToAttribute(String x, String y, ActionAST node);
-	/** Error checking when $x.y is not attribute. We ask if $x is a dict. */
-	public boolean resolvesToAttributeDict(String x, ActionAST node);
 	public AttributeDict resolveToDynamicScope(String x, ActionAST node);
-	//public Attribute resolveToDynamicScopeAttribute(String x, String y, ActionAST node);
-	/** Resolve to surrounding rule, rule ref/label if in alt, or other rule */
-	public Rule resolveToRule(String x, ActionAST node);
 }

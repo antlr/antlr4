@@ -122,7 +122,7 @@ UNKNOWN_RULE_ATTRIBUTE(arg,arg2,arg3) ::=
 	"unknown attribute <arg> for rule <arg2> in <arg3>"
 UNKNOWN_SIMPLE_ATTRIBUTE(arg,arg2) ::=
 	"unknown attribute reference <arg> in <arg2>"
-ISOLATED_RULE_SCOPE(arg,arg2) ::=
+ISOLATED_RULE_REF(arg,arg2) ::=
 	"missing attribute access on rule reference <arg> in <arg2>"
 INVALID_RULE_PARAMETER_REF(arg,arg2) ::=
 	"cannot access rule <arg>'s parameter: <arg2>"

@@ -80,7 +80,7 @@ public enum ErrorType {
 	INVALID_RULE_PARAMETER_REF(ErrorSeverity.ERROR, true, true),
 	UNKNOWN_RULE_ATTRIBUTE(ErrorSeverity.ERROR, true, true),
     UNKNOWN_ATTRIBUTE_IN_SCOPE(ErrorSeverity.ERROR, true, true),
-	ISOLATED_RULE_SCOPE(ErrorSeverity.ERROR, true, true),
+	ISOLATED_RULE_REF(ErrorSeverity.ERROR, true, true),
 	SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(ErrorSeverity.ERROR, true, true),
 	LABEL_CONFLICTS_WITH_RULE(ErrorSeverity.ERROR, true, true),
 	LABEL_CONFLICTS_WITH_TOKEN(ErrorSeverity.ERROR, true, true),
@@ -130,7 +130,7 @@ public enum ErrorType {
 	AST_OP_IN_ALT_WITH_REWRITE(ErrorSeverity.ERROR, true, true),
     WILDCARD_AS_ROOT(ErrorSeverity.ERROR, true, true),
     CONFLICTING_OPTION_IN_TREE_FILTER(ErrorSeverity.ERROR, true, true),
-    /** Documentation comment is unterminated */
+	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(ErrorSeverity.ERROR, true, true),
 
     // Dependency sorting errors

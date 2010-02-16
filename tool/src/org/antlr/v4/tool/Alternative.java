@@ -33,8 +33,6 @@ public class Alternative implements AttributeResolver {
 
     public Alternative(Rule r) { this.rule = r; }
 
-    private AttributeResolver getParent() { return rule; }
-
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
@@ -70,56 +68,13 @@ public class Alternative implements AttributeResolver {
 		return null;
 	}
 
-	/** $x		AttributeDict: references to tokens and token labels in the
-	 * 			current alt (including any elements within subrules contained
-	 * 			in that outermost alt). x can be rule with scope or a global scope.
-	 *
-	 * 			x can also be surrounding rule since we use for error checking. 
-	 */
-	public boolean resolvesToAttributeDict(String x, ActionAST node) {
-		if ( tokenRefs.get(x)!=null ) return true;
-		List<LabelElementPair> labels = labelDefs.get(x);
-		if ( labels!=null ) { // it's a label ref. is it a token label?
-			LabelElementPair anyLabelDef = labels.get(0);
-			if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
-		}
-		if ( x.equals(rule.name) ) return true; // $r for action in rule r, $r is a dict
-		Rule r = rule.g.getRule(x);
-		if ( r!=null && r.scope!=null ) return true;
-		if ( rule.g.scopes.get(x)!=null ) return true;
-		return false;
-	}
-
-	//    public boolean resolves(String x, ActionAST node) {
-//        boolean inAlt =
-//            tokenRefs.get(x)!=null||
-//            ruleRefs.get(x)!=null ||
-//            labelDefs.get(x)!=null;
-//        if ( inAlt ) return inAlt;
-//        return getParent().resolves(x, node);
-//    }
-//
-//    /** Find x as token/rule/label ref then find y in properties list. */
-//    public boolean resolves(String x, String y, ActionAST node) {
-//        if ( tokenRefs.get(x)!=null ) { // token ref in this alt?
-//            return rule.getPredefinedScope(LabelType.TOKEN_LABEL).get(y)!=null;
-//        }
-//        if ( ruleRefs.get(x)!=null ) {  // rule ref in this alt?
-//            // look up rule, ask it to resolve y (must be retval or predefined)
-//            return rule.g.getRule(x).resolvesAsRetvalOrProperty(y);
-//        }
-//        Rule r = resolveRule(x, node);
-//        if ( r!=null ) return r.resolvesAsRetvalOrProperty(y);
-//        return getParent().resolves(x, y, node);
-//    }
-
-
 	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
 		Rule r = resolveToRule(x, node);
 		if ( r!=null && r.scope !=null ) return r.scope;
-		return getParent().resolveToDynamicScope(x, node);
+		return rule.resolveToDynamicScope(x, node);
 	}
 
+	/** x can be ruleref or rule label. */
 	public Rule resolveToRule(String x, ActionAST node) {
         if ( ruleRefs.get(x)!=null ) return rule.g.getRule(x);
         List<LabelElementPair> labels = labelDefs.get(x);
@@ -129,6 +84,7 @@ public class Alternative implements AttributeResolver {
                 return rule.g.getRule(anyLabelDef.element.getText());
             }
         }
-        return getParent().resolveToRule(x, node);
+		if ( x.equals(rule.name) ) return rule;
+        return null;
     }
 }
