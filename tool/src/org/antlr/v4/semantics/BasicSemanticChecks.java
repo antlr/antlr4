@@ -125,13 +125,13 @@ public class BasicSemanticChecks {
         }
     }
 
-    protected static void checkNumRules(int gtype, String fileName,
-                                        GrammarAST rulesNode)
+    protected static void checkNumRules(Grammar g, GrammarAST rulesNode)
     {
         if ( rulesNode.getChildCount()==0 ) {
             GrammarAST root = (GrammarAST)rulesNode.getParent();
             GrammarAST IDNode = (GrammarAST)root.getChild(0);
-            ErrorManager.grammarError(ErrorType.NO_RULES, fileName, null, IDNode.getText());
+            ErrorManager.grammarError(ErrorType.NO_RULES, g.fileName,
+									  null, IDNode.getText(), g);
         }
     }
 

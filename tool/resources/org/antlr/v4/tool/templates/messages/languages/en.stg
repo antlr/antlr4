@@ -205,7 +205,7 @@ REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(arg) ::=
   "<if(arg)>rule <arg> uses <endif>rewrite syntax or operator with no output option"
 AST_OP_WITH_NON_AST_OUTPUT_OPTION(arg) ::=
   "AST operator with non-AST output option: <arg>"
-NO_RULES(arg) ::= "grammar file <arg> has no rules"
+NO_RULES(arg,arg2) ::= "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no rules"
 MISSING_AST_TYPE_IN_TREE_GRAMMAR(arg) ::=
   "tree grammar <arg> has no ASTLabelType option"
 REWRITE_FOR_MULTI_ELEMENT_ALT(arg) ::=

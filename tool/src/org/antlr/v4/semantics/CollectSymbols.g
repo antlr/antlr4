@@ -76,6 +76,7 @@ Rule currentRule = null;
 int currentAlt = 1; // 1..n
 public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
+public List<GrammarAST> qualifiedRulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> strings = new ArrayList<GrammarAST>();
@@ -260,11 +261,14 @@ terminal
 
 ruleref
 //@init {System.out.println("ruleref: "+((Tree)input.LT(1)).getText());}
-    :	RULE_REF
-    	{
-    	rulerefs.add($RULE_REF);
+    :	(	{inContext("DOT ...")}?
+    		r=RULE_REF {qualifiedRulerefs.add((GrammarAST)$r.getParent());}
+	   	|	r=RULE_REF
+	   	)
+ 	    {
+    	rulerefs.add($r);
     	if ( currentRule!=null ) {
-    		currentRule.alt[currentAlt].ruleRefs.map($RULE_REF.text, $RULE_REF);
+    		currentRule.alt[currentAlt].ruleRefs.map($r.text, $r);
     	}
     	}
     ;

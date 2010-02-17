@@ -39,10 +39,11 @@ public class SymbolChecks {
         // methods affect fields, but no side-effects outside this object
         // So, call order sensitive
         checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames
+		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
         checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
         checkActionRedefinitions(collector.actions);    // sets actionScopeToActionNames
         checkTokenAliasRedefinitions(collector.tokensDefs);
-        checkRuleArgs(collector.rulerefs);
+        //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
         checkForLabelConflicts(collector.rules);
         checkRewriteElementsPresentOnLeftSide(collector.rules);
@@ -114,28 +115,6 @@ public class SymbolChecks {
             if ( globalScopeNames.contains(t.getText()) ) {
                 ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
                                           g.fileName, t, ID);
-            }
-        }
-    }
-
-    public void checkRuleArgs(List<GrammarAST> rulerefs) {
-        if ( rulerefs==null ) return;
-        for (GrammarAST ref : rulerefs) {
-            String ruleName = ref.getText();
-            Rule r = nameToRuleMap.get(ruleName);
-            if ( r==null ) {
-                ErrorManager.grammarError(ErrorType.UNDEFINED_RULE_REF,
-                                          g.fileName, ref.token, ruleName);
-            }
-            GrammarAST arg = (GrammarAST)ref.getChild(0);
-            if ( arg!=null && r.args==null ) {
-                ErrorManager.grammarError(ErrorType.RULE_HAS_NO_ARGS,
-                                          g.fileName, ref.token, ruleName);
-
-            }
-            else if ( arg==null && (r!=null&&r.args!=null) ) {
-                ErrorManager.grammarError(ErrorType.MISSING_RULE_ARGS,
-                                          g.fileName, ref.token, ruleName);
             }
         }
     }

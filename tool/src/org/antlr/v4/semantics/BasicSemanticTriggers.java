@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} BasicSemanticTriggers.g 2010-02-16 12:43:07
+// $ANTLR ${project.version} ${buildNumber} BasicSemanticTriggers.g 2010-02-17 12:27:38
 
 /*
  [The "BSD license"]
@@ -818,7 +818,7 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
             {
             RULES3=(GrammarAST)match(input,RULES,FOLLOW_RULES_in_rules359); if (state.failed) return ;
             if ( state.backtracking==1 ) {
-              BasicSemanticChecks.checkNumRules(g.getType(), g.fileName, RULES3);
+              BasicSemanticChecks.checkNumRules(g, RULES3);
             }
 
             }

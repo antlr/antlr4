@@ -31,9 +31,9 @@ public class Grammar implements AttributeResolver {
             put("tree:WILDCARD_TREE_LABEL", AttributeDict.predefinedTokenDict);
             put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
             put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-        }};
-    
-    public Tool tool;
+		}};
+
+	public Tool tool;
     public String name;
     public GrammarRootAST ast;
     public String text; // testing only
@@ -122,21 +122,42 @@ public class Grammar implements AttributeResolver {
 
     public void defineRule(Rule r) { rules.put(r.name, r); }
 
-    public Rule getRule(String name) { return rules.get(name); }
+    public Rule getRule(String name) {
+		Rule r = rules.get(name);
+		if ( r!=null ) return r;
+		List<Grammar> imports = getAllImportedGrammars();
+		if ( imports==null ) return null;
+		for (Grammar g : imports) {
+			r = g.rules.get(name);
+			if ( r!=null ) return r;
+		}
+		return null;
+	}
+
+	public Rule getRule(String grammarName, String ruleName) {
+		if ( grammarName!=null ) { // scope override
+			Grammar g = getImportedGrammar(grammarName);
+			if ( g ==null ) {
+				return null;
+			}
+			return g.rules.get(ruleName);
+		}
+		return getRule(ruleName);
+	}
 
     public void defineScope(AttributeDict s) { scopes.put(s.getName(), s); }
 
-    /** Get list of all delegates from all grammars in the delegate subtree of g.
-     *  The grammars are in delegation tree preorder.  Don't include ourselves
+    /** Get list of all imports from all grammars in the delegate subtree of g.
+     *  The grammars are in import tree preorder.  Don't include ourselves
      *  in list as we're not a delegate of ourselves.
      */
-    public List<Grammar> getDelegates() {
+    public List<Grammar> getAllImportedGrammars() {
         if ( importedGrammars==null ) return null;
         List<Grammar> delegates = new ArrayList<Grammar>();
         for (int i = 0; i < importedGrammars.size(); i++) {
             Grammar d = importedGrammars.get(i);
             delegates.add(d);
-            List<Grammar> ds = d.getDelegates();
+            List<Grammar> ds = d.getAllImportedGrammars();
             if ( ds!=null ) delegates.addAll( ds );
         }
         return delegates;
@@ -153,10 +174,10 @@ public class Grammar implements AttributeResolver {
     }
 */
     
-    /** Return list of delegate grammars from root down to our parent.
+    /** Return list of imported grammars from root down to our parent.
      *  Order is [root, ..., this.parent].  (us not included).
      */
-    public List<Grammar> getDelegationAncestors() {
+    public List<Grammar> getGrammarAncestors() {
         Grammar root = getOutermostGrammar();
         if ( this==root ) return null;
         List<Grammar> grammars = new ArrayList<Grammar>();
@@ -184,7 +205,7 @@ public class Grammar implements AttributeResolver {
      */
     public String getRecognizerName() {
         String suffix = "";
-        List<Grammar> grammarsFromRootToMe = getOutermostGrammar().getDelegationAncestors();
+        List<Grammar> grammarsFromRootToMe = getOutermostGrammar().getGrammarAncestors();
         String qualifiedName = name;
         if ( grammarsFromRootToMe!=null ) {
             StringBuffer buf = new StringBuffer();
@@ -205,8 +226,7 @@ public class Grammar implements AttributeResolver {
 
     /** Return grammar directly imported by this grammar */
     public Grammar getImportedGrammar(String name) {
-        for (int i = 0; i < importedGrammars.size(); i++) {
-            Grammar g = importedGrammars.get(i);
+		for (Grammar g : importedGrammars) {
             if ( g.name.equals(name) ) return g;
         }
         return null;

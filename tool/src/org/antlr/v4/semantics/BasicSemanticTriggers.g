@@ -139,7 +139,7 @@ delegateGrammar
 	    {BasicSemanticChecks.checkImport(g, $id.token);}
     ;
 
-rules : RULES {BasicSemanticChecks.checkNumRules(g.getType(), g.fileName, $RULES);} ;
+rules : RULES {BasicSemanticChecks.checkNumRules(g, $RULES);} ;
 
 option // TODO: put in grammar, or rule, or block
     :   {inContext("OPTIONS")}? ^(ASSIGN o=ID optionValue)
