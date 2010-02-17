@@ -22,6 +22,6 @@ public interface ActionSplitterListener {
     void setAttribute(String expr);
     void templateExpr(String expr);
 
-    void unknownSyntax(String text);
+    void unknownSyntax(Token t);
     void text(String text);
 }

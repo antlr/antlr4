@@ -132,7 +132,7 @@ TEMPLATE_EXPR
 	;
 
 UNKNOWN_SYNTAX
-@after {delegate.unknownSyntax($text);}
+@after {delegate.unknownSyntax(emit());}
 	:	'%' (ID|'.'|'('|')'|','|'{'|'}'|'"')*
 	;
 

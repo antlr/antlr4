@@ -167,8 +167,9 @@ public class AttributeChecks implements ActionSplitterListener {
 		new AttributeChecks(g, r, alt, node, index).examineAction();
 	}
 
-    public void unknownSyntax(String text) {
-        System.err.println("unknown: "+text);
+    public void unknownSyntax(Token t) {
+		ErrorManager.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,
+								  g.fileName, t, t.getText());
     }
 
     public void text(String text) { }
