@@ -226,6 +226,8 @@ public class Grammar implements AttributeResolver {
 		return scopes.get(x);
 	}
 
+	public boolean resolvesToListLabel(String x, ActionAST node) { return false; }
+	
 	//	/** $x in grammar action can only be scope name */
 //    public boolean resolves(String x, ActionAST node) {
 //        return scopes.get(x)!=null;

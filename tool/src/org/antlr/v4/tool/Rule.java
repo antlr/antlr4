@@ -135,7 +135,9 @@ public class Rule implements AttributeResolver {
         return defs;
     }
 
-	/**  $x		Attribute: rule arguments, return values, predefined rule prop. */
+	/**  $x		Attribute: rule arguments, return values, predefined rule prop,
+ 	 * 			or a token/rule list label.
+	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		Attribute a = args.get(x);   if ( a!=null ) return a;
 		a = retvals.get(x);          if ( a!=null ) return a;
@@ -149,13 +151,14 @@ public class Rule implements AttributeResolver {
 			AttributeDict d = getPredefinedScope(LabelType.RULE_LABEL);
 			return d.get(y);
 		}
-		List<LabelElementPair> labels = getLabelDefs().get(x);
-		if ( labels!=null ) { // it's a label ref. is it a rule label?
-			LabelElementPair anyLabelDef = labels.get(0);
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		if ( anyLabelDef!=null ) {
 			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
 				return g.getRule(anyLabelDef.element.getText()).resolveRetvalOrProperty(y);
 			}
-			return getPredefinedScope(anyLabelDef.type).get(y);
+			else {
+				return getPredefinedScope(anyLabelDef.type).get(y);
+			}
 		}
 		return null;
 
@@ -167,17 +170,27 @@ public class Rule implements AttributeResolver {
 		return g.scopes.get(x);
 	}
 
+	public boolean resolvesToListLabel(String x, ActionAST node) {
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		return anyLabelDef!=null &&
+			   (anyLabelDef.type==LabelType.RULE_LIST_LABEL ||
+				anyLabelDef.type==LabelType.TOKEN_LIST_LABEL);
+	}
+
 	public Rule resolveToRule(String x) {
 		if ( x.equals(this.name) ) return this;
-		List<LabelElementPair> labels = getLabelDefs().get(x);
-		if ( labels!=null ) {  // it's a label ref. is it a rule label?
-			LabelElementPair anyLabelDef = labels.get(0);
-			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-				return g.getRule(anyLabelDef.element.getText());
-			}
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) {
+			return g.getRule(anyLabelDef.element.getText());
 		}
-        return g.getRule(x);
-    }
+		return g.getRule(x);
+	}
+
+	public LabelElementPair getAnyLabelDef(String x) {
+		List<LabelElementPair> labels = getLabelDefs().get(x);
+		if ( labels!=null ) return labels.get(0);
+		return null;
+	}
 
     public AttributeDict getPredefinedScope(LabelType ltype) {
         String grammarLabelKey = g.getTypeString() + ":" + ltype;

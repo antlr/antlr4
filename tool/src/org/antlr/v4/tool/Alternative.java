@@ -55,34 +55,43 @@ public class Alternative implements AttributeResolver {
         }
         if ( ruleRefs.get(x)!=null ) {  // rule ref in this alt?
             // look up rule, ask it to resolve y (must be retval or predefined)
-            return rule.g.getRule(x).resolveRetvalOrProperty(y);
-        }
-		List<LabelElementPair> labels = labelDefs.get(x);
-		if ( labels!=null ) { // it's a label ref. is it a rule label?
-			LabelElementPair anyLabelDef = labels.get(0);
-			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-				return rule.g.getRule(anyLabelDef.element.getText()).resolveRetvalOrProperty(y);
-			}
+			return rule.g.getRule(x).resolveRetvalOrProperty(y);
+		}
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) {
+			return rule.g.getRule(anyLabelDef.element.getText()).resolveRetvalOrProperty(y);
+		}
+		else if ( anyLabelDef!=null ) {
 			return rule.getPredefinedScope(anyLabelDef.type).get(y);
 		}
 		return null;
 	}
 
 	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
-		Rule r = resolveToRule(x, node);
+		Rule r = resolveToRule(x);
 		if ( r!=null && r.scope !=null ) return r.scope;
 		return rule.resolveToDynamicScope(x, node);
 	}
 
+	public boolean resolvesToListLabel(String x, ActionAST node) {
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		return anyLabelDef!=null &&
+			   (anyLabelDef.type==LabelType.RULE_LIST_LABEL ||
+				anyLabelDef.type==LabelType.TOKEN_LIST_LABEL);
+	}
+
+	public LabelElementPair getAnyLabelDef(String x) {
+		List<LabelElementPair> labels = labelDefs.get(x);
+		if ( labels!=null ) return labels.get(0);
+		return null;
+	}
+
 	/** x can be ruleref or rule label. */
-	public Rule resolveToRule(String x, ActionAST node) {
+	public Rule resolveToRule(String x) {
         if ( ruleRefs.get(x)!=null ) return rule.g.getRule(x);
-        List<LabelElementPair> labels = labelDefs.get(x);
-        if ( labels!=null ) { // it's a label ref. is it a rule label?
-            LabelElementPair anyLabelDef = labels.get(0);
-            if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
-                return rule.g.getRule(anyLabelDef.element.getText());
-            }
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) {
+            return rule.g.getRule(anyLabelDef.element.getText());
         }
 		if ( x.equals(rule.name) ) return rule;
         return null;

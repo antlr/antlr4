@@ -106,6 +106,12 @@ public class AttributeChecks implements ActionSplitterListener {
 			if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
 				return; // $S for scope S is ok
 			}
+			if ( resolvesToToken(x.getText()) ) {
+				return; // $ID for token ref or label of token
+			}
+			if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
+				return; // $ids for ids+=ID etc...
+			}
 			if ( isolatedRuleRef(x.getText())!=null ) {
 				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_REF,
 										  g.fileName, x, x.getText(), expr);
@@ -202,8 +208,24 @@ public class AttributeChecks implements ActionSplitterListener {
     }
 
 	public boolean resolvesToAttributeDict(String x) {
+		if ( resolvesToToken(x) ) return true;
 		if ( node.resolver instanceof Grammar ) return g.scopes.get(x)!=null;
 
+		if ( x.equals(r.name) ) return true; // $r for action in rule r, $r is a dict
+		Rule r = g.getRule(x);
+		if ( r!=null && r.scope!=null ) return true;
+		if ( g.scopes.get(x)!=null ) return true;
+		return false;
+	}
+
+	public boolean resolvesToToken(String x) {
+		if ( node.resolver instanceof Grammar ) return false;
+
+		if ( node.resolver instanceof Alternative &&
+			 ((Alternative)node.resolver).tokenRefs.get(x)!=null )
+		{
+			return true;
+		}
 		List<LabelElementPair> labels = null;
 		if ( node.resolver instanceof Rule ) {
 			labels = r.getLabelDefs().get(x);
@@ -215,11 +237,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			LabelElementPair anyLabelDef = labels.get(0);
 			if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
 		}
-		if ( x.equals(r.name) ) return true; // $r for action in rule r, $r is a dict
-		Rule r = g.getRule(x);
-		if ( r!=null && r.scope!=null ) return true;
-		if ( g.scopes.get(x)!=null ) return true;
 		return false;
-	}	
+	}
 
 }
