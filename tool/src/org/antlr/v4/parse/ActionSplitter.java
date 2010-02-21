@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ActionSplitter.g 2010-02-16 17:54:26
+// $ANTLR ${project.version} ${buildNumber} ActionSplitter.g 2010-02-19 17:45:08
 
 package org.antlr.v4.parse;
 
@@ -2175,20 +2175,6 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred12_ActionSplitter() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred12_ActionSplitter_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
     public final boolean synpred17_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
@@ -2208,6 +2194,20 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         int start = input.mark();
         try {
             synpred7_ActionSplitter_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public final boolean synpred12_ActionSplitter() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred12_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2399,11 +2399,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred15_ActionSplitter() {
+    public final boolean synpred3_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred15_ActionSplitter_fragment(); // can never throw exception
+            synpred3_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2413,11 +2413,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred3_ActionSplitter() {
+    public final boolean synpred15_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred3_ActionSplitter_fragment(); // can never throw exception
+            synpred15_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2495,29 +2495,17 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
     static final String DFA29_eofS =
         "\31\uffff";
     static final String DFA29_minS =
-        "\1\0\1\uffff\1\0\6\uffff\1\0\2\uffff\1\0\1\uffff\1\0\12\uffff";
+        "\1\0\1\uffff\1\0\12\uffff\1\0\2\uffff\1\0\6\uffff\1\0\1\uffff";
     static final String DFA29_maxS =
-        "\1\uffff\1\uffff\1\0\6\uffff\1\0\2\uffff\1\0\1\uffff\1\0\12\uffff";
+        "\1\uffff\1\uffff\1\0\12\uffff\1\0\2\uffff\1\0\6\uffff\1\0\1\uffff";
     static final String DFA29_acceptS =
-        "\1\uffff\1\24\1\uffff\1\16\1\17\1\20\1\21\1\22\1\23\1\uffff\1\1"+
-        "\1\2\1\uffff\1\3\1\uffff\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14"+
-        "\1\15";
+        "\1\uffff\1\24\1\uffff\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1"+
+        "\15\1\uffff\1\1\1\2\1\uffff\1\16\1\17\1\20\1\21\1\22\1\23\1\uffff"+
+        "\1\3";
     static final String DFA29_specialS =
-        "\1\0\1\uffff\1\1\6\uffff\1\2\2\uffff\1\3\1\uffff\1\4\12\uffff}>";
+        "\1\0\1\uffff\1\1\12\uffff\1\2\2\uffff\1\3\6\uffff\1\4\1\uffff}>";
     static final String[] DFA29_transitionS = {
-            "\44\1\1\16\1\2\11\1\1\11\54\1\1\14\uffa3\1",
-            "",
-            "\1\uffff",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\uffff",
-            "",
-            "",
-            "\1\uffff",
+            "\44\1\1\2\1\20\11\1\1\15\54\1\1\27\uffa3\1",
             "",
             "\1\uffff",
             "",
@@ -2529,6 +2517,18 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             "",
             "",
             "",
+            "",
+            "\1\uffff",
+            "",
+            "",
+            "\1\uffff",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\1\uffff",
             ""
     };
 
@@ -2574,13 +2574,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                         s = -1;
                         if ( ((LA29_0>='\u0000' && LA29_0<='#')||(LA29_0>='&' && LA29_0<='.')||(LA29_0>='0' && LA29_0<='[')||(LA29_0>=']' && LA29_0<='\uFFFF')) ) {s = 1;}
 
-                        else if ( (LA29_0=='%') ) {s = 2;}
+                        else if ( (LA29_0=='$') ) {s = 2;}
 
-                        else if ( (LA29_0=='/') ) {s = 9;}
+                        else if ( (LA29_0=='/') ) {s = 13;}
 
-                        else if ( (LA29_0=='\\') ) {s = 12;}
+                        else if ( (LA29_0=='%') ) {s = 16;}
 
-                        else if ( (LA29_0=='$') ) {s = 14;}
+                        else if ( (LA29_0=='\\') ) {s = 23;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -2591,83 +2591,83 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                         int index29_2 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred14_ActionSplitter()) ) {s = 3;}
+                        if ( (synpred4_ActionSplitter()) ) {s = 3;}
 
-                        else if ( (synpred15_ActionSplitter()) ) {s = 4;}
+                        else if ( (synpred5_ActionSplitter()) ) {s = 4;}
 
-                        else if ( (synpred16_ActionSplitter()) ) {s = 5;}
+                        else if ( (synpred6_ActionSplitter()) ) {s = 5;}
 
-                        else if ( (synpred17_ActionSplitter()) ) {s = 6;}
+                        else if ( (synpred7_ActionSplitter()) ) {s = 6;}
 
-                        else if ( (synpred18_ActionSplitter()) ) {s = 7;}
+                        else if ( (synpred8_ActionSplitter()) ) {s = 7;}
 
-                        else if ( (synpred19_ActionSplitter()) ) {s = 8;}
+                        else if ( (synpred9_ActionSplitter()) ) {s = 8;}
+
+                        else if ( (synpred10_ActionSplitter()) ) {s = 9;}
+
+                        else if ( (synpred11_ActionSplitter()) ) {s = 10;}
+
+                        else if ( (synpred12_ActionSplitter()) ) {s = 11;}
+
+                        else if ( (synpred13_ActionSplitter()) ) {s = 12;}
 
                          
                         input.seek(index29_2);
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
-                        int LA29_9 = input.LA(1);
+                        int LA29_13 = input.LA(1);
 
                          
-                        int index29_9 = input.index();
+                        int index29_13 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred1_ActionSplitter()) ) {s = 10;}
+                        if ( (synpred1_ActionSplitter()) ) {s = 14;}
 
-                        else if ( (synpred2_ActionSplitter()) ) {s = 11;}
+                        else if ( (synpred2_ActionSplitter()) ) {s = 15;}
 
                         else if ( (true) ) {s = 1;}
 
                          
-                        input.seek(index29_9);
+                        input.seek(index29_13);
                         if ( s>=0 ) return s;
                         break;
                     case 3 : 
-                        int LA29_12 = input.LA(1);
+                        int LA29_16 = input.LA(1);
 
                          
-                        int index29_12 = input.index();
+                        int index29_16 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred3_ActionSplitter()) ) {s = 13;}
+                        if ( (synpred14_ActionSplitter()) ) {s = 17;}
+
+                        else if ( (synpred15_ActionSplitter()) ) {s = 18;}
+
+                        else if ( (synpred16_ActionSplitter()) ) {s = 19;}
+
+                        else if ( (synpred17_ActionSplitter()) ) {s = 20;}
+
+                        else if ( (synpred18_ActionSplitter()) ) {s = 21;}
+
+                        else if ( (synpred19_ActionSplitter()) ) {s = 22;}
+
+                         
+                        input.seek(index29_16);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 4 : 
+                        int LA29_23 = input.LA(1);
+
+                         
+                        int index29_23 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred3_ActionSplitter()) ) {s = 24;}
 
                         else if ( (true) ) {s = 1;}
 
                          
-                        input.seek(index29_12);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
-                        int LA29_14 = input.LA(1);
-
-                         
-                        int index29_14 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred4_ActionSplitter()) ) {s = 15;}
-
-                        else if ( (synpred5_ActionSplitter()) ) {s = 16;}
-
-                        else if ( (synpred6_ActionSplitter()) ) {s = 17;}
-
-                        else if ( (synpred7_ActionSplitter()) ) {s = 18;}
-
-                        else if ( (synpred8_ActionSplitter()) ) {s = 19;}
-
-                        else if ( (synpred9_ActionSplitter()) ) {s = 20;}
-
-                        else if ( (synpred10_ActionSplitter()) ) {s = 21;}
-
-                        else if ( (synpred11_ActionSplitter()) ) {s = 22;}
-
-                        else if ( (synpred12_ActionSplitter()) ) {s = 23;}
-
-                        else if ( (synpred13_ActionSplitter()) ) {s = 24;}
-
-                         
-                        input.seek(index29_14);
+                        input.seek(index29_23);
                         if ( s>=0 ) return s;
                         break;
             }

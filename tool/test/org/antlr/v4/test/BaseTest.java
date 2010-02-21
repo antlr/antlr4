@@ -418,7 +418,7 @@ public abstract class BaseTest {
 		return null;
 	}
 
-    public void testErrors(String[] pairs) {
+    public void testErrors(String[] pairs, boolean printTree) {
         for (int i = 0; i < pairs.length; i+=2) {
             String input = pairs[i];
             String expect = pairs[i+1];
@@ -427,14 +427,19 @@ public abstract class BaseTest {
             try {
                 String[] lines = input.split("\n");
                 String fileName = "<string>";
-                int grIndex = lines[0].indexOf("grammar");
-                if ( grIndex>=0 ) {
+                int grIndex = lines[0].lastIndexOf("grammar");
+				int semi = lines[0].lastIndexOf(';');
+                if ( grIndex>=0 && semi>=0 ) {
                     int space = lines[0].indexOf(' ', grIndex);
-                    int semi = lines[0].lastIndexOf(';');
                     fileName = lines[0].substring(space+1, semi)+".g";
                 }
+				if ( fileName.length()==".g".length() ) fileName = "<string>";
                 Grammar g = new Grammar(fileName, input);
                 g.loadImportedGrammars();
+				if ( printTree ) {
+					if ( g.ast!=null ) System.out.println(g.ast.toStringTree());
+					else System.out.println("null tree");
+				}
                 SemanticPipeline sem = new SemanticPipeline();
                 sem.process(g);
             }
@@ -442,7 +447,11 @@ public abstract class BaseTest {
                 re.printStackTrace(System.err);
             }
             String actual = equeue.toString();
-            assertEquals(expect,actual);
+			String msg = input;
+			msg = msg.replaceAll("\n","\\\\n");
+			msg = msg.replaceAll("\r","\\\\r");
+			msg = msg.replaceAll("\t","\\\\t");
+            assertEquals("error in: "+msg,expect,actual);
         }
     }
 

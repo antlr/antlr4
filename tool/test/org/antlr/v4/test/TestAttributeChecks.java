@@ -240,7 +240,7 @@ public class TestAttributeChecks extends BaseTest {
             ST st = new ST(template);
             st.add(location, action);
             String grammar = st.render();
-            testErrors(new String[] {grammar, expected});
+            testErrors(new String[] {grammar, expected}, false);
         }
     }
 }

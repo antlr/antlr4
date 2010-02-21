@@ -291,7 +291,7 @@ public class Tool {
         }
     }
 
-    public GrammarRootAST load(String fileName) {
+    public GrammarAST load(String fileName) {
         ANTLRFileStream in = null;
         try {
             in = new ANTLRFileStream(fileName);
@@ -302,18 +302,18 @@ public class Tool {
         return load(in);
     }
 
-    public GrammarRootAST loadFromString(String grammar) {
+    public GrammarAST loadFromString(String grammar) {
         return load(new ANTLRStringStream(grammar));
     }
 
-    public GrammarRootAST load(CharStream in) {
+    public GrammarAST load(CharStream in) {
         try {
             ANTLRLexer lexer = new ANTLRLexer(in);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             ANTLRParser p = new ANTLRParser(tokens);
             p.setTreeAdaptor(new GrammarASTAdaptor(in));
             ParserRuleReturnScope r = p.grammarSpec();
-            return (GrammarRootAST)r.getTree();
+            return (GrammarAST)r.getTree();
         }
         catch (RecognitionException re) {
             // TODO: do we gen errors now?
@@ -324,8 +324,10 @@ public class Tool {
 
     public void process() {
         // testing parser
-        GrammarRootAST ast = load(grammarFileNames.get(0));
+        GrammarAST t = load(grammarFileNames.get(0));
         GrammarRootAST lexerAST = null;
+		if ( t instanceof GrammarASTErrorNode ) return; // came back as error node
+		GrammarRootAST ast = (GrammarRootAST)t;
         if ( ast.grammarType==ANTLRParser.COMBINED ) {
             lexerAST = extractImplicitLexer(ast); // alters ast
         }

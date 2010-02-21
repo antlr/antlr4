@@ -136,11 +136,15 @@ public class Rule implements AttributeResolver {
     }
 
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop,
- 	 * 			or a token/rule list label.
+	 * 			or a token/rule list label.
 	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
-		Attribute a = args.get(x);   if ( a!=null ) return a;
-		a = retvals.get(x);          if ( a!=null ) return a;
+		if ( args!=null ) {
+			Attribute a = args.get(x);   	if ( a!=null ) return a;
+		}
+		if ( retvals!=null ) {
+			Attribute a = retvals.get(x);	if ( a!=null ) return a;
+		}
 		AttributeDict properties = getPredefinedScope(LabelType.RULE_LABEL);
 		return properties.get(x);
 	}

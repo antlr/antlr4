@@ -72,13 +72,13 @@ public String getErrorMessage(RecognitionException e,
 {
     List stack = getRuleInvocationStack(e, this.getClass().getName());
     String msg = null;
-    String inputContext =
-        ((CommonTree)input.LT(-3)).token+" "+
-        ((CommonTree)input.LT(-2)).token+" "+
-        ((CommonTree)input.LT(-1)).token+" >>>"+
-        ((CommonTree)input.LT(1)).token+"<<< "+
-        ((CommonTree)input.LT(2)).token+" "+
-        ((CommonTree)input.LT(3)).token;
+        String inputContext =
+          input.LT(-3) == null ? "" : ((Tree)input.LT(-3)).getText()+" "+
+          input.LT(-2) == null ? "" : ((Tree)input.LT(-2)).getText()+" "+
+          input.LT(-1) == null ? "" : ((Tree)input.LT(-1)).getText()+" >>>"+
+          input.LT(1) == null ? "" : ((Tree)input.LT(1)).getText()+"<<< "+
+          input.LT(2) == null ? "" : ((Tree)input.LT(2)).getText()+" "+
+          input.LT(3) == null ? "" : ((Tree)input.LT(3)).getText();
     if ( e instanceof NoViableAltException ) {
        NoViableAltException nvae = (NoViableAltException)e;
        msg = " no viable alt; token="+e.token+
@@ -104,6 +104,23 @@ public void traceIn(String ruleName, int ruleIndex)  {
 		System.out.print(" backtracking="+state.backtracking);
 	}
 	System.out.println();
+}
+	protected void mismatch(IntStream input, int ttype, BitSet follow)
+		throws RecognitionException {
+		throw new MismatchedTokenException(ttype, input);
+	}
+	public void recoverFromMismatchedToken(IntStream input,
+										   RecognitionException e, BitSet follow)
+		throws RecognitionException
+
+	{
+		throw e;
+	}
+}
+
+// Alter code generation so catch-clauses get replace with // this action.
+@rulecatch { catch (RecognitionException e) {
+throw e;
 }
 }
 

@@ -1,6 +1,10 @@
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.v4.parse.v4ParserException;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
@@ -166,6 +170,17 @@ public class ErrorManager {
         
     }
 
+	public static void syntaxError(ErrorType etype,
+								   String fileName,
+								   Token token,
+								   RecognitionException antlrException,
+								   Object... args)
+	{
+		state.get().errors++;
+		Message msg = new GrammarSyntaxMessage(etype,fileName,token,antlrException,args);
+		state.get().listener.error(msg);
+	}
+
     public static void internalError(String error, Throwable e) {
         state.get().errors++;
         StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
@@ -190,6 +205,30 @@ public class ErrorManager {
 	public static void toolError(ErrorType errorType, Object... args) {
         state.get().errors++;
         state.get().listener.error(new ToolMessage(errorType, args));
+	}
+
+	public static String getParserErrorMessage(Parser parser, RecognitionException e) {
+		String msg = null;
+		if ( e instanceof NoViableAltException) {
+			String t = parser.getTokenErrorDisplay(e.token);
+			   String name = "<EOF>";
+			if ( e.token.getType()>=0 ) name = parser.getTokenNames()[e.token.getType()];
+			msg = " came as a complete surprise to me";
+			msg = t+msg;
+//			if ( t.toLowerCase().equals("'"+name.toLowerCase()+"'") ) {
+//				msg = t+msg;
+//			}
+//			else {
+//				msg = t+"<"+name+">"+msg;
+//			}
+		}
+		else if ( e instanceof v4ParserException) {
+			msg = ((v4ParserException)e).msg;
+		}
+		else {
+			msg = parser.getErrorMessage(e, parser.getTokenNames());
+		}
+		return msg;
 	}
 
     /**

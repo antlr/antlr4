@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-02-17 12:27:38
+// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-02-19 17:45:09
 
 /*
  [The "BSD license"]
@@ -40,15 +40,15 @@ import java.util.List;
  */
 public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "RESULT", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "RESULT", "ALT_REWRITE"
     };
-    public static final int COMBINED=91;
+    public static final int COMBINED=90;
     public static final int LT=43;
     public static final int STAR=48;
-    public static final int BACKTRACK_SEMPRED=96;
+    public static final int BACKTRACK_SEMPRED=95;
     public static final int DOUBLE_ANGLE_STRING_LITERAL=11;
     public static final int FORCED_ACTION=5;
-    public static final int ARGLIST=89;
+    public static final int ARGLIST=88;
     public static final int ALTLIST=85;
     public static final int NOT=60;
     public static final int EOF=-1;
@@ -56,12 +56,12 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int ACTION=16;
     public static final int TOKEN_REF=62;
     public static final int RULEMODIFIERS=74;
-    public static final int ST_RESULT=100;
+    public static final int ST_RESULT=99;
     public static final int RPAREN=41;
-    public static final int RET=90;
+    public static final int RET=89;
     public static final int IMPORT=22;
     public static final int STRING_LITERAL=67;
-    public static final int ARG=88;
+    public static final int ARG=87;
     public static final int ARG_ACTION=14;
     public static final int DOUBLE_QUOTE_STRING_LITERAL=10;
     public static final int COMMENT=9;
@@ -69,7 +69,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int GRAMMAR=27;
     public static final int RULEACTIONS=75;
     public static final int WSCHARS=65;
-    public static final int INITACTION=92;
+    public static final int INITACTION=91;
     public static final int ALT_REWRITE=101;
     public static final int IMPLIES=42;
     public static final int RULE=72;
@@ -81,7 +81,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int CHAR_RANGE=82;
     public static final int INT=64;
     public static final int EPSILON=83;
-    public static final int LIST=98;
+    public static final int LIST=97;
     public static final int COLONCOLON=37;
     public static final int WSNLCHARS=18;
     public static final int WS=70;
@@ -93,10 +93,10 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int PARSER=25;
     public static final int DOLLAR=53;
     public static final int PROTECTED=28;
-    public static final int ELEMENT_OPTIONS=99;
+    public static final int ELEMENT_OPTIONS=98;
     public static final int NESTED_ACTION=15;
     public static final int FRAGMENT=23;
-    public static final int ID=87;
+    public static final int ID=86;
     public static final int TREE_BEGIN=58;
     public static final int LPAREN=40;
     public static final int AT=59;
@@ -106,7 +106,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int SCOPE=21;
     public static final int ETC=56;
     public static final int COMMA=38;
-    public static final int WILDCARD=97;
+    public static final int WILDCARD=96;
     public static final int DOC_COMMENT=6;
     public static final int PLUS=49;
     public static final int REWRITE_BLOCK=77;
@@ -118,8 +118,8 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int HEX_DIGIT=68;
     public static final int RANGE=55;
     public static final int TOKENS=20;
-    public static final int GATED_SEMPRED=94;
-    public static final int RESULT=86;
+    public static final int RESULT=100;
+    public static final int GATED_SEMPRED=93;
     public static final int BANG=47;
     public static final int ACTION_STRING_LITERAL=12;
     public static final int ROOT=52;
@@ -132,8 +132,8 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final int QUESTION=46;
     public static final int FINALLY=34;
     public static final int TEMPLATE=35;
-    public static final int LABEL=93;
-    public static final int SYN_SEMPRED=95;
+    public static final int LABEL=92;
+    public static final int SYN_SEMPRED=94;
     public static final int ERRCHAR=71;
     public static final int BLOCK=76;
     public static final int ASSIGN=45;
@@ -1399,10 +1399,10 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     static final String DFA1_eofS =
         "\41\uffff";
     static final String DFA1_minS =
-        "\1\16\3\2\4\uffff\3\0\6\uffff\1\20\2\127\2\uffff\1\3\1\uffff\1\20"+
+        "\1\16\3\2\4\uffff\3\0\6\uffff\1\20\2\126\2\uffff\1\3\1\uffff\1\20"+
         "\1\4\1\uffff\1\3\1\uffff\1\2\2\0\1\uffff";
     static final String DFA1_maxS =
-        "\1\145\3\2\4\uffff\3\0\6\uffff\3\127\2\uffff\1\127\1\uffff\1\127"+
+        "\1\145\3\2\4\uffff\3\0\6\uffff\3\126\2\uffff\1\126\1\uffff\1\126"+
         "\1\145\1\uffff\1\3\1\uffff\1\3\2\0\1\uffff";
     static final String DFA1_acceptS =
         "\4\uffff\1\3\1\4\1\5\1\6\3\uffff\1\12\1\14\1\15\1\16\1\17\1\20\3"+
@@ -1413,8 +1413,8 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     static final String[] DFA1_transitionS = {
             "\1\6\1\uffff\1\16\4\uffff\1\1\11\uffff\1\7\1\uffff\1\20\1\17"+
             "\12\uffff\1\3\4\uffff\1\14\10\uffff\1\2\2\uffff\1\12\1\10\3"+
-            "\uffff\1\11\4\uffff\1\5\13\uffff\1\15\2\uffff\1\4\5\uffff\1"+
-            "\13\7\uffff\1\15",
+            "\uffff\1\11\4\uffff\1\5\13\uffff\1\15\1\uffff\1\4\5\uffff\1"+
+            "\13\10\uffff\1\15",
             "\1\21",
             "\1\22",
             "\1\23",
@@ -1431,14 +1431,14 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             "",
             "",
             "",
-            "\1\27\106\uffff\1\26",
+            "\1\27\105\uffff\1\26",
             "\1\30",
             "\1\31",
             "",
             "",
-            "\1\27\14\uffff\1\32\106\uffff\1\27",
+            "\1\27\14\uffff\1\32\105\uffff\1\27",
             "",
-            "\1\33\106\uffff\1\34",
+            "\1\33\105\uffff\1\34",
             "\77\14\1\35\42\14",
             "",
             "\1\36",
@@ -1591,7 +1591,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final BitSet FOLLOW_ID_in_globalScope257 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_globalScope259 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_AT_in_globalNamedAction278 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_globalNamedAction280 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_globalNamedAction280 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
     public static final BitSet FOLLOW_ID_in_globalNamedAction283 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_ACTION_in_globalNamedAction285 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ASSIGN_in_tokensSection308 = new BitSet(new long[]{0x0000000000000004L});
@@ -1617,7 +1617,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec543 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec545 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec558 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_ruleScopeSpec562 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_ruleScopeSpec562 = new BitSet(new long[]{0x0000000000000008L,0x0000000000400000L});
     public static final BitSet FOLLOW_set_in_rewriteElement590 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ASSIGN_in_labeledElement626 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_labeledElement630 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});

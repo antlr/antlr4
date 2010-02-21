@@ -93,7 +93,7 @@ NO_VIABLE_DFA_ALT(arg,arg2) ::=
 */
 
 // GRAMMAR ERRORS
-SYNTAX_ERROR(arg) ::= "syntax error: <arg>"
+SYNTAX_ERROR(arg) ::= "<arg>"
 RULE_REDEFINITION(arg) ::=
 	"rule <arg> redefinition"
 SCOPE_REDEFINITION(arg) ::=

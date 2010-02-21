@@ -16,7 +16,7 @@ public class SymbolChecks {
     protected Grammar g;
     protected CollectSymbols collector;
     protected Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
-    protected Set<String> tokenIDs = new HashSet<String>();
+	protected Set<String> tokenIDs = new HashSet<String>();
     protected Set<String> globalScopeNames = new HashSet<String>();
     protected Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 
@@ -46,7 +46,7 @@ public class SymbolChecks {
         //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
         checkForLabelConflicts(collector.rules);
-        checkRewriteElementsPresentOnLeftSide(collector.rules);
+        //checkRewriteElementsPresentOnLeftSide(collector.rules); // move to after token type assignment
     }
 
     public void checkForRuleConflicts(List<Rule> rules) {
@@ -77,7 +77,7 @@ public class SymbolChecks {
                 globalScopeNames.add(s.getName());
             }
             else {
-                Token idNode = ((GrammarAST) s.ast.getChild(0)).token;
+                Token idNode = ((GrammarAST) s.ast.getParent().getChild(0)).token;
                 ErrorManager.grammarError(ErrorType.SCOPE_REDEFINITION,
                                           g.fileName, idNode, s.getName());
             }
@@ -258,22 +258,6 @@ public class SymbolChecks {
                 ErrorManager.grammarError(msgID,g.fileName,
                                           r.scope.ast.token,
                                           attrName,arg2);
-            }
-        }
-    }
-
-    public void checkRewriteElementsPresentOnLeftSide(List<Rule> rules) {
-        for (Rule r : rules) {
-            for (int a=1; a<=r.numberOfAlts; a++) {
-                Alternative alt = r.alt[a];
-                for (GrammarAST e : alt.rewriteElements) {
-                    if ( !(alt.ruleRefs.containsKey(e.getText()) ||
-                           alt.tokenRefs.containsKey(e.getText()) ||
-                           alt.labelDefs.containsKey(e.getText())) ) {
-                        ErrorManager.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
-                                                  g.fileName, e.token, e.getText());
-                    }
-                }
             }
         }
     }

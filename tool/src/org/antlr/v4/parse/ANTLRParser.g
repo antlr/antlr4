@@ -73,7 +73,6 @@ tokens {
     EPSILON;
     ALT;
     ALTLIST;
-    RESULT;  
     ID;
     ARG;
     ARGLIST;
@@ -132,6 +131,22 @@ package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
 }
 
+@members {
+Stack paraphrases = new Stack();
+public void displayRecognitionError(String[] tokenNames,
+									RecognitionException e)
+{
+	String msg = ErrorManager.getParserErrorMessage(this, e);
+	if ( paraphrases.size()>0 ) {
+		String paraphrase = (String)paraphrases.peek();
+		msg = msg+" while "+paraphrase;
+	}
+	List stack = getRuleInvocationStack(e, this.getClass().getName());
+	msg += ", rule stack = "+stack;
+	ErrorManager.syntaxError(ErrorType.SYNTAX_ERROR, getSourceName(), e.token, e, msg);
+}
+}
+
 // The main entry point for parsing a V3 grammar from top to toe. This is
 // the method call from whence to obtain the AST for the parse.
 //
@@ -158,7 +173,7 @@ grammarSpec
 // constrained by some arbitrary order of declarations that nobody
 // can remember. In the next phase of the parse, we verify that these
 // constructs are valid, not repeated and so on.
-      prequelConstruct*
+      sync ( prequelConstruct sync )*
 	    
 	  // We should now see at least one ANTLR EBNF style rule
 	  // declaration. If the rules are missing we will let the
@@ -351,12 +366,24 @@ actionScopeName
 	;
 
 rules
-    : rule*      
+    :	sync (rule sync)*    
       // Rewrite with an enclosing node as this is good for counting
       // the number of rules and an easy marker for the walker to detect
       // that there are no rules.
       ->^(RULES rule*)
     ;    
+
+sync
+@init {
+	BitSet followSet = computeErrorRecoverySet();
+	if ( input.LA(1)!=Token.EOF && !followSet.member(input.LA(1)) ) {
+		reportError(new NoViableAltException("",0,0,input));			
+       	beginResync();
+       	consumeUntil(input, followSet);
+       	endResync();
+	}
+}	:
+	;
 
 // The specification of an EBNF rule in ANTLR style, with all the
 // rule level parameters, declarations, actions, rewrite specs and so
@@ -368,6 +395,8 @@ rules
 // particular functional element is not valid in the context of the
 // grammar type, such as using returns in lexer rules and so on.
 rule
+@init { paraphrases.push("matching a rule"); }
+@after { paraphrases.pop(); }
     : // A rule may start with an optional documentation comment
       DOC_COMMENT?
       
@@ -406,20 +435,20 @@ rule
 // context free and just accept anything that is a syntactically correct
 // construct.
 //
-      rulePrequel*
+      rulePrequels
       
       COLON
       
       // The rule is, at the top level, just a list of alts, with
       // finer grained structure defined within the alts.
-      altListAsBlock
+      ruleBlock
       
       SEMI
 
       exceptionGroup
             
       -> ^( RULE<RuleAST> id DOC_COMMENT? ruleModifiers? ARG_ACTION?
-      		ruleReturns? rulePrequel* altListAsBlock exceptionGroup*
+      		ruleReturns? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
 
@@ -445,7 +474,13 @@ finallyClause
 	: FINALLY ACTION -> ^(FINALLY ACTION<ActionAST>)
 	;
   
-// An individual rule level configuration as referenced by the ruleActions
+rulePrequels
+@init { paraphrases.push("matching rule preamble"); }
+@after { paraphrases.pop(); }
+	:	sync (rulePrequel sync)* -> rulePrequel*
+	;
+	
+	// An individual rule level configuration as referenced by the ruleActions
 // rule above.
 //
 rulePrequel
@@ -534,13 +569,19 @@ altList
 // can be processed by the generic BLOCK rule. Note that we
 // use a separate rule so that the BLOCK node has start and stop
 // boundaries set correctly by rule post processing of rewrites.
-altListAsBlock
+ruleBlock
     : altList -> ^(BLOCK<BlockAST> altList)
     ;
+    catch [ResyncToEndOfRuleBlock e] {
+    	// just resyncing; ignore error
+		retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), null);			
+    }
 
 // An individual alt with an optional rewrite clause for the
 // elements of the alt.
 alternative
+@init { paraphrases.push("matching alternative"); }
+@after { paraphrases.pop(); }
     :	elements
     	(	rewrite -> ^(ALT_REWRITE elements rewrite)
     	|			-> elements
@@ -554,6 +595,11 @@ elements
     ;
   
 element
+@init {
+	paraphrases.push("looking for rule element");
+	int m = input.mark();
+}
+@after { paraphrases.pop(); }
 	:	labeledElement
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT labeledElement ) ))
 		|				-> labeledElement
@@ -573,9 +619,79 @@ element
 		|				-> treeSpec
 		)
 	;
-	
+    catch [RecognitionException re] {
+    	retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+    	int ttype = input.get(input.range()).getType();
+	    // look for anything that really belongs at the start of the rule minus the initial ID
+    	if ( ttype==COLON || ttype==RETURNS || ttype==CATCH || ttype==FINALLY || ttype==AT ) {
+			RecognitionException missingSemi =
+				new v4ParserException("unterminated rule (missing ';') detected at '"+
+									  input.LT(1).getText()+" "+input.LT(2).getText()+"'", input);
+			reportError(missingSemi);
+			if ( ttype==CATCH || ttype==FINALLY ) {
+				input.seek(input.range()); // ignore what's before rule trailer stuff
+			}
+			if ( ttype==RETURNS || ttype==AT ) { // scan back looking for ID of rule header
+				int p = input.index();
+				Token t = input.get(p);
+				while ( t.getType()!=RULE_REF && t.getType()!=TOKEN_REF ) {
+					p--;
+					t = input.get(p);
+				}
+				input.seek(p);
+			}
+			throw new ResyncToEndOfRuleBlock(); // make sure it goes back to rule block level to recover
+		}
+        reportError(re);
+        recover(input,re);
+/*
+		input.rewind(m);
+		final List subset = input.get(input.index(), input.range());
+		System.out.println("failed to match as element: '"+subset);
+		CommonTokenStream ns = new CommonTokenStream(
+			new TokenSource() {
+				int i = 0;
+				public Token nextToken() {
+					if ( i>=subset.size() ) return Token.EOF_TOKEN;
+					return (Token)subset.get(i++);
+				}
+				public String getSourceName() { return null; }
+			});
+		ANTLRParser errorParser = new ANTLRParser(ns);
+		errorParser.setTreeAdaptor(this.adaptor);
+		errorParser.element_errors(re);
+        retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+        */
+	}
+
+/*
+element_errors[RecognitionException origError]
+options {backtrack=true;}
+@init {
+int m = input.mark();
+//state.backtracking++;
+}
+@after {
+//state.backtracking--;
+}
+	:	(	DOC_COMMENT? ruleModifiers? id ARG_ACTION? ruleReturns? rulePrequel* COLON
+		|	exceptionGroup
+		)
+		{reportError(missingSemi); recover(input,null);}
+	;
+	catch [RecognitionException ignore]	{
+		input.rewind(m);
+		input.consume(); // kill at least one token
+		reportError(origError);
+		BitSet followSet = computeErrorRecoverySet();
+		beginResync();
+		consumeUntil(input, followSet);
+		endResync();
+	}
+*/
+
 labeledElement : id (ASSIGN^|PLUS_ASSIGN^) (atom|block) ;
-    
+
 // Tree specifying alt
 // Tree grammars need to have alts that describe a tree structure they
 // will walk of course. Alts for trees therefore start with ^( XXX, which 
@@ -650,8 +766,7 @@ atom:	range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
     |   ruleref
     |	notSet (ROOT^|BANG^)?
     ;
-  
-
+    catch [RecognitionException re] { throw re; } // pass upwards to element
    
 // --------------------  
 // Inverted element set
@@ -704,7 +819,8 @@ ruleref
 		|						-> ^(RULE_REF ARG_ACTION?)
 		)
     ;
-  
+    catch [RecognitionException re] { throw re; } // pass upwards to element
+
 // ---------------  
 // Character Range
 //
@@ -895,12 +1011,18 @@ rewriteTemplateArg
 // reference, hence this rule is used to pick up whichever it is and rewrite
 // it as a generic ID token.
 id
+@init { paraphrases.push("looking for an identifier"); }
+@after { paraphrases.pop(); }
     : RULE_REF  ->ID[$RULE_REF]
     | TOKEN_REF ->ID[$TOKEN_REF]
     | TEMPLATE  ->ID[$TEMPLATE] // keyword
     ;
     
-qid :	id (DOT id)* -> ID[$qid.start, $text] ;
+qid
+@init { paraphrases.push("looking for a qualified identifier"); }
+@after { paraphrases.pop(); }
+	:	id (DOT id)* -> ID[$qid.start, $text]
+	;
 
 alternativeEntry : alternative EOF ; // allow gunit to call alternative and see EOF afterwards
 elementEntry : element EOF ;

@@ -36,10 +36,12 @@ public class Alternative implements AttributeResolver {
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
-		Attribute a = rule.args.get(x);   if ( a!=null ) return a;
-		a = rule.retvals.get(x);          if ( a!=null ) return a;
-		AttributeDict properties = rule.getPredefinedScope(LabelType.RULE_LABEL);
-		return properties.get(x);
+		return rule.resolveToAttribute(x, node); // reuse that code
+//		if ( rule.args==null ) return null;
+//		Attribute a = rule.args.get(x);   if ( a!=null ) return a;
+//		a = rule.retvals.get(x);          if ( a!=null ) return a;
+//		AttributeDict properties = rule.getPredefinedScope(LabelType.RULE_LABEL);
+//		return properties.get(x);
 	}
 
 	/** $x.y, x can be surrounding rule, token/rule/label ref. y is visible

@@ -2,6 +2,7 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
+import org.antlr.v4.analysis.Label;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -12,6 +13,8 @@ import java.util.List;
 /** */
 public class SemanticPipeline {
 	public void process(Grammar g) {
+		if ( g.ast==null ) return;
+		
 		// VALIDATE AST STRUCTURE
 		// use buffered node stream as we will look around in stream
 		// to give good error messages.
@@ -23,6 +26,7 @@ public class SemanticPipeline {
 		try {walker.grammarSpec();}
 		catch (RecognitionException re) {
 			ErrorManager.internalError("bad grammar AST structure", re);
+			return; // don't process; will get internal errors
 		}
 
 		// DO BASIC / EASY SEMANTIC CHECKS
@@ -66,6 +70,11 @@ public class SemanticPipeline {
 		AttributeChecks.checkAllAttributeExpressions(g);
 
 		// ASSIGN TOKEN TYPES
+		//for (GrammarAST a : collector.strings) g.defineAction(a);
+		//for (String id : symcheck.tokenIDs) g.defineAction(a);
+
+		// TODO: move to a use-def or deadcode eliminator
+		checkRewriteElementsPresentOnLeftSide(g, collector.rules);
 	}
 
 	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
@@ -111,4 +120,23 @@ public class SemanticPipeline {
 			}
 		}
 	}
+
+	public void checkRewriteElementsPresentOnLeftSide(Grammar g, List<Rule> rules) {
+		for (Rule r : rules) {
+			for (int a=1; a<=r.numberOfAlts; a++) {
+				Alternative alt = r.alt[a];
+				for (GrammarAST e : alt.rewriteElements) {
+					if ( !(alt.ruleRefs.containsKey(e.getText()) ||
+						   g.getTokenType(e.getText())!= Label.INVALID ||
+						   alt.labelDefs.containsKey(e.getText()) ||
+						   e.getText().equals(r.name)) ) // $r ok in rule r
+					{
+						ErrorManager.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
+												  g.fileName, e.token, e.getText());
+					}
+				}
+			}
+		}
+	}
+
 }

@@ -5,6 +5,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.Label;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -48,6 +49,15 @@ public class Grammar implements AttributeResolver {
     public List<Grammar> importedGrammars;
     public Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
 
+	/** Map token like ID (but not literals like "while") to its token type */
+	public Map<String, Integer> tokenNameToTypeMap = new HashMap<String, Integer>();
+
+	/** Map token literals like "while" to its token type.  It may be that
+	 *  WHILE="while"=35, in which case both tokenIDToTypeMap and this
+	 *  field will have entries both mapped to 35.
+	 */
+	public Map<String, Integer> stringLiteralToTypeMap = new HashMap<String, Integer>();
+
     /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
      *  I track the AST node for the action in case I need the line number
@@ -70,19 +80,22 @@ public class Grammar implements AttributeResolver {
     /** For testing */
     public Grammar(String fileName, String grammarText) throws RecognitionException {
         this.text = grammarText;
-        ANTLRStringStream in = new ANTLRStringStream(grammarText);
-        in.name = fileName;
-        ANTLRLexer lexer = new ANTLRLexer(in);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        ANTLRParser p = new ANTLRParser(tokens);
-        p.setTreeAdaptor(new GrammarASTAdaptor(in));
-        ParserRuleReturnScope r = p.grammarSpec();
-        ast = (GrammarRootAST)r.getTree();
-        this.name = ((GrammarAST)ast.getChild(0)).getText();
-        this.fileName = fileName;
+		this.fileName = fileName;
+		ANTLRStringStream in = new ANTLRStringStream(grammarText);
+		in.name = fileName;
+		ANTLRLexer lexer = new ANTLRLexer(in);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		ANTLRParser p = new ANTLRParser(tokens);
+		p.setTreeAdaptor(new GrammarASTAdaptor(in));
+		ParserRuleReturnScope r = p.grammarSpec();
+		if ( r.getTree() instanceof GrammarRootAST ) {
+			this.ast = (GrammarRootAST)r.getTree();
+			this.name = ((GrammarAST)ast.getChild(0)).getText();
+		}
     }
 
     public void loadImportedGrammars() {
+		if ( ast==null ) return;
         GrammarAST i = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.IMPORT);
         if ( i==null ) return;
         importedGrammars = new ArrayList<Grammar>();
@@ -98,7 +111,9 @@ public class Grammar implements AttributeResolver {
                 System.out.println("import "+t.getText());
             }
             try {
-                GrammarRootAST ast = tool.load(importedGrammarName+".g");
+                GrammarAST root = tool.load(importedGrammarName+".g");
+				if ( root instanceof GrammarASTErrorNode ) return; // came back as error node
+				GrammarRootAST ast = (GrammarRootAST)root;
                 Grammar g = new Grammar(tool, ast);
                 g.parent = this;
                 importedGrammars.add(g);
@@ -231,6 +246,19 @@ public class Grammar implements AttributeResolver {
         }
         return null;
     }
+
+	public int getTokenType(String tokenName) {
+		Integer I = null;
+		if ( tokenName.charAt(0)=='\'') {
+			I = stringLiteralToTypeMap.get(tokenName);
+		}
+		else { // must be a label like ID
+			I = tokenNameToTypeMap.get(tokenName);
+		}
+		int i = (I!=null)?I.intValue(): Label.INVALID;
+		//System.out.println("grammar type "+type+" "+tokenName+"->"+i);
+		return i;
+	}
 
 	// no isolated attr at grammar action level
 	public Attribute resolveToAttribute(String x, ActionAST node) {

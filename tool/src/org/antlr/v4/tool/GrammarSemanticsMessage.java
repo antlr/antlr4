@@ -12,6 +12,7 @@ public class GrammarSemanticsMessage extends Message {
      */
     public Token offendingToken;
 
+	/*
     public GrammarSemanticsMessage(ErrorType etype,
                                    Grammar g,
                                    Token offendingToken,
@@ -26,7 +27,7 @@ public class GrammarSemanticsMessage extends Message {
             charPosition = offendingToken.getCharPositionInLine();
         }
     }
-
+*/
     public GrammarSemanticsMessage(ErrorType etype,
                                    String fileName,
                                    Token offendingToken,

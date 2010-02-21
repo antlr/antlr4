@@ -10,23 +10,23 @@ import java.util.List;
 
 public class TestActionSplitter extends BaseTest {
     static String[] exprs = {
-        "foo",		"['foo'<26>]",
-        "$x",		"['$x'<16>]",
-        "\\$x",		"['\\$x'<26>]",
-        "$x.y",		"['$x.y'<8>]",
-        "$ID.text",		"['$ID.text'<8>]",
-        "$ID",		"['$ID'<16>]",
-        "$ID.getText()",		"['$ID'<16>, '.getText()'<26>]",
-        "$ID.text = \"test\";",		"['$ID.text = \"test\";'<7>]",
-        "$a.line == $b.line",		"['$a.line'<8>, ' == '<26>, '$b.line'<8>]",
-        "$r.tree",		"['$r.tree'<8>]",
-        "foo $a::n bar",		"['foo '<26>, '$a::n'<10>, ' bar'<26>]",
-        "$Symbols[-1]::names.add($id.text);",		"['$Symbols[-1]::names'<12>, '.add('<26>, '$id.text'<8>, ');'<26>]",
-        "$Symbols[0]::names.add($id.text);",		"['$Symbols[0]::names'<14>, '.add('<26>, '$id.text'<8>, ');'<26>]",
-        "$Symbols::x;",		"['$Symbols::x'<10>, ';'<26>]",
-        "$Symbols.size()>0",		"['$Symbols'<16>, '.size()>0'<26>]",
-        "$field::x = $field.st;",		"['$field::x = $field.st;'<9>]",
-        "$foo.get(\"ick\");",		"['$foo'<16>, '.get(\"ick\");'<26>]",
+        "foo",		"['foo'<29>]",
+        "$x",		"['$x'<20>]",
+        "\\$x",		"['\\$'<6>, 'x'<29>]",
+        "$x.y",		"['$x.y'<11>]",
+        "$ID.text",		"['$ID.text'<11>]",
+        "$ID",		"['$ID'<20>]",
+        "$ID.getText()",		"['$ID'<20>, '.getText()'<29>]",
+        "$ID.text = \"test\";",		"['$ID.text = \"test\";'<10>]",
+        "$a.line == $b.line",		"['$a.line'<11>, ' == '<29>, '$b.line'<11>]",
+        "$r.tree",		"['$r.tree'<11>]",
+        "foo $a::n bar",		"['foo '<29>, '$a::n'<13>, ' bar'<29>]",
+        "$Symbols[-1]::names.add($id.text);",		"['$Symbols[-1]::names'<16>, '.add('<29>, '$id.text'<11>, ');'<29>]",
+        "$Symbols[0]::names.add($id.text);",		"['$Symbols[0]::names'<18>, '.add('<29>, '$id.text'<11>, ');'<29>]",
+        "$Symbols::x;",		"['$Symbols::x'<13>, ';'<29>]",
+        "$Symbols.size()>0",		"['$Symbols'<20>, '.size()>0'<29>]",
+        "$field::x = $field.st;",		"['$field::x = $field.st;'<12>]",
+        "$foo.get(\"ick\");",		"['$foo'<20>, '.get(\"ick\");'<29>]",
     };
 
     @Test public void testExprs() {
@@ -34,13 +34,14 @@ public class TestActionSplitter extends BaseTest {
             String input = exprs[i];
             String expect = exprs[i+1];
             List<String> chunks = getActionChunks(input);
-            assertEquals(expect, chunks.toString());
+            assertEquals("input: "+input, expect, chunks.toString());
         }
     }
 
     public static List<String> getActionChunks(String a) {
         List<String> chunks = new ArrayList<String>();
-        ActionSplitter splitter = new ActionSplitter(new ANTLRStringStream(a));
+        ActionSplitter splitter = new ActionSplitter(new ANTLRStringStream(a),
+													 new BlankActionSplitterListener());
         Token t = splitter.nextToken();
         while ( t.getType()!=Token.EOF ) {
             chunks.add("'"+t.getText()+"'<"+t.getType()+">");
