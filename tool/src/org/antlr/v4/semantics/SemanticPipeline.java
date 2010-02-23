@@ -2,25 +2,37 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
-import org.antlr.v4.analysis.Label;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.*;
 
-import java.util.List;
 import java.util.Map;
 
-/** */
+/** Do as much semantic checking as we can and fill in grammar
+ *  with rules, dynamic scopes, actions, and token definitions.
+ *  The only side effects are in the grammar pass to process().
+ *  We consume a bunch of memory here while we build up data structures
+ *  to perform checking, but all of it goes away after this pipeline object
+ *  gets garbage collected.
+ *
+ *  After this pipeline finishes, we can be sure that the grammar
+ *  is syntactically correct and that it's semantically correct enough for us
+ *  to attempt grammar analysis. We have assigned all token types.
+ *  Note that imported grammars bring in token and rule definitions
+ *  but only the root grammar and any implicitly created lexer grammar
+ *  get their token definitions filled up. We are treating the
+ *  imported grammars like includes (the generated code treats them
+ *  as separate objects, however).
+ */
 public class SemanticPipeline {
 	public void process(Grammar g) {
 		if ( g.ast==null ) return;
 		
 		// VALIDATE AST STRUCTURE
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		// use buffered node stream as we will look around in stream
 		// to give good error messages.
-		// TODO: send parse errors to buffer not stderr
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		BufferedTreeNodeStream nodes =
 			new BufferedTreeNodeStream(adaptor,g.ast);
 		ASTVerifier walker = new ASTVerifier(nodes);
@@ -67,8 +79,8 @@ public class SemanticPipeline {
 		// ASSIGN TOKEN TYPES
 		assignTokenTypes(g, collector, symcheck);
 
-		// TODO: move to a use-def or deadcode eliminator
-		checkRewriteElementsPresentOnLeftSide(g, collector.rules);
+		UseDefAnalyzer usedef = new UseDefAnalyzer();
+		usedef.checkRewriteElementsPresentOnLeftSide(g, collector.rules);
 	}
 
 	public void assignTokenTypes(Grammar g, CollectSymbols collector, SymbolChecks symcheck) {
@@ -105,24 +117,6 @@ public class SemanticPipeline {
 			for (String s : collector.strings) { G.defineStringLiteral(s); }
 //			System.out.println("tokens="+G.tokenNameToTypeMap);
 //			System.out.println("strings="+G.stringLiteralToTypeMap);
-		}
-	}
-
-	public void checkRewriteElementsPresentOnLeftSide(Grammar g, List<Rule> rules) {
-		for (Rule r : rules) {
-			for (int a=1; a<=r.numberOfAlts; a++) {
-				Alternative alt = r.alt[a];
-				for (GrammarAST e : alt.rewriteElements) {
-					if ( !(alt.ruleRefs.containsKey(e.getText()) ||
-						   g.getTokenType(e.getText())!= Label.INVALID ||
-						   alt.labelDefs.containsKey(e.getText()) ||
-						   e.getText().equals(r.name)) ) // $r ok in rule r
-					{
-						ErrorManager.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
-												  g.fileName, e.token, e.getText());
-					}
-				}
-			}
 		}
 	}
 }
