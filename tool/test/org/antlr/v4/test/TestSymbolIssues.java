@@ -49,7 +49,8 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "s : FOO ;",
         // YIELDS
-        "error(34): B.g:9:0: symbol s conflicts with global dynamic scope with same name\n" +
+        "error(25): B.g:2:9: can't assign string value to token name X in non-combined grammar\n" +
+		"error(34): B.g:9:0: symbol s conflicts with global dynamic scope with same name\n" +
 		"error(35): B.g:5:9: label b conflicts with rule with same name\n" +
 		"error(34): B.g:5:4: symbol s conflicts with global dynamic scope with same name\n" +
 		"error(36): B.g:5:15: label X conflicts with token with same name\n" +
@@ -66,12 +67,10 @@ public class TestSymbolIssues extends BaseTest {
         "b : B ;\n"+
         "A : 'a';",
         // YIELDS
-        "error(51): C.g:3:23: reference to rewrite element ID not found to left of ->\n" +
-		"error(51): C.g:3:28: reference to rewrite element r not found to left of ->\n" +
+        "error(51): C.g:3:28: reference to rewrite element r not found to left of ->\n" +
 		"error(51): C.g:3:30: reference to rewrite element foo not found to left of ->\n" +
 		"error(51): C.g:3:49: reference to rewrite element 'eh?' not found to left of ->\n" +
-		"error(51): C.g:4:10: reference to rewrite element x not found to left of ->\n" +
-		"error(51): C.g:4:13: reference to rewrite element A not found to left of ->"
+		"error(51): C.g:4:10: reference to rewrite element x not found to left of ->"
     };
 
     static String[] D = {
