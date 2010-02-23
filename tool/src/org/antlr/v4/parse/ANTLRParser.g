@@ -141,8 +141,8 @@ public void displayRecognitionError(String[] tokenNames,
 		String paraphrase = (String)paraphrases.peek();
 		msg = msg+" while "+paraphrase;
 	}
-	List stack = getRuleInvocationStack(e, this.getClass().getName());
-	msg += ", rule stack = "+stack;
+//	List stack = getRuleInvocationStack(e, this.getClass().getName());
+//	msg += ", rule stack = "+stack;
 	ErrorManager.syntaxError(ErrorType.SYNTAX_ERROR, getSourceName(), e.token, e, msg);
 }
 }

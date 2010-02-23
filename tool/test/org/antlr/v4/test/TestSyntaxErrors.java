@@ -11,10 +11,10 @@ public class TestSyntaxErrors extends BaseTest {
         "error(63): A.g::: grammar A has no rules",
 
 		"A;",
-		"error(17): <string>:1:0: 'A'<TOKEN_REF> came as a complete surprise to me",
+		"error(17): <string>:1:0: 'A' came as a complete surprise to me",
 
 		"grammar ;",
-		"error(17): <string>:1:8: ';'<SEMI> came as a complete surprise to me",
+		"error(17): <string>:1:8: ';' came as a complete surprise to me while looking for an identifier",
 
 		"grammar A\n" +
 		"a : ID ;\n",
@@ -23,20 +23,22 @@ public class TestSyntaxErrors extends BaseTest {
 		"grammar A;\n" +
 		"a : ID ;;\n"+
 		"b : B ;",
-		"error(17): A.g:2:8: ';'<SEMI> came as a complete surprise to me",
+		"error(17): A.g:2:8: ';' came as a complete surprise to me",
 
 		"grammar A;;\n" +
 		"a : ID ;\n",
-		"error(17): A;.g:1:10: ';'<SEMI> came as a complete surprise to me",
+		"error(17): A;.g:1:10: ';' came as a complete surprise to me",
 
 		"grammar A;\n" +
 		"a @init : ID ;\n",
-		"error(17): A.g:2:8: missing ACTION at ':' while matching a rule",
+		"error(17): A.g:2:8: mismatched input ':' expecting ACTION while matching rule preamble",
 
 		"grammar A;\n" +
 		"a  ( A | B ) D ;\n" +
 		"b : B ;",
-		"error(17): A.g:2:3: missing COLON at '(' while matching a rule",
+		"error(17): A.g:2:3: '(' came as a complete surprise to me while matching rule preamble\n" +
+		"error(17): A.g:2:11: mismatched input ')' expecting SEMI while matching a rule\n" +
+		"error(17): A.g:2:15: ';' came as a complete surprise to me while matching rule preamble",
     };
 
 	@Test public void testA() { super.testErrors(A, true); }
@@ -46,7 +48,7 @@ public class TestSyntaxErrors extends BaseTest {
 			"grammar A;\n" +
 			"a : : A ;\n" +
 			"b : B ;",
-			"error(17): A.g:2:4: ':'<COLON> came as a complete surprise to me while matching alternative",
+			"error(17): A.g:2:4: ':' came as a complete surprise to me while matching alternative",
 		};
 		super.testErrors(pair, true);
 	}
