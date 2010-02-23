@@ -181,7 +181,12 @@ public class ErrorManager {
 		state.get().listener.error(msg);
 	}
 
-    public static void internalError(String error, Throwable e) {
+	public static void fatalInternalError(String error, Throwable e) {
+		internalError(error, e);
+		throw new RuntimeException(error, e);
+	}
+
+	public static void internalError(String error, Throwable e) {
         state.get().errors++;
         StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
         String msg = "Exception "+e+"@"+location+": "+error;

@@ -314,7 +314,11 @@ public class Tool {
             ANTLRParser p = new ANTLRParser(tokens);
             p.setTreeAdaptor(new GrammarASTAdaptor(in));
             ParserRuleReturnScope r = p.grammarSpec();
-            return (GrammarAST)r.getTree();
+			GrammarAST root = (GrammarAST) r.getTree();
+			if ( root instanceof GrammarRootAST ) {
+				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
+			}
+			return root;
         }
         catch (RecognitionException re) {
             // TODO: do we gen errors now?
@@ -324,9 +328,12 @@ public class Tool {
     }
 
     public void processGrammarsOnCommandLine() {
+		// TODO: process all files
         GrammarAST t = load(grammarFileNames.get(0));
         GrammarRootAST lexerAST = null;
 		if ( t instanceof GrammarASTErrorNode ) return; // came back as error node
+		if ( ((GrammarRootAST)t).hasErrors ) return;
+
 		GrammarRootAST ast = (GrammarRootAST)t;
         Grammar g = new Grammar(this, ast);
         g.fileName = grammarFileNames.get(0);

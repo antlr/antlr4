@@ -26,8 +26,7 @@ public class SemanticPipeline {
 		ASTVerifier walker = new ASTVerifier(nodes);
 		try {walker.grammarSpec();}
 		catch (RecognitionException re) {
-			ErrorManager.internalError("bad grammar AST structure", re);
-			return; // don't process; will get internal errors
+			ErrorManager.fatalInternalError("bad grammar AST structure", re);
 		}
 
 		// DO BASIC / EASY SEMANTIC CHECKS

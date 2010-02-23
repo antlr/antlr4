@@ -440,8 +440,10 @@ public abstract class BaseTest {
 					if ( g.ast!=null ) System.out.println(g.ast.toStringTree());
 					else System.out.println("null tree");
 				}
-                SemanticPipeline sem = new SemanticPipeline();
-                sem.process(g);
+				if ( g.ast!=null && !g.ast.hasErrors ) {
+					SemanticPipeline sem = new SemanticPipeline();
+					sem.process(g);
+				}
             }
             catch (RecognitionException re) {
                 re.printStackTrace(System.err);

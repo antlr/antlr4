@@ -104,6 +104,7 @@ public class Grammar implements AttributeResolver {
 		ParserRuleReturnScope r = p.grammarSpec();
 		if ( r.getTree() instanceof GrammarRootAST ) {
 			this.ast = (GrammarRootAST)r.getTree();
+			this.ast.hasErrors = p.getNumberOfSyntaxErrors()>0;
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
 		}
 		initTokenSymbolTables();
