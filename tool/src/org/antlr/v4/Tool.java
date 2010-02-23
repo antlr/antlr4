@@ -1,6 +1,7 @@
 package org.antlr.v4;
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -71,7 +72,7 @@ public class Tool {
         Tool antlr = new Tool(args);
 
         if (!exitNow) {
-            antlr.process();
+            antlr.processGrammarsOnCommandLine();
             if (ErrorManager.getNumErrors() > 0) {
                 antlr.exit(1);
             }
@@ -322,20 +323,17 @@ public class Tool {
         return null;
     }
 
-    public void process() {
-        // testing parser
+    public void processGrammarsOnCommandLine() {
         GrammarAST t = load(grammarFileNames.get(0));
         GrammarRootAST lexerAST = null;
 		if ( t instanceof GrammarASTErrorNode ) return; // came back as error node
 		GrammarRootAST ast = (GrammarRootAST)t;
-        if ( ast.grammarType==ANTLRParser.COMBINED ) {
-            lexerAST = extractImplicitLexer(ast); // alters ast
-        }
         Grammar g = new Grammar(this, ast);
         g.fileName = grammarFileNames.get(0);
         process(g);
-        if ( lexerAST!=null ) {
-            // todo: don't process if errors in parser
+		if ( ast.grammarType==ANTLRParser.COMBINED ) {
+			// todo: don't process if errors in parser
+			lexerAST = extractImplicitLexer(g); // alters ast
             Grammar lexerg = new Grammar(this, lexerAST);
             lexerg.fileName = grammarFileNames.get(0);
             g.implicitLexer = lexerg;
@@ -351,8 +349,13 @@ public class Tool {
         //g.ast.inspect();
         SemanticPipeline sem = new SemanticPipeline();
         sem.process(g);
-
-        // todo: add strings we collected to lexer?        
+		
+		// process imported grammars (if any)
+		if ( g.getImportedGrammars()!=null ) {
+			for (Grammar imp : g.getImportedGrammars()) {
+				process(imp);
+			}
+		}
     }
 
     // TODO: Move to ast manipulation class?
@@ -375,7 +378,8 @@ public class Tool {
      *                in combined AST. Careful: nodes are shared between
      *                trees after this call.
      */
-    public GrammarRootAST extractImplicitLexer(GrammarRootAST combinedAST) {
+    public GrammarRootAST extractImplicitLexer(Grammar combinedGrammar) {
+		GrammarRootAST combinedAST = combinedGrammar.ast;
         //System.out.println("before="+combinedAST.toStringTree());
         GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
         List<GrammarAST> elements = combinedAST.getChildren();
@@ -417,7 +421,10 @@ public class Tool {
             (GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.RULES);
         if ( combinedRulesRoot==null ) return lexerAST;
 
+		TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
+
         // MOVE lexer rules
+
         GrammarAST lexerRulesRoot =
             (GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
         lexerAST.addChild(lexerRulesRoot);
@@ -432,8 +439,23 @@ public class Tool {
         }
         rules.removeAll(rulesWeMoved);
 
+		// Will track 'if' from IF : 'if' ; rules to avoid defining new token for 'if'
+		Map<String,String> litAliases =
+			Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
+
+		// add strings from combined grammar (and imported grammars) into to lexer
+		for (String lit : combinedGrammar.stringLiteralToTypeMap.keySet()) {
+			if ( litAliases.containsKey(lit) ) continue; // already has rule
+			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
+			//TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
+			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
+			GrammarAST litRule = (GrammarAST)
+				wiz.create("(RULE ID["+rname+"] (BLOCK (ALT STRING_LITERAL["+lit+"])))");
+			lexerRulesRoot.addChild(litRule);
+		}
+
         //System.out.println("after ="+combinedAST.toStringTree());
-        //System.out.println("lexer ="+lexerAST.toStringTree());
+        System.out.println("lexer ="+lexerAST.toStringTree());
         return lexerAST;
     }
 

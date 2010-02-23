@@ -9,6 +9,7 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.*;
 
 import java.util.List;
+import java.util.Map;
 
 /** */
 public class SemanticPipeline {
@@ -37,14 +38,6 @@ public class SemanticPipeline {
 		// don't continue if we get errors in this basic check
 		if ( false ) return;
 
-		// TODO: can i move to Tool.process? why recurse here?
-		// NOW DO BASIC / EASY SEMANTIC CHECKS FOR DELEGATES (IF ANY)
-		if ( g.getImportedGrammars()!=null ) {
-			for (Grammar d : g.getImportedGrammars()) {
-				process(d);
-			}
-		}
-
 		// COLLECT SYMBOLS: RULES, ACTIONS, TERMINALS, ...
 		nodes.reset();
 		CollectSymbols collector = new CollectSymbols(nodes,g);
@@ -62,62 +55,57 @@ public class SemanticPipeline {
 		for (AttributeDict s : collector.scopes) g.defineScope(s);
 		for (GrammarAST a : collector.actions) g.defineAction(a);
 
-		// CHECK RULE REFS NOW
-		checkRuleArgs(g, collector.rulerefs);
-		checkForQualifiedRuleIssues(g, collector.qualifiedRulerefs);
+		// CHECK RULE REFS NOW (that we've defined rules in grammar)
+		symcheck.checkRuleArgs(g, collector.rulerefs);
+		symcheck.checkForQualifiedRuleIssues(g, collector.qualifiedRulerefs);
+
+		// don't continue if we get symbol errors
+		if ( false ) return;
 
 		// CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
 		AttributeChecks.checkAllAttributeExpressions(g);
 
 		// ASSIGN TOKEN TYPES
-		//for (GrammarAST a : collector.strings) g.defineAction(a);
-		//for (String id : symcheck.tokenIDs) g.defineAction(a);
+		assignTokenTypes(g, collector, symcheck);
 
 		// TODO: move to a use-def or deadcode eliminator
 		checkRewriteElementsPresentOnLeftSide(g, collector.rules);
 	}
 
-	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
-		if ( rulerefs==null ) return;
-		for (GrammarAST ref : rulerefs) {
-			String ruleName = ref.getText();
-			Rule r = g.getRule(ruleName);
-			if ( r==null && !ref.hasAncestor(ANTLRParser.DOT)) {
-				// only give error for unqualified rule refs now
-				ErrorManager.grammarError(ErrorType.UNDEFINED_RULE_REF,
-										  g.fileName, ref.token, ruleName);
-			}
-			GrammarAST arg = (GrammarAST)ref.getChild(0);
-			if ( arg!=null && r.args==null ) {
-				ErrorManager.grammarError(ErrorType.RULE_HAS_NO_ARGS,
-										  g.fileName, ref.token, ruleName);
-
-			}
-			else if ( arg==null && (r!=null&&r.args!=null) ) {
-				ErrorManager.grammarError(ErrorType.MISSING_RULE_ARGS,
-										  g.fileName, ref.token, ruleName);
-			}
+	public void assignTokenTypes(Grammar g, CollectSymbols collector, SymbolChecks symcheck) {
+		if ( g.implicitLexerOwner!=null ) {
+			// copy vocab from combined to implicit lexer
+			g.importVocab(g.implicitLexerOwner);
+			System.out.println("tokens="+g.tokenNameToTypeMap);
+			System.out.println("strings="+g.stringLiteralToTypeMap);
 		}
-	}
+		else {
+			Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
-	public void checkForQualifiedRuleIssues(Grammar g, List<GrammarAST> qualifiedRuleRefs) {
-		for (GrammarAST dot : qualifiedRuleRefs) {
-			GrammarAST grammar = (GrammarAST)dot.getChild(0);
-			GrammarAST rule = (GrammarAST)dot.getChild(1);
-			System.out.println(grammar.getText()+"."+rule.getText());
-			Grammar delegate = g.getImportedGrammar(grammar.getText());
-			if ( delegate==null ) {
-				ErrorManager.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
-										  g.fileName, grammar.token, grammar.getText(),
-										  rule.getText());
-			}
-			else {
-				if ( g.getRule(grammar.getText(), rule.getText())==null ) {
-					ErrorManager.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
-											  g.fileName, rule.token, grammar.getText(),
-											  rule.getText());
+			// DEFINE tokens { X='x'; } ALIASES
+			for (GrammarAST alias : collector.tokensDefs) {
+				if ( alias.getType()== ANTLRParser.ASSIGN ) {
+					String name = alias.getChild(0).getText();
+					String lit = alias.getChild(1).getText();
+					G.defineTokenAlias(name, lit);
 				}
 			}
+
+			// DEFINE TOKEN TYPES FOR X : 'x' ; RULES
+			Map<String,String> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
+			if ( litAliases!=null ) {
+				for (String lit : litAliases.keySet()) {
+					G.defineTokenAlias(litAliases.get(lit), lit);
+				}
+			}
+
+			// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
+			for (String id : symcheck.tokenIDs) { G.defineTokenName(id); }
+
+			// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
+			for (String s : collector.strings) { G.defineStringLiteral(s); }
+			System.out.println("tokens="+G.tokenNameToTypeMap);
+			System.out.println("strings="+G.stringLiteralToTypeMap);
 		}
 	}
 
@@ -138,5 +126,4 @@ public class SemanticPipeline {
 			}
 		}
 	}
-
 }

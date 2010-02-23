@@ -92,6 +92,10 @@ public class SymbolChecks {
             GrammarAST idNode = a;
             if ( a.getType()== ANTLRParser.ASSIGN ) {
                 idNode = (GrammarAST)a.getChild(0);
+				if ( g!=g.getOutermostGrammar() ) {
+					ErrorManager.grammarError(ErrorType.TOKEN_ALIAS_IN_DELEGATE,
+											  g.fileName, idNode.token, idNode.getText(), g.name);
+				}
             }
             GrammarAST prev = aliasTokenNames.get(idNode.getText());
             if ( prev==null ) {
@@ -261,4 +265,50 @@ public class SymbolChecks {
             }
         }
     }
+
+	// CAN ONLY CALL THE TWO NEXT METHODS AFTER GRAMMAR HAS RULE DEFS (see semanticpipeline)
+	
+	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
+		if ( rulerefs==null ) return;
+		for (GrammarAST ref : rulerefs) {
+			String ruleName = ref.getText();
+			Rule r = g.getRule(ruleName);
+			if ( r==null && !ref.hasAncestor(ANTLRParser.DOT)) {
+				// only give error for unqualified rule refs now
+				ErrorManager.grammarError(ErrorType.UNDEFINED_RULE_REF,
+										  g.fileName, ref.token, ruleName);
+			}
+			GrammarAST arg = (GrammarAST)ref.getChild(0);
+			if ( arg!=null && r.args==null ) {
+				ErrorManager.grammarError(ErrorType.RULE_HAS_NO_ARGS,
+										  g.fileName, ref.token, ruleName);
+
+			}
+			else if ( arg==null && (r!=null&&r.args!=null) ) {
+				ErrorManager.grammarError(ErrorType.MISSING_RULE_ARGS,
+										  g.fileName, ref.token, ruleName);
+			}
+		}
+	}
+
+	public void checkForQualifiedRuleIssues(Grammar g, List<GrammarAST> qualifiedRuleRefs) {
+		for (GrammarAST dot : qualifiedRuleRefs) {
+			GrammarAST grammar = (GrammarAST)dot.getChild(0);
+			GrammarAST rule = (GrammarAST)dot.getChild(1);
+			System.out.println(grammar.getText()+"."+rule.getText());
+			Grammar delegate = g.getImportedGrammar(grammar.getText());
+			if ( delegate==null ) {
+				ErrorManager.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
+										  g.fileName, grammar.token, grammar.getText(),
+										  rule.getText());
+			}
+			else {
+				if ( g.getRule(grammar.getText(), rule.getText())==null ) {
+					ErrorManager.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
+											  g.fileName, rule.token, grammar.getText(),
+											  rule.getText());
+				}
+			}
+		}
+	}	
 }

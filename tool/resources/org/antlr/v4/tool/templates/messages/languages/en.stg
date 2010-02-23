@@ -112,8 +112,8 @@ UNDEFINED_RULE_REF(arg) ::=
 	"reference to undefined rule: <arg>"
 LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(arg) ::=
 	"literal has no associated lexer rule: <arg>"
-CANNOT_ALIAS_TOKENS_IN_LEXER(arg) ::=
-	"literals are illegal in lexer tokens{} section: <arg>"
+CANNOT_ALIAS_TOKENS(arg) ::=
+	"can't assign string value to token name <arg> in non-combined grammar"
 ATTRIBUTE_REF_NOT_IN_RULE(arg,arg2) ::=
 	"reference to attribute outside of a rule: <arg><if(arg2)>.<arg2><endif>"
 UNKNOWN_ATTRIBUTE_IN_SCOPE(arg,arg2) ::=
@@ -224,6 +224,8 @@ TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
   "cannot alias <arg>; token name already <if(arg2)>assigned to <arg2><else>defined<endif>"
 TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
   "tokenVocab option ignored in imported grammar <arg>"
+TOKEN_ALIAS_IN_DELEGATE(arg,arg2) ::=
+  "can't assign string to token name <arg> to string in imported grammar <arg2>"
 INVALID_IMPORT(arg,arg2) ::=
   "<arg.typeString> grammar <arg.name> cannot import <arg2.typeString> grammar <arg2.name>"
 IMPORTED_TOKENS_RULE_EMPTY(arg,arg2) ::=

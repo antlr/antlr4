@@ -167,7 +167,7 @@ public abstract class BaseTest {
 			ErrorManager.setErrorListener(equeue);
 			*/
 			Tool antlr = newTool(optionsA);
-			antlr.process();
+			antlr.processGrammarsOnCommandLine();
 			ANTLRErrorListener listener = ErrorManager.getErrorListener();
 			if ( listener instanceof ErrorQueue ) {
 				ErrorQueue equeue = (ErrorQueue)listener;

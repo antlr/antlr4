@@ -79,7 +79,7 @@ public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> qualifiedRulerefs = new ArrayList<GrammarAST>();
 public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
 public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
-public List<GrammarAST> strings = new ArrayList<GrammarAST>();
+public Set<String> strings = new HashSet<String>();
 public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
 public List<AttributeDict> scopes = new ArrayList<AttributeDict>();
 public List<GrammarAST> actions = new ArrayList<GrammarAST>();
@@ -134,7 +134,7 @@ tokensSection
 	:	{inContext("TOKENS")}?
 		(	^(ASSIGN t=ID STRING_LITERAL)
 			{terminals.add($t); tokenIDRefs.add($t);
-			 tokensDefs.add($ASSIGN); strings.add($STRING_LITERAL);}
+			 tokensDefs.add($ASSIGN); strings.add($STRING_LITERAL.text);}
 		|	t=ID
 			{terminals.add($t); tokenIDRefs.add($t); tokensDefs.add($t);}
 		)
@@ -149,7 +149,7 @@ rule:   ^( RULE name=ID .+)
 		currentAlt = 1;
 		}
     ;
-
+	
 setAlt
 	:	{inContext("RULE BLOCK")}? ( ALT | ALT_REWRITE )
 		{currentAlt = $start.getChildIndex()+1;}
@@ -244,7 +244,7 @@ terminal
     :	{!inContext("TOKENS ASSIGN")}? STRING_LITERAL
     	{
     	terminals.add($start);
-    	strings.add($STRING_LITERAL);
+    	strings.add($STRING_LITERAL.text);
     	if ( currentRule!=null ) {
     		currentRule.alt[currentAlt].tokenRefs.map($STRING_LITERAL.text, $STRING_LITERAL);
     	}

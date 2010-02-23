@@ -14,7 +14,7 @@ import java.util.*;
  * FILE_AND_GRAMMAR_NAME_DIFFER
  * LEXER_RULES_NOT_ALLOWED
  * PARSER_RULES_NOT_ALLOWED
- * CANNOT_ALIAS_TOKENS_IN_LEXER
+ * CANNOT_ALIAS_TOKENS
  * ARGS_ON_TOKEN_REF
  * ILLEGAL_OPTION
  * REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION
@@ -101,7 +101,6 @@ public class BasicSemanticChecks {
         new MultiMap<Integer,Integer>() {
             {
                 map(ANTLRParser.LEXER, ANTLRParser.LEXER);
-                map(ANTLRParser.LEXER, ANTLRParser.PARSER);
                 map(ANTLRParser.LEXER, ANTLRParser.COMBINED);
 
                 map(ANTLRParser.PARSER, ANTLRParser.PARSER);
@@ -109,8 +108,7 @@ public class BasicSemanticChecks {
 
                 map(ANTLRParser.TREE, ANTLRParser.TREE);
 
-                // TODO: allow COMBINED
-                // map(ANTLRParser.GRAMMAR, ANTLRParser.GRAMMAR);
+                map(ANTLRParser.COMBINED, ANTLRParser.COMBINED);
             }
         };
 
@@ -170,7 +168,6 @@ public class BasicSemanticChecks {
         }
     }
 
-    // todo: get filename from stream via token?
     protected static void checkInvalidRuleRef(int gtype, Token ruleID) {
         String fileName = ruleID.getInputStream().getSourceName();
         if ( gtype==ANTLRParser.LEXER && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
@@ -187,8 +184,8 @@ public class BasicSemanticChecks {
                                       tokenID,
                                       tokenID.getText());
         }
-        if ( gtype==ANTLRParser.LEXER ) {
-            ErrorManager.grammarError(ErrorType.CANNOT_ALIAS_TOKENS_IN_LEXER,
+        if ( gtype!=ANTLRParser.COMBINED ) {
+            ErrorManager.grammarError(ErrorType.CANNOT_ALIAS_TOKENS,
                                       fileName,
                                       tokenID,
                                       tokenID.getText());

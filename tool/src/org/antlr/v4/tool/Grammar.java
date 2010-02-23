@@ -1,9 +1,7 @@
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.ParserRuleReturnScope;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.*;
+import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.Label;
 import org.antlr.v4.parse.ANTLRLexer;
@@ -49,14 +47,29 @@ public class Grammar implements AttributeResolver {
     public List<Grammar> importedGrammars;
     public Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
 
+	/** Token names and literal tokens like "void" are uniquely indexed.
+	 *  with -1 implying EOF.  Characters are different; they go from
+	 *  -1 (EOF) to \uFFFE.  For example, 0 could be a binary byte you
+	 *  want to lexer.  Labels of DFA/NFA transitions can be both tokens
+	 *  and characters.  I use negative numbers for bookkeeping labels
+	 *  like EPSILON. Char/String literals and token types overlap in the same
+	 *  space, however.
+	 */
+	protected int maxTokenType = Token.MIN_TOKEN_TYPE-1;
+	
 	/** Map token like ID (but not literals like "while") to its token type */
-	public Map<String, Integer> tokenNameToTypeMap = new HashMap<String, Integer>();
+	public Map<String, Integer> tokenNameToTypeMap = new LinkedHashMap<String, Integer>();
 
 	/** Map token literals like "while" to its token type.  It may be that
 	 *  WHILE="while"=35, in which case both tokenIDToTypeMap and this
 	 *  field will have entries both mapped to 35.
 	 */
-	public Map<String, Integer> stringLiteralToTypeMap = new HashMap<String, Integer>();
+	public Map<String, Integer> stringLiteralToTypeMap = new LinkedHashMap<String, Integer>();
+
+	/** Map a token type to its token name.
+	 *  Must subtract MIN_TOKEN_TYPE from index.
+	 */
+	public Vector<String> typeToTokenList = new Vector<String>();
 
     /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
@@ -75,6 +88,7 @@ public class Grammar implements AttributeResolver {
         this.tool = tool;
         this.ast = ast;
         this.name = ((GrammarAST)ast.getChild(0)).getText();
+		initTokenSymbolTables();		
     }
     
     /** For testing */
@@ -92,7 +106,34 @@ public class Grammar implements AttributeResolver {
 			this.ast = (GrammarRootAST)r.getTree();
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
 		}
+		initTokenSymbolTables();
     }
+
+	protected void initTokenSymbolTables() {
+		// the faux token types take first NUM_FAUX_LABELS positions
+		// then we must have room for the predefined runtime token types
+		// like DOWN/UP used for tree parsing.
+		typeToTokenList.setSize(Label.NUM_FAUX_LABELS+Token.MIN_TOKEN_TYPE-1);
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.INVALID, "<INVALID>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOT, "<EOT>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SEMPRED, "<SEMPRED>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SET, "<SET>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "EOF");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.DOWN-1, "DOWN");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.UP-1, "UP");
+		tokenNameToTypeMap.put("<INVALID>", Label.INVALID);
+		tokenNameToTypeMap.put("<ACTION>", Label.ACTION);
+		tokenNameToTypeMap.put("<EPSILON>", Label.EPSILON);
+		tokenNameToTypeMap.put("<SEMPRED>", Label.SEMPRED);
+		tokenNameToTypeMap.put("<SET>", Label.SET);
+		tokenNameToTypeMap.put("<EOT>", Label.EOT);
+		tokenNameToTypeMap.put("EOF", Label.EOF);
+		tokenNameToTypeMap.put("<EOR>", Label.EOR_TOKEN_TYPE);
+		tokenNameToTypeMap.put("DOWN", Token.DOWN);
+		tokenNameToTypeMap.put("UP", Token.UP);
+	}
 
     public void loadImportedGrammars() {
 		if ( ast==null ) return;
@@ -115,6 +156,7 @@ public class Grammar implements AttributeResolver {
 				if ( root instanceof GrammarASTErrorNode ) return; // came back as error node
 				GrammarRootAST ast = (GrammarRootAST)root;
                 Grammar g = new Grammar(tool, ast);
+				g.fileName = importedGrammarName+".g";
                 g.parent = this;
                 importedGrammars.add(g);
             }
@@ -239,6 +281,11 @@ public class Grammar implements AttributeResolver {
         return qualifiedName+suffix;
     }
 
+	public String getStringLiteralLexerRuleName(String lit) {
+		int ttype = getTokenType(lit);
+		return "T__"+ttype;
+	}
+
     /** Return grammar directly imported by this grammar */
     public Grammar getImportedGrammar(String name) {
 		for (Grammar g : importedGrammars) {
@@ -247,17 +294,67 @@ public class Grammar implements AttributeResolver {
         return null;
     }
 
-	public int getTokenType(String tokenName) {
+	public int getTokenType(String token) {
 		Integer I = null;
-		if ( tokenName.charAt(0)=='\'') {
-			I = stringLiteralToTypeMap.get(tokenName);
+		if ( token.charAt(0)=='\'') {
+			I = stringLiteralToTypeMap.get(token);
 		}
 		else { // must be a label like ID
-			I = tokenNameToTypeMap.get(tokenName);
+			I = tokenNameToTypeMap.get(token);
 		}
 		int i = (I!=null)?I.intValue(): Label.INVALID;
 		//System.out.println("grammar type "+type+" "+tokenName+"->"+i);
 		return i;
+	}
+
+	/** Return a new unique integer in the token type space */
+	public int getNewTokenType() {
+		maxTokenType++;
+		return maxTokenType;
+	}
+
+	public void importVocab(Grammar g) {
+		this.tokenNameToTypeMap.putAll( g.tokenNameToTypeMap );
+		this.stringLiteralToTypeMap.putAll( g.stringLiteralToTypeMap );
+		this.typeToTokenList.addAll( g.typeToTokenList );
+	}
+
+	public int defineTokenName(String name) {
+		Integer prev = tokenNameToTypeMap.get(name);
+		if ( prev!=null ) return prev;
+		int ttype = getNewTokenType();
+		tokenNameToTypeMap.put(name, ttype);
+		setTokenForType(ttype, name);
+		return ttype;
+	}
+
+	public int defineStringLiteral(String lit) {
+		if ( !stringLiteralToTypeMap.containsKey(lit) ) {
+			int ttype = getNewTokenType();
+			stringLiteralToTypeMap.put(lit, ttype);
+			setTokenForType(ttype, lit);
+			return ttype;
+		}
+		return Token.INVALID_TOKEN_TYPE;
+	}
+
+	public int defineTokenAlias(String name, String lit) {
+		int ttype = defineTokenName(name);
+		stringLiteralToTypeMap.put(lit, ttype);
+		setTokenForType(ttype, name);
+		return ttype;
+	}
+
+	public void setTokenForType(int ttype, String text) {
+		int index = Label.NUM_FAUX_LABELS+ttype-1;
+		if ( index>=typeToTokenList.size() ) {
+			typeToTokenList.setSize(index+1);
+		}
+		String prevToken = (String)typeToTokenList.get(index);
+		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {
+			// only record if nothing there before or if thing before was a literal
+			typeToTokenList.set(index, text);
+		}
 	}
 
 	// no isolated attr at grammar action level
@@ -324,6 +421,33 @@ public class Grammar implements AttributeResolver {
             default :
                 return "<invalid>";
         }
-    }
+	}
+
+	public static Map<String,String> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
+		GrammarAST combinedRulesRoot =
+			(GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);
+		if ( combinedRulesRoot==null ) return null;
+
+		List<GrammarASTWithOptions> ruleNodes = combinedRulesRoot.getChildren();
+		if ( ruleNodes==null || ruleNodes.size()==0 ) return null;
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(ruleNodes.get(0).token.getInputStream());
+		TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
+		Map<String,String> lexerRuleToStringLiteral = new HashMap<String,String>();
+
+        for (GrammarASTWithOptions r : ruleNodes) {
+            String ruleName = r.getChild(0).getText();
+            if ( Character.isUpperCase(ruleName.charAt(0)) ) {
+				Map nodes = new HashMap();
+				boolean isLitRule =
+					wiz.parse(r, "(RULE %name:ID (BLOCK (ALT %lit:STRING_LITERAL)))", nodes);
+				if ( isLitRule ) {
+					GrammarAST litNode = (GrammarAST)nodes.get("lit");
+					GrammarAST nameNode = (GrammarAST)nodes.get("name");
+					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
+				}
+            }
+        }
+		return lexerRuleToStringLiteral;
+	}
 
 }
