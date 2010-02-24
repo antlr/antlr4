@@ -374,16 +374,6 @@ public class Grammar implements AttributeResolver {
 
 	public boolean resolvesToListLabel(String x, ActionAST node) { return false; }
 	
-	//	/** $x in grammar action can only be scope name */
-//    public boolean resolves(String x, ActionAST node) {
-//        return scopes.get(x)!=null;
-//    }
-//
-//    /** $x.y makes no sense in grammar action; Rule.resolves()
-//     *  shouldn't call this.
-//     */
-//    public boolean resolves(String x, String y, ActionAST node) { return false; }
-
     /** Given a grammar type, what should be the default action scope?
      *  If I say @members in a COMBINED grammar, for example, the
      *  default scope should be "parser".

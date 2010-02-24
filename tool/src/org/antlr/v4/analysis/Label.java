@@ -2,7 +2,13 @@ package org.antlr.v4.analysis;
 
 import org.antlr.runtime.Token;
 
-public class Label implements Comparable, Cloneable {
+/** A state machine transition label.  A label can be either a simple
+ *  label such as a token or character.  A label can be a set of char or
+ *  tokens.  It can be an epsilon transition.  It can be a semantic predicate
+ *  (which assumes an epsilon transition) or a tree of predicates (in a DFA).
+ *  Special label types have to be < 0 to avoid conflict with char.
+ */
+public abstract class Label implements /*Comparable, */ Cloneable {
     public static final int INVALID = -7;
 
 	public static final int ACTION = -6;

@@ -338,8 +338,7 @@ public class Tool {
         Grammar g = new Grammar(this, ast);
         g.fileName = grammarFileNames.get(0);
         process(g);
-		if ( ast.grammarType==ANTLRParser.COMBINED ) {
-			// todo: don't process if errors in parser
+		if ( ast!=null && ast.grammarType==ANTLRParser.COMBINED && !ast.hasErrors ) {
 			lexerAST = extractImplicitLexer(g); // alters ast
             Grammar lexerg = new Grammar(this, lexerAST);
             lexerg.fileName = grammarFileNames.get(0);
@@ -354,15 +353,21 @@ public class Tool {
         g.loadImportedGrammars();
         if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
         //g.ast.inspect();
+
+		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
         SemanticPipeline sem = new SemanticPipeline();
         sem.process(g);
-		
-		// process imported grammars (if any)
-		if ( g.getImportedGrammars()!=null ) {
+		if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
 			for (Grammar imp : g.getImportedGrammars()) {
 				process(imp);
 			}
 		}
+
+		// BUILD NFA FROM AST
+
+		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
+
+		// GENERATE CODE
     }
 
     // TODO: Move to ast manipulation class?
