@@ -6,7 +6,6 @@ import org.antlr.v4.misc.IntervalSet;
 /** A label containing a set of values */
 public class SetTransition extends Label {
 	/** A set of token types or character codes if label==SET */
-	// TODO: try IntervalSet for everything
 	protected IntSet label;
 
 	public SetTransition(IntSet label) {
