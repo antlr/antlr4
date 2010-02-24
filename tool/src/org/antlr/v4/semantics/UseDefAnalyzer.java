@@ -1,6 +1,6 @@
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.analysis.Label;
+import org.antlr.v4.automata.Label;
 import org.antlr.v4.tool.*;
 
 import java.util.List;

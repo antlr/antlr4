@@ -1,4 +1,4 @@
-package org.antlr.v4.analysis;
+package org.antlr.v4.automata;
 
 import org.antlr.runtime.Token;
 

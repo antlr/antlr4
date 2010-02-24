@@ -1,5 +1,6 @@
-package org.antlr.v4.analysis;
+package org.antlr.v4.automata;
 
+import org.antlr.v4.analysis.SemanticContext;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
 
@@ -8,14 +9,14 @@ import org.antlr.v4.tool.GrammarAST;
  *  may have to combine a bunch of them as it collects predicates from
  *  multiple NFA configurations into a single DFA state.
  */
-public class PredicateLabel extends Label {
+public class PredicateTransition extends Label {
 	protected SemanticContext semanticContext;
 
-	public PredicateLabel(GrammarAST predicateASTNode) {
+	public PredicateTransition(GrammarAST predicateASTNode) {
 		this.semanticContext = new SemanticContext.Predicate(predicateASTNode);
 	}
 
-	public PredicateLabel(SemanticContext semCtx) {
+	public PredicateTransition(SemanticContext semCtx) {
 		this.semanticContext = semCtx;
 	}
 
@@ -30,10 +31,10 @@ public class PredicateLabel extends Label {
 		if ( this == o ) {
 			return true; // equals if same object
 		}
-		if ( !(o instanceof PredicateLabel) ) {
+		if ( !(o instanceof PredicateTransition) ) {
 			return false;
 		}
-		return semanticContext.equals(((PredicateLabel)o).semanticContext);
+		return semanticContext.equals(((PredicateTransition)o).semanticContext);
 	}
 
 	public String toString() {

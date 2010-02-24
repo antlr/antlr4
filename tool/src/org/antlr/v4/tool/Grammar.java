@@ -3,7 +3,7 @@ package org.antlr.v4.tool;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
-import org.antlr.v4.analysis.Label;
+import org.antlr.v4.automata.Label;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;

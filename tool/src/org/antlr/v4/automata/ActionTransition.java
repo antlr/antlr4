@@ -1,18 +1,21 @@
-package org.antlr.v4.analysis;
+package org.antlr.v4.automata;
 
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
 
-/** */
-public class ActionLabel extends Label {
+public class ActionTransition extends Transition {
 	public GrammarAST actionAST;
 
-	public ActionLabel(GrammarAST actionAST) {
+	public ActionTransition(GrammarAST actionAST) {
 		this.actionAST = actionAST;
 	}
 
 	public boolean isEpsilon() {
 		return true; // we are to be ignored by analysis 'cept for predicates
+	}
+
+	public int compareTo(Object o) {
+		return 0;
 	}
 
 	public String toString() {
