@@ -1,27 +1,14 @@
 package org.antlr.v4.automata;
 
-import org.antlr.analysis.Transition;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * 	// I need to distinguish between NFA decision states for (...)* and (...)+
-	// during NFA interpretation.
-	public static final int LOOPBACK = 1;
-	public static final int BLOCK_START = 2;
-	public static final int OPTIONAL_BLOCK_START = 3;
-	public static final int BYPASS = 4;
-	public static final int RIGHT_EDGE_OF_BLOCK = 5;
-
- make subclasses for all of these
- */
 public class NFAState extends State {
-	public static final int INITIAL_NUM_TRANSITIONS = 4;
+	/** Which NFA are we in? */
+	public NFA nfa = null;
 	
-	/** Track the transitions emanating from this NFA state. */
-	protected List<Transition> transitions =
-		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
+	/** For o-A->o type NFA tranitions, record the label that leads to this
+	 *  state.  Useful for creating rich error messages when we find
+	 *  insufficiently (with preds) covered states.
+	 */
+	public NFATransition incidentTransition;
 	
 	@Override
 	public int getNumberOfTransitions() {

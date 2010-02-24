@@ -4,19 +4,23 @@ import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 
 /** A label containing a set of values */
-public class SetTransition extends Label {
+public class SetTransition extends NFATransition {
 	/** A set of token types or character codes if label==SET */
 	protected IntSet label;
 
 	public SetTransition(IntSet label) {
 		if ( label==null ) {
-			this.label = IntervalSet.of(INVALID);
+			this.label = IntervalSet.of(Label.INVALID);
 			return;
 		}
 		this.label = label;
 	}
 
-//	public boolean intersect(Label other) {
+	public int compareTo(Object o) {
+		return 0;
+	}
+
+	//	public boolean intersect(Label other) {
 //		if ( other.getClass() == SetTransition.class ) {
 //			return label.and(((SetTransition)other).label).isNil();
 //		}
