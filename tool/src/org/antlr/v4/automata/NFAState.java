@@ -1,5 +1,10 @@
 package org.antlr.v4.automata;
 
+import org.antlr.analysis.Transition;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 	// I need to distinguish between NFA decision states for (...)* and (...)+
 	// during NFA interpretation.
@@ -12,6 +17,12 @@ package org.antlr.v4.automata;
  make subclasses for all of these
  */
 public class NFAState extends State {
+	public static final int INITIAL_NUM_TRANSITIONS = 4;
+	
+	/** Track the transitions emanating from this NFA state. */
+	protected List<Transition> transitions =
+		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
+	
 	@Override
 	public int getNumberOfTransitions() {
 		return 0;

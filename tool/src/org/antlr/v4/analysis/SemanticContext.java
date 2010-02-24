@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-/** A binary tree structure used to record the semantic context in which
+/** A tree structure used to record the semantic context in which
  *  an NFA configuration is valid.  It's either a single predicate or
  *  a tree representing an operation tree such as: p1&&p2 or p1||p2.
  *
@@ -19,13 +19,6 @@ import java.util.Set;
  *  we will have to combine p1 and p2 into DFA state as we will be
  *  adding NFA configurations for state 2 with two predicates p1,p2.
  *  So, set context for combined NFA config for state 2: OR(p1,p2).
- *
- *  I have scoped the AND, NOT, OR, and Predicate subclasses of
- *  SemanticContext within the scope of this outer class.
- *
- *  July 7, 2006: TJP altered OR to be set of operands. the Binary tree
- *  made it really hard to reduce complicated || sequences to their minimum.
- *  Got huge repeated || conditions.
  */
 public abstract class SemanticContext {
 	/** Create a default value for the semantic context shared among all
@@ -62,7 +55,6 @@ public abstract class SemanticContext {
 		protected boolean synpred = false;
 
 		public static final int INVALID_PRED_VALUE = -1;
-		public static final int FALSE_PRED = 0;
 		public static final int TRUE_PRED = 1;
 
 		/** sometimes predicates are known to be true or false; we need
@@ -96,7 +88,7 @@ public abstract class SemanticContext {
 		/** Two predicates are the same if they are literally the same
 		 *  text rather than same node in the grammar's AST.
 		 *  Or, if they have the same constant value, return equal.
-		 *  As of July 2006 I'm not sure these are needed.
+		 *  TODO: As of July 2006 I'm not sure these are needed.
 		 */
 		public boolean equals(Object o) {
 			if ( !(o instanceof Predicate) ) {
@@ -170,9 +162,9 @@ public abstract class SemanticContext {
 	}
 
 	public static class OR extends SemanticContext {
-		protected Set operands;
+		protected Set<SemanticContext> operands;
 		public OR(SemanticContext a, SemanticContext b) {
-			operands = new HashSet();
+			operands = new HashSet<SemanticContext>();
 			if ( a instanceof OR ) {
 				operands.addAll(((OR)a).operands);
 			}

@@ -1,5 +1,10 @@
 package org.antlr.v4.automata;
 
+import org.antlr.analysis.Transition;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /** A DFA state represents a set of possible NFA configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -29,6 +34,11 @@ package org.antlr.v4.automata;
  *  meaning that state was reached via a different set of rule invocations.
  */
 public class DFAState extends State {
+	public static final int INITIAL_NUM_TRANSITIONS = 4;
+	/** Track the transitions emanating from this DFA state. */
+	protected List<Transition> transitions =
+		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
+
 	@Override
 	public int getNumberOfTransitions() {
 		return 0;
