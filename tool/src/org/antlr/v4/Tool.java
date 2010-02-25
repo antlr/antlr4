@@ -1,10 +1,12 @@
 package org.antlr.v4;
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.NFABuilder;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
@@ -364,6 +366,11 @@ public class Tool {
 		}
 
 		// BUILD NFA FROM AST
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+		BufferedTreeNodeStream nodes =
+			new BufferedTreeNodeStream(adaptor,g.ast);
+		NFABuilder nfaBuilder = new NFABuilder(nodes,g);
+		nfaBuilder.downup(g.ast);
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
 
