@@ -30,7 +30,6 @@ options {
 	tokenVocab   = ANTLRParser;
 	ASTLabelType = GrammarAST;
 	filter 	     = true;
-	superClass   = 'org.antlr.v4.automata.NFAFactory';
 }
 
 // Include the copyright in this source and also the generated source
@@ -62,15 +61,15 @@ options {
 */
 package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.automata.NFAFactory;
 import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
 }
 
 @members {
-	Rule currentRule;
-    Grammar g;
-    public NFABuilder(TreeNodeStream input, Grammar g) {
+    NFAFactory factory;
+    public NFABuilder(TreeNodeStream input, NFAFactory factory) {
     	this(input);
-    	this.g = g;
+    	this.factory = factory;
     }
 }
 
@@ -84,7 +83,7 @@ bottomup
 	:	block // match block innermost to outermost all the way out to rule block
 	;
 
-rule:   ^(RULE name=ID .+) {currentRule = g.getRule($name.text);}
+rule:   ^(RULE name=ID .+) {factory.setCurrentRuleName($name.text);}
 	;
 
 block

@@ -1,7 +1,5 @@
 package org.antlr.v4.automata;
 
-import org.antlr.analysis.Transition;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +34,8 @@ import java.util.List;
 public class DFAState extends State {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 	/** Track the transitions emanating from this DFA state. */
-	protected List<Transition> transitions =
-		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
+	protected List<org.antlr.analysis.Transition> transitions =
+		new ArrayList<org.antlr.analysis.Transition>(INITIAL_NUM_TRANSITIONS);
 
 	@Override
 	public int getNumberOfTransitions() {
@@ -45,11 +43,11 @@ public class DFAState extends State {
 	}
 
 	@Override
-	public void addTransition(NFATransition e) {
+	public void addTransition(Transition e) {
 	}
 
 	@Override
-	public NFATransition transition(int i) {
+	public Transition transition(int i) {
 		return null;
 	}
 }

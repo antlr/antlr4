@@ -13,7 +13,7 @@ public class BlockStartState extends NFAState {
 	protected int decisionNumber = 0;	
 
 	/** Track the transitions emanating from this NFA state. */
-	protected List<NFATransition> transitions =
-		new ArrayList<NFATransition>(INITIAL_NUM_TRANSITIONS);
+	protected List<Transition> transitions =
+		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 		
 }

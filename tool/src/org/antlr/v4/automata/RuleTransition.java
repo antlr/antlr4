@@ -3,7 +3,7 @@ package org.antlr.v4.automata;
 import org.antlr.v4.tool.Rule;
 
 /** */
-public class RuleTransition extends NFATransition {
+public class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */
 	public Rule rule;
 

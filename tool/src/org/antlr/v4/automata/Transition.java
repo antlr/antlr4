@@ -12,11 +12,11 @@ package org.antlr.v4.automata;
  *  the states. We'll use the term Edge for the DFA to distinguish them from
  *  NFA transitions.
  */
-public abstract class NFATransition implements Comparable {
+public abstract class Transition implements Comparable {
 	/** The target of this transition */
-	public NFAState target;
+	public State target;
 
-	public NFATransition() { }
+	public Transition() { }
 
-	public NFATransition(NFAState target) { this.target = target; }
+	public Transition(NFAState target) { this.target = target; }
 }

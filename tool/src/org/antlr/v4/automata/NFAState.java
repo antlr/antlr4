@@ -8,7 +8,7 @@ public class NFAState extends State {
 	 *  state.  Useful for creating rich error messages when we find
 	 *  insufficiently (with preds) covered states.
 	 */
-	public NFATransition incidentTransition;
+	public Transition incidentTransition;
 	
 	@Override
 	public int getNumberOfTransitions() {
@@ -16,11 +16,11 @@ public class NFAState extends State {
 	}
 
 	@Override
-	public void addTransition(NFATransition e) {
+	public void addTransition(Transition e) {
 	}
 
 	@Override
-	public NFATransition transition(int i) {
+	public Transition transition(int i) {
 		return null;
 	}
 }

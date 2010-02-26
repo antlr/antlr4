@@ -3,7 +3,7 @@ package org.antlr.v4.automata;
 import org.antlr.v4.misc.IntervalSet;
 
 /** */
-public class AtomTransition extends NFATransition {
+public class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
 	protected int label;
 

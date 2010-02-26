@@ -3,7 +3,7 @@ package org.antlr.v4.automata;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
 
-public class ActionTransition extends NFATransition {
+public class ActionTransition extends Transition {
 	public GrammarAST actionAST;
 
 	public ActionTransition(GrammarAST actionAST) {

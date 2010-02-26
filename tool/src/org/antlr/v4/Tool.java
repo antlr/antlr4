@@ -3,6 +3,9 @@ package org.antlr.v4;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.runtime.tree.TreeWizard;
+import org.antlr.v4.automata.LexerNFAFactory;
+import org.antlr.v4.automata.NFAFactory;
+import org.antlr.v4.automata.ParserNFAFactory;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -369,7 +372,9 @@ public class Tool {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		BufferedTreeNodeStream nodes =
 			new BufferedTreeNodeStream(adaptor,g.ast);
-		NFABuilder nfaBuilder = new NFABuilder(nodes,g);
+		NFAFactory fac = new ParserNFAFactory(g);
+		if ( g.getType()==ANTLRParser.LEXER ) fac = new LexerNFAFactory(g);
+		NFABuilder nfaBuilder = new NFABuilder(nodes,fac);
 		nfaBuilder.downup(g.ast);
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs

@@ -13,7 +13,19 @@ public abstract class State {
 
     public abstract int getNumberOfTransitions();
 
-    public abstract void addTransition(NFATransition e);
+    public abstract void addTransition(Transition e);
 
-    public abstract NFATransition transition(int i);
+    public abstract Transition transition(int i);
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// are these states same object?
+		if ( o instanceof State ) return this == (State)o;
+		return false;
+	}
 }
