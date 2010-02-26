@@ -7,8 +7,9 @@ public class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
 	protected int label;
 
-	public AtomTransition(int label) {
+	public AtomTransition(int label, NFAState target) {
 		this.label = label;
+		this.target = target;
 	}
 
 	public int hashCode() { return label; }

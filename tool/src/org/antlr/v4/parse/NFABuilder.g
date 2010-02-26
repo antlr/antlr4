@@ -83,20 +83,23 @@ bottomup
 	:	block // match block innermost to outermost all the way out to rule block
 	;
 
-rule:   ^(RULE name=ID .+) {factory.setCurrentRuleName($name.text);}
+rule returns [NFAFactory.Handle p]
+	:   ^(RULE name=ID .+) {factory.setCurrentRuleName($name.text);}
 	;
 
-block
-    :	^(BLOCK ~ALT+ alternative+)
+block returns [NFAFactory.Handle p]
+@init {List<NFAFactory.Handle> alts = new ArrayList<NFAFactory.Handle>();}
+    :	^(BLOCK ~ALT* (a=alternative {alts.add($a.p);})+)
+    	{factory.block(alts);}
     ;
 
-alternative
+alternative returns [NFAFactory.Handle p]
     :	^(ALT_REWRITE alternative .)
     |	^(ALT EPSILON)
     |   ^(ALT element+)
     ;
 
-element
+element returns [NFAFactory.Handle p]
 	:	labeledElement
 	|	atom
 	|	ebnf
@@ -106,35 +109,37 @@ element
 	|	treeSpec
 	;
 	
-labeledElement
+labeledElement returns [NFAFactory.Handle p]
 	:	^(ASSIGN ID atom)
 	|	^(ASSIGN ID block)
 	|	^(PLUS_ASSIGN ID atom)
 	|	^(PLUS_ASSIGN ID block)
 	;
 
-treeSpec
+treeSpec returns [NFAFactory.Handle p]
     : ^(TREE_BEGIN element+)
     ;
 
-ebnf:	^(blockSuffix block)
+ebnf returns [NFAFactory.Handle p]
+	:	^(blockSuffix block)
 	| 	block
     ;
 
-blockSuffix
+blockSuffix returns [NFAFactory.Handle p]
     : ebnfSuffix
     | ROOT
     | IMPLIES
     | BANG
     ;
 
-ebnfSuffix
+ebnfSuffix returns [NFAFactory.Handle p]
 	:	OPTIONAL
   	|	CLOSURE
    	|	POSITIVE_CLOSURE
 	;
 	
-atom:	^(ROOT range)
+atom returns [NFAFactory.Handle p]	
+	:	^(ROOT range)
 	|	^(BANG range)
 	|	^(ROOT notSet)
 	|	^(BANG notSet)
@@ -145,40 +150,34 @@ atom:	^(ROOT range)
     |   ruleref
     ;
 
-notSet
+notSet returns [NFAFactory.Handle p]
     : ^(NOT notTerminal)
     | ^(NOT block)
     ;
 
-notTerminal
+notTerminal returns [NFAFactory.Handle p]
     : TOKEN_REF
     | STRING_LITERAL
     ;
 
-ruleref
-    :	^(ROOT ^(RULE_REF ARG_ACTION?))
-    |	^(BANG ^(RULE_REF ARG_ACTION?))
-    |	^(RULE_REF ARG_ACTION?)
+ruleref returns [NFAFactory.Handle p]
+    :	^(ROOT ^(RULE_REF ARG_ACTION?))	{factory.ruleRef($RULE_REF);}
+    |	^(BANG ^(RULE_REF ARG_ACTION?))	{factory.ruleRef($RULE_REF);}
+    |	^(RULE_REF ARG_ACTION?)			{factory.ruleRef($RULE_REF);}
     ;
 
-range
-    : ^(RANGE rangeElement rangeElement)
+range returns [NFAFactory.Handle p]
+    : ^(RANGE a=STRING_LITERAL b=STRING_LITERAL) {factory.range($a,$b);}
     ;
 
-rangeElement
-    : STRING_LITERAL
-    | RULE_REF
-    | TOKEN_REF
-    ;
-
-terminal
-    :  ^(STRING_LITERAL .)
-    |	STRING_LITERAL
-    |	^(TOKEN_REF ARG_ACTION .)
-    |	^(TOKEN_REF .)
-    |	TOKEN_REF
-    |	^(WILDCARD .)
-    |	WILDCARD
+terminal returns [NFAFactory.Handle p]
+    :  ^(STRING_LITERAL .)			{factory.stringLiteral($start);}
+    |	STRING_LITERAL				{factory.stringLiteral($start);}
+    |	^(TOKEN_REF ARG_ACTION .)	{factory.tokenRef((TerminalAST)$start);}
+    |	^(TOKEN_REF .)				{factory.tokenRef((TerminalAST)$start);}
+    |	TOKEN_REF					{factory.tokenRef((TerminalAST)$start);}
+    |	^(WILDCARD .)				{factory.wildcard($start);}
+    |	WILDCARD					{factory.wildcard($start);}
     |	^(ROOT terminal)
     |	^(BANG terminal)
     ;

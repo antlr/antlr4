@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-23 11:32:31
+// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-02-25 18:15:27
 
 /*
  [The "BSD licence"]
@@ -263,7 +263,7 @@ public class ANTLRLexer extends Lexer {
                         if ( (( input.LA(2) != '/')) ) {
                             alt3=1;
                         }
-                        else if ( ((( true )||(( true )&&(    !(input.LA(1) == '*' && input.LA(2) == '/') )))) ) {
+                        else if ( (((( true )&&(    !(input.LA(1) == '*' && input.LA(2) == '/') ))||( true ))) ) {
                             alt3=2;
                         }
                         else {

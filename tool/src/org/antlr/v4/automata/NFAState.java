@@ -1,14 +1,15 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.tool.GrammarAST;
+
 public class NFAState extends State {
 	/** Which NFA are we in? */
 	public NFA nfa = null;
-	
-	/** For o-A->o type NFA tranitions, record the label that leads to this
-	 *  state.  Useful for creating rich error messages when we find
-	 *  insufficiently (with preds) covered states.
-	 */
-	public Transition incidentTransition;
+
+	/** NFA state is associated with which node in AST? */
+	public GrammarAST ast;
+
+	public NFAState(NFA nfa) { this.nfa = nfa; }
 	
 	@Override
 	public int getNumberOfTransitions() {

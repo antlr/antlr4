@@ -327,13 +327,7 @@ ruleref
     ;
 
 range
-    : ^(RANGE rangeElement rangeElement)
-    ;
-
-rangeElement
-    : STRING_LITERAL
-    | RULE_REF
-    | TOKEN_REF
+    : ^(RANGE STRING_LITERAL STRING_LITERAL)
     ;
 
 terminal

@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} NFABuilder.g 2010-02-25 17:17:35
+// $ANTLR ${project.version} ${buildNumber} NFABuilder.g 2010-02-25 18:51:26
 
 /*
  [The "BSD license"]
@@ -30,8 +30,13 @@ package org.antlr.v4.parse;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeFilter;
 import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
 import org.antlr.v4.automata.NFAFactory;
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.TerminalAST;
+
+import java.util.ArrayList;
+import java.util.List;
 public class NFABuilder extends TreeFilter {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "RESULT", "ALT_REWRITE"
@@ -216,19 +221,21 @@ public class NFABuilder extends TreeFilter {
 
 
     // $ANTLR start "rule"
-    // NFABuilder.g:86:1: rule : ^( RULE name= ID ( . )+ ) ;
-    public final void rule() throws RecognitionException {
+    // NFABuilder.g:86:1: rule returns [NFAFactory.Handle p] : ^( RULE name= ID ( . )+ ) ;
+    public final NFAFactory.Handle rule() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         GrammarAST name=null;
 
         try {
-            // NFABuilder.g:86:5: ( ^( RULE name= ID ( . )+ ) )
-            // NFABuilder.g:86:9: ^( RULE name= ID ( . )+ )
+            // NFABuilder.g:87:2: ( ^( RULE name= ID ( . )+ ) )
+            // NFABuilder.g:87:6: ^( RULE name= ID ( . )+ )
             {
-            match(input,RULE,FOLLOW_RULE_in_rule103); if (state.failed) return ;
+            match(input,RULE,FOLLOW_RULE_in_rule109); if (state.failed) return p;
 
-            match(input, Token.DOWN, null); if (state.failed) return ;
-            name=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule107); if (state.failed) return ;
-            // NFABuilder.g:86:24: ( . )+
+            match(input, Token.DOWN, null); if (state.failed) return p;
+            name=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule113); if (state.failed) return p;
+            // NFABuilder.g:87:21: ( . )+
             int cnt1=0;
             loop1:
             do {
@@ -245,16 +252,16 @@ public class NFABuilder extends TreeFilter {
 
                 switch (alt1) {
             	case 1 :
-            	    // NFABuilder.g:86:24: .
+            	    // NFABuilder.g:87:21: .
             	    {
-            	    matchAny(input); if (state.failed) return ;
+            	    matchAny(input); if (state.failed) return p;
 
             	    }
             	    break;
 
             	default :
             	    if ( cnt1 >= 1 ) break loop1;
-            	    if (state.backtracking>0) {state.failed=true; return ;}
+            	    if (state.backtracking>0) {state.failed=true; return p;}
                         EarlyExitException eee =
                             new EarlyExitException(1, input);
                         throw eee;
@@ -263,7 +270,7 @@ public class NFABuilder extends TreeFilter {
             } while (true);
 
 
-            match(input, Token.UP, null); if (state.failed) return ;
+            match(input, Token.UP, null); if (state.failed) return p;
             if ( state.backtracking==1 ) {
               factory.setCurrentRuleName((name!=null?name.getText():null));
             }
@@ -277,23 +284,28 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "rule"
 
 
     // $ANTLR start "block"
-    // NFABuilder.g:89:1: block : ^( BLOCK (~ ALT )+ ( alternative )+ ) ;
-    public final void block() throws RecognitionException {
-        try {
-            // NFABuilder.g:90:5: ( ^( BLOCK (~ ALT )+ ( alternative )+ ) )
-            // NFABuilder.g:90:7: ^( BLOCK (~ ALT )+ ( alternative )+ )
-            {
-            match(input,BLOCK,FOLLOW_BLOCK_in_block128); if (state.failed) return ;
+    // NFABuilder.g:90:1: block returns [NFAFactory.Handle p] : ^( BLOCK (~ ALT )* (a= alternative )+ ) ;
+    public final NFAFactory.Handle block() throws RecognitionException {
+        NFAFactory.Handle p = null;
 
-            match(input, Token.DOWN, null); if (state.failed) return ;
-            // NFABuilder.g:90:15: (~ ALT )+
-            int cnt2=0;
+        NFAFactory.Handle a = null;
+
+
+        List<NFAFactory.Handle> alts = new ArrayList<NFAFactory.Handle>();
+        try {
+            // NFABuilder.g:92:5: ( ^( BLOCK (~ ALT )* (a= alternative )+ ) )
+            // NFABuilder.g:92:7: ^( BLOCK (~ ALT )* (a= alternative )+ )
+            {
+            match(input,BLOCK,FOLLOW_BLOCK_in_block143); if (state.failed) return p;
+
+            match(input, Token.DOWN, null); if (state.failed) return p;
+            // NFABuilder.g:92:15: (~ ALT )*
             loop2:
             do {
                 int alt2=2;
@@ -315,14 +327,14 @@ public class NFABuilder extends TreeFilter {
 
                 switch (alt2) {
             	case 1 :
-            	    // NFABuilder.g:90:15: ~ ALT
+            	    // NFABuilder.g:92:15: ~ ALT
             	    {
             	    if ( (input.LA(1)>=SEMPRED && input.LA(1)<=EPSILON)||(input.LA(1)>=ALTLIST && input.LA(1)<=ALT_REWRITE) ) {
             	        input.consume();
             	        state.errorRecovery=false;state.failed=false;
             	    }
             	    else {
-            	        if (state.backtracking>0) {state.failed=true; return ;}
+            	        if (state.backtracking>0) {state.failed=true; return p;}
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        throw mse;
             	    }
@@ -332,16 +344,11 @@ public class NFABuilder extends TreeFilter {
             	    break;
 
             	default :
-            	    if ( cnt2 >= 1 ) break loop2;
-            	    if (state.backtracking>0) {state.failed=true; return ;}
-                        EarlyExitException eee =
-                            new EarlyExitException(2, input);
-                        throw eee;
+            	    break loop2;
                 }
-                cnt2++;
             } while (true);
 
-            // NFABuilder.g:90:21: ( alternative )+
+            // NFABuilder.g:92:21: (a= alternative )+
             int cnt3=0;
             loop3:
             do {
@@ -355,20 +362,23 @@ public class NFABuilder extends TreeFilter {
 
                 switch (alt3) {
             	case 1 :
-            	    // NFABuilder.g:90:21: alternative
+            	    // NFABuilder.g:92:22: a= alternative
             	    {
-            	    pushFollow(FOLLOW_alternative_in_block134);
-            	    alternative();
+            	    pushFollow(FOLLOW_alternative_in_block152);
+            	    a=alternative();
 
             	    state._fsp--;
-            	    if (state.failed) return ;
+            	    if (state.failed) return p;
+            	    if ( state.backtracking==1 ) {
+            	      alts.add(a);
+            	    }
 
             	    }
             	    break;
 
             	default :
             	    if ( cnt3 >= 1 ) break loop3;
-            	    if (state.backtracking>0) {state.failed=true; return ;}
+            	    if (state.backtracking>0) {state.failed=true; return p;}
                         EarlyExitException eee =
                             new EarlyExitException(3, input);
                         throw eee;
@@ -377,7 +387,10 @@ public class NFABuilder extends TreeFilter {
             } while (true);
 
 
-            match(input, Token.UP, null); if (state.failed) return ;
+            match(input, Token.UP, null); if (state.failed) return p;
+            if ( state.backtracking==1 ) {
+              factory.block(alts);
+            }
 
             }
 
@@ -388,16 +401,18 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "block"
 
 
     // $ANTLR start "alternative"
-    // NFABuilder.g:93:1: alternative : ( ^( ALT_REWRITE alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) );
-    public final void alternative() throws RecognitionException {
+    // NFABuilder.g:96:1: alternative returns [NFAFactory.Handle p] : ( ^( ALT_REWRITE alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) );
+    public final NFAFactory.Handle alternative() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:94:5: ( ^( ALT_REWRITE alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) )
+            // NFABuilder.g:97:5: ( ^( ALT_REWRITE alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) )
             int alt5=3;
             int LA5_0 = input.LA(1);
 
@@ -417,7 +432,7 @@ public class NFABuilder extends TreeFilter {
                         alt5=3;
                     }
                     else {
-                        if (state.backtracking>0) {state.failed=true; return ;}
+                        if (state.backtracking>0) {state.failed=true; return p;}
                         NoViableAltException nvae =
                             new NoViableAltException("", 5, 3, input);
 
@@ -425,7 +440,7 @@ public class NFABuilder extends TreeFilter {
                     }
                 }
                 else {
-                    if (state.backtracking>0) {state.failed=true; return ;}
+                    if (state.backtracking>0) {state.failed=true; return p;}
                     NoViableAltException nvae =
                         new NoViableAltException("", 5, 2, input);
 
@@ -433,7 +448,7 @@ public class NFABuilder extends TreeFilter {
                 }
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 5, 0, input);
 
@@ -441,41 +456,41 @@ public class NFABuilder extends TreeFilter {
             }
             switch (alt5) {
                 case 1 :
-                    // NFABuilder.g:94:7: ^( ALT_REWRITE alternative . )
+                    // NFABuilder.g:97:7: ^( ALT_REWRITE alternative . )
                     {
-                    match(input,ALT_REWRITE,FOLLOW_ALT_REWRITE_in_alternative154); if (state.failed) return ;
+                    match(input,ALT_REWRITE,FOLLOW_ALT_REWRITE_in_alternative186); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_alternative_in_alternative156);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_alternative_in_alternative188);
                     alternative();
 
                     state._fsp--;
-                    if (state.failed) return ;
-                    matchAny(input); if (state.failed) return ;
+                    if (state.failed) return p;
+                    matchAny(input); if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:95:7: ^( ALT EPSILON )
+                    // NFABuilder.g:98:7: ^( ALT EPSILON )
                     {
-                    match(input,ALT,FOLLOW_ALT_in_alternative168); if (state.failed) return ;
+                    match(input,ALT,FOLLOW_ALT_in_alternative200); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,EPSILON,FOLLOW_EPSILON_in_alternative170); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,EPSILON,FOLLOW_EPSILON_in_alternative202); if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:96:9: ^( ALT ( element )+ )
+                    // NFABuilder.g:99:9: ^( ALT ( element )+ )
                     {
-                    match(input,ALT,FOLLOW_ALT_in_alternative182); if (state.failed) return ;
+                    match(input,ALT,FOLLOW_ALT_in_alternative214); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    // NFABuilder.g:96:15: ( element )+
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    // NFABuilder.g:99:15: ( element )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -489,20 +504,20 @@ public class NFABuilder extends TreeFilter {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // NFABuilder.g:96:15: element
+                    	    // NFABuilder.g:99:15: element
                     	    {
-                    	    pushFollow(FOLLOW_element_in_alternative184);
+                    	    pushFollow(FOLLOW_element_in_alternative216);
                     	    element();
 
                     	    state._fsp--;
-                    	    if (state.failed) return ;
+                    	    if (state.failed) return p;
 
                     	    }
                     	    break;
 
                     	default :
                     	    if ( cnt4 >= 1 ) break loop4;
-                    	    if (state.backtracking>0) {state.failed=true; return ;}
+                    	    if (state.backtracking>0) {state.failed=true; return p;}
                                 EarlyExitException eee =
                                     new EarlyExitException(4, input);
                                 throw eee;
@@ -511,7 +526,7 @@ public class NFABuilder extends TreeFilter {
                     } while (true);
 
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
@@ -524,81 +539,83 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "alternative"
 
 
     // $ANTLR start "element"
-    // NFABuilder.g:99:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
-    public final void element() throws RecognitionException {
+    // NFABuilder.g:102:1: element returns [NFAFactory.Handle p] : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
+    public final NFAFactory.Handle element() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:100:2: ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
+            // NFABuilder.g:103:2: ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
             int alt6=7;
             alt6 = dfa6.predict(input);
             switch (alt6) {
                 case 1 :
-                    // NFABuilder.g:100:4: labeledElement
+                    // NFABuilder.g:103:4: labeledElement
                     {
-                    pushFollow(FOLLOW_labeledElement_in_element200);
+                    pushFollow(FOLLOW_labeledElement_in_element236);
                     labeledElement();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:101:4: atom
+                    // NFABuilder.g:104:4: atom
                     {
-                    pushFollow(FOLLOW_atom_in_element205);
+                    pushFollow(FOLLOW_atom_in_element241);
                     atom();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:102:4: ebnf
+                    // NFABuilder.g:105:4: ebnf
                     {
-                    pushFollow(FOLLOW_ebnf_in_element210);
+                    pushFollow(FOLLOW_ebnf_in_element246);
                     ebnf();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
                 case 4 :
-                    // NFABuilder.g:103:6: ACTION
+                    // NFABuilder.g:106:6: ACTION
                     {
-                    match(input,ACTION,FOLLOW_ACTION_in_element217); if (state.failed) return ;
+                    match(input,ACTION,FOLLOW_ACTION_in_element253); if (state.failed) return p;
 
                     }
                     break;
                 case 5 :
-                    // NFABuilder.g:104:6: SEMPRED
+                    // NFABuilder.g:107:6: SEMPRED
                     {
-                    match(input,SEMPRED,FOLLOW_SEMPRED_in_element224); if (state.failed) return ;
+                    match(input,SEMPRED,FOLLOW_SEMPRED_in_element260); if (state.failed) return p;
 
                     }
                     break;
                 case 6 :
-                    // NFABuilder.g:105:4: GATED_SEMPRED
+                    // NFABuilder.g:108:4: GATED_SEMPRED
                     {
-                    match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element229); if (state.failed) return ;
+                    match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element265); if (state.failed) return p;
 
                     }
                     break;
                 case 7 :
-                    // NFABuilder.g:106:4: treeSpec
+                    // NFABuilder.g:109:4: treeSpec
                     {
-                    pushFollow(FOLLOW_treeSpec_in_element234);
+                    pushFollow(FOLLOW_treeSpec_in_element270);
                     treeSpec();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
@@ -611,84 +628,86 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "element"
 
 
     // $ANTLR start "labeledElement"
-    // NFABuilder.g:109:1: labeledElement : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );
-    public final void labeledElement() throws RecognitionException {
+    // NFABuilder.g:112:1: labeledElement returns [NFAFactory.Handle p] : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );
+    public final NFAFactory.Handle labeledElement() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:110:2: ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) )
+            // NFABuilder.g:113:2: ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) )
             int alt7=4;
             alt7 = dfa7.predict(input);
             switch (alt7) {
                 case 1 :
-                    // NFABuilder.g:110:4: ^( ASSIGN ID atom )
+                    // NFABuilder.g:113:4: ^( ASSIGN ID atom )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement247); if (state.failed) return ;
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement287); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_labeledElement249); if (state.failed) return ;
-                    pushFollow(FOLLOW_atom_in_labeledElement251);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,ID,FOLLOW_ID_in_labeledElement289); if (state.failed) return p;
+                    pushFollow(FOLLOW_atom_in_labeledElement291);
                     atom();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:111:4: ^( ASSIGN ID block )
+                    // NFABuilder.g:114:4: ^( ASSIGN ID block )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement258); if (state.failed) return ;
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement298); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_labeledElement260); if (state.failed) return ;
-                    pushFollow(FOLLOW_block_in_labeledElement262);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,ID,FOLLOW_ID_in_labeledElement300); if (state.failed) return p;
+                    pushFollow(FOLLOW_block_in_labeledElement302);
                     block();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:112:4: ^( PLUS_ASSIGN ID atom )
+                    // NFABuilder.g:115:4: ^( PLUS_ASSIGN ID atom )
                     {
-                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement269); if (state.failed) return ;
+                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement309); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_labeledElement271); if (state.failed) return ;
-                    pushFollow(FOLLOW_atom_in_labeledElement273);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,ID,FOLLOW_ID_in_labeledElement311); if (state.failed) return p;
+                    pushFollow(FOLLOW_atom_in_labeledElement313);
                     atom();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 4 :
-                    // NFABuilder.g:113:4: ^( PLUS_ASSIGN ID block )
+                    // NFABuilder.g:116:4: ^( PLUS_ASSIGN ID block )
                     {
-                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement280); if (state.failed) return ;
+                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement320); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_labeledElement282); if (state.failed) return ;
-                    pushFollow(FOLLOW_block_in_labeledElement284);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,ID,FOLLOW_ID_in_labeledElement322); if (state.failed) return p;
+                    pushFollow(FOLLOW_block_in_labeledElement324);
                     block();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
@@ -701,22 +720,24 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "labeledElement"
 
 
     // $ANTLR start "treeSpec"
-    // NFABuilder.g:116:1: treeSpec : ^( TREE_BEGIN ( element )+ ) ;
-    public final void treeSpec() throws RecognitionException {
-        try {
-            // NFABuilder.g:117:5: ( ^( TREE_BEGIN ( element )+ ) )
-            // NFABuilder.g:117:7: ^( TREE_BEGIN ( element )+ )
-            {
-            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec300); if (state.failed) return ;
+    // NFABuilder.g:119:1: treeSpec returns [NFAFactory.Handle p] : ^( TREE_BEGIN ( element )+ ) ;
+    public final NFAFactory.Handle treeSpec() throws RecognitionException {
+        NFAFactory.Handle p = null;
 
-            match(input, Token.DOWN, null); if (state.failed) return ;
-            // NFABuilder.g:117:20: ( element )+
+        try {
+            // NFABuilder.g:120:5: ( ^( TREE_BEGIN ( element )+ ) )
+            // NFABuilder.g:120:7: ^( TREE_BEGIN ( element )+ )
+            {
+            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec344); if (state.failed) return p;
+
+            match(input, Token.DOWN, null); if (state.failed) return p;
+            // NFABuilder.g:120:20: ( element )+
             int cnt8=0;
             loop8:
             do {
@@ -730,20 +751,20 @@ public class NFABuilder extends TreeFilter {
 
                 switch (alt8) {
             	case 1 :
-            	    // NFABuilder.g:117:20: element
+            	    // NFABuilder.g:120:20: element
             	    {
-            	    pushFollow(FOLLOW_element_in_treeSpec302);
+            	    pushFollow(FOLLOW_element_in_treeSpec346);
             	    element();
 
             	    state._fsp--;
-            	    if (state.failed) return ;
+            	    if (state.failed) return p;
 
             	    }
             	    break;
 
             	default :
             	    if ( cnt8 >= 1 ) break loop8;
-            	    if (state.backtracking>0) {state.failed=true; return ;}
+            	    if (state.backtracking>0) {state.failed=true; return p;}
                         EarlyExitException eee =
                             new EarlyExitException(8, input);
                         throw eee;
@@ -752,7 +773,7 @@ public class NFABuilder extends TreeFilter {
             } while (true);
 
 
-            match(input, Token.UP, null); if (state.failed) return ;
+            match(input, Token.UP, null); if (state.failed) return p;
 
             }
 
@@ -763,16 +784,18 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "treeSpec"
 
 
     // $ANTLR start "ebnf"
-    // NFABuilder.g:120:1: ebnf : ( ^( blockSuffix block ) | block );
-    public final void ebnf() throws RecognitionException {
+    // NFABuilder.g:123:1: ebnf returns [NFAFactory.Handle p] : ( ^( blockSuffix block ) | block );
+    public final NFAFactory.Handle ebnf() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:120:5: ( ^( blockSuffix block ) | block )
+            // NFABuilder.g:124:2: ( ^( blockSuffix block ) | block )
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -783,7 +806,7 @@ public class NFABuilder extends TreeFilter {
                 alt9=2;
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 9, 0, input);
 
@@ -791,33 +814,33 @@ public class NFABuilder extends TreeFilter {
             }
             switch (alt9) {
                 case 1 :
-                    // NFABuilder.g:120:7: ^( blockSuffix block )
+                    // NFABuilder.g:124:4: ^( blockSuffix block )
                     {
-                    pushFollow(FOLLOW_blockSuffix_in_ebnf317);
+                    pushFollow(FOLLOW_blockSuffix_in_ebnf367);
                     blockSuffix();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_block_in_ebnf319);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_block_in_ebnf369);
                     block();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:121:5: block
+                    // NFABuilder.g:125:5: block
                     {
-                    pushFollow(FOLLOW_block_in_ebnf326);
+                    pushFollow(FOLLOW_block_in_ebnf376);
                     block();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
@@ -830,16 +853,18 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "ebnf"
 
 
     // $ANTLR start "blockSuffix"
-    // NFABuilder.g:124:1: blockSuffix : ( ebnfSuffix | ROOT | IMPLIES | BANG );
-    public final void blockSuffix() throws RecognitionException {
+    // NFABuilder.g:128:1: blockSuffix returns [NFAFactory.Handle p] : ( ebnfSuffix | ROOT | IMPLIES | BANG );
+    public final NFAFactory.Handle blockSuffix() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:125:5: ( ebnfSuffix | ROOT | IMPLIES | BANG )
+            // NFABuilder.g:129:5: ( ebnfSuffix | ROOT | IMPLIES | BANG )
             int alt10=4;
             switch ( input.LA(1) ) {
             case OPTIONAL:
@@ -865,7 +890,7 @@ public class NFABuilder extends TreeFilter {
                 }
                 break;
             default:
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 10, 0, input);
 
@@ -874,34 +899,34 @@ public class NFABuilder extends TreeFilter {
 
             switch (alt10) {
                 case 1 :
-                    // NFABuilder.g:125:7: ebnfSuffix
+                    // NFABuilder.g:129:7: ebnfSuffix
                     {
-                    pushFollow(FOLLOW_ebnfSuffix_in_blockSuffix343);
+                    pushFollow(FOLLOW_ebnfSuffix_in_blockSuffix397);
                     ebnfSuffix();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:126:7: ROOT
+                    // NFABuilder.g:130:7: ROOT
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_blockSuffix351); if (state.failed) return ;
+                    match(input,ROOT,FOLLOW_ROOT_in_blockSuffix405); if (state.failed) return p;
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:127:7: IMPLIES
+                    // NFABuilder.g:131:7: IMPLIES
                     {
-                    match(input,IMPLIES,FOLLOW_IMPLIES_in_blockSuffix359); if (state.failed) return ;
+                    match(input,IMPLIES,FOLLOW_IMPLIES_in_blockSuffix413); if (state.failed) return p;
 
                     }
                     break;
                 case 4 :
-                    // NFABuilder.g:128:7: BANG
+                    // NFABuilder.g:132:7: BANG
                     {
-                    match(input,BANG,FOLLOW_BANG_in_blockSuffix367); if (state.failed) return ;
+                    match(input,BANG,FOLLOW_BANG_in_blockSuffix421); if (state.failed) return p;
 
                     }
                     break;
@@ -914,16 +939,18 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "blockSuffix"
 
 
     // $ANTLR start "ebnfSuffix"
-    // NFABuilder.g:131:1: ebnfSuffix : ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE );
-    public final void ebnfSuffix() throws RecognitionException {
+    // NFABuilder.g:135:1: ebnfSuffix returns [NFAFactory.Handle p] : ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE );
+    public final NFAFactory.Handle ebnfSuffix() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:132:2: ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE )
+            // NFABuilder.g:136:2: ( OPTIONAL | CLOSURE | POSITIVE_CLOSURE )
             // NFABuilder.g:
             {
             if ( (input.LA(1)>=OPTIONAL && input.LA(1)<=POSITIVE_CLOSURE) ) {
@@ -931,7 +958,7 @@ public class NFABuilder extends TreeFilter {
                 state.errorRecovery=false;state.failed=false;
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 MismatchedSetException mse = new MismatchedSetException(null,input);
                 throw mse;
             }
@@ -946,147 +973,149 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "ebnfSuffix"
 
 
     // $ANTLR start "atom"
-    // NFABuilder.g:137:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );
-    public final void atom() throws RecognitionException {
+    // NFABuilder.g:141:1: atom returns [NFAFactory.Handle p] : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );
+    public final NFAFactory.Handle atom() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:137:5: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref )
+            // NFABuilder.g:142:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref )
             int alt11=9;
             alt11 = dfa11.predict(input);
             switch (alt11) {
                 case 1 :
-                    // NFABuilder.g:137:7: ^( ROOT range )
+                    // NFABuilder.g:142:4: ^( ROOT range )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom407); if (state.failed) return ;
+                    match(input,ROOT,FOLLOW_ROOT_in_atom472); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_range_in_atom409);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_range_in_atom474);
                     range();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:138:4: ^( BANG range )
+                    // NFABuilder.g:143:4: ^( BANG range )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom416); if (state.failed) return ;
+                    match(input,BANG,FOLLOW_BANG_in_atom481); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_range_in_atom418);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_range_in_atom483);
                     range();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:139:4: ^( ROOT notSet )
+                    // NFABuilder.g:144:4: ^( ROOT notSet )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom425); if (state.failed) return ;
+                    match(input,ROOT,FOLLOW_ROOT_in_atom490); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_notSet_in_atom427);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_notSet_in_atom492);
                     notSet();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 4 :
-                    // NFABuilder.g:140:4: ^( BANG notSet )
+                    // NFABuilder.g:145:4: ^( BANG notSet )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom434); if (state.failed) return ;
+                    match(input,BANG,FOLLOW_BANG_in_atom499); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_notSet_in_atom436);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_notSet_in_atom501);
                     notSet();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 5 :
-                    // NFABuilder.g:141:4: range
+                    // NFABuilder.g:146:4: range
                     {
-                    pushFollow(FOLLOW_range_in_atom442);
+                    pushFollow(FOLLOW_range_in_atom507);
                     range();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
                 case 6 :
-                    // NFABuilder.g:142:4: ^( DOT ID terminal )
+                    // NFABuilder.g:147:4: ^( DOT ID terminal )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom448); if (state.failed) return ;
+                    match(input,DOT,FOLLOW_DOT_in_atom513); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_atom450); if (state.failed) return ;
-                    pushFollow(FOLLOW_terminal_in_atom452);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,ID,FOLLOW_ID_in_atom515); if (state.failed) return p;
+                    pushFollow(FOLLOW_terminal_in_atom517);
                     terminal();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 7 :
-                    // NFABuilder.g:143:4: ^( DOT ID ruleref )
+                    // NFABuilder.g:148:4: ^( DOT ID ruleref )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom459); if (state.failed) return ;
+                    match(input,DOT,FOLLOW_DOT_in_atom524); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_atom461); if (state.failed) return ;
-                    pushFollow(FOLLOW_ruleref_in_atom463);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    match(input,ID,FOLLOW_ID_in_atom526); if (state.failed) return p;
+                    pushFollow(FOLLOW_ruleref_in_atom528);
                     ruleref();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 8 :
-                    // NFABuilder.g:144:9: terminal
+                    // NFABuilder.g:149:9: terminal
                     {
-                    pushFollow(FOLLOW_terminal_in_atom474);
+                    pushFollow(FOLLOW_terminal_in_atom539);
                     terminal();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
                 case 9 :
-                    // NFABuilder.g:145:9: ruleref
+                    // NFABuilder.g:150:9: ruleref
                     {
-                    pushFollow(FOLLOW_ruleref_in_atom484);
+                    pushFollow(FOLLOW_ruleref_in_atom549);
                     ruleref();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
                     }
                     break;
@@ -1099,16 +1128,18 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "atom"
 
 
     // $ANTLR start "notSet"
-    // NFABuilder.g:148:1: notSet : ( ^( NOT notTerminal ) | ^( NOT block ) );
-    public final void notSet() throws RecognitionException {
+    // NFABuilder.g:153:1: notSet returns [NFAFactory.Handle p] : ( ^( NOT notTerminal ) | ^( NOT block ) );
+    public final NFAFactory.Handle notSet() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:149:5: ( ^( NOT notTerminal ) | ^( NOT block ) )
+            // NFABuilder.g:154:5: ( ^( NOT notTerminal ) | ^( NOT block ) )
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -1118,14 +1149,14 @@ public class NFABuilder extends TreeFilter {
                 if ( (LA12_1==DOWN) ) {
                     int LA12_2 = input.LA(3);
 
-                    if ( (LA12_2==TOKEN_REF||LA12_2==STRING_LITERAL) ) {
-                        alt12=1;
-                    }
-                    else if ( (LA12_2==BLOCK) ) {
+                    if ( (LA12_2==BLOCK) ) {
                         alt12=2;
                     }
+                    else if ( (LA12_2==TOKEN_REF||LA12_2==STRING_LITERAL) ) {
+                        alt12=1;
+                    }
                     else {
-                        if (state.backtracking>0) {state.failed=true; return ;}
+                        if (state.backtracking>0) {state.failed=true; return p;}
                         NoViableAltException nvae =
                             new NoViableAltException("", 12, 2, input);
 
@@ -1133,7 +1164,7 @@ public class NFABuilder extends TreeFilter {
                     }
                 }
                 else {
-                    if (state.backtracking>0) {state.failed=true; return ;}
+                    if (state.backtracking>0) {state.failed=true; return p;}
                     NoViableAltException nvae =
                         new NoViableAltException("", 12, 1, input);
 
@@ -1141,7 +1172,7 @@ public class NFABuilder extends TreeFilter {
                 }
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 12, 0, input);
 
@@ -1149,34 +1180,34 @@ public class NFABuilder extends TreeFilter {
             }
             switch (alt12) {
                 case 1 :
-                    // NFABuilder.g:149:7: ^( NOT notTerminal )
+                    // NFABuilder.g:154:7: ^( NOT notTerminal )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet502); if (state.failed) return ;
+                    match(input,NOT,FOLLOW_NOT_in_notSet571); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_notTerminal_in_notSet504);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_notTerminal_in_notSet573);
                     notTerminal();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:150:7: ^( NOT block )
+                    // NFABuilder.g:155:7: ^( NOT block )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet514); if (state.failed) return ;
+                    match(input,NOT,FOLLOW_NOT_in_notSet583); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_block_in_notSet516);
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    pushFollow(FOLLOW_block_in_notSet585);
                     block();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return p;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
 
                     }
                     break;
@@ -1189,16 +1220,18 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "notSet"
 
 
     // $ANTLR start "notTerminal"
-    // NFABuilder.g:153:1: notTerminal : ( TOKEN_REF | STRING_LITERAL );
-    public final void notTerminal() throws RecognitionException {
+    // NFABuilder.g:158:1: notTerminal returns [NFAFactory.Handle p] : ( TOKEN_REF | STRING_LITERAL );
+    public final NFAFactory.Handle notTerminal() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
         try {
-            // NFABuilder.g:154:5: ( TOKEN_REF | STRING_LITERAL )
+            // NFABuilder.g:159:5: ( TOKEN_REF | STRING_LITERAL )
             // NFABuilder.g:
             {
             if ( input.LA(1)==TOKEN_REF||input.LA(1)==STRING_LITERAL ) {
@@ -1206,7 +1239,7 @@ public class NFABuilder extends TreeFilter {
                 state.errorRecovery=false;state.failed=false;
             }
             else {
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 MismatchedSetException mse = new MismatchedSetException(null,input);
                 throw mse;
             }
@@ -1221,16 +1254,22 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "notTerminal"
 
 
     // $ANTLR start "ruleref"
-    // NFABuilder.g:158:1: ruleref : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
-    public final void ruleref() throws RecognitionException {
+    // NFABuilder.g:163:1: ruleref returns [NFAFactory.Handle p] : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
+    public final NFAFactory.Handle ruleref() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
+        GrammarAST RULE_REF1=null;
+        GrammarAST RULE_REF2=null;
+        GrammarAST RULE_REF3=null;
+
         try {
-            // NFABuilder.g:159:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
+            // NFABuilder.g:164:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
             int alt16=3;
             switch ( input.LA(1) ) {
             case ROOT:
@@ -1249,7 +1288,7 @@ public class NFABuilder extends TreeFilter {
                 }
                 break;
             default:
-                if (state.backtracking>0) {state.failed=true; return ;}
+                if (state.backtracking>0) {state.failed=true; return p;}
                 NoViableAltException nvae =
                     new NoViableAltException("", 16, 0, input);
 
@@ -1258,16 +1297,16 @@ public class NFABuilder extends TreeFilter {
 
             switch (alt16) {
                 case 1 :
-                    // NFABuilder.g:159:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
+                    // NFABuilder.g:164:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_ruleref560); if (state.failed) return ;
+                    match(input,ROOT,FOLLOW_ROOT_in_ruleref637); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref563); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    RULE_REF1=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref640); if (state.failed) return p;
 
                     if ( input.LA(1)==Token.DOWN ) {
-                        match(input, Token.DOWN, null); if (state.failed) return ;
-                        // NFABuilder.g:159:25: ( ARG_ACTION )?
+                        match(input, Token.DOWN, null); if (state.failed) return p;
+                        // NFABuilder.g:164:25: ( ARG_ACTION )?
                         int alt13=2;
                         int LA13_0 = input.LA(1);
 
@@ -1276,9 +1315,9 @@ public class NFABuilder extends TreeFilter {
                         }
                         switch (alt13) {
                             case 1 :
-                                // NFABuilder.g:159:25: ARG_ACTION
+                                // NFABuilder.g:164:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref565); if (state.failed) return ;
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref642); if (state.failed) return p;
 
                                 }
                                 break;
@@ -1286,24 +1325,27 @@ public class NFABuilder extends TreeFilter {
                         }
 
 
-                        match(input, Token.UP, null); if (state.failed) return ;
+                        match(input, Token.UP, null); if (state.failed) return p;
                     }
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
+                    if ( state.backtracking==1 ) {
+                      factory.ruleRef(RULE_REF1);
+                    }
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:160:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
+                    // NFABuilder.g:165:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_ruleref577); if (state.failed) return ;
+                    match(input,BANG,FOLLOW_BANG_in_ruleref656); if (state.failed) return p;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref580); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return p;
+                    RULE_REF2=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref659); if (state.failed) return p;
 
                     if ( input.LA(1)==Token.DOWN ) {
-                        match(input, Token.DOWN, null); if (state.failed) return ;
-                        // NFABuilder.g:160:25: ( ARG_ACTION )?
+                        match(input, Token.DOWN, null); if (state.failed) return p;
+                        // NFABuilder.g:165:25: ( ARG_ACTION )?
                         int alt14=2;
                         int LA14_0 = input.LA(1);
 
@@ -1312,9 +1354,9 @@ public class NFABuilder extends TreeFilter {
                         }
                         switch (alt14) {
                             case 1 :
-                                // NFABuilder.g:160:25: ARG_ACTION
+                                // NFABuilder.g:165:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref582); if (state.failed) return ;
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref661); if (state.failed) return p;
 
                                 }
                                 break;
@@ -1322,21 +1364,24 @@ public class NFABuilder extends TreeFilter {
                         }
 
 
-                        match(input, Token.UP, null); if (state.failed) return ;
+                        match(input, Token.UP, null); if (state.failed) return p;
                     }
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return p;
+                    if ( state.backtracking==1 ) {
+                      factory.ruleRef(RULE_REF2);
+                    }
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:161:7: ^( RULE_REF ( ARG_ACTION )? )
+                    // NFABuilder.g:166:7: ^( RULE_REF ( ARG_ACTION )? )
                     {
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref594); if (state.failed) return ;
+                    RULE_REF3=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref675); if (state.failed) return p;
 
                     if ( input.LA(1)==Token.DOWN ) {
-                        match(input, Token.DOWN, null); if (state.failed) return ;
-                        // NFABuilder.g:161:18: ( ARG_ACTION )?
+                        match(input, Token.DOWN, null); if (state.failed) return p;
+                        // NFABuilder.g:166:18: ( ARG_ACTION )?
                         int alt15=2;
                         int LA15_0 = input.LA(1);
 
@@ -1345,9 +1390,9 @@ public class NFABuilder extends TreeFilter {
                         }
                         switch (alt15) {
                             case 1 :
-                                // NFABuilder.g:161:18: ARG_ACTION
+                                // NFABuilder.g:166:18: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref596); if (state.failed) return ;
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref677); if (state.failed) return p;
 
                                 }
                                 break;
@@ -1355,7 +1400,10 @@ public class NFABuilder extends TreeFilter {
                         }
 
 
-                        match(input, Token.UP, null); if (state.failed) return ;
+                        match(input, Token.UP, null); if (state.failed) return p;
+                    }
+                    if ( state.backtracking==1 ) {
+                      factory.ruleRef(RULE_REF3);
                     }
 
                     }
@@ -1369,33 +1417,33 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "ruleref"
 
 
     // $ANTLR start "range"
-    // NFABuilder.g:164:1: range : ^( RANGE rangeElement rangeElement ) ;
-    public final void range() throws RecognitionException {
+    // NFABuilder.g:169:1: range returns [NFAFactory.Handle p] : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
+    public final NFAFactory.Handle range() throws RecognitionException {
+        NFAFactory.Handle p = null;
+
+        GrammarAST a=null;
+        GrammarAST b=null;
+
         try {
-            // NFABuilder.g:165:5: ( ^( RANGE rangeElement rangeElement ) )
-            // NFABuilder.g:165:7: ^( RANGE rangeElement rangeElement )
+            // NFABuilder.g:170:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
+            // NFABuilder.g:170:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
             {
-            match(input,RANGE,FOLLOW_RANGE_in_range616); if (state.failed) return ;
+            match(input,RANGE,FOLLOW_RANGE_in_range705); if (state.failed) return p;
 
-            match(input, Token.DOWN, null); if (state.failed) return ;
-            pushFollow(FOLLOW_rangeElement_in_range618);
-            rangeElement();
+            match(input, Token.DOWN, null); if (state.failed) return p;
+            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range709); if (state.failed) return p;
+            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range713); if (state.failed) return p;
 
-            state._fsp--;
-            if (state.failed) return ;
-            pushFollow(FOLLOW_rangeElement_in_range620);
-            rangeElement();
-
-            state._fsp--;
-            if (state.failed) return ;
-
-            match(input, Token.UP, null); if (state.failed) return ;
+            match(input, Token.UP, null); if (state.failed) return p;
+            if ( state.backtracking==1 ) {
+              factory.range(a,b);
+            }
 
             }
 
@@ -1406,150 +1454,145 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return p;
     }
     // $ANTLR end "range"
 
-
-    // $ANTLR start "rangeElement"
-    // NFABuilder.g:168:1: rangeElement : ( STRING_LITERAL | RULE_REF | TOKEN_REF );
-    public final void rangeElement() throws RecognitionException {
-        try {
-            // NFABuilder.g:169:5: ( STRING_LITERAL | RULE_REF | TOKEN_REF )
-            // NFABuilder.g:
-            {
-            if ( (input.LA(1)>=TOKEN_REF && input.LA(1)<=RULE_REF)||input.LA(1)==STRING_LITERAL ) {
-                input.consume();
-                state.errorRecovery=false;state.failed=false;
-            }
-            else {
-                if (state.backtracking>0) {state.failed=true; return ;}
-                MismatchedSetException mse = new MismatchedSetException(null,input);
-                throw mse;
-            }
-
-
-            }
-
-        }
-        catch (RecognitionException re) {
-            reportError(re);
-            recover(input,re);
-        }
-        finally {
-        }
-        return ;
-    }
-    // $ANTLR end "rangeElement"
-
+    public static class terminal_return extends TreeRuleReturnScope {
+        public NFAFactory.Handle p;
+    };
 
     // $ANTLR start "terminal"
-    // NFABuilder.g:174:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( WILDCARD . ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );
-    public final void terminal() throws RecognitionException {
+    // NFABuilder.g:173:1: terminal returns [NFAFactory.Handle p] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( WILDCARD . ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );
+    public final NFABuilder.terminal_return terminal() throws RecognitionException {
+        NFABuilder.terminal_return retval = new NFABuilder.terminal_return();
+        retval.start = input.LT(1);
+
         try {
-            // NFABuilder.g:175:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( WILDCARD . ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) )
+            // NFABuilder.g:174:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( WILDCARD . ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) )
             int alt17=9;
             alt17 = dfa17.predict(input);
             switch (alt17) {
                 case 1 :
-                    // NFABuilder.g:175:8: ^( STRING_LITERAL . )
+                    // NFABuilder.g:174:8: ^( STRING_LITERAL . )
                     {
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal673); if (state.failed) return ;
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal739); if (state.failed) return retval;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    matchAny(input); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return retval;
+                    matchAny(input); if (state.failed) return retval;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.stringLiteral(((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 2 :
-                    // NFABuilder.g:176:7: STRING_LITERAL
+                    // NFABuilder.g:175:7: STRING_LITERAL
                     {
-                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal684); if (state.failed) return ;
+                    match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal754); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.stringLiteral(((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 3 :
-                    // NFABuilder.g:177:7: ^( TOKEN_REF ARG_ACTION . )
+                    // NFABuilder.g:176:7: ^( TOKEN_REF ARG_ACTION . )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal693); if (state.failed) return ;
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal768); if (state.failed) return retval;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal695); if (state.failed) return ;
-                    matchAny(input); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return retval;
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal770); if (state.failed) return retval;
+                    matchAny(input); if (state.failed) return retval;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.tokenRef((TerminalAST)((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 4 :
-                    // NFABuilder.g:178:7: ^( TOKEN_REF . )
+                    // NFABuilder.g:177:7: ^( TOKEN_REF . )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal707); if (state.failed) return ;
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal784); if (state.failed) return retval;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    matchAny(input); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return retval;
+                    matchAny(input); if (state.failed) return retval;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.tokenRef((TerminalAST)((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 5 :
-                    // NFABuilder.g:179:7: TOKEN_REF
+                    // NFABuilder.g:178:7: TOKEN_REF
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal718); if (state.failed) return ;
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal800); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.tokenRef((TerminalAST)((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 6 :
-                    // NFABuilder.g:180:7: ^( WILDCARD . )
+                    // NFABuilder.g:179:7: ^( WILDCARD . )
                     {
-                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal727); if (state.failed) return ;
+                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal815); if (state.failed) return retval;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    matchAny(input); if (state.failed) return ;
+                    match(input, Token.DOWN, null); if (state.failed) return retval;
+                    matchAny(input); if (state.failed) return retval;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.wildcard(((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 7 :
-                    // NFABuilder.g:181:7: WILDCARD
+                    // NFABuilder.g:180:7: WILDCARD
                     {
-                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal738); if (state.failed) return ;
+                    match(input,WILDCARD,FOLLOW_WILDCARD_in_terminal831); if (state.failed) return retval;
+                    if ( state.backtracking==1 ) {
+                      factory.wildcard(((GrammarAST)retval.start));
+                    }
 
                     }
                     break;
                 case 8 :
-                    // NFABuilder.g:182:7: ^( ROOT terminal )
+                    // NFABuilder.g:181:7: ^( ROOT terminal )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_terminal747); if (state.failed) return ;
+                    match(input,ROOT,FOLLOW_ROOT_in_terminal846); if (state.failed) return retval;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_terminal_in_terminal749);
+                    match(input, Token.DOWN, null); if (state.failed) return retval;
+                    pushFollow(FOLLOW_terminal_in_terminal848);
                     terminal();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return retval;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return retval;
 
                     }
                     break;
                 case 9 :
-                    // NFABuilder.g:183:7: ^( BANG terminal )
+                    // NFABuilder.g:182:7: ^( BANG terminal )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_terminal759); if (state.failed) return ;
+                    match(input,BANG,FOLLOW_BANG_in_terminal858); if (state.failed) return retval;
 
-                    match(input, Token.DOWN, null); if (state.failed) return ;
-                    pushFollow(FOLLOW_terminal_in_terminal761);
+                    match(input, Token.DOWN, null); if (state.failed) return retval;
+                    pushFollow(FOLLOW_terminal_in_terminal860);
                     terminal();
 
                     state._fsp--;
-                    if (state.failed) return ;
+                    if (state.failed) return retval;
 
-                    match(input, Token.UP, null); if (state.failed) return ;
+                    match(input, Token.UP, null); if (state.failed) return retval;
 
                     }
                     break;
@@ -1562,7 +1605,7 @@ public class NFABuilder extends TreeFilter {
         }
         finally {
         }
-        return ;
+        return retval;
     }
     // $ANTLR end "terminal"
 
@@ -1634,7 +1677,7 @@ public class NFABuilder extends TreeFilter {
             this.transition = DFA6_transition;
         }
         public String getDescription() {
-            return "99:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
+            return "102:1: element returns [NFAFactory.Handle p] : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
         }
     }
     static final String DFA7_eotS =
@@ -1695,7 +1738,7 @@ public class NFABuilder extends TreeFilter {
             this.transition = DFA7_transition;
         }
         public String getDescription() {
-            return "109:1: labeledElement : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );";
+            return "112:1: labeledElement returns [NFAFactory.Handle p] : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );";
         }
     }
     static final String DFA11_eotS =
@@ -1773,7 +1816,7 @@ public class NFABuilder extends TreeFilter {
             this.transition = DFA11_transition;
         }
         public String getDescription() {
-            return "137:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );";
+            return "141:1: atom returns [NFAFactory.Handle p] : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | terminal | ruleref );";
         }
     }
     static final String DFA17_eotS =
@@ -1845,98 +1888,97 @@ public class NFABuilder extends TreeFilter {
             this.transition = DFA17_transition;
         }
         public String getDescription() {
-            return "174:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( WILDCARD . ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );";
+            return "173:1: terminal returns [NFAFactory.Handle p] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( WILDCARD . ) | WILDCARD | ^( ROOT terminal ) | ^( BANG terminal ) );";
         }
     }
  
 
     public static final BitSet FOLLOW_rule_in_topdown79 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_block_in_bottomup90 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RULE_in_rule103 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule107 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_BLOCK_in_block128 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_set_in_block130 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_alternative_in_block134 = new BitSet(new long[]{0x0000000000000008L,0x0000002000100000L});
-    public static final BitSet FOLLOW_ALT_REWRITE_in_alternative154 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_alternative_in_alternative156 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_ALT_in_alternative168 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_EPSILON_in_alternative170 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ALT_in_alternative182 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_element_in_alternative184 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000012001D008L});
-    public static final BitSet FOLLOW_labeledElement_in_element200 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_atom_in_element205 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnf_in_element210 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_element217 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEMPRED_in_element224 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GATED_SEMPRED_in_element229 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_treeSpec_in_element234 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement247 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement249 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
-    public static final BitSet FOLLOW_atom_in_labeledElement251 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement258 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement260 = new BitSet(new long[]{0x0010840000000000L,0x000000000001D000L});
-    public static final BitSet FOLLOW_block_in_labeledElement262 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement269 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement271 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
-    public static final BitSet FOLLOW_atom_in_labeledElement273 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement280 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement282 = new BitSet(new long[]{0x0010840000000000L,0x000000000001D000L});
-    public static final BitSet FOLLOW_block_in_labeledElement284 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec300 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_element_in_treeSpec302 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000012001D008L});
-    public static final BitSet FOLLOW_blockSuffix_in_ebnf317 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf319 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_block_in_ebnf326 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ebnfSuffix_in_blockSuffix343 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_blockSuffix351 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPLIES_in_blockSuffix359 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BANG_in_blockSuffix367 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_in_rule109 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_rule113 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_BLOCK_in_block143 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_set_in_block145 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_alternative_in_block152 = new BitSet(new long[]{0x0000000000000008L,0x0000002000100000L});
+    public static final BitSet FOLLOW_ALT_REWRITE_in_alternative186 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_alternative_in_alternative188 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_ALT_in_alternative200 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_EPSILON_in_alternative202 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ALT_in_alternative214 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_element_in_alternative216 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000012001D008L});
+    public static final BitSet FOLLOW_labeledElement_in_element236 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_atom_in_element241 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnf_in_element246 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_element253 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEMPRED_in_element260 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GATED_SEMPRED_in_element265 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_treeSpec_in_element270 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement287 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement289 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
+    public static final BitSet FOLLOW_atom_in_labeledElement291 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement298 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement300 = new BitSet(new long[]{0x0010840000000000L,0x000000000001D000L});
+    public static final BitSet FOLLOW_block_in_labeledElement302 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement309 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement311 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
+    public static final BitSet FOLLOW_atom_in_labeledElement313 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement320 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement322 = new BitSet(new long[]{0x0010840000000000L,0x000000000001D000L});
+    public static final BitSet FOLLOW_block_in_labeledElement324 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec344 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_element_in_treeSpec346 = new BitSet(new long[]{0xC4D4A40000010018L,0x000000012001D008L});
+    public static final BitSet FOLLOW_blockSuffix_in_ebnf367 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf369 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_block_in_ebnf376 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ebnfSuffix_in_blockSuffix397 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_blockSuffix405 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IMPLIES_in_blockSuffix413 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BANG_in_blockSuffix421 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_ebnfSuffix0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_atom407 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom409 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom416 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom418 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_atom425 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom427 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom434 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom436 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_range_in_atom442 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_atom448 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom450 = new BitSet(new long[]{0x4010800000000000L,0x0000000100000008L});
-    public static final BitSet FOLLOW_terminal_in_atom452 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOT_in_atom459 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom461 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
-    public static final BitSet FOLLOW_ruleref_in_atom463 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_terminal_in_atom474 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_atom484 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet502 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notTerminal_in_notSet504 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOT_in_notSet514 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_notSet516 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom472 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom474 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom481 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom483 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom490 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom492 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom499 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom501 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_range_in_atom507 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_atom513 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom515 = new BitSet(new long[]{0x4010800000000000L,0x0000000100000008L});
+    public static final BitSet FOLLOW_terminal_in_atom517 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOT_in_atom524 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom526 = new BitSet(new long[]{0xC0D0800000000000L,0x0000000100000008L});
+    public static final BitSet FOLLOW_ruleref_in_atom528 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_terminal_in_atom539 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_atom549 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet571 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notTerminal_in_notSet573 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOT_in_notSet583 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_notSet585 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_notTerminal0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_ruleref560 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref563 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref565 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_ruleref577 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref580 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref582 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref594 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref596 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RANGE_in_range616 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_rangeElement_in_range618 = new BitSet(new long[]{0xC000000000000000L,0x0000000000000008L});
-    public static final BitSet FOLLOW_rangeElement_in_range620 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_set_in_rangeElement0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal673 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal684 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal693 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal695 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal707 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal718 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_WILDCARD_in_terminal727 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_WILDCARD_in_terminal738 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal747 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal749 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_terminal759 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal761 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_ruleref637 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref640 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref642 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_ruleref656 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref659 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref661 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref675 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref677 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RANGE_in_range705 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range709 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range713 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal739 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal754 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal768 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal770 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal784 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal800 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WILDCARD_in_terminal815 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_WILDCARD_in_terminal831 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_terminal846 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal848 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_terminal858 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal860 = new BitSet(new long[]{0x0000000000000008L});
 
 }

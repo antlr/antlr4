@@ -15,5 +15,6 @@ public class BlockStartState extends NFAState {
 	/** Track the transitions emanating from this NFA state. */
 	protected List<Transition> transitions =
 		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
-		
+
+	public BlockStartState(NFA nfa) { super(nfa); }
 }

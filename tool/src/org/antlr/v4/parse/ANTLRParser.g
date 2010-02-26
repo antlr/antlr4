@@ -831,23 +831,9 @@ ruleref
 // error about any abuse of the .. operator.
 //
 range
-    : rangeElement RANGE^ rangeElement
+    : STRING_LITERAL<TerminalAST> RANGE^ STRING_LITERAL<TerminalAST>
     ;
 
-// -----------------
-// Atoms for a range
-//  
-// All the things that we are going to allow syntactically as the subject of a range
-// operator. We do not want to restrict this just to STRING_LITERAL as then
-// we will issue a syntax error that is perhaps none too obvious, even though we
-// say 'expecting STRING_LITERAL'. Instead we will check these semantically
-//
-rangeElement
-    : STRING_LITERAL<TerminalAST>
-    | RULE_REF        // Invalid
-    | TOKEN_REF<TerminalAST>       // Invalid
-    ;
-    
 terminal
     :   (	// Args are only valid for lexer rules
 		    TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION? elementOptions?)
