@@ -6,7 +6,8 @@ import org.antlr.v4.tool.GrammarAST;
 public class ActionTransition extends Transition {
 	public GrammarAST actionAST;
 
-	public ActionTransition(GrammarAST actionAST) {
+	public ActionTransition(GrammarAST actionAST, NFAState target) {
+		super(target);
 		this.actionAST = actionAST;
 	}
 

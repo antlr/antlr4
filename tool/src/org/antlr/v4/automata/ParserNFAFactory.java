@@ -10,6 +10,8 @@ import org.antlr.v4.tool.TerminalAST;
 import java.util.Collection;
 import java.util.List;
 
+// TODO: investigate o-X->o for basic states with typename for transition
+
 /** Superclass of NFABuilder.g that provides actual NFA construction routines. */
 public class ParserNFAFactory implements NFAFactory {
 	public Grammar g;
@@ -41,22 +43,22 @@ public class ParserNFAFactory implements NFAFactory {
 		this.currentRule = g.getRule(name);
 	}
 
-	public NFAState newState() {
-		NFAState n = new BasicState(nfa);
+	public BasicState newState(GrammarAST node) {
+		BasicState n = new BasicState(nfa);
+		n.ast = node;
 		nfa.addState(n);
 		return n;
 	}
 
+	public BasicState newState() { return newState(null); }
+
 	/** From label A build Graph o-A->o */
 	public Handle tokenRef(TerminalAST node) {
 		System.out.println("tokenRef: "+node);
-		NFAState left = newState();
-		NFAState right = newState();
-		left.ast = node;
-		right.ast = node;
+		BasicState left = newState(node);
+		BasicState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
-		Transition e = new AtomTransition(ttype, right);
-		left.addTransition(e);
+		left.transition = new AtomTransition(ttype, right);
 		return new Handle(left, right);
 	}
 
@@ -65,18 +67,19 @@ public class ParserNFAFactory implements NFAFactory {
      */
 	public Handle set(IntSet set, GrammarAST associatedAST) { return null; }
 
+	public Handle tree(List<Handle> els) {
+		return null;
+	}
+
 	public Handle range(GrammarAST a, GrammarAST b) { return null; }
 
-	/** From char 'c' build Grip o-intValue(c)->o
+	public Handle not(Handle A) {
+		return null;
+	}
+
+	/** From char 'c' build o-intValue(c)->o
 	 */
 	public Handle charLiteral(GrammarAST charLiteralAST) { return null; }
-
-	/** From char 'c' build Grip o-intValue(c)->o
-	 *  can include unicode spec likes '\u0024' later.  Accepts
-	 *  actual unicode 16-bit now, of course, by default.
-     *  TODO not supplemental char clean!
-	 */
-	public Handle charRange(String a, String b) { return null; }
 
 	/** For a non-lexer, just build a simple token reference atom.
 	 *  For a lexer, a string is a sequence of char to match.  That is,
@@ -107,21 +110,37 @@ public class ParserNFAFactory implements NFAFactory {
 	 */
 	public Handle ruleRef(GrammarAST node) { return null; }
 
-	/** From an empty alternative build Grip o-e->o */
+	/** From an empty alternative build  o-e->o */
 	public Handle epsilon() { return null; }
 
 	/** Build what amounts to an epsilon transition with a semantic
 	 *  predicate action.  The pred is a pointer into the AST of
 	 *  the SEMPRED token.
 	 */
-	public Handle sempred(GrammarAST pred) { return null; }
+	public Handle sempred(GrammarAST pred) {
+		System.out.println("sempred: "+ pred);
+		BasicState left = newState(pred);
+		NFAState right = newState(pred);
+		left.transition = new PredicateTransition(pred, right);
+		return new Handle(left, right);
+	}
+
+	public Handle gated_sempred(GrammarAST pred) {
+		return null;
+	}
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into NFA though it is ignored during analysis.
 	 *  It slows things down a bit, but I must ignore predicates after
 	 *  having seen an action (5-5-2008).
 	 */
-	public Handle action(GrammarAST action) { return null; }
+	public Handle action(GrammarAST action) {
+		System.out.println("action: "+action);
+		BasicState left = newState(action);
+		NFAState right = newState(action);
+		left.transition = new ActionTransition(action, right);  
+		return new Handle(left, right);
+	}
 
 	/** From A B build A-e->B (that is, build an epsilon arc from right
 	 *  of A to left of B).
@@ -148,7 +167,7 @@ public class ParserNFAFactory implements NFAFactory {
      *
      *  So every alternative gets begin NFAState connected by epsilon
      *  and every alt right side points at a block end NFAState.  There is a
-     *  new NFAState in the NFAState in the Grip for each alt plus one for the
+     *  new NFAState in the NFAState in the handle for each alt plus one for the
      *  end NFAState.
      *
      *  Special case: only one alternative: don't make a block with alt
@@ -164,6 +183,12 @@ public class ParserNFAFactory implements NFAFactory {
 		return null;
 	}
 
+	public Handle alt(List<Handle> els) {
+		Handle first = els.get(0);
+		Handle last = els.get(els.size()-1);
+		return new Handle(first.left, last.right);
+	}
+
 	/** From (A)? build either:
 	 *
 	 *  o--A->o
@@ -172,7 +197,14 @@ public class ParserNFAFactory implements NFAFactory {
 	 *
 	 *  or, if A is a block, just add an empty alt to the end of the block
 	 */
-	public Handle optional(Handle A) { return null; }
+	public Handle optional(Handle A) {
+		OptionalBlockStartState left = new OptionalBlockStartState(nfa);
+		BlockEndState right = new BlockEndState(nfa);
+		epsilon(left, A.left);
+		epsilon(A.right, right);
+		epsilon(left, right);
+		return new Handle(left, right);
+	}
 
 	/** From (A)+ build
 	 *

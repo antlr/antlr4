@@ -94,90 +94,89 @@ block returns [NFAFactory.Handle p]
     ;
 
 alternative returns [NFAFactory.Handle p]
-    :	^(ALT_REWRITE alternative .)
-    |	^(ALT EPSILON)
-    |   ^(ALT element+)
+@init {List<NFAFactory.Handle> els = new ArrayList<NFAFactory.Handle>();}
+    :	^(ALT_REWRITE a=alternative .)	{$p = $a.p;}
+    |	^(ALT EPSILON)					{$p = factory.epsilon();}
+    |   ^(ALT (e=element {els.add($e.p);})+)
+    									{$p = factory.alt(els);}
     ;
 
 element returns [NFAFactory.Handle p]
-	:	labeledElement
-	|	atom
-	|	ebnf
-	|   ACTION
-	|   SEMPRED
-	|	GATED_SEMPRED
-	|	treeSpec
+	:	labeledElement				{$p = $labeledElement.p;}
+	|	atom						{$p = $atom.p;}
+	|	ebnf						{$p = $ebnf.p;}
+	|   ACTION						{$p = factory.action($ACTION);}
+	|   SEMPRED						{$p = factory.sempred($SEMPRED);}
+	|	GATED_SEMPRED				{$p = factory.gated_sempred($GATED_SEMPRED);}
+	|	treeSpec					{$p = $treeSpec.p;}
 	;
 	
 labeledElement returns [NFAFactory.Handle p]
-	:	^(ASSIGN ID atom)
-	|	^(ASSIGN ID block)
-	|	^(PLUS_ASSIGN ID atom)
-	|	^(PLUS_ASSIGN ID block)
+	:	^(ASSIGN ID atom)			{$p = $atom.p;}
+	|	^(ASSIGN ID block)			{$p = $block.p;}
+	|	^(PLUS_ASSIGN ID atom)		{$p = $atom.p;}
+	|	^(PLUS_ASSIGN ID block)		{$p = $block.p;}
 	;
 
 treeSpec returns [NFAFactory.Handle p]
-    : ^(TREE_BEGIN element+)
+@init {List<NFAFactory.Handle> els = new ArrayList<NFAFactory.Handle>();}
+    : ^(TREE_BEGIN  (e=element {els.add($e.p);})+)	{$p = factory.tree(els);}
     ;
 
 ebnf returns [NFAFactory.Handle p]
-	:	^(blockSuffix block)
-	| 	block
+	:	^(astBlockSuffix block)		{$p = $block.p;}
+	|	^(OPTIONAL block)			{$p = factory.optional($block.p);}
+	|	^(CLOSURE block)			{$p = factory.star($block.p);}
+	|	^(POSITIVE_CLOSURE block)	{$p = factory.plus($block.p);}
+	| 	block						{$p = $block.p;}
     ;
 
-blockSuffix returns [NFAFactory.Handle p]
-    : ebnfSuffix
-    | ROOT
+astBlockSuffix
+    : ROOT
     | IMPLIES
     | BANG
     ;
 
-ebnfSuffix returns [NFAFactory.Handle p]
-	:	OPTIONAL
-  	|	CLOSURE
-   	|	POSITIVE_CLOSURE
-	;
-	
 atom returns [NFAFactory.Handle p]	
-	:	^(ROOT range)
-	|	^(BANG range)
-	|	^(ROOT notSet)
-	|	^(BANG notSet)
-	|	range
-	|	^(DOT ID terminal)
-	|	^(DOT ID ruleref)
-    |   terminal
-    |   ruleref
+	:	^(ROOT range)			{$p = $range.p;}
+	|	^(BANG range)			{$p = $range.p;}
+	|	^(ROOT notSet)			{$p = $notSet.p;}
+	|	^(BANG notSet)			{$p = $notSet.p;}
+	|	range					{$p = $range.p;}
+	|	^(DOT ID terminal)		{$p = $terminal.p;}
+	|	^(DOT ID ruleref)		{$p = $ruleref.p;}
+    |   terminal				{$p = $terminal.p;}
+    |   ruleref					{$p = $ruleref.p;}
     ;
 
 notSet returns [NFAFactory.Handle p]
-    : ^(NOT notTerminal)
-    | ^(NOT block)
+    : ^(NOT notTerminal)	{$p = factory.not($notTerminal.p);}
+    | ^(NOT block)			{$p = factory.not($block.p);}
     ;
 
 notTerminal returns [NFAFactory.Handle p]
-    : TOKEN_REF
-    | STRING_LITERAL
+    : TOKEN_REF				{$p = factory.tokenRef((TerminalAST)$TOKEN_REF);}
+    | STRING_LITERAL		{$p = factory.stringLiteral($start);}
     ;
 
 ruleref returns [NFAFactory.Handle p]
-    :	^(ROOT ^(RULE_REF ARG_ACTION?))	{factory.ruleRef($RULE_REF);}
-    |	^(BANG ^(RULE_REF ARG_ACTION?))	{factory.ruleRef($RULE_REF);}
-    |	^(RULE_REF ARG_ACTION?)			{factory.ruleRef($RULE_REF);}
+    :	^(ROOT ^(RULE_REF ARG_ACTION?))	{$p = factory.ruleRef($RULE_REF);}
+    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$p = factory.ruleRef($RULE_REF);}
+    |	^(RULE_REF ARG_ACTION?)			{$p = factory.ruleRef($RULE_REF);}
     ;
 
 range returns [NFAFactory.Handle p]
-    : ^(RANGE a=STRING_LITERAL b=STRING_LITERAL) {factory.range($a,$b);}
+    : ^(RANGE a=STRING_LITERAL b=STRING_LITERAL) {$p = factory.range($a,$b);}
     ;
 
 terminal returns [NFAFactory.Handle p]
-    :  ^(STRING_LITERAL .)			{factory.stringLiteral($start);}
-    |	STRING_LITERAL				{factory.stringLiteral($start);}
-    |	^(TOKEN_REF ARG_ACTION .)	{factory.tokenRef((TerminalAST)$start);}
-    |	^(TOKEN_REF .)				{factory.tokenRef((TerminalAST)$start);}
-    |	TOKEN_REF					{factory.tokenRef((TerminalAST)$start);}
-    |	^(WILDCARD .)				{factory.wildcard($start);}
-    |	WILDCARD					{factory.wildcard($start);}
-    |	^(ROOT terminal)
-    |	^(BANG terminal)
+    :  ^(STRING_LITERAL .)			{$p = factory.stringLiteral($start);}
+    |	STRING_LITERAL				{$p = factory.stringLiteral($start);}
+    |	^(TOKEN_REF ARG_ACTION .)	{$p = factory.tokenRef((TerminalAST)$start);}
+    |	^(TOKEN_REF .)				{$p = factory.tokenRef((TerminalAST)$start);}
+    |	TOKEN_REF					{$p = factory.tokenRef((TerminalAST)$start);}
+    |	^(WILDCARD .)				{$p = factory.wildcard($start);}
+    |	WILDCARD					{$p = factory.wildcard($start);}
+    |	^(ROOT t=terminal)			{$p = $t.p;}
+    |	^(BANG t=terminal)			{$p = $t.p;}
     ;

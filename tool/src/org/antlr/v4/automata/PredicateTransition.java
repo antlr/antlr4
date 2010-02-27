@@ -9,15 +9,16 @@ import org.antlr.v4.tool.GrammarAST;
  *  may have to combine a bunch of them as it collects predicates from
  *  multiple NFA configurations into a single DFA state.
  */
-public class PredicateTransition extends Label {
+public class PredicateTransition extends Transition {
 	protected SemanticContext semanticContext;
 
-	public PredicateTransition(GrammarAST predicateASTNode) {
+	public PredicateTransition(GrammarAST predicateASTNode, NFAState target) {
+		super(target);
 		this.semanticContext = new SemanticContext.Predicate(predicateASTNode);
 	}
 
-	public PredicateTransition(SemanticContext semCtx) {
-		this.semanticContext = semCtx;
+	public int compareTo(Object o) {
+		return 0;
 	}
 
 	public int hashCode() {
