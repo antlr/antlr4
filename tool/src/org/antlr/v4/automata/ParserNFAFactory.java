@@ -2,11 +2,9 @@ package org.antlr.v4.automata;
 
 
 import org.antlr.v4.misc.IntSet;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.TerminalAST;
+import org.antlr.v4.tool.*;
 
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,6 +39,20 @@ public class ParserNFAFactory implements NFAFactory {
 
 	public void setCurrentRuleName(String name) {
 		this.currentRule = g.getRule(name);
+	}
+
+	public NFAState newState(Class nodeType, GrammarAST node) {
+		try {
+			Constructor ctor = nodeType.getConstructor(NFA.class);
+			NFAState s = (NFAState)ctor.newInstance(nfa);
+			s.ast = node;
+			nfa.addState(s);
+			return s;
+		}
+		catch (Exception e) {
+			ErrorManager.internalError("can't create NFA node: "+nodeType.getName(), e);
+		}
+		return null;
 	}
 
 	public BasicState newState(GrammarAST node) {
@@ -157,18 +169,16 @@ public class ParserNFAFactory implements NFAFactory {
 
 	/** From A|B|..|Z alternative block build
      *
-     *  o->o-A->o->o (last NFAState is blockEndNFAState pointed to by all alts)
+     *  o->o-A->o->o (last NFAState is BlockEndState pointed to by all alts)
      *  |          ^
-     *  o->o-B->o--|
+     *  |->o-B->o--|
      *  |          |
      *  ...        |
      *  |          |
-     *  o->o-Z->o--|
+     *  |->o-Z->o--|
      *
-     *  So every alternative gets begin NFAState connected by epsilon
-     *  and every alt right side points at a block end NFAState.  There is a
-     *  new NFAState in the NFAState in the handle for each alt plus one for the
-     *  end NFAState.
+     *  So start node points at every alternative with epsilon transition
+     *  and every alt right side points at a block end NFAState.
      *
      *  Special case: only one alternative: don't make a block with alt
      *  begin/end.
@@ -176,11 +186,23 @@ public class ParserNFAFactory implements NFAFactory {
      *  Special case: if just a list of tokens/chars/sets, then collapse
      *  to a single edge'd o-set->o graph.
      *
-     *  Set alt number (1..n) in the left-Transition NFAState.
+     *  TODO: Set alt number (1..n) in the states?
      */
-	public Handle block(List<Handle> alts) {
+	public Handle block(GrammarAST blkAST, List<Handle> alts) {
 		System.out.println("block: "+alts);
-		return null;
+		if ( alts.size()==1 ) return alts.get(0);
+				
+		BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
+		BlockEndState end = (BlockEndState)newState(BlockEndState.class, blkAST);
+		for (Handle alt : alts) {
+			epsilon(start, alt.left);
+			epsilon(alt.right, end);
+		}
+		Handle h = new Handle(start, end);
+		FASerializer ser = new FASerializer(g, h.left);
+		nfa.defineDecisionState(start);
+		System.out.println(blkAST.toStringTree()+":\n"+ser);
+		return h;
 	}
 
 	public Handle alt(List<Handle> els) {
@@ -197,13 +219,27 @@ public class ParserNFAFactory implements NFAFactory {
 	 *
 	 *  or, if A is a block, just add an empty alt to the end of the block
 	 */
-	public Handle optional(Handle A) {
-		OptionalBlockStartState left = new OptionalBlockStartState(nfa);
-		BlockEndState right = new BlockEndState(nfa);
-		epsilon(left, A.left);
-		epsilon(A.right, right);
-		epsilon(left, right);
-		return new Handle(left, right);
+	public Handle optional(GrammarAST optAST, Handle blk) {
+		if ( blk.left instanceof BlockStartState ) {
+			epsilon(blk.left, blk.right);
+			FASerializer ser = new FASerializer(g, blk.left);
+			System.out.println(optAST.toStringTree()+":\n"+ser);
+			return blk;
+		}
+
+		// construct block
+		BlockStartState start = (BlockStartState)newState(BlockStartState.class, optAST);
+		BlockEndState end = (BlockEndState)newState(BlockEndState.class, optAST);
+		epsilon(start, blk.left);
+		epsilon(blk.right, end);
+		epsilon(start, end);
+
+		nfa.defineDecisionState(start);
+
+		Handle h = new Handle(start, end);
+		FASerializer ser = new FASerializer(g, h.left);
+		System.out.println(optAST.toStringTree()+":\n"+ser);
+		return h;
 	}
 
 	/** From (A)+ build
@@ -219,7 +255,7 @@ public class ParserNFAFactory implements NFAFactory {
 	 *  During analysis we'll call the follow link (transition 1) alt n+1 for
 	 *  an n-alt A block.
 	 */
-	public Handle plus(Handle A) { return null; }
+	public Handle plus(GrammarAST plusAST, Handle blk) { return null; }
 
 	/** From (A)* build
 	 *
@@ -251,7 +287,7 @@ public class ParserNFAFactory implements NFAFactory {
 	 *  is sufficient to let me make an appropriate enter, exit, loop
 	 *  determination.  See codegen.g
 	 */
-	public Handle star(Handle A) { return null; }
+	public Handle star(GrammarAST starAST, Handle blk) { return null; }
 
 	/** Build an atom with all possible values in its label */
 	public Handle wildcard(GrammarAST associatedAST) { return null; }

@@ -28,4 +28,9 @@ public abstract class State {
 		if ( o instanceof State ) return this == (State)o;
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(stateNumber);
+	}
 }

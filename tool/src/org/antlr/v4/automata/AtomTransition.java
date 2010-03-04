@@ -1,6 +1,7 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.IntervalSet;
+import org.antlr.v4.tool.Grammar;
 
 /** */
 public class AtomTransition extends Transition {
@@ -32,5 +33,9 @@ public class AtomTransition extends Transition {
 
 	public int compareTo(Object o) {
 		return this.label-((AtomTransition)o).label;
+	}
+
+	public String toString(Grammar g) {
+		return g.getTokenDisplayName(label);
 	}
 }

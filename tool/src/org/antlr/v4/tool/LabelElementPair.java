@@ -1,15 +1,14 @@
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.BitSet;
 import org.antlr.v4.parse.ANTLRParser;
-
-import java.util.BitSet;
 
 public class LabelElementPair {
     public static final BitSet tokenTypeForTokens = new BitSet();
     static {
-        tokenTypeForTokens.set(ANTLRParser.TOKEN_REF);
-        tokenTypeForTokens.set(ANTLRParser.STRING_LITERAL);
-        tokenTypeForTokens.set(ANTLRParser.WILDCARD);
+        tokenTypeForTokens.add(ANTLRParser.TOKEN_REF);
+        tokenTypeForTokens.add(ANTLRParser.STRING_LITERAL);
+        tokenTypeForTokens.add(ANTLRParser.WILDCARD);
     }
 
     public GrammarAST label;

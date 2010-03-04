@@ -29,7 +29,7 @@ options {
 	language     = Java;
 	tokenVocab   = ANTLRParser;
 	ASTLabelType = GrammarAST;
-	filter 	     = true;
+//	filter 	     = true;
 }
 
 // Include the copyright in this source and also the generated source
@@ -84,13 +84,13 @@ bottomup
 	;
 
 rule returns [NFAFactory.Handle p]
-	:   ^(RULE name=ID .+) {factory.setCurrentRuleName($name.text);}
+	:   ^(RULE name=ID ~BLOCK* block) {factory.setCurrentRuleName($name.text);}
 	;
 
 block returns [NFAFactory.Handle p]
 @init {List<NFAFactory.Handle> alts = new ArrayList<NFAFactory.Handle>();}
     :	^(BLOCK ~ALT* (a=alternative {alts.add($a.p);})+)
-    	{factory.block(alts);}
+    	{$p = factory.block($BLOCK, alts);}
     ;
 
 alternative returns [NFAFactory.Handle p]
@@ -125,9 +125,9 @@ treeSpec returns [NFAFactory.Handle p]
 
 ebnf returns [NFAFactory.Handle p]
 	:	^(astBlockSuffix block)		{$p = $block.p;}
-	|	^(OPTIONAL block)			{$p = factory.optional($block.p);}
-	|	^(CLOSURE block)			{$p = factory.star($block.p);}
-	|	^(POSITIVE_CLOSURE block)	{$p = factory.plus($block.p);}
+	|	^(OPTIONAL block)			{$p = factory.optional($start, $block.p);}
+	|	^(CLOSURE block)			{$p = factory.star($start, $block.p);}
+	|	^(POSITIVE_CLOSURE block)	{$p = factory.plus($start, $block.p);}
 	| 	block						{$p = $block.p;}
     ;
 

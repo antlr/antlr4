@@ -4,6 +4,7 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.Label;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -65,6 +66,8 @@ public class Grammar implements AttributeResolver {
 	 *  field will have entries both mapped to 35.
 	 */
 	public Map<String, Integer> stringLiteralToTypeMap = new LinkedHashMap<String, Integer>();
+	/** Reverse index for stringLiteralToTypeMap */
+	public Vector<String> typeToStringLiteralList = new Vector<String>();	
 
 	/** Map a token type to its token name.
 	 *  Must subtract MIN_TOKEN_TYPE from index.
@@ -82,6 +85,8 @@ public class Grammar implements AttributeResolver {
     public Map<String, String> options;
 
     public Map<String, AttributeDict> scopes = new LinkedHashMap<String, AttributeDict>();
+	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
+	
 
 	public Grammar(Tool tool, GrammarRootAST ast) {
         if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
@@ -284,7 +289,7 @@ public class Grammar implements AttributeResolver {
 
 	public String getStringLiteralLexerRuleName(String lit) {
 		int ttype = getTokenType(lit);
-		return "T__"+ttype;
+		return AUTO_GENERATED_TOKEN_NAME_PREFIX +ttype;
 	}
 
     /** Return grammar directly imported by this grammar */
@@ -307,6 +312,44 @@ public class Grammar implements AttributeResolver {
 		//System.out.println("grammar type "+type+" "+tokenName+"->"+i);
 		return i;
 	}
+
+	/** Given a token type, get a meaningful name for it such as the ID
+	 *  or string literal.  If this is a lexer and the ttype is in the
+	 *  char vocabulary, compute an ANTLR-valid (possibly escaped) char literal.
+	 */
+	public String getTokenDisplayName(int ttype) {
+		String tokenName = null;
+		int index=0;
+		// inside any target's char range and is lexer grammar?
+		if ( getType()==ANTLRParser.LEXER &&
+			 ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE )
+		{
+			return Target.getANTLRCharLiteralForChar(ttype);
+		}
+		// faux label?
+		else if ( ttype<0 ) {
+			tokenName = typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
+		}
+		else {
+			// compute index in typeToTokenList for ttype
+			index = ttype-1; // normalize to 0..n-1
+			index += Label.NUM_FAUX_LABELS;     // jump over faux tokens
+
+			if ( index<typeToTokenList.size() ) {
+				tokenName = typeToTokenList.get(index);
+				if ( tokenName!=null &&
+					 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) )
+				{
+					tokenName = typeToStringLiteralList.get(ttype);
+				}
+			}
+			else {
+				tokenName = String.valueOf(ttype);
+			}
+		}
+		//System.out.println("getTokenDisplayName ttype="+ttype+", index="+index+", name="+tokenName);
+		return tokenName;
+	}	
 
 	/** Return a new unique integer in the token type space */
 	public int getNewTokenType() {
@@ -333,6 +376,12 @@ public class Grammar implements AttributeResolver {
 		if ( !stringLiteralToTypeMap.containsKey(lit) ) {
 			int ttype = getNewTokenType();
 			stringLiteralToTypeMap.put(lit, ttype);
+			// track in reverse index too
+			if ( ttype>=typeToStringLiteralList.size() ) {
+				typeToStringLiteralList.setSize(ttype+1);
+			}
+			typeToStringLiteralList.set(ttype, text);
+
 			setTokenForType(ttype, lit);
 			return ttype;
 		}

@@ -57,8 +57,8 @@ public abstract class Label implements /*Comparable, */ Cloneable {
      */
     public static final int MIN_ATOM_VALUE = EOT;
 
-//    public static final int MIN_CHAR_VALUE = '\u0000';
-//    public static final int MAX_CHAR_VALUE = '\uFFFE';
+    public static final int MIN_CHAR_VALUE = '\u0000';
+    public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	/** End of rule token type; imaginary token type used only for
 	 *  local, partial FOLLOW sets to indicate that the local FOLLOW

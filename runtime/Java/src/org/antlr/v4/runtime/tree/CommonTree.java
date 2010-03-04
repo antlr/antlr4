@@ -27,12 +27,11 @@
  */
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.runtime.BitSet;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BaseTree;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.gui.ASTViewer;
-
-import java.util.BitSet;
 
 /** A tree node that is wrapper for a Token object.  After 3.0 release
  *  while building tree rewrite stuff, it became clear that computing
@@ -183,7 +182,7 @@ public class CommonTree extends BaseTree {
 
     // TODO: move to basetree when i settle on how runtime works
     // TODO: don't include this node!!
-    /** include this node */
+	// TODO: reuse other method
     public CommonTree getFirstDescendantWithType(int type) {
         if ( getType()==type ) return this;
         if ( children==null ) return null;
@@ -196,17 +195,18 @@ public class CommonTree extends BaseTree {
         return null;
     }
 
-    public CommonTree getFirstDescendantWithType(BitSet types) {
-        if ( types.get(getType()) ) return this;
-        if ( children==null ) return null;
-        for (Object c : children) {
-            CommonTree t = (CommonTree)c;
-            if ( types.get(t.getType()) ) return t;
-            CommonTree d = t.getFirstDescendantWithType(types);
-            if ( d!=null ) return d;
-        }
-        return null;
-    }
+	// TODO: don't include this node!!
+	public CommonTree getFirstDescendantWithType(BitSet types) {
+		if ( types.member(getType()) ) return this;
+		if ( children==null ) return null;
+		for (Object c : children) {
+			CommonTree t = (CommonTree)c;
+			if ( types.member(t.getType()) ) return t;
+			CommonTree d = t.getFirstDescendantWithType(types);
+			if ( d!=null ) return d;
+		}
+		return null;
+	}
 
     public String toString() {
         if ( isNil() ) {

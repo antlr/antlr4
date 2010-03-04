@@ -369,13 +369,23 @@ public class Tool {
 		}
 
 		// BUILD NFA FROM AST
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		BufferedTreeNodeStream nodes =
-			new BufferedTreeNodeStream(adaptor,g.ast);
-		NFAFactory fac = new ParserNFAFactory(g);
-		if ( g.getType()==ANTLRParser.LEXER ) fac = new LexerNFAFactory(g);
-		NFABuilder nfaBuilder = new NFABuilder(nodes,fac);
-		nfaBuilder.downup(g.ast);
+		NFAFactory factory = new ParserNFAFactory(g);
+		if ( g.getType()==ANTLRParser.LEXER ) factory = new LexerNFAFactory(g);
+		GrammarAST rules = (GrammarAST)g.ast.getFirstChildWithType(ANTLRParser.RULES);
+		List<GrammarAST> kids = rules.getChildren();
+		for (GrammarAST n : kids) {
+			if ( n.getType()!=ANTLRParser.RULE ) continue;
+			GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+			BufferedTreeNodeStream nodes =
+				new BufferedTreeNodeStream(adaptor,n);
+			NFABuilder b = new NFABuilder(nodes,factory);
+			try {
+				b.rule();
+			}
+			catch (RecognitionException re) {
+				
+			}
+		}
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
 
