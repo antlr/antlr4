@@ -31,12 +31,14 @@ public class FASerializer {
 		State s = null;
 		while ( work.size()>0 ) {
 			s = work.remove(0);
+			if ( marked.contains(s) ) continue; 
 			int n = s.getNumberOfTransitions();
 			//System.out.println("visit "+getStateString(s)+"; edges="+n);
 			marked.add(s);
 			for (int i=0; i<n; i++) {
 				Transition t = s.transition(i);
-				work.add( t.target );
+				if ( t instanceof RuleTransition ) work.add(((RuleTransition)t).followState);
+				else work.add( t.target );
 				buf.append(getStateString(s));
 				if ( t instanceof EpsilonTransition ) {
 					buf.append("->"+getStateString(t.target)+'\n');
@@ -61,13 +63,13 @@ public class FASerializer {
 //		}
 //		else
 		if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
-		if ( s instanceof PlusBlockStartState ) stateStr = "PlusBlockStart_"+n;
-		if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
-		if ( s instanceof BlockStartState ) stateStr = "BlockStart_"+n;
-		if ( s instanceof BlockEndState ) stateStr = "BlockEnd_"+n;
-		if ( s instanceof RuleStartState ) stateStr = "RuleStart_"+n;
-		if ( s instanceof RuleStopState ) stateStr = "RuleStop"+n;
-		if ( s instanceof LoopbackState ) stateStr = "LoopBack_"+n;
+		else if ( s instanceof PlusBlockStartState ) stateStr = "PlusBlockStart_"+n;
+		else if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
+		else if ( s instanceof BlockStartState ) stateStr = "BlockStart_"+n;
+		else if ( s instanceof BlockEndState ) stateStr = "BlockEnd_"+n;
+		else if ( s instanceof RuleStartState ) stateStr = "RuleStart_"+((RuleStartState)s).rule.name+"_"+n;
+		else if ( s instanceof RuleStopState ) stateStr = "RuleStop_"+((RuleStopState)s).rule.name+"_"+n;
+		else if ( s instanceof LoopbackState ) stateStr = "LoopBack_"+n;
 		return stateStr;
 	}
 }

@@ -1,15 +1,14 @@
 package org.antlr.v4;
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.automata.LexerNFAFactory;
+import org.antlr.v4.automata.NFA;
 import org.antlr.v4.automata.NFAFactory;
 import org.antlr.v4.automata.ParserNFAFactory;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.NFABuilder;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
@@ -371,22 +370,8 @@ public class Tool {
 		// BUILD NFA FROM AST
 		NFAFactory factory = new ParserNFAFactory(g);
 		if ( g.getType()==ANTLRParser.LEXER ) factory = new LexerNFAFactory(g);
-		GrammarAST rules = (GrammarAST)g.ast.getFirstChildWithType(ANTLRParser.RULES);
-		List<GrammarAST> kids = rules.getChildren();
-		for (GrammarAST n : kids) {
-			if ( n.getType()!=ANTLRParser.RULE ) continue;
-			GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-			BufferedTreeNodeStream nodes =
-				new BufferedTreeNodeStream(adaptor,n);
-			NFABuilder b = new NFABuilder(nodes,factory);
-			try {
-				b.rule();
-			}
-			catch (RecognitionException re) {
-				
-			}
-		}
-
+		NFA nfa = factory.createNFA();
+		
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
 
 		// GENERATE CODE

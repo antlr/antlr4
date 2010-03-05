@@ -1,16 +1,20 @@
 package org.antlr.v4.automata;
 
 
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.NFABuilder;
 import org.antlr.v4.tool.*;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
 import java.util.List;
 
-// TODO: investigate o-X->o for basic states with typename for transition
-
-/** Superclass of NFABuilder.g that provides actual NFA construction routines. */
+/** NFA construction routines triggered by NFABuilder.g.
+ *
+ *  No side-effects. It builds an NFA object and returns it.
+ */
 public class ParserNFAFactory implements NFAFactory {
 	public Grammar g;
 	public Rule currentRule;
@@ -18,27 +22,38 @@ public class ParserNFAFactory implements NFAFactory {
 
 	public ParserNFAFactory(Grammar g) { this.g = g; nfa = new NFA(g); }
 
-	public NFA getNFA() {
-		addEOFStates(g.rules.values());
-		return null;
+	public NFA createNFA() {
+		createRuleStartAndStopNFAStates();
+
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+		for (Rule r : g.rules.values()) {
+			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,r.ast);
+			NFABuilder b = new NFABuilder(nodes,this);
+			try { b.rule();	}
+			catch (RecognitionException re) {
+				ErrorManager.fatalInternalError("bad grammar AST structure", re);
+			}
+		}
+
+		addEOFTransitionToStartRules();
+		return nfa;
 	}
-
-	/** add an EOF transition to any rule end NFAState that points to nothing
-     *  (i.e., for all those rules not invoked by another rule).  These
-     *  are start symbols then.
-	 *
-	 *  Return the number of grammar entry points; i.e., how many rules are
-	 *  not invoked by another rule (they can only be invoked from outside).
-	 *  These are the start rules.
-     */
-	public int addEOFStates(Collection<Rule> rules) { return 0; }
-
-
-	
-	public Rule getCurrentRule() { return currentRule; }
 
 	public void setCurrentRuleName(String name) {
 		this.currentRule = g.getRule(name);
+	}
+
+	/* start->ruleblock->end */
+	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {
+		Rule r = g.getRule(name);
+		RuleStartState start = nfa.ruleToStartState.get(r);
+		epsilon(start, blk.left);
+		RuleStopState stop = nfa.ruleToStopState.get(r);
+		epsilon(blk.right, stop);
+		Handle h = new Handle(start, stop);
+		FASerializer ser = new FASerializer(g, h.left);
+		System.out.println(ruleAST.toStringTree()+":\n"+ser);
+		return h;
 	}
 
 	public NFAState newState(Class nodeType, GrammarAST node) {
@@ -66,7 +81,6 @@ public class ParserNFAFactory implements NFAFactory {
 
 	/** From label A build Graph o-A->o */
 	public Handle tokenRef(TerminalAST node) {
-		System.out.println("tokenRef: "+node);
 		BasicState left = newState(node);
 		BasicState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
@@ -99,31 +113,36 @@ public class ParserNFAFactory implements NFAFactory {
 	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
 	 *  for n characters.
 	 */
-	public Handle stringLiteral(GrammarAST stringLiteralAST) {
-		System.out.println("stringLiteral: "+stringLiteralAST);
-		return null;
+	public Handle stringLiteral(TerminalAST stringLiteralAST) {
+		return tokenRef(stringLiteralAST);
 	}
 
 	/** For reference to rule r, build
 	 *
-	 *  o-e->(r)  o
+	 *  o->(r)  o
 	 *
 	 *  where (r) is the start of rule r and the trailing o is not linked
-	 *  to from rule ref state directly (it's done thru the transition(0)
-	 *  RuleClosureTransition.
-	 *
-	 *  If the rule r is just a list of tokens, it's block will be just
-	 *  a set on an edge o->o->o-set->o->o->o, could inline it rather than doing
-	 *  the rule reference, but i'm not doing this yet as I'm not sure
-	 *  it would help much in the NFA->DFA construction.
-	 *
-	 *  TODO add to codegen: collapse alt blks that are sets into single matchSet
-	 * @param node
+	 *  to from rule ref state directly (uses followState).
 	 */
-	public Handle ruleRef(GrammarAST node) { return null; }
+	public Handle ruleRef(GrammarAST node) {
+		Rule r = g.getRule(node.getText());
+		RuleStartState start = nfa.ruleToStartState.get(r);
+		RuleStartState stop = nfa.ruleToStartState.get(r);
+		BasicState left = newState(node);
+		BasicState right = newState(node);
+		RuleTransition call = new RuleTransition(r, start, stop);
+		call.followState = right;
+		left.transition = call;
+		return new Handle(left, right);
+	}
 
 	/** From an empty alternative build  o-e->o */
-	public Handle epsilon() { return null; }
+	public Handle epsilon(GrammarAST node) {
+		BasicState left = newState(node);
+		BasicState right = newState(node);
+		epsilon(left, right);
+		return new Handle(left, right);
+	}
 
 	/** Build what amounts to an epsilon transition with a semantic
 	 *  predicate action.  The pred is a pointer into the AST of
@@ -154,13 +173,6 @@ public class ParserNFAFactory implements NFAFactory {
 		return new Handle(left, right);
 	}
 
-	/** From A B build A-e->B (that is, build an epsilon arc from right
-	 *  of A to left of B).
-	 *
-	 *  As a convenience, return B if A is null or return A if B is null.
-	 */
-	public Handle sequence(Handle A, Handle B) { return null; }
-
 	/** From a set ('a'|'b') build
      *
      *  o->o-'a'..'b'->o->o (last NFAState is blockEndNFAState pointed to by all alts)
@@ -189,7 +201,6 @@ public class ParserNFAFactory implements NFAFactory {
      *  TODO: Set alt number (1..n) in the states?
      */
 	public Handle block(GrammarAST blkAST, List<Handle> alts) {
-		System.out.println("block: "+alts);
 		if ( alts.size()==1 ) return alts.get(0);
 				
 		BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
@@ -206,6 +217,11 @@ public class ParserNFAFactory implements NFAFactory {
 	}
 
 	public Handle alt(List<Handle> els) {
+		Handle prev = null;
+		for (Handle el : els) { // hook up elements
+			if ( prev!=null ) epsilon(prev.right, el.left);
+			prev = el;
+		}
 		Handle first = els.get(0);
 		Handle last = els.get(els.size()-1);
 		return new Handle(first.left, last.right);
@@ -244,18 +260,24 @@ public class ParserNFAFactory implements NFAFactory {
 
 	/** From (A)+ build
 	 *
-	 *     |---|    (Transition 2 from A.right points at alt 1)
-	 *     v   |    (follow of loop is Transition 1)
-	 *  o->o-A-o->o
+	 *     |------|
+	 *     v      |
+	 *  o->o-A-o->o->o
 	 *
-	 *  Meaning that the last NFAState in A points back to A's left Transition NFAState
-	 *  and we add a new begin/end NFAState.  A can be single alternative or
-	 *  multiple.
-	 *
-	 *  During analysis we'll call the follow link (transition 1) alt n+1 for
-	 *  an n-alt A block.
+	 *  Meaning that the last NFAState in A blk points to loop back node,
+	 *  which points back to block start.  We add start/end nodes to
+	 *  outside.
 	 */
-	public Handle plus(GrammarAST plusAST, Handle blk) { return null; }
+	public Handle plus(GrammarAST plusAST, Handle blk) {
+		PlusBlockStartState start = (PlusBlockStartState)newState(PlusBlockStartState.class, plusAST);
+		LoopbackState loop = (LoopbackState)newState(LoopbackState.class, plusAST);
+		BlockEndState end = (BlockEndState)newState(BlockEndState.class, plusAST);
+		epsilon(start, blk.left);
+		epsilon(loop, blk.left);
+		epsilon(blk.right, loop);
+		epsilon(loop, end);
+		return new Handle(start, end);
+	}
 
 	/** From (A)* build
 	 *
@@ -299,5 +321,43 @@ public class ParserNFAFactory implements NFAFactory {
 
 	void epsilon(NFAState a, NFAState b) {
 		a.addTransition(new EpsilonTransition(b));
+	}
+
+	/** Define all the rule begin/end NFAStates to solve forward reference
+	 *  issues.
+	 */
+	void createRuleStartAndStopNFAStates() {
+		for (Rule r : g.rules.values()) {
+			RuleStartState start = (RuleStartState)newState(RuleStartState.class, r.ast);
+			RuleStopState stop = (RuleStopState)newState(RuleStopState.class, r.ast);
+			start.stopState = stop;
+			start.rule = r;
+			stop.rule = r;
+			nfa.ruleToStartState.put(r, start);
+			nfa.ruleToStopState.put(r, stop);
+		}
+	}
+
+	/** add an EOF transition to any rule end NFAState that points to nothing
+     *  (i.e., for all those rules not invoked by another rule).  These
+     *  are start symbols then.
+	 *
+	 *  Return the number of grammar entry points; i.e., how many rules are
+	 *  not invoked by another rule (they can only be invoked from outside).
+	 *  These are the start rules.
+     */
+	public int addEOFTransitionToStartRules() {
+		int n = 0;
+		for (Rule r : g.rules.values()) {
+			NFAState stop = nfa.ruleToStopState.get(r);
+			if ( stop.getNumberOfTransitions()==0 ) {
+				n++;
+				continue;
+			}
+			BasicState eofTarget = newState(r.ast);
+			Transition t = new AtomTransition(Label.EOF, eofTarget);
+			stop.addTransition(t);
+		}
+		return n;
 	}
 }

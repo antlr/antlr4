@@ -73,18 +73,9 @@ import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
     }
 }
 
-// IGNORE EVERYTHING UNTIL WE SEE A RULE OR BLOCK SUBTREE
-
-topdown
-	:	rule
-	;
-
-bottomup
-	:	block // match block innermost to outermost all the way out to rule block
-	;
-
 rule returns [NFAFactory.Handle p]
-	:   ^(RULE name=ID ~BLOCK* block) {factory.setCurrentRuleName($name.text);}
+	:   ^(RULE name=ID ~BLOCK* {factory.setCurrentRuleName($name.text);} block)
+		{$p = factory.rule($RULE, $name.text, $block.p);}
 	;
 
 block returns [NFAFactory.Handle p]
@@ -96,7 +87,7 @@ block returns [NFAFactory.Handle p]
 alternative returns [NFAFactory.Handle p]
 @init {List<NFAFactory.Handle> els = new ArrayList<NFAFactory.Handle>();}
     :	^(ALT_REWRITE a=alternative .)	{$p = $a.p;}
-    |	^(ALT EPSILON)					{$p = factory.epsilon();}
+    |	^(ALT EPSILON)					{$p = factory.epsilon($EPSILON);}
     |   ^(ALT (e=element {els.add($e.p);})+)
     									{$p = factory.alt(els);}
     ;
@@ -156,7 +147,7 @@ notSet returns [NFAFactory.Handle p]
 
 notTerminal returns [NFAFactory.Handle p]
     : TOKEN_REF				{$p = factory.tokenRef((TerminalAST)$TOKEN_REF);}
-    | STRING_LITERAL		{$p = factory.stringLiteral($start);}
+    | STRING_LITERAL		{$p = factory.stringLiteral((TerminalAST)$start);}
     ;
 
 ruleref returns [NFAFactory.Handle p]
@@ -170,8 +161,8 @@ range returns [NFAFactory.Handle p]
     ;
 
 terminal returns [NFAFactory.Handle p]
-    :  ^(STRING_LITERAL .)			{$p = factory.stringLiteral($start);}
-    |	STRING_LITERAL				{$p = factory.stringLiteral($start);}
+    :  ^(STRING_LITERAL .)			{$p = factory.stringLiteral((TerminalAST)$start);}
+    |	STRING_LITERAL				{$p = factory.stringLiteral((TerminalAST)$start);}
     |	^(TOKEN_REF ARG_ACTION .)	{$p = factory.tokenRef((TerminalAST)$start);}
     |	^(TOKEN_REF .)				{$p = factory.tokenRef((TerminalAST)$start);}
     |	TOKEN_REF					{$p = factory.tokenRef((TerminalAST)$start);}

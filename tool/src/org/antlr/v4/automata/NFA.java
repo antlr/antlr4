@@ -1,9 +1,12 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** */
 public class NFA {
@@ -14,7 +17,10 @@ public class NFA {
 	 *  can go back later and build DFA predictors for them.  This includes
 	 *  all the rules, subrules, optional blocks, ()+, ()* etc...
 	 */
-	protected List<NFAState> decisionToNFAState = new ArrayList<NFAState>();
+	public List<NFAState> decisionToNFAState = new ArrayList<NFAState>();
+
+	Map<Rule, RuleStartState> ruleToStartState = new HashMap<Rule, RuleStartState>();
+	Map<Rule, RuleStopState> ruleToStopState = new HashMap<Rule, RuleStopState>();
 
 	int stateNumber = 0;
 	
