@@ -19,8 +19,8 @@ public class NFA {
 	 */
 	public List<NFAState> decisionToNFAState = new ArrayList<NFAState>();
 
-	Map<Rule, RuleStartState> ruleToStartState = new HashMap<Rule, RuleStartState>();
-	Map<Rule, RuleStopState> ruleToStopState = new HashMap<Rule, RuleStopState>();
+	public Map<Rule, RuleStartState> ruleToStartState = new HashMap<Rule, RuleStartState>();
+	public Map<Rule, RuleStopState> ruleToStopState = new HashMap<Rule, RuleStopState>();
 
 	int stateNumber = 0;
 	

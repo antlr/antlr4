@@ -426,14 +426,7 @@ public abstract class BaseTest {
             ErrorManager.setErrorListener(equeue);
             try {
                 String[] lines = input.split("\n");
-                String fileName = "<string>";
-                int grIndex = lines[0].lastIndexOf("grammar");
-				int semi = lines[0].lastIndexOf(';');
-                if ( grIndex>=0 && semi>=0 ) {
-                    int space = lines[0].indexOf(' ', grIndex);
-                    fileName = lines[0].substring(space+1, semi)+".g";
-                }
-				if ( fileName.length()==".g".length() ) fileName = "<string>";
+				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
                 Grammar g = new Grammar(fileName, input);
                 g.loadImportedGrammars();
 				if ( printTree ) {
@@ -457,7 +450,19 @@ public abstract class BaseTest {
         }
     }
 
-    public static class StreamVacuum implements Runnable {
+	public String getFilenameFromFirstLineOfGrammar(String line) {
+		String fileName = "<string>";
+		int grIndex = line.lastIndexOf("grammar");
+		int semi = line.lastIndexOf(';');
+		if ( grIndex>=0 && semi>=0 ) {
+			int space = line.indexOf(' ', grIndex);
+			fileName = line.substring(space+1, semi)+".g";
+		}
+		if ( fileName.length()==".g".length() ) fileName = "<string>";
+		return fileName;
+	}
+
+	public static class StreamVacuum implements Runnable {
 		StringBuffer buf = new StringBuffer();
 		BufferedReader in;
 		Thread sucker;

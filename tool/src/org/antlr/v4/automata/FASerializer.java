@@ -37,8 +37,10 @@ public class FASerializer {
 			marked.add(s);
 			for (int i=0; i<n; i++) {
 				Transition t = s.transition(i);
-				if ( t instanceof RuleTransition ) work.add(((RuleTransition)t).followState);
-				else work.add( t.target );
+				if ( !(s instanceof RuleStopState) ) { // don't add follow states to work
+					if ( t instanceof RuleTransition ) work.add(((RuleTransition)t).followState);
+					else work.add( t.target );
+				}
 				buf.append(getStateString(s));
 				if ( t instanceof EpsilonTransition ) {
 					buf.append("->"+getStateString(t.target)+'\n');
@@ -46,9 +48,16 @@ public class FASerializer {
 				else if ( t instanceof RuleTransition ) {
 					buf.append("->"+getStateString(t.target)+'\n');
 				}
-				else {
+				else if ( t instanceof ActionTransition ) {
+					ActionTransition a = (ActionTransition)t;
+					buf.append("-"+a.actionAST.getText()+"->"+getStateString(t.target)+'\n');
+				}
+				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
 					buf.append("-"+a.toString(g)+"->"+getStateString(t.target)+'\n');
+				}
+				else {
+					buf.append("-"+t.toString()+"->"+getStateString(t.target)+'\n');					
 				}
 			}
 		}
@@ -57,7 +66,7 @@ public class FASerializer {
 
 	String getStateString(State s) {
 		int n = s.stateNumber;
-		String stateStr = ".s"+n;
+		String stateStr = "s"+n;
 //		if ( s instanceof DFAState ) {
 //			stateStr = ":s"+n+"=>"+((DFAState)s).getUniquelyPredictedAlt();
 //		}

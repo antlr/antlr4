@@ -352,7 +352,7 @@ public class Tool {
         }
     }
 
-    protected void process(Grammar g) {
+    public void process(Grammar g) {
         grammars.put(g.name, g);
         g.loadImportedGrammars();
         if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());

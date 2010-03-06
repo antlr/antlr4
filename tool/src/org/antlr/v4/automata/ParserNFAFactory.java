@@ -97,22 +97,14 @@ public class ParserNFAFactory implements NFAFactory {
 		return null;
 	}
 
-	public Handle range(GrammarAST a, GrammarAST b) { return null; }
+	/** Not valid for non-lexers */
+	public Handle range(GrammarAST a, GrammarAST b) { throw new UnsupportedOperationException(); }
 
 	public Handle not(Handle A) {
 		return null;
 	}
 
-	/** From char 'c' build o-intValue(c)->o
-	 */
-	public Handle charLiteral(GrammarAST charLiteralAST) { return null; }
-
-	/** For a non-lexer, just build a simple token reference atom.
-	 *  For a lexer, a string is a sequence of char to match.  That is,
-	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
-	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
-	 *  for n characters.
-	 */
+	/** For a non-lexer, just build a simple token reference atom. */
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		return tokenRef(stringLiteralAST);
 	}
@@ -127,12 +119,16 @@ public class ParserNFAFactory implements NFAFactory {
 	public Handle ruleRef(GrammarAST node) {
 		Rule r = g.getRule(node.getText());
 		RuleStartState start = nfa.ruleToStartState.get(r);
-		RuleStartState stop = nfa.ruleToStartState.get(r);
 		BasicState left = newState(node);
 		BasicState right = newState(node);
-		RuleTransition call = new RuleTransition(r, start, stop);
+		RuleTransition call = new RuleTransition(r, start, right);
 		call.followState = right;
 		left.transition = call;
+
+		// add follow edge from end of invoked rule
+		RuleStopState stop = nfa.ruleToStopState.get(r);
+		epsilon(stop, right);
+
 		return new Handle(left, right);
 	}
 
@@ -281,19 +277,11 @@ public class ParserNFAFactory implements NFAFactory {
 
 	/** From (A)* build
 	 *
-	 *     |---|
-	 *     v   |
-	 *  o->o-A-o--o (Transition 2 from block end points at alt 1; follow is Transition 1)
-	 *  |         ^
-	 *  o---------| (optional branch is 2nd alt of optional block containing A+)
-	 *
-	 *  Meaning that the last (end) NFAState in A points back to A's
-	 *  left side NFAState and we add 3 new NFAStates (the
-	 *  optional branch is built just like an optional subrule).
-	 *  See the Aplus() method for more on the loop back Transition.
-	 *  The new node on right edge is set to RIGHT_EDGE_OF_CLOSURE so we
-	 *  can detect nested (A*)* loops and insert an extra node.  Previously,
-	 *  two blocks shared same EOB node.
+	 *     |------|
+	 *     v      |
+	 *  o->o-A-o->o->o
+	 *  |            ^
+	 *  o------------| (optional branch is 2nd alt of StarBlockStartState)
 	 *
 	 *  There are 2 or 3 decision points in a A*.  If A is not a block (i.e.,
 	 *  it only has one alt), then there are two decisions: the optional bypass
@@ -307,9 +295,19 @@ public class ParserNFAFactory implements NFAFactory {
 	 *  for generating code, I don't need a DFA for the optional branch by
 	 *  virtue of how I generate code.  The exit-loopback-branch decision
 	 *  is sufficient to let me make an appropriate enter, exit, loop
-	 *  determination.  See codegen.g
+	 *  determination.
 	 */
-	public Handle star(GrammarAST starAST, Handle blk) { return null; }
+	public Handle star(GrammarAST starAST, Handle blk) {
+		StarBlockStartState start = (StarBlockStartState)newState(StarBlockStartState.class, starAST);
+		LoopbackState loop = (LoopbackState)newState(LoopbackState.class, starAST);
+		BlockEndState end = (BlockEndState)newState(BlockEndState.class, starAST);
+		epsilon(start, blk.left);
+		epsilon(start, end); // bypass edge
+		epsilon(loop, blk.left);
+		epsilon(blk.right, loop);
+		epsilon(loop, end);
+		return new Handle(start, end);
+	}
 
 	/** Build an atom with all possible values in its label */
 	public Handle wildcard(GrammarAST associatedAST) { return null; }
@@ -350,10 +348,8 @@ public class ParserNFAFactory implements NFAFactory {
 		int n = 0;
 		for (Rule r : g.rules.values()) {
 			NFAState stop = nfa.ruleToStopState.get(r);
-			if ( stop.getNumberOfTransitions()==0 ) {
-				n++;
-				continue;
-			}
+			if ( stop.getNumberOfTransitions()>0 ) continue;
+			n++;
 			BasicState eofTarget = newState(r.ast);
 			Transition t = new AtomTransition(Label.EOF, eofTarget);
 			stop.addTransition(t);

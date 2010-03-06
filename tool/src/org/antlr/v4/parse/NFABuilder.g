@@ -80,7 +80,7 @@ rule returns [NFAFactory.Handle p]
 
 block returns [NFAFactory.Handle p]
 @init {List<NFAFactory.Handle> alts = new ArrayList<NFAFactory.Handle>();}
-    :	^(BLOCK ~ALT* (a=alternative {alts.add($a.p);})+)
+    :	^(BLOCK (^(OPTIONS .+))? (a=alternative {alts.add($a.p);})+)
     	{$p = factory.block($BLOCK, alts);}
     ;
 

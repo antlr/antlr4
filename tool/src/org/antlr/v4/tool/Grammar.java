@@ -8,6 +8,7 @@ import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.semantics.SemanticPipeline;
 
 import java.util.*;
 
@@ -97,7 +98,12 @@ public class Grammar implements AttributeResolver {
     }
     
     /** For testing */
-    public Grammar(String fileName, String grammarText) throws RecognitionException {
+	public Grammar(String grammarText) throws RecognitionException {
+		this("<string>", grammarText);
+	}
+
+	/** For testing */
+	public Grammar(String fileName, String grammarText) throws RecognitionException {
         this.text = grammarText;
 		this.fileName = fileName;
 		ANTLRStringStream in = new ANTLRStringStream(grammarText);
@@ -113,6 +119,15 @@ public class Grammar implements AttributeResolver {
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
 		}
 		initTokenSymbolTables();
+
+		Tool antlr = new Tool();
+		SemanticPipeline sem = new SemanticPipeline();
+		sem.process(this);
+		if ( getImportedGrammars()!=null ) { // process imported grammars (if any)
+			for (Grammar imp : getImportedGrammars()) {
+				antlr.process(imp);
+			}
+		}		
     }
 
 	protected void initTokenSymbolTables() {
