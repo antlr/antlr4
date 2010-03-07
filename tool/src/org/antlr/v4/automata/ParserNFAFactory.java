@@ -4,6 +4,7 @@ package org.antlr.v4.automata;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.NFABuilder;
 import org.antlr.v4.tool.*;
@@ -23,20 +24,29 @@ public class ParserNFAFactory implements NFAFactory {
 	public ParserNFAFactory(Grammar g) { this.g = g; nfa = new NFA(g); }
 
 	public NFA createNFA() {
+		_createNFA();
+		addEOFTransitionToStartRules();
+		return nfa;
+	}
+
+	public void _createNFA() {
 		createRuleStartAndStopNFAStates();
 
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		for (Rule r : g.rules.values()) {
-			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,r.ast);
+			// find rule's block
+			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
+			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			NFABuilder b = new NFABuilder(nodes,this);
-			try { b.rule();	}
+			try {
+				setCurrentRuleName(r.name);
+				Handle h = b.block();
+				rule(r.ast, r.name, h);
+			}
 			catch (RecognitionException re) {
 				ErrorManager.fatalInternalError("bad grammar AST structure", re);
 			}
 		}
-
-		addEOFTransitionToStartRules();
-		return nfa;
 	}
 
 	public void setCurrentRuleName(String name) {
@@ -51,8 +61,8 @@ public class ParserNFAFactory implements NFAFactory {
 		RuleStopState stop = nfa.ruleToStopState.get(r);
 		epsilon(blk.right, stop);
 		Handle h = new Handle(start, stop);
-		FASerializer ser = new FASerializer(g, h.left);
-		System.out.println(ruleAST.toStringTree()+":\n"+ser);
+//		FASerializer ser = new FASerializer(g, h.left);
+//		System.out.println(ruleAST.toStringTree()+":\n"+ser);
 		return h;
 	}
 
@@ -145,7 +155,7 @@ public class ParserNFAFactory implements NFAFactory {
 	 *  the SEMPRED token.
 	 */
 	public Handle sempred(GrammarAST pred) {
-		System.out.println("sempred: "+ pred);
+		//System.out.println("sempred: "+ pred);
 		BasicState left = newState(pred);
 		NFAState right = newState(pred);
 		left.transition = new PredicateTransition(pred, right);
@@ -162,7 +172,7 @@ public class ParserNFAFactory implements NFAFactory {
 	 *  having seen an action (5-5-2008).
 	 */
 	public Handle action(GrammarAST action) {
-		System.out.println("action: "+action);
+		//System.out.println("action: "+action);
 		BasicState left = newState(action);
 		NFAState right = newState(action);
 		left.transition = new ActionTransition(action, right);  
@@ -205,10 +215,10 @@ public class ParserNFAFactory implements NFAFactory {
 			epsilon(start, alt.left);
 			epsilon(alt.right, end);
 		}
-		Handle h = new Handle(start, end);
-		FASerializer ser = new FASerializer(g, h.left);
 		nfa.defineDecisionState(start);
-		System.out.println(blkAST.toStringTree()+":\n"+ser);
+		Handle h = new Handle(start, end);
+//		FASerializer ser = new FASerializer(g, h.left);
+//		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		return h;
 	}
 
@@ -234,8 +244,8 @@ public class ParserNFAFactory implements NFAFactory {
 	public Handle optional(GrammarAST optAST, Handle blk) {
 		if ( blk.left instanceof BlockStartState ) {
 			epsilon(blk.left, blk.right);
-			FASerializer ser = new FASerializer(g, blk.left);
-			System.out.println(optAST.toStringTree()+":\n"+ser);
+//			FASerializer ser = new FASerializer(g, blk.left);
+//			System.out.println(optAST.toStringTree()+":\n"+ser);
 			return blk;
 		}
 
@@ -249,8 +259,8 @@ public class ParserNFAFactory implements NFAFactory {
 		nfa.defineDecisionState(start);
 
 		Handle h = new Handle(start, end);
-		FASerializer ser = new FASerializer(g, h.left);
-		System.out.println(optAST.toStringTree()+":\n"+ser);
+//		FASerializer ser = new FASerializer(g, h.left);
+//		System.out.println(optAST.toStringTree()+":\n"+ser);
 		return h;
 	}
 
@@ -272,6 +282,7 @@ public class ParserNFAFactory implements NFAFactory {
 		epsilon(loop, blk.left);
 		epsilon(blk.right, loop);
 		epsilon(loop, end);
+		nfa.defineDecisionState(loop);
 		return new Handle(start, end);
 	}
 
@@ -306,6 +317,8 @@ public class ParserNFAFactory implements NFAFactory {
 		epsilon(loop, blk.left);
 		epsilon(blk.right, loop);
 		epsilon(loop, end);
+		nfa.defineDecisionState(start);
+		nfa.defineDecisionState(loop);
 		return new Handle(start, end);
 	}
 

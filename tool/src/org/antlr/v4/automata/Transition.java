@@ -14,9 +14,12 @@ package org.antlr.v4.automata;
  */
 public abstract class Transition implements Comparable {
 	/** The target of this transition */
-	public State target;
+	public NFAState target;
 
 	public Transition() { }
 
 	public Transition(NFAState target) { this.target = target; }
+
+	/** Are we epsilon, action, sempred? */
+	public boolean isEpsilon() { return false; }
 }

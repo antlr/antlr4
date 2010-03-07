@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** */
-public class BlockStartState extends NFAState {
+public class BlockStartState extends DecisionState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 
 	BlockEndState endState;

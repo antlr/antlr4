@@ -203,11 +203,12 @@ public class Rule implements AttributeResolver {
 
     @Override
     public String toString() {
-        return "Rule{" +
-               "name='" + name + '\'' +
-               ", args=" + args +
-               ", retvals=" + retvals +
-               ", scope=" + scope +
-               '}';
+		StringBuilder buf = new StringBuilder();
+		buf.append("Rule{name="+name);
+		if ( args!=null ) buf.append(", args=" + args);
+		if ( retvals!=null ) buf.append(", retvals=" + retvals);
+		if ( scope!=null ) buf.append(", scope=" + scope);
+		buf.append("}");
+		return buf.toString();
     }
 }

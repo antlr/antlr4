@@ -4,6 +4,7 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.Label;
+import org.antlr.v4.automata.NFA;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -34,7 +35,6 @@ public class Grammar implements AttributeResolver {
             put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
 		}};
 
-	public Tool tool;
     public String name;
     public GrammarRootAST ast;
     public String text; // testing only
@@ -48,6 +48,13 @@ public class Grammar implements AttributeResolver {
     public Grammar parent;
     public List<Grammar> importedGrammars;
     public Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
+
+	/** The NFA that represents the grammar with edges labelled with tokens
+	 *  or epsilon.  It is more suitable to analysis than an AST representation.
+	 */
+	public NFA nfa;
+	
+	public Tool tool;
 
 	/** Token names and literal tokens like "void" are uniquely indexed.
 	 *  with -1 implying EOF.  Characters are different; they go from
@@ -119,6 +126,8 @@ public class Grammar implements AttributeResolver {
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
 		}
 		initTokenSymbolTables();
+
+		if ( this.ast==null || this.ast.hasErrors ) return;
 
 		Tool antlr = new Tool();
 		SemanticPipeline sem = new SemanticPipeline();

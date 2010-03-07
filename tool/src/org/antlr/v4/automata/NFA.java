@@ -4,7 +4,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +17,10 @@ public class NFA {
 	 *  can go back later and build DFA predictors for them.  This includes
 	 *  all the rules, subrules, optional blocks, ()+, ()* etc...
 	 */
-	public List<NFAState> decisionToNFAState = new ArrayList<NFAState>();
+	public List<DecisionState> decisionToNFAState = new ArrayList<DecisionState>();
 
-	public Map<Rule, RuleStartState> ruleToStartState = new HashMap<Rule, RuleStartState>();
-	public Map<Rule, RuleStopState> ruleToStopState = new HashMap<Rule, RuleStopState>();
+	public Map<Rule, RuleStartState> ruleToStartState = new LinkedHashMap<Rule, RuleStartState>();
+	public Map<Rule, RuleStopState> ruleToStopState = new LinkedHashMap<Rule, RuleStopState>();
 
 	int stateNumber = 0;
 	
@@ -31,7 +31,7 @@ public class NFA {
 		state.stateNumber = stateNumber++;
 	}
 
-	public int defineDecisionState(NFAState s) {
+	public int defineDecisionState(DecisionState s) {
 		decisionToNFAState.add(s);
 		return decisionToNFAState.size()-1;
 	}

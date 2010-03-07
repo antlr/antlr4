@@ -1,11 +1,9 @@
 package org.antlr.v4.automata;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.NFABuilder;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.TerminalAST;
 import org.stringtemplate.v4.misc.Misc;
 
 /** */
@@ -13,18 +11,7 @@ public class LexerNFAFactory extends ParserNFAFactory {
 	public LexerNFAFactory(Grammar g) { super(g); }
 
 	public NFA createNFA() {
-		createRuleStartAndStopNFAStates();
-
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		for (Rule r : g.rules.values()) {
-			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,r.ast);
-			NFABuilder b = new NFABuilder(nodes,this);
-			try { b.rule();	}
-			catch (RecognitionException re) {
-				ErrorManager.fatalInternalError("bad grammar AST structure", re);
-			}
-		}
-
+		_createNFA();
 		return nfa;
 	}
 

@@ -17,6 +17,8 @@ public class PredicateTransition extends Transition {
 		this.semanticContext = new SemanticContext.Predicate(predicateASTNode);
 	}
 
+	public boolean isEpsilon() { return true; }
+	
 	public int compareTo(Object o) {
 		return 0;
 	}

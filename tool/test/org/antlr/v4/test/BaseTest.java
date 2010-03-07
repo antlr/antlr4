@@ -33,7 +33,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.v4.Tool;
-import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRErrorListener;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
@@ -432,10 +431,6 @@ public abstract class BaseTest {
 				if ( printTree ) {
 					if ( g.ast!=null ) System.out.println(g.ast.toStringTree());
 					else System.out.println("null tree");
-				}
-				if ( g.ast!=null && !g.ast.hasErrors ) {
-					SemanticPipeline sem = new SemanticPipeline();
-					sem.process(g);
 				}
             }
             catch (RecognitionException re) {

@@ -73,11 +73,6 @@ import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
     }
 }
 
-rule returns [NFAFactory.Handle p]
-	:   ^(RULE name=ID ~BLOCK* {factory.setCurrentRuleName($name.text);} block)
-		{$p = factory.rule($RULE, $name.text, $block.p);}
-	;
-
 block returns [NFAFactory.Handle p]
 @init {List<NFAFactory.Handle> alts = new ArrayList<NFAFactory.Handle>();}
     :	^(BLOCK (^(OPTIONS .+))? (a=alternative {alts.add($a.p);})+)

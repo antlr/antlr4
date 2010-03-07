@@ -2,8 +2,8 @@ package org.antlr.v4;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
+import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.LexerNFAFactory;
-import org.antlr.v4.automata.NFA;
 import org.antlr.v4.automata.NFAFactory;
 import org.antlr.v4.automata.ParserNFAFactory;
 import org.antlr.v4.parse.ANTLRLexer;
@@ -370,10 +370,12 @@ public class Tool {
 		// BUILD NFA FROM AST
 		NFAFactory factory = new ParserNFAFactory(g);
 		if ( g.getType()==ANTLRParser.LEXER ) factory = new LexerNFAFactory(g);
-		NFA nfa = factory.createNFA();
-		
-		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
+		g.nfa = factory.createNFA();
 
+		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
+		AnalysisPipeline anal = new AnalysisPipeline();
+		anal.process(g);
+		
 		// GENERATE CODE
     }
 
