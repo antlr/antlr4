@@ -27,7 +27,7 @@
  */
 package org.antlr.v4.misc;
 
-import org.antlr.tool.Grammar;
+import org.antlr.v4.tool.Grammar;
 
 import java.util.List;
 

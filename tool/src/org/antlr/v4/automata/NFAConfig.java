@@ -8,13 +8,13 @@ package org.antlr.v4.automata;
  */
 public class NFAConfig {
 	/** The NFA state associated with this configuration */
-	public int state;
+	public NFAState state;
 
 	/** What alt is predicted by this configuration */
 	public int alt;
 
 	/** Record the NFA state that invoked another rule's start state */
-	public NFAState invokingState;
+	public NFAState context;
 
 	/** The set of semantic predicates associated with this NFA
 	 *  configuration.  The predicates were found on the way to
@@ -45,13 +45,13 @@ public class NFAConfig {
 	 */
 	//protected boolean resolveWithPredicate;
 
-	public NFAConfig(int state,
+	public NFAConfig(NFAState state,
 					 int alt,
-					 NFAState invokingState)
+					 NFAState context)
 	{
 		this.state = state;
 		this.alt = alt;
-		this.invokingState = invokingState;
+		this.context = context;
 		//this.semanticContext = semanticContext;
 	}
 
@@ -67,13 +67,13 @@ public class NFAConfig {
         NFAConfig other = (NFAConfig)o;
         return this.state==other.state &&
                this.alt==other.alt &&
-			   this.invokingState==other.invokingState; 
+			   this.context ==other.context;
 //               this.context.equals (other.context)&&
 //               this.semanticContext.equals(other.semanticContext)
     }
 
     public int hashCode() {
-        int h = state + alt;// + context.hashCode();
+        int h = state.stateNumber + alt;// + context.hashCode();
         return h;
     }
 
@@ -88,9 +88,9 @@ public class NFAConfig {
 			buf.append("|");
 			buf.append(alt);
 		}
-		if ( invokingState!=null ) {
+		if ( context !=null ) {
             buf.append("|");
-            buf.append(invokingState);
+            buf.append(context);
         }
 //        if ( resolved ) {
 //            buf.append("|resolved");

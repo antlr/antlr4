@@ -359,8 +359,8 @@ public class Tool {
         //g.ast.inspect();
 
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
-        SemanticPipeline sem = new SemanticPipeline();
-        sem.process(g);
+        SemanticPipeline sem = new SemanticPipeline(g);
+        sem.process();
 		if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
 			for (Grammar imp : g.getImportedGrammars()) {
 				process(imp);
@@ -373,8 +373,8 @@ public class Tool {
 		g.nfa = factory.createNFA();
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
-		AnalysisPipeline anal = new AnalysisPipeline();
-		anal.process(g);
+		AnalysisPipeline anal = new AnalysisPipeline(g);
+		anal.process();
 		
 		// GENERATE CODE
     }

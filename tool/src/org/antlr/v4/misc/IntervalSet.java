@@ -27,8 +27,8 @@
  */
 package org.antlr.v4.misc;
 
-import org.antlr.analysis.Label;
-import org.antlr.tool.Grammar;
+import org.antlr.v4.automata.Label;
+import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,7 +50,7 @@ import java.util.ListIterator;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
-	public static final IntervalSet COMPLETE_SET = IntervalSet.of(0,Label.MAX_CHAR_VALUE);
+	public static final IntervalSet COMPLETE_SET = IntervalSet.of(0, Label.MAX_CHAR_VALUE);
 
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
@@ -557,7 +557,7 @@ public class IntervalSet implements IntSet {
     }
 
     public String toString() {
-        return toString(null);
+        return toString((Grammar)null);
     }
 
     public String toString(Grammar g) {

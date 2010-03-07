@@ -2,7 +2,28 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.tool.GrammarAST;
 
-public class NFAState extends State {
+public class NFAState {
+	public static final int INVALID_STATE_NUMBER = -1;
+
+	public int stateNumber = INVALID_STATE_NUMBER;
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// are these states same object?
+		if ( o instanceof NFAState ) return this == (NFAState)o;
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(stateNumber);
+	}
+
 	/** Which NFA are we in? */
 	public NFA nfa = null;
 
@@ -11,16 +32,13 @@ public class NFAState extends State {
 
 	public NFAState(NFA nfa) { this.nfa = nfa; }
 	
-	@Override
 	public int getNumberOfTransitions() {
 		return 0;
 	}
 
-	@Override
 	public void addTransition(Transition e) {
 	}
 
-	@Override
 	public Transition transition(int i) {
 		return null;
 	}

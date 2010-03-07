@@ -916,7 +916,7 @@ public class TestNFAConstruction extends BaseTest {
 		NFA nfa = f.createNFA();
 		Rule r = g.getRule(ruleName);
 		NFAState startState = nfa.ruleToStartState.get(r);
-		FASerializer serializer = new FASerializer(g, startState);
+		NFASerializer serializer = new NFASerializer(g, startState);
 		String result = serializer.toString();
 
 		//System.out.print(result);

@@ -26,7 +26,13 @@ import java.util.Map;
  *  as separate objects, however).
  */
 public class SemanticPipeline {
-	public void process(Grammar g) {
+	public Grammar g;
+	
+	public SemanticPipeline(Grammar g) {
+		this.g = g;
+	}
+	
+	public void process() {
 		if ( g.ast==null ) return;
 		
 		// VALIDATE AST STRUCTURE

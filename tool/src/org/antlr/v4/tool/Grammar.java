@@ -130,8 +130,8 @@ public class Grammar implements AttributeResolver {
 		if ( this.ast==null || this.ast.hasErrors ) return;
 
 		Tool antlr = new Tool();
-		SemanticPipeline sem = new SemanticPipeline();
-		sem.process(this);
+		SemanticPipeline sem = new SemanticPipeline(this);
+		sem.process();
 		if ( getImportedGrammars()!=null ) { // process imported grammars (if any)
 			for (Grammar imp : getImportedGrammars()) {
 				antlr.process(imp);

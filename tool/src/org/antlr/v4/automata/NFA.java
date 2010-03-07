@@ -10,6 +10,8 @@ import java.util.Map;
 
 /** */
 public class NFA {
+	public static final int INVALID_ALT_NUMBER = -1;
+	
 	public Grammar g;
 	public List<NFAState> states = new ArrayList<NFAState>();
 

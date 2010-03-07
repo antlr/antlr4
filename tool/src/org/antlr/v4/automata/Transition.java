@@ -1,5 +1,7 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.tool.Grammar;
+
 /** An NFA transition between any two NFA states.  Subclasses define
  *  atom, set, epsilon, action, predicate, rule transitions.
  *
@@ -22,4 +24,6 @@ public abstract class Transition implements Comparable {
 
 	/** Are we epsilon, action, sempred? */
 	public boolean isEpsilon() { return false; }
+
+	public String toString(Grammar g) { return toString(); }	
 }

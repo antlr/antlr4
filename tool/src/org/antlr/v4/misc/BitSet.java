@@ -27,8 +27,8 @@
  */
 package org.antlr.v4.misc;
 
-import org.antlr.analysis.Label;
-import org.antlr.tool.Grammar;
+import org.antlr.v4.automata.Label;
+import org.antlr.v4.tool.Grammar;
 
 import java.util.Collection;
 import java.util.Iterator;
