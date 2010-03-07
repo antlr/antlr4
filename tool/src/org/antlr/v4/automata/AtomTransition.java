@@ -38,4 +38,8 @@ public class AtomTransition extends Transition {
 	public String toString(Grammar g) {
 		return g.getTokenDisplayName(label);
 	}
+
+	public String toString() {
+		return String.valueOf(label);
+	}
 }

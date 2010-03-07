@@ -19,9 +19,6 @@ public class LeftRecursionDetector {
 	 */
 	Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<RuleStartState>();
 
-	/** prevents epsilon-loop-induced infinite recursion. */
-	Set<NFAState> visitedStates = new HashSet<NFAState>();
-
 	public LeftRecursionDetector(NFA nfa) {	this.nfa = nfa; }
 
 	public void check() {
@@ -29,10 +26,10 @@ public class LeftRecursionDetector {
 			//System.out.print("check "+start.rule.name);
 			rulesVisitedPerRuleCheck.clear();
 			rulesVisitedPerRuleCheck.add(start);
-			FASerializer ser = new FASerializer(nfa.g, start);
+			//FASerializer ser = new FASerializer(nfa.g, start);
 			//System.out.print(":\n"+ser+"\n");
 
-			check(start.rule, start);
+			check(start.rule, start, new HashSet<NFAState>());
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
 	}
@@ -48,11 +45,12 @@ public class LeftRecursionDetector {
 	 *  filling the cycles in listOfRecursiveCycles and also, as a
 	 *  side-effect, set leftRecursiveRules.
 	 */
-	public boolean check(Rule enclosingRule, NFAState s) {
+	public boolean check(Rule enclosingRule, NFAState s, Set<NFAState> visitedStates) {
 		if ( s instanceof RuleStopState ) return true;
 		if ( visitedStates.contains(s) ) return false;
 		visitedStates.add(s);
 
+		//System.out.println("visit "+s);
 		int n = s.getNumberOfTransitions();
 		boolean stateReachesStopState = false;
 		for (int i=0; i<n; i++) {
@@ -64,17 +62,21 @@ public class LeftRecursionDetector {
 					addRulesToCycle(enclosingRule, r);
 				}
 				else {
+					// must visit if not already visited; mark target, pop when done
 					rulesVisitedPerRuleCheck.add((RuleStartState)t.target);
-					boolean nullable = check(r, t.target);
+					// send new visitedStates set per rule invocation
+					boolean nullable = check(r, t.target, new HashSet<NFAState>());
+					// we're back from visiting that rule
+					rulesVisitedPerRuleCheck.remove((RuleStartState)t.target);
 					if ( nullable ) {
-						stateReachesStopState |= check(enclosingRule, rt.followState);
+						stateReachesStopState |= check(enclosingRule, rt.followState, visitedStates);
 					}
 				}
 			}
 			else if ( t.isEpsilon() ) {
-				stateReachesStopState |= check(enclosingRule, t.target);
+				stateReachesStopState |= check(enclosingRule, t.target, visitedStates);
 			}
-			// ignore non-epsilon transitions
+			// else ignore non-epsilon transitions
 		}
 		return stateReachesStopState;
 	}
