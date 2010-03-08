@@ -1,10 +1,9 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /** Code that embodies the NFA conversion to DFA. A new object is needed
  *  per DFA (also required for thread safety if multiple conversions
@@ -21,6 +20,12 @@ public class NFAToDFAConverter {
 	/** A list of DFA states we still need to process during NFA conversion */
 	List<DFAState> work = new LinkedList<DFAState>();
 
+	/** Used to prevent the closure operation from looping to itself and
+     *  hence looping forever.  Sensitive to the NFA state, the alt, and
+     *  the stack context.
+     */
+	Set<NFAConfig> closureBusy;
+
 	public static boolean debug = false;
 	
 	public NFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
@@ -36,10 +41,92 @@ public class NFAToDFAConverter {
 
 		// while more DFA states to check, process them
 		while ( work.size()>0 ) {
-
+			DFAState d = work.get(0);
+			reach(d);
+			work.remove(0); // we're done with this DFA state
 		}
 		
 		return dfa;
+	}
+
+	/** From this node, add a d--a-->t transition for all
+	 *  labels 'a' where t is a DFA node created
+	 *  from the set of NFA states reachable from any NFA
+	 *  state in DFA state d.
+	 */
+	void reach(DFAState d) {
+		OrderedHashSet<IntervalSet> labels = getReachableLabels(d);
+
+		for (IntervalSet label : labels) {
+			DFAState newd = reach(d, label);
+			if ( debug ) {
+				System.out.println("DFA state after reach "+label+" "+d+"-" +
+								   label.toString(g)+"->"+newd);
+			}
+			if ( newd==null ) {
+				// nothing was reached by label due to conflict resolution
+				// EOT also seems to be in here occasionally probably due
+				// to an end-of-rule state seeing it even though we'll pop
+				// an invoking state off the state; don't bother to conflict
+				// as this labels set is a covering approximation only.
+				continue;
+			}
+			if ( newd.getUniqueAlt()== NFA.INVALID_ALT_NUMBER ) {
+				// Only compute closure if a unique alt number is not known.
+				// If a unique alternative is mentioned among all NFA
+				// configurations then there is no possibility of needing to look
+				// beyond this state; also no possibility of a nondeterminism.
+				// This optimization May 22, 2006 just dropped -Xint time
+				// for analysis of Java grammar from 11.5s to 2s!  Wow.
+				closure(newd);  // add any NFA states reachable via epsilon
+			}
+			
+			// add if not in DFA yet and then make d-label->t
+			DFAState targetState = newd;
+			DFAState existingState = dfa.addState(newd);
+			if ( newd != existingState ) {
+				// already there...use/return the existing DFA state.
+				targetState = existingState;
+			}
+
+			d.addTransition(new Edge(targetState, label));
+
+//
+//			numberOfEdgesEmanating +=
+//				addTransition(d, label, targetState, targetToLabelMap);
+		}
+	}
+
+	/** Given the set of NFA states in DFA state d, find all NFA states
+	 *  reachable traversing label arcs.  By definition, there can be
+	 *  only one DFA state reachable by a single label from DFA state d so we must
+	 *  find and merge all NFA states reachable via label.  Return a new
+	 *  DFAState that has all of those NFA states with their context.
+	 *
+	 *  Because we cannot jump to another rule nor fall off the end of a rule
+	 *  via a non-epsilon transition, NFA states reachable from d have the
+	 *  same configuration as the NFA state in d.  So if NFA state 7 in d's
+	 *  configurations can reach NFA state 13 then 13 will be added to the
+	 *  new DFAState (labelDFATarget) with the same configuration as state
+	 *  7 had.
+	 */
+	public DFAState reach(DFAState d, IntervalSet label) {
+		//System.out.println("reach "+label.toString(dfa.nfa.grammar)+" from "+d.stateNumber);
+		DFAState labelTarget = dfa.newState();
+
+		for (NFAConfig c : d.nfaConfigs) {
+			int n = c.state.getNumberOfTransitions();
+			for (int i=0; i<n; i++) {               // for each transition
+				Transition t = c.state.transition(i);
+				// found a transition with label; does it collide with label?
+				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
+					// add NFA target to (potentially) new DFA state
+					labelTarget.addNFAConfig(t.target, c.alt, c.context);
+				}
+			}
+		}
+		
+		return labelTarget;
 	}
 
 	/** From this first NFA state of a decision, create a DFA.
@@ -57,9 +144,11 @@ public class NFAToDFAConverter {
 		for (int altNum=1; altNum<=dfa.nAlts; altNum++) {
 			Transition t = nfaStartState.transition(altNum-1);
 			NFAState altStart = t.target;
-			d.addNFAConfig(altStart, altNum+1, null);
+			d.addNFAConfig(altStart, altNum, null);
 
 		}
+
+		System.out.println("before closure start d="+d);
 
 		closure(d);
 
@@ -75,11 +164,15 @@ public class NFAToDFAConverter {
 			System.out.println("closure("+d+")");
 		}
 
+		closureBusy = new HashSet<NFAConfig>();
+		
 		List<NFAConfig> configs = new ArrayList<NFAConfig>();
 		for (NFAConfig c : d.nfaConfigs) {
 			closure(c.state, c.alt, c.context, configs);
 		}
 		d.nfaConfigs.addAll(configs); // Add new NFA configs to DFA state d
+
+		closureBusy = null; // wack all that memory used during closure
 
 		System.out.println("after closure d="+d);
 	}
@@ -92,15 +185,159 @@ public class NFAToDFAConverter {
 		NFAConfig proposedNFAConfig =
 			new NFAConfig(s, altNum, context);
 
+		if ( closureBusy.contains(proposedNFAConfig) ) {
+			return;
+		}
+
+		closureBusy.add(proposedNFAConfig);
+
 		// p itself is always in closure
 		configs.add(proposedNFAConfig);
+
+		if ( s instanceof RuleStopState ) {
+			// do follow
+			int n = s.getNumberOfTransitions();
+			for (int i=0; i<n; i++) {
+				Transition t = s.transition(i);
+			}
+			return;
+		}
 
 		int n = s.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
-			if ( t.isEpsilon() ) {
+			if ( t instanceof RuleTransition ) {
+				NFAState newContext = context;
+				if ( context==null ) newContext = s; // push new context
+				closure(t.target, altNum, newContext, configs);
+			}
+			else if ( t.isEpsilon() ) {
 				closure(t.target, altNum, context, configs);
 			}
 		}
 	}
+
+	public OrderedHashSet<IntervalSet> getReachableLabels(DFAState d) {
+		OrderedHashSet<IntervalSet> reachableLabels = new OrderedHashSet<IntervalSet>();
+		for (NFAState s : d.getUniqueNFAStates()) { // for each state
+			int n = s.getNumberOfTransitions();
+			for (int i=0; i<n; i++) {               // for each transition
+				Transition t = s.transition(i);
+				IntervalSet label = null;
+				if ( t instanceof AtomTransition ) {
+					label = IntervalSet.of(((AtomTransition)t).label);
+				}
+				else if ( t instanceof SetTransition ) {
+					label = ((SetTransition)t).label;
+				}
+				if ( label!=null ) {
+					addReachableLabel(reachableLabels, label);
+				}
+			}
+		}
+		System.out.println("reachable labels for "+d+"="+reachableLabels);
+		return reachableLabels;
+	}
+
+	/** Add label uniquely and disjointly; intersection with
+     *  another set or int/char forces breaking up the set(s).
+     *
+     *  Example, if reachable list of labels is [a..z, {k,9}, 0..9],
+     *  the disjoint list will be [{a..j,l..z}, k, 9, 0..8].
+     *
+     *  As we add NFA configurations to a DFA state, we might as well track
+     *  the set of all possible transition labels to make the DFA conversion
+     *  more efficient.  W/o the reachable labels, we'd need to check the
+     *  whole vocabulary space (could be 0..\uFFFE)!  The problem is that
+     *  labels can be sets, which may overlap with int labels or other sets.
+     *  As we need a deterministic set of transitions from any
+     *  state in the DFA, we must make the reachable labels set disjoint.
+     *  This operation amounts to finding the character classes for this
+     *  DFA state whereas with tools like flex, that need to generate a
+     *  homogeneous DFA, must compute char classes across all states.
+     *  We are going to generate DFAs with heterogeneous states so we
+     *  only care that the set of transitions out of a single state is
+     *  unique. :)
+     *
+     *  The idea for adding a new set, t, is to look for overlap with the
+     *  elements of existing list s.  Upon overlap, replace
+     *  existing set s[i] with two new disjoint sets, s[i]-t and s[i]&t.
+     *  (if s[i]-t is nil, don't add).  The remainder is t-s[i], which is
+     *  what you want to add to the set minus what was already there.  The
+     *  remainder must then be compared against the i+1..n elements in s
+     *  looking for another collision.  Each collision results in a smaller
+     *  and smaller remainder.  Stop when you run out of s elements or
+     *  remainder goes to nil.  If remainder is non nil when you run out of
+     *  s elements, then add remainder to the end.
+     */
+    protected void addReachableLabel(OrderedHashSet<IntervalSet> reachableLabels,
+									 IntervalSet label)
+	{
+		/*
+		System.out.println("addReachableLabel to state "+dfa.decisionNumber+"."+stateNumber+": "+label.getSet().toString(dfa.nfa.grammar));
+		System.out.println("start of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
+				"reachableLabels="+reachableLabels.toString());
+				*/
+		if ( reachableLabels.contains(label) ) { // exact label present
+            return;
+        }
+        IntervalSet remainder = label; // remainder starts out as whole set to add
+        int n = reachableLabels.size(); // only look at initial elements
+        // walk the existing list looking for the collision
+        for (int i=0; i<n; i++) {
+			IntervalSet rl = reachableLabels.get(i);
+            /*
+			System.out.println("comparing ["+i+"]: "+label.toString(dfa.nfa.grammar)+" & "+
+                    rl.toString(dfa.nfa.grammar)+"="+
+                    intersection.toString(dfa.nfa.grammar));
+            */
+			IntervalSet intersection = (IntervalSet)label.and(rl);
+			if ( intersection.isNil() ) {
+                continue;
+            }
+			//System.out.println(label+" collides with "+rl);
+
+			// For any (s_i, t) with s_i&t!=nil replace with (s_i-t, s_i&t)
+            // (ignoring s_i-t if nil; don't put in list)
+
+            // Replace existing s_i with intersection since we
+            // know that will always be a non nil character class
+			IntervalSet s_i = rl;
+            reachableLabels.set(i, intersection);
+
+            // Compute s_i-t to see what is in current set and not in incoming
+            IntervalSet existingMinusNewElements = (IntervalSet)s_i.subtract(label);
+			//System.out.println(s_i+"-"+t+"="+existingMinusNewElements);
+            if ( !existingMinusNewElements.isNil() ) {
+                // found a new character class, add to the end (doesn't affect
+                // outer loop duration due to n computation a priori.
+                reachableLabels.add(existingMinusNewElements);
+            }
+
+			/*
+            System.out.println("after collision, " +
+                    "reachableLabels="+reachableLabels.toString());
+					*/
+
+            // anything left to add to the reachableLabels?
+            remainder = (IntervalSet)label.subtract(s_i);
+            if ( remainder.isNil() ) {
+                break; // nothing left to add to set.  done!
+            }
+
+            label = remainder;
+        }
+        if ( !remainder.isNil() ) {
+			/*
+			System.out.println("before add remainder to state "+dfa.decisionNumber+"."+stateNumber+": " +
+					"reachableLabels="+reachableLabels.toString());
+			System.out.println("remainder state "+dfa.decisionNumber+"."+stateNumber+": "+remainder.toString(dfa.nfa.grammar));
+            */
+            reachableLabels.add(remainder);
+        }
+		/*
+		System.out.println("#END of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
+				"reachableLabels="+reachableLabels.toString());
+				*/
+    }
 }

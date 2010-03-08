@@ -37,7 +37,7 @@ public class DFASerializer {
 			marked.add(s);
 			for (int i=0; i<n; i++) {
 				Edge t = s.transition(i);
-				buf.append("-"+t.toString()+"->"+ getStateString(t.target)+'\n');
+				buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
 			}
 		}
 		return buf.toString();

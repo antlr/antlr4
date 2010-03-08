@@ -1,5 +1,6 @@
 package org.antlr.v4;
 
+import org.antlr.codegen.CodeGenerator;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.analysis.AnalysisPipeline;
@@ -12,8 +13,7 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Tool {
@@ -371,6 +371,9 @@ public class Tool {
 		NFAFactory factory = new ParserNFAFactory(g);
 		if ( g.getType()==ANTLRParser.LEXER ) factory = new LexerNFAFactory(g);
 		g.nfa = factory.createNFA();
+		
+		if ( generate_NFA_dot ) generateNFAs(g);
+		
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -480,6 +483,151 @@ public class Tool {
         return lexerAST;
     }
 
+	protected void generateNFAs(Grammar g) {
+		DOTGenerator dotGenerator = new DOTGenerator(g);
+		List<Grammar> grammars = new ArrayList<Grammar>();
+		grammars.add(g);
+		List<Grammar> imported = g.getAllImportedGrammars();
+		if ( imported!=null ) grammars.addAll(imported);
+		for (Grammar ig : grammars) {
+			for (Rule r : ig.rules.values()) {
+				try {
+					String dot = dotGenerator.getDOT(g.nfa.ruleToStartState.get(r));
+					if (dot != null) {
+						writeDOTFile(g, r, dot);
+					}
+				} catch (IOException ioe) {
+					ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
+				}
+			}
+		}
+	}
+
+	protected void writeDOTFile(Grammar g, Rule r, String dot) throws IOException {
+		writeDOTFile(g, r.g.name + "." + r.name, dot);
+	}
+
+	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {
+		Writer fw = getOutputFile(g, name + ".dot");
+		fw.write(dot);
+		fw.close();
+	}
+
+	/** This method is used by all code generators to create new output
+	 *  files. If the outputDir set by -o is not present it will be created.
+	 *  The final filename is sensitive to the output directory and
+	 *  the directory where the grammar file was found.  If -o is /tmp
+	 *  and the original grammar file was foo/t.g then output files
+	 *  go in /tmp/foo.
+	 *
+	 *  The output dir -o spec takes precedence if it's absolute.
+	 *  E.g., if the grammar file dir is absolute the output dir is given
+	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
+	 *  output (assuming t.g holds T.java).
+	 *
+	 *  If no -o is specified, then just write to the directory where the
+	 *  grammar file was found.
+	 *
+	 *  If outputDirectory==null then write a String.
+	 */
+	public Writer getOutputFile(Grammar g, String fileName) throws IOException {
+		if (outputDirectory == null) {
+			return new StringWriter();
+		}
+		// output directory is a function of where the grammar file lives
+		// for subdir/T.g, you get subdir here.  Well, depends on -o etc...
+		// But, if this is a .tokens file, then we force the output to
+		// be the base output directory (or current directory if there is not a -o)
+		//
+		File outputDir;
+		if (fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION)) {
+			if (haveOutputDir) {
+				outputDir = new File(outputDirectory);
+			}
+			else {
+				outputDir = new File(".");
+			}
+		}
+		else {
+			outputDir = getOutputDirectory(g.fileName);
+		}
+		File outputFile = new File(outputDir, fileName);
+
+		if (!outputDir.exists()) {
+			outputDir.mkdirs();
+		}
+		FileWriter fw = new FileWriter(outputFile);
+		return new BufferedWriter(fw);
+	}
+
+	/**
+	 * Return the location where ANTLR will generate output files for a given file. This is a
+	 * base directory and output files will be relative to here in some cases
+	 * such as when -o option is used and input files are given relative
+	 * to the input directory.
+	 *
+	 * @param fileNameWithPath path to input source
+	 * @return
+	 */
+	public File getOutputDirectory(String fileNameWithPath) {
+
+		File outputDir = new File(outputDirectory);
+		String fileDirectory;
+
+		// Some files are given to us without a PATH but should should
+		// still be written to the output directory in the relative path of
+		// the output directory. The file directory is either the set of sub directories
+		// or just or the relative path recorded for the parent grammar. This means
+		// that when we write the tokens files, or the .java files for imported grammars
+		// taht we will write them in the correct place.
+		//
+		if (fileNameWithPath.lastIndexOf(File.separatorChar) == -1) {
+
+			// No path is included in the file name, so make the file
+			// directory the same as the parent grammar (which might sitll be just ""
+			// but when it is not, we will write the file in the correct place.
+			//
+			fileDirectory = grammarOutputDirectory;
+
+		}
+		else {
+			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
+		}
+		if ( fileDirectory == null ) {
+			fileDirectory = ".";
+		}
+		if (haveOutputDir) {
+			// -o /tmp /var/lib/t.g => /tmp/T.java
+			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
+			// -o . /usr/lib/t.g => ./T.java
+			if ((fileDirectory != null && !forceRelativeOutput) &&
+				(new File(fileDirectory).isAbsolute() ||
+				 fileDirectory.startsWith("~")) || // isAbsolute doesn't count this :(
+				forceAllFilesToOutputDir) {
+				// somebody set the dir, it takes precendence; write new file there
+				outputDir = new File(outputDirectory);
+			}
+			else {
+				// -o /tmp subdir/t.g => /tmp/subdir/t.g
+				if (fileDirectory != null) {
+					outputDir = new File(outputDirectory, fileDirectory);
+				}
+				else {
+					outputDir = new File(outputDirectory);
+				}
+			}
+		}
+		else {
+			// they didn't specify a -o dir so just write to location
+			// where grammar is, absolute or relative, this will only happen
+			// with command line invocation as build tools will always
+			// supply an output directory.
+			//
+			outputDir = new File(fileDirectory);
+		}
+		return outputDir;
+	}	
+	
     private static void version() {
         ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
     }

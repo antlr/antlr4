@@ -1,5 +1,6 @@
 package org.antlr.v4.automata;
 
+import org.antlr.analysis.NFA;
 import org.antlr.v4.misc.Utils;
 import org.stringtemplate.v4.misc.MultiMap;
 
@@ -195,7 +196,7 @@ public class DFAState {
 		if ( cachedUniquelyPredicatedAlt!=NFA.INVALID_ALT_NUMBER ) {
 			return cachedUniquelyPredicatedAlt;
 		}
-		int alt = org.antlr.analysis.NFA.INVALID_ALT_NUMBER;
+		int alt = NFA.INVALID_ALT_NUMBER;
 		for (NFAConfig c : nfaConfigs) {
 			if ( alt== NFA.INVALID_ALT_NUMBER ) {
 				alt = c.alt; // found first nonresolved alt
@@ -205,6 +206,23 @@ public class DFAState {
 			}
 		}
 		this.cachedUniquelyPredicatedAlt = alt;
+		return alt;
+	}
+
+	/** Return the uniquely mentioned alt from the NFA configurations;
+	 *  Ignore the resolved bit etc...  Return INVALID_ALT_NUMBER
+	 *  if there is more than one alt mentioned.
+	 */
+	public int getUniqueAlt() {
+		int alt = NFA.INVALID_ALT_NUMBER;
+		for (NFAConfig c : nfaConfigs) {
+			if ( alt== NFA.INVALID_ALT_NUMBER ) {
+				alt = c.alt; // found first alt
+			}
+			else if ( c.alt!=alt ) {
+				return NFA.INVALID_ALT_NUMBER;
+			}
+		}
 		return alt;
 	}
 
@@ -220,7 +238,13 @@ public class DFAState {
 		return alts;
 	}
 
-	
+	public Set<NFAState> getUniqueNFAStates() {
+		Set<NFAState> alts = new HashSet<NFAState>();
+		for (NFAConfig c : nfaConfigs) alts.add(c.state);
+		if ( alts.size()==0 ) return null;
+		return alts;
+	}
+
 	public int getNumberOfTransitions() { return edges.size(); }
 
 	public void addTransition(Edge e) { edges.add(e); }

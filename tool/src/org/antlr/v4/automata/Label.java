@@ -1,6 +1,7 @@
 package org.antlr.v4.automata;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.misc.IntervalSet;
 
 /** A state machine transition label.  A label can be either a simple
  *  label such as a token or character.  A label can be a set of char or
@@ -72,6 +73,10 @@ public abstract class Label implements /*Comparable, */ Cloneable {
 	 *  this issue.
 	 */
 	public static final int EOR_TOKEN_TYPE = Token.EOR_TOKEN_TYPE;
+
+	public int atom = Label.INVALID;
+	public IntervalSet set;
+
 
 	public int compareTo(Object o) {
 		return 0; // TODO: impl

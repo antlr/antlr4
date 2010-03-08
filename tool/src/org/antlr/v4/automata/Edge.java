@@ -5,15 +5,17 @@ import org.antlr.v4.tool.Grammar;
 
 /** A DFA edge (NFA edges are called transitions) */
 public class Edge {
-	public int atom = Label.INVALID;
-	public IntervalSet set;
-	
+	public IntervalSet label;
 	public DFAState target;
 
-	public Edge(DFAState target) { this.target = target; }
+	public Edge(DFAState target, IntervalSet label) {
+		this.target = target;
+		this.label = label;
+	}
+
+	public String toString() { return label.toString(); }	
 
 	public String toString(Grammar g) {
-		if ( set==null ) return g.getTokenDisplayName(atom);
-		else return set.toString(g);
+		return label.toString(g);
 	}
 }

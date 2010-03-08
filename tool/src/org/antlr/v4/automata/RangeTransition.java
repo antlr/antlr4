@@ -1,6 +1,7 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.IntervalSet;
 
 public class RangeTransition extends Transition {
 	public int from;
@@ -10,9 +11,13 @@ public class RangeTransition extends Transition {
 		this.from = from;
 		this.to = to;
 	}
+
 	public int compareTo(Object o) {
 		return 0;
 	}
+
+	@Override
+	public IntervalSet label() { return IntervalSet.of(from,to); }
 
 	@Override
 	public String toString() {

@@ -48,7 +48,7 @@ public class DOTGenerator {
 				Utils.integer(startState.stateNumber));
 		walkRuleNFACreatingDOT(dot, startState);
 		dot.add("rankdir", rankdir);
-		return dot.toString();
+		return dot.render();
 	}
 
 	public String getDOT(DFAState startState) {
@@ -65,23 +65,8 @@ public class DOTGenerator {
 				Boolean.valueOf(Tool.internalOption_ShowNFAConfigsInDFA));
 		walkCreatingDFADOT(dot, (DFAState)startState);
 		dot.add("rankdir", rankdir);
-		return dot.toString();
+		return dot.render();
 	}
-
-	/** Return a String containing a DOT description that, when displayed,
-	 *  will show the incoming state machine visually.  All nodes reachable
-     *  from startState will be included.
-    public String getRuleNFADOT(State startState) {
-        // The output DOT graph for visualization
-        ST dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
-
-        markedStates = new HashSet();
-        dot.add("startState",
-                Utils.integer(startState.stateNumber));
-        walkRuleNFACreatingDOT(dot, startState);
-        return dot.toString();
-    }
-	 */
 
     /** Do a depth-first walk of the state machine graph and
      *  fill a DOT description template.  Keep filling the

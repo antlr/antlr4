@@ -3,7 +3,7 @@ package org.antlr.v4.automata;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-/** */
+/** TODO: make all transitions sets? */
 public class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
 	protected int label;
@@ -12,6 +12,8 @@ public class AtomTransition extends Transition {
 		this.label = label;
 		this.target = target;
 	}
+
+	public IntervalSet label() { return IntervalSet.of(label); }
 
 	public int hashCode() { return label; }
 

@@ -1,20 +1,21 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 
 /** A label containing a set of values */
 public class SetTransition extends Transition {
 	/** A set of token types or character codes if label==SET */
-	protected IntSet label;
+	protected IntervalSet label;
 
-	public SetTransition(IntSet label) {
+	public SetTransition(IntervalSet label) {
 		if ( label==null ) {
 			this.label = IntervalSet.of(Label.INVALID);
 			return;
 		}
 		this.label = label;
 	}
+
+	public IntervalSet label() { return label; }
 
 	public int compareTo(Object o) {
 		return 0;

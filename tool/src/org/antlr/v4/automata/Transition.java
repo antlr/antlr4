@@ -1,5 +1,6 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
 /** An NFA transition between any two NFA states.  Subclasses define
@@ -24,6 +25,8 @@ public abstract class Transition implements Comparable {
 
 	/** Are we epsilon, action, sempred? */
 	public boolean isEpsilon() { return false; }
+
+	public IntervalSet label() { return null; }
 
 	public String toString(Grammar g) { return toString(); }	
 }
