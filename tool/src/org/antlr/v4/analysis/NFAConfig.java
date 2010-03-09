@@ -1,4 +1,6 @@
-package org.antlr.v4.automata;
+package org.antlr.v4.analysis;
+
+import org.antlr.v4.automata.NFAState;
 
 /** An NFA state, predicted alt, and syntactic/semantic context.
  *  The syntactic context is a pointer into the rule invocation
@@ -14,7 +16,7 @@ public class NFAConfig {
 	public int alt;
 
 	/** Record the NFA state that invoked another rule's start state */
-	public NFAState context;
+	public NFAContext context;
 
 	/** The set of semantic predicates associated with this NFA
 	 *  configuration.  The predicates were found on the way to
@@ -47,7 +49,7 @@ public class NFAConfig {
 
 	public NFAConfig(NFAState state,
 					 int alt,
-					 NFAState context)
+					 NFAContext context)
 	{
 		this.state = state;
 		this.alt = alt;
@@ -68,13 +70,15 @@ public class NFAConfig {
         NFAConfig other = (NFAConfig)o;
         return this.state==other.state &&
                this.alt==other.alt &&
-			   this.context==other.context;
-//               this.context.equals (other.context)&&
+               this.context.equals(other.context);
 //               this.semanticContext.equals(other.semanticContext)
     }
 
     public int hashCode() {
-        int h = state.stateNumber + alt;// + context.hashCode();
+		if ( state==null || context==null ) {
+			System.out.println("eh?");
+		}
+        int h = state.stateNumber + alt + context.hashCode();
         return h;
     }
 

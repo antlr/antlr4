@@ -1,6 +1,7 @@
 package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.NFAConfig;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.Utils;
 import org.stringtemplate.v4.ST;
@@ -59,10 +60,8 @@ public class DOTGenerator {
 		ST dot = null;
 		markedStates = new HashSet<Integer>();
 		dot = stlib.getInstanceOf("dfa");
-		dot.add("startState",
-				Utils.integer(startState.stateNumber));
-		dot.add("useBox",
-				Boolean.valueOf(Tool.internalOption_ShowNFAConfigsInDFA));
+		dot.add("startState", startState.stateNumber);
+		dot.add("useBox", Tool.internalOption_ShowNFAConfigsInDFA);
 		walkCreatingDFADOT(dot, (DFAState)startState);
 		dot.add("rankdir", rankdir);
 		return dot.render();

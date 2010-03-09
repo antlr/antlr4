@@ -26,11 +26,15 @@ public class AnalysisPipeline {
 
 	public DFA createDFA(DecisionState s) {
 		// TRY APPROXIMATE LL(*) ANALYSIS
-		NFAToDFAConverter conv = new NFAToDFAConverter(g, s);
-		DFA dfa = conv.createDFA();
+		NFAToApproxDFAConverter approxConv = new NFAToApproxDFAConverter(g, s);
+		DFA dfa = approxConv.createDFA();
 		System.out.println("DFA="+dfa);
 		
 		// REAL LL(*) ANALYSIS IF THAT FAILS
+		NFAToExactDFAConverter conv = new NFAToExactDFAConverter(g, s);
+//		DFA dfa = conv.createDFA();
+//		System.out.println("DFA="+dfa);
+
 		return dfa;
 	}
 }

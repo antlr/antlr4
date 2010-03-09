@@ -59,7 +59,7 @@ public class DFA {
 
 	/** We only want one accept state per predicted alt; track here */
 	public DFAState[] altToAcceptState;	
-	
+
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
 

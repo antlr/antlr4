@@ -12,7 +12,9 @@ import java.util.*;
  *  per DFA (also required for thread safety if multiple conversions
  *  launched).
  */
-public class NFAToDFAConverter {
+public class NFAToApproxDFAConverter {
+	public static final NFAContext NFA_EMPTY_STACK_CONTEXT = new NFAContext(null, null);
+
 	Grammar g;
 
 	DecisionState nfaStartState;
@@ -30,8 +32,8 @@ public class NFAToDFAConverter {
 	Set<NFAConfig> closureBusy;
 
 	public static boolean debug = false;
-	
-	public NFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
+
+	public NFAToApproxDFAConverter(Grammar g, DecisionState nfaStartState) {
 		this.g = g;
 		this.nfaStartState = nfaStartState;
 		dfa = new DFA(g, nfaStartState);
@@ -95,7 +97,8 @@ public class NFAToDFAConverter {
 
 		// resolve any syntactic conflicts by choosing a single alt or
 		// by using semantic predicates if present.
-		Resolver.resolveNonDeterminisms(t);
+		boolean approx = this instanceof NFAToApproxDFAConverter;
+		Resolver.resolveNonDeterminisms(t, approx);
 
 		// If deterministic, don't add this state; it's an accept state
 		// Just return as a valid DFA state
@@ -163,7 +166,8 @@ public class NFAToDFAConverter {
 		for (int altNum=1; altNum<=dfa.nAlts; altNum++) {
 			Transition t = nfaStartState.transition(altNum-1);
 			NFAState altStart = t.target;
-			d.addNFAConfig(altStart, altNum, null);
+			NFAContext initialContext = NFA_EMPTY_STACK_CONTEXT;
+			d.addNFAConfig(altStart, altNum, initialContext);
 		}
 
 		closure(d);
@@ -190,12 +194,31 @@ public class NFAToDFAConverter {
 
 		closureBusy = null; // wack all that memory used during closure
 
+		if ( debug ) {
+			System.out.println("after closure("+d+")");
+		}
 		// System.out.println("after closure d="+d);
 	}
 
 	/** Where can we get from NFA state s traversing only epsilon transitions?
+	 *
+	 *  A closure operation should abort if that computation has already
+	 *  been done or a computation with a conflicting context has already
+	 *  been done.  If proposed NFA config's state and alt are the same
+	 *  there is potentially a problem.  If the stack context is identical
+	 *  then clearly the exact same computation is proposed.  If a context
+	 *  is a suffix of the other, then again the computation is in an
+	 *  identical context.  beta $ and beta alpha $ are considered the same stack.
+	 *  We could walk configurations linearly doing the comparison instead
+	 *  of a set for exact matches but it's much slower because you can't
+	 *  do a Set lookup.  I use exact match as ANTLR
+	 *  always detect the conflict later when checking for context suffixes...
+	 *  I check for left-recursive stuff and terminate before analysis to
+	 *  avoid need to do this more expensive computation.
+	 *
+	 *  TODO: remove altNum if we don't reorder for loopback nodes
 	 */
-	public void closure(NFAState s, int altNum, NFAState context,
+	public void closure(NFAState s, int altNum, NFAContext context,
 						List<NFAConfig> configs)
 	{
 		NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context);
@@ -206,47 +229,61 @@ public class NFAToDFAConverter {
 		// p itself is always in closure
 		configs.add(proposedNFAConfig);
 
-		Rule invokingRule = null;
-
-		if ( context!=null ) invokingRule = context.rule;
-
 		// if we have context info and we're at rule stop state, do
 		// local follow for invokingRule and global follow for other links
-		if ( invokingRule!=null && s instanceof RuleStopState ) {
-			//System.out.println("FOLLOW of "+s+" context="+context);
-			// follow all static FOLLOW links
-			int n = s.getNumberOfTransitions();
-			for (int i=0; i<n; i++) {
-				Transition t = s.transition(i);
-				// Chase global FOLLOW links if they don't point at invoking rule
-				// else follow link to context state only
-				if ( t.target.rule != invokingRule ) {
-					//System.out.println("OFF TO "+t.target);
-					closure(t.target, altNum, context, configs);
-				}
-				else if ( t.target == context ) {
-					//System.out.println("OFF TO CALL SITE "+t.target);
-					// go to specific call site; pop context
-					closure(t.target, altNum, null, configs);
-				}
-			}
-			return;
+		if ( s instanceof RuleStopState ) {
+			ruleStopStateClosure(s, altNum, context, configs);
 		}
+		else {
+			commonClosure(s, altNum, context, configs);
+		}
+	}
 
+	void ruleStopStateClosure(NFAState s, int altNum, NFAContext context, List<NFAConfig> configs) {
+		Rule invokingRule = null;
+
+		if ( context!=NFA_EMPTY_STACK_CONTEXT ) invokingRule = context.returnState.rule;
+
+		//System.out.println("FOLLOW of "+s+" context="+context);
+		// follow all static FOLLOW links
 		int n = s.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
-			NFAState newContext = context;       // assume old context
-			if ( t instanceof RuleTransition && context==null ) {
-				newContext = ((RuleTransition)t).followState; // push new context if none
+			if ( !(t instanceof EpsilonTransition) ) continue; // ignore EOF transitions
+			// Chase global FOLLOW links if they don't point at invoking rule
+			// else follow link to context state only
+			if ( t.target.rule != invokingRule ) {
+				//System.out.println("OFF TO "+t.target);
+				closure(t.target, altNum, context, configs);
+			}
+			else {
+				if ( t.target == context.returnState) {
+					//System.out.println("OFF TO CALL SITE "+t.target);
+					// go only to specific call site; pop context
+					closure(t.target, altNum, NFA_EMPTY_STACK_CONTEXT, configs);
+				}
+			}
+		}
+		return;
+	}
+
+	void commonClosure(NFAState s, int altNum, NFAContext context, List<NFAConfig> configs) {
+		int n = s.getNumberOfTransitions();
+		for (int i=0; i<n; i++) {
+			Transition t = s.transition(i);
+			NFAContext newContext = context;	// assume old context
+			if ( t instanceof RuleTransition) {
+				NFAState retState = ((RuleTransition)t).followState;
+				if ( context==NFA_EMPTY_STACK_CONTEXT ) { // track first call return state only
+					newContext = new NFAContext(context, retState);
+				}
 			}
 			if ( t.isEpsilon() ) {
 				closure(t.target, altNum, newContext, configs);
 			}
 		}
 	}
-
-
+	
 	public OrderedHashSet<IntervalSet> getReachableLabels(DFAState d) {
 		OrderedHashSet<IntervalSet> reachableLabels = new OrderedHashSet<IntervalSet>();
 		for (NFAState s : d.getUniqueNFAStates()) { // for each state
