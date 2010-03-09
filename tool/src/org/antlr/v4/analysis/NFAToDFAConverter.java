@@ -1,7 +1,10 @@
-package org.antlr.v4.automata;
+package org.antlr.v4.analysis;
 
+import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.IntervalSet;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 import java.util.*;
 
@@ -41,8 +44,7 @@ public class NFAToDFAConverter {
 
 		// while more DFA states to check, process them
 		while ( work.size()>0 ) {
-			DFAState d = work.get(0);
-			reach(d);
+			reach( work.get(0) );
 			work.remove(0); // we're done with this DFA state
 		}
 		
@@ -52,49 +54,62 @@ public class NFAToDFAConverter {
 	/** From this node, add a d--a-->t transition for all
 	 *  labels 'a' where t is a DFA node created
 	 *  from the set of NFA states reachable from any NFA
-	 *  state in DFA state d.
+	 *  configuration in DFA state d.
 	 */
 	void reach(DFAState d) {
 		OrderedHashSet<IntervalSet> labels = getReachableLabels(d);
 
 		for (IntervalSet label : labels) {
-			DFAState newd = reach(d, label);
+			DFAState t = reach(d, label);
 			if ( debug ) {
-				System.out.println("DFA state after reach "+label+" "+d+"-" +
-								   label.toString(g)+"->"+newd);
+				System.out.println("DFA state after reach -" +
+								   label.toString(g)+"->"+t);
 			}
-			if ( newd==null ) {
-				// nothing was reached by label due to conflict resolution
-				// EOT also seems to be in here occasionally probably due
-				// to an end-of-rule state seeing it even though we'll pop
-				// an invoking state off the state; don't bother to conflict
-				// as this labels set is a covering approximation only.
-				continue;
-			}
-			if ( newd.getUniqueAlt()== NFA.INVALID_ALT_NUMBER ) {
-				// Only compute closure if a unique alt number is not known.
-				// If a unique alternative is mentioned among all NFA
-				// configurations then there is no possibility of needing to look
-				// beyond this state; also no possibility of a nondeterminism.
-				// This optimization May 22, 2006 just dropped -Xint time
-				// for analysis of Java grammar from 11.5s to 2s!  Wow.
-				closure(newd);  // add any NFA states reachable via epsilon
-			}
-			
-			// add if not in DFA yet and then make d-label->t
-			DFAState targetState = newd;
-			DFAState existingState = dfa.addState(newd);
-			if ( newd != existingState ) {
-				// already there...use/return the existing DFA state.
-				targetState = existingState;
-			}
+			// nothing was reached by label due to conflict resolution
+			if ( t==null ) continue;
+//			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
+//				// Only compute closure if a unique alt number is not known.
+//				// If a unique alternative is mentioned among all NFA
+//				// configurations then there is no possibility of needing to look
+//				// beyond this state; also no possibility of a nondeterminism.
+//				// This optimization May 22, 2006 just dropped -Xint time
+//				// for analysis of Java grammar from 11.5s to 2s!  Wow.
+//				closure(t);  // add any NFA states reachable via epsilon
+//			}
 
-			d.addTransition(new Edge(targetState, label));
+			closure(t);  // add any NFA states reachable via epsilon
 
-//
-//			numberOfEdgesEmanating +=
-//				addTransition(d, label, targetState, targetToLabelMap);
+			addTransition(d, label, t); // make d-label->t transition
 		}
+	}
+
+	/** Add t if not in DFA yet, resolving nondet's and then make d-label->t */
+	void addTransition(DFAState d, IntervalSet label, DFAState t) {
+		DFAState existing = dfa.uniqueStates.get(t);
+		if ( existing != null ) { // seen before; point at old one
+			d.addTransition(new Edge(existing, label));
+			return;
+		}
+
+		dfa.addState(t);  // add state we've never seen before
+
+		// resolve any syntactic conflicts by choosing a single alt or
+		// by using semantic predicates if present.
+		Resolver.resolveNonDeterminisms(t);
+
+		// If deterministic, don't add this state; it's an accept state
+		// Just return as a valid DFA state
+		int alt = t.getUniquelyPredictedAlt();
+		if ( alt > 0 ) { // uniquely predicts an alt?
+			System.out.println(t+" predicts "+alt);
+			t.isAcceptState = true;
+		}
+		else {
+			System.out.println("ADD "+t);
+			work.add(t); // unresolved, add to work list to continue NFA conversion
+		}
+
+		d.addTransition(new Edge(t, label));
 	}
 
 	/** Given the set of NFA states in DFA state d, find all NFA states
@@ -111,7 +126,7 @@ public class NFAToDFAConverter {
 	 *  7 had.
 	 */
 	public DFAState reach(DFAState d, IntervalSet label) {
-		//System.out.println("reach "+label.toString(dfa.nfa.grammar)+" from "+d.stateNumber);
+		//System.out.println("reach "+label.toString(g)+" from "+d.stateNumber);
 		DFAState labelTarget = dfa.newState();
 
 		for (NFAConfig c : d.nfaConfigs) {
@@ -124,6 +139,10 @@ public class NFAToDFAConverter {
 					labelTarget.addNFAConfig(t.target, c.alt, c.context);
 				}
 			}
+		}
+
+		if ( labelTarget.nfaConfigs.size()==0 ) {
+			System.err.println("why is this empty?");
 		}
 		
 		return labelTarget;
@@ -145,10 +164,7 @@ public class NFAToDFAConverter {
 			Transition t = nfaStartState.transition(altNum-1);
 			NFAState altStart = t.target;
 			d.addNFAConfig(altStart, altNum, null);
-
 		}
-
-		System.out.println("before closure start d="+d);
 
 		closure(d);
 
@@ -174,7 +190,7 @@ public class NFAToDFAConverter {
 
 		closureBusy = null; // wack all that memory used during closure
 
-		System.out.println("after closure d="+d);
+		// System.out.println("after closure d="+d);
 	}
 
 	/** Where can we get from NFA state s traversing only epsilon transitions?
@@ -194,11 +210,29 @@ public class NFAToDFAConverter {
 		// p itself is always in closure
 		configs.add(proposedNFAConfig);
 
-		if ( s instanceof RuleStopState ) {
-			// do follow
+		Rule invokingRule = null;
+
+		if ( context!=null ) invokingRule = context.rule;
+
+		// if we have context info and we're at rule stop state, do
+		// dynamic follow for invokingRule and static follow for other links
+		if ( invokingRule!=null && s instanceof RuleStopState ) {
+			//System.out.println("FOLLOW of "+s+" context="+context);
+			// follow all static FOLLOW links
 			int n = s.getNumberOfTransitions();
 			for (int i=0; i<n; i++) {
 				Transition t = s.transition(i);
+				// Follow static links if they don't point at invoking rule
+				// else follow link to context state only
+				if ( t.target.rule != invokingRule ) {
+					//System.out.println("OFF TO "+t.target);
+					closure(t.target, altNum, context, configs);
+				}
+				else if ( t.target == context ) {
+					//System.out.println("OFF TO CALL SITE "+t.target);
+					// go to specific call site; pop context
+					closure(t.target, altNum, null, configs);
+				}
 			}
 			return;
 		}
@@ -206,16 +240,24 @@ public class NFAToDFAConverter {
 		int n = s.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
-			if ( t instanceof RuleTransition ) {
-				NFAState newContext = context;
-				if ( context==null ) newContext = s; // push new context
+			NFAState newContext = context;       // assume old context
+			if ( t instanceof RuleTransition && context==null ) {
+				newContext = ((RuleTransition)t).followState; // push new context if none
+			}
+			if ( t.isEpsilon() ) {
 				closure(t.target, altNum, newContext, configs);
 			}
-			else if ( t.isEpsilon() ) {
-				closure(t.target, altNum, context, configs);
-			}
+//			if ( t instanceof RuleTransition ) {
+//				NFAState newContext = context;       // assume old context
+//				if ( context==null ) newContext = s; // push new context if none
+//				closure(t.target, altNum, newContext, configs);
+//			}
+//			else if ( t.isEpsilon() ) {
+//				closure(t.target, altNum, context, configs);
+//			}
 		}
 	}
+
 
 	public OrderedHashSet<IntervalSet> getReachableLabels(DFAState d) {
 		OrderedHashSet<IntervalSet> reachableLabels = new OrderedHashSet<IntervalSet>();
@@ -235,7 +277,7 @@ public class NFAToDFAConverter {
 				}
 			}
 		}
-		System.out.println("reachable labels for "+d+"="+reachableLabels);
+		//System.out.println("reachable labels for "+d+"="+reachableLabels);
 		return reachableLabels;
 	}
 

@@ -72,8 +72,8 @@ public class NFASerializer {
 		else if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
 		else if ( s instanceof BlockStartState ) stateStr = "BlockStart_"+n;
 		else if ( s instanceof BlockEndState ) stateStr = "BlockEnd_"+n;
-		else if ( s instanceof RuleStartState ) stateStr = "RuleStart_"+((RuleStartState)s).rule.name+"_"+n;
-		else if ( s instanceof RuleStopState ) stateStr = "RuleStop_"+((RuleStopState)s).rule.name+"_"+n;
+		else if ( s instanceof RuleStartState ) stateStr = "RuleStart_"+s.rule.name+"_"+n;
+		else if ( s instanceof RuleStopState ) stateStr = "RuleStop_"+s.rule.name+"_"+n;
 		else if ( s instanceof LoopbackState ) stateStr = "LoopBack_"+n;
 		return stateStr;
 	}

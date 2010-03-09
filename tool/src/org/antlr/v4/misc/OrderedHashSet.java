@@ -1,4 +1,4 @@
-package org.antlr.v4.automata;
+package org.antlr.v4.misc;
 
 import java.util.ArrayList;
 import java.util.HashSet;

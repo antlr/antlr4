@@ -1,11 +1,15 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.Rule;
 
 public class NFAState {
 	public static final int INVALID_STATE_NUMBER = -1;
 
 	public int stateNumber = INVALID_STATE_NUMBER;
+
+	/** NFAState created for which rule? */
+	public Rule rule;
 
 	@Override
 	public int hashCode() {
@@ -15,7 +19,7 @@ public class NFAState {
 	@Override
 	public boolean equals(Object o) {
 		// are these states same object?
-		if ( o instanceof NFAState ) return this == (NFAState)o;
+		if ( o instanceof NFAState ) return stateNumber==((NFAState)o).stateNumber;
 		return false;
 	}
 

@@ -31,12 +31,14 @@ public class DFASerializer {
 
 		while ( work.size()>0 ) {
 			s = work.remove(0);
-			if ( marked.contains(s) ) continue; 
-			int n = s.getNumberOfTransitions();
-			//System.out.println("visit "+getDFAStateString(s)+"; edges="+n);
+			if ( marked.contains(s) ) continue;
 			marked.add(s);
+			int n = s.getNumberOfTransitions();
+			//System.out.println("visit "+getStateString(s)+"; edges="+n);
 			for (int i=0; i<n; i++) {
+				buf.append(getStateString(s));
 				Edge t = s.transition(i);
+				work.add( t.target );				
 				buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
 			}
 		}
@@ -46,7 +48,7 @@ public class DFASerializer {
 	String getStateString(DFAState s) {
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
-		stateStr = ":s"+n+"=>"+s.getUniquelyPredictedAlt();
+		if ( s.isAcceptState ) stateStr = ":s"+n+"=>"+s.getUniquelyPredictedAlt();
 		return stateStr;
 	}
 }

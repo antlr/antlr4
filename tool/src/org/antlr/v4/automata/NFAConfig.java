@@ -33,7 +33,7 @@ public class NFAConfig {
 	 *  such as (s|2) and (s|3), I can set (s|3) to resolved=true (and any
 	 *  other configuration associated with alt 3).
 	 */
-	//protected boolean resolved;
+	public boolean resolved;
 
 	/** This bit is used to indicate a semantic predicate will be
 	 *  used to resolve the conflict.  Method
@@ -64,10 +64,11 @@ public class NFAConfig {
      */
     public boolean equals(Object o) {
 		if ( o==null ) return false;
+		if ( this==o ) return true;
         NFAConfig other = (NFAConfig)o;
         return this.state==other.state &&
                this.alt==other.alt &&
-			   this.context ==other.context;
+			   this.context==other.context;
 //               this.context.equals (other.context)&&
 //               this.semanticContext.equals(other.semanticContext)
     }
@@ -92,9 +93,9 @@ public class NFAConfig {
             buf.append("|");
             buf.append(context);
         }
-//        if ( resolved ) {
-//            buf.append("|resolved");
-//        }
+        if ( resolved ) {
+            buf.append("|resolved");
+        }
 //		if ( resolveWithPredicate ) {
 //			buf.append("|resolveWithPredicate");
 //		}

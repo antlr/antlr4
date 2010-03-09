@@ -1,10 +1,14 @@
 package org.antlr.v4.automata;
 
-import org.antlr.analysis.NFA;
+import org.antlr.v4.analysis.Resolver;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** A DFA state represents a set of possible NFA configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -52,7 +56,7 @@ public class DFAState {
 	public OrderedHashSet<NFAConfig> nfaConfigs =
 		new OrderedHashSet<NFAConfig>();
 
-	int cachedUniquelyPredicatedAlt = NFA.INVALID_ALT_NUMBER;
+	//int cachedUniquelyPredicatedAlt = NFA.INVALID_ALT_NUMBER;
 
 	public DFAState(DFA dfa) { this.dfa = dfa; }
 
@@ -72,7 +76,7 @@ public class DFAState {
 
 	/** Walk each NFA configuration in this DFA state looking for a conflict
 	 *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
-	 *  context conflicting ctx predicts alts i and j.  Return an Integer set
+	 *  conflicting ctx predicts alts i and j.  Return an Integer set
 	 *  of the alternative numbers that conflict.  Two contexts conflict if
 	 *  they are equal or one is a stack suffix of the other or one is
 	 *  the empty context.
@@ -83,8 +87,7 @@ public class DFAState {
 	 *  alt must be different or must have different contexts to avoid a
 	 *  conflict.
 	 */
-	protected Set<Integer> getConflictingAlts() {
-		// TODO this is called multiple times: cache result?
+	public Set<Integer> getNonDeterministicAlts() {
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
 		 Set<Integer> nondeterministicAlts = new HashSet<Integer>();
 
@@ -93,54 +96,44 @@ public class DFAState {
 		// and so we save a hash map and iterator creation for each
 		// state.
 		int numConfigs = nfaConfigs.size();
-		if ( numConfigs <=1 ) {
-			return null;
-		}
+		if ( numConfigs<=1 ) return null;
 
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
 		MultiMap<Integer, NFAConfig> stateToConfigListMap =
 			new MultiMap<Integer, NFAConfig>();
-		for (int i = 0; i < numConfigs; i++) {
-			NFAConfig configuration = (NFAConfig) nfaConfigs.get(i);
-			Integer stateI = Utils.integer(configuration.state.stateNumber);
-			stateToConfigListMap.map(stateI, configuration);
+		for (NFAConfig c : nfaConfigs) {
+			stateToConfigListMap.map(Utils.integer(c.state.stateNumber), c);
 		}
+		
 		// potential conflicts are states with > 1 configuration and diff alts
-		Set states = stateToConfigListMap.keySet();
-		int numPotentialConflicts = 0;
-		for (Iterator it = states.iterator(); it.hasNext();) {
-			Integer stateI = (Integer) it.next();
-			boolean thisStateHasPotentialProblem = false;
-			List configsForState = (List)stateToConfigListMap.get(stateI);
-			int alt=0;
-			int numConfigsForState = configsForState.size();
-			for (int i = 0; i < numConfigsForState && numConfigsForState>1 ; i++) {
-				NFAConfig c = (NFAConfig) configsForState.get(i);
-				if ( alt==0 ) {
-					alt = c.alt;
+		boolean thisStateHasPotentialProblem = false;
+		for (List<NFAConfig> configsForState : stateToConfigListMap.values()) {
+			if ( configsForState.size()>1 ) {
+//				for (NFAConfig c : configsForState) {
+//					if ( alt==0 ) alt = c.alt;
+//					else if ( c.alt!=alt ) {
+//					 System.out.println("potential conflict in state "+stateI+
+//										" configs: "+configsForState);
+//						numPotentialConflicts++;
+//						thisStateHasPotentialProblem = true;
+//					}
+//				}
+				int predictedAlt = Resolver.getUniqueAlt(configsForState, false);
+				if ( predictedAlt > 0 ) {
+					// remove NFA state's configurations from
+					// further checking; no issues with it
+					// (can't remove as it's concurrent modification; set to null)
+					stateToConfigListMap.put(configsForState.get(0).state.stateNumber, null);
 				}
-				else if ( c.alt!=alt ) {
-					/*
-					System.out.println("potential conflict in state "+stateI+
-									   " configs: "+configsForState);
-					*/
-					numPotentialConflicts++;
+				else {
 					thisStateHasPotentialProblem = true;
 				}
-			}
-			if ( !thisStateHasPotentialProblem ) {
-				// remove NFA state's configurations from
-				// further checking; no issues with it
-				// (can't remove as it's concurrent modification; set to null)
-				stateToConfigListMap.put(stateI, null);
 			}
 		}
 
 		// a fast check for potential issues; most states have none
-		if ( numPotentialConflicts==0 ) {
-			return null;
-		}
+		if ( !thisStateHasPotentialProblem ) return null;
 
 		// we have a potential problem, so now go through config lists again
 		// looking for different alts (only states with potential issues
@@ -155,15 +148,11 @@ public class DFAState {
 		// Indeed a conflict exists as same state 3, same context [$], predicts
 		// alts 1 and 2.
 		// walk each state with potential conflicting configurations
-		for (Iterator it = states.iterator(); it.hasNext();) {
-			Integer stateI = (Integer) it.next();
-			List configsForState = (List)stateToConfigListMap.get(stateI);
+		for (List<NFAConfig> configsForState : stateToConfigListMap.values()) {
 			// compare each configuration pair s, t to ensure:
 			// s.ctx different than t.ctx if s.alt != t.alt
 			int numConfigsForState = 0;
-			if ( configsForState!=null ) {
-				numConfigsForState = configsForState.size();
-			}
+			if ( configsForState!=null ) numConfigsForState = configsForState.size();
 			for (int i = 0; i < numConfigsForState; i++) {
 				NFAConfig s = (NFAConfig) configsForState.get(i);
 				for (int j = i+1; j < numConfigsForState; j++) {
@@ -171,7 +160,7 @@ public class DFAState {
 					// conflicts means s.ctx==t.ctx or s.ctx is a stack
 					// suffix of t.ctx or vice versa (if alts differ).
 					// Also a conflict if s.ctx or t.ctx is empty
-					if ( s.alt != t.alt && s.context != t.context ) {
+					if ( s.alt != t.alt && s.context == t.context ) {
 						nondeterministicAlts.add(Utils.integer(s.alt));
 						nondeterministicAlts.add(Utils.integer(t.alt));
 					}
@@ -179,52 +168,21 @@ public class DFAState {
 			}
 		}
 
-		if ( nondeterministicAlts.size()==0 ) {
-			return null;
-		}
+		if ( nondeterministicAlts.size()==0 ) return null;
 		return nondeterministicAlts;
 	}
 
 	/** Walk each configuration and if they are all the same alt, return
 	 *  that alt else return NFA.INVALID_ALT_NUMBER.  Ignore resolved
-	 *  configurations, but don't ignore resolveWithPredicate configs
-	 *  because this state should not be an accept state.  We need to add
-	 *  this to the work list and then have semantic predicate edges
-	 *  emanating from it.
+	 *  configs.  TODO: Cache results?
 	 */
-	public int getUniquelyPredictedAlt() {
-		if ( cachedUniquelyPredicatedAlt!=NFA.INVALID_ALT_NUMBER ) {
-			return cachedUniquelyPredicatedAlt;
-		}
-		int alt = NFA.INVALID_ALT_NUMBER;
-		for (NFAConfig c : nfaConfigs) {
-			if ( alt== NFA.INVALID_ALT_NUMBER ) {
-				alt = c.alt; // found first nonresolved alt
-			}
-			else if ( c.alt!=alt ) {
-				return NFA.INVALID_ALT_NUMBER;
-			}
-		}
-		this.cachedUniquelyPredicatedAlt = alt;
-		return alt;
-	}
+	public int getUniquelyPredictedAlt() { return Resolver.getUniqueAlt(nfaConfigs, false); }
 
 	/** Return the uniquely mentioned alt from the NFA configurations;
-	 *  Ignore the resolved bit etc...  Return INVALID_ALT_NUMBER
-	 *  if there is more than one alt mentioned.
+	 *  Return INVALID_ALT_NUMBER if there is more than one alt mentioned.
+	 *  Consider all configs in state.
 	 */
-	public int getUniqueAlt() {
-		int alt = NFA.INVALID_ALT_NUMBER;
-		for (NFAConfig c : nfaConfigs) {
-			if ( alt== NFA.INVALID_ALT_NUMBER ) {
-				alt = c.alt; // found first alt
-			}
-			else if ( c.alt!=alt ) {
-				return NFA.INVALID_ALT_NUMBER;
-			}
-		}
-		return alt;
-	}
+	public int getUniqueAlt() { return Resolver.getUniqueAlt(nfaConfigs, true); }
 
 	/** Get the set of all alts mentioned by all NFA configurations in this
 	 *  DFA state.
@@ -236,6 +194,14 @@ public class DFAState {
 		}
 		if ( alts.size()==0 ) return null;
 		return alts;
+	}
+
+	public int getMinAlt() {
+		int min = Integer.MAX_VALUE;
+		for (NFAConfig c : nfaConfigs) {
+			if ( c.alt < min ) min = c.alt;
+		}
+		return min;
 	}
 
 	public Set<NFAState> getUniqueNFAStates() {
@@ -273,8 +239,11 @@ public class DFAState {
 	 */
 	public boolean equals(Object o) {
 		// compare set of NFA configurations in this set with other
+		if ( this==o ) return true;
 		DFAState other = (DFAState)o;
-		return this.nfaConfigs.equals(other.nfaConfigs);
+		boolean sameSet = this.nfaConfigs.equals(other.nfaConfigs);
+		//System.out.println("DFAState.equals: "+nfaConfigs+(sameSet?"==":"!=")+other.nfaConfigs);
+		return sameSet;
 	}
 
 	/** Print all NFA states plus what alts they predict */

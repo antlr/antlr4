@@ -6,7 +6,7 @@ import org.antlr.v4.tool.Grammar;
 /** TODO: make all transitions sets? */
 public class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
-	protected int label;
+	public int label;
 
 	public AtomTransition(int label, NFAState target) {
 		this.label = label;

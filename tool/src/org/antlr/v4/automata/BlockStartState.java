@@ -9,9 +9,6 @@ public class BlockStartState extends DecisionState {
 
 	BlockEndState endState;
 
-	/** What's its decision number from 1..n? */
-	protected int decisionNumber = 0;	
-
 	/** Track the transitions emanating from this NFA state. */
 	protected List<Transition> transitions =
 		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);

@@ -71,6 +71,7 @@ public class ParserNFAFactory implements NFAFactory {
 			Constructor ctor = nodeType.getConstructor(NFA.class);
 			NFAState s = (NFAState)ctor.newInstance(nfa);
 			s.ast = node;
+			s.rule = currentRule;
 			nfa.addState(s);
 			return s;
 		}
@@ -82,6 +83,7 @@ public class ParserNFAFactory implements NFAFactory {
 
 	public BasicState newState(GrammarAST node) {
 		BasicState n = new BasicState(nfa);
+		n.rule = currentRule;
 		n.ast = node;
 		nfa.addState(n);
 		return n;
@@ -133,7 +135,7 @@ public class ParserNFAFactory implements NFAFactory {
 		BasicState right = newState(node);
 		RuleTransition call = new RuleTransition(r, start, right);
 		call.followState = right;
-		left.transition = call;
+		left.addTransition(call);
 
 		// add follow edge from end of invoked rule
 		RuleStopState stop = nfa.ruleToStopState.get(r);

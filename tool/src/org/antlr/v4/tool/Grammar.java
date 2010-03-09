@@ -3,9 +3,11 @@ package org.antlr.v4.tool;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
+import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.Label;
 import org.antlr.v4.automata.NFA;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -53,6 +55,8 @@ public class Grammar implements AttributeResolver {
 	 *  or epsilon.  It is more suitable to analysis than an AST representation.
 	 */
 	public NFA nfa;
+
+	public Map<Integer, DFA> decisionDFAs = new HashMap<Integer, DFA>();
 	
 	public Tool tool;
 
@@ -514,4 +518,7 @@ public class Grammar implements AttributeResolver {
 		return lexerRuleToStringLiteral;
 	}
 
+	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
+		decisionDFAs.put(Utils.integer(decision), lookaheadDFA);
+	}
 }

@@ -3,8 +3,8 @@ package org.antlr.v4.automata;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +18,7 @@ public class DFA {
 	/** What's the start state for this DFA? */
     public DFAState startState;
 
-	/** Which NFA are we converting (well, which piece of the NFA)? */
-//    public NFA nfa;
+	public int decision;
 
 	/** From what NFAState did we create the DFA? */
 	public DecisionState decisionNFAStartState;
@@ -68,39 +67,24 @@ public class DFA {
 		this.g = g;
 		this.decisionNFAStartState = startState;
 		nAlts = startState.getNumberOfTransitions();
-		unreachableAlts = new LinkedList();
+		decision = startState.decision;
+		unreachableAlts = new ArrayList<Integer>();
 		for (int i = 1; i <= nAlts; i++) {
 			unreachableAlts.add(Utils.integer(i));
 		}
 		altToAcceptState = new DFAState[nAlts+1];
 	}
 
-	/** Add a new DFA state to this DFA if not already present.
-     *  To force an acyclic, fixed maximum depth DFA, just always
-	 *  return the incoming state.  By not reusing old states,
-	 *  no cycles can be created.  If we're doing fixed k lookahead
-	 *  don't updated uniqueStates, just return incoming state, which
-	 *  indicates it's a new state.
-     */
-    protected DFAState addState(DFAState d) {
-		// does a DFA state exist already with everything the same
-		// except its state number?
-		DFAState existing = (DFAState)uniqueStates.get(d);
-		if ( existing != null ) {
-            /*
-            System.out.println("state "+d.stateNumber+" exists as state "+
-                existing.stateNumber);
-                */
-            // already there...get the existing DFA state
-			return existing;
-		}
-
-		// if not there, then add new state.
+	/** Add a new DFA state to this DFA (doesn't check if already present). */
+	public void addState(DFAState d) {
 		uniqueStates.put(d,d);
 		d.stateNumber = stateCounter++;
-		return d;
 	}
 
+	public void defineAcceptState(int alt, DFAState acceptState) {
+		altToAcceptState[alt] = acceptState;
+	}
+	
 	public DFAState newState() {
 		DFAState n = new DFAState(this);
 //		states.setSize(n.stateNumber+1);

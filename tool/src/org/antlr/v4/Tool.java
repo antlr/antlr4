@@ -1,9 +1,9 @@
 package org.antlr.v4;
 
-import org.antlr.codegen.CodeGenerator;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.analysis.AnalysisPipeline;
+import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.LexerNFAFactory;
 import org.antlr.v4.automata.NFAFactory;
 import org.antlr.v4.automata.ParserNFAFactory;
@@ -373,12 +373,14 @@ public class Tool {
 		g.nfa = factory.createNFA();
 		
 		if ( generate_NFA_dot ) generateNFAs(g);
-		
+
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
 		anal.process();
 		
+		if ( generate_DFA_dot ) generateDFAs(g);
+
 		// GENERATE CODE
     }
 
@@ -483,7 +485,7 @@ public class Tool {
         return lexerAST;
     }
 
-	protected void generateNFAs(Grammar g) {
+	public void generateNFAs(Grammar g) {
 		DOTGenerator dotGenerator = new DOTGenerator(g);
 		List<Grammar> grammars = new ArrayList<Grammar>();
 		grammars.add(g);
@@ -499,6 +501,25 @@ public class Tool {
 				} catch (IOException ioe) {
 					ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 				}
+			}
+		}
+	}
+
+	public void generateDFAs(Grammar g) {
+		for (DFA dfa : g.decisionDFAs.values()) {
+			DOTGenerator dotGenerator = new DOTGenerator(g);
+			String dot = dotGenerator.getDOT(dfa.startState);
+			String dotFileName = g.name + "." + "dec-" + dfa.decision;
+			if (g.implicitLexer!=null) {
+				dotFileName = g.name +
+							  Grammar.getGrammarTypeToFileNameSuffix(g.getType()) +
+							  "." + "dec-" + dfa.decision;
+			}
+			try {
+				writeDOTFile(g, dotFileName, dot);
+			}
+			catch (IOException ioe) {
+				ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, dotFileName, ioe);
 			}
 		}
 	}
@@ -540,7 +561,7 @@ public class Tool {
 		// be the base output directory (or current directory if there is not a -o)
 		//
 		File outputDir;
-		if (fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION)) {
+		if ( fileName.endsWith(".tokens") ) {// CodeGenerator.VOCAB_FILE_EXTENSION)) {
 			if (haveOutputDir) {
 				outputDir = new File(outputDirectory);
 			}
