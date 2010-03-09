@@ -198,13 +198,9 @@ public class NFAToDFAConverter {
 	public void closure(NFAState s, int altNum, NFAState context,
 						List<NFAConfig> configs)
 	{
-		NFAConfig proposedNFAConfig =
-			new NFAConfig(s, altNum, context);
+		NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context);
 
-		if ( closureBusy.contains(proposedNFAConfig) ) {
-			return;
-		}
-
+		if ( closureBusy.contains(proposedNFAConfig) ) return;
 		closureBusy.add(proposedNFAConfig);
 
 		// p itself is always in closure
@@ -215,14 +211,14 @@ public class NFAToDFAConverter {
 		if ( context!=null ) invokingRule = context.rule;
 
 		// if we have context info and we're at rule stop state, do
-		// dynamic follow for invokingRule and static follow for other links
+		// local follow for invokingRule and global follow for other links
 		if ( invokingRule!=null && s instanceof RuleStopState ) {
 			//System.out.println("FOLLOW of "+s+" context="+context);
 			// follow all static FOLLOW links
 			int n = s.getNumberOfTransitions();
 			for (int i=0; i<n; i++) {
 				Transition t = s.transition(i);
-				// Follow static links if they don't point at invoking rule
+				// Chase global FOLLOW links if they don't point at invoking rule
 				// else follow link to context state only
 				if ( t.target.rule != invokingRule ) {
 					//System.out.println("OFF TO "+t.target);
@@ -247,14 +243,6 @@ public class NFAToDFAConverter {
 			if ( t.isEpsilon() ) {
 				closure(t.target, altNum, newContext, configs);
 			}
-//			if ( t instanceof RuleTransition ) {
-//				NFAState newContext = context;       // assume old context
-//				if ( context==null ) newContext = s; // push new context if none
-//				closure(t.target, altNum, newContext, configs);
-//			}
-//			else if ( t.isEpsilon() ) {
-//				closure(t.target, altNum, context, configs);
-//			}
 		}
 	}
 
