@@ -1,11 +1,9 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.misc.Utils;
+import org.antlr.v4.analysis.StackLimitedNFAToDFAConverter;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /** A DFA (converted from a grammar's NFA).
@@ -44,17 +42,6 @@ public class DFA {
 	 */
 	//protected List<DFAState> states = new ArrayList<DFAState>();
 
-	/** Each alt in an NFA derived from a grammar must have a DFA state that
-     *  predicts it lest the parser not know what to do.  Nondeterminisms can
-     *  lead to this situation (assuming no semantic predicates can resolve
-     *  the problem) and when for some reason, I cannot compute the lookahead
-     *  (which might arise from an error in the algorithm or from
-     *  left-recursion etc...).  This list starts out with all alts contained
-     *  and then in method doesStateReachAcceptState() I remove the alts I
-     *  know to be uniquely predicted.
-     */
-    public List<Integer> unreachableAlts;
-
 	public int nAlts = 0;
 
 	/** We only want one accept state per predicted alt; track here */
@@ -63,15 +50,13 @@ public class DFA {
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
 
+	public StackLimitedNFAToDFAConverter converter;
+
 	public DFA(Grammar g, DecisionState startState) {
 		this.g = g;
 		this.decisionNFAStartState = startState;
 		nAlts = startState.getNumberOfTransitions();
 		decision = startState.decision;
-		unreachableAlts = new ArrayList<Integer>();
-		for (int i = 1; i <= nAlts; i++) {
-			unreachableAlts.add(Utils.integer(i));
-		}
 		altToAcceptState = new DFAState[nAlts+1];
 	}
 
@@ -82,6 +67,7 @@ public class DFA {
 	}
 
 	public void defineAcceptState(int alt, DFAState acceptState) {
+		if ( uniqueStates.get(acceptState)==null ) addState(acceptState);
 		altToAcceptState[alt] = acceptState;
 	}
 	
@@ -92,6 +78,17 @@ public class DFA {
 		return n;
 	}
 
+	public boolean isDeterministic() {
+		if ( converter.danglingStates.size()==0 &&
+			 converter.nondeterministicStates.size()==0 &&
+			 converter.unreachableAlts.size()==0 )
+		{
+			return true;
+		}
+		// ...
+		return false;
+	}
+	
 	public String toString() {
 		if ( startState==null ) return "";
 		DFASerializer serializer = new DFASerializer(g, startState);

@@ -62,7 +62,7 @@ public class DOTGenerator {
 		dot = stlib.getInstanceOf("dfa");
 		dot.add("startState", startState.stateNumber);
 		dot.add("useBox", Tool.internalOption_ShowNFAConfigsInDFA);
-		walkCreatingDFADOT(dot, (DFAState)startState);
+		walkCreatingDFADOT(dot,startState);
 		dot.add("rankdir", rankdir);
 		return dot.render();
 	}
@@ -99,6 +99,13 @@ public class DOTGenerator {
 				" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
 			*/
 			st = stlib.getInstanceOf("edge");
+//			SemanticContext preds = s.getGatedPredicatesInNFAConfigurations();
+//			if ( preds!=null ) {
+//				String predsStr = "";
+//				predsStr = "&&{"+preds.toString()+"}?";
+//				label += predsStr;
+//			}
+
 			st.add("label", getEdgeLabel(edge.toString(grammar)));
 			st.add("src", getStateLabel(s));
             st.add("target", getStateLabel(edge.target));
@@ -181,6 +188,9 @@ public class DOTGenerator {
             }
 			if ( edge instanceof ActionTransition ) {
 				edgeST = stlib.getInstanceOf("action-edge");
+			}
+			else if ( edge instanceof PredicateTransition ) {
+				edgeST = stlib.getInstanceOf("edge");
 			}
 			else if ( edge.isEpsilon() ) {
 				edgeST = stlib.getInstanceOf("epsilon-edge");

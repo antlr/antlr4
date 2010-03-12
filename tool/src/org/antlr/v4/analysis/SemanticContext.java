@@ -64,7 +64,6 @@ public abstract class SemanticContext {
 		protected int constantValue = INVALID_PRED_VALUE;
 
 		public Predicate() {
-			predicateAST = new GrammarAST();
 			this.gated=false;
 		}
 
@@ -87,14 +86,13 @@ public abstract class SemanticContext {
 
 		/** Two predicates are the same if they are literally the same
 		 *  text rather than same node in the grammar's AST.
-		 *  Or, if they have the same constant value, return equal.
-		 *  TODO: As of July 2006 I'm not sure these are needed.
 		 */
 		public boolean equals(Object o) {
-			if ( !(o instanceof Predicate) ) {
-				return false;
-			}
-			return predicateAST.getText().equals(((Predicate)o).predicateAST.getText());
+			if ( !(o instanceof Predicate) ) return false;
+			Predicate p = (Predicate) o;
+			if ( predicateAST!=null && p.predicateAST!=null )
+				return predicateAST.getText().equals(p.predicateAST.getText());
+			return predicateAST==null && p.predicateAST==null;
 		}
 
 		public int hashCode() {

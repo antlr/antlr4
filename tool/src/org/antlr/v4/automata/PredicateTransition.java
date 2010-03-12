@@ -10,7 +10,7 @@ import org.antlr.v4.tool.GrammarAST;
  *  multiple NFA configurations into a single DFA state.
  */
 public class PredicateTransition extends Transition {
-	protected SemanticContext semanticContext;
+	public SemanticContext semanticContext;
 
 	public PredicateTransition(GrammarAST predicateASTNode, NFAState target) {
 		super(target);

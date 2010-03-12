@@ -3,8 +3,8 @@ package org.antlr.v4.automata;
 import org.antlr.v4.analysis.NFAConfig;
 import org.antlr.v4.analysis.NFAContext;
 import org.antlr.v4.analysis.Resolver;
+import org.antlr.v4.analysis.SemanticContext;
 import org.antlr.v4.misc.OrderedHashSet;
-import org.antlr.v4.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,6 +57,15 @@ public class DFAState {
 	public OrderedHashSet<NFAConfig> nfaConfigs =
 		new OrderedHashSet<NFAConfig>();
 
+	/** Rather than recheck every NFA configuration in a DFA state (after
+	 *  resolving) in reach just check this boolean.  Saves a linear walk
+	 *  perhaps DFA state creation. Every little bit helps.
+	 *
+	 *  This indicates that at least 2 alts were resolved, but not necessarily
+	 *  all alts in DFA state configs.
+	 */
+	public boolean resolvedWithPredicates = false;
+
 	//int cachedUniquelyPredicatedAlt = NFA.INVALID_ALT_NUMBER;
 
 	public DFAState(DFA dfa) { this.dfa = dfa; }
@@ -68,9 +77,10 @@ public class DFAState {
 
 	public NFAConfig addNFAConfig(NFAState state,
 								  int alt,
-								  NFAContext context)
+								  NFAContext context,
+								  SemanticContext semanticContext)
 	{
-		NFAConfig c = new NFAConfig(state, alt,	context);
+		NFAConfig c = new NFAConfig(state, alt,	context, semanticContext);
 		addNFAConfig(state, c);
 		return c;
 	}
@@ -93,7 +103,7 @@ public class DFAState {
 	public Set<Integer> getAltSet() {
 		Set<Integer> alts = new HashSet<Integer>();
 		for (NFAConfig c : nfaConfigs) {
-			alts.add(Utils.integer(c.alt));
+			alts.add(c.alt);
 		}
 		if ( alts.size()==0 ) return null;
 		return alts;

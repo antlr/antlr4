@@ -8,8 +8,12 @@ public class Edge {
 	public IntervalSet label;
 	public DFAState target;
 
-	public Edge(DFAState target, IntervalSet label) {
+	public Edge(DFAState target) {
 		this.target = target;
+	}
+
+	public Edge(DFAState target, IntervalSet label) {
+		this(target);
 		this.label = label;
 	}
 

@@ -12,7 +12,7 @@ import java.util.*;
  *  per DFA (also required for thread safety if multiple conversions
  *  launched).
  */
-public class NFAToApproxDFAConverter {
+public class StackLimitedNFAToDFAConverter {
 	public static final NFAContext NFA_EMPTY_STACK_CONTEXT = new NFAContext(null, null);
 
 	Grammar g;
@@ -22,34 +22,85 @@ public class NFAToApproxDFAConverter {
 	/** DFA we are creating */
 	DFA dfa;
 
+	/** Stack depth max; same as Bermudez's m */
+	int m = 1;
+
 	/** A list of DFA states we still need to process during NFA conversion */
 	List<DFAState> work = new LinkedList<DFAState>();
 
+	/** Each alt in an NFA derived from a grammar must have a DFA state that
+     *  predicts it lest the parser not know what to do.  Nondeterminisms can
+     *  lead to this situation (assuming no semantic predicates can resolve
+     *  the problem) and when for some reason, I cannot compute the lookahead
+     *  (which might arise from an error in the algorithm or from
+     *  left-recursion etc...).  This list starts out with all alts contained
+     *  and then in method doesStateReachAcceptState() I remove the alts I
+     *  know to be uniquely predicted.
+     */
+    public List<Integer> unreachableAlts;
+
+	/** Track all DFA states with nondeterministic alternatives.
+	 *  By reaching the same DFA state, a path through the NFA for some input
+	 *  is able to reach the same NFA state by starting at more than one
+	 *  alternative's left edge.  Though, later, we may find that predicates
+	 *  resolve the issue, but track info anyway.
+	 *  Note that from the DFA state, you can ask for
+	 *  which alts are nondeterministic.
+	 */
+	public Set<DFAState> nondeterministicStates = new HashSet<DFAState>();
+
+	/** The set of states w/o emanating edges (and w/o resolving sem preds). */
+	public Set<DFAState> danglingStates = new HashSet<DFAState>();
+
+	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
+	 *  state that predicts more than one alternative, must be resolved
+	 *  with predicates or it should be reported to the user.
+	 */
+	Set<DFAState> resolvedWithSemanticPredicates = new HashSet<DFAState>();
+
+	/** Tracks alts insufficiently covered.
+	 *  For example, p1||true gets reduced to true and so leaves
+	 *  whole alt uncovered.  This maps DFA state to the set of alts
+	 */
+	Set<DFAState> incompletelyCoveredStates = new HashSet<DFAState>();
+
+	Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
+	
 	/** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
      *  the stack context.
      */
 	Set<NFAConfig> closureBusy;
 
+	Resolver resolver;
+
 	public static boolean debug = false;
 
-	public NFAToApproxDFAConverter(Grammar g, DecisionState nfaStartState) {
+	public StackLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
 		this.g = g;
 		this.nfaStartState = nfaStartState;
 		dfa = new DFA(g, nfaStartState);
+		dfa.converter = this;
+		resolver = new Resolver(this);
+		unreachableAlts = new ArrayList<Integer>();
+		for (int i = 1; i <= dfa.nAlts; i++) {
+			unreachableAlts.add(i);
+		}		
 	}
 
 	public DFA createDFA() {
-		dfa.startState = computeStartState();
+		computeStartState();
 		dfa.addState(dfa.startState); // make sure dfa knows about this state
 		work.add(dfa.startState);
 
 		// while more DFA states to check, process them
 		while ( work.size()>0 ) {
-			reach( work.get(0) );
+			DFAState d = work.get(0);
+			reach(d);
+			resolver.resolveDanglingState(d);
 			work.remove(0); // we're done with this DFA state
 		}
-		
+
 		return dfa;
 	}
 
@@ -67,7 +118,8 @@ public class NFAToApproxDFAConverter {
 				System.out.println("DFA state after reach -" +
 								   label.toString(g)+"->"+t);
 			}
-			// nothing was reached by label due to conflict resolution
+			// nothing was reached by label; we must have resolved
+			// all NFA configs in d, when added to work, that point at label
 			if ( t==null ) continue;
 //			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
 //				// Only compute closure if a unique alt number is not known.
@@ -83,6 +135,9 @@ public class NFAToApproxDFAConverter {
 
 			addTransition(d, label, t); // make d-label->t transition
 		}
+
+		// Add semantic predicate transitions if we resolved when added to work list
+		if ( d.resolvedWithPredicates ) addPredicateTransitions(d);
 	}
 
 	/** Add t if not in DFA yet, resolving nondet's and then make d-label->t */
@@ -97,8 +152,7 @@ public class NFAToApproxDFAConverter {
 
 		// resolve any syntactic conflicts by choosing a single alt or
 		// by using semantic predicates if present.
-		boolean approx = this instanceof NFAToApproxDFAConverter;
-		Resolver.resolveNonDeterminisms(t, approx);
+		resolver.resolveNonDeterminisms(t);
 
 		// If deterministic, don't add this state; it's an accept state
 		// Just return as a valid DFA state
@@ -136,17 +190,20 @@ public class NFAToApproxDFAConverter {
 			int n = c.state.getNumberOfTransitions();
 			for (int i=0; i<n; i++) {               // for each transition
 				Transition t = c.state.transition(i);
+				// when we added this state as target of some other state,
+				// we tried to resolve any conflicts.  Ignore anything we
+				// were able to fix previously
+				if ( c.resolved || c.resolvedWithPredicate) continue;
 				// found a transition with label; does it collide with label?
 				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
 					// add NFA target to (potentially) new DFA state
-					labelTarget.addNFAConfig(t.target, c.alt, c.context);
+					labelTarget.addNFAConfig(t.target, c.alt, c.context, c.semanticContext);
 				}
 			}
 		}
 
-		if ( labelTarget.nfaConfigs.size()==0 ) {
-			System.err.println("why is this empty?");
-		}
+		// if we couldn't find any non-resolved edges to add, return nothing
+		if ( labelTarget.nfaConfigs.size()==0 ) return null;
 		
 		return labelTarget;
 	}
@@ -159,20 +216,20 @@ public class NFAToApproxDFAConverter {
 	 *  derived from this.  At a stop state in the DFA, we can return this alt
 	 *  number, indicating which alt is predicted.
 	 */
-	public DFAState computeStartState() {
+	public void computeStartState() {
 		DFAState d = dfa.newState();
+		dfa.startState = d;
 
 		// add config for each alt start, then add closure for those states
 		for (int altNum=1; altNum<=dfa.nAlts; altNum++) {
 			Transition t = nfaStartState.transition(altNum-1);
 			NFAState altStart = t.target;
-			NFAContext initialContext = NFA_EMPTY_STACK_CONTEXT;
-			d.addNFAConfig(altStart, altNum, initialContext);
+			d.addNFAConfig(altStart, altNum,
+						   NFA_EMPTY_STACK_CONTEXT,
+						   SemanticContext.EMPTY_SEMANTIC_CONTEXT);
 		}
 
 		closure(d);
-
-		return d;
 	}
 
 	/** For all NFA states (configurations) merged in d,
@@ -184,11 +241,16 @@ public class NFAToApproxDFAConverter {
 			System.out.println("closure("+d+")");
 		}
 
+		// Only the start state initiates pred collection; gets turned
+		// off maybe by actions later hence we need a parameter to carry
+		// it forward
+		boolean collectPredicates = (d == dfa.startState);
+		
 		closureBusy = new HashSet<NFAConfig>();
 		
 		List<NFAConfig> configs = new ArrayList<NFAConfig>();
 		for (NFAConfig c : d.nfaConfigs) {
-			closure(c.state, c.alt, c.context, configs);
+			closure(c.state, c.alt, c.context, c.semanticContext, collectPredicates, configs);
 		}
 		d.nfaConfigs.addAll(configs); // Add new NFA configs to DFA state d
 
@@ -219,9 +281,11 @@ public class NFAToApproxDFAConverter {
 	 *  TODO: remove altNum if we don't reorder for loopback nodes
 	 */
 	public void closure(NFAState s, int altNum, NFAContext context,
+						SemanticContext semanticContext,
+						boolean collectPredicates,
 						List<NFAConfig> configs)
 	{
-		NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context);
+		NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context, semanticContext);
 
 		if ( closureBusy.contains(proposedNFAConfig) ) return;
 		closureBusy.add(proposedNFAConfig);
@@ -229,20 +293,27 @@ public class NFAToApproxDFAConverter {
 		// p itself is always in closure
 		configs.add(proposedNFAConfig);
 
-		// if we have context info and we're at rule stop state, do
-		// local follow for invokingRule and global follow for other links
 		if ( s instanceof RuleStopState ) {
-			ruleStopStateClosure(s, altNum, context, configs);
+			ruleStopStateClosure(s, altNum, context, semanticContext, collectPredicates, configs);
 		}
 		else {
-			commonClosure(s, altNum, context, configs);
+			commonClosure(s, altNum, context, semanticContext, collectPredicates, configs);
 		}
 	}
 
-	void ruleStopStateClosure(NFAState s, int altNum, NFAContext context, List<NFAConfig> configs) {
+	// if we have context info and we're at rule stop state, do
+	// local follow for invokingRule and global follow for other links	
+	void ruleStopStateClosure(NFAState s, int altNum, NFAContext context,
+							  SemanticContext semanticContext,
+							  boolean collectPredicates,
+							  List<NFAConfig> configs)
+	{
 		Rule invokingRule = null;
 
-		if ( context!=NFA_EMPTY_STACK_CONTEXT ) invokingRule = context.returnState.rule;
+		if ( context!=NFA_EMPTY_STACK_CONTEXT ) {
+			// if stack not empty, get invoking rule from top of stack
+			invokingRule = context.returnState.rule;
+		}
 
 		//System.out.println("FOLLOW of "+s+" context="+context);
 		// follow all static FOLLOW links
@@ -254,32 +325,66 @@ public class NFAToApproxDFAConverter {
 			// else follow link to context state only
 			if ( t.target.rule != invokingRule ) {
 				//System.out.println("OFF TO "+t.target);
-				closure(t.target, altNum, context, configs);
+				closure(t.target, altNum, context, semanticContext, collectPredicates, configs);
 			}
-			else {
-				if ( t.target == context.returnState) {
+			else { // t.target is in invoking rule; only follow context's link
+				if ( t.target == context.returnState ) {
 					//System.out.println("OFF TO CALL SITE "+t.target);
 					// go only to specific call site; pop context
-					closure(t.target, altNum, NFA_EMPTY_STACK_CONTEXT, configs);
+					NFAContext newContext = context.parent; // "pop" invoking state
+					closure(t.target, altNum, newContext, semanticContext, collectPredicates, configs);
 				}
 			}
 		}
 		return;
 	}
 
-	void commonClosure(NFAState s, int altNum, NFAContext context, List<NFAConfig> configs) {
+	void commonClosure(NFAState s, int altNum, NFAContext context,
+						SemanticContext semanticContext, boolean collectPredicates,
+						List<NFAConfig> configs)
+	{
 		int n = s.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
-			NFAContext newContext = context;	// assume old context
 			if ( t instanceof RuleTransition) {
+				NFAContext newContext = context;	// assume old context
 				NFAState retState = ((RuleTransition)t).followState;
-				if ( context==NFA_EMPTY_STACK_CONTEXT ) { // track first call return state only
+				if ( context.depth() < m ) { // track first call return state only
 					newContext = new NFAContext(context, retState);
 				}
+				closure(t.target, altNum, newContext, semanticContext, collectPredicates, configs);
 			}
-			if ( t.isEpsilon() ) {
-				closure(t.target, altNum, newContext, configs);
+			else if ( t instanceof ActionTransition ) {
+				continue;
+			}
+			else if ( t instanceof PredicateTransition ) {
+                SemanticContext labelContext = ((PredicateTransition)t).semanticContext;
+                SemanticContext newSemanticContext = semanticContext;
+                if ( collectPredicates ) {
+                    // AND the previous semantic context with new pred
+//                    int walkAlt =
+//						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(alt);
+					NFAState altLeftEdge = dfa.decisionNFAStartState.transition(altNum).target;
+					/*
+					System.out.println("state "+p.stateNumber+" alt "+alt+" walkAlt "+walkAlt+" trans to "+transition0.target);
+					System.out.println("DFA start state "+dfa.decisionNFAStartState.stateNumber);
+					System.out.println("alt left edge "+altLeftEdge.stateNumber+
+						", epsilon target "+
+						altLeftEdge.transition(0).target.stateNumber);
+					*/
+					// do not hoist syn preds from other rules; only get if in
+					// starting state's rule (i.e., context is empty)
+					if ( !labelContext.isSyntacticPredicate() || s==altLeftEdge ) {
+						System.out.println("&"+labelContext+" enclosingRule="+s.rule);
+						newSemanticContext =
+							SemanticContext.and(semanticContext, labelContext);
+					}
+				}
+				closure(t.target, altNum, context, newSemanticContext, collectPredicates, configs);
+			}
+
+			else if ( t.isEpsilon() ) {
+				closure(t.target, altNum, context, semanticContext, collectPredicates, configs);
 			}
 		}
 	}
@@ -407,4 +512,60 @@ public class NFAToApproxDFAConverter {
 				"reachableLabels="+reachableLabels.toString());
 				*/
     }
+
+	/** for each NFA config in d, look for "predicate required" sign we set
+	 *  during nondeterminism resolution.
+	 *
+	 *  Add the predicate edges sorted by the alternative number; I'm fairly
+	 *  sure that I could walk the configs backwards so they are added to
+	 *  the predDFATarget in the right order, but it's best to make sure.
+	 *  Predicates succeed in the order they are specifed.  Alt i wins
+	 *  over alt i+1 if both predicates are true.
+	 */
+	protected void addPredicateTransitions(DFAState d) {
+		List<NFAConfig> configsWithPreds = new ArrayList<NFAConfig>();
+		// get a list of all configs with predicates
+		for (NFAConfig c : d.nfaConfigs) {
+			if ( c.resolvedWithPredicate) {
+				configsWithPreds.add(c);
+			}
+		}
+		// Sort ascending according to alt; alt i has higher precedence than i+1
+		Collections.sort(configsWithPreds,
+			 new Comparator<NFAConfig>() {
+				 public int compare(NFAConfig a, NFAConfig b) {
+					 if ( a.alt < b.alt ) return -1;
+					 else if ( a.alt > b.alt ) return 1;
+					 return 0;
+				 }
+			 });
+		List<NFAConfig> predConfigsSortedByAlt = configsWithPreds;
+		// Now, we can add edges emanating from d for these preds in right order
+		for (NFAConfig c : predConfigsSortedByAlt) {
+			DFAState predDFATarget = dfa.altToAcceptState[c.alt];
+			if ( predDFATarget==null ) {
+				predDFATarget = dfa.newState(); // create if not there.
+				// new DFA state is a target of the predicate from d
+				predDFATarget.addNFAConfig(c.state,
+										   c.alt,
+										   c.context,
+										   c.semanticContext);
+				predDFATarget.isAcceptState = true;
+				dfa.defineAcceptState(c.alt, predDFATarget);
+				// v3 checked if already there, but new state is an accept
+				// state and therefore can't be there yet; we just checked above
+//				DFAState existingState = dfa.addState(predDFATarget);
+//				if ( predDFATarget != existingState ) {
+//					// already there...use/return the existing DFA state that
+//					// is a target of this predicate.  Make this state number
+//					// point at the existing state
+//					dfa.setState(predDFATarget.stateNumber, existingState);
+//					predDFATarget = existingState;
+//				}
+			}
+			// add a transition to pred target from d
+			d.addTransition(new PredicateEdge(c.semanticContext, predDFATarget));
+		}
+	}
+	
 }

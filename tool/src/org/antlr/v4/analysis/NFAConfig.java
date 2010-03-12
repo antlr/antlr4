@@ -21,13 +21,8 @@ public class NFAConfig {
 	/** The set of semantic predicates associated with this NFA
 	 *  configuration.  The predicates were found on the way to
 	 *  the associated NFA state in this syntactic context.
-	 *  Set<AST>: track nodes in grammar containing the predicate
-	 *  for error messages and such (nice to know where the predicate
-	 *  came from in case of duplicates etc...).  By using a set,
-	 *  the equals() method will correctly show {pred1,pred2} as equals()
-	 *  to {pred2,pred1}.
 	 */
-	//public SemanticContext semanticContext = SemanticContext.EMPTY_SEMANTIC_CONTEXT;
+	public SemanticContext semanticContext = SemanticContext.EMPTY_SEMANTIC_CONTEXT;
 
 	/** Indicate that this configuration has been resolved and no further
 	 *  DFA processing should occur with it.  Essentially, this is used
@@ -45,16 +40,17 @@ public class NFAConfig {
 	 *  nondeterministic configurations (as it does for "resolved" field)
 	 *  that have enough predicates to resolve the conflit.
 	 */
-	//protected boolean resolveWithPredicate;
+	protected boolean resolvedWithPredicate;
 
 	public NFAConfig(NFAState state,
 					 int alt,
-					 NFAContext context)
+					 NFAContext context,
+					 SemanticContext semanticContext)
 	{
 		this.state = state;
 		this.alt = alt;
 		this.context = context;
-		//this.semanticContext = semanticContext;
+		this.semanticContext = semanticContext;
 	}
 
 	/** An NFA configuration is equal to another if both have
@@ -70,8 +66,8 @@ public class NFAConfig {
         NFAConfig other = (NFAConfig)o;
         return this.state==other.state &&
                this.alt==other.alt &&
-               this.context.equals(other.context);
-//               this.semanticContext.equals(other.semanticContext)
+               this.context.equals(other.context) &&
+               this.semanticContext.equals(other.semanticContext);
     }
 
     public int hashCode() {
@@ -93,16 +89,16 @@ public class NFAConfig {
 			buf.append("|");
 			buf.append(alt);
 		}
-		if ( context !=null ) {
+		if ( context!=null && context!= StackLimitedNFAToDFAConverter.NFA_EMPTY_STACK_CONTEXT ) {
             buf.append("|");
             buf.append(context);
         }
         if ( resolved ) {
             buf.append("|resolved");
         }
-//		if ( resolveWithPredicate ) {
-//			buf.append("|resolveWithPredicate");
-//		}
+		if (resolvedWithPredicate) {
+			buf.append("|resolveWithPredicate");
+		}
 		return buf.toString();
     }
 }

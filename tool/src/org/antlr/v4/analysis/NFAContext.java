@@ -46,61 +46,7 @@ import org.antlr.v4.automata.NFAState;
  *  on the path from this node thru the parent pointers to the root.
  */
 public class NFAContext {
-	/** This is similar to Bermudez's m constant in his LAR(m) where
-	 *  you bound the stack so your states don't explode.  The main difference
-	 *  is that I bound only recursion on the stack, not the simple stack size.
-	 *  This looser constraint will let the conversion roam further to find
-	 *  lookahead to resolve a decision.
-	 *
-	 *  Bermudez's m operates differently as it is his LR stack depth
-	 *  I'm pretty sure it therefore includes all stack symbols.  Here I
-	 *  restrict the size of an NFA configuration to be finite because a
-	 *  stack component may mention the same NFA invocation state at
-	 *  most m times.  Hence, the number of DFA states will not grow forever.
-	 *  With recursive rules like
-	 *
-	 *    e : '(' e ')' | INT ;
-	 *
-	 *  you could chase your tail forever if somebody said "s : e '.' | e ';' ;"
-	 *  This constant prevents new states from being created after a stack gets
-	 *  "too big".  Actually (12/14/2007) I realize that this example is
-	 *  trapped by the non-LL(*) detector for recursion in > 1 alt.  Here is
-	 *  an example that trips stack overflow:
-	 *
-	 *	  s : a Y | A A A A A X ; // force recursion past m=4
-	 *	  a : A a | Q;
-	 *
-	 *  If that were:
-	 *
-	 *	  s : a Y | A+ X ;
-	 *
-	 *  it could loop forever.
-	 *
-	 *  Imagine doing a depth-first search on the e DFA...as you chase an input
-	 *  sequence you can recurse to same rule such as e above.  You'd have a
-	 *  chain of ((((.  When you get do some point, you have to give up.  The
-	 *  states in the chain will have longer and longer NFA config stacks.
-	 *  Must limit size.
-	 *
-	 *  max=0 implies you cannot ever jump to another rule during closure.
-	 *  max=1 implies you can make as many calls as you want--you just
-	 *        can't ever visit a state that is on your rule invocation stack.
-	 * 		  I.e., you cannot ever recurse.
-	 *  max=2 implies you are able to recurse once (i.e., call a rule twice
-	 *  	  from the same place).
-	 *
-	 *  This tracks recursion to a rule specific to an invocation site!
-	 *  It does not detect multiple calls to a rule from different rule
-	 *  invocation states.  We are guaranteed to terminate because the
-	 *  stack can only grow as big as the number of NFA states * max.
-	 *
-	 *  I noticed that the Java grammar didn't work with max=1, but did with
-	 *  max=4.  Let's set to 4. Recursion is sometimes needed to resolve some
-	 *  fixed lookahead decisions.
-	 */
-	public static int MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK = 4;
-
-    public NFAContext parent;
+	public NFAContext parent;
 
     /** The NFA state following state that invoked another rule's start state
 	 *  is recorded on the rule invocation context stack.
@@ -133,9 +79,6 @@ public class NFAContext {
 	 *  same call stack; walk upwards to the root.
 	 *  Recall that the root sentinel node has no invokingStates and no parent.
 	 *  Note that you may be comparing contexts in different alt trees.
-	 *
-	 *  The hashCode is now cheap as it's computed once upon each context
-	 *  push on the stack.  Use it to make equals() more efficient.
 	 */
 	public boolean equals(Object o) {
 		NFAContext other = ((NFAContext)o);
@@ -241,15 +184,28 @@ public class NFAContext {
 		return n;
 	}
 
-    public int hashCode() {
-        int h = 0;
-        NFAContext sp = this;
-        while ( sp.parent!=null ) {
-            h += sp.returnState.stateNumber;
-            sp = sp.parent;
-        }
-        return h;
-    }
+	public int hashCode() {
+		int h = 0;
+		NFAContext sp = this;
+		while ( sp.parent!=null ) {
+			h += sp.returnState.stateNumber;
+			sp = sp.parent;
+		}
+		return h;
+	}
+
+	/** How many rule invocations in this context? I.e., how many
+	 *  elements in stack (path to root, not including root placeholder)?
+	 */
+	public int depth() {
+		int n = 0;
+		NFAContext sp = this;
+		while ( sp != StackLimitedNFAToDFAConverter.NFA_EMPTY_STACK_CONTEXT ) {
+			n++;
+			sp = sp.parent;
+		}
+		return n;
+	}
 
 	/** A context is empty if there is no parent; meaning nobody pushed
 	 *  anything on the call stack.

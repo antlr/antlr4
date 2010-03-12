@@ -12,6 +12,15 @@ import java.util.Set;
 
 /** Code "module" that knows how to resolve LL(*) nondeterminisms. */
 public class Resolver {
+	StackLimitedNFAToDFAConverter converter;
+
+	PredicateResolver semResolver;
+
+	public Resolver(StackLimitedNFAToDFAConverter converter) {
+		this.converter = converter;
+		semResolver = new PredicateResolver(converter);
+	}
+	
 	/** Walk each NFA configuration in this DFA state looking for a conflict
 	 *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
 	 *  conflicting ctx predicts alts i and j.  Return an Integer set
@@ -25,7 +34,7 @@ public class Resolver {
 	 *  alt must be different or must have different contexts to avoid a
 	 *  conflict.
 	 */
-	public static Set<Integer> getNonDeterministicAlts(DFAState d, boolean approx) {
+	public Set<Integer> getNonDeterministicAlts(DFAState d) {
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
 		 Set<Integer> nondeterministicAlts = new HashSet<Integer>();
 
@@ -91,16 +100,15 @@ public class Resolver {
 					// Also a conflict if s.ctx or t.ctx is empty
 					boolean altConflict = s.alt != t.alt;
 					boolean ctxConflict = false;
-					if ( approx ) {
-						ctxConflict = s.context == t.context &&
-								      s.context != NFAToApproxDFAConverter.NFA_EMPTY_STACK_CONTEXT;
+					if ( converter instanceof StackLimitedNFAToDFAConverter) {
+						ctxConflict = s.context.equals(t.context);
 					}
 					else {
 						ctxConflict = s.context.conflictsWith(t.context);
 					}
 					if ( altConflict && ctxConflict ) {
-						nondeterministicAlts.add(Utils.integer(s.alt));
-						nondeterministicAlts.add(Utils.integer(t.alt));
+						nondeterministicAlts.add(s.alt);
+						nondeterministicAlts.add(t.alt);
 					}
 				}
 			}
@@ -110,12 +118,12 @@ public class Resolver {
 		return nondeterministicAlts;
 	}
 
-	public static void resolveNonDeterminisms(DFAState d, boolean approx) {
-		if ( NFAToApproxDFAConverter.debug ) {
+	public void resolveNonDeterminisms(DFAState d) {
+		if ( StackLimitedNFAToDFAConverter.debug ) {
 			System.out.println("resolveNonDeterminisms "+d.toString());
 		}
-		Set nondeterministicAlts = getNonDeterministicAlts(d, approx);
-		if ( NFAToApproxDFAConverter.debug && nondeterministicAlts!=null ) {
+		Set<Integer> nondeterministicAlts = getNonDeterministicAlts(d);
+		if ( StackLimitedNFAToDFAConverter.debug && nondeterministicAlts!=null ) {
 			System.out.println("nondet alts="+nondeterministicAlts);
 		}
 
@@ -123,24 +131,38 @@ public class Resolver {
 		if ( nondeterministicAlts==null ) return;
 
 		// reportNondeterminism(d, nondeterministicAlts);
-		System.err.println("nondterministic alts "+nondeterministicAlts);
+		converter.nondeterministicStates.add(d);
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
-		if ( !approx ) {
-//		boolean resolved =
-//			tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
-//		if ( resolved ) {
-//			if ( debug ) {
-//				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
-//			}
-//			d.resolvedWithPredicates = true;
-//			dfa.probe.reportNondeterminismResolvedWithSemanticPredicate(d);
-//			return;
-//		}
+		boolean resolved =
+			semResolver.tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
+		if ( resolved ) {
+			if ( StackLimitedNFAToDFAConverter.debug ) {
+				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
+			}
+			d.resolvedWithPredicates = true;
+			converter.resolvedWithSemanticPredicates.add(d);
+			return;
 		}
 
 		// RESOLVE SYNTACTIC CONFLICT BY REMOVING ALL BUT ONE ALT
 		resolveByPickingMinAlt(d, nondeterministicAlts);
+	}
+
+
+	public void resolveDanglingState(DFAState d) {
+		if ( d.resolvedWithPredicates || d.getNumberOfTransitions()>0 ) return;
+		
+		System.err.println("dangling DFA state "+d+" after reach / closures");
+		converter.danglingStates.add(d);
+		// turn off all configurations except for those associated with
+		// min alt number; somebody has to win else some input will not
+		// predict any alt.
+		int minAlt = resolveByPickingMinAlt(d, null);
+		// force it to be an accept state
+		d.isAcceptState = true;
+		// might be adding new accept state for alt, but that's ok
+		converter.dfa.defineAcceptState(minAlt, d);
 	}
 
 	/** Turn off all configurations associated with the
@@ -153,7 +175,7 @@ public class Resolver {
 	 *
 	 *  Return the min alt found.
 	 */
-	static int resolveByPickingMinAlt(DFAState d, Set nondeterministicAlts) {
+	int resolveByPickingMinAlt(DFAState d, Set<Integer> nondeterministicAlts) {
 		int min = Integer.MAX_VALUE;
 		if ( nondeterministicAlts!=null ) {
 			min = getMinAlt(nondeterministicAlts);
@@ -170,13 +192,13 @@ public class Resolver {
 	/** turn off all states associated with alts other than the good one
 	 *  (as long as they are one of the nondeterministic ones)
 	 */
-	static void turnOffOtherAlts(DFAState d, int min, Set<Integer> nondeterministicAlts) {
+	void turnOffOtherAlts(DFAState d, int min, Set<Integer> nondeterministicAlts) {
 		int numConfigs = d.nfaConfigs.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfig configuration = d.nfaConfigs.get(i);
 			if ( configuration.alt!=min ) {
 				if ( nondeterministicAlts==null ||
-					 nondeterministicAlts.contains(Utils.integer(configuration.alt)) )
+					 nondeterministicAlts.contains(configuration.alt) )
 				{
 					configuration.resolved = true;
 				}
@@ -184,7 +206,7 @@ public class Resolver {
 		}
 	}
 
-	static int getMinAlt(Set<Integer> nondeterministicAlts) {
+	public static int getMinAlt(Set<Integer> nondeterministicAlts) {
 		int min = Integer.MAX_VALUE;
 		for (Integer altI : nondeterministicAlts) {
 			int alt = altI.intValue();
