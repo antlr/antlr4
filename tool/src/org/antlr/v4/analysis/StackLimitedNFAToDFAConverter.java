@@ -33,24 +33,27 @@ public class StackLimitedNFAToDFAConverter {
      *  lead to this situation (assuming no semantic predicates can resolve
      *  the problem) and when for some reason, I cannot compute the lookahead
      *  (which might arise from an error in the algorithm or from
-     *  left-recursion etc...).  This list starts out with all alts contained
-     *  and then in method doesStateReachAcceptState() I remove the alts I
-     *  know to be uniquely predicted.
+     *  left-recursion etc...).
      */
-    public List<Integer> unreachableAlts;
+    public Set<Integer> unreachableAlts;
 
-	/** Track all DFA states with nondeterministic alternatives.
+	/** Track all DFA states with ambiguous configurations.
 	 *  By reaching the same DFA state, a path through the NFA for some input
 	 *  is able to reach the same NFA state by starting at more than one
-	 *  alternative's left edge.  Though, later, we may find that predicates
-	 *  resolve the issue, but track info anyway.
-	 *  Note that from the DFA state, you can ask for
-	 *  which alts are nondeterministic.
+	 *  alternative's left edge. If the context is the same or conflicts,
+	 *  then we have ambiguity. If the context is different, it's simply
+	 *  nondeterministic and we should keep looking for edges that will
+	 *  render it deterministic. If we run out of things to add to the DFA,
+	 *  we'll get a dangling state; it's non-LL(*). Later we may find that predicates
+	 *  resolve the issue, but track ambiguous states anyway.
 	 */
-	public Set<DFAState> nondeterministicStates = new HashSet<DFAState>();
+	public Set<DFAState> ambiguousStates = new HashSet<DFAState>();
 
 	/** The set of states w/o emanating edges (and w/o resolving sem preds). */
 	public Set<DFAState> danglingStates = new HashSet<DFAState>();
+
+	/** If non-reduced, this is set of states that don't lead to accept state */
+	public Set<DFAState> deadStates;
 
 	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
 	 *  state that predicts more than one alternative, must be resolved
@@ -65,7 +68,13 @@ public class StackLimitedNFAToDFAConverter {
 	Set<DFAState> incompletelyCoveredStates = new HashSet<DFAState>();
 
 	Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
-	
+
+	/** Are there any loops in this DFA?  Computed by DFAVerifier */
+	public boolean cyclic = false;
+
+	/** Is this DFA reduced?  I.e., can all states lead to an accept state? */
+	public boolean reduced = true;	
+
 	/** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
      *  the stack context.
@@ -74,6 +83,8 @@ public class StackLimitedNFAToDFAConverter {
 
 	Resolver resolver;
 
+	DFAVerifier verifier;
+	
 	public static boolean debug = false;
 
 	public StackLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
@@ -82,10 +93,7 @@ public class StackLimitedNFAToDFAConverter {
 		dfa = new DFA(g, nfaStartState);
 		dfa.converter = this;
 		resolver = new Resolver(this);
-		unreachableAlts = new ArrayList<Integer>();
-		for (int i = 1; i <= dfa.nAlts; i++) {
-			unreachableAlts.add(i);
-		}		
+		verifier = new DFAVerifier(dfa, this);
 	}
 
 	public DFA createDFA() {
@@ -100,6 +108,9 @@ public class StackLimitedNFAToDFAConverter {
 			resolver.resolveDanglingState(d);
 			work.remove(0); // we're done with this DFA state
 		}
+
+		unreachableAlts = verifier.getUnreachableAlts();
+		//deadStates = verifier.getDeadStates();
 
 		return dfa;
 	}
@@ -142,7 +153,7 @@ public class StackLimitedNFAToDFAConverter {
 
 	/** Add t if not in DFA yet, resolving nondet's and then make d-label->t */
 	void addTransition(DFAState d, IntervalSet label, DFAState t) {
-		DFAState existing = dfa.uniqueStates.get(t);
+		DFAState existing = dfa.states.get(t);
 		if ( existing != null ) { // seen before; point at old one
 			d.addTransition(new Edge(existing, label));
 			return;
@@ -152,7 +163,7 @@ public class StackLimitedNFAToDFAConverter {
 
 		// resolve any syntactic conflicts by choosing a single alt or
 		// by using semantic predicates if present.
-		resolver.resolveNonDeterminisms(t);
+		resolver.resolveAmbiguities(t);
 
 		// If deterministic, don't add this state; it's an accept state
 		// Just return as a valid DFA state

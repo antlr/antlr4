@@ -20,12 +20,6 @@ public class DOTGenerator {
 	/** Library of output templates; use <attrname> format */
     public static STGroup stlib = new STGroupDir("org/antlr/v4/tool/templates/dot");
 
-    /** To prevent infinite recursion when walking state machines, record
-     *  which states we've visited.  Make a new set every time you start
-     *  walking in case you reuse this object.
-     */
-    protected Set<Integer> markedStates = null;
-
     protected Grammar grammar;
 
     /** This aspect is associated with a grammar */
@@ -38,67 +32,154 @@ public class DOTGenerator {
      *  from startState will be included.
      */
 	public String getDOT(NFAState startState) {
-		if ( startState==null ) {
-			return null;
-		}
+		if ( startState==null )	return null;
+
 		// The output DOT graph for visualization
 		ST dot = null;
-		markedStates = new HashSet<Integer>();
+		Set<NFAState> markedStates = new HashSet<NFAState>();
 		dot = stlib.getInstanceOf("nfa");
-		dot.add("startState",
-				Utils.integer(startState.stateNumber));
-		walkRuleNFACreatingDOT(dot, startState);
+		dot.add("startState", Utils.integer(startState.stateNumber));
 		dot.add("rankdir", rankdir);
+
+		List<NFAState> work = new LinkedList<NFAState>();
+
+		work.add(startState);
+		while ( work.size()>0 ) {
+			NFAState s = work.get(0);
+			if ( markedStates.contains(s) ) { work.remove(0); continue; }
+			markedStates.add(s);
+
+			// first add this node
+			ST stateST;
+			if ( s instanceof RuleStopState ) {
+				stateST = stlib.getInstanceOf("stopstate");
+			}
+			else {
+				stateST = stlib.getInstanceOf("state");
+			}
+			stateST.add("name", getStateLabel(s));
+
+			// don't go past end of rule node to the follow states
+			if ( s instanceof RuleStopState ) continue;
+
+			// special case: if decision point, then line up the alt start states
+			// unless it's an end of block
+			if ( s instanceof DecisionState ) {
+				GrammarAST n = ((NFAState)s).ast;
+				if ( n!=null && s instanceof BlockEndState ) {
+					ST rankST = stlib.getInstanceOf("decision-rank");
+					NFAState alt = (NFAState)s;
+					while ( alt!=null ) {
+						rankST.add("states", alt.stateNumber);
+						if ( alt.transition(1) !=null ) {
+							alt = (NFAState)alt.transition(1).target;
+						}
+						else {
+							alt=null;
+						}
+					}
+					dot.add("decisionRanks", rankST);
+				}
+			}
+
+			// make a DOT edge for each transition
+			ST edgeST = null;
+			for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+				Transition edge = (Transition) s.transition(i);
+				if ( edge instanceof RuleTransition ) {
+					RuleTransition rr = ((RuleTransition)edge);
+					// don't jump to other rules, but display edge to follow node
+					edgeST = stlib.getInstanceOf("edge");
+					if ( rr.rule.g != grammar ) {
+						edgeST.add("label", "<"+rr.rule.g.name+"."+rr.rule.name+">");
+					}
+					else {
+						edgeST.add("label", "<"+rr.rule.name+">");
+					}
+					edgeST.add("src", s.stateNumber);
+					edgeST.add("target", rr.followState.stateNumber);
+					edgeST.add("arrowhead", arrowhead);
+					dot.add("edges", edgeST);
+					work.add(rr.followState);
+					continue;
+				}
+				if ( edge instanceof ActionTransition ) {
+					edgeST = stlib.getInstanceOf("action-edge");
+				}
+				else if ( edge instanceof PredicateTransition ) {
+					edgeST = stlib.getInstanceOf("edge");
+				}
+				else if ( edge.isEpsilon() ) {
+					edgeST = stlib.getInstanceOf("epsilon-edge");
+				}
+				else {
+					edgeST = stlib.getInstanceOf("edge");
+				}
+				edgeST.add("label", getEdgeLabel(edge.toString(grammar)));
+				edgeST.add("src", s.stateNumber);
+				edgeST.add("target", edge.target.stateNumber);
+				edgeST.add("arrowhead", arrowhead);
+				dot.add("edges", edgeST);
+				work.add(edge.target);
+			}
+		}
+
+		// define nodes we visited (they will appear first in DOT output)
+		// this is an example of ST's lazy eval :)
+		for (NFAState s : markedStates) {
+			ST st;
+			if ( s instanceof RuleStopState ) {
+				st = stlib.getInstanceOf("stopstate");
+			}
+			else {
+				st = stlib.getInstanceOf("state");
+			}
+			st.add("name", s.stateNumber);
+			st.add("label", getStateLabel(s));
+			dot.add("states", st);
+		}
+
 		return dot.render();
 	}
 
 	public String getDOT(DFAState startState) {
-		if ( startState==null ) {
-			return null;
-		}
-		// The output DOT graph for visualization
-		ST dot = null;
-		markedStates = new HashSet<Integer>();
-		dot = stlib.getInstanceOf("dfa");
+		if ( startState==null )	return null;
+
+		ST dot = stlib.getInstanceOf("dfa");
 		dot.add("startState", startState.stateNumber);
 		dot.add("useBox", Tool.internalOption_ShowNFAConfigsInDFA);
-		walkCreatingDFADOT(dot,startState);
 		dot.add("rankdir", rankdir);
-		return dot.render();
-	}
 
-    /** Do a depth-first walk of the state machine graph and
-     *  fill a DOT description template.  Keep filling the
-     *  states and edges attributes.
-     */
-    protected void walkCreatingDFADOT(ST dot,
-									  DFAState s)
-    {
-		if ( markedStates.contains(Utils.integer(s.stateNumber)) ) {
-			return; // already visited this node
-        }
+		Set<DFAState> markedStates = new HashSet<DFAState>();
+		List<DFAState> work = new LinkedList<DFAState>();
 
-		markedStates.add(Utils.integer(s.stateNumber)); // mark this node as completed.
+		for (DFAState d : startState.dfa.states.values()) {
+			ST st;
+			if ( d.isAcceptState ) {
+				st = stlib.getInstanceOf("stopstate");
+			}
+			else {
+				st = stlib.getInstanceOf("state");
+			}
+			st.add("name", "s"+d.stateNumber);
+			st.add("label", getStateLabel(d));
+			dot.add("states", st);
+		}
 
-        // first add this node
-        ST st;
-        if ( s.isAcceptState ) {
-            st = stlib.getInstanceOf("stopstate");
-        }
-        else {
-            st = stlib.getInstanceOf("state");
-        }
-        st.add("name", getStateLabel(s));
-        dot.add("states", st);
-
-        // make a DOT edge for each transition
-		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-			Edge edge = s.transition(i);
-			/*
-			System.out.println("dfa "+s.dfa.decisionNumber+
-				" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
-			*/
-			st = stlib.getInstanceOf("edge");
+		work.add(startState);
+		while ( work.size()>0 ) {
+			DFAState d = work.get(0);
+			if ( markedStates.contains(d) ) { work.remove(0); continue; }
+			markedStates.add(d);
+			
+			// make a DOT edge for each transition
+			for (int i = 0; i < d.getNumberOfTransitions(); i++) {
+				Edge edge = d.transition(i);
+				/*
+				System.out.println("dfa "+s.dfa.decisionNumber+
+					" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
+				*/
+				ST st = stlib.getInstanceOf("edge");
 //			SemanticContext preds = s.getGatedPredicatesInNFAConfigurations();
 //			if ( preds!=null ) {
 //				String predsStr = "";
@@ -106,14 +187,19 @@ public class DOTGenerator {
 //				label += predsStr;
 //			}
 
-			st.add("label", getEdgeLabel(edge.toString(grammar)));
-			st.add("src", getStateLabel(s));
-            st.add("target", getStateLabel(edge.target));
-			st.add("arrowhead", arrowhead);
-            dot.add("edges", st);
-            walkCreatingDFADOT(dot, edge.target); // keep walkin'
-        }
-    }
+				st.add("label", getEdgeLabel(edge.toString(grammar)));
+				st.add("src", "s"+d.stateNumber);
+				st.add("target", "s"+edge.target.stateNumber);
+				st.add("arrowhead", arrowhead);
+				dot.add("edges", st);
+				work.add(edge.target); // add targets to list of states to visit
+			}
+
+			work.remove(0);
+		}
+
+		return dot.render();
+	}
 
     /** Do a depth-first walk of the state machine graph and
      *  fill a DOT description template.  Keep filling the
@@ -121,91 +207,91 @@ public class DOTGenerator {
      *  for a rule so don't traverse edges to other rules and
      *  don't go past rule end state.
      */
-    protected void walkRuleNFACreatingDOT(ST dot,
-                                          NFAState s)
-    {
-        if ( markedStates.contains(s) ) {
-            return; // already visited this node
-        }
-
-        markedStates.add(s.stateNumber); // mark this node as completed.
-
-        // first add this node
-        ST stateST;
-        if ( s instanceof RuleStopState ) {
-            stateST = stlib.getInstanceOf("stopstate");
-        }
-        else {
-            stateST = stlib.getInstanceOf("state");
-        }
-        stateST.add("name", getStateLabel(s));
-        dot.add("states", stateST);
-
-        if ( s instanceof RuleStopState )  {
-            return; // don't go past end of rule node to the follow states
-        }
-
-        // special case: if decision point, then line up the alt start states
-        // unless it's an end of block
-		if ( s instanceof DecisionState ) {
-			GrammarAST n = ((NFAState)s).ast;
-			if ( n!=null && s instanceof BlockEndState ) {
-				ST rankST = stlib.getInstanceOf("decision-rank");
-				NFAState alt = (NFAState)s;
-				while ( alt!=null ) {
-					rankST.add("states", getStateLabel(alt));
-					if ( alt.transition(1) !=null ) {
-						alt = (NFAState)alt.transition(1).target;
-					}
-					else {
-						alt=null;
-					}
-				}
-				dot.add("decisionRanks", rankST);
-			}
-		}
-
-        // make a DOT edge for each transition
-		ST edgeST = null;
-		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-            Transition edge = (Transition) s.transition(i);
-            if ( edge instanceof RuleTransition ) {
-                RuleTransition rr = ((RuleTransition)edge);
-                // don't jump to other rules, but display edge to follow node
-                edgeST = stlib.getInstanceOf("edge");
-				if ( rr.rule.g != grammar ) {
-					edgeST.add("label", "<"+rr.rule.g.name+"."+rr.rule.name+">");
-				}
-				else {
-					edgeST.add("label", "<"+rr.rule.name+">");
-				}
-				edgeST.add("src", getStateLabel(s));
-				edgeST.add("target", getStateLabel(rr.followState));
-				edgeST.add("arrowhead", arrowhead);
-                dot.add("edges", edgeST);
-				walkRuleNFACreatingDOT(dot, rr.followState);
-                continue;
-            }
-			if ( edge instanceof ActionTransition ) {
-				edgeST = stlib.getInstanceOf("action-edge");
-			}
-			else if ( edge instanceof PredicateTransition ) {
-				edgeST = stlib.getInstanceOf("edge");
-			}
-			else if ( edge.isEpsilon() ) {
-				edgeST = stlib.getInstanceOf("epsilon-edge");
-			}
-			else {
-				edgeST = stlib.getInstanceOf("edge");
-			}
-			edgeST.add("label", getEdgeLabel(edge.toString(grammar)));
-            edgeST.add("src", getStateLabel(s));
-			edgeST.add("target", getStateLabel(edge.target));
-			edgeST.add("arrowhead", arrowhead);
-            dot.add("edges", edgeST);
-            walkRuleNFACreatingDOT(dot, edge.target); // keep walkin'
-        }
-    }
+//    protected void walkRuleNFACreatingDOT(ST dot,
+//                                          NFAState s)
+//    {
+//        if ( markedStates.contains(s) ) {
+//            return; // already visited this node
+//        }
+//
+//        markedStates.add(s.stateNumber); // mark this node as completed.
+//
+//        // first add this node
+//        ST stateST;
+//        if ( s instanceof RuleStopState ) {
+//            stateST = stlib.getInstanceOf("stopstate");
+//        }
+//        else {
+//            stateST = stlib.getInstanceOf("state");
+//        }
+//        stateST.add("name", getStateLabel(s));
+//        dot.add("states", stateST);
+//
+//        if ( s instanceof RuleStopState )  {
+//            return; // don't go past end of rule node to the follow states
+//        }
+//
+//        // special case: if decision point, then line up the alt start states
+//        // unless it's an end of block
+//		if ( s instanceof DecisionState ) {
+//			GrammarAST n = ((NFAState)s).ast;
+//			if ( n!=null && s instanceof BlockEndState ) {
+//				ST rankST = stlib.getInstanceOf("decision-rank");
+//				NFAState alt = (NFAState)s;
+//				while ( alt!=null ) {
+//					rankST.add("states", getStateLabel(alt));
+//					if ( alt.transition(1) !=null ) {
+//						alt = (NFAState)alt.transition(1).target;
+//					}
+//					else {
+//						alt=null;
+//					}
+//				}
+//				dot.add("decisionRanks", rankST);
+//			}
+//		}
+//
+//        // make a DOT edge for each transition
+//		ST edgeST = null;
+//		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+//            Transition edge = (Transition) s.transition(i);
+//            if ( edge instanceof RuleTransition ) {
+//                RuleTransition rr = ((RuleTransition)edge);
+//                // don't jump to other rules, but display edge to follow node
+//                edgeST = stlib.getInstanceOf("edge");
+//				if ( rr.rule.g != grammar ) {
+//					edgeST.add("label", "<"+rr.rule.g.name+"."+rr.rule.name+">");
+//				}
+//				else {
+//					edgeST.add("label", "<"+rr.rule.name+">");
+//				}
+//				edgeST.add("src", getStateLabel(s));
+//				edgeST.add("target", getStateLabel(rr.followState));
+//				edgeST.add("arrowhead", arrowhead);
+//                dot.add("edges", edgeST);
+//				walkRuleNFACreatingDOT(dot, rr.followState);
+//                continue;
+//            }
+//			if ( edge instanceof ActionTransition ) {
+//				edgeST = stlib.getInstanceOf("action-edge");
+//			}
+//			else if ( edge instanceof PredicateTransition ) {
+//				edgeST = stlib.getInstanceOf("edge");
+//			}
+//			else if ( edge.isEpsilon() ) {
+//				edgeST = stlib.getInstanceOf("epsilon-edge");
+//			}
+//			else {
+//				edgeST = stlib.getInstanceOf("edge");
+//			}
+//			edgeST.add("label", getEdgeLabel(edge.toString(grammar)));
+//            edgeST.add("src", getStateLabel(s));
+//			edgeST.add("target", getStateLabel(edge.target));
+//			edgeST.add("arrowhead", arrowhead);
+//            dot.add("edges", edgeST);
+//            walkRuleNFACreatingDOT(dot, edge.target); // keep walkin'
+//        }
+//    }
 
     /** Fix edge strings so they print out in DOT properly;
 	 *  generate any gated predicates on edge too.
@@ -222,14 +308,13 @@ public class DOTGenerator {
 		if ( s==null ) return "null";
 		String stateLabel = String.valueOf(s.stateNumber);
 		if ( s instanceof DecisionState ) {
-			stateLabel = stateLabel+",d="+((DecisionState)s).decision;
+			stateLabel = stateLabel+"\\nd="+((DecisionState)s).decision;
 		}
-		return '"'+stateLabel+'"';
+		return stateLabel;
 	}
 
 	protected String getStateLabel(DFAState s) {
 		if ( s==null ) return "null";
-		String stateLabel = String.valueOf(s.stateNumber);
 		StringBuffer buf = new StringBuffer(250);
 		buf.append('s');
 		buf.append(s.stateNumber);
@@ -275,10 +360,10 @@ public class DOTGenerator {
 				}
 			}
 		}
-		stateLabel = buf.toString();
+		String stateLabel = buf.toString();
 		if ( s.isAcceptState ) {
             stateLabel = stateLabel+"=>"+s.getUniquelyPredictedAlt();
         }
-        return '"'+stateLabel+'"';
+        return stateLabel;
     }
 }

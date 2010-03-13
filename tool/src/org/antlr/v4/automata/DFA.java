@@ -28,7 +28,7 @@ public class DFA {
 	 *  Not used during fixed k lookahead as it's a waste to fill it with
 	 *  a dup of states array.
      */
-    public Map<DFAState, DFAState> uniqueStates = new HashMap<DFAState, DFAState>();
+    public Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
 
 	/** Maps the state number to the actual DFAState.  This contains all
 	 *  states, but the states are not unique.  s3 might be same as s1 so
@@ -62,12 +62,12 @@ public class DFA {
 
 	/** Add a new DFA state to this DFA (doesn't check if already present). */
 	public void addState(DFAState d) {
-		uniqueStates.put(d,d);
+		states.put(d,d);
 		d.stateNumber = stateCounter++;
 	}
 
 	public void defineAcceptState(int alt, DFAState acceptState) {
-		if ( uniqueStates.get(acceptState)==null ) addState(acceptState);
+		if ( states.get(acceptState)==null ) addState(acceptState);
 		altToAcceptState[alt] = acceptState;
 	}
 	
@@ -80,7 +80,7 @@ public class DFA {
 
 	public boolean isDeterministic() {
 		if ( converter.danglingStates.size()==0 &&
-			 converter.nondeterministicStates.size()==0 &&
+			 converter.ambiguousStates.size()==0 &&
 			 converter.unreachableAlts.size()==0 )
 		{
 			return true;

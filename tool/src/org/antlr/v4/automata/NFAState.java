@@ -11,6 +11,14 @@ public class NFAState {
 	/** NFAState created for which rule? */
 	public Rule rule;
 
+	/** Which NFA are we in? */
+	public NFA nfa = null;
+
+	/** NFA state is associated with which node in AST? */
+	public GrammarAST ast;
+
+	public NFAState(NFA nfa) { this.nfa = nfa; }
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
@@ -27,14 +35,6 @@ public class NFAState {
 	public String toString() {
 		return String.valueOf(stateNumber);
 	}
-
-	/** Which NFA are we in? */
-	public NFA nfa = null;
-
-	/** NFA state is associated with which node in AST? */
-	public GrammarAST ast;
-
-	public NFAState(NFA nfa) { this.nfa = nfa; }
 	
 	public int getNumberOfTransitions() {
 		return 0;

@@ -26,7 +26,8 @@ public class Resolver {
 	 *  conflicting ctx predicts alts i and j.  Return an Integer set
 	 *  of the alternative numbers that conflict.  Two contexts conflict if
 	 *  they are equal or one is a stack suffix of the other or one is
-	 *  the empty context.
+	 *  the empty context.  The conflict is a true ambiguity. No amount
+	 *  of further looking in grammar will resolve issue (only preds help).
 	 *
 	 *  Use a hash table to record the lists of configs for each state
 	 *  as they are encountered.  We need only consider states for which
@@ -34,9 +35,9 @@ public class Resolver {
 	 *  alt must be different or must have different contexts to avoid a
 	 *  conflict.
 	 */
-	public Set<Integer> getNonDeterministicAlts(DFAState d) {
+	public Set<Integer> getAmbiguousAlts(DFAState d) {
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
-		 Set<Integer> nondeterministicAlts = new HashSet<Integer>();
+		 Set<Integer> ambiguousAlts = new HashSet<Integer>();
 
 		// If only 1 NFA conf then no way it can be nondeterministic;
 		// save the overhead.  There are many o-a->o NFA transitions
@@ -54,7 +55,8 @@ public class Resolver {
 		}
 
 		// potential conflicts are states with > 1 configuration and diff alts
-		boolean thisStateHasPotentialProblem = false;
+//		boolean thisStateHasPotentialProblem = false;
+		boolean deterministic = true;
 		for (List<NFAConfig> configsForState : stateToConfigListMap.values()) {
 			if ( configsForState.size()>1 ) {
 				int predictedAlt = Resolver.getUniqueAlt(configsForState, false);
@@ -65,13 +67,19 @@ public class Resolver {
 					stateToConfigListMap.put(configsForState.get(0).state.stateNumber, null);
 				}
 				else {
-					thisStateHasPotentialProblem = true;
+					//thisStateHasPotentialProblem = true;
+					deterministic = false;
 				}
 			}
 		}
 
 		// a fast check for potential issues; most states have none
-		if ( !thisStateHasPotentialProblem ) return null;
+//		if ( !thisStateHasPotentialProblem ) return null;
+
+		if ( deterministic ) {
+			d.isAcceptState = true;
+			return null;
+		}
 
 		// we have a potential problem, so now go through config lists again
 		// looking for different alts (only states with potential issues
@@ -107,35 +115,34 @@ public class Resolver {
 						ctxConflict = s.context.conflictsWith(t.context);
 					}
 					if ( altConflict && ctxConflict ) {
-						nondeterministicAlts.add(s.alt);
-						nondeterministicAlts.add(t.alt);
+						ambiguousAlts.add(s.alt);
+						ambiguousAlts.add(t.alt);
 					}
 				}
 			}
 		}
 
-		if ( nondeterministicAlts.size()==0 ) return null;
-		return nondeterministicAlts;
+		if ( ambiguousAlts.size()==0 ) return null;
+		return ambiguousAlts;
 	}
 
-	public void resolveNonDeterminisms(DFAState d) {
+	public void resolveAmbiguities(DFAState d) {
 		if ( StackLimitedNFAToDFAConverter.debug ) {
 			System.out.println("resolveNonDeterminisms "+d.toString());
 		}
-		Set<Integer> nondeterministicAlts = getNonDeterministicAlts(d);
-		if ( StackLimitedNFAToDFAConverter.debug && nondeterministicAlts!=null ) {
-			System.out.println("nondet alts="+nondeterministicAlts);
+		Set<Integer> ambiguousAlts = getAmbiguousAlts(d);
+		if ( StackLimitedNFAToDFAConverter.debug && ambiguousAlts!=null ) {
+			System.out.println("ambig alts="+ambiguousAlts);
 		}
 
 		// if no problems return
-		if ( nondeterministicAlts==null ) return;
+		if ( ambiguousAlts==null ) return;
 
-		// reportNondeterminism(d, nondeterministicAlts);
-		converter.nondeterministicStates.add(d);
+		converter.ambiguousStates.add(d);
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
 		boolean resolved =
-			semResolver.tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
+			semResolver.tryToResolveWithSemanticPredicates(d, ambiguousAlts);
 		if ( resolved ) {
 			if ( StackLimitedNFAToDFAConverter.debug ) {
 				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
@@ -146,7 +153,7 @@ public class Resolver {
 		}
 
 		// RESOLVE SYNTACTIC CONFLICT BY REMOVING ALL BUT ONE ALT
-		resolveByPickingMinAlt(d, nondeterministicAlts);
+		resolveByPickingMinAlt(d, ambiguousAlts);
 	}
 
 
@@ -166,39 +173,39 @@ public class Resolver {
 	}
 
 	/** Turn off all configurations associated with the
-	 *  set of incoming nondeterministic alts except the min alt number.
+	 *  set of incoming alts except the min alt number.
 	 *  There may be many alts among the configurations but only turn off
 	 *  the ones with problems (other than the min alt of course).
 	 *
-	 *  If nondeterministicAlts is null then turn off all configs 'cept those
+	 *  If alts is null then turn off all configs 'cept those
 	 *  associated with the minimum alt.
 	 *
 	 *  Return the min alt found.
 	 */
-	int resolveByPickingMinAlt(DFAState d, Set<Integer> nondeterministicAlts) {
+	int resolveByPickingMinAlt(DFAState d, Set<Integer> alts) {
 		int min = Integer.MAX_VALUE;
-		if ( nondeterministicAlts!=null ) {
-			min = getMinAlt(nondeterministicAlts);
+		if ( alts !=null ) {
+			min = getMinAlt(alts);
 		}
 		else {
 			min = d.getMinAlt();
 		}
 
-		turnOffOtherAlts(d, min, nondeterministicAlts);
+		turnOffOtherAlts(d, min, alts);
 
 		return min;
 	}
 
 	/** turn off all states associated with alts other than the good one
-	 *  (as long as they are one of the nondeterministic ones)
+	 *  (as long as they are one of the ones in alts)
 	 */
-	void turnOffOtherAlts(DFAState d, int min, Set<Integer> nondeterministicAlts) {
+	void turnOffOtherAlts(DFAState d, int min, Set<Integer> alts) {
 		int numConfigs = d.nfaConfigs.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfig configuration = d.nfaConfigs.get(i);
 			if ( configuration.alt!=min ) {
-				if ( nondeterministicAlts==null ||
-					 nondeterministicAlts.contains(configuration.alt) )
+				if ( alts==null ||
+					 alts.contains(configuration.alt) )
 				{
 					configuration.resolved = true;
 				}
@@ -206,9 +213,9 @@ public class Resolver {
 		}
 	}
 
-	public static int getMinAlt(Set<Integer> nondeterministicAlts) {
+	public static int getMinAlt(Set<Integer> alts) {
 		int min = Integer.MAX_VALUE;
-		for (Integer altI : nondeterministicAlts) {
+		for (Integer altI : alts) {
 			int alt = altI.intValue();
 			if ( alt < min ) min = alt;
 		}

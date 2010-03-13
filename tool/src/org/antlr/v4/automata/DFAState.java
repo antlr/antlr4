@@ -50,7 +50,7 @@ public class DFAState {
 	public DFA dfa;
 
 	/** Track the transitions emanating from this DFA state. */
-	protected List<Edge> edges =
+	public List<Edge> edges =
 		new ArrayList<Edge>(INITIAL_NUM_TRANSITIONS);
 
 	/** The set of NFA configurations (state,alt,context) for this DFA state */
