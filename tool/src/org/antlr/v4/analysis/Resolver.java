@@ -55,8 +55,7 @@ public class Resolver {
 		}
 
 		// potential conflicts are states with > 1 configuration and diff alts
-//		boolean thisStateHasPotentialProblem = false;
-		boolean deterministic = true;
+		boolean thisStateHasPotentialProblem = false;
 		for (List<NFAConfig> configsForState : stateToConfigListMap.values()) {
 			if ( configsForState.size()>1 ) {
 				int predictedAlt = Resolver.getUniqueAlt(configsForState, false);
@@ -67,19 +66,13 @@ public class Resolver {
 					stateToConfigListMap.put(configsForState.get(0).state.stateNumber, null);
 				}
 				else {
-					//thisStateHasPotentialProblem = true;
-					deterministic = false;
+					thisStateHasPotentialProblem = true;
 				}
 			}
 		}
 
 		// a fast check for potential issues; most states have none
-//		if ( !thisStateHasPotentialProblem ) return null;
-
-		if ( deterministic ) {
-			d.isAcceptState = true;
-			return null;
-		}
+		if ( !thisStateHasPotentialProblem ) return null;
 
 		// we have a potential problem, so now go through config lists again
 		// looking for different alts (only states with potential issues
@@ -107,9 +100,17 @@ public class Resolver {
 					// suffix of t.ctx or vice versa (if alts differ).
 					// Also a conflict if s.ctx or t.ctx is empty
 					boolean altConflict = s.alt != t.alt;
+					if ( !altConflict ) continue;
 					boolean ctxConflict = false;
 					if ( converter instanceof StackLimitedNFAToDFAConverter) {
-						ctxConflict = s.context.equals(t.context);
+						// TODO: figure out if conflict rule is same for stack limited; as of 3/12/10 i think so
+						// doesn't matter how we limit stack, once we the same context on both
+						// stack tops (even if one is subset of other) we can't ever resolve ambig.
+						// We are at same NFA state, predicting diff alts, and if we ever fall off
+						// end of rule, we'll do the same thing in both cases.
+
+						//ctxConflict = s.context.equals(t.context);
+						ctxConflict = s.context.conflictsWith(t.context);
 					}
 					else {
 						ctxConflict = s.context.conflictsWith(t.context);
@@ -156,8 +157,7 @@ public class Resolver {
 		resolveByPickingMinAlt(d, ambiguousAlts);
 	}
 
-
-	public void resolveDanglingState(DFAState d) {
+	public void resolveDeadState(DFAState d) {
 		if ( d.resolvedWithPredicates || d.getNumberOfTransitions()>0 ) return;
 		
 		System.err.println("dangling DFA state "+d+" after reach / closures");

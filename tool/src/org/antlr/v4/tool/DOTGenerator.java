@@ -49,16 +49,6 @@ public class DOTGenerator {
 			if ( markedStates.contains(s) ) { work.remove(0); continue; }
 			markedStates.add(s);
 
-			// first add this node
-			ST stateST;
-			if ( s instanceof RuleStopState ) {
-				stateST = stlib.getInstanceOf("stopstate");
-			}
-			else {
-				stateST = stlib.getInstanceOf("state");
-			}
-			stateST.add("name", getStateLabel(s));
-
 			// don't go past end of rule node to the follow states
 			if ( s instanceof RuleStopState ) continue;
 
@@ -96,8 +86,8 @@ public class DOTGenerator {
 					else {
 						edgeST.add("label", "<"+rr.rule.name+">");
 					}
-					edgeST.add("src", s.stateNumber);
-					edgeST.add("target", rr.followState.stateNumber);
+					edgeST.add("src", "s"+s.stateNumber);
+					edgeST.add("target", "s"+rr.followState.stateNumber);
 					edgeST.add("arrowhead", arrowhead);
 					dot.add("edges", edgeST);
 					work.add(rr.followState);
@@ -116,8 +106,8 @@ public class DOTGenerator {
 					edgeST = stlib.getInstanceOf("edge");
 				}
 				edgeST.add("label", getEdgeLabel(edge.toString(grammar)));
-				edgeST.add("src", s.stateNumber);
-				edgeST.add("target", edge.target.stateNumber);
+				edgeST.add("src", "s"+s.stateNumber);
+				edgeST.add("target", "s"+edge.target.stateNumber);
 				edgeST.add("arrowhead", arrowhead);
 				dot.add("edges", edgeST);
 				work.add(edge.target);
@@ -126,15 +116,17 @@ public class DOTGenerator {
 
 		// define nodes we visited (they will appear first in DOT output)
 		// this is an example of ST's lazy eval :)
+		// define stop state first; seems to be a bug in DOT where doublecircle
+		// shape only works if we define them first. weird.
+		NFAState stopState = startState.nfa.ruleToStopState.get(startState.rule);
+		ST st = stlib.getInstanceOf("stopstate");
+		st.add("name", "s"+stopState.stateNumber);
+		st.add("label", getStateLabel(stopState));
+		dot.add("states", st);
 		for (NFAState s : markedStates) {
-			ST st;
-			if ( s instanceof RuleStopState ) {
-				st = stlib.getInstanceOf("stopstate");
-			}
-			else {
-				st = stlib.getInstanceOf("state");
-			}
-			st.add("name", s.stateNumber);
+			if ( s instanceof RuleStopState ) continue;
+			st = stlib.getInstanceOf("state");
+			st.add("name", "s"+s.stateNumber);
 			st.add("label", getStateLabel(s));
 			dot.add("states", st);
 		}
@@ -153,14 +145,21 @@ public class DOTGenerator {
 		Set<DFAState> markedStates = new HashSet<DFAState>();
 		List<DFAState> work = new LinkedList<DFAState>();
 
+		// define stop states first; seems to be a bug in DOT where doublecircle
+		for (List<DFAState> stops : startState.dfa.altToAcceptState) {
+			if ( stops==null ) continue;
+			for (DFAState d : stops) {
+				if ( d==null ) continue;
+				ST st = stlib.getInstanceOf("stopstate");
+				st.add("name", "s"+d.stateNumber);
+				st.add("label", getStateLabel(d));
+				dot.add("states", st);
+			}
+		}
+
 		for (DFAState d : startState.dfa.states.values()) {
-			ST st;
-			if ( d.isAcceptState ) {
-				st = stlib.getInstanceOf("stopstate");
-			}
-			else {
-				st = stlib.getInstanceOf("state");
-			}
+			if ( d.isAcceptState ) continue;
+			ST st = stlib.getInstanceOf("state");
 			st.add("name", "s"+d.stateNumber);
 			st.add("label", getStateLabel(d));
 			dot.add("states", st);

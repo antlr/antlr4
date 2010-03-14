@@ -109,7 +109,7 @@ public class NFAContext {
 	 *  single NFA state's configurations within a single DFA state.
 	 *  If there are configurations s and t within a DFA state such that
 	 *  s.state=t.state && s.alt != t.alt && s.ctx conflicts t.ctx then
-	 *  the DFA state predicts more than a single alt--it's nondeterministic.
+	 *  the DFA state predicts more than a single alt--grammar is ambiguous.
 	 *  Two contexts conflict if they are the same or if one is a suffix
 	 *  of the other.
 	 *
@@ -139,10 +139,10 @@ public class NFAContext {
 	 *  that they are now going to track perfectly together.  Once they
 	 *  converged on state 21, there is no way they can separate.  In other
 	 *  words, the prior stack state is not consulted when computing where to
-	 *  go in the closure operation.  ?$ and ??$ are considered the same stack.
-	 *  If ? is popped off then $ and ?$ remain; they are now an empty and
+	 *  go in the closure operation.  beta $ and beta alpha $ are considered the same stack.
+	 *  If beta is popped off then $ and alpha$ remain; there is now an empty and
 	 *  nonempty context comparison.  So, if one stack is a suffix of
-	 *  another, then it will still degenerate to the simple empty stack
+	 *  another, then it will still degenerate to the simple empty / nonempty stack
 	 *  comparison case.
 	 */
 	protected boolean suffix(NFAContext other) {

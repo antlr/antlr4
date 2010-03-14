@@ -3,7 +3,10 @@ package org.antlr.v4.automata;
 import org.antlr.v4.analysis.StackLimitedNFAToDFAConverter;
 import org.antlr.v4.tool.Grammar;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** A DFA (converted from a grammar's NFA).
@@ -45,7 +48,7 @@ public class DFA {
 	public int nAlts = 0;
 
 	/** We only want one accept state per predicted alt; track here */
-	public DFAState[] altToAcceptState;	
+	public List<DFAState>[] altToAcceptState;
 
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
@@ -57,7 +60,7 @@ public class DFA {
 		this.decisionNFAStartState = startState;
 		nAlts = startState.getNumberOfTransitions();
 		decision = startState.decision;
-		altToAcceptState = new DFAState[nAlts+1];
+		altToAcceptState = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
 	}
 
 	/** Add a new DFA state to this DFA (doesn't check if already present). */
@@ -67,8 +70,12 @@ public class DFA {
 	}
 
 	public void defineAcceptState(int alt, DFAState acceptState) {
+		acceptState.isAcceptState = true;
 		if ( states.get(acceptState)==null ) addState(acceptState);
-		altToAcceptState[alt] = acceptState;
+		if ( altToAcceptState[alt]==null ) {
+			altToAcceptState[alt] = new ArrayList<DFAState>();
+		}
+		altToAcceptState[alt].add(acceptState);
 	}
 	
 	public DFAState newState() {
@@ -79,8 +86,13 @@ public class DFA {
 	}
 
 	public boolean isDeterministic() {
+		boolean resolvedWithPredicates = true;
+		// flip resolvedWithPredicates if we find an ambig state not resolve with pred
+		for (DFAState d : converter.ambiguousStates) {
+			if ( !d.resolvedWithPredicates ) resolvedWithPredicates = false;
+		}
 		if ( converter.danglingStates.size()==0 &&
-			 converter.ambiguousStates.size()==0 &&
+			 resolvedWithPredicates &&
 			 converter.unreachableAlts.size()==0 )
 		{
 			return true;

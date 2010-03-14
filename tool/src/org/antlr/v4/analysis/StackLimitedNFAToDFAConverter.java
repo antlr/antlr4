@@ -83,8 +83,6 @@ public class StackLimitedNFAToDFAConverter {
 
 	Resolver resolver;
 
-	DFAVerifier verifier;
-	
 	public static boolean debug = false;
 
 	public StackLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
@@ -93,7 +91,6 @@ public class StackLimitedNFAToDFAConverter {
 		dfa = new DFA(g, nfaStartState);
 		dfa.converter = this;
 		resolver = new Resolver(this);
-		verifier = new DFAVerifier(dfa, this);
 	}
 
 	public DFA createDFA() {
@@ -105,12 +102,11 @@ public class StackLimitedNFAToDFAConverter {
 		while ( work.size()>0 ) {
 			DFAState d = work.get(0);
 			reach(d);
-			resolver.resolveDanglingState(d);
+			resolver.resolveDeadState(d);
 			work.remove(0); // we're done with this DFA state
 		}
 
-		unreachableAlts = verifier.getUnreachableAlts();
-		//deadStates = verifier.getDeadStates();
+		unreachableAlts = getUnreachableAlts();
 
 		return dfa;
 	}
@@ -159,8 +155,6 @@ public class StackLimitedNFAToDFAConverter {
 			return;
 		}
 
-		dfa.addState(t);  // add state we've never seen before
-
 		// resolve any syntactic conflicts by choosing a single alt or
 		// by using semantic predicates if present.
 		resolver.resolveAmbiguities(t);
@@ -170,11 +164,13 @@ public class StackLimitedNFAToDFAConverter {
 		int alt = t.getUniquelyPredictedAlt();
 		if ( alt > 0 ) { // uniquely predicts an alt?
 			System.out.println(t+" predicts "+alt);
-			t.isAcceptState = true;
+			// Define new stop state
+			dfa.defineAcceptState(alt, t);
 		}
 		else {
 			System.out.println("ADD "+t);
 			work.add(t); // unresolved, add to work list to continue NFA conversion
+			dfa.addState(t);  // add state we've never seen before
 		}
 
 		d.addTransition(new Edge(t, label));
@@ -553,30 +549,23 @@ public class StackLimitedNFAToDFAConverter {
 		List<NFAConfig> predConfigsSortedByAlt = configsWithPreds;
 		// Now, we can add edges emanating from d for these preds in right order
 		for (NFAConfig c : predConfigsSortedByAlt) {
-			DFAState predDFATarget = dfa.altToAcceptState[c.alt];
-			if ( predDFATarget==null ) {
-				predDFATarget = dfa.newState(); // create if not there.
-				// new DFA state is a target of the predicate from d
-				predDFATarget.addNFAConfig(c.state,
-										   c.alt,
-										   c.context,
-										   c.semanticContext);
-				predDFATarget.isAcceptState = true;
-				dfa.defineAcceptState(c.alt, predDFATarget);
-				// v3 checked if already there, but new state is an accept
-				// state and therefore can't be there yet; we just checked above
-//				DFAState existingState = dfa.addState(predDFATarget);
-//				if ( predDFATarget != existingState ) {
-//					// already there...use/return the existing DFA state that
-//					// is a target of this predicate.  Make this state number
-//					// point at the existing state
-//					dfa.setState(predDFATarget.stateNumber, existingState);
-//					predDFATarget = existingState;
-//				}
-			}
+			DFAState predDFATarget = dfa.newState();
+			// new DFA state is a target of the predicate from d
+			predDFATarget.addNFAConfig(c.state,
+									   c.alt,
+									   c.context,
+									   c.semanticContext);
+			dfa.defineAcceptState(c.alt, predDFATarget);
 			// add a transition to pred target from d
 			d.addTransition(new PredicateEdge(c.semanticContext, predDFATarget));
 		}
 	}
-	
+
+	public Set<Integer> getUnreachableAlts() {
+		Set<Integer> unreachable = new HashSet<Integer>();
+		for (int alt=0; alt<dfa.nAlts; alt++) {
+			if ( alt>0 && dfa.altToAcceptState[alt]==null ) unreachable.add(alt);
+		}
+		return unreachable;
+	}	
 }

@@ -13,6 +13,8 @@ import java.util.*;
  *  1. nonreduced DFA (dangling states)
  *  2. unreachable stop states
  *  3. nondeterministic states
+ *
+ *  TODO: unneeded?
  */
 public class DFAVerifier {
 	public static enum ReachableStatus {
@@ -28,9 +30,16 @@ public class DFAVerifier {
 
 	StackLimitedNFAToDFAConverter converter;
 
+	// create 2D matrix showing incident edges; inverse of adjacency matrix
+	// incidentEdges.get(s) is list of edges pointing at state s
+	MultiMap<DFAState, DFAState> incidentStates = new MultiMap<DFAState, DFAState>();
+	
 	public DFAVerifier(DFA dfa, StackLimitedNFAToDFAConverter converter) {
 		this.dfa = dfa;
 		this.converter = converter;
+		for (DFAState d : dfa.states.values()) {
+			for (Edge e : d.edges) incidentStates.map(e.target, d);
+		}
 	}
 
 	public Set<Integer> getUnreachableAlts() {
@@ -41,20 +50,16 @@ public class DFAVerifier {
 		return unreachable; 
 	}
 
+	public List<DFAState> getIncidentEdgeStates(DFAState d) {
+		return incidentStates.get(d);
+	}
+	
 	public Set<DFAState> getDeadStates() {
-		// create 2D matrix showing incident edges; inverse of adjacency matrix 
-		// incidentEdges.get(s) is list of edges pointing at state s 
-		MultiMap<DFAState, DFAState> incidentStates = new MultiMap<DFAState, DFAState>();
-		for (DFAState d : dfa.states.values()) {
-			for (Edge e : d.edges) incidentStates.map(e.target, d);
-		}
-		//Set<DFAState> reaches = new HashSet<DFAState>(dfa.uniqueStates.size());
-
 		Set<DFAState> dead = new HashSet<DFAState>(dfa.states.size());
 		dead.addAll(dfa.states.values());
-		for (DFAState a : dfa.altToAcceptState) {
-			if ( a!=null ) dead.remove(a);
-		}
+//		for (DFAState a : dfa.altToAcceptState) {
+//			if ( a!=null ) dead.remove(a);
+//		}
 
 		// obviously accept states reach accept states
 		//reaches.addAll(Arrays.asList(dfa.altToAcceptState));

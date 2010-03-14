@@ -29,14 +29,23 @@ public class AnalysisPipeline {
 		StackLimitedNFAToDFAConverter approxConv = new StackLimitedNFAToDFAConverter(g, s);
 		DFA dfa = approxConv.createDFA();
 		System.out.println("DFA="+dfa);
-		if ( dfa.isDeterministic() ) return dfa;
+		if ( dfa.isDeterministic() ) {
+			System.out.println("deterministic :)");
+			return dfa;
+		}
+		else System.out.println("nondeterministic!!!!!!!");
 
+		// TODO: is it ok to have unreachable alts in approx? maybe we don't need to do full LL(*)
+		
 		// REAL LL(*) ANALYSIS IF THAT FAILS
 		RecursionLimitedNFAToDFAConverter conv = new RecursionLimitedNFAToDFAConverter(g, s);
-//		DFA dfa = conv.createDFA();
-//		System.out.println("DFA="+dfa);
-//		DFAVerifier verifier = new DFAVerifier(dfa, approxConv);
-//		verifier.analyze();
+		dfa = conv.createDFA();
+		System.out.println("DFA="+dfa);
+		if ( dfa.isDeterministic() ) {
+			System.out.println("recursion limited deterministic :)");
+			return dfa;
+		}
+		else System.out.println("recursion limited nondeterministic!!!!!!!");
 
 		return dfa;
 	}
