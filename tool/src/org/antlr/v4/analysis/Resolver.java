@@ -58,7 +58,7 @@ public class Resolver {
 		boolean thisStateHasPotentialProblem = false;
 		for (List<NFAConfig> configsForState : stateToConfigListMap.values()) {
 			if ( configsForState.size()>1 ) {
-				int predictedAlt = Resolver.getUniqueAlt(configsForState, false);
+				int predictedAlt = Resolver.getUniqueAlt(configsForState);
 				if ( predictedAlt > 0 ) {
 					// remove NFA state's configurations from
 					// further checking; no issues with it
@@ -158,7 +158,7 @@ public class Resolver {
 	}
 
 	public void resolveDeadState(DFAState d) {
-		if ( d.resolvedWithPredicates || d.getNumberOfTransitions()>0 ) return;
+		if ( d.resolvedWithPredicates || d.getNumberOfEdges()>0 ) return;
 		
 		System.err.println("dangling DFA state "+d+" after reach / closures");
 		converter.danglingStates.add(d);
@@ -183,7 +183,7 @@ public class Resolver {
 	 *  Return the min alt found.
 	 */
 	int resolveByPickingMinAlt(DFAState d, Set<Integer> alts) {
-		int min = Integer.MAX_VALUE;
+		int min = 0;
 		if ( alts !=null ) {
 			min = getMinAlt(alts);
 		}
@@ -220,6 +220,10 @@ public class Resolver {
 			if ( alt < min ) min = alt;
 		}
 		return min;
+	}
+
+	public static int getUniqueAlt(Collection<NFAConfig> nfaConfigs) {
+		return getUniqueAlt(nfaConfigs, true);
 	}
 
 	public static int getUniqueAlt(Collection<NFAConfig> nfaConfigs,

@@ -1,6 +1,8 @@
 package org.antlr.v4.analysis;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.automata.*;
+import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
@@ -151,7 +153,7 @@ public class StackLimitedNFAToDFAConverter {
 	void addTransition(DFAState d, IntervalSet label, DFAState t) {
 		DFAState existing = dfa.states.get(t);
 		if ( existing != null ) { // seen before; point at old one
-			d.addTransition(new Edge(existing, label));
+			d.addEdge(new Edge(existing, label));
 			return;
 		}
 
@@ -173,7 +175,7 @@ public class StackLimitedNFAToDFAConverter {
 			dfa.addState(t);  // add state we've never seen before
 		}
 
-		d.addTransition(new Edge(t, label));
+		d.addEdge(new Edge(t, label));
 	}
 
 	/** Given the set of NFA states in DFA state d, find all NFA states
@@ -557,7 +559,7 @@ public class StackLimitedNFAToDFAConverter {
 									   c.semanticContext);
 			dfa.defineAcceptState(c.alt, predDFATarget);
 			// add a transition to pred target from d
-			d.addTransition(new PredicateEdge(c.semanticContext, predDFATarget));
+			d.addEdge(new PredicateEdge(c.semanticContext, predDFATarget));
 		}
 	}
 
@@ -567,5 +569,39 @@ public class StackLimitedNFAToDFAConverter {
 			if ( alt>0 && dfa.altToAcceptState[alt]==null ) unreachable.add(alt);
 		}
 		return unreachable;
-	}	
+	}
+
+	void issueAmbiguityWarnings() {
+		MachineProbe probe = new MachineProbe(dfa);
+		
+		for (DFAState d : ambiguousStates) {
+			Set<Integer> alts = resolver.getAmbiguousAlts(d);
+			List<Integer> sorted = new ArrayList<Integer>(alts);
+			Collections.sort(sorted);
+			System.out.println("ambig alts="+sorted);
+			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
+			System.out.print("path =");
+			for (DFAState d2 : dfaStates) {
+				System.out.print(" "+d2.stateNumber);
+			}
+			System.out.println("");
+
+			List<IntSet> labels = probe.getEdgeLabels(d);
+
+			System.out.println("labels="+probe.getInputSequenceDisplay(g, labels));
+
+			for (int alt : sorted) {
+				List<Set<NFAState>> nfaStates = new ArrayList<Set<NFAState>>();
+				for (DFAState d2 : dfaStates) {
+					nfaStates.add( d2.getUniqueNFAStates(alt) );
+				}
+				System.out.println("NFAConfigs per state: "+nfaStates);
+				List<Token> path =
+					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
+				System.out.println("path = "+path);
+			}
+		}
+		if ( unreachableAlts.size()>0 ) System.out.println("unreachable="+unreachableAlts);
+	}
+
 }

@@ -118,17 +118,23 @@ public class DFAState {
 	}
 
 	public Set<NFAState> getUniqueNFAStates() {
+		return getUniqueNFAStates(NFA.INVALID_ALT_NUMBER);
+	}
+
+	public Set<NFAState> getUniqueNFAStates(int alt) {
 		Set<NFAState> alts = new HashSet<NFAState>();
-		for (NFAConfig c : nfaConfigs) alts.add(c.state);
+		for (NFAConfig c : nfaConfigs) {
+			if ( alt==NFA.INVALID_ALT_NUMBER || c.alt==alt ) alts.add(c.state);
+		}
 		if ( alts.size()==0 ) return null;
 		return alts;
 	}
 
-	public int getNumberOfTransitions() { return edges.size(); }
+	public int getNumberOfEdges() { return edges.size(); }
 
-	public void addTransition(Edge e) { edges.add(e); }
+	public void addEdge(Edge e) { edges.add(e); }
 
-	public Edge transition(int i) { return edges.get(i); }
+	public Edge edge(int i) { return edges.get(i); }
 
 	/** A decent hash for a DFA state is the sum of the NFA state/alt pairs. */
 	public int hashCode() {

@@ -172,8 +172,8 @@ public class DOTGenerator {
 			markedStates.add(d);
 			
 			// make a DOT edge for each transition
-			for (int i = 0; i < d.getNumberOfTransitions(); i++) {
-				Edge edge = d.transition(i);
+			for (int i = 0; i < d.getNumberOfEdges(); i++) {
+				Edge edge = d.edge(i);
 				/*
 				System.out.println("dfa "+s.dfa.decisionNumber+
 					" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());

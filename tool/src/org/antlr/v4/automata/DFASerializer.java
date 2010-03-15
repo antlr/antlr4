@@ -33,11 +33,11 @@ public class DFASerializer {
 			s = work.remove(0);
 			if ( marked.contains(s) ) continue;
 			marked.add(s);
-			int n = s.getNumberOfTransitions();
+			int n = s.getNumberOfEdges();
 			//System.out.println("visit "+getStateString(s)+"; edges="+n);
 			for (int i=0; i<n; i++) {
 				buf.append(getStateString(s));
-				Edge t = s.transition(i);
+				Edge t = s.edge(i);
 				work.add( t.target );				
 				buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
 			}

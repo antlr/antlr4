@@ -19,6 +19,7 @@ public class AnalysisPipeline {
 
 		// BUILD DFA FOR EACH DECISION
 		for (DecisionState s : g.nfa.decisionToNFAState) {
+			System.out.println("\nDECISION "+s.decision);
 			DFA dfa = createDFA(s);
 			g.setLookaheadDFA(s.decision, dfa);
 		}
@@ -26,27 +27,38 @@ public class AnalysisPipeline {
 
 	public DFA createDFA(DecisionState s) {
 		// TRY APPROXIMATE LL(*) ANALYSIS
-		StackLimitedNFAToDFAConverter approxConv = new StackLimitedNFAToDFAConverter(g, s);
-		DFA dfa = approxConv.createDFA();
-		System.out.println("DFA="+dfa);
-		if ( dfa.isDeterministic() ) {
-			System.out.println("deterministic :)");
+		StackLimitedNFAToDFAConverter conv = new StackLimitedNFAToDFAConverter(g, s);
+		DFA dfa = conv.createDFA();
+		System.out.print("DFA="+dfa);
+		if ( dfa.isAmbiguous() ) System.out.println("ambiguous");
+		else System.out.println("NOT ambiguous");
+
+		if ( dfa.valid() ) System.out.println("stack limited valid");
+
+		if ( dfa.valid() ) {
+			// ambig / unreachable errors
+			conv.issueAmbiguityWarnings();
 			return dfa;
 		}
-		else System.out.println("nondeterministic!!!!!!!");
-
-		// TODO: is it ok to have unreachable alts in approx? maybe we don't need to do full LL(*)
+		
+		// Only do recursion limited version if we get dangling states in stack
+		// limited version.  Ambiguities are ok because if the approx version
+		// gets an ambiguity it's defin
 		
 		// REAL LL(*) ANALYSIS IF THAT FAILS
-		RecursionLimitedNFAToDFAConverter conv = new RecursionLimitedNFAToDFAConverter(g, s);
+		conv = new RecursionLimitedNFAToDFAConverter(g, s);
 		dfa = conv.createDFA();
-		System.out.println("DFA="+dfa);
-		if ( dfa.isDeterministic() ) {
-			System.out.println("recursion limited deterministic :)");
-			return dfa;
+		System.out.print("DFA="+dfa);
+
+		// ambig / unreachable errors
+		conv.issueAmbiguityWarnings();
+		if ( !dfa.valid() ) {
+			System.out.println("non-LL(*)");
+			System.out.println("recursion limited NOT valid :)");
 		}
-		else System.out.println("recursion limited nondeterministic!!!!!!!");
+		else System.out.println("recursion limited valid");
 
 		return dfa;
 	}
+
 }

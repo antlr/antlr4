@@ -131,8 +131,8 @@ public class DFAVerifier {
 		// Visit every transition, track if at least one edge reaches stop state
 		// Cannot terminate when we know this state reaches stop state since
 		// all transitions must be traversed to set status of each DFA state.
-		for (int i=0; i<d.getNumberOfTransitions(); i++) {
-			Edge t = d.transition(i);
+		for (int i=0; i<d.getNumberOfEdges(); i++) {
+			Edge t = d.edge(i);
 			DFAState edgeTarget = (DFAState)t.target;
 			ReachableStatus targetStatus = status.get(edgeTarget);
 			if ( targetStatus==ReachableStatus.BUSY ) { // avoid cycles; they say nothing

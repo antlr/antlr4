@@ -14,7 +14,7 @@ import java.util.Map;
  *  of recognizers (lexers, parsers, tree walkers).
  */
 public class DFA {
-	Grammar g;
+	public Grammar g;
 
 	/** What's the start state for this DFA? */
     public DFAState startState;
@@ -85,21 +85,17 @@ public class DFA {
 		return n;
 	}
 
-	public boolean isDeterministic() {
+	// could imply converter.unreachableAlts.size()>0 too
+	public boolean isAmbiguous() {
 		boolean resolvedWithPredicates = true;
 		// flip resolvedWithPredicates if we find an ambig state not resolve with pred
 		for (DFAState d : converter.ambiguousStates) {
 			if ( !d.resolvedWithPredicates ) resolvedWithPredicates = false;
 		}
-		if ( converter.danglingStates.size()==0 &&
-			 resolvedWithPredicates &&
-			 converter.unreachableAlts.size()==0 )
-		{
-			return true;
-		}
-		// ...
-		return false;
+		return converter.ambiguousStates.size()>0 && !resolvedWithPredicates;
 	}
+
+	public boolean valid() { return converter.danglingStates.size()==0; }
 	
 	public String toString() {
 		if ( startState==null ) return "";
