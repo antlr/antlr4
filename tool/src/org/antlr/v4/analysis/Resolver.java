@@ -116,6 +116,7 @@ public class Resolver {
 						ctxConflict = s.context.conflictsWith(t.context);
 					}
 					if ( altConflict && ctxConflict ) {
+						//System.out.println("ctx conflict between "+s+" and "+t);
 						ambiguousAlts.add(s.alt);
 						ambiguousAlts.add(t.alt);
 					}

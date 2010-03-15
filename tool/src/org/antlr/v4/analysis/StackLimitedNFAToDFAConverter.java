@@ -54,9 +54,6 @@ public class StackLimitedNFAToDFAConverter {
 	/** The set of states w/o emanating edges (and w/o resolving sem preds). */
 	public Set<DFAState> danglingStates = new HashSet<DFAState>();
 
-	/** If non-reduced, this is set of states that don't lead to accept state */
-	public Set<DFAState> deadStates;
-
 	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
 	 *  state that predicts more than one alternative, must be resolved
 	 *  with predicates or it should be reported to the user.
@@ -268,7 +265,7 @@ public class StackLimitedNFAToDFAConverter {
 		if ( debug ) {
 			System.out.println("after closure("+d+")");
 		}
-		// System.out.println("after closure d="+d);
+		//System.out.println("after closure d="+d);
 	}
 
 	/** Where can we get from NFA state s traversing only epsilon transitions?
@@ -571,6 +568,7 @@ public class StackLimitedNFAToDFAConverter {
 		return unreachable;
 	}
 
+	// TODO: where does this belong?
 	void issueAmbiguityWarnings() {
 		MachineProbe probe = new MachineProbe(dfa);
 		
@@ -603,5 +601,4 @@ public class StackLimitedNFAToDFAConverter {
 		}
 		if ( unreachableAlts.size()>0 ) System.out.println("unreachable="+unreachableAlts);
 	}
-
 }

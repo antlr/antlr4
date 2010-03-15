@@ -149,11 +149,6 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 	@Override
 	void reach(DFAState d) {
 		super.reach(d);
-
-//		// Check to see if we need to add any semantic predicate transitions
-//		if ( d.isResolvedWithPredicates() ) {
-//			addPredicateTransitions(d);
-//		}
 	}
 
 	/**
@@ -192,7 +187,6 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 		}
 	}
 
-	// TODO: make sure to deal with sempreds in exact DFA
 	/**  1. Traverse an edge that takes us to the start state of another
 	 *      rule, r.  We must push this state so that if the DFA
 	 *      conversion hits the end of rule r, then it knows to continue
@@ -228,6 +222,7 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 				// if this context has hit the max recursions for p.stateNumber,
 				// don't allow it to enter p.stateNumber again
 				if ( depth >= r ) {
+					throw new RuntimeException("recursion overflow in "+altNum);
 				}
 				// first create a new context and push onto call tree,
 				// recording the fact that we are invoking a rule and
