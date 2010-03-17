@@ -38,6 +38,11 @@ public class AnalysisPipeline {
 		if ( dfa.valid() ) {
 			// ambig / unreachable errors
 			conv.issueAmbiguityWarnings();
+
+			System.out.println("MINIMIZE");
+			DFAMinimizer dmin = new DFAMinimizer(dfa);
+			dmin.minimize();
+
 			return dfa;
 		}
 		
@@ -58,6 +63,10 @@ public class AnalysisPipeline {
 		}
 		else System.out.println("recursion limited valid");
 
+		System.out.println("MINIMIZE");
+		DFAMinimizer dmin = new DFAMinimizer(dfa);
+		dmin.minimize();
+		
 		return dfa;
 	}
 

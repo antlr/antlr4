@@ -148,7 +148,7 @@ public class StackLimitedNFAToDFAConverter {
 
 	/** Add t if not in DFA yet, resolving nondet's and then make d-label->t */
 	void addTransition(DFAState d, IntervalSet label, DFAState t) {
-		DFAState existing = dfa.states.get(t);
+		DFAState existing = dfa.stateSet.get(t);
 		if ( existing != null ) { // seen before; point at old one
 			d.addEdge(new Edge(existing, label));
 			return;
@@ -562,8 +562,8 @@ public class StackLimitedNFAToDFAConverter {
 
 	public Set<Integer> getUnreachableAlts() {
 		Set<Integer> unreachable = new HashSet<Integer>();
-		for (int alt=0; alt<dfa.nAlts; alt++) {
-			if ( alt>0 && dfa.altToAcceptState[alt]==null ) unreachable.add(alt);
+		for (int alt=1; alt<=dfa.nAlts; alt++) {
+			if ( dfa.altToAcceptStates[alt]==null ) unreachable.add(alt);
 		}
 		return unreachable;
 	}
@@ -576,7 +576,7 @@ public class StackLimitedNFAToDFAConverter {
 			Set<Integer> alts = resolver.getAmbiguousAlts(d);
 			List<Integer> sorted = new ArrayList<Integer>(alts);
 			Collections.sort(sorted);
-			System.out.println("ambig alts="+sorted);
+			System.err.println("ambig alts="+sorted);
 			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
 			System.out.print("path =");
 			for (DFAState d2 : dfaStates) {
@@ -599,6 +599,6 @@ public class StackLimitedNFAToDFAConverter {
 				System.out.println("path = "+path);
 			}
 		}
-		if ( unreachableAlts.size()>0 ) System.out.println("unreachable="+unreachableAlts);
+		if ( unreachableAlts.size()>0 ) System.err.println("unreachable="+unreachableAlts);
 	}
 }

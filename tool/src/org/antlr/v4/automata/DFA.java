@@ -24,31 +24,25 @@ public class DFA {
 	/** From what NFAState did we create the DFA? */
 	public DecisionState decisionNFAStartState;
 
-	/** A set of all uniquely-numbered DFA states.  Maps hash of DFAState
-     *  to the actual DFAState object.  We use this to detect
-     *  existing DFA states.  Map<DFAState,DFAState>.  Use Map so
+	/** A set of all DFA states. Use Map so
 	 *  we can get old state back (Set only allows you to see if it's there).
 	 *  Not used during fixed k lookahead as it's a waste to fill it with
 	 *  a dup of states array.
      */
-    public Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
+    public Map<DFAState, DFAState> stateSet = new HashMap<DFAState, DFAState>();
 
-	/** Maps the state number to the actual DFAState.  This contains all
-	 *  states, but the states are not unique.  s3 might be same as s1 so
-	 *  s3 -> s1 in this table.  This is how cycles occur.  If fixed k,
-	 *  then these states will all be unique as states[i] always points
-	 *  at state i when no cycles exist.
+	/** Maps the state number to the actual DFAState. 
 	 *
 	 *  This is managed in parallel with uniqueStates and simply provides
 	 *  a way to go from state number to DFAState rather than via a
 	 *  hash lookup.
 	 */
-	//protected List<DFAState> states = new ArrayList<DFAState>();
+	public List<DFAState> states = new ArrayList<DFAState>();
 
 	public int nAlts = 0;
 
 	/** We only want one accept state per predicted alt; track here */
-	public List<DFAState>[] altToAcceptState;
+	public List<DFAState>[] altToAcceptStates;
 
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
@@ -60,22 +54,24 @@ public class DFA {
 		this.decisionNFAStartState = startState;
 		nAlts = startState.getNumberOfTransitions();
 		decision = startState.decision;
-		altToAcceptState = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
+		altToAcceptStates = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
 	}
 
 	/** Add a new DFA state to this DFA (doesn't check if already present). */
 	public void addState(DFAState d) {
-		states.put(d,d);
+		stateSet.put(d,d);
 		d.stateNumber = stateCounter++;
+		states.add( d ); // index in states should be d.stateCounter
 	}
 
 	public void defineAcceptState(int alt, DFAState acceptState) {
 		acceptState.isAcceptState = true;
-		if ( states.get(acceptState)==null ) addState(acceptState);
-		if ( altToAcceptState[alt]==null ) {
-			altToAcceptState[alt] = new ArrayList<DFAState>();
+		acceptState.predictsAlt = alt;		
+		if ( stateSet.get(acceptState)==null ) addState(acceptState);
+		if ( altToAcceptStates[alt]==null ) {
+			altToAcceptStates[alt] = new ArrayList<DFAState>();
 		}
-		altToAcceptState[alt].add(acceptState);
+		altToAcceptStates[alt].add(acceptState);
 	}
 	
 	public DFAState newState() {

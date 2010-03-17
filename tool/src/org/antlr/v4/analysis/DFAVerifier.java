@@ -37,15 +37,15 @@ public class DFAVerifier {
 	public DFAVerifier(DFA dfa, StackLimitedNFAToDFAConverter converter) {
 		this.dfa = dfa;
 		this.converter = converter;
-		for (DFAState d : dfa.states.values()) {
+		for (DFAState d : dfa.stateSet.values()) {
 			for (Edge e : d.edges) incidentStates.map(e.target, d);
 		}
 	}
 
 	public Set<Integer> getUnreachableAlts() {
 		Set<Integer> unreachable = new HashSet<Integer>();
-		for (int alt=0; alt<dfa.nAlts; alt++) {
-			if ( dfa.altToAcceptState[alt]==null ) unreachable.add(alt);
+		for (int alt=0; alt<=dfa.nAlts; alt++) {
+			if ( dfa.altToAcceptStates[alt]==null ) unreachable.add(alt);
 		}
 		return unreachable; 
 	}
@@ -55,8 +55,8 @@ public class DFAVerifier {
 	}
 	
 	public Set<DFAState> getDeadStates() {
-		Set<DFAState> dead = new HashSet<DFAState>(dfa.states.size());
-		dead.addAll(dfa.states.values());
+		Set<DFAState> dead = new HashSet<DFAState>(dfa.stateSet.size());
+		dead.addAll(dfa.stateSet.values());
 //		for (DFAState a : dfa.altToAcceptState) {
 //			if ( a!=null ) dead.remove(a);
 //		}
@@ -67,7 +67,7 @@ public class DFAVerifier {
 		boolean changed = true;
 		while ( changed ) {
 			changed = false;
-			for (DFAState d : dfa.states.values()) {
+			for (DFAState d : dfa.stateSet.values()) {
 				if ( !dead.contains(d) ) {
 					// if d isn't dead, it reaches accept state.
 					dead.remove(d);

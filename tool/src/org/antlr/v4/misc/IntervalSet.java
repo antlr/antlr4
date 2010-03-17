@@ -543,7 +543,16 @@ public class IntervalSet implements IntSet {
         return intervals;
     }
 
-    /** Are two IntervalSets equal?  Because all intervals are sorted
+	@Override
+	public int hashCode() {
+		if ( isNil() ) return 0;
+		int n = 0;
+		// just add left edge of intervals
+		for (Interval I : intervals) n += I.a;
+		return n;
+	}
+
+	/** Are two IntervalSets equal?  Because all intervals are sorted
      *  and disjoint, equals is a simple linear walk over both lists
      *  to make sure they are the same.  Interval.equals() is used
      *  by the List.equals() method to check the ranges.

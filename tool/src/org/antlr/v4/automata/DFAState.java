@@ -4,6 +4,7 @@ import org.antlr.v4.analysis.NFAConfig;
 import org.antlr.v4.analysis.NFAContext;
 import org.antlr.v4.analysis.Resolver;
 import org.antlr.v4.analysis.SemanticContext;
+import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.OrderedHashSet;
 
 import java.util.ArrayList;
@@ -45,6 +46,9 @@ public class DFAState {
 	public int stateNumber = INVALID_STATE_NUMBER;
 
 	public boolean isAcceptState = false;
+
+	/** If accept, which alt does it predict? */
+	public int predictsAlt;
 
 	/** State in which DFA? */
 	public DFA dfa;
@@ -135,6 +139,13 @@ public class DFAState {
 	public void addEdge(Edge e) { edges.add(e); }
 
 	public Edge edge(int i) { return edges.get(i); }
+
+	public DFAState target(IntSet label) {
+		for (Edge e : edges) {
+			if ( !e.label.and(label).isNil() ) return e.target;
+		}
+		return null;
+	}
 
 	/** A decent hash for a DFA state is the sum of the NFA state/alt pairs. */
 	public int hashCode() {

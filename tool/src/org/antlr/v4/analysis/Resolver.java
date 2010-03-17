@@ -169,6 +169,7 @@ public class Resolver {
 		int minAlt = resolveByPickingMinAlt(d, null);
 		// force it to be an accept state
 		d.isAcceptState = true;
+		d.predictsAlt = minAlt;
 		// might be adding new accept state for alt, but that's ok
 		converter.dfa.defineAcceptState(minAlt, d);
 	}

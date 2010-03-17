@@ -146,7 +146,7 @@ public class DOTGenerator {
 		List<DFAState> work = new LinkedList<DFAState>();
 
 		// define stop states first; seems to be a bug in DOT where doublecircle
-		for (List<DFAState> stops : startState.dfa.altToAcceptState) {
+		for (List<DFAState> stops : startState.dfa.altToAcceptStates) {
 			if ( stops==null ) continue;
 			for (DFAState d : stops) {
 				if ( d==null ) continue;
@@ -157,7 +157,7 @@ public class DOTGenerator {
 			}
 		}
 
-		for (DFAState d : startState.dfa.states.values()) {
+		for (DFAState d : startState.dfa.stateSet.values()) {
 			if ( d.isAcceptState ) continue;
 			ST st = stlib.getInstanceOf("state");
 			st.add("name", "s"+d.stateNumber);
