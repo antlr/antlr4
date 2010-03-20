@@ -5,6 +5,7 @@ import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
+import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -571,7 +572,7 @@ public class StackLimitedNFAToDFAConverter {
 	// TODO: where does this belong?
 	void issueAmbiguityWarnings() {
 		MachineProbe probe = new MachineProbe(dfa);
-		
+
 		for (DFAState d : ambiguousStates) {
 			Set<Integer> alts = resolver.getAmbiguousAlts(d);
 			List<Integer> sorted = new ArrayList<Integer>(alts);
@@ -586,8 +587,10 @@ public class StackLimitedNFAToDFAConverter {
 
 			List<IntSet> labels = probe.getEdgeLabels(d);
 
-			System.out.println("labels="+probe.getInputSequenceDisplay(g, labels));
+			String input = probe.getInputSequenceDisplay(g, labels);
+			System.out.println("input="+ input);
 
+			LinkedHashMap<Integer,List<Token>> altPaths = new LinkedHashMap<Integer,List<Token>>();
 			for (int alt : sorted) {
 				List<Set<NFAState>> nfaStates = new ArrayList<Set<NFAState>>();
 				for (DFAState d2 : dfaStates) {
@@ -596,9 +599,13 @@ public class StackLimitedNFAToDFAConverter {
 				System.out.println("NFAConfigs per state: "+nfaStates);
 				List<Token> path =
 					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
+				altPaths.put(alt, path);
 				System.out.println("path = "+path);
 			}
+			ErrorManager.ambiguity(dfa.g.fileName, d, sorted, input, altPaths);
 		}
-		if ( unreachableAlts.size()>0 ) System.err.println("unreachable="+unreachableAlts);
+		if ( unreachableAlts.size()>0 ) {
+			ErrorManager.unreachableAlts(dfa.g.fileName, dfa, unreachableAlts);
+		}
 	}
 }

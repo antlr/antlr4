@@ -40,6 +40,7 @@ public class DFAMinimizer {
 		// we may have also have multiple accepts per alt--put all of them in same partition
 		for (int alt=1; alt<=dfa.nAlts; alt++) {
 			List<DFAState> acceptsForAlt = dfa.altToAcceptStates[alt];
+			if ( acceptsForAlt==null ) continue; // hmm...must be unreachable
 			// distinguish all these accepts from every other state
 			for (DFAState p : acceptsForAlt) {
 				for (int i=0; i<n; i++) {
@@ -141,7 +142,7 @@ public class DFAMinimizer {
 			uniq.add(s);
 		}
 		System.out.println("uniq sets = "+uniq);
-		if ( uniq.size()==0 ) {
+		if ( uniq.size()==dfa.states.size() ) {
 			System.out.println("was already minimal");
 			return;
 		}

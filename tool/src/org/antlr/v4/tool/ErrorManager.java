@@ -4,6 +4,8 @@ import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.v4.automata.DFA;
+import org.antlr.v4.automata.DFAState;
 import org.antlr.v4.parse.v4ParserException;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
@@ -13,6 +15,9 @@ import org.stringtemplate.v4.misc.ErrorBuffer;
 import org.stringtemplate.v4.misc.STMessage;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 
 /** Defines all the errors ANTLR can generator for both the tool and for
@@ -295,7 +300,38 @@ public class ErrorManager {
         state.get().listener.warning(msg);
     }
 
-    /** Process a new message by sending it on to the error listener associated with the current thread
+	public static void ambiguity(String fileName,
+								 DFAState d,
+								 List<Integer> conflictingAlts,
+								 String input,
+								 LinkedHashMap<Integer,List<Token>> conflictingPaths)
+	{
+		state.get().warnings++;
+		AmbiguityMessage msg =
+			new AmbiguityMessage(ErrorType.AMBIGUITY,fileName,
+								 d,
+								 conflictingAlts,
+								 input,
+								 conflictingPaths);
+		state.get().listener.warning(msg);
+	}
+
+	public static void unreachableAlts(String fileName,
+									   DFA dfa,
+									   Collection<Integer> unreachableAlts)
+	{
+		System.err.println("unreachable="+unreachableAlts);
+		state.get().warnings++;
+		UnreachableAltsMessage msg =
+			new UnreachableAltsMessage(ErrorType.UNREACHABLE_ALTS,
+									   fileName,
+									   dfa,
+									   unreachableAlts);
+		state.get().listener.warning(msg);
+	}
+
+
+	/** Process a new message by sending it on to the error listener associated with the current thread
      *  and recording any information we need in the error state for the current thread.
      */
     private static void processMessage() {
@@ -358,6 +394,7 @@ public class ErrorManager {
         }
 
         messages = new STGroupFile(fileName, "UTF-8");
+		messages.debug = true;		
         messages.load();
         if ( initSTListener.errors.size()>0 ) {
             rawError("ANTLR installation corrupted; can't load messages format file:\n"+
@@ -398,6 +435,7 @@ public class ErrorManager {
         }
 
         format = new STGroupFile(fileName, "UTF-8");
+		format.debug = true;
         format.load();
 
         if ( initSTListener.errors.size()>0 ) {

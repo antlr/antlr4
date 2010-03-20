@@ -72,6 +72,8 @@ public class Message {
 
         if (locationValid) reportST.add("location", locationST);
         reportST.add("message", messageFormatST);
+		//((DebugST)reportST).inspect();
+		//reportST.impl.dump();
         return reportST;
     }
 

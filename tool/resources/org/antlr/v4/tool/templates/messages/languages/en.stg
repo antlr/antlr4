@@ -240,6 +240,11 @@ CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::=
 
 // GRAMMAR WARNINGS
 
+AMBIGUITY(arg) ::= <<
+Decision can match input such as "<arg.input>" using multiple alternatives:
+<arg.conflictingPaths.keys:{alt | alt <alt> via tokens <arg.conflictingPaths.(alt); separator=","><\n>}>
+>>
+
 GRAMMAR_NONDETERMINISM(input,conflictingAlts,paths,disabled,hasPredicateBlockedByAction) ::=
 <<
 <if(paths)>
@@ -255,8 +260,8 @@ DANGLING_STATE(danglingAlts,input) ::= <<
 the decision cannot distinguish between alternative(s) <danglingAlts; separator=","> for input such as "<input>"
 >>
 
-UNREACHABLE_ALTS(alts) ::= <<
-The following alternatives can never be matched: <alts; separator=","><\n>
+UNREACHABLE_ALTS(arg) ::= <<
+The following alternatives can never be matched: <arg.alts; separator=","><\n>
 >>
 
 INSUFFICIENT_PREDICATES(upon,altToLocations,hasPredicateBlockedByAction) ::= <<
@@ -270,7 +275,7 @@ ANALYSIS_ABORTED(enclosingRule) ::= <<
 ANTLR could not analyze this decision in rule <enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and possibly adding a syntactic predicate.
 >>
 
-RECURSION_OVERLOW(alt,input,targetRules,callSiteStates) ::= <<
+RECURSION_OVERFLOW(alt,input,targetRules,callSiteStates) ::= <<
 Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule.name>};separator=", ">}; separator=" and ">
 >>
 

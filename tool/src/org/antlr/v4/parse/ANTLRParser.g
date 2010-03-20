@@ -570,7 +570,8 @@ altList
 // use a separate rule so that the BLOCK node has start and stop
 // boundaries set correctly by rule post processing of rewrites.
 ruleBlock
-    : altList -> ^(BLOCK<BlockAST> altList)
+@init {Token colon = input.LT(-1);}
+    : altList -> ^(BLOCK<BlockAST>[colon,"BLOCK"] altList)
     ;
     catch [ResyncToEndOfRuleBlock e] {
     	// just resyncing; ignore error
@@ -601,11 +602,11 @@ element
 }
 @after { paraphrases.pop(); }
 	:	labeledElement
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT labeledElement ) ))
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$labeledElement.start,"BLOCK"] ^(ALT labeledElement ) ))
 		|				-> labeledElement
 		)
 	|	atom
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT atom ) ) )
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$atom.start,"BLOCK"] ^(ALT atom) ) )
 		|				-> atom
 		)
 	|	ebnf
@@ -615,7 +616,7 @@ element
 		|				-> SEMPRED
 		)
 	|   treeSpec
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST> ^(ALT treeSpec ) ) )
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT treeSpec ) ) )
 		|				-> treeSpec
 		)
 	;
@@ -804,7 +805,7 @@ block
          ( optionsSpec? ra+=ruleAction* COLON )?
          altList         
       RPAREN
-      -> ^(BLOCK<BlockAST> optionsSpec? $ra* altList )
+      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] optionsSpec? $ra* altList )
     ; 
 
 // ----------------    

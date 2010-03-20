@@ -131,6 +131,11 @@ public enum ErrorType {
 	AST_OP_IN_ALT_WITH_REWRITE(ErrorSeverity.ERROR, true, true),
     WILDCARD_AS_ROOT(ErrorSeverity.ERROR, true, true),
     CONFLICTING_OPTION_IN_TREE_FILTER(ErrorSeverity.ERROR, true, true),
+
+	AMBIGUITY(ErrorSeverity.ERROR, true, true),
+	UNREACHABLE_ALTS(ErrorSeverity.ERROR, true, true),
+	RECURSION_OVERFLOW(ErrorSeverity.ERROR, true, true),
+	
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(ErrorSeverity.ERROR, true, true),
 

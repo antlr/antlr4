@@ -16,11 +16,15 @@ public class GrammarAST extends CommonTree {
     public GrammarAST(Token t) { super(t); }
     public GrammarAST(GrammarAST node) { super(node); }
     public GrammarAST(int type) { super(new CommonToken(type, ANTLRParser.tokenNames[type])); }
-    public GrammarAST(int type, Token t) { this(t); t.setType(type); }
+    public GrammarAST(int type, Token t) {
+		this(new CommonToken(type, t.getText()));
+		token.setLine(t.getLine());
+		token.setCharPositionInLine(t.getCharPositionInLine());
+	}
     public GrammarAST(int type, Token t, String text) {
-        this(t);
-        t.setType(type);
-        t.setText(text);
+		this(new CommonToken(type, text));
+		token.setLine(t.getLine());
+		token.setCharPositionInLine(t.getCharPositionInLine());
     }
 
 	public List<GrammarAST> getNodesWithType(int ttype) {
