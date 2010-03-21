@@ -1,7 +1,12 @@
 package org.antlr.v4.analysis;
 
+import org.antlr.runtime.Token;
+import org.antlr.v4.automata.BasicState;
 import org.antlr.v4.automata.DFAState;
+import org.antlr.v4.automata.Label;
+import org.antlr.v4.automata.NFAState;
 import org.antlr.v4.misc.BitSet;
+import org.antlr.v4.tool.ErrorManager;
 
 import java.util.*;
 
@@ -40,20 +45,18 @@ public class PredicateResolver {
 	 *  This is done down in getPredicatesPerNonDeterministicAlt().
 	 */
 	protected boolean tryToResolveWithSemanticPredicates(DFAState d,
-														 Set<Integer> nondeterministicAlts)
+														 Set<Integer> ambiguousAlts)
 	{
 		Map<Integer, SemanticContext> altToPredMap =
-				getPredicatesPerNonDeterministicAlt(d, nondeterministicAlts);
+			getPredicatesPerAmbiguousAlt(d, ambiguousAlts);
 
 		if ( altToPredMap.size()==0 ) return false;
 
 		//System.out.println("nondeterministic alts with predicates: "+altToPredMap);
-		// TODO: do we need?
-		// dfa.probe.reportAltPredicateContext(d, altToPredMap);
 
-		if ( nondeterministicAlts.size()-altToPredMap.size()>1 ) {
-			// too few predicates to resolve; just return
-			// TODO: actually do we need to gen error here?
+		if ( ambiguousAlts.size()-altToPredMap.size()>1 ) {
+			// too few predicates to resolve; just return.
+			// We caught/tracked incompletly covered preds in getPredicatesPerNonDeterministicAlt
 			return false;
 		}
 
@@ -69,13 +72,13 @@ public class PredicateResolver {
 		// anyway as it's !(union of other preds).  This implies
 		// that there is no such thing as noviable alt for synpred edges
 		// emanating from a DFA state.
-		if ( altToPredMap.size()==nondeterministicAlts.size()-1 ) {
+		if ( altToPredMap.size()==ambiguousAlts.size()-1 ) {
 			// if there are n-1 predicates for n nondeterministic alts, can fix
-			BitSet ndSet = BitSet.of(nondeterministicAlts);
+			BitSet ndSet = BitSet.of(ambiguousAlts);
 			BitSet predSet = BitSet.of(altToPredMap);
 			int nakedAlt = ndSet.subtract(predSet).getSingleElement();
 			SemanticContext nakedAltPred = null;
-			if ( nakedAlt == Collections.max(nondeterministicAlts) ) {
+			if ( nakedAlt == Collections.max(ambiguousAlts) ) {
 				// the naked alt is the last nondet alt and will be the default clause
 				nakedAltPred = new SemanticContext.TruePredicate();
 			}
@@ -108,7 +111,7 @@ public class PredicateResolver {
 			}
 		}
 
-		if ( altToPredMap.size()==nondeterministicAlts.size() ) {
+		if ( altToPredMap.size()==ambiguousAlts.size() ) {
 			// RESOLVE CONFLICT by picking one NFA configuration for each alt
 			// and setting its resolvedWithPredicate flag
 			// First, prevent a recursion warning on this state due to
@@ -130,7 +133,7 @@ public class PredicateResolver {
 //						dfa.nfa.grammar.synPredUsedInDFA(dfa, semCtx);
 //					}
 				}
-				else if ( nondeterministicAlts.contains(c.alt) ) {
+				else if ( ambiguousAlts.contains(c.alt) ) {
 					// resolve all other configurations for nondeterministic alts
 					// for which there is no predicate context by turning it off
 					c.resolved = true;
@@ -161,32 +164,28 @@ public class PredicateResolver {
 	 *  we did a reach on to compute state d.  d may have insufficient
 	 *  preds, so we really want this for the error message.
 	 */
-	protected Map<Integer, SemanticContext> getPredicatesPerNonDeterministicAlt(
+	public Map<Integer, SemanticContext> getPredicatesPerAmbiguousAlt(
 		DFAState d,
-		Set<Integer> nondeterministicAlts)
+		Set<Integer> ambiguousAlts)
 	{
 		// map alt to combined SemanticContext
 		Map<Integer, SemanticContext> altToPredicateContextMap =
 			new HashMap<Integer, SemanticContext>();
-		// init the alt to predicate set map
 		Map<Integer, Set<SemanticContext>> altToSetOfContextsMap =
 			new HashMap<Integer, Set<SemanticContext>>();
-		for (int alt : nondeterministicAlts) {
+		for (int alt : ambiguousAlts) {
 			altToSetOfContextsMap.put(alt, new HashSet<SemanticContext>());
 		}
 
 		// Create a unique set of predicates from configs
 		// Also, track the alts with at least one uncovered configuration
 		// (one w/o a predicate); tracks tautologies like p1||true
-		//Map<Integer, Set<Token>> altToLocationsReachableWithoutPredicate = new HashMap<Integer, Set<Token>>();
-		Set<Integer> nondetAltsWithUncoveredConfiguration = new HashSet<Integer>();
+		Set<Integer> ambigAltsWithUncoveredConfiguration = new HashSet<Integer>();
 		//System.out.println("configs="+d.nfaConfigs);
 		//System.out.println("configs with preds?"+d.atLeastOneConfigurationHasAPredicate);
 		//System.out.println("configs with preds="+d.configurationsWithPredicateEdges);
 		for (NFAConfig c : d.nfaConfigs) {
-			// if alt is nondeterministic, combine its predicates
-			if ( nondeterministicAlts.contains(c.alt) ) {
-				// if there is a predicate for this NFA configuration, OR in
+			if ( ambiguousAlts.contains(c.alt) ) {
 				if ( c.semanticContext != SemanticContext.EMPTY_SEMANTIC_CONTEXT ) {
 					Set<SemanticContext> predSet = altToSetOfContextsMap.get(c.alt);
 					predSet.add(c.semanticContext);
@@ -195,21 +194,21 @@ public class PredicateResolver {
 					// if no predicate, but it's part of nondeterministic alt
 					// then at least one path exists not covered by a predicate.
 					// must remove predicate for this alt; track incomplete alts
-					nondetAltsWithUncoveredConfiguration.add(c.alt);
+					ambigAltsWithUncoveredConfiguration.add(c.alt);
 				}
 			}
 		}
-
+		
 		// Walk semantic contexts for nondet alts, ORing them together
 		// Also, track the list of incompletely covered alts: those alts
 		// with at least 1 predicate and at least one configuration w/o a
 		// predicate. We want this in order to report to the decision probe.
 		List<Integer> incompletelyCoveredAlts = new ArrayList<Integer>();
-		for (int alt : nondeterministicAlts) {
+		for (int alt : ambiguousAlts) {
 			Set<SemanticContext> contextsForThisAlt = altToSetOfContextsMap.get(alt);
-			if ( nondetAltsWithUncoveredConfiguration.contains(alt) ) { // >= 1 config has no ctx
+			if ( ambigAltsWithUncoveredConfiguration.contains(alt) ) { // >= 1 config has no ctx
 				if ( contextsForThisAlt.size()>0 ) {    // && at least one pred
-					incompletelyCoveredAlts.add(alt);  // this alt incompleted covered
+					incompletelyCoveredAlts.add(alt);   // this alt incompleted covered
 				}
 				continue; // don't include at least 1 config has no ctx
 			}
@@ -223,52 +222,61 @@ public class PredicateResolver {
 		}
 
 		if ( incompletelyCoveredAlts.size()>0 ) {
-			/*
-			System.out.println("prob in dec "+dfa.decisionNumber+" state="+d);
-			FASerializer serializer = new FASerializer(dfa.nfa.grammar);
-			String result = serializer.serialize(dfa.startState);
-			System.out.println("dfa: "+result);
-			System.out.println("incomplete alts: "+incompletelyCoveredAlts);
-			System.out.println("nondet="+nondeterministicAlts);
-			System.out.println("nondetAltsWithUncoveredConfiguration="+ nondetAltsWithUncoveredConfiguration);
-			System.out.println("altToCtxMap="+altToSetOfContextsMap);
-			System.out.println("altToPredicateContextMap="+altToPredicateContextMap);
-			*/
-			// TODO: add back if we're using in error messages
-//			for (NFAConfig c : d.nfaConfigs) {
-//				if ( incompletelyCoveredAlts.contains(c.alt) &&
-//					 c.semanticContext == SemanticContext.EMPTY_SEMANTIC_CONTEXT )
-//				{
-//					NFAState s = c.state;
-//					/*
-//					System.out.print("nondet config w/o context "+configuration+
-//									 " incident "+(s.incidentEdgeLabel!=null?s.incidentEdgeLabel.toString(dfa.nfa.grammar):null));
-//					if ( s.associatedASTNode!=null ) {
-//						System.out.print(" token="+s.associatedASTNode.token);
-//					}
-//					else System.out.println();
-//					*/
-//                    // We want to report getting to an NFA state with an
-//                    // incoming label, unless it's EOF, w/o a predicate.
-//                    if ( s.incidentEdgeLabel!=null && s.incidentEdgeLabel.label != Label.EOF ) {
-//                        if ( s.ast==null || s.ast.token==null ) {
-//							ErrorManager.internalError("no AST/token for nonepsilon target w/o predicate");
-//						}
-//						else {
-//							Set<Token> locations = altToLocationsReachableWithoutPredicate.get(c.alt);
-//							if ( locations==null ) {
-//								locations = new HashSet<Token>();
-//								altToLocationsReachableWithoutPredicate.put(c.alt, locations);
-//							}
-//							locations.add(s.ast.token);
-//						}
-//					}
-//				}
-//			}
-			converter.incompletelyCoveredStates.add(d);
+			// track these troublesome states later for reporting.
+			converter.statesWithIncompletelyCoveredAlts.put(d, incompletelyCoveredAlts);
 		}
 
 		return altToPredicateContextMap;
+	}
+
+	public Map<Integer, Set<Token>> getInsufficientlyPredicatedLocations(DFAState d,
+																		 List<Integer> incompletelyCoveredAlts)
+	{
+		Map<Integer, Set<Token>> altToLocationsReachableWithoutPredicate = new HashMap<Integer, Set<Token>>();
+		for (NFAConfig c : d.nfaConfigs) {
+			if ( incompletelyCoveredAlts.contains(c.alt) &&
+				 c.semanticContext == SemanticContext.EMPTY_SEMANTIC_CONTEXT )
+			{
+				NFAState s = c.state;
+				/*
+				   System.out.print("nondet config w/o context "+configuration+
+									" incident "+(s.incidentEdgeLabel!=null?s.incidentEdgeLabel.toString(dfa.nfa.grammar):null));
+				   if ( s.associatedASTNode!=null ) {
+					   System.out.print(" token="+s.associatedASTNode.token);
+				   }
+				   else System.out.println();
+				   */
+				// We want to report getting to an NFA state with an
+				// incoming label, unless it's EOF, w/o a predicate.
+				if ( s instanceof BasicState &&
+					 ((BasicState)s).incidentTransition!=null &&
+					 !((BasicState)s).incidentTransition.label().member(Label.EOF) )
+				{
+					if ( s.ast==null || s.ast.token==null ) {
+						ErrorManager.internalError("no AST/token for nonepsilon target w/o predicate");
+					}
+					else {
+						Set<Token> locations = altToLocationsReachableWithoutPredicate.get(c.alt);
+						if ( locations==null ) {
+							locations = new HashSet<Token>();
+							altToLocationsReachableWithoutPredicate.put(c.alt, locations);
+						}
+						locations.add(s.ast.token);
+					}
+				}
+			}
+		}
+
+		// get new map sorted by alt nums
+		Map<Integer, Set<Token>> sortedMap = new LinkedHashMap<Integer, Set<Token>>();
+		List<Integer> alts = new ArrayList<Integer>();
+		alts.addAll(altToLocationsReachableWithoutPredicate.keySet());
+		Collections.sort(alts);
+		for (int alt : alts) {
+			sortedMap.put(alt, altToLocationsReachableWithoutPredicate.get(alt));
+		}
+
+		return sortedMap;
 	}
 
 	/** OR together all predicates from the alts.  Note that the predicate

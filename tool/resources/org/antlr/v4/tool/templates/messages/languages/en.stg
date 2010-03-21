@@ -245,6 +245,7 @@ Decision can match input such as "<arg.input>" using multiple alternatives:
 <arg.conflictingPaths.keys:{alt | alt <alt> via tokens <arg.conflictingPaths.(alt); separator=","><\n>}>
 >>
 
+/*
 GRAMMAR_NONDETERMINISM(input,conflictingAlts,paths,disabled,hasPredicateBlockedByAction) ::=
 <<
 <if(paths)>
@@ -255,6 +256,7 @@ Decision can match input such as "<input>" using multiple alternatives: <conflic
 <endif>
 <if(disabled)><\n>As a result, alternative(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
+*/
 
 DANGLING_STATE(danglingAlts,input) ::= <<
 the decision cannot distinguish between alternative(s) <danglingAlts; separator=","> for input such as "<input>"
@@ -264,8 +266,8 @@ UNREACHABLE_ALTS(arg) ::= <<
 The following alternatives can never be matched: <arg.alts; separator=","><\n>
 >>
 
-INSUFFICIENT_PREDICATES(upon,altToLocations,hasPredicateBlockedByAction) ::= <<
-Input such as "<upon>" is insufficiently covered with predicates at locations: <altToLocations.keys:{alt|alt <alt>: <altToLocations.(alt):{loc| line <loc.line>:<loc.column> at <loc.text>}; separator=", ">}; separator=", "><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
+INSUFFICIENT_PREDICATES(arg) ::= <<
+Input such as "<arg.input>" is insufficiently covered with predicates at locations: <arg.altToLocations.keys:{alt|alt <alt>: <arg.altToLocations.(alt):{loc| line <loc.line>:<loc.charPositionInLine> at <loc.text>}; separator=", ">}; separator=", "><if(arg.hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
 
 DUPLICATE_SET_ENTRY(arg) ::=

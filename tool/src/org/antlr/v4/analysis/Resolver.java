@@ -1,14 +1,15 @@
 package org.antlr.v4.analysis;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.automata.DFAState;
 import org.antlr.v4.automata.NFA;
+import org.antlr.v4.automata.NFAState;
+import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.tool.ErrorManager;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** Code "module" that knows how to resolve LL(*) nondeterminisms. */
 public class Resolver {
@@ -243,4 +244,54 @@ public class Resolver {
 		}
 		return alt;
 	}
+
+
+
+	void issueAmbiguityWarnings() {
+		MachineProbe probe = new MachineProbe(converter.dfa);
+
+		for (DFAState d : converter.ambiguousStates) {
+			Set<Integer> alts = getAmbiguousAlts(d);
+			List<Integer> sorted = new ArrayList<Integer>(alts);
+			Collections.sort(sorted);
+			System.err.println("ambig alts="+sorted);
+			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
+			System.out.print("path =");
+			for (DFAState d2 : dfaStates) {
+				System.out.print(" "+d2.stateNumber);
+			}
+			System.out.println("");
+
+			List<IntSet> labels = probe.getEdgeLabels(d);
+
+			String input = probe.getInputSequenceDisplay(converter.g, labels);
+			System.out.println("input="+ input);
+
+			LinkedHashMap<Integer,List<Token>> altPaths = new LinkedHashMap<Integer,List<Token>>();
+			for (int alt : sorted) {
+				List<Set<NFAState>> nfaStates = new ArrayList<Set<NFAState>>();
+				for (DFAState d2 : dfaStates) {
+					nfaStates.add( d2.getUniqueNFAStates(alt) );
+				}
+				System.out.println("NFAConfigs per state: "+nfaStates);
+				List<Token> path =
+					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
+				altPaths.put(alt, path);
+				System.out.println("path = "+path);
+			}
+
+			List<Integer> incompletelyCoveredAlts = converter.statesWithIncompletelyCoveredAlts.get(d);
+			if ( incompletelyCoveredAlts!=null && incompletelyCoveredAlts.size()>0 ) {
+				Map<Integer, Set<Token>> insufficientAltToLocations =
+					semResolver.getInsufficientlyPredicatedLocations(d, incompletelyCoveredAlts);
+				ErrorManager.insufficientPredicates(converter.g.fileName, d, input, insufficientAltToLocations);
+			}
+
+			ErrorManager.ambiguity(converter.g.fileName, d, sorted, input, altPaths);
+		}
+		if ( converter.unreachableAlts.size()>0 ) {
+			ErrorManager.unreachableAlts(converter.g.fileName, converter.dfa, converter.unreachableAlts);
+		}
+	}
+
 }

@@ -1,11 +1,8 @@
 package org.antlr.v4.analysis;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.automata.*;
-import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -59,15 +56,16 @@ public class StackLimitedNFAToDFAConverter {
 	 *  state that predicts more than one alternative, must be resolved
 	 *  with predicates or it should be reported to the user.
 	 */
-	Set<DFAState> resolvedWithSemanticPredicates = new HashSet<DFAState>();
+	public Set<DFAState> resolvedWithSemanticPredicates = new HashSet<DFAState>();
 
 	/** Tracks alts insufficiently covered.
 	 *  For example, p1||true gets reduced to true and so leaves
-	 *  whole alt uncovered.  This maps DFA state to the set of alts
+	 *  whole alt uncovered.  This maps alt num to the set of (Token)
+	 *  locations in grammar of uncovered elements.
 	 */
-	Set<DFAState> incompletelyCoveredStates = new HashSet<DFAState>();
+	public Map<DFAState, List<Integer>> statesWithIncompletelyCoveredAlts = new HashMap<DFAState, List<Integer>>();
 
-	Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
+	public Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
 
 	/** Are there any loops in this DFA?  Computed by DFAVerifier */
 	public boolean cyclic = false;
@@ -371,7 +369,7 @@ public class StackLimitedNFAToDFAConverter {
                     // AND the previous semantic context with new pred
 //                    int walkAlt =
 //						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(alt);
-					NFAState altLeftEdge = dfa.decisionNFAStartState.transition(altNum).target;
+					NFAState altLeftEdge = dfa.decisionNFAStartState.transition(altNum-1).target;
 					/*
 					System.out.println("state "+p.stateNumber+" alt "+alt+" walkAlt "+walkAlt+" trans to "+transition0.target);
 					System.out.println("DFA start state "+dfa.decisionNFAStartState.stateNumber);
@@ -569,43 +567,5 @@ public class StackLimitedNFAToDFAConverter {
 		return unreachable;
 	}
 
-	// TODO: where does this belong?
-	void issueAmbiguityWarnings() {
-		MachineProbe probe = new MachineProbe(dfa);
-
-		for (DFAState d : ambiguousStates) {
-			Set<Integer> alts = resolver.getAmbiguousAlts(d);
-			List<Integer> sorted = new ArrayList<Integer>(alts);
-			Collections.sort(sorted);
-			System.err.println("ambig alts="+sorted);
-			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
-			System.out.print("path =");
-			for (DFAState d2 : dfaStates) {
-				System.out.print(" "+d2.stateNumber);
-			}
-			System.out.println("");
-
-			List<IntSet> labels = probe.getEdgeLabels(d);
-
-			String input = probe.getInputSequenceDisplay(g, labels);
-			System.out.println("input="+ input);
-
-			LinkedHashMap<Integer,List<Token>> altPaths = new LinkedHashMap<Integer,List<Token>>();
-			for (int alt : sorted) {
-				List<Set<NFAState>> nfaStates = new ArrayList<Set<NFAState>>();
-				for (DFAState d2 : dfaStates) {
-					nfaStates.add( d2.getUniqueNFAStates(alt) );
-				}
-				System.out.println("NFAConfigs per state: "+nfaStates);
-				List<Token> path =
-					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
-				altPaths.put(alt, path);
-				System.out.println("path = "+path);
-			}
-			ErrorManager.ambiguity(dfa.g.fileName, d, sorted, input, altPaths);
-		}
-		if ( unreachableAlts.size()>0 ) {
-			ErrorManager.unreachableAlts(dfa.g.fileName, dfa, unreachableAlts);
-		}
-	}
+	void issueAmbiguityWarnings() { resolver.issueAmbiguityWarnings(); }
 }

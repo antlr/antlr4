@@ -15,10 +15,7 @@ import org.stringtemplate.v4.misc.ErrorBuffer;
 import org.stringtemplate.v4.misc.STMessage;
 
 import java.net.URL;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /** Defines all the errors ANTLR can generator for both the tool and for
  *  issues with a grammar.
@@ -330,10 +327,24 @@ public class ErrorManager {
 		state.get().listener.warning(msg);
 	}
 
+	public static void insufficientPredicates(String fileName,
+											  DFAState d,
+											  String input,
+											  Map<Integer, Set<Token>> incompletelyCoveredAlts)
+	{
+		state.get().warnings++;
+		InsufficientPredicatesMessage msg =
+			new InsufficientPredicatesMessage(ErrorType.INSUFFICIENT_PREDICATES,
+											  fileName,
+											  d,
+											  input,
+											  incompletelyCoveredAlts);
+		state.get().listener.warning(msg);
+	}
 
 	/** Process a new message by sending it on to the error listener associated with the current thread
-     *  and recording any information we need in the error state for the current thread.
-     */
+	 *  and recording any information we need in the error state for the current thread.
+	 */
     private static void processMessage() {
     }
 

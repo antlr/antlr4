@@ -97,13 +97,21 @@ public class ParserNFAFactory implements NFAFactory {
 		BasicState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
 		left.transition = new AtomTransition(ttype, right);
+		right.incidentTransition = left.transition;
+		
 		return new Handle(left, right);
 	}
 
 	/** From set build single edge graph o->o-set->o.  To conform to
      *  what an alt block looks like, must have extra state on left.
      */
-	public Handle set(IntSet set, GrammarAST associatedAST) { return null; }
+	public Handle set(IntSet set, GrammarAST associatedAST) {
+		//TODO impl
+		throw new UnsupportedOperationException();
+		//right.incidentTransition = left.transition;
+
+		//return null;
+	}
 
 	public Handle tree(List<Handle> els) {
 		return null;
