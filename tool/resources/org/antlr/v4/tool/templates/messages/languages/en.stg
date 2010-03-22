@@ -283,10 +283,6 @@ RECURSION_OVERFLOW(alt,input,targetRules,callSiteStates) ::= <<
 Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule.name>};separator=", ">}; separator=" and ">
 >>
 
-LEFT_RECURSION(targetRules,alt,callSiteStates) ::= <<
-Alternative <alt> discovers infinite left-recursion <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule>};separator=", ">}; separator=" and ">
->>
-
 UNREACHABLE_TOKENS(tokens) ::= <<
 The following token definitions can never be matched because prior tokens match the same input: <tokens; separator=",">
 >>
@@ -302,8 +298,8 @@ Multiple token rules can match input such as "<input>": <conflictingTokens; sepa
 <if(disabled)><\n>As a result, token(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
 
-LEFT_RECURSION_CYCLES(listOfCycles) ::= <<
-The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r|<r.name>}; separator=", ">]}; separator=" and ">
+LEFT_RECURSION_CYCLES(arg) ::= <<
+The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=", ">]}; separator=" and ">
 >>
 
 NONREGULAR_DECISION(ruleName,alts) ::= <<

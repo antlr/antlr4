@@ -319,14 +319,14 @@ public class ErrorManager {
 									   DFA dfa,
 									   Collection<Integer> unreachableAlts)
 	{
-		System.err.println("unreachable="+unreachableAlts);
-		state.get().warnings++;
+		//System.err.println("unreachable="+unreachableAlts);
+		state.get().errors++;
 		UnreachableAltsMessage msg =
 			new UnreachableAltsMessage(ErrorType.UNREACHABLE_ALTS,
 									   fileName,
 									   dfa,
 									   unreachableAlts);
-		state.get().listener.warning(msg);
+		state.get().listener.error(msg);
 	}
 
 	public static void insufficientPredicates(String fileName,
@@ -343,6 +343,12 @@ public class ErrorManager {
 											  input,
 											  incompletelyCoveredAlts,
 											  hasPredicateBlockedByAction);
+		state.get().listener.warning(msg);
+	}
+
+	public static void leftRecursionCycles(Collection cycles) {
+		state.get().errors++;
+		Message msg = new LeftRecursionCyclesMessage(cycles);
 		state.get().listener.warning(msg);
 	}
 

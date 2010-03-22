@@ -1,6 +1,7 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.*;
+import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class LeftRecursionDetector {
 			check(start.rule, start, new HashSet<NFAState>());
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
+		ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
 	}
 
 	/** From state s, look for any transition to a rule that is currently
@@ -87,7 +89,7 @@ public class LeftRecursionDetector {
 	 *  cycle.
 	 */
 	protected void addRulesToCycle(Rule enclosingRule, Rule targetRule) {
-		System.err.println("left-recursion to "+targetRule.name+" from "+enclosingRule.name);		
+		//System.err.println("left-recursion to "+targetRule.name+" from "+enclosingRule.name);		
 		boolean foundCycle = false;
 		for (int i = 0; i < listOfRecursiveCycles.size(); i++) {
 			Set<Rule> rulesInCycle = listOfRecursiveCycles.get(i);

@@ -136,7 +136,8 @@ public enum ErrorType {
 	UNREACHABLE_ALTS(ErrorSeverity.ERROR, true, true),
 	RECURSION_OVERFLOW(ErrorSeverity.ERROR, true, true),
 	INSUFFICIENT_PREDICATES(ErrorSeverity.ERROR, true, true),
-
+	LEFT_RECURSION_CYCLES(ErrorSeverity.ERROR, true, true),
+	
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(ErrorSeverity.ERROR, true, true),
 
