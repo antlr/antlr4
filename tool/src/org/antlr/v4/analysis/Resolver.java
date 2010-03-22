@@ -284,10 +284,16 @@ public class Resolver {
 			if ( incompletelyCoveredAlts!=null && incompletelyCoveredAlts.size()>0 ) {
 				Map<Integer, Set<Token>> insufficientAltToLocations =
 					semResolver.getInsufficientlyPredicatedLocations(d, incompletelyCoveredAlts);
-				ErrorManager.insufficientPredicates(converter.g.fileName, d, input, insufficientAltToLocations);
+				ErrorManager.insufficientPredicates(converter.g.fileName, d, input,
+													insufficientAltToLocations, converter.hasPredicateBlockedByAction);
 			}
 
-			ErrorManager.ambiguity(converter.g.fileName, d, sorted, input, altPaths);
+			if ( !d.resolvedWithPredicates &&
+				 (incompletelyCoveredAlts==null || incompletelyCoveredAlts.size()==0) )
+			{
+				ErrorManager.ambiguity(converter.g.fileName, d, sorted, input, altPaths,
+									   converter.hasPredicateBlockedByAction);
+			}
 		}
 		if ( converter.unreachableAlts.size()>0 ) {
 			ErrorManager.unreachableAlts(converter.g.fileName, converter.dfa, converter.unreachableAlts);

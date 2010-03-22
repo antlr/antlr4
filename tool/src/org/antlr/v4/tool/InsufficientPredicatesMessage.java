@@ -17,7 +17,8 @@ public class InsufficientPredicatesMessage extends Message {
 										 String fileName,
 										 DFAState d,
 										 String input,
-										 Map<Integer, Set<Token>> incompletelyCoveredAlts)
+										 Map<Integer, Set<Token>> incompletelyCoveredAlts,
+										 boolean hasPredicateBlockedByAction)
 	{
 		super(etype);
 		this.fileName = fileName;
@@ -32,6 +33,7 @@ public class InsufficientPredicatesMessage extends Message {
 		info.put("dfaState", d);
 		info.put("input", input);
 		info.put("altToLocations", incompletelyCoveredAlts);
+		info.put("hasPredicateBlockedByAction", hasPredicateBlockedByAction);				
 		args = new Object[] {info}; // pass this whole object in to message
 	}
 }

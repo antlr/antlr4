@@ -65,6 +65,8 @@ public class StackLimitedNFAToDFAConverter {
 	 */
 	public Map<DFAState, List<Integer>> statesWithIncompletelyCoveredAlts = new HashMap<DFAState, List<Integer>>();
 
+	public boolean hasPredicateBlockedByAction = false;	
+
 	public Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
 
 	/** Are there any loops in this DFA?  Computed by DFAVerifier */
@@ -360,7 +362,8 @@ public class StackLimitedNFAToDFAConverter {
 				closure(t.target, altNum, newContext, semanticContext, collectPredicates, configs);
 			}
 			else if ( t instanceof ActionTransition ) {
-				continue;
+				collectPredicates = false; // can't see past actions
+				closure(t.target, altNum, context, semanticContext, collectPredicates, configs);
 			}
 			else if ( t instanceof PredicateTransition ) {
                 SemanticContext labelContext = ((PredicateTransition)t).semanticContext;
@@ -384,6 +387,10 @@ public class StackLimitedNFAToDFAConverter {
 						newSemanticContext =
 							SemanticContext.and(semanticContext, labelContext);
 					}
+				}
+				else {
+					// if we're not collecting, means we saw an action previously. that blocks this pred
+					hasPredicateBlockedByAction = true;
 				}
 				closure(t.target, altNum, context, newSemanticContext, collectPredicates, configs);
 			}

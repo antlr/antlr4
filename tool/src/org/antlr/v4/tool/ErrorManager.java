@@ -301,7 +301,8 @@ public class ErrorManager {
 								 DFAState d,
 								 List<Integer> conflictingAlts,
 								 String input,
-								 LinkedHashMap<Integer,List<Token>> conflictingPaths)
+								 LinkedHashMap<Integer,List<Token>> conflictingPaths,
+								 boolean hasPredicateBlockedByAction)
 	{
 		state.get().warnings++;
 		AmbiguityMessage msg =
@@ -309,7 +310,8 @@ public class ErrorManager {
 								 d,
 								 conflictingAlts,
 								 input,
-								 conflictingPaths);
+								 conflictingPaths,
+								 hasPredicateBlockedByAction);
 		state.get().listener.warning(msg);
 	}
 
@@ -330,7 +332,8 @@ public class ErrorManager {
 	public static void insufficientPredicates(String fileName,
 											  DFAState d,
 											  String input,
-											  Map<Integer, Set<Token>> incompletelyCoveredAlts)
+											  Map<Integer, Set<Token>> incompletelyCoveredAlts,
+											  boolean hasPredicateBlockedByAction)
 	{
 		state.get().warnings++;
 		InsufficientPredicatesMessage msg =
@@ -338,7 +341,8 @@ public class ErrorManager {
 											  fileName,
 											  d,
 											  input,
-											  incompletelyCoveredAlts);
+											  incompletelyCoveredAlts,
+											  hasPredicateBlockedByAction);
 		state.get().listener.warning(msg);
 	}
 

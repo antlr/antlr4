@@ -317,6 +317,9 @@ public class DOTGenerator {
 		StringBuffer buf = new StringBuffer(250);
 		buf.append('s');
 		buf.append(s.stateNumber);
+		if ( s.isAcceptState ) {
+            buf.append("=>"+s.getUniquelyPredictedAlt());
+        }
 		if ( Tool.internalOption_ShowNFAConfigsInDFA ) {
 			Set<Integer> alts = ((DFAState)s).getAltSet();
 			if ( alts!=null ) {
@@ -360,9 +363,6 @@ public class DOTGenerator {
 			}
 		}
 		String stateLabel = buf.toString();
-		if ( s.isAcceptState ) {
-            stateLabel = stateLabel+"=>"+s.getUniquelyPredictedAlt();
-        }
         return stateLabel;
     }
 }

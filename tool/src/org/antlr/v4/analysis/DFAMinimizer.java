@@ -3,6 +3,7 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DFAState;
 import org.antlr.v4.automata.Edge;
+import org.antlr.v4.automata.PredicateEdge;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.Interval;
 import org.antlr.v4.misc.IntervalSet;
@@ -30,11 +31,14 @@ public class DFAMinimizer {
 		for (DFAState d : dfa.states) {
 			for (Edge e : d.edges) {
 				// todo: slow? might want to flatten to list of int token types
-				labels.add(e.label);	
+				if ( !(e instanceof PredicateEdge) ) {
+					labels.add(e.label);	
+				}
 			}
 		}
 		System.out.println("labels="+labels);
-		
+
+
 		// create initial partition distinguishing between states and accept states
 		// we need to distinguish between accepts for different alts.
 		// we may have also have multiple accepts per alt--put all of them in same partition
@@ -53,7 +57,15 @@ public class DFAMinimizer {
 				}
 			}
 		}
-		
+
+		// Nobody can merge with a state resolved with predicates to be safe
+		for (DFAState d : dfa.converter.resolvedWithSemanticPredicates) {
+			for (int i=1; i<n; i++) {
+				distinct[d.stateNumber][i] = true;
+				distinct[i][d.stateNumber] = true;
+			}
+		}
+
 		for (int i=1; i<n; i++) {
 			for (int j=0; j<i; j++) {
 				DFAState p = dfa.states.get(i);

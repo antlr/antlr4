@@ -19,7 +19,8 @@ public class AmbiguityMessage extends Message {
 							DFAState d,
 							List<Integer> conflictingAlts,
 							String input,
-							LinkedHashMap<Integer,List<Token>> conflictingPaths)
+							LinkedHashMap<Integer,List<Token>> conflictingPaths,
+							boolean hasPredicateBlockedByAction)
 	{
 		super(etype);
 		this.fileName = fileName;
@@ -36,6 +37,7 @@ public class AmbiguityMessage extends Message {
 		info.put("conflictingAlts", conflictingAlts);
 		info.put("input", input);
 		info.put("conflictingPaths", conflictingPaths);
+		info.put("hasPredicateBlockedByAction", hasPredicateBlockedByAction);		
 		args = new Object[] {info}; // pass this whole object in to message
 	}
 }

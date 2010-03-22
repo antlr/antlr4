@@ -142,7 +142,11 @@ public class DFAState {
 
 	public DFAState target(IntSet label) {
 		for (Edge e : edges) {
-			if ( !e.label.and(label).isNil() ) return e.target;
+			if ( !(e instanceof PredicateEdge) &&
+				 !e.label.and(label).isNil() )
+			{
+				return e.target;
+			}
 		}
 		return null;
 	}

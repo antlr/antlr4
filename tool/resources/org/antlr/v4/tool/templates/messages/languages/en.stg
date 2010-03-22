@@ -242,7 +242,8 @@ CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::=
 
 AMBIGUITY(arg) ::= <<
 Decision can match input such as "<arg.input>" using multiple alternatives:
-<arg.conflictingPaths.keys:{alt | alt <alt> via tokens <arg.conflictingPaths.(alt); separator=","><\n>}>
+<arg.conflictingPaths.keys:{alt | alt <alt> via tokens <arg.conflictingPaths.(alt); separator=",">}>
+<if(arg.hasPredicateBlockedByAction)><\n>At least one possibly relevant semantic predicate was hidden by action(s).<endif>
 >>
 
 /*
@@ -267,7 +268,8 @@ The following alternatives can never be matched: <arg.alts; separator=","><\n>
 >>
 
 INSUFFICIENT_PREDICATES(arg) ::= <<
-Input such as "<arg.input>" is insufficiently covered with predicates at locations: <arg.altToLocations.keys:{alt|alt <alt>: <arg.altToLocations.(alt):{loc| line <loc.line>:<loc.charPositionInLine> at <loc.text>}; separator=", ">}; separator=", "><if(arg.hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
+Input such as "<arg.input>" is insufficiently covered with predicates at locations: <arg.altToLocations.keys:{alt|alt <alt>: <arg.altToLocations.(alt):{loc| line <loc.line>:<loc.charPositionInLine> at <loc.text>}; separator=", ">}; separator=", ">
+<if(arg.hasPredicateBlockedByAction)><\n>At least one possibly relevant semantic predicate was hidden by action(s).<endif>
 >>
 
 DUPLICATE_SET_ENTRY(arg) ::=

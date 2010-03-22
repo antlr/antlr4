@@ -181,9 +181,6 @@ public class PredicateResolver {
 		// Also, track the alts with at least one uncovered configuration
 		// (one w/o a predicate); tracks tautologies like p1||true
 		Set<Integer> ambigAltsWithUncoveredConfiguration = new HashSet<Integer>();
-		//System.out.println("configs="+d.nfaConfigs);
-		//System.out.println("configs with preds?"+d.atLeastOneConfigurationHasAPredicate);
-		//System.out.println("configs with preds="+d.configurationsWithPredicateEdges);
 		for (NFAConfig c : d.nfaConfigs) {
 			if ( ambiguousAlts.contains(c.alt) ) {
 				if ( c.semanticContext != SemanticContext.EMPTY_SEMANTIC_CONTEXT ) {
