@@ -33,7 +33,9 @@ public class LeftRecursionDetector {
 			check(start.rule, start, new HashSet<NFAState>());
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
-		ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
+		if ( listOfRecursiveCycles.size()>0 ) {
+			ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
+		}
 	}
 
 	/** From state s, look for any transition to a rule that is currently
