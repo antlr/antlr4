@@ -23,7 +23,7 @@ public class DFAMinimizer {
 		this.dfa = dfa;
 	}
 
-	public void minimize() {
+	public boolean minimize() {
 		int n = dfa.states.size();
 		boolean[][] distinct = new boolean[n][n];
 
@@ -156,7 +156,7 @@ public class DFAMinimizer {
 		System.out.println("uniq sets = "+uniq);
 		if ( uniq.size()==dfa.states.size() ) {
 			System.out.println("was already minimal");
-			return;
+			return false;
 		}
 
 		// minimize the DFA (combine equiv sets)
@@ -207,6 +207,7 @@ public class DFAMinimizer {
 				}
 			}
 		}
+		return true;
 	}
 
 	void print(boolean[][] distinct) {

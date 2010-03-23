@@ -2,7 +2,6 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 
 public class AnalysisPipeline {
@@ -27,7 +26,7 @@ public class AnalysisPipeline {
 	}
 
 	public DFA createDFA(DecisionState s) {
-		// TRY APPROXIMATE LL(*) ANALYSIS
+		// TRY APPROXIMATE (STACK LIMITED) LL(*) ANALYSIS
 		StackLimitedNFAToDFAConverter conv = new StackLimitedNFAToDFAConverter(g, s);
 		DFA dfa = conv.createDFA();
 		System.out.print("DFA="+dfa);
@@ -41,7 +40,7 @@ public class AnalysisPipeline {
 
 			System.out.println("MINIMIZE");
 			DFAMinimizer dmin = new DFAMinimizer(dfa);
-			dmin.minimize();
+			dfa.minimized = dmin.minimize();
 
 			return dfa;
 		}
@@ -50,21 +49,10 @@ public class AnalysisPipeline {
 		// limited version.  Ambiguities are ok because if the approx version
 		// gets an ambiguity it's defin
 		
-		// REAL LL(*) ANALYSIS IF THAT FAILS
+		// RECURSION LIMITED LL(*) ANALYSIS IF THAT FAILS
 		conv = new RecursionLimitedNFAToDFAConverter(g, s);
-		try {
-			dfa = conv.createDFA();
-			System.out.print("DFA="+dfa);
-		}
-		catch (RecursionOverflowSignal ros) {
-			ErrorManager.recursionOverflow(g.fileName, dfa, ros.state, ros.altNum, ros.depth);
-		}
-		catch (MultipleRecursiveAltsSignal mras) {
-			ErrorManager.multipleRecursiveAlts(g.fileName, dfa, mras.recursiveAltSet);
-		}
-		catch (AnalysisTimeoutSignal at) {// TODO: nobody throws yet
-			ErrorManager.analysisTimeout();
-		}
+		dfa = conv.createDFA();
+		System.out.print("DFA="+dfa);
 
 		conv.issueAmbiguityWarnings(); // ambig / unreachable errors
 		//conv.issueRecursionWarnings();
@@ -72,13 +60,16 @@ public class AnalysisPipeline {
 			System.out.println("non-LL(*)");
 			System.out.println("recursion limited NOT valid");
 		}
-		else System.out.println("recursion limited valid");
-
-		System.out.println("MINIMIZE");
-		DFAMinimizer dmin = new DFAMinimizer(dfa);
-		dmin.minimize();
-		
+		else {
+			System.out.println("recursion limited valid");
+			// gen DOT now to see non-minimized
+			System.out.println("DFA #states="+dfa.stateSet.size());
+			//if ( g.tool.generate_NFA_dot ) g.tool.generateDFA(g, dfa);
+			System.out.println("MINIMIZE");
+			DFAMinimizer dmin = new DFAMinimizer(dfa);
+			dfa.minimized = dmin.minimize();
+			if ( dfa.minimized ) System.out.println("DFA minimized to #states="+dfa.stateSet.size());			
+		}
 		return dfa;
 	}
-
 }

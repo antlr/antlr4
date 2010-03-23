@@ -3,9 +3,9 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
+import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -66,21 +66,16 @@ public class StackLimitedNFAToDFAConverter {
 	 */
 	public Map<DFAState, List<Integer>> statesWithIncompletelyCoveredAlts = new HashMap<DFAState, List<Integer>>();
 
-	public boolean hasPredicateBlockedByAction = false;	
+	public boolean hasPredicateBlockedByAction = false;
 
-	/** Recursion is limited to a particular depth.  If that limit is exceeded
-	 *  the proposed new NFA configuration is recorded for the associated DFA state.
-	 */
-	protected MultiMap<DFAState, NFAConfig> stateToRecursionOverflowConfigurationsMap =
-		new MultiMap<DFAState, NFAConfig>();
+	/** Recursion is limited to a particular depth. Which state tripped it? */
+	public DFAState recursionOverflowState;
 
-	//public Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
+	/** Which state found multiple recursive alts? */
+	public DFAState abortedDueToMultipleRecursiveAltsAt;
 
-	/** Are there any loops in this DFA?  Computed by DFAVerifier */
-	public boolean cyclic = false;
-
-	/** Is this DFA reduced?  I.e., can all states lead to an accept state? */
-	public boolean reduced = true;	
+	/** Are there any loops in this DFA? */
+//	public boolean cyclic = false;
 
 	/** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
@@ -145,7 +140,20 @@ public class StackLimitedNFAToDFAConverter {
 //				closure(t);  // add any NFA states reachable via epsilon
 //			}
 
-			closure(t);  // add any NFA states reachable via epsilon
+			try {
+				closure(t);  // add any NFA states reachable via epsilon
+			}
+			catch (RecursionOverflowSignal ros) {
+				recursionOverflowState = d;
+				ErrorManager.recursionOverflow(g.fileName, d, ros.state, ros.altNum, ros.depth);
+			}
+			catch (MultipleRecursiveAltsSignal mras) {
+				abortedDueToMultipleRecursiveAltsAt = d;
+				ErrorManager.multipleRecursiveAlts(g.fileName, d, mras.recursiveAltSet);
+			}
+			catch (AnalysisTimeoutSignal at) {// TODO: nobody throws yet
+				ErrorManager.analysisTimeout();
+			}
 
 			addTransition(d, label, t); // make d-label->t transition
 		}
@@ -218,7 +226,7 @@ public class StackLimitedNFAToDFAConverter {
 
 		// if we couldn't find any non-resolved edges to add, return nothing
 		if ( labelTarget.nfaConfigs.size()==0 ) return null;
-		
+
 		return labelTarget;
 	}
 
@@ -259,9 +267,9 @@ public class StackLimitedNFAToDFAConverter {
 		// off maybe by actions later hence we need a parameter to carry
 		// it forward
 		boolean collectPredicates = (d == dfa.startState);
-		
+
 		closureBusy = new HashSet<NFAConfig>();
-		
+
 		List<NFAConfig> configs = new ArrayList<NFAConfig>();
 		for (NFAConfig c : d.nfaConfigs) {
 			closure(c.state, c.alt, c.context, c.semanticContext, collectPredicates, configs);
@@ -316,7 +324,7 @@ public class StackLimitedNFAToDFAConverter {
 	}
 
 	// if we have context info and we're at rule stop state, do
-	// local follow for invokingRule and global follow for other links	
+	// local follow for invokingRule and global follow for other links
 	void ruleStopStateClosure(NFAState s, int altNum, NFAContext context,
 							  SemanticContext semanticContext,
 							  boolean collectPredicates,
@@ -407,7 +415,7 @@ public class StackLimitedNFAToDFAConverter {
 			}
 		}
 	}
-	
+
 	public OrderedHashSet<IntervalSet> getReachableLabels(DFAState d) {
 		OrderedHashSet<IntervalSet> reachableLabels = new OrderedHashSet<IntervalSet>();
 		for (NFAState s : d.getUniqueNFAStates()) { // for each state

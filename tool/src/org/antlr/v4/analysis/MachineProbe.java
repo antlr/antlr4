@@ -49,6 +49,7 @@ public class MachineProbe {
 	public List<IntSet> getEdgeLabels(DFAState targetState) {
 		List<DFAState> dfaStates = getAnyDFAPathToTarget(targetState);
 		List<IntSet> labels = new ArrayList<IntSet>();
+		if ( dfaStates==null ) return labels;
 		for (int i=0; i<dfaStates.size()-1; i++) {
 			DFAState d = dfaStates.get(i);
 			DFAState nextState = dfaStates.get(i + 1);

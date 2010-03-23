@@ -44,6 +44,9 @@ public class DFA {
 	/** We only want one accept state per predicted alt; track here */
 	public List<DFAState>[] altToAcceptStates;
 
+	/** Did DFA minimization do anything? */
+	public boolean minimized;
+
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
 
@@ -91,7 +94,12 @@ public class DFA {
 		return converter.ambiguousStates.size()>0 && !resolvedWithPredicates;
 	}
 
-	public boolean valid() { return converter.danglingStates.size()==0; }
+	public boolean valid() {
+		return
+			converter.danglingStates.size()==0 &&
+			converter.abortedDueToMultipleRecursiveAltsAt ==null &&
+			converter.recursionOverflowState ==null;
+	}
 	
 	public String toString() {
 		if ( startState==null ) return "";

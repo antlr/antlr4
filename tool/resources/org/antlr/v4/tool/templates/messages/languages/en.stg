@@ -276,8 +276,8 @@ ANALYSIS_TIMEOUT(arg) ::= <<
 ANTLR could not analyze this decision in rule <arg.enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and possibly adding a syntactic predicate 
 >>
 
-RECURSION_OVERFLOW(alt,input,targetRules,callSiteStates) ::= <<
-Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule.name>};separator=", ">}; separator=" and ">
+RECURSION_OVERFLOW(arg) ::= <<
+Recursion overflow to <arg.targetRule.name> from alternative <arg.alt> of <arg.sourceRule.name> after matching input such as <arg.input>
 >>
 
 LEFT_RECURSION_CYCLES(arg) ::= <<

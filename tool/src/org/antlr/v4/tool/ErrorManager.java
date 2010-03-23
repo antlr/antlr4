@@ -355,16 +355,16 @@ public class ErrorManager {
 	}
 
 	public static void recursionOverflow(String fileName,
-										 DFA dfa, NFAState s, int altNum, int depth) {
+										 DFAState d, NFAState s, int altNum, int depth) {
 		state.get().errors++;
-		Message msg = new RecursionOverflowMessage(fileName, dfa, s, altNum, depth);
+		Message msg = new RecursionOverflowMessage(fileName, d, s, altNum, depth);
 		state.get().listener.error(msg);
 	}
 
 	public static void multipleRecursiveAlts(String fileName,
-											 DFA dfa, IntSet recursiveAltSet) {
+											 DFAState d, IntSet recursiveAltSet) {
 		state.get().errors++;
-		Message msg = new MultipleRecursiveAltsMessage(fileName, dfa, recursiveAltSet);
+		Message msg = new MultipleRecursiveAltsMessage(fileName, d, recursiveAltSet);
 		state.get().listener.error(msg);
 	}
 

@@ -1,6 +1,9 @@
 package org.antlr.v4.analysis;
 
-import org.antlr.v4.automata.*;
+import org.antlr.v4.automata.DecisionState;
+import org.antlr.v4.automata.NFAState;
+import org.antlr.v4.automata.RuleTransition;
+import org.antlr.v4.automata.Transition;
 import org.antlr.v4.misc.BitSet;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.tool.Grammar;
@@ -144,11 +147,6 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 	
 	public RecursionLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
 		super(g, nfaStartState);
-	}
-
-	@Override
-	void reach(DFAState d) {
-		super.reach(d);
 	}
 
 	/**

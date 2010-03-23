@@ -21,26 +21,26 @@ public class Tool {
     public String VERSION = "!Unknown version!";
     //public static final String VERSION = "${project.version}";
     public static final String UNINITIALIZED_DIR = "<unset-dir>";
-    private List<String> grammarFileNames = new ArrayList<String>();
-    private boolean generate_NFA_dot = false;
-    private boolean generate_DFA_dot = false;
-    private String outputDirectory = ".";
-    private boolean haveOutputDir = false;
-    private String inputDirectory = null;
-    private String parentGrammarDirectory;
-    private String grammarOutputDirectory;
-    private boolean haveInputDir = false;
-    private String libDirectory = ".";
-    private boolean debug = false;
-    private boolean trace = false;
-    private boolean profile = false;
-    private boolean report = false;
-    private boolean printGrammar = false;
-    private boolean depend = false;
-    private boolean forceAllFilesToOutputDir = false;
-    private boolean forceRelativeOutput = false;
-    protected boolean deleteTempLexer = true;
-    private boolean verbose = false;
+    public List<String> grammarFileNames = new ArrayList<String>();
+    public boolean generate_NFA_dot = false;
+    public boolean generate_DFA_dot = false;
+    public String outputDirectory = ".";
+    public boolean haveOutputDir = false;
+    public String inputDirectory = null;
+    public String parentGrammarDirectory;
+    public String grammarOutputDirectory;
+    public boolean haveInputDir = false;
+    public String libDirectory = ".";
+    public boolean debug = false;
+    public boolean trace = false;
+    public boolean profile = false;
+    public boolean report = false;
+    public boolean printGrammar = false;
+    public boolean depend = false;
+    public boolean forceAllFilesToOutputDir = false;
+    public boolean forceRelativeOutput = false;
+    public boolean deleteTempLexer = true;
+    public boolean verbose = false;
     /** Don't process grammar file if generated files are newer than grammar */
     /**
      * Indicate whether the tool should analyze the dependencies of the provided grammar
@@ -57,11 +57,11 @@ public class Tool {
      *
      * @param make
      */
-     private boolean make = false;
-    private boolean showBanner = true;
+     public boolean make = false;
+    public boolean showBanner = true;
 
     /** Exit after showing version or whatever */ 
-    private static boolean exitNow = false;
+    public static boolean exitNow = false;
 
     // The internal options are for my use on the command line during dev
     public static boolean internalOption_PrintGrammarTree = false;
@@ -507,20 +507,26 @@ public class Tool {
 
 	public void generateDFAs(Grammar g) {
 		for (DFA dfa : g.decisionDFAs.values()) {
-			DOTGenerator dotGenerator = new DOTGenerator(g);
-			String dot = dotGenerator.getDOT(dfa.startState);
-			String dotFileName = g.name + "." + "dec-" + dfa.decision;
-			if (g.implicitLexer!=null) {
-				dotFileName = g.name +
-							  Grammar.getGrammarTypeToFileNameSuffix(g.getType()) +
-							  "." + "dec-" + dfa.decision;
-			}
-			try {
-				writeDOTFile(g, dotFileName, dot);
-			}
-			catch (IOException ioe) {
-				ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, dotFileName, ioe);
-			}
+			generateDFA(g, dfa);
+		}
+	}
+
+	public void generateDFA(Grammar g, DFA dfa) {
+		DOTGenerator dotGenerator = new DOTGenerator(g);
+		String dot = dotGenerator.getDOT(dfa.startState);
+		String dec = "dec-";
+		//if ( dfa.minimized ) dec += "min-";
+		String dotFileName = g.name + "." + dec + dfa.decision;
+		if (g.implicitLexer!=null) {
+			dotFileName = g.name +
+						  Grammar.getGrammarTypeToFileNameSuffix(g.getType()) +
+						  "." + dec + dfa.decision;
+		}
+		try {
+			writeDOTFile(g, dotFileName, dot);
+		}
+		catch (IOException ioe) {
+			ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, dotFileName, ioe);
 		}
 	}
 
@@ -649,11 +655,11 @@ public class Tool {
 		return outputDir;
 	}	
 	
-    private static void version() {
+    public static void version() {
         ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
     }
 
-    private static void help() {
+    public static void help() {
         ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
         System.err.println("  -o outputDir          specify output directory where all output is generated");
@@ -673,7 +679,7 @@ public class Tool {
         System.err.println("  -X                    display extended argument list");
     }
 
-    private static void Xhelp() {
+    public static void Xhelp() {
         ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("  -Xgrtree                print the grammar AST");
         System.err.println("  -Xdfa                   print DFA as text ");
