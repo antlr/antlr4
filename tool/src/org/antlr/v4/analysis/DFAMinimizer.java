@@ -194,17 +194,22 @@ public class DFAMinimizer {
 		for (IntervalSet s : uniq) {
 			List<Interval> intervals = s.getIntervals();
 			for (Interval I : intervals) {
-				for (int i=I.a+1; i<=I.b; i++) {
-					System.out.println("kill "+i);
-					dfa.stateSet.remove(dfa.states.get(i));
-					dfa.states.set(i, null);
+				for (int i=I.a; i<=I.b; i++) {
+					if ( states[i].stateNumber != i ) { // if not one of our merged states
+						System.out.println("kill "+i);
+						DFAState d = dfa.states.get(i);
+						dfa.stateSet.remove(d);
+						if ( d.isAcceptState ) {
+							dfa.altToAcceptStates[d.predictsAlt].remove(d);
+						}
+						dfa.states.set(i, null);
+					}
 				}
 			}
 		}
-
 	}
 
-	private void print(boolean[][] distinct) {
+	void print(boolean[][] distinct) {
 		int n = distinct.length;
 		for (int i=0; i<n; i++) {
 			System.out.print(dfa.states.get(i).stateNumber+":");
