@@ -245,9 +245,7 @@ public class Resolver {
 		return alt;
 	}
 
-
-
-	void issueAmbiguityWarnings() {
+	public void issueAmbiguityWarnings() {
 		MachineProbe probe = new MachineProbe(converter.dfa);
 
 		for (DFAState d : converter.ambiguousStates) {
@@ -295,9 +293,89 @@ public class Resolver {
 									   converter.hasPredicateBlockedByAction);
 			}
 		}
-		if ( converter.unreachableAlts.size()>0 ) {
+		if ( converter.unreachableAlts!=null && converter.unreachableAlts.size()>0 ) {
 			ErrorManager.unreachableAlts(converter.g.fileName, converter.dfa, converter.unreachableAlts);
 		}
 	}
+
+	/*
+	void issueRecursionWarnings() {
+		// RECURSION OVERFLOW
+		Set dfaStatesWithRecursionProblems =
+			converter.stateToRecursionOverflowConfigurationsMap.keySet();
+		// now walk truly unique (unaliased) list of dfa states with inf recur
+		// Goal: create a map from alt to map<target,List<callsites>>
+		// Map<Map<String target, List<NFAState call sites>>
+		Map<Integer, Map<>> altToT argetToCallSitesMap = new HashMap();
+		// track a single problem DFA state for each alt
+		Map<Integer, DFAState> altToDFAState = new HashMap<Integer, DFAState>();
+		computeAltToProblemMaps(dfaStatesWithRecursionProblems,
+								converter.stateToRecursionOverflowConfigurationsMap,
+								altToTargetToCallSitesMap, // output param
+								altToDFAState);            // output param
+
+		// walk each alt with recursion overflow problems and generate error
+		Set<Integer> alts = altToTargetToCallSitesMap.keySet();
+		List<Integer> sortedAlts = new ArrayList<Integer>(alts);
+		Collections.sort(sortedAlts);
+		for (Iterator altsIt = sortedAlts.iterator(); altsIt.hasNext();) {
+			Integer altI = (Integer) altsIt.next();
+			Map<Integer, > targetToCallSiteMap =
+				altToTargetToCallSitesMap.get(altI);
+			Set targetRules = targetToCallSiteMap.keySet();
+			Collection callSiteStates = targetToCallSiteMap.values();
+			DFAState sampleBadState = altToDFAState.get(altI);
+			ErrorManager.recursionOverflow(this,
+										   sampleBadState,
+										   altI.intValue(),
+										   targetRules,
+										   callSiteStates);
+		}
+	}
+
+	void computeAltToProblemMaps(Set<DFAState> dfaStatesUnaliased,
+								 Map configurationsMap,
+								 Map<Integer, NFAState> altToTargetToCallSitesMap,
+								 Map altToDFAState)
+	{
+		for (DFAState d : dfaStatesUnaliased) {
+			for (NFAConfig c : d.nfaConfigs) {
+				NFAState ruleInvocationState = c.state;
+				RuleTransition rt = (RuleTransition)ruleInvocationState.transition(0);
+				String targetRule = rt.rule.name;
+			}
+		}
+		for (Iterator it = dfaStatesUnaliased.iterator(); it.hasNext();) {
+			Integer stateI = (Integer) it.next();
+			// walk this DFA's config list
+			List configs = (List)configurationsMap.get(stateI);
+			for (int i = 0; i < configs.size(); i++) {
+				NFAConfig c = (NFAConfig) configs.get(i);
+				NFAState ruleInvocationState = c.state;
+				Transition transition0 = ruleInvocationState.transition(0);
+				RuleTransition ref = (RuleTransition)transition0;
+				String targetRule = ((NFAState) ref.target).rule.name;
+				Integer altI = org.antlr.misc.Utils.integer(c.alt);
+				Map<Integer, NFAState> targetToCallSiteMap =
+					altToTargetToCallSitesMap.get(altI);
+				if ( targetToCallSiteMap==null ) {
+					targetToCallSiteMap = new HashMap();
+					altToTargetToCallSitesMap.put(altI, targetToCallSiteMap);
+				}
+				Set<NFAState> callSites = targetToCallSiteMap.get(targetRule);
+				if ( callSites==null ) {
+					callSites = new HashSet();
+					targetToCallSiteMap.put(targetRule, callSites);
+				}
+				callSites.add(ruleInvocationState);
+				// track one problem DFA state per alt
+				if ( altToDFAState.get(altI)==null ) {
+					DFAState sampleBadState = converter.dfa.states.get(stateI.intValue());
+					altToDFAState.put(altI, sampleBadState);
+				}
+			}
+		}
+	}
+	*/
 
 }

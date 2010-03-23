@@ -272,20 +272,28 @@ Input such as "<arg.input>" is insufficiently covered with predicates at locatio
 <if(arg.hasPredicateBlockedByAction)><\n>At least one possibly relevant semantic predicate was hidden by action(s).<endif>
 >>
 
-DUPLICATE_SET_ENTRY(arg) ::=
-	"duplicate token type <arg> when collapsing subrule into set"
-
-ANALYSIS_ABORTED(enclosingRule) ::= <<
-ANTLR could not analyze this decision in rule <enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and possibly adding a syntactic predicate.
+ANALYSIS_TIMEOUT(arg) ::= <<
+ANTLR could not analyze this decision in rule <arg.enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and possibly adding a syntactic predicate 
 >>
 
 RECURSION_OVERFLOW(alt,input,targetRules,callSiteStates) ::= <<
 Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule.name>};separator=", ">}; separator=" and ">
 >>
 
+LEFT_RECURSION_CYCLES(arg) ::= <<
+The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=", ">]}; separator=" and ">
+>>
+
+MULTIPLE_RECURSIVE_ALTS(arg) ::= <<
+[fatal] rule <arg.ruleName> has non-LL(*) decision due to recursive rule invocations reachable from alts <arg.alts; separator=",">.  Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
+>>
+
 UNREACHABLE_TOKENS(tokens) ::= <<
 The following token definitions can never be matched because prior tokens match the same input: <tokens; separator=",">
 >>
+
+DUPLICATE_SET_ENTRY(arg) ::=
+	"duplicate token type <arg> when collapsing subrule into set"
 
 TOKEN_NONDETERMINISM(input,conflictingTokens,paths,disabled,hasPredicateBlockedByAction) ::=
 <<
@@ -297,15 +305,6 @@ Multiple token rules can match input such as "<input>": <conflictingTokens; sepa
 <endif>
 <if(disabled)><\n>As a result, token(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
-
-LEFT_RECURSION_CYCLES(arg) ::= <<
-The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=", ">]}; separator=" and ">
->>
-
-NONREGULAR_DECISION(ruleName,alts) ::= <<
-[fatal] rule <ruleName> has non-LL(*) decision due to recursive rule invocations reachable from alts <alts; separator=",">.  Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
->>
-
 /* l10n for message levels */
 WARNING() ::= "warning"
 ERROR() ::= "error"

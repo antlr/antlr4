@@ -2,6 +2,7 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
+import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 
 public class AnalysisPipeline {
@@ -36,8 +37,7 @@ public class AnalysisPipeline {
 		if ( dfa.valid() ) System.out.println("stack limited valid");
 
 		if ( dfa.valid() ) {
-			// ambig / unreachable errors
-			conv.issueAmbiguityWarnings();
+			conv.issueAmbiguityWarnings(); // ambig / unreachable errors
 
 			System.out.println("MINIMIZE");
 			DFAMinimizer dmin = new DFAMinimizer(dfa);
@@ -52,14 +52,25 @@ public class AnalysisPipeline {
 		
 		// REAL LL(*) ANALYSIS IF THAT FAILS
 		conv = new RecursionLimitedNFAToDFAConverter(g, s);
-		dfa = conv.createDFA();
-		System.out.print("DFA="+dfa);
+		try {
+			dfa = conv.createDFA();
+			System.out.print("DFA="+dfa);
+		}
+		catch (RecursionOverflowSignal ros) {
+			ErrorManager.recursionOverflow(g.fileName, dfa, ros.state, ros.altNum, ros.depth);
+		}
+		catch (MultipleRecursiveAltsSignal mras) {
+			ErrorManager.multipleRecursiveAlts(g.fileName, dfa, mras.recursiveAltSet);
+		}
+		catch (AnalysisTimeoutSignal at) {// TODO: nobody throws yet
+			ErrorManager.analysisTimeout();
+		}
 
-		// ambig / unreachable errors
-		conv.issueAmbiguityWarnings();
+		conv.issueAmbiguityWarnings(); // ambig / unreachable errors
+		//conv.issueRecursionWarnings();
 		if ( !dfa.valid() ) {
 			System.out.println("non-LL(*)");
-			System.out.println("recursion limited NOT valid :)");
+			System.out.println("recursion limited NOT valid");
 		}
 		else System.out.println("recursion limited valid");
 

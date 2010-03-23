@@ -215,14 +215,14 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 				if ( depth==1 ) { // recursion
 					recursiveAltSet.add(altNum); // indicate that this alt is recursive
 					if ( recursiveAltSet.size()>1 ) {
-						throw new RuntimeException("recursion in >1 alt: "+recursiveAltSet);
+						throw new MultipleRecursiveAltsSignal(recursiveAltSet);
 					}
 				}
 				// Detect an attempt to recurse too high
 				// if this context has hit the max recursions for p.stateNumber,
 				// don't allow it to enter p.stateNumber again
 				if ( depth >= r ) {
-					throw new RuntimeException("recursion overflow in "+altNum);
+					throw new RecursionOverflowSignal(altNum, depth, s);
 				}
 				// first create a new context and push onto call tree,
 				// recording the fact that we are invoking a rule and

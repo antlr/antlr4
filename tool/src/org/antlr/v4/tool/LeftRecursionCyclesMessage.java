@@ -5,8 +5,9 @@ import java.util.Collection;
 public class LeftRecursionCyclesMessage extends Message {
 	public Collection cycles;
 
-	public LeftRecursionCyclesMessage(Collection cycles) {
+	public LeftRecursionCyclesMessage(String fileName, Collection cycles) {
 		super(ErrorType.LEFT_RECURSION_CYCLES, cycles);
 		this.cycles = cycles;
+		this.fileName = fileName;		
 	}
 }

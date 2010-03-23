@@ -34,7 +34,7 @@ public class LeftRecursionDetector {
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
 		if ( listOfRecursiveCycles.size()>0 ) {
-			ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
+			ErrorManager.leftRecursionCycles(nfa.g.fileName, listOfRecursiveCycles);
 		}
 	}
 

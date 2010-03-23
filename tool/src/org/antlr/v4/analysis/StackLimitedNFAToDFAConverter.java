@@ -5,6 +5,7 @@ import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
+import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -67,7 +68,13 @@ public class StackLimitedNFAToDFAConverter {
 
 	public boolean hasPredicateBlockedByAction = false;	
 
-	public Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
+	/** Recursion is limited to a particular depth.  If that limit is exceeded
+	 *  the proposed new NFA configuration is recorded for the associated DFA state.
+	 */
+	protected MultiMap<DFAState, NFAConfig> stateToRecursionOverflowConfigurationsMap =
+		new MultiMap<DFAState, NFAConfig>();
+
+	//public Set<DFAState> recursionOverflowStates = new HashSet<DFAState>();
 
 	/** Are there any loops in this DFA?  Computed by DFAVerifier */
 	public boolean cyclic = false;
@@ -575,4 +582,5 @@ public class StackLimitedNFAToDFAConverter {
 	}
 
 	void issueAmbiguityWarnings() { resolver.issueAmbiguityWarnings(); }
+	//void issueRecursionWarnings() { resolver.issueRecursionWarnings(); }
 }
