@@ -58,8 +58,7 @@ public class DFAState {
 		new ArrayList<Edge>(INITIAL_NUM_TRANSITIONS);
 
 	/** The set of NFA configurations (state,alt,context) for this DFA state */
-	public OrderedHashSet<NFAConfig> nfaConfigs =
-		new OrderedHashSet<NFAConfig>();
+	public OrderedHashSet<NFAConfig> nfaConfigs;
 
 	/** Rather than recheck every NFA configuration in a DFA state (after
 	 *  resolving) in reach just check this boolean.  Saves a linear walk
@@ -72,9 +71,14 @@ public class DFAState {
 
 	//int cachedUniquelyPredicatedAlt = NFA.INVALID_ALT_NUMBER;
 
-	public DFAState(DFA dfa) { this.dfa = dfa; }
+	public DFAState() {; }	
 
-	public void addNFAConfig(NFAState s, NFAConfig c) {
+	public DFAState(DFA dfa) {
+		this.dfa = dfa;
+		nfaConfigs = new OrderedHashSet<NFAConfig>();
+	}
+
+	public void addNFAConfig(NFAConfig c) {
 		if ( nfaConfigs.contains(c) ) return;
 		nfaConfigs.add(c);
 	}
@@ -85,7 +89,7 @@ public class DFAState {
 								  SemanticContext semanticContext)
 	{
 		NFAConfig c = new NFAConfig(state, alt,	context, semanticContext);
-		addNFAConfig(state, c);
+		addNFAConfig(c);
 		return c;
 	}
 

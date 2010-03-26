@@ -140,10 +140,13 @@ tokensSection
 		)
 	;
 
-rule:   ^( RULE name=ID .+)
+rule
+@init {List<GrammarAST> modifiers = new ArrayList<GrammarAST>();}
+	:   ^( RULE name=ID (^(RULEMODIFIERS (m=. {modifiers.add($m);})+))? .)
 		{
 		int numAlts = $RULE.getFirstChildWithType(BLOCK).getChildCount();
 		Rule r = new Rule(g, $name.text, (GrammarASTWithOptions)$RULE, numAlts);
+		if ( modifiers.size()>0 ) r.modifiers = modifiers;
 		rules.add(r);
 		currentRule = r;
 		currentAlt = 1;

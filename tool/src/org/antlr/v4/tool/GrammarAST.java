@@ -42,9 +42,14 @@ public class GrammarAST extends CommonTree {
 			work.addAll(children);
 		}
 		return nodes;
-	}	
+	}
 
-    @Override
+//	@Override
+//	public boolean equals(Object obj) {
+//		return super.equals(obj);
+//	}
+
+	@Override
     public Tree dupNode() {
         return new GrammarAST(this);
     }

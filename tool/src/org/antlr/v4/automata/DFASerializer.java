@@ -1,6 +1,7 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +47,19 @@ public class DFASerializer {
 	String getStateString(DFAState s) {
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
-		if ( s.isAcceptState ) stateStr = ":s"+n+"=>"+s.getUniquelyPredictedAlt();
+		if ( s.isAcceptState ) {
+			if ( s instanceof LexerState ) {
+				stateStr = ":s"+n+"=>";
+				StringBuilder buf = new StringBuilder();
+				for (Rule r : ((LexerState)s).matchesRules) {
+					buf.append(" "+r.name);
+				}
+				stateStr += buf.toString();
+			}
+			else {
+				stateStr = ":s"+n+"=>"+s.getUniquelyPredictedAlt();
+			}
+		}
 		return stateStr;
 	}
 }

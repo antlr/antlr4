@@ -3,6 +3,7 @@ package org.antlr.v4.automata;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.TerminalAST;
 import org.stringtemplate.v4.misc.Misc;
 
@@ -11,7 +12,20 @@ public class LexerNFAFactory extends ParserNFAFactory {
 	public LexerNFAFactory(Grammar g) { super(g); }
 
 	public NFA createNFA() {
+		// create s0, start state (must be first)
+		// implied Tokens rule node
+		NFAState startState = newState(TokensStartState.class, null);
+
 		_createNFA();
+
+		// LINK START STATE TO EACH TOKEN RULE
+		for (Rule r : g.rules.values()) {
+			if ( !r.isFragment() ) {
+				RuleStartState s = nfa.ruleToStartState.get(r);
+				epsilon(startState, s);
+			}
+		}
+
 		return nfa;
 	}
 
@@ -44,4 +58,8 @@ public class LexerNFAFactory extends ParserNFAFactory {
 		return new Handle(left, right);
 	}
 
+	@Override
+	public Handle tokenRef(TerminalAST node) {
+		return ruleRef(node);
+	}
 }

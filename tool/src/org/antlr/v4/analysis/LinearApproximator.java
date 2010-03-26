@@ -142,7 +142,7 @@ public class LinearApproximator {
 				DFAState t = new DFAState(dfa);
 				t.nfaConfigs = altConfigs.get(a)[k];
 				dfa.addState(t);
-				if ( k==depth ) dfa.defineAcceptState(a, t);
+				if ( k==depth ) dfa.addAcceptState(a, t);
 				Edge e = new Edge(t, look[k]);
 				d.addEdge(e);
 				d = t;

@@ -50,6 +50,7 @@ public class Grammar implements AttributeResolver {
     public Grammar parent;
     public List<Grammar> importedGrammars;
     public Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
+	int ruleNumber = 1;
 
 	/** The NFA that represents the grammar with edges labelled with tokens
 	 *  or epsilon.  It is more suitable to analysis than an AST representation.
@@ -211,7 +212,10 @@ public class Grammar implements AttributeResolver {
         }
     }
 
-    public void defineRule(Rule r) { rules.put(r.name, r); }
+    public void defineRule(Rule r) {
+		rules.put(r.name, r);
+		r.index = ruleNumber++;
+	}
 
     public Rule getRule(String name) {
 		Rule r = rules.get(name);

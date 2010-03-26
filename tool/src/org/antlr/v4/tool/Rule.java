@@ -40,6 +40,8 @@ public class Rule implements AttributeResolver {
         }};
 
     public String name;
+	public List<GrammarAST> modifiers;
+	
     public GrammarASTWithOptions ast;
     public AttributeDict args;
     public AttributeDict retvals;
@@ -69,6 +71,9 @@ public class Rule implements AttributeResolver {
      */
 
     public Alternative[] alt;
+
+	/** All rules have unique index 1..n */
+	public int index;
 
 	public Rule(Grammar g, String name, GrammarASTWithOptions ast, int numberOfAlts) {
         this.g = g;
@@ -200,6 +205,14 @@ public class Rule implements AttributeResolver {
         String grammarLabelKey = g.getTypeString() + ":" + ltype;
         return Grammar.grammarAndLabelRefTypeToScope.get(grammarLabelKey);
     }
+
+	public boolean isFragment() {
+		if ( modifiers==null ) return false;
+		for (GrammarAST a : modifiers) {
+			if ( a.getText().equals("fragment") ) return true;
+		}
+		return false;
+	}
 
     @Override
     public String toString() {

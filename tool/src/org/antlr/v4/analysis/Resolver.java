@@ -172,7 +172,7 @@ public class Resolver {
 		d.isAcceptState = true;
 		d.predictsAlt = minAlt;
 		// might be adding new accept state for alt, but that's ok
-		converter.dfa.defineAcceptState(minAlt, d);
+		converter.dfa.addAcceptState(minAlt, d);
 	}
 
 	/** Turn off all configurations associated with the

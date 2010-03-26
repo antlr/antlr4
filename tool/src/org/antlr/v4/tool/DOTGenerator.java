@@ -318,11 +318,23 @@ public class DOTGenerator {
 		buf.append('s');
 		buf.append(s.stateNumber);
 		if ( s.isAcceptState ) {
-            buf.append("=>"+s.getUniquelyPredictedAlt());
+			if ( s instanceof LexerState ) {
+				buf.append("=>");
+				for (Rule r : ((LexerState)s).matchesRules) {
+					buf.append(" "+r.name);
+				}
+			}
+			else {
+				buf.append("=>"+s.getUniquelyPredictedAlt());
+			}
         }
 		if ( Tool.internalOption_ShowNFAConfigsInDFA ) {
 			Set<Integer> alts = ((DFAState)s).getAltSet();
-			if ( alts!=null ) {
+			if ( s instanceof LexerState ) {
+				buf.append("\\n");
+				buf.append( ((LexerState)s).nfaStates.toString() );
+			}
+			else if ( alts!=null ) {
 				buf.append("\\n");
 				// separate alts
 				List<Integer> altList = new ArrayList<Integer>();

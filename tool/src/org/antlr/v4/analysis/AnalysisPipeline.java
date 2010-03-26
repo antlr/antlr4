@@ -2,6 +2,7 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 
 public class AnalysisPipeline {
@@ -17,6 +18,12 @@ public class AnalysisPipeline {
 		lr.check();
 		if ( lr.listOfRecursiveCycles.size()>0 ) return; // bail out
 
+		if ( g.getType() == ANTLRParser.LEXER ) {
+			LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(g);
+			DFA dfa = conv.createDFA();
+			g.setLookaheadDFA(0, dfa); // only one decision			
+			return;
+		}
 		// BUILD DFA FOR EACH DECISION
 		for (DecisionState s : g.nfa.decisionToNFAState) {
 			System.out.println("\nDECISION "+s.decision);
