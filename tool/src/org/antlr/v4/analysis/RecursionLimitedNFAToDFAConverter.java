@@ -176,7 +176,7 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 							  boolean collectPredicates,
 							  List<NFAConfig> configs)
 	{
-		if ( context != NFA_EMPTY_STACK_CONTEXT ) {
+		if ( context != NFAContext.EMPTY) {
 			NFAContext newContext = context.parent; // "pop" invoking state
 			closure(context.returnState, altNum, newContext, semanticContext, collectPredicates, configs);
 		}

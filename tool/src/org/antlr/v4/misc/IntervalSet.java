@@ -28,6 +28,7 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.automata.Label;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
@@ -64,6 +65,11 @@ public class IntervalSet implements IntSet {
 		this.intervals = intervals;
 	}
 
+	public IntervalSet(IntervalSet set) {
+		this();
+		addAll(set);
+	}
+
 	/** Create a set with a single element, el. */
     public static IntervalSet of(int a) {
 		IntervalSet s = new IntervalSet();
@@ -72,11 +78,11 @@ public class IntervalSet implements IntSet {
     }
 
     /** Create a set with all ints within range [a..b] (inclusive) */
-    public static IntervalSet of(int a, int b) {
-        IntervalSet s = new IntervalSet();
-        s.add(a,b);
-        return s;
-    }
+	public static IntervalSet of(int a, int b) {
+		IntervalSet s = new IntervalSet();
+		s.add(a,b);
+		return s;
+	}
 
     /** Add a single element to the set.  An isolated element is stored
      *  as a range el..el.
@@ -386,12 +392,10 @@ public class IntervalSet implements IntSet {
     }
 	 */
 
-    /** TODO: implement this! */
 	public IntSet or(IntSet a) {
 		IntervalSet o = new IntervalSet();
 		o.addAll(this);
 		o.addAll(a);
-		//throw new NoSuchMethodError();
 		return o;
 	}
 
@@ -574,7 +578,7 @@ public class IntervalSet implements IntSet {
 		if ( this.intervals==null || this.intervals.size()==0 ) {
 			return "{}";
 		}
-        if ( this.intervals.size()>1 ) {
+        if ( this.size()>1 ) {
             buf.append("{");
         }
         Iterator iter = this.intervals.iterator();
@@ -591,18 +595,26 @@ public class IntervalSet implements IntSet {
                 }
             }
             else {
-                if ( g!=null ) {
-                    buf.append(g.getTokenDisplayName(a)+".."+g.getTokenDisplayName(b));
-                }
-                else {
-                    buf.append(a+".."+b);
-                }
+				if ( g!=null ) {
+					if ( g.getType()!= ANTLRParser.LEXER ) {
+						for (int i=a; i<=b; i++) {
+							if ( i>a ) buf.append(", ");
+							buf.append(g.getTokenDisplayName(i));
+						}
+					}
+					else {
+						buf.append(g.getTokenDisplayName(a)+".."+g.getTokenDisplayName(b));
+					}
+				}
+				else {
+					buf.append(a+".."+b);
+				}
             }
             if ( iter.hasNext() ) {
                 buf.append(", ");
             }
         }
-        if ( this.intervals.size()>1 ) {
+        if ( this.size()>1 ) {
             buf.append("}");
         }
         return buf.toString();
@@ -622,8 +634,8 @@ public class IntervalSet implements IntSet {
 		return n;
     }
 
-    public List toList() {
-		List values = new ArrayList();
+    public List<Integer> toList() {
+		List<Integer> values = new ArrayList<Integer>();
 		int n = intervals.size();
 		for (int i = 0; i < n; i++) {
 			Interval I = (Interval) intervals.get(i);

@@ -207,6 +207,13 @@ public class DFAMinimizer {
 				}
 			}
 		}
+
+		// RENUMBER STATES
+		int i = 0;
+		for (DFAState d : dfa.states) {
+			if ( d!=null ) d.stateNumber = i++;
+		}
+
 		return true;
 	}
 

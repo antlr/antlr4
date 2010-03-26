@@ -230,11 +230,11 @@ public class Resolver {
 	}
 
 	public static int getUniqueAlt(Collection<NFAConfig> nfaConfigs,
-								   boolean ignoreResolved)
+								   boolean ignoreResolvedBit)
 	{
 		int alt = NFA.INVALID_ALT_NUMBER;
 		for (NFAConfig c : nfaConfigs) {
-			if ( !ignoreResolved && c.resolved ) continue;
+			if ( !ignoreResolvedBit && c.resolved ) continue;
 			if ( alt==NFA.INVALID_ALT_NUMBER ) {
 				alt = c.alt; // found first alt
 			}

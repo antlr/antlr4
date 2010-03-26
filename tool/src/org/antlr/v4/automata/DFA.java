@@ -33,7 +33,7 @@ public class DFA {
 
 	/** Maps the state number to the actual DFAState. 
 	 *
-	 *  This is managed in parallel with uniqueStates and simply provides
+	 *  This is managed in parallel with stateSet and simply provides
 	 *  a way to go from state number to DFAState rather than via a
 	 *  hash lookup.
 	 */
@@ -47,6 +47,8 @@ public class DFA {
 	/** Did DFA minimization do anything? */
 	public boolean minimized;
 
+	public boolean cyclic;
+
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
 
@@ -57,6 +59,12 @@ public class DFA {
 		this.decisionNFAStartState = startState;
 		nAlts = startState.getNumberOfTransitions();
 		decision = startState.decision;
+		altToAcceptStates = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
+	}
+
+	public DFA(Grammar g, int nAlts) {
+		this.g = g;
+		this.nAlts = nAlts;
 		altToAcceptStates = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
 	}
 

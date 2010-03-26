@@ -46,6 +46,8 @@ import org.antlr.v4.automata.NFAState;
  *  on the path from this node thru the parent pointers to the root.
  */
 public class NFAContext {
+	public static final NFAContext EMPTY = new NFAContext(null, null);
+
 	public NFAContext parent;
 
     /** The NFA state following state that invoked another rule's start state
@@ -64,7 +66,7 @@ public class NFAContext {
      */
     protected int cachedHashCode;
 
-    public NFAContext(NFAContext parent, NFAState returnState) {
+	public NFAContext(NFAContext parent, NFAState returnState) {
         this.parent = parent;
         this.returnState = returnState;
         if ( returnState !=null ) {
@@ -200,7 +202,7 @@ public class NFAContext {
 	public int depth() {
 		int n = 0;
 		NFAContext sp = this;
-		while ( sp != StackLimitedNFAToDFAConverter.NFA_EMPTY_STACK_CONTEXT ) {
+		while ( sp != EMPTY) {
 			n++;
 			sp = sp.parent;
 		}

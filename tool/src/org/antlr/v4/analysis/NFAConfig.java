@@ -89,7 +89,7 @@ public class NFAConfig {
 			buf.append("|");
 			buf.append(alt);
 		}
-		if ( context!=null && context!= StackLimitedNFAToDFAConverter.NFA_EMPTY_STACK_CONTEXT ) {
+		if ( context!=null && context!= NFAContext.EMPTY) {
             buf.append("|");
             buf.append(context);
         }

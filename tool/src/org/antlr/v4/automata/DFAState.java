@@ -48,7 +48,7 @@ public class DFAState {
 	public boolean isAcceptState = false;
 
 	/** If accept, which alt does it predict? */
-	public int predictsAlt;
+	public int predictsAlt = NFA.INVALID_ALT_NUMBER;
 
 	/** State in which DFA? */
 	public DFA dfa;
@@ -89,15 +89,17 @@ public class DFAState {
 		return c;
 	}
 
-	/** Walk each configuration and if they are all the same alt, return
-	 *  that alt else return NFA.INVALID_ALT_NUMBER.  Ignore resolved
-	 *  configs.  TODO: Cache results?
+	/** Walk each configuration and if they are all the same alt,
+	 *  even the resolved configs.
 	 */
-	public int getUniquelyPredictedAlt() { return Resolver.getUniqueAlt(nfaConfigs, false); }
+	public int getUniquelyPredictedAlt() {
+		if ( predictsAlt!=NFA.INVALID_ALT_NUMBER ) return predictsAlt;
+		predictsAlt = Resolver.getUniqueAlt(nfaConfigs, false);
+		return predictsAlt;
+	}
 
-	/** Return the uniquely mentioned alt from the NFA configurations;
-	 *  Return INVALID_ALT_NUMBER if there is more than one alt mentioned.
-	 *  Consider all configs in state.
+	/** Return the uniquely mentioned alt from the NFA configurations, ignoring
+	 *  resolved configs
 	 */
 	public int getUniqueAlt() { return Resolver.getUniqueAlt(nfaConfigs, true); }
 

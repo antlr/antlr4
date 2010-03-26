@@ -9,8 +9,6 @@ import java.util.Set;
 
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {
-	List<DFAState> work;
-	Set<DFAState> marked;
 	Grammar g;
 	DFAState start;
 
@@ -21,9 +19,11 @@ public class DFASerializer {
 
 	public String toString() {
 		if ( start==null ) return null;
-		marked = new HashSet<DFAState>();
+		// don't track DFAStates here; sometimes nfa configs are empty
+		// (when we build DFA for linear approx lookahead).
+		Set<Integer> marked = new HashSet<Integer>();
 
-		work = new ArrayList<DFAState>();
+		List<DFAState> work = new ArrayList<DFAState>();
 		work.add(start);
 
 		StringBuilder buf = new StringBuilder();
@@ -31,8 +31,8 @@ public class DFASerializer {
 
 		while ( work.size()>0 ) {
 			s = work.remove(0);
-			if ( marked.contains(s) ) continue;
-			marked.add(s);
+			if ( marked.contains(s.stateNumber) ) continue;
+			marked.add(s.stateNumber);
 			int n = s.getNumberOfEdges();
 			//System.out.println("visit "+getStateString(s)+"; edges="+n);
 			for (int i=0; i<n; i++) {

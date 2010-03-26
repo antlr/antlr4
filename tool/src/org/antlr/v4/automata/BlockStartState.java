@@ -7,11 +7,10 @@ import java.util.List;
 public class BlockStartState extends DecisionState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 
-	BlockEndState endState;
+	//BlockEndState endState;
 
 	/** Track the transitions emanating from this NFA state. */
-	protected List<Transition> transitions =
-		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
+	public List<Transition> transitions = new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 
 	public BlockStartState(NFA nfa) { super(nfa); }
 

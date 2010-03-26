@@ -14,8 +14,6 @@ import java.util.*;
  *  launched).
  */
 public class StackLimitedNFAToDFAConverter {
-	public static final NFAContext NFA_EMPTY_STACK_CONTEXT = new NFAContext(null, null);
-
 	Grammar g;
 
 	DecisionState nfaStartState;
@@ -247,7 +245,7 @@ public class StackLimitedNFAToDFAConverter {
 			Transition t = nfaStartState.transition(altNum-1);
 			NFAState altStart = t.target;
 			d.addNFAConfig(altStart, altNum,
-						   NFA_EMPTY_STACK_CONTEXT,
+						   NFAContext.EMPTY,
 						   SemanticContext.EMPTY_SEMANTIC_CONTEXT);
 		}
 
@@ -332,7 +330,7 @@ public class StackLimitedNFAToDFAConverter {
 	{
 		Rule invokingRule = null;
 
-		if ( context!=NFA_EMPTY_STACK_CONTEXT ) {
+		if ( context!= NFAContext.EMPTY) {
 			// if stack not empty, get invoking rule from top of stack
 			invokingRule = context.returnState.rule;
 		}
@@ -590,5 +588,4 @@ public class StackLimitedNFAToDFAConverter {
 	}
 
 	void issueAmbiguityWarnings() { resolver.issueAmbiguityWarnings(); }
-	//void issueRecursionWarnings() { resolver.issueRecursionWarnings(); }
 }
