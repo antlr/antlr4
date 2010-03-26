@@ -68,7 +68,7 @@ public class LinearApproximator {
 	public LinearApproximator(Grammar g, int decision) {
 		this.g = g; this.decision = decision;
 	}
-	
+
 	public LinearApproximator(Grammar g, int decision, int k) {
 		this(g,decision); max_k = k;
 	}
@@ -124,10 +124,10 @@ public class LinearApproximator {
 		}
 		return 0;
 	}
-	
+
 	DFA createApproximateDFA(List<IntervalSet[]> altLook,
-						  List<OrderedHashSet[]> altConfigs,
-						  int depth)
+							 List<OrderedHashSet[]> altConfigs,
+							 int depth)
 	{
 		int nAlts = altLook.size() - 1;
 		DFA dfa = new DFA(g, nAlts);
@@ -140,8 +140,7 @@ public class LinearApproximator {
 			IntervalSet[] look = altLook.get(a);
 			for (int k=1; k<=depth; k++) {
 				DFAState t = new DFAState(dfa);
-				OrderedHashSet[] configs = altConfigs.get(a);
-				t.nfaConfigs.addAll(configs[k]);
+				t.nfaConfigs = altConfigs.get(a)[k];
 				dfa.addState(t);
 				if ( k==depth ) dfa.defineAcceptState(a, t);
 				Edge e = new Edge(t, look[k]);
