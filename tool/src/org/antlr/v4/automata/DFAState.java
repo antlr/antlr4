@@ -58,7 +58,7 @@ public class DFAState {
 		new ArrayList<Edge>(INITIAL_NUM_TRANSITIONS);
 
 	/** The set of NFA configurations (state,alt,context) for this DFA state */
-	public OrderedHashSet<NFAConfig> nfaConfigs;
+	public OrderedHashSet<NFAConfig> nfaConfigs = new OrderedHashSet<NFAConfig>();
 
 	/** Rather than recheck every NFA configuration in a DFA state (after
 	 *  resolving) in reach just check this boolean.  Saves a linear walk
@@ -75,7 +75,6 @@ public class DFAState {
 
 	public DFAState(DFA dfa) {
 		this.dfa = dfa;
-		nfaConfigs = new OrderedHashSet<NFAConfig>();
 	}
 
 	public void addNFAConfig(NFAConfig c) {

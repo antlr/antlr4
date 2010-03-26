@@ -94,6 +94,7 @@ public class StackLimitedNFAToDFAConverter {
 	}
 
 	public DFA createDFA() {
+		closureBusy = new HashSet<NFAConfig>();
 		computeStartState();
 		dfa.addState(dfa.startState); // make sure dfa knows about this state
 		work.add(dfa.startState);
@@ -107,6 +108,8 @@ public class StackLimitedNFAToDFAConverter {
 		}
 
 		unreachableAlts = getUnreachableAlts();
+
+		closureBusy = null; // wack all that memory used during closure		
 
 		return dfa;
 	}
@@ -266,17 +269,15 @@ public class StackLimitedNFAToDFAConverter {
 		// it forward
 		boolean collectPredicates = (d == dfa.startState);
 
-		closureBusy = new HashSet<NFAConfig>();
-
 		// TODO: can we avoid this separate list by directly filling d.nfaConfigs?
-		// OH: concurrent modification. dup initialconfigs?
+		// OH: concurrent modification. dup initialconfigs? works for lexers, try here to save configs param
 		List<NFAConfig> configs = new ArrayList<NFAConfig>();
 		for (NFAConfig c : d.nfaConfigs) {
 			closure(c.state, c.alt, c.context, c.semanticContext, collectPredicates, configs);
 		}
 		d.nfaConfigs.addAll(configs); // Add new NFA configs to DFA state d
 
-		closureBusy = null; // wack all that memory used during closure
+		closureBusy.clear();
 
 		if ( debug ) {
 			System.out.println("after closure("+d+")");

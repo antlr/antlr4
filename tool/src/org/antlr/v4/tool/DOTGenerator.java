@@ -330,11 +330,7 @@ public class DOTGenerator {
         }
 		if ( Tool.internalOption_ShowNFAConfigsInDFA ) {
 			Set<Integer> alts = ((DFAState)s).getAltSet();
-			if ( s instanceof LexerState ) {
-				buf.append("\\n");
-				buf.append( ((LexerState)s).nfaStates.toString() );
-			}
-			else if ( alts!=null ) {
+			if ( alts!=null ) {
 				buf.append("\\n");
 				// separate alts
 				List<Integer> altList = new ArrayList<Integer>();

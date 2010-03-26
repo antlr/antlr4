@@ -5,9 +5,7 @@ import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class LexerNFAToDFAConverter {
 	Grammar g;
@@ -19,6 +17,12 @@ public class LexerNFAToDFAConverter {
 	List<LexerState> work = new LinkedList<LexerState>();
 	List<LexerState> accepts = new LinkedList<LexerState>();
 
+	/** Used to prevent the closure operation from looping to itself and
+     *  hence looping forever.  Sensitive to the NFA state, the alt, and
+     *  the stack context.
+     */
+	Set<NFAConfig> closureBusy;	
+
 	public static boolean debug = false;	
 
 	public LexerNFAToDFAConverter(Grammar g) {
@@ -28,6 +32,7 @@ public class LexerNFAToDFAConverter {
 	}
 
 	public DFA createDFA() {
+		closureBusy = new HashSet<NFAConfig>();
 		LexerState start = computeStartState();
 		dfa.startState = start;
 		dfa.addState(start); // make sure dfa knows about this state
@@ -42,7 +47,8 @@ public class LexerNFAToDFAConverter {
 
 		// walk accept states, informing DFA
 		for (LexerState d : accepts) {
-			for (NFAState s : d.nfaStates) {
+			for (NFAConfig c : d.nfaConfigs) {
+				NFAState s = c.state;
 				if ( s instanceof RuleStopState && !s.rule.isFragment() ) {
 					dfa.defineAcceptState(s.rule.index, d);
 					d.matchesRules.add(s.rule);
@@ -50,13 +56,23 @@ public class LexerNFAToDFAConverter {
 			}
 		}
 
+		closureBusy = null; // wack all that memory used during closure			
+
 		return dfa;
 	}
 
 	/** */
 	public LexerState computeStartState() {
 		LexerState d = dfa.newLexerState();
-		d.nfaStates.add(dfa.decisionNFAStartState);		
+		// add config for each alt start, then add closure for those states
+		for (int ruleIndex=1; ruleIndex<=dfa.nAlts; ruleIndex++) {
+			Transition t = dfa.decisionNFAStartState.transition(ruleIndex-1);
+			NFAState altStart = t.target;
+			d.addNFAConfig(altStart, ruleIndex,
+						   NFAContext.EMPTY,
+						   SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+		}
+
 		closure(d);
 		return d;
 	}
@@ -106,14 +122,16 @@ public class LexerNFAToDFAConverter {
 		//System.out.println("reach "+label.toString(g)+" from "+d.stateNumber);
 		LexerState labelTarget = dfa.newLexerState();
 
-		for (NFAState s : d.nfaStates) {
+		for (NFAConfig c : d.nfaConfigs) {
+			NFAState s = c.state;
 			int n = s.getNumberOfTransitions();
 			for (int i=0; i<n; i++) {               // for each transition
 				Transition t = s.transition(i);
 				// found a transition with label; does it collide with label?
 				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
 					// add NFA target to (potentially) new DFA state
-					labelTarget.nfaStates.add(t.target);
+					labelTarget.addNFAConfig(t.target, c.alt, c.context,
+											 SemanticContext.EMPTY_SEMANTIC_CONTEXT);
 				}
 			}
 		}
@@ -130,9 +148,13 @@ public class LexerNFAToDFAConverter {
 			System.out.println("closure("+d+")");
 		}
 
-		List<NFAState> states = new ArrayList<NFAState>();
-		states.addAll(d.nfaStates.elements()); // dup initial list; avoid walk/update issue
-		for (NFAState s : states) closure(d, s, NFAContext.EMPTY); // update d.nfaStates
+		List<NFAConfig> configs = new ArrayList<NFAConfig>();
+		configs.addAll(d.nfaConfigs.elements()); // dup initial list; avoid walk/update issue
+		for (NFAConfig c : configs) {
+			closure(d, c.state, c.alt, c.context); // update d.nfaStates
+		}
+
+		closureBusy.clear();
 
 		if ( debug ) {
 			System.out.println("after closure("+d+")");
@@ -140,16 +162,20 @@ public class LexerNFAToDFAConverter {
 		//System.out.println("after closure d="+d);
 	}
 
-	public void closure(LexerState d, NFAState s, NFAContext context) {
+	public void closure(LexerState d, NFAState s, int ruleIndex, NFAContext context) {
+		NFAConfig proposedNFAConfig =
+			new NFAConfig(s, ruleIndex, context, SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+
+		if ( closureBusy.contains(proposedNFAConfig) ) return;
+		closureBusy.add(proposedNFAConfig);
+
 		// s itself is always in closure
-		d.nfaStates.add(s);
+		d.nfaConfigs.add(proposedNFAConfig);
 
 		if ( s instanceof RuleStopState ) {
 			// TODO: chase FOLLOW links if recursive
 			if ( context!=NFAContext.EMPTY ) {
-				if ( !d.nfaStates.contains(context.returnState) ) {
-					closure(d, context.returnState, context.parent);
-				}
+				closure(d, context.returnState, ruleIndex, context.parent);
 				// do nothing if context not empty and already added to nfaStates
 			}
 			else {
@@ -163,10 +189,10 @@ public class LexerNFAToDFAConverter {
 				if ( t instanceof RuleTransition ) {
 					NFAContext newContext =
 						new NFAContext(context, ((RuleTransition)t).followState);
-					if ( !d.nfaStates.contains(t.target) ) closure(d, t.target, newContext);
+					closure(d, t.target, ruleIndex, newContext);
 				}
-				else if ( t.isEpsilon() && !d.nfaStates.contains(t.target) ) {
-					closure(d, t.target, context);
+				else if ( t.isEpsilon() ) {
+					closure(d, t.target, ruleIndex, context);
 				}
 			}
 		}
