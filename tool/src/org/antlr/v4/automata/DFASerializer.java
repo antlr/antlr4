@@ -19,8 +19,6 @@ public class DFASerializer {
 
 	public String toString() {
 		if ( start==null ) return null;
-		// don't track DFAStates here; sometimes nfa configs are empty
-		// (when we build DFA for linear approx lookahead).
 		Set<Integer> marked = new HashSet<Integer>();
 
 		List<DFAState> work = new ArrayList<DFAState>();
