@@ -13,7 +13,7 @@ import java.util.*;
  *  per DFA (also required for thread safety if multiple conversions
  *  launched).
  */
-public class StackLimitedNFAToDFAConverter {
+public class unused_StackLimitedNFAToDFAConverter {
 	Grammar g;
 
 	DecisionState nfaStartState;
@@ -85,12 +85,12 @@ public class StackLimitedNFAToDFAConverter {
 
 	public static boolean debug = false;
 
-	public StackLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
+	public unused_StackLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
 		this.g = g;
 		this.nfaStartState = nfaStartState;
 		dfa = new DFA(g, nfaStartState);
-		dfa.converter = this;
-		resolver = new Resolver(this);
+//		dfa.converter = this;
+		//resolver = new Resolver(this);
 	}
 
 	public DFA createDFA() {

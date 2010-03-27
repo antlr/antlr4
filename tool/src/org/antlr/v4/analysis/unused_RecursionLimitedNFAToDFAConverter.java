@@ -75,7 +75,7 @@ import java.util.List;
  *
  *      This case also catches infinite left recursion.
  */
-public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConverter {
+public class unused_RecursionLimitedNFAToDFAConverter extends unused_StackLimitedNFAToDFAConverter {
 	/** This is similar to Bermudez's m constant in his LAR(m) where
 	 *  you bound the stack so your states don't explode.  The main difference
 	 *  is that I bound only recursion on the stack, not the simple stack size.
@@ -145,7 +145,7 @@ public class RecursionLimitedNFAToDFAConverter extends StackLimitedNFAToDFAConve
 	 */
 	public IntSet recursiveAltSet = new BitSet();
 	
-	public RecursionLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
+	public unused_RecursionLimitedNFAToDFAConverter(Grammar g, DecisionState nfaStartState) {
 		super(g, nfaStartState);
 	}
 
