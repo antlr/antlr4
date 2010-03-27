@@ -333,7 +333,7 @@ public class unused_StackLimitedNFAToDFAConverter {
 	{
 		Rule invokingRule = null;
 
-		if ( context!= NFAContext.EMPTY) {
+		if ( context!=NFAContext.EMPTY) {
 			// if stack not empty, get invoking rule from top of stack
 			invokingRule = context.returnState.rule;
 		}
