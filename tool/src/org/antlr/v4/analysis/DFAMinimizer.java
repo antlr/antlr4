@@ -59,10 +59,12 @@ public class DFAMinimizer {
 		}
 
 		// Nobody can merge with a state resolved with predicates to be safe
-		for (DFAState d : dfa.converter.resolvedWithSemanticPredicates) {
-			for (int i=1; i<n; i++) {
-				distinct[d.stateNumber][i] = true;
-				distinct[i][d.stateNumber] = true;
+		if ( dfa.converter!=null ) {
+			for (DFAState d : dfa.converter.resolvedWithSemanticPredicates) {
+				for (int i=1; i<n; i++) {
+					distinct[d.stateNumber][i] = true;
+					distinct[i][d.stateNumber] = true;
+				}
 			}
 		}
 

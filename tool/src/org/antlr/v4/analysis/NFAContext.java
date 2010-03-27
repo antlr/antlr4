@@ -77,6 +77,16 @@ public class NFAContext {
         }
     }
 
+	/** Is s anywhere in the context? */
+	public boolean contains(NFAState s) {
+		NFAContext sp = this;
+		while ( sp!=null ) {
+			if ( sp.returnState == s ) return true;
+			sp = sp.parent;
+		}
+		return false;
+	}
+
 	/** Two contexts are equals() if both have
 	 *  same call stack; walk upwards to the root.
 	 *  Recall that the root sentinel node has no invokingStates and no parent.

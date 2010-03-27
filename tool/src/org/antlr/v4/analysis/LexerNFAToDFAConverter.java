@@ -50,7 +50,7 @@ public class LexerNFAToDFAConverter {
 			for (NFAConfig c : d.nfaConfigs) {
 				NFAState s = c.state;
 				if ( s instanceof RuleStopState && !s.rule.isFragment() ) {
-					dfa.defineAcceptState(s.rule.index, d);
+					dfa.defineAcceptState(c.alt, d);
 					d.matchesRules.add(s.rule);
 				}
 			}
@@ -187,9 +187,14 @@ public class LexerNFAToDFAConverter {
 			for (int i=0; i<n; i++) {
 				Transition t = s.transition(i);
 				if ( t instanceof RuleTransition ) {
-					NFAContext newContext =
-						new NFAContext(context, ((RuleTransition)t).followState);
-					closure(d, t.target, ruleIndex, newContext);
+					// simulate an r=0 recursion limited conversion by avoiding
+					// any recursive call. It approximates recursive lexer
+					// rules with loops.  Later we can try rule for real.
+					if ( !context.contains(((RuleTransition)t).followState) ) {
+						NFAContext newContext =
+							new NFAContext(context, ((RuleTransition)t).followState);
+						closure(d, t.target, ruleIndex, newContext);
+					}
 				}
 				else if ( t.isEpsilon() ) {
 					closure(d, t.target, ruleIndex, context);
