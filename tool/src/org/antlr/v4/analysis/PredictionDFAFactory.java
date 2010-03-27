@@ -81,6 +81,8 @@ public class PredictionDFAFactory {
      */
 	Set<NFAConfig> closureBusy;
 
+	//org.antlr.v4.misc.BitSet visited = new org.antlr.v4.misc.BitSet();
+
 	Resolver resolver;
 
 	public static boolean debug = false;
@@ -316,6 +318,9 @@ public class PredictionDFAFactory {
 		// p itself is always in closure
 		configs.add(proposedNFAConfig);
 
+//		if ( s instanceof RuleStartState ) {
+//			visited.add(s.rule.index);
+//		}
 		if ( s instanceof RuleStopState ) {
 			ruleStopStateClosure(s, altNum, context, semanticContext, collectPredicates, configs);
 		}
@@ -331,14 +336,26 @@ public class PredictionDFAFactory {
 							  boolean collectPredicates,
 							  List<NFAConfig> configs)
 	{
+		if ( !context.recursed ) {
+			System.out.println("dynamic FOLLOW of "+s+" context="+context);
+			if ( context != NFAContext.EMPTY) {
+				NFAContext newContext = context.parent; // "pop" invoking state
+				closure(context.returnState, altNum, newContext, semanticContext, collectPredicates, configs);
+			}
+			else {
+				commonClosure(s, altNum, context, semanticContext, collectPredicates, configs); // do global FOLLOW
+			}
+			return;
+		}
+
 		Rule invokingRule = null;
 
-		if ( context!= NFAContext.EMPTY) {
+		if ( context != NFAContext.EMPTY) {
 			// if stack not empty, get invoking rule from top of stack
 			invokingRule = context.returnState.rule;
 		}
 
-		//System.out.println("FOLLOW of "+s+" context="+context);
+		System.out.println("FOLLOW of "+s+" context="+context);
 		// follow all static FOLLOW links
 		int n = s.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
@@ -362,6 +379,7 @@ public class PredictionDFAFactory {
 		return;
 	}
 
+
 	void commonClosure(NFAState s, int altNum, NFAContext context,
 						SemanticContext semanticContext, boolean collectPredicates,
 						List<NFAConfig> configs)
@@ -372,11 +390,20 @@ public class PredictionDFAFactory {
 			if ( t instanceof RuleTransition) {
 				NFAState retState = ((RuleTransition)t).followState;
 				NFAContext newContext = context;
-				if ( !context.contains(((RuleTransition)t).followState) ) { // !recursive?
+				//if ( !visited.member(t.target.rule.index) ) { // !recursive?
+				if ( s.rule != t.target.rule &&
+					 !context.contains(((RuleTransition)t).followState) ) { // !recursive?
 					// first create a new context and push onto call tree,
 					// recording the fact that we are invoking a rule and
 					// from which state.
+					System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+context);
 					newContext = new NFAContext(context, retState);
+				}
+				else {
+					System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+context);
+					// don't record recursion, but record we did so we know
+					// what to do at end of rule.
+					context.recursed = true;
 				}
 				// traverse epsilon edge to new rule
 				closure(t.target, altNum, newContext, semanticContext, collectPredicates, configs);

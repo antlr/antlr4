@@ -55,6 +55,8 @@ public class NFAContext {
      */
     public NFAState returnState;
 
+	public boolean recursed;
+
     /** Computing the hashCode is very expensive and closureBusy()
      *  uses it to track when it's seen a state|ctx before to avoid
      *  infinite loops.  As we add new contexts, record the hash code
