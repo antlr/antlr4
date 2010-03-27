@@ -12,8 +12,8 @@ import java.util.*;
 
 /** */
 public class PredicateResolver {
-	StackLimitedNFAToDFAConverter converter;
-	public PredicateResolver(StackLimitedNFAToDFAConverter converter) {
+	PredictionDFAFactory converter;
+	public PredicateResolver(PredictionDFAFactory converter) {
 		this.converter = converter;
 	}
 

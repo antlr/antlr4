@@ -1,6 +1,6 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.analysis.StackLimitedNFAToDFAConverter;
+import org.antlr.v4.analysis.PredictionDFAFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
@@ -54,7 +54,7 @@ public class DFA {
 	/** Unique state numbers per DFA */
 	int stateCounter = 0;
 
-	public StackLimitedNFAToDFAConverter converter;
+	public PredictionDFAFactory converter;
 
 	public DFA(Grammar g, DecisionState startState) {
 		this.g = g;

@@ -37,29 +37,27 @@ public class AnalysisPipeline {
 		// BUILD DFA FOR EACH DECISION IN NONLEXER
 		for (DecisionState s : g.nfa.decisionToNFAState) {
 			System.out.println("\nDECISION "+s.decision);
+
 			// TRY LINEAR APPROX FIXED LOOKAHEAD FIRST
 			LinearApproximator lin = new LinearApproximator(g, s.decision);
 			DFA dfa = lin.createDFA(s);
+
 			// IF NOT LINEAR APPROX, TRY NFA TO DFA CONVERSION
-			if ( dfa==null ) dfa = createDFA(s);
+			if ( dfa==null ) {
+				dfa = createDFA(s);
+			}
 			g.setLookaheadDFA(s.decision, dfa);
 		}
 	}
 
 	public DFA createDFA(DecisionState s) {
 		// TRY STACK LIMITED LL(*) ANALYSIS
-		StackLimitedNFAToDFAConverter conv = new StackLimitedNFAToDFAConverter(g, s);
+		PredictionDFAFactory conv = new PredictionDFAFactory(g, s);
 		DFA dfa = conv.createDFA();
 		System.out.print("DFA="+dfa);
 
-		// RECURSION LIMITED LL(*) ANALYSIS IF THAT FAILS
-		// Only do recursion limited version if we get dangling states in stack
-		// limited version.  Ambiguities are ok since recursion limited would
-		// see same thing.
  		if ( !dfa.valid() ) {
-			conv = new RecursionLimitedNFAToDFAConverter(g, s);
-			dfa = conv.createDFA();
-			System.out.print("DFA="+dfa);
+			System.out.print("invalid DFA");
 		}
 
 		conv.issueAmbiguityWarnings();

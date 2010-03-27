@@ -13,11 +13,11 @@ import java.util.*;
 
 /** Code "module" that knows how to resolve LL(*) nondeterminisms. */
 public class Resolver {
-	StackLimitedNFAToDFAConverter converter;
+	PredictionDFAFactory converter;
 
 	PredicateResolver semResolver;
 
-	public Resolver(StackLimitedNFAToDFAConverter converter) {
+	public Resolver(PredictionDFAFactory converter) {
 		this.converter = converter;
 		semResolver = new PredicateResolver(converter);
 	}
@@ -101,21 +101,7 @@ public class Resolver {
 					// suffix of t.ctx or vice versa (if alts differ).
 					// Also a conflict if s.ctx or t.ctx is empty
 					boolean altConflict = s.alt != t.alt;
-					if ( !altConflict ) continue;
-					boolean ctxConflict = false;
-					if ( converter instanceof StackLimitedNFAToDFAConverter) {
-						// TODO: figure out if conflict rule is same for stack limited; as of 3/12/10 i think so
-						// doesn't matter how we limit stack, once we the same context on both
-						// stack tops (even if one is subset of other) we can't ever resolve ambig.
-						// We are at same NFA state, predicting diff alts, and if we ever fall off
-						// end of rule, we'll do the same thing in both cases.
-
-						//ctxConflict = s.context.equals(t.context);
-						ctxConflict = s.context.conflictsWith(t.context);
-					}
-					else {
-						ctxConflict = s.context.conflictsWith(t.context);
-					}
+					boolean ctxConflict = s.context.conflictsWith(t.context);
 					if ( altConflict && ctxConflict ) {
 						//System.out.println("ctx conflict between "+s+" and "+t);
 						ambiguousAlts.add(s.alt);
@@ -130,11 +116,11 @@ public class Resolver {
 	}
 
 	public void resolveAmbiguities(DFAState d) {
-		if ( StackLimitedNFAToDFAConverter.debug ) {
+		if ( unused_StackLimitedNFAToDFAConverter.debug ) {
 			System.out.println("resolveNonDeterminisms "+d.toString());
 		}
 		Set<Integer> ambiguousAlts = getAmbiguousAlts(d);
-		if ( StackLimitedNFAToDFAConverter.debug && ambiguousAlts!=null ) {
+		if ( unused_StackLimitedNFAToDFAConverter.debug && ambiguousAlts!=null ) {
 			System.out.println("ambig alts="+ambiguousAlts);
 		}
 
@@ -147,7 +133,7 @@ public class Resolver {
 		boolean resolved =
 			semResolver.tryToResolveWithSemanticPredicates(d, ambiguousAlts);
 		if ( resolved ) {
-			if ( StackLimitedNFAToDFAConverter.debug ) {
+			if ( unused_StackLimitedNFAToDFAConverter.debug ) {
 				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
 			}
 			d.resolvedWithPredicates = true;
