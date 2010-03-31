@@ -163,7 +163,7 @@ public class LinearApproximator {
 			configs[i] = new OrderedHashSet<NFAConfig>();
 		}
 		
-		_LOOK(s, alt, k, NFAContext.EMPTY);
+		_LOOK(s, alt, k, NFAContext.EMPTY());
 		return look;
 	}
 
@@ -173,7 +173,7 @@ public class LinearApproximator {
 		if ( lookBusy.contains(ac) ) return;
 		lookBusy.add(ac);
 
-		if ( s instanceof RuleStopState && context!=NFAContext.EMPTY ) {
+		if ( s instanceof RuleStopState && !context.isEmpty() ) {
 			_LOOK(context.returnState, alt, k, context.parent);
 			return;
 		}
@@ -192,7 +192,8 @@ public class LinearApproximator {
 			else {
 				//System.out.println("adding "+ t.label().toString(g) +" @ i="+(MAX_K-k+1));
 				look[max_k-k+1].addAll( t.label() );
-				NFAConfig c = new NFAConfig(t.target, alt, context, SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+				NFAConfig c = new NFAConfig(t.target, alt, context,
+											SemanticContext.EMPTY_SEMANTIC_CONTEXT);
 				configs[max_k-k+1].add(c);
 				if ( k>1 ) _LOOK(t.target, alt, k-1, context);
 			}

@@ -116,11 +116,11 @@ public class Resolver {
 	}
 
 	public void resolveAmbiguities(DFAState d) {
-		if ( unused_StackLimitedNFAToDFAConverter.debug ) {
+		if ( PredictionDFAFactory.debug ) {
 			System.out.println("resolveNonDeterminisms "+d.toString());
 		}
 		Set<Integer> ambiguousAlts = getAmbiguousAlts(d);
-		if ( unused_StackLimitedNFAToDFAConverter.debug && ambiguousAlts!=null ) {
+		if ( PredictionDFAFactory.debug && ambiguousAlts!=null ) {
 			System.out.println("ambig alts="+ambiguousAlts);
 		}
 
@@ -133,7 +133,7 @@ public class Resolver {
 		boolean resolved =
 			semResolver.tryToResolveWithSemanticPredicates(d, ambiguousAlts);
 		if ( resolved ) {
-			if ( unused_StackLimitedNFAToDFAConverter.debug ) {
+			if ( PredictionDFAFactory.debug ) {
 				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
 			}
 			d.resolvedWithPredicates = true;

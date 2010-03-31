@@ -46,8 +46,6 @@ import org.antlr.v4.automata.NFAState;
  *  on the path from this node thru the parent pointers to the root.
  */
 public class NFAContext {
-	public static final NFAContext EMPTY = new NFAContext(null, null);
-
 	public NFAContext parent;
 
     /** The NFA state following state that invoked another rule's start state
@@ -55,6 +53,9 @@ public class NFAContext {
      */
     public NFAState returnState;
 
+	/** Indicates this config led to recursive closure request. Everything
+	 *  derived from here is approximation.
+	 */
 	public boolean recursed;
 
     /** Computing the hashCode is very expensive and closureBusy()
@@ -78,6 +79,9 @@ public class NFAContext {
             this.cachedHashCode += parent.cachedHashCode;
         }
     }
+
+	public static NFAContext EMPTY() { return new NFAContext(null, null); }
+
 
 	/** Is s anywhere in the context? */
 	public boolean contains(NFAState s) {
@@ -214,7 +218,7 @@ public class NFAContext {
 	public int depth() {
 		int n = 0;
 		NFAContext sp = this;
-		while ( sp != EMPTY) {
+		while ( !sp.isEmpty() ) {
 			n++;
 			sp = sp.parent;
 		}

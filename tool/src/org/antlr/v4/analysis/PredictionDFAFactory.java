@@ -146,14 +146,14 @@ public class PredictionDFAFactory {
 			try {
 				closure(t);  // add any NFA states reachable via epsilon
 			}
-			catch (RecursionOverflowSignal ros) {
-				recursionOverflowState = d;
-				ErrorManager.recursionOverflow(g.fileName, d, ros.state, ros.altNum, ros.depth);
-			}
-			catch (MultipleRecursiveAltsSignal mras) {
-				abortedDueToMultipleRecursiveAltsAt = d;
-				ErrorManager.multipleRecursiveAlts(g.fileName, d, mras.recursiveAltSet);
-			}
+//			catch (RecursionOverflowSignal ros) {
+//				recursionOverflowState = d;
+//				ErrorManager.recursionOverflow(g.fileName, d, ros.state, ros.altNum, ros.depth);
+//			}
+//			catch (MultipleRecursiveAltsSignal mras) {
+//				abortedDueToMultipleRecursiveAltsAt = d;
+//				ErrorManager.multipleRecursiveAlts(g.fileName, d, mras.recursiveAltSet);
+//			}
 			catch (AnalysisTimeoutSignal at) {// TODO: nobody throws yet
 				ErrorManager.analysisTimeout();
 			}
@@ -177,7 +177,7 @@ public class PredictionDFAFactory {
 		// by using semantic predicates if present.
 		resolver.resolveAmbiguities(t);
 
-		// If deterministic, don't add this state; it's an accept state
+		// If deterministic, don't add this state to work list; it's an accept state
 		// Just return as a valid DFA state
 		int alt = t.getUniquelyPredictedAlt();
 		if ( alt > 0 ) { // uniquely predicts an alt?
@@ -222,7 +222,7 @@ public class PredictionDFAFactory {
 				// found a transition with label; does it collide with label?
 				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
 					// add NFA target to (potentially) new DFA state
-					labelTarget.addNFAConfig(t.target, c.alt, c.context, c.semanticContext);
+					labelTarget.addNFAConfig(new NFAConfig(c, t.target));
 				}
 			}
 		}
@@ -249,9 +249,10 @@ public class PredictionDFAFactory {
 		for (int altNum=1; altNum<=dfa.nAlts; altNum++) {
 			Transition t = nfaStartState.transition(altNum-1);
 			NFAState altStart = t.target;
-			d.addNFAConfig(altStart, altNum,
-						   NFAContext.EMPTY,
-						   SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+			d.addNFAConfig(
+				new NFAConfig(altStart, altNum,
+							  NFAContext.EMPTY(),
+							  SemanticContext.EMPTY_SEMANTIC_CONTEXT));
 		}
 
 		closure(d);
@@ -275,7 +276,7 @@ public class PredictionDFAFactory {
 		// OH: concurrent modification. dup initialconfigs? works for lexers, try here to save configs param
 		List<NFAConfig> configs = new ArrayList<NFAConfig>();
 		for (NFAConfig c : d.nfaConfigs) {
-			closure(c.state, c.alt, c.context, c.semanticContext, collectPredicates, configs);
+			closure(c, collectPredicates, configs);
 		}
 		d.nfaConfigs.addAll(configs); // Add new NFA configs to DFA state d
 
@@ -303,76 +304,70 @@ public class PredictionDFAFactory {
 	 *  I check for left-recursive stuff and terminate before analysis to
 	 *  avoid need to do this more expensive computation.
 	 *
+	 *  This
+	 *
 	 *  TODO: remove altNum if we don't reorder for loopback nodes
+	 *  TODO: pass in a config?
 	 */
-	public void closure(NFAState s, int altNum, NFAContext context,
-						SemanticContext semanticContext,
-						boolean collectPredicates,
-						List<NFAConfig> configs)
-	{
-		NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context, semanticContext);
+	public void closure(NFAConfig c, boolean collectPredicates,	List<NFAConfig> configs) {
+		//NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context, semanticContext);
 
-		if ( closureBusy.contains(proposedNFAConfig) ) return;
-		closureBusy.add(proposedNFAConfig);
+		if ( closureBusy.contains(c) ) return;
+		closureBusy.add(c);
 
 		// p itself is always in closure
-		configs.add(proposedNFAConfig);
+		configs.add(c);
 
-//		if ( s instanceof RuleStartState ) {
-//			visited.add(s.rule.index);
-//		}
-		if ( s instanceof RuleStopState ) {
-			ruleStopStateClosure(s, altNum, context, semanticContext, collectPredicates, configs);
+		if ( c.state instanceof RuleStopState ) {
+			ruleStopStateClosure(c, collectPredicates, configs);
 		}
 		else {
-			commonClosure(s, altNum, context, semanticContext, collectPredicates, configs);
+			commonClosure(c, collectPredicates, configs);
 		}
 	}
 
 	// if we have context info and we're at rule stop state, do
 	// local follow for invokingRule and global follow for other links
-	void ruleStopStateClosure(NFAState s, int altNum, NFAContext context,
-							  SemanticContext semanticContext,
-							  boolean collectPredicates,
-							  List<NFAConfig> configs)
-	{
-		if ( !context.recursed ) {
-			System.out.println("dynamic FOLLOW of "+s+" context="+context);
-			if ( context != NFAContext.EMPTY) {
-				NFAContext newContext = context.parent; // "pop" invoking state
-				closure(context.returnState, altNum, newContext, semanticContext, collectPredicates, configs);
+	void ruleStopStateClosure(NFAConfig c, boolean collectPredicates, List<NFAConfig> configs) {
+		if ( !c.context.recursed ) {
+			System.out.println("dynamic FOLLOW of "+c.state+" context="+c.context);
+			if ( !c.context.isEmpty() ) {
+				NFAContext newContext = c.context.parent; // "pop" invoking state
+				closure(new NFAConfig(c, c.context.returnState, newContext),
+						collectPredicates, configs);
 			}
 			else {
-				commonClosure(s, altNum, context, semanticContext, collectPredicates, configs); // do global FOLLOW
+				commonClosure(c, collectPredicates, configs); // do global FOLLOW
 			}
 			return;
 		}
 
 		Rule invokingRule = null;
 
-		if ( context != NFAContext.EMPTY) {
+		if ( !c.context.isEmpty() ) {
 			// if stack not empty, get invoking rule from top of stack
-			invokingRule = context.returnState.rule;
+			invokingRule = c.context.returnState.rule;
 		}
 
-		System.out.println("FOLLOW of "+s+" context="+context);
+		System.out.println("FOLLOW of "+c.state+" context="+c.context);
 		// follow all static FOLLOW links
-		int n = s.getNumberOfTransitions();
+		int n = c.state.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
-			Transition t = s.transition(i);
+			Transition t = c.state.transition(i);
 			if ( !(t instanceof EpsilonTransition) ) continue; // ignore EOF transitions
 			// Chase global FOLLOW links if they don't point at invoking rule
 			// else follow link to context state only
 			if ( t.target.rule != invokingRule ) {
 				//System.out.println("OFF TO "+t.target);
-				closure(t.target, altNum, context, semanticContext, collectPredicates, configs);
+				closure(new NFAConfig(c, t.target), collectPredicates, configs);
 			}
 			else { // t.target is in invoking rule; only follow context's link
-				if ( t.target == context.returnState ) {
+				if ( t.target == c.context.returnState ) {
 					//System.out.println("OFF TO CALL SITE "+t.target);
 					// go only to specific call site; pop context
-					NFAContext newContext = context.parent; // "pop" invoking state
-					closure(t.target, altNum, newContext, semanticContext, collectPredicates, configs);
+					NFAContext newContext = c.context.parent; // "pop" invoking state
+					closure(new NFAConfig(c, t.target, newContext),
+							collectPredicates, configs);
 				}
 			}
 		}
@@ -380,46 +375,44 @@ public class PredictionDFAFactory {
 	}
 
 
-	void commonClosure(NFAState s, int altNum, NFAContext context,
-						SemanticContext semanticContext, boolean collectPredicates,
-						List<NFAConfig> configs)
-	{
-		int n = s.getNumberOfTransitions();
+	void commonClosure(NFAConfig c, boolean collectPredicates, List<NFAConfig> configs) {
+		int n = c.state.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
-			Transition t = s.transition(i);
+			Transition t = c.state.transition(i);
 			if ( t instanceof RuleTransition) {
 				NFAState retState = ((RuleTransition)t).followState;
-				NFAContext newContext = context;
+				NFAContext newContext = c.context;
 				//if ( !visited.member(t.target.rule.index) ) { // !recursive?
-				if ( s.rule != t.target.rule &&
-					 !context.contains(((RuleTransition)t).followState) ) { // !recursive?
+				if ( c.state.rule != t.target.rule &&
+					 !c.context.contains(((RuleTransition)t).followState) ) { // !recursive?
 					// first create a new context and push onto call tree,
 					// recording the fact that we are invoking a rule and
 					// from which state.
-					System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+context);
-					newContext = new NFAContext(context, retState);
+					System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+					newContext = new NFAContext(c.context, retState);
 				}
 				else {
-					System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+context);
+					System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
 					// don't record recursion, but record we did so we know
 					// what to do at end of rule.
-					context.recursed = true;
+					c.context.recursed = true;
 				}
 				// traverse epsilon edge to new rule
-				closure(t.target, altNum, newContext, semanticContext, collectPredicates, configs);
+				closure(new NFAConfig(c, t.target, newContext),
+						collectPredicates, configs);
 			}
 			else if ( t instanceof ActionTransition ) {
 				collectPredicates = false; // can't see past actions
-				closure(t.target, altNum, context, semanticContext, collectPredicates, configs);
+				closure(new NFAConfig(c, t.target), collectPredicates, configs);
 			}
 			else if ( t instanceof PredicateTransition ) {
                 SemanticContext labelContext = ((PredicateTransition)t).semanticContext;
-                SemanticContext newSemanticContext = semanticContext;
+                SemanticContext newSemanticContext = c.semanticContext;
                 if ( collectPredicates ) {
                     // AND the previous semantic context with new pred
 //                    int walkAlt =
 //						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(alt);
-					NFAState altLeftEdge = dfa.decisionNFAStartState.transition(altNum-1).target;
+					NFAState altLeftEdge = dfa.decisionNFAStartState.transition(c.alt-1).target;
 					/*
 					System.out.println("state "+p.stateNumber+" alt "+alt+" walkAlt "+walkAlt+" trans to "+transition0.target);
 					System.out.println("DFA start state "+dfa.decisionNFAStartState.stateNumber);
@@ -429,21 +422,22 @@ public class PredictionDFAFactory {
 					*/
 					// do not hoist syn preds from other rules; only get if in
 					// starting state's rule (i.e., context is empty)
-					if ( !labelContext.isSyntacticPredicate() || s==altLeftEdge ) {
-						System.out.println("&"+labelContext+" enclosingRule="+s.rule);
+					if ( !labelContext.isSyntacticPredicate() || c.state==altLeftEdge ) {
+						System.out.println("&"+labelContext+" enclosingRule="+c.state.rule);
 						newSemanticContext =
-							SemanticContext.and(semanticContext, labelContext);
+							SemanticContext.and(c.semanticContext, labelContext);
 					}
 				}
 				else {
 					// if we're not collecting, means we saw an action previously. that blocks this pred
 					hasPredicateBlockedByAction = true;
 				}
-				closure(t.target, altNum, context, newSemanticContext, collectPredicates, configs);
+				closure(new NFAConfig(c, t.target, newSemanticContext),
+						collectPredicates, configs);
 			}
 
 			else if ( t.isEpsilon() ) {
-				closure(t.target, altNum, context, semanticContext, collectPredicates, configs);
+				closure(new NFAConfig(c, t.target), collectPredicates, configs);
 			}
 		}
 	}
@@ -479,10 +473,7 @@ public class PredictionDFAFactory {
 		for (NFAConfig c : predConfigsSortedByAlt) {
 			DFAState predDFATarget = dfa.newState();
 			// new DFA state is a target of the predicate from d
-			predDFATarget.addNFAConfig(c.state,
-									   c.alt,
-									   c.context,
-									   c.semanticContext);
+			predDFATarget.addNFAConfig(c);
 			dfa.addAcceptState(c.alt, predDFATarget);
 			// add a transition to pred target from d
 			d.addEdge(new PredicateEdge(c.semanticContext, predDFATarget));

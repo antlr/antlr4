@@ -68,9 +68,10 @@ public class LexerNFAToDFAConverter {
 		for (int ruleIndex=1; ruleIndex<=dfa.nAlts; ruleIndex++) {
 			Transition t = dfa.decisionNFAStartState.transition(ruleIndex-1);
 			NFAState altStart = t.target;
-			d.addNFAConfig(altStart, ruleIndex,
-						   NFAContext.EMPTY,
-						   SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+			d.addNFAConfig(
+				new NFAConfig(altStart, ruleIndex,
+							  NFAContext.EMPTY(),
+							  SemanticContext.EMPTY_SEMANTIC_CONTEXT));
 		}
 
 		closure(d);
@@ -130,8 +131,8 @@ public class LexerNFAToDFAConverter {
 				// found a transition with label; does it collide with label?
 				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
 					// add NFA target to (potentially) new DFA state
-					labelTarget.addNFAConfig(t.target, c.alt, c.context,
-											 SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+					labelTarget.addNFAConfig(
+						new NFAConfig(c, t.target, SemanticContext.EMPTY_SEMANTIC_CONTEXT));
 				}
 			}
 		}
@@ -162,6 +163,7 @@ public class LexerNFAToDFAConverter {
 		//System.out.println("after closure d="+d);
 	}
 
+	// TODO: make pass NFAConfig like other DFA
 	public void closure(LexerState d, NFAState s, int ruleIndex, NFAContext context) {
 		NFAConfig proposedNFAConfig =
 			new NFAConfig(s, ruleIndex, context, SemanticContext.EMPTY_SEMANTIC_CONTEXT);
@@ -174,7 +176,7 @@ public class LexerNFAToDFAConverter {
 
 		if ( s instanceof RuleStopState ) {
 			// TODO: chase FOLLOW links if recursive
-			if ( context!=NFAContext.EMPTY ) {
+			if ( !context.isEmpty() ) {
 				closure(d, context.returnState, ruleIndex, context.parent);
 				// do nothing if context not empty and already added to nfaStates
 			}

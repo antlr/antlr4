@@ -1,9 +1,7 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.analysis.NFAConfig;
-import org.antlr.v4.analysis.NFAContext;
 import org.antlr.v4.analysis.Resolver;
-import org.antlr.v4.analysis.SemanticContext;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.OrderedHashSet;
 
@@ -80,16 +78,6 @@ public class DFAState {
 	public void addNFAConfig(NFAConfig c) {
 		if ( nfaConfigs.contains(c) ) return;
 		nfaConfigs.add(c);
-	}
-
-	public NFAConfig addNFAConfig(NFAState state,
-								  int alt,
-								  NFAContext context,
-								  SemanticContext semanticContext)
-	{
-		NFAConfig c = new NFAConfig(state, alt,	context, semanticContext);
-		addNFAConfig(c);
-		return c;
 	}
 
 	/** Walk each configuration and if they are all the same alt,

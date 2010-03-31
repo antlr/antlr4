@@ -40,7 +40,7 @@ public class NFAConfig {
 	 *  nondeterministic configurations (as it does for "resolved" field)
 	 *  that have enough predicates to resolve the conflit.
 	 */
-	protected boolean resolvedWithPredicate;
+	boolean resolvedWithPredicate;
 
 	public NFAConfig(NFAState state,
 					 int alt,
@@ -50,6 +50,35 @@ public class NFAConfig {
 		this.state = state;
 		this.alt = alt;
 		this.context = context;
+		this.semanticContext = semanticContext;
+	}
+
+	public NFAConfig(NFAConfig c) {
+		this.state = c.state;
+		this.alt = c.alt;
+		this.context = c.context;
+		this.semanticContext = c.semanticContext;
+	}
+
+	public NFAConfig(NFAConfig c, NFAState state) {
+		this(c);
+		this.state = state;
+	}
+
+	public NFAConfig(NFAConfig c, NFAState state, NFAContext context) {
+		this(c);
+		this.state = state;
+		this.context = context;
+	}
+
+	public NFAConfig(NFAConfig c, NFAContext context) {
+		this(c);
+		this.context = context;
+	}
+
+	public NFAConfig(NFAConfig c, NFAState state, SemanticContext semanticContext) {
+		this(c);
+		this.state = state;
 		this.semanticContext = semanticContext;
 	}
 
@@ -89,7 +118,7 @@ public class NFAConfig {
 			buf.append("|");
 			buf.append(alt);
 		}
-		if ( context!=null && context!= NFAContext.EMPTY) {
+		if ( context!=null && !context.isEmpty() ) {
             buf.append("|");
             buf.append(context);
         }
