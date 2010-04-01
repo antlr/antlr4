@@ -303,6 +303,12 @@ public class PredictionDFAFactory {
 	 *  always detect the conflict later when checking for context suffixes...
 	 *  I check for left-recursive stuff and terminate before analysis to
 	 *  avoid need to do this more expensive computation.
+	 *
+	 *  Side-effect warning:
+	 *
+	 *  Rather than pass in a list of configs to update or return and
+	 *  collect lots of little config lists, it's more efficient to
+	 *  modify d's config list directly.
 	 */
 	public void closure(DFAState d, NFAConfig c, boolean collectPredicates) {
 		//NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context, semanticContext);
