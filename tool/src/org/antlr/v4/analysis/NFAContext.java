@@ -95,8 +95,8 @@ public class NFAContext {
 
 	/** Two contexts are equals() if both have
 	 *  same call stack; walk upwards to the root.
-	 *  Recall that the root sentinel node has no invokingStates and no parent.
-	 *  Note that you may be comparing contexts in different alt trees.
+	 *  Recall that the root sentinel node has no parent.
+	 *  Note that you may be comparing contextsv in different alt trees.
 	 */
 	public boolean equals(Object o) {
 		NFAContext other = ((NFAContext)o);
@@ -105,9 +105,7 @@ public class NFAContext {
 		// System.out.println("comparing "+this+" with "+other);
 		NFAContext sp = this;
 		while ( sp.parent!=null && other.parent!=null ) {
-			if ( sp.returnState != other.returnState) {
-				return false;
-			}
+			if ( sp.returnState != other.returnState) return false;
 			sp = sp.parent;
 			other = other.parent;
 		}
