@@ -1,5 +1,6 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -41,7 +42,8 @@ public class DFASerializer {
 				buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
 			}
 		}
-		return buf.toString();
+		String output = buf.toString();
+		return Utils.sortLinesInString(output);
 	}
 
 	String getStateString(DFAState s) {

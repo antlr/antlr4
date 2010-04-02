@@ -197,7 +197,8 @@ public class DOTGenerator {
 			work.remove(0);
 		}
 
-		return dot.render();
+		String output = dot.render();
+		return Utils.sortLinesInString(output);
 	}
 
     /** Do a depth-first walk of the state machine graph and

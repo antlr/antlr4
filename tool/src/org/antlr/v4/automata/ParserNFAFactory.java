@@ -3,7 +3,8 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.NFABuilder;
@@ -105,12 +106,13 @@ public class ParserNFAFactory implements NFAFactory {
 	/** From set build single edge graph o->o-set->o.  To conform to
      *  what an alt block looks like, must have extra state on left.
      */
-	public Handle set(IntSet set, GrammarAST associatedAST) {
-		//TODO impl
-		throw new UnsupportedOperationException();
-		//right.incidentTransition = left.transition;
+	public Handle set(IntervalSet set, GrammarAST associatedAST) {
+		BasicState left = newState(associatedAST);
+		BasicState right = newState(associatedAST);
+		left.transition = new SetTransition(set, right);
+		right.incidentTransition = left.transition;
 
-		//return null;
+		return new Handle(left, right);
 	}
 
 	public Handle tree(List<Handle> els) {
@@ -120,8 +122,24 @@ public class ParserNFAFactory implements NFAFactory {
 	/** Not valid for non-lexers */
 	public Handle range(GrammarAST a, GrammarAST b) { throw new UnsupportedOperationException(); }
 
-	public Handle not(Handle A) {
-		return null;
+	public Handle not(GrammarAST n, Handle A) {
+		GrammarAST ast = A.left.ast;
+		int ttype = 0;
+		if ( g.getType()==ANTLRParser.LEXER ) {
+			ttype = Target.getCharValueFromGrammarCharLiteral(ast.getText());
+		}
+		else {
+			ttype = g.getTokenType(ast.getText());
+		}
+		IntervalSet notAtom =
+			(IntervalSet)IntervalSet.of(ttype).complement(g.getTokenTypes());
+		if ( notAtom.isNil() ) {
+			ErrorManager.grammarError(ErrorType.EMPTY_COMPLEMENT,
+									  g.fileName,
+									  ast.token,
+									  ast.getText());
+		}
+		return set(notAtom, n);
 	}
 
 	/** For a non-lexer, just build a simple token reference atom. */

@@ -57,7 +57,7 @@ public class NFASerializer {
 					buf.append("-"+a.toString(g)+"->"+ getStateString(t.target)+'\n');
 				}
 				else {
-					buf.append("-"+t.toString()+"->"+ getStateString(t.target)+'\n');
+					buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
 				}
 			}
 		}

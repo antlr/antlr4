@@ -41,7 +41,7 @@ public class PredicateTransition extends Transition {
 	}
 
 	public String toString() {
-		return "{"+semanticContext+"}?";
+		return semanticContext.toString();
 	}
 
 	public String toString(Grammar g) {

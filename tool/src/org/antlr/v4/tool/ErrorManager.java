@@ -6,8 +6,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DFAState;
-import org.antlr.v4.automata.NFAState;
-import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.parse.v4ParserException;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
@@ -351,20 +349,6 @@ public class ErrorManager {
 	public static void leftRecursionCycles(String fileName, Collection cycles) {
 		state.get().errors++;
 		Message msg = new LeftRecursionCyclesMessage(fileName, cycles);
-		state.get().listener.error(msg);
-	}
-
-	public static void recursionOverflow(String fileName,
-										 DFAState d, NFAState s, int altNum, int depth) {
-		state.get().errors++;
-		Message msg = new RecursionOverflowMessage(fileName, d, s, altNum, depth);
-		state.get().listener.error(msg);
-	}
-
-	public static void multipleRecursiveAlts(String fileName,
-											 DFAState d, IntSet recursiveAltSet) {
-		state.get().errors++;
-		Message msg = new MultipleRecursiveAltsMessage(fileName, d, recursiveAltSet);
 		state.get().listener.error(msg);
 	}
 

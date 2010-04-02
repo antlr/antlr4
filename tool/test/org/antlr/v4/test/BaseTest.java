@@ -33,6 +33,11 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.v4.Tool;
+import org.antlr.v4.automata.LexerNFAFactory;
+import org.antlr.v4.automata.NFA;
+import org.antlr.v4.automata.ParserNFAFactory;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRErrorListener;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
@@ -99,6 +104,24 @@ public abstract class BaseTest {
 		return tool;
 	}
 
+	NFA createNFA(Grammar g) {
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			System.out.println(g.ast.toStringTree());
+			Tool antlr = new Tool();
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
+			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+				for (Grammar imp : g.getImportedGrammars()) {
+					antlr.process(imp);
+				}
+			}
+		}
+
+		ParserNFAFactory f = new ParserNFAFactory(g);
+		if ( g.getType()== ANTLRParser.LEXER ) f = new LexerNFAFactory(g);
+		return f.createNFA();
+	}
+	
 	protected boolean compile(String fileName) {
 		String compiler = "javac";
 		String classpathOption = "-classpath";
@@ -427,11 +450,24 @@ public abstract class BaseTest {
                 String[] lines = input.split("\n");
 				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
                 Grammar g = new Grammar(fileName, input);
-                g.loadImportedGrammars();
+
 				if ( printTree ) {
 					if ( g.ast!=null ) System.out.println(g.ast.toStringTree());
 					else System.out.println("null tree");
 				}
+
+				if ( g.ast!=null && !g.ast.hasErrors ) {
+					Tool antlr = new Tool();
+					SemanticPipeline sem = new SemanticPipeline(g);
+					sem.process();
+					if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+						for (Grammar imp : g.getImportedGrammars()) {
+							antlr.process(imp);
+						}
+					}
+				}
+
+				//g.loadImportedGrammars();
             }
             catch (RecognitionException re) {
                 re.printStackTrace(System.err);
@@ -779,18 +815,6 @@ public abstract class BaseTest {
 		return lines[0].substring(prefix.length(),lines[0].length());
 	}
 
-    public String sortLinesInString(String s) {
-        String lines[] = s.split("\n");
-        Arrays.sort(lines);
-        List<String> linesL = Arrays.asList(lines);
-        StringBuffer buf = new StringBuffer();
-        for (String l : linesL) {
-            buf.append(l);
-            buf.append('\n');
-        }
-        return buf.toString();
-    }
-    
     /**
      * When looking at a result set that consists of a Map/HashTable
      * we cannot rely on the output order, as the hashing algorithm or other aspects

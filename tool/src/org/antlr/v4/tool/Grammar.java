@@ -7,11 +7,12 @@ import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.Label;
 import org.antlr.v4.automata.NFA;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.semantics.SemanticPipeline;
 
 import java.util.*;
 
@@ -131,17 +132,6 @@ public class Grammar implements AttributeResolver {
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
 		}
 		initTokenSymbolTables();
-
-		if ( this.ast==null || this.ast.hasErrors ) return;
-
-		Tool antlr = new Tool();
-		SemanticPipeline sem = new SemanticPipeline(this);
-		sem.process();
-		if ( getImportedGrammars()!=null ) { // process imported grammars (if any)
-			for (Grammar imp : getImportedGrammars()) {
-				antlr.process(imp);
-			}
-		}		
     }
 
 	protected void initTokenSymbolTables() {
@@ -382,6 +372,39 @@ public class Grammar implements AttributeResolver {
 		//System.out.println("getTokenDisplayName ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
 	}	
+
+	/** What is the max char value possible for this grammar's target?  Use
+	 *  unicode max if no target defined.
+	 */
+	public int getMaxCharValue() {
+		return Label.MAX_CHAR_VALUE;
+//		if ( generator!=null ) {
+//			return generator.target.getMaxCharValue(generator);
+//		}
+//		else {
+//			return Label.MAX_CHAR_VALUE;
+//		}
+	}
+
+	/** Return a set of all possible token or char types for this grammar */
+	public IntSet getTokenTypes() {
+		if ( getType()==ANTLRParser.LEXER ) {
+			return getAllCharValues();
+		}
+		return IntervalSet.of(Token.MIN_TOKEN_TYPE, getMaxTokenType());
+	}
+
+	/** Return min to max char as defined by the target.
+	 *  If no target, use max unicode char value.
+	 */
+	public IntSet getAllCharValues() {
+		return IntervalSet.of(Label.MIN_CHAR_VALUE, getMaxCharValue());
+	}
+
+	/** How many token types have been allocated so far? */
+	public int getMaxTokenType() {
+		return maxTokenType;
+	}
 
 	/** Return a new unique integer in the token type space */
 	public int getNewTokenType() {

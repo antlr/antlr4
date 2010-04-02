@@ -142,7 +142,12 @@ tokensSection
 
 rule
 @init {List<GrammarAST> modifiers = new ArrayList<GrammarAST>();}
-	:   ^( RULE name=ID (^(RULEMODIFIERS (m=. {modifiers.add($m);})+))? .)
+	:   ^( RULE
+	       name=ID (options {greedy=false;}:.)*
+	       (^(RULEMODIFIERS (m=. {modifiers.add($m);})+))?
+	       ^(BLOCK .+)
+	       .*
+	     )
 		{
 		int numAlts = $RULE.getFirstChildWithType(BLOCK).getChildCount();
 		Rule r = new Rule(g, $name.text, (GrammarASTWithOptions)$RULE, numAlts);

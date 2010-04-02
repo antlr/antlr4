@@ -134,11 +134,11 @@ public enum ErrorType {
 
 	AMBIGUITY(ErrorSeverity.ERROR, true, true),
 	UNREACHABLE_ALTS(ErrorSeverity.ERROR, true, true),
-	MULTIPLE_RECURSIVE_ALTS(ErrorSeverity.ERROR, true, true),
+	//MULTIPLE_RECURSIVE_ALTS(ErrorSeverity.ERROR, true, true),
 	INSUFFICIENT_PREDICATES(ErrorSeverity.ERROR, true, true),
 
 	// these next 3 can happen in recursion-limited LL(*)
-	RECURSION_OVERFLOW(ErrorSeverity.ERROR, true, true),
+	//RECURSION_OVERFLOW(ErrorSeverity.ERROR, true, true),
 	LEFT_RECURSION_CYCLES(ErrorSeverity.ERROR, true, true),
 	ANALYSIS_TIMEOUT(ErrorSeverity.ERROR, true, true),
 

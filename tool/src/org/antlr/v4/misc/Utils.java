@@ -1,6 +1,8 @@
 package org.antlr.v4.misc;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /** */
 public class Utils {
@@ -64,5 +66,18 @@ public class Utils {
 		}
 		result.append(src.substring(startIndex,src.length()));
 		return result.toString();
-	}	
+	}
+
+	public static String sortLinesInString(String s) {
+		String lines[] = s.split("\n");
+		Arrays.sort(lines);
+		List<String> linesL = Arrays.asList(lines);
+		StringBuffer buf = new StringBuffer();
+		for (String l : linesL) {
+			buf.append(l);
+			buf.append('\n');
+		}
+		return buf.toString();
+	}
+
 }

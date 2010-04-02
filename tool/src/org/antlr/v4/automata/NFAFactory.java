@@ -1,6 +1,6 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.TerminalAST;
 
@@ -38,13 +38,13 @@ public interface NFAFactory {
 	/** From set build single edge graph o->o-set->o.  To conform to
      *  what an alt block looks like, must have extra state on left.
      */
-	Handle set(IntSet set, GrammarAST associatedAST);
+	Handle set(IntervalSet set, GrammarAST associatedAST);
 
 	Handle tree(List<Handle> els);
 	
 	Handle range(GrammarAST a, GrammarAST b);
 
-	Handle not(Handle A);
+	Handle not(GrammarAST a, Handle A);
 
 	/** For a non-lexer, just build a simple token reference atom.
 	 *  For a lexer, a string is a sequence of char to match.  That is,

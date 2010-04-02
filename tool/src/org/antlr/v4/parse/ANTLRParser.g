@@ -742,9 +742,7 @@ ebnfSuffix
    	|	PLUS	 	-> POSITIVE_CLOSURE[op]
 	;
 	
-atom:	range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
-      
-	|	// Qualified reference delegate.rule. This must be
+atom:	// Qualified reference delegate.rule. This must be
 	    // lexically contiguous (no spaces either side of the DOT)
 	    // otherwise it is two references with a wildcard in between
 	    // and not a qualified reference.
@@ -753,19 +751,17 @@ atom:	range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
 	        input.LT(2).getCharPositionInLine() &&
 	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
 	    }?
-	    id DOT ruleref 
-	    -> ^(DOT id ruleref)
-	|	// Qualified reference delegate.token.
-	    {
-	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
-	        input.LT(2).getCharPositionInLine() &&
-	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
-	    }?
-	    id DOT terminal
-	    -> ^(DOT id terminal)
-    |   terminal
+	    id DOT ruleref -> ^(DOT id ruleref)
+    |   range    (ROOT^ | BANG^)? // Range x..y - only valid in lexers      
+	|	terminal (ROOT^ | BANG^)?
     |   ruleref
-    |	notSet (ROOT^|BANG^)?
+    |	notSet   (ROOT^|BANG^)?
+	|   // Wildcard '.' means any character in a lexer, any
+		// token in parser and any token or node in a tree parser
+		// Because the terminal rule is allowed to be the node
+		// specification for the start of a tree rule, we must
+		// later check that wildcard was not used for that.
+	    DOT elementOptions?		 			  -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
    
@@ -776,19 +772,8 @@ atom:	range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
 // that are then used to create the inverse set of them.
 //
 notSet
-    : NOT notTerminal	-> ^(NOT notTerminal)
-    | NOT block			-> ^(NOT block)
-    ;
-   
-// ------------------- 
-// Valid set terminals
-//
-// The terminal tokens that can be members of an inverse set (for
-// matching anything BUT these)
-//
-notTerminal
-    : TOKEN_REF<TerminalAST>
-    | STRING_LITERAL<TerminalAST>
+    : NOT terminal	-> ^(NOT terminal)
+    | NOT block		-> ^(NOT block)
     ;
 
 // -------------
@@ -836,31 +821,15 @@ range
     ;
 
 terminal
-    :   (	// Args are only valid for lexer rules
-		    TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION? elementOptions?)
-		|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
-		|   // Wildcard '.' means any character in a lexer, any
-			// token in parser and any token or node in a tree parser
-			// Because the terminal rule is allowed to be the node
-			// specification for the start of a tree rule, we must
-			// later check that wildcard was not used for that.
-		    DOT elementOptions?		 			  -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
-		)
-		(	ROOT								  -> ^(ROOT $terminal)
-		|	BANG								  -> ^(BANG $terminal)
-		)?
+    :   // Args are only valid for lexer rules
+		TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION? elementOptions?)
+	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	;
 
- // --------------- 
- // Generic options
- //
- // Terminals may be adorned with certain options when
- // reference in the grammar: TOK<,,,>
- //
- elementOptions
-    : // Options begin with < and end with >
-      //
-      LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS elementOption+)
+// Terminals may be adorned with certain options when
+// reference in the grammar: TOK<,,,>
+elementOptions
+    : LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS elementOption+)
     ;
 
 // WHen used with elements we can specify what the tree node type can

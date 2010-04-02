@@ -128,21 +128,19 @@ atom returns [NFAFactory.Handle p]
 	|	^(BANG range)			{$p = $range.p;}
 	|	^(ROOT notSet)			{$p = $notSet.p;}
 	|	^(BANG notSet)			{$p = $notSet.p;}
+	|	notSet					{$p = $notSet.p;}
 	|	range					{$p = $range.p;}
 	|	^(DOT ID terminal)		{$p = $terminal.p;}
 	|	^(DOT ID ruleref)		{$p = $ruleref.p;}
+    |	^(WILDCARD .)			{$p = factory.wildcard($start);}
+    |	WILDCARD				{$p = factory.wildcard($start);}
     |   terminal				{$p = $terminal.p;}
     |   ruleref					{$p = $ruleref.p;}
     ;
 
 notSet returns [NFAFactory.Handle p]
-    : ^(NOT notTerminal)	{$p = factory.not($notTerminal.p);}
-    | ^(NOT block)			{$p = factory.not($block.p);}
-    ;
-
-notTerminal returns [NFAFactory.Handle p]
-    : TOKEN_REF				{$p = factory.tokenRef((TerminalAST)$TOKEN_REF);}
-    | STRING_LITERAL		{$p = factory.stringLiteral((TerminalAST)$start);}
+    : ^(NOT terminal)		{$p = factory.not($NOT, $terminal.p);}
+    | ^(NOT block)			{$p = factory.not($NOT, $block.p);}
     ;
 
 ruleref returns [NFAFactory.Handle p]
@@ -161,8 +159,6 @@ terminal returns [NFAFactory.Handle p]
     |	^(TOKEN_REF ARG_ACTION .)	{$p = factory.tokenRef((TerminalAST)$start);}
     |	^(TOKEN_REF .)				{$p = factory.tokenRef((TerminalAST)$start);}
     |	TOKEN_REF					{$p = factory.tokenRef((TerminalAST)$start);}
-    |	^(WILDCARD .)				{$p = factory.wildcard($start);}
-    |	WILDCARD					{$p = factory.wildcard($start);}
     |	^(ROOT t=terminal)			{$p = $t.p;}
     |	^(BANG t=terminal)			{$p = $t.p;}
     ;

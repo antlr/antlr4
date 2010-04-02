@@ -1,17 +1,15 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.IntervalSet;
+import org.antlr.v4.tool.Grammar;
 
-/** A label containing a set of values */
+/** A transition containing a set of values */
 public class SetTransition extends Transition {
-	/** A set of token types or character codes if label==SET */
 	public IntervalSet label;
 
-	public SetTransition(IntervalSet label) {
-		if ( label==null ) {
-			this.label = IntervalSet.of(Label.INVALID);
-			return;
-		}
+	public SetTransition(IntervalSet label, NFAState target) {
+		super(target);
+		if ( label==null ) label = IntervalSet.of(Label.INVALID);
 		this.label = label;
 	}
 
@@ -38,4 +36,12 @@ public class SetTransition extends Transition {
 		}
 		return this.label.equals(((SetTransition)o).label);
 	}
+
+	public String toString(Grammar g) {
+		return label.toString(g);
+	}
+
+	public String toString() {
+		return label.toString();
+	}	
 }

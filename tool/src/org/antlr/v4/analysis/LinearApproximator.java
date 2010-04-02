@@ -86,8 +86,8 @@ public class LinearApproximator {
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
 			LOOK(t.target, i+1, MAX_LINEAR_APPROXIMATE_DEPTH);
-			altLook.add(look);
-			altConfigs.add(configs);
+			altLook.add(look.clone());
+			altConfigs.add(configs.clone());
 //			for (int k=1; k<=MAX_LINEAR_APPROXIMATE_DEPTH; k++) {
 //				System.out.println(s.rule.name+"["+(i+1)+"]["+k+"]="+look[k].toString(g));
 //				System.out.println("configs["+(i+1)+"]["+k+"]="+ configs[k].toString());

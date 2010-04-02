@@ -299,21 +299,21 @@ atom:	^(ROOT range)
 	|	^(BANG range)
 	|	^(ROOT notSet)
 	|	^(BANG notSet)
+	|	notSet
+    |	^(ROOT terminal)
+    |	^(BANG terminal)
 	|	range
 	|	^(DOT ID terminal)
 	|	^(DOT ID ruleref)
+    |	^(WILDCARD elementOptions)
+    |	WILDCARD
     |   terminal
     |   ruleref
     ;
 
 notSet
-    : ^(NOT notTerminal)
+    : ^(NOT terminal)
     | ^(NOT block)
-    ;
-
-notTerminal
-    : TOKEN_REF
-    | STRING_LITERAL
     ;
 
 block
@@ -337,10 +337,6 @@ terminal
     |	^(TOKEN_REF ARG_ACTION)
     |	^(TOKEN_REF elementOptions)
     |	TOKEN_REF
-    |	^(WILDCARD elementOptions)
-    |	WILDCARD
-    |	^(ROOT terminal)
-    |	^(BANG terminal)
     ;
 
 elementOptions

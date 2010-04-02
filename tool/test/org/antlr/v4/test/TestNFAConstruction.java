@@ -1,7 +1,9 @@
 package org.antlr.v4.test;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.junit.Test;
@@ -264,13 +266,7 @@ public class TestNFAConstruction extends BaseTest {
 			"lexer grammar t;\n"+
 			"A : (options {greedy=false;}:'0'..'9')+ ;\n"); // TODO: check after doing greedy
 		String expecting =
-			"RuleStart_A_0->PlusBlockStart_4\n" +
-			"PlusBlockStart_4->s2\n" +
-			"s2-'0'..'9'->s3\n" +
-			"s3->LoopBack_5\n" +
-			"LoopBack_5->BlockEnd_6\n" +
-			"LoopBack_5->s2\n" +
-			"BlockEnd_6->RuleStop_A_1\n";
+			"\n";
 		checkRule(g, "A", expecting);
 	}
 
@@ -366,7 +362,19 @@ public class TestNFAConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : {p1}? A | {p2}? B ;");
 		String expecting =
-			"\n";
+			"RuleStart_a_0->BlockStart_10\n" +
+			"BlockStart_10->s2\n" +
+			"BlockStart_10->s6\n" +
+			"s2-{p1}?->s3\n" +
+			"s6-{p2}?->s7\n" +
+			"s3->s4\n" +
+			"s7->s8\n" +
+			"s4-A->s5\n" +
+			"s8-B->s9\n" +
+			"s5->BlockEnd_11\n" +
+			"s9->BlockEnd_11\n" +
+			"BlockEnd_11->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s12\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -414,10 +422,6 @@ public class TestNFAConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "a", expecting);
 
-		String expectingGrammarStr =
-			"1:8: parser grammar P;\n" +
-			"a : ~ A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testNotSingletonBlockSet() throws Exception {
@@ -428,11 +432,6 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			"\n";
 		checkRule(g, "a", expecting);
-
-		String expectingGrammarStr =
-			"1:8: parser grammar P;\n" +
-			"a : ~ ( A ) ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testNotCharSet() throws Exception {
@@ -440,14 +439,10 @@ public class TestNFAConstruction extends BaseTest {
 			"lexer grammar P;\n"+
 			"A : ~'3' ;\n");
 		String expecting =
-			"\n";
+			"RuleStart_A_1->s5\n" +
+			"s5-{'\\u0000'..'2', '4'..'\\uFFFE'}->s6\n" +
+			"s6->RuleStop_A_2\n";
 		checkRule(g, "A", expecting);
-
-		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
-			"A : ~ '3' ;\n"+
-			"Tokens : A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testNotBlockSet() throws Exception {
@@ -457,12 +452,6 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			"\n";
 		checkRule(g, "A", expecting);
-
-		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
-			"A : ~ ( '3' | 'b' ) ;\n" +
-			"Tokens : A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testNotSetLoop() throws Exception {
@@ -472,12 +461,6 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			"\n";
 		checkRule(g, "A", expecting);
-
-		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
-			"A : (~ ( '3' ) )* ;\n" +
-			"Tokens : A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testNotBlockSetLoop() throws Exception {
@@ -487,27 +470,7 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			"\n";
 		checkRule(g, "A", expecting);
-
-		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
-			"A : (~ ( '3' | 'b' ) )* ;\n" +
-			"Tokens : A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
-
-//	@Test public void testSetsInCombinedGrammarSentToLexer() throws Exception {
-//		// not sure this belongs in this test suite, but whatever.
-//		Grammar g = new Grammar(
-//			"grammar t;\n"+
-//			"A : '{' ~('}')* '}';\n");
-//		String result = g.getLexerGrammar();
-//		String expecting =
-//			"lexer grammar t;\n" +
-//			"\n" +
-//			"// $ANTLR src \"<string>\" 2\n"+
-//			"A : '{' ~('}')* '}';\n";
-//		assertEquals(result, expecting);
-//	}
 
 	@Test public void testLabeledNotSet() throws Exception {
 		Grammar g = new Grammar(
@@ -521,11 +484,6 @@ public class TestNFAConstruction extends BaseTest {
 			".s3->:s4\n" +
 			":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
-
-		String expectingGrammarStr =
-			"1:8: parser grammar P;\n" +
-			"a : t=~ A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testLabeledNotCharSet() throws Exception {
@@ -539,12 +497,6 @@ public class TestNFAConstruction extends BaseTest {
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
-
-		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
-			"A : t=~ '3' ;\n"+
-			"Tokens : A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testLabeledNotBlockSet() throws Exception {
@@ -558,12 +510,6 @@ public class TestNFAConstruction extends BaseTest {
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
-
-		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
-			"A : t=~ ( '3' | 'b' ) ;\n" +
-			"Tokens : A ;";
-		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	@Test public void testEscapedCharLiteral() throws Exception {
@@ -911,6 +857,18 @@ public class TestNFAConstruction extends BaseTest {
 	}
 
 	void checkRule(Grammar g, String ruleName, String expecting) {
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			System.out.println(g.ast.toStringTree());
+			Tool antlr = new Tool();
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
+			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+				for (Grammar imp : g.getImportedGrammars()) {
+					antlr.process(imp);
+				}
+			}
+		}
+		
 		ParserNFAFactory f = new ParserNFAFactory(g);
 		if ( g.getType()== ANTLRParser.LEXER ) f = new LexerNFAFactory(g);
 		NFA nfa = f.createNFA();
