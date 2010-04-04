@@ -359,7 +359,7 @@ public class ParserNFAFactory implements NFAFactory {
 	public Handle wildcardTree(GrammarAST associatedAST) { return null; }
 
 	void epsilon(NFAState a, NFAState b) {
-		a.addTransition(new EpsilonTransition(b));
+		if ( a!=null ) a.addTransition(new EpsilonTransition(b));
 	}
 
 	/** Define all the rule begin/end NFAStates to solve forward reference

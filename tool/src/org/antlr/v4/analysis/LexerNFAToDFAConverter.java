@@ -3,6 +3,7 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.*;
@@ -47,12 +48,20 @@ public class LexerNFAToDFAConverter {
 
 		// walk accept states, informing DFA
 		for (LexerState d : accepts) {
+			Set<Integer> nfaAcceptStates = new HashSet<Integer>();
 			for (NFAConfig c : d.nfaConfigs) {
 				NFAState s = c.state;
 				if ( s instanceof RuleStopState && !s.rule.isFragment() ) {
 					dfa.defineAcceptState(c.alt, d);
-					d.matchesRules.add(s.rule);
+					nfaAcceptStates.add(Utils.integer(s.stateNumber));
 				}
+			}
+			List<Integer> sorted = new ArrayList<Integer>();
+			sorted.addAll(nfaAcceptStates);
+			Collections.sort(sorted);
+			for (int i : sorted) {
+				NFAState s = g.nfa.states.get(i);
+				d.matchesRules.add(s.rule);
 			}
 		}
 
@@ -105,7 +114,7 @@ public class LexerNFAToDFAConverter {
 			return;
 		}
 
-		System.out.println("ADD "+t);
+		//System.out.println("ADD "+t);
 		work.add(t); 		// add to work list to continue NFA conversion
 		dfa.addState(t); 	// add state we've never seen before
 		if ( t.isAcceptState ) accepts.add(t);

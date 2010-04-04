@@ -21,9 +21,6 @@ public class PredictionDFAFactory {
 	/** DFA we are creating */
 	DFA dfa;
 
-	/** Stack depth max; same as Bermudez's m */
-	int m = 1;
-
 	/** A list of DFA states we still need to process during NFA conversion */
 	List<DFAState> work = new LinkedList<DFAState>();
 
@@ -80,8 +77,6 @@ public class PredictionDFAFactory {
      *  the stack context.
      */
 	Set<NFAConfig> closureBusy;
-
-	//org.antlr.v4.misc.BitSet visited = new org.antlr.v4.misc.BitSet();
 
 	Resolver resolver;
 
@@ -181,12 +176,12 @@ public class PredictionDFAFactory {
 		// Just return as a valid DFA state
 		int alt = t.getUniquelyPredictedAlt();
 		if ( alt > 0 ) { // uniquely predicts an alt?
-			System.out.println(t+" predicts "+alt);
+			//System.out.println(t+" predicts "+alt);
 			// Define new stop state
 			dfa.addAcceptState(alt, t);
 		}
 		else {
-			System.out.println("ADD "+t);
+			// System.out.println("ADD "+t);
 			work.add(t); // unresolved, add to work list to continue NFA conversion
 			dfa.addState(t);  // add state we've never seen before
 		}
@@ -331,7 +326,7 @@ public class PredictionDFAFactory {
 	// local follow for invokingRule and global follow for other links
 	void ruleStopStateClosure(DFAState d, NFAConfig c, boolean collectPredicates) {
 		if ( !c.context.recursed ) {
-			System.out.println("dynamic FOLLOW of "+c.state+" context="+c.context);
+			//System.out.println("dynamic FOLLOW of "+c.state+" context="+c.context);
 			if ( c.context.isEmpty() ) {
 				commonClosure(d, c, collectPredicates); // do global FOLLOW
 			}
@@ -350,7 +345,7 @@ public class PredictionDFAFactory {
 			invokingRule = c.context.returnState.rule;
 		}
 
-		System.out.println("FOLLOW of "+c.state+" context="+c.context);
+		//System.out.println("FOLLOW of "+c.state+" context="+c.context);
 		// follow all static FOLLOW links
 		int n = c.state.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
@@ -388,11 +383,11 @@ public class PredictionDFAFactory {
 					// first create a new context and push onto call tree,
 					// recording the fact that we are invoking a rule and
 					// from which state.
-					System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+					//System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
 					newContext = new NFAContext(c.context, retState);
 				}
 				else {
-					System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+					//System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
 					// don't record recursion, but record we did so we know
 					// what to do at end of rule.
 					c.context.recursed = true;
@@ -423,7 +418,7 @@ public class PredictionDFAFactory {
 					// do not hoist syn preds from other rules; only get if in
 					// starting state's rule (i.e., context is empty)
 					if ( !labelContext.isSyntacticPredicate() || c.state==altLeftEdge ) {
-						System.out.println("&"+labelContext+" enclosingRule="+c.state.rule);
+						//System.out.println("&"+labelContext+" enclosingRule="+c.state.rule);
 						newSemanticContext =
 							SemanticContext.and(c.semanticContext, labelContext);
 					}
@@ -488,5 +483,5 @@ public class PredictionDFAFactory {
 		return unreachable;
 	}
 
-	void issueAmbiguityWarnings() { resolver.issueAmbiguityWarnings(); }
+	public void issueAmbiguityWarnings() { resolver.issueAmbiguityWarnings(); }
 }

@@ -40,6 +40,7 @@ public class Tool {
     public boolean forceAllFilesToOutputDir = false;
     public boolean forceRelativeOutput = false;
     public boolean deleteTempLexer = true;
+	public boolean minimizeDFA = true;
     public boolean verbose = false;
     /** Don't process grammar file if generated files are newer than grammar */
     /**
@@ -57,7 +58,7 @@ public class Tool {
      *
      * @param make
      */
-     public boolean make = false;
+    public boolean make = false;
     public boolean showBanner = true;
 
     /** Exit after showing version or whatever */ 
@@ -197,9 +198,12 @@ public class Tool {
             else if (args[i].equals("-Xgrtree")) {
                 internalOption_PrintGrammarTree = true; // print grammar tree
             }
-            else if (args[i].equals("-Xdfa")) {
-                internalOption_PrintDFA = true;
-            }
+			else if (args[i].equals("-Xdfa")) {
+				internalOption_PrintDFA = true;
+			}
+			else if (args[i].equals("-Xnominimizedfa")) {
+				minimizeDFA = false;
+			}
             else if (args[i].equals("-Xnoprune")) {
                 //DFAOptimizer.PRUNE_EBNF_EXIT_BRANCHES = false;
             }
@@ -341,14 +345,16 @@ public class Tool {
 		GrammarRootAST ast = (GrammarRootAST)t;
         Grammar g = new Grammar(this, ast);
         g.fileName = grammarFileNames.get(0);
-        process(g);
+		process(g);
 		if ( ast!=null && ast.grammarType==ANTLRParser.COMBINED && !ast.hasErrors ) {
 			lexerAST = extractImplicitLexer(g); // alters ast
-            Grammar lexerg = new Grammar(this, lexerAST);
-            lexerg.fileName = grammarFileNames.get(0);
-            g.implicitLexer = lexerg;
-            lexerg.implicitLexerOwner = g;
-            process(lexerg);
+			if ( lexerAST!=null ) {
+				Grammar lexerg = new Grammar(this, lexerAST);
+				lexerg.fileName = grammarFileNames.get(0);
+				g.implicitLexer = lexerg;
+				lexerg.implicitLexerOwner = g;
+				process(lexerg);
+			}
         }
     }
 
@@ -361,6 +367,9 @@ public class Tool {
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
         SemanticPipeline sem = new SemanticPipeline(g);
         sem.process();
+
+		if ( ErrorManager.getNumErrors()>0 ) return;
+		
 		if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
 			for (Grammar imp : g.getImportedGrammars()) {
 				process(imp);
@@ -463,15 +472,23 @@ public class Tool {
                 rulesWeMoved.add(r);
             }
         }
+		int nLexicalRules = rulesWeMoved.size();
         rules.removeAll(rulesWeMoved);
 
 		// Will track 'if' from IF : 'if' ; rules to avoid defining new token for 'if'
 		Map<String,String> litAliases =
 			Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
 
+		if ( nLexicalRules==0 && (litAliases==null||litAliases.size()==0) &&
+			 combinedGrammar.stringLiteralToTypeMap.size()==0 )
+		{
+			// no rules, tokens{}, or 'literals' in grammar
+			return null;
+		}
+
 		// add strings from combined grammar (and imported grammars) into to lexer
 		for (String lit : combinedGrammar.stringLiteralToTypeMap.keySet()) {
-			if ( litAliases.containsKey(lit) ) continue; // already has rule
+			if ( litAliases!=null && litAliases.containsKey(lit) ) continue; // already has rule
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
 			//TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
 			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
@@ -682,7 +699,8 @@ public class Tool {
     public static void Xhelp() {
         ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("  -Xgrtree                print the grammar AST");
-        System.err.println("  -Xdfa                   print DFA as text ");
+		System.err.println("  -Xdfa                   print DFA as text");
+		System.err.println("  -Xnominimizedfa         don't minimize decision DFA");
         System.err.println("  -Xnoprune               test lookahead against EBNF block exit branches");
         System.err.println("  -Xnocollapse            collapse incident edges into DFA states");
         System.err.println("  -Xdbgconversion         dump lots of info during NFA conversion");

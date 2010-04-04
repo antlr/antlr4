@@ -2,23 +2,22 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.tool.Rule;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Lexer DFA states track just NFAStates not config with stack/alt etc... like
  *  DFA used for prediction.
  */
 public class LexerState extends DFAState {
-	//public OrderedHashSet<NFAState> nfaStates;
-
 	/** For ambiguous lexer rules, the accept state matches a set of rules,
-	 *  not just one. Means we can't use predictsAlt (an int).
+	 *  not just one. Means we can't use predictsAlt (an int).  The
+	 *  order of rules is order given in grammar.  So, gives precedence to
+	 *  keywords vs IDs if keywords are first.
 	 */
-	public Set<Rule> matchesRules = new HashSet<Rule>();
+	public List<Rule> matchesRules = new ArrayList<Rule>();
 
 	public LexerState(DFA dfa) {
 		super(dfa);
-		//nfaStates = new OrderedHashSet<NFAState>();
 	}
 
 //	public Set<NFAState> getUniqueNFAStates() { return nfaStates; }

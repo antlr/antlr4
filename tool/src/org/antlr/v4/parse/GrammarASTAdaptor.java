@@ -5,6 +5,7 @@ import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.GrammarASTErrorNode;
 import org.antlr.v4.tool.GrammarASTWithOptions;
+import org.antlr.v4.tool.TerminalAST;
 
 public class GrammarASTAdaptor extends CommonTreeAdaptor {
     CharStream input; // where we can find chars ref'd by tokens in tree
@@ -22,6 +23,11 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
 		if ( tokenType==ANTLRParser.RULE ) {
 			// needed by TreeWizard to make RULE tree
         	t = new GrammarASTWithOptions(new CommonToken(tokenType, text));
+		}
+		else if ( tokenType==ANTLRParser.STRING_LITERAL ) {
+			// implicit lexer construction done with wizard; needs this node type
+			// whereas grammar ANTLRParser.g can use token option to spec node type
+			t = new TerminalAST(new CommonToken(tokenType, text));
 		}
 		else {
 			t = (GrammarAST)super.create(tokenType, text);

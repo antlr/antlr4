@@ -238,18 +238,18 @@ public class Resolver {
 			Set<Integer> alts = getAmbiguousAlts(d);
 			List<Integer> sorted = new ArrayList<Integer>(alts);
 			Collections.sort(sorted);
-			System.err.println("ambig alts="+sorted);
+			//System.err.println("ambig alts="+sorted);
 			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
-			System.out.print("path =");
+			//System.out.print("path =");
 			for (DFAState d2 : dfaStates) {
 				System.out.print(" "+d2.stateNumber);
 			}
-			System.out.println("");
+			//System.out.println("");
 
 			List<IntSet> labels = probe.getEdgeLabels(d);
 
 			String input = probe.getInputSequenceDisplay(converter.g, labels);
-			System.out.println("input="+ input);
+			//System.out.println("input="+ input);
 
 			LinkedHashMap<Integer,List<Token>> altPaths = new LinkedHashMap<Integer,List<Token>>();
 			for (int alt : sorted) {
@@ -257,11 +257,11 @@ public class Resolver {
 				for (DFAState d2 : dfaStates) {
 					nfaStates.add( d2.getUniqueNFAStates(alt) );
 				}
-				System.out.println("NFAConfigs per state: "+nfaStates);
+				//System.out.println("NFAConfigs per state: "+nfaStates);
 				List<Token> path =
 					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
 				altPaths.put(alt, path);
-				System.out.println("path = "+path);
+				//System.out.println("path = "+path);
 			}
 
 			List<Integer> incompletelyCoveredAlts = converter.statesWithIncompletelyCoveredAlts.get(d);

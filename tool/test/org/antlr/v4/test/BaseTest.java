@@ -33,9 +33,10 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.v4.Tool;
-import org.antlr.v4.automata.LexerNFAFactory;
-import org.antlr.v4.automata.NFA;
-import org.antlr.v4.automata.ParserNFAFactory;
+import org.antlr.v4.analysis.DFAMinimizer;
+import org.antlr.v4.analysis.LexerNFAToDFAConverter;
+import org.antlr.v4.analysis.PredictionDFAFactory;
+import org.antlr.v4.automata.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRErrorListener;
@@ -121,7 +122,62 @@ public abstract class BaseTest {
 		if ( g.getType()== ANTLRParser.LEXER ) f = new LexerNFAFactory(g);
 		return f.createNFA();
 	}
-	
+
+	public DFA createDFA(Grammar g, DecisionState s) {
+		PredictionDFAFactory conv = new PredictionDFAFactory(g, s);
+		DFA dfa = conv.createDFA();
+		conv.issueAmbiguityWarnings();
+		System.out.print("DFA="+dfa);
+		return dfa;
+	}
+
+	public void minimizeDFA(DFA dfa) {
+		DFAMinimizer dmin = new DFAMinimizer(dfa);
+		dfa.minimized = dmin.minimize();
+	}
+
+	List<Message> checkRuleDFA(String gtext, String ruleName, String expecting)
+		throws Exception
+	{
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		Grammar g = new Grammar(gtext);
+		NFA nfa = createNFA(g);
+		NFAState s = nfa.ruleToStartState.get(g.getRule(ruleName));
+		if ( s==null ) {
+			System.err.println("no such rule: "+ruleName);
+			return null;
+		}
+		DecisionState blk = (DecisionState)s.transition(0).target;
+
+		DFA dfa = createDFA(g, blk);
+		String result = null;
+		if ( dfa!=null ) result = dfa.toString();
+		assertEquals(expecting, result);
+
+		return equeue.all;
+	}
+
+	List<Message> checkLexerDFA(String gtext, String expecting)
+		throws Exception
+	{
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		Grammar g = new Grammar(gtext);
+		g.nfa = createNFA(g);
+		LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(g);
+		DFA dfa = conv.createDFA();
+		g.setLookaheadDFA(0, dfa); // only one decision
+
+		String result = null;
+		if ( dfa!=null ) result = dfa.toString();
+		assertEquals(expecting, result);
+
+		return equeue.all;
+	}
+
 	protected boolean compile(String fileName) {
 		String compiler = "javac";
 		String classpathOption = "-classpath";
