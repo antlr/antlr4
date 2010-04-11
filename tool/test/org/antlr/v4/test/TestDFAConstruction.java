@@ -380,6 +380,7 @@ public class TestDFAConstruction extends BaseTest {
 		assertEquals(msgs.size(), 1);
 	}
 
+	/*
 	@Test public void _template() throws Exception {
 		String g =
 			"";
@@ -391,5 +392,6 @@ public class TestDFAConstruction extends BaseTest {
 		//unreachable(msgs, new int[] {2});
 		assertEquals(msgs.size(), 0);
 	}
+	 */
 
 }

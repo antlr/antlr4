@@ -298,8 +298,9 @@ public class PredictionDFAFactory {
 	 *  later when checking for ambiguous configs (it tests context suffixes).
 	 *
 	 *  TODO: change comment once I figure out if we can ignore suffixes in favor of empty/non test only
+	 *  4/11/2010 I removed suffix check from getAmbigAlts and it broke; seems I need it.
 	 *
-	 *  Side-effect warning:
+	 *  Side-effect warnings:
 	 *
 	 *  Rather than pass in a list of configs to update or return and
 	 *  collect lots of little config lists, it's more efficient to

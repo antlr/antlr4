@@ -81,6 +81,7 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 		checkRuleDFA(g, "a", expecting);
 	}
 
+	/*
 	@Test public void _template() throws Exception {
 		String g =
 			"";
@@ -92,5 +93,5 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 		//unreachable(msgs, new int[] {2});
 		assertEquals(msgs.size(), 2);
 	}
-	
+	*/
 }

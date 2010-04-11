@@ -378,6 +378,7 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 
+/*
 	@Test public void testMultiplePredicates() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -855,7 +856,7 @@ public class TestNFAConstruction extends BaseTest {
 			":s6-EOF->.s7\n";
 		checkRule(g, "a", expecting);
 	}
-
+*/
 	void checkRule(Grammar g, String ruleName, String expecting) {
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 			System.out.println(g.ast.toStringTree());
