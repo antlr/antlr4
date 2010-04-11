@@ -84,10 +84,7 @@ public class NFAConfig {
 
 	/** An NFA configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
-     *  syntactic/semantic contexts are the same.  I don't think
-     *  the state|alt|ctx could be the same and have two different
-     *  semantic contexts, but might as well define equals to be
-     *  everything.
+     *  syntactic/semantic contexts are the same.
      */
     public boolean equals(Object o) {
 		if ( o==null ) return false;

@@ -62,6 +62,25 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 		System.err.println(msgs);
 	}
 
+	@Test
+	public void testSemanticContextPreventsEarlyTerminationOfClosure() throws Exception {
+		String g =
+			"parser grammar T;\n" +
+			"a : loop SEMI | ID SEMI\n" +
+			"  ;\n" +
+			"loop\n" +
+			"    : {while}? ID\n" +
+			"    | {do}? ID\n" +
+			"    | {for}? ID\n" +
+			"    ;";
+		String expecting =
+			"s0-ID->s1\n" +
+			"s1-SEMI->s2\n" +
+			"s2-({while}?||{for}?||{do}?)->:s3=>1\n" +
+			"s2-true->:s4=>2\n";
+		checkRuleDFA(g, "a", expecting);
+	}
+
 	@Test public void _template() throws Exception {
 		String g =
 			"";
