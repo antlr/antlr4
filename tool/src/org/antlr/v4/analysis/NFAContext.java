@@ -100,6 +100,9 @@ public class NFAContext {
 	 */
 	public boolean equals(Object o) {
 		NFAContext other = ((NFAContext)o);
+		if ( this.cachedHashCode != other.cachedHashCode ) {
+			return false; // can't be same if hash is different
+		}
 		if ( this==other ) return true;
 
 		// System.out.println("comparing "+this+" with "+other);
