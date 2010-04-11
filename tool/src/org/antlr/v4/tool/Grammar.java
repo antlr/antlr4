@@ -203,6 +203,7 @@ public class Grammar implements AttributeResolver {
     }
 
     public void defineRule(Rule r) {
+		if ( rules.get(r.name)!=null ) return;
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 	}

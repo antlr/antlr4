@@ -61,9 +61,9 @@ public class TestNFAConstruction extends BaseTest {
 			"A : 'a'..'c' ;"
 		);
 		String expecting =
-			"RuleStart_A_0->s2\n" +
-			"s2-'a'..'c'->s3\n" +
-			"s3->RuleStop_A_1\n";
+			"RuleStart_A_1->s3\n" +
+			"s3-'a'..'c'->s4\n" +
+			"s4->RuleStop_A_2\n";
 		checkRule(g, "A", expecting);
 	}
 
@@ -73,28 +73,36 @@ public class TestNFAConstruction extends BaseTest {
 			"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
 		);
 		String expecting =
-			"RuleStart_A_0->BlockStart_10\n" +
-			"BlockStart_10->s2\n" +
-			"BlockStart_10->s6\n" +
-			"s2-'a'..'c'->s3\n" +
-			"s6-'q'->s7\n" +
-			"s3->s4\n" +
-			"s7->s8\n" +
-			"s4-'h'->s5\n" +
-			"s8-'j'..'l'->s9\n" +
-			"s5->BlockEnd_11\n" +
-			"s9->BlockEnd_11\n" +
-			"BlockEnd_11->RuleStop_A_1\n";
+			"RuleStart_A_1->BlockStart_11\n" +
+			"BlockStart_11->s3\n" +
+			"BlockStart_11->s7\n" +
+			"s3-'a'..'c'->s4\n" +
+			"s7-'q'->s8\n" +
+			"s4->s5\n" +
+			"s8->s9\n" +
+			"s5-'h'->s6\n" +
+			"s9-'j'..'l'->s10\n" +
+			"s6->BlockEnd_12\n" +
+			"s10->BlockEnd_12\n" +
+			"BlockEnd_12->RuleStop_A_2\n";
 		checkRule(g, "A", expecting);
 	}
 
-	@Test public void testCharSetInParser() throws Exception {
+	@Test public void testStringLiteralInParser() throws Exception {
 		Grammar g = new Grammar(
 			"grammar P;\n"+
 			"a : A|'b' ;"
 		);
 		String expecting =
-			"\n";
+			"RuleStart_a_0->BlockStart_6\n" +
+			"BlockStart_6->s2\n" +
+			"BlockStart_6->s4\n" +
+			"s2-A->s3\n" +
+			"s4-'b'->s5\n" +
+			"s3->BlockEnd_7\n" +
+			"s5->BlockEnd_7\n" +
+			"BlockEnd_7->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s8\n";
 		checkRule(g, "a", expecting);
 	}
 

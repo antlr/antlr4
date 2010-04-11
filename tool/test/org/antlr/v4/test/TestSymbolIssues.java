@@ -32,7 +32,9 @@ public class TestSymbolIssues extends BaseTest {
 		"error(72): A.g:3:19: cannot alias X; token name already defined\n" +
 		"error(72): A.g:3:26: cannot alias Y; token name already assigned to 'y'\n" +
 		"error(72): A.g:3:36: cannot alias Z; token name already defined\n" +
-		"error(23): A.g:13:43: reference to undefined rule: q"
+		"error(46): A.g:13:37: rule b has no defined parameters\n" +
+		"error(23): A.g:13:43: reference to undefined rule: q\n" +
+		"error(45): A.g:14:31: missing parameter(s) on rule reference: a"
     };
 
     static String[] B = {

@@ -385,6 +385,7 @@ public class ErrorManager {
      *  thread.
      */
     public static void setErrorListener(ANTLRErrorListener l) {
+		resetErrorState();
         state.get().listener = l;
     }
 

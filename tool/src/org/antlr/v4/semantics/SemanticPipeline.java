@@ -65,7 +65,8 @@ public class SemanticPipeline {
 		symcheck.examine(); // side-effect: strip away redef'd rules.
 
 		// don't continue if we get symbol errors
-		if ( ErrorManager.getNumErrors()>0 ) return;
+		//if ( ErrorManager.getNumErrors()>0 ) return;
+		// hmm...we don't get missing arg errors and such if we bail out here
 
 		// STORE RULES/ACTIONS/SCOPES IN GRAMMAR
 		for (Rule r : collector.rules) g.defineRule(r);
@@ -76,7 +77,7 @@ public class SemanticPipeline {
 		symcheck.checkRuleArgs(g, collector.rulerefs);
 		symcheck.checkForQualifiedRuleIssues(g, collector.qualifiedRulerefs);
 
-		// don't continue if we get symbol errors
+		// don't continue if we got symbol errors
 		if ( ErrorManager.getNumErrors()>0 ) return;
 
 		// CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
