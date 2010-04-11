@@ -86,7 +86,11 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 			"";
 		String expecting =
 			"";
-		checkRuleDFA(g, "a", expecting);
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		System.out.println(msgs);
+		//ambig(msgs, new int[] {1,2}, "A");
+		//unreachable(msgs, new int[] {2});
+		assertEquals(msgs.size(), 2);
 	}
 	
 }

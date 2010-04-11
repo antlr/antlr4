@@ -1,12 +1,12 @@
 package org.antlr.v4.test;
 
-import org.antlr.v4.tool.AmbiguityMessage;
+import org.antlr.v4.analysis.LeftRecursionDetector;
+import org.antlr.v4.automata.NFA;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Message;
-import org.antlr.v4.tool.UnreachableAltsMessage;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TestDFAConstruction extends BaseTest {
@@ -144,8 +144,6 @@ public class TestDFAConstruction extends BaseTest {
 		checkRuleDFA(g, "s", expecting);
 	}
 
-
-
 	@Test public void recursionInMultipleWithoutNonRecursiveAlt() throws Exception {
 		String g =
 			"parser grammar t;\n"+
@@ -195,7 +193,194 @@ public class TestDFAConstruction extends BaseTest {
 		assertEquals(msgs.size(), 0);
 	}
 
-	public void _template() throws Exception {
+	@Test public void testRecursion() throws Exception {
+		String g =
+			"parser grammar t;\n"+
+			"s : a Y | A+ X ;\n" +
+			"a : A a | Q;";
+		String expecting =
+			"s0-A->s2\n" +
+			"s0-Q->:s1=>1\n" +
+			"s2-A->s2\n" +
+			"s2-Q->:s3=>1\n" +
+			"s2-X->:s4=>2\n";
+		List<Message> msgs = checkRuleDFA(g, "s", expecting);
+		System.out.println(msgs);
+		assertEquals(msgs.size(), 0);
+	}
+
+	@Test public void testimmediateLeftRecursion() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : a A | B;");
+		NFA nfa = createNFA(g);
+		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
+		lr.check();
+		String expecting = "[[Rule{name=a}]]";
+		assertEquals(expecting, lr.listOfRecursiveCycles.toString());
+	}
+
+	@Test public void testLeftRecursionInMultipleCycles() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+				"s : a x ;\n" +
+				"a : b | A ;\n" +
+				"b : c ;\n" +
+				"c : a | C ;\n" +
+				"x : y | X ;\n" +
+				"y : x ;\n");
+		NFA nfa = createNFA(g);
+		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
+		lr.check();
+		String expecting = "[[Rule{name=a}, Rule{name=c}, Rule{name=b}], [Rule{name=x}, Rule{name=y}]]";
+		assertEquals(expecting, lr.listOfRecursiveCycles.toString());
+	}
+
+	@Test public void selfRecurseNonDet() throws Exception {
+		String g =
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : P a P | P;";
+		// nondeterministic from left edge
+		String expecting =
+			"s0-P->s1\n" +
+			"s1-EOF->:s3=>2\n" +
+			"s1-P->:s2=>1\n";
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "P P");
+		assertEquals(msgs.size(), 1);
+	}
+
+	@Test public void testIndirectRecursionLoop() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : b X ;\n"+
+			"b : a B ;\n");
+		NFA nfa = createNFA(g);
+		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
+		lr.check();
+		String expecting = "[[Rule{name=a}, Rule{name=b}]]";
+		assertEquals(lr.listOfRecursiveCycles.toString(), expecting);
+	}
+
+	@Test public void testIndirectRecursionLoop2() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : i b X ;\n"+ // should see through i
+			"b : a B ;\n" +
+			"i : ;\n");
+		NFA nfa = createNFA(g);
+		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
+		lr.check();
+		String expecting = "[[Rule{name=a}, Rule{name=b}]]";
+		assertEquals(expecting, lr.listOfRecursiveCycles.toString());
+	}
+
+	@Test public void testifThenElse() throws Exception {
+		String g =
+			"parser grammar t;\n"+
+			"s : IF s (E s)? | B;\n" +
+			"slist: s SEMI ;";
+		String expecting =
+			"s0-E->:s1=>1\n" +
+			"s0-SEMI->:s2=>2\n";
+		List<Message> msgs = checkRuleDFA(g, 0, expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "E");
+		//unreachable(msgs, new int[] {2});
+		assertEquals(msgs.size(), 1);
+	}
+
+	@Test public void testifThenElseChecksStackSuffixConflict() throws Exception {
+		// if you don't check stack soon enough, this finds E B not just E
+		// as ambig input
+		String g =
+			"parser grammar t;\n"+
+			"slist: s SEMI ;\n"+
+			"s : IF s el | B;\n" +
+			"el: (E s)? ;\n";
+		String expecting =
+			"s0-E->:s1=>1\n" +
+			"s0-SEMI->:s2=>2\n";
+		List<Message> msgs = checkRuleDFA(g, 1, expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "E");
+		assertEquals(msgs.size(), 1);
+	}
+
+	@Test
+    public void testDoubleInvokeRuleLeftEdge() throws Exception {
+		String g =
+			"parser grammar t;\n"+
+			"a : b X\n" +
+			"  | b Y\n" +
+			"  ;\n" +
+			"b : c B\n" +
+			"  | c\n" +
+			"  ;\n" +
+			"c : C ;\n";
+		String expecting =
+			"s0-C->s1\n" +
+			"s1-B->s2\n" +
+			"s1-X->:s4=>1\n" +
+			"s1-Y->:s3=>2\n" +
+			"s2-X->:s4=>1\n" +
+			"s2-Y->:s3=>2\n";
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		System.out.println(msgs);
+		assertEquals(msgs.size(), 0);
+	}
+
+	@Test public void testimmediateTailRecursion() throws Exception {
+		String g =
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : A a | A B;";
+		String expecting =
+			"s0-A->s1\n" +
+			"s1-A->:s2=>1\n" +
+			"s1-B->:s3=>2\n";
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		assertEquals(msgs.size(), 0);
+	}
+
+	@Test public void testCycleInsideRuleDoesNotForceInfiniteRecursion() throws Exception {
+		// shouldn't be possible to loop
+		// forever inside of a rule if there is an epsilon loop.
+		String g =
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : (A|)+ B;\n";
+		String expecting =
+			"s0-A->:s1=>1\n" +
+			"s0-B->:s2=>2\n";
+		List<Message> msgs = checkRuleDFA(g, 0, expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "A");
+		assertEquals(msgs.size(), 1);
+
+		expecting =
+			"s0-A->:s1=>2\n" +
+			"s0-B->:s2=>1\n";
+		msgs = checkRuleDFA(g, 1, expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "B");
+		assertEquals(msgs.size(), 1);
+	}
+
+	@Test public void _template() throws Exception {
 		String g =
 			"";
 		String expecting =
@@ -204,50 +389,7 @@ public class TestDFAConstruction extends BaseTest {
 		System.out.println(msgs);
 		//ambig(msgs, new int[] {1,2}, "A");
 		//unreachable(msgs, new int[] {2});
-		assertEquals(msgs.size(), 2);
-	}
-
-	void ambig(List<Message> msgs, int[] expectedAmbigAlts, String expectedAmbigInput)
-		throws Exception
-	{
-		ambig(msgs, 0, expectedAmbigAlts, expectedAmbigInput);
-	}
-
-	void ambig(List<Message> msgs, int i, int[] expectedAmbigAlts, String expectedAmbigInput)
-		throws Exception
-	{
-		List<Message> amsgs = getMessagesOfType(msgs, AmbiguityMessage.class);
-		AmbiguityMessage a = (AmbiguityMessage)amsgs.get(i);
-		if ( a==null ) assertNull(expectedAmbigAlts);
-		else {
-			assertEquals(a.conflictingAlts.toString(), Arrays.toString(expectedAmbigAlts));
-		}
-		assertEquals(expectedAmbigInput, a.input);
-	}
-
-	void unreachable(List<Message> msgs, int[] expectedUnreachableAlts)
-		throws Exception
-	{
-		unreachable(msgs, 0, expectedUnreachableAlts);
-	}
-
-	void unreachable(List<Message> msgs, int i, int[] expectedUnreachableAlts)
-		throws Exception
-	{
-		List<Message> amsgs = getMessagesOfType(msgs, UnreachableAltsMessage.class);
-		UnreachableAltsMessage u = (UnreachableAltsMessage)amsgs.get(i);
-		if ( u==null ) assertNull(expectedUnreachableAlts);
-		else {
-			assertEquals(u.conflictingAlts.toString(), Arrays.toString(expectedUnreachableAlts));
-		}
-	}
-
-	List<Message> getMessagesOfType(List<Message> msgs, Class c) {
-		List<Message> filtered = new ArrayList<Message>();
-		for (Message m : msgs) {
-			if ( m.getClass() == c ) filtered.add(m);
-		}
-		return filtered;
+		assertEquals(msgs.size(), 0);
 	}
 
 }

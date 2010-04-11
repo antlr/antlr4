@@ -39,10 +39,7 @@ import org.antlr.v4.analysis.PredictionDFAFactory;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.ANTLRErrorListener;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Message;
+import org.antlr.v4.tool.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -150,7 +147,12 @@ public abstract class BaseTest {
 			System.err.println("no such rule: "+ruleName);
 			return null;
 		}
-		DecisionState blk = (DecisionState)s.transition(0).target;
+		NFAState t = s.transition(0).target;
+		if ( !(t instanceof DecisionState) ) {
+			System.out.println(ruleName+" has no decision");
+			return null;
+		}
+		DecisionState blk = (DecisionState)t;
 		checkRuleDFA(g, blk, expecting);
 		return equeue.all;
 	}
@@ -163,7 +165,6 @@ public abstract class BaseTest {
 
 		Grammar g = new Grammar(gtext);
 		NFA nfa = createNFA(g);
-		System.out.println("# decs="+nfa.decisionToNFAState.size());
 		DecisionState blk = nfa.decisionToNFAState.get(decision);
 		checkRuleDFA(g, blk, expecting);
 		return equeue.all;
@@ -566,6 +567,49 @@ public abstract class BaseTest {
 		}
 		if ( fileName.length()==".g".length() ) fileName = "<string>";
 		return fileName;
+	}
+
+	void ambig(List<Message> msgs, int[] expectedAmbigAlts, String expectedAmbigInput)
+		throws Exception
+	{
+		ambig(msgs, 0, expectedAmbigAlts, expectedAmbigInput);
+	}
+
+	void ambig(List<Message> msgs, int i, int[] expectedAmbigAlts, String expectedAmbigInput)
+		throws Exception
+	{
+		List<Message> amsgs = getMessagesOfType(msgs, AmbiguityMessage.class);
+		AmbiguityMessage a = (AmbiguityMessage)amsgs.get(i);
+		if ( a==null ) assertNull(expectedAmbigAlts);
+		else {
+			assertEquals(a.conflictingAlts.toString(), Arrays.toString(expectedAmbigAlts));
+		}
+		assertEquals(expectedAmbigInput, a.input);
+	}
+
+	void unreachable(List<Message> msgs, int[] expectedUnreachableAlts)
+		throws Exception
+	{
+		unreachable(msgs, 0, expectedUnreachableAlts);
+	}
+
+	void unreachable(List<Message> msgs, int i, int[] expectedUnreachableAlts)
+		throws Exception
+	{
+		List<Message> amsgs = getMessagesOfType(msgs, UnreachableAltsMessage.class);
+		UnreachableAltsMessage u = (UnreachableAltsMessage)amsgs.get(i);
+		if ( u==null ) assertNull(expectedUnreachableAlts);
+		else {
+			assertEquals(u.conflictingAlts.toString(), Arrays.toString(expectedUnreachableAlts));
+		}
+	}
+
+	List<Message> getMessagesOfType(List<Message> msgs, Class c) {
+		List<Message> filtered = new ArrayList<Message>();
+		for (Message m : msgs) {
+			if ( m.getClass() == c ) filtered.add(m);
+		}
+		return filtered;
 	}
 
 	public static class StreamVacuum implements Runnable {

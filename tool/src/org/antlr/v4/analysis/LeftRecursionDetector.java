@@ -1,6 +1,7 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.*;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Rule;
 
@@ -106,7 +107,7 @@ public class LeftRecursionDetector {
 			}
 		}
 		if ( !foundCycle ) {
-			Set<Rule> cycle = new HashSet<Rule>();
+			Set<Rule> cycle = new OrderedHashSet<Rule>();
 			cycle.add(targetRule);
 			cycle.add(enclosingRule);
 			listOfRecursiveCycles.add(cycle);
