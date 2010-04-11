@@ -115,32 +115,6 @@ public class NFAContext {
 		return true;
 	}
 
-	/** Two contexts conflict() if they are equals() or one is a stack suffix
-	 *  of the other.  For example, contexts [21 12 $] and [21 9 $] do not
-	 *  conflict, but [21 $] and [21 12 $] do conflict.  Note that I should
-	 *  probably not show the $ in this case.  There is a dummy node for each
-	 *  stack that just means empty; $ is a marker that's all.
-	 *
-	 *  This is used in relation to checking conflicts associated with a
-	 *  single NFA state's configurations within a single DFA state.
-	 *  If there are configurations s and t within a DFA state such that
-	 *  s.state=t.state && s.alt != t.alt && s.ctx conflicts t.ctx then
-	 *  the DFA state predicts more than a single alt--grammar is ambiguous.
-	 *  Two contexts conflict if they are the same or if one is a suffix
-	 *  of the other.
-	 *
-	 *  When comparing contexts, if one context has a stack and the other
-	 *  does not then they should be considered the same context.  The only
-	 *  way for an NFA state p to have an empty context and a nonempty context
-	 *  is the case when closure falls off end of rule without a call stack
-	 *  and re-enters the rule with a context.  This resolves the issue I
-	 *  discussed with Sriram Srinivasan Feb 28, 2005 about not terminating
-	 *  fast enough upon nondeterminism.
-	 */
-	public boolean conflictsWith(NFAContext other) {
-		return this.suffix(other) || this.equals(other);
-	}
-
 	/** [$] suffix any context
 	 *  [21 $] suffix [21 12 $]
 	 *  [21 12 $] suffix [21 $]

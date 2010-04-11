@@ -23,8 +23,8 @@ public class Resolver {
 	}
 	
 	/** Walk each NFA configuration in this DFA state looking for a conflict
-	 *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
-	 *  conflicting ctx predicts alts i and j.  Return an Integer set
+	 *  where (s|i|ctx1) and (s|j|ctx2) exist such that ctx1 and ctx2 conflict.
+	 *  That indicates that state s predicts alts i and j.  Return an Integer set
 	 *  of the alternative numbers that conflict.  Two contexts conflict if
 	 *  they are equal or one is a stack suffix of the other or one is
 	 *  the empty context.  The conflict is a true ambiguity. No amount
@@ -35,6 +35,13 @@ public class Resolver {
 	 *  there is more than one configuration.  The configurations' predicted
 	 *  alt must be different or must have different contexts to avoid a
 	 *  conflict.
+	 *
+	 *  We check exact config match only in closure-busy test so we'll see
+	 *  empty and nonempty contexts here for same state and alt; e.g.,
+	 *  (s|i|$) and (s|i|[21 3 $]).
+	 *
+	 *  TODO: suffix degenerates to one empty one nonempty; avoid some tests?
+	 *  TODO: or perhaps check if i, j are already in and don't do compare?
 	 */
 	public Set<Integer> getAmbiguousAlts(DFAState d) {
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
@@ -100,8 +107,12 @@ public class Resolver {
 					// conflicts means s.ctx==t.ctx or s.ctx is a stack
 					// suffix of t.ctx or vice versa (if alts differ).
 					// Also a conflict if s.ctx or t.ctx is empty
+					// TODO: might be faster to avoid suffix test if i or j already in ambiguousAlts
+					// that set is usually 2 alts, maybe three.  Use a List.
 					boolean altConflict = s.alt != t.alt;
-					boolean ctxConflict = s.context.conflictsWith(t.context);
+					boolean ctxConflict = (s.context==null && t.context!=null) ||
+										  (s.context!=null && t.context==null) ||
+										  (s.context.suffix(t.context) || s.context.equals(t.context));
 					if ( altConflict && ctxConflict ) {
 						//System.out.println("ctx conflict between "+s+" and "+t);
 						ambiguousAlts.add(s.alt);

@@ -292,23 +292,23 @@ public class PredictionDFAFactory {
 	 *  then clearly the exact same computation is proposed.  If a context
 	 *  is a suffix of the other, then again the computation is in an
 	 *  identical context.  beta $ and beta alpha $ are considered the same stack.
-	 *  We could walk configurations linearly doing the comparison instead
-	 *  of a set for exact matches but it's much slower because you can't
-	 *  do a Set lookup.  I use exact match as ANTLR
-	 *  always detect the conflict later when checking for context suffixes...
-	 *  I check for left-recursive stuff and terminate before analysis to
-	 *  avoid need to do this more expensive computation.
+	 *  We could walk configurations linearly doing suuch a comparison instead
+	 *  of a set lookup for exact matches but it's much slower because you can't
+	 *  do a Set lookup.  I use exact match as ANTLR always detect the conflict
+	 *  later when checking for ambiguous configs (it tests context suffixes).
+	 *
+	 *  TODO: change comment once I figure out if we can ignore suffixes in favor of empty/non test only
 	 *
 	 *  Side-effect warning:
 	 *
 	 *  Rather than pass in a list of configs to update or return and
 	 *  collect lots of little config lists, it's more efficient to
 	 *  modify d's config list directly.
+	 *
+	 *  Rather than pass closureBusy everywhere, I use a field of this object.
 	 */
 	public void closure(DFAState d, NFAConfig c, boolean collectPredicates) {
-		//NFAConfig proposedNFAConfig = new NFAConfig(s, altNum, context, semanticContext);
-
-		if ( closureBusy.contains(c) ) return;
+		if ( closureBusy.contains(c) ) return; // don't re-attempt same closure(c)
 		closureBusy.add(c);
 
 		// p itself is always in closure
