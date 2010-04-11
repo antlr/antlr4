@@ -166,6 +166,7 @@ public class ErrorManager {
     }
 
     public static void resetErrorState() {        
+		state.set(new ErrorState());
     }
 
     public static void info(Object... args) {

@@ -878,6 +878,7 @@ public class TestNFAConstruction extends BaseTest {
 		String result = serializer.toString();
 
 		//System.out.print(result);
+		System.out.println("test NFA checkRule: thread name: "+Thread.currentThread().getName());
 		assertEquals(expecting, result);
 	}
 }

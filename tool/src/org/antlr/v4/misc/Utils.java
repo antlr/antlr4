@@ -43,6 +43,18 @@ public class Utils {
         return buf.toString();
     }
 
+	public static String join(Object[] a, String separator) {
+		StringBuilder buf = new StringBuilder();
+		for (int i=0; i<a.length; i++) {
+			Object o = a[i];
+			buf.append(o.toString());
+			if ( (i+1)<a.length ) {
+				buf.append(separator);
+			}
+		}
+		return buf.toString();
+	}
+
 	/** Given a source string, src,
 		a string to replace, replacee,
 		and a string to replace with, replacer,

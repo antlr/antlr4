@@ -242,7 +242,7 @@ CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::=
 
 AMBIGUITY(arg) ::= <<
 Decision can match input such as "<arg.input>" using multiple alternatives:
-<arg.conflictingPaths.keys:{alt | alt <alt> via tokens <arg.conflictingPaths.(alt); separator=",">}>
+<arg.conflictingPaths.keys:{alt | alt <alt> via token <arg.conflictingPaths.(alt):{t | <t.text> at line <t.line>:<t.charPositionInLine>}; separator=",">}; separator=" and ">
 <if(arg.hasPredicateBlockedByAction)><\n>At least one possibly relevant semantic predicate was hidden by action(s).<endif>
 >>
 

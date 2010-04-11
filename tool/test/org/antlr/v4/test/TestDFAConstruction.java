@@ -1,8 +1,12 @@
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.AmbiguityMessage;
 import org.antlr.v4.tool.Message;
+import org.antlr.v4.tool.UnreachableAltsMessage;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TestDFAConstruction extends BaseTest {
@@ -105,16 +109,145 @@ public class TestDFAConstruction extends BaseTest {
 		System.out.println(msgs);
 	}
 
+	@Test public void testMultiAltsWithRecursion() throws Exception {
+		String g =
+			"parser grammar T;\n" +
+			"s : b X\n" +
+			"  | b Y\n" +
+			"  ;\n" +
+			"b : L b R\n" +
+			"  | A b B\n" +
+			"  | I\n" +
+			"  ;";
+		String expecting =
+			"s0-A->s1\n" +
+			"s0-I->s3\n" +
+			"s0-L->s2\n" +
+			"s1-A->s1\n" +
+			"s1-I->s3\n" +
+			"s1-L->s2\n" +
+			"s2-A->s1\n" +
+			"s2-I->s3\n" +
+			"s2-L->s2\n" +
+			"s3-B->s4\n" +
+			"s3-R->s5\n" +
+			"s3-X->:s7=>1\n" +
+			"s3-Y->:s6=>2\n" +
+			"s4-B->s4\n" +
+			"s4-R->s5\n" +
+			"s4-X->:s7=>1\n" +
+			"s4-Y->:s6=>2\n" +
+			"s5-B->s4\n" +
+			"s5-R->s5\n" +
+			"s5-X->:s7=>1\n" +
+			"s5-Y->:s6=>2\n";
+		checkRuleDFA(g, "s", expecting);
+	}
 
 
 
-	@Test public void _template() throws Exception {
+	@Test public void recursionInMultipleWithoutNonRecursiveAlt() throws Exception {
+		String g =
+			"parser grammar t;\n"+
+			"a : A a X | A a Y;";
+		String expecting =
+			"s0-A->:s1=>1\n";
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "A");
+		unreachable(msgs, new int[] {2});
+		assertEquals(msgs.size(), 2);
+	}
+	
+	@Test public void emptyAndNonEmptyContextStack() throws Exception {
+		String g =
+			"parser grammar S4;\n" +
+			"a : A+ ;\n" +
+			"x : a a ;";
+		String expecting =
+			"s0-A->:s1=>1\n" +
+			"s0-EOF->:s2=>1\n";
+		List<Message> msgs = checkRuleDFA(g, 0, expecting);
+		System.out.println(msgs);
+		ambig(msgs, new int[] {1,2}, "A");
+		unreachable(msgs, new int[] {2});
+		assertEquals(msgs.size(), 2);
+	}
+
+
+	@Test public void simpleNullableRule() throws Exception {
+		String g =
+			"parser grammar S2;\n" +
+			"a : b X \n" +
+			"  | b Y\n" +
+			"  ; \n" +
+			"b : F     \n" +
+			"  |       \n" +
+			"  ;";
+		String expecting =
+			"s0-F->s1\n" +
+			"s0-X->:s3=>1\n" +
+			"s0-Y->:s2=>2\n" +
+			"s1-X->:s3=>1\n" +
+			"s1-Y->:s2=>2\n";
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		System.out.println(msgs);
+		assertEquals(msgs.size(), 0);
+	}
+
+	public void _template() throws Exception {
 		String g =
 			"";
 		String expecting =
 			"";
-		checkRuleDFA(g, "a", expecting);
+		List<Message> msgs = checkRuleDFA(g, "a", expecting);
+		System.out.println(msgs);
+		//ambig(msgs, new int[] {1,2}, "A");
+		//unreachable(msgs, new int[] {2});
+		assertEquals(msgs.size(), 2);
 	}
 
+	void ambig(List<Message> msgs, int[] expectedAmbigAlts, String expectedAmbigInput)
+		throws Exception
+	{
+		ambig(msgs, 0, expectedAmbigAlts, expectedAmbigInput);
+	}
+
+	void ambig(List<Message> msgs, int i, int[] expectedAmbigAlts, String expectedAmbigInput)
+		throws Exception
+	{
+		List<Message> amsgs = getMessagesOfType(msgs, AmbiguityMessage.class);
+		AmbiguityMessage a = (AmbiguityMessage)amsgs.get(i);
+		if ( a==null ) assertNull(expectedAmbigAlts);
+		else {
+			assertEquals(a.conflictingAlts.toString(), Arrays.toString(expectedAmbigAlts));
+		}
+		assertEquals(expectedAmbigInput, a.input);
+	}
+
+	void unreachable(List<Message> msgs, int[] expectedUnreachableAlts)
+		throws Exception
+	{
+		unreachable(msgs, 0, expectedUnreachableAlts);
+	}
+
+	void unreachable(List<Message> msgs, int i, int[] expectedUnreachableAlts)
+		throws Exception
+	{
+		List<Message> amsgs = getMessagesOfType(msgs, UnreachableAltsMessage.class);
+		UnreachableAltsMessage u = (UnreachableAltsMessage)amsgs.get(i);
+		if ( u==null ) assertNull(expectedUnreachableAlts);
+		else {
+			assertEquals(u.conflictingAlts.toString(), Arrays.toString(expectedUnreachableAlts));
+		}
+	}
+
+	List<Message> getMessagesOfType(List<Message> msgs, Class c) {
+		List<Message> filtered = new ArrayList<Message>();
+		for (Message m : msgs) {
+			if ( m.getClass() == c ) filtered.add(m);
+		}
+		return filtered;
+	}
 
 }

@@ -26,12 +26,12 @@ public class TestLexerDFAConstruction extends BaseTest {
 		String expecting =
 			":s1=> INT-{'0'..'9'}->:s1=> INT\n" +
 			":s2=> ID-{'a'..'z'}->:s2=> ID\n" +
-			":s3=> ID-'f'->:s4=> ID IF\n" +
+			":s3=> ID-'f'->:s4=> IF ID\n" +
 			":s3=> ID-{'a'..'e', 'g'..'z'}->:s2=> ID\n" +
-			":s4=> ID IF-{'a'..'z'}->:s2=> ID\n" +
+			":s4=> IF ID-{'a'..'z'}->:s2=> ID\n" +
 			"s0-'i'->:s3=> ID\n" +
 			"s0-{'0'..'9'}->:s1=> INT\n" +
-			"s0-{'a'..'h', 'j'..'z'}->:s2=> ID";
+			"s0-{'a'..'h', 'j'..'z'}->:s2=> ID\n";
 		checkLexerDFA(g, expecting);
 	}
 
@@ -68,24 +68,7 @@ public class TestLexerDFAConstruction extends BaseTest {
 		checkLexerDFA(g, expecting);
 	}
 
-	@Test public void _t3emplate() throws Exception {
-		String g =
-			"";
-		String expecting =
-			"";
-		checkLexerDFA(g, expecting);
-	}
-
-	@Test public void _templ33ate() throws Exception {
-		String g =
-			"";
-		String expecting =
-			"";
-		checkLexerDFA(g, expecting);
-	}
-
-
-	@Test public void _template() throws Exception {
+	public void _template() throws Exception {
 		String g =
 			"";
 		String expecting =

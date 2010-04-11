@@ -82,7 +82,8 @@ public abstract class BaseTest {
 	public void setUp() throws Exception {
         lastTestFailed = false; // hope for the best, but set to true in asserts that fail
         // new output dir for each test
-        tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr-"+getClass().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+        tmpdir = new File(System.getProperty("java.io.tmpdir"),
+						  "antlr-"+getClass().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
         ErrorManager.resetErrorState();
     }
 
@@ -150,13 +151,31 @@ public abstract class BaseTest {
 			return null;
 		}
 		DecisionState blk = (DecisionState)s.transition(0).target;
+		checkRuleDFA(g, blk, expecting);
+		return equeue.all;
+	}
 
+	List<Message> checkRuleDFA(String gtext, int decision, String expecting)
+		throws Exception
+	{
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		Grammar g = new Grammar(gtext);
+		NFA nfa = createNFA(g);
+		System.out.println("# decs="+nfa.decisionToNFAState.size());
+		DecisionState blk = nfa.decisionToNFAState.get(decision);
+		checkRuleDFA(g, blk, expecting);
+		return equeue.all;
+	}
+
+	void checkRuleDFA(Grammar g, DecisionState blk, String expecting)
+		throws Exception
+	{
 		DFA dfa = createDFA(g, blk);
 		String result = null;
 		if ( dfa!=null ) result = dfa.toString();
 		assertEquals(expecting, result);
-
-		return equeue.all;
 	}
 
 	List<Message> checkLexerDFA(String gtext, String expecting)
