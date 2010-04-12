@@ -15,14 +15,15 @@ public class AttributeChecks implements ActionSplitterListener {
     public Alternative alt; // null if action outside of alt; could be in rule
     public ActionAST node;
 	public Token actionToken; // token within action
-    //public String action;
-    
+	public ErrorManager errMgr;
+
     public AttributeChecks(Grammar g, Rule r, Alternative alt, ActionAST node, Token actionToken) {
         this.g = g;
         this.r = r;
         this.alt = alt;
         this.node = node;
         this.actionToken = actionToken;
+		this.errMgr = g.tool.errMgr;
     }
 
     public static void checkAllAttributeExpressions(Grammar g) {
@@ -74,20 +75,20 @@ public class AttributeChecks implements ActionSplitterListener {
 			Rule rref = isolatedRuleRef(x.getText());
 			if ( rref!=null ) {
 				if ( rref!=null && rref.args!=null && rref.args.get(y.getText())!=null ) {
-					ErrorManager.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
+					g.tool.errMgr.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
 											  g.fileName, y, y.getText(), expr);
 				}
 				else {
-					ErrorManager.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
+					errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
 											  g.fileName, y, y.getText(), rref.name, expr);
 				}
 			}
 			else if ( !resolvesToAttributeDict(x.getText()) ) {
-				ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+				errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
 										  g.fileName, x, x.getText(), expr);
 			}
 			else {
-				ErrorManager.grammarError(ErrorType.UNKNOWN_ATTRIBUTE_IN_SCOPE,
+				errMgr.grammarError(ErrorType.UNKNOWN_ATTRIBUTE_IN_SCOPE,
 										  g.fileName, y, y.getText(), expr);
 			}
 		}
@@ -95,7 +96,7 @@ public class AttributeChecks implements ActionSplitterListener {
 
 	public void setAttr(String expr, Token x, Token rhs) {
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-            ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+            errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
                                       g.fileName, x, x.getText(), expr);
         }
         new AttributeChecks(g, r, alt, node, rhs).examineAction();
@@ -113,11 +114,11 @@ public class AttributeChecks implements ActionSplitterListener {
 				return; // $ids for ids+=ID etc...
 			}
 			if ( isolatedRuleRef(x.getText())!=null ) {
-				ErrorManager.grammarError(ErrorType.ISOLATED_RULE_REF,
+				errMgr.grammarError(ErrorType.ISOLATED_RULE_REF,
 										  g.fileName, x, x.getText(), expr);
 				return;
 			}
-			ErrorManager.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
 									  g.fileName, x, x.getText(), expr);
 		}
     }
@@ -132,13 +133,13 @@ public class AttributeChecks implements ActionSplitterListener {
 		//System.out.println(x+" :: "+y);
 		AttributeDict s = node.resolver.resolveToDynamicScope(x.getText(), node);
 		if ( s==null ) {
-			ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE,
+			errMgr.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE,
 									  g.fileName, x, x.getText(), expr);
 			return;
 		}
 		Attribute a = s.get(y.getText());
 		if ( a==null ) {
-			ErrorManager.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
+			errMgr.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
 									  g.fileName, y, x.getText(), y.getText(), expr);
 		}
 	}
@@ -168,7 +169,7 @@ public class AttributeChecks implements ActionSplitterListener {
 	}
 
     public void unknownSyntax(Token t) {
-		ErrorManager.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,
+		errMgr.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,
 								  g.fileName, t, t.getText());
     }
 

@@ -1,12 +1,10 @@
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.v4.Tool;
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DFAState;
-import org.antlr.v4.parse.v4ParserException;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
@@ -52,44 +50,28 @@ import java.util.*;
  *  full of messages has an error, how could I print to anything but System.err?
  */
 public class ErrorManager {
-    /** The group of templates that represent all possible ANTLR errors. */
-    private static STGroup messages;
+	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
+	public static final String MESSAGES_DIR = "org/antlr/v4/tool/templates/messages/languages/";
+
+	public Tool tool;
+	public int errors;
+	public int warnings;
+
+	/** The group of templates that represent all possible ANTLR errors. */
+    STGroup messages;
 
     /** The group of templates that represent the current message format. */
-    private static STGroup format;
+    STGroup format;
 
     /** Messages should be sensitive to the locale. */
-    private static Locale locale;
-    private static String formatName;
+    Locale locale;
+    String formatName;
 
-    static ANTLRErrorListener theDefaultErrorListener = new ANTLRErrorListener() {
-        public void info(String msg) {
-            if (formatWantsSingleLineMessage()) {
-                msg = msg.replaceAll("\n", " ");
-            }
-            System.err.println(msg);
-        }
+    
 
-        public void error(Message msg) {
-            String outputMsg = msg.toString();
-            if (formatWantsSingleLineMessage()) {
-                outputMsg = outputMsg.replaceAll("\n", " ");
-            }
-            System.err.println(outputMsg);
-        }
+    ErrorBuffer initSTListener = new ErrorBuffer();
 
-        public void warning(Message msg) {
-            String outputMsg = msg.toString();
-            if (formatWantsSingleLineMessage()) {
-                outputMsg = outputMsg.replaceAll("\n", " ");
-            }
-            System.err.println(outputMsg);
-        }
-    };
-
-    static ErrorBuffer initSTListener = new ErrorBuffer();
-
-    static STErrorListener theDefaultSTListener =
+    STErrorListener theDefaultSTListener =
         new STErrorListener() {
             public void compileTimeError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
@@ -107,81 +89,108 @@ public class ErrorManager {
                 ErrorManager.internalError(msg.toString());
             }
         };
-    public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
-    public static final String MESSAGES_DIR = "org/antlr/v4/tool/templates/messages/languages/";
 
-    private static class ErrorState {
-        public ANTLRErrorListener listener;
-        public int errors;
-        public int warnings;
-    }
+	public ErrorManager(Tool tool) {
+		this.tool = tool;
+		org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
+		// it is inefficient to set the default locale here if another
+		// piece of code is going to set the locale, but that would
+		// require that a user call an init() function or something.  I prefer
+		// that this class be ready to go when loaded as I'm absentminded ;)
+		setLocale(Locale.getDefault());
+		// try to load the message format group
+		// the user might have specified one on the command line
+		// if not, or if the user has given an illegal value, we will fall back to "antlr"
+		setFormat("antlr");
+		org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);
+	}
 
-    private static ThreadLocal<ErrorState> state = new ThreadLocal<ErrorState>();
+	public void resetErrorState() {
+		errors = 0;
+		warnings = 0;
+	}
 
-    // make sure that this class is ready to use after loading
-    static {
-        state.set(new ErrorState());
-        setErrorListener(theDefaultErrorListener);
-        org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
-        // it is inefficient to set the default locale here if another
-        // piece of code is going to set the locale, but that would
-        // require that a user call an init() function or something.  I prefer
-        // that this class be ready to go when loaded as I'm absentminded ;)
-        setLocale(Locale.getDefault());
-        // try to load the message format group
-        // the user might have specified one on the command line
-        // if not, or if the user has given an illegal value, we will fall back to "antlr"
-        setFormat("antlr");
-        org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);        
-    }
+	public ST getMessageTemplate(Message msg) {
+		ST messageST = getMessageTemplate(msg.errorType);
+		ST locationST = getLocationFormat();
+		ST reportST = getReportFormat(msg.errorType.getSeverity());
+		ST messageFormatST = getMessageFormat();
 
+		if ( msg.args!=null ) { // fill in arg1, arg2, ...
+			for (int i=0; i<msg.args.length; i++) {
+				if ( i==(msg.args.length-1) && msg.args[i]==null ) { // don't set last if null
+					continue;
+				}
+				String attr = "arg";
+				if ( i>0 ) attr += i + 1;
+				messageST.add(attr, msg.args[i]);
+			}
+		}
+		if ( msg.e!=null ) {
+			messageST.add("exception", msg.e);
+			messageST.add("stackTrace", msg.e.getStackTrace());
+		}
 
-  
-    public static ANTLRErrorListener getErrorListener() {
-        return state.get().listener;
-    }    
+		boolean locationValid = false;
+		if (msg.line != -1) {
+			locationST.add("line", msg.line);
+			locationValid = true;
+		}
+		if (msg.charPosition != -1) {
+			locationST.add("column", msg.charPosition);
+			locationValid = true;
+		}
+		if (msg.fileName != null) {
+			locationST.add("file", msg.fileName);
+			locationValid = true;
+		}
+
+		messageFormatST.add("id", msg.errorType.ordinal());
+		messageFormatST.add("text", messageST);
+
+		if (locationValid) reportST.add("location", locationST);
+		reportST.add("message", messageFormatST);
+		//((DebugST)reportST).inspect();
+		//reportST.impl.dump();
+		return reportST;
+	}
 
     /** Return a StringTemplate that refers to the current format used for
      * emitting messages.
      */
-    public static ST getLocationFormat() {
+    public ST getLocationFormat() {
         return format.getInstanceOf("location");
     }
-    public static ST getReportFormat(ErrorSeverity severity) {
+
+    public ST getReportFormat(ErrorSeverity severity) {
         ST st = format.getInstanceOf("report");
         ST type = messages.getInstanceOf(severity.toString());
         st.add("type", type);
         return st;
 
     }
-    public static ST getMessageFormat() {
+    public ST getMessageFormat() {
         return format.getInstanceOf("message");
     }
-    public static boolean formatWantsSingleLineMessage() {
+    public boolean formatWantsSingleLineMessage() {
         return format.getInstanceOf("wantsSingleLineMessage").render().equals("true");
     }
-    public static ST getMessageTemplate(ErrorType etype) {
+    public ST getMessageTemplate(ErrorType etype) {
         String msgName = etype.toString();
 		return messages.getInstanceOf(msgName);
     }
 
-    public static void resetErrorState() {        
-		state.set(new ErrorState());
-    }
+    public void info(String msg) { tool.info(msg); }
 
-    public static void info(Object... args) {
-        
-    }
-
-	public static void syntaxError(ErrorType etype,
+	public void syntaxError(ErrorType etype,
 								   String fileName,
 								   Token token,
 								   RecognitionException antlrException,
 								   Object... args)
 	{
-		state.get().errors++;
+		errors++;
 		Message msg = new GrammarSyntaxMessage(etype,fileName,token,antlrException,args);
-		state.get().listener.error(msg);
+		tool.error(msg);
 	}
 
 	public static void fatalInternalError(String error, Throwable e) {
@@ -190,14 +199,11 @@ public class ErrorManager {
 	}
 
 	public static void internalError(String error, Throwable e) {
-        state.get().errors++;
         StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
-        String msg = "Exception "+e+"@"+location+": "+error;
-        System.err.println("internal error: "+msg);
+		internalError("Exception "+e+"@"+location+": "+error);
     }
 
     public static void internalError(String error) {
-        state.get().errors++;
         StackTraceElement location =
             getLastNonErrorManagerCodeLocation(new Exception());
         String msg = location+": "+error;
@@ -210,102 +216,39 @@ public class ErrorManager {
      * @param errorType The Message Descriptor
      * @param args The arguments to pass to the StringTemplate
      */
-	public static void toolError(ErrorType errorType, Object... args) {
-        state.get().errors++;
-        state.get().listener.error(new ToolMessage(errorType, args));
+	public void toolError(ErrorType errorType, Object... args) {
+        errors++;
+        tool.error(new ToolMessage(errorType, args));
 	}
 
-	public static String getParserErrorMessage(Parser parser, RecognitionException e) {
-		String msg = null;
-		if ( e instanceof NoViableAltException) {
-			String t = parser.getTokenErrorDisplay(e.token);
-			   String name = "<EOF>";
-			if ( e.token.getType()>=0 ) name = parser.getTokenNames()[e.token.getType()];
-			msg = " came as a complete surprise to me";
-			msg = t+msg;
-//			if ( t.toLowerCase().equals("'"+name.toLowerCase()+"'") ) {
-//				msg = t+msg;
-//			}
-//			else {
-//				msg = t+"<"+name+">"+msg;
-//			}
-		}
-		else if ( e instanceof v4ParserException) {
-			msg = ((v4ParserException)e).msg;
-		}
-		else {
-			msg = parser.getErrorMessage(e, parser.getTokenNames());
-		}
-		return msg;
-	}
-
-    /**
-     * Raise a predefined message with some number of parameters for the StringTemplate
-     * with error information supplied explicitly.
-     *
-     * @param errorType The Message Descriptor
-     * @param args The arguments to pass to the StringTemplate
-	public static void toolError(ErrorType errorType, int line, int column, int absOffset, int endLine, int endColumn, int endAbsOffset, Object... args) {
-	}
-     */
-
-    /**
-     * Raise a predefined message with some number of paramters for the StringTemplate, for which there is a CommonToken
-     * that can give us the location information.
-     * @param errorType The message descriptor.
-     * @param t     The token that contains our location information
-     * @param args  The varargs array of values that will be set in the StrngTemplate as arg0, arg1, ... argn
-    public static void error(ErrorType errorType, CommonToken t, Object... args) {
-	}
-     */
-
-    /**
-     * Construct a message when we have a node stream and AST node that we can extract location
-     * from and possbily some arguments for the StringTemplate that will construct this message.
-    public static void error(ErrorType errorType, CommonTree node, Object... args) {
-	}
-     */
-
-    /*
-    public static void grammarError(ErrorType etype,
-                                    Grammar g,
-                                    Token token,
-                                    Object... args)
-    {
-        state.get().errors++;
-        Message msg = new GrammarSemanticsMessage(etype,g,token,args);
-        state.get().listener.error(msg);
-    }
-     */
-
-    public static void grammarError(ErrorType etype,
-                                    String fileName,
-                                    Token token,
-                                    Object... args)
-    {
-        state.get().errors++;
+    public void grammarError(ErrorType etype,
+							 String fileName,
+							 Token token,
+							 Object... args)
+	{
+		errors++;
         Message msg = new GrammarSemanticsMessage(etype,fileName,token,args);
-        state.get().listener.error(msg);
+        tool.error(msg);
     }
 
-    public static void grammarWarning(ErrorType etype,
+    public void grammarWarning(ErrorType etype,
                                       String fileName,
                                       Token token,
                                       Object... args)
     {
-        state.get().warnings++;
+        warnings++;
         Message msg = new GrammarSemanticsMessage(etype,fileName,token,args);
-        state.get().listener.warning(msg);
+        tool.warning(msg);
     }
 
-	public static void ambiguity(String fileName,
+	public void ambiguity(String fileName,
 								 DFAState d,
 								 List<Integer> conflictingAlts,
 								 String input,
 								 LinkedHashMap<Integer,List<Token>> conflictingPaths,
 								 boolean hasPredicateBlockedByAction)
 	{
-		state.get().warnings++;
+		warnings++;
 		AmbiguityMessage msg =
 			new AmbiguityMessage(ErrorType.AMBIGUITY,fileName,
 								 d,
@@ -313,30 +256,30 @@ public class ErrorManager {
 								 input,
 								 conflictingPaths,
 								 hasPredicateBlockedByAction);
-		state.get().listener.warning(msg);
+		tool.warning(msg);
 	}
 
-	public static void unreachableAlts(String fileName,
+	public void unreachableAlts(String fileName,
 									   DFA dfa,
 									   Collection<Integer> unreachableAlts)
 	{
 		//System.err.println("unreachable="+unreachableAlts);
-		state.get().errors++;
+		errors++;
 		UnreachableAltsMessage msg =
 			new UnreachableAltsMessage(ErrorType.UNREACHABLE_ALTS,
 									   fileName,
 									   dfa,
 									   unreachableAlts);
-		state.get().listener.error(msg);
+		tool.error(msg);
 	}
 
-	public static void insufficientPredicates(String fileName,
+	public void insufficientPredicates(String fileName,
 											  DFAState d,
 											  String input,
 											  Map<Integer, Set<Token>> incompletelyCoveredAlts,
 											  boolean hasPredicateBlockedByAction)
 	{
-		state.get().warnings++;
+		warnings++;
 		InsufficientPredicatesMessage msg =
 			new InsufficientPredicatesMessage(ErrorType.INSUFFICIENT_PREDICATES,
 											  fileName,
@@ -344,23 +287,23 @@ public class ErrorManager {
 											  input,
 											  incompletelyCoveredAlts,
 											  hasPredicateBlockedByAction);
-		state.get().listener.warning(msg);
+		tool.warning(msg);
 	}
 
-	public static void leftRecursionCycles(String fileName, Collection cycles) {
-		state.get().errors++;
+	public void leftRecursionCycles(String fileName, Collection cycles) {
+		errors++;
 		Message msg = new LeftRecursionCyclesMessage(fileName, cycles);
-		state.get().listener.error(msg);
+		tool.error(msg);
 	}
 
-	public static void analysisTimeout() {
-		state.get().errors++;
+	public void analysisTimeout() {
+		errors++;
 		Message msg = new AnalysisTimeoutMessage();
-		state.get().listener.error(msg);
+		tool.error(msg);
 	}
 
-    public static int getNumErrors() {
-        return state.get().errors;
+    public int getNumErrors() {
+        return errors;
     }
 
     /** Return first non ErrorManager code location for generating messages */
@@ -377,18 +320,6 @@ public class ErrorManager {
         return location;
     }
 
-    /** In general, you'll want all errors to go to a single spot.
-     *  However, in a GUI, you might have two frames up with two
-     *  different grammars.  Two threads might launch to process the
-     *  grammars--you would want errors to go to different objects
-     *  depending on the thread.  I store a single listener per
-     *  thread.
-     */
-    public static void setErrorListener(ANTLRErrorListener l) {
-		resetErrorState();
-        state.get().listener = l;
-    }
-
     // S U P P O R T  C O D E
 
     /** We really only need a single locale for entire running ANTLR code
@@ -396,8 +327,8 @@ public class ErrorManager {
      *  so that French Canadians and French Frenchies all get the same
      *  template file, fr.stg.  Just easier this way.
      */
-    public static void setLocale(Locale locale) {
-        ErrorManager.locale = locale;
+    public void setLocale(Locale locale) {
+        this.locale = locale;
         String language = locale.getLanguage();
         String fileName = MESSAGES_DIR +language+".stg";
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -417,7 +348,7 @@ public class ErrorManager {
         }
 
         messages = new STGroupFile(fileName, "UTF-8");
-		messages.debug = true;		
+		messages.debug = true;
         messages.load();
         if ( initSTListener.errors.size()>0 ) {
             rawError("ANTLR installation corrupted; can't load messages format file:\n"+
@@ -438,8 +369,8 @@ public class ErrorManager {
     /** The format gets reset either from the Tool if the user supplied a command line option to that effect
      *  Otherwise we just use the default "antlr".
      */
-    public static void setFormat(String formatName) {
-        ErrorManager.formatName = formatName;
+    public void setFormat(String formatName) {
+        this.formatName = formatName;
         String fileName = FORMATS_DIR +formatName+".stg";
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         URL url = cl.getResource(fileName);
@@ -480,7 +411,7 @@ public class ErrorManager {
     /** Use reflection to find list of MSG_ fields and then verify a
      *  template exists for each one from the locale's group.
      */
-    protected static boolean verifyMessages() {
+    protected boolean verifyMessages() {
         boolean ok = true;
         ErrorType[] errors = ErrorType.values();
         for (int i = 0; i < errors.length; i++) {
@@ -504,7 +435,7 @@ public class ErrorManager {
     }
 
     /** Verify the message format template group */
-    protected static boolean verifyFormat() {
+    protected boolean verifyFormat() {
         boolean ok = true;
         if (!format.isDefined("location")) {
             System.err.println("Format template 'location' not found in " + formatName);

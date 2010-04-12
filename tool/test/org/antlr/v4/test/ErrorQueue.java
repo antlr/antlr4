@@ -27,15 +27,17 @@
  */
 package org.antlr.v4.test;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.tool.ANTLRErrorListener;
+import org.antlr.v4.tool.ANTLRToolListener;
 import org.antlr.v4.tool.Message;
 import org.antlr.v4.tool.ToolMessage;
+import org.stringtemplate.v4.ST;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ErrorQueue implements ANTLRErrorListener {
+public class ErrorQueue implements ANTLRToolListener {
 	public List<String> infos = new ArrayList<String>();
 	public List<Message> errors = new ArrayList<Message>();
 	public List<Message> warnings = new ArrayList<Message>();
@@ -65,5 +67,16 @@ public class ErrorQueue implements ANTLRErrorListener {
 	}
 
 	public String toString() { return Utils.join(all.iterator(), "\n"); }
+
+	public String toString(Tool tool) {
+		StringBuilder buf = new StringBuilder();
+		for (Message m : all) {
+			ST st = tool.errMgr.getMessageTemplate(m);
+			buf.append(st.render());
+			buf.append("\n");
+		}
+		return buf.toString();
+	}
+
 }
 

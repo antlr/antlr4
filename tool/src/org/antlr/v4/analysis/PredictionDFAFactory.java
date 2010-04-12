@@ -3,7 +3,6 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -150,7 +149,7 @@ public class PredictionDFAFactory {
 //				ErrorManager.multipleRecursiveAlts(g.fileName, d, mras.recursiveAltSet);
 //			}
 			catch (AnalysisTimeoutSignal at) {// TODO: nobody throws yet
-				ErrorManager.analysisTimeout();
+				g.tool.errMgr.analysisTimeout();
 			}
 
 			addTransition(d, label, t); // make d-label->t transition

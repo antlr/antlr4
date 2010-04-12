@@ -10,6 +10,7 @@ import org.antlr.v4.automata.ParserNFAFactory;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
@@ -21,7 +22,23 @@ public class Tool {
     public String VERSION = "!Unknown version!";
     //public static final String VERSION = "${project.version}";
     public static final String UNINITIALIZED_DIR = "<unset-dir>";
+
+	public ErrorManager errMgr = new ErrorManager(this);
+	
+	List<ANTLRToolListener> listeners =
+		Collections.synchronizedList(new ArrayList<ANTLRToolListener>());
+	/** Track separately so if someone adds a listener, it's the only one
+	 *  instead of it and the default stderr listener.
+	 */
+	DefaultToolListener defaultListener = new DefaultToolListener(this);
+
+    Map<String, Grammar> grammars = new HashMap<String, Grammar>();
+
+	// GRAMMARS
     public List<String> grammarFileNames = new ArrayList<String>();
+	
+	// COMMAND-LINE OPTIONS
+
     public boolean generate_NFA_dot = false;
     public boolean generate_DFA_dot = false;
     public String outputDirectory = ".";
@@ -42,6 +59,7 @@ public class Tool {
     public boolean deleteTempLexer = true;
 	public boolean minimizeDFA = true;
     public boolean verbose = false;
+	
     /** Don't process grammar file if generated files are newer than grammar */
     /**
      * Indicate whether the tool should analyze the dependencies of the provided grammar
@@ -71,38 +89,32 @@ public class Tool {
     public static boolean internalOption_watchNFAConversion = false;
     public static boolean internalOption_saveTempLexer = false;
 
-    protected Map<String, Grammar> grammars = new HashMap<String, Grammar>();
-    
     public static void main(String[] args) {
         Tool antlr = new Tool(args);
 
         if (!exitNow) {
             antlr.processGrammarsOnCommandLine();
-            if (ErrorManager.getNumErrors() > 0) {
+            if (antlr.errMgr.getNumErrors() > 0) {
                 antlr.exit(1);
             }
             antlr.exit(0);
         }
     }
 
-    public Tool() {
-    }
+    public Tool() { }
 
     public Tool(String[] args) {
+		this();
         processArgs(args);
     }
 
-    public void exit(int e) {
-        System.exit(e);
-    }
+    public void exit(int e) { System.exit(e); }
 
-    public void panic() {
-        throw new Error("ANTLR panic");
-    }
+    public void panic() { throw new Error("ANTLR panic"); }
     
     public void processArgs(String[] args) {
         if (verbose) {
-            ErrorManager.info("ANTLR Parser Generator  Version " + VERSION);
+			info("ANTLR Parser Generator  Version " + VERSION);
             showBanner = false;
         }
 
@@ -129,7 +141,7 @@ public class Tool {
                     File outDir = new File(outputDirectory);
                     haveOutputDir = true;
                     if (outDir.exists() && !outDir.isDirectory()) {
-                        ErrorManager.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
+                        errMgr.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
                         libDirectory = ".";
                     }
                 }
@@ -147,7 +159,7 @@ public class Tool {
                     }
                     File outDir = new File(libDirectory);
                     if (!outDir.exists()) {
-                        ErrorManager.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
+                        errMgr.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
                         libDirectory = ".";
                     }
                 }
@@ -306,7 +318,7 @@ public class Tool {
             in = new ANTLRFileStream(fileName);
         }
         catch (IOException ioe) {
-            ErrorManager.toolError(ErrorType.CANNOT_OPEN_FILE, fileName, ioe);
+            errMgr.toolError(ErrorType.CANNOT_OPEN_FILE, fileName, ioe);
         }
         return load(in);
     }
@@ -319,7 +331,7 @@ public class Tool {
         try {
             ANTLRLexer lexer = new ANTLRLexer(in);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            ANTLRParser p = new ANTLRParser(tokens);
+            ToolANTLRParser p = new ToolANTLRParser(tokens, this);
             p.setTreeAdaptor(new GrammarASTAdaptor(in));
             ParserRuleReturnScope r = p.grammarSpec();
 			GrammarAST root = (GrammarAST) r.getTree();
@@ -330,7 +342,7 @@ public class Tool {
         }
         catch (RecognitionException re) {
             // TODO: do we gen errors now?
-            ErrorManager.internalError("can't generate this message at moment; antlr recovers");
+            errMgr.internalError("can't generate this message at moment; antlr recovers");
         }
         return null;
     }
@@ -368,7 +380,7 @@ public class Tool {
         SemanticPipeline sem = new SemanticPipeline(g);
         sem.process();
 
-		if ( ErrorManager.getNumErrors()>0 ) return;
+		if ( errMgr.getNumErrors()>0 ) return;
 		
 		if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
 			for (Grammar imp : g.getImportedGrammars()) {
@@ -516,7 +528,7 @@ public class Tool {
 						writeDOTFile(g, r, dot);
 					}
 				} catch (IOException ioe) {
-					ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
+					errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 				}
 			}
 		}
@@ -543,7 +555,7 @@ public class Tool {
 			writeDOTFile(g, dotFileName, dot);
 		}
 		catch (IOException ioe) {
-			ErrorManager.toolError(ErrorType.CANNOT_WRITE_FILE, dotFileName, ioe);
+			errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, dotFileName, ioe);
 		}
 	}
 
@@ -670,14 +682,44 @@ public class Tool {
 			outputDir = new File(fileDirectory);
 		}
 		return outputDir;
-	}	
+	}
+
+	public void addListener(ANTLRToolListener tl) {
+		if ( tl!=null ) listeners.add(tl);
+	}
+	public void removeListener(ANTLRToolListener tl) { listeners.remove(tl); }
+	public void removeListeners() { listeners.clear(); }
+	public List<ANTLRToolListener> getListeners() { return listeners; }
+
+	public void info(String msg) {
+		if ( listeners.size()==0 ) {
+			defaultListener.info(msg);
+			return;
+		}
+		for (ANTLRToolListener l : listeners) l.info(msg);
+	}
+	public void error(Message msg) {
+		if ( listeners.size()==0 ) {
+			defaultListener.error(msg);
+			return;
+		}
+		for (ANTLRToolListener l : listeners) l.error(msg);
+	}
+	public void warning(Message msg) {
+		if ( listeners.size()==0 ) {
+			defaultListener.warning(msg);
+			return;
+		}
+		for (ANTLRToolListener l : listeners) l.warning(msg);
+	}
+
 	
-    public static void version() {
-        ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+    public void version() {
+        info("ANTLR Parser Generator  Version " + new Tool().VERSION);
     }
 
-    public static void help() {
-        ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+    public void help() {
+        info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
         System.err.println("  -o outputDir          specify output directory where all output is generated");
         System.err.println("  -fo outputDir         same as -o but force even files with relative paths to dir");
@@ -696,8 +738,8 @@ public class Tool {
         System.err.println("  -X                    display extended argument list");
     }
 
-    public static void Xhelp() {
-        ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+    public void Xhelp() {
+        info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("  -Xgrtree                print the grammar AST");
 		System.err.println("  -Xdfa                   print DFA as text");
 		System.err.println("  -Xnominimizedfa         don't minimize decision DFA");
@@ -746,31 +788,19 @@ public class Tool {
         return null;
     }
 
-    /**
-     * Returns the number of errors that the analysis/processing threw up.
-     * @return Error count
-     */
-    public int getNumErrors() {
-        return ErrorManager.getNumErrors();
-    }
+    public int getNumErrors() { return errMgr.getNumErrors(); }
 
-    /**
-     * Set the message format to one of ANTLR, gnu, vs2005
-     *
-     * @param format
-     */
+    /**Set the message format to one of ANTLR, gnu, vs2005 */
     public void setMessageFormat(String format) {
-        //ErrorManager.setFormat(format);
+        errMgr.setFormat(format);
     }
 
-    /**
-     * Set the location (base directory) where output files should be produced
-     * by the ANTLR tool.
-     * @param outputDirectory
+    /** Set the location (base directory) where output files should be produced
+     *  by the ANTLR tool.
      */
     public void setOutputDirectory(String outputDirectory) {
         haveOutputDir = true;
-        outputDirectory = outputDirectory;
+        this.outputDirectory = outputDirectory;
     }
 
     /**

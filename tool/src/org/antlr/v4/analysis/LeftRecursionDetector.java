@@ -2,7 +2,6 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.OrderedHashSet;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class LeftRecursionDetector {
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
 		if ( listOfRecursiveCycles.size()>0 ) {
-			ErrorManager.leftRecursionCycles(nfa.g.fileName, listOfRecursiveCycles);
+			nfa.g.tool.errMgr.leftRecursionCycles(nfa.g.fileName, listOfRecursiveCycles);
 		}
 	}
 

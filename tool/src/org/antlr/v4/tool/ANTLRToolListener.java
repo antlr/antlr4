@@ -7,7 +7,7 @@ package org.antlr.v4.tool;
  *  In this way, users of this interface are less sensitive to changes in
  *  the info I need for error messages.
  */
-public interface ANTLRErrorListener {
+public interface ANTLRToolListener {
 	public void info(String msg);
 	public void error(Message msg);
 	public void warning(Message msg);

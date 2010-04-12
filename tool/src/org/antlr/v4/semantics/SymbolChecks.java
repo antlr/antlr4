@@ -13,16 +13,18 @@ import java.util.*;
  *  Side-effect: strip away redef'd rules.
  */
 public class SymbolChecks {
-    protected Grammar g;
-    protected CollectSymbols collector;
-    protected Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
-	protected Set<String> tokenIDs = new HashSet<String>();
-    protected Set<String> globalScopeNames = new HashSet<String>();
-    protected Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+    Grammar g;
+    CollectSymbols collector;
+    Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
+	Set<String> tokenIDs = new HashSet<String>();
+    Set<String> globalScopeNames = new HashSet<String>();
+    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+	public ErrorManager errMgr;
 
     public SymbolChecks(Grammar g, CollectSymbols collector) {
         this.g = g;
         this.collector = collector;
+		this.errMgr = g.tool.errMgr;		
         /*
         System.out.println("rules="+collector.rules);
         System.out.println("rulerefs="+collector.rulerefs);
@@ -57,12 +59,12 @@ public class SymbolChecks {
             }
             else {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
-                ErrorManager.grammarError(ErrorType.RULE_REDEFINITION,
+                errMgr.grammarError(ErrorType.RULE_REDEFINITION,
                                           g.fileName, idNode.token, r.name);
             }
             if ( globalScopeNames.contains(r.name) ) {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
-                ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
+                errMgr.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
                                           g.fileName, idNode.token, r.name);                
             }
         }
@@ -78,7 +80,7 @@ public class SymbolChecks {
             }
             else {
                 Token idNode = ((GrammarAST) s.ast.getParent().getChild(0)).token;
-                ErrorManager.grammarError(ErrorType.SCOPE_REDEFINITION,
+                errMgr.grammarError(ErrorType.SCOPE_REDEFINITION,
                                           g.fileName, idNode, s.getName());
             }
         }
@@ -93,7 +95,7 @@ public class SymbolChecks {
             if ( a.getType()== ANTLRParser.ASSIGN ) {
                 idNode = (GrammarAST)a.getChild(0);
 				if ( g!=g.getOutermostGrammar() ) {
-					ErrorManager.grammarError(ErrorType.TOKEN_ALIAS_IN_DELEGATE,
+					errMgr.grammarError(ErrorType.TOKEN_ALIAS_IN_DELEGATE,
 											  g.fileName, idNode.token, idNode.getText(), g.name);
 				}
             }
@@ -105,7 +107,7 @@ public class SymbolChecks {
                 GrammarAST value = (GrammarAST)prev.getChild(1);
                 String valueText = null;
                 if ( value!=null ) valueText = value.getText();
-                ErrorManager.grammarError(ErrorType.TOKEN_ALIAS_REASSIGNMENT,
+                errMgr.grammarError(ErrorType.TOKEN_ALIAS_REASSIGNMENT,
                                           g.fileName, idNode.token, idNode.getText(), valueText);
             }
         }
@@ -117,7 +119,7 @@ public class SymbolChecks {
             String ID = t.getText();
             tokenIDs.add(ID);
             if ( globalScopeNames.contains(t.getText()) ) {
-                ErrorManager.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
+                errMgr.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
                                           g.fileName, t, ID);
             }
         }
@@ -146,7 +148,7 @@ public class SymbolChecks {
                 scopeActions.add(name);
             }
             else {
-                ErrorManager.grammarError(ErrorType.ACTION_REDEFINITION,
+                errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
                                           g.fileName, nameNode.token, name);
             }
         }
@@ -179,13 +181,13 @@ public class SymbolChecks {
         }
     }
 
-    protected void checkForTypeMismatch(LabelElementPair prevLabelPair,
+    void checkForTypeMismatch(LabelElementPair prevLabelPair,
                                         LabelElementPair labelPair)
     {
         // label already defined; if same type, no problem
         if ( prevLabelPair.type != labelPair.type ) {
             String typeMismatchExpr = labelPair.type+"!="+prevLabelPair.type;
-            ErrorManager.grammarError(
+            errMgr.grammarError(
                 ErrorType.LABEL_TYPE_CONFLICT,
                 g.fileName,
                 labelPair.label.token,
@@ -218,7 +220,7 @@ public class SymbolChecks {
             arg2 = r.name;
         }
         if ( etype!=ErrorType.INVALID ) {
-            ErrorManager.grammarError(etype,g.fileName,labelID.token,name,arg2);
+            errMgr.grammarError(etype,g.fileName,labelID.token,name,arg2);
         }
     }
 
@@ -228,7 +230,7 @@ public class SymbolChecks {
             if (conflictingKeys!=null) {
                 for (Iterator it = conflictingKeys.iterator(); it.hasNext();) {
                     String key = (String) it.next();
-                    ErrorManager.grammarError(
+                    errMgr.grammarError(
                         ErrorType.ARG_RETVAL_CONFLICT,
                         g.fileName,
                         ((GrammarAST)r.ast.getChild(0)).token,
@@ -259,7 +261,7 @@ public class SymbolChecks {
                 arg2 = r.name;
             }
             if ( msgID!=ErrorType.INVALID ) {
-                ErrorManager.grammarError(msgID,g.fileName,
+                errMgr.grammarError(msgID,g.fileName,
                                           r.scope.ast.token,
                                           attrName,arg2);
             }
@@ -275,17 +277,17 @@ public class SymbolChecks {
 			Rule r = g.getRule(ruleName);
 			if ( r==null && !ref.hasAncestor(ANTLRParser.DOT)) {
 				// only give error for unqualified rule refs now
-				ErrorManager.grammarError(ErrorType.UNDEFINED_RULE_REF,
+				errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
 										  g.fileName, ref.token, ruleName);
 			}
 			GrammarAST arg = (GrammarAST)ref.getChild(0);
 			if ( arg!=null && r.args==null ) {
-				ErrorManager.grammarError(ErrorType.RULE_HAS_NO_ARGS,
+				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 										  g.fileName, ref.token, ruleName);
 
 			}
 			else if ( arg==null && (r!=null&&r.args!=null) ) {
-				ErrorManager.grammarError(ErrorType.MISSING_RULE_ARGS,
+				errMgr.grammarError(ErrorType.MISSING_RULE_ARGS,
 										  g.fileName, ref.token, ruleName);
 			}
 		}
@@ -298,13 +300,13 @@ public class SymbolChecks {
 			System.out.println(grammar.getText()+"."+rule.getText());
 			Grammar delegate = g.getImportedGrammar(grammar.getText());
 			if ( delegate==null ) {
-				ErrorManager.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
+				errMgr.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
 										  g.fileName, grammar.token, grammar.getText(),
 										  rule.getText());
 			}
 			else {
 				if ( g.getRule(grammar.getText(), rule.getText())==null ) {
-					ErrorManager.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
+					errMgr.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
 											  g.fileName, rule.token, grammar.getText(),
 											  rule.getText());
 				}

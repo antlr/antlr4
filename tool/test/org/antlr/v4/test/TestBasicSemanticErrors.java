@@ -18,7 +18,7 @@ public class TestBasicSemanticErrors extends BaseTest {
         "error(68): A.g:7:7: alts with rewrites can't use heterogeneous types left of ->\n" +
 		"error(78): A.g:9:4: AST operator with non-AST output option: ^\n" +
 		"error(78): A.g:9:11: AST operator with non-AST output option: !\n" +
-		"error(79): A.g:9:11: rule b alt 2 uses rewrite syntax and also an AST operator",
+		"error(79): A.g:9:11: rule b alt 2 uses rewrite syntax and also an AST operator\n",
 
         // INPUT
         "tree grammar B;\n" +
@@ -34,7 +34,7 @@ public class TestBasicSemanticErrors extends BaseTest {
         // YIELDS
         "error(80): B.g:10:6: Wildcard invalid as root; wildcard can itself be a tree\n" +
 		"error(81): B.g:1:5: option backtrack=false conflicts with tree grammar filter mode\n" +
-		"error(81): B.g:1:5: option output=template conflicts with tree grammar filter mode"
+		"error(81): B.g:1:5: option output=template conflicts with tree grammar filter mode\n"
     };
 
     static String[] U = {
@@ -64,7 +64,7 @@ public class TestBasicSemanticErrors extends BaseTest {
 		"error(49): U.g:8:10: illegal option x\n" +
 		"error(49): U.g:11:10: illegal option blech\n" +
 		"error(49): U.g:14:16: illegal option ick\n" +
-		"error(49): U.g:15:16: illegal option x",
+		"error(49): U.g:15:16: illegal option x\n",
 
         // INPUT
         "tree grammar V;\n" +
@@ -76,7 +76,7 @@ public class TestBasicSemanticErrors extends BaseTest {
         "  | A B -> template() \"kjsfdkdsj\" \n" +
         "  ;",
         // YIELDS
-        "error(66): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct",
+        "error(66): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct\n",
 
         // INPUT
         "tree grammar V;\n" +
@@ -85,7 +85,7 @@ public class TestBasicSemanticErrors extends BaseTest {
         "  | A B -> template() \"kjsfdkdsj\" \n" +
         "  ;",
         // YIELDS
-        "error(62): V.g:4:8: rule a uses rewrite syntax or operator with no output option",
+        "error(62): V.g:4:8: rule a uses rewrite syntax or operator with no output option\n",
     };
 
 	static String[] C = {

@@ -6,7 +6,6 @@ import org.antlr.v4.automata.NFA;
 import org.antlr.v4.automata.NFAState;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.tool.ErrorManager;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -279,19 +278,21 @@ public class Resolver {
 			if ( incompletelyCoveredAlts!=null && incompletelyCoveredAlts.size()>0 ) {
 				Map<Integer, Set<Token>> insufficientAltToLocations =
 					semResolver.getInsufficientlyPredicatedLocations(d, incompletelyCoveredAlts);
-				ErrorManager.insufficientPredicates(converter.g.fileName, d, input,
-													insufficientAltToLocations, converter.hasPredicateBlockedByAction);
+				converter.g.tool.errMgr.insufficientPredicates(converter.g.fileName, d, input,
+															   insufficientAltToLocations,
+															   converter.hasPredicateBlockedByAction);
 			}
 
 			if ( !d.resolvedWithPredicates &&
 				 (incompletelyCoveredAlts==null || incompletelyCoveredAlts.size()==0) )
 			{
-				ErrorManager.ambiguity(converter.g.fileName, d, sorted, input, altPaths,
-									   converter.hasPredicateBlockedByAction);
+				converter.g.tool.errMgr.ambiguity(converter.g.fileName, d, sorted, input, altPaths,
+												  converter.hasPredicateBlockedByAction);
 			}
 		}
 		if ( converter.unreachableAlts!=null && converter.unreachableAlts.size()>0 ) {
-			ErrorManager.unreachableAlts(converter.g.fileName, converter.dfa, converter.unreachableAlts);
+			converter.g.tool.errMgr.unreachableAlts(converter.g.fileName, converter.dfa,
+													converter.unreachableAlts);
 		}
 	}
 

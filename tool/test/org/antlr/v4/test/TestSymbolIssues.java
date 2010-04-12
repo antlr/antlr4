@@ -34,7 +34,7 @@ public class TestSymbolIssues extends BaseTest {
 		"error(72): A.g:3:36: cannot alias Z; token name already defined\n" +
 		"error(46): A.g:13:37: rule b has no defined parameters\n" +
 		"error(23): A.g:13:43: reference to undefined rule: q\n" +
-		"error(45): A.g:14:31: missing parameter(s) on rule reference: a"
+		"error(45): A.g:14:31: missing parameter(s) on rule reference: a\n"
     };
 
     static String[] B = {
@@ -54,7 +54,7 @@ public class TestSymbolIssues extends BaseTest {
 		"error(35): B.g:5:9: label b conflicts with rule with same name\n" +
 		"error(34): B.g:5:4: symbol s conflicts with global dynamic scope with same name\n" +
 		"error(36): B.g:5:15: label X conflicts with token with same name\n" +
-		"error(41): B.g:7:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL"
+		"error(41): B.g:7:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n"
     };
 
     static String[] C = {
@@ -70,7 +70,7 @@ public class TestSymbolIssues extends BaseTest {
         "error(51): C.g:3:28: reference to rewrite element r not found to left of ->\n" +
 		"error(51): C.g:3:30: reference to rewrite element foo not found to left of ->\n" +
 		"error(51): C.g:3:49: reference to rewrite element 'eh?' not found to left of ->\n" +
-		"error(51): C.g:4:10: reference to rewrite element x not found to left of ->"
+		"error(51): C.g:4:10: reference to rewrite element x not found to left of ->\n"
     };
 
     static String[] D = {
@@ -92,7 +92,7 @@ public class TestSymbolIssues extends BaseTest {
 		"error(42): D.g:6:0: rule b's argument i conflicts a return value with same name\n" +
 		"error(40): D.g:9:6: rule c's dynamically-scoped attribute i conflicts with c's return value or parameter with same name\n" +
 		"error(39): D.g:9:6: rule c's dynamically-scoped attribute c conflicts with the rule name\n" +
-		"error(40): D.g:9:6: rule c's dynamically-scoped attribute k conflicts with c's return value or parameter with same name"
+		"error(40): D.g:9:6: rule c's dynamically-scoped attribute k conflicts with c's return value or parameter with same name\n"
     };
 
     @Test public void testA() { super.testErrors(A, false); }

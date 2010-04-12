@@ -134,10 +134,10 @@ public class ParserNFAFactory implements NFAFactory {
 		IntervalSet notAtom =
 			(IntervalSet)IntervalSet.of(ttype).complement(g.getTokenTypes());
 		if ( notAtom.isNil() ) {
-			ErrorManager.grammarError(ErrorType.EMPTY_COMPLEMENT,
-									  g.fileName,
-									  ast.token,
-									  ast.getText());
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_COMPLEMENT,
+									   g.fileName,
+									   ast.token,
+									   ast.getText());
 		}
 		return set(notAtom, n);
 	}

@@ -39,7 +39,10 @@ import org.antlr.v4.analysis.PredictionDFAFactory;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.AmbiguityMessage;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Message;
+import org.antlr.v4.tool.UnreachableAltsMessage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -81,7 +84,6 @@ public abstract class BaseTest {
         // new output dir for each test
         tmpdir = new File(System.getProperty("java.io.tmpdir"),
 						  "antlr-"+getClass().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-        ErrorManager.resetErrorState();
     }
 
     @After
@@ -138,9 +140,7 @@ public abstract class BaseTest {
 		throws Exception
 	{
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-
-		Grammar g = new Grammar(gtext);
+		Grammar g = new Grammar(gtext, equeue);
 		NFA nfa = createNFA(g);
 		NFAState s = nfa.ruleToStartState.get(g.getRule(ruleName));
 		if ( s==null ) {
@@ -161,9 +161,7 @@ public abstract class BaseTest {
 		throws Exception
 	{
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-
-		Grammar g = new Grammar(gtext);
+		Grammar g = new Grammar(gtext, equeue);
 		NFA nfa = createNFA(g);
 		DecisionState blk = nfa.decisionToNFAState.get(decision);
 		checkRuleDFA(g, blk, expecting);
@@ -183,9 +181,7 @@ public abstract class BaseTest {
 		throws Exception
 	{
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-
-		Grammar g = new Grammar(gtext);
+		Grammar g = new Grammar(gtext, equeue);
 		g.nfa = createNFA(g);
 		LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(g);
 		DFA dfa = conv.createDFA();
@@ -260,26 +256,20 @@ public abstract class BaseTest {
 			options.add(new File(tmpdir,grammarFileName).toString());
 			final String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
-			/*
-			final ErrorQueue equeue = new ErrorQueue();
-			ErrorManager.setErrorListener(equeue);
-			*/
+			ErrorQueue equeue = new ErrorQueue();
 			Tool antlr = newTool(optionsA);
+			antlr.addListener(equeue);
 			antlr.processGrammarsOnCommandLine();
-			ANTLRErrorListener listener = ErrorManager.getErrorListener();
-			if ( listener instanceof ErrorQueue ) {
-				ErrorQueue equeue = (ErrorQueue)listener;
-				if ( equeue.errors.size()>0 ) {
-					allIsWell = false;
-					System.err.println("antlr reports errors from "+options);
-					for (int i = 0; i < equeue.errors.size(); i++) {
-						Message msg = (Message) equeue.errors.get(i);
-						System.err.println(msg);
-					}
-                    System.out.println("!!!\ngrammar:");
-                    System.out.println(grammarStr);
-                    System.out.println("###");
-                }
+			if ( equeue.errors.size()>0 ) {
+				allIsWell = false;
+				System.err.println("antlr reports errors from "+options);
+				for (int i = 0; i < equeue.errors.size(); i++) {
+					Message msg = (Message) equeue.errors.get(i);
+					System.err.println(msg);
+				}
+				System.out.println("!!!\ngrammar:");
+				System.out.println(grammarStr);
+				System.out.println("###");
 			}
 		}
 		catch (Exception e) {
@@ -521,11 +511,11 @@ public abstract class BaseTest {
             String input = pairs[i];
             String expect = pairs[i+1];
             ErrorQueue equeue = new ErrorQueue();
-            ErrorManager.setErrorListener(equeue);
+			Grammar g=null;
             try {
                 String[] lines = input.split("\n");
 				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-                Grammar g = new Grammar(fileName, input);
+                g = new Grammar(fileName, input, equeue);
 
 				if ( printTree ) {
 					if ( g.ast!=null ) System.out.println(g.ast.toStringTree());
@@ -548,7 +538,7 @@ public abstract class BaseTest {
             catch (RecognitionException re) {
                 re.printStackTrace(System.err);
             }
-            String actual = equeue.toString();
+            String actual = equeue.toString(g.tool);
 			String msg = input;
 			msg = msg.replaceAll("\n","\\\\n");
 			msg = msg.replaceAll("\r","\\\\r");

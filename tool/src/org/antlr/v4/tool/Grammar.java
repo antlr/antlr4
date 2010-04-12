@@ -13,6 +13,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.ToolANTLRParser;
 
 import java.util.*;
 
@@ -110,20 +111,31 @@ public class Grammar implements AttributeResolver {
 		initTokenSymbolTables();		
     }
     
-    /** For testing */
+	/** For testing */
 	public Grammar(String grammarText) throws RecognitionException {
-		this("<string>", grammarText);
+		this("<string>", grammarText, null);
 	}
 
 	/** For testing */
-	public Grammar(String fileName, String grammarText) throws RecognitionException {
+	public Grammar(String grammarText, ANTLRToolListener listener)
+		throws RecognitionException
+	{
+		this("<string>", grammarText, listener);
+	}
+
+	/** For testing */
+	public Grammar(String fileName, String grammarText, ANTLRToolListener listener)
+		throws RecognitionException
+	{
         this.text = grammarText;
 		this.fileName = fileName;
+		this.tool = new Tool();
+		this.tool.addListener(listener);
 		ANTLRStringStream in = new ANTLRStringStream(grammarText);
 		in.name = fileName;
 		ANTLRLexer lexer = new ANTLRLexer(in);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		ANTLRParser p = new ANTLRParser(tokens);
+		ToolANTLRParser p = new ToolANTLRParser(tokens,tool);
 		p.setTreeAdaptor(new GrammarASTAdaptor(in));
 		ParserRuleReturnScope r = p.grammarSpec();
 		if ( r.getTree() instanceof GrammarRootAST ) {

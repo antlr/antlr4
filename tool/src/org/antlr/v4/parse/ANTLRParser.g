@@ -133,18 +133,6 @@ import org.antlr.v4.tool.*;
 
 @members {
 Stack paraphrases = new Stack();
-public void displayRecognitionError(String[] tokenNames,
-									RecognitionException e)
-{
-	String msg = ErrorManager.getParserErrorMessage(this, e);
-	if ( paraphrases.size()>0 ) {
-		String paraphrase = (String)paraphrases.peek();
-		msg = msg+" while "+paraphrase;
-	}
-//	List stack = getRuleInvocationStack(e, this.getClass().getName());
-//	msg += ", rule stack = "+stack;
-	ErrorManager.syntaxError(ErrorType.SYNTAX_ERROR, getSourceName(), e.token, e, msg);
-}
 }
 
 // The main entry point for parsing a V3 grammar from top to toe. This is

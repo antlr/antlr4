@@ -78,7 +78,7 @@ public class SemanticPipeline {
 		symcheck.checkForQualifiedRuleIssues(g, collector.qualifiedRulerefs);
 
 		// don't continue if we got symbol errors
-		if ( ErrorManager.getNumErrors()>0 ) return;
+		if ( g.tool.getNumErrors()>0 ) return;
 
 		// CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
 		AttributeChecks.checkAllAttributeExpressions(g);

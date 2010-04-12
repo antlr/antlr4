@@ -17,8 +17,8 @@ public class UseDefAnalyzer {
 						   alt.labelDefs.containsKey(e.getText()) ||
 						   e.getText().equals(r.name)) ) // $r ok in rule r
 					{
-						ErrorManager.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
-												  g.fileName, e.token, e.getText());
+						g.tool.errMgr.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
+												   g.fileName, e.token, e.getText());
 					}
 				}
 			}

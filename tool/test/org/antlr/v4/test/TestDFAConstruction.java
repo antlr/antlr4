@@ -2,7 +2,6 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.analysis.LeftRecursionDetector;
 import org.antlr.v4.automata.NFA;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Message;
 import org.junit.Test;
@@ -211,11 +210,10 @@ public class TestDFAConstruction extends BaseTest {
 
 	@Test public void testimmediateLeftRecursion() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
-			"a : a A | B;");
+			"a : a A | B;", equeue);
 		NFA nfa = createNFA(g);
 		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
 		lr.check();
@@ -225,7 +223,6 @@ public class TestDFAConstruction extends BaseTest {
 
 	@Test public void testLeftRecursionInMultipleCycles() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 				"s : a x ;\n" +
@@ -233,7 +230,7 @@ public class TestDFAConstruction extends BaseTest {
 				"b : c ;\n" +
 				"c : a | C ;\n" +
 				"x : y | X ;\n" +
-				"y : x ;\n");
+				"y : x ;\n", equeue);
 		NFA nfa = createNFA(g);
 		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
 		lr.check();
@@ -259,12 +256,11 @@ public class TestDFAConstruction extends BaseTest {
 
 	@Test public void testIndirectRecursionLoop() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
 			"a : b X ;\n"+
-			"b : a B ;\n");
+			"b : a B ;\n", equeue);
 		NFA nfa = createNFA(g);
 		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
 		lr.check();
@@ -274,13 +270,12 @@ public class TestDFAConstruction extends BaseTest {
 
 	@Test public void testIndirectRecursionLoop2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
 			"a : i b X ;\n"+ // should see through i
 			"b : a B ;\n" +
-			"i : ;\n");
+			"i : ;\n", equeue);
 		NFA nfa = createNFA(g);
 		LeftRecursionDetector lr = new LeftRecursionDetector(nfa);
 		lr.check();
