@@ -131,8 +131,7 @@ public class BasicSemanticChecks {
 		}
 	}
 
-	void checkNumRules(GrammarAST rulesNode)
-	{
+	void checkNumRules(GrammarAST rulesNode) {
 		if ( rulesNode.getChildCount()==0 ) {
 			GrammarAST root = (GrammarAST)rulesNode.getParent();
 			GrammarAST IDNode = (GrammarAST)root.getChild(0);
@@ -141,6 +140,13 @@ public class BasicSemanticChecks {
 		}
 	}
 
+	void checkMode(Token modeNameToken) {
+		if ( g.getType()!=ANTLRParser.LEXER ) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
+									   modeNameToken, modeNameToken.getText(), g);
+		}
+	}
+	
 	void checkNumPrequels(List<GrammarAST> options,
 						  List<GrammarAST> imports,
 						  List<GrammarAST> tokens)

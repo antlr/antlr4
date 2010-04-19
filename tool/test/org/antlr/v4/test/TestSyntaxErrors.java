@@ -128,4 +128,16 @@ public class TestSyntaxErrors extends BaseTest {
 		super.testErrors(pair, true);
 	}
 
+	@Test public void testModeInParser() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a : A ;\n" +
+			"mode foo;\n" +
+			"b : B ;",
+
+			"error(87): A.g:3:5: lexical modes are only allowed in lexer grammars\n"
+		};
+		super.testErrors(pair, true);
+	}
+
 }

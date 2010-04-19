@@ -86,6 +86,7 @@ public BasicSemanticTriggers(TreeNodeStream input, Grammar g) {
 topdown  // do these on way down so options and such are set first
 	:	grammarSpec
 	|	rules
+	|	mode
 	|	option
 	|	rule
 	|	tokenAlias
@@ -142,6 +143,8 @@ delegateGrammar
     ;
 
 rules : RULES {checker.checkNumRules($RULES);} ;
+
+mode : ^(MODE ID .*) {checker.checkMode($ID.token);} ;
 
 option // TODO: put in grammar, or rule, or block
     :   {inContext("OPTIONS")}? ^(ASSIGN o=ID optionValue)

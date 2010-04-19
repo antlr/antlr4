@@ -142,6 +142,8 @@ public enum ErrorType {
 	LEFT_RECURSION_CYCLES(ErrorSeverity.ERROR, true, true),
 	ANALYSIS_TIMEOUT(ErrorSeverity.ERROR, true, true),
 
+	MODE_NOT_IN_LEXER(ErrorSeverity.ERROR, true, true),
+
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(ErrorSeverity.ERROR, true, true),
 
