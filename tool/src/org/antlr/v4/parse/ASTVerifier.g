@@ -125,15 +125,9 @@ throw e;
 }
 
 grammarSpec
-    :   ^(GRAMMAR ID DOC_COMMENT? prequelConstruct* rules)
+    :   ^(GRAMMAR ID DOC_COMMENT? prequelConstruct* rules mode*)
 	;
 	
-/*
-grammarType
-    :   LEXER_GRAMMAR | PARSER_GRAMMAR | TREE_GRAMMAR | COMBINED_GRAMMAR 
-    ;
-    */
-
 prequelConstruct
 	:   optionsSpec
     |   delegateGrammars
@@ -188,13 +182,15 @@ rules
     : ^(RULES rule*)
     ;
 
+mode:	^( MODE ID rule+ ) ;
+	
 rule:   ^( RULE ID DOC_COMMENT? ruleModifiers? ARG_ACTION?
       	   ruleReturns? rulePrequel* altListAsBlock exceptionGroup
       	 )
     ;
 
 exceptionGroup
-    : exceptionHandler* finallyClause?
+    :	exceptionHandler* finallyClause?
     ;
 
 exceptionHandler

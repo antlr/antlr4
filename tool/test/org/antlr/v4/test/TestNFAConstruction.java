@@ -272,9 +272,15 @@ public class TestNFAConstruction extends BaseTest {
 	@Test public void testAplusNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : (options {greedy=false;}:'0'..'9')+ ;\n"); // TODO: check after doing greedy
+			"A : (options {greedy=false;}:'0'..'9')+ ;\n");
 		String expecting =
-			"\n";
+			"RuleStart_A_1->PlusBlockStart_5\n" +
+			"PlusBlockStart_5->s3\n" +
+			"s3-'0'..'9'->s4\n" +
+			"s4->LoopBack_6\n" +
+			"LoopBack_6->BlockEnd_7\n" +
+			"LoopBack_6->s3\n" +
+			"BlockEnd_7->RuleStop_A_2\n";
 		checkRule(g, "A", expecting);
 	}
 

@@ -68,6 +68,26 @@ public class TestLexerDFAConstruction extends BaseTest {
 		checkLexerDFA(g, expecting);
 	}
 
+	@Test public void testAplusNonGreedy() throws Exception {
+		String g =
+			"lexer grammar t;\n"+
+			"A : (options {greedy=false;}:'0'..'9')+ '000' ;\n";
+		String expecting =
+			"\n";
+		checkLexerDFA(g, expecting);
+	}
+
+	@Test public void testDotNonGreedy() throws Exception {
+		String g =
+			"lexer grammar t;\n"+
+			"A : (options {greedy=false;}:.)+ '000' ;\n";
+		String expecting =
+			"\n";
+		checkLexerDFA(g, expecting);
+	}
+
+
+
 	public void _template() throws Exception {
 		String g =
 			"";

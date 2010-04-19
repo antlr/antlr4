@@ -139,6 +139,7 @@ public class LexerNFAToDFAConverter {
 				Transition t = s.transition(i);
 				// found a transition with label; does it collide with label?
 				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
+					//System.out.println("found edge with "+label.toString(g)+" from NFA state "+s);
 					// add NFA target to (potentially) new DFA state
 					labelTarget.addNFAConfig(
 						new NFAConfig(c, t.target, SemanticContext.EMPTY_SEMANTIC_CONTEXT));

@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} BasicSemanticTriggers.g 2010-04-12 12:06:05
+// $ANTLR ${project.version} ${buildNumber} BasicSemanticTriggers.g 2010-04-19 15:55:58
 
 /*
  [The "BSD license"]
@@ -40,106 +40,107 @@ import java.util.List;
  */
 public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "MODE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "RESULT", "ALT_REWRITE"
     };
-    public static final int COMBINED=90;
-    public static final int LT=43;
-    public static final int STAR=48;
-    public static final int BACKTRACK_SEMPRED=95;
+    public static final int COMBINED=91;
+    public static final int LT=44;
+    public static final int STAR=49;
+    public static final int BACKTRACK_SEMPRED=96;
     public static final int DOUBLE_ANGLE_STRING_LITERAL=11;
     public static final int FORCED_ACTION=5;
-    public static final int ARGLIST=88;
-    public static final int ALTLIST=85;
-    public static final int NOT=60;
+    public static final int ARGLIST=89;
+    public static final int ALTLIST=86;
+    public static final int NOT=61;
     public static final int EOF=-1;
     public static final int SEMPRED=4;
     public static final int ACTION=16;
-    public static final int TOKEN_REF=62;
-    public static final int RULEMODIFIERS=74;
-    public static final int ST_RESULT=99;
-    public static final int RPAREN=41;
-    public static final int RET=89;
+    public static final int TOKEN_REF=63;
+    public static final int RULEMODIFIERS=75;
+    public static final int ST_RESULT=100;
+    public static final int RPAREN=42;
+    public static final int RET=90;
     public static final int IMPORT=22;
-    public static final int STRING_LITERAL=67;
-    public static final int ARG=87;
+    public static final int STRING_LITERAL=68;
+    public static final int ARG=88;
     public static final int ARG_ACTION=14;
     public static final int DOUBLE_QUOTE_STRING_LITERAL=10;
     public static final int COMMENT=9;
     public static final int ACTION_CHAR_LITERAL=13;
     public static final int GRAMMAR=27;
-    public static final int RULEACTIONS=75;
-    public static final int WSCHARS=65;
-    public static final int INITACTION=91;
-    public static final int ALT_REWRITE=101;
-    public static final int IMPLIES=42;
-    public static final int RULE=72;
-    public static final int RBRACE=61;
+    public static final int RULEACTIONS=76;
+    public static final int WSCHARS=66;
+    public static final int INITACTION=92;
+    public static final int ALT_REWRITE=102;
+    public static final int IMPLIES=43;
+    public static final int RULE=73;
+    public static final int RBRACE=62;
     public static final int ACTION_ESC=17;
     public static final int PRIVATE=30;
     public static final int SRC=7;
     public static final int THROWS=32;
-    public static final int CHAR_RANGE=82;
-    public static final int INT=64;
-    public static final int EPSILON=83;
-    public static final int LIST=97;
-    public static final int COLONCOLON=37;
+    public static final int CHAR_RANGE=83;
+    public static final int INT=65;
+    public static final int EPSILON=84;
+    public static final int LIST=98;
+    public static final int COLONCOLON=38;
     public static final int WSNLCHARS=18;
-    public static final int WS=70;
+    public static final int WS=71;
     public static final int LEXER=24;
-    public static final int OR=51;
-    public static final int GT=44;
+    public static final int OR=52;
+    public static final int GT=45;
     public static final int CATCH=33;
-    public static final int CLOSURE=79;
+    public static final int CLOSURE=80;
     public static final int PARSER=25;
-    public static final int DOLLAR=53;
+    public static final int DOLLAR=54;
     public static final int PROTECTED=28;
-    public static final int ELEMENT_OPTIONS=98;
+    public static final int ELEMENT_OPTIONS=99;
     public static final int NESTED_ACTION=15;
     public static final int FRAGMENT=23;
-    public static final int ID=86;
-    public static final int TREE_BEGIN=58;
-    public static final int LPAREN=40;
-    public static final int AT=59;
-    public static final int ESC_SEQ=66;
-    public static final int ALT=84;
+    public static final int ID=87;
+    public static final int TREE_BEGIN=59;
+    public static final int LPAREN=41;
+    public static final int AT=60;
+    public static final int ESC_SEQ=67;
+    public static final int ALT=85;
     public static final int TREE=26;
     public static final int SCOPE=21;
-    public static final int ETC=56;
-    public static final int COMMA=38;
-    public static final int WILDCARD=96;
+    public static final int ETC=57;
+    public static final int COMMA=39;
+    public static final int WILDCARD=97;
     public static final int DOC_COMMENT=6;
-    public static final int PLUS=49;
-    public static final int REWRITE_BLOCK=77;
-    public static final int DOT=54;
+    public static final int PLUS=50;
+    public static final int REWRITE_BLOCK=78;
+    public static final int DOT=55;
+    public static final int MODE=36;
     public static final int RETURNS=31;
-    public static final int RULES=73;
-    public static final int RARROW=57;
-    public static final int UNICODE_ESC=69;
-    public static final int HEX_DIGIT=68;
-    public static final int RANGE=55;
+    public static final int RULES=74;
+    public static final int RARROW=58;
+    public static final int UNICODE_ESC=70;
+    public static final int HEX_DIGIT=69;
+    public static final int RANGE=56;
     public static final int TOKENS=20;
-    public static final int RESULT=100;
-    public static final int GATED_SEMPRED=93;
-    public static final int BANG=47;
+    public static final int RESULT=101;
+    public static final int GATED_SEMPRED=94;
+    public static final int BANG=48;
     public static final int ACTION_STRING_LITERAL=12;
-    public static final int ROOT=52;
-    public static final int SEMI=39;
-    public static final int RULE_REF=63;
+    public static final int ROOT=53;
+    public static final int SEMI=40;
+    public static final int RULE_REF=64;
     public static final int NLCHARS=8;
-    public static final int OPTIONAL=78;
-    public static final int SYNPRED=81;
-    public static final int COLON=36;
-    public static final int QUESTION=46;
+    public static final int OPTIONAL=79;
+    public static final int SYNPRED=82;
+    public static final int COLON=37;
+    public static final int QUESTION=47;
     public static final int FINALLY=34;
     public static final int TEMPLATE=35;
-    public static final int LABEL=92;
-    public static final int SYN_SEMPRED=94;
-    public static final int ERRCHAR=71;
-    public static final int BLOCK=76;
-    public static final int ASSIGN=45;
-    public static final int PLUS_ASSIGN=50;
+    public static final int LABEL=93;
+    public static final int SYN_SEMPRED=95;
+    public static final int ERRCHAR=72;
+    public static final int BLOCK=77;
+    public static final int ASSIGN=46;
+    public static final int PLUS_ASSIGN=51;
     public static final int PUBLIC=29;
-    public static final int POSITIVE_CLOSURE=80;
+    public static final int POSITIVE_CLOSURE=81;
     public static final int OPTIONS=19;
 
     // delegates
@@ -1522,15 +1523,15 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     static final String DFA1_eofS =
         "\14\uffff";
     static final String DFA1_minS =
-        "\1\33\2\uffff\1\2\2\uffff\1\126\1\60\1\3\1\uffff\1\0\1\uffff";
+        "\1\33\2\uffff\1\2\2\uffff\1\127\1\61\1\3\1\uffff\1\0\1\uffff";
     static final String DFA1_maxS =
-        "\1\144\2\uffff\1\2\2\uffff\2\126\1\3\1\uffff\1\0\1\uffff";
+        "\1\145\2\uffff\1\2\2\uffff\2\127\1\3\1\uffff\1\0\1\uffff";
     static final String DFA1_acceptS =
         "\1\uffff\1\1\1\2\1\uffff\1\4\1\6\3\uffff\1\3\1\uffff\1\5";
     static final String DFA1_specialS =
         "\12\uffff\1\0\1\uffff}>";
     static final String[] DFA1_transitionS = {
-            "\1\1\21\uffff\1\3\32\uffff\1\4\1\2\31\uffff\2\5",
+            "\1\1\22\uffff\1\3\32\uffff\1\4\1\2\31\uffff\2\5",
             "",
             "",
             "\1\6",
@@ -1619,47 +1620,47 @@ public class BasicSemanticTriggers extends org.antlr.v4.runtime.tree.TreeFilter 
     public static final BitSet FOLLOW_checkGrammarOptions_in_bottomup158 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_wildcardRoot_in_bottomup164 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_GRAMMAR_in_grammarSpec182 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_grammarSpec184 = new BitSet(new long[]{0x0000000000580040L,0x0000000000000200L});
-    public static final BitSet FOLLOW_DOC_COMMENT_in_grammarSpec186 = new BitSet(new long[]{0x0000000000580000L,0x0000000000000200L});
-    public static final BitSet FOLLOW_prequelConstructs_in_grammarSpec204 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000200L});
+    public static final BitSet FOLLOW_ID_in_grammarSpec184 = new BitSet(new long[]{0x0000000000580040L,0x0000000000000400L});
+    public static final BitSet FOLLOW_DOC_COMMENT_in_grammarSpec186 = new BitSet(new long[]{0x0000000000580000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_prequelConstructs_in_grammarSpec204 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
     public static final BitSet FOLLOW_RULES_in_grammarSpec207 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_GRAMMAR_in_checkGrammarOptions230 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_OPTIONS_in_prequelConstructs253 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_IMPORT_in_prequelConstructs266 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_delegateGrammar_in_prequelConstructs268 = new BitSet(new long[]{0x0000200000000008L,0x0000000000400000L});
+    public static final BitSet FOLLOW_delegateGrammar_in_prequelConstructs268 = new BitSet(new long[]{0x0000400000000008L,0x0000000000800000L});
     public static final BitSet FOLLOW_TOKENS_in_prequelConstructs279 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ASSIGN_in_delegateGrammar312 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_delegateGrammar314 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_ID_in_delegateGrammar314 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
     public static final BitSet FOLLOW_ID_in_delegateGrammar318 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ID_in_delegateGrammar332 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULES_in_rules359 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ASSIGN_in_option380 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option384 = new BitSet(new long[]{0x0001000000000000L,0x0000000000400009L});
+    public static final BitSet FOLLOW_ID_in_option384 = new BitSet(new long[]{0x0002000000000000L,0x0000000000800012L});
     public static final BitSet FOLLOW_optionValue_in_option386 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_set_in_optionValue0 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_in_rule468 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule472 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_ID_in_rule472 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000007FFFFFFFFFL});
     public static final BitSet FOLLOW_RULE_REF_in_ruleref495 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ASSIGN_in_tokenAlias514 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_tokenAlias516 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_tokenAlias516 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_tokenAlias518 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_TOKEN_REF_in_tokenRefWithArgs543 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ARG_ACTION_in_tokenRefWithArgs545 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ELEMENT_OPTIONS_in_elementOption575 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ASSIGN_in_elementOption586 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_elementOption590 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_ID_in_elementOption590 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
     public static final BitSet FOLLOW_ID_in_elementOption594 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ASSIGN_in_elementOption608 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_elementOption612 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000008L});
+    public static final BitSet FOLLOW_ID_in_elementOption612 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_elementOption616 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ID_in_elementOption630 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ALT_in_multiElementAltInTreeGrammar670 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar672 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE0L,0x0000003FFFFFFFFFL});
-    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar679 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE8L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar672 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE0L,0x0000007FFFFFFFFFL});
+    public static final BitSet FOLLOW_set_in_multiElementAltInTreeGrammar679 = new BitSet(new long[]{0xFFFFFFFFFFFEFFE8L,0x0000007FFFFFFFFFL});
     public static final BitSet FOLLOW_ROOT_in_astOps705 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_BANG_in_astOps718 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_set_in_rewrite736 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_TREE_BEGIN_in_wildcardRoot760 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_WILDCARD_in_wildcardRoot762 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000003FFFFFFFFFL});
+    public static final BitSet FOLLOW_WILDCARD_in_wildcardRoot762 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF8L,0x0000007FFFFFFFFFL});
 
 }

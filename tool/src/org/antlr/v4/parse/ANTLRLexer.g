@@ -428,6 +428,7 @@ THROWS       : 'throws'               ;
 CATCH        : 'catch'                ;
 FINALLY      : 'finally'              ;
 TEMPLATE     : 'template'             ;
+MODE         : 'mode'                 ;
 
 // -----------
 // Punctuation

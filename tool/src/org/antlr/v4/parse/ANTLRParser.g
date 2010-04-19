@@ -168,6 +168,8 @@ grammarSpec
 	  // semantic verification phase tell the user about it.
 	  //  
 	  rules
+	  
+	  mode*
       
       // And we force ANTLR to process everything it finds in the input
       // stream by specifying hte need to match End Of File before the
@@ -185,37 +187,10 @@ grammarSpec
              DOC_COMMENT?    // We may or may not have a global documentation comment for the file
              prequelConstruct* // The set of declarations we accumulated
              rules           // And of course, we need the set of rules we discovered
+             mode*
          )
 	;
 	
-
-// ------------
-// Grammar Type
-//
-// ANTLR will process a combined lexer/grammar, a stand alone parser,
-// a stand alone lexer, and tree grammars. This rule determines which of
-// these the gramamr author is asking us to deal with. This choice will
-// later allow us to throw out valid syntactical constructs that are
-// not valid for certain grammar types, such as rule parameters and
-// returns specified for lexer rules.
-//
-/*
-grammarType
-    : (	  // A standalone lexer specification
-          LEXER GRAMMAR  -> LEXER_GRAMMAR<GrammarRootAST>[$LEXER, "LEXER_GRAMMAR"]
-          
-        | // A standalone parser specification
-          PARSER GRAMMAR -> PARSER_GRAMMAR<GrammarRootAST>[$PARSER, "PARSER_GRAMMAR"]
-          
-        | // A standalone tree parser specification
-          TREE GRAMMAR   -> TREE_GRAMMAR<GrammarRootAST>[$TREE, "TREE_GRAMMAR"]
-          
-        // A combined lexer and parser specification
-        | g=GRAMMAR        -> COMBINED_GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
-                  
-       )
-    ;
-    */
 grammarType
 @after {
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
@@ -353,8 +328,10 @@ actionScopeName
     |   PARSER	-> ID[$PARSER]
 	;
 
+mode:	MODE id SEMI sync (rule sync)+  -> ^(MODE id rule+) ;
+
 rules
-    :	sync (rule sync)*    
+    :	sync (rule sync)*    	
       // Rewrite with an enclosing node as this is good for counting
       // the number of rules and an easy marker for the walker to detect
       // that there are no rules.

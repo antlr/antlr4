@@ -351,12 +351,15 @@ public class ParserNFAFactory implements NFAFactory {
 	}
 
 	/** Build an atom with all possible values in its label */
-	public Handle wildcard(GrammarAST associatedAST) { return null; }
+	public Handle wildcard(GrammarAST associatedAST) {
+		return set(IntervalSet.of(Label.MIN_CHAR_VALUE, Label.MAX_CHAR_VALUE),
+				   associatedAST); 
+	}
 
 	/** Build a subrule matching ^(. .*) (any tree or node). Let's use
 	 *  (^(. .+) | .) to be safe.
 	 */
-	public Handle wildcardTree(GrammarAST associatedAST) { return null; }
+	public Handle wildcardTree(GrammarAST associatedAST) { throw new UnsupportedOperationException(); }
 
 	void epsilon(NFAState a, NFAState b) {
 		if ( a!=null ) a.addTransition(new EpsilonTransition(b));

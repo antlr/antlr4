@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-04-02 12:57:42
+// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-04-19 15:55:53
 
 /*
  [The "BSD licence"]
@@ -53,71 +53,72 @@ import org.antlr.runtime.*;
  *  2009
  */
 public class ANTLRLexer extends Lexer {
-    public static final int DOLLAR=53;
+    public static final int DOLLAR=54;
     public static final int PROTECTED=28;
-    public static final int LT=43;
-    public static final int STAR=48;
+    public static final int LT=44;
+    public static final int STAR=49;
     public static final int NESTED_ACTION=15;
     public static final int DOUBLE_ANGLE_STRING_LITERAL=11;
     public static final int FORCED_ACTION=5;
     public static final int FRAGMENT=23;
-    public static final int NOT=60;
-    public static final int TREE_BEGIN=58;
+    public static final int NOT=61;
+    public static final int TREE_BEGIN=59;
     public static final int EOF=-1;
     public static final int SEMPRED=4;
     public static final int ACTION=16;
-    public static final int TOKEN_REF=62;
-    public static final int LPAREN=40;
-    public static final int AT=59;
-    public static final int RPAREN=41;
+    public static final int TOKEN_REF=63;
+    public static final int LPAREN=41;
+    public static final int AT=60;
+    public static final int RPAREN=42;
     public static final int IMPORT=22;
-    public static final int STRING_LITERAL=67;
-    public static final int ESC_SEQ=66;
+    public static final int STRING_LITERAL=68;
+    public static final int ESC_SEQ=67;
     public static final int SCOPE=21;
     public static final int TREE=26;
-    public static final int ETC=56;
-    public static final int COMMA=38;
+    public static final int ETC=57;
+    public static final int COMMA=39;
     public static final int ARG_ACTION=14;
     public static final int DOC_COMMENT=6;
-    public static final int PLUS=49;
+    public static final int PLUS=50;
     public static final int DOUBLE_QUOTE_STRING_LITERAL=10;
-    public static final int DOT=54;
+    public static final int DOT=55;
     public static final int COMMENT=9;
+    public static final int MODE=36;
     public static final int ACTION_CHAR_LITERAL=13;
     public static final int GRAMMAR=27;
-    public static final int WSCHARS=65;
+    public static final int WSCHARS=66;
     public static final int RETURNS=31;
-    public static final int IMPLIES=42;
-    public static final int RBRACE=61;
+    public static final int IMPLIES=43;
+    public static final int RBRACE=62;
     public static final int ACTION_ESC=17;
     public static final int PRIVATE=30;
-    public static final int UNICODE_ESC=69;
-    public static final int RARROW=57;
+    public static final int UNICODE_ESC=70;
+    public static final int RARROW=58;
     public static final int SRC=7;
-    public static final int HEX_DIGIT=68;
-    public static final int RANGE=55;
+    public static final int HEX_DIGIT=69;
+    public static final int RANGE=56;
     public static final int TOKENS=20;
     public static final int THROWS=32;
-    public static final int INT=64;
-    public static final int BANG=47;
+    public static final int INT=65;
+    public static final int BANG=48;
     public static final int ACTION_STRING_LITERAL=12;
-    public static final int ROOT=52;
-    public static final int SEMI=39;
-    public static final int RULE_REF=63;
+    public static final int ROOT=53;
+    public static final int SEMI=40;
+    public static final int RULE_REF=64;
     public static final int NLCHARS=8;
-    public static final int COLON=36;
-    public static final int COLONCOLON=37;
+    public static final int COLON=37;
+    public static final int COLONCOLON=38;
     public static final int WSNLCHARS=18;
-    public static final int WS=70;
-    public static final int QUESTION=46;
+    public static final int WS=71;
+    public static final int QUESTION=47;
     public static final int FINALLY=34;
     public static final int TEMPLATE=35;
     public static final int LEXER=24;
-    public static final int ERRCHAR=71;
-    public static final int OR=51;
-    public static final int PLUS_ASSIGN=50;
-    public static final int ASSIGN=45;
-    public static final int GT=44;
+    public static final int ERRCHAR=72;
+    public static final int OR=52;
+    public static final int PLUS_ASSIGN=51;
+    public static final int ASSIGN=46;
+    public static final int GT=45;
     public static final int CATCH=33;
     public static final int PARSER=25;
     public static final int PUBLIC=29;
@@ -1328,13 +1329,34 @@ public class ANTLRLexer extends Lexer {
     }
     // $ANTLR end "TEMPLATE"
 
+    // $ANTLR start "MODE"
+    public final void mMODE() throws RecognitionException {
+        try {
+            int _type = MODE;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // ANTLRLexer.g:431:14: ( 'mode' )
+            // ANTLRLexer.g:431:16: 'mode'
+            {
+            match("mode"); if (state.failed) return ;
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "MODE"
+
     // $ANTLR start "COLON"
     public final void mCOLON() throws RecognitionException {
         try {
             int _type = COLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:437:14: ( ':' )
-            // ANTLRLexer.g:437:16: ':'
+            // ANTLRLexer.g:438:14: ( ':' )
+            // ANTLRLexer.g:438:16: ':'
             {
             match(':'); if (state.failed) return ;
 
@@ -1353,8 +1375,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = COLONCOLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:438:14: ( '::' )
-            // ANTLRLexer.g:438:16: '::'
+            // ANTLRLexer.g:439:14: ( '::' )
+            // ANTLRLexer.g:439:16: '::'
             {
             match("::"); if (state.failed) return ;
 
@@ -1374,8 +1396,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = COMMA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:439:14: ( ',' )
-            // ANTLRLexer.g:439:16: ','
+            // ANTLRLexer.g:440:14: ( ',' )
+            // ANTLRLexer.g:440:16: ','
             {
             match(','); if (state.failed) return ;
 
@@ -1394,8 +1416,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = SEMI;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:440:14: ( ';' )
-            // ANTLRLexer.g:440:16: ';'
+            // ANTLRLexer.g:441:14: ( ';' )
+            // ANTLRLexer.g:441:16: ';'
             {
             match(';'); if (state.failed) return ;
 
@@ -1414,8 +1436,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = LPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:441:14: ( '(' )
-            // ANTLRLexer.g:441:16: '('
+            // ANTLRLexer.g:442:14: ( '(' )
+            // ANTLRLexer.g:442:16: '('
             {
             match('('); if (state.failed) return ;
 
@@ -1434,8 +1456,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = RPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:442:14: ( ')' )
-            // ANTLRLexer.g:442:16: ')'
+            // ANTLRLexer.g:443:14: ( ')' )
+            // ANTLRLexer.g:443:16: ')'
             {
             match(')'); if (state.failed) return ;
 
@@ -1454,8 +1476,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = IMPLIES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:443:14: ( '=>' )
-            // ANTLRLexer.g:443:16: '=>'
+            // ANTLRLexer.g:444:14: ( '=>' )
+            // ANTLRLexer.g:444:16: '=>'
             {
             match("=>"); if (state.failed) return ;
 
@@ -1475,8 +1497,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = LT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:444:14: ( '<' )
-            // ANTLRLexer.g:444:16: '<'
+            // ANTLRLexer.g:445:14: ( '<' )
+            // ANTLRLexer.g:445:16: '<'
             {
             match('<'); if (state.failed) return ;
 
@@ -1495,8 +1517,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = GT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:445:14: ( '>' )
-            // ANTLRLexer.g:445:16: '>'
+            // ANTLRLexer.g:446:14: ( '>' )
+            // ANTLRLexer.g:446:16: '>'
             {
             match('>'); if (state.failed) return ;
 
@@ -1515,8 +1537,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = ASSIGN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:446:14: ( '=' )
-            // ANTLRLexer.g:446:16: '='
+            // ANTLRLexer.g:447:14: ( '=' )
+            // ANTLRLexer.g:447:16: '='
             {
             match('='); if (state.failed) return ;
 
@@ -1535,8 +1557,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = QUESTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:447:14: ( '?' )
-            // ANTLRLexer.g:447:16: '?'
+            // ANTLRLexer.g:448:14: ( '?' )
+            // ANTLRLexer.g:448:16: '?'
             {
             match('?'); if (state.failed) return ;
 
@@ -1555,8 +1577,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = BANG;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:448:14: ( '!' )
-            // ANTLRLexer.g:448:16: '!'
+            // ANTLRLexer.g:449:14: ( '!' )
+            // ANTLRLexer.g:449:16: '!'
             {
             match('!'); if (state.failed) return ;
 
@@ -1575,8 +1597,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = STAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:449:14: ( '*' )
-            // ANTLRLexer.g:449:16: '*'
+            // ANTLRLexer.g:450:14: ( '*' )
+            // ANTLRLexer.g:450:16: '*'
             {
             match('*'); if (state.failed) return ;
 
@@ -1595,8 +1617,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:450:14: ( '+' )
-            // ANTLRLexer.g:450:16: '+'
+            // ANTLRLexer.g:451:14: ( '+' )
+            // ANTLRLexer.g:451:16: '+'
             {
             match('+'); if (state.failed) return ;
 
@@ -1615,8 +1637,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = PLUS_ASSIGN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:451:14: ( '+=' )
-            // ANTLRLexer.g:451:16: '+='
+            // ANTLRLexer.g:452:14: ( '+=' )
+            // ANTLRLexer.g:452:16: '+='
             {
             match("+="); if (state.failed) return ;
 
@@ -1636,8 +1658,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = OR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:452:14: ( '|' )
-            // ANTLRLexer.g:452:16: '|'
+            // ANTLRLexer.g:453:14: ( '|' )
+            // ANTLRLexer.g:453:16: '|'
             {
             match('|'); if (state.failed) return ;
 
@@ -1656,8 +1678,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = ROOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:453:14: ( '^' )
-            // ANTLRLexer.g:453:16: '^'
+            // ANTLRLexer.g:454:14: ( '^' )
+            // ANTLRLexer.g:454:16: '^'
             {
             match('^'); if (state.failed) return ;
 
@@ -1676,8 +1698,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = DOLLAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:454:14: ( '$' )
-            // ANTLRLexer.g:454:16: '$'
+            // ANTLRLexer.g:455:14: ( '$' )
+            // ANTLRLexer.g:455:16: '$'
             {
             match('$'); if (state.failed) return ;
 
@@ -1696,8 +1718,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = DOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:455:11: ( '.' )
-            // ANTLRLexer.g:455:13: '.'
+            // ANTLRLexer.g:456:11: ( '.' )
+            // ANTLRLexer.g:456:13: '.'
             {
             match('.'); if (state.failed) return ;
 
@@ -1716,8 +1738,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = RANGE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:456:14: ( '..' )
-            // ANTLRLexer.g:456:16: '..'
+            // ANTLRLexer.g:457:14: ( '..' )
+            // ANTLRLexer.g:457:16: '..'
             {
             match(".."); if (state.failed) return ;
 
@@ -1737,8 +1759,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = ETC;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:457:14: ( '...' )
-            // ANTLRLexer.g:457:16: '...'
+            // ANTLRLexer.g:458:14: ( '...' )
+            // ANTLRLexer.g:458:16: '...'
             {
             match("..."); if (state.failed) return ;
 
@@ -1758,8 +1780,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = RARROW;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:458:14: ( '->' )
-            // ANTLRLexer.g:458:16: '->'
+            // ANTLRLexer.g:459:14: ( '->' )
+            // ANTLRLexer.g:459:16: '->'
             {
             match("->"); if (state.failed) return ;
 
@@ -1779,8 +1801,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = TREE_BEGIN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:459:14: ( '^(' )
-            // ANTLRLexer.g:459:16: '^('
+            // ANTLRLexer.g:460:14: ( '^(' )
+            // ANTLRLexer.g:460:16: '^('
             {
             match("^("); if (state.failed) return ;
 
@@ -1800,8 +1822,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = AT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:460:14: ( '@' )
-            // ANTLRLexer.g:460:16: '@'
+            // ANTLRLexer.g:461:14: ( '@' )
+            // ANTLRLexer.g:461:16: '@'
             {
             match('@'); if (state.failed) return ;
 
@@ -1820,8 +1842,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = NOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:461:14: ( '~' )
-            // ANTLRLexer.g:461:16: '~'
+            // ANTLRLexer.g:462:14: ( '~' )
+            // ANTLRLexer.g:462:16: '~'
             {
             match('~'); if (state.failed) return ;
 
@@ -1840,8 +1862,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = RBRACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:462:14: ( '}' )
-            // ANTLRLexer.g:462:16: '}'
+            // ANTLRLexer.g:463:14: ( '}' )
+            // ANTLRLexer.g:463:16: '}'
             {
             match('}'); if (state.failed) return ;
 
@@ -1860,17 +1882,17 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = TOKEN_REF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:471:5: ( ( 'A' .. 'Z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )* )
-            // ANTLRLexer.g:471:7: ( 'A' .. 'Z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
+            // ANTLRLexer.g:472:5: ( ( 'A' .. 'Z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )* )
+            // ANTLRLexer.g:472:7: ( 'A' .. 'Z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
             {
-            // ANTLRLexer.g:471:7: ( 'A' .. 'Z' )
-            // ANTLRLexer.g:471:8: 'A' .. 'Z'
+            // ANTLRLexer.g:472:7: ( 'A' .. 'Z' )
+            // ANTLRLexer.g:472:8: 'A' .. 'Z'
             {
             matchRange('A','Z'); if (state.failed) return ;
 
             }
 
-            // ANTLRLexer.g:471:18: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
+            // ANTLRLexer.g:472:18: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
             loop16:
             do {
                 int alt16=2;
@@ -1920,17 +1942,17 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = RULE_REF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:482:5: ( ( 'a' .. 'z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )* )
-            // ANTLRLexer.g:482:7: ( 'a' .. 'z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
+            // ANTLRLexer.g:483:5: ( ( 'a' .. 'z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )* )
+            // ANTLRLexer.g:483:7: ( 'a' .. 'z' ) ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
             {
-            // ANTLRLexer.g:482:7: ( 'a' .. 'z' )
-            // ANTLRLexer.g:482:8: 'a' .. 'z'
+            // ANTLRLexer.g:483:7: ( 'a' .. 'z' )
+            // ANTLRLexer.g:483:8: 'a' .. 'z'
             {
             matchRange('a','z'); if (state.failed) return ;
 
             }
 
-            // ANTLRLexer.g:482:18: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
+            // ANTLRLexer.g:483:18: ( 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' )*
             loop17:
             do {
                 int alt17=2;
@@ -1978,25 +2000,25 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "ACTION_CHAR_LITERAL"
     public final void mACTION_CHAR_LITERAL() throws RecognitionException {
         try {
-            // ANTLRLexer.g:505:2: ( '\\'' ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )* '\\'' )
-            // ANTLRLexer.g:505:4: '\\'' ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )* '\\''
+            // ANTLRLexer.g:506:2: ( '\\'' ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )* '\\'' )
+            // ANTLRLexer.g:506:4: '\\'' ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )* '\\''
             {
             match('\''); if (state.failed) return ;
-            // ANTLRLexer.g:505:9: ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )*
+            // ANTLRLexer.g:506:9: ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )*
             loop18:
             do {
                 int alt18=3;
                 alt18 = dfa18.predict(input);
                 switch (alt18) {
             	case 1 :
-            	    // ANTLRLexer.g:505:10: ( '\\\\' )=> ACTION_ESC
+            	    // ANTLRLexer.g:506:10: ( '\\\\' )=> ACTION_ESC
             	    {
             	    mACTION_ESC(); if (state.failed) return ;
 
             	    }
             	    break;
             	case 2 :
-            	    // ANTLRLexer.g:505:31: ~ '\\''
+            	    // ANTLRLexer.g:506:31: ~ '\\''
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -2030,25 +2052,25 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "ACTION_STRING_LITERAL"
     public final void mACTION_STRING_LITERAL() throws RecognitionException {
         try {
-            // ANTLRLexer.g:515:2: ( '\"' ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )* '\"' )
-            // ANTLRLexer.g:515:4: '\"' ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )* '\"'
+            // ANTLRLexer.g:516:2: ( '\"' ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )* '\"' )
+            // ANTLRLexer.g:516:4: '\"' ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )* '\"'
             {
             match('\"'); if (state.failed) return ;
-            // ANTLRLexer.g:515:8: ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )*
+            // ANTLRLexer.g:516:8: ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )*
             loop19:
             do {
                 int alt19=3;
                 alt19 = dfa19.predict(input);
                 switch (alt19) {
             	case 1 :
-            	    // ANTLRLexer.g:515:9: ( '\\\\' )=> ACTION_ESC
+            	    // ANTLRLexer.g:516:9: ( '\\\\' )=> ACTION_ESC
             	    {
             	    mACTION_ESC(); if (state.failed) return ;
 
             	    }
             	    break;
             	case 2 :
-            	    // ANTLRLexer.g:515:30: ~ '\"'
+            	    // ANTLRLexer.g:516:30: ~ '\"'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -2082,8 +2104,8 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "ACTION_ESC"
     public final void mACTION_ESC() throws RecognitionException {
         try {
-            // ANTLRLexer.g:525:2: ( '\\\\' . )
-            // ANTLRLexer.g:525:4: '\\\\' .
+            // ANTLRLexer.g:526:2: ( '\\\\' . )
+            // ANTLRLexer.g:526:4: '\\\\' .
             {
             match('\\'); if (state.failed) return ;
             matchAny(); if (state.failed) return ;
@@ -2101,10 +2123,10 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:533:5: ( ( '0' .. '9' )+ )
-            // ANTLRLexer.g:533:7: ( '0' .. '9' )+
+            // ANTLRLexer.g:534:5: ( ( '0' .. '9' )+ )
+            // ANTLRLexer.g:534:7: ( '0' .. '9' )+
             {
-            // ANTLRLexer.g:533:7: ( '0' .. '9' )+
+            // ANTLRLexer.g:534:7: ( '0' .. '9' )+
             int cnt20=0;
             loop20:
             do {
@@ -2118,7 +2140,7 @@ public class ANTLRLexer extends Lexer {
 
                 switch (alt20) {
             	case 1 :
-            	    // ANTLRLexer.g:533:8: '0' .. '9'
+            	    // ANTLRLexer.g:534:8: '0' .. '9'
             	    {
             	    matchRange('0','9'); if (state.failed) return ;
 
@@ -2152,12 +2174,12 @@ public class ANTLRLexer extends Lexer {
             CommonToken file=null;
             CommonToken line=null;
 
-            // ANTLRLexer.g:545:5: ( 'src' ( WSCHARS )+ file= ACTION_STRING_LITERAL ( WSCHARS )+ line= INT )
-            // ANTLRLexer.g:545:7: 'src' ( WSCHARS )+ file= ACTION_STRING_LITERAL ( WSCHARS )+ line= INT
+            // ANTLRLexer.g:546:5: ( 'src' ( WSCHARS )+ file= ACTION_STRING_LITERAL ( WSCHARS )+ line= INT )
+            // ANTLRLexer.g:546:7: 'src' ( WSCHARS )+ file= ACTION_STRING_LITERAL ( WSCHARS )+ line= INT
             {
             match("src"); if (state.failed) return ;
 
-            // ANTLRLexer.g:545:13: ( WSCHARS )+
+            // ANTLRLexer.g:546:13: ( WSCHARS )+
             int cnt21=0;
             loop21:
             do {
@@ -2171,7 +2193,7 @@ public class ANTLRLexer extends Lexer {
 
                 switch (alt21) {
             	case 1 :
-            	    // ANTLRLexer.g:545:13: WSCHARS
+            	    // ANTLRLexer.g:546:13: WSCHARS
             	    {
             	    mWSCHARS(); if (state.failed) return ;
 
@@ -2188,14 +2210,14 @@ public class ANTLRLexer extends Lexer {
                 cnt21++;
             } while (true);
 
-            int fileStart3568 = getCharIndex();
-            int fileStartLine3568 = getLine();
-            int fileStartCharPos3568 = getCharPositionInLine();
+            int fileStart3600 = getCharIndex();
+            int fileStartLine3600 = getLine();
+            int fileStartCharPos3600 = getCharPositionInLine();
             mACTION_STRING_LITERAL(); if (state.failed) return ;
-            file = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, fileStart3568, getCharIndex()-1);
-            file.setLine(fileStartLine3568);
-            file.setCharPositionInLine(fileStartCharPos3568);
-            // ANTLRLexer.g:545:49: ( WSCHARS )+
+            file = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, fileStart3600, getCharIndex()-1);
+            file.setLine(fileStartLine3600);
+            file.setCharPositionInLine(fileStartCharPos3600);
+            // ANTLRLexer.g:546:49: ( WSCHARS )+
             int cnt22=0;
             loop22:
             do {
@@ -2209,7 +2231,7 @@ public class ANTLRLexer extends Lexer {
 
                 switch (alt22) {
             	case 1 :
-            	    // ANTLRLexer.g:545:49: WSCHARS
+            	    // ANTLRLexer.g:546:49: WSCHARS
             	    {
             	    mWSCHARS(); if (state.failed) return ;
 
@@ -2226,13 +2248,13 @@ public class ANTLRLexer extends Lexer {
                 cnt22++;
             } while (true);
 
-            int lineStart3575 = getCharIndex();
-            int lineStartLine3575 = getLine();
-            int lineStartCharPos3575 = getCharPositionInLine();
+            int lineStart3607 = getCharIndex();
+            int lineStartLine3607 = getLine();
+            int lineStartCharPos3607 = getCharPositionInLine();
             mINT(); if (state.failed) return ;
-            line = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, lineStart3575, getCharIndex()-1);
-            line.setLine(lineStartLine3575);
-            line.setCharPositionInLine(lineStartCharPos3575);
+            line = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, lineStart3607, getCharIndex()-1);
+            line.setLine(lineStartLine3607);
+            line.setCharPositionInLine(lineStartCharPos3607);
             if ( state.backtracking==0 ) {
 
                        // TODO: Add target specific code to change the source file name and current line number
@@ -2256,11 +2278,11 @@ public class ANTLRLexer extends Lexer {
 
                int len = 0;
 
-            // ANTLRLexer.g:563:5: ( '\\'' ( ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) ) )* '\\'' )
-            // ANTLRLexer.g:563:8: '\\'' ( ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) ) )* '\\''
+            // ANTLRLexer.g:564:5: ( '\\'' ( ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) ) )* '\\'' )
+            // ANTLRLexer.g:564:8: '\\'' ( ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) ) )* '\\''
             {
             match('\''); if (state.failed) return ;
-            // ANTLRLexer.g:563:13: ( ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) ) )*
+            // ANTLRLexer.g:564:13: ( ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) ) )*
             loop24:
             do {
                 int alt24=2;
@@ -2273,9 +2295,9 @@ public class ANTLRLexer extends Lexer {
 
                 switch (alt24) {
             	case 1 :
-            	    // ANTLRLexer.g:563:15: ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) )
+            	    // ANTLRLexer.g:564:15: ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) )
             	    {
-            	    // ANTLRLexer.g:563:15: ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) )
+            	    // ANTLRLexer.g:564:15: ( ESC_SEQ | ~ ( '\\\\' | '\\'' ) )
             	    int alt23=2;
             	    int LA23_0 = input.LA(1);
 
@@ -2294,14 +2316,14 @@ public class ANTLRLexer extends Lexer {
             	    }
             	    switch (alt23) {
             	        case 1 :
-            	            // ANTLRLexer.g:563:17: ESC_SEQ
+            	            // ANTLRLexer.g:564:17: ESC_SEQ
             	            {
             	            mESC_SEQ(); if (state.failed) return ;
 
             	            }
             	            break;
             	        case 2 :
-            	            // ANTLRLexer.g:563:27: ~ ( '\\\\' | '\\'' )
+            	            // ANTLRLexer.g:564:27: ~ ( '\\\\' | '\\'' )
             	            {
             	            if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	                input.consume();
@@ -2346,8 +2368,8 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "HEX_DIGIT"
     public final void mHEX_DIGIT() throws RecognitionException {
         try {
-            // ANTLRLexer.g:569:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
-            // ANTLRLexer.g:569:13: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // ANTLRLexer.g:570:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // ANTLRLexer.g:570:13: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f') ) {
                 input.consume();
@@ -2371,79 +2393,79 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "ESC_SEQ"
     public final void mESC_SEQ() throws RecognitionException {
         try {
-            // ANTLRLexer.g:576:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | ) )
-            // ANTLRLexer.g:576:7: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | )
+            // ANTLRLexer.g:577:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | ) )
+            // ANTLRLexer.g:577:7: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | )
             {
             match('\\'); if (state.failed) return ;
-            // ANTLRLexer.g:577:9: ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | )
+            // ANTLRLexer.g:578:9: ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | )
             int alt25=10;
             alt25 = dfa25.predict(input);
             switch (alt25) {
                 case 1 :
-                    // ANTLRLexer.g:581:9: 'b'
+                    // ANTLRLexer.g:582:9: 'b'
                     {
                     match('b'); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // ANTLRLexer.g:581:13: 't'
+                    // ANTLRLexer.g:582:13: 't'
                     {
                     match('t'); if (state.failed) return ;
 
                     }
                     break;
                 case 3 :
-                    // ANTLRLexer.g:581:17: 'n'
+                    // ANTLRLexer.g:582:17: 'n'
                     {
                     match('n'); if (state.failed) return ;
 
                     }
                     break;
                 case 4 :
-                    // ANTLRLexer.g:581:21: 'f'
+                    // ANTLRLexer.g:582:21: 'f'
                     {
                     match('f'); if (state.failed) return ;
 
                     }
                     break;
                 case 5 :
-                    // ANTLRLexer.g:581:25: 'r'
+                    // ANTLRLexer.g:582:25: 'r'
                     {
                     match('r'); if (state.failed) return ;
 
                     }
                     break;
                 case 6 :
-                    // ANTLRLexer.g:581:29: '\\\"'
+                    // ANTLRLexer.g:582:29: '\\\"'
                     {
                     match('\"'); if (state.failed) return ;
 
                     }
                     break;
                 case 7 :
-                    // ANTLRLexer.g:581:34: '\\''
+                    // ANTLRLexer.g:582:34: '\\''
                     {
                     match('\''); if (state.failed) return ;
 
                     }
                     break;
                 case 8 :
-                    // ANTLRLexer.g:581:39: '\\\\'
+                    // ANTLRLexer.g:582:39: '\\\\'
                     {
                     match('\\'); if (state.failed) return ;
 
                     }
                     break;
                 case 9 :
-                    // ANTLRLexer.g:585:12: UNICODE_ESC
+                    // ANTLRLexer.g:586:12: UNICODE_ESC
                     {
                     mUNICODE_ESC(); if (state.failed) return ;
 
                     }
                     break;
                 case 10 :
-                    // ANTLRLexer.g:589:12: 
+                    // ANTLRLexer.g:590:12: 
                     {
                     if ( state.backtracking==0 ) {
 
@@ -2476,11 +2498,11 @@ public class ANTLRLexer extends Lexer {
             	//
             	int	hCount = 0;
 
-            // ANTLRLexer.g:606:5: ( 'u' ( ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) ) | ) )
-            // ANTLRLexer.g:606:9: 'u' ( ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) ) | )
+            // ANTLRLexer.g:607:5: ( 'u' ( ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) ) | ) )
+            // ANTLRLexer.g:607:9: 'u' ( ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) ) | )
             {
             match('u'); if (state.failed) return ;
-            // ANTLRLexer.g:615:6: ( ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) ) | )
+            // ANTLRLexer.g:616:6: ( ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) ) | )
             int alt29=2;
             int LA29_0 = input.LA(1);
 
@@ -2491,16 +2513,16 @@ public class ANTLRLexer extends Lexer {
                 alt29=2;}
             switch (alt29) {
                 case 1 :
-                    // ANTLRLexer.g:616:9: ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) )
+                    // ANTLRLexer.g:617:9: ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) )
                     {
-                    // ANTLRLexer.g:616:9: ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) )
-                    // ANTLRLexer.g:617:12: HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | )
+                    // ANTLRLexer.g:617:9: ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | ) )
+                    // ANTLRLexer.g:618:12: HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | )
                     {
                     mHEX_DIGIT(); if (state.failed) return ;
                     if ( state.backtracking==0 ) {
                        hCount++; 
                     }
-                    // ANTLRLexer.g:618:14: ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | )
+                    // ANTLRLexer.g:619:14: ( HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | ) | )
                     int alt28=2;
                     int LA28_0 = input.LA(1);
 
@@ -2511,13 +2533,13 @@ public class ANTLRLexer extends Lexer {
                         alt28=2;}
                     switch (alt28) {
                         case 1 :
-                            // ANTLRLexer.g:619:19: HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | )
+                            // ANTLRLexer.g:620:19: HEX_DIGIT ( HEX_DIGIT ( HEX_DIGIT | ) | )
                             {
                             mHEX_DIGIT(); if (state.failed) return ;
                             if ( state.backtracking==0 ) {
                                hCount++; 
                             }
-                            // ANTLRLexer.g:620:16: ( HEX_DIGIT ( HEX_DIGIT | ) | )
+                            // ANTLRLexer.g:621:16: ( HEX_DIGIT ( HEX_DIGIT | ) | )
                             int alt27=2;
                             int LA27_0 = input.LA(1);
 
@@ -2528,13 +2550,13 @@ public class ANTLRLexer extends Lexer {
                                 alt27=2;}
                             switch (alt27) {
                                 case 1 :
-                                    // ANTLRLexer.g:621:21: HEX_DIGIT ( HEX_DIGIT | )
+                                    // ANTLRLexer.g:622:21: HEX_DIGIT ( HEX_DIGIT | )
                                     {
                                     mHEX_DIGIT(); if (state.failed) return ;
                                     if ( state.backtracking==0 ) {
                                        hCount++; 
                                     }
-                                    // ANTLRLexer.g:622:21: ( HEX_DIGIT | )
+                                    // ANTLRLexer.g:623:21: ( HEX_DIGIT | )
                                     int alt26=2;
                                     int LA26_0 = input.LA(1);
 
@@ -2545,7 +2567,7 @@ public class ANTLRLexer extends Lexer {
                                         alt26=2;}
                                     switch (alt26) {
                                         case 1 :
-                                            // ANTLRLexer.g:625:25: HEX_DIGIT
+                                            // ANTLRLexer.g:626:25: HEX_DIGIT
                                             {
                                             mHEX_DIGIT(); if (state.failed) return ;
                                             if ( state.backtracking==0 ) {
@@ -2555,7 +2577,7 @@ public class ANTLRLexer extends Lexer {
                                             }
                                             break;
                                         case 2 :
-                                            // ANTLRLexer.g:628:21: 
+                                            // ANTLRLexer.g:629:21: 
                                             {
                                             }
                                             break;
@@ -2566,7 +2588,7 @@ public class ANTLRLexer extends Lexer {
                                     }
                                     break;
                                 case 2 :
-                                    // ANTLRLexer.g:631:17: 
+                                    // ANTLRLexer.g:632:17: 
                                     {
                                     }
                                     break;
@@ -2577,7 +2599,7 @@ public class ANTLRLexer extends Lexer {
                             }
                             break;
                         case 2 :
-                            // ANTLRLexer.g:634:11: 
+                            // ANTLRLexer.g:635:11: 
                             {
                             }
                             break;
@@ -2591,7 +2613,7 @@ public class ANTLRLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // ANTLRLexer.g:637:6: 
+                    // ANTLRLexer.g:638:6: 
                     {
                     }
                     break;
@@ -2620,10 +2642,10 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:657:5: ( ( ' ' | '\\t' | '\\r' | '\\n' | '\\f' )+ )
-            // ANTLRLexer.g:657:7: ( ' ' | '\\t' | '\\r' | '\\n' | '\\f' )+
+            // ANTLRLexer.g:658:5: ( ( ' ' | '\\t' | '\\r' | '\\n' | '\\f' )+ )
+            // ANTLRLexer.g:658:7: ( ' ' | '\\t' | '\\r' | '\\n' | '\\f' )+
             {
-            // ANTLRLexer.g:657:7: ( ' ' | '\\t' | '\\r' | '\\n' | '\\f' )+
+            // ANTLRLexer.g:658:7: ( ' ' | '\\t' | '\\r' | '\\n' | '\\f' )+
             int cnt30=0;
             loop30:
             do {
@@ -2683,7 +2705,7 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "NLCHARS"
     public final void mNLCHARS() throws RecognitionException {
         try {
-            // ANTLRLexer.g:675:5: ( '\\n' | '\\r' )
+            // ANTLRLexer.g:676:5: ( '\\n' | '\\r' )
             // ANTLRLexer.g:
             {
             if ( input.LA(1)=='\n'||input.LA(1)=='\r' ) {
@@ -2708,7 +2730,7 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "WSCHARS"
     public final void mWSCHARS() throws RecognitionException {
         try {
-            // ANTLRLexer.g:683:5: ( ' ' | '\\t' | '\\f' )
+            // ANTLRLexer.g:684:5: ( ' ' | '\\t' | '\\f' )
             // ANTLRLexer.g:
             {
             if ( input.LA(1)=='\t'||input.LA(1)=='\f'||input.LA(1)==' ' ) {
@@ -2733,7 +2755,7 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR start "WSNLCHARS"
     public final void mWSNLCHARS() throws RecognitionException {
         try {
-            // ANTLRLexer.g:692:5: ( ' ' | '\\t' | '\\f' | '\\n' | '\\r' )
+            // ANTLRLexer.g:693:5: ( ' ' | '\\t' | '\\f' | '\\n' | '\\r' )
             // ANTLRLexer.g:
             {
             if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
@@ -2760,8 +2782,8 @@ public class ANTLRLexer extends Lexer {
         try {
             int _type = ERRCHAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ANTLRLexer.g:707:5: ( . )
-            // ANTLRLexer.g:707:7: .
+            // ANTLRLexer.g:708:5: ( . )
+            // ANTLRLexer.g:708:7: .
             {
             matchAny(); if (state.failed) return ;
             if ( state.backtracking==0 ) {
@@ -2783,8 +2805,8 @@ public class ANTLRLexer extends Lexer {
     // $ANTLR end "ERRCHAR"
 
     public void mTokens() throws RecognitionException {
-        // ANTLRLexer.g:1:8: ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | DOT | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR )
-        int alt31=54;
+        // ANTLRLexer.g:1:8: ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | MODE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | DOT | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR )
+        int alt31=55;
         alt31 = dfa31.predict(input);
         switch (alt31) {
             case 1 :
@@ -2942,224 +2964,231 @@ public class ANTLRLexer extends Lexer {
                 }
                 break;
             case 23 :
-                // ANTLRLexer.g:1:218: COLON
+                // ANTLRLexer.g:1:218: MODE
+                {
+                mMODE(); if (state.failed) return ;
+
+                }
+                break;
+            case 24 :
+                // ANTLRLexer.g:1:223: COLON
                 {
                 mCOLON(); if (state.failed) return ;
 
                 }
                 break;
-            case 24 :
-                // ANTLRLexer.g:1:224: COLONCOLON
+            case 25 :
+                // ANTLRLexer.g:1:229: COLONCOLON
                 {
                 mCOLONCOLON(); if (state.failed) return ;
 
                 }
                 break;
-            case 25 :
-                // ANTLRLexer.g:1:235: COMMA
+            case 26 :
+                // ANTLRLexer.g:1:240: COMMA
                 {
                 mCOMMA(); if (state.failed) return ;
 
                 }
                 break;
-            case 26 :
-                // ANTLRLexer.g:1:241: SEMI
+            case 27 :
+                // ANTLRLexer.g:1:246: SEMI
                 {
                 mSEMI(); if (state.failed) return ;
 
                 }
                 break;
-            case 27 :
-                // ANTLRLexer.g:1:246: LPAREN
+            case 28 :
+                // ANTLRLexer.g:1:251: LPAREN
                 {
                 mLPAREN(); if (state.failed) return ;
 
                 }
                 break;
-            case 28 :
-                // ANTLRLexer.g:1:253: RPAREN
+            case 29 :
+                // ANTLRLexer.g:1:258: RPAREN
                 {
                 mRPAREN(); if (state.failed) return ;
 
                 }
                 break;
-            case 29 :
-                // ANTLRLexer.g:1:260: IMPLIES
+            case 30 :
+                // ANTLRLexer.g:1:265: IMPLIES
                 {
                 mIMPLIES(); if (state.failed) return ;
 
                 }
                 break;
-            case 30 :
-                // ANTLRLexer.g:1:268: LT
+            case 31 :
+                // ANTLRLexer.g:1:273: LT
                 {
                 mLT(); if (state.failed) return ;
 
                 }
                 break;
-            case 31 :
-                // ANTLRLexer.g:1:271: GT
+            case 32 :
+                // ANTLRLexer.g:1:276: GT
                 {
                 mGT(); if (state.failed) return ;
 
                 }
                 break;
-            case 32 :
-                // ANTLRLexer.g:1:274: ASSIGN
+            case 33 :
+                // ANTLRLexer.g:1:279: ASSIGN
                 {
                 mASSIGN(); if (state.failed) return ;
 
                 }
                 break;
-            case 33 :
-                // ANTLRLexer.g:1:281: QUESTION
+            case 34 :
+                // ANTLRLexer.g:1:286: QUESTION
                 {
                 mQUESTION(); if (state.failed) return ;
 
                 }
                 break;
-            case 34 :
-                // ANTLRLexer.g:1:290: BANG
+            case 35 :
+                // ANTLRLexer.g:1:295: BANG
                 {
                 mBANG(); if (state.failed) return ;
 
                 }
                 break;
-            case 35 :
-                // ANTLRLexer.g:1:295: STAR
+            case 36 :
+                // ANTLRLexer.g:1:300: STAR
                 {
                 mSTAR(); if (state.failed) return ;
 
                 }
                 break;
-            case 36 :
-                // ANTLRLexer.g:1:300: PLUS
+            case 37 :
+                // ANTLRLexer.g:1:305: PLUS
                 {
                 mPLUS(); if (state.failed) return ;
 
                 }
                 break;
-            case 37 :
-                // ANTLRLexer.g:1:305: PLUS_ASSIGN
+            case 38 :
+                // ANTLRLexer.g:1:310: PLUS_ASSIGN
                 {
                 mPLUS_ASSIGN(); if (state.failed) return ;
 
                 }
                 break;
-            case 38 :
-                // ANTLRLexer.g:1:317: OR
+            case 39 :
+                // ANTLRLexer.g:1:322: OR
                 {
                 mOR(); if (state.failed) return ;
 
                 }
                 break;
-            case 39 :
-                // ANTLRLexer.g:1:320: ROOT
+            case 40 :
+                // ANTLRLexer.g:1:325: ROOT
                 {
                 mROOT(); if (state.failed) return ;
 
                 }
                 break;
-            case 40 :
-                // ANTLRLexer.g:1:325: DOLLAR
+            case 41 :
+                // ANTLRLexer.g:1:330: DOLLAR
                 {
                 mDOLLAR(); if (state.failed) return ;
 
                 }
                 break;
-            case 41 :
-                // ANTLRLexer.g:1:332: DOT
+            case 42 :
+                // ANTLRLexer.g:1:337: DOT
                 {
                 mDOT(); if (state.failed) return ;
 
                 }
                 break;
-            case 42 :
-                // ANTLRLexer.g:1:336: RANGE
+            case 43 :
+                // ANTLRLexer.g:1:341: RANGE
                 {
                 mRANGE(); if (state.failed) return ;
 
                 }
                 break;
-            case 43 :
-                // ANTLRLexer.g:1:342: ETC
+            case 44 :
+                // ANTLRLexer.g:1:347: ETC
                 {
                 mETC(); if (state.failed) return ;
 
                 }
                 break;
-            case 44 :
-                // ANTLRLexer.g:1:346: RARROW
+            case 45 :
+                // ANTLRLexer.g:1:351: RARROW
                 {
                 mRARROW(); if (state.failed) return ;
 
                 }
                 break;
-            case 45 :
-                // ANTLRLexer.g:1:353: TREE_BEGIN
+            case 46 :
+                // ANTLRLexer.g:1:358: TREE_BEGIN
                 {
                 mTREE_BEGIN(); if (state.failed) return ;
 
                 }
                 break;
-            case 46 :
-                // ANTLRLexer.g:1:364: AT
+            case 47 :
+                // ANTLRLexer.g:1:369: AT
                 {
                 mAT(); if (state.failed) return ;
 
                 }
                 break;
-            case 47 :
-                // ANTLRLexer.g:1:367: NOT
+            case 48 :
+                // ANTLRLexer.g:1:372: NOT
                 {
                 mNOT(); if (state.failed) return ;
 
                 }
                 break;
-            case 48 :
-                // ANTLRLexer.g:1:371: RBRACE
+            case 49 :
+                // ANTLRLexer.g:1:376: RBRACE
                 {
                 mRBRACE(); if (state.failed) return ;
 
                 }
                 break;
-            case 49 :
-                // ANTLRLexer.g:1:378: TOKEN_REF
+            case 50 :
+                // ANTLRLexer.g:1:383: TOKEN_REF
                 {
                 mTOKEN_REF(); if (state.failed) return ;
 
                 }
                 break;
-            case 50 :
-                // ANTLRLexer.g:1:388: RULE_REF
+            case 51 :
+                // ANTLRLexer.g:1:393: RULE_REF
                 {
                 mRULE_REF(); if (state.failed) return ;
 
                 }
                 break;
-            case 51 :
-                // ANTLRLexer.g:1:397: INT
+            case 52 :
+                // ANTLRLexer.g:1:402: INT
                 {
                 mINT(); if (state.failed) return ;
 
                 }
                 break;
-            case 52 :
-                // ANTLRLexer.g:1:401: STRING_LITERAL
+            case 53 :
+                // ANTLRLexer.g:1:406: STRING_LITERAL
                 {
                 mSTRING_LITERAL(); if (state.failed) return ;
 
                 }
                 break;
-            case 53 :
-                // ANTLRLexer.g:1:416: WS
+            case 54 :
+                // ANTLRLexer.g:1:421: WS
                 {
                 mWS(); if (state.failed) return ;
 
                 }
                 break;
-            case 54 :
-                // ANTLRLexer.g:1:419: ERRCHAR
+            case 55 :
+                // ANTLRLexer.g:1:424: ERRCHAR
                 {
                 mERRCHAR(); if (state.failed) return ;
 
@@ -3239,8 +3268,8 @@ public class ANTLRLexer extends Lexer {
 
     // $ANTLR start synpred7_ANTLRLexer
     public final void synpred7_ANTLRLexer_fragment() throws RecognitionException {   
-        // ANTLRLexer.g:505:10: ( '\\\\' )
-        // ANTLRLexer.g:505:11: '\\\\'
+        // ANTLRLexer.g:506:10: ( '\\\\' )
+        // ANTLRLexer.g:506:11: '\\\\'
         {
         match('\\'); if (state.failed) return ;
 
@@ -3250,8 +3279,8 @@ public class ANTLRLexer extends Lexer {
 
     // $ANTLR start synpred8_ANTLRLexer
     public final void synpred8_ANTLRLexer_fragment() throws RecognitionException {   
-        // ANTLRLexer.g:515:9: ( '\\\\' )
-        // ANTLRLexer.g:515:10: '\\\\'
+        // ANTLRLexer.g:516:9: ( '\\\\' )
+        // ANTLRLexer.g:516:10: '\\\\'
         {
         match('\\'); if (state.failed) return ;
 
@@ -3394,8 +3423,8 @@ public class ANTLRLexer extends Lexer {
     static final String DFA2_acceptS =
         "\2\uffff\1\2\16\uffff\1\1\1\uffff\1\1\6\uffff";
     static final String DFA2_specialS =
-        "\15\uffff\1\5\1\10\1\7\2\uffff\1\2\1\uffff\1\1\1\4\1\uffff\1\3\1"+
-        "\0\1\6}>";
+        "\15\uffff\1\1\1\2\1\3\2\uffff\1\6\1\uffff\1\10\1\0\1\uffff\1\5\1"+
+        "\7\1\4}>";
     static final String[] DFA2_transitionS = {
             "\1\1",
             "\1\3",
@@ -3464,90 +3493,6 @@ public class ANTLRLexer extends Lexer {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA2_24 = input.LA(1);
-
-                         
-                        int index2_24 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred1_ANTLRLexer()) ) {s = 19;}
-
-                        else if ( (true) ) {s = 2;}
-
-                         
-                        input.seek(index2_24);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
-                        int LA2_20 = input.LA(1);
-
-                         
-                        int index2_20 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA2_20=='\"') ) {s = 18;}
-
-                        else if ( (LA2_20=='\n'||LA2_20=='\r') && (synpred1_ANTLRLexer())) {s = 19;}
-
-                        else if ( (LA2_20=='\\') ) {s = 20;}
-
-                        else if ( ((LA2_20>='\u0000' && LA2_20<='\t')||(LA2_20>='\u000B' && LA2_20<='\f')||(LA2_20>='\u000E' && LA2_20<='!')||(LA2_20>='#' && LA2_20<='[')||(LA2_20>=']' && LA2_20<='\uFFFF')) ) {s = 21;}
-
-                        else s = 2;
-
-                         
-                        input.seek(index2_20);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 2 : 
-                        int LA2_18 = input.LA(1);
-
-                         
-                        int index2_18 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA2_18=='\"') ) {s = 16;}
-
-                        else if ( (LA2_18=='\\') ) {s = 14;}
-
-                        else if ( (LA2_18=='\t'||LA2_18=='\f'||LA2_18==' ') ) {s = 23;}
-
-                        else if ( (LA2_18=='\n'||LA2_18=='\r') && (synpred1_ANTLRLexer())) {s = 17;}
-
-                        else if ( ((LA2_18>='\u0000' && LA2_18<='\b')||LA2_18=='\u000B'||(LA2_18>='\u000E' && LA2_18<='\u001F')||LA2_18=='!'||(LA2_18>='#' && LA2_18<='[')||(LA2_18>=']' && LA2_18<='\uFFFF')) ) {s = 15;}
-
-                        else s = 2;
-
-                         
-                        input.seek(index2_18);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 3 : 
-                        int LA2_23 = input.LA(1);
-
-                         
-                        int index2_23 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA2_23=='\"') ) {s = 16;}
-
-                        else if ( (LA2_23=='\\') ) {s = 14;}
-
-                        else if ( ((LA2_23>='0' && LA2_23<='9')) ) {s = 25;}
-
-                        else if ( (LA2_23=='\n'||LA2_23=='\r') && (synpred1_ANTLRLexer())) {s = 17;}
-
-                        else if ( (LA2_23=='\t'||LA2_23=='\f'||LA2_23==' ') ) {s = 23;}
-
-                        else if ( ((LA2_23>='\u0000' && LA2_23<='\b')||LA2_23=='\u000B'||(LA2_23>='\u000E' && LA2_23<='\u001F')||LA2_23=='!'||(LA2_23>='#' && LA2_23<='/')||(LA2_23>=':' && LA2_23<='[')||(LA2_23>=']' && LA2_23<='\uFFFF')) ) {s = 15;}
-
-                        else s = 2;
-
-                         
-                        input.seek(index2_23);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
                         int LA2_21 = input.LA(1);
 
                          
@@ -3568,7 +3513,7 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index2_21);
                         if ( s>=0 ) return s;
                         break;
-                    case 5 : 
+                    case 1 : 
                         int LA2_13 = input.LA(1);
 
                          
@@ -3589,22 +3534,28 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index2_13);
                         if ( s>=0 ) return s;
                         break;
-                    case 6 : 
-                        int LA2_25 = input.LA(1);
+                    case 2 : 
+                        int LA2_14 = input.LA(1);
 
                          
-                        int index2_25 = input.index();
+                        int index2_14 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred1_ANTLRLexer()) ) {s = 19;}
+                        if ( (LA2_14=='\"') ) {s = 18;}
 
-                        else if ( (true) ) {s = 2;}
+                        else if ( (LA2_14=='\n'||LA2_14=='\r') && (synpred1_ANTLRLexer())) {s = 19;}
+
+                        else if ( (LA2_14=='\\') ) {s = 20;}
+
+                        else if ( ((LA2_14>='\u0000' && LA2_14<='\t')||(LA2_14>='\u000B' && LA2_14<='\f')||(LA2_14>='\u000E' && LA2_14<='!')||(LA2_14>='#' && LA2_14<='[')||(LA2_14>=']' && LA2_14<='\uFFFF')) ) {s = 21;}
+
+                        else s = 2;
 
                          
-                        input.seek(index2_25);
+                        input.seek(index2_14);
                         if ( s>=0 ) return s;
                         break;
-                    case 7 : 
+                    case 3 : 
                         int LA2_15 = input.LA(1);
 
                          
@@ -3625,25 +3576,103 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index2_15);
                         if ( s>=0 ) return s;
                         break;
-                    case 8 : 
-                        int LA2_14 = input.LA(1);
+                    case 4 : 
+                        int LA2_25 = input.LA(1);
 
                          
-                        int index2_14 = input.index();
+                        int index2_25 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (LA2_14=='\"') ) {s = 18;}
+                        if ( (synpred1_ANTLRLexer()) ) {s = 19;}
 
-                        else if ( (LA2_14=='\n'||LA2_14=='\r') && (synpred1_ANTLRLexer())) {s = 19;}
+                        else if ( (true) ) {s = 2;}
 
-                        else if ( (LA2_14=='\\') ) {s = 20;}
+                         
+                        input.seek(index2_25);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 5 : 
+                        int LA2_23 = input.LA(1);
 
-                        else if ( ((LA2_14>='\u0000' && LA2_14<='\t')||(LA2_14>='\u000B' && LA2_14<='\f')||(LA2_14>='\u000E' && LA2_14<='!')||(LA2_14>='#' && LA2_14<='[')||(LA2_14>=']' && LA2_14<='\uFFFF')) ) {s = 21;}
+                         
+                        int index2_23 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((LA2_23>='0' && LA2_23<='9')) ) {s = 25;}
+
+                        else if ( (LA2_23=='\t'||LA2_23=='\f'||LA2_23==' ') ) {s = 23;}
+
+                        else if ( (LA2_23=='\"') ) {s = 16;}
+
+                        else if ( (LA2_23=='\\') ) {s = 14;}
+
+                        else if ( ((LA2_23>='\u0000' && LA2_23<='\b')||LA2_23=='\u000B'||(LA2_23>='\u000E' && LA2_23<='\u001F')||LA2_23=='!'||(LA2_23>='#' && LA2_23<='/')||(LA2_23>=':' && LA2_23<='[')||(LA2_23>=']' && LA2_23<='\uFFFF')) ) {s = 15;}
+
+                        else if ( (LA2_23=='\n'||LA2_23=='\r') && (synpred1_ANTLRLexer())) {s = 17;}
 
                         else s = 2;
 
                          
-                        input.seek(index2_14);
+                        input.seek(index2_23);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 6 : 
+                        int LA2_18 = input.LA(1);
+
+                         
+                        int index2_18 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA2_18=='\t'||LA2_18=='\f'||LA2_18==' ') ) {s = 23;}
+
+                        else if ( (LA2_18=='\"') ) {s = 16;}
+
+                        else if ( (LA2_18=='\\') ) {s = 14;}
+
+                        else if ( ((LA2_18>='\u0000' && LA2_18<='\b')||LA2_18=='\u000B'||(LA2_18>='\u000E' && LA2_18<='\u001F')||LA2_18=='!'||(LA2_18>='#' && LA2_18<='[')||(LA2_18>=']' && LA2_18<='\uFFFF')) ) {s = 15;}
+
+                        else if ( (LA2_18=='\n'||LA2_18=='\r') && (synpred1_ANTLRLexer())) {s = 17;}
+
+                        else s = 2;
+
+                         
+                        input.seek(index2_18);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 7 : 
+                        int LA2_24 = input.LA(1);
+
+                         
+                        int index2_24 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred1_ANTLRLexer()) ) {s = 19;}
+
+                        else if ( (true) ) {s = 2;}
+
+                         
+                        input.seek(index2_24);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 8 : 
+                        int LA2_20 = input.LA(1);
+
+                         
+                        int index2_20 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA2_20=='\"') ) {s = 18;}
+
+                        else if ( (LA2_20=='\\') ) {s = 20;}
+
+                        else if ( ((LA2_20>='\u0000' && LA2_20<='\t')||(LA2_20>='\u000B' && LA2_20<='\f')||(LA2_20>='\u000E' && LA2_20<='!')||(LA2_20>='#' && LA2_20<='[')||(LA2_20>=']' && LA2_20<='\uFFFF')) ) {s = 21;}
+
+                        else if ( (LA2_20=='\n'||LA2_20=='\r') && (synpred1_ANTLRLexer())) {s = 19;}
+
+                        else s = 2;
+
+                         
+                        input.seek(index2_20);
                         if ( s>=0 ) return s;
                         break;
             }
@@ -3665,7 +3694,7 @@ public class ANTLRLexer extends Lexer {
     static final String DFA7_acceptS =
         "\1\uffff\1\3\1\uffff\1\2\3\uffff\3\1";
     static final String DFA7_specialS =
-        "\1\1\1\uffff\1\2\1\uffff\1\0\1\4\1\3\3\uffff}>";
+        "\1\3\1\uffff\1\2\1\uffff\1\0\1\4\1\1\3\uffff}>";
     static final String[] DFA7_transitionS = {
             "\42\3\1\1\71\3\1\2\uffa3\3",
             "",
@@ -3735,15 +3764,18 @@ public class ANTLRLexer extends Lexer {
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA7_0 = input.LA(1);
+                        int LA7_6 = input.LA(1);
 
+                         
+                        int index7_6 = input.index();
+                        input.rewind();
                         s = -1;
-                        if ( (LA7_0=='\"') ) {s = 1;}
+                        if ( (synpred2_ANTLRLexer()) ) {s = 9;}
 
-                        else if ( (LA7_0=='\\') ) {s = 2;}
+                        else if ( (true) ) {s = 3;}
 
-                        else if ( ((LA7_0>='\u0000' && LA7_0<='!')||(LA7_0>='#' && LA7_0<='[')||(LA7_0>=']' && LA7_0<='\uFFFF')) ) {s = 3;}
-
+                         
+                        input.seek(index7_6);
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
@@ -3759,18 +3791,15 @@ public class ANTLRLexer extends Lexer {
                         if ( s>=0 ) return s;
                         break;
                     case 3 : 
-                        int LA7_6 = input.LA(1);
+                        int LA7_0 = input.LA(1);
 
-                         
-                        int index7_6 = input.index();
-                        input.rewind();
                         s = -1;
-                        if ( (synpred2_ANTLRLexer()) ) {s = 9;}
+                        if ( (LA7_0=='\"') ) {s = 1;}
 
-                        else if ( (true) ) {s = 3;}
+                        else if ( (LA7_0=='\\') ) {s = 2;}
 
-                         
-                        input.seek(index7_6);
+                        else if ( ((LA7_0>='\u0000' && LA7_0<='!')||(LA7_0>='#' && LA7_0<='[')||(LA7_0>=']' && LA7_0<='\uFFFF')) ) {s = 3;}
+
                         if ( s>=0 ) return s;
                         break;
                     case 4 : 
@@ -3797,156 +3826,156 @@ public class ANTLRLexer extends Lexer {
         }
     }
     static final String DFA10_eotS =
-        "\6\uffff\1\5\5\uffff\1\5\4\uffff\1\5\10\uffff\1\5\11\uffff\1\5\2"+
-        "\uffff\1\5\10\uffff\1\5\3\uffff\1\5\10\uffff\1\5\12\uffff\1\135"+
-        "\14\uffff\1\155\2\uffff\1\135\6\uffff\1\135\5\uffff\1\155\2\uffff"+
-        "\1\155\5\uffff\1\135\4\uffff\1\155\4\uffff";
+        "\6\uffff\1\5\4\uffff\1\5\4\uffff\1\5\14\uffff\1\5\4\uffff\1\5\7"+
+        "\uffff\1\5\4\uffff\1\5\10\uffff\1\5\10\uffff\1\5\10\uffff\1\135"+
+        "\6\uffff\1\150\10\uffff\1\135\3\uffff\1\135\4\uffff\1\150\7\uffff"+
+        "\1\150\2\uffff\1\135\6\uffff\1\150\2\uffff";
     static final String DFA10_eofS =
         "\170\uffff";
     static final String DFA10_minS =
-        "\1\0\1\uffff\3\0\1\uffff\17\0\5\uffff\5\0\3\uffff\12\0\3\uffff\56"+
-        "\0\1\uffff\17\0\1\uffff\12\0";
+        "\1\0\1\uffff\3\0\1\uffff\17\0\10\uffff\12\0\3\uffff\63\0\1\uffff"+
+        "\12\0\1\uffff\17\0";
     static final String DFA10_maxS =
-        "\1\uffff\1\uffff\3\uffff\1\uffff\1\uffff\4\0\2\uffff\1\0\4\uffff"+
-        "\1\0\2\uffff\5\uffff\1\uffff\1\0\3\uffff\3\uffff\1\0\7\uffff\1\0"+
-        "\1\uffff\3\uffff\3\uffff\1\0\2\uffff\1\0\12\uffff\1\0\5\uffff\1"+
-        "\0\14\uffff\1\0\7\uffff\1\0\1\uffff\1\uffff\3\uffff\1\0\1\uffff"+
-        "\1\0\5\uffff\1\0\3\uffff\1\uffff\3\uffff\1\0\2\uffff\1\0\3\uffff";
+        "\1\uffff\1\uffff\3\uffff\1\uffff\1\uffff\4\0\2\uffff\1\0\5\uffff"+
+        "\1\0\1\uffff\10\uffff\2\uffff\1\0\4\uffff\1\0\2\uffff\3\uffff\3"+
+        "\uffff\1\0\4\uffff\1\0\7\uffff\1\0\11\uffff\1\0\10\uffff\1\0\1\uffff"+
+        "\1\0\13\uffff\1\0\1\uffff\1\uffff\1\uffff\1\0\4\uffff\1\0\3\uffff"+
+        "\1\uffff\1\0\5\uffff\1\0\6\uffff\1\0\1\uffff";
     static final String DFA10_acceptS =
-        "\1\uffff\1\5\3\uffff\1\4\17\uffff\5\1\5\uffff\3\2\12\uffff\3\3\56"+
-        "\uffff\1\2\17\uffff\1\3\12\uffff";
+        "\1\uffff\1\5\3\uffff\1\4\17\uffff\5\1\3\2\12\uffff\3\3\63\uffff"+
+        "\1\2\12\uffff\1\3\17\uffff";
     static final String DFA10_specialS =
-        "\1\20\1\uffff\1\6\1\14\1\47\1\uffff\1\11\1\135\1\50\1\133\1\4\1"+
-        "\141\1\26\1\146\1\111\1\101\1\53\1\110\1\72\1\75\1\22\5\uffff\1"+
-        "\131\1\124\1\10\1\34\1\64\3\uffff\1\134\1\66\1\115\1\15\1\23\1\43"+
-        "\1\63\1\114\1\76\1\21\3\uffff\1\57\1\62\1\136\1\137\1\25\1\147\1"+
-        "\116\1\5\1\120\1\46\1\122\1\41\1\56\1\55\1\123\1\3\1\17\1\44\1\54"+
-        "\1\143\1\37\1\52\1\1\1\112\1\13\1\117\1\77\1\106\1\36\1\113\1\70"+
-        "\1\100\1\65\1\71\1\73\1\107\1\140\1\144\1\35\1\104\1\103\1\27\1"+
-        "\150\1\51\1\60\1\121\1\uffff\1\40\1\105\1\30\1\102\1\12\1\142\1"+
-        "\74\1\61\1\2\1\24\1\132\1\32\1\7\1\42\1\67\1\uffff\1\0\1\125\1\130"+
-        "\1\16\1\31\1\145\1\127\1\33\1\126\1\45}>";
+        "\1\67\1\uffff\1\150\1\114\1\5\1\uffff\1\130\1\62\1\35\1\117\1\76"+
+        "\1\144\1\36\1\20\1\50\1\23\1\16\1\127\1\37\1\107\1\74\10\uffff\1"+
+        "\73\1\71\1\61\1\44\1\54\1\66\1\106\1\11\1\1\1\25\3\uffff\1\140\1"+
+        "\145\1\112\1\14\1\136\1\55\1\133\1\125\1\10\1\17\1\141\1\137\1\63"+
+        "\1\102\1\131\1\56\1\3\1\26\1\0\1\142\1\146\1\104\1\110\1\103\1\47"+
+        "\1\52\1\51\1\147\1\101\1\45\1\113\1\64\1\13\1\132\1\21\1\116\1\111"+
+        "\1\7\1\40\1\123\1\53\1\15\1\105\1\115\1\134\1\34\1\24\1\46\1\2\1"+
+        "\121\1\42\1\uffff\1\126\1\33\1\31\1\57\1\100\1\75\1\43\1\70\1\41"+
+        "\1\65\1\uffff\1\6\1\77\1\60\1\12\1\32\1\22\1\120\1\27\1\124\1\30"+
+        "\1\122\1\72\1\143\1\135\1\4}>";
     static final String[] DFA10_transitionS = {
             "\42\5\1\3\4\5\1\4\64\5\1\2\1\1\uffa2\5",
             "",
             "\42\12\1\10\4\12\1\11\64\12\1\7\1\6\uffa2\12",
-            "\42\17\1\15\4\17\1\16\64\17\1\13\1\14\uffa2\17",
-            "\42\24\1\23\4\24\1\22\64\24\1\20\1\21\uffa2\24",
+            "\42\17\1\15\4\17\1\16\64\17\1\14\1\13\uffa2\17",
+            "\42\24\1\22\4\24\1\23\64\24\1\21\1\20\uffa2\24",
             "",
             "\42\31\1\27\4\31\1\30\64\31\1\26\1\25\uffa2\31",
             "\1\uffff",
             "\1\uffff",
             "\1\uffff",
             "\1\uffff",
-            "\42\36\1\33\4\36\1\35\64\36\1\34\1\32\uffa2\36",
-            "\42\41\1\37\71\41\1\40\uffa3\41",
+            "\42\34\1\32\71\34\1\33\uffa3\34",
+            "\42\41\1\37\4\41\1\40\64\41\1\36\1\35\uffa2\41",
             "\1\uffff",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\17\1\15\4\17\1\16\64\17\1\13\1\14\uffa2\17",
-            "\42\53\1\51\4\53\1\52\64\53\1\50\1\47\uffa2\53",
-            "\47\56\1\54\64\56\1\55\uffa3\56",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\17\1\15\4\17\1\16\64\17\1\14\1\13\uffa2\17",
+            "\47\51\1\47\64\51\1\50\uffa3\51",
+            "\42\56\1\54\4\56\1\55\64\56\1\53\1\52\uffa2\56",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
             "\1\uffff",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
-            "\42\24\1\23\4\24\1\22\64\24\1\20\1\21\uffa2\24",
+            "\42\24\1\22\4\24\1\23\64\24\1\21\1\20\uffa2\24",
             "",
             "",
             "",
             "",
             "",
-            "\42\17\1\15\4\17\1\16\64\17\1\13\1\14\uffa2\17",
+            "",
+            "",
+            "",
+            "\42\17\1\15\4\17\1\16\64\17\1\14\1\13\uffa2\17",
+            "\42\41\1\37\4\41\1\40\64\41\1\36\1\35\uffa2\41",
             "\1\uffff",
-            "\42\36\1\33\4\36\1\35\64\36\1\34\1\32\uffa2\36",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\17\1\15\4\17\1\16\64\17\1\13\1\14\uffa2\17",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\17\1\15\4\17\1\16\64\17\1\14\1\13\uffa2\17",
+            "\42\67\1\66\4\67\1\64\64\67\1\65\uffa3\67",
+            "\42\74\1\72\4\74\1\73\64\74\1\71\1\70\uffa2\74",
+            "\1\uffff",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
             "",
             "",
             "",
+            "\42\24\1\22\4\24\1\23\64\24\1\21\1\20\uffa2\24",
+            "\42\56\1\54\4\56\1\55\64\56\1\53\1\52\uffa2\56",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
             "\1\uffff",
-            "\42\70\1\65\4\70\1\67\64\70\1\66\1\64\uffa2\70",
-            "\42\74\1\71\4\74\1\73\64\74\1\72\uffa3\74",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\24\1\23\4\24\1\22\64\24\1\20\1\21\uffa2\24",
-            "\42\53\1\51\4\53\1\52\64\53\1\50\1\47\uffa2\53",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
+            "\42\24\1\22\4\24\1\23\64\24\1\21\1\20\uffa2\24",
+            "\42\100\1\77\4\100\1\75\64\100\1\76\uffa3\100",
+            "\42\105\1\103\4\105\1\104\64\105\1\102\1\101\uffa2\105",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
             "\1\uffff",
-            "\42\24\1\23\4\24\1\22\64\24\1\20\1\21\uffa2\24",
-            "",
-            "",
-            "",
-            "\42\101\1\76\4\101\1\100\64\101\1\77\1\75\uffa2\101",
-            "\42\105\1\102\4\105\1\104\64\105\1\103\uffa3\105",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
+            "\42\17\1\15\4\17\1\16\64\17\1\14\1\13\uffa2\17",
+            "\42\111\1\110\4\111\1\106\64\111\1\107\uffa3\111",
+            "\42\116\1\114\4\116\1\115\64\116\1\113\1\112\uffa2\116",
+            "\42\67\1\66\4\67\1\64\64\67\1\65\uffa3\67",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\74\1\72\4\74\1\73\64\74\1\71\1\70\uffa2\74",
             "\1\uffff",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\123\1\117\4\123\1\122\64\123\1\120\1\121\uffa2\123",
+            "\42\127\1\126\4\127\1\124\64\127\1\125\uffa3\127",
+            "\42\24\1\22\4\24\1\23\64\24\1\21\1\20\uffa2\24",
+            "\42\100\1\77\4\100\1\75\64\100\1\76\uffa3\100",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
+            "\42\105\1\103\4\105\1\104\64\105\1\102\1\101\uffa2\105",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
             "\1\uffff",
-            "\42\70\1\65\4\70\1\67\64\70\1\66\1\64\uffa2\70",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\112\1\111\4\112\1\106\64\112\1\107\1\110\uffa2\112",
-            "\42\116\1\113\4\116\1\115\64\116\1\114\uffa3\116",
-            "\42\17\1\15\4\17\1\16\64\17\1\13\1\14\uffa2\17",
-            "\42\74\1\71\4\74\1\73\64\74\1\72\uffa3\74",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
-            "\42\101\1\76\4\101\1\100\64\101\1\77\1\75\uffa2\101",
-            "\1\uffff",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
-            "\42\24\1\23\4\24\1\22\64\24\1\20\1\21\uffa2\24",
-            "\42\122\1\117\4\122\1\121\64\122\1\120\uffa3\122",
-            "\42\127\1\123\4\127\1\126\64\127\1\124\1\125\uffa2\127",
-            "\42\105\1\102\4\105\1\104\64\105\1\103\uffa3\105",
-            "\1\uffff",
-            "\42\134\1\132\4\134\1\133\64\134\1\131\1\130\uffa2\134",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
+            "\42\46\1\44\4\46\1\45\64\46\1\43\1\42\uffa2\46",
+            "\42\111\1\110\4\111\1\106\64\111\1\107\uffa3\111",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
+            "\42\67\1\66\4\67\1\64\64\67\1\65\uffa3\67",
             "\0\5",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
-            "\42\112\1\111\4\112\1\106\64\112\1\107\1\110\uffa2\112",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
-            "\42\116\1\113\4\116\1\115\64\116\1\114\uffa3\116",
-            "\42\46\1\42\4\46\1\45\64\46\1\43\1\44\uffa2\46",
-            "\42\74\1\71\4\74\1\73\64\74\1\72\uffa3\74",
-            "\42\63\1\61\4\63\1\62\64\63\1\57\1\60\uffa2\63",
-            "\42\122\1\117\4\122\1\121\64\122\1\120\uffa3\122",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
-            "\42\105\1\102\4\105\1\104\64\105\1\103\uffa3\105",
+            "\42\142\1\141\4\142\1\137\64\142\1\140\1\136\uffa2\142",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
             "\1\uffff",
-            "\42\154\1\151\4\154\1\153\64\154\1\152\1\150\uffa2\154",
+            "\42\116\1\114\4\116\1\115\64\116\1\113\1\112\uffa2\116",
+            "\1\uffff",
+            "\42\147\1\144\4\147\1\146\64\147\1\145\1\143\uffa2\147",
             "\0\5",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
-            "\42\127\1\123\4\127\1\126\64\127\1\124\1\125\uffa2\127",
-            "\42\112\1\111\4\112\1\106\64\112\1\107\1\110\uffa2\112",
-            "\42\134\1\132\4\134\1\133\64\134\1\131\1\130\uffa2\134",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\42\123\1\117\4\123\1\122\64\123\1\120\1\121\uffa2\123",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\42\127\1\126\4\127\1\124\64\127\1\125\uffa3\127",
+            "\42\63\1\61\4\63\1\62\64\63\1\60\1\57\uffa2\63",
+            "\42\100\1\77\4\100\1\75\64\100\1\76\uffa3\100",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
+            "\42\162\1\161\4\162\1\157\64\162\1\160\1\156\uffa2\162",
+            "\42\67\1\66\4\67\1\64\64\67\1\65\uffa3\67",
             "\1\uffff",
-            "\42\112\1\111\4\112\1\106\64\112\1\107\1\110\uffa2\112",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
             "",
-            "\42\162\1\157\4\162\1\161\64\162\1\160\1\156\uffa2\162",
-            "\42\74\1\71\4\74\1\73\64\74\1\72\uffa3\74",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
+            "\42\116\1\114\4\116\1\115\64\116\1\113\1\112\uffa2\116",
             "\1\uffff",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
+            "\42\142\1\141\4\142\1\137\64\142\1\140\1\136\uffa2\142",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
+            "\42\116\1\114\4\116\1\115\64\116\1\113\1\112\uffa2\116",
+            "\42\123\1\117\4\123\1\122\64\123\1\120\1\121\uffa2\123",
             "\1\uffff",
-            "\42\167\1\164\4\167\1\166\64\167\1\165\1\163\uffa2\167",
-            "\42\105\1\102\4\105\1\104\64\105\1\103\uffa3\105",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
-            "\42\127\1\123\4\127\1\126\64\127\1\124\1\125\uffa2\127",
-            "\1\uffff",
-            "\42\154\1\151\4\154\1\153\64\154\1\152\1\150\uffa2\154",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
-            "\42\127\1\123\4\127\1\126\64\127\1\124\1\125\uffa2\127",
+            "\42\147\1\144\4\147\1\146\64\147\1\145\1\143\uffa2\147",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\42\123\1\117\4\123\1\122\64\123\1\120\1\121\uffa2\123",
             "",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
-            "\42\162\1\157\4\162\1\161\64\162\1\160\1\156\uffa2\162",
             "\1\uffff",
-            "\42\142\1\140\4\142\1\141\64\142\1\136\1\137\uffa2\142",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
+            "\42\167\1\166\4\167\1\163\64\167\1\164\1\165\uffa2\167",
+            "\42\100\1\77\4\100\1\75\64\100\1\76\uffa3\100",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
             "\1\uffff",
-            "\42\167\1\164\4\167\1\166\64\167\1\165\1\163\uffa2\167",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147",
-            "\42\147\1\143\4\147\1\146\64\147\1\144\1\145\uffa2\147"
+            "\42\162\1\161\4\162\1\157\64\162\1\160\1\156\uffa2\162",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
+            "\42\134\1\130\4\134\1\133\64\134\1\131\1\132\uffa2\134",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\42\167\1\166\4\167\1\163\64\167\1\164\1\165\uffa2\167",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155",
+            "\1\uffff",
+            "\42\155\1\151\4\155\1\154\64\155\1\152\1\153\uffa2\155"
     };
 
     static final short[] DFA10_eot = DFA.unpackEncodedString(DFA10_eotS);
@@ -3986,21 +4015,309 @@ public class ANTLRLexer extends Lexer {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
+                        int LA10_60 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_60==']') ) {s = 34;}
+
+                        else if ( (LA10_60=='\\') ) {s = 35;}
+
+                        else if ( (LA10_60=='\"') ) {s = 36;}
+
+                        else if ( (LA10_60=='\'') ) {s = 37;}
+
+                        else if ( ((LA10_60>='\u0000' && LA10_60<='!')||(LA10_60>='#' && LA10_60<='&')||(LA10_60>='(' && LA10_60<='[')||(LA10_60>='^' && LA10_60<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 1 : 
+                        int LA10_37 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_37==']') ) {s = 34;}
+
+                        else if ( (LA10_37=='\\') ) {s = 35;}
+
+                        else if ( (LA10_37=='\"') ) {s = 36;}
+
+                        else if ( (LA10_37=='\'') ) {s = 37;}
+
+                        else if ( ((LA10_37>='\u0000' && LA10_37<='!')||(LA10_37>='#' && LA10_37<='&')||(LA10_37>='(' && LA10_37<='[')||(LA10_37>='^' && LA10_37<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 2 : 
+                        int LA10_90 = input.LA(1);
+
+                         
+                        int index10_90 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_90=='\'') ) {s = 52;}
+
+                        else if ( (LA10_90=='\\') ) {s = 53;}
+
+                        else if ( (LA10_90=='\"') ) {s = 54;}
+
+                        else if ( ((LA10_90>='\u0000' && LA10_90<='!')||(LA10_90>='#' && LA10_90<='&')||(LA10_90>='(' && LA10_90<='[')||(LA10_90>=']' && LA10_90<='\uFFFF')) ) {s = 55;}
+
+                        else s = 93;
+
+                         
+                        input.seek(index10_90);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 3 : 
+                        int LA10_58 = input.LA(1);
+
+                         
+                        int index10_58 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 28;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_58);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 4 : 
+                        int LA10_119 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_119=='\"') ) {s = 105;}
+
+                        else if ( (LA10_119=='\\') ) {s = 106;}
+
+                        else if ( (LA10_119=='\'') ) {s = 108;}
+
+                        else if ( (LA10_119==']') ) {s = 107;}
+
+                        else if ( ((LA10_119>='\u0000' && LA10_119<='!')||(LA10_119>='#' && LA10_119<='&')||(LA10_119>='(' && LA10_119<='[')||(LA10_119>='^' && LA10_119<='\uFFFF')) ) {s = 109;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 5 : 
+                        int LA10_4 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_4==']') ) {s = 16;}
+
+                        else if ( (LA10_4=='\\') ) {s = 17;}
+
+                        else if ( (LA10_4=='\"') ) {s = 18;}
+
+                        else if ( (LA10_4=='\'') ) {s = 19;}
+
+                        else if ( ((LA10_4>='\u0000' && LA10_4<='!')||(LA10_4>='#' && LA10_4<='&')||(LA10_4>='(' && LA10_4<='[')||(LA10_4>='^' && LA10_4<='\uFFFF')) ) {s = 20;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 6 : 
+                        int LA10_105 = input.LA(1);
+
+                         
+                        int index10_105 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 104;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_105);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 7 : 
+                        int LA10_79 = input.LA(1);
+
+                         
+                        int index10_79 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 41;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_79);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 8 : 
+                        int LA10_50 = input.LA(1);
+
+                         
+                        int index10_50 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 41;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_50);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 9 : 
+                        int LA10_36 = input.LA(1);
+
+                         
+                        int index10_36 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 28;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_36);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 10 : 
+                        int LA10_108 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_108=='\"') ) {s = 105;}
+
+                        else if ( (LA10_108=='\\') ) {s = 106;}
+
+                        else if ( (LA10_108==']') ) {s = 107;}
+
+                        else if ( (LA10_108=='\'') ) {s = 108;}
+
+                        else if ( ((LA10_108>='\u0000' && LA10_108<='!')||(LA10_108>='#' && LA10_108<='&')||(LA10_108>='(' && LA10_108<='[')||(LA10_108>='^' && LA10_108<='\uFFFF')) ) {s = 109;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 11 : 
+                        int LA10_74 = input.LA(1);
+
+                         
+                        int index10_74 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((LA10_74>='\u0000' && LA10_74<='\uFFFF')) ) {s = 5;}
+
+                        else s = 93;
+
+                         
+                        input.seek(index10_74);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 12 : 
+                        int LA10_45 = input.LA(1);
+
+                         
+                        int index10_45 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 41;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_45);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 13 : 
+                        int LA10_83 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_83=='\"') ) {s = 79;}
+
+                        else if ( (LA10_83=='\\') ) {s = 80;}
+
+                        else if ( (LA10_83==']') ) {s = 81;}
+
+                        else if ( (LA10_83=='\'') ) {s = 82;}
+
+                        else if ( ((LA10_83>='\u0000' && LA10_83<='!')||(LA10_83>='#' && LA10_83<='&')||(LA10_83>='(' && LA10_83<='[')||(LA10_83>='^' && LA10_83<='\uFFFF')) ) {s = 83;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 14 : 
+                        int LA10_16 = input.LA(1);
+
+                         
+                        int index10_16 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_16=='\'') && (synpred6_ANTLRLexer())) {s = 39;}
+
+                        else if ( (LA10_16=='\\') && (synpred6_ANTLRLexer())) {s = 40;}
+
+                        else if ( ((LA10_16>='\u0000' && LA10_16<='&')||(LA10_16>='(' && LA10_16<='[')||(LA10_16>=']' && LA10_16<='\uFFFF')) && (synpred6_ANTLRLexer())) {s = 41;}
+
+                        else s = 5;
+
+                         
+                        input.seek(index10_16);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 15 : 
+                        int LA10_51 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_51==']') ) {s = 47;}
+
+                        else if ( (LA10_51=='\\') ) {s = 48;}
+
+                        else if ( (LA10_51=='\"') ) {s = 49;}
+
+                        else if ( (LA10_51=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_51>='\u0000' && LA10_51<='!')||(LA10_51>='#' && LA10_51<='&')||(LA10_51>='(' && LA10_51<='[')||(LA10_51>='^' && LA10_51<='\uFFFF')) ) {s = 51;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 16 : 
+                        int LA10_13 = input.LA(1);
+
+                         
+                        int index10_13 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 28;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_13);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 17 : 
+                        int LA10_76 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_76=='\\') ) {s = 89;}
+
+                        else if ( (LA10_76=='\'') ) {s = 91;}
+
+                        else if ( (LA10_76=='\"') ) {s = 88;}
+
+                        else if ( (LA10_76==']') ) {s = 90;}
+
+                        else if ( ((LA10_76>='\u0000' && LA10_76<='!')||(LA10_76>='#' && LA10_76<='&')||(LA10_76>='(' && LA10_76<='[')||(LA10_76>='^' && LA10_76<='\uFFFF')) ) {s = 92;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 18 : 
                         int LA10_110 = input.LA(1);
 
                          
                         int index10_110 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (LA10_110=='\"') ) {s = 96;}
+                        if ( (LA10_110=='\"') ) {s = 88;}
 
-                        else if ( (LA10_110=='\\') ) {s = 94;}
+                        else if ( (LA10_110=='\\') ) {s = 89;}
 
-                        else if ( (LA10_110==']') ) {s = 95;}
+                        else if ( (LA10_110=='\'') ) {s = 91;}
 
-                        else if ( (LA10_110=='\'') ) {s = 97;}
+                        else if ( (LA10_110==']') ) {s = 90;}
 
-                        else if ( ((LA10_110>='\u0000' && LA10_110<='!')||(LA10_110>='#' && LA10_110<='&')||(LA10_110>='(' && LA10_110<='[')||(LA10_110>='^' && LA10_110<='\uFFFF')) ) {s = 98;}
+                        else if ( ((LA10_110>='\u0000' && LA10_110<='!')||(LA10_110>='#' && LA10_110<='&')||(LA10_110>='(' && LA10_110<='[')||(LA10_110>='^' && LA10_110<='\uFFFF')) ) {s = 92;}
 
                         else s = 93;
 
@@ -4008,53 +4325,697 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index10_110);
                         if ( s>=0 ) return s;
                         break;
-                    case 1 : 
-                        int LA10_69 = input.LA(1);
+                    case 19 : 
+                        int LA10_15 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_69=='\"') ) {s = 66;}
+                        if ( (LA10_15==']') ) {s = 11;}
 
-                        else if ( (LA10_69=='\\') ) {s = 67;}
+                        else if ( (LA10_15=='\\') ) {s = 12;}
 
-                        else if ( (LA10_69=='\'') ) {s = 68;}
+                        else if ( (LA10_15=='\"') ) {s = 13;}
 
-                        else if ( ((LA10_69>='\u0000' && LA10_69<='!')||(LA10_69>='#' && LA10_69<='&')||(LA10_69>='(' && LA10_69<='[')||(LA10_69>=']' && LA10_69<='\uFFFF')) ) {s = 69;}
+                        else if ( (LA10_15=='\'') ) {s = 14;}
+
+                        else if ( ((LA10_15>='\u0000' && LA10_15<='!')||(LA10_15>='#' && LA10_15<='&')||(LA10_15>='(' && LA10_15<='[')||(LA10_15>='^' && LA10_15<='\uFFFF')) ) {s = 15;}
 
                         if ( s>=0 ) return s;
                         break;
-                    case 2 : 
+                    case 20 : 
+                        int LA10_88 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_88=='\\') ) {s = 89;}
+
+                        else if ( (LA10_88=='\'') ) {s = 91;}
+
+                        else if ( (LA10_88=='\"') ) {s = 88;}
+
+                        else if ( (LA10_88==']') ) {s = 90;}
+
+                        else if ( ((LA10_88>='\u0000' && LA10_88<='!')||(LA10_88>='#' && LA10_88<='&')||(LA10_88>='(' && LA10_88<='[')||(LA10_88>='^' && LA10_88<='\uFFFF')) ) {s = 92;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 21 : 
+                        int LA10_38 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_38==']') ) {s = 34;}
+
+                        else if ( (LA10_38=='\\') ) {s = 35;}
+
+                        else if ( (LA10_38=='\"') ) {s = 36;}
+
+                        else if ( (LA10_38=='\'') ) {s = 37;}
+
+                        else if ( ((LA10_38>='\u0000' && LA10_38<='!')||(LA10_38>='#' && LA10_38<='&')||(LA10_38>='(' && LA10_38<='[')||(LA10_38>='^' && LA10_38<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 22 : 
+                        int LA10_59 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_59==']') ) {s = 34;}
+
+                        else if ( (LA10_59=='\\') ) {s = 35;}
+
+                        else if ( (LA10_59=='\"') ) {s = 36;}
+
+                        else if ( (LA10_59=='\'') ) {s = 37;}
+
+                        else if ( ((LA10_59>='\u0000' && LA10_59<='!')||(LA10_59>='#' && LA10_59<='&')||(LA10_59>='(' && LA10_59<='[')||(LA10_59>='^' && LA10_59<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 23 : 
+                        int LA10_112 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_112=='\"') ) {s = 113;}
+
+                        else if ( (LA10_112=='\\') ) {s = 112;}
+
+                        else if ( (LA10_112==']') ) {s = 110;}
+
+                        else if ( (LA10_112=='\'') ) {s = 111;}
+
+                        else if ( ((LA10_112>='\u0000' && LA10_112<='!')||(LA10_112>='#' && LA10_112<='&')||(LA10_112>='(' && LA10_112<='[')||(LA10_112>='^' && LA10_112<='\uFFFF')) ) {s = 114;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 24 : 
+                        int LA10_114 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_114=='\"') ) {s = 88;}
+
+                        else if ( (LA10_114=='\\') ) {s = 89;}
+
+                        else if ( (LA10_114=='\'') ) {s = 91;}
+
+                        else if ( (LA10_114==']') ) {s = 90;}
+
+                        else if ( ((LA10_114>='\u0000' && LA10_114<='!')||(LA10_114>='#' && LA10_114<='&')||(LA10_114>='(' && LA10_114<='[')||(LA10_114>='^' && LA10_114<='\uFFFF')) ) {s = 92;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 25 : 
+                        int LA10_96 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_96==']') ) {s = 94;}
+
+                        else if ( (LA10_96=='\'') ) {s = 95;}
+
+                        else if ( (LA10_96=='\\') ) {s = 96;}
+
+                        else if ( (LA10_96=='\"') ) {s = 97;}
+
+                        else if ( ((LA10_96>='\u0000' && LA10_96<='!')||(LA10_96>='#' && LA10_96<='&')||(LA10_96>='(' && LA10_96<='[')||(LA10_96>='^' && LA10_96<='\uFFFF')) ) {s = 98;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 26 : 
+                        int LA10_109 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_109=='\'') ) {s = 108;}
+
+                        else if ( (LA10_109=='\\') ) {s = 106;}
+
+                        else if ( (LA10_109=='\"') ) {s = 105;}
+
+                        else if ( (LA10_109==']') ) {s = 107;}
+
+                        else if ( ((LA10_109>='\u0000' && LA10_109<='!')||(LA10_109>='#' && LA10_109<='&')||(LA10_109>='(' && LA10_109<='[')||(LA10_109>='^' && LA10_109<='\uFFFF')) ) {s = 109;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 27 : 
+                        int LA10_95 = input.LA(1);
+
+                         
+                        int index10_95 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_95);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 28 : 
+                        int LA10_87 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_87=='\"') ) {s = 63;}
+
+                        else if ( (LA10_87=='\\') ) {s = 62;}
+
+                        else if ( (LA10_87=='\'') ) {s = 61;}
+
+                        else if ( ((LA10_87>='\u0000' && LA10_87<='!')||(LA10_87>='#' && LA10_87<='&')||(LA10_87>='(' && LA10_87<='[')||(LA10_87>=']' && LA10_87<='\uFFFF')) ) {s = 64;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 29 : 
+                        int LA10_8 = input.LA(1);
+
+                         
+                        int index10_8 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred3_ANTLRLexer()) ) {s = 25;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_8);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 30 : 
+                        int LA10_12 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_12==']') ) {s = 29;}
+
+                        else if ( (LA10_12=='\\') ) {s = 30;}
+
+                        else if ( (LA10_12=='\"') ) {s = 31;}
+
+                        else if ( (LA10_12=='\'') ) {s = 32;}
+
+                        else if ( ((LA10_12>='\u0000' && LA10_12<='!')||(LA10_12>='#' && LA10_12<='&')||(LA10_12>='(' && LA10_12<='[')||(LA10_12>='^' && LA10_12<='\uFFFF')) ) {s = 33;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 31 : 
+                        int LA10_18 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_18==']') ) {s = 47;}
+
+                        else if ( (LA10_18=='\\') ) {s = 48;}
+
+                        else if ( (LA10_18=='\"') ) {s = 49;}
+
+                        else if ( (LA10_18=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_18>='\u0000' && LA10_18<='!')||(LA10_18>='#' && LA10_18<='&')||(LA10_18>='(' && LA10_18<='[')||(LA10_18>='^' && LA10_18<='\uFFFF')) ) {s = 51;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 32 : 
+                        int LA10_80 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_80==']') ) {s = 99;}
+
+                        else if ( (LA10_80=='\"') ) {s = 100;}
+
+                        else if ( (LA10_80=='\\') ) {s = 101;}
+
+                        else if ( (LA10_80=='\'') ) {s = 102;}
+
+                        else if ( ((LA10_80>='\u0000' && LA10_80<='!')||(LA10_80>='#' && LA10_80<='&')||(LA10_80>='(' && LA10_80<='[')||(LA10_80>='^' && LA10_80<='\uFFFF')) ) {s = 103;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 33 : 
                         int LA10_102 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_102=='\"') ) {s = 99;}
+                        if ( (LA10_102=='\"') ) {s = 105;}
 
-                        else if ( (LA10_102=='\\') ) {s = 100;}
+                        else if ( (LA10_102=='\\') ) {s = 106;}
 
-                        else if ( (LA10_102==']') ) {s = 101;}
+                        else if ( (LA10_102==']') ) {s = 107;}
 
-                        else if ( (LA10_102=='\'') ) {s = 102;}
+                        else if ( (LA10_102=='\'') ) {s = 108;}
 
-                        else if ( ((LA10_102>='\u0000' && LA10_102<='!')||(LA10_102>='#' && LA10_102<='&')||(LA10_102>='(' && LA10_102<='[')||(LA10_102>='^' && LA10_102<='\uFFFF')) ) {s = 103;}
+                        else if ( ((LA10_102>='\u0000' && LA10_102<='!')||(LA10_102>='#' && LA10_102<='&')||(LA10_102>='(' && LA10_102<='[')||(LA10_102>='^' && LA10_102<='\uFFFF')) ) {s = 109;}
 
                         if ( s>=0 ) return s;
                         break;
-                    case 3 : 
-                        int LA10_62 = input.LA(1);
+                    case 34 : 
+                        int LA10_92 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_62=='\"') ) {s = 49;}
+                        if ( (LA10_92=='\'') ) {s = 91;}
 
-                        else if ( (LA10_62=='\\') ) {s = 47;}
+                        else if ( (LA10_92=='\\') ) {s = 89;}
 
-                        else if ( (LA10_62==']') ) {s = 48;}
+                        else if ( (LA10_92==']') ) {s = 90;}
 
-                        else if ( (LA10_62=='\'') ) {s = 50;}
+                        else if ( (LA10_92=='\"') ) {s = 88;}
 
-                        else if ( ((LA10_62>='\u0000' && LA10_62<='!')||(LA10_62>='#' && LA10_62<='&')||(LA10_62>='(' && LA10_62<='[')||(LA10_62>='^' && LA10_62<='\uFFFF')) ) {s = 51;}
+                        else if ( ((LA10_92>='\u0000' && LA10_92<='!')||(LA10_92>='#' && LA10_92<='&')||(LA10_92>='(' && LA10_92<='[')||(LA10_92>='^' && LA10_92<='\uFFFF')) ) {s = 92;}
 
                         if ( s>=0 ) return s;
                         break;
-                    case 4 : 
+                    case 35 : 
+                        int LA10_100 = input.LA(1);
+
+                         
+                        int index10_100 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 104;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_100);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 36 : 
+                        int LA10_32 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_32==']') ) {s = 34;}
+
+                        else if ( (LA10_32=='\\') ) {s = 35;}
+
+                        else if ( (LA10_32=='\"') ) {s = 36;}
+
+                        else if ( (LA10_32=='\'') ) {s = 37;}
+
+                        else if ( ((LA10_32>='\u0000' && LA10_32<='!')||(LA10_32>='#' && LA10_32<='&')||(LA10_32>='(' && LA10_32<='[')||(LA10_32>='^' && LA10_32<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 37 : 
+                        int LA10_71 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_71=='\"') ) {s = 72;}
+
+                        else if ( (LA10_71=='\\') ) {s = 71;}
+
+                        else if ( (LA10_71=='\'') ) {s = 70;}
+
+                        else if ( ((LA10_71>='\u0000' && LA10_71<='!')||(LA10_71>='#' && LA10_71<='&')||(LA10_71>='(' && LA10_71<='[')||(LA10_71>=']' && LA10_71<='\uFFFF')) ) {s = 73;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 38 : 
+                        int LA10_89 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_89==']') ) {s = 110;}
+
+                        else if ( (LA10_89=='\'') ) {s = 111;}
+
+                        else if ( (LA10_89=='\\') ) {s = 112;}
+
+                        else if ( (LA10_89=='\"') ) {s = 113;}
+
+                        else if ( ((LA10_89>='\u0000' && LA10_89<='!')||(LA10_89>='#' && LA10_89<='&')||(LA10_89>='(' && LA10_89<='[')||(LA10_89>='^' && LA10_89<='\uFFFF')) ) {s = 114;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 39 : 
+                        int LA10_66 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_66==']') ) {s = 65;}
+
+                        else if ( (LA10_66=='\\') ) {s = 66;}
+
+                        else if ( (LA10_66=='\"') ) {s = 67;}
+
+                        else if ( (LA10_66=='\'') ) {s = 68;}
+
+                        else if ( ((LA10_66>='\u0000' && LA10_66<='!')||(LA10_66>='#' && LA10_66<='&')||(LA10_66>='(' && LA10_66<='[')||(LA10_66>='^' && LA10_66<='\uFFFF')) ) {s = 69;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 40 : 
+                        int LA10_14 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_14==']') ) {s = 34;}
+
+                        else if ( (LA10_14=='\\') ) {s = 35;}
+
+                        else if ( (LA10_14=='\"') ) {s = 36;}
+
+                        else if ( (LA10_14=='\'') ) {s = 37;}
+
+                        else if ( ((LA10_14>='\u0000' && LA10_14<='!')||(LA10_14>='#' && LA10_14<='&')||(LA10_14>='(' && LA10_14<='[')||(LA10_14>='^' && LA10_14<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 41 : 
+                        int LA10_68 = input.LA(1);
+
+                         
+                        int index10_68 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 41;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_68);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 42 : 
+                        int LA10_67 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_67==']') ) {s = 47;}
+
+                        else if ( (LA10_67=='\\') ) {s = 48;}
+
+                        else if ( (LA10_67=='\"') ) {s = 49;}
+
+                        else if ( (LA10_67=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_67>='\u0000' && LA10_67<='!')||(LA10_67>='#' && LA10_67<='&')||(LA10_67>='(' && LA10_67<='[')||(LA10_67>='^' && LA10_67<='\uFFFF')) ) {s = 51;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 43 : 
+                        int LA10_82 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_82=='\"') ) {s = 105;}
+
+                        else if ( (LA10_82=='\\') ) {s = 106;}
+
+                        else if ( (LA10_82==']') ) {s = 107;}
+
+                        else if ( (LA10_82=='\'') ) {s = 108;}
+
+                        else if ( ((LA10_82>='\u0000' && LA10_82<='!')||(LA10_82>='#' && LA10_82<='&')||(LA10_82>='(' && LA10_82<='[')||(LA10_82>='^' && LA10_82<='\uFFFF')) ) {s = 109;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 44 : 
+                        int LA10_33 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_33==']') ) {s = 11;}
+
+                        else if ( (LA10_33=='\\') ) {s = 12;}
+
+                        else if ( (LA10_33=='\"') ) {s = 13;}
+
+                        else if ( (LA10_33=='\'') ) {s = 14;}
+
+                        else if ( ((LA10_33>='\u0000' && LA10_33<='!')||(LA10_33>='#' && LA10_33<='&')||(LA10_33>='(' && LA10_33<='[')||(LA10_33>='^' && LA10_33<='\uFFFF')) ) {s = 15;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 45 : 
+                        int LA10_47 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_47=='\'') ) {s = 61;}
+
+                        else if ( (LA10_47=='\\') ) {s = 62;}
+
+                        else if ( (LA10_47=='\"') ) {s = 63;}
+
+                        else if ( ((LA10_47>='\u0000' && LA10_47<='!')||(LA10_47>='#' && LA10_47<='&')||(LA10_47>='(' && LA10_47<='[')||(LA10_47>=']' && LA10_47<='\uFFFF')) ) {s = 64;}
+
+                        else s = 5;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 46 : 
+                        int LA10_57 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_57==']') ) {s = 56;}
+
+                        else if ( (LA10_57=='\\') ) {s = 57;}
+
+                        else if ( (LA10_57=='\"') ) {s = 58;}
+
+                        else if ( (LA10_57=='\'') ) {s = 59;}
+
+                        else if ( ((LA10_57>='\u0000' && LA10_57<='!')||(LA10_57>='#' && LA10_57<='&')||(LA10_57>='(' && LA10_57<='[')||(LA10_57>='^' && LA10_57<='\uFFFF')) ) {s = 60;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 47 : 
+                        int LA10_97 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_97=='\\') ) {s = 89;}
+
+                        else if ( (LA10_97=='\'') ) {s = 91;}
+
+                        else if ( (LA10_97=='\"') ) {s = 88;}
+
+                        else if ( (LA10_97==']') ) {s = 90;}
+
+                        else if ( ((LA10_97>='\u0000' && LA10_97<='!')||(LA10_97>='#' && LA10_97<='&')||(LA10_97>='(' && LA10_97<='[')||(LA10_97>='^' && LA10_97<='\uFFFF')) ) {s = 92;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 48 : 
+                        int LA10_107 = input.LA(1);
+
+                         
+                        int index10_107 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_107=='\'') ) {s = 61;}
+
+                        else if ( (LA10_107=='\\') ) {s = 62;}
+
+                        else if ( (LA10_107=='\"') ) {s = 63;}
+
+                        else if ( ((LA10_107>='\u0000' && LA10_107<='!')||(LA10_107>='#' && LA10_107<='&')||(LA10_107>='(' && LA10_107<='[')||(LA10_107>=']' && LA10_107<='\uFFFF')) ) {s = 64;}
+
+                        else s = 104;
+
+                         
+                        input.seek(index10_107);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 49 : 
+                        int LA10_31 = input.LA(1);
+
+                         
+                        int index10_31 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 28;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_31);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 50 : 
+                        int LA10_7 = input.LA(1);
+
+                         
+                        int index10_7 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred3_ANTLRLexer()) ) {s = 25;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_7);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 51 : 
+                        int LA10_54 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_54==']') ) {s = 74;}
+
+                        else if ( (LA10_54=='\\') ) {s = 75;}
+
+                        else if ( (LA10_54=='\"') ) {s = 76;}
+
+                        else if ( (LA10_54=='\'') ) {s = 77;}
+
+                        else if ( ((LA10_54>='\u0000' && LA10_54<='!')||(LA10_54>='#' && LA10_54<='&')||(LA10_54>='(' && LA10_54<='[')||(LA10_54>='^' && LA10_54<='\uFFFF')) ) {s = 78;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 52 : 
+                        int LA10_73 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_73=='\"') ) {s = 54;}
+
+                        else if ( (LA10_73=='\\') ) {s = 53;}
+
+                        else if ( (LA10_73=='\'') ) {s = 52;}
+
+                        else if ( ((LA10_73>='\u0000' && LA10_73<='!')||(LA10_73>='#' && LA10_73<='&')||(LA10_73>='(' && LA10_73<='[')||(LA10_73>=']' && LA10_73<='\uFFFF')) ) {s = 55;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 53 : 
+                        int LA10_103 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_103=='\"') ) {s = 79;}
+
+                        else if ( (LA10_103=='\\') ) {s = 80;}
+
+                        else if ( (LA10_103==']') ) {s = 81;}
+
+                        else if ( (LA10_103=='\'') ) {s = 82;}
+
+                        else if ( ((LA10_103>='\u0000' && LA10_103<='!')||(LA10_103>='#' && LA10_103<='&')||(LA10_103>='(' && LA10_103<='[')||(LA10_103>='^' && LA10_103<='\uFFFF')) ) {s = 83;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 54 : 
+                        int LA10_34 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_34=='\'') ) {s = 52;}
+
+                        else if ( (LA10_34=='\\') ) {s = 53;}
+
+                        else if ( (LA10_34=='\"') ) {s = 54;}
+
+                        else if ( ((LA10_34>='\u0000' && LA10_34<='!')||(LA10_34>='#' && LA10_34<='&')||(LA10_34>='(' && LA10_34<='[')||(LA10_34>=']' && LA10_34<='\uFFFF')) ) {s = 55;}
+
+                        else s = 5;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 55 : 
+                        int LA10_0 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_0==']') ) {s = 1;}
+
+                        else if ( (LA10_0=='\\') ) {s = 2;}
+
+                        else if ( (LA10_0=='\"') ) {s = 3;}
+
+                        else if ( (LA10_0=='\'') ) {s = 4;}
+
+                        else if ( ((LA10_0>='\u0000' && LA10_0<='!')||(LA10_0>='#' && LA10_0<='&')||(LA10_0>='(' && LA10_0<='[')||(LA10_0>='^' && LA10_0<='\uFFFF')) ) {s = 5;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 56 : 
+                        int LA10_101 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_101=='\"') ) {s = 100;}
+
+                        else if ( (LA10_101=='\\') ) {s = 101;}
+
+                        else if ( (LA10_101==']') ) {s = 99;}
+
+                        else if ( (LA10_101=='\'') ) {s = 102;}
+
+                        else if ( ((LA10_101>='\u0000' && LA10_101<='!')||(LA10_101>='#' && LA10_101<='&')||(LA10_101>='(' && LA10_101<='[')||(LA10_101>='^' && LA10_101<='\uFFFF')) ) {s = 103;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 57 : 
+                        int LA10_30 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_30==']') ) {s = 29;}
+
+                        else if ( (LA10_30=='\\') ) {s = 30;}
+
+                        else if ( (LA10_30=='\"') ) {s = 31;}
+
+                        else if ( (LA10_30=='\'') ) {s = 32;}
+
+                        else if ( ((LA10_30>='\u0000' && LA10_30<='!')||(LA10_30>='#' && LA10_30<='&')||(LA10_30>='(' && LA10_30<='[')||(LA10_30>='^' && LA10_30<='\uFFFF')) ) {s = 33;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 58 : 
+                        int LA10_116 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_116=='\"') ) {s = 118;}
+
+                        else if ( (LA10_116=='\\') ) {s = 116;}
+
+                        else if ( (LA10_116==']') ) {s = 117;}
+
+                        else if ( (LA10_116=='\'') ) {s = 115;}
+
+                        else if ( ((LA10_116>='\u0000' && LA10_116<='!')||(LA10_116>='#' && LA10_116<='&')||(LA10_116>='(' && LA10_116<='[')||(LA10_116>='^' && LA10_116<='\uFFFF')) ) {s = 119;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 59 : 
+                        int LA10_29 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_29=='\"') ) {s = 13;}
+
+                        else if ( (LA10_29=='\\') ) {s = 12;}
+
+                        else if ( (LA10_29==']') ) {s = 11;}
+
+                        else if ( (LA10_29=='\'') ) {s = 14;}
+
+                        else if ( ((LA10_29>='\u0000' && LA10_29<='!')||(LA10_29>='#' && LA10_29<='&')||(LA10_29>='(' && LA10_29<='[')||(LA10_29>='^' && LA10_29<='\uFFFF')) ) {s = 15;}
+
+                        else s = 5;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 60 : 
+                        int LA10_20 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_20==']') ) {s = 16;}
+
+                        else if ( (LA10_20=='\\') ) {s = 17;}
+
+                        else if ( (LA10_20=='\"') ) {s = 18;}
+
+                        else if ( (LA10_20=='\'') ) {s = 19;}
+
+                        else if ( ((LA10_20>='\u0000' && LA10_20<='!')||(LA10_20>='#' && LA10_20<='&')||(LA10_20>='(' && LA10_20<='[')||(LA10_20>='^' && LA10_20<='\uFFFF')) ) {s = 20;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 61 : 
+                        int LA10_99 = input.LA(1);
+
+                         
+                        int index10_99 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_99=='\"') ) {s = 79;}
+
+                        else if ( (LA10_99=='\\') ) {s = 80;}
+
+                        else if ( (LA10_99==']') ) {s = 81;}
+
+                        else if ( (LA10_99=='\'') ) {s = 82;}
+
+                        else if ( ((LA10_99>='\u0000' && LA10_99<='!')||(LA10_99>='#' && LA10_99<='&')||(LA10_99>='(' && LA10_99<='[')||(LA10_99>='^' && LA10_99<='\uFFFF')) ) {s = 83;}
+
+                        else s = 104;
+
+                         
+                        input.seek(index10_99);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 62 : 
                         int LA10_10 = input.LA(1);
 
                          
@@ -4069,71 +5030,404 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index10_10);
                         if ( s>=0 ) return s;
                         break;
-                    case 5 : 
-                        int LA10_54 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_54==']') ) {s = 52;}
-
-                        else if ( (LA10_54=='\"') ) {s = 53;}
-
-                        else if ( (LA10_54=='\\') ) {s = 54;}
-
-                        else if ( (LA10_54=='\'') ) {s = 55;}
-
-                        else if ( ((LA10_54>='\u0000' && LA10_54<='!')||(LA10_54>='#' && LA10_54<='&')||(LA10_54>='(' && LA10_54<='[')||(LA10_54>='^' && LA10_54<='\uFFFF')) ) {s = 56;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 6 : 
-                        int LA10_2 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_2==']') ) {s = 6;}
-
-                        else if ( (LA10_2=='\\') ) {s = 7;}
-
-                        else if ( (LA10_2=='\"') ) {s = 8;}
-
-                        else if ( (LA10_2=='\'') ) {s = 9;}
-
-                        else if ( ((LA10_2>='\u0000' && LA10_2<='!')||(LA10_2>='#' && LA10_2<='&')||(LA10_2>='(' && LA10_2<='[')||(LA10_2>='^' && LA10_2<='\uFFFF')) ) {s = 10;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 7 : 
+                    case 63 : 
                         int LA10_106 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_106==']') ) {s = 104;}
+                        if ( (LA10_106=='\'') ) {s = 115;}
 
-                        else if ( (LA10_106=='\"') ) {s = 105;}
+                        else if ( (LA10_106=='\\') ) {s = 116;}
 
-                        else if ( (LA10_106=='\\') ) {s = 106;}
+                        else if ( (LA10_106==']') ) {s = 117;}
 
-                        else if ( (LA10_106=='\'') ) {s = 107;}
+                        else if ( (LA10_106=='\"') ) {s = 118;}
 
-                        else if ( ((LA10_106>='\u0000' && LA10_106<='!')||(LA10_106>='#' && LA10_106<='&')||(LA10_106>='(' && LA10_106<='[')||(LA10_106>='^' && LA10_106<='\uFFFF')) ) {s = 108;}
+                        else if ( ((LA10_106>='\u0000' && LA10_106<='!')||(LA10_106>='#' && LA10_106<='&')||(LA10_106>='(' && LA10_106<='[')||(LA10_106>='^' && LA10_106<='\uFFFF')) ) {s = 119;}
 
                         if ( s>=0 ) return s;
                         break;
-                    case 8 : 
-                        int LA10_28 = input.LA(1);
+                    case 64 : 
+                        int LA10_98 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_28==']') ) {s = 26;}
+                        if ( (LA10_98=='\'') ) {s = 77;}
 
-                        else if ( (LA10_28=='\"') ) {s = 27;}
+                        else if ( (LA10_98=='\\') ) {s = 75;}
 
-                        else if ( (LA10_28=='\\') ) {s = 28;}
+                        else if ( (LA10_98==']') ) {s = 74;}
 
-                        else if ( (LA10_28=='\'') ) {s = 29;}
+                        else if ( (LA10_98=='\"') ) {s = 76;}
 
-                        else if ( ((LA10_28>='\u0000' && LA10_28<='!')||(LA10_28>='#' && LA10_28<='&')||(LA10_28>='(' && LA10_28<='[')||(LA10_28>='^' && LA10_28<='\uFFFF')) ) {s = 30;}
+                        else if ( ((LA10_98>='\u0000' && LA10_98<='!')||(LA10_98>='#' && LA10_98<='&')||(LA10_98>='(' && LA10_98<='[')||(LA10_98>='^' && LA10_98<='\uFFFF')) ) {s = 78;}
 
                         if ( s>=0 ) return s;
                         break;
-                    case 9 : 
+                    case 65 : 
+                        int LA10_70 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_70=='\"') ) {s = 36;}
+
+                        else if ( (LA10_70=='\\') ) {s = 35;}
+
+                        else if ( (LA10_70=='\'') ) {s = 37;}
+
+                        else if ( (LA10_70==']') ) {s = 34;}
+
+                        else if ( ((LA10_70>='\u0000' && LA10_70<='!')||(LA10_70>='#' && LA10_70<='&')||(LA10_70>='(' && LA10_70<='[')||(LA10_70>='^' && LA10_70<='\uFFFF')) ) {s = 38;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 66 : 
+                        int LA10_55 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_55=='\'') ) {s = 52;}
+
+                        else if ( (LA10_55=='\\') ) {s = 53;}
+
+                        else if ( (LA10_55=='\"') ) {s = 54;}
+
+                        else if ( ((LA10_55>='\u0000' && LA10_55<='!')||(LA10_55>='#' && LA10_55<='&')||(LA10_55>='(' && LA10_55<='[')||(LA10_55>=']' && LA10_55<='\uFFFF')) ) {s = 55;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 67 : 
+                        int LA10_65 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_65=='\"') ) {s = 49;}
+
+                        else if ( (LA10_65=='\\') ) {s = 48;}
+
+                        else if ( (LA10_65=='\'') ) {s = 50;}
+
+                        else if ( (LA10_65==']') ) {s = 47;}
+
+                        else if ( ((LA10_65>='\u0000' && LA10_65<='!')||(LA10_65>='#' && LA10_65<='&')||(LA10_65>='(' && LA10_65<='[')||(LA10_65>='^' && LA10_65<='\uFFFF')) ) {s = 51;}
+
+                        else s = 5;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 68 : 
+                        int LA10_63 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_63==']') ) {s = 16;}
+
+                        else if ( (LA10_63=='\\') ) {s = 17;}
+
+                        else if ( (LA10_63=='\"') ) {s = 18;}
+
+                        else if ( (LA10_63=='\'') ) {s = 19;}
+
+                        else if ( ((LA10_63>='\u0000' && LA10_63<='!')||(LA10_63>='#' && LA10_63<='&')||(LA10_63>='(' && LA10_63<='[')||(LA10_63>='^' && LA10_63<='\uFFFF')) ) {s = 20;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 69 : 
+                        int LA10_84 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_84=='\"') ) {s = 105;}
+
+                        else if ( (LA10_84=='\\') ) {s = 106;}
+
+                        else if ( (LA10_84=='\'') ) {s = 108;}
+
+                        else if ( (LA10_84==']') ) {s = 107;}
+
+                        else if ( ((LA10_84>='\u0000' && LA10_84<='!')||(LA10_84>='#' && LA10_84<='&')||(LA10_84>='(' && LA10_84<='[')||(LA10_84>='^' && LA10_84<='\uFFFF')) ) {s = 109;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 70 : 
+                        int LA10_35 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_35==']') ) {s = 56;}
+
+                        else if ( (LA10_35=='\\') ) {s = 57;}
+
+                        else if ( (LA10_35=='\"') ) {s = 58;}
+
+                        else if ( (LA10_35=='\'') ) {s = 59;}
+
+                        else if ( ((LA10_35>='\u0000' && LA10_35<='!')||(LA10_35>='#' && LA10_35<='&')||(LA10_35>='(' && LA10_35<='[')||(LA10_35>='^' && LA10_35<='\uFFFF')) ) {s = 60;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 71 : 
+                        int LA10_19 = input.LA(1);
+
+                         
+                        int index10_19 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred6_ANTLRLexer()) ) {s = 41;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_19);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 72 : 
+                        int LA10_64 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_64=='\'') ) {s = 61;}
+
+                        else if ( (LA10_64=='\\') ) {s = 62;}
+
+                        else if ( (LA10_64=='\"') ) {s = 63;}
+
+                        else if ( ((LA10_64>='\u0000' && LA10_64<='!')||(LA10_64>='#' && LA10_64<='&')||(LA10_64>='(' && LA10_64<='[')||(LA10_64>=']' && LA10_64<='\uFFFF')) ) {s = 64;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 73 : 
+                        int LA10_78 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_78=='\'') ) {s = 77;}
+
+                        else if ( (LA10_78=='\\') ) {s = 75;}
+
+                        else if ( (LA10_78==']') ) {s = 74;}
+
+                        else if ( (LA10_78=='\"') ) {s = 76;}
+
+                        else if ( ((LA10_78>='\u0000' && LA10_78<='!')||(LA10_78>='#' && LA10_78<='&')||(LA10_78>='(' && LA10_78<='[')||(LA10_78>='^' && LA10_78<='\uFFFF')) ) {s = 78;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 74 : 
+                        int LA10_44 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_44==']') ) {s = 47;}
+
+                        else if ( (LA10_44=='\\') ) {s = 48;}
+
+                        else if ( (LA10_44=='\"') ) {s = 49;}
+
+                        else if ( (LA10_44=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_44>='\u0000' && LA10_44<='!')||(LA10_44>='#' && LA10_44<='&')||(LA10_44>='(' && LA10_44<='[')||(LA10_44>='^' && LA10_44<='\uFFFF')) ) {s = 51;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 75 : 
+                        int LA10_72 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_72=='\"') ) {s = 88;}
+
+                        else if ( (LA10_72=='\\') ) {s = 89;}
+
+                        else if ( (LA10_72==']') ) {s = 90;}
+
+                        else if ( (LA10_72=='\'') ) {s = 91;}
+
+                        else if ( ((LA10_72>='\u0000' && LA10_72<='!')||(LA10_72>='#' && LA10_72<='&')||(LA10_72>='(' && LA10_72<='[')||(LA10_72>='^' && LA10_72<='\uFFFF')) ) {s = 92;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 76 : 
+                        int LA10_3 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_3==']') ) {s = 11;}
+
+                        else if ( (LA10_3=='\\') ) {s = 12;}
+
+                        else if ( (LA10_3=='\"') ) {s = 13;}
+
+                        else if ( (LA10_3=='\'') ) {s = 14;}
+
+                        else if ( ((LA10_3>='\u0000' && LA10_3<='!')||(LA10_3>='#' && LA10_3<='&')||(LA10_3>='(' && LA10_3<='[')||(LA10_3>='^' && LA10_3<='\uFFFF')) ) {s = 15;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 77 : 
+                        int LA10_85 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_85=='\"') ) {s = 86;}
+
+                        else if ( (LA10_85=='\\') ) {s = 85;}
+
+                        else if ( (LA10_85=='\'') ) {s = 84;}
+
+                        else if ( ((LA10_85>='\u0000' && LA10_85<='!')||(LA10_85>='#' && LA10_85<='&')||(LA10_85>='(' && LA10_85<='[')||(LA10_85>=']' && LA10_85<='\uFFFF')) ) {s = 87;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 78 : 
+                        int LA10_77 = input.LA(1);
+
+                         
+                        int index10_77 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_77);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 79 : 
+                        int LA10_9 = input.LA(1);
+
+                         
+                        int index10_9 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred3_ANTLRLexer()) ) {s = 25;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_9);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 80 : 
+                        int LA10_111 = input.LA(1);
+
+                         
+                        int index10_111 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_111);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 81 : 
+                        int LA10_91 = input.LA(1);
+
+                         
+                        int index10_91 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
+
+                        else if ( (true) ) {s = 5;}
+
+                         
+                        input.seek(index10_91);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 82 : 
+                        int LA10_115 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_115=='\"') ) {s = 105;}
+
+                        else if ( (LA10_115=='\\') ) {s = 106;}
+
+                        else if ( (LA10_115==']') ) {s = 107;}
+
+                        else if ( (LA10_115=='\'') ) {s = 108;}
+
+                        else if ( ((LA10_115>='\u0000' && LA10_115<='!')||(LA10_115>='#' && LA10_115<='&')||(LA10_115>='(' && LA10_115<='[')||(LA10_115>='^' && LA10_115<='\uFFFF')) ) {s = 109;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 83 : 
+                        int LA10_81 = input.LA(1);
+
+                         
+                        int index10_81 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( ((LA10_81>='\u0000' && LA10_81<='\uFFFF')) ) {s = 5;}
+
+                        else s = 104;
+
+                         
+                        input.seek(index10_81);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 84 : 
+                        int LA10_113 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_113=='\"') ) {s = 88;}
+
+                        else if ( (LA10_113=='\\') ) {s = 89;}
+
+                        else if ( (LA10_113==']') ) {s = 90;}
+
+                        else if ( (LA10_113=='\'') ) {s = 91;}
+
+                        else if ( ((LA10_113>='\u0000' && LA10_113<='!')||(LA10_113>='#' && LA10_113<='&')||(LA10_113>='(' && LA10_113<='[')||(LA10_113>='^' && LA10_113<='\uFFFF')) ) {s = 92;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 85 : 
+                        int LA10_49 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_49==']') ) {s = 47;}
+
+                        else if ( (LA10_49=='\\') ) {s = 48;}
+
+                        else if ( (LA10_49=='\"') ) {s = 49;}
+
+                        else if ( (LA10_49=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_49>='\u0000' && LA10_49<='!')||(LA10_49>='#' && LA10_49<='&')||(LA10_49>='(' && LA10_49<='[')||(LA10_49>='^' && LA10_49<='\uFFFF')) ) {s = 51;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 86 : 
+                        int LA10_94 = input.LA(1);
+
+                         
+                        int index10_94 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_94=='\'') ) {s = 77;}
+
+                        else if ( (LA10_94=='\\') ) {s = 75;}
+
+                        else if ( (LA10_94==']') ) {s = 74;}
+
+                        else if ( (LA10_94=='\"') ) {s = 76;}
+
+                        else if ( ((LA10_94>='\u0000' && LA10_94<='!')||(LA10_94>='#' && LA10_94<='&')||(LA10_94>='(' && LA10_94<='[')||(LA10_94>='^' && LA10_94<='\uFFFF')) ) {s = 78;}
+
+                        else s = 93;
+
+                         
+                        input.seek(index10_94);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 87 : 
+                        int LA10_17 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_17==']') ) {s = 42;}
+
+                        else if ( (LA10_17=='\\') ) {s = 43;}
+
+                        else if ( (LA10_17=='\"') ) {s = 44;}
+
+                        else if ( (LA10_17=='\'') ) {s = 45;}
+
+                        else if ( ((LA10_17>='\u0000' && LA10_17<='!')||(LA10_17>='#' && LA10_17<='&')||(LA10_17>='(' && LA10_17<='[')||(LA10_17>='^' && LA10_17<='\uFFFF')) ) {s = 46;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 88 : 
                         int LA10_6 = input.LA(1);
 
                          
@@ -4156,1533 +5450,268 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index10_6);
                         if ( s>=0 ) return s;
                         break;
-                    case 10 : 
-                        int LA10_98 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_98=='\"') ) {s = 96;}
-
-                        else if ( (LA10_98=='\\') ) {s = 94;}
-
-                        else if ( (LA10_98=='\'') ) {s = 97;}
-
-                        else if ( (LA10_98==']') ) {s = 95;}
-
-                        else if ( ((LA10_98>='\u0000' && LA10_98<='!')||(LA10_98>='#' && LA10_98<='&')||(LA10_98>='(' && LA10_98<='[')||(LA10_98>='^' && LA10_98<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 11 : 
-                        int LA10_71 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_71==']') ) {s = 88;}
-
-                        else if ( (LA10_71=='\\') ) {s = 89;}
-
-                        else if ( (LA10_71=='\"') ) {s = 90;}
-
-                        else if ( (LA10_71=='\'') ) {s = 91;}
-
-                        else if ( ((LA10_71>='\u0000' && LA10_71<='!')||(LA10_71>='#' && LA10_71<='&')||(LA10_71>='(' && LA10_71<='[')||(LA10_71>='^' && LA10_71<='\uFFFF')) ) {s = 92;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 12 : 
-                        int LA10_3 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_3=='\\') ) {s = 11;}
-
-                        else if ( (LA10_3==']') ) {s = 12;}
-
-                        else if ( (LA10_3=='\"') ) {s = 13;}
-
-                        else if ( (LA10_3=='\'') ) {s = 14;}
-
-                        else if ( ((LA10_3>='\u0000' && LA10_3<='!')||(LA10_3>='#' && LA10_3<='&')||(LA10_3>='(' && LA10_3<='[')||(LA10_3>='^' && LA10_3<='\uFFFF')) ) {s = 15;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 13 : 
-                        int LA10_37 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_37=='\"') ) {s = 34;}
-
-                        else if ( (LA10_37=='\\') ) {s = 35;}
-
-                        else if ( (LA10_37==']') ) {s = 36;}
-
-                        else if ( (LA10_37=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_37>='\u0000' && LA10_37<='!')||(LA10_37>='#' && LA10_37<='&')||(LA10_37>='(' && LA10_37<='[')||(LA10_37>='^' && LA10_37<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 14 : 
-                        int LA10_113 = input.LA(1);
-
-                         
-                        int index10_113 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_113);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 15 : 
-                        int LA10_63 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_63==']') ) {s = 61;}
-
-                        else if ( (LA10_63=='\"') ) {s = 62;}
-
-                        else if ( (LA10_63=='\\') ) {s = 63;}
-
-                        else if ( (LA10_63=='\'') ) {s = 64;}
-
-                        else if ( ((LA10_63>='\u0000' && LA10_63<='!')||(LA10_63>='#' && LA10_63<='&')||(LA10_63>='(' && LA10_63<='[')||(LA10_63>='^' && LA10_63<='\uFFFF')) ) {s = 65;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 16 : 
-                        int LA10_0 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_0==']') ) {s = 1;}
-
-                        else if ( (LA10_0=='\\') ) {s = 2;}
-
-                        else if ( (LA10_0=='\"') ) {s = 3;}
-
-                        else if ( (LA10_0=='\'') ) {s = 4;}
-
-                        else if ( ((LA10_0>='\u0000' && LA10_0<='!')||(LA10_0>='#' && LA10_0<='&')||(LA10_0>='(' && LA10_0<='[')||(LA10_0>='^' && LA10_0<='\uFFFF')) ) {s = 5;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 17 : 
-                        int LA10_43 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_43==']') ) {s = 17;}
-
-                        else if ( (LA10_43=='\\') ) {s = 16;}
-
-                        else if ( (LA10_43=='\"') ) {s = 19;}
-
-                        else if ( (LA10_43=='\'') ) {s = 18;}
-
-                        else if ( ((LA10_43>='\u0000' && LA10_43<='!')||(LA10_43>='#' && LA10_43<='&')||(LA10_43>='(' && LA10_43<='[')||(LA10_43>='^' && LA10_43<='\uFFFF')) ) {s = 20;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 18 : 
-                        int LA10_20 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_20==']') ) {s = 17;}
-
-                        else if ( (LA10_20=='\\') ) {s = 16;}
-
-                        else if ( (LA10_20=='\"') ) {s = 19;}
-
-                        else if ( (LA10_20=='\'') ) {s = 18;}
-
-                        else if ( ((LA10_20>='\u0000' && LA10_20<='!')||(LA10_20>='#' && LA10_20<='&')||(LA10_20>='(' && LA10_20<='[')||(LA10_20>='^' && LA10_20<='\uFFFF')) ) {s = 20;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 19 : 
-                        int LA10_38 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_38=='\"') ) {s = 34;}
-
-                        else if ( (LA10_38=='\\') ) {s = 35;}
-
-                        else if ( (LA10_38==']') ) {s = 36;}
-
-                        else if ( (LA10_38=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_38>='\u0000' && LA10_38<='!')||(LA10_38>='#' && LA10_38<='&')||(LA10_38>='(' && LA10_38<='[')||(LA10_38>='^' && LA10_38<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 20 : 
-                        int LA10_103 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_103=='\"') ) {s = 99;}
-
-                        else if ( (LA10_103=='\\') ) {s = 100;}
-
-                        else if ( (LA10_103=='\'') ) {s = 102;}
-
-                        else if ( (LA10_103==']') ) {s = 101;}
-
-                        else if ( ((LA10_103>='\u0000' && LA10_103<='!')||(LA10_103>='#' && LA10_103<='&')||(LA10_103>='(' && LA10_103<='[')||(LA10_103>='^' && LA10_103<='\uFFFF')) ) {s = 103;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 21 : 
-                        int LA10_51 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_51=='\"') ) {s = 49;}
-
-                        else if ( (LA10_51=='\\') ) {s = 47;}
-
-                        else if ( (LA10_51==']') ) {s = 48;}
-
-                        else if ( (LA10_51=='\'') ) {s = 50;}
-
-                        else if ( ((LA10_51>='\u0000' && LA10_51<='!')||(LA10_51>='#' && LA10_51<='&')||(LA10_51>='(' && LA10_51<='[')||(LA10_51>='^' && LA10_51<='\uFFFF')) ) {s = 51;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 22 : 
-                        int LA10_12 = input.LA(1);
-
-                         
-                        int index10_12 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA10_12=='\"') && (synpred5_ANTLRLexer())) {s = 31;}
-
-                        else if ( (LA10_12=='\\') && (synpred5_ANTLRLexer())) {s = 32;}
-
-                        else if ( ((LA10_12>='\u0000' && LA10_12<='!')||(LA10_12>='#' && LA10_12<='[')||(LA10_12>=']' && LA10_12<='\uFFFF')) && (synpred5_ANTLRLexer())) {s = 33;}
-
-                        else s = 5;
-
-                         
-                        input.seek(index10_12);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 23 : 
-                        int LA10_88 = input.LA(1);
-
-                         
-                        int index10_88 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA10_88==']') ) {s = 72;}
-
-                        else if ( (LA10_88=='\\') ) {s = 71;}
-
-                        else if ( (LA10_88=='\"') ) {s = 73;}
-
-                        else if ( (LA10_88=='\'') ) {s = 70;}
-
-                        else if ( ((LA10_88>='\u0000' && LA10_88<='!')||(LA10_88>='#' && LA10_88<='&')||(LA10_88>='(' && LA10_88<='[')||(LA10_88>='^' && LA10_88<='\uFFFF')) ) {s = 74;}
-
-                        else s = 93;
-
-                         
-                        input.seek(index10_88);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 24 : 
-                        int LA10_96 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_96=='\\') ) {s = 94;}
-
-                        else if ( (LA10_96=='\'') ) {s = 97;}
-
-                        else if ( (LA10_96=='\"') ) {s = 96;}
-
-                        else if ( (LA10_96==']') ) {s = 95;}
-
-                        else if ( ((LA10_96>='\u0000' && LA10_96<='!')||(LA10_96>='#' && LA10_96<='&')||(LA10_96>='(' && LA10_96<='[')||(LA10_96>='^' && LA10_96<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 25 : 
-                        int LA10_114 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_114=='\"') ) {s = 96;}
-
-                        else if ( (LA10_114=='\\') ) {s = 94;}
-
-                        else if ( (LA10_114==']') ) {s = 95;}
-
-                        else if ( (LA10_114=='\'') ) {s = 97;}
-
-                        else if ( ((LA10_114>='\u0000' && LA10_114<='!')||(LA10_114>='#' && LA10_114<='&')||(LA10_114>='(' && LA10_114<='[')||(LA10_114>='^' && LA10_114<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 26 : 
-                        int LA10_105 = input.LA(1);
-
-                         
-                        int index10_105 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 109;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_105);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 27 : 
-                        int LA10_117 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_117==']') ) {s = 115;}
-
-                        else if ( (LA10_117=='\"') ) {s = 116;}
-
-                        else if ( (LA10_117=='\\') ) {s = 117;}
-
-                        else if ( (LA10_117=='\'') ) {s = 118;}
-
-                        else if ( ((LA10_117>='\u0000' && LA10_117<='!')||(LA10_117>='#' && LA10_117<='&')||(LA10_117>='(' && LA10_117<='[')||(LA10_117>='^' && LA10_117<='\uFFFF')) ) {s = 119;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 28 : 
-                        int LA10_29 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_29=='\"') ) {s = 34;}
-
-                        else if ( (LA10_29=='\\') ) {s = 35;}
-
-                        else if ( (LA10_29==']') ) {s = 36;}
-
-                        else if ( (LA10_29=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_29>='\u0000' && LA10_29<='!')||(LA10_29>='#' && LA10_29<='&')||(LA10_29>='(' && LA10_29<='[')||(LA10_29>='^' && LA10_29<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 29 : 
-                        int LA10_85 = input.LA(1);
-
-                         
-                        int index10_85 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((LA10_85>='\u0000' && LA10_85<='\uFFFF')) ) {s = 5;}
-
-                        else s = 109;
-
-                         
-                        input.seek(index10_85);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 30 : 
-                        int LA10_75 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_75=='\"') ) {s = 96;}
-
-                        else if ( (LA10_75=='\\') ) {s = 94;}
-
-                        else if ( (LA10_75=='\'') ) {s = 97;}
-
-                        else if ( (LA10_75==']') ) {s = 95;}
-
-                        else if ( ((LA10_75>='\u0000' && LA10_75<='!')||(LA10_75>='#' && LA10_75<='&')||(LA10_75>='(' && LA10_75<='[')||(LA10_75>='^' && LA10_75<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 31 : 
-                        int LA10_67 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_67=='\"') ) {s = 79;}
-
-                        else if ( (LA10_67=='\\') ) {s = 80;}
-
-                        else if ( (LA10_67=='\'') ) {s = 81;}
-
-                        else if ( ((LA10_67>='\u0000' && LA10_67<='!')||(LA10_67>='#' && LA10_67<='&')||(LA10_67>='(' && LA10_67<='[')||(LA10_67>=']' && LA10_67<='\uFFFF')) ) {s = 82;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 32 : 
-                        int LA10_94 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_94==']') ) {s = 110;}
-
-                        else if ( (LA10_94=='\"') ) {s = 111;}
-
-                        else if ( (LA10_94=='\\') ) {s = 112;}
-
-                        else if ( (LA10_94=='\'') ) {s = 113;}
-
-                        else if ( ((LA10_94>='\u0000' && LA10_94<='!')||(LA10_94>='#' && LA10_94<='&')||(LA10_94>='(' && LA10_94<='[')||(LA10_94>='^' && LA10_94<='\uFFFF')) ) {s = 114;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 33 : 
-                        int LA10_58 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_58=='\"') ) {s = 75;}
-
-                        else if ( (LA10_58=='\\') ) {s = 76;}
-
-                        else if ( (LA10_58=='\'') ) {s = 77;}
-
-                        else if ( ((LA10_58>='\u0000' && LA10_58<='!')||(LA10_58>='#' && LA10_58<='&')||(LA10_58>='(' && LA10_58<='[')||(LA10_58>=']' && LA10_58<='\uFFFF')) ) {s = 78;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 34 : 
-                        int LA10_107 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_107=='\"') ) {s = 99;}
-
-                        else if ( (LA10_107=='\\') ) {s = 100;}
-
-                        else if ( (LA10_107==']') ) {s = 101;}
-
-                        else if ( (LA10_107=='\'') ) {s = 102;}
-
-                        else if ( ((LA10_107>='\u0000' && LA10_107<='!')||(LA10_107>='#' && LA10_107<='&')||(LA10_107>='(' && LA10_107<='[')||(LA10_107>='^' && LA10_107<='\uFFFF')) ) {s = 103;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 35 : 
-                        int LA10_39 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_39==']') ) {s = 17;}
-
-                        else if ( (LA10_39=='\\') ) {s = 16;}
-
-                        else if ( (LA10_39=='\"') ) {s = 19;}
-
-                        else if ( (LA10_39=='\'') ) {s = 18;}
-
-                        else if ( ((LA10_39>='\u0000' && LA10_39<='!')||(LA10_39>='#' && LA10_39<='&')||(LA10_39>='(' && LA10_39<='[')||(LA10_39>='^' && LA10_39<='\uFFFF')) ) {s = 20;}
-
-                        else s = 5;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 36 : 
-                        int LA10_64 = input.LA(1);
-
-                         
-                        int index10_64 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 46;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_64);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 37 : 
-                        int LA10_119 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_119=='\"') ) {s = 99;}
-
-                        else if ( (LA10_119=='\\') ) {s = 100;}
-
-                        else if ( (LA10_119==']') ) {s = 101;}
-
-                        else if ( (LA10_119=='\'') ) {s = 102;}
-
-                        else if ( ((LA10_119>='\u0000' && LA10_119<='!')||(LA10_119>='#' && LA10_119<='&')||(LA10_119>='(' && LA10_119<='[')||(LA10_119>='^' && LA10_119<='\uFFFF')) ) {s = 103;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 38 : 
+                    case 89 : 
                         int LA10_56 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_56=='\"') ) {s = 34;}
+                        if ( (LA10_56=='\"') ) {s = 36;}
 
                         else if ( (LA10_56=='\\') ) {s = 35;}
 
-                        else if ( (LA10_56==']') ) {s = 36;}
-
                         else if ( (LA10_56=='\'') ) {s = 37;}
 
+                        else if ( (LA10_56==']') ) {s = 34;}
+
                         else if ( ((LA10_56>='\u0000' && LA10_56<='!')||(LA10_56>='#' && LA10_56<='&')||(LA10_56>='(' && LA10_56<='[')||(LA10_56>='^' && LA10_56<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 39 : 
-                        int LA10_4 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_4=='\\') ) {s = 16;}
-
-                        else if ( (LA10_4==']') ) {s = 17;}
-
-                        else if ( (LA10_4=='\'') ) {s = 18;}
-
-                        else if ( (LA10_4=='\"') ) {s = 19;}
-
-                        else if ( ((LA10_4>='\u0000' && LA10_4<='!')||(LA10_4>='#' && LA10_4<='&')||(LA10_4>='(' && LA10_4<='[')||(LA10_4>='^' && LA10_4<='\uFFFF')) ) {s = 20;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 40 : 
-                        int LA10_8 = input.LA(1);
-
-                         
-                        int index10_8 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred3_ANTLRLexer()) ) {s = 25;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_8);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 41 : 
-                        int LA10_90 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_90==']') ) {s = 95;}
-
-                        else if ( (LA10_90=='\\') ) {s = 94;}
-
-                        else if ( (LA10_90=='\"') ) {s = 96;}
-
-                        else if ( (LA10_90=='\'') ) {s = 97;}
-
-                        else if ( ((LA10_90>='\u0000' && LA10_90<='!')||(LA10_90>='#' && LA10_90<='&')||(LA10_90>='(' && LA10_90<='[')||(LA10_90>='^' && LA10_90<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 42 : 
-                        int LA10_68 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_68=='\"') ) {s = 83;}
-
-                        else if ( (LA10_68=='\\') ) {s = 84;}
-
-                        else if ( (LA10_68==']') ) {s = 85;}
-
-                        else if ( (LA10_68=='\'') ) {s = 86;}
-
-                        else if ( ((LA10_68>='\u0000' && LA10_68<='!')||(LA10_68>='#' && LA10_68<='&')||(LA10_68>='(' && LA10_68<='[')||(LA10_68>='^' && LA10_68<='\uFFFF')) ) {s = 87;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 43 : 
-                        int LA10_16 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_16==']') ) {s = 39;}
-
-                        else if ( (LA10_16=='\\') ) {s = 40;}
-
-                        else if ( (LA10_16=='\"') ) {s = 41;}
-
-                        else if ( (LA10_16=='\'') ) {s = 42;}
-
-                        else if ( ((LA10_16>='\u0000' && LA10_16<='!')||(LA10_16>='#' && LA10_16<='&')||(LA10_16>='(' && LA10_16<='[')||(LA10_16>='^' && LA10_16<='\uFFFF')) ) {s = 43;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 44 : 
-                        int LA10_65 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_65=='\"') ) {s = 49;}
-
-                        else if ( (LA10_65=='\\') ) {s = 47;}
-
-                        else if ( (LA10_65==']') ) {s = 48;}
-
-                        else if ( (LA10_65=='\'') ) {s = 50;}
-
-                        else if ( ((LA10_65>='\u0000' && LA10_65<='!')||(LA10_65>='#' && LA10_65<='&')||(LA10_65>='(' && LA10_65<='[')||(LA10_65>='^' && LA10_65<='\uFFFF')) ) {s = 51;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 45 : 
-                        int LA10_60 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_60=='\"') ) {s = 57;}
-
-                        else if ( (LA10_60=='\\') ) {s = 58;}
-
-                        else if ( (LA10_60=='\'') ) {s = 59;}
-
-                        else if ( ((LA10_60>='\u0000' && LA10_60<='!')||(LA10_60>='#' && LA10_60<='&')||(LA10_60>='(' && LA10_60<='[')||(LA10_60>=']' && LA10_60<='\uFFFF')) ) {s = 60;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 46 : 
-                        int LA10_59 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_59=='\"') ) {s = 13;}
-
-                        else if ( (LA10_59=='\\') ) {s = 11;}
-
-                        else if ( (LA10_59==']') ) {s = 12;}
-
-                        else if ( (LA10_59=='\'') ) {s = 14;}
-
-                        else if ( ((LA10_59>='\u0000' && LA10_59<='!')||(LA10_59>='#' && LA10_59<='&')||(LA10_59>='(' && LA10_59<='[')||(LA10_59>='^' && LA10_59<='\uFFFF')) ) {s = 15;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 47 : 
-                        int LA10_47 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_47==']') ) {s = 61;}
-
-                        else if ( (LA10_47=='\"') ) {s = 62;}
-
-                        else if ( (LA10_47=='\\') ) {s = 63;}
-
-                        else if ( (LA10_47=='\'') ) {s = 64;}
-
-                        else if ( ((LA10_47>='\u0000' && LA10_47<='!')||(LA10_47>='#' && LA10_47<='&')||(LA10_47>='(' && LA10_47<='[')||(LA10_47>='^' && LA10_47<='\uFFFF')) ) {s = 65;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 48 : 
-                        int LA10_91 = input.LA(1);
-
-                         
-                        int index10_91 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_91);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 49 : 
-                        int LA10_101 = input.LA(1);
-
-                         
-                        int index10_101 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA10_101=='\"') ) {s = 66;}
-
-                        else if ( (LA10_101=='\\') ) {s = 67;}
-
-                        else if ( (LA10_101=='\'') ) {s = 68;}
-
-                        else if ( ((LA10_101>='\u0000' && LA10_101<='!')||(LA10_101>='#' && LA10_101<='&')||(LA10_101>='(' && LA10_101<='[')||(LA10_101>=']' && LA10_101<='\uFFFF')) ) {s = 69;}
-
-                        else s = 109;
-
-                         
-                        input.seek(index10_101);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 50 : 
-                        int LA10_48 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_48=='\"') ) {s = 66;}
-
-                        else if ( (LA10_48=='\\') ) {s = 67;}
-
-                        else if ( (LA10_48=='\'') ) {s = 68;}
-
-                        else if ( ((LA10_48>='\u0000' && LA10_48<='!')||(LA10_48>='#' && LA10_48<='&')||(LA10_48>='(' && LA10_48<='[')||(LA10_48>=']' && LA10_48<='\uFFFF')) ) {s = 69;}
-
-                        else s = 5;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 51 : 
-                        int LA10_40 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_40==']') ) {s = 39;}
-
-                        else if ( (LA10_40=='\\') ) {s = 40;}
-
-                        else if ( (LA10_40=='\"') ) {s = 41;}
-
-                        else if ( (LA10_40=='\'') ) {s = 42;}
-
-                        else if ( ((LA10_40>='\u0000' && LA10_40<='!')||(LA10_40>='#' && LA10_40<='&')||(LA10_40>='(' && LA10_40<='[')||(LA10_40>='^' && LA10_40<='\uFFFF')) ) {s = 43;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 52 : 
-                        int LA10_30 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_30=='\"') ) {s = 13;}
-
-                        else if ( (LA10_30=='\\') ) {s = 11;}
-
-                        else if ( (LA10_30==']') ) {s = 12;}
-
-                        else if ( (LA10_30=='\'') ) {s = 14;}
-
-                        else if ( ((LA10_30>='\u0000' && LA10_30<='!')||(LA10_30>='#' && LA10_30<='&')||(LA10_30>='(' && LA10_30<='[')||(LA10_30>='^' && LA10_30<='\uFFFF')) ) {s = 15;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 53 : 
-                        int LA10_79 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_79=='\"') ) {s = 49;}
-
-                        else if ( (LA10_79=='\\') ) {s = 47;}
-
-                        else if ( (LA10_79==']') ) {s = 48;}
-
-                        else if ( (LA10_79=='\'') ) {s = 50;}
-
-                        else if ( ((LA10_79>='\u0000' && LA10_79<='!')||(LA10_79>='#' && LA10_79<='&')||(LA10_79>='(' && LA10_79<='[')||(LA10_79>='^' && LA10_79<='\uFFFF')) ) {s = 51;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 54 : 
-                        int LA10_35 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_35==']') ) {s = 52;}
-
-                        else if ( (LA10_35=='\"') ) {s = 53;}
-
-                        else if ( (LA10_35=='\\') ) {s = 54;}
-
-                        else if ( (LA10_35=='\'') ) {s = 55;}
-
-                        else if ( ((LA10_35>='\u0000' && LA10_35<='!')||(LA10_35>='#' && LA10_35<='&')||(LA10_35>='(' && LA10_35<='[')||(LA10_35>='^' && LA10_35<='\uFFFF')) ) {s = 56;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 55 : 
-                        int LA10_108 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_108=='\"') ) {s = 83;}
-
-                        else if ( (LA10_108=='\\') ) {s = 84;}
-
-                        else if ( (LA10_108==']') ) {s = 85;}
-
-                        else if ( (LA10_108=='\'') ) {s = 86;}
-
-                        else if ( ((LA10_108>='\u0000' && LA10_108<='!')||(LA10_108>='#' && LA10_108<='&')||(LA10_108>='(' && LA10_108<='[')||(LA10_108>='^' && LA10_108<='\uFFFF')) ) {s = 87;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 56 : 
-                        int LA10_77 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_77=='\"') ) {s = 34;}
-
-                        else if ( (LA10_77=='\\') ) {s = 35;}
-
-                        else if ( (LA10_77==']') ) {s = 36;}
-
-                        else if ( (LA10_77=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_77>='\u0000' && LA10_77<='!')||(LA10_77>='#' && LA10_77<='&')||(LA10_77>='(' && LA10_77<='[')||(LA10_77>='^' && LA10_77<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 57 : 
-                        int LA10_80 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_80=='\"') ) {s = 79;}
-
-                        else if ( (LA10_80=='\\') ) {s = 80;}
-
-                        else if ( (LA10_80=='\'') ) {s = 81;}
-
-                        else if ( ((LA10_80>='\u0000' && LA10_80<='!')||(LA10_80>='#' && LA10_80<='&')||(LA10_80>='(' && LA10_80<='[')||(LA10_80>=']' && LA10_80<='\uFFFF')) ) {s = 82;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 58 : 
-                        int LA10_18 = input.LA(1);
-
-                         
-                        int index10_18 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 46;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_18);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 59 : 
-                        int LA10_81 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_81=='\"') ) {s = 99;}
-
-                        else if ( (LA10_81=='\\') ) {s = 100;}
-
-                        else if ( (LA10_81==']') ) {s = 101;}
-
-                        else if ( (LA10_81=='\'') ) {s = 102;}
-
-                        else if ( ((LA10_81>='\u0000' && LA10_81<='!')||(LA10_81>='#' && LA10_81<='&')||(LA10_81>='(' && LA10_81<='[')||(LA10_81>='^' && LA10_81<='\uFFFF')) ) {s = 103;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 60 : 
-                        int LA10_100 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_100==']') ) {s = 115;}
-
-                        else if ( (LA10_100=='\"') ) {s = 116;}
-
-                        else if ( (LA10_100=='\\') ) {s = 117;}
-
-                        else if ( (LA10_100=='\'') ) {s = 118;}
-
-                        else if ( ((LA10_100>='\u0000' && LA10_100<='!')||(LA10_100>='#' && LA10_100<='&')||(LA10_100>='(' && LA10_100<='[')||(LA10_100>='^' && LA10_100<='\uFFFF')) ) {s = 119;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 61 : 
-                        int LA10_19 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_19=='\\') ) {s = 47;}
-
-                        else if ( (LA10_19==']') ) {s = 48;}
-
-                        else if ( (LA10_19=='\"') ) {s = 49;}
-
-                        else if ( (LA10_19=='\'') ) {s = 50;}
-
-                        else if ( ((LA10_19>='\u0000' && LA10_19<='!')||(LA10_19>='#' && LA10_19<='&')||(LA10_19>='(' && LA10_19<='[')||(LA10_19>='^' && LA10_19<='\uFFFF')) ) {s = 51;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 62 : 
-                        int LA10_42 = input.LA(1);
-
-                         
-                        int index10_42 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 46;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_42);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 63 : 
-                        int LA10_73 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_73=='\\') ) {s = 94;}
-
-                        else if ( (LA10_73==']') ) {s = 95;}
-
-                        else if ( (LA10_73=='\"') ) {s = 96;}
-
-                        else if ( (LA10_73=='\'') ) {s = 97;}
-
-                        else if ( ((LA10_73>='\u0000' && LA10_73<='!')||(LA10_73>='#' && LA10_73<='&')||(LA10_73>='(' && LA10_73<='[')||(LA10_73>='^' && LA10_73<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 64 : 
-                        int LA10_78 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_78=='\"') ) {s = 57;}
-
-                        else if ( (LA10_78=='\\') ) {s = 58;}
-
-                        else if ( (LA10_78=='\'') ) {s = 59;}
-
-                        else if ( ((LA10_78>='\u0000' && LA10_78<='!')||(LA10_78>='#' && LA10_78<='&')||(LA10_78>='(' && LA10_78<='[')||(LA10_78>=']' && LA10_78<='\uFFFF')) ) {s = 60;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 65 : 
-                        int LA10_15 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_15=='\"') ) {s = 13;}
-
-                        else if ( (LA10_15=='\\') ) {s = 11;}
-
-                        else if ( (LA10_15==']') ) {s = 12;}
-
-                        else if ( (LA10_15=='\'') ) {s = 14;}
-
-                        else if ( ((LA10_15>='\u0000' && LA10_15<='!')||(LA10_15>='#' && LA10_15<='&')||(LA10_15>='(' && LA10_15<='[')||(LA10_15>='^' && LA10_15<='\uFFFF')) ) {s = 15;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 66 : 
-                        int LA10_97 = input.LA(1);
-
-                         
-                        int index10_97 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 93;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_97);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 67 : 
-                        int LA10_87 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_87=='\"') ) {s = 83;}
-
-                        else if ( (LA10_87=='\\') ) {s = 84;}
-
-                        else if ( (LA10_87==']') ) {s = 85;}
-
-                        else if ( (LA10_87=='\'') ) {s = 86;}
-
-                        else if ( ((LA10_87>='\u0000' && LA10_87<='!')||(LA10_87>='#' && LA10_87<='&')||(LA10_87>='(' && LA10_87<='[')||(LA10_87>='^' && LA10_87<='\uFFFF')) ) {s = 87;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 68 : 
-                        int LA10_86 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_86=='\"') ) {s = 99;}
-
-                        else if ( (LA10_86=='\\') ) {s = 100;}
-
-                        else if ( (LA10_86==']') ) {s = 101;}
-
-                        else if ( (LA10_86=='\'') ) {s = 102;}
-
-                        else if ( ((LA10_86>='\u0000' && LA10_86<='!')||(LA10_86>='#' && LA10_86<='&')||(LA10_86>='(' && LA10_86<='[')||(LA10_86>='^' && LA10_86<='\uFFFF')) ) {s = 103;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 69 : 
-                        int LA10_95 = input.LA(1);
-
-                         
-                        int index10_95 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA10_95=='\"') ) {s = 57;}
-
-                        else if ( (LA10_95=='\\') ) {s = 58;}
-
-                        else if ( (LA10_95=='\'') ) {s = 59;}
-
-                        else if ( ((LA10_95>='\u0000' && LA10_95<='!')||(LA10_95>='#' && LA10_95<='&')||(LA10_95>='(' && LA10_95<='[')||(LA10_95>=']' && LA10_95<='\uFFFF')) ) {s = 60;}
-
-                        else s = 93;
-
-                         
-                        input.seek(index10_95);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 70 : 
-                        int LA10_74 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_74==']') ) {s = 72;}
-
-                        else if ( (LA10_74=='\\') ) {s = 71;}
-
-                        else if ( (LA10_74=='\"') ) {s = 73;}
-
-                        else if ( (LA10_74=='\'') ) {s = 70;}
-
-                        else if ( ((LA10_74>='\u0000' && LA10_74<='!')||(LA10_74>='#' && LA10_74<='&')||(LA10_74>='(' && LA10_74<='[')||(LA10_74>='^' && LA10_74<='\uFFFF')) ) {s = 74;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 71 : 
-                        int LA10_82 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_82=='\"') ) {s = 66;}
-
-                        else if ( (LA10_82=='\\') ) {s = 67;}
-
-                        else if ( (LA10_82=='\'') ) {s = 68;}
-
-                        else if ( ((LA10_82>='\u0000' && LA10_82<='!')||(LA10_82>='#' && LA10_82<='&')||(LA10_82>='(' && LA10_82<='[')||(LA10_82>=']' && LA10_82<='\uFFFF')) ) {s = 69;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 72 : 
-                        int LA10_17 = input.LA(1);
-
-                         
-                        int index10_17 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA10_17=='\'') && (synpred6_ANTLRLexer())) {s = 44;}
-
-                        else if ( (LA10_17=='\\') && (synpred6_ANTLRLexer())) {s = 45;}
-
-                        else if ( ((LA10_17>='\u0000' && LA10_17<='&')||(LA10_17>='(' && LA10_17<='[')||(LA10_17>=']' && LA10_17<='\uFFFF')) && (synpred6_ANTLRLexer())) {s = 46;}
-
-                        else s = 5;
-
-                         
-                        input.seek(index10_17);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 73 : 
-                        int LA10_14 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_14=='\"') ) {s = 34;}
-
-                        else if ( (LA10_14=='\\') ) {s = 35;}
-
-                        else if ( (LA10_14==']') ) {s = 36;}
-
-                        else if ( (LA10_14=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_14>='\u0000' && LA10_14<='!')||(LA10_14>='#' && LA10_14<='&')||(LA10_14>='(' && LA10_14<='[')||(LA10_14>='^' && LA10_14<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 74 : 
-                        int LA10_70 = input.LA(1);
-
-                         
-                        int index10_70 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 33;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_70);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 75 : 
-                        int LA10_76 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_76=='\"') ) {s = 75;}
-
-                        else if ( (LA10_76=='\\') ) {s = 76;}
-
-                        else if ( (LA10_76=='\'') ) {s = 77;}
-
-                        else if ( ((LA10_76>='\u0000' && LA10_76<='!')||(LA10_76>='#' && LA10_76<='&')||(LA10_76>='(' && LA10_76<='[')||(LA10_76>=']' && LA10_76<='\uFFFF')) ) {s = 78;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 76 : 
-                        int LA10_41 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_41==']') ) {s = 48;}
-
-                        else if ( (LA10_41=='\\') ) {s = 47;}
-
-                        else if ( (LA10_41=='\"') ) {s = 49;}
-
-                        else if ( (LA10_41=='\'') ) {s = 50;}
-
-                        else if ( ((LA10_41>='\u0000' && LA10_41<='!')||(LA10_41>='#' && LA10_41<='&')||(LA10_41>='(' && LA10_41<='[')||(LA10_41>='^' && LA10_41<='\uFFFF')) ) {s = 51;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 77 : 
-                        int LA10_36 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_36=='\"') ) {s = 57;}
-
-                        else if ( (LA10_36=='\\') ) {s = 58;}
-
-                        else if ( (LA10_36=='\'') ) {s = 59;}
-
-                        else if ( ((LA10_36>='\u0000' && LA10_36<='!')||(LA10_36>='#' && LA10_36<='&')||(LA10_36>='(' && LA10_36<='[')||(LA10_36>=']' && LA10_36<='\uFFFF')) ) {s = 60;}
-
-                        else s = 5;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 78 : 
-                        int LA10_53 = input.LA(1);
-
-                         
-                        int index10_53 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 33;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_53);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 79 : 
-                        int LA10_72 = input.LA(1);
-
-                         
-                        int index10_72 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((LA10_72>='\u0000' && LA10_72<='\uFFFF')) ) {s = 5;}
-
-                        else s = 93;
-
-                         
-                        input.seek(index10_72);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 80 : 
-                        int LA10_55 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_55=='\"') ) {s = 34;}
-
-                        else if ( (LA10_55=='\\') ) {s = 35;}
-
-                        else if ( (LA10_55==']') ) {s = 36;}
-
-                        else if ( (LA10_55=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_55>='\u0000' && LA10_55<='!')||(LA10_55>='#' && LA10_55<='&')||(LA10_55>='(' && LA10_55<='[')||(LA10_55>='^' && LA10_55<='\uFFFF')) ) {s = 38;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 81 : 
-                        int LA10_92 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_92==']') ) {s = 72;}
-
-                        else if ( (LA10_92=='\\') ) {s = 71;}
-
-                        else if ( (LA10_92=='\"') ) {s = 73;}
-
-                        else if ( (LA10_92=='\'') ) {s = 70;}
-
-                        else if ( ((LA10_92>='\u0000' && LA10_92<='!')||(LA10_92>='#' && LA10_92<='&')||(LA10_92>='(' && LA10_92<='[')||(LA10_92>='^' && LA10_92<='\uFFFF')) ) {s = 74;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 82 : 
-                        int LA10_57 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_57=='\'') ) {s = 70;}
-
-                        else if ( (LA10_57=='\\') ) {s = 71;}
-
-                        else if ( (LA10_57==']') ) {s = 72;}
-
-                        else if ( (LA10_57=='\"') ) {s = 73;}
-
-                        else if ( ((LA10_57>='\u0000' && LA10_57<='!')||(LA10_57>='#' && LA10_57<='&')||(LA10_57>='(' && LA10_57<='[')||(LA10_57>='^' && LA10_57<='\uFFFF')) ) {s = 74;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 83 : 
-                        int LA10_61 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_61=='\"') ) {s = 49;}
-
-                        else if ( (LA10_61=='\\') ) {s = 47;}
-
-                        else if ( (LA10_61==']') ) {s = 48;}
-
-                        else if ( (LA10_61=='\'') ) {s = 50;}
-
-                        else if ( ((LA10_61>='\u0000' && LA10_61<='!')||(LA10_61>='#' && LA10_61<='&')||(LA10_61>='(' && LA10_61<='[')||(LA10_61>='^' && LA10_61<='\uFFFF')) ) {s = 51;}
-
-                        else s = 5;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 84 : 
-                        int LA10_27 = input.LA(1);
-
-                         
-                        int index10_27 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 33;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_27);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 85 : 
-                        int LA10_111 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_111=='\"') ) {s = 96;}
-
-                        else if ( (LA10_111=='\\') ) {s = 94;}
-
-                        else if ( (LA10_111==']') ) {s = 95;}
-
-                        else if ( (LA10_111=='\'') ) {s = 97;}
-
-                        else if ( ((LA10_111>='\u0000' && LA10_111<='!')||(LA10_111>='#' && LA10_111<='&')||(LA10_111>='(' && LA10_111<='[')||(LA10_111>='^' && LA10_111<='\uFFFF')) ) {s = 98;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 86 : 
-                        int LA10_118 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_118=='\"') ) {s = 99;}
-
-                        else if ( (LA10_118=='\\') ) {s = 100;}
-
-                        else if ( (LA10_118==']') ) {s = 101;}
-
-                        else if ( (LA10_118=='\'') ) {s = 102;}
-
-                        else if ( ((LA10_118>='\u0000' && LA10_118<='!')||(LA10_118>='#' && LA10_118<='&')||(LA10_118>='(' && LA10_118<='[')||(LA10_118>='^' && LA10_118<='\uFFFF')) ) {s = 103;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 87 : 
-                        int LA10_116 = input.LA(1);
-
-                         
-                        int index10_116 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 109;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_116);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 88 : 
-                        int LA10_112 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_112==']') ) {s = 110;}
-
-                        else if ( (LA10_112=='\"') ) {s = 111;}
-
-                        else if ( (LA10_112=='\\') ) {s = 112;}
-
-                        else if ( (LA10_112=='\'') ) {s = 113;}
-
-                        else if ( ((LA10_112>='\u0000' && LA10_112<='!')||(LA10_112>='#' && LA10_112<='&')||(LA10_112>='(' && LA10_112<='[')||(LA10_112>='^' && LA10_112<='\uFFFF')) ) {s = 114;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 89 : 
-                        int LA10_26 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_26==']') ) {s = 12;}
-
-                        else if ( (LA10_26=='\\') ) {s = 11;}
-
-                        else if ( (LA10_26=='\"') ) {s = 13;}
-
-                        else if ( (LA10_26=='\'') ) {s = 14;}
-
-                        else if ( ((LA10_26>='\u0000' && LA10_26<='!')||(LA10_26>='#' && LA10_26<='&')||(LA10_26>='(' && LA10_26<='[')||(LA10_26>='^' && LA10_26<='\uFFFF')) ) {s = 15;}
 
                         else s = 5;
 
                         if ( s>=0 ) return s;
                         break;
                     case 90 : 
-                        int LA10_104 = input.LA(1);
+                        int LA10_75 = input.LA(1);
 
-                         
-                        int index10_104 = input.index();
-                        input.rewind();
                         s = -1;
-                        if ( (LA10_104=='\"') ) {s = 83;}
+                        if ( (LA10_75==']') ) {s = 94;}
 
-                        else if ( (LA10_104=='\\') ) {s = 84;}
+                        else if ( (LA10_75=='\'') ) {s = 95;}
 
-                        else if ( (LA10_104==']') ) {s = 85;}
+                        else if ( (LA10_75=='\\') ) {s = 96;}
 
-                        else if ( (LA10_104=='\'') ) {s = 86;}
+                        else if ( (LA10_75=='\"') ) {s = 97;}
 
-                        else if ( ((LA10_104>='\u0000' && LA10_104<='!')||(LA10_104>='#' && LA10_104<='&')||(LA10_104>='(' && LA10_104<='[')||(LA10_104>='^' && LA10_104<='\uFFFF')) ) {s = 87;}
+                        else if ( ((LA10_75>='\u0000' && LA10_75<='!')||(LA10_75>='#' && LA10_75<='&')||(LA10_75>='(' && LA10_75<='[')||(LA10_75>='^' && LA10_75<='\uFFFF')) ) {s = 98;}
 
-                        else s = 109;
-
-                         
-                        input.seek(index10_104);
                         if ( s>=0 ) return s;
                         break;
                     case 91 : 
-                        int LA10_9 = input.LA(1);
+                        int LA10_48 = input.LA(1);
 
-                         
-                        int index10_9 = input.index();
-                        input.rewind();
                         s = -1;
-                        if ( (synpred3_ANTLRLexer()) ) {s = 25;}
+                        if ( (LA10_48==']') ) {s = 65;}
 
-                        else if ( (true) ) {s = 5;}
+                        else if ( (LA10_48=='\\') ) {s = 66;}
 
-                         
-                        input.seek(index10_9);
+                        else if ( (LA10_48=='\"') ) {s = 67;}
+
+                        else if ( (LA10_48=='\'') ) {s = 68;}
+
+                        else if ( ((LA10_48>='\u0000' && LA10_48<='!')||(LA10_48>='#' && LA10_48<='&')||(LA10_48>='(' && LA10_48<='[')||(LA10_48>='^' && LA10_48<='\uFFFF')) ) {s = 69;}
+
                         if ( s>=0 ) return s;
                         break;
                     case 92 : 
-                        int LA10_34 = input.LA(1);
+                        int LA10_86 = input.LA(1);
 
-                         
-                        int index10_34 = input.index();
-                        input.rewind();
                         s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 33;}
+                        if ( (LA10_86=='\"') ) {s = 49;}
 
-                        else if ( (true) ) {s = 5;}
+                        else if ( (LA10_86=='\\') ) {s = 48;}
 
-                         
-                        input.seek(index10_34);
+                        else if ( (LA10_86==']') ) {s = 47;}
+
+                        else if ( (LA10_86=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_86>='\u0000' && LA10_86<='!')||(LA10_86>='#' && LA10_86<='&')||(LA10_86>='(' && LA10_86<='[')||(LA10_86>='^' && LA10_86<='\uFFFF')) ) {s = 51;}
+
                         if ( s>=0 ) return s;
                         break;
                     case 93 : 
-                        int LA10_7 = input.LA(1);
+                        int LA10_118 = input.LA(1);
 
                          
-                        int index10_7 = input.index();
+                        int index10_118 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred3_ANTLRLexer()) ) {s = 25;}
+                        if ( (synpred6_ANTLRLexer()) ) {s = 104;}
 
                         else if ( (true) ) {s = 5;}
 
                          
-                        input.seek(index10_7);
+                        input.seek(index10_118);
                         if ( s>=0 ) return s;
                         break;
                     case 94 : 
-                        int LA10_49 = input.LA(1);
+                        int LA10_46 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_49=='\\') ) {s = 47;}
+                        if ( (LA10_46==']') ) {s = 16;}
 
-                        else if ( (LA10_49==']') ) {s = 48;}
+                        else if ( (LA10_46=='\\') ) {s = 17;}
 
-                        else if ( (LA10_49=='\"') ) {s = 49;}
+                        else if ( (LA10_46=='\"') ) {s = 18;}
 
-                        else if ( (LA10_49=='\'') ) {s = 50;}
+                        else if ( (LA10_46=='\'') ) {s = 19;}
 
-                        else if ( ((LA10_49>='\u0000' && LA10_49<='!')||(LA10_49>='#' && LA10_49<='&')||(LA10_49>='(' && LA10_49<='[')||(LA10_49>='^' && LA10_49<='\uFFFF')) ) {s = 51;}
+                        else if ( ((LA10_46>='\u0000' && LA10_46<='!')||(LA10_46>='#' && LA10_46<='&')||(LA10_46>='(' && LA10_46<='[')||(LA10_46>='^' && LA10_46<='\uFFFF')) ) {s = 20;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 95 : 
-                        int LA10_50 = input.LA(1);
+                        int LA10_53 = input.LA(1);
 
-                         
-                        int index10_50 = input.index();
-                        input.rewind();
                         s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 46;}
+                        if ( (LA10_53=='\'') ) {s = 70;}
 
-                        else if ( (true) ) {s = 5;}
+                        else if ( (LA10_53=='\\') ) {s = 71;}
 
-                         
-                        input.seek(index10_50);
+                        else if ( (LA10_53=='\"') ) {s = 72;}
+
+                        else if ( ((LA10_53>='\u0000' && LA10_53<='!')||(LA10_53>='#' && LA10_53<='&')||(LA10_53>='(' && LA10_53<='[')||(LA10_53>=']' && LA10_53<='\uFFFF')) ) {s = 73;}
+
                         if ( s>=0 ) return s;
                         break;
                     case 96 : 
-                        int LA10_83 = input.LA(1);
-
-                         
-                        int index10_83 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 46;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_83);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 97 : 
-                        int LA10_11 = input.LA(1);
+                        int LA10_42 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_11==']') ) {s = 26;}
+                        if ( (LA10_42=='\'') ) {s = 19;}
 
-                        else if ( (LA10_11=='\"') ) {s = 27;}
+                        else if ( (LA10_42=='\\') ) {s = 17;}
 
-                        else if ( (LA10_11=='\\') ) {s = 28;}
+                        else if ( (LA10_42==']') ) {s = 16;}
 
-                        else if ( (LA10_11=='\'') ) {s = 29;}
+                        else if ( (LA10_42=='\"') ) {s = 18;}
 
-                        else if ( ((LA10_11>='\u0000' && LA10_11<='!')||(LA10_11>='#' && LA10_11<='&')||(LA10_11>='(' && LA10_11<='[')||(LA10_11>='^' && LA10_11<='\uFFFF')) ) {s = 30;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 98 : 
-                        int LA10_99 = input.LA(1);
-
-                         
-                        int index10_99 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred6_ANTLRLexer()) ) {s = 109;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_99);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 99 : 
-                        int LA10_66 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_66==']') ) {s = 17;}
-
-                        else if ( (LA10_66=='\\') ) {s = 16;}
-
-                        else if ( (LA10_66=='\"') ) {s = 19;}
-
-                        else if ( (LA10_66=='\'') ) {s = 18;}
-
-                        else if ( ((LA10_66>='\u0000' && LA10_66<='!')||(LA10_66>='#' && LA10_66<='&')||(LA10_66>='(' && LA10_66<='[')||(LA10_66>='^' && LA10_66<='\uFFFF')) ) {s = 20;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 100 : 
-                        int LA10_84 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_84==']') ) {s = 104;}
-
-                        else if ( (LA10_84=='\"') ) {s = 105;}
-
-                        else if ( (LA10_84=='\\') ) {s = 106;}
-
-                        else if ( (LA10_84=='\'') ) {s = 107;}
-
-                        else if ( ((LA10_84>='\u0000' && LA10_84<='!')||(LA10_84>='#' && LA10_84<='&')||(LA10_84>='(' && LA10_84<='[')||(LA10_84>='^' && LA10_84<='\uFFFF')) ) {s = 108;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 101 : 
-                        int LA10_115 = input.LA(1);
-
-                         
-                        int index10_115 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (LA10_115=='\"') ) {s = 99;}
-
-                        else if ( (LA10_115=='\\') ) {s = 100;}
-
-                        else if ( (LA10_115==']') ) {s = 101;}
-
-                        else if ( (LA10_115=='\'') ) {s = 102;}
-
-                        else if ( ((LA10_115>='\u0000' && LA10_115<='!')||(LA10_115>='#' && LA10_115<='&')||(LA10_115>='(' && LA10_115<='[')||(LA10_115>='^' && LA10_115<='\uFFFF')) ) {s = 103;}
-
-                        else s = 109;
-
-                         
-                        input.seek(index10_115);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 102 : 
-                        int LA10_13 = input.LA(1);
-
-                         
-                        int index10_13 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred5_ANTLRLexer()) ) {s = 33;}
-
-                        else if ( (true) ) {s = 5;}
-
-                         
-                        input.seek(index10_13);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 103 : 
-                        int LA10_52 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA10_52==']') ) {s = 36;}
-
-                        else if ( (LA10_52=='\\') ) {s = 35;}
-
-                        else if ( (LA10_52=='\"') ) {s = 34;}
-
-                        else if ( (LA10_52=='\'') ) {s = 37;}
-
-                        else if ( ((LA10_52>='\u0000' && LA10_52<='!')||(LA10_52>='#' && LA10_52<='&')||(LA10_52>='(' && LA10_52<='[')||(LA10_52>='^' && LA10_52<='\uFFFF')) ) {s = 38;}
+                        else if ( ((LA10_42>='\u0000' && LA10_42<='!')||(LA10_42>='#' && LA10_42<='&')||(LA10_42>='(' && LA10_42<='[')||(LA10_42>='^' && LA10_42<='\uFFFF')) ) {s = 20;}
 
                         else s = 5;
 
                         if ( s>=0 ) return s;
                         break;
-                    case 104 : 
-                        int LA10_89 = input.LA(1);
+                    case 97 : 
+                        int LA10_52 = input.LA(1);
 
                         s = -1;
-                        if ( (LA10_89==']') ) {s = 88;}
+                        if ( (LA10_52==']') ) {s = 11;}
 
-                        else if ( (LA10_89=='\\') ) {s = 89;}
+                        else if ( (LA10_52=='\\') ) {s = 12;}
 
-                        else if ( (LA10_89=='\"') ) {s = 90;}
+                        else if ( (LA10_52=='\"') ) {s = 13;}
 
-                        else if ( (LA10_89=='\'') ) {s = 91;}
+                        else if ( (LA10_52=='\'') ) {s = 14;}
 
-                        else if ( ((LA10_89>='\u0000' && LA10_89<='!')||(LA10_89>='#' && LA10_89<='&')||(LA10_89>='(' && LA10_89<='[')||(LA10_89>='^' && LA10_89<='\uFFFF')) ) {s = 92;}
+                        else if ( ((LA10_52>='\u0000' && LA10_52<='!')||(LA10_52>='#' && LA10_52<='&')||(LA10_52>='(' && LA10_52<='[')||(LA10_52>='^' && LA10_52<='\uFFFF')) ) {s = 15;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 98 : 
+                        int LA10_61 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_61=='\"') ) {s = 79;}
+
+                        else if ( (LA10_61=='\\') ) {s = 80;}
+
+                        else if ( (LA10_61==']') ) {s = 81;}
+
+                        else if ( (LA10_61=='\'') ) {s = 82;}
+
+                        else if ( ((LA10_61>='\u0000' && LA10_61<='!')||(LA10_61>='#' && LA10_61<='&')||(LA10_61>='(' && LA10_61<='[')||(LA10_61>='^' && LA10_61<='\uFFFF')) ) {s = 83;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 99 : 
+                        int LA10_117 = input.LA(1);
+
+                         
+                        int index10_117 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_117=='\"') ) {s = 105;}
+
+                        else if ( (LA10_117=='\\') ) {s = 106;}
+
+                        else if ( (LA10_117=='\'') ) {s = 108;}
+
+                        else if ( (LA10_117==']') ) {s = 107;}
+
+                        else if ( ((LA10_117>='\u0000' && LA10_117<='!')||(LA10_117>='#' && LA10_117<='&')||(LA10_117>='(' && LA10_117<='[')||(LA10_117>='^' && LA10_117<='\uFFFF')) ) {s = 109;}
+
+                        else s = 104;
+
+                         
+                        input.seek(index10_117);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 100 : 
+                        int LA10_11 = input.LA(1);
+
+                         
+                        int index10_11 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (LA10_11=='\"') && (synpred5_ANTLRLexer())) {s = 26;}
+
+                        else if ( (LA10_11=='\\') && (synpred5_ANTLRLexer())) {s = 27;}
+
+                        else if ( ((LA10_11>='\u0000' && LA10_11<='!')||(LA10_11>='#' && LA10_11<='[')||(LA10_11>=']' && LA10_11<='\uFFFF')) && (synpred5_ANTLRLexer())) {s = 28;}
+
+                        else s = 5;
+
+                         
+                        input.seek(index10_11);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 101 : 
+                        int LA10_43 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_43==']') ) {s = 42;}
+
+                        else if ( (LA10_43=='\\') ) {s = 43;}
+
+                        else if ( (LA10_43=='\"') ) {s = 44;}
+
+                        else if ( (LA10_43=='\'') ) {s = 45;}
+
+                        else if ( ((LA10_43>='\u0000' && LA10_43<='!')||(LA10_43>='#' && LA10_43<='&')||(LA10_43>='(' && LA10_43<='[')||(LA10_43>='^' && LA10_43<='\uFFFF')) ) {s = 46;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 102 : 
+                        int LA10_62 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_62=='\'') ) {s = 84;}
+
+                        else if ( (LA10_62=='\\') ) {s = 85;}
+
+                        else if ( (LA10_62=='\"') ) {s = 86;}
+
+                        else if ( ((LA10_62>='\u0000' && LA10_62<='!')||(LA10_62>='#' && LA10_62<='&')||(LA10_62>='(' && LA10_62<='[')||(LA10_62>=']' && LA10_62<='\uFFFF')) ) {s = 87;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 103 : 
+                        int LA10_69 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_69==']') ) {s = 47;}
+
+                        else if ( (LA10_69=='\\') ) {s = 48;}
+
+                        else if ( (LA10_69=='\"') ) {s = 49;}
+
+                        else if ( (LA10_69=='\'') ) {s = 50;}
+
+                        else if ( ((LA10_69>='\u0000' && LA10_69<='!')||(LA10_69>='#' && LA10_69<='&')||(LA10_69>='(' && LA10_69<='[')||(LA10_69>='^' && LA10_69<='\uFFFF')) ) {s = 51;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 104 : 
+                        int LA10_2 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA10_2==']') ) {s = 6;}
+
+                        else if ( (LA10_2=='\\') ) {s = 7;}
+
+                        else if ( (LA10_2=='\"') ) {s = 8;}
+
+                        else if ( (LA10_2=='\'') ) {s = 9;}
+
+                        else if ( ((LA10_2>='\u0000' && LA10_2<='!')||(LA10_2>='#' && LA10_2<='&')||(LA10_2>='(' && LA10_2<='[')||(LA10_2>='^' && LA10_2<='\uFFFF')) ) {s = 10;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -5705,7 +5734,7 @@ public class ANTLRLexer extends Lexer {
     static final String DFA18_acceptS =
         "\1\uffff\1\3\1\uffff\1\2\3\uffff\3\1";
     static final String DFA18_specialS =
-        "\1\1\1\uffff\1\0\1\uffff\1\3\1\4\1\2\3\uffff}>";
+        "\1\2\1\uffff\1\1\1\uffff\1\4\1\0\1\3\3\uffff}>";
     static final String[] DFA18_transitionS = {
             "\47\3\1\1\64\3\1\2\uffa3\3",
             "",
@@ -5749,13 +5778,28 @@ public class ANTLRLexer extends Lexer {
             this.transition = DFA18_transition;
         }
         public String getDescription() {
-            return "()* loopback of 505:9: ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )*";
+            return "()* loopback of 506:9: ( ( '\\\\' )=> ACTION_ESC | ~ '\\'' )*";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             IntStream input = _input;
         	int _s = s;
             switch ( s ) {
                     case 0 : 
+                        int LA18_5 = input.LA(1);
+
+                         
+                        int index18_5 = input.index();
+                        input.rewind();
+                        s = -1;
+                        if ( (synpred7_ANTLRLexer()) ) {s = 9;}
+
+                        else if ( (true) ) {s = 3;}
+
+                         
+                        input.seek(index18_5);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 1 : 
                         int LA18_2 = input.LA(1);
 
                         s = -1;
@@ -5767,7 +5811,7 @@ public class ANTLRLexer extends Lexer {
 
                         if ( s>=0 ) return s;
                         break;
-                    case 1 : 
+                    case 2 : 
                         int LA18_0 = input.LA(1);
 
                         s = -1;
@@ -5779,7 +5823,7 @@ public class ANTLRLexer extends Lexer {
 
                         if ( s>=0 ) return s;
                         break;
-                    case 2 : 
+                    case 3 : 
                         int LA18_6 = input.LA(1);
 
                          
@@ -5794,7 +5838,7 @@ public class ANTLRLexer extends Lexer {
                         input.seek(index18_6);
                         if ( s>=0 ) return s;
                         break;
-                    case 3 : 
+                    case 4 : 
                         int LA18_4 = input.LA(1);
 
                          
@@ -5811,21 +5855,6 @@ public class ANTLRLexer extends Lexer {
 
                          
                         input.seek(index18_4);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 : 
-                        int LA18_5 = input.LA(1);
-
-                         
-                        int index18_5 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (synpred7_ANTLRLexer()) ) {s = 9;}
-
-                        else if ( (true) ) {s = 3;}
-
-                         
-                        input.seek(index18_5);
                         if ( s>=0 ) return s;
                         break;
             }
@@ -5847,7 +5876,7 @@ public class ANTLRLexer extends Lexer {
     static final String DFA19_acceptS =
         "\1\uffff\1\3\1\uffff\1\2\3\uffff\3\1";
     static final String DFA19_specialS =
-        "\1\4\1\uffff\1\0\1\uffff\1\1\1\3\1\2\3\uffff}>";
+        "\1\1\1\uffff\1\4\1\uffff\1\0\1\3\1\2\3\uffff}>";
     static final String[] DFA19_transitionS = {
             "\42\3\1\1\71\3\1\2\uffa3\3",
             "",
@@ -5891,25 +5920,13 @@ public class ANTLRLexer extends Lexer {
             this.transition = DFA19_transition;
         }
         public String getDescription() {
-            return "()* loopback of 515:8: ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )*";
+            return "()* loopback of 516:8: ( ( '\\\\' )=> ACTION_ESC | ~ '\"' )*";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             IntStream input = _input;
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA19_2 = input.LA(1);
-
-                        s = -1;
-                        if ( (LA19_2=='\"') ) {s = 4;}
-
-                        else if ( (LA19_2=='\\') ) {s = 5;}
-
-                        else if ( ((LA19_2>='\u0000' && LA19_2<='!')||(LA19_2>='#' && LA19_2<='[')||(LA19_2>=']' && LA19_2<='\uFFFF')) ) {s = 6;}
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
                         int LA19_4 = input.LA(1);
 
                          
@@ -5926,6 +5943,18 @@ public class ANTLRLexer extends Lexer {
 
                          
                         input.seek(index19_4);
+                        if ( s>=0 ) return s;
+                        break;
+                    case 1 : 
+                        int LA19_0 = input.LA(1);
+
+                        s = -1;
+                        if ( (LA19_0=='\"') ) {s = 1;}
+
+                        else if ( (LA19_0=='\\') ) {s = 2;}
+
+                        else if ( ((LA19_0>='\u0000' && LA19_0<='!')||(LA19_0>='#' && LA19_0<='[')||(LA19_0>=']' && LA19_0<='\uFFFF')) ) {s = 3;}
+
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
@@ -5959,14 +5988,14 @@ public class ANTLRLexer extends Lexer {
                         if ( s>=0 ) return s;
                         break;
                     case 4 : 
-                        int LA19_0 = input.LA(1);
+                        int LA19_2 = input.LA(1);
 
                         s = -1;
-                        if ( (LA19_0=='\"') ) {s = 1;}
+                        if ( (LA19_2=='\"') ) {s = 4;}
 
-                        else if ( (LA19_0=='\\') ) {s = 2;}
+                        else if ( (LA19_2=='\\') ) {s = 5;}
 
-                        else if ( ((LA19_0>='\u0000' && LA19_0<='!')||(LA19_0>='#' && LA19_0<='[')||(LA19_0>=']' && LA19_0<='\uFFFF')) ) {s = 3;}
+                        else if ( ((LA19_2>='\u0000' && LA19_2<='!')||(LA19_2>='#' && LA19_2<='[')||(LA19_2>=']' && LA19_2<='\uFFFF')) ) {s = 6;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -6035,104 +6064,106 @@ public class ANTLRLexer extends Lexer {
             this.transition = DFA25_transition;
         }
         public String getDescription() {
-            return "577:9: ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | )";
+            return "578:9: ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' | UNICODE_ESC | )";
         }
     }
     static final String DFA31_eotS =
-        "\2\uffff\1\50\1\54\1\50\1\uffff\12\60\1\101\4\uffff\1\107\4\uffff"+
-        "\1\115\1\uffff\1\120\1\uffff\1\123\1\50\6\uffff\1\50\10\uffff\1"+
-        "\60\1\uffff\17\60\22\uffff\1\156\11\uffff\21\60\2\uffff\2\60\1\u0082"+
-        "\20\60\1\uffff\2\60\1\u0095\3\60\1\u0099\6\60\1\u00a0\2\60\1\u00a3"+
-        "\1\60\1\uffff\1\u00a5\2\60\1\uffff\1\u00a8\2\60\1\u00ab\2\60\1\uffff"+
-        "\1\60\2\uffff\1\60\1\uffff\1\60\1\u00b1\1\uffff\1\60\1\u00b3\1\uffff"+
-        "\1\u00b4\1\u00b5\1\uffff\1\u00b6\1\u00b7\1\uffff\1\60\5\uffff\1"+
-        "\u00b9\1\uffff";
+        "\2\uffff\1\51\1\55\1\51\1\uffff\13\61\1\103\4\uffff\1\111\4\uffff"+
+        "\1\117\1\uffff\1\122\1\uffff\1\125\1\51\6\uffff\1\51\10\uffff\1"+
+        "\61\1\uffff\20\61\22\uffff\1\161\11\uffff\22\61\2\uffff\2\61\1\u0086"+
+        "\16\61\1\u0095\2\61\1\uffff\2\61\1\u009a\3\61\1\u009e\6\61\1\u00a5"+
+        "\1\uffff\2\61\1\u00a8\1\61\1\uffff\1\u00aa\2\61\1\uffff\1\u00ad"+
+        "\2\61\1\u00b0\2\61\1\uffff\1\61\2\uffff\1\61\1\uffff\1\61\1\u00b6"+
+        "\1\uffff\1\61\1\u00b8\1\uffff\1\u00b9\1\u00ba\1\uffff\1\u00bb\1"+
+        "\u00bc\1\uffff\1\61\5\uffff\1\u00be\1\uffff";
     static final String DFA31_eofS =
-        "\u00ba\uffff";
+        "\u00bf\uffff";
     static final String DFA31_minS =
         "\1\0\1\uffff\1\0\1\74\1\0\1\uffff\1\160\1\145\1\143\1\155\1\151"+
-        "\1\145\1\141\1\162\1\145\1\141\1\72\4\uffff\1\76\4\uffff\1\75\1"+
-        "\uffff\1\50\1\uffff\1\56\1\76\6\uffff\1\0\10\uffff\1\164\1\uffff"+
-        "\1\153\1\145\1\162\1\155\1\157\1\160\1\141\1\156\1\170\1\162\1\151"+
-        "\1\142\1\141\2\164\22\uffff\1\56\11\uffff\1\151\2\145\1\157\2\160"+
-        "\1\157\1\147\1\141\1\145\1\163\1\164\1\166\1\154\1\155\1\165\1\143"+
-        "\2\uffff\1\157\1\156\1\60\1\167\1\154\1\145\1\162\1\155\1\154\1"+
-        "\162\2\145\1\141\1\151\1\155\1\162\1\150\1\156\1\163\1\uffff\1\163"+
-        "\1\141\1\60\1\164\1\145\1\154\1\60\1\162\1\143\1\164\1\143\1\141"+
-        "\1\156\1\60\1\163\1\11\1\60\1\164\1\uffff\1\60\1\156\1\171\1\uffff"+
-        "\1\60\1\164\1\145\1\60\1\162\1\163\1\uffff\1\11\2\uffff\1\145\1"+
-        "\uffff\1\164\1\60\1\uffff\1\145\1\60\1\uffff\2\60\1\uffff\2\60\1"+
-        "\uffff\1\144\5\uffff\1\60\1\uffff";
+        "\1\145\1\141\1\162\1\145\1\141\1\157\1\72\4\uffff\1\76\4\uffff\1"+
+        "\75\1\uffff\1\50\1\uffff\1\56\1\76\6\uffff\1\0\10\uffff\1\164\1"+
+        "\uffff\1\153\1\145\1\162\1\155\1\157\1\160\1\141\1\156\1\170\1\162"+
+        "\1\151\1\142\1\141\2\164\1\144\22\uffff\1\56\11\uffff\1\151\2\145"+
+        "\1\157\2\160\1\157\1\147\1\141\1\145\1\163\1\164\1\166\1\154\1\155"+
+        "\1\165\1\143\1\145\2\uffff\1\157\1\156\1\60\1\167\1\154\1\145\1"+
+        "\162\1\155\1\154\1\162\2\145\1\141\1\151\1\155\1\162\1\150\1\60"+
+        "\1\156\1\163\1\uffff\1\163\1\141\1\60\1\164\1\145\1\154\1\60\1\162"+
+        "\1\143\1\164\1\143\1\141\1\156\1\60\1\uffff\1\163\1\11\1\60\1\164"+
+        "\1\uffff\1\60\1\156\1\171\1\uffff\1\60\1\164\1\145\1\60\1\162\1"+
+        "\163\1\uffff\1\11\2\uffff\1\145\1\uffff\1\164\1\60\1\uffff\1\145"+
+        "\1\60\1\uffff\2\60\1\uffff\2\60\1\uffff\1\144\5\uffff\1\60\1\uffff";
     static final String DFA31_maxS =
         "\1\uffff\1\uffff\1\uffff\1\74\1\uffff\1\uffff\1\160\1\162\1\143"+
-        "\1\155\1\162\1\145\1\165\1\162\1\145\1\141\1\72\4\uffff\1\76\4\uffff"+
-        "\1\75\1\uffff\1\50\1\uffff\1\56\1\76\6\uffff\1\uffff\10\uffff\1"+
-        "\164\1\uffff\1\153\1\145\1\162\1\155\1\157\1\160\1\141\1\156\1\170"+
-        "\1\162\1\157\1\142\1\141\2\164\22\uffff\1\56\11\uffff\1\151\2\145"+
-        "\1\157\2\160\1\157\1\147\1\141\1\145\1\163\1\164\1\166\1\154\1\155"+
-        "\1\165\1\143\2\uffff\1\157\1\156\1\172\1\167\1\154\1\145\1\162\1"+
-        "\155\1\154\1\162\2\145\1\141\1\151\1\155\1\162\1\150\1\156\1\163"+
-        "\1\uffff\1\163\1\141\1\172\1\164\1\145\1\154\1\172\1\162\1\143\1"+
-        "\164\1\143\1\141\1\156\1\172\1\163\1\173\1\172\1\164\1\uffff\1\172"+
-        "\1\156\1\171\1\uffff\1\172\1\164\1\145\1\172\1\162\1\163\1\uffff"+
-        "\1\173\2\uffff\1\145\1\uffff\1\164\1\172\1\uffff\1\145\1\172\1\uffff"+
-        "\2\172\1\uffff\2\172\1\uffff\1\144\5\uffff\1\172\1\uffff";
+        "\1\155\1\162\1\145\1\165\1\162\1\145\1\141\1\157\1\72\4\uffff\1"+
+        "\76\4\uffff\1\75\1\uffff\1\50\1\uffff\1\56\1\76\6\uffff\1\uffff"+
+        "\10\uffff\1\164\1\uffff\1\153\1\145\1\162\1\155\1\157\1\160\1\141"+
+        "\1\156\1\170\1\162\1\157\1\142\1\141\2\164\1\144\22\uffff\1\56\11"+
+        "\uffff\1\151\2\145\1\157\2\160\1\157\1\147\1\141\1\145\1\163\1\164"+
+        "\1\166\1\154\1\155\1\165\1\143\1\145\2\uffff\1\157\1\156\1\172\1"+
+        "\167\1\154\1\145\1\162\1\155\1\154\1\162\2\145\1\141\1\151\1\155"+
+        "\1\162\1\150\1\172\1\156\1\163\1\uffff\1\163\1\141\1\172\1\164\1"+
+        "\145\1\154\1\172\1\162\1\143\1\164\1\143\1\141\1\156\1\172\1\uffff"+
+        "\1\163\1\173\1\172\1\164\1\uffff\1\172\1\156\1\171\1\uffff\1\172"+
+        "\1\164\1\145\1\172\1\162\1\163\1\uffff\1\173\2\uffff\1\145\1\uffff"+
+        "\1\164\1\172\1\uffff\1\145\1\172\1\uffff\2\172\1\uffff\2\172\1\uffff"+
+        "\1\144\5\uffff\1\172\1\uffff";
     static final String DFA31_acceptS =
-        "\1\uffff\1\1\3\uffff\1\5\13\uffff\1\31\1\32\1\33\1\34\1\uffff\1"+
-        "\37\1\41\1\42\1\43\1\uffff\1\46\1\uffff\1\50\2\uffff\1\56\1\57\1"+
-        "\60\1\61\1\62\1\63\1\uffff\1\65\1\66\1\1\1\2\1\3\1\36\1\4\1\5\1"+
-        "\uffff\1\62\17\uffff\1\30\1\27\1\31\1\32\1\33\1\34\1\35\1\40\1\37"+
-        "\1\41\1\42\1\43\1\45\1\44\1\46\1\55\1\47\1\50\1\uffff\1\51\1\54"+
-        "\1\56\1\57\1\60\1\61\1\63\1\64\1\65\21\uffff\1\53\1\52\23\uffff"+
-        "\1\15\22\uffff\1\10\3\uffff\1\13\6\uffff\1\24\1\uffff\1\7\1\23\1"+
-        "\uffff\1\11\2\uffff\1\14\2\uffff\1\20\2\uffff\1\6\2\uffff\1\25\1"+
-        "\uffff\1\21\1\16\1\22\1\26\1\12\1\uffff\1\17";
+        "\1\uffff\1\1\3\uffff\1\5\14\uffff\1\32\1\33\1\34\1\35\1\uffff\1"+
+        "\40\1\42\1\43\1\44\1\uffff\1\47\1\uffff\1\51\2\uffff\1\57\1\60\1"+
+        "\61\1\62\1\63\1\64\1\uffff\1\66\1\67\1\1\1\2\1\3\1\37\1\4\1\5\1"+
+        "\uffff\1\63\20\uffff\1\31\1\30\1\32\1\33\1\34\1\35\1\36\1\41\1\40"+
+        "\1\42\1\43\1\44\1\46\1\45\1\47\1\56\1\50\1\51\1\uffff\1\52\1\55"+
+        "\1\57\1\60\1\61\1\62\1\64\1\65\1\66\22\uffff\1\54\1\53\24\uffff"+
+        "\1\15\16\uffff\1\27\4\uffff\1\10\3\uffff\1\13\6\uffff\1\24\1\uffff"+
+        "\1\7\1\23\1\uffff\1\11\2\uffff\1\14\2\uffff\1\20\2\uffff\1\6\2\uffff"+
+        "\1\25\1\uffff\1\21\1\16\1\22\1\26\1\12\1\uffff\1\17";
     static final String DFA31_specialS =
-        "\1\0\1\uffff\1\3\1\uffff\1\1\41\uffff\1\2\u0093\uffff}>";
+        "\1\2\1\uffff\1\0\1\uffff\1\3\42\uffff\1\1\u0097\uffff}>";
     static final String[] DFA31_transitionS = {
-            "\11\50\2\47\1\50\2\47\22\50\1\47\1\30\1\2\1\50\1\35\2\50\1\46"+
-            "\1\23\1\24\1\31\1\32\1\21\1\37\1\36\1\1\12\45\1\20\1\22\1\3"+
-            "\1\25\1\26\1\27\1\40\32\43\1\4\2\50\1\34\2\50\2\44\1\17\2\44"+
-            "\1\12\1\15\1\44\1\11\2\44\1\13\2\44\1\6\1\14\1\44\1\16\1\10"+
-            "\1\7\6\44\1\5\1\33\1\42\1\41\uff81\50",
+            "\11\51\2\50\1\51\2\50\22\51\1\50\1\31\1\2\1\51\1\36\2\51\1\47"+
+            "\1\24\1\25\1\32\1\33\1\22\1\40\1\37\1\1\12\46\1\21\1\23\1\3"+
+            "\1\26\1\27\1\30\1\41\32\44\1\4\2\51\1\35\2\51\2\45\1\17\2\45"+
+            "\1\12\1\15\1\45\1\11\2\45\1\13\1\20\1\45\1\6\1\14\1\45\1\16"+
+            "\1\10\1\7\6\45\1\5\1\34\1\43\1\42\uff81\51",
             "",
-            "\0\52",
-            "\1\53",
-            "\0\55",
+            "\0\53",
+            "\1\54",
+            "\0\56",
             "",
-            "\1\57",
-            "\1\64\2\uffff\1\63\6\uffff\1\61\2\uffff\1\62",
-            "\1\65",
+            "\1\60",
+            "\1\65\2\uffff\1\64\6\uffff\1\62\2\uffff\1\63",
             "\1\66",
-            "\1\70\10\uffff\1\67",
-            "\1\71",
-            "\1\72\20\uffff\1\73\2\uffff\1\74",
-            "\1\75",
+            "\1\67",
+            "\1\71\10\uffff\1\70",
+            "\1\72",
+            "\1\73\20\uffff\1\74\2\uffff\1\75",
             "\1\76",
             "\1\77",
             "\1\100",
+            "\1\101",
+            "\1\102",
             "",
             "",
             "",
             "",
-            "\1\106",
+            "\1\110",
             "",
             "",
             "",
             "",
-            "\1\114",
+            "\1\116",
             "",
-            "\1\117",
+            "\1\121",
             "",
-            "\1\122",
             "\1\124",
+            "\1\126",
             "",
             "",
             "",
             "",
             "",
             "",
-            "\0\132",
+            "\0\134",
             "",
             "",
             "",
@@ -6141,10 +6172,8 @@ public class ANTLRLexer extends Lexer {
             "",
             "",
             "",
-            "\1\134",
-            "",
-            "\1\135",
             "\1\136",
+            "",
             "\1\137",
             "\1\140",
             "\1\141",
@@ -6153,42 +6182,42 @@ public class ANTLRLexer extends Lexer {
             "\1\144",
             "\1\145",
             "\1\146",
-            "\1\150\5\uffff\1\147",
-            "\1\151",
-            "\1\152",
+            "\1\147",
+            "\1\150",
+            "\1\152\5\uffff\1\151",
             "\1\153",
             "\1\154",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
             "\1\155",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
+            "\1\156",
             "\1\157",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\160",
-            "\1\161",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\162",
             "\1\163",
             "\1\164",
@@ -6203,15 +6232,15 @@ public class ANTLRLexer extends Lexer {
             "\1\175",
             "\1\176",
             "\1\177",
-            "",
-            "",
             "\1\u0080",
             "\1\u0081",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "\1\u0082",
             "\1\u0083",
+            "",
+            "",
             "\1\u0084",
             "\1\u0085",
-            "\1\u0086",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             "\1\u0087",
             "\1\u0088",
             "\1\u0089",
@@ -6224,61 +6253,67 @@ public class ANTLRLexer extends Lexer {
             "\1\u0090",
             "\1\u0091",
             "\1\u0092",
-            "",
             "\1\u0093",
             "\1\u0094",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             "\1\u0096",
             "\1\u0097",
+            "",
             "\1\u0098",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
-            "\1\u009a",
+            "\1\u0099",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             "\1\u009b",
             "\1\u009c",
             "\1\u009d",
-            "\1\u009e",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             "\1\u009f",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "\1\u00a0",
             "\1\u00a1",
-            "\2\u00a2\1\uffff\2\u00a2\22\uffff\1\u00a2\132\uffff\1\u00a2",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "\1\u00a2",
+            "\1\u00a3",
             "\1\u00a4",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             "",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
             "\1\u00a6",
-            "\1\u00a7",
-            "",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "\2\u00a7\1\uffff\2\u00a7\22\uffff\1\u00a7\132\uffff\1\u00a7",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             "\1\u00a9",
-            "\1\u00aa",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "\1\u00ab",
             "\1\u00ac",
-            "\1\u00ad",
             "",
-            "\2\u00ae\1\uffff\2\u00ae\22\uffff\1\u00ae\132\uffff\1\u00ae",
-            "",
-            "",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "\1\u00ae",
             "\1\u00af",
-            "",
-            "\1\u00b0",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
-            "",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "\1\u00b1",
             "\1\u00b2",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
             "",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
-            "",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
-            "",
-            "\1\u00b8",
+            "\2\u00b3\1\uffff\2\u00b3\22\uffff\1\u00b3\132\uffff\1\u00b3",
             "",
             "",
+            "\1\u00b4",
+            "",
+            "\1\u00b5",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "",
+            "\1\u00b7",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
+            "",
+            "\1\u00bd",
             "",
             "",
             "",
-            "\12\60\7\uffff\32\60\4\uffff\1\60\1\uffff\32\60",
+            "",
+            "",
+            "\12\61\7\uffff\32\61\4\uffff\1\61\1\uffff\32\61",
             ""
     };
 
@@ -6312,13 +6347,33 @@ public class ANTLRLexer extends Lexer {
             this.transition = DFA31_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | DOT | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR );";
+            return "1:1: Tokens : ( COMMENT | DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL | ARG_ACTION | ACTION | OPTIONS | TOKENS | SCOPE | IMPORT | FRAGMENT | LEXER | PARSER | TREE | GRAMMAR | PROTECTED | PUBLIC | PRIVATE | RETURNS | THROWS | CATCH | FINALLY | TEMPLATE | MODE | COLON | COLONCOLON | COMMA | SEMI | LPAREN | RPAREN | IMPLIES | LT | GT | ASSIGN | QUESTION | BANG | STAR | PLUS | PLUS_ASSIGN | OR | ROOT | DOLLAR | DOT | RANGE | ETC | RARROW | TREE_BEGIN | AT | NOT | RBRACE | TOKEN_REF | RULE_REF | INT | STRING_LITERAL | WS | ERRCHAR );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             IntStream input = _input;
         	int _s = s;
             switch ( s ) {
                     case 0 : 
+                        int LA31_2 = input.LA(1);
+
+                        s = -1;
+                        if ( ((LA31_2>='\u0000' && LA31_2<='\uFFFF')) ) {s = 43;}
+
+                        else s = 41;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 1 : 
+                        int LA31_39 = input.LA(1);
+
+                        s = -1;
+                        if ( ((LA31_39>='\u0000' && LA31_39<='\uFFFF')) ) {s = 92;}
+
+                        else s = 41;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 2 : 
                         int LA31_0 = input.LA(1);
 
                         s = -1;
@@ -6352,85 +6407,67 @@ public class ANTLRLexer extends Lexer {
 
                         else if ( (LA31_0=='c') ) {s = 15;}
 
-                        else if ( (LA31_0==':') ) {s = 16;}
+                        else if ( (LA31_0=='m') ) {s = 16;}
 
-                        else if ( (LA31_0==',') ) {s = 17;}
+                        else if ( (LA31_0==':') ) {s = 17;}
 
-                        else if ( (LA31_0==';') ) {s = 18;}
+                        else if ( (LA31_0==',') ) {s = 18;}
 
-                        else if ( (LA31_0=='(') ) {s = 19;}
+                        else if ( (LA31_0==';') ) {s = 19;}
 
-                        else if ( (LA31_0==')') ) {s = 20;}
+                        else if ( (LA31_0=='(') ) {s = 20;}
 
-                        else if ( (LA31_0=='=') ) {s = 21;}
+                        else if ( (LA31_0==')') ) {s = 21;}
 
-                        else if ( (LA31_0=='>') ) {s = 22;}
+                        else if ( (LA31_0=='=') ) {s = 22;}
 
-                        else if ( (LA31_0=='?') ) {s = 23;}
+                        else if ( (LA31_0=='>') ) {s = 23;}
 
-                        else if ( (LA31_0=='!') ) {s = 24;}
+                        else if ( (LA31_0=='?') ) {s = 24;}
 
-                        else if ( (LA31_0=='*') ) {s = 25;}
+                        else if ( (LA31_0=='!') ) {s = 25;}
 
-                        else if ( (LA31_0=='+') ) {s = 26;}
+                        else if ( (LA31_0=='*') ) {s = 26;}
 
-                        else if ( (LA31_0=='|') ) {s = 27;}
+                        else if ( (LA31_0=='+') ) {s = 27;}
 
-                        else if ( (LA31_0=='^') ) {s = 28;}
+                        else if ( (LA31_0=='|') ) {s = 28;}
 
-                        else if ( (LA31_0=='$') ) {s = 29;}
+                        else if ( (LA31_0=='^') ) {s = 29;}
 
-                        else if ( (LA31_0=='.') ) {s = 30;}
+                        else if ( (LA31_0=='$') ) {s = 30;}
 
-                        else if ( (LA31_0=='-') ) {s = 31;}
+                        else if ( (LA31_0=='.') ) {s = 31;}
 
-                        else if ( (LA31_0=='@') ) {s = 32;}
+                        else if ( (LA31_0=='-') ) {s = 32;}
 
-                        else if ( (LA31_0=='~') ) {s = 33;}
+                        else if ( (LA31_0=='@') ) {s = 33;}
 
-                        else if ( (LA31_0=='}') ) {s = 34;}
+                        else if ( (LA31_0=='~') ) {s = 34;}
 
-                        else if ( ((LA31_0>='A' && LA31_0<='Z')) ) {s = 35;}
+                        else if ( (LA31_0=='}') ) {s = 35;}
 
-                        else if ( ((LA31_0>='a' && LA31_0<='b')||(LA31_0>='d' && LA31_0<='e')||LA31_0=='h'||(LA31_0>='j' && LA31_0<='k')||(LA31_0>='m' && LA31_0<='n')||LA31_0=='q'||(LA31_0>='u' && LA31_0<='z')) ) {s = 36;}
+                        else if ( ((LA31_0>='A' && LA31_0<='Z')) ) {s = 36;}
 
-                        else if ( ((LA31_0>='0' && LA31_0<='9')) ) {s = 37;}
+                        else if ( ((LA31_0>='a' && LA31_0<='b')||(LA31_0>='d' && LA31_0<='e')||LA31_0=='h'||(LA31_0>='j' && LA31_0<='k')||LA31_0=='n'||LA31_0=='q'||(LA31_0>='u' && LA31_0<='z')) ) {s = 37;}
 
-                        else if ( (LA31_0=='\'') ) {s = 38;}
+                        else if ( ((LA31_0>='0' && LA31_0<='9')) ) {s = 38;}
 
-                        else if ( ((LA31_0>='\t' && LA31_0<='\n')||(LA31_0>='\f' && LA31_0<='\r')||LA31_0==' ') ) {s = 39;}
+                        else if ( (LA31_0=='\'') ) {s = 39;}
 
-                        else if ( ((LA31_0>='\u0000' && LA31_0<='\b')||LA31_0=='\u000B'||(LA31_0>='\u000E' && LA31_0<='\u001F')||LA31_0=='#'||(LA31_0>='%' && LA31_0<='&')||(LA31_0>='\\' && LA31_0<=']')||(LA31_0>='_' && LA31_0<='`')||(LA31_0>='\u007F' && LA31_0<='\uFFFF')) ) {s = 40;}
+                        else if ( ((LA31_0>='\t' && LA31_0<='\n')||(LA31_0>='\f' && LA31_0<='\r')||LA31_0==' ') ) {s = 40;}
 
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 : 
-                        int LA31_4 = input.LA(1);
-
-                        s = -1;
-                        if ( ((LA31_4>='\u0000' && LA31_4<='\uFFFF')) ) {s = 45;}
-
-                        else s = 40;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 2 : 
-                        int LA31_38 = input.LA(1);
-
-                        s = -1;
-                        if ( ((LA31_38>='\u0000' && LA31_38<='\uFFFF')) ) {s = 90;}
-
-                        else s = 40;
+                        else if ( ((LA31_0>='\u0000' && LA31_0<='\b')||LA31_0=='\u000B'||(LA31_0>='\u000E' && LA31_0<='\u001F')||LA31_0=='#'||(LA31_0>='%' && LA31_0<='&')||(LA31_0>='\\' && LA31_0<=']')||(LA31_0>='_' && LA31_0<='`')||(LA31_0>='\u007F' && LA31_0<='\uFFFF')) ) {s = 41;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 3 : 
-                        int LA31_2 = input.LA(1);
+                        int LA31_4 = input.LA(1);
 
                         s = -1;
-                        if ( ((LA31_2>='\u0000' && LA31_2<='\uFFFF')) ) {s = 42;}
+                        if ( ((LA31_4>='\u0000' && LA31_4<='\uFFFF')) ) {s = 46;}
 
-                        else s = 40;
+                        else s = 41;
 
                         if ( s>=0 ) return s;
                         break;
