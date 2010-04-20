@@ -2,9 +2,9 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.*;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.junit.Test;
 
@@ -56,7 +56,7 @@ public class TestNFAConstruction extends BaseTest {
 	}
 
 	@Test public void testRange() throws Exception {
-		Grammar g = new Grammar(
+		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+
 			"A : 'a'..'c' ;"
 		);
@@ -64,11 +64,11 @@ public class TestNFAConstruction extends BaseTest {
 			"RuleStart_A_1->s3\n" +
 			"s3-'a'..'c'->s4\n" +
 			"s4->RuleStop_A_2\n";
-		checkRule(g, "A", expecting);
+		checkTokensRule(g, "A", expecting);
 	}
 
 	@Test public void testRangeOrRange() throws Exception {
-		Grammar g = new Grammar(
+		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+
 			"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
 		);
@@ -85,7 +85,7 @@ public class TestNFAConstruction extends BaseTest {
 			"s6->BlockEnd_12\n" +
 			"s10->BlockEnd_12\n" +
 			"BlockEnd_12->RuleStop_A_2\n";
-		checkRule(g, "A", expecting);
+		checkTokensRule(g, "A", expecting);
 	}
 
 	@Test public void testStringLiteralInParser() throws Exception {
@@ -267,21 +267,6 @@ public class TestNFAConstruction extends BaseTest {
 			"BlockEnd_10->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s11\n";
 		checkRule(g, "a", expecting);
-	}
-
-	@Test public void testAplusNonGreedy() throws Exception {
-		Grammar g = new Grammar(
-			"lexer grammar t;\n"+
-			"A : (options {greedy=false;}:'0'..'9')+ ;\n");
-		String expecting =
-			"RuleStart_A_1->PlusBlockStart_5\n" +
-			"PlusBlockStart_5->s3\n" +
-			"s3-'0'..'9'->s4\n" +
-			"s4->LoopBack_6\n" +
-			"LoopBack_6->BlockEnd_7\n" +
-			"LoopBack_6->s3\n" +
-			"BlockEnd_7->RuleStop_A_2\n";
-		checkRule(g, "A", expecting);
 	}
 
 	@Test public void testAorBorEmptyPlus() throws Exception {
@@ -871,6 +856,75 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 */
+
+	@Test public void testDefaultMode() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a' ;\n" +
+			"X : 'x' ;\n" +
+			"mode FOO;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n");
+		String expecting =
+			"BlockStart_0->RuleStart_A_2\n" +
+			"BlockStart_0->RuleStart_X_4\n" +
+			"RuleStart_A_2->s10\n" +
+			"RuleStart_X_4->s12\n" +
+			"s10-'a'->s11\n" +
+			"s12-'x'->s13\n" +
+			"s11->RuleStop_A_3\n" +
+			"s13->RuleStop_X_5\n";
+		checkTokensRule(g, "DEFAULT_MODE", expecting);
+	}
+
+	@Test public void testMode() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a' ;\n" +
+			"X : 'x' ;\n" +
+			"mode FOO;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n");
+		String expecting =
+			"BlockStart_1->RuleStart_B_6\n" +
+			"BlockStart_1->RuleStart_C_8\n" +
+			"RuleStart_B_6->s14\n" +
+			"RuleStart_C_8->s16\n" +
+			"s14-'b'->s15\n" +
+			"s16-'c'->s17\n" +
+			"s15->RuleStop_B_7\n" +
+			"s17->RuleStop_C_9\n";
+		checkTokensRule(g, "FOO", expecting);
+	}
+
+	void checkTokensRule(LexerGrammar g, String modeName, String expecting) {
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			System.out.println(g.ast.toStringTree());
+			Tool antlr = new Tool();
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
+			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+				for (Grammar imp : g.getImportedGrammars()) {
+					antlr.process(imp);
+				}
+			}
+		}
+
+		if ( g.modes.get(modeName)==null ) {
+			System.err.println("no such mode "+modeName);
+			return;
+		}
+
+		ParserNFAFactory f = new LexerNFAFactory((LexerGrammar)g);
+		NFA nfa = f.createNFA();
+		NFAState startState = nfa.modeToStartState.get(modeName);
+		NFASerializer serializer = new NFASerializer(g, startState);
+		String result = serializer.toString();
+
+		//System.out.print(result);
+		assertEquals(expecting, result);
+	}
+
 	void checkRule(Grammar g, String ruleName, String expecting) {
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 			System.out.println(g.ast.toStringTree());
@@ -885,7 +939,6 @@ public class TestNFAConstruction extends BaseTest {
 		}
 		
 		ParserNFAFactory f = new ParserNFAFactory(g);
-		if ( g.getType()== ANTLRParser.LEXER ) f = new LexerNFAFactory(g);
 		NFA nfa = f.createNFA();
 		Rule r = g.getRule(ruleName);
 		NFAState startState = nfa.ruleToStartState.get(r);
@@ -893,7 +946,6 @@ public class TestNFAConstruction extends BaseTest {
 		String result = serializer.toString();
 
 		//System.out.print(result);
-		System.out.println("test NFA checkRule: thread name: "+Thread.currentThread().getName());
 		assertEquals(expecting, result);
 	}
 }

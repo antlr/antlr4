@@ -46,9 +46,14 @@ public class Rule implements AttributeResolver {
     public AttributeDict args;
     public AttributeDict retvals;
     public AttributeDict scope; // scope { int i; }
-    /** A list of scope names used by this rule */
+
+	/** A list of scope names used by this rule */
     public List<Token> useScopes;
-    public Grammar g;
+
+	public Grammar g;
+
+	/** If we're in a lexer grammar, we might be in a mode */ 
+	public String mode;
 
     /** Map a name to an action for this rule like @init {...}.
      *  The code generator will use this to fill holes in the rule template.

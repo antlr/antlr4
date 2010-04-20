@@ -5,6 +5,7 @@ import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 
 import java.util.*;
 
@@ -26,13 +27,15 @@ public class LexerNFAToDFAConverter {
 
 	public static boolean debug = false;	
 
-	public LexerNFAToDFAConverter(Grammar g) {
+	public LexerNFAToDFAConverter(LexerGrammar g) {
 		this.g = g;
-		TokensStartState startState = (TokensStartState)g.nfa.states.get(0);
-		dfa = new DFA(g, startState);
 	}
 
-	public DFA createDFA() {
+	public DFA createDFA() { return createDFA(LexerGrammar.DEFAULT_MODE_NAME); }
+
+	public DFA createDFA(String modeName) {
+		TokensStartState startState = g.nfa.modeToStartState.get(modeName);
+		dfa = new DFA(g, startState);
 		closureBusy = new HashSet<NFAConfig>();
 		LexerState start = computeStartState();
 		dfa.startState = start;

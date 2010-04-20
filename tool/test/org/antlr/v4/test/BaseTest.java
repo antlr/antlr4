@@ -37,12 +37,8 @@ import org.antlr.v4.analysis.DFAMinimizer;
 import org.antlr.v4.analysis.LexerNFAToDFAConverter;
 import org.antlr.v4.analysis.PredictionDFAFactory;
 import org.antlr.v4.automata.*;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.AmbiguityMessage;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Message;
-import org.antlr.v4.tool.UnreachableAltsMessage;
+import org.antlr.v4.tool.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -119,7 +115,7 @@ public abstract class BaseTest {
 		}
 
 		ParserNFAFactory f = new ParserNFAFactory(g);
-		if ( g.getType()== ANTLRParser.LEXER ) f = new LexerNFAFactory(g);
+		if ( g.isLexer() ) f = new LexerNFAFactory((LexerGrammar)g);
 		return f.createNFA();
 	}
 
@@ -180,12 +176,18 @@ public abstract class BaseTest {
 	List<Message> checkLexerDFA(String gtext, String expecting)
 		throws Exception
 	{
+		return checkLexerDFA(gtext, LexerGrammar.DEFAULT_MODE_NAME, expecting);
+	}
+
+	List<Message> checkLexerDFA(String gtext, String modeName, String expecting)
+		throws Exception
+	{
 		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
+		LexerGrammar g = new LexerGrammar(gtext, equeue);
 		g.nfa = createNFA(g);
 		LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(g);
-		DFA dfa = conv.createDFA();
-		g.setLookaheadDFA(0, dfa); // only one decision
+		DFA dfa = conv.createDFA(modeName);
+		g.setLookaheadDFA(0, dfa); // only one decision to worry about
 
 		String result = null;
 		if ( dfa!=null ) result = dfa.toString();

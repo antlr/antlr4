@@ -1,28 +1,38 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.TerminalAST;
 import org.stringtemplate.v4.misc.Misc;
 
-/** */
+import java.util.List;
+
 public class LexerNFAFactory extends ParserNFAFactory {
-	public LexerNFAFactory(Grammar g) { super(g); }
+	public LexerNFAFactory(LexerGrammar g) { super(g); }
 
 	public NFA createNFA() {
-		// create s0, start state (must be first)
-		// implied Tokens rule node
-		NFAState startState = newState(TokensStartState.class, null);
+		// BUILD ALL START STATES (ONE PER MODE)
+		for (String modeName : ((LexerGrammar)g).modes.keySet()) {
+			// create s0, start state; implied Tokens rule node
+			TokensStartState startState =
+				(TokensStartState)newState(TokensStartState.class, null);
+			nfa.modeToStartState.put(modeName, startState);
+		}
 
-		_createNFA();
+		// CREATE NFA FOR EACH RULE
+		_createNFA(g.rules.values());
 
-		// LINK START STATE TO EACH TOKEN RULE
-		for (Rule r : g.rules.values()) {
-			if ( !r.isFragment() ) {
-				RuleStartState s = nfa.ruleToStartState.get(r);
-				epsilon(startState, s);
+		// LINK MODE START STATE TO EACH TOKEN RULE
+		for (String modeName : ((LexerGrammar)g).modes.keySet()) {
+			List<Rule> rules = ((LexerGrammar)g).modes.get(modeName);
+			TokensStartState startState = nfa.modeToStartState.get(modeName);
+			for (Rule r : rules) {
+				if ( !r.isFragment() ) {
+					RuleStartState s = nfa.ruleToStartState.get(r);
+					epsilon(startState, s);
+				}
 			}
 		}
 

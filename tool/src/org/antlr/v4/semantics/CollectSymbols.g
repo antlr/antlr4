@@ -72,7 +72,8 @@ import org.stringtemplate.v4.misc.MultiMap;
 }
 
 @members {
-Rule currentRule = null;
+Rule currentRule;
+String currentMode = Grammar.DEFAULT_MODE_NAME;
 int currentAlt = 1; // 1..n
 public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
@@ -95,6 +96,7 @@ topdown
     :	globalScope
     |	globalNamedAction
     |	tokensSection
+    |	mode
     |	rule
     |	ruleArg
     |	ruleReturns
@@ -140,6 +142,8 @@ tokensSection
 		)
 	;
 
+mode:	^(MODE ID .+) {currentMode = $ID.text;} ;
+
 rule
 @init {List<GrammarAST> modifiers = new ArrayList<GrammarAST>();}
 	:   ^( RULE
@@ -151,13 +155,14 @@ rule
 		{
 		int numAlts = $RULE.getFirstChildWithType(BLOCK).getChildCount();
 		Rule r = new Rule(g, $name.text, (GrammarASTWithOptions)$RULE, numAlts);
+		if ( g.isLexer() ) r.mode = currentMode;
 		if ( modifiers.size()>0 ) r.modifiers = modifiers;
 		rules.add(r);
 		currentRule = r;
 		currentAlt = 1;
 		}
     ;
-	
+
 setAlt
 	:	{inContext("RULE BLOCK")}? ( ALT | ALT_REWRITE )
 		{currentAlt = $start.getChildIndex()+1;}

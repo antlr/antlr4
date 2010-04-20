@@ -355,13 +355,13 @@ public class Tool {
 		if ( ((GrammarRootAST)t).hasErrors ) return;
 
 		GrammarRootAST ast = (GrammarRootAST)t;
-        Grammar g = new Grammar(this, ast);
+        Grammar g = createGrammar(ast);
         g.fileName = grammarFileNames.get(0);
 		process(g);
 		if ( ast!=null && ast.grammarType==ANTLRParser.COMBINED && !ast.hasErrors ) {
 			lexerAST = extractImplicitLexer(g); // alters ast
 			if ( lexerAST!=null ) {
-				Grammar lexerg = new Grammar(this, lexerAST);
+				LexerGrammar lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = grammarFileNames.get(0);
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
@@ -369,6 +369,11 @@ public class Tool {
 			}
         }
     }
+
+	public Grammar createGrammar(GrammarRootAST ast) {
+		if ( ast.grammarType==ANTLRParser.LEXER ) return new LexerGrammar(this, ast);
+		else return new Grammar(this, ast);
+	}	
 
     public void process(Grammar g) {
         grammars.put(g.name, g);
@@ -390,11 +395,10 @@ public class Tool {
 
 		// BUILD NFA FROM AST
 		NFAFactory factory = new ParserNFAFactory(g);
-		if ( g.getType()==ANTLRParser.LEXER ) factory = new LexerNFAFactory(g);
+		if ( g.isLexer() ) factory = new LexerNFAFactory((LexerGrammar)g);
 		g.nfa = factory.createNFA();
 		
 		if ( generate_NFA_dot ) generateNFAs(g);
-
 
 		// PERFORM GRAMMAR ANALYSIS ON NFA: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);

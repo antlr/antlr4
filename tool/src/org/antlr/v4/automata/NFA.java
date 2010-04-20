@@ -23,6 +23,8 @@ public class NFA {
 
 	public Map<Rule, RuleStartState> ruleToStartState = new LinkedHashMap<Rule, RuleStartState>();
 	public Map<Rule, RuleStopState> ruleToStopState = new LinkedHashMap<Rule, RuleStopState>();
+	public Map<String, TokensStartState> modeToStartState =
+		new LinkedHashMap<String, TokensStartState>();
 
 	int stateNumber = 0;
 	

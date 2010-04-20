@@ -141,7 +141,7 @@ public class BasicSemanticChecks {
 	}
 
 	void checkMode(Token modeNameToken) {
-		if ( g.getType()!=ANTLRParser.LEXER ) {
+		if ( !g.isLexer() ) {
 			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
 									   modeNameToken, modeNameToken.getText(), g);
 		}
@@ -170,11 +170,11 @@ public class BasicSemanticChecks {
 
 	void checkInvalidRuleDef(Token ruleID) {
 		String fileName = ruleID.getInputStream().getSourceName();
-		if ( g.getType()==ANTLRParser.LEXER && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
+		if ( g.isLexer() && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
 			g.tool.errMgr.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
 									   fileName, ruleID, ruleID.getText());
 		}
-		if ( (g.getType()==ANTLRParser.PARSER||g.getType()==ANTLRParser.TREE) &&
+		if ( (g.isParser()||g.isTreeGrammar()) &&
 			 Character.isUpperCase(ruleID.getText().charAt(0)) )
 		{
 			g.tool.errMgr.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
@@ -184,7 +184,7 @@ public class BasicSemanticChecks {
 
 	void checkInvalidRuleRef(Token ruleID) {
 		String fileName = ruleID.getInputStream().getSourceName();
-		if ( g.getType()==ANTLRParser.LEXER && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
+		if ( g.isLexer() && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
 			g.tool.errMgr.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
 									   fileName, ruleID, ruleID.getText());
 		}
@@ -198,7 +198,7 @@ public class BasicSemanticChecks {
 									   tokenID,
 									   tokenID.getText());
 		}
-		if ( g.getType()!=ANTLRParser.COMBINED ) {
+		if ( !g.isCombined() ) {
 			g.tool.errMgr.grammarError(ErrorType.CANNOT_ALIAS_TOKENS,
 									   fileName,
 									   tokenID,
@@ -212,7 +212,7 @@ public class BasicSemanticChecks {
 	 */
 	void checkTokenArgs(Token tokenID) {
 		String fileName = tokenID.getInputStream().getSourceName();
-		if ( g.getType()!=ANTLRParser.LEXER ) {
+		if ( !g.isLexer() ) {
 			g.tool.errMgr.grammarError(ErrorType.ARGS_ON_TOKEN_REF,
 									   fileName, tokenID, tokenID.getText());
 		}
@@ -315,7 +315,7 @@ public class BasicSemanticChecks {
 		Token altStart,
 		int alt)
 	{
-		if ( g.getType()==ANTLRParser.TREE &&
+		if ( g.isTreeGrammar() &&
 			 options!=null && options.get("output")!=null &&
 			 options.get("output").equals("template") &&
 			 options.get("rewrite")!=null &&
@@ -377,7 +377,7 @@ public class BasicSemanticChecks {
 		if ( options==null ) return;
 		String fileName = root.token.getInputStream().getSourceName();
 		String filter = options.get("filter");
-		if ( g.getType()==ANTLRParser.TREE && filter!=null && filter.equals("true") ) {
+		if ( g.isTreeGrammar() && filter!=null && filter.equals("true") ) {
 			// check for conflicting options
 			// filter => backtrack=true (can't be false)
 			// filter&&output!=AST => error
@@ -424,7 +424,7 @@ public class BasicSemanticChecks {
 									   importID,
 									   g, delegate);
 		}
-		if ( g.getType()==ANTLRParser.COMBINED &&
+		if ( g.isCombined() &&
 			 (delegate.name.equals(g.name+Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.LEXER))||
 			  delegate.name.equals(g.name+Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.PARSER))) )
 		{

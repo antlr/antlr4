@@ -2,8 +2,8 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 
 public class AnalysisPipeline {
 	public Grammar g;
@@ -18,13 +18,21 @@ public class AnalysisPipeline {
 		lr.check();
 		if ( lr.listOfRecursiveCycles.size()>0 ) return; // bail out
 
-		if ( g.getType() == ANTLRParser.LEXER ) {
-			LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(g);
-			DFA dfa = conv.createDFA();
-			g.setLookaheadDFA(0, dfa); // only one decision			
+		// BUILD DFA FOR EACH DECISION
+		if ( g.isLexer() ) processLexer();
+		else processParserOrTreeParser();
+	}
+
+	void processLexer() {
+		LexerGrammar lg = (LexerGrammar)g;
+		int d = 0;
+		for (String modeName : lg.modes.keySet()) {
+			LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(lg);
+			DFA dfa = conv.createDFA(modeName);
+			g.setLookaheadDFA(d, dfa);
+			d++;
 
 			if ( g.tool.minimizeDFA ) {
-				System.out.println("MINIMIZE");
 				int before = dfa.stateSet.size();
 				DFAMinimizer dmin = new DFAMinimizer(dfa);
 				dfa.minimized = dmin.minimize();
@@ -33,10 +41,10 @@ public class AnalysisPipeline {
 					System.out.println("DFA minimized from "+before+" to "+after+" states");
 				}
 			}
-			return;
 		}
+	}
 
-		// BUILD DFA FOR EACH DECISION IN NONLEXER
+	void processParserOrTreeParser() {
 		for (DecisionState s : g.nfa.decisionToNFAState) {
 			System.out.println("\nDECISION "+s.decision);
 

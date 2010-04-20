@@ -18,7 +18,7 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
-    public static final Set doNotCopyOptionsToLexer =
+	public static final Set doNotCopyOptionsToLexer =
         new HashSet() {
             {
                 add("output"); add("ASTLabelType"); add("superClass");
@@ -71,7 +71,7 @@ public class Grammar implements AttributeResolver {
 	 *  like EPSILON. Char/String literals and token types overlap in the same
 	 *  space, however.
 	 */
-	protected int maxTokenType = Token.MIN_TOKEN_TYPE-1;
+	int maxTokenType = Token.MIN_TOKEN_TYPE-1;
 	
 	/** Map token like ID (but not literals like "while") to its token type */
 	public Map<String, Integer> tokenNameToTypeMap = new LinkedHashMap<String, Integer>();
@@ -108,7 +108,7 @@ public class Grammar implements AttributeResolver {
         this.tool = tool;
         this.ast = ast;
         this.name = ((GrammarAST)ast.getChild(0)).getText();
-		initTokenSymbolTables();		
+		initTokenSymbolTables();
     }
     
 	/** For testing */
@@ -192,7 +192,7 @@ public class Grammar implements AttributeResolver {
                 GrammarAST root = tool.load(importedGrammarName+".g");
 				if ( root instanceof GrammarASTErrorNode ) return; // came back as error node
 				GrammarRootAST ast = (GrammarRootAST)root;
-                Grammar g = new Grammar(tool, ast);
+                Grammar g = tool.createGrammar(ast);
 				g.fileName = importedGrammarName+".g";
                 g.parent = this;
                 importedGrammars.add(g);
@@ -314,8 +314,7 @@ public class Grammar implements AttributeResolver {
             buf.append(name);
             qualifiedName = buf.toString();
         }
-        if ( getType()==ANTLRParser.COMBINED ||
-             (getType()==ANTLRParser.LEXER && implicitLexer!=null) )
+        if ( isCombined() || (isLexer() && implicitLexer!=null) )
         {
             suffix = Grammar.getGrammarTypeToFileNameSuffix(getType());
         }
@@ -356,7 +355,7 @@ public class Grammar implements AttributeResolver {
 		String tokenName = null;
 		int index=0;
 		// inside any target's char range and is lexer grammar?
-		if ( getType()==ANTLRParser.LEXER &&
+		if ( isLexer() &&
 			 ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE )
 		{
 			return Target.getANTLRCharLiteralForChar(ttype);
@@ -401,7 +400,7 @@ public class Grammar implements AttributeResolver {
 
 	/** Return a set of all possible token or char types for this grammar */
 	public IntSet getTokenTypes() {
-		if ( getType()==ANTLRParser.LEXER ) {
+		if ( isLexer() ) {
 			return getAllCharValues();
 		}
 		return IntervalSet.of(Token.MIN_TOKEN_TYPE, getMaxTokenType());
@@ -512,6 +511,11 @@ public class Grammar implements AttributeResolver {
         if ( ast!=null ) return ast.grammarType;
         return 0;
     }
+
+	public boolean isLexer() { return getType()==ANTLRParser.LEXER; }
+	public boolean isParser() { return getType()==ANTLRParser.PARSER; }
+	public boolean isTreeGrammar() { return getType()==ANTLRParser.TREE; }
+	public boolean isCombined() { return getType()==ANTLRParser.COMBINED; }
 
     public String getTypeString() {
         if ( ast==null ) return null;

@@ -11,6 +11,7 @@ import org.antlr.v4.parse.NFABuilder;
 import org.antlr.v4.tool.*;
 
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.List;
 
 /** NFA construction routines triggered by NFABuilder.g.
@@ -25,16 +26,16 @@ public class ParserNFAFactory implements NFAFactory {
 	public ParserNFAFactory(Grammar g) { this.g = g; nfa = new NFA(g); }
 
 	public NFA createNFA() {
-		_createNFA();
+		_createNFA(g.rules.values());
 		addEOFTransitionToStartRules();
 		return nfa;
 	}
 
-	public void _createNFA() {
+	public void _createNFA(Collection<Rule> rules) {
 		createRuleStartAndStopNFAStates();
 
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		for (Rule r : g.rules.values()) {
+		for (Rule r : rules) {
 			// find rule's block
 			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
@@ -125,7 +126,7 @@ public class ParserNFAFactory implements NFAFactory {
 	public Handle not(GrammarAST n, Handle A) {
 		GrammarAST ast = A.left.ast;
 		int ttype = 0;
-		if ( g.getType()==ANTLRParser.LEXER ) {
+		if ( g.isLexer() ) {
 			ttype = Target.getCharValueFromGrammarCharLiteral(ast.getText());
 		}
 		else {

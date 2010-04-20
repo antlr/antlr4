@@ -28,7 +28,6 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.automata.Label;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
@@ -596,7 +595,7 @@ public class IntervalSet implements IntSet {
             }
             else {
 				if ( g!=null ) {
-					if ( g.getType()!= ANTLRParser.LEXER ) {
+					if ( !g.isLexer() ) {
 						for (int i=a; i<=b; i++) {
 							if ( i>a ) buf.append(", ");
 							buf.append(g.getTokenDisplayName(i));

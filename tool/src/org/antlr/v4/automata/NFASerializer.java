@@ -65,6 +65,9 @@ public class NFASerializer {
 	}
 
 	String getStateString(NFAState s) {
+		if ( s==null ) {
+			System.out.println("s==null");
+		}
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
 		if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
