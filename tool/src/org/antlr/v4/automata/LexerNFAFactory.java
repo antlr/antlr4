@@ -19,6 +19,7 @@ public class LexerNFAFactory extends ParserNFAFactory {
 			TokensStartState startState =
 				(TokensStartState)newState(TokensStartState.class, null);
 			nfa.modeToStartState.put(modeName, startState);
+			nfa.defineDecisionState(startState);			
 		}
 
 		// CREATE NFA FOR EACH RULE
