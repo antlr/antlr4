@@ -65,6 +65,35 @@ public class Target {
 		}
 	}
 
+	public static String getStringFromGrammarStringLiteral(String literal) {
+		StringBuilder buf = new StringBuilder();
+		int n = literal.length();
+		int i = 1; // skip first quote
+		while ( i < (n-1) ) { // scan all but last quote 
+			switch ( literal.charAt(i) ) {
+				case '\\' :
+					i++;
+					if ( literal.charAt(i)=='u' ) { // '\u1234'
+						i++;
+						String unicodeChars = literal.substring(3,literal.length()-1);
+						buf.append((char)Integer.parseInt(unicodeChars, 16));
+					}
+					else {
+						char escChar = literal.charAt(i);
+						int charVal = ANTLRLiteralEscapedCharValue[escChar];
+						if ( charVal==0 ) buf.append(escChar); // Unnecessary escapes like '\{' should just yield {
+						else buf.append((char)charVal);
+					}
+					break;
+				default :
+					buf.append(literal.charAt(i));
+					i++;
+					break;
+			}
+		}
+		return buf.toString();
+	}
+
 	/** Return a string representing the escaped char for code c.  E.g., If c
 	 *  has value 0x100, you will get "\u0100".  ASCII gets the usual
 	 *  char (non-hex) representation.  Control characters are spit out
