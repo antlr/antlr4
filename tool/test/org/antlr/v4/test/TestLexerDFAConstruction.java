@@ -2,7 +2,7 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
-/** */
+/** TODO: delete since i don't built DFA anymore for lexer */
 public class TestLexerDFAConstruction extends BaseTest {
 
 	@Test public void unicode() throws Exception {
