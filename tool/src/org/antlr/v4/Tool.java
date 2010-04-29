@@ -7,6 +7,7 @@ import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.LexerNFAFactory;
 import org.antlr.v4.automata.NFAFactory;
 import org.antlr.v4.automata.ParserNFAFactory;
+import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -407,6 +408,8 @@ public class Tool {
 		if ( generate_DFA_dot ) generateDFAs(g);
 
 		// GENERATE CODE
+		CodeGenPipeline gen = new CodeGenPipeline(g);
+		gen.process();
     }
 
     // TODO: Move to ast manipulation class?

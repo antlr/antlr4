@@ -113,9 +113,9 @@ public class DFA {
 
 	public boolean valid() {
 		return
-			converter.danglingStates.size()==0 &&
-			converter.abortedDueToMultipleRecursiveAltsAt ==null &&
-			converter.recursionOverflowState ==null;
+			converter.danglingStates.size()==0;
+//			converter.abortedDueToMultipleRecursiveAltsAt ==null &&
+//			converter.recursionOverflowState ==null;
 	}
 	
 	public String toString() {

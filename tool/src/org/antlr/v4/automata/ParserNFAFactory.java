@@ -259,6 +259,9 @@ public class ParserNFAFactory implements NFAFactory {
 		}
 		Handle first = els.get(0);
 		Handle last = els.get(els.size()-1);
+		if ( first==null || last==null ) {
+			System.out.println("huh?");
+		}
 		return new Handle(first.left, last.right);
 	}
 

@@ -84,13 +84,24 @@ public class SemanticPipeline {
 		AttributeChecks.checkAllAttributeExpressions(g);
 
 		// ASSIGN TOKEN TYPES
-		assignTokenTypes(g, collector, symcheck);
+		if ( g.isLexer() ) assignLexerTokenTypes(g, collector);
+		else assignTokenTypes(g, collector, symcheck);
 
 		UseDefAnalyzer usedef = new UseDefAnalyzer();
 		usedef.checkRewriteElementsPresentOnLeftSide(g, collector.rules);
 	}
 
-	public void assignTokenTypes(Grammar g, CollectSymbols collector, SymbolChecks symcheck) {
+	void assignLexerTokenTypes(Grammar g, CollectSymbols collector) {
+		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
+		for (GrammarAST def : collector.tokensDefs) {
+			if ( def.getType()== ANTLRParser.ID ) G.defineTokenName(def.getText());
+		}
+		for (Rule r : g.rules.values()) {
+			if ( !r.isFragment() ) G.defineTokenName(r.name);
+		}
+	}
+
+	void assignTokenTypes(Grammar g, CollectSymbols collector, SymbolChecks symcheck) {
 		if ( g.implicitLexerOwner!=null ) {
 			// copy vocab from combined to implicit lexer
 			g.importVocab(g.implicitLexerOwner);

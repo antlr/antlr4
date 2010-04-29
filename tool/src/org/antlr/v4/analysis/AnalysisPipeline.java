@@ -68,7 +68,7 @@ public class AnalysisPipeline {
 		System.out.print("DFA="+dfa);
 
  		if ( !dfa.valid() ) {
-			System.out.print("invalid DFA");
+			System.out.println("invalid DFA");
 		}
 
 		conv.issueAmbiguityWarnings();

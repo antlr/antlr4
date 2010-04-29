@@ -73,7 +73,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 
 @members {
 Rule currentRule;
-String currentMode = Grammar.DEFAULT_MODE_NAME;
+String currentMode = LexerGrammar.DEFAULT_MODE_NAME;
 int currentAlt = 1; // 1..n
 public List<Rule> rules = new ArrayList<Rule>();
 public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
@@ -149,6 +149,7 @@ rule
 	:   ^( RULE
 	       name=ID (options {greedy=false;}:.)*
 	       (^(RULEMODIFIERS (m=. {modifiers.add($m);})+))?
+	       (^(AT ID ACTION))*
 	       ^(BLOCK .+)
 	       .*
 	     )
