@@ -1,7 +1,10 @@
 package org.antlr.v4.runtime.nfa;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.Token;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /** http://swtch.com/~rsc/regexp/regexp2.html */
@@ -102,6 +105,178 @@ public class NFA {
 			}
 		}
 		return 0;
+	}
+
+	public static class Context {
+		public int ip;
+		public int inputMarker;
+		public Context(int ip, int inputMarker) {
+			this.ip = ip;
+			this.inputMarker = inputMarker;
+		}
+	}
+
+	public int execNoRecursion(CharStream input, int ip) {
+		List<Context> work = new ArrayList<Context>();
+		work.add(new Context(ip, input.mark()));
+workLoop:
+		while ( work.size()>0 ) {
+			Context ctx = work.remove(work.size()-1); // treat like stack
+			ip = ctx.ip;
+			input.rewind(ctx.inputMarker);
+			while ( ip < code.length ) {
+				int c = input.LA(1);
+				trace(ip);
+				short opcode = code[ip];
+				ip++; // move to next instruction or first byte of operand
+				switch (opcode) {
+					case Bytecode.MATCH8 :
+						if ( c != code[ip] ) continue workLoop;
+						ip++;
+						input.consume();
+						break;
+					case Bytecode.MATCH16 :
+						if ( c != getShort(code, ip) ) continue workLoop;
+						ip += 2;
+						input.consume();
+						break;
+					case Bytecode.RANGE8 :
+						if ( c<code[ip] || c>code[ip+1] ) continue workLoop;
+						ip += 2;
+						input.consume();
+						break;
+					case Bytecode.RANGE16 :
+						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) continue workLoop;
+						ip += 4;
+						input.consume();
+						break;
+					case Bytecode.ACCEPT :
+						int ruleIndex = getShort(code, ip);
+						ip += 2;
+						System.out.println("accept "+ruleIndex);
+						// returning gives first match not longest; i.e., like PEG
+						return ruleIndex;
+					case Bytecode.JMP :
+						int target = getShort(code, ip);
+						ip = target;
+						continue;
+					case Bytecode.SPLIT :
+						int nopnds = getShort(code, ip);
+						ip += 2;
+						// add split addresses to work queue in reverse order ('cept first one)
+						for (int i=nopnds-1; i>=1; i--) {
+							int addr = getShort(code, ip+i*2);
+							//System.out.println("try alt "+i+" at "+addr);
+							work.add(new Context(addr, input.mark()));
+						}
+						// try first alternative (w/o adding to work list)
+						int addr = getShort(code, ip);
+						ip = addr;
+						//System.out.println("try alt "+nopnds+" at "+addr);
+						continue;
+					default :
+						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
+				}
+			}
+		}
+		return 0;
+	}
+
+	public int execThompson(CharStream input, int ip) {
+		List<Integer> closure = new ArrayList<Integer>();
+		List<Integer> reach = new ArrayList<Integer>();
+		int lastAcceptAddr = Integer.MAX_VALUE;
+		int lastAcceptLastCharIndex = -1;
+		addToClosure(closure, ip);
+		//while ( input.LA(1) != Token.EOF ) {
+		while ( true ) {
+			if ( closure.size()==0 ) break; // no more work
+			int c = input.LA(1);
+processOneChar:
+			//while ( closure.size()>0 ) {
+			for (int i=0; i<closure.size(); i++) {
+				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				ip = closure.get(i); 
+				trace(ip);
+				short opcode = code[ip];
+				ip++; // move to next instruction or first byte of operand
+				switch (opcode) {
+					case Bytecode.MATCH8 :
+						if ( c == code[ip] ) {
+							addToClosure(reach, ip+1);
+						}
+						break;
+					case Bytecode.MATCH16 :
+						if ( c == getShort(code, ip) ) {
+							addToClosure(reach, ip+2);
+						}
+						break;
+					case Bytecode.RANGE8 :
+						if ( c>=code[ip] && c<=code[ip+1] ) {
+							addToClosure(reach, ip+2);
+						}
+						break;
+					case Bytecode.RANGE16 :
+						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) {
+							addToClosure(reach, ip+4);
+						}
+						break;
+					case Bytecode.ACCEPT :
+						int ttype = getShort(code, ip);
+						System.out.println("ACCEPT "+ttype+" with last char position "+(input.index()-1));
+						if ( input.index()-1 >= lastAcceptLastCharIndex ) {
+							lastAcceptLastCharIndex = input.index()-1;
+							// choose first rule mentioned if match of same length
+							if ( ip-1 < lastAcceptAddr ) { // it will see both accepts of ambig rules
+								System.out.println("replacing old best match @ "+lastAcceptAddr);
+								lastAcceptAddr = ip-1;
+							}
+						}
+						// returning gives first match not longest; i.e., like PEG
+						//break processOneChar;
+						// keep trying for more to get longest (like we expect)
+						break;
+					case Bytecode.JMP :
+					case Bytecode.SPLIT :
+						break;
+					default :
+						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
+				}
+			}
+			if ( reach.size()>0 ) { // if we reached other code, consume and process reach list
+				System.out.println("CONSUME");
+				input.consume();
+			}
+			// swap to avoid reallocating space
+			List<Integer> tmp = reach;
+			reach = closure;
+			closure = tmp;
+			reach.clear();
+		}
+		if ( lastAcceptAddr<0 ) return Token.INVALID_TOKEN_TYPE;
+		int ttype = getShort(code, lastAcceptAddr+1);
+		return ttype;
+	}
+
+	void addToClosure(List<Integer> closure, int ip) {
+		//System.out.println("add to closure "+ip+" "+closure);
+		if ( closure.contains(ip) ) return;
+		closure.add(ip);
+		short opcode = code[ip];
+		ip++; // move to next instruction or first byte of operand
+		switch (opcode) {
+			case Bytecode.JMP :
+				addToClosure(closure, getShort(code, ip));
+				break;
+			case Bytecode.SPLIT :
+				int nopnds = getShort(code, ip);
+				ip += 2;
+				// add split addresses to work queue in reverse order ('cept first one)
+				for (int i=0; i<nopnds; i++) {
+					addToClosure(closure, getShort(code, ip+i*2));
+				}
+				break;
+		}
 	}
 
 	void trace(int ip) {
