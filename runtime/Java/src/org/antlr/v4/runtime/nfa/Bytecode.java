@@ -46,6 +46,8 @@ public class Bytecode {
 	public static final short MATCH16	= 5;
 	public static final short RANGE8	= 6;
 	public static final short RANGE16	= 7;
+	public static final short WILDCARD	= 8;
+	public static final short SAVE		= 9;
 
 	/** Used for disassembly; describes instruction set */
 	public static Instruction[] instructions = new Instruction[] {
@@ -56,7 +58,9 @@ public class Bytecode {
 		new Instruction("match8", OperandType.BYTE),
 		new Instruction("match16", OperandType.CHAR),
 		new Instruction("range8", OperandType.BYTE, OperandType.BYTE),
-		new Instruction("range16", OperandType.CHAR, OperandType.CHAR)
+		new Instruction("range16", OperandType.CHAR, OperandType.CHAR),
+		new Instruction("wildcard"),
+		new Instruction("save", OperandType.SHORT),
 	};
 
 	public static String disassemble(byte[] code, int start) {

@@ -185,7 +185,7 @@ workLoop:
 	public int execThompson(CharStream input, int ip) {
 		int c = input.LA(1);
 		if ( c==Token.EOF ) return Token.EOF;
-		
+
 		List<Integer> closure = new ArrayList<Integer>();
 		List<Integer> reach = new ArrayList<Integer>();
 		int prevAcceptAddr = Integer.MAX_VALUE;
@@ -265,13 +265,19 @@ processOneChar:
 
 	void addToClosure(List<Integer> closure, int ip) {
 		//System.out.println("add to closure "+ip+" "+closure);
-		if ( closure.contains(ip) ) return;
+		if ( closure.contains(ip) ) return; // TODO: VERY INEFFICIENT! use int[num-states] as set test
 		closure.add(ip);
 		short opcode = code[ip];
 		ip++; // move to next instruction or first byte of operand
 		switch (opcode) {
 			case Bytecode.JMP :
 				addToClosure(closure, getShort(code, ip));
+				break;
+			case Bytecode.SAVE :
+				int labelIndex = getShort(code, ip);
+				ip += 2;
+				addToClosure(closure, ip); // do closure pass SAVE
+				// TODO: impl
 				break;
 			case Bytecode.SPLIT :
 				int nopnds = getShort(code, ip);
