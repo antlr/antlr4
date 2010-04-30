@@ -183,17 +183,17 @@ workLoop:
 	}
 
 	public int execThompson(CharStream input, int ip) {
+		int c = input.LA(1);
+		if ( c==Token.EOF ) return Token.EOF;
+		
 		List<Integer> closure = new ArrayList<Integer>();
 		List<Integer> reach = new ArrayList<Integer>();
-		int lastAcceptAddr = Integer.MAX_VALUE;
-		int lastAcceptLastCharIndex = -1;
+		int prevAcceptAddr = Integer.MAX_VALUE;
+		int prevAcceptLastCharIndex = -1;
 		addToClosure(closure, ip);
-		//while ( input.LA(1) != Token.EOF ) {
-		while ( true ) {
-			if ( closure.size()==0 ) break; // no more work
-			int c = input.LA(1);
+		do { // while more work
+			c = input.LA(1);
 processOneChar:
-			//while ( closure.size()>0 ) {
 			for (int i=0; i<closure.size(); i++) {
 				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				ip = closure.get(i); 
@@ -223,18 +223,22 @@ processOneChar:
 						break;
 					case Bytecode.ACCEPT :
 						int ttype = getShort(code, ip);
-						System.out.println("ACCEPT "+ttype+" with last char position "+(input.index()-1));
-						if ( input.index()-1 >= lastAcceptLastCharIndex ) {
-							lastAcceptLastCharIndex = input.index()-1;
-							// choose first rule mentioned if match of same length
-							if ( ip-1 < lastAcceptAddr ) { // it will see both accepts of ambig rules
-								System.out.println("replacing old best match @ "+lastAcceptAddr);
-								lastAcceptAddr = ip-1;
+						int tokenLastCharIndex = input.index() - 1;
+						System.out.println("ACCEPT "+ttype+" with last char position "+ tokenLastCharIndex);
+						if ( tokenLastCharIndex > prevAcceptLastCharIndex ) {
+							prevAcceptLastCharIndex = tokenLastCharIndex;
+							// choose longest match so far regardless of rule priority
+							System.out.println("replacing old best match @ "+prevAcceptAddr);
+							prevAcceptAddr = ip-1;
+						}
+						else if ( tokenLastCharIndex == prevAcceptLastCharIndex ) {
+							// choose first rule matched if match is of same length
+							if ( ip-1 < prevAcceptAddr ) { // it will see both accepts for ambig rules
+								System.out.println("replacing old best match @ "+prevAcceptAddr);
+								prevAcceptAddr = ip-1;
 							}
 						}
-						// returning gives first match not longest; i.e., like PEG
-						//break processOneChar;
-						// keep trying for more to get longest (like we expect)
+						// keep trying for more to get longest match
 						break;
 					case Bytecode.JMP :
 					case Bytecode.SPLIT :
@@ -243,7 +247,7 @@ processOneChar:
 						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
 				}
 			}
-			if ( reach.size()>0 ) { // if we reached other code, consume and process reach list
+			if ( reach.size()>0 ) { // if we reached other states, consume and process them
 				System.out.println("CONSUME");
 				input.consume();
 			}
@@ -252,9 +256,10 @@ processOneChar:
 			reach = closure;
 			closure = tmp;
 			reach.clear();
-		}
-		if ( lastAcceptAddr<0 ) return Token.INVALID_TOKEN_TYPE;
-		int ttype = getShort(code, lastAcceptAddr+1);
+		} while ( closure.size()>0 );
+
+		if ( prevAcceptAddr<0 ) return Token.INVALID_TOKEN_TYPE;
+		int ttype = getShort(code, prevAcceptAddr+1);
 		return ttype;
 	}
 
