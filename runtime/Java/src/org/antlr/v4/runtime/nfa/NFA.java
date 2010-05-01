@@ -177,7 +177,7 @@ workLoop:
 			boolean accepted = false;
 processOneChar:
 			while ( i<closure.size() ) {
-				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				ThreadState t = closure.get(i);
 				ip = t.addr;
 				NFAStack context = t.context;
@@ -260,7 +260,7 @@ processOneChar:
 				input.consume();
 			}
 			else if ( !accepted) {
-				System.err.println("no match for char "+(char)c+" at "+input.index());
+				System.out.println("!!!!! no match for char "+(char)c+" at "+input.index());
 				input.consume();
 			}
 			// else reach.size==0 && matched, don't consume: accepted and

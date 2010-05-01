@@ -95,6 +95,29 @@ public class TestNFABytecodeInterp extends BaseTest {
 		checkMatches(g, "aaxa", expecting);
 	}
 
+	@Test public void testRewindBackToLastGoodMatch() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' 'b'? ;\n"+
+			"B : 'b' ;\n"+
+			"WS : ' ' ;\n");
+		String expecting = "A, WS, A, WS, B, EOF";
+		checkMatches(g, "a ab b", expecting);
+	}
+
+	// fixes http://www.antlr.org/jira/browse/ANTLR-189 from v3
+	@Test public void testRewindBackToLastGoodMatch_DOT_vs_NUM() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"NUM: '0'..'9'+ ('.' '0'..'9'+)? ;\n"+
+			"DOT : '.' ;\n"+
+			"WS : ' ' ;\n");
+		checkMatches(g, "3.14 .", "NUM, WS, DOT, EOF");
+		checkMatches(g, "9", "NUM, EOF");
+		checkMatches(g, ".1", "DOT, NUM, EOF");
+		checkMatches(g, "1.", "NUM, DOT, EOF");
+	}
+
 	public void _template() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"\n");
