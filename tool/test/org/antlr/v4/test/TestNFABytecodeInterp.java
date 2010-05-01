@@ -77,11 +77,22 @@ public class TestNFABytecodeInterp extends BaseTest {
 
 	@Test public void testRecursiveCall() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-			"lexer grammar L;\n" + //TODO 
-			"I : D+ ;\n" +
-			"fragment D : '0'..'9'+ ;\n");
-		String expecting = "I, EOF";
-		checkMatches(g, "32", expecting);
+			"lexer grammar L;\n" +
+			"ACTION : '{' (ACTION|.)* '}' ;\n");
+		String expecting = "ACTION, EOF";
+		checkMatches(g, "{hi}", expecting);
+		checkMatches(g, "{{hi}}", expecting);
+		checkMatches(g, "{{x}{y}}", expecting);
+		checkMatches(g, "{{{{{{x}}}}}}", expecting);
+	}
+
+	@Test public void testAltOrWildcard() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"ELSE : . ;\n");
+		String expecting = "A, A, ELSE, A, EOF";
+		checkMatches(g, "aaxa", expecting);
 	}
 
 	public void _template() throws Exception {

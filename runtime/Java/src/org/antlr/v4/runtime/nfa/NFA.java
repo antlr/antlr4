@@ -177,7 +177,7 @@ workLoop:
 			boolean accepted = false;
 processOneChar:
 			while ( i<closure.size() ) {
-				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				ThreadState t = closure.get(i);
 				ip = t.addr;
 				NFAStack context = t.context;
@@ -238,7 +238,7 @@ processOneChar:
 						int j=i+1;
 						while ( j<closure.size() ) {
 							ThreadState cl = closure.get(j);
-							System.out.println("remaining "+ cl);
+							//System.out.println("remaining "+ cl);
 							if ( cl.alt==alt ) closure.remove(j);
 							else j++;
 						}
