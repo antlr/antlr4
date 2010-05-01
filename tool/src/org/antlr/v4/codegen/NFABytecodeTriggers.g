@@ -97,14 +97,15 @@ ebnf
 		int start=ip;
 	   	SplitInstr S = new SplitInstr(2);
 		emit(S);
-   		S.addrs.add(ip);
+		int blk = ip;
 		}
 		^(CLOSURE block)			
 		{
 	    JumpInstr J = new JumpInstr();
 	    emit(J);
 	    J.target = start;
-	    S.addrs.add(ip);
+   		S.addrs.add(blk);
+	    S.addrs.add(ip); // reverse for nongreedy
 		}
 	|	{int start=ip;} ^(POSITIVE_CLOSURE block)
 		{
@@ -132,8 +133,8 @@ atom
 	|	range					
 	|	^(DOT ID terminal)		
 	|	^(DOT ID ruleref)		
-    |	^(WILDCARD .)			
-    |	WILDCARD				
+    |	^(WILDCARD .)		{emit(new WildcardInstr($WILDCARD.token));}		
+    |	WILDCARD			{emit(new WildcardInstr($WILDCARD.token));}	
     |   terminal				
     |   ruleref					
     ;

@@ -19,7 +19,8 @@ public class CodeGenPipeline {
 		LexerGrammar lg = (LexerGrammar)g;
 		for (String modeName : lg.modes.keySet()) { // for each mode
 			NFA nfa = NFABytecodeGenerator.getBytecode(lg, modeName);
-			ANTLRStringStream input = new ANTLRStringStream("abc32ab");
+			ANTLRStringStream input = new ANTLRStringStream("/*x*/ab");
+			//ANTLRStringStream input = new ANTLRStringStream("abc32ab");
 			int ttype = 0;
 			while ( ttype!= Token.EOF ) {
 				ttype = nfa.execThompson(input, 0); System.out.println("ttype="+ttype);

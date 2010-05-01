@@ -33,6 +33,13 @@ public class NFABytecodeGenerator extends TreeParser {
 		public void write(byte[] code) { code[addr] = (byte)opcode();	}
 	}
 
+	public static class WildcardInstr extends Instr {
+		Token token;
+		public WildcardInstr(Token t) { super(); this.token = t; }
+		public short opcode() { return Bytecode.WILDCARD; }
+		public int nBytes() { return 1; }
+	}
+
 	public static class MatchInstr extends Instr {
 		Token token;
 		int c;
@@ -199,10 +206,13 @@ public class NFABytecodeGenerator extends TreeParser {
 		gen.emit(s0);
 
 		Map<String, Integer> ruleToAddr = new HashMap<String, Integer>();
+		int[] tokenTypeToAddr = new int[lg.getMaxTokenType()+1];
 		for (Rule r : lg.modes.get(modeName)) { // for each rule in mode
 			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			gen.setTreeNodeStream(nodes);
+			int ttype = lg.getTokenType(r.name);
+			tokenTypeToAddr[ttype] = gen.ip;
 			ruleToAddr.put(r.name, gen.ip);
 			if ( !r.isFragment() ) s0.addrs.add(gen.ip);
 			try {
@@ -220,6 +230,7 @@ public class NFABytecodeGenerator extends TreeParser {
 		System.out.println("rule addrs="+ruleToAddr);
 
 		NFA nfa = new NFA(code, ruleToAddr);
+		nfa.tokenTypeToAddr = tokenTypeToAddr;
 		return nfa;
 	}
 

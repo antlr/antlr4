@@ -47,6 +47,7 @@ public class Bytecode {
 	public static final short RANGE8	= 6;
 	public static final short RANGE16	= 7;
 	public static final short WILDCARD	= 8;
+	//public static final short NOT	= 8; ???
 	public static final short SAVE		= 9;
 
 	/** Used for disassembly; describes instruction set */

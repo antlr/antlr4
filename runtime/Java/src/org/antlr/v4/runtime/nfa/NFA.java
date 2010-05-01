@@ -35,6 +35,9 @@ for(;;){
 public class NFA {
 	public byte[] code;
 	Map<String, Integer> ruleToAddr;
+	public int[] tokenTypeToAddr;
+	// 7, 29 -> rule
+	// 7..28, 29..len
 
 	public NFA(byte[] code, Map<String, Integer> ruleToAddr) {
 		this.code = code;
@@ -193,8 +196,10 @@ workLoop:
 		addToClosure(closure, ip);
 		do { // while more work
 			c = input.LA(1);
+			int i = 0;
 processOneChar:
-			for (int i=0; i<closure.size(); i++) {
+			while ( i<closure.size() ) {
+			//for (int i=0; i<closure.size(); i++) {
 				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				ip = closure.get(i); 
 				trace(ip);
@@ -221,10 +226,13 @@ processOneChar:
 							addToClosure(reach, ip+4);
 						}
 						break;
+					case Bytecode.WILDCARD :
+						if ( c!=Token.EOF ) addToClosure(reach, ip);
+						break;
 					case Bytecode.ACCEPT :
-						int ttype = getShort(code, ip);
 						int tokenLastCharIndex = input.index() - 1;
-						System.out.println("ACCEPT "+ttype+" with last char position "+ tokenLastCharIndex);
+						int ttype = getShort(code, ip);
+						System.out.println("ACCEPT "+ ttype +" with last char position "+ tokenLastCharIndex);
 						if ( tokenLastCharIndex > prevAcceptLastCharIndex ) {
 							prevAcceptLastCharIndex = tokenLastCharIndex;
 							// choose longest match so far regardless of rule priority
@@ -238,17 +246,34 @@ processOneChar:
 								prevAcceptAddr = ip-1;
 							}
 						}
-						// keep trying for more to get longest match
+						// if we reach accept state, toss out any addresses in rest
+						// of work list associated with accept's rule; that rule is done
+						int ruleStart = tokenTypeToAddr[ttype];
+						int ruleStop = code.length;
+						if ( ttype+1 < tokenTypeToAddr.length ) {
+							ruleStop = tokenTypeToAddr[ttype+1]-1;
+						}
+						System.out.println("kill range "+ruleStart+".."+ruleStop);
+						int j=i+1;
+						while ( j<closure.size() ) {
+							Integer cl = closure.get(j);
+							System.out.println("remaining "+ cl);
+							if ( cl>=ruleStart || cl<=ruleStop ) closure.remove(j);
+							else j++;
+						}
+						// then, move to next char, looking for longer match
+						// (we continue processing if there are states in reach)
 						break;
-					case Bytecode.JMP :
+						//break processOneChar;
+					case Bytecode.JMP : // ignore
 					case Bytecode.SPLIT :
 						break;
 					default :
 						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
 				}
+				i++;
 			}
 			if ( reach.size()>0 ) { // if we reached other states, consume and process them
-				System.out.println("CONSUME");
 				input.consume();
 			}
 			// swap to avoid reallocating space
@@ -258,7 +283,7 @@ processOneChar:
 			reach.clear();
 		} while ( closure.size()>0 );
 
-		if ( prevAcceptAddr<0 ) return Token.INVALID_TOKEN_TYPE;
+		if ( prevAcceptAddr >= code.length ) return Token.INVALID_TOKEN_TYPE;
 		int ttype = getShort(code, prevAcceptAddr+1);
 		return ttype;
 	}
