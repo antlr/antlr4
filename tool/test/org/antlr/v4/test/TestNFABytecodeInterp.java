@@ -59,8 +59,8 @@ public class TestNFABytecodeInterp extends BaseTest {
 			"lexer grammar L;\n" +
 			"I : D+ ;\n" +
 			"fragment D : '0'..'9'+ ;\n");
-		String expecting = "";
-		checkMatches(g, "a", expecting);
+		String expecting = "I, EOF";
+		checkMatches(g, "32", expecting);
 	}
 
 	public void _template() throws Exception {

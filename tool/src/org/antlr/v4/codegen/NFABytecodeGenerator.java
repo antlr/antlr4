@@ -194,24 +194,32 @@ public class NFABytecodeGenerator extends TreeParser {
 	}
 
 	/** Given any block of alts, return list of instruction objects */
-	public static List<Instr> getInstructions(GrammarAST blk, int acceptValue) {
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-		NFABytecodeTriggers gen = new NFABytecodeTriggers(nodes);
-		try {
-			gen.block();
-			gen.emit(new NFABytecodeGenerator.AcceptInstr(acceptValue));
-		}
-		catch (Exception e){
-			e.printStackTrace(System.err);
-		}
-		return gen.instrs;
-	}
+//	public static List<Instr> getInstructions(GrammarAST blk, int acceptValue) {
+//		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+//		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
+//		NFABytecodeTriggers gen = new NFABytecodeTriggers(nodes);
+//		try {
+//			gen.block();
+//			gen.emit(new NFABytecodeGenerator.AcceptInstr(acceptValue));
+//		}
+//		catch (Exception e){
+//			e.printStackTrace(System.err);
+//		}
+//		return gen.instrs;
+//	}
 
-	public static byte[] getByteCode(List<Instr> instrs) {
+	public static byte[] getByteCode(Map<String, Integer> ruleToAddr, List<Instr> instrs) {
 		Instr last = instrs.get(instrs.size() - 1);
 		int size = last.addr + last.nBytes();
 		byte[] code = new byte[size];
+		// resolve CALL instruction targets before generating code
+		for (Instr I : instrs) {
+			if ( I instanceof CallInstr ) {
+				CallInstr C = (CallInstr) I;
+				String ruleName = C.token.getText();
+				C.target = ruleToAddr.get(ruleName);
+			}
+		}
 		for (Instr I : instrs) {
 			I.write(code);
 		}
@@ -255,12 +263,11 @@ public class NFABytecodeGenerator extends TreeParser {
 				e.printStackTrace(System.err);
 			}
 		}
-		byte[] code = NFABytecodeGenerator.getByteCode(gen.instrs);
+		byte[] code = NFABytecodeGenerator.getByteCode(ruleToAddr, gen.instrs);
+		System.out.println(Bytecode.disassemble(code));
 		System.out.println("rule addrs="+ruleToAddr);
 
-		NFA nfa = new NFA(code, ruleToAddr);
-		nfa.tokenTypeToAddr = tokenTypeToAddr;
-		return nfa;
+		return new NFA(code, ruleToAddr, tokenTypeToAddr);
 	}
 
 	/** Write value at index into a byte array highest to lowest byte,

@@ -71,11 +71,12 @@ public class TestNFABytecodeGeneration extends BaseTest {
 			"fragment D : '0'..'9'+ ;\n");
 		String expecting =
 			"0000:\tsplit         5\n" +
-			"0005:\tsplit         5, 12\n" +
-			"0012:\taccept        4\n" +
-			"0015:\trange8        '0', '9'\n" +
-			"0018:\tsplit         15, 25\n" +
-			"0025:\tret             \n";
+			"0005:\tcall          18\n" +
+			"0008:\tsplit         5, 15\n" +
+			"0015:\taccept        4\n" +
+			"0018:\trange8        '0', '9'\n" +
+			"0021:\tsplit         18, 28\n" +
+			"0028:\tret             \n";
 		checkBytecode(g, expecting);
 	}
 

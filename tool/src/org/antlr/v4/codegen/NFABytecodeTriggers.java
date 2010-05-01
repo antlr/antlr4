@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} NFABytecodeTriggers.g 2010-05-01 11:23:08
+// $ANTLR ${project.version} ${buildNumber} NFABytecodeTriggers.g 2010-05-01 12:43:43
 
 package org.antlr.v4.codegen;
 
@@ -1321,6 +1321,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
         GrammarAST STRING_LITERAL4=null;
         GrammarAST TOKEN_REF5=null;
         GrammarAST TOKEN_REF6=null;
+        GrammarAST TOKEN_REF7=null;
 
         try {
             // NFABytecodeTriggers.g:169:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) )
@@ -1378,17 +1379,18 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                 case 5 :
                     // NFABytecodeTriggers.g:173:7: TOKEN_REF
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal879); 
+                    TOKEN_REF7=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal879); 
+                    emit(new CallInstr(TOKEN_REF7.token));
 
                     }
                     break;
                 case 6 :
                     // NFABytecodeTriggers.g:174:7: ^( ROOT terminal )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_terminal893); 
+                    match(input,ROOT,FOLLOW_ROOT_in_terminal894); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal895);
+                    pushFollow(FOLLOW_terminal_in_terminal896);
                     terminal();
 
                     state._fsp--;
@@ -1401,10 +1403,10 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                 case 7 :
                     // NFABytecodeTriggers.g:175:7: ^( BANG terminal )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_terminal908); 
+                    match(input,BANG,FOLLOW_BANG_in_terminal909); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal910);
+                    pushFollow(FOLLOW_terminal_in_terminal911);
                     terminal();
 
                     state._fsp--;
@@ -1791,9 +1793,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
     public static final BitSet FOLLOW_ARG_ACTION_in_terminal849 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
     public static final BitSet FOLLOW_TOKEN_REF_in_terminal863 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_TOKEN_REF_in_terminal879 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal893 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal895 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_terminal908 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal910 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_terminal894 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal896 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_terminal909 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal911 = new BitSet(new long[]{0x0000000000000008L});
 
 }

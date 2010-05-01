@@ -8,40 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 /** http://swtch.com/~rsc/regexp/regexp2.html */
-/*
-for(;;){
-	switch(pc->opcode){
-	case Char:
-		if(*sp != pc->c)
-			return 0;
-		pc++;
-		sp++;
-		continue;
-	case Match:
-		return 1;
-	case Jmp:
-		pc = pc->x;
-		continue;
-	case Split:
-		if(recursiveloop(pc->x, sp))
-			return 1;
-		pc = pc->y;
-		continue;
-	}
-	assert(0);
-	return -1;
-}
- */
 public class NFA {
 	public byte[] code;
 	Map<String, Integer> ruleToAddr;
 	public int[] tokenTypeToAddr;
-	// 7, 29 -> rule
-	// 7..28, 29..len
 
-	public NFA(byte[] code, Map<String, Integer> ruleToAddr) {
+	public NFA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr) {
 		this.code = code;
 		this.ruleToAddr = ruleToAddr;
+		this.tokenTypeToAddr = tokenTypeToAddr;
 	}
 
 	public int exec(CharStream input, String ruleName) {
@@ -310,7 +285,7 @@ processOneChar:
 			case Bytecode.SAVE :
 				int labelIndex = getShort(code, ip);
 				ip += 2;
-				addToClosure(closure, ip, alt, context); // do closure pass SAVE
+				addToClosure(closure, ip, alt, context); // do closure past SAVE
 				// TODO: impl
 				break;
 			case Bytecode.SPLIT :
@@ -321,6 +296,18 @@ processOneChar:
 					addToClosure(closure, getShort(code, ip+i*2), alt, context);
 				}
 				break;
+			case Bytecode.CALL :
+				int target = getShort(code, ip);
+				int retaddr = ip+2;
+				addToClosure(closure, target, alt, new NFAStack(context, retaddr));
+				break;
+			case Bytecode.RET :
+				if ( context != NFAStack.EMPTY ) {
+					addToClosure(closure, context.returnAddr, alt, context.parent);
+				}
+				break;
+			case Bytecode.ACCEPT :
+				// if stack
 		}
 	}
 

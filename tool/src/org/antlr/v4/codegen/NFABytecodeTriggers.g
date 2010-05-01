@@ -170,7 +170,7 @@ terminal
     |	STRING_LITERAL				{emitString($STRING_LITERAL.token);}
     |	^(TOKEN_REF ARG_ACTION .)	{emit(new CallInstr($TOKEN_REF.token));}
     |	^(TOKEN_REF .)				{emit(new CallInstr($TOKEN_REF.token));}
-    |	TOKEN_REF					
+    |	TOKEN_REF					{emit(new CallInstr($TOKEN_REF.token));}
     |	^(ROOT terminal)			
     |	^(BANG terminal)			
     ;
