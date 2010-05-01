@@ -193,6 +193,8 @@ workLoop:
 		List<Integer> reach = new ArrayList<Integer>();
 		int prevAcceptAddr = Integer.MAX_VALUE;
 		int prevAcceptLastCharIndex = -1;
+		int prevAcceptInputMarker = -1;
+		int firstAcceptInputMarker = -1;
 		addToClosure(closure, ip);
 		do { // while more work
 			c = input.LA(1);
@@ -238,12 +240,15 @@ processOneChar:
 							// choose longest match so far regardless of rule priority
 							System.out.println("replacing old best match @ "+prevAcceptAddr);
 							prevAcceptAddr = ip-1;
+							prevAcceptInputMarker = input.mark();
+							firstAcceptInputMarker = prevAcceptInputMarker;
 						}
 						else if ( tokenLastCharIndex == prevAcceptLastCharIndex ) {
 							// choose first rule matched if match is of same length
 							if ( ip-1 < prevAcceptAddr ) { // it will see both accepts for ambig rules
 								System.out.println("replacing old best match @ "+prevAcceptAddr);
 								prevAcceptAddr = ip-1;
+								prevAcceptInputMarker = input.mark();
 							}
 						}
 						// if we reach accept state, toss out any addresses in rest
@@ -285,6 +290,11 @@ processOneChar:
 
 		if ( prevAcceptAddr >= code.length ) return Token.INVALID_TOKEN_TYPE;
 		int ttype = getShort(code, prevAcceptAddr+1);
+		System.out.println("done at index "+input.index());
+		System.out.println("accept marker="+prevAcceptInputMarker);
+		input.rewind(prevAcceptInputMarker); // does nothing if we accept'd at input.index() but might need to rewind
+		input.release(firstAcceptInputMarker); // kill any other markers in stream we made
+		System.out.println("leaving with index "+input.index());
 		return ttype;
 	}
 

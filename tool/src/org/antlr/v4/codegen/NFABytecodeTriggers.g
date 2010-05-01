@@ -9,6 +9,10 @@ options {
 @header {
 package org.antlr.v4.codegen;
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.GrammarASTWithOptions;
+import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 }
 
 /*
@@ -83,6 +87,10 @@ treeSpec
     ;
 
 ebnf
+@init {
+	GrammarASTWithOptions blk = (GrammarASTWithOptions)$start.getChild(0);
+	String greedyOption = blk.getOption("greedy");
+}
 	:	^(astBlockSuffix block)		
 	|	{
 	   	SplitInstr S = new SplitInstr(2);
@@ -97,15 +105,16 @@ ebnf
 		int start=ip;
 	   	SplitInstr S = new SplitInstr(2);
 		emit(S);
-		int blk = ip;
+		int blkStart = ip;
 		}
 		^(CLOSURE block)			
 		{
 	    JumpInstr J = new JumpInstr();
 	    emit(J);
 	    J.target = start;
-   		S.addrs.add(blk);
-	    S.addrs.add(ip); // reverse for nongreedy
+   		S.addrs.add(blkStart);
+	    S.addrs.add(ip);
+	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
 		}
 	|	{int start=ip;} ^(POSITIVE_CLOSURE block)
 		{
@@ -114,6 +123,7 @@ ebnf
 		int stop = ip;
    		S.addrs.add(start);
    		S.addrs.add(stop);
+	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
 		}
 	| 	block						
     ;

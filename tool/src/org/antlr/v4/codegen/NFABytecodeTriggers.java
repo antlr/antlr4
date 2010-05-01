@@ -1,13 +1,16 @@
-// $ANTLR ${project.version} ${buildNumber} NFABytecodeTriggers.g 2010-04-30 17:54:24
+// $ANTLR ${project.version} ${buildNumber} NFABytecodeTriggers.g 2010-04-30 18:19:35
 
 package org.antlr.v4.codegen;
-import org.antlr.v4.tool.GrammarAST;
-
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;import java.util.Stack;
-import java.util.List;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.GrammarASTWithOptions;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NFABytecodeTriggers extends NFABytecodeGenerator {
     public static final String[] tokenNames = new String[] {
@@ -135,19 +138,19 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
     };
 
     // $ANTLR start "block"
-    // NFABytecodeTriggers.g:24:1: block : ^( BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) ;
+    // NFABytecodeTriggers.g:28:1: block : ^( BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) ;
     public final NFABytecodeTriggers.block_return block() throws RecognitionException {
         NFABytecodeTriggers.block_return retval = new NFABytecodeTriggers.block_return();
         retval.start = input.LT(1);
 
         try {
-            // NFABytecodeTriggers.g:25:5: ( ^( BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) )
-            // NFABytecodeTriggers.g:25:7: ^( BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ )
+            // NFABytecodeTriggers.g:29:5: ( ^( BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) )
+            // NFABytecodeTriggers.g:29:7: ^( BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ )
             {
             match(input,BLOCK,FOLLOW_BLOCK_in_block70); 
 
             match(input, Token.DOWN, null); 
-            // NFABytecodeTriggers.g:25:16: ( ^( OPTIONS ( . )+ ) )?
+            // NFABytecodeTriggers.g:29:16: ( ^( OPTIONS ( . )+ ) )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -156,12 +159,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             }
             switch (alt2) {
                 case 1 :
-                    // NFABytecodeTriggers.g:25:17: ^( OPTIONS ( . )+ )
+                    // NFABytecodeTriggers.g:29:17: ^( OPTIONS ( . )+ )
                     {
                     match(input,OPTIONS,FOLLOW_OPTIONS_in_block74); 
 
                     match(input, Token.DOWN, null); 
-                    // NFABytecodeTriggers.g:25:27: ( . )+
+                    // NFABytecodeTriggers.g:29:27: ( . )+
                     int cnt1=0;
                     loop1:
                     do {
@@ -178,7 +181,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
                         switch (alt1) {
                     	case 1 :
-                    	    // NFABytecodeTriggers.g:25:27: .
+                    	    // NFABytecodeTriggers.g:29:27: .
                     	    {
                     	    matchAny(input); 
 
@@ -216,7 +219,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                 		}
                 		int alt = 1;
                 		
-            // NFABytecodeTriggers.g:40:7: ( alternative )+
+            // NFABytecodeTriggers.g:44:7: ( alternative )+
             int cnt3=0;
             loop3:
             do {
@@ -230,7 +233,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
                 switch (alt3) {
             	case 1 :
-            	    // NFABytecodeTriggers.g:40:9: alternative
+            	    // NFABytecodeTriggers.g:44:9: alternative
             	    {
             	    pushFollow(FOLLOW_alternative_in_block98);
             	    alternative();
@@ -281,10 +284,10 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "alternative"
-    // NFABytecodeTriggers.g:58:1: alternative : ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT (e= element )+ ) );
+    // NFABytecodeTriggers.g:62:1: alternative : ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT (e= element )+ ) );
     public final void alternative() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:59:5: ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT (e= element )+ ) )
+            // NFABytecodeTriggers.g:63:5: ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT (e= element )+ ) )
             int alt5=3;
             int LA5_0 = input.LA(1);
 
@@ -325,7 +328,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             }
             switch (alt5) {
                 case 1 :
-                    // NFABytecodeTriggers.g:59:7: ^( ALT_REWRITE a= alternative . )
+                    // NFABytecodeTriggers.g:63:7: ^( ALT_REWRITE a= alternative . )
                     {
                     match(input,ALT_REWRITE,FOLLOW_ALT_REWRITE_in_alternative149); 
 
@@ -342,7 +345,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:60:7: ^( ALT EPSILON )
+                    // NFABytecodeTriggers.g:64:7: ^( ALT EPSILON )
                     {
                     match(input,ALT,FOLLOW_ALT_in_alternative166); 
 
@@ -354,12 +357,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:61:9: ^( ALT (e= element )+ )
+                    // NFABytecodeTriggers.g:65:9: ^( ALT (e= element )+ )
                     {
                     match(input,ALT,FOLLOW_ALT_in_alternative185); 
 
                     match(input, Token.DOWN, null); 
-                    // NFABytecodeTriggers.g:61:15: (e= element )+
+                    // NFABytecodeTriggers.g:65:15: (e= element )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -373,7 +376,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // NFABytecodeTriggers.g:61:16: e= element
+                    	    // NFABytecodeTriggers.g:65:16: e= element
                     	    {
                     	    pushFollow(FOLLOW_element_in_alternative190);
                     	    element();
@@ -413,15 +416,15 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "element"
-    // NFABytecodeTriggers.g:64:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
+    // NFABytecodeTriggers.g:68:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
     public final void element() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:65:2: ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
+            // NFABytecodeTriggers.g:69:2: ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
             int alt6=7;
             alt6 = dfa6.predict(input);
             switch (alt6) {
                 case 1 :
-                    // NFABytecodeTriggers.g:65:4: labeledElement
+                    // NFABytecodeTriggers.g:69:4: labeledElement
                     {
                     pushFollow(FOLLOW_labeledElement_in_element221);
                     labeledElement();
@@ -432,7 +435,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:66:4: atom
+                    // NFABytecodeTriggers.g:70:4: atom
                     {
                     pushFollow(FOLLOW_atom_in_element230);
                     atom();
@@ -443,7 +446,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:67:4: ebnf
+                    // NFABytecodeTriggers.g:71:4: ebnf
                     {
                     pushFollow(FOLLOW_ebnf_in_element241);
                     ebnf();
@@ -454,28 +457,28 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // NFABytecodeTriggers.g:68:6: ACTION
+                    // NFABytecodeTriggers.g:72:6: ACTION
                     {
                     match(input,ACTION,FOLLOW_ACTION_in_element254); 
 
                     }
                     break;
                 case 5 :
-                    // NFABytecodeTriggers.g:69:6: SEMPRED
+                    // NFABytecodeTriggers.g:73:6: SEMPRED
                     {
                     match(input,SEMPRED,FOLLOW_SEMPRED_in_element267); 
 
                     }
                     break;
                 case 6 :
-                    // NFABytecodeTriggers.g:70:4: GATED_SEMPRED
+                    // NFABytecodeTriggers.g:74:4: GATED_SEMPRED
                     {
                     match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element278); 
 
                     }
                     break;
                 case 7 :
-                    // NFABytecodeTriggers.g:71:4: treeSpec
+                    // NFABytecodeTriggers.g:75:4: treeSpec
                     {
                     pushFollow(FOLLOW_treeSpec_in_element287);
                     treeSpec();
@@ -500,15 +503,15 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "labeledElement"
-    // NFABytecodeTriggers.g:74:1: labeledElement : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );
+    // NFABytecodeTriggers.g:78:1: labeledElement : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );
     public final void labeledElement() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:75:2: ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) )
+            // NFABytecodeTriggers.g:79:2: ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) )
             int alt7=4;
             alt7 = dfa7.predict(input);
             switch (alt7) {
                 case 1 :
-                    // NFABytecodeTriggers.g:75:4: ^( ASSIGN ID atom )
+                    // NFABytecodeTriggers.g:79:4: ^( ASSIGN ID atom )
                     {
                     match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement305); 
 
@@ -525,7 +528,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:76:4: ^( ASSIGN ID block )
+                    // NFABytecodeTriggers.g:80:4: ^( ASSIGN ID block )
                     {
                     match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement319); 
 
@@ -542,7 +545,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:77:4: ^( PLUS_ASSIGN ID atom )
+                    // NFABytecodeTriggers.g:81:4: ^( PLUS_ASSIGN ID atom )
                     {
                     match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement333); 
 
@@ -559,7 +562,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // NFABytecodeTriggers.g:78:4: ^( PLUS_ASSIGN ID block )
+                    // NFABytecodeTriggers.g:82:4: ^( PLUS_ASSIGN ID block )
                     {
                     match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement346); 
 
@@ -590,16 +593,16 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "treeSpec"
-    // NFABytecodeTriggers.g:81:1: treeSpec : ^( TREE_BEGIN (e= element )+ ) ;
+    // NFABytecodeTriggers.g:85:1: treeSpec : ^( TREE_BEGIN (e= element )+ ) ;
     public final void treeSpec() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:82:5: ( ^( TREE_BEGIN (e= element )+ ) )
-            // NFABytecodeTriggers.g:82:7: ^( TREE_BEGIN (e= element )+ )
+            // NFABytecodeTriggers.g:86:5: ( ^( TREE_BEGIN (e= element )+ ) )
+            // NFABytecodeTriggers.g:86:7: ^( TREE_BEGIN (e= element )+ )
             {
             match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec368); 
 
             match(input, Token.DOWN, null); 
-            // NFABytecodeTriggers.g:82:21: (e= element )+
+            // NFABytecodeTriggers.g:86:21: (e= element )+
             int cnt8=0;
             loop8:
             do {
@@ -613,7 +616,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
                 switch (alt8) {
             	case 1 :
-            	    // NFABytecodeTriggers.g:82:22: e= element
+            	    // NFABytecodeTriggers.g:86:22: e= element
             	    {
             	    pushFollow(FOLLOW_element_in_treeSpec374);
             	    element();
@@ -649,12 +652,21 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
     }
     // $ANTLR end "treeSpec"
 
+    public static class ebnf_return extends TreeRuleReturnScope {
+    };
 
     // $ANTLR start "ebnf"
-    // NFABytecodeTriggers.g:85:1: ebnf : ( ^( astBlockSuffix block ) | ^( OPTIONAL block ) | ^( CLOSURE block ) | ^( POSITIVE_CLOSURE block ) | block );
-    public final void ebnf() throws RecognitionException {
+    // NFABytecodeTriggers.g:89:1: ebnf : ( ^( astBlockSuffix block ) | ^( OPTIONAL block ) | ^( CLOSURE block ) | ^( POSITIVE_CLOSURE block ) | block );
+    public final NFABytecodeTriggers.ebnf_return ebnf() throws RecognitionException {
+        NFABytecodeTriggers.ebnf_return retval = new NFABytecodeTriggers.ebnf_return();
+        retval.start = input.LT(1);
+
+
+        	GrammarASTWithOptions blk = (GrammarASTWithOptions)((GrammarAST)retval.start).getChild(0);
+        	String greedyOption = blk.getOption("greedy");
+
         try {
-            // NFABytecodeTriggers.g:86:2: ( ^( astBlockSuffix block ) | ^( OPTIONAL block ) | ^( CLOSURE block ) | ^( POSITIVE_CLOSURE block ) | block )
+            // NFABytecodeTriggers.g:94:2: ( ^( astBlockSuffix block ) | ^( OPTIONAL block ) | ^( CLOSURE block ) | ^( POSITIVE_CLOSURE block ) | block )
             int alt9=5;
             switch ( input.LA(1) ) {
             case IMPLIES:
@@ -693,16 +705,16 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
             switch (alt9) {
                 case 1 :
-                    // NFABytecodeTriggers.g:86:4: ^( astBlockSuffix block )
+                    // NFABytecodeTriggers.g:94:4: ^( astBlockSuffix block )
                     {
-                    pushFollow(FOLLOW_astBlockSuffix_in_ebnf394);
+                    pushFollow(FOLLOW_astBlockSuffix_in_ebnf399);
                     astBlockSuffix();
 
                     state._fsp--;
 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf396);
+                    pushFollow(FOLLOW_block_in_ebnf401);
                     block();
 
                     state._fsp--;
@@ -713,17 +725,17 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:87:4: ^( OPTIONAL block )
+                    // NFABytecodeTriggers.g:95:4: ^( OPTIONAL block )
                     {
 
                     	   	SplitInstr S = new SplitInstr(2);
                     		emit(S);
                        		S.addrs.add(ip);
                     		
-                    match(input,OPTIONAL,FOLLOW_OPTIONAL_in_ebnf409); 
+                    match(input,OPTIONAL,FOLLOW_OPTIONAL_in_ebnf414); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf411);
+                    pushFollow(FOLLOW_block_in_ebnf416);
                     block();
 
                     state._fsp--;
@@ -737,18 +749,18 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:96:4: ^( CLOSURE block )
+                    // NFABytecodeTriggers.g:104:4: ^( CLOSURE block )
                     {
 
                     		int start=ip;
                     	   	SplitInstr S = new SplitInstr(2);
                     		emit(S);
-                    		int blk = ip;
+                    		int blkStart = ip;
                     		
-                    match(input,CLOSURE,FOLLOW_CLOSURE_in_ebnf429); 
+                    match(input,CLOSURE,FOLLOW_CLOSURE_in_ebnf434); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf431);
+                    pushFollow(FOLLOW_block_in_ebnf436);
                     block();
 
                     state._fsp--;
@@ -759,20 +771,21 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     	    JumpInstr J = new JumpInstr();
                     	    emit(J);
                     	    J.target = start;
-                       		S.addrs.add(blk);
-                    	    S.addrs.add(ip); // reverse for nongreedy
+                       		S.addrs.add(blkStart);
+                    	    S.addrs.add(ip);
+                    	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
                     		
 
                     }
                     break;
                 case 4 :
-                    // NFABytecodeTriggers.g:110:4: ^( POSITIVE_CLOSURE block )
+                    // NFABytecodeTriggers.g:119:4: ^( POSITIVE_CLOSURE block )
                     {
                     int start=ip;
-                    match(input,POSITIVE_CLOSURE,FOLLOW_POSITIVE_CLOSURE_in_ebnf447); 
+                    match(input,POSITIVE_CLOSURE,FOLLOW_POSITIVE_CLOSURE_in_ebnf452); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf449);
+                    pushFollow(FOLLOW_block_in_ebnf454);
                     block();
 
                     state._fsp--;
@@ -785,14 +798,15 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     		int stop = ip;
                        		S.addrs.add(start);
                        		S.addrs.add(stop);
+                    	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
                     		
 
                     }
                     break;
                 case 5 :
-                    // NFABytecodeTriggers.g:118:5: block
+                    // NFABytecodeTriggers.g:128:5: block
                     {
-                    pushFollow(FOLLOW_block_in_ebnf460);
+                    pushFollow(FOLLOW_block_in_ebnf465);
                     block();
 
                     state._fsp--;
@@ -809,16 +823,16 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
         }
         finally {
         }
-        return ;
+        return retval;
     }
     // $ANTLR end "ebnf"
 
 
     // $ANTLR start "astBlockSuffix"
-    // NFABytecodeTriggers.g:121:1: astBlockSuffix : ( ROOT | IMPLIES | BANG );
+    // NFABytecodeTriggers.g:131:1: astBlockSuffix : ( ROOT | IMPLIES | BANG );
     public final void astBlockSuffix() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:122:5: ( ROOT | IMPLIES | BANG )
+            // NFABytecodeTriggers.g:132:5: ( ROOT | IMPLIES | BANG )
             // NFABytecodeTriggers.g:
             {
             if ( input.LA(1)==IMPLIES||input.LA(1)==BANG||input.LA(1)==ROOT ) {
@@ -846,23 +860,23 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "atom"
-    // NFABytecodeTriggers.g:127:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref );
+    // NFABytecodeTriggers.g:137:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref );
     public final void atom() throws RecognitionException {
         GrammarAST WILDCARD1=null;
         GrammarAST WILDCARD2=null;
 
         try {
-            // NFABytecodeTriggers.g:128:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref )
+            // NFABytecodeTriggers.g:138:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref )
             int alt10=12;
             alt10 = dfa10.predict(input);
             switch (alt10) {
                 case 1 :
-                    // NFABytecodeTriggers.g:128:4: ^( ROOT range )
+                    // NFABytecodeTriggers.g:138:4: ^( ROOT range )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom514); 
+                    match(input,ROOT,FOLLOW_ROOT_in_atom519); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_range_in_atom516);
+                    pushFollow(FOLLOW_range_in_atom521);
                     range();
 
                     state._fsp--;
@@ -873,12 +887,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:129:4: ^( BANG range )
+                    // NFABytecodeTriggers.g:139:4: ^( BANG range )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom526); 
+                    match(input,BANG,FOLLOW_BANG_in_atom531); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_range_in_atom528);
+                    pushFollow(FOLLOW_range_in_atom533);
                     range();
 
                     state._fsp--;
@@ -889,12 +903,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:130:4: ^( ROOT notSet )
+                    // NFABytecodeTriggers.g:140:4: ^( ROOT notSet )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom538); 
+                    match(input,ROOT,FOLLOW_ROOT_in_atom543); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notSet_in_atom540);
+                    pushFollow(FOLLOW_notSet_in_atom545);
                     notSet();
 
                     state._fsp--;
@@ -905,12 +919,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // NFABytecodeTriggers.g:131:4: ^( BANG notSet )
+                    // NFABytecodeTriggers.g:141:4: ^( BANG notSet )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom550); 
+                    match(input,BANG,FOLLOW_BANG_in_atom555); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notSet_in_atom552);
+                    pushFollow(FOLLOW_notSet_in_atom557);
                     notSet();
 
                     state._fsp--;
@@ -921,9 +935,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 5 :
-                    // NFABytecodeTriggers.g:132:4: notSet
+                    // NFABytecodeTriggers.g:142:4: notSet
                     {
-                    pushFollow(FOLLOW_notSet_in_atom561);
+                    pushFollow(FOLLOW_notSet_in_atom566);
                     notSet();
 
                     state._fsp--;
@@ -932,9 +946,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 6 :
-                    // NFABytecodeTriggers.g:133:4: range
+                    // NFABytecodeTriggers.g:143:4: range
                     {
-                    pushFollow(FOLLOW_range_in_atom571);
+                    pushFollow(FOLLOW_range_in_atom576);
                     range();
 
                     state._fsp--;
@@ -943,13 +957,13 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 7 :
-                    // NFABytecodeTriggers.g:134:4: ^( DOT ID terminal )
+                    // NFABytecodeTriggers.g:144:4: ^( DOT ID terminal )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom582); 
+                    match(input,DOT,FOLLOW_DOT_in_atom587); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom584); 
-                    pushFollow(FOLLOW_terminal_in_atom586);
+                    match(input,ID,FOLLOW_ID_in_atom589); 
+                    pushFollow(FOLLOW_terminal_in_atom591);
                     terminal();
 
                     state._fsp--;
@@ -960,13 +974,13 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 8 :
-                    // NFABytecodeTriggers.g:135:4: ^( DOT ID ruleref )
+                    // NFABytecodeTriggers.g:145:4: ^( DOT ID ruleref )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom595); 
+                    match(input,DOT,FOLLOW_DOT_in_atom600); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom597); 
-                    pushFollow(FOLLOW_ruleref_in_atom599);
+                    match(input,ID,FOLLOW_ID_in_atom602); 
+                    pushFollow(FOLLOW_ruleref_in_atom604);
                     ruleref();
 
                     state._fsp--;
@@ -977,9 +991,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 9 :
-                    // NFABytecodeTriggers.g:136:7: ^( WILDCARD . )
+                    // NFABytecodeTriggers.g:146:7: ^( WILDCARD . )
                     {
-                    WILDCARD1=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom611); 
+                    WILDCARD1=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom616); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
@@ -990,17 +1004,17 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 10 :
-                    // NFABytecodeTriggers.g:137:7: WILDCARD
+                    // NFABytecodeTriggers.g:147:7: WILDCARD
                     {
-                    WILDCARD2=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom627); 
+                    WILDCARD2=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom632); 
                     emit(new WildcardInstr(WILDCARD2.token));
 
                     }
                     break;
                 case 11 :
-                    // NFABytecodeTriggers.g:138:9: terminal
+                    // NFABytecodeTriggers.g:148:9: terminal
                     {
-                    pushFollow(FOLLOW_terminal_in_atom642);
+                    pushFollow(FOLLOW_terminal_in_atom647);
                     terminal();
 
                     state._fsp--;
@@ -1009,9 +1023,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 12 :
-                    // NFABytecodeTriggers.g:139:9: ruleref
+                    // NFABytecodeTriggers.g:149:9: ruleref
                     {
-                    pushFollow(FOLLOW_ruleref_in_atom656);
+                    pushFollow(FOLLOW_ruleref_in_atom661);
                     ruleref();
 
                     state._fsp--;
@@ -1034,10 +1048,10 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "notSet"
-    // NFABytecodeTriggers.g:142:1: notSet : ( ^( NOT terminal ) | ^( NOT block ) );
+    // NFABytecodeTriggers.g:152:1: notSet : ( ^( NOT terminal ) | ^( NOT block ) );
     public final void notSet() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:143:5: ( ^( NOT terminal ) | ^( NOT block ) )
+            // NFABytecodeTriggers.g:153:5: ( ^( NOT terminal ) | ^( NOT block ) )
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -1075,12 +1089,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             }
             switch (alt11) {
                 case 1 :
-                    // NFABytecodeTriggers.g:143:7: ^( NOT terminal )
+                    // NFABytecodeTriggers.g:153:7: ^( NOT terminal )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet679); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet684); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_notSet681);
+                    pushFollow(FOLLOW_terminal_in_notSet686);
                     terminal();
 
                     state._fsp--;
@@ -1091,12 +1105,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:144:7: ^( NOT block )
+                    // NFABytecodeTriggers.g:154:7: ^( NOT block )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet693); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet698); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_notSet695);
+                    pushFollow(FOLLOW_block_in_notSet700);
                     block();
 
                     state._fsp--;
@@ -1121,10 +1135,10 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "ruleref"
-    // NFABytecodeTriggers.g:147:1: ruleref : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
+    // NFABytecodeTriggers.g:157:1: ruleref : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
     public final void ruleref() throws RecognitionException {
         try {
-            // NFABytecodeTriggers.g:148:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
+            // NFABytecodeTriggers.g:158:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
             int alt15=3;
             switch ( input.LA(1) ) {
             case ROOT:
@@ -1151,16 +1165,16 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
             switch (alt15) {
                 case 1 :
-                    // NFABytecodeTriggers.g:148:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
+                    // NFABytecodeTriggers.g:158:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_ruleref717); 
+                    match(input,ROOT,FOLLOW_ROOT_in_ruleref722); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref720); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref725); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // NFABytecodeTriggers.g:148:25: ( ARG_ACTION )?
+                        // NFABytecodeTriggers.g:158:25: ( ARG_ACTION )?
                         int alt12=2;
                         int LA12_0 = input.LA(1);
 
@@ -1169,9 +1183,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                         }
                         switch (alt12) {
                             case 1 :
-                                // NFABytecodeTriggers.g:148:25: ARG_ACTION
+                                // NFABytecodeTriggers.g:158:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref722); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref727); 
 
                                 }
                                 break;
@@ -1187,16 +1201,16 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:149:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
+                    // NFABytecodeTriggers.g:159:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_ruleref735); 
+                    match(input,BANG,FOLLOW_BANG_in_ruleref740); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref738); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref743); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // NFABytecodeTriggers.g:149:25: ( ARG_ACTION )?
+                        // NFABytecodeTriggers.g:159:25: ( ARG_ACTION )?
                         int alt13=2;
                         int LA13_0 = input.LA(1);
 
@@ -1205,9 +1219,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                         }
                         switch (alt13) {
                             case 1 :
-                                // NFABytecodeTriggers.g:149:25: ARG_ACTION
+                                // NFABytecodeTriggers.g:159:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref740); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref745); 
 
                                 }
                                 break;
@@ -1223,13 +1237,13 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:150:7: ^( RULE_REF ( ARG_ACTION )? )
+                    // NFABytecodeTriggers.g:160:7: ^( RULE_REF ( ARG_ACTION )? )
                     {
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref753); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref758); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // NFABytecodeTriggers.g:150:18: ( ARG_ACTION )?
+                        // NFABytecodeTriggers.g:160:18: ( ARG_ACTION )?
                         int alt14=2;
                         int LA14_0 = input.LA(1);
 
@@ -1238,9 +1252,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                         }
                         switch (alt14) {
                             case 1 :
-                                // NFABytecodeTriggers.g:150:18: ARG_ACTION
+                                // NFABytecodeTriggers.g:160:18: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref755); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref760); 
 
                                 }
                                 break;
@@ -1268,20 +1282,20 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "range"
-    // NFABytecodeTriggers.g:153:1: range : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
+    // NFABytecodeTriggers.g:163:1: range : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
     public final void range() throws RecognitionException {
         GrammarAST a=null;
         GrammarAST b=null;
 
         try {
-            // NFABytecodeTriggers.g:154:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
-            // NFABytecodeTriggers.g:154:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
+            // NFABytecodeTriggers.g:164:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
+            // NFABytecodeTriggers.g:164:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
             {
-            match(input,RANGE,FOLLOW_RANGE_in_range778); 
+            match(input,RANGE,FOLLOW_RANGE_in_range783); 
 
             match(input, Token.DOWN, null); 
-            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range782); 
-            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range786); 
+            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range787); 
+            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range791); 
 
             match(input, Token.UP, null); 
             emit(new RangeInstr(a.token, b.token));
@@ -1301,20 +1315,20 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
 
 
     // $ANTLR start "terminal"
-    // NFABytecodeTriggers.g:158:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) );
+    // NFABytecodeTriggers.g:168:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) );
     public final void terminal() throws RecognitionException {
         GrammarAST STRING_LITERAL3=null;
         GrammarAST STRING_LITERAL4=null;
 
         try {
-            // NFABytecodeTriggers.g:159:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) )
+            // NFABytecodeTriggers.g:169:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) )
             int alt16=7;
             alt16 = dfa16.predict(input);
             switch (alt16) {
                 case 1 :
-                    // NFABytecodeTriggers.g:159:8: ^( STRING_LITERAL . )
+                    // NFABytecodeTriggers.g:169:8: ^( STRING_LITERAL . )
                     {
-                    STRING_LITERAL3=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal813); 
+                    STRING_LITERAL3=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal818); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
@@ -1325,20 +1339,20 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // NFABytecodeTriggers.g:160:7: STRING_LITERAL
+                    // NFABytecodeTriggers.g:170:7: STRING_LITERAL
                     {
-                    STRING_LITERAL4=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal828); 
+                    STRING_LITERAL4=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal833); 
                     emitString(STRING_LITERAL4.token);
 
                     }
                     break;
                 case 3 :
-                    // NFABytecodeTriggers.g:161:7: ^( TOKEN_REF ARG_ACTION . )
+                    // NFABytecodeTriggers.g:171:7: ^( TOKEN_REF ARG_ACTION . )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal842); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal847); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal844); 
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal849); 
                     matchAny(input); 
 
                     match(input, Token.UP, null); 
@@ -1346,9 +1360,9 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // NFABytecodeTriggers.g:162:7: ^( TOKEN_REF . )
+                    // NFABytecodeTriggers.g:172:7: ^( TOKEN_REF . )
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal857); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal862); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
@@ -1358,19 +1372,19 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 5 :
-                    // NFABytecodeTriggers.g:163:7: TOKEN_REF
+                    // NFABytecodeTriggers.g:173:7: TOKEN_REF
                     {
-                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal872); 
+                    match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal877); 
 
                     }
                     break;
                 case 6 :
-                    // NFABytecodeTriggers.g:164:7: ^( ROOT terminal )
+                    // NFABytecodeTriggers.g:174:7: ^( ROOT terminal )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_terminal886); 
+                    match(input,ROOT,FOLLOW_ROOT_in_terminal891); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal888);
+                    pushFollow(FOLLOW_terminal_in_terminal893);
                     terminal();
 
                     state._fsp--;
@@ -1381,12 +1395,12 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
                     }
                     break;
                 case 7 :
-                    // NFABytecodeTriggers.g:165:7: ^( BANG terminal )
+                    // NFABytecodeTriggers.g:175:7: ^( BANG terminal )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_terminal901); 
+                    match(input,BANG,FOLLOW_BANG_in_terminal906); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal903);
+                    pushFollow(FOLLOW_terminal_in_terminal908);
                     terminal();
 
                     state._fsp--;
@@ -1478,7 +1492,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             this.transition = DFA6_transition;
         }
         public String getDescription() {
-            return "64:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
+            return "68:1: element : ( labeledElement | atom | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
         }
     }
     static final String DFA7_eotS =
@@ -1539,7 +1553,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             this.transition = DFA7_transition;
         }
         public String getDescription() {
-            return "74:1: labeledElement : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );";
+            return "78:1: labeledElement : ( ^( ASSIGN ID atom ) | ^( ASSIGN ID block ) | ^( PLUS_ASSIGN ID atom ) | ^( PLUS_ASSIGN ID block ) );";
         }
     }
     static final String DFA10_eotS =
@@ -1621,7 +1635,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             this.transition = DFA10_transition;
         }
         public String getDescription() {
-            return "127:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref );";
+            return "137:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref );";
         }
     }
     static final String DFA16_eotS =
@@ -1687,7 +1701,7 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
             this.transition = DFA16_transition;
         }
         public String getDescription() {
-            return "158:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) );";
+            return "168:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) );";
         }
     }
  
@@ -1722,60 +1736,60 @@ public class NFABytecodeTriggers extends NFABytecodeGenerator {
     public static final BitSet FOLLOW_block_in_labeledElement350 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec368 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_element_in_treeSpec374 = new BitSet(new long[]{0xA9A9480000010018L,0x000000024003A011L});
-    public static final BitSet FOLLOW_astBlockSuffix_in_ebnf394 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf396 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_OPTIONAL_in_ebnf409 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf411 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_CLOSURE_in_ebnf429 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf431 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_POSITIVE_CLOSURE_in_ebnf447 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf449 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_block_in_ebnf460 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_astBlockSuffix_in_ebnf399 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf401 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_OPTIONAL_in_ebnf414 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf416 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_CLOSURE_in_ebnf434 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf436 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_POSITIVE_CLOSURE_in_ebnf452 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf454 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_block_in_ebnf465 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_astBlockSuffix0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_atom514 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom516 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom526 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom528 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_atom538 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom540 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom550 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom552 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_notSet_in_atom561 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_range_in_atom571 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_atom582 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom584 = new BitSet(new long[]{0x8021000000000000L,0x0000000000000010L});
-    public static final BitSet FOLLOW_terminal_in_atom586 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOT_in_atom595 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom597 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
-    public static final BitSet FOLLOW_ruleref_in_atom599 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_WILDCARD_in_atom611 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_WILDCARD_in_atom627 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_terminal_in_atom642 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_atom656 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet679 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_notSet681 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOT_in_notSet693 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_notSet695 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_ruleref717 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref720 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref722 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_ruleref735 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref738 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref740 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref753 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref755 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RANGE_in_range778 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_range782 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_range786 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal813 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal828 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal842 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal844 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal857 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal872 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal886 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal888 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_terminal901 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal903 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom519 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom521 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom531 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom533 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom543 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom545 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom555 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom557 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_notSet_in_atom566 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_range_in_atom576 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_atom587 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom589 = new BitSet(new long[]{0x8021000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_terminal_in_atom591 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOT_in_atom600 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom602 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
+    public static final BitSet FOLLOW_ruleref_in_atom604 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_WILDCARD_in_atom616 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_WILDCARD_in_atom632 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_terminal_in_atom647 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_atom661 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet684 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_notSet686 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOT_in_notSet698 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_notSet700 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_ruleref722 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref725 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref727 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_ruleref740 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref743 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref745 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref758 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref760 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RANGE_in_range783 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range787 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range791 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal818 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal833 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal847 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal849 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal862 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal877 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_terminal891 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal893 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_terminal906 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal908 = new BitSet(new long[]{0x0000000000000008L});
 
 }
