@@ -103,6 +103,11 @@ public class NFABytecodeGenerator extends TreeParser {
 		public String toString() { return addr+":AcceptInstr "+ruleIndex; }
 	}
 
+	public static class RetInstr extends Instr {
+		public short opcode() { return Bytecode.RET; }
+		public int nBytes() { return 1; }
+	}
+
 	public static class JumpInstr extends Instr {
 		int target;
 		public short opcode() { return Bytecode.JMP; };
@@ -115,6 +120,25 @@ public class NFABytecodeGenerator extends TreeParser {
 		@Override
 		public String toString() {
 			return addr+":JumpInstr{" +
+				   "target=" + target +
+				   '}';
+		}
+	}
+
+	public static class CallInstr extends Instr {
+		Token token;
+		int target;
+		public CallInstr(Token token) { this.token = token; }
+		public short opcode() { return Bytecode.CALL; };
+		public int nBytes() { return 1+Bytecode.ADDR_SIZE; }
+		public void write(byte[] code) {
+			super.write(code);
+			writeShort(code, addr+1, (short)target);
+		}
+
+		@Override
+		public String toString() {
+			return addr+":CallInstr{" +
 				   "target=" + target +
 				   '}';
 		}
@@ -212,21 +236,26 @@ public class NFABytecodeGenerator extends TreeParser {
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			gen.setTreeNodeStream(nodes);
 			int ttype = lg.getTokenType(r.name);
-			tokenTypeToAddr[ttype] = gen.ip;
 			ruleToAddr.put(r.name, gen.ip);
-			if ( !r.isFragment() ) s0.addrs.add(gen.ip);
+			if ( !r.isFragment() ) {
+				s0.addrs.add(gen.ip);
+				tokenTypeToAddr[ttype] = gen.ip;				
+			}
 			try {
 				gen.block();
 				int ruleTokenType = lg.getTokenType(r.name);
-				gen.emit(new NFABytecodeGenerator.AcceptInstr(ruleTokenType));
+				if ( !r.isFragment() ) {
+					gen.emit(new NFABytecodeGenerator.AcceptInstr(ruleTokenType));
+				}
+				else {
+					gen.emit(new NFABytecodeGenerator.RetInstr());
+				}
 			}
 			catch (Exception e){
 				e.printStackTrace(System.err);
 			}
 		}
 		byte[] code = NFABytecodeGenerator.getByteCode(gen.instrs);
-		System.out.println("all:");
-		System.out.println(Bytecode.disassemble(code));
 		System.out.println("rule addrs="+ruleToAddr);
 
 		NFA nfa = new NFA(code, ruleToAddr);

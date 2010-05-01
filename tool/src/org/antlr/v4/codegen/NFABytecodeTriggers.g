@@ -168,8 +168,8 @@ range
 terminal
     :  ^(STRING_LITERAL .)			{emitString($STRING_LITERAL.token);}
     |	STRING_LITERAL				{emitString($STRING_LITERAL.token);}
-    |	^(TOKEN_REF ARG_ACTION .)	
-    |	^(TOKEN_REF .)				
+    |	^(TOKEN_REF ARG_ACTION .)	{emit(new CallInstr($TOKEN_REF.token));}
+    |	^(TOKEN_REF .)				{emit(new CallInstr($TOKEN_REF.token));}
     |	TOKEN_REF					
     |	^(ROOT terminal)			
     |	^(BANG terminal)			

@@ -185,7 +185,159 @@ workLoop:
 		return 0;
 	}
 
-	public int execThompson(CharStream input, int ip) {
+	public int execThompson(CharStream input) {
+		int ip = 0; // always start at SPLIT instr at address 0
+		int c = input.LA(1);
+		if ( c==Token.EOF ) return Token.EOF;
+
+		List<ThreadState> closure = computeStartState(ip);
+		List<ThreadState> reach = new ArrayList<ThreadState>();
+		int prevAcceptAddr = Integer.MAX_VALUE;
+		int prevAcceptLastCharIndex = -1;
+		int prevAcceptInputMarker = -1;
+		int firstAcceptInputMarker = -1;
+		do { // while more work
+			c = input.LA(1);
+			int i = 0;
+processOneChar:
+			while ( i<closure.size() ) {
+			//for (int i=0; i<closure.size(); i++) {
+				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				ThreadState t = closure.get(i);
+				ip = t.addr;
+				NFAStack context = t.context;
+				int alt = t.alt;
+				trace(ip);
+				short opcode = code[ip];
+				ip++; // move to next instruction or first byte of operand
+				switch (opcode) {
+					case Bytecode.MATCH8 :
+						if ( c == code[ip] ) {
+							addToClosure(reach, ip+1, alt, context);
+						}
+						break;
+					case Bytecode.MATCH16 :
+						if ( c == getShort(code, ip) ) {
+							addToClosure(reach, ip+2, alt, context);
+						}
+						break;
+					case Bytecode.RANGE8 :
+						if ( c>=code[ip] && c<=code[ip+1] ) {
+							addToClosure(reach, ip+2, alt, context);
+						}
+						break;
+					case Bytecode.RANGE16 :
+						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) {
+							addToClosure(reach, ip+4, alt, context);
+						}
+						break;
+					case Bytecode.WILDCARD :
+						if ( c!=Token.EOF ) addToClosure(reach, ip, alt, context);
+						break;
+					case Bytecode.ACCEPT :
+						int tokenLastCharIndex = input.index() - 1;
+						int ttype = getShort(code, ip);
+						System.out.println("ACCEPT "+ ttype +" with last char position "+ tokenLastCharIndex);
+						if ( tokenLastCharIndex > prevAcceptLastCharIndex ) {
+							prevAcceptLastCharIndex = tokenLastCharIndex;
+							// choose longest match so far regardless of rule priority
+							System.out.println("replacing old best match @ "+prevAcceptAddr);
+							prevAcceptAddr = ip-1;
+							prevAcceptInputMarker = input.mark();
+							firstAcceptInputMarker = prevAcceptInputMarker;
+						}
+						else if ( tokenLastCharIndex == prevAcceptLastCharIndex ) {
+							// choose first rule matched if match is of same length
+							if ( ip-1 < prevAcceptAddr ) { // it will see both accepts for ambig rules
+								System.out.println("replacing old best match @ "+prevAcceptAddr);
+								prevAcceptAddr = ip-1;
+								prevAcceptInputMarker = input.mark();
+							}
+						}
+						// if we reach accept state, toss out any addresses in rest
+						// of work list associated with accept's rule; that rule is done
+						int j=i+1;
+						while ( j<closure.size() ) {
+							ThreadState cl = closure.get(j);
+							System.out.println("remaining "+ cl);
+							if ( cl.alt==alt ) closure.remove(j);
+							else j++;
+						}
+						// then, move to next char, looking for longer match
+						// (we continue processing if there are states in reach)
+						break;
+					case Bytecode.JMP : // ignore
+					case Bytecode.SPLIT :
+					case Bytecode.CALL :
+					case Bytecode.RET :
+						break;
+					default :
+						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
+				}
+				i++;
+			}
+			if ( reach.size()>0 ) { // if we reached other states, consume and process them
+				input.consume();
+			}
+			// swap to avoid reallocating space
+			List<ThreadState> tmp = reach;
+			reach = closure;
+			closure = tmp;
+			reach.clear();
+		} while ( closure.size()>0 );
+
+		if ( prevAcceptAddr >= code.length ) return Token.INVALID_TOKEN_TYPE;
+		int ttype = getShort(code, prevAcceptAddr+1);
+		System.out.println("done at index "+input.index());
+		System.out.println("accept marker="+prevAcceptInputMarker);
+		input.rewind(prevAcceptInputMarker); // does nothing if we accept'd at input.index() but might need to rewind
+		input.release(firstAcceptInputMarker); // kill any other markers in stream we made
+		System.out.println("leaving with index "+input.index());
+		return ttype;
+	}
+
+	void addToClosure(List<ThreadState> closure, int ip, int alt, NFAStack context) {
+		ThreadState t = new ThreadState(ip, alt, context);
+		//System.out.println("add to closure "+ip+" "+closure);
+		if ( closure.contains(t) ) return; // TODO: VERY INEFFICIENT! use int[num-states] as set test
+		closure.add(t);
+		short opcode = code[ip];
+		ip++; // move to next instruction or first byte of operand
+		switch (opcode) {
+			case Bytecode.JMP :
+				addToClosure(closure, getShort(code, ip), alt, context);
+				break;
+			case Bytecode.SAVE :
+				int labelIndex = getShort(code, ip);
+				ip += 2;
+				addToClosure(closure, ip, alt, context); // do closure pass SAVE
+				// TODO: impl
+				break;
+			case Bytecode.SPLIT :
+				int nopnds = getShort(code, ip);
+				ip += 2;
+				// add split addresses to work queue in reverse order ('cept first one)
+				for (int i=0; i<nopnds; i++) {
+					addToClosure(closure, getShort(code, ip+i*2), alt, context);
+				}
+				break;
+		}
+	}
+
+	List<ThreadState> computeStartState(int ip) { // assume SPLIT at ip
+		List<ThreadState> closure = new ArrayList<ThreadState>();
+		ip++;
+		int nalts = getShort(code, ip);
+		ip += 2;
+		// add split addresses to work queue in reverse order ('cept first one)
+		for (int i=1; i<=nalts; i++) {
+			addToClosure(closure, getShort(code, ip), i, NFAStack.EMPTY);
+			ip += Bytecode.ADDR_SIZE;
+		}
+		return closure;
+	}
+
+	public int execThompson_no_stack(CharStream input, int ip) {
 		int c = input.LA(1);
 		if ( c==Token.EOF ) return Token.EOF;
 
@@ -195,7 +347,7 @@ workLoop:
 		int prevAcceptLastCharIndex = -1;
 		int prevAcceptInputMarker = -1;
 		int firstAcceptInputMarker = -1;
-		addToClosure(closure, ip);
+		addToClosure_no_stack(closure, ip);
 		do { // while more work
 			c = input.LA(1);
 			int i = 0;
@@ -210,26 +362,26 @@ processOneChar:
 				switch (opcode) {
 					case Bytecode.MATCH8 :
 						if ( c == code[ip] ) {
-							addToClosure(reach, ip+1);
+							addToClosure_no_stack(reach, ip+1);
 						}
 						break;
 					case Bytecode.MATCH16 :
 						if ( c == getShort(code, ip) ) {
-							addToClosure(reach, ip+2);
+							addToClosure_no_stack(reach, ip+2);
 						}
 						break;
 					case Bytecode.RANGE8 :
 						if ( c>=code[ip] && c<=code[ip+1] ) {
-							addToClosure(reach, ip+2);
+							addToClosure_no_stack(reach, ip+2);
 						}
 						break;
 					case Bytecode.RANGE16 :
 						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) {
-							addToClosure(reach, ip+4);
+							addToClosure_no_stack(reach, ip+4);
 						}
 						break;
 					case Bytecode.WILDCARD :
-						if ( c!=Token.EOF ) addToClosure(reach, ip);
+						if ( c!=Token.EOF ) addToClosure_no_stack(reach, ip);
 						break;
 					case Bytecode.ACCEPT :
 						int tokenLastCharIndex = input.index() - 1;
@@ -298,7 +450,7 @@ processOneChar:
 		return ttype;
 	}
 
-	void addToClosure(List<Integer> closure, int ip) {
+	void addToClosure_no_stack(List<Integer> closure, int ip) {
 		//System.out.println("add to closure "+ip+" "+closure);
 		if ( closure.contains(ip) ) return; // TODO: VERY INEFFICIENT! use int[num-states] as set test
 		closure.add(ip);
@@ -306,12 +458,12 @@ processOneChar:
 		ip++; // move to next instruction or first byte of operand
 		switch (opcode) {
 			case Bytecode.JMP :
-				addToClosure(closure, getShort(code, ip));
+				addToClosure_no_stack(closure, getShort(code, ip));
 				break;
 			case Bytecode.SAVE :
 				int labelIndex = getShort(code, ip);
 				ip += 2;
-				addToClosure(closure, ip); // do closure pass SAVE
+				addToClosure_no_stack(closure, ip); // do closure pass SAVE
 				// TODO: impl
 				break;
 			case Bytecode.SPLIT :
@@ -319,7 +471,7 @@ processOneChar:
 				ip += 2;
 				// add split addresses to work queue in reverse order ('cept first one)
 				for (int i=0; i<nopnds; i++) {
-					addToClosure(closure, getShort(code, ip+i*2));
+					addToClosure_no_stack(closure, getShort(code, ip+i*2));
 				}
 				break;
 		}

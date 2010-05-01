@@ -48,7 +48,9 @@ public class Bytecode {
 	public static final short RANGE16	= 7;
 	public static final short WILDCARD	= 8;
 	//public static final short NOT	= 8; ???
-	public static final short SAVE		= 9;
+	public static final short CALL		= 9; // JMP with a push
+	public static final short RET		= 10; // an accept instr for fragment rules
+	public static final short SAVE		= 11;
 
 	/** Used for disassembly; describes instruction set */
 	public static Instruction[] instructions = new Instruction[] {
@@ -61,6 +63,8 @@ public class Bytecode {
 		new Instruction("range8", OperandType.BYTE, OperandType.BYTE),
 		new Instruction("range16", OperandType.CHAR, OperandType.CHAR),
 		new Instruction("wildcard"),
+		new Instruction("call", OperandType.ADDR),
+		new Instruction("ret"),
 		new Instruction("save", OperandType.SHORT),
 	};
 

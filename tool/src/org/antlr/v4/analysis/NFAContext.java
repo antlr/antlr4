@@ -178,13 +178,14 @@ public class NFAContext {
 	}
 
 	public int hashCode() {
-		int h = 0;
-		NFAContext sp = this;
-		while ( sp.parent!=null ) {
-			h += sp.returnState.stateNumber;
-			sp = sp.parent;
-		}
-		return h;
+		return cachedHashCode; // works with tests; don't recompute.
+//		int h = 0;
+//		NFAContext sp = this;
+//		while ( sp.parent!=null ) {
+//			h += sp.returnState.stateNumber;
+//			sp = sp.parent;
+//		}
+//		return h;
 	}
 
 	/** How many rule invocations in this context? I.e., how many
