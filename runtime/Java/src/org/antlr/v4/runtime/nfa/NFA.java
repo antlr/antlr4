@@ -174,9 +174,9 @@ workLoop:
 		do { // while more work
 			c = input.LA(1);
 			int i = 0;
+			boolean accepted = false;
 processOneChar:
 			while ( i<closure.size() ) {
-			//for (int i=0; i<closure.size(); i++) {
 				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				ThreadState t = closure.get(i);
 				ip = t.addr;
@@ -207,9 +207,13 @@ processOneChar:
 						}
 						break;
 					case Bytecode.WILDCARD :
-						if ( c!=Token.EOF ) addToClosure(reach, ip, alt, context);
+						if ( c!=Token.EOF ) {
+							addToClosure(reach, ip, alt, context);
+						}
 						break;
 					case Bytecode.ACCEPT :
+						if ( context != NFAStack.EMPTY ) break; // only do accept for outermost rule 						
+						accepted = true;
 						int tokenLastCharIndex = input.index() - 1;
 						int ttype = getShort(code, ip);
 						System.out.println("ACCEPT "+ ttype +" with last char position "+ tokenLastCharIndex);
@@ -251,9 +255,16 @@ processOneChar:
 				}
 				i++;
 			}
+			// if reach is empty, we didn't match anything but might have accepted
 			if ( reach.size()>0 ) { // if we reached other states, consume and process them
 				input.consume();
 			}
+			else if ( !accepted) {
+				System.err.println("no match for char "+(char)c+" at "+input.index());
+				input.consume();
+			}
+			// else reach.size==0 && matched, don't consume: accepted and
+
 			// swap to avoid reallocating space
 			List<ThreadState> tmp = reach;
 			reach = closure;
@@ -301,13 +312,14 @@ processOneChar:
 				int retaddr = ip+2;
 				addToClosure(closure, target, alt, new NFAStack(context, retaddr));
 				break;
+			case Bytecode.ACCEPT :
+				// accept is just a ret if we have a stack;
+				// i.e., don't stop; someone called us and we need to use their
+				// accept, not this one
 			case Bytecode.RET :
 				if ( context != NFAStack.EMPTY ) {
 					addToClosure(closure, context.returnAddr, alt, context.parent);
 				}
-				break;
-			case Bytecode.ACCEPT :
-				// if stack
 		}
 	}
 

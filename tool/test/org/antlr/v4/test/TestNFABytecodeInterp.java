@@ -63,6 +63,27 @@ public class TestNFABytecodeInterp extends BaseTest {
 		checkMatches(g, "32", expecting);
 	}
 
+	@Test public void testCallNonFragment() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"QID : ID ('.' ID)+ ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : ' ' ;\n");
+		String expecting = "ID, EOF";
+		checkMatches(g, "z", expecting);
+		expecting = "ID, WS, QID, WS, ID, WS, QID, WS, ID, EOF";
+		checkMatches(g, "z a.b x c.d.e y", expecting);
+	}
+
+	@Test public void testRecursiveCall() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" + //TODO 
+			"I : D+ ;\n" +
+			"fragment D : '0'..'9'+ ;\n");
+		String expecting = "I, EOF";
+		checkMatches(g, "32", expecting);
+	}
+
 	public void _template() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"\n");
