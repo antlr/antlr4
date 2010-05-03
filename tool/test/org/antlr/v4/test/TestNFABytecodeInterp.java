@@ -4,6 +4,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.nfa.NFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
@@ -11,6 +12,7 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** */
@@ -118,6 +120,44 @@ public class TestNFABytecodeInterp extends BaseTest {
 		checkMatches(g, "1.", "NUM, DOT, EOF");
 	}
 
+	@Test public void testLabeledChar() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='a' ;\n");
+		checkMatches(g, "a", "A, EOF", "[[@-1,0:0='a',<0>,1:0]]");
+	}
+
+	@Test public void testLabeledString() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='abc' ;\n");
+		checkMatches(g, "abc", "A, EOF", "[[@-1,0:2='abc',<0>,1:0]]");
+	}
+
+	@Test public void testLabeledToken() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"I : d=D ;\n" +
+			"fragment D : '0'..'9'+ ;\n");
+		checkMatches(g, "901", "I, EOF", "[[@-1,0:2='901',<0>,1:0]]");
+	}
+
+	@Test public void testLabelInLoopIsLastElement() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"I : d=D+ ;\n" +
+			"fragment D : '0'..'9' ;\n");
+		checkMatches(g, "901", "I, EOF", "[[@-1,2:2='1',<0>,1:2]]");
+	}
+
+	@Test public void testLabelIndexes() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='a' ;\n" +
+			"B : a='b' b='c' ;\n");
+		checkMatches(g, "bc", "B, EOF", "[[@-1,0:-1='',<0>,1:0], [@-1,0:0='b',<0>,1:0], [@-1,1:1='c',<0>,1:1]]");
+	}
+
 	public void _template() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"\n");
@@ -126,6 +166,12 @@ public class TestNFABytecodeInterp extends BaseTest {
 	}
 
 	void checkMatches(LexerGrammar g, String input, String expecting) {
+		checkMatches(g, input, expecting, null);
+	}
+	
+	void checkMatches(LexerGrammar g, String input, String expecting,
+					  String expectingTokens)
+	{
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 			System.out.println(g.ast.toStringTree());
 			Tool antlr = new Tool();
@@ -138,22 +184,27 @@ public class TestNFABytecodeInterp extends BaseTest {
 			}
 		}
 
-		List<Integer> expectingTokens = new ArrayList<Integer>();
+		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
 		if ( expecting!=null && !expecting.trim().equals("") ) {
 			for (String tname : expecting.replace(" ", "").split(",")) {
 				int ttype = g.getTokenType(tname);
-				expectingTokens.add(ttype);
+				expectingTokenTypes.add(ttype);
 			}
 		}
 
 		NFA nfa = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
 		ANTLRStringStream in = new ANTLRStringStream(input);
-		List<Integer> tokens = new ArrayList<Integer>();
+		List<Integer> tokenTypes = new ArrayList<Integer>();
+		CommonToken[] tokens = new CommonToken[nfa.labels.length];
 		int ttype = 0;
 		do {
-			ttype = nfa.execThompson(in);
-			tokens.add(ttype);
+			ttype = nfa.execThompson(in, 0, true, tokens);
+			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
-		assertEquals(expectingTokens, tokens);
+		assertEquals(expectingTokenTypes, tokenTypes);
+
+		if ( expectingTokens!=null ) {
+			assertEquals(expectingTokens, Arrays.toString(tokens));
+		}
 	}
 }

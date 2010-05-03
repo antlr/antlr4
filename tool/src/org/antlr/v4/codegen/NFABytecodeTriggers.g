@@ -8,11 +8,19 @@ options {
 
 @header {
 package org.antlr.v4.codegen;
+import org.antlr.v4.codegen.nfa.*;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.GrammarASTWithOptions;
+import org.antlr.v4.tool.LexerGrammar;
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
+}
+
+@members {
+    public NFABytecodeTriggers(LexerGrammar lg, TreeNodeStream input) {
+        super(lg, input);
+    }
 }
 
 /*
@@ -69,14 +77,14 @@ element
 	:	labeledElement				
 	|	atom						
 	|	ebnf						
-	|   ACTION						
-	|   SEMPRED						
-	|	GATED_SEMPRED				
+	|   ACTION			{emit(new ActionInstr($ACTION.token));}			
+	|   SEMPRED			{emit(new SemPredInstr($SEMPRED.token));}		
+	|	GATED_SEMPRED	{emit(new SemPredInstr($GATED_SEMPRED.token));}
 	|	treeSpec					
 	;
 	
 labeledElement
-	:	^(ASSIGN ID atom)			
+	:	^(ASSIGN ID {emit(new LabelInstr($ID.token));} atom {emit(new SaveInstr($ID.token));} )
 	|	^(ASSIGN ID block)			
 	|	^(PLUS_ASSIGN ID atom)		
 	|	^(PLUS_ASSIGN ID block)		

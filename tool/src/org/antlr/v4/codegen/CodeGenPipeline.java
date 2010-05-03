@@ -24,7 +24,8 @@ public class CodeGenPipeline {
 			//ANTLRStringStream input = new ANTLRStringStream("abc32ab");
 			int ttype = 0;
 			while ( ttype!= Token.EOF ) {
-				ttype = nfa.execThompson(input); System.out.println("ttype="+ttype);
+				ttype = nfa.execThompson(input);
+				System.out.println("ttype="+ttype);
 			}
 		}
 	}

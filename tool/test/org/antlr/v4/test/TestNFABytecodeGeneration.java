@@ -80,6 +80,71 @@ public class TestNFABytecodeGeneration extends BaseTest {
 		checkBytecode(g, expecting);
 	}
 
+	@Test public void testLabeledChar() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='a' ;\n");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tlabel         0\n" +
+			"0008:\tmatch8        'a'\n" +
+			"0010:\tsave          0\n" +
+			"0013:\taccept        4\n";
+		checkBytecode(g, expecting);
+	}
+
+	@Test public void testLabeledString() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='aa' ;\n");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tlabel         0\n" +
+			"0008:\tmatch8        'a'\n" +
+			"0010:\tmatch8        'a'\n" +
+			"0012:\tsave          0\n" +
+			"0015:\taccept        4\n";
+		checkBytecode(g, expecting);
+	}
+
+	@Test public void testLabeledToken() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"I : d=D ;\n" +
+			"fragment D : '0'..'9'+ ;\n");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tlabel         0\n" +
+			"0008:\tcall          17\n" +
+			"0011:\tsave          0\n" +
+			"0014:\taccept        4\n" +
+			"0017:\trange8        '0', '9'\n" +
+			"0020:\tsplit         17, 27\n" +
+			"0027:\tret             \n";
+		checkBytecode(g, expecting);
+	}
+
+	@Test public void testLabelIndexes() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='a' ;\n" +
+			"B : a='b' b='c' ;\n");
+		String expecting =
+			"0000:\tsplit         7, 18\n" +
+			"0007:\tlabel         0\n" +
+			"0010:\tmatch8        'a'\n" +
+			"0012:\tsave          0\n" +
+			"0015:\taccept        4\n" +
+			"0018:\tlabel         1\n" +
+			"0021:\tmatch8        'b'\n" +
+			"0023:\tsave          1\n" +
+			"0026:\tlabel         2\n" +
+			"0029:\tmatch8        'c'\n" +
+			"0031:\tsave          2\n" +
+			"0034:\taccept        5\n";
+		checkBytecode(g, expecting);
+	}
+
 	public void _template() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"\n");

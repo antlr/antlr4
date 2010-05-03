@@ -50,7 +50,10 @@ public class Bytecode {
 	//public static final short NOT	= 8; ???
 	public static final short CALL		= 9; // JMP with a push
 	public static final short RET		= 10; // an accept instr for fragment rules
-	public static final short SAVE		= 11;
+	public static final short LABEL		= 11;
+	public static final short SAVE		= 12;
+	public static final short SEMPRED	= 13;
+	public static final short ACTION	= 14;
 
 	/** Used for disassembly; describes instruction set */
 	public static Instruction[] instructions = new Instruction[] {
@@ -65,7 +68,10 @@ public class Bytecode {
 		new Instruction("wildcard"),
 		new Instruction("call", OperandType.ADDR),
 		new Instruction("ret"),
+		new Instruction("label", OperandType.SHORT),
 		new Instruction("save", OperandType.SHORT),
+		new Instruction("sempred", OperandType.SHORT),
+		new Instruction("action", OperandType.SHORT),
 	};
 
 	public static String disassemble(byte[] code, int start) {
