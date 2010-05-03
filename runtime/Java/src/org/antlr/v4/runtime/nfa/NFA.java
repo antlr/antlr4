@@ -188,6 +188,7 @@ processOneChar:
 			case Bytecode.LABEL :
 			case Bytecode.SAVE :
 			case Bytecode.ACTION :
+				// see through them for closure ops
 				int labelIndex = getShort(code, ip);
 				ip += 2;
 				addToClosure(closure, ip, alt, context); // do closure past SAVE
@@ -213,6 +214,10 @@ processOneChar:
 				if ( context != NFAStack.EMPTY ) {
 					addToClosure(closure, context.returnAddr, alt, context.parent);
 				}
+				break;
+			case Bytecode.SEMPRED :
+				// TODO: add next instruction only if sempred succeeds
+				break;
 		}
 	}
 
