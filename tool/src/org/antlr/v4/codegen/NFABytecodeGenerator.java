@@ -5,6 +5,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.nfa.*;
+import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.nfa.Bytecode;
@@ -27,13 +28,21 @@ public class NFABytecodeGenerator extends TreeParser {
 	Map<String, Integer> ruleToAddr = new HashMap<String, Integer>();
 	int[] tokenTypeToAddr;
 
-	Map<Rule, Map<String, Integer>> ruleLabels = new HashMap<Rule, Map<String, Integer>>();
-	Map<Rule, Map<Token, Integer>> ruleActions = new HashMap<Rule, Map<Token, Integer>>();
-	Map<Rule, Map<Token, Integer>> ruleSempreds = new HashMap<Rule, Map<Token, Integer>>();
+	DoubleKeyMap<Rule, String, Integer> ruleLabels = new DoubleKeyMap<Rule, String, Integer>();
+	DoubleKeyMap<Rule, Token, Integer> ruleActions = new DoubleKeyMap<Rule, Token, Integer>();
+	DoubleKeyMap<Rule, Token, Integer> ruleSempreds = new DoubleKeyMap<Rule, Token, Integer>();
 
 	public Rule currentRule;
 
-	public int labelIndex = 0;
+	public int labelIndex = 0; // first time we ask for labels we index
+
+//	public abstract class LabelMaker<Key,Label> {
+//		Map<Key,Label> labels = new HashMap<Key,Label>();
+//		public LabelMaker(Collection<Key> keys) {
+//			for (Key k : keys) labels.put(k, computeLabel(k));
+//		}
+//		public abstract Label computeLabel(Key k);
+//	}
 
 	public NFABytecodeGenerator(TreeNodeStream input, RecognizerSharedState state) {
 		super(input, state);
@@ -49,36 +58,22 @@ public class NFABytecodeGenerator extends TreeParser {
 
 	// indexed from 0 per rule
 	public int getActionIndex(Rule r, Token actionToken) {
-		Map<Token, Integer> actions = ruleActions.get(r);
-		if ( actions==null ) {
-			actions = new HashMap<Token, Integer>();
-			ruleActions.put(r, actions);
-		}
-		if ( actions.get(actionToken)!=null ) {
-			return actions.get(actionToken);
-		}
-		else {
-			int i = actions.size();
-			actions.put(actionToken, i);
-			return i;
-		}
+		Integer I = ruleActions.get(r, actionToken);
+		if ( I!=null ) return I; // already got its label
+		Map<Token, Integer> labels = ruleActions.get(r);
+		int i = labels.size();
+		ruleActions.put(r, actionToken, i);
+		return i;
 	}
 
 	// indexed from 0 per rule
 	public int getSempredIndex(Rule r, Token actionToken) {
-		Map<Token, Integer> actions = ruleSempreds.get(r);
-		if ( actions==null ) {
-			actions = new HashMap<Token, Integer>();
-			ruleSempreds.put(r, actions);
-		}
-		if ( actions.get(actionToken)!=null ) {
-			return actions.get(actionToken);
-		}
-		else {
-			int i = actions.size();
-			actions.put(actionToken, i);
-			return i;
-		}
+		Integer I = ruleSempreds.get(r, actionToken);
+		if ( I!=null ) return I; // already got its label
+		Map<Token, Integer> labels = ruleSempreds.get(r);
+		int i = labels.size();
+		ruleSempreds.put(r, actionToken, i);
+		return i;
 	}
 
 	/** labels in all rules share single label space
@@ -86,18 +81,11 @@ public class NFABytecodeGenerator extends TreeParser {
 	 *  to an index in an action.
 	 */
 	public int getLabelIndex(Rule r, String labelName) {
-		Map<String, Integer> labels = ruleLabels.get(r);
-		if ( labels==null ) {
-			labels = new HashMap<String, Integer>();
-			ruleLabels.put(r, labels);
-		}
-		if ( labels.get(labelName)!=null ) {
-			return labels.get(labelName);
-		}
-		else {
-			labels.put(labelName, labelIndex);
-			return labelIndex++;
-		}
+		Integer I = ruleLabels.get(r, labelName);
+		if ( I!=null ) return I; // already got its label
+		int i = labelIndex++;
+		ruleLabels.put(r, labelName, i);
+		return i;
 	}
 
 	public void emitString(Token t) {

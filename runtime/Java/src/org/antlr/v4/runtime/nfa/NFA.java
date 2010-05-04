@@ -70,7 +70,7 @@ processOneChar:
 				ip = t.addr;
 				NFAStack context = t.context;
 				int alt = t.alt;
-				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				trace(ip);
 				short opcode = code[ip];
 				ip++; // move to next instruction or first byte of operand
@@ -284,7 +284,7 @@ processOneChar:
 processOneChar:
 			while ( i<closure.size() ) {
 			//for (int i=0; i<closure.size(); i++) {
-				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				ip = closure.get(i); 
 				trace(ip);
 				short opcode = code[ip];
