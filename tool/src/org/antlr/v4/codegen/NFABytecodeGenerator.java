@@ -26,13 +26,16 @@ public class NFABytecodeGenerator extends TreeParser {
 	public int ip = 0; // where to write next
 	Map<String, Integer> ruleToAddr = new HashMap<String, Integer>();
 	int[] tokenTypeToAddr;
-	List<String> labels = new ArrayList<String>();
 
-	public NFABytecodeGenerator(LexerGrammar lg, TreeNodeStream input) {
-		super(input);
-		this.lg = lg;
-		tokenTypeToAddr = new int[lg.getMaxTokenType()+1];
-	}
+	Map<Rule, Map<String, Integer>> labels = new HashMap<Rule, Map<String, Integer>>();
+
+	public Rule currentRule;
+
+	/** labels in all rules share single label space
+	 *  but we still track labels per rule so we can translate $label
+	 *  to an index in an action.
+	 */
+	public int numLabels = 0;
 
 	public NFABytecodeGenerator(TreeNodeStream input, RecognizerSharedState state) {
 		super(input, state);
@@ -40,6 +43,7 @@ public class NFABytecodeGenerator extends TreeParser {
 
 	public void emit(Instr I) {
 		I.addr = ip;
+		I.rule = currentRule;
 		ip += I.nBytes();
 		instrs.add(I);
 	}
@@ -55,6 +59,7 @@ public class NFABytecodeGenerator extends TreeParser {
 		Instr last = instrs.get(instrs.size() - 1);
 		int size = last.addr + last.nBytes();
 		byte[] code = new byte[size];
+
 		// resolve CALL instruction targets and index labels before generating code
 		for (Instr I : instrs) {
 			if ( I instanceof CallInstr ) {
@@ -64,12 +69,24 @@ public class NFABytecodeGenerator extends TreeParser {
 			}
 			else if ( I instanceof LabelInstr ) {
 				LabelInstr L = (LabelInstr)I;
-				L.labelIndex = labels.size();
-				labels.add(L.token.getText());
+				Map<String, Integer> ruleLabels = labels.get(I.rule);
+				if ( ruleLabels==null ) {
+					ruleLabels = new HashMap<String, Integer>();
+					labels.put(I.rule, ruleLabels);
+				}
+				String labelName = L.token.getText();
+				if ( ruleLabels.get(labelName)!=null ) {
+					L.labelIndex = ruleLabels.get(labelName);
+				}
+				else {
+					ruleLabels.put(labelName, numLabels);
+					L.labelIndex = numLabels++;
+				}
 			}
 			else if ( I instanceof SaveInstr ) {
 				SaveInstr S = (SaveInstr)I;
-				S.labelIndex = labels.size()-1;
+				Map<String, Integer> ruleLabels = labels.get(I.rule);
+				S.labelIndex = ruleLabels.get(S.token.getText());
 			}
 		}
 		for (Instr I : instrs) {
@@ -80,7 +97,9 @@ public class NFABytecodeGenerator extends TreeParser {
 
 	public static NFA getBytecode(LexerGrammar lg, String modeName) {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		NFABytecodeTriggers gen = new NFABytecodeTriggers(lg, null);
+		NFABytecodeTriggers gen = new NFABytecodeTriggers(null);
+		gen.lg = lg;
+		gen.tokenTypeToAddr = new int[lg.getMaxTokenType()+1];
 
 		// add split for s0 to hook up rules (fill in operands as we gen rules)
 		int numRules = lg.modes.get(modeName).size();
@@ -89,7 +108,9 @@ public class NFABytecodeGenerator extends TreeParser {
 		SplitInstr s0 = new SplitInstr(numRules - numFragmentRules);
 		gen.emit(s0);
 
+
 		for (Rule r : lg.modes.get(modeName)) { // for each rule in mode
+			gen.currentRule = r;
 			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			gen.setTreeNodeStream(nodes);
@@ -100,7 +121,7 @@ public class NFABytecodeGenerator extends TreeParser {
 				gen.tokenTypeToAddr[ttype] = gen.ip;
 			}
 			try {
-				((NFABytecodeTriggers)gen).block();
+				gen.block(); // GEN Instr OBJECTS
 				int ruleTokenType = lg.getTokenType(r.name);
 				if ( !r.isFragment() ) {
 					gen.emit(new AcceptInstr(ruleTokenType));
@@ -117,7 +138,7 @@ public class NFABytecodeGenerator extends TreeParser {
 		System.out.println(Bytecode.disassemble(code));
 		System.out.println("rule addrs="+gen.ruleToAddr);
 
-		return new NFA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.labels.toArray(new String[0]));
+		return new NFA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.numLabels);
 	}
 
 	/** Write value at index into a byte array highest to lowest byte,

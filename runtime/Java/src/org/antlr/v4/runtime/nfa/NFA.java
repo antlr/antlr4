@@ -13,22 +13,20 @@ public class NFA {
 	public byte[] code;
 	public Map<String, Integer> ruleToAddr;
 	public int[] tokenTypeToAddr;
-	public String[] labels; // TODO: need for actions.  What is $label?
+	public CommonToken[] labelValues;
 
-	public NFA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr,
-			   String[] labels)
-	{
+	public NFA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels) {
 		this.code = code;
 		this.ruleToAddr = ruleToAddr;
 		this.tokenTypeToAddr = tokenTypeToAddr;
-		this.labels = labels;
+		labelValues = new CommonToken[nLabels];
 	}
 
 	public int execThompson(CharStream input) {
-		return execThompson(input, 0, false, new CommonToken[labels.length]);
+		return execThompson(input, 0, false);
 	}
 
-	public int execThompson(CharStream input, int ip, boolean doActions, CommonToken[] labelValues) {
+	public int execThompson(CharStream input, int ip, boolean doActions) {
 		int c = input.LA(1);
 		if ( c==Token.EOF ) return Token.EOF;
 
@@ -37,7 +35,6 @@ public class NFA {
 		ThreadState prevAccept = new ThreadState(Integer.MAX_VALUE, -1, NFAStack.EMPTY);
 		ThreadState firstAccept = null;
 
-//		int maxAlts = closure.size(); // >= number of alts; if no decision, this is 1
 		int firstCharIndex = input.index(); // use when creating Token
 
 		do { // while more work
@@ -83,7 +80,6 @@ processOneChar:
 					case Bytecode.LABEL :
 						if ( doActions ) {
 							int labelIndex = getShort(code, ip);
-							System.out.println("label "+labels[labelIndex]);
 							labelValues[labelIndex] =
 								new CommonToken(input, 0, 0, input.index(), -1);
 						}
@@ -91,7 +87,6 @@ processOneChar:
 					case Bytecode.SAVE :
 						if ( doActions ) {
 							int labelIndex = getShort(code, ip);
-							System.out.println("save "+labels[labelIndex]);
 							labelValues[labelIndex].setStopIndex(input.index()-1);
 						}
 						break;

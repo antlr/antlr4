@@ -4,7 +4,6 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.NFABytecodeGenerator;
-import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.nfa.NFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
@@ -195,16 +194,15 @@ public class TestNFABytecodeInterp extends BaseTest {
 		NFA nfa = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
-		CommonToken[] tokens = new CommonToken[nfa.labels.length];
 		int ttype = 0;
 		do {
-			ttype = nfa.execThompson(in, 0, true, tokens);
+			ttype = nfa.execThompson(in, 0, true);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
 		assertEquals(expectingTokenTypes, tokenTypes);
 
 		if ( expectingTokens!=null ) {
-			assertEquals(expectingTokens, Arrays.toString(tokens));
+			assertEquals(expectingTokens, Arrays.toString(nfa.labelValues));
 		}
 	}
 }

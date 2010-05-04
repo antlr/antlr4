@@ -1,8 +1,11 @@
 package org.antlr.v4.codegen.nfa;
 
+import org.antlr.v4.tool.Rule;
+
 /** */
 public abstract class Instr {
 	public int addr;
+	public Rule rule;
 	public abstract short opcode();
 	public abstract int nBytes();
 	public int charSize(int a, int b) { return Math.max(charSize(a), charSize(b)); }

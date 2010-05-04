@@ -125,6 +125,7 @@ public class TestNFABytecodeGeneration extends BaseTest {
 	}
 
 	@Test public void testLabelIndexes() throws Exception {
+		// labels indexed from 0 in each rule
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n" +
 			"A : a='a' ;\n" +
@@ -142,6 +143,23 @@ public class TestNFABytecodeGeneration extends BaseTest {
 			"0029:\tmatch8        'c'\n" +
 			"0031:\tsave          2\n" +
 			"0034:\taccept        5\n";
+		checkBytecode(g, expecting);
+	}
+
+	@Test public void testLabelReuseWithinRule() throws Exception {
+		// labels indexed from 0 in each rule
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : a='b' a='c' ;\n");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tlabel         0\n" +
+			"0008:\tmatch8        'b'\n" +
+			"0010:\tsave          0\n" +
+			"0013:\tlabel         0\n" +
+			"0016:\tmatch8        'c'\n" +
+			"0018:\tsave          0\n" +
+			"0021:\taccept        4\n";
 		checkBytecode(g, expecting);
 	}
 

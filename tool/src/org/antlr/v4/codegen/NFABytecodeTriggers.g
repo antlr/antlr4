@@ -17,22 +17,6 @@ import java.util.Map;
 import java.util.HashMap;
 }
 
-@members {
-    public NFABytecodeTriggers(LexerGrammar lg, TreeNodeStream input) {
-        super(lg, input);
-    }
-}
-
-/*
-e1 | e2 | e3:
-	split 3, L1, L2, L3
-L1:	e1
-	jmp END
-L2:	e2
-	jmp END
-L3:	e3
-END:
-*/
 block
     :	^(	BLOCK (^(OPTIONS .+))?
     		{
