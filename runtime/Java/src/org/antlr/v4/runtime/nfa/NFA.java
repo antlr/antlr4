@@ -5,6 +5,7 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.CommonToken;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class NFA {
 	public Map<String, Integer> ruleToAddr;
 	public int[] tokenTypeToAddr;
 	public CommonToken[] labelValues;
+	public int nLabels;
 
 	/** If we hit an action, we'll have to rewind and do the winning rule again */
 	boolean bypassedAction;
@@ -23,17 +25,20 @@ public class NFA {
 		this.code = code;
 		this.ruleToAddr = ruleToAddr;
 		this.tokenTypeToAddr = tokenTypeToAddr;
+		this.nLabels = nLabels;
 		labelValues = new CommonToken[nLabels];
 	}
 
 	public int execThompson(CharStream input) {
 		int m = input.mark();
+		Arrays.fill(labelValues, null);
 		int ttype = execThompson(input, 0, false);
-		System.out.println("ttype="+ttype);
+		System.out.println("first attempt ttype="+ttype);
 		if ( bypassedAction ) {
 			input.rewind(m);
 			System.out.println("Bypassed action; rewinding to "+input.index()+" doing with feeling");
 			bypassedAction = false;
+			Arrays.fill(labelValues, null);
 			int ttype2 = execThompson(input, tokenTypeToAddr[ttype], true);
 			if ( ttype!=ttype2 ) {
 				System.err.println("eh? token diff with action(s)");
@@ -96,24 +101,20 @@ processOneChar:
 						}
 						break;
 					case Bytecode.LABEL :
-						if ( doActions ) {
-							int labelIndex = getShort(code, ip);
-							labelValues[labelIndex] =
-								new CommonToken(input, 0, 0, input.index(), -1);
-						}
+						int labelIndex = getShort(code, ip);
+						labelValues[labelIndex] =
+							new CommonToken(input, 0, 0, input.index(), -1);
 						break;
 					case Bytecode.SAVE :
-						if ( doActions ) {
-							int labelIndex = getShort(code, ip);
-							labelValues[labelIndex].setStopIndex(input.index()-1);
-						}
+						labelIndex = getShort(code, ip);
+						labelValues[labelIndex].setStopIndex(input.index()-1);
 						break;
 					case Bytecode.ACTION :
 						bypassedAction = true;
 						if ( doActions ) {
 							int ruleIndex = getShort(code, ip);
 							int actionIndex = getShort(code, ip+2);
-							System.out.println("action "+ ruleIndex+", "+actionIndex);
+							action(ruleIndex, actionIndex);
 						}
 						break;
 					case Bytecode.ACCEPT :
@@ -154,6 +155,7 @@ processOneChar:
 					case Bytecode.SPLIT :
 					case Bytecode.CALL :
 					case Bytecode.RET :
+					case Bytecode.SEMPRED :
 						break;
 					default :
 						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
@@ -231,7 +233,13 @@ processOneChar:
 				}
 				break;
 			case Bytecode.SEMPRED :
-				// TODO: add next instruction only if sempred succeeds
+				// add next instruction only if sempred succeeds
+				int ruleIndex = getShort(code, ip);
+				int actionIndex = getShort(code, ip+2);
+				System.out.println("eval sempred "+ ruleIndex+", "+actionIndex);
+				if ( sempred(ruleIndex, actionIndex) ) {
+					addToClosure(closure, ip+4, alt, context);
+				}
 				break;
 		}
 	}
@@ -257,7 +265,7 @@ processOneChar:
 
 	// ---------------------------------------------------------------------
 
-	// this stuff below can't do SAVE nor CALL/RET but faster.
+	// this stuff below can't do SAVE nor CALL/RET but faster.  (nor preds)
 	
 	public int execThompson_no_stack(CharStream input, int ip) {
 		int c = input.LA(1);
@@ -406,6 +414,15 @@ processOneChar:
 
 	public static int getShort(byte[] memory, int index) {
 		return (memory[index]&0xFF) <<(8*1) | (memory[index+1]&0xFF); // prevent sign extension with mask
+	}
+
+	// subclass needs to override these if there are sempreds or actions in lexer rules
+
+	public boolean sempred(int ruleIndex, int actionIndex) {
+		return true;
+	}
+
+	public void action(int ruleIndex, int actionIndex) {
 	}
 
 /*

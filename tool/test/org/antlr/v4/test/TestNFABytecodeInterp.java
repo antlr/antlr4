@@ -123,14 +123,14 @@ public class TestNFABytecodeInterp extends BaseTest {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n" +
 			"A : a='a' ;\n");
-		checkMatches(g, "a", "A, EOF", "[[@-1,0:0='a',<0>,1:0]]");
+		checkLabels(g, "a", "A", "[[@-1,0:0='a',<0>,1:0]]");
 	}
 
 	@Test public void testLabeledString() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n" +
 			"A : a='abc' ;\n");
-		checkMatches(g, "abc", "A, EOF", "[[@-1,0:2='abc',<0>,1:0]]");
+		checkLabels(g, "abc", "A", "[[@-1,0:2='abc',<0>,1:0]]");
 	}
 
 	@Test public void testLabeledToken() throws Exception {
@@ -138,7 +138,7 @@ public class TestNFABytecodeInterp extends BaseTest {
 			"lexer grammar L;\n" +
 			"I : d=D ;\n" +
 			"fragment D : '0'..'9'+ ;\n");
-		checkMatches(g, "901", "I, EOF", "[[@-1,0:2='901',<0>,1:0]]");
+		checkLabels(g, "901", "I", "[[@-1,0:2='901',<0>,1:0]]");
 	}
 
 	@Test public void testLabelInLoopIsLastElement() throws Exception {
@@ -146,7 +146,7 @@ public class TestNFABytecodeInterp extends BaseTest {
 			"lexer grammar L;\n" +
 			"I : d=D+ ;\n" +
 			"fragment D : '0'..'9' ;\n");
-		checkMatches(g, "901", "I, EOF", "[[@-1,2:2='1',<0>,1:2]]");
+		checkLabels(g, "901", "I", "[[@-1,2:2='1',<0>,1:2]]");
 	}
 
 	@Test public void testLabelIndexes() throws Exception {
@@ -154,7 +154,7 @@ public class TestNFABytecodeInterp extends BaseTest {
 			"lexer grammar L;\n" +
 			"A : a='a' ;\n" +
 			"B : a='b' b='c' ;\n");
-		checkMatches(g, "bc", "B, EOF", "[[@-1,0:-1='',<0>,1:0], [@-1,0:0='b',<0>,1:0], [@-1,1:1='c',<0>,1:1]]");
+		checkLabels(g, "bc", "B", "[[@-1,0:-1='',<0>,1:0], [@-1,0:0='b',<0>,1:0], [@-1,1:1='c',<0>,1:1]]");
 	}
 
 	@Test public void testAction() throws Exception {
@@ -162,7 +162,15 @@ public class TestNFABytecodeInterp extends BaseTest {
 			"lexer grammar L;\n" +
 			"I : {a1} d=D {a2} ;\n" +
 			"fragment D : ('0'..'9' {a3})+ ;\n");
-		checkMatches(g, "901", "I, EOF", "[[@-1,0:2='901',<0>,1:0]]");
+		checkLabels(g, "901", "I", "[[@-1,0:2='901',<0>,1:0]]");
+	}
+
+	@Test public void testSempred() throws Exception {
+		// not actually evaluating preds since we're interpreting; assumes true.
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : {true}? 'a' | 'b' {true}? ;\n");
+		checkMatches(g, "ab", "A, A, EOF");
 	}
 
 
@@ -174,12 +182,6 @@ public class TestNFABytecodeInterp extends BaseTest {
 	}
 
 	void checkMatches(LexerGrammar g, String input, String expecting) {
-		checkMatches(g, input, expecting, null);
-	}
-	
-	void checkMatches(LexerGrammar g, String input, String expecting,
-					  String expectingTokens)
-	{
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 			System.out.println(g.ast.toStringTree());
 			Tool antlr = new Tool();
@@ -208,6 +210,37 @@ public class TestNFABytecodeInterp extends BaseTest {
 			ttype = nfa.execThompson(in);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
+		assertEquals(expectingTokenTypes, tokenTypes);
+	}
+
+	void checkLabels(LexerGrammar g, String input, String expecting,
+					  String expectingTokens)
+	{
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			System.out.println(g.ast.toStringTree());
+			Tool antlr = new Tool();
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
+			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+				for (Grammar imp : g.getImportedGrammars()) {
+					antlr.process(imp);
+				}
+			}
+		}
+
+		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
+		if ( expecting!=null && !expecting.trim().equals("") ) {
+			for (String tname : expecting.replace(" ", "").split(",")) {
+				int ttype = g.getTokenType(tname);
+				expectingTokenTypes.add(ttype);
+			}
+		}
+
+		NFA nfa = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		ANTLRStringStream in = new ANTLRStringStream(input);
+		List<Integer> tokenTypes = new ArrayList<Integer>();
+		int ttype = nfa.execThompson(in);
+		tokenTypes.add(ttype);
 		assertEquals(expectingTokenTypes, tokenTypes);
 
 		if ( expectingTokens!=null ) {

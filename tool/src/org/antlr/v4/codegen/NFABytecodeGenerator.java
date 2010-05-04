@@ -28,8 +28,8 @@ public class NFABytecodeGenerator extends TreeParser {
 	int[] tokenTypeToAddr;
 
 	Map<Rule, Map<String, Integer>> ruleLabels = new HashMap<Rule, Map<String, Integer>>();
-
 	Map<Rule, Map<Token, Integer>> ruleActions = new HashMap<Rule, Map<Token, Integer>>();
+	Map<Rule, Map<Token, Integer>> ruleSempreds = new HashMap<Rule, Map<Token, Integer>>();
 
 	public Rule currentRule;
 
@@ -53,6 +53,23 @@ public class NFABytecodeGenerator extends TreeParser {
 		if ( actions==null ) {
 			actions = new HashMap<Token, Integer>();
 			ruleActions.put(r, actions);
+		}
+		if ( actions.get(actionToken)!=null ) {
+			return actions.get(actionToken);
+		}
+		else {
+			int i = actions.size();
+			actions.put(actionToken, i);
+			return i;
+		}
+	}
+
+	// indexed from 0 per rule
+	public int getSempredIndex(Rule r, Token actionToken) {
+		Map<Token, Integer> actions = ruleSempreds.get(r);
+		if ( actions==null ) {
+			actions = new HashMap<Token, Integer>();
+			ruleSempreds.put(r, actions);
 		}
 		if ( actions.get(actionToken)!=null ) {
 			return actions.get(actionToken);
@@ -95,37 +112,13 @@ public class NFABytecodeGenerator extends TreeParser {
 		int size = last.addr + last.nBytes();
 		byte[] code = new byte[size];
 
-		// resolve CALL instruction targets and index labels before generating code
-		// TODO: move this code to Instr objects? Need code gen pointer then.
+		// resolve CALL instruction targets before generating code
 		for (Instr I : instrs) {
 			if ( I instanceof CallInstr ) {
 				CallInstr C = (CallInstr) I;
 				String ruleName = C.token.getText();
 				C.target = ruleToAddr.get(ruleName);
 			}
-/*
-			else if ( I instanceof LabelInstr ) {
-				LabelInstr L = (LabelInstr)I;
-				Map<String, Integer> ruleLabels = labels.get(I.rule);
-				if ( ruleLabels==null ) {
-					ruleLabels = new HashMap<String, Integer>();
-					labels.put(I.rule, ruleLabels);
-				}
-				String labelName = L.token.getText();
-				if ( ruleLabels.get(labelName)!=null ) {
-					L.labelIndex = ruleLabels.get(labelName);
-				}
-				else {
-					ruleLabels.put(labelName, labelIndex);
-					L.labelIndex = labelIndex++;
-				}
-			}
-			else if ( I instanceof SaveInstr ) {
-				SaveInstr S = (SaveInstr)I;
-				Map<String, Integer> ruleLabels = labels.get(I.rule);
-				S.labelIndex = ruleLabels.get(S.token.getText());
-			}
-			 */
 		}
 		for (Instr I : instrs) {
 			I.write(code);

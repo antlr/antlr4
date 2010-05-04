@@ -12,10 +12,11 @@ public class SemPredInstr extends Instr {
 		this.token = token;
 	}
 	public short opcode() { return Bytecode.SEMPRED; };
-	public int nBytes() { return 1+2; }
+	public int nBytes() { return 1+2*2; }
 	public void write(byte[] code) {
 		super.write(code);
-		NFABytecodeGenerator.writeShort(code, addr+1, (short) predIndex);
+		NFABytecodeGenerator.writeShort(code, addr+1, (short)rule.index);
+		NFABytecodeGenerator.writeShort(code, addr+1+2, (short)gen.getSempredIndex(rule, token));
 	}
 	public String toString() { return addr+":SemPredInstr "+ predIndex; }
 }

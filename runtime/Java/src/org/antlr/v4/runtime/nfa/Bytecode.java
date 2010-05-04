@@ -70,7 +70,7 @@ public class Bytecode {
 		new Instruction("ret"),
 		new Instruction("label", OperandType.SHORT),
 		new Instruction("save", OperandType.SHORT),
-		new Instruction("sempred", OperandType.SHORT),
+		new Instruction("sempred", OperandType.SHORT, OperandType.SHORT), // sempred ruleIndex, predIndex
 		new Instruction("action", OperandType.SHORT, OperandType.SHORT), // action ruleIndex, actionIndex
 	};
 
