@@ -12,10 +12,11 @@ public class ActionInstr extends Instr {
 		this.token = token;
 	}
 	public short opcode() { return Bytecode.ACTION; };
-	public int nBytes() { return 1+2; }
+	public int nBytes() { return 1+2*2; }
 	public void write(byte[] code) {
 		super.write(code);
-		NFABytecodeGenerator.writeShort(code, addr+1, (short)actionIndex);
+		NFABytecodeGenerator.writeShort(code, addr+1, (short)rule.index);
+		NFABytecodeGenerator.writeShort(code, addr+1+2, (short)gen.getActionIndex(rule, token));
 	}
 	public String toString() { return addr+":ActionInstr "+actionIndex; }
 }

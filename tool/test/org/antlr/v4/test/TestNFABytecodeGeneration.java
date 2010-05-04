@@ -163,6 +163,22 @@ public class TestNFABytecodeGeneration extends BaseTest {
 		checkBytecode(g, expecting);
 	}
 
+	@Test public void testAction() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : {foo} 'a' | 'b' {bar} ;\n");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tsplit         12, 22\n" +
+			"0012:\taction        1, 0\n" +
+			"0017:\tmatch8        'a'\n" +
+			"0019:\tjmp           29\n" +
+			"0022:\tmatch8        'b'\n" +
+			"0024:\taction        1, 1\n" +
+			"0029:\taccept        4\n";
+		checkBytecode(g, expecting);
+	}
+
 	public void _template() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"\n");

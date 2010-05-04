@@ -15,6 +15,10 @@ public class NFA {
 	public int[] tokenTypeToAddr;
 	public CommonToken[] labelValues;
 
+	/** If we hit an action, we'll have to rewind and do the winning rule again */
+	boolean bypassedAction;
+
+
 	public NFA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels) {
 		this.code = code;
 		this.ruleToAddr = ruleToAddr;
@@ -23,7 +27,21 @@ public class NFA {
 	}
 
 	public int execThompson(CharStream input) {
-		return execThompson(input, 0, false);
+		int m = input.mark();
+		int ttype = execThompson(input, 0, false);
+		System.out.println("ttype="+ttype);
+		if ( bypassedAction ) {
+			input.rewind(m);
+			System.out.println("Bypassed action; rewinding to "+input.index()+" doing with feeling");
+			bypassedAction = false;
+			int ttype2 = execThompson(input, tokenTypeToAddr[ttype], true);
+			if ( ttype!=ttype2 ) {
+				System.err.println("eh? token diff with action(s)");
+			}
+			else System.out.println("types are same");
+		}
+		else input.release(m);
+		return ttype;
 	}
 
 	public int execThompson(CharStream input, int ip, boolean doActions) {
@@ -47,7 +65,7 @@ processOneChar:
 				ip = t.addr;
 				NFAStack context = t.context;
 				int alt = t.alt;
-				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
+				System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				trace(ip);
 				short opcode = code[ip];
 				ip++; // move to next instruction or first byte of operand
@@ -91,9 +109,11 @@ processOneChar:
 						}
 						break;
 					case Bytecode.ACTION :
+						bypassedAction = true;
 						if ( doActions ) {
-							int actionIndex = getShort(code, ip);
-							System.out.println("action "+ actionIndex);
+							int ruleIndex = getShort(code, ip);
+							int actionIndex = getShort(code, ip+2);
+							System.out.println("action "+ ruleIndex+", "+actionIndex);
 						}
 						break;
 					case Bytecode.ACCEPT :
@@ -180,11 +200,11 @@ processOneChar:
 			case Bytecode.JMP :
 				addToClosure(closure, getShort(code, ip), alt, context);
 				break;
+			case Bytecode.ACTION :
+				ip += 2; // has 2 more bytes than LABEL/SAVE
 			case Bytecode.LABEL :
 			case Bytecode.SAVE :
-			case Bytecode.ACTION :
 				// see through them for closure ops
-				int labelIndex = getShort(code, ip);
 				ip += 2;
 				addToClosure(closure, ip, alt, context); // do closure past SAVE
 				break;

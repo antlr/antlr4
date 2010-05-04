@@ -71,7 +71,7 @@ public class Bytecode {
 		new Instruction("label", OperandType.SHORT),
 		new Instruction("save", OperandType.SHORT),
 		new Instruction("sempred", OperandType.SHORT),
-		new Instruction("action", OperandType.SHORT),
+		new Instruction("action", OperandType.SHORT, OperandType.SHORT), // action ruleIndex, actionIndex
 	};
 
 	public static String disassemble(byte[] code, int start) {

@@ -157,6 +157,15 @@ public class TestNFABytecodeInterp extends BaseTest {
 		checkMatches(g, "bc", "B, EOF", "[[@-1,0:-1='',<0>,1:0], [@-1,0:0='b',<0>,1:0], [@-1,1:1='c',<0>,1:1]]");
 	}
 
+	@Test public void testAction() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"I : {a1} d=D {a2} ;\n" +
+			"fragment D : ('0'..'9' {a3})+ ;\n");
+		checkMatches(g, "901", "I, EOF", "[[@-1,0:2='901',<0>,1:0]]");
+	}
+
+
 	public void _template() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"\n");
@@ -196,7 +205,7 @@ public class TestNFABytecodeInterp extends BaseTest {
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
 		do {
-			ttype = nfa.execThompson(in, 0, true);
+			ttype = nfa.execThompson(in);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
 		assertEquals(expectingTokenTypes, tokenTypes);

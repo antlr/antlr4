@@ -27,15 +27,13 @@ public class NFABytecodeGenerator extends TreeParser {
 	Map<String, Integer> ruleToAddr = new HashMap<String, Integer>();
 	int[] tokenTypeToAddr;
 
-	Map<Rule, Map<String, Integer>> labels = new HashMap<Rule, Map<String, Integer>>();
+	Map<Rule, Map<String, Integer>> ruleLabels = new HashMap<Rule, Map<String, Integer>>();
+
+	Map<Rule, Map<Token, Integer>> ruleActions = new HashMap<Rule, Map<Token, Integer>>();
 
 	public Rule currentRule;
 
-	/** labels in all rules share single label space
-	 *  but we still track labels per rule so we can translate $label
-	 *  to an index in an action.
-	 */
-	public int numLabels = 0;
+	public int labelIndex = 0;
 
 	public NFABytecodeGenerator(TreeNodeStream input, RecognizerSharedState state) {
 		super(input, state);
@@ -44,8 +42,45 @@ public class NFABytecodeGenerator extends TreeParser {
 	public void emit(Instr I) {
 		I.addr = ip;
 		I.rule = currentRule;
+		I.gen = this;
 		ip += I.nBytes();
 		instrs.add(I);
+	}
+
+	// indexed from 0 per rule
+	public int getActionIndex(Rule r, Token actionToken) {
+		Map<Token, Integer> actions = ruleActions.get(r);
+		if ( actions==null ) {
+			actions = new HashMap<Token, Integer>();
+			ruleActions.put(r, actions);
+		}
+		if ( actions.get(actionToken)!=null ) {
+			return actions.get(actionToken);
+		}
+		else {
+			int i = actions.size();
+			actions.put(actionToken, i);
+			return i;
+		}
+	}
+
+	/** labels in all rules share single label space
+	 *  but we still track labels per rule so we can translate $label
+	 *  to an index in an action.
+	 */
+	public int getLabelIndex(Rule r, String labelName) {
+		Map<String, Integer> labels = ruleLabels.get(r);
+		if ( labels==null ) {
+			labels = new HashMap<String, Integer>();
+			ruleLabels.put(r, labels);
+		}
+		if ( labels.get(labelName)!=null ) {
+			return labels.get(labelName);
+		}
+		else {
+			labels.put(labelName, labelIndex);
+			return labelIndex++;
+		}
 	}
 
 	public void emitString(Token t) {
@@ -61,12 +96,14 @@ public class NFABytecodeGenerator extends TreeParser {
 		byte[] code = new byte[size];
 
 		// resolve CALL instruction targets and index labels before generating code
+		// TODO: move this code to Instr objects? Need code gen pointer then.
 		for (Instr I : instrs) {
 			if ( I instanceof CallInstr ) {
 				CallInstr C = (CallInstr) I;
 				String ruleName = C.token.getText();
 				C.target = ruleToAddr.get(ruleName);
 			}
+/*
 			else if ( I instanceof LabelInstr ) {
 				LabelInstr L = (LabelInstr)I;
 				Map<String, Integer> ruleLabels = labels.get(I.rule);
@@ -79,8 +116,8 @@ public class NFABytecodeGenerator extends TreeParser {
 					L.labelIndex = ruleLabels.get(labelName);
 				}
 				else {
-					ruleLabels.put(labelName, numLabels);
-					L.labelIndex = numLabels++;
+					ruleLabels.put(labelName, labelIndex);
+					L.labelIndex = labelIndex++;
 				}
 			}
 			else if ( I instanceof SaveInstr ) {
@@ -88,6 +125,7 @@ public class NFABytecodeGenerator extends TreeParser {
 				Map<String, Integer> ruleLabels = labels.get(I.rule);
 				S.labelIndex = ruleLabels.get(S.token.getText());
 			}
+			 */
 		}
 		for (Instr I : instrs) {
 			I.write(code);
@@ -138,7 +176,7 @@ public class NFABytecodeGenerator extends TreeParser {
 		System.out.println(Bytecode.disassemble(code));
 		System.out.println("rule addrs="+gen.ruleToAddr);
 
-		return new NFA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.numLabels);
+		return new NFA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.labelIndex);
 	}
 
 	/** Write value at index into a byte array highest to lowest byte,

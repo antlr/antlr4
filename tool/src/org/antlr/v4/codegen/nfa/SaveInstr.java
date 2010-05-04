@@ -15,6 +15,7 @@ public class SaveInstr extends Instr {
 	public int nBytes() { return 1+2; }
 	public void write(byte[] code) {
 		super.write(code);
+		labelIndex = gen.getLabelIndex(rule, token.getText());		
 		NFABytecodeGenerator.writeShort(code, addr+1, (short) labelIndex);
 	}
 	public String toString() { return addr+":SaveInstr "+ labelIndex; }
