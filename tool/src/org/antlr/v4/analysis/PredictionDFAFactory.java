@@ -202,28 +202,41 @@ public class PredictionDFAFactory {
 	 *  7 had.
 	 */
 	public DFAState reach(DFAState d, IntervalSet label) {
-		//System.out.println("reach "+label.toString(g)+" from "+d.stateNumber);
-		DFAState labelTarget = dfa.newState();
+		System.out.println("reach "+label.toString(g)+" from "+d.stateNumber);
+		DFAState labelTarget = null;
 
 		for (NFAConfig c : d.nfaConfigs) {
 			int n = c.state.getNumberOfTransitions();
+//			int nEp = 0;
 			for (int i=0; i<n; i++) {               // for each transition
 				Transition t = c.state.transition(i);
+
+//				if ( t.isEpsilon() ) nEp++;
+
 				// when we added this state as target of some other state,
 				// we tried to resolve any conflicts.  Ignore anything we
 				// were able to fix previously
-				if ( c.resolved || c.resolvedWithPredicate) continue;
+				if ( c.resolved || c.resolvedWithPredicate ) continue;
 				// found a transition with label; does it collide with label?
+				// [Note: we still must test for isEpsilon here since
+				//  computeStartState has to add these.  Non-start-state
+				//  closure ops will not add NFA states with only epsilon
+				//  transitions, however.]
 				if ( !t.isEpsilon() && !t.label().and(label).isNil() ) {
 					// add NFA target to (potentially) new DFA state
+					if ( labelTarget==null ) labelTarget = dfa.newState();
 					labelTarget.addNFAConfig(new NFAConfig(c, t.target));
 				}
 			}
+
+//			System.out.println("config "+c+" has "+nEp+'/'+n+" eps edges");
+//			if ( nEp>0 && nEp!=n ) {
+//				System.out.println("MISMATCH");
+//			}
 		}
 
-		// if we couldn't find any non-resolved edges to add, return nothing
-		if ( labelTarget.nfaConfigs.size()==0 ) return null;
-
+		// [if we couldn't find any non-resolved edges to add, return nothing]
+		
 		return labelTarget;
 	}
 
@@ -311,8 +324,28 @@ public class PredictionDFAFactory {
 		if ( closureBusy.contains(c) ) return; // don't re-attempt same closure(c)
 		closureBusy.add(c);
 
-		// p itself is always in closure
-		d.nfaConfigs.add(c);
+		// Theory says p is always in closure; in practice, though, we
+		// we want to reduce the number of NFA configurations in the closure.
+		// The purpose of the closure operation is to find all NFA states
+		// reachable from a particular state traversing only epsilon
+ 		// transitions. Later, during the reach operation, we're going to
+ 		// find all NFA states reachable from those states given a particular
+ 		// label (token).  The fewer the NFA states we have to walk during
+		// reach the better.  Since reach only cares about states with non-epsilon
+		// transitions, let's only add those states to the closure. Saves memory
+		// and time.  When I run TestDFAConstruction, printing out the
+		// NFA configs as I test them in reach(), it reduces output from
+		// 1436 lines to 74. seriously. like wow.
+		//
+		// 5/5/2010: This optimization only occurred to me after I implemented
+		// the NFA bytecode VM. It had to ignore all SPLIT, JMP states
+		// during reach. I realized that we could simply avoid adding these
+ 		// closures instead of ignoring them later.  I retrofitted to parser
+		// DFA construction.
+		//
+		if ( !c.state.onlyHasEpsilonTransitions() )	{
+			d.nfaConfigs.add(c);
+		}
 
 		if ( c.state instanceof RuleStopState ) {
 			ruleStopStateClosure(d, c, collectPredicates);

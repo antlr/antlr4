@@ -201,8 +201,8 @@ public class TestDFAConstruction extends BaseTest {
 			"s0-A->s2\n" +
 			"s0-Q->:s1=>1\n" +
 			"s2-A->s2\n" +
-			"s2-Q->:s3=>1\n" +
-			"s2-X->:s4=>2\n";
+			"s2-Q->:s1=>1\n" +
+			"s2-X->:s3=>2\n";
 		List<Message> msgs = checkRuleDFA(g, "s", expecting);
 		System.out.println(msgs);
 		assertEquals(msgs.size(), 0);

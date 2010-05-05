@@ -46,4 +46,6 @@ public class NFAState {
 	public Transition transition(int i) {
 		return null;
 	}
+
+	public boolean onlyHasEpsilonTransitions() { return false; }
 }

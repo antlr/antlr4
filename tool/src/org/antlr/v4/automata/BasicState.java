@@ -29,4 +29,9 @@ public class BasicState extends NFAState {
 		if ( i>0 ) throw new IllegalArgumentException("only one transition");
 		return transition;
 	}
+
+	@Override
+	public boolean onlyHasEpsilonTransitions() {
+		return transition!=null && transition.isEpsilon();
+	}
 }

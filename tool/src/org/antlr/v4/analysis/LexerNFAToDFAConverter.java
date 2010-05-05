@@ -9,6 +9,7 @@ import org.antlr.v4.tool.LexerGrammar;
 
 import java.util.*;
 
+// TODO: might not need anymore if NFA simulator is fast enough
 public class LexerNFAToDFAConverter {
 	Grammar g;
 

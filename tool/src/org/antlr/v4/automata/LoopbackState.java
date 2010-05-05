@@ -27,4 +27,7 @@ public class LoopbackState extends DecisionState {
 		if ( i==1 ) return transition;
 		return loopBack;
 	}
+
+	@Override
+	public boolean onlyHasEpsilonTransitions() { return true; }
 }
