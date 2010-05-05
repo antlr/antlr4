@@ -195,7 +195,6 @@ processOneChar:
 		ThreadState t = new ThreadState(ip, alt, context);
 		//System.out.println("add to closure "+ip+" "+closure);
 		if ( closure.contains(t) ) return;
-		closure.add(t);
 		short opcode = code[ip];
 		ip++; // move to next instruction or first byte of operand
 		switch (opcode) {
@@ -207,6 +206,7 @@ processOneChar:
 			case Bytecode.LABEL :
 			case Bytecode.SAVE :
 				// see through them for closure ops
+				closure.add(t); // add to closure; need to execute during reach
 				ip += 2;
 				addToClosure(closure, ip, alt, context); // do closure past SAVE
 				break;
@@ -227,6 +227,7 @@ processOneChar:
 				// accept is just a ret if we have a stack;
 				// i.e., don't stop; someone called us and we need to use their
 				// accept, not this one
+				closure.add(t);	 // add to closure; need to execute during reach			
 			case Bytecode.RET :
 				if ( context != NFAStack.EMPTY ) {
 					addToClosure(closure, context.returnAddr, alt, context.parent);
@@ -240,6 +241,11 @@ processOneChar:
 				if ( sempred(ruleIndex, actionIndex) ) {
 					addToClosure(closure, ip+4, alt, context);
 				}
+				break;
+			default :
+				// optimization: only add edges of closure to closure list; reduces what we walk later
+				// we don't want to have to ignore CALL, RET, etc... later
+				closure.add(t);
 				break;
 		}
 	}
