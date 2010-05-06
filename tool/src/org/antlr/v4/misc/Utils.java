@@ -1,5 +1,8 @@
 package org.antlr.v4.misc;
 
+import org.antlr.v4.tool.GrammarAST;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -92,4 +95,9 @@ public class Utils {
 		return buf.toString();
 	}
 
+	public static <T extends GrammarAST> List<String> nodesToStrings(List<T> nodes) {
+		List<String> a = new ArrayList<String>();
+		for (T t : nodes) a.add(t.getText());
+		return a;
+	}
 }

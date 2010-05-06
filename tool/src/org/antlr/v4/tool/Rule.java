@@ -63,8 +63,12 @@ public class Rule implements AttributeResolver {
     public Map<String, ActionAST> namedActions =
         new HashMap<String, ActionAST>();
 
-    /** Track exception handlers, finally action */
+    /** Track exception handler actions (exception type is prev child);
+	 *  don't track finally action
+	 */
     public List<ActionAST> exceptionActions = new ArrayList<ActionAST>();
+
+	public ActionAST finallyAction;
 
     public int numberOfAlts;
 
@@ -118,9 +122,16 @@ public class Rule implements AttributeResolver {
 		return d.get(y);
 	}
 
+	// TODO: move to code gen InvokeRule function? is only place we ref?
 	public Set<String> getRuleRefs() {
         Set<String> refs = new HashSet<String>();
         for (Alternative a : alt) refs.addAll(a.ruleRefs.keySet());
+        return refs;
+    }
+
+	public Set<String> getTokenRefs() {
+        Set<String> refs = new HashSet<String>();
+        for (Alternative a : alt) refs.addAll(a.tokenRefs.keySet());
         return refs;
     }
 

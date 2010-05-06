@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-04-28 18:42:02
+// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-05-06 12:54:51
 
 /*
  [The "BSD license"]
@@ -1088,7 +1088,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             match(input, Token.UP, null); if (state.failed) return ;
             if ( state.backtracking==1 ) {
 
-              		currentRule.exceptionActions.add((ActionAST)ACTION13);
+              		currentRule.finallyAction = (ActionAST)ACTION13;
               		((ActionAST)ACTION13).resolver = currentRule;
               		
             }

@@ -47,8 +47,13 @@ public class AttributeChecks implements ActionSplitterListener {
             }
             for (ActionAST a : r.exceptionActions) {
                 AttributeChecks checker = new AttributeChecks(g, r, null, a, a.token);
-                checker.examineAction();                
-            }
+                checker.examineAction();
+			}
+			if ( r.finallyAction!=null ) {
+				AttributeChecks checker =
+					new AttributeChecks(g, r, null, r.finallyAction, r.finallyAction.token);
+				checker.examineAction();
+			}
         }
     }
 

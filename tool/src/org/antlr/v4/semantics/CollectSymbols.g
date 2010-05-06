@@ -202,7 +202,7 @@ exceptionHandler
 finallyClause
 	:	^(FINALLY ACTION)	
 		{
-		currentRule.exceptionActions.add((ActionAST)$ACTION);
+		currentRule.finallyAction = (ActionAST)$ACTION;
 		((ActionAST)$ACTION).resolver = currentRule;
 		}
 	;
