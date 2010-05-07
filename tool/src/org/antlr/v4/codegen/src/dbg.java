@@ -1,5 +1,5 @@
 package org.antlr.v4.codegen.src;
 
 /** */
-public class dbg {
+public class dbg extends OutputModelObject {
 }

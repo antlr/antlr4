@@ -125,14 +125,18 @@ public class Rule implements AttributeResolver {
 	// TODO: move to code gen InvokeRule function? is only place we ref?
 	public Set<String> getRuleRefs() {
         Set<String> refs = new HashSet<String>();
-        for (Alternative a : alt) refs.addAll(a.ruleRefs.keySet());
+		for (int i=1; i<=numberOfAlts; i++) {
+			refs.addAll(alt[i].ruleRefs.keySet());
+		}
         return refs;
     }
 
 	public Set<String> getTokenRefs() {
         Set<String> refs = new HashSet<String>();
-        for (Alternative a : alt) refs.addAll(a.tokenRefs.keySet());
-        return refs;
+		for (int i=1; i<=numberOfAlts; i++) {
+			refs.addAll(alt[i].tokenRefs.keySet());
+		}
+		return refs;
     }
 
     public Set<String> getLabelNames() {

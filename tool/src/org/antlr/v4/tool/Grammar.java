@@ -536,6 +536,18 @@ public class Grammar implements AttributeResolver {
         }
 	}
 
+	public String getOption(String key) {
+		if ( options==null ) return null;
+		return options.get(key);
+	}
+
+	public String getOption(String key, String defaultValue) {
+		if ( options==null ) return defaultValue;
+		String v = options.get(key);
+		if ( v!=null ) return v;
+		return defaultValue;
+	}
+
 	public static Map<String,String> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
 		GrammarAST combinedRulesRoot =
 			(GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);

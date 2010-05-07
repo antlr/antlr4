@@ -13,6 +13,12 @@ public class CodeGenPipeline {
 	}
 	public void process() {
 		if ( g.isLexer() ) processLexer();
+		else if ( g.isParser() ) processParser();
+	}
+
+	void processParser() {
+		ParserGenerator gen = new ParserGenerator(g);
+		gen.write();
 	}
 
 	void processLexer() {

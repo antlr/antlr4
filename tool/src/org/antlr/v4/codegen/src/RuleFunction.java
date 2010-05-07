@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 /** */
-public class RuleFunction {
+public class RuleFunction extends OutputModelObject {
 	public String name;
 	public List<String> modifiers;
     public Collection<Attribute> args;
@@ -33,12 +33,17 @@ public class RuleFunction {
 		}
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
-		args = r.args.attributes.values();
-		retvals = r.retvals.attributes.values();
-		ruleScopeDecls = r.scope.attributes.values();
+		if ( r.args!=null ) args = r.args.attributes.values();
+		if ( r.retvals!=null ) retvals = r.retvals.attributes.values();
+		if ( r.scope!=null ) ruleScopeDecls = r.scope.attributes.values();
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
-		finallyAction = r.finallyAction.getText();
+		if ( r.finallyAction!=null ) finallyAction = r.finallyAction.getText();
+	}
+
+	@Override
+	public List<String> getChildren() {
+		return new ArrayList<String>() {{ add("code"); }};
 	}
 }

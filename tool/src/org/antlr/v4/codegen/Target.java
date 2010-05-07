@@ -1,7 +1,11 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.analysis.Label;
-import org.antlr.tool.ErrorManager;
+import org.antlr.v4.Tool;
+import org.antlr.v4.automata.Label;
+import org.antlr.v4.tool.Grammar;
+import org.stringtemplate.v4.ST;
+
+import java.io.IOException;
 
 /** */
 public class Target {
@@ -32,6 +36,26 @@ public class Target {
 		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
+	protected void genRecognizerFile(Tool tool,
+									 CodeGenerator generator,
+									 Grammar grammar,
+									 ST outputFileST)
+		throws IOException
+	{
+		String fileName = generator.getRecognizerFileName();
+		generator.write(outputFileST, fileName);
+	}
+
+	protected void genRecognizerHeaderFile(Tool tool,
+										   CodeGenerator generator,
+										   Grammar grammar,
+										   ST headerFileST,
+										   String extName) // e.g., ".h"
+		throws IOException
+	{
+		// no header file by default
+	}
+	
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
 	 *  return the int value of 'a'. Convert escape sequences here also.
 	 */
@@ -43,8 +67,8 @@ public class Target {
 			case 4 :
 				// '\x'  (antlr lexer will catch invalid char)
 				if ( Character.isDigit(literal.charAt(2)) ) {
-					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
-									   "invalid char literal: "+literal);
+//					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
+//									   "invalid char literal: "+literal);
 					return -1;
 				}
 				int escChar = literal.charAt(2);
@@ -59,8 +83,8 @@ public class Target {
 				String unicodeChars = literal.substring(3,literal.length()-1);
 				return Integer.parseInt(unicodeChars, 16);
 			default :
-				ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
-								   "invalid char literal: "+literal);
+//				ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
+//								   "invalid char literal: "+literal);
 				return -1;
 		}
 	}
@@ -102,7 +126,6 @@ public class Target {
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
 		if ( c< Label.MIN_CHAR_VALUE ) {
-			ErrorManager.internalError("invalid char value "+c);
 			return "'<INVALID>'";
 		}
 		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {

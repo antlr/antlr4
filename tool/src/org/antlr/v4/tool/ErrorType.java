@@ -55,13 +55,13 @@ public enum ErrorType {
 
 	INTERNAL_ERROR(ErrorSeverity.ERROR, true, true),
 	INTERNAL_WARNING(ErrorSeverity.ERROR, true, true),
-	ERROR_CREATING_ARTIFICIAL_RULE(ErrorSeverity.ERROR, true, true),
 	TOKENS_FILE_SYNTAX_ERROR(ErrorSeverity.ERROR, true, true),
 	CANNOT_GEN_DOT_FILE(ErrorSeverity.ERROR, true, true),
 
 	// Code generation errors
 	MISSING_CODE_GEN_TEMPLATES(ErrorSeverity.ERROR, false, true),
 	CANNOT_CREATE_TARGET_GENERATOR(ErrorSeverity.ERROR, false, true),
+	CODE_TEMPLATE_ARG_ISSUE(ErrorSeverity.ERROR, false, true),
 
 	// Grammar errors
 	SYNTAX_ERROR(ErrorSeverity.ERROR, true, true),

@@ -96,6 +96,7 @@ public class Utils {
 	}
 
 	public static <T extends GrammarAST> List<String> nodesToStrings(List<T> nodes) {
+		if ( nodes == null ) return null;
 		List<String> a = new ArrayList<String>();
 		for (T t : nodes) a.add(t.getText());
 		return a;

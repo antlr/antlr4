@@ -85,6 +85,8 @@ CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::=
 	"cannot create target <arg> code generator: <exception>"
 CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::=
 	"cannot generate a sample input sequence from lookahead DFA"
+CODE_TEMPLATE_ARG_ISSUE(arg,arg2) ::=
+    "code generation template <arg> has missing, misnamed, or incomplete arg list: <arg2>"
 
 // grammar interpretation errors
 /*
