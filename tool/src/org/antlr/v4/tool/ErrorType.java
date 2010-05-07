@@ -62,6 +62,8 @@ public enum ErrorType {
 	MISSING_CODE_GEN_TEMPLATES(ErrorSeverity.ERROR, false, true),
 	CANNOT_CREATE_TARGET_GENERATOR(ErrorSeverity.ERROR, false, true),
 	CODE_TEMPLATE_ARG_ISSUE(ErrorSeverity.ERROR, false, true),
+	CODE_GEN_TEMPLATES_INCOMPLETE(ErrorSeverity.ERROR, false, true),
+	NO_MODEL_TO_TEMPLATE_MAPPING(ErrorSeverity.ERROR, false, true),
 
 	// Grammar errors
 	SYNTAX_ERROR(ErrorSeverity.ERROR, true, true),

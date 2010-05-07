@@ -1,6 +1,5 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.automata.Label;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
@@ -36,9 +35,8 @@ public class Target {
 		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
-	protected void genRecognizerFile(Tool tool,
-									 CodeGenerator generator,
-									 Grammar grammar,
+	protected void genRecognizerFile(CodeGenerator generator,
+									 Grammar g,
 									 ST outputFileST)
 		throws IOException
 	{
@@ -46,9 +44,8 @@ public class Target {
 		generator.write(outputFileST, fileName);
 	}
 
-	protected void genRecognizerHeaderFile(Tool tool,
-										   CodeGenerator generator,
-										   Grammar grammar,
+	protected void genRecognizerHeaderFile(CodeGenerator generator,
+										   Grammar g,
 										   ST headerFileST,
 										   String extName) // e.g., ".h"
 		throws IOException

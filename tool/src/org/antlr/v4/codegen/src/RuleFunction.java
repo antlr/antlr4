@@ -1,6 +1,10 @@
 package org.antlr.v4.codegen.src;
 
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.v4.codegen.SourceGenTriggers;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
@@ -40,6 +44,17 @@ public class RuleFunction extends OutputModelObject {
 		tokenLabels = r.getTokenRefs();
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
 		if ( r.finallyAction!=null ) finallyAction = r.finallyAction.getText();
+
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
+		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
+		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
+		SourceGenTriggers gen = new SourceGenTriggers(nodes);
+		try {
+			gen.block(); // GEN Instr OBJECTS
+		}
+		catch (Exception e){
+			e.printStackTrace(System.err);
+		}		
 	}
 
 	@Override

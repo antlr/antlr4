@@ -51,7 +51,14 @@ public abstract class CodeGenerator {
 	}
 
 	public void loadTemplates(String language) {
-		templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+".stg");
+		try {
+			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+".stg");
+		}
+		catch (IllegalArgumentException iae) {
+			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 language);
+		}
+
 //		if ( EMIT_TEMPLATE_DELIMITERS ) {
 //			templates.emitDebugStartStopStrings(true);
 //			templates.doNotEmitDebugStringsForTemplate("codeFileExtension");
@@ -59,6 +66,7 @@ public abstract class CodeGenerator {
 //		}		
 	}
 
+	/** The parser, tree parser, etc... variants know to build the model */
 	public abstract OutputModelObject buildOutputModel();
 
 	public void write() {
@@ -70,11 +78,11 @@ public abstract class CodeGenerator {
 		
 		// WRITE FILES
 		try {
-			target.genRecognizerFile(g.tool,this,g,outputFileST);
+			target.genRecognizerFile(this,g,outputFileST);
 			if ( templates.isDefined("headerFile") ) {
 				ST extST = templates.getInstanceOf("headerFileExtension");
 				ST headerFileST = null;
-				target.genRecognizerHeaderFile(g.tool,this,g,headerFileST,extST.render());
+				target.genRecognizerHeaderFile(this,g,headerFileST,extST.render());
 			}
 //			// write out the vocab interchange file; used by antlr,
 //			// does not change per target

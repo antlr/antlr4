@@ -1,0 +1,29 @@
+// args must be <object-model-object>, <fields-resulting-in-STs>
+parserFile(f, parser) ::= <<
+// $ANTLR ANTLRVersion> <f.fileName> generatedTimestamp>
+import org.antlr.runtime.*;
+
+<parser>
+>>
+
+parser(p,funcs,dfaDefs) ::= <<
+public class <p.name> {
+    <funcs>
+    <dfaDefs>
+}
+>>
+
+DFA(dfa) ::= <<
+// define <dfa.name>
+>>
+
+parserFunction(f,code) ::= <<
+<f.modifiers:{f | <f> }>void <f.name>(<f.args>) {
+    <code>
+}
+>>
+
+codeFileExtension() ::= ".java"
+
+true() ::= "true"
+false() ::= "false"

@@ -6,11 +6,10 @@ import org.antlr.v4.tool.ErrorType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.FormalArgument;
+import org.stringtemplate.v4.misc.BlankST;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** Convert output model tree to template hierarchy */
 public class OutputModelWalker {
@@ -30,29 +29,52 @@ public class OutputModelWalker {
 	public ST walk(OutputModelObject omo) {
 		// CREATE TEMPLATE FOR THIS OUTPUT OBJECT
 		String templateName = modelToTemplateMap.get(omo.getClass());
+		if ( templateName == null ) {
+			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, omo.getClass().getSimpleName());
+			return new BlankST();
+		}
 		ST st = templates.getInstanceOf(templateName);
-		if ( st.impl.formalArguments== FormalArgument.UNKNOWN ) {
+		if ( st == null ) {
+			tool.errMgr.toolError(ErrorType.CODE_GEN_TEMPLATES_INCOMPLETE, templateName);
+			return new BlankST();
+		}
+		if ( st.impl.formalArguments == FormalArgument.UNKNOWN ) {
 			tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, "<none>");
 			return st;
 		}
-		// todo: chk arg-field mismtch
-		Set<String> argNames = st.impl.formalArguments.keySet();
-		String arg = argNames.iterator().next(); // should be just one
 
-		// PASS IN OUTPUT OBJECT TO TEMPLATE
-		st.add(arg, omo); // set template attribute of correct name
+		List<String> kids = omo.getChildren();
 
-		for (String fieldName : omo.getChildren()) {
-			if ( argNames.contains(fieldName) ) continue; // they won't use so don't compute
+		LinkedHashMap<String,FormalArgument> formalArgs = st.impl.formalArguments;
+		Set<String> argNames = formalArgs.keySet();
+		Iterator<String> it = argNames.iterator();
+
+		// PASS IN OUTPUT MODEL OBJECT TO TEMPLATE
+		String modelArgName = it.next(); // ordered so this is first arg
+		st.add(modelArgName, omo);
+
+		// ENSURE TEMPLATE ARGS AND CHILD FIELDS MATCH UP
+		while ( it.hasNext() ) {
+			String argName = it.next();
+			if ( !kids.contains(argName) ) {
+				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, argName);
+				return st;
+			}
+		}
+
+		// COMPUTE STs FOR EACH NESTED MODEL OBJECT NAMED AS ARG BY TEMPLATE
+		if ( kids!=null ) for (String fieldName : kids) {
+			if ( !argNames.contains(fieldName) ) continue; // they won't use so don't compute
+			//System.out.println("computing ST for field "+fieldName+" of "+omo.getClass());
 			try {
 				Field fi = omo.getClass().getField(fieldName);
 				Object o = fi.get(omo);
-				if ( o instanceof OutputModelObject ) {
+				if ( o instanceof OutputModelObject ) {  // SINGLE MODEL OBJECT?
 					OutputModelObject nestedOmo = (OutputModelObject)o;
 					ST nestedST = walk(nestedOmo);
 					st.add(fieldName, nestedST);
 				}
-				else if ( o instanceof Collection) {
+				else if ( o instanceof Collection ) {    // LIST OF MODEL OBJECTS?
 					Collection<? extends OutputModelObject> nestedOmos = (Collection)o;
 					for (OutputModelObject nestedOmo : nestedOmos) {
 						ST nestedST = walk(nestedOmo);
@@ -64,7 +86,7 @@ public class OutputModelWalker {
 				}
 			}
 			catch (NoSuchFieldException nsfe) {
-				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, fieldName);
+				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, nsfe.getMessage());
 			}
 			catch (IllegalAccessException iae) {
 				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, fieldName);

@@ -1,9 +1,6 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.src.OutputModelObject;
-import org.antlr.v4.codegen.src.Parser;
-import org.antlr.v4.codegen.src.ParserFile;
-import org.antlr.v4.codegen.src.RuleFunction;
+import org.antlr.v4.codegen.src.*;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.HashMap;
@@ -16,6 +13,7 @@ public class ParserGenerator extends CodeGenerator {
 		put(ParserFile.class, "parserFile");
 		put(Parser.class, "parser");
 		put(RuleFunction.class, "parserFunction");
+		put(DFADef.class, "DFA");
 	}};
 
 	public ParserGenerator(Grammar g) {
@@ -24,8 +22,6 @@ public class ParserGenerator extends CodeGenerator {
 
 	public OutputModelObject buildOutputModel() {
 		Parser p = new Parser(g);
-		ParserFile f = new ParserFile(p, getRecognizerFileName());
-
-		return f;
+		return new ParserFile(p, getRecognizerFileName());
 	}
 }

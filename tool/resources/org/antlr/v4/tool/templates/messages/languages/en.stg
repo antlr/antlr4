@@ -76,17 +76,20 @@ FILENAME_EXTENSION_ERROR(arg) ::=
 
 // code gen errors
 MISSING_CODE_GEN_TEMPLATES(arg) ::=
-	"cannot find code generation templates <arg>.stg"
+	"cannot find code generation templates for language <arg>"
 MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES() ::=
 	"cannot find code generation cyclic DFA templates for language <arg>"
 CODE_GEN_TEMPLATES_INCOMPLETE(arg) ::=
-	"at least one code generation template missing for language <arg>"
+	"missing code generation template <arg>"
 CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::=
 	"cannot create target <arg> code generator: <exception>"
-CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::=
-	"cannot generate a sample input sequence from lookahead DFA"
 CODE_TEMPLATE_ARG_ISSUE(arg,arg2) ::=
     "code generation template <arg> has missing, misnamed, or incomplete arg list: <arg2>"
+NO_MODEL_TO_TEMPLATE_MAPPING(arg) ::=
+    "no mapping to template name for output model class <arg>"
+
+CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::=
+	"cannot generate a sample input sequence from lookahead DFA"
 
 // grammar interpretation errors
 /*
