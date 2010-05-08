@@ -34,7 +34,7 @@ switch ( input.LA(1) ) {
 >>
 
 matchToken(m) ::= <<
-match(<m.ttype>);
+match(<m.name>);
 >>
 
 codeFileExtension() ::= ".java"

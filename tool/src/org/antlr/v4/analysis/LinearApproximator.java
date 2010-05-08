@@ -66,11 +66,13 @@ public class LinearApproximator {
 	OrderedHashSet<NFAConfig>[] configs;
 
 	public LinearApproximator(Grammar g, int decision) {
-		this.g = g; this.decision = decision;
+		this.g = g;
+		this.decision = decision;
 	}
 
 	public LinearApproximator(Grammar g, int decision, int k) {
-		this(g,decision); max_k = k;
+		this(g,decision);
+		max_k = k;
 	}
 
 	public DFA createDFA(DecisionState s) {
@@ -85,7 +87,7 @@ public class LinearApproximator {
 		// COLLECT LOOKAHEAD 1..k
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
-			LOOK(t.target, i+1, MAX_LINEAR_APPROXIMATE_DEPTH);
+			LOOK(t.target, MAX_LINEAR_APPROXIMATE_DEPTH);
 			altLook.add(look.clone());
 			altConfigs.add(configs.clone());
 //			for (int k=1; k<=MAX_LINEAR_APPROXIMATE_DEPTH; k++) {
@@ -155,7 +157,7 @@ public class LinearApproximator {
 	/** From an NFA state, s, find the set of all labels reachable from s at
 	 *  depth k.
 	 */
-	public IntervalSet[] LOOK(NFAState s, int alt, int k) {
+	public IntervalSet[] LOOK(NFAState s, int k) {
 		System.out.println("LOOK("+s.stateNumber+", "+k+")");
 		lookBusy.clear();
 		for (int i=1; i<=max_k; i++) { // init / reset work arrays
@@ -163,18 +165,18 @@ public class LinearApproximator {
 			configs[i] = new OrderedHashSet<NFAConfig>();
 		}
 		
-		_LOOK(s, alt, k, NFAContext.EMPTY());
+		_LOOK(s, k, NFAContext.EMPTY());
 		return look;
 	}
 
-	void _LOOK(NFAState s, int alt, int k, NFAContext context) {
+	void _LOOK(NFAState s, int k, NFAContext context) {
 		//System.out.println("_LOOK("+s.stateNumber+", "+k+", ctx="+context);
 		LookaheadNFAConfig ac = new LookaheadNFAConfig(s,k,context);
 		if ( lookBusy.contains(ac) ) return;
 		lookBusy.add(ac);
 
 		if ( s instanceof RuleStopState && !context.isEmpty() ) {
-			_LOOK(context.returnState, alt, k, context.parent);
+			_LOOK(context.returnState, k, context.parent);
 			return;
 		}
 
@@ -184,18 +186,54 @@ public class LinearApproximator {
 			if ( t instanceof RuleTransition ) {
 				NFAContext newContext =
 					new NFAContext(context, ((RuleTransition)t).followState);
-				_LOOK(t.target, alt, k, newContext);
+				_LOOK(t.target, k, newContext);
 			}
 			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, alt, k, context);
+				_LOOK(t.target, k, context);
 			}
 			else {
-				//System.out.println("adding "+ t.label().toString(g) +" @ i="+(MAX_K-k+1));
+				System.out.println("adding "+ t.label().toString(g) +" @ i="+(max_k-k+1));
 				look[max_k-k+1].addAll( t.label() );
-				NFAConfig c = new NFAConfig(t.target, alt, context,
+				NFAConfig c = new NFAConfig(t.target, 0, context,
 											SemanticContext.EMPTY_SEMANTIC_CONTEXT);
 				configs[max_k-k+1].add(c);
-				if ( k>1 ) _LOOK(t.target, alt, k-1, context);
+				if ( k>1 ) _LOOK(t.target, k-1, context);
+			}
+		}
+	}
+
+	public IntervalSet LOOK(NFAState s) {
+		System.out.println("LOOK("+s.stateNumber+")");
+		lookBusy.clear();
+		IntervalSet fset = new IntervalSet();
+		_LOOK(s, NFAContext.EMPTY(), fset);
+		return fset;
+	}
+
+	void _LOOK(NFAState s, NFAContext context, IntervalSet fset) {
+		//System.out.println("_LOOK("+s.stateNumber+", "+k+", ctx="+context);
+		LookaheadNFAConfig ac = new LookaheadNFAConfig(s,1,context);
+		if ( lookBusy.contains(ac) ) return;
+		lookBusy.add(ac);
+
+		if ( s instanceof RuleStopState && !context.isEmpty() ) {
+			_LOOK(context.returnState, context.parent, fset);
+			return;
+		}
+
+		int n = s.getNumberOfTransitions();
+		for (int i=0; i<n; i++) {
+			Transition t = s.transition(i);
+			if ( t instanceof RuleTransition ) {
+				NFAContext newContext =
+					new NFAContext(context, ((RuleTransition)t).followState);
+				_LOOK(t.target, newContext, fset);
+			}
+			else if ( t.isEpsilon() ) {
+				_LOOK(t.target, context, fset);
+			}
+			else {
+				fset.addAll( t.label() );
 			}
 		}
 	}
