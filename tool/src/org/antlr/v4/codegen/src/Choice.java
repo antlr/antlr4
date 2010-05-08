@@ -1,17 +1,18 @@
 package org.antlr.v4.codegen.src;
 
-import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.codegen.CodeGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** */
-public class Choice extends SrcOp {
+public abstract class Choice extends SrcOp {
 	public DFADef dfaDef;
 	public List<CodeBlock> alts;
 
-	public Choice(Alternative[] alts) {
-		
+	public Choice(CodeGenerator gen, List<CodeBlock> alts) {
+		this.gen = gen;
+		this.alts = alts;
 	}
 
 	@Override

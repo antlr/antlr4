@@ -4,6 +4,7 @@ import org.antlr.runtime.BitSet;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.automata.NFAState;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.tree.CommonTree;
 
@@ -12,6 +13,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GrammarAST extends CommonTree {
+	/** If we build an NFA, we make AST node point at left edge of NFA construct */
+	public NFAState nfaState;
+
     public GrammarAST() {;}
     public GrammarAST(Token t) { super(t); }
     public GrammarAST(GrammarAST node) { super(node); }

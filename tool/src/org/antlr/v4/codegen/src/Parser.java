@@ -1,8 +1,8 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.automata.DFA;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.IntSet;
-import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -15,12 +15,13 @@ public class Parser extends OutputModelObject {
 	public List<DFADef> dfaDefs = new ArrayList<DFADef>();
 	public List<IntSet> bitsetDefs;
 
-	public Parser(Grammar g) {		
-		name = g.getRecognizerName();
-		for (Rule r : g.rules.values()) funcs.add( new RuleFunction(r) );
+	public Parser(CodeGenerator gen) {
+		this.gen = gen;
+		name = gen.g.getRecognizerName();
+		for (Rule r : gen.g.rules.values()) funcs.add( new RuleFunction(gen, r) );
 
 		// build DFA, bitset defs
-		for (DFA dfa : g.decisionDFAs.values()) {
+		for (DFA dfa : gen.g.decisionDFAs.values()) {
 			dfaDefs.add( new DFADef("DFA"+dfa.decision, dfa) );
 		}
 	}

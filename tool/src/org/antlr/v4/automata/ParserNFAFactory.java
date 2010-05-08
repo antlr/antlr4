@@ -65,33 +65,9 @@ public class ParserNFAFactory implements NFAFactory {
 		Handle h = new Handle(start, stop);
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(ruleAST.toStringTree()+":\n"+ser);
+		ruleAST.nfaState = start;
 		return h;
 	}
-
-	public NFAState newState(Class nodeType, GrammarAST node) {
-		try {
-			Constructor ctor = nodeType.getConstructor(NFA.class);
-			NFAState s = (NFAState)ctor.newInstance(nfa);
-			s.ast = node;
-			s.rule = currentRule;
-			nfa.addState(s);
-			return s;
-		}
-		catch (Exception e) {
-			ErrorManager.internalError("can't create NFA node: "+nodeType.getName(), e);
-		}
-		return null;
-	}
-
-	public BasicState newState(GrammarAST node) {
-		BasicState n = new BasicState(nfa);
-		n.rule = currentRule;
-		n.ast = node;
-		nfa.addState(n);
-		return n;
-	}
-
-	public BasicState newState() { return newState(null); }
 
 	/** From label A build Graph o-A->o */
 	public Handle tokenRef(TerminalAST node) {
@@ -100,7 +76,7 @@ public class ParserNFAFactory implements NFAFactory {
 		int ttype = g.getTokenType(node.getText());
 		left.transition = new AtomTransition(ttype, right);
 		right.incidentTransition = left.transition;
-		
+		node.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -112,7 +88,7 @@ public class ParserNFAFactory implements NFAFactory {
 		BasicState right = newState(associatedAST);
 		left.transition = new SetTransition(set, right);
 		right.incidentTransition = left.transition;
-
+		associatedAST.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -168,6 +144,7 @@ public class ParserNFAFactory implements NFAFactory {
 		RuleStopState stop = nfa.ruleToStopState.get(r);
 		epsilon(stop, right);
 
+		node.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -176,6 +153,7 @@ public class ParserNFAFactory implements NFAFactory {
 		BasicState left = newState(node);
 		BasicState right = newState(node);
 		epsilon(left, right);
+		node.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -188,6 +166,7 @@ public class ParserNFAFactory implements NFAFactory {
 		BasicState left = newState(pred);
 		NFAState right = newState(pred);
 		left.transition = new PredicateTransition(pred, right);
+		pred.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -205,6 +184,7 @@ public class ParserNFAFactory implements NFAFactory {
 		BasicState left = newState(action);
 		NFAState right = newState(action);
 		left.transition = new ActionTransition(action, right);  
+		action.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -248,6 +228,7 @@ public class ParserNFAFactory implements NFAFactory {
 		Handle h = new Handle(start, end);
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(blkAST.toStringTree()+":\n"+ser);
+		blkAST.nfaState = start;		
 		return h;
 	}
 
@@ -293,6 +274,7 @@ public class ParserNFAFactory implements NFAFactory {
 		Handle h = new Handle(start, end);
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(optAST.toStringTree()+":\n"+ser);
+		optAST.nfaState = start;
 		return h;
 	}
 
@@ -315,6 +297,7 @@ public class ParserNFAFactory implements NFAFactory {
 		epsilon(blk.right, loop);
 		epsilon(loop, end);
 		nfa.defineDecisionState(loop);
+		plusAST.nfaState = start;
 		return new Handle(start, end);
 	}
 
@@ -351,6 +334,7 @@ public class ParserNFAFactory implements NFAFactory {
 		epsilon(loop, end);
 		nfa.defineDecisionState(start);
 		nfa.defineDecisionState(loop);
+		starAST.nfaState = start;
 		return new Handle(start, end);
 	}
 
@@ -404,4 +388,29 @@ public class ParserNFAFactory implements NFAFactory {
 		}
 		return n;
 	}
+
+	public NFAState newState(Class nodeType, GrammarAST node) {
+		try {
+			Constructor ctor = nodeType.getConstructor(NFA.class);
+			NFAState s = (NFAState)ctor.newInstance(nfa);
+			s.ast = node;
+			s.rule = currentRule;
+			nfa.addState(s);
+			return s;
+		}
+		catch (Exception e) {
+			ErrorManager.internalError("can't create NFA node: "+nodeType.getName(), e);
+		}
+		return null;
+	}
+
+	public BasicState newState(GrammarAST node) {
+		BasicState n = new BasicState(nfa);
+		n.rule = currentRule;
+		n.ast = node;
+		nfa.addState(n);
+		return n;
+	}
+
+	public BasicState newState() { return newState(null); }	
 }

@@ -14,6 +14,9 @@ public class ParserGenerator extends CodeGenerator {
 		put(Parser.class, "parser");
 		put(RuleFunction.class, "parserFunction");
 		put(DFADef.class, "DFA");
+		put(CodeBlock.class, "codeBlock");
+		put(LL1Choice.class, "switch");
+		put(MatchToken.class, "matchToken");
 	}};
 
 	public ParserGenerator(Grammar g) {
@@ -21,7 +24,7 @@ public class ParserGenerator extends CodeGenerator {
 	}
 
 	public OutputModelObject buildOutputModel() {
-		Parser p = new Parser(g);
-		return new ParserFile(p, getRecognizerFileName());
+		Parser p = new Parser(this);
+		return new ParserFile(this, p, getRecognizerFileName());
 	}
 }

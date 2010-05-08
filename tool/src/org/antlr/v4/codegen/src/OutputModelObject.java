@@ -1,10 +1,12 @@
 package org.antlr.v4.codegen.src;
 
+import org.antlr.v4.codegen.CodeGenerator;
+
 import java.util.List;
 
 /** */
 public abstract class OutputModelObject {
-	//public ST st;
+	public CodeGenerator gen;
 
 	/** If the output model object encloses some other model objects,
 	 *  we need to be able to walk them. Rather than make each class

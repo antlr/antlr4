@@ -23,6 +23,20 @@ parserFunction(f,code) ::= <<
 }
 >>
 
+codeBlock(c, ops) ::= <<
+<ops>
+>>
+
+switch(c, alts) ::= <<
+switch ( input.LA(1) ) {
+	<alts>
+}
+>>
+
+matchToken(m) ::= <<
+match(<m.ttype>);
+>>
+
 codeFileExtension() ::= ".java"
 
 true() ::= "true"

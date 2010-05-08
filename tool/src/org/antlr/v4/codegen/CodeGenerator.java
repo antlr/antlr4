@@ -12,15 +12,15 @@ import java.io.Writer;
 public abstract class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
-	protected final static String vocabFilePattern =
+	public final static String vocabFilePattern =
 		"<tokens:{<attr.name>=<attr.type>\n}>" +
 		"<literals:{<attr.name>=<attr.type>\n}>";
 
-	Grammar g;
-	Target target;
-	STGroup templates;
+	public Grammar g;
+	public Target target;
+	public STGroup templates;
 
-	int lineWidth = 72;
+	public int lineWidth = 72;
 
 	public CodeGenerator(Grammar g) {
 		this.g = g;
