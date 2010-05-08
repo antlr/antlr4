@@ -9,6 +9,8 @@ import org.stringtemplate.v4.misc.Misc;
 
 import java.util.List;
 
+// TODO: i don't think we create lexer NFAs anymore
+
 public class LexerNFAFactory extends ParserNFAFactory {
 	public LexerNFAFactory(LexerGrammar g) { super(g); }
 
@@ -46,6 +48,8 @@ public class LexerNFAFactory extends ParserNFAFactory {
 		int t1 = Target.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = Target.getCharValueFromGrammarCharLiteral(b.getText());
 		left.transition = new RangeTransition(t1, t2, right);
+		a.nfaState = left;
+		b.nfaState = left;
 		return new Handle(left, right);
 	}
 
@@ -66,6 +70,7 @@ public class LexerNFAFactory extends ParserNFAFactory {
 			prev.transition = new AtomTransition(chars.charAt(i), right);
 			prev = right;
 		}
+		stringLiteralAST.nfaState = left;
 		return new Handle(left, right);
 	}
 
