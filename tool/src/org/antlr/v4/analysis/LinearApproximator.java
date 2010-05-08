@@ -25,7 +25,7 @@ public class LinearApproximator {
 
 	int max_k = MAX_LINEAR_APPROXIMATE_DEPTH;
 
-	/** Records state of a LOOK operation */
+	/** Records state of a LOOK operation; used just for lookahead busy checks */
 	static class LookaheadNFAConfig {
 		public NFAState s;
 		public int k;
