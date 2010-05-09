@@ -5,6 +5,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.nfa.*;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -89,7 +90,7 @@ public class NFABytecodeGenerator extends TreeParser {
 	}
 
 	public void emitString(Token t) {
-		String chars = Target.getStringFromGrammarStringLiteral(t.getText());
+		String chars = CharSupport.getStringFromGrammarStringLiteral(t.getText());
 		for (char c : chars.toCharArray()) {
 			emit(new MatchInstr(t, c));
 		}

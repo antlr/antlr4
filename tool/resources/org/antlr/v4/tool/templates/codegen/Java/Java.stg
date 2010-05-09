@@ -1,40 +1,45 @@
 // args must be <object-model-object>, <fields-resulting-in-STs>
-parserFile(f, parser) ::= <<
+ParserFile(f, parser, dfaDefs, bitSetDefs) ::= <<
 // $ANTLR ANTLRVersion> <f.fileName> generatedTimestamp>
 import org.antlr.runtime.*;
 
 <parser>
 >>
 
-parser(p,funcs,dfaDefs) ::= <<
+Parser(p, funcs) ::= <<
 public class <p.name> {
-    <funcs>
-    <dfaDefs>
+    <funcs; separator="\n">
+    <dfaDefs; separator="\n">
+    <bitSetDefs; separator="\n">
 }
 >>
 
-DFA(dfa) ::= <<
+DFADef(dfa) ::= <<
 // define <dfa.name>
 >>
 
-parserFunction(f,code) ::= <<
+BitSetDef(b) ::= <<
+// define <b.name>
+>>
+
+RuleFunction(f,code) ::= <<
 <f.modifiers:{f | <f> }>void <f.name>(<f.args>) {
     <code>
 }
 >>
 
-codeBlock(c, ops) ::= <<
-<ops>
+CodeBlock(c, ops) ::= <<
+<ops; separator="\n">
 >>
 
-switch(c, alts) ::= <<
+LL1Choice(c, alts) ::= <<
 switch ( input.LA(1) ) {
-	<alts>
+	<alts; separator="\n">
 }
 >>
 
-matchToken(m) ::= <<
-match(<m.name>);
+MatchToken(m) ::= <<
+match(<m.name>, <m.follow.name>);
 >>
 
 codeFileExtension() ::= ".java"

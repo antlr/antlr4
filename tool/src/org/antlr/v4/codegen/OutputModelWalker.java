@@ -15,20 +15,19 @@ import java.util.*;
 public class OutputModelWalker {
 	Tool tool;
 	STGroup templates;
-	Map<Class, String> modelToTemplateMap;
+	//Map<Class, String> modelToTemplateMap;
 
 	public OutputModelWalker(Tool tool,
-							 STGroup templates,
-							 Map<Class, String> modelToTemplateMap)
+							 STGroup templates)
 	{
 		this.tool = tool;
 		this.templates = templates;
-		this.modelToTemplateMap = modelToTemplateMap;
+		//this.modelToTemplateMap = modelToTemplateMap;
 	}
 	
 	public ST walk(OutputModelObject omo) {
 		// CREATE TEMPLATE FOR THIS OUTPUT OBJECT
-		String templateName = modelToTemplateMap.get(omo.getClass());
+		String templateName = omo.getClass().getSimpleName();
 		if ( templateName == null ) {
 			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, omo.getClass().getSimpleName());
 			return new BlankST();

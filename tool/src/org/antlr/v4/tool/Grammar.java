@@ -6,7 +6,7 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.Label;
 import org.antlr.v4.automata.NFA;
-import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.Utils;
@@ -359,7 +359,7 @@ public class Grammar implements AttributeResolver {
 		if ( isLexer() &&
 			 ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE )
 		{
-			return Target.getANTLRCharLiteralForChar(ttype);
+			return CharSupport.getANTLRCharLiteralForChar(ttype);
 		}
 		// faux label?
 		else if ( ttype<0 ) {

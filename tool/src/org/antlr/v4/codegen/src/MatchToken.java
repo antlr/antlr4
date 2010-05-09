@@ -8,15 +8,15 @@ import org.antlr.v4.tool.TerminalAST;
 /** */
 public class MatchToken extends SrcOp {
 	public String name;
-	public String bitSetName;
+	public BitSetDef follow;
 
 	public MatchToken(CodeGenerator gen, TerminalAST ast) {
 		this.gen = gen;
 		name = ast.getText();
 
 		LinearApproximator approx = new LinearApproximator(gen.g, -1);
-		IntervalSet follow = approx.LOOK(ast.nfaState.transition(0).target);
+		IntervalSet fset = approx.LOOK(ast.nfaState.transition(0).target);
 		System.out.println("follow="+follow);
-		//bitSetName = gen.defineBitSet(follow);
+		follow = gen.defineBitSet(ast, fset);
 	}
 }

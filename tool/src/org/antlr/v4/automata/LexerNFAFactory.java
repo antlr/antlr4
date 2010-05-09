@@ -1,6 +1,6 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -45,8 +45,8 @@ public class LexerNFAFactory extends ParserNFAFactory {
 	public Handle range(GrammarAST a, GrammarAST b) {
 		BasicState left = newState(a);
 		BasicState right = newState(b);
-		int t1 = Target.getCharValueFromGrammarCharLiteral(a.getText());
-		int t2 = Target.getCharValueFromGrammarCharLiteral(b.getText());
+		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
+		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
 		left.transition = new RangeTransition(t1, t2, right);
 		a.nfaState = left;
 		b.nfaState = left;

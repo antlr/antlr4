@@ -1,6 +1,6 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.IntervalSet;
 
 public class RangeTransition extends Transition {
@@ -21,7 +21,7 @@ public class RangeTransition extends Transition {
 
 	@Override
 	public String toString() {
-		return Target.getANTLRCharLiteralForChar(from)+".."+
-			   Target.getANTLRCharLiteralForChar(to);
+		return CharSupport.getANTLRCharLiteralForChar(from)+".."+
+			   CharSupport.getANTLRCharLiteralForChar(to);
 	}
 }

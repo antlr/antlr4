@@ -3,7 +3,7 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.v4.codegen.Target;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -103,7 +103,7 @@ public class ParserNFAFactory implements NFAFactory {
 		GrammarAST ast = A.left.ast;
 		int ttype = 0;
 		if ( g.isLexer() ) {
-			ttype = Target.getCharValueFromGrammarCharLiteral(ast.getText());
+			ttype = CharSupport.getCharValueFromGrammarCharLiteral(ast.getText());
 		}
 		else {
 			ttype = g.getTokenType(ast.getText());

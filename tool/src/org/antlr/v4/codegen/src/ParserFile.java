@@ -9,15 +9,20 @@ import java.util.List;
 public class ParserFile extends OutputModelObject {
 	public String fileName;
 	public Parser parser;
+	public List<DFADef> dfaDefs = new ArrayList<DFADef>();
+	public List<BitSetDef> bitSetDefs = new ArrayList<BitSetDef>();
 	
-	public ParserFile(CodeGenerator gen, Parser p, String fileName) {
+	public ParserFile(CodeGenerator gen, String fileName) {
 		this.gen = gen;
-		parser = p;
 		this.fileName = fileName; 
 	}
 
 	@Override
 	public List<String> getChildren() {
-		return new ArrayList<String>() {{ add("parser"); }};
+		return new ArrayList<String>() {{
+			add("parser");
+			add("dfaDefs");
+			add("bitSetDefs");
+		}};
 	}
 }

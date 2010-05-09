@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.automata.Label;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
 
@@ -8,31 +9,28 @@ import java.io.IOException;
 
 /** */
 public class Target {
-	/** When converting ANTLR char and string literals, here is the
-	 *  value set of escape chars.
+	/** For pure strings of Java 16-bit unicode char, how can we display
+	 *  it in the target language as a literal.  Useful for dumping
+	 *  predicates and such that may refer to chars that need to be escaped
+	 *  when represented as strings.  Also, templates need to be escaped so
+	 *  that the target language can hold them as a string.
+	 *
+	 *  I have defined (via the constructor) the set of typical escapes,
+	 *  but your Target subclass is free to alter the translated chars or
+	 *  add more definitions.  This is nonstatic so each target can have
+	 *  a different set in memory at same time.
 	 */
-	public static int ANTLRLiteralEscapedCharValue[] = new int[255];
+	protected String[] targetCharValueEscape = new String[255];
 
-	/** Given a char, we need to be able to show as an ANTLR literal.
-	 */
-	public static String ANTLRLiteralCharValueEscape[] = new String[255];
-
-	static {
-		ANTLRLiteralEscapedCharValue['n'] = '\n';
-		ANTLRLiteralEscapedCharValue['r'] = '\r';
-		ANTLRLiteralEscapedCharValue['t'] = '\t';
-		ANTLRLiteralEscapedCharValue['b'] = '\b';
-		ANTLRLiteralEscapedCharValue['f'] = '\f';
-		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralEscapedCharValue['\''] = '\'';
-		ANTLRLiteralEscapedCharValue['"'] = '"';
-		ANTLRLiteralCharValueEscape['\n'] = "\\n";
-		ANTLRLiteralCharValueEscape['\r'] = "\\r";
-		ANTLRLiteralCharValueEscape['\t'] = "\\t";
-		ANTLRLiteralCharValueEscape['\b'] = "\\b";
-		ANTLRLiteralCharValueEscape['\f'] = "\\f";
-		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-		ANTLRLiteralCharValueEscape['\''] = "\\'";
+	public Target() {
+		targetCharValueEscape['\n'] = "\\n";
+		targetCharValueEscape['\r'] = "\\r";
+		targetCharValueEscape['\t'] = "\\t";
+		targetCharValueEscape['\b'] = "\\b";
+		targetCharValueEscape['\f'] = "\\f";
+		targetCharValueEscape['\\'] = "\\\\";
+		targetCharValueEscape['\''] = "\\'";
+		targetCharValueEscape['"'] = "\\\"";
 	}
 
 	protected void genRecognizerFile(CodeGenerator generator,
@@ -52,96 +50,66 @@ public class Target {
 	{
 		// no header file by default
 	}
-	
-	/** Given a literal like (the 3 char sequence with single quotes) 'a',
-	 *  return the int value of 'a'. Convert escape sequences here also.
+
+	/** Get a meaningful name for a token type useful during code generation.
+	 *  Literals without associated names are converted to the string equivalent
+	 *  of their integer values. Used to generate x==ID and x==34 type comparisons
+	 *  etc...  Essentially we are looking for the most obvious way to refer
+	 *  to a token type in the generated code.  If in the lexer, return the
+	 *  char literal translated to the target language.  For example, ttype=10
+	 *  will yield '\n' from the getTokenDisplayName method.  That must
+	 *  be converted to the target languages literals.  For most C-derived
+	 *  languages no translation is needed.
 	 */
-	public static int getCharValueFromGrammarCharLiteral(String literal) {
-		switch ( literal.length() ) {
-			case 3 :
-				// 'x'
-				return literal.charAt(1); // no escape char
-			case 4 :
-				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(literal.charAt(2)) ) {
-//					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
-//									   "invalid char literal: "+literal);
-					return -1;
-				}
-				int escChar = literal.charAt(2);
-				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) {
-					// Unnecessary escapes like '\{' should just yield {
-					return escChar;
-				}
-				return charVal;
-			case 8 :
-				// '\u1234'
-				String unicodeChars = literal.substring(3,literal.length()-1);
-				return Integer.parseInt(unicodeChars, 16);
-			default :
-//				ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
-//								   "invalid char literal: "+literal);
-				return -1;
+	public String getTokenTypeAsTargetLabel(Grammar g, int ttype) {
+		if ( g.getType() == ANTLRParser.LEXER ) {
+//			String name = g.getTokenDisplayName(ttype);
+//			return getTargetCharLiteralFromANTLRCharLiteral(this,name);
 		}
+		String name = g.getTokenDisplayName(ttype);
+		// If name is a literal, return the token type instead
+		if ( name.charAt(0)=='\'' ) {
+			return String.valueOf(ttype);
+		}
+		return name;
 	}
 
-	public static String getStringFromGrammarStringLiteral(String literal) {
-		StringBuilder buf = new StringBuilder();
-		int n = literal.length();
-		int i = 1; // skip first quote
-		while ( i < (n-1) ) { // scan all but last quote 
-			switch ( literal.charAt(i) ) {
-				case '\\' :
-					i++;
-					if ( literal.charAt(i)=='u' ) { // '\u1234'
-						i++;
-						String unicodeChars = literal.substring(3,literal.length()-1);
-						buf.append((char)Integer.parseInt(unicodeChars, 16));
-					}
-					else {
-						char escChar = literal.charAt(i);
-						int charVal = ANTLRLiteralEscapedCharValue[escChar];
-						if ( charVal==0 ) buf.append(escChar); // Unnecessary escapes like '\{' should just yield {
-						else buf.append((char)charVal);
-					}
-					break;
-				default :
-					buf.append(literal.charAt(i));
-					i++;
-					break;
-			}
+	/** Convert from an ANTLR char literal found in a grammar file to
+	 *  an equivalent char literal in the target language.  For most
+	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
+	 *  to escape '\u000A' so that it doesn't get converted to \n by
+	 *  the compiler.  Convert the literal to the char value and then
+	 *  to an appropriate target char literal.
+	 *
+	 *  Expect single quotes around the incoming literal.
+	 */
+	public String getTargetCharLiteralCharValue(int c) {
+		StringBuffer buf = new StringBuffer();
+		buf.append('\'');
+		if ( c<Label.MIN_CHAR_VALUE ) return "'\u0000'";
+		if ( c<targetCharValueEscape.length &&
+			 targetCharValueEscape[c]!=null )
+		{
+			buf.append(targetCharValueEscape[c]);
 		}
+		else if ( Character.UnicodeBlock.of((char)c)==
+				  Character.UnicodeBlock.BASIC_LATIN &&
+				  !Character.isISOControl((char)c) )
+		{
+			// normal char
+			buf.append((char)c);
+		}
+		else {
+			// must be something unprintable...use \\uXXXX
+			// turn on the bit above max "\\uFFFF" value so that we pad with zeros
+			// then only take last 4 digits
+			String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
+			buf.append("\\u");
+			buf.append(hex);
+		}
+
+		buf.append('\'');
 		return buf.toString();
 	}
 
-	/** Return a string representing the escaped char for code c.  E.g., If c
-	 *  has value 0x100, you will get "\u0100".  ASCII gets the usual
-	 *  char (non-hex) representation.  Control characters are spit out
-	 *  as unicode.  While this is specially set up for returning Java strings,
-	 *  it can be used by any language target that has the same syntax. :)
-	 */
-	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c< Label.MIN_CHAR_VALUE ) {
-			return "'<INVALID>'";
-		}
-		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
-		}
-		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-			 !Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "'\\\\'";
-			}
-			if ( c=='\'') {
-				return "'\\''";
-			}
-			return '\''+Character.toString((char)c)+'\'';
-		}
-		// turn on the bit above max "\uFFFF" value so that we pad with zeros
-		// then only take last 4 digits
-		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-		String unicodeStr = "'\\u"+hex+"'";
-		return unicodeStr;
-	}
 }

@@ -1,8 +1,13 @@
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.codegen.src.BitSetDef;
 import org.antlr.v4.codegen.src.OutputModelObject;
+import org.antlr.v4.codegen.src.ParserFile;
+import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
 import org.stringtemplate.v4.*;
 
 import java.io.IOException;
@@ -19,6 +24,7 @@ public abstract class CodeGenerator {
 	public Grammar g;
 	public Target target;
 	public STGroup templates;
+	public ParserFile outputModel;
 
 	public int lineWidth = 72;
 
@@ -72,8 +78,7 @@ public abstract class CodeGenerator {
 	public void write() {
 		OutputModelObject root = buildOutputModel();
 
-		OutputModelWalker walker = new OutputModelWalker(g.tool, templates,
-														 ParserGenerator.modelToTemplateMap);
+		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
 		ST outputFileST = walker.walk(root);
 		
 		// WRITE FILES
@@ -129,5 +134,17 @@ public abstract class CodeGenerator {
 //			return null;
 //		}
 		return g.name+VOCAB_FILE_EXTENSION;
+	}
+
+	public BitSetDef defineBitSet(GrammarAST ast, IntSet follow) {
+		String inRuleName = ast.nfaState.rule.name;
+		String elementName = ast.getText(); // assume rule ref
+		if ( ast.getType() == ANTLRParser.TOKEN_REF ) {
+			target.getTokenTypeAsTargetLabel(g, ast.getType() );
+		}
+		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+ast.token.getTokenIndex();
+		BitSetDef b = new BitSetDef(this, name, follow);
+		outputModel.bitSetDefs.add(b);
+		return b;
 	}
 }
