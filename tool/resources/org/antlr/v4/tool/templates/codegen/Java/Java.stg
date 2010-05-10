@@ -32,15 +32,53 @@ CodeBlock(c, ops) ::= <<
 <ops; separator="\n">
 >>
 
-LL1Choice(c, alts) ::= <<
+LL1Choice(choice, alts) ::= <<
 switch ( input.LA(1) ) {
-	<alts; separator="\n">
+	<choice.altLook,alts:{look,alt| <look:cases()><alt>}; separator="\n">
+	default :
+	    error
 }
 >>
 
-MatchToken(m) ::= <<
-match(<m.name>, <m.follow.name>);
+LL1OptionalBlock(choice, expr, alts) ::= <<
+switch ( <expr> ) {
+	<choice.altLook,alts:{look,alt| <look:cases()><alt>}; separator="\n">
+}
 >>
+
+LL1OptionalBlockSingleAlt(choice, expr, alts, decls) ::= <<
+<decls>
+if ( <expr> ) {
+    <alts; separator="\n">
+}
+else {
+    NoViableAltException nvae = new NoViableAltException("", 4, 0, input);
+}
+>>
+
+TestSet(s) ::= <<
+<s.set.name>.member(input.LA(1))
+>>
+
+TestSetInline(s) ::= <<
+<s.ttypes:{ttype | <first(choice.decls).varName>==<ttype>}; separator=" || ">
+>>
+
+cases(look) ::= <<
+<look:{case <it>:<\n>}>
+>>
+
+InvokeRule(r) ::= <<
+pushFollow(<r.follow.name>);
+<if(r.label)><r.label> = <endif><r.name>();
+state._fsp--;
+>>
+
+MatchToken(m) ::= <<
+<if(m.label)><m.label> = <endif>match(<m.name>, <m.follow.name>);
+>>
+
+NextTokenDecl(d) ::= "Token <d.varName> = input.LA(1);"
 
 codeFileExtension() ::= ".java"
 

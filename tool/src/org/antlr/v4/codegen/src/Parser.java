@@ -27,6 +27,7 @@ public class Parser extends OutputModelObject {
 
 	@Override
 	public List<String> getChildren() {
-		return new ArrayList<String>() {{ add("funcs"); }};
+		final List<String> sup = super.getChildren();
+		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("funcs"); }};
 	}
 }

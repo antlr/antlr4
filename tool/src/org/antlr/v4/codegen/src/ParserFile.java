@@ -19,7 +19,9 @@ public class ParserFile extends OutputModelObject {
 
 	@Override
 	public List<String> getChildren() {
+		final List<String> sup = super.getChildren();
 		return new ArrayList<String>() {{
+			if ( sup!=null ) addAll(sup);
 			add("parser");
 			add("dfaDefs");
 			add("bitSetDefs");

@@ -1,22 +1,28 @@
 package org.antlr.v4.codegen.src;
 
+import org.antlr.v4.automata.BlockStartState;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** */
 public abstract class Choice extends SrcOp {
-	public DFADef dfaDef;
+	public int decision;
 	public List<CodeBlock> alts;
+	public List<Decl> decls;
 
-	public Choice(CodeGenerator gen, List<CodeBlock> alts) {
+	public Choice(CodeGenerator gen, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
 		this.gen = gen;
+		this.ast = blkOrEbnfRootAST;
 		this.alts = alts;
+		this.decision = ((BlockStartState)blkOrEbnfRootAST.nfaState).decision;
 	}
 
 	@Override
 	public List<String> getChildren() {
-		return new ArrayList<String>() {{ add("alts"); }};
+		final List<String> sup = super.getChildren();
+		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("alts"); add("decls"); }};
 	}
 }

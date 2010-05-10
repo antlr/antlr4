@@ -22,6 +22,7 @@ public class CodeBlock extends SrcOp {
 
 	@Override
 	public List<String> getChildren() {
-		return new ArrayList<String>() {{ add("ops"); }};
+		final List<String> sup = super.getChildren();
+		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("ops"); }};
 	}
 }

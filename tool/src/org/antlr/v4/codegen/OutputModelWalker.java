@@ -73,9 +73,16 @@ public class OutputModelWalker {
 					ST nestedST = walk(nestedOmo);
 					st.add(fieldName, nestedST);
 				}
-				else if ( o instanceof Collection ) {    // LIST OF MODEL OBJECTS?
+				else if ( o instanceof Collection || o instanceof OutputModelObject[] ) {
+					// LIST OF MODEL OBJECTS?
+					if ( o instanceof OutputModelObject[] ) {
+						o = Arrays.asList((OutputModelObject[])o);
+					}
 					Collection<? extends OutputModelObject> nestedOmos = (Collection)o;
 					for (OutputModelObject nestedOmo : nestedOmos) {
+						if ( nestedOmo==null ) {
+							System.out.println("collection has nulls: "+nestedOmos);
+						}
 						ST nestedST = walk(nestedOmo);
 						st.add(fieldName, nestedST);
 					}

@@ -154,6 +154,16 @@ public class LinearApproximator {
 		return dfa;
 	}
 
+	/** From linear approximate LL(1) DFA, get lookahead per alt; 1..n */
+	public static IntervalSet[] getLL1LookaheadSets(DFA dfa) {
+		IntervalSet[] look = new IntervalSet[dfa.nAlts+1];
+		DFAState s0 = dfa.startState;
+		for (int a=1; a<=dfa.nAlts; a++) {
+			look[a] = s0.edges.get(a-1).label;
+		}
+		return look;
+	}
+
 	/** From an NFA state, s, find the set of all labels reachable from s at
 	 *  depth k.
 	 */

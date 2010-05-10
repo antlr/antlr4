@@ -28,7 +28,7 @@ public class RuleFunction extends OutputModelObject {
 	public List<String> exceptions;
 	public String finallyAction;
 
-	public CodeBlock code;
+	public SrcOp code;
 
 	public RuleFunction(CodeGenerator gen, Rule r) {
 		this.gen = gen;
@@ -52,7 +52,7 @@ public class RuleFunction extends OutputModelObject {
 		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 		SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, gen);
 		try {
-			code = genTriggers.block(); // GEN Instr OBJECTS
+			code = genTriggers.block(null,null); // GEN Instr OBJECTS
 		}
 		catch (Exception e){
 			e.printStackTrace(System.err);
@@ -61,6 +61,7 @@ public class RuleFunction extends OutputModelObject {
 
 	@Override
 	public List<String> getChildren() {
-		return new ArrayList<String>() {{ add("code"); }};
+		final List<String> sup = super.getChildren();
+		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("code"); }};
 	}
 }

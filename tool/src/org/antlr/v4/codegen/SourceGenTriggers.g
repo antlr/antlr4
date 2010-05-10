@@ -24,14 +24,14 @@ import java.util.HashMap;
     }
 }
 
-block returns [CodeBlock omo]
-    :	^(	BLOCK (^(OPTIONS .+))?
+block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo]
+    :	^( blk=BLOCK (^(OPTIONS .+))?
 		{List<CodeBlock> alts = new ArrayList<CodeBlock>();}
     		( alternative {alts.add($alternative.omo);} )+
     	)
     	{
-    	Choice c = new LL1Choice(gen, alts); // TODO: assumes LL1
-		$omo = new CodeBlock(gen, c);
+    	if ( alts.size()==1 && ebnfRoot==null) return alts.get(0);
+    	$omo = gen.getChoiceBlock((BlockAST)$blk, $ebnfRoot, alts);
     	}
     ;
 
@@ -43,9 +43,9 @@ alternative returns [CodeBlock omo]
     ;
 
 element returns [SrcOp omo]
-	:	labeledElement				
-	|	atom						{$omo = $atom.omo;}
-	|	ebnf						
+	:	labeledElement					{$omo = $labeledElement.omo;}
+	|	atom[null]						{$omo = $atom.omo;}
+	|	ebnf							{$omo = $ebnf.omo;}						
 	|   ACTION						
 	|   SEMPRED					
 	|	GATED_SEMPRED	
@@ -53,10 +53,10 @@ element returns [SrcOp omo]
 	;
 	
 labeledElement returns [SrcOp omo]
-	:	^(ASSIGN ID  atom  )
-	|	^(ASSIGN ID block)			
-	|	^(PLUS_ASSIGN ID atom)		
-	|	^(PLUS_ASSIGN ID block)		
+	:	^(ASSIGN ID atom[$ID] )				{$omo = $atom.omo;}
+	|	^(ASSIGN ID block[$ID,null])		{$omo = $block.omo;}
+	|	^(PLUS_ASSIGN ID atom[$ID])			{$omo = $atom.omo;}
+	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omo = $block.omo;}	
 	;
 
 treeSpec returns [SrcOp omo]
@@ -64,14 +64,12 @@ treeSpec returns [SrcOp omo]
     ;
 
 ebnf returns [SrcOp omo]
-	:	^(astBlockSuffix block)		
-	|	^(OPTIONAL block)			
-		
-	|	^(CLOSURE block)			
-		
-	|	^(POSITIVE_CLOSURE block)
-		
-	| 	block						
+	:	^(astBlockSuffix block[null,null])		
+	|	^(OPTIONAL block[null,$OPTIONAL])	{$omo = $block.omo;}		
+	|	^(CLOSURE block[null,$CLOSURE])		{$omo = $block.omo;}		
+	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE])
+										    {$omo = $block.omo;}
+	| 	block[null, null]					{$omo = $block.omo;}
     ;
 
 astBlockSuffix
@@ -80,43 +78,44 @@ astBlockSuffix
     | BANG
     ;
 
-atom returns [SrcOp omo]
-	:	^(ROOT range)			
-	|	^(BANG range)			
-	|	^(ROOT notSet)			
-	|	^(BANG notSet)			
-	|	notSet					
-	|	range					
-	|	^(DOT ID terminal)		
-	|	^(DOT ID ruleref)		
+// TODO: combine ROOT/BANG into one then just make new op ref'ing return value of atom/terminal...
+// TODO: same for NOT
+atom[GrammarAST label] returns [SrcOp omo]
+	:	^(ROOT range[label])			
+	|	^(BANG range[label])		{$omo = $range.omo;}	
+	|	^(ROOT notSet[label])			
+	|	^(BANG notSet[label])		{$omo = $notSet.omo;}	
+	|	notSet[label]					
+	|	range[label]				{$omo = $range.omo;}	
+	|	^(DOT ID terminal[label])
+	|	^(DOT ID ruleref[label])
     |	^(WILDCARD .)				
     |	WILDCARD				
-    |   terminal				{$omo = $terminal.omo;}
-    |   ruleref					{$omo = $ruleref.omo;}
+    |   terminal[label]				{$omo = $terminal.omo;}
+    |   ruleref[label]				{$omo = $ruleref.omo;}
     ;
 
-notSet returns [SrcOp omo]
-    : ^(NOT terminal)		
-    | ^(NOT block)			
+notSet[GrammarAST label] returns [SrcOp omo]
+    : ^(NOT terminal[label])		
+    | ^(NOT block[label,null])			
     ;
 
-ruleref returns [SrcOp omo]
-    :	^(ROOT ^(RULE_REF ARG_ACTION?))	
-    |	^(BANG ^(RULE_REF ARG_ACTION?))	
-    |	^(RULE_REF ARG_ACTION?)			
+ruleref[GrammarAST label] returns [SrcOp omo]
+    :	^(ROOT ^(RULE_REF ARG_ACTION?))
+    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$omo = new InvokeRule(gen, $RULE_REF, $label);}
+    |	^(RULE_REF ARG_ACTION?)			{$omo = new InvokeRule(gen, $RULE_REF, $label);}
     ;
 
-range returns [SrcOp omo]
-    :	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
-    	
+range[GrammarAST label] returns [SrcOp omo]
+    :	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)    	
     ;
 
-terminal returns [MatchToken omo]
-    :  ^(STRING_LITERAL .)			
-    |	STRING_LITERAL				
-    |	^(TOKEN_REF ARG_ACTION .)	
-    |	^(TOKEN_REF .)				
-    |	TOKEN_REF					{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF);}
-    |	^(ROOT terminal)			
-    |	^(BANG terminal)			
+terminal[GrammarAST label] returns [MatchToken omo]
+    :  ^(STRING_LITERAL .)			{$omo = new MatchToken(gen, (TerminalAST)$STRING_LITERAL, $label);}
+    |	STRING_LITERAL				{$omo = new MatchToken(gen, (TerminalAST)$STRING_LITERAL, $label);}
+    |	^(TOKEN_REF ARG_ACTION .)	{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF, $label);}
+    |	^(TOKEN_REF .)				{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF, $label);}
+    |	TOKEN_REF					{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF, $label);}
+    |	^(ROOT terminal[label])			
+    |	^(BANG terminal[label])			
     ;

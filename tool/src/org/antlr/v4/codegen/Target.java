@@ -74,6 +74,14 @@ public class Target {
 		return name;
 	}
 
+	public String[] getTokenTypeAsTargetLabel(Grammar g, int[] ttypes) {
+		String[] labels = new String[ttypes.length];
+		for (int i=0; i<ttypes.length; i++) {
+			labels[i] = getTokenTypeAsTargetLabel(g, ttypes[i]);
+		}
+		return labels;
+	}
+
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For most
 	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
@@ -112,4 +120,5 @@ public class Target {
 		return buf.toString();
 	}
 
+	public int getInlineTestsVsBitsetThreshold() { return 20; }
 }

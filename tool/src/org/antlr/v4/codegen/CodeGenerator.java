@@ -1,10 +1,10 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.src.BitSetDef;
-import org.antlr.v4.codegen.src.OutputModelObject;
-import org.antlr.v4.codegen.src.ParserFile;
+import org.antlr.v4.automata.DFA;
+import org.antlr.v4.codegen.src.*;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.tool.BlockAST;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
@@ -12,6 +12,7 @@ import org.stringtemplate.v4.*;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 /** */
 public abstract class CodeGenerator {
@@ -105,6 +106,27 @@ public abstract class CodeGenerator {
 		}
 	}
 
+	public Choice getChoiceBlock(BlockAST blkAST, GrammarAST ebnfRoot, List<CodeBlock> alts) {
+		// TODO: assumes LL1
+		int ebnf = 0;
+		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
+		Choice c = null;
+		switch ( ebnf ) {
+			case ANTLRParser.OPTIONAL :
+				if ( alts.size()==1 ) c = new LL1OptionalBlockSingleAlt(this, ebnfRoot, alts);
+				else c = new LL1OptionalBlock(this, ebnfRoot, alts);
+				break;
+			case ANTLRParser.CLOSURE :
+				break;
+			case ANTLRParser.POSITIVE_CLOSURE :
+				break;
+			default :
+				c = new LL1Choice(this, blkAST, alts);
+				break;
+		}
+		return c;
+	}
+
 	public void write(ST code, String fileName) throws IOException {
 		long start = System.currentTimeMillis();
 		Writer w = g.tool.getOutputFile(g, fileName);
@@ -136,14 +158,28 @@ public abstract class CodeGenerator {
 		return g.name+VOCAB_FILE_EXTENSION;
 	}
 
-	public BitSetDef defineBitSet(GrammarAST ast, IntSet follow) {
+	public DFADef defineDFA(GrammarAST ast, DFA dfa) {
+		return null;
+//		DFADef d = new DFADef(name, dfa);
+//		outputModel.dfaDefs.add(d);
+	}
+
+	public BitSetDef defineFollowBitSet(GrammarAST ast, IntSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String elementName = ast.getText(); // assume rule ref
 		if ( ast.getType() == ANTLRParser.TOKEN_REF ) {
-			target.getTokenTypeAsTargetLabel(g, ast.getType() );
+			elementName = target.getTokenTypeAsTargetLabel(g, g.tokenNameToTypeMap.get(elementName));
 		}
-		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+ast.token.getTokenIndex();
-		BitSetDef b = new BitSetDef(this, name, follow);
+		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+"_"+ast.token.getTokenIndex();
+		BitSetDef b = new BitSetDef(this, name, set);
+		outputModel.bitSetDefs.add(b);
+		return b;
+	}
+
+	public BitSetDef defineTestBitSet(GrammarAST ast, IntSet set) {
+		String inRuleName = ast.nfaState.rule.name;
+		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
+		BitSetDef b = new BitSetDef(this, name, set);
 		outputModel.bitSetDefs.add(b);
 		return b;
 	}
