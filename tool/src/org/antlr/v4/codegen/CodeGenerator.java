@@ -117,6 +117,8 @@ public abstract class CodeGenerator {
 				else c = new LL1OptionalBlock(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.CLOSURE :
+				if ( alts.size()==1 ) c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
+				else c = new LL1StarBlock(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.POSITIVE_CLOSURE :
 				break;

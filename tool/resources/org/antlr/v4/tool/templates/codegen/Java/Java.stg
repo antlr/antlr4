@@ -34,17 +34,16 @@ CodeBlock(c, ops) ::= <<
 
 LL1Choice(choice, alts) ::= <<
 switch ( input.LA(1) ) {
-	<choice.altLook,alts:{look,alt| <look:cases()><alt>}; separator="\n">
+	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n">
 	default :
 	    error
 }
 >>
 
-LL1OptionalBlock(choice, expr, alts) ::= <<
-switch ( <expr> ) {
-	<choice.altLook,alts:{look,alt| <look:cases()><alt>}; separator="\n">
-}
->>
+// follow set included as choice by analysis
+LL1OptionalBlock ::= LL1Choice
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble) ::= <<
 <preamble>
@@ -56,6 +55,28 @@ else {
 }
 >>
 
+LL1StarBlock(choice, alts) ::= <<
+<choice.loopLabel>:
+while (true) {
+	switch ( input.LA(1) ) {
+		<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+		<alt>
+		break;}; separator="\n">
+		<cases(ttypes=choice.exitLook)>
+		    break <choice.loopLabel>;
+		default :
+		    error
+	}
+}
+>>
+
+LL1StarBlockSingleAlt(choice, expr, alts, preamble) ::= <<
+<preamble>
+while ( <expr> ) {
+    <alts; separator="\n">
+}
+>>
+
 TestSet(s) ::= <<
 <s.set.name>.member(input.LA(1))
 >>
@@ -64,8 +85,8 @@ TestSetInline(s) ::= <<
 <s.ttypes:{ttype | <s.nextToken.varName>==<ttype>}; separator=" || ">
 >>
 
-cases(look) ::= <<
-<look:{case <it>:<\n>}>
+cases(ttypes) ::= <<
+<ttypes:{t | case <t>:}; separator="\n">
 >>
 
 InvokeRule(r) ::= <<
@@ -76,6 +97,11 @@ state._fsp--;
 
 MatchToken(m) ::= <<
 <if(m.label)><m.label> = <endif>match(<m.name>, <m.follow.name>);
+>>
+
+Action(a) ::= "<a.ast.text>"
+SemPred(p) ::= <<
+if (!(<p.ast.text>)) throw new FailedPredicateException(input, "<ruleName>", "<description>");
 >>
 
 CaptureNextToken(d) ::= "Token <d.varName> = input.LA(1);"

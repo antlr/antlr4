@@ -46,8 +46,8 @@ element returns [SrcOp omo]
 	:	labeledElement					{$omo = $labeledElement.omo;}
 	|	atom[null]						{$omo = $atom.omo;}
 	|	ebnf							{$omo = $ebnf.omo;}						
-	|   ACTION						
-	|   SEMPRED					
+	|   ACTION							{$omo = new Action(gen, $ACTION);}
+	|   SEMPRED							{$omo = new SemPred(gen, $SEMPRED);}
 	|	GATED_SEMPRED	
 	|	treeSpec					
 	;

@@ -7,7 +7,7 @@ import java.util.List;
 public class BlockStartState extends DecisionState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 
-	//BlockEndState endState;
+	public BlockEndState endState;
 
 	/** Track the transitions emanating from this NFA state. */
 	public List<Transition> transitions = new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);

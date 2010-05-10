@@ -216,10 +216,15 @@ public class ParserNFAFactory implements NFAFactory {
      *  TODO: Set alt number (1..n) in the states?
      */
 	public Handle block(GrammarAST blkAST, List<Handle> alts) {
-		if ( alts.size()==1 ) return alts.get(0);
+		if ( alts.size()==1 ) {
+			Handle h = alts.get(0);
+			blkAST.nfaState = h.left;
+			return h;
+		}
 				
 		BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
 		BlockEndState end = (BlockEndState)newState(BlockEndState.class, blkAST);
+		start.endState = end;
 		for (Handle alt : alts) {
 			epsilon(start, alt.left);
 			epsilon(alt.right, end);
@@ -259,6 +264,7 @@ public class ParserNFAFactory implements NFAFactory {
 			epsilon(blk.left, blk.right);
 //			FASerializer ser = new FASerializer(g, blk.left);
 //			System.out.println(optAST.toStringTree()+":\n"+ser);
+			optAST.nfaState = blk.left;
 			return blk;
 		}
 
@@ -327,6 +333,8 @@ public class ParserNFAFactory implements NFAFactory {
 		StarBlockStartState start = (StarBlockStartState)newState(StarBlockStartState.class, starAST);
 		LoopbackState loop = (LoopbackState)newState(LoopbackState.class, starAST);
 		BlockEndState end = (BlockEndState)newState(BlockEndState.class, starAST);
+		start.endState = end; // points past loopback state
+		start.loopBackState = loop;
 		epsilon(start, blk.left);
 		epsilon(start, end); // bypass edge
 		epsilon(loop, blk.left);

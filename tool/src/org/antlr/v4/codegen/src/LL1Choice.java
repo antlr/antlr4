@@ -22,7 +22,7 @@ public class LL1Choice extends Choice {
 		altLook = new ArrayList<String[]>();
 		for (int a=1; a<altLookSets.length; a++) {
 			IntervalSet s = altLookSets[a];
-			altLook.add(gen.target.getTokenTypeAsTargetLabel(gen.g, s.toArray()));
+			altLook.add(gen.target.getTokenTypesAsTargetLabels(gen.g, s.toArray()));
 		}
 	}
 }

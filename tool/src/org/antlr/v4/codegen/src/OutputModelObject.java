@@ -21,4 +21,13 @@ public abstract class OutputModelObject {
 	public List<String> getChildren() {
 		return null;
 	}
+
+	public OutputModelObject() {;}
+	
+	public OutputModelObject(CodeGenerator gen) { this.gen = gen; }
+
+	public OutputModelObject(CodeGenerator gen, GrammarAST ast) {
+		this.gen = gen;
+		this.ast = ast;
+	}
 }

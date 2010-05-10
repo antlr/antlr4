@@ -74,7 +74,7 @@ public class Target {
 		return name;
 	}
 
-	public String[] getTokenTypeAsTargetLabel(Grammar g, int[] ttypes) {
+	public String[] getTokenTypesAsTargetLabels(Grammar g, int[] ttypes) {
 		String[] labels = new String[ttypes.length];
 		for (int i=0; i<ttypes.length; i++) {
 			labels[i] = getTokenTypeAsTargetLabel(g, ttypes[i]);
