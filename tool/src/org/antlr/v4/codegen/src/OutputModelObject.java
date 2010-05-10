@@ -1,12 +1,14 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
 
 /** */
 public abstract class OutputModelObject {
 	public CodeGenerator gen;
+	public GrammarAST ast;
 
 	/** If the output model object encloses some other model objects,
 	 *  we need to be able to walk them. Rather than make each class

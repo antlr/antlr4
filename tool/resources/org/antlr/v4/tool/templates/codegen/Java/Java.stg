@@ -46,8 +46,8 @@ switch ( <expr> ) {
 }
 >>
 
-LL1OptionalBlockSingleAlt(choice, expr, alts, decls) ::= <<
-<decls>
+LL1OptionalBlockSingleAlt(choice, expr, alts, preamble) ::= <<
+<preamble>
 if ( <expr> ) {
     <alts; separator="\n">
 }
@@ -61,7 +61,7 @@ TestSet(s) ::= <<
 >>
 
 TestSetInline(s) ::= <<
-<s.ttypes:{ttype | <first(choice.decls).varName>==<ttype>}; separator=" || ">
+<s.ttypes:{ttype | <s.nextToken.varName>==<ttype>}; separator=" || ">
 >>
 
 cases(look) ::= <<
@@ -78,7 +78,7 @@ MatchToken(m) ::= <<
 <if(m.label)><m.label> = <endif>match(<m.name>, <m.follow.name>);
 >>
 
-NextTokenDecl(d) ::= "Token <d.varName> = input.LA(1);"
+CaptureNextToken(d) ::= "Token <d.varName> = input.LA(1);"
 
 codeFileExtension() ::= ".java"
 

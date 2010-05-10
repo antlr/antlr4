@@ -14,9 +14,7 @@ public class LL1OptionalBlockSingleAlt extends LL1OptionalBlock {
 		super(gen, blkAST, alts);
 		IntervalSet look = altLookSets[1];
 		if ( look.size() < gen.target.getInlineTestsVsBitsetThreshold() ) {
-			expr = new TestSetInline(gen, blkAST, look);
-			decls = new ArrayList<Decl>();
-			decls.add(new NextTokenDecl("la34"));
+			expr = new TestSetInline(gen, this, blkAST, look);
 		}
 		else {
 			expr = new TestSet(gen, blkAST, look);
