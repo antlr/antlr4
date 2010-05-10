@@ -25,6 +25,7 @@ public class LL1StarBlock extends LL1Choice {
 		IntervalSet exitLook = dfa.startState.edge(1).label;
 		this.exitLook = gen.target.getTokenTypesAsTargetLabels(gen.g, exitLook.toArray());
 
-		loopLabel = "loop"+blkAST.token.getTokenIndex();
+		loopLabel = gen.getLoopLabel(blkAST);
 	}
+
 }

@@ -3,6 +3,7 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.codegen.src.*;
 import org.antlr.v4.misc.IntSet;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.BlockAST;
 import org.antlr.v4.tool.ErrorType;
@@ -121,12 +122,25 @@ public abstract class CodeGenerator {
 				else c = new LL1StarBlock(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.POSITIVE_CLOSURE :
+				if ( alts.size()==1 ) c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
+				else c = new LL1PlusBlock(this, ebnfRoot, alts);
 				break;
 			default :
 				c = new LL1Choice(this, blkAST, alts);
 				break;
 		}
 		return c;
+	}
+
+	public OutputModelObject getLL1Test(Choice choice, IntervalSet look, GrammarAST blkAST) {
+		OutputModelObject expr;
+		if ( look.size() < target.getInlineTestsVsBitsetThreshold() ) {
+			expr = new TestSetInline(this, choice, blkAST, look);
+		}
+		else {
+			expr = new TestSet(this, blkAST, look);
+		}
+		return expr;
 	}
 
 	public void write(ST code, String fileName) throws IOException {
@@ -184,5 +198,13 @@ public abstract class CodeGenerator {
 		BitSetDef b = new BitSetDef(this, name, set);
 		outputModel.bitSetDefs.add(b);
 		return b;
+	}
+
+	public String getLoopLabel(GrammarAST ast) {
+		return "loop"+ ast.token.getTokenIndex();
+	}
+
+	public String getLoopCounter(GrammarAST ast) {
+		return "cnt"+ ast.token.getTokenIndex();
 	}
 }

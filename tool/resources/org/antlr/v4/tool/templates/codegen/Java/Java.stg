@@ -74,7 +74,35 @@ LL1StarBlockSingleAlt(choice, expr, alts, preamble) ::= <<
 <preamble>
 while ( <expr> ) {
     <alts; separator="\n">
+    <choice.expr.nextToken.varName> = input.LA(1);
 }
+>>
+
+LL1PlusBlock(choice, alts) ::= <<
+int <choice.loopCounterVar> = 0;
+<choice.loopLabel>:
+while (true) {
+	switch ( input.LA(1) ) {
+		<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n">
+		<cases(ttypes=choice.exitLook)>
+		    if ( <choice.loopCounterVar> >= 1 ) break <choice.loopLabel>;
+		    else error
+		default :
+		    error
+	}
+}
+>>
+
+//LL1PlusBlockSingleAlt ::= LL1PlusBlock
+
+LL1PlusBlockSingleAlt(choice, expr, alts, preamble) ::= <<
+<preamble>
+do {
+    <alts; separator="\n">
+    <choice.expr.nextToken.varName> = input.LA(1);
+} while ( <expr> );
 >>
 
 TestSet(s) ::= <<

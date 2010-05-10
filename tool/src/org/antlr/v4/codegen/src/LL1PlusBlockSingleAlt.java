@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** */
-public class LL1StarBlockSingleAlt extends LL1Choice {
+public class LL1PlusBlockSingleAlt extends LL1Choice {
 	public Object expr;
-	public LL1StarBlockSingleAlt(CodeGenerator gen, GrammarAST blkAST, List<CodeBlock> alts) {
+	public LL1PlusBlockSingleAlt(CodeGenerator gen, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(gen, blkAST, alts);
-		IntervalSet look = altLookSets[1];
-		expr = gen.getLL1Test(this, look, blkAST);
+		IntervalSet loopBackLook = altLookSets[2]; // loop exit is alt 1
+		expr = gen.getLL1Test(this, loopBackLook, blkAST);
 	}
 
 	@Override
@@ -21,4 +21,5 @@ public class LL1StarBlockSingleAlt extends LL1Choice {
 		final List<String> sup = super.getChildren();
 		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("expr"); }};
 	}
+	
 }

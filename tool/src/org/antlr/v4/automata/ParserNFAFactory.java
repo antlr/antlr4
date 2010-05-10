@@ -298,6 +298,8 @@ public class ParserNFAFactory implements NFAFactory {
 		PlusBlockStartState start = (PlusBlockStartState)newState(PlusBlockStartState.class, plusAST);
 		LoopbackState loop = (LoopbackState)newState(LoopbackState.class, plusAST);
 		BlockEndState end = (BlockEndState)newState(BlockEndState.class, plusAST);
+		start.endState = end; // points past loopback state
+		start.loopBackState = loop;
 		epsilon(start, blk.left);
 		epsilon(loop, blk.left);
 		epsilon(blk.right, loop);

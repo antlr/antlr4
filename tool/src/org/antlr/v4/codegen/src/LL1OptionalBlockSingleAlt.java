@@ -13,12 +13,7 @@ public class LL1OptionalBlockSingleAlt extends LL1OptionalBlock {
 	public LL1OptionalBlockSingleAlt(CodeGenerator gen, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(gen, blkAST, alts);
 		IntervalSet look = altLookSets[1];
-		if ( look.size() < gen.target.getInlineTestsVsBitsetThreshold() ) {
-			expr = new TestSetInline(gen, this, blkAST, look);
-		}
-		else {
-			expr = new TestSet(gen, blkAST, look);
-		}
+		expr = gen.getLL1Test(this, look, blkAST);
 	}
 
 	@Override
