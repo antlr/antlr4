@@ -101,4 +101,12 @@ public class Utils {
 		for (T t : nodes) a.add(t.getText());
 		return a;
 	}
+
+	public static <T> List<T> list(T... values) {
+		List<T> x = new ArrayList<T>(values.length);
+		for (T v : values) {
+			if ( v!=null ) x.add(v);
+		}
+		return x;
+	}
 }
