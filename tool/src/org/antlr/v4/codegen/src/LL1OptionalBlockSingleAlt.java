@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** */
-public class LL1OptionalBlockSingleAlt extends LL1OptionalBlock {
+public class LL1OptionalBlockSingleAlt extends LL1Choice {
 	public Object expr;
 	public LL1OptionalBlockSingleAlt(CodeGenerator gen, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(gen, blkAST, alts);
