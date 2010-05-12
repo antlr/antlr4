@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.src;
 
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,13 @@ public class ParserFile extends OutputModelObject {
 	public List<DFADef> dfaDefs = new ArrayList<DFADef>();
 	public List<BitSetDef> bitSetDefs = new ArrayList<BitSetDef>();
 	
-	public ParserFile(CodeGenerator gen, String fileName) {
-		this.gen = gen;
+	public ParserFile(OutputModelFactory factory, String fileName) {
+		super(factory);
 		this.fileName = fileName; 
+	}
+
+	public void defineBitSet(BitSetDef b) {
+		bitSetDefs.add(b);
 	}
 
 	@Override

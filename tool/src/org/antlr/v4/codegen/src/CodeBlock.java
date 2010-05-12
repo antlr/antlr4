@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.src;
 
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,15 +9,15 @@ import java.util.List;
 public class CodeBlock extends SrcOp {
 	public List<SrcOp> ops;
 
-	public CodeBlock(CodeGenerator gen) { this.gen = gen; }
+	public CodeBlock(OutputModelFactory factory) { this.factory = factory; }
 	
-	public CodeBlock(CodeGenerator gen, List<SrcOp> ops) {
-		this.gen = gen;
+	public CodeBlock(OutputModelFactory factory, List<SrcOp> ops) {
+		super(factory);
 		this.ops = ops;
 	}
 
-	public CodeBlock(CodeGenerator gen, final SrcOp elem) {
-		this(gen, new ArrayList<SrcOp>() {{ add(elem); }});
+	public CodeBlock(OutputModelFactory factory, final SrcOp elem) {
+		this(factory, new ArrayList<SrcOp>() {{ add(elem); }});
 	}
 
 	@Override

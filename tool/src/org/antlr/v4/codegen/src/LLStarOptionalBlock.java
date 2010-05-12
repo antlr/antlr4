@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.src;
 
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.BlockAST;
 
 import java.util.List;
@@ -8,8 +8,8 @@ import java.util.List;
 /** */
 public class LLStarOptionalBlock extends OptionalBlock {
 	public DFADef dfaDef;
-	public LLStarOptionalBlock(CodeGenerator gen, BlockAST blkAST, List<CodeBlock> alts) {
-		super(gen, blkAST, alts);
-		dfaDef = gen.defineDFA(ast, gen.g.decisionDFAs.get(decision));
+	public LLStarOptionalBlock(OutputModelFactory factory, BlockAST blkAST, List<CodeBlock> alts) {
+		super(factory, blkAST, alts);
+		dfaDef = factory.defineDFA(ast, factory.g.decisionDFAs.get(decision));
 	}
 }

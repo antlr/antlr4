@@ -3,7 +3,6 @@ options {
 	language     = Java;
 	tokenVocab   = ANTLRParser;
 	ASTLabelType = GrammarAST;
-//	superClass   = NFABytecodeGenerator;
 }
 
 @header {
@@ -17,10 +16,10 @@ import java.util.HashMap;
 
 @members {
 // TODO: identical grammar to NFABytecodeTriggers; would be nice to combine
-	public CodeGenerator gen;
-    public SourceGenTriggers(TreeNodeStream input, CodeGenerator gen) {
+	public OutputModelFactory factory;
+    public SourceGenTriggers(TreeNodeStream input, OutputModelFactory factory) {
     	this(input);
-    	this.gen = gen;
+    	this.factory = factory;
     }
 }
 
@@ -31,23 +30,23 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo]
     	)
     	{
     	if ( alts.size()==1 && ebnfRoot==null) return alts.get(0);
-    	$omo = gen.getChoiceBlock((BlockAST)$blk, $ebnfRoot, alts);
+    	$omo = factory.getChoiceBlock((BlockAST)$blk, $ebnfRoot, alts);
     	}
     ;
 
 alternative returns [CodeBlock omo]
 @init {List<SrcOp> elems = new ArrayList<SrcOp>();}
     :	^(ALT_REWRITE a=alternative .)	
-    |	^(ALT EPSILON) {$omo = new CodeBlock(gen);}
-    |   ^( ALT ( element {elems.add($element.omo);} )+ ) {$omo = new CodeBlock(gen, elems);}
+    |	^(ALT EPSILON) {$omo = factory.epsilon();}
+    |   ^( ALT ( element {elems.add($element.omo);} )+ ) {$omo = factory.alternative(elems);}
     ;
 
 element returns [SrcOp omo]
 	:	labeledElement					{$omo = $labeledElement.omo;}
 	|	atom[null]						{$omo = $atom.omo;}
 	|	ebnf							{$omo = $ebnf.omo;}						
-	|   ACTION							{$omo = new Action(gen, $ACTION);}
-	|   SEMPRED							{$omo = new SemPred(gen, $SEMPRED);}
+	|   ACTION							{$omo = factory.action($ACTION);}
+	|   SEMPRED							{$omo = factory.sempred($SEMPRED);}
 	|	GATED_SEMPRED	
 	|	treeSpec					
 	;
@@ -102,8 +101,8 @@ notSet[GrammarAST label] returns [SrcOp omo]
 
 ruleref[GrammarAST label] returns [SrcOp omo]
     :	^(ROOT ^(RULE_REF ARG_ACTION?))
-    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$omo = new InvokeRule(gen, $RULE_REF, $label);}
-    |	^(RULE_REF ARG_ACTION?)			{$omo = new InvokeRule(gen, $RULE_REF, $label);}
+    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$omo = new InvokeRule(factory, $RULE_REF, $label);}
+    |	^(RULE_REF ARG_ACTION?)			{$omo = new InvokeRule(factory, $RULE_REF, $label);}
     ;
 
 range[GrammarAST label] returns [SrcOp omo]
@@ -111,11 +110,11 @@ range[GrammarAST label] returns [SrcOp omo]
     ;
 
 terminal[GrammarAST label] returns [MatchToken omo]
-    :  ^(STRING_LITERAL .)			{$omo = new MatchToken(gen, (TerminalAST)$STRING_LITERAL, $label);}
-    |	STRING_LITERAL				{$omo = new MatchToken(gen, (TerminalAST)$STRING_LITERAL, $label);}
-    |	^(TOKEN_REF ARG_ACTION .)	{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF, $label);}
-    |	^(TOKEN_REF .)				{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF, $label);}
-    |	TOKEN_REF					{$omo = new MatchToken(gen, (TerminalAST)$TOKEN_REF, $label);}
+    :  ^(STRING_LITERAL .)			{$omo = new MatchToken(factory, (TerminalAST)$STRING_LITERAL, $label);}
+    |	STRING_LITERAL				{$omo = new MatchToken(factory, (TerminalAST)$STRING_LITERAL, $label);}
+    |	^(TOKEN_REF ARG_ACTION .)	{$omo = new MatchToken(factory, (TerminalAST)$TOKEN_REF, $label);}
+    |	^(TOKEN_REF .)				{$omo = new MatchToken(factory, (TerminalAST)$TOKEN_REF, $label);}
+    |	TOKEN_REF					{$omo = new MatchToken(factory, (TerminalAST)$TOKEN_REF, $label);}
     |	^(ROOT terminal[label])			
     |	^(BANG terminal[label])			
     ;

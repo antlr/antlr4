@@ -1,22 +1,16 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.automata.DFA;
-import org.antlr.v4.codegen.src.*;
-import org.antlr.v4.misc.IntSet;
-import org.antlr.v4.misc.IntervalSet;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.BlockAST;
+import org.antlr.v4.codegen.src.OutputModelObject;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
 import org.stringtemplate.v4.*;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
-/** */
-public abstract class CodeGenerator {
+/** General controller for code gen.  Can instantiate sub generator(s).
+ */
+public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	public final static String vocabFilePattern =
@@ -26,7 +20,6 @@ public abstract class CodeGenerator {
 	public Grammar g;
 	public Target target;
 	public STGroup templates;
-	public ParserFile outputModel;
 
 	public int lineWidth = 72;
 
@@ -74,14 +67,14 @@ public abstract class CodeGenerator {
 //		}		
 	}
 
-	/** The parser, tree parser, etc... variants know to build the model */
-	public abstract OutputModelObject buildOutputModel();
-
 	public void write() {
-		OutputModelObject root = buildOutputModel();
+		OutputModelFactory factory = null;
+		if ( g.isParser() ) factory = new ParserFactory(this);
+		// ...
+		OutputModelObject outputModel = factory.buildOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
-		ST outputFileST = walker.walk(root);
+		ST outputFileST = walker.walk(outputModel);
 		
 		// WRITE FILES
 		try {
@@ -105,42 +98,6 @@ public abstract class CodeGenerator {
 						 getVocabFileName(),
 						 ioe);
 		}
-	}
-
-	public Choice getChoiceBlock(BlockAST blkAST, GrammarAST ebnfRoot, List<CodeBlock> alts) {
-		// TODO: assumes LL1
-		int ebnf = 0;
-		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
-		Choice c = null;
-		switch ( ebnf ) {
-			case ANTLRParser.OPTIONAL :
-				if ( alts.size()==1 ) c = new LL1OptionalBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1OptionalBlock(this, ebnfRoot, alts);
-				break;
-			case ANTLRParser.CLOSURE :
-				if ( alts.size()==1 ) c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1StarBlock(this, ebnfRoot, alts);
-				break;
-			case ANTLRParser.POSITIVE_CLOSURE :
-				if ( alts.size()==1 ) c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1PlusBlock(this, ebnfRoot, alts);
-				break;
-			default :
-				c = new LL1Choice(this, blkAST, alts);
-				break;
-		}
-		return c;
-	}
-
-	public OutputModelObject getLL1Test(Choice choice, IntervalSet look, GrammarAST blkAST) {
-		OutputModelObject expr;
-		if ( look.size() < target.getInlineTestsVsBitsetThreshold() ) {
-			expr = new TestSetInline(this, choice, blkAST, look);
-		}
-		else {
-			expr = new TestSet(this, blkAST, look);
-		}
-		return expr;
 	}
 
 	public void write(ST code, String fileName) throws IOException {
@@ -174,37 +131,4 @@ public abstract class CodeGenerator {
 		return g.name+VOCAB_FILE_EXTENSION;
 	}
 
-	public DFADef defineDFA(GrammarAST ast, DFA dfa) {
-		return null;
-//		DFADef d = new DFADef(name, dfa);
-//		outputModel.dfaDefs.add(d);
-	}
-
-	public BitSetDef defineFollowBitSet(GrammarAST ast, IntSet set) {
-		String inRuleName = ast.nfaState.rule.name;
-		String elementName = ast.getText(); // assume rule ref
-		if ( ast.getType() == ANTLRParser.TOKEN_REF ) {
-			elementName = target.getTokenTypeAsTargetLabel(g, g.tokenNameToTypeMap.get(elementName));
-		}
-		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDef b = new BitSetDef(this, name, set);
-		outputModel.bitSetDefs.add(b);
-		return b;
-	}
-
-	public BitSetDef defineTestBitSet(GrammarAST ast, IntSet set) {
-		String inRuleName = ast.nfaState.rule.name;
-		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDef b = new BitSetDef(this, name, set);
-		outputModel.bitSetDefs.add(b);
-		return b;
-	}
-
-	public String getLoopLabel(GrammarAST ast) {
-		return "loop"+ ast.token.getTokenIndex();
-	}
-
-	public String getLoopCounter(GrammarAST ast) {
-		return "cnt"+ ast.token.getTokenIndex();
-	}
 }

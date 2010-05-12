@@ -1,7 +1,7 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.SourceGenTriggers;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
@@ -30,8 +30,8 @@ public class RuleFunction extends OutputModelObject {
 
 	public SrcOp code;
 
-	public RuleFunction(CodeGenerator gen, Rule r) {
-		this.gen = gen;
+	public RuleFunction(OutputModelFactory factory, Rule r) {
+		super(factory);
 		this.name = r.name;
 		if ( r.modifiers!=null && r.modifiers.size()>0 ) {
 			this.modifiers = new ArrayList<String>();
@@ -50,7 +50,7 @@ public class RuleFunction extends OutputModelObject {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
 		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-		SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, gen);
+		SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, factory);
 		try {
 			code = genTriggers.block(null,null); // GEN Instr OBJECTS
 		}

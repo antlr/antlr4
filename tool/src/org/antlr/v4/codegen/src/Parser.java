@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.src;
 
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ public class Parser extends OutputModelObject {
 	public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 	ParserFile file;
 
-	public Parser(CodeGenerator gen, ParserFile file) {
-		this.gen = gen;
+	public Parser(OutputModelFactory factory, ParserFile file) {
+		this.factory = factory;
 		this.file = file; // who contains us?
-		name = gen.g.getRecognizerName();
-		for (Rule r : gen.g.rules.values()) funcs.add( new RuleFunction(gen, r) );
+		name = factory.g.getRecognizerName();
+		for (Rule r : factory.g.rules.values()) funcs.add( new RuleFunction(factory, r) );
 
 		// We create dfa and bitsets during rule function construction.
 		// They get stored in code gen for convenience as we walk rule block tree

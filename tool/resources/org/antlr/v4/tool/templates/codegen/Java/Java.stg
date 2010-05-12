@@ -74,7 +74,7 @@ LL1StarBlockSingleAlt(choice, expr, alts, preamble) ::= <<
 <preamble>
 while ( <expr> ) {
     <alts; separator="\n">
-    <choice.expr.nextToken.varName> = input.LA(1);
+    <choice.loop
 }
 >>
 
@@ -95,12 +95,11 @@ while (true) {
 }
 >>
 
-//LL1PlusBlockSingleAlt ::= LL1PlusBlock
-
 LL1PlusBlockSingleAlt(choice, expr, alts, preamble) ::= <<
 <preamble>
 do {
     <alts; separator="\n">
+    // TODO: only if !set
     <choice.expr.nextToken.varName> = input.LA(1);
 } while ( <expr> );
 >>
@@ -110,7 +109,7 @@ TestSet(s) ::= <<
 >>
 
 TestSetInline(s) ::= <<
-<s.ttypes:{ttype | <s.nextToken.varName>==<ttype>}; separator=" || ">
+<s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
 >>
 
 cases(ttypes) ::= <<

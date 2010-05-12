@@ -1,7 +1,7 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.analysis.LinearApproximator;
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
 
@@ -14,8 +14,8 @@ public class InvokeRule extends SrcOp {
 	public List<String> args;
 	public BitSetDef follow;
 
-	public InvokeRule(CodeGenerator gen, GrammarAST ast, GrammarAST labelAST) {
-		this.gen = gen;
+	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
+		this.factory = factory;
 		this.ast = ast;
 		this.name = ast.getText();
 		if ( labelAST!=null ) this.label = labelAST.getText();
@@ -24,9 +24,10 @@ public class InvokeRule extends SrcOp {
 			// split and translate argAction
 		}
 		// compute follow
-		LinearApproximator approx = new LinearApproximator(gen.g, -1);
+		LinearApproximator approx = new LinearApproximator(factory.g, -1);
 		IntervalSet fset = approx.LOOK(ast.nfaState.transition(0).target);
 		System.out.println("follow="+follow);
-		follow = gen.defineFollowBitSet(ast, fset);
+		follow = factory.createFollowBitSet(ast, fset);
+		factory.defineBitSet(follow);
 	}
 }

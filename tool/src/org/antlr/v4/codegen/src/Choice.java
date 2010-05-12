@@ -1,7 +1,7 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.automata.BlockStartState;
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.ArrayList;
@@ -13,18 +13,18 @@ public abstract class Choice extends SrcOp {
 	public List<CodeBlock> alts;
 	public List<SrcOp> preamble;
 
-	public Choice(CodeGenerator gen, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
-		this.gen = gen;
+	public Choice(OutputModelFactory factory, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
+		this.factory = factory;
 		this.ast = blkOrEbnfRootAST;
 		this.alts = alts;
 		this.decision = ((BlockStartState)blkOrEbnfRootAST.nfaState).decision;
 	}
 
 	public void addPreambleOp(SrcOp op) {
-		preamble = new ArrayList<SrcOp>();
+		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
 		preamble.add(op);
 	}
-	
+
 	@Override
 	public List<String> getChildren() {
 		final List<String> sup = super.getChildren();

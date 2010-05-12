@@ -17,7 +17,7 @@ public class CodeGenPipeline {
 	}
 
 	void processParser() {
-		ParserGenerator gen = new ParserGenerator(g);
+		CodeGenerator gen = new CodeGenerator(g);
 		gen.write();
 	}
 
