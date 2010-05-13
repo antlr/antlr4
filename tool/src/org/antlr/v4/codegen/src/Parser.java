@@ -17,12 +17,6 @@ public class Parser extends OutputModelObject {
 		this.file = file; // who contains us?
 		name = factory.g.getRecognizerName();
 		for (Rule r : factory.g.rules.values()) funcs.add( new RuleFunction(factory, r) );
-
-		// We create dfa and bitsets during rule function construction.
-		// They get stored in code gen for convenience as we walk rule block tree
-//		for (DFA dfa : gen.g.decisionDFAs.values()) {
-//			file.dfaDefs.add( new DFADef("DFA"+dfa.decision, dfa) );
-//		}
 	}
 
 	@Override

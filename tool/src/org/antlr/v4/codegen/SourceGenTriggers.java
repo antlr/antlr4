@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} SourceGenTriggers.g 2010-05-12 14:22:11
+// $ANTLR ${project.version} ${buildNumber} SourceGenTriggers.g 2010-05-12 16:26:01
 
 package org.antlr.v4.codegen;
 
@@ -6,12 +6,10 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.runtime.tree.TreeParser;
 import org.antlr.v4.codegen.src.CodeBlock;
-import org.antlr.v4.codegen.src.InvokeRule;
-import org.antlr.v4.codegen.src.MatchToken;
 import org.antlr.v4.codegen.src.SrcOp;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.BlockAST;
 import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.TerminalAST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,7 +146,7 @@ public class SourceGenTriggers extends TreeParser {
 
 
     // $ANTLR start "block"
-    // SourceGenTriggers.g:26:1: block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo] : ^(blk= BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) ;
+    // SourceGenTriggers.g:27:1: block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo] : ^(blk= BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) ;
     public final SrcOp block(GrammarAST label, GrammarAST ebnfRoot) throws RecognitionException {
         SrcOp omo = null;
 
@@ -157,13 +155,13 @@ public class SourceGenTriggers extends TreeParser {
 
 
         try {
-            // SourceGenTriggers.g:27:5: ( ^(blk= BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) )
-            // SourceGenTriggers.g:27:7: ^(blk= BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ )
+            // SourceGenTriggers.g:28:5: ( ^(blk= BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ ) )
+            // SourceGenTriggers.g:28:7: ^(blk= BLOCK ( ^( OPTIONS ( . )+ ) )? ( alternative )+ )
             {
             blk=(GrammarAST)match(input,BLOCK,FOLLOW_BLOCK_in_block71); 
 
             match(input, Token.DOWN, null); 
-            // SourceGenTriggers.g:27:20: ( ^( OPTIONS ( . )+ ) )?
+            // SourceGenTriggers.g:28:20: ( ^( OPTIONS ( . )+ ) )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -172,12 +170,12 @@ public class SourceGenTriggers extends TreeParser {
             }
             switch (alt2) {
                 case 1 :
-                    // SourceGenTriggers.g:27:21: ^( OPTIONS ( . )+ )
+                    // SourceGenTriggers.g:28:21: ^( OPTIONS ( . )+ )
                     {
                     match(input,OPTIONS,FOLLOW_OPTIONS_in_block75); 
 
                     match(input, Token.DOWN, null); 
-                    // SourceGenTriggers.g:27:31: ( . )+
+                    // SourceGenTriggers.g:28:31: ( . )+
                     int cnt1=0;
                     loop1:
                     do {
@@ -194,7 +192,7 @@ public class SourceGenTriggers extends TreeParser {
 
                         switch (alt1) {
                     	case 1 :
-                    	    // SourceGenTriggers.g:27:31: .
+                    	    // SourceGenTriggers.g:28:31: .
                     	    {
                     	    matchAny(input); 
 
@@ -219,7 +217,7 @@ public class SourceGenTriggers extends TreeParser {
             }
 
             List<CodeBlock> alts = new ArrayList<CodeBlock>();
-            // SourceGenTriggers.g:29:7: ( alternative )+
+            // SourceGenTriggers.g:30:7: ( alternative )+
             int cnt3=0;
             loop3:
             do {
@@ -233,7 +231,7 @@ public class SourceGenTriggers extends TreeParser {
 
                 switch (alt3) {
             	case 1 :
-            	    // SourceGenTriggers.g:29:9: alternative
+            	    // SourceGenTriggers.g:30:9: alternative
             	    {
             	    pushFollow(FOLLOW_alternative_in_block95);
             	    alternative1=alternative();
@@ -276,18 +274,18 @@ public class SourceGenTriggers extends TreeParser {
 
 
     // $ANTLR start "alternative"
-    // SourceGenTriggers.g:37:1: alternative returns [CodeBlock omo] : ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) );
+    // SourceGenTriggers.g:38:1: alternative returns [CodeBlock omo] : ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) );
     public final CodeBlock alternative() throws RecognitionException {
         CodeBlock omo = null;
 
         CodeBlock a = null;
 
-        SrcOp element2 = null;
+        List<SrcOp> element2 = null;
 
 
         List<SrcOp> elems = new ArrayList<SrcOp>();
         try {
-            // SourceGenTriggers.g:39:5: ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) )
+            // SourceGenTriggers.g:40:5: ( ^( ALT_REWRITE a= alternative . ) | ^( ALT EPSILON ) | ^( ALT ( element )+ ) )
             int alt5=3;
             int LA5_0 = input.LA(1);
 
@@ -328,7 +326,7 @@ public class SourceGenTriggers extends TreeParser {
             }
             switch (alt5) {
                 case 1 :
-                    // SourceGenTriggers.g:39:7: ^( ALT_REWRITE a= alternative . )
+                    // SourceGenTriggers.g:40:7: ^( ALT_REWRITE a= alternative . )
                     {
                     match(input,ALT_REWRITE,FOLLOW_ALT_REWRITE_in_alternative141); 
 
@@ -345,7 +343,7 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:40:7: ^( ALT EPSILON )
+                    // SourceGenTriggers.g:41:7: ^( ALT EPSILON )
                     {
                     match(input,ALT,FOLLOW_ALT_in_alternative158); 
 
@@ -358,12 +356,12 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:41:9: ^( ALT ( element )+ )
+                    // SourceGenTriggers.g:42:9: ^( ALT ( element )+ )
                     {
                     match(input,ALT,FOLLOW_ALT_in_alternative175); 
 
                     match(input, Token.DOWN, null); 
-                    // SourceGenTriggers.g:41:16: ( element )+
+                    // SourceGenTriggers.g:42:16: ( element )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -377,14 +375,14 @@ public class SourceGenTriggers extends TreeParser {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // SourceGenTriggers.g:41:18: element
+                    	    // SourceGenTriggers.g:42:18: element
                     	    {
                     	    pushFollow(FOLLOW_element_in_alternative179);
                     	    element2=element();
 
                     	    state._fsp--;
 
-                    	    elems.add(element2);
+                    	    elems.addAll(element2);
 
                     	    }
                     	    break;
@@ -419,87 +417,87 @@ public class SourceGenTriggers extends TreeParser {
 
 
     // $ANTLR start "element"
-    // SourceGenTriggers.g:44:1: element returns [SrcOp omo] : ( labeledElement | atom[null] | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
-    public final SrcOp element() throws RecognitionException {
-        SrcOp omo = null;
+    // SourceGenTriggers.g:45:1: element returns [List<SrcOp> omos] : ( labeledElement | atom[null] | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );
+    public final List<SrcOp> element() throws RecognitionException {
+        List<SrcOp> omos = null;
 
         GrammarAST ACTION6=null;
         GrammarAST SEMPRED7=null;
-        SrcOp labeledElement3 = null;
+        List<SrcOp> labeledElement3 = null;
 
-        SrcOp atom4 = null;
+        List<SrcOp> atom4 = null;
 
         SrcOp ebnf5 = null;
 
 
         try {
-            // SourceGenTriggers.g:45:2: ( labeledElement | atom[null] | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
+            // SourceGenTriggers.g:46:2: ( labeledElement | atom[null] | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec )
             int alt6=7;
             alt6 = dfa6.predict(input);
             switch (alt6) {
                 case 1 :
-                    // SourceGenTriggers.g:45:4: labeledElement
+                    // SourceGenTriggers.g:46:4: labeledElement
                     {
                     pushFollow(FOLLOW_labeledElement_in_element206);
                     labeledElement3=labeledElement();
 
                     state._fsp--;
 
-                    omo = labeledElement3;
+                    omos = labeledElement3;
 
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:46:4: atom[null]
+                    // SourceGenTriggers.g:47:4: atom[null]
                     {
                     pushFollow(FOLLOW_atom_in_element217);
                     atom4=atom(null);
 
                     state._fsp--;
 
-                    omo = atom4;
+                    omos = atom4;
 
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:47:4: ebnf
+                    // SourceGenTriggers.g:48:4: ebnf
                     {
                     pushFollow(FOLLOW_ebnf_in_element230);
                     ebnf5=ebnf();
 
                     state._fsp--;
 
-                    omo = ebnf5;
+                    omos = Utils.list(ebnf5);
 
                     }
                     break;
                 case 4 :
-                    // SourceGenTriggers.g:48:6: ACTION
+                    // SourceGenTriggers.g:49:6: ACTION
                     {
-                    ACTION6=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_element251); 
-                    omo = factory.action(ACTION6);
+                    ACTION6=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_element245); 
+                    omos = Utils.list(factory.action(ACTION6));
 
                     }
                     break;
                 case 5 :
-                    // SourceGenTriggers.g:49:6: SEMPRED
+                    // SourceGenTriggers.g:50:6: SEMPRED
                     {
-                    SEMPRED7=(GrammarAST)match(input,SEMPRED,FOLLOW_SEMPRED_in_element266); 
-                    omo = factory.sempred(SEMPRED7);
+                    SEMPRED7=(GrammarAST)match(input,SEMPRED,FOLLOW_SEMPRED_in_element260); 
+                    omos = Utils.list(factory.sempred(SEMPRED7));
 
                     }
                     break;
                 case 6 :
-                    // SourceGenTriggers.g:50:4: GATED_SEMPRED
+                    // SourceGenTriggers.g:51:4: GATED_SEMPRED
                     {
-                    match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element279); 
+                    match(input,GATED_SEMPRED,FOLLOW_GATED_SEMPRED_in_element273); 
 
                     }
                     break;
                 case 7 :
-                    // SourceGenTriggers.g:51:4: treeSpec
+                    // SourceGenTriggers.g:52:4: treeSpec
                     {
-                    pushFollow(FOLLOW_treeSpec_in_element285);
+                    pushFollow(FOLLOW_treeSpec_in_element279);
                     treeSpec();
 
                     state._fsp--;
@@ -516,103 +514,103 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "element"
 
 
     // $ANTLR start "labeledElement"
-    // SourceGenTriggers.g:54:1: labeledElement returns [SrcOp omo] : ( ^( ASSIGN ID atom[$ID] ) | ^( ASSIGN ID block[$ID,null] ) | ^( PLUS_ASSIGN ID atom[$ID] ) | ^( PLUS_ASSIGN ID block[$ID,null] ) );
-    public final SrcOp labeledElement() throws RecognitionException {
-        SrcOp omo = null;
+    // SourceGenTriggers.g:55:1: labeledElement returns [List<SrcOp> omos] : ( ^( ASSIGN ID atom[$ID] ) | ^( ASSIGN ID block[$ID,null] ) | ^( PLUS_ASSIGN ID atom[$ID] ) | ^( PLUS_ASSIGN ID block[$ID,null] ) );
+    public final List<SrcOp> labeledElement() throws RecognitionException {
+        List<SrcOp> omos = null;
 
         GrammarAST ID8=null;
         GrammarAST ID10=null;
         GrammarAST ID12=null;
         GrammarAST ID14=null;
-        SrcOp atom9 = null;
+        List<SrcOp> atom9 = null;
 
         SrcOp block11 = null;
 
-        SrcOp atom13 = null;
+        List<SrcOp> atom13 = null;
 
         SrcOp block15 = null;
 
 
         try {
-            // SourceGenTriggers.g:55:2: ( ^( ASSIGN ID atom[$ID] ) | ^( ASSIGN ID block[$ID,null] ) | ^( PLUS_ASSIGN ID atom[$ID] ) | ^( PLUS_ASSIGN ID block[$ID,null] ) )
+            // SourceGenTriggers.g:56:2: ( ^( ASSIGN ID atom[$ID] ) | ^( ASSIGN ID block[$ID,null] ) | ^( PLUS_ASSIGN ID atom[$ID] ) | ^( PLUS_ASSIGN ID block[$ID,null] ) )
             int alt7=4;
             alt7 = dfa7.predict(input);
             switch (alt7) {
                 case 1 :
-                    // SourceGenTriggers.g:55:4: ^( ASSIGN ID atom[$ID] )
+                    // SourceGenTriggers.g:56:4: ^( ASSIGN ID atom[$ID] )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement307); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement301); 
 
                     match(input, Token.DOWN, null); 
-                    ID8=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement309); 
-                    pushFollow(FOLLOW_atom_in_labeledElement311);
+                    ID8=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement303); 
+                    pushFollow(FOLLOW_atom_in_labeledElement305);
                     atom9=atom(ID8);
 
                     state._fsp--;
 
 
                     match(input, Token.UP, null); 
-                    omo = atom9;
+                    omos = atom9;
 
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:56:4: ^( ASSIGN ID block[$ID,null] )
+                    // SourceGenTriggers.g:57:4: ^( ASSIGN ID block[$ID,null] )
                     {
-                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement325); 
+                    match(input,ASSIGN,FOLLOW_ASSIGN_in_labeledElement319); 
 
                     match(input, Token.DOWN, null); 
-                    ID10=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement327); 
-                    pushFollow(FOLLOW_block_in_labeledElement329);
+                    ID10=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement321); 
+                    pushFollow(FOLLOW_block_in_labeledElement323);
                     block11=block(ID10, null);
 
                     state._fsp--;
 
 
                     match(input, Token.UP, null); 
-                    omo = block11;
+                    omos = Utils.list(block11);
 
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:57:4: ^( PLUS_ASSIGN ID atom[$ID] )
+                    // SourceGenTriggers.g:58:4: ^( PLUS_ASSIGN ID atom[$ID] )
                     {
-                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement340); 
+                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement334); 
 
                     match(input, Token.DOWN, null); 
-                    ID12=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement342); 
-                    pushFollow(FOLLOW_atom_in_labeledElement344);
+                    ID12=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement336); 
+                    pushFollow(FOLLOW_atom_in_labeledElement338);
                     atom13=atom(ID12);
 
                     state._fsp--;
 
 
                     match(input, Token.UP, null); 
-                    omo = atom13;
+                    omos = atom13;
 
                     }
                     break;
                 case 4 :
-                    // SourceGenTriggers.g:58:4: ^( PLUS_ASSIGN ID block[$ID,null] )
+                    // SourceGenTriggers.g:59:4: ^( PLUS_ASSIGN ID block[$ID,null] )
                     {
-                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement356); 
+                    match(input,PLUS_ASSIGN,FOLLOW_PLUS_ASSIGN_in_labeledElement350); 
 
                     match(input, Token.DOWN, null); 
-                    ID14=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement358); 
-                    pushFollow(FOLLOW_block_in_labeledElement360);
+                    ID14=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement352); 
+                    pushFollow(FOLLOW_block_in_labeledElement354);
                     block15=block(ID14, null);
 
                     state._fsp--;
 
 
                     match(input, Token.UP, null); 
-                    omo = block15;
+                    omos = Utils.list(block15);
 
                     }
                     break;
@@ -625,27 +623,27 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "labeledElement"
 
 
     // $ANTLR start "treeSpec"
-    // SourceGenTriggers.g:61:1: treeSpec returns [SrcOp omo] : ^( TREE_BEGIN (e= element )+ ) ;
+    // SourceGenTriggers.g:62:1: treeSpec returns [SrcOp omo] : ^( TREE_BEGIN (e= element )+ ) ;
     public final SrcOp treeSpec() throws RecognitionException {
         SrcOp omo = null;
 
-        SrcOp e = null;
+        List<SrcOp> e = null;
 
 
         try {
-            // SourceGenTriggers.g:62:5: ( ^( TREE_BEGIN (e= element )+ ) )
-            // SourceGenTriggers.g:62:7: ^( TREE_BEGIN (e= element )+ )
+            // SourceGenTriggers.g:63:5: ( ^( TREE_BEGIN (e= element )+ ) )
+            // SourceGenTriggers.g:63:7: ^( TREE_BEGIN (e= element )+ )
             {
-            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec384); 
+            match(input,TREE_BEGIN,FOLLOW_TREE_BEGIN_in_treeSpec378); 
 
             match(input, Token.DOWN, null); 
-            // SourceGenTriggers.g:62:21: (e= element )+
+            // SourceGenTriggers.g:63:21: (e= element )+
             int cnt8=0;
             loop8:
             do {
@@ -659,9 +657,9 @@ public class SourceGenTriggers extends TreeParser {
 
                 switch (alt8) {
             	case 1 :
-            	    // SourceGenTriggers.g:62:22: e= element
+            	    // SourceGenTriggers.g:63:22: e= element
             	    {
-            	    pushFollow(FOLLOW_element_in_treeSpec390);
+            	    pushFollow(FOLLOW_element_in_treeSpec384);
             	    e=element();
 
             	    state._fsp--;
@@ -697,7 +695,7 @@ public class SourceGenTriggers extends TreeParser {
 
 
     // $ANTLR start "ebnf"
-    // SourceGenTriggers.g:65:1: ebnf returns [SrcOp omo] : ( ^( astBlockSuffix block[null,null] ) | ^( OPTIONAL block[null,$OPTIONAL] ) | ^( CLOSURE block[null,$CLOSURE] ) | ^( POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE] ) | block[null, null] );
+    // SourceGenTriggers.g:66:1: ebnf returns [SrcOp omo] : ( ^( astBlockSuffix block[null,null] ) | ^( OPTIONAL block[null,$OPTIONAL] ) | ^( CLOSURE block[null,$CLOSURE] ) | ^( POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE] ) | block[null, null] );
     public final SrcOp ebnf() throws RecognitionException {
         SrcOp omo = null;
 
@@ -714,7 +712,7 @@ public class SourceGenTriggers extends TreeParser {
 
 
         try {
-            // SourceGenTriggers.g:66:2: ( ^( astBlockSuffix block[null,null] ) | ^( OPTIONAL block[null,$OPTIONAL] ) | ^( CLOSURE block[null,$CLOSURE] ) | ^( POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE] ) | block[null, null] )
+            // SourceGenTriggers.g:67:2: ( ^( astBlockSuffix block[null,null] ) | ^( OPTIONAL block[null,$OPTIONAL] ) | ^( CLOSURE block[null,$CLOSURE] ) | ^( POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE] ) | block[null, null] )
             int alt9=5;
             switch ( input.LA(1) ) {
             case IMPLIES:
@@ -753,16 +751,16 @@ public class SourceGenTriggers extends TreeParser {
 
             switch (alt9) {
                 case 1 :
-                    // SourceGenTriggers.g:66:4: ^( astBlockSuffix block[null,null] )
+                    // SourceGenTriggers.g:67:4: ^( astBlockSuffix block[null,null] )
                     {
-                    pushFollow(FOLLOW_astBlockSuffix_in_ebnf414);
+                    pushFollow(FOLLOW_astBlockSuffix_in_ebnf408);
                     astBlockSuffix();
 
                     state._fsp--;
 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf416);
+                    pushFollow(FOLLOW_block_in_ebnf410);
                     block(null, null);
 
                     state._fsp--;
@@ -773,12 +771,12 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:67:4: ^( OPTIONAL block[null,$OPTIONAL] )
+                    // SourceGenTriggers.g:68:4: ^( OPTIONAL block[null,$OPTIONAL] )
                     {
-                    OPTIONAL16=(GrammarAST)match(input,OPTIONAL,FOLLOW_OPTIONAL_in_ebnf426); 
+                    OPTIONAL16=(GrammarAST)match(input,OPTIONAL,FOLLOW_OPTIONAL_in_ebnf420); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf428);
+                    pushFollow(FOLLOW_block_in_ebnf422);
                     block17=block(null, OPTIONAL16);
 
                     state._fsp--;
@@ -790,12 +788,12 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:68:4: ^( CLOSURE block[null,$CLOSURE] )
+                    // SourceGenTriggers.g:69:4: ^( CLOSURE block[null,$CLOSURE] )
                     {
-                    CLOSURE18=(GrammarAST)match(input,CLOSURE,FOLLOW_CLOSURE_in_ebnf440); 
+                    CLOSURE18=(GrammarAST)match(input,CLOSURE,FOLLOW_CLOSURE_in_ebnf434); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf442);
+                    pushFollow(FOLLOW_block_in_ebnf436);
                     block19=block(null, CLOSURE18);
 
                     state._fsp--;
@@ -807,12 +805,12 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // SourceGenTriggers.g:69:4: ^( POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE] )
+                    // SourceGenTriggers.g:70:4: ^( POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE] )
                     {
-                    POSITIVE_CLOSURE20=(GrammarAST)match(input,POSITIVE_CLOSURE,FOLLOW_POSITIVE_CLOSURE_in_ebnf455); 
+                    POSITIVE_CLOSURE20=(GrammarAST)match(input,POSITIVE_CLOSURE,FOLLOW_POSITIVE_CLOSURE_in_ebnf449); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_ebnf457);
+                    pushFollow(FOLLOW_block_in_ebnf451);
                     block21=block(null, POSITIVE_CLOSURE20);
 
                     state._fsp--;
@@ -824,9 +822,9 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // SourceGenTriggers.g:71:5: block[null, null]
+                    // SourceGenTriggers.g:72:5: block[null, null]
                     {
-                    pushFollow(FOLLOW_block_in_ebnf481);
+                    pushFollow(FOLLOW_block_in_ebnf475);
                     block22=block(null, null);
 
                     state._fsp--;
@@ -850,10 +848,10 @@ public class SourceGenTriggers extends TreeParser {
 
 
     // $ANTLR start "astBlockSuffix"
-    // SourceGenTriggers.g:74:1: astBlockSuffix : ( ROOT | IMPLIES | BANG );
+    // SourceGenTriggers.g:75:1: astBlockSuffix : ( ROOT | IMPLIES | BANG );
     public final void astBlockSuffix() throws RecognitionException {
         try {
-            // SourceGenTriggers.g:75:5: ( ROOT | IMPLIES | BANG )
+            // SourceGenTriggers.g:76:5: ( ROOT | IMPLIES | BANG )
             // SourceGenTriggers.g:
             {
             if ( input.LA(1)==IMPLIES||input.LA(1)==BANG||input.LA(1)==ROOT ) {
@@ -881,33 +879,33 @@ public class SourceGenTriggers extends TreeParser {
 
 
     // $ANTLR start "atom"
-    // SourceGenTriggers.g:82:1: atom[GrammarAST label] returns [SrcOp omo] : ( ^( ROOT range[label] ) | ^( BANG range[label] ) | ^( ROOT notSet[label] ) | ^( BANG notSet[label] ) | notSet[label] | range[label] | ^( DOT ID terminal[label] ) | ^( DOT ID ruleref[label] ) | ^( WILDCARD . ) | WILDCARD | terminal[label] | ruleref[label] );
-    public final SrcOp atom(GrammarAST label) throws RecognitionException {
-        SrcOp omo = null;
+    // SourceGenTriggers.g:83:1: atom[GrammarAST label] returns [List<SrcOp> omos] : ( ^( ROOT range[label] ) | ^( BANG range[label] ) | ^( ROOT notSet[label] ) | ^( BANG notSet[label] ) | notSet[label] | range[label] | ^( DOT ID terminal[label] ) | ^( DOT ID ruleref[label] ) | ^( WILDCARD . ) | WILDCARD | terminal[label] | ruleref[label] );
+    public final List<SrcOp> atom(GrammarAST label) throws RecognitionException {
+        List<SrcOp> omos = null;
 
-        SrcOp range23 = null;
+        List<SrcOp> range23 = null;
 
-        SrcOp notSet24 = null;
+        List<SrcOp> notSet24 = null;
 
-        SrcOp range25 = null;
+        List<SrcOp> range25 = null;
 
-        MatchToken terminal26 = null;
+        List<SrcOp> terminal26 = null;
 
-        SrcOp ruleref27 = null;
+        List<SrcOp> ruleref27 = null;
 
 
         try {
-            // SourceGenTriggers.g:83:2: ( ^( ROOT range[label] ) | ^( BANG range[label] ) | ^( ROOT notSet[label] ) | ^( BANG notSet[label] ) | notSet[label] | range[label] | ^( DOT ID terminal[label] ) | ^( DOT ID ruleref[label] ) | ^( WILDCARD . ) | WILDCARD | terminal[label] | ruleref[label] )
+            // SourceGenTriggers.g:84:2: ( ^( ROOT range[label] ) | ^( BANG range[label] ) | ^( ROOT notSet[label] ) | ^( BANG notSet[label] ) | notSet[label] | range[label] | ^( DOT ID terminal[label] ) | ^( DOT ID ruleref[label] ) | ^( WILDCARD . ) | WILDCARD | terminal[label] | ruleref[label] )
             int alt10=12;
             alt10 = dfa10.predict(input);
             switch (alt10) {
                 case 1 :
-                    // SourceGenTriggers.g:83:4: ^( ROOT range[label] )
+                    // SourceGenTriggers.g:84:4: ^( ROOT range[label] )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom543); 
+                    match(input,ROOT,FOLLOW_ROOT_in_atom537); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_range_in_atom545);
+                    pushFollow(FOLLOW_range_in_atom539);
                     range(label);
 
                     state._fsp--;
@@ -918,29 +916,29 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:84:4: ^( BANG range[label] )
+                    // SourceGenTriggers.g:85:4: ^( BANG range[label] )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom556); 
+                    match(input,BANG,FOLLOW_BANG_in_atom550); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_range_in_atom558);
+                    pushFollow(FOLLOW_range_in_atom552);
                     range23=range(label);
 
                     state._fsp--;
 
 
                     match(input, Token.UP, null); 
-                    omo = range23;
+                    omos = range23;
 
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:85:4: ^( ROOT notSet[label] )
+                    // SourceGenTriggers.g:86:4: ^( ROOT notSet[label] )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_atom570); 
+                    match(input,ROOT,FOLLOW_ROOT_in_atom564); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notSet_in_atom572);
+                    pushFollow(FOLLOW_notSet_in_atom566);
                     notSet(label);
 
                     state._fsp--;
@@ -951,26 +949,26 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // SourceGenTriggers.g:86:4: ^( BANG notSet[label] )
+                    // SourceGenTriggers.g:87:4: ^( BANG notSet[label] )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_atom583); 
+                    match(input,BANG,FOLLOW_BANG_in_atom577); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_notSet_in_atom585);
+                    pushFollow(FOLLOW_notSet_in_atom579);
                     notSet24=notSet(label);
 
                     state._fsp--;
 
 
                     match(input, Token.UP, null); 
-                    omo = notSet24;
+                    omos = notSet24;
 
                     }
                     break;
                 case 5 :
-                    // SourceGenTriggers.g:87:4: notSet[label]
+                    // SourceGenTriggers.g:88:4: notSet[label]
                     {
-                    pushFollow(FOLLOW_notSet_in_atom596);
+                    pushFollow(FOLLOW_notSet_in_atom590);
                     notSet(label);
 
                     state._fsp--;
@@ -979,25 +977,25 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 6 :
-                    // SourceGenTriggers.g:88:4: range[label]
+                    // SourceGenTriggers.g:89:4: range[label]
                     {
-                    pushFollow(FOLLOW_range_in_atom607);
+                    pushFollow(FOLLOW_range_in_atom601);
                     range25=range(label);
 
                     state._fsp--;
 
-                    omo = range25;
+                    omos = range25;
 
                     }
                     break;
                 case 7 :
-                    // SourceGenTriggers.g:89:4: ^( DOT ID terminal[label] )
+                    // SourceGenTriggers.g:90:4: ^( DOT ID terminal[label] )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom620); 
+                    match(input,DOT,FOLLOW_DOT_in_atom614); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom622); 
-                    pushFollow(FOLLOW_terminal_in_atom624);
+                    match(input,ID,FOLLOW_ID_in_atom616); 
+                    pushFollow(FOLLOW_terminal_in_atom618);
                     terminal(label);
 
                     state._fsp--;
@@ -1008,13 +1006,13 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 8 :
-                    // SourceGenTriggers.g:90:4: ^( DOT ID ruleref[label] )
+                    // SourceGenTriggers.g:91:4: ^( DOT ID ruleref[label] )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom632); 
+                    match(input,DOT,FOLLOW_DOT_in_atom626); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom634); 
-                    pushFollow(FOLLOW_ruleref_in_atom636);
+                    match(input,ID,FOLLOW_ID_in_atom628); 
+                    pushFollow(FOLLOW_ruleref_in_atom630);
                     ruleref(label);
 
                     state._fsp--;
@@ -1025,9 +1023,9 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 9 :
-                    // SourceGenTriggers.g:91:7: ^( WILDCARD . )
+                    // SourceGenTriggers.g:92:7: ^( WILDCARD . )
                     {
-                    match(input,WILDCARD,FOLLOW_WILDCARD_in_atom647); 
+                    match(input,WILDCARD,FOLLOW_WILDCARD_in_atom641); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
@@ -1037,33 +1035,33 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 10 :
-                    // SourceGenTriggers.g:92:7: WILDCARD
+                    // SourceGenTriggers.g:93:7: WILDCARD
                     {
-                    match(input,WILDCARD,FOLLOW_WILDCARD_in_atom662); 
+                    match(input,WILDCARD,FOLLOW_WILDCARD_in_atom656); 
 
                     }
                     break;
                 case 11 :
-                    // SourceGenTriggers.g:93:9: terminal[label]
+                    // SourceGenTriggers.g:94:9: terminal[label]
                     {
-                    pushFollow(FOLLOW_terminal_in_atom676);
+                    pushFollow(FOLLOW_terminal_in_atom670);
                     terminal26=terminal(label);
 
                     state._fsp--;
 
-                    omo = terminal26;
+                    omos = terminal26;
 
                     }
                     break;
                 case 12 :
-                    // SourceGenTriggers.g:94:9: ruleref[label]
+                    // SourceGenTriggers.g:95:9: ruleref[label]
                     {
-                    pushFollow(FOLLOW_ruleref_in_atom692);
+                    pushFollow(FOLLOW_ruleref_in_atom686);
                     ruleref27=ruleref(label);
 
                     state._fsp--;
 
-                    omo = ruleref27;
+                    omos = ruleref27;
 
                     }
                     break;
@@ -1076,18 +1074,18 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "atom"
 
 
     // $ANTLR start "notSet"
-    // SourceGenTriggers.g:97:1: notSet[GrammarAST label] returns [SrcOp omo] : ( ^( NOT terminal[label] ) | ^( NOT block[label,null] ) );
-    public final SrcOp notSet(GrammarAST label) throws RecognitionException {
-        SrcOp omo = null;
+    // SourceGenTriggers.g:98:1: notSet[GrammarAST label] returns [List<SrcOp> omos] : ( ^( NOT terminal[label] ) | ^( NOT block[label,null] ) );
+    public final List<SrcOp> notSet(GrammarAST label) throws RecognitionException {
+        List<SrcOp> omos = null;
 
         try {
-            // SourceGenTriggers.g:98:5: ( ^( NOT terminal[label] ) | ^( NOT block[label,null] ) )
+            // SourceGenTriggers.g:99:5: ( ^( NOT terminal[label] ) | ^( NOT block[label,null] ) )
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -1125,12 +1123,12 @@ public class SourceGenTriggers extends TreeParser {
             }
             switch (alt11) {
                 case 1 :
-                    // SourceGenTriggers.g:98:7: ^( NOT terminal[label] )
+                    // SourceGenTriggers.g:99:7: ^( NOT terminal[label] )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet721); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet715); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_notSet723);
+                    pushFollow(FOLLOW_terminal_in_notSet717);
                     terminal(label);
 
                     state._fsp--;
@@ -1141,12 +1139,12 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:99:7: ^( NOT block[label,null] )
+                    // SourceGenTriggers.g:100:7: ^( NOT block[label,null] )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet736); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet730); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_block_in_notSet738);
+                    pushFollow(FOLLOW_block_in_notSet732);
                     block(label, null);
 
                     state._fsp--;
@@ -1165,21 +1163,23 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "notSet"
 
 
     // $ANTLR start "ruleref"
-    // SourceGenTriggers.g:102:1: ruleref[GrammarAST label] returns [SrcOp omo] : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
-    public final SrcOp ruleref(GrammarAST label) throws RecognitionException {
-        SrcOp omo = null;
+    // SourceGenTriggers.g:103:1: ruleref[GrammarAST label] returns [List<SrcOp> omos] : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
+    public final List<SrcOp> ruleref(GrammarAST label) throws RecognitionException {
+        List<SrcOp> omos = null;
 
         GrammarAST RULE_REF28=null;
-        GrammarAST RULE_REF29=null;
+        GrammarAST ARG_ACTION29=null;
+        GrammarAST RULE_REF30=null;
+        GrammarAST ARG_ACTION31=null;
 
         try {
-            // SourceGenTriggers.g:103:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
+            // SourceGenTriggers.g:104:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
             int alt15=3;
             switch ( input.LA(1) ) {
             case ROOT:
@@ -1206,16 +1206,16 @@ public class SourceGenTriggers extends TreeParser {
 
             switch (alt15) {
                 case 1 :
-                    // SourceGenTriggers.g:103:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
+                    // SourceGenTriggers.g:104:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_ruleref766); 
+                    match(input,ROOT,FOLLOW_ROOT_in_ruleref760); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref769); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref763); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // SourceGenTriggers.g:103:25: ( ARG_ACTION )?
+                        // SourceGenTriggers.g:104:25: ( ARG_ACTION )?
                         int alt12=2;
                         int LA12_0 = input.LA(1);
 
@@ -1224,9 +1224,9 @@ public class SourceGenTriggers extends TreeParser {
                         }
                         switch (alt12) {
                             case 1 :
-                                // SourceGenTriggers.g:103:25: ARG_ACTION
+                                // SourceGenTriggers.g:104:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref771); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref765); 
 
                                 }
                                 break;
@@ -1242,16 +1242,16 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:104:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
+                    // SourceGenTriggers.g:105:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_ruleref783); 
+                    match(input,BANG,FOLLOW_BANG_in_ruleref777); 
 
                     match(input, Token.DOWN, null); 
-                    RULE_REF28=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref786); 
+                    RULE_REF28=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref780); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // SourceGenTriggers.g:104:25: ( ARG_ACTION )?
+                        // SourceGenTriggers.g:105:25: ( ARG_ACTION )?
                         int alt13=2;
                         int LA13_0 = input.LA(1);
 
@@ -1260,9 +1260,9 @@ public class SourceGenTriggers extends TreeParser {
                         }
                         switch (alt13) {
                             case 1 :
-                                // SourceGenTriggers.g:104:25: ARG_ACTION
+                                // SourceGenTriggers.g:105:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref788); 
+                                ARG_ACTION29=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref782); 
 
                                 }
                                 break;
@@ -1274,18 +1274,18 @@ public class SourceGenTriggers extends TreeParser {
                     }
 
                     match(input, Token.UP, null); 
-                    omo = new InvokeRule(factory, RULE_REF28, label);
+                    omos = factory.ruleRef(RULE_REF28, label, ARG_ACTION29);
 
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:105:7: ^( RULE_REF ( ARG_ACTION )? )
+                    // SourceGenTriggers.g:106:7: ^( RULE_REF ( ARG_ACTION )? )
                     {
-                    RULE_REF29=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref802); 
+                    RULE_REF30=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref796); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // SourceGenTriggers.g:105:18: ( ARG_ACTION )?
+                        // SourceGenTriggers.g:106:18: ( ARG_ACTION )?
                         int alt14=2;
                         int LA14_0 = input.LA(1);
 
@@ -1294,9 +1294,9 @@ public class SourceGenTriggers extends TreeParser {
                         }
                         switch (alt14) {
                             case 1 :
-                                // SourceGenTriggers.g:105:18: ARG_ACTION
+                                // SourceGenTriggers.g:106:18: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref804); 
+                                ARG_ACTION31=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref798); 
 
                                 }
                                 break;
@@ -1306,7 +1306,7 @@ public class SourceGenTriggers extends TreeParser {
 
                         match(input, Token.UP, null); 
                     }
-                    omo = new InvokeRule(factory, RULE_REF29, label);
+                    omos = factory.ruleRef(RULE_REF30, label, ARG_ACTION31);
 
                     }
                     break;
@@ -1319,28 +1319,28 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "ruleref"
 
 
     // $ANTLR start "range"
-    // SourceGenTriggers.g:108:1: range[GrammarAST label] returns [SrcOp omo] : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
-    public final SrcOp range(GrammarAST label) throws RecognitionException {
-        SrcOp omo = null;
+    // SourceGenTriggers.g:109:1: range[GrammarAST label] returns [List<SrcOp> omos] : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
+    public final List<SrcOp> range(GrammarAST label) throws RecognitionException {
+        List<SrcOp> omos = null;
 
         GrammarAST a=null;
         GrammarAST b=null;
 
         try {
-            // SourceGenTriggers.g:109:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
-            // SourceGenTriggers.g:109:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
+            // SourceGenTriggers.g:110:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
+            // SourceGenTriggers.g:110:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
             {
-            match(input,RANGE,FOLLOW_RANGE_in_range833); 
+            match(input,RANGE,FOLLOW_RANGE_in_range827); 
 
             match(input, Token.DOWN, null); 
-            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range837); 
-            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range841); 
+            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range831); 
+            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range835); 
 
             match(input, Token.UP, null); 
 
@@ -1353,90 +1353,91 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "range"
 
 
     // $ANTLR start "terminal"
-    // SourceGenTriggers.g:112:1: terminal[GrammarAST label] returns [MatchToken omo] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[label] ) | ^( BANG terminal[label] ) );
-    public final MatchToken terminal(GrammarAST label) throws RecognitionException {
-        MatchToken omo = null;
+    // SourceGenTriggers.g:113:1: terminal[GrammarAST label] returns [List<SrcOp> omos] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[label] ) | ^( BANG terminal[label] ) );
+    public final List<SrcOp> terminal(GrammarAST label) throws RecognitionException {
+        List<SrcOp> omos = null;
 
-        GrammarAST STRING_LITERAL30=null;
-        GrammarAST STRING_LITERAL31=null;
-        GrammarAST TOKEN_REF32=null;
-        GrammarAST TOKEN_REF33=null;
+        GrammarAST STRING_LITERAL32=null;
+        GrammarAST STRING_LITERAL33=null;
         GrammarAST TOKEN_REF34=null;
+        GrammarAST ARG_ACTION35=null;
+        GrammarAST TOKEN_REF36=null;
+        GrammarAST TOKEN_REF37=null;
 
         try {
-            // SourceGenTriggers.g:113:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[label] ) | ^( BANG terminal[label] ) )
+            // SourceGenTriggers.g:114:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[label] ) | ^( BANG terminal[label] ) )
             int alt16=7;
             alt16 = dfa16.predict(input);
             switch (alt16) {
                 case 1 :
-                    // SourceGenTriggers.g:113:8: ^( STRING_LITERAL . )
+                    // SourceGenTriggers.g:114:8: ^( STRING_LITERAL . )
                     {
-                    STRING_LITERAL30=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal871); 
+                    STRING_LITERAL32=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal865); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
 
                     match(input, Token.UP, null); 
-                    omo = new MatchToken(factory, (TerminalAST)STRING_LITERAL30, label);
+                    omos = factory.stringRef(STRING_LITERAL32, label);
 
                     }
                     break;
                 case 2 :
-                    // SourceGenTriggers.g:114:7: STRING_LITERAL
+                    // SourceGenTriggers.g:115:7: STRING_LITERAL
                     {
-                    STRING_LITERAL31=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal886); 
-                    omo = new MatchToken(factory, (TerminalAST)STRING_LITERAL31, label);
+                    STRING_LITERAL33=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal880); 
+                    omos = factory.stringRef(STRING_LITERAL33, label);
 
                     }
                     break;
                 case 3 :
-                    // SourceGenTriggers.g:115:7: ^( TOKEN_REF ARG_ACTION . )
+                    // SourceGenTriggers.g:116:7: ^( TOKEN_REF ARG_ACTION . )
                     {
-                    TOKEN_REF32=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal900); 
+                    TOKEN_REF34=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal894); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal902); 
+                    ARG_ACTION35=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal896); 
                     matchAny(input); 
 
                     match(input, Token.UP, null); 
-                    omo = new MatchToken(factory, (TerminalAST)TOKEN_REF32, label);
+                    omos = factory.tokenRef(TOKEN_REF34, label, ARG_ACTION35);
 
                     }
                     break;
                 case 4 :
-                    // SourceGenTriggers.g:116:7: ^( TOKEN_REF . )
+                    // SourceGenTriggers.g:117:7: ^( TOKEN_REF . )
                     {
-                    TOKEN_REF33=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal916); 
+                    TOKEN_REF36=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal910); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
 
                     match(input, Token.UP, null); 
-                    omo = new MatchToken(factory, (TerminalAST)TOKEN_REF33, label);
+                    omos = factory.tokenRef(TOKEN_REF36, label, null);
 
                     }
                     break;
                 case 5 :
-                    // SourceGenTriggers.g:117:7: TOKEN_REF
+                    // SourceGenTriggers.g:118:7: TOKEN_REF
                     {
-                    TOKEN_REF34=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal932); 
-                    omo = new MatchToken(factory, (TerminalAST)TOKEN_REF34, label);
+                    TOKEN_REF37=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal926); 
+                    omos = factory.tokenRef(TOKEN_REF37, label, null);
 
                     }
                     break;
                 case 6 :
-                    // SourceGenTriggers.g:118:7: ^( ROOT terminal[label] )
+                    // SourceGenTriggers.g:119:7: ^( ROOT terminal[label] )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_terminal947); 
+                    match(input,ROOT,FOLLOW_ROOT_in_terminal941); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal949);
+                    pushFollow(FOLLOW_terminal_in_terminal943);
                     terminal(label);
 
                     state._fsp--;
@@ -1447,12 +1448,12 @@ public class SourceGenTriggers extends TreeParser {
                     }
                     break;
                 case 7 :
-                    // SourceGenTriggers.g:119:7: ^( BANG terminal[label] )
+                    // SourceGenTriggers.g:120:7: ^( BANG terminal[label] )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_terminal963); 
+                    match(input,BANG,FOLLOW_BANG_in_terminal957); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal965);
+                    pushFollow(FOLLOW_terminal_in_terminal959);
                     terminal(label);
 
                     state._fsp--;
@@ -1471,7 +1472,7 @@ public class SourceGenTriggers extends TreeParser {
         }
         finally {
         }
-        return omo;
+        return omos;
     }
     // $ANTLR end "terminal"
 
@@ -1544,7 +1545,7 @@ public class SourceGenTriggers extends TreeParser {
             this.transition = DFA6_transition;
         }
         public String getDescription() {
-            return "44:1: element returns [SrcOp omo] : ( labeledElement | atom[null] | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
+            return "45:1: element returns [List<SrcOp> omos] : ( labeledElement | atom[null] | ebnf | ACTION | SEMPRED | GATED_SEMPRED | treeSpec );";
         }
     }
     static final String DFA7_eotS =
@@ -1605,7 +1606,7 @@ public class SourceGenTriggers extends TreeParser {
             this.transition = DFA7_transition;
         }
         public String getDescription() {
-            return "54:1: labeledElement returns [SrcOp omo] : ( ^( ASSIGN ID atom[$ID] ) | ^( ASSIGN ID block[$ID,null] ) | ^( PLUS_ASSIGN ID atom[$ID] ) | ^( PLUS_ASSIGN ID block[$ID,null] ) );";
+            return "55:1: labeledElement returns [List<SrcOp> omos] : ( ^( ASSIGN ID atom[$ID] ) | ^( ASSIGN ID block[$ID,null] ) | ^( PLUS_ASSIGN ID atom[$ID] ) | ^( PLUS_ASSIGN ID block[$ID,null] ) );";
         }
     }
     static final String DFA10_eotS =
@@ -1687,7 +1688,7 @@ public class SourceGenTriggers extends TreeParser {
             this.transition = DFA10_transition;
         }
         public String getDescription() {
-            return "82:1: atom[GrammarAST label] returns [SrcOp omo] : ( ^( ROOT range[label] ) | ^( BANG range[label] ) | ^( ROOT notSet[label] ) | ^( BANG notSet[label] ) | notSet[label] | range[label] | ^( DOT ID terminal[label] ) | ^( DOT ID ruleref[label] ) | ^( WILDCARD . ) | WILDCARD | terminal[label] | ruleref[label] );";
+            return "83:1: atom[GrammarAST label] returns [List<SrcOp> omos] : ( ^( ROOT range[label] ) | ^( BANG range[label] ) | ^( ROOT notSet[label] ) | ^( BANG notSet[label] ) | notSet[label] | range[label] | ^( DOT ID terminal[label] ) | ^( DOT ID ruleref[label] ) | ^( WILDCARD . ) | WILDCARD | terminal[label] | ruleref[label] );";
         }
     }
     static final String DFA16_eotS =
@@ -1753,7 +1754,7 @@ public class SourceGenTriggers extends TreeParser {
             this.transition = DFA16_transition;
         }
         public String getDescription() {
-            return "112:1: terminal[GrammarAST label] returns [MatchToken omo] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[label] ) | ^( BANG terminal[label] ) );";
+            return "113:1: terminal[GrammarAST label] returns [List<SrcOp> omos] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[label] ) | ^( BANG terminal[label] ) );";
         }
     }
  
@@ -1770,78 +1771,78 @@ public class SourceGenTriggers extends TreeParser {
     public static final BitSet FOLLOW_labeledElement_in_element206 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_atom_in_element217 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ebnf_in_element230 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_element251 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEMPRED_in_element266 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GATED_SEMPRED_in_element279 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_treeSpec_in_element285 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement307 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement309 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
-    public static final BitSet FOLLOW_atom_in_labeledElement311 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ASSIGN_in_labeledElement325 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement327 = new BitSet(new long[]{0x0021080000000000L,0x000000000003A000L});
-    public static final BitSet FOLLOW_block_in_labeledElement329 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement340 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement342 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
-    public static final BitSet FOLLOW_atom_in_labeledElement344 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement356 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_labeledElement358 = new BitSet(new long[]{0x0021080000000000L,0x000000000003A000L});
-    public static final BitSet FOLLOW_block_in_labeledElement360 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec384 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_element_in_treeSpec390 = new BitSet(new long[]{0xA9A9480000010018L,0x000000024003A011L});
-    public static final BitSet FOLLOW_astBlockSuffix_in_ebnf414 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf416 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_OPTIONAL_in_ebnf426 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf428 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_CLOSURE_in_ebnf440 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf442 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_POSITIVE_CLOSURE_in_ebnf455 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_ebnf457 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_block_in_ebnf481 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_element245 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEMPRED_in_element260 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GATED_SEMPRED_in_element273 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_treeSpec_in_element279 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement301 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement303 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
+    public static final BitSet FOLLOW_atom_in_labeledElement305 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_in_labeledElement319 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement321 = new BitSet(new long[]{0x0021080000000000L,0x000000000003A000L});
+    public static final BitSet FOLLOW_block_in_labeledElement323 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement334 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement336 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
+    public static final BitSet FOLLOW_atom_in_labeledElement338 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_PLUS_ASSIGN_in_labeledElement350 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_labeledElement352 = new BitSet(new long[]{0x0021080000000000L,0x000000000003A000L});
+    public static final BitSet FOLLOW_block_in_labeledElement354 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_TREE_BEGIN_in_treeSpec378 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_element_in_treeSpec384 = new BitSet(new long[]{0xA9A9480000010018L,0x000000024003A011L});
+    public static final BitSet FOLLOW_astBlockSuffix_in_ebnf408 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf410 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_OPTIONAL_in_ebnf420 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf422 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_CLOSURE_in_ebnf434 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf436 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_POSITIVE_CLOSURE_in_ebnf449 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_ebnf451 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_block_in_ebnf475 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_astBlockSuffix0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_atom543 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom545 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom556 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_range_in_atom558 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_atom570 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom572 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_atom583 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_notSet_in_atom585 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_notSet_in_atom596 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_range_in_atom607 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOT_in_atom620 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom622 = new BitSet(new long[]{0x8021000000000000L,0x0000000000000010L});
-    public static final BitSet FOLLOW_terminal_in_atom624 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOT_in_atom632 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom634 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
-    public static final BitSet FOLLOW_ruleref_in_atom636 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_WILDCARD_in_atom647 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_WILDCARD_in_atom662 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_terminal_in_atom676 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_atom692 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet721 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_notSet723 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOT_in_notSet736 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_notSet738 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_ruleref766 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref769 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref771 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_ruleref783 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref786 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref788 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref802 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref804 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RANGE_in_range833 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_range837 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_range841 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal871 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal886 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal900 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal902 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal916 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal932 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal947 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal949 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_terminal963 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal965 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom537 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom539 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom550 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_range_in_atom552 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_atom564 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom566 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_atom577 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_notSet_in_atom579 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_notSet_in_atom590 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_range_in_atom601 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOT_in_atom614 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom616 = new BitSet(new long[]{0x8021000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_terminal_in_atom618 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOT_in_atom626 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom628 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
+    public static final BitSet FOLLOW_ruleref_in_atom630 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_WILDCARD_in_atom641 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_WILDCARD_in_atom656 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_terminal_in_atom670 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_atom686 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet715 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_notSet717 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOT_in_notSet730 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_notSet732 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_ruleref760 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref763 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref765 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_ruleref777 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref780 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref782 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref796 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref798 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RANGE_in_range827 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range831 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range835 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal865 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal880 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal894 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal896 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal910 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal926 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_terminal941 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal943 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_terminal957 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal959 = new BitSet(new long[]{0x0000000000000008L});
 
 }

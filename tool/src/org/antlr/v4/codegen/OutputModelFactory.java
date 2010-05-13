@@ -10,13 +10,16 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
+import java.util.Stack;
 
-/** */
+/** Create output objects wthin rule functions */
 public abstract class OutputModelFactory {
 	public Grammar g;
 	public CodeGenerator gen;
 
-	public OutputModelObject root;	
+	// Context ptrs
+	public OutputModelObject file; // root
+	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();	
 
 	protected OutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
@@ -25,16 +28,19 @@ public abstract class OutputModelFactory {
 
 	public abstract OutputModelObject buildOutputModel();
 
-	public abstract ParserFile outputFile(String fileName);
-
-	public abstract Parser parser(ParserFile pf);
-
 	public CodeBlock epsilon() { return new CodeBlock(this); }
 
 	public CodeBlock alternative(List<SrcOp> elems) { return new CodeBlock(this, elems); }
 
 	public SrcOp action(GrammarAST ast) { return new Action(this, ast); }
+
 	public SrcOp sempred(GrammarAST ast) { return new SemPred(this, ast); }
+
+	public abstract List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args);
+	
+	public abstract List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args);
+
+	public abstract List<SrcOp> stringRef(GrammarAST ID, GrammarAST label);
 
 	public Choice getChoiceBlock(BlockAST blkAST, GrammarAST ebnfRoot, List<CodeBlock> alts) {
 		// TODO: assumes LL1

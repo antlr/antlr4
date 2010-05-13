@@ -7,6 +7,7 @@ options {
 
 @header {
 package org.antlr.v4.codegen;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.codegen.src.*;
 import org.antlr.v4.tool.*;
 import java.util.Collections;
@@ -38,24 +39,24 @@ alternative returns [CodeBlock omo]
 @init {List<SrcOp> elems = new ArrayList<SrcOp>();}
     :	^(ALT_REWRITE a=alternative .)	
     |	^(ALT EPSILON) {$omo = factory.epsilon();}
-    |   ^( ALT ( element {elems.add($element.omo);} )+ ) {$omo = factory.alternative(elems);}
+    |   ^( ALT ( element {elems.addAll($element.omos);} )+ ) {$omo = factory.alternative(elems);}
     ;
 
-element returns [SrcOp omo]
-	:	labeledElement					{$omo = $labeledElement.omo;}
-	|	atom[null]						{$omo = $atom.omo;}
-	|	ebnf							{$omo = $ebnf.omo;}						
-	|   ACTION							{$omo = factory.action($ACTION);}
-	|   SEMPRED							{$omo = factory.sempred($SEMPRED);}
+element returns [List<SrcOp> omos]
+	:	labeledElement					{$omos = $labeledElement.omos;}
+	|	atom[null]						{$omos = $atom.omos;}
+	|	ebnf							{$omos = Utils.list($ebnf.omo);}
+	|   ACTION							{$omos = Utils.list(factory.action($ACTION));}
+	|   SEMPRED							{$omos = Utils.list(factory.sempred($SEMPRED));}
 	|	GATED_SEMPRED	
 	|	treeSpec					
 	;
 	
-labeledElement returns [SrcOp omo]
-	:	^(ASSIGN ID atom[$ID] )				{$omo = $atom.omo;}
-	|	^(ASSIGN ID block[$ID,null])		{$omo = $block.omo;}
-	|	^(PLUS_ASSIGN ID atom[$ID])			{$omo = $atom.omo;}
-	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omo = $block.omo;}	
+labeledElement returns [List<SrcOp> omos]
+	:	^(ASSIGN ID atom[$ID] )				{$omos = $atom.omos;}
+	|	^(ASSIGN ID block[$ID,null])		{$omos = Utils.list($block.omo);}
+	|	^(PLUS_ASSIGN ID atom[$ID])			{$omos = $atom.omos;}
+	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omos = Utils.list($block.omo);}	
 	;
 
 treeSpec returns [SrcOp omo]
@@ -79,42 +80,42 @@ astBlockSuffix
 
 // TODO: combine ROOT/BANG into one then just make new op ref'ing return value of atom/terminal...
 // TODO: same for NOT
-atom[GrammarAST label] returns [SrcOp omo]
+atom[GrammarAST label] returns [List<SrcOp> omos]
 	:	^(ROOT range[label])			
-	|	^(BANG range[label])		{$omo = $range.omo;}	
+	|	^(BANG range[label])		{$omos = $range.omos;}	
 	|	^(ROOT notSet[label])			
-	|	^(BANG notSet[label])		{$omo = $notSet.omo;}	
+	|	^(BANG notSet[label])		{$omos = $notSet.omos;}	
 	|	notSet[label]					
-	|	range[label]				{$omo = $range.omo;}	
+	|	range[label]				{$omos = $range.omos;}	
 	|	^(DOT ID terminal[label])
 	|	^(DOT ID ruleref[label])
     |	^(WILDCARD .)				
     |	WILDCARD				
-    |   terminal[label]				{$omo = $terminal.omo;}
-    |   ruleref[label]				{$omo = $ruleref.omo;}
+    |   terminal[label]				{$omos = $terminal.omos;}
+    |   ruleref[label]				{$omos = $ruleref.omos;}
     ;
 
-notSet[GrammarAST label] returns [SrcOp omo]
+notSet[GrammarAST label] returns [List<SrcOp> omos]
     : ^(NOT terminal[label])		
     | ^(NOT block[label,null])			
     ;
 
-ruleref[GrammarAST label] returns [SrcOp omo]
+ruleref[GrammarAST label] returns [List<SrcOp> omos]
     :	^(ROOT ^(RULE_REF ARG_ACTION?))
-    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$omo = new InvokeRule(factory, $RULE_REF, $label);}
-    |	^(RULE_REF ARG_ACTION?)			{$omo = new InvokeRule(factory, $RULE_REF, $label);}
+    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$omos = factory.ruleRef($RULE_REF, $label, $ARG_ACTION);}
+    |	^(RULE_REF ARG_ACTION?)			{$omos = factory.ruleRef($RULE_REF, $label, $ARG_ACTION);}
     ;
 
-range[GrammarAST label] returns [SrcOp omo]
+range[GrammarAST label] returns [List<SrcOp> omos]
     :	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)    	
     ;
 
-terminal[GrammarAST label] returns [MatchToken omo]
-    :  ^(STRING_LITERAL .)			{$omo = new MatchToken(factory, (TerminalAST)$STRING_LITERAL, $label);}
-    |	STRING_LITERAL				{$omo = new MatchToken(factory, (TerminalAST)$STRING_LITERAL, $label);}
-    |	^(TOKEN_REF ARG_ACTION .)	{$omo = new MatchToken(factory, (TerminalAST)$TOKEN_REF, $label);}
-    |	^(TOKEN_REF .)				{$omo = new MatchToken(factory, (TerminalAST)$TOKEN_REF, $label);}
-    |	TOKEN_REF					{$omo = new MatchToken(factory, (TerminalAST)$TOKEN_REF, $label);}
+terminal[GrammarAST label] returns [List<SrcOp> omos]
+    :  ^(STRING_LITERAL .)			{$omos = factory.stringRef($STRING_LITERAL, $label);}
+    |	STRING_LITERAL				{$omos = factory.stringRef($STRING_LITERAL, $label);}
+    |	^(TOKEN_REF ARG_ACTION .)	{$omos = factory.tokenRef($TOKEN_REF, $label, $ARG_ACTION);}
+    |	^(TOKEN_REF .)				{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
+    |	TOKEN_REF					{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
     |	^(ROOT terminal[label])			
     |	^(BANG terminal[label])			
     ;

@@ -47,6 +47,7 @@ public class RuleFunction extends OutputModelObject {
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
 		if ( r.finallyAction!=null ) finallyAction = r.finallyAction.getText();
 
+		factory.currentRule.push(this);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
 		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
@@ -56,7 +57,8 @@ public class RuleFunction extends OutputModelObject {
 		}
 		catch (Exception e){
 			e.printStackTrace(System.err);
-		}		
+		}
+		factory.currentRule.pop();
 	}
 
 	@Override

@@ -14,7 +14,9 @@ public class ParserFile extends OutputModelObject {
 	
 	public ParserFile(OutputModelFactory factory, String fileName) {
 		super(factory);
-		this.fileName = fileName; 
+		this.fileName = fileName;
+		factory.file = this;
+		parser = new Parser(factory, this);
 	}
 
 	public void defineBitSet(BitSetDef b) {

@@ -102,9 +102,17 @@ public class Utils {
 		return a;
 	}
 
-	public static <T> List<T> list(T... values) {
-		List<T> x = new ArrayList<T>(values.length);
-		for (T v : values) {
+//	public static <T> List<T> list(T... values) {
+//		List<T> x = new ArrayList<T>(values.length);
+//		for (T v : values) {
+//			if ( v!=null ) x.add(v);
+//		}
+//		return x;
+//	}
+
+	public static List list(Object... values) {
+		List x = new ArrayList(values.length);
+		for (Object v : values) {
 			if ( v!=null ) x.add(v);
 		}
 		return x;

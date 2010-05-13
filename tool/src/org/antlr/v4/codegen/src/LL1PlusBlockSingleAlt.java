@@ -14,9 +14,9 @@ public class LL1PlusBlockSingleAlt extends LL1Choice {
 	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
 		IntervalSet loopBackLook = altLookSets[2]; // loop exit is alt 1
-		expr = factory.getLL1Test(loopBackLook, blkAST);
+		expr = factory.getLL1Test(loopBackLook, ast);
 		if ( expr instanceof TestSetInline ) {
-			CaptureNextToken nextToken = new CaptureNextToken("la"+blkAST.token.getTokenIndex());
+			CaptureNextToken nextToken = new CaptureNextToken("la"+ast.token.getTokenIndex());
 			addPreambleOp(nextToken);
 			loopIteration.add(nextToken);
 		}

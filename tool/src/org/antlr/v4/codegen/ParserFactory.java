@@ -1,8 +1,11 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.src.*;
+import org.antlr.v4.misc.Utils;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.TerminalAST;
 
-import java.util.Stack;
+import java.util.List;
 
 /** */
 public class ParserFactory extends OutputModelFactory {
@@ -16,30 +19,29 @@ public class ParserFactory extends OutputModelFactory {
 //		put(MatchToken.class, "matchToken");
 //	}};
 
-	// Context ptrs
-	ParserFile file;
-	Parser parser;
-	Stack<RuleFunction> currentRule;
-
 	public ParserFactory(CodeGenerator gen) {
 		super(gen);
 	}
 
 	public OutputModelObject buildOutputModel() {
-		root = file = new ParserFile(this, gen.getRecognizerFileName());
-		file.parser = new Parser(this, file);
-
-		// side-effect: fills pf dfa and bitset defs
-		return file;
+		return new ParserFile(this, gen.getRecognizerFileName());
 	}
 
-	public ParserFile outputFile(String fileName) {
-		return new ParserFile(this, fileName);
+	@Override
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
+		InvokeRule r = new InvokeRule(this, ID, label);
+		return Utils.list(r);
 	}
 
-	public Parser parser(ParserFile pf) {
-		return new Parser(this, pf);
+	@Override
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
+		return Utils.list(new MatchToken(this, (TerminalAST)ID, label));
 	}
 
-	public void defineBitSet(BitSetDef b) { file.defineBitSet(b); }
+	@Override
+	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {
+		return tokenRef(ID, label, null);
+	}
+
+	public void defineBitSet(BitSetDef b) { ((ParserFile)file).defineBitSet(b); }
 }

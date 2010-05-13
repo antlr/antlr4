@@ -10,6 +10,15 @@ public abstract class OutputModelObject {
 	public OutputModelFactory factory;
 	public GrammarAST ast;
 
+	public OutputModelObject() {;}
+	
+	public OutputModelObject(OutputModelFactory factory) { this.factory = factory; }
+
+	public OutputModelObject(OutputModelFactory factory, GrammarAST ast) {
+		this.factory = factory;
+		this.ast = ast;
+	}
+
 	/** If the output model object encloses some other model objects,
 	 *  we need to be able to walk them. Rather than make each class
 	 *  properly walk any nested objects, I'm going to use a generic
@@ -20,14 +29,5 @@ public abstract class OutputModelObject {
 	// TODO: make list of Fields to avoid repeated look up
 	public List<String> getChildren() {
 		return null;
-	}
-
-	public OutputModelObject() {;}
-	
-	public OutputModelObject(OutputModelFactory factory) { this.factory = factory; }
-
-	public OutputModelObject(OutputModelFactory factory, GrammarAST ast) {
-		this.factory = factory;
-		this.ast = ast;
 	}
 }
