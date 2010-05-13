@@ -40,7 +40,7 @@ public class OrderedHashSet<T> extends HashSet<T> {
 		return result;
     }
 
-    public boolean remove(Object o) {
+	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
     }
 
@@ -54,16 +54,6 @@ public class OrderedHashSet<T> extends HashSet<T> {
      */
     public List<T> elements() {
         return elements;
-    }
-
-    public int size() {
-		/*
-		if ( elements.size()!=super.size() ) {
-			ErrorManager.internalError("OrderedHashSet: elements and set size differs; "+
-									   elements.size()+"!="+super.size());
-        }
-        */
-        return elements.size();
     }
 
     public String toString() {

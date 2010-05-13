@@ -9,7 +9,7 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.List;
 
 /** */
-public class LL1PlusBlock extends LL1Choice {
+public class LL1PlusBlock extends LL1Loop {
 	public String loopLabel;
 	public String loopCounterVar;
 	public String[] exitLook;

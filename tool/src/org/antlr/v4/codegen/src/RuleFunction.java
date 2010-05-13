@@ -3,6 +3,7 @@ package org.antlr.v4.codegen.src;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.SourceGenTriggers;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -28,6 +29,7 @@ public class RuleFunction extends OutputModelObject {
 	public List<String> exceptions;
 	public String finallyAction;
 
+	public OrderedHashSet<SrcOp> decls;
 	public SrcOp code;
 
 	public RuleFunction(OutputModelFactory factory, Rule r) {
@@ -61,9 +63,16 @@ public class RuleFunction extends OutputModelObject {
 		factory.currentRule.pop();
 	}
 
+	public void addDecl(Decl d) {
+		if ( decls==null ) decls = new OrderedHashSet<SrcOp>();
+		decls.add(d);
+	}
+
 	@Override
 	public List<String> getChildren() {
 		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("code"); }};
+		return new ArrayList<String>() {{
+			if ( sup!=null ) addAll(sup); add("decls"); add("code"); 
+		}};
 	}
 }

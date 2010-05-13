@@ -9,7 +9,7 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.List;
 
 /** */
-public class LL1StarBlock extends LL1Choice {
+public class LL1StarBlock extends LL1Loop {
 	public String loopLabel;
 	public String[] exitLook;
 	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {

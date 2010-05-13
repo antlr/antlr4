@@ -13,7 +13,7 @@ public class TestSetInline extends OutputModelObject {
 	public TestSetInline(OutputModelFactory factory, GrammarAST blkAST, IntervalSet set) {
 		super(factory, blkAST);
 		this.ttypes = factory.gen.target.getTokenTypesAsTargetLabels(factory.g, set.toArray());
-		this.varName = "la"+blkAST.token.getTokenIndex();
+		this.varName = "_la";
 //		this.choice = choice;
 //		nextToken = new CaptureNextToken();
 //		choice.addPreambleOp(nextToken);
