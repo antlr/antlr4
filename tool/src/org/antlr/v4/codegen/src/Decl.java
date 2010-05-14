@@ -1,18 +1,29 @@
 package org.antlr.v4.codegen.src;
 
+import org.antlr.v4.codegen.OutputModelFactory;
+
 /** */
 public class Decl extends SrcOp {
-	public String varName;
-	public String type;
-	public Decl(String varName, String type) { this.varName = varName; this.type = type; }
+	public String name;
+	public String decl;
+
+	public Decl(OutputModelFactory factory, String name, String decl) {
+		this(factory, name);
+		this.decl = decl;
+	}
+
+	public Decl(OutputModelFactory factory, String name) {
+		super(factory);
+		this.name = name;
+	}
 
 	@Override
 	public int hashCode() {
-		return varName.hashCode();
+		return name.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return varName.equals(((Decl)obj).varName);
+		return name.equals(((Decl)obj).name);
 	}
 }

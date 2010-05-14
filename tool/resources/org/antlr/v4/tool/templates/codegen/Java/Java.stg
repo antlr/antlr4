@@ -11,7 +11,7 @@ javaTypeInitMap ::= [
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
-ParserFile(f, parser, dfaDefs, bitSetDefs) ::= <<
+ParserFile(f, parser, dfaDecls, bitSetDecls) ::= <<
 // $ANTLR ANTLRVersion> <f.fileName> generatedTimestamp>
 import org.antlr.runtime.*;
 
@@ -21,23 +21,33 @@ import org.antlr.runtime.*;
 Parser(p, funcs) ::= <<
 public class <p.name> {
     <funcs; separator="\n">
-    <dfaDefs; separator="\n">
-    <bitSetDefs; separator="\n">
+    <dfaDecls; separator="\n">
+    <bitSetDecls; separator="\n">
 }
 >>
 
-DFADef(dfa) ::= <<
-// define <dfa.name>
->>
+/*
+   // S.g:5:1: b returns [String q, float x] : A ;
+    public final S.b_return b() throws RecognitionException {
+        b_stack.push(new b_scope());
+        S.b_return retval = new S.b_return();
+*/
 
-BitSetDef(b) ::= <<
-// define <b.name>
->>
-
-RuleFunction(f,code,decls) ::= <<
-<f.modifiers:{f | <f> }>void <f.name>(<f.args>) {
-    <decls>
-    <code>
+RuleFunction(f,code,decls,args,retvals,scope) ::= <<
+<args>
+<retvals>
+<scope>
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>() {
+	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif>
+    <decls; separator="\n">
+	try {
+	    <code>
+	}
+	finally {
+		<if(f.scope)><f.scope.name>.pop();<endif>
+		<if(f.args)>_args.pop();<endif>
+		_follow.pop();
+	}
 }
 >>
 
@@ -129,9 +139,9 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r) ::= <<
-pushFollow(<r.follow.name>);
+_follow.push(<r.follow.name>);
+<if(r.args)>_args.push(new );<endif>
 <if(r.label)><r.label> = <endif><r.name>();
-state._fsp--;
 >>
 
 MatchToken(m) ::= <<
@@ -143,11 +153,46 @@ SemPred(p) ::= <<
 if (!(<p.ast.text>)) throw new FailedPredicateException(input, "<ruleName>", "<description>");
 >>
 
+AddToList(a) ::= "<a.listName>.add(<a.opWithResultToAdd.label>);"
+
 //Decl(d) ::= "<d.type> <d.varName> = <d.type:initValue()>;"
 
 TokenDecl(t) ::= "Token <t.varName>;"
+TokenListDecl(t) ::= "List\<Token> <t.varName> = new ArrayList\<Token>();"
 
 CaptureNextToken(d) ::= "<d.varName> = input.LA(1);"
+
+ArgStruct(rv,attrs) ::= <<
+public static class <rv.name> {
+    <attrs:{a | <a>;}; separator="\n">
+    public <rv.name>(<attrs; separator=", ">) {
+        <rv.attrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+    }
+};
+>>
+
+ReturnValueStruct(rv,attrs) ::= <<
+public static class <rv.name> extends ParserRuleReturnScope {
+    <attrs:{a | <a>;}; separator="\n">
+};
+>>
+
+DynamicScopeStruct(rv,attrs) ::= <<
+public static class <rv.name> {
+    <attrs:{a | <a>;}; separator="\n">
+};
+QStack b_stack = new QStack();
+>>
+
+AttributeDecl(d) ::= "<d.decl>"
+
+DFADecl(dfa) ::= <<
+// define <dfa.name>
+>>
+
+BitSetDecl(b) ::= <<
+// define <b.name>
+>>
 
 /** Using a type to init value map, try to init a type; if not in table
  *  must be an object, default value is "null".

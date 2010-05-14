@@ -64,7 +64,7 @@ public class OutputModelWalker {
 		// COMPUTE STs FOR EACH NESTED MODEL OBJECT NAMED AS ARG BY TEMPLATE
 		if ( kids!=null ) for (String fieldName : kids) {
 			if ( !argNames.contains(fieldName) ) continue; // they won't use so don't compute
-			//System.out.println("computing ST for field "+fieldName+" of "+omo.getClass());
+			System.out.println("computing ST for field "+fieldName+" of "+omo.getClass());
 			try {
 				Field fi = omo.getClass().getField(fieldName);
 				Object o = fi.get(omo);
@@ -98,6 +98,7 @@ public class OutputModelWalker {
 				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, fieldName);
 			}
 		}
+		st.impl.dump();
 		return st;
 	}
 

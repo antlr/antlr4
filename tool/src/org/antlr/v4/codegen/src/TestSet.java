@@ -6,7 +6,7 @@ import org.antlr.v4.tool.GrammarAST;
 
 /** */
 public class TestSet extends OutputModelObject {
-	public BitSetDef set;
+	public BitSetDecl set;
 	public TestSet(OutputModelFactory factory, GrammarAST blkAST, IntervalSet set) {
 		this.set = factory.createTestBitSet(blkAST, set);
 		factory.defineBitSet(this.set);

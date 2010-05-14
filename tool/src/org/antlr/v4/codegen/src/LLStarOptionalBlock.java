@@ -7,9 +7,9 @@ import java.util.List;
 
 /** */
 public class LLStarOptionalBlock extends OptionalBlock {
-	public DFADef dfaDef;
+	public DFADecl dfaDecl;
 	public LLStarOptionalBlock(OutputModelFactory factory, BlockAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
-		dfaDef = factory.defineDFA(ast, factory.g.decisionDFAs.get(decision));
+		dfaDecl = factory.defineDFA(ast, factory.g.decisionDFAs.get(decision));
 	}
 }

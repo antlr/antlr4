@@ -68,7 +68,7 @@ public abstract class OutputModelFactory {
 	}
 
 
-	public abstract void defineBitSet(BitSetDef b);
+	public abstract void defineBitSet(BitSetDecl b);
 
 	public OutputModelObject getLL1Test(IntervalSet look, GrammarAST blkAST) {
 		OutputModelObject expr;
@@ -81,7 +81,7 @@ public abstract class OutputModelFactory {
 		return expr;
 	}
 
-	public DFADef defineDFA(GrammarAST ast, DFA dfa) {
+	public DFADecl defineDFA(GrammarAST ast, DFA dfa) {
 		return null;
 //		DFADef d = new DFADef(name, dfa);
 //		outputModel.dfaDefs.add(d);
@@ -95,21 +95,26 @@ public abstract class OutputModelFactory {
 		return "cnt"+ ast.token.getTokenIndex();
 	}
 
-	public BitSetDef createFollowBitSet(GrammarAST ast, IntSet set) {
+	public String getListLabel(String label) { return label+"_list"; }
+	public String getReturnStructName(String ruleName) { return ruleName+"_return"; }
+	public String getArgStructName(String ruleName) { return ruleName+"_args"; }
+	public String getDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
+
+	public BitSetDecl createFollowBitSet(GrammarAST ast, IntSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String elementName = ast.getText(); // assume rule ref
 		if ( ast.getType() == ANTLRParser.TOKEN_REF ) {
 			elementName = gen.target.getTokenTypeAsTargetLabel(g, g.tokenNameToTypeMap.get(elementName));
 		}
 		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDef b = new BitSetDef(this, name, set);
+		BitSetDecl b = new BitSetDecl(this, name, set);
 		return b;
 	}
 
-	public BitSetDef createTestBitSet(GrammarAST ast, IntSet set) {
+	public BitSetDecl createTestBitSet(GrammarAST ast, IntSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDef b = new BitSetDef(this, name, set);
+		BitSetDecl b = new BitSetDecl(this, name, set);
 		return b;
 	}
 }

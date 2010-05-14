@@ -2,6 +2,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.src.*;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.TerminalAST;
 
@@ -30,12 +31,21 @@ public class ParserFactory extends OutputModelFactory {
 	@Override
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		InvokeRule r = new InvokeRule(this, ID, label);
-		return Utils.list(r);
+		AddToList a = null;
+		if ( label!=null && label.parent.getType()== ANTLRParser.PLUS_ASSIGN ) {
+			a = new AddToList(this, getListLabel(r.label), r);
+		}
+		return Utils.list(r, a);
 	}
 
 	@Override
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
-		return Utils.list(new MatchToken(this, (TerminalAST)ID, label));
+		MatchToken m = new MatchToken(this, (TerminalAST) ID, label);
+		AddToList a = null;
+		if ( label!=null && label.parent.getType()== ANTLRParser.PLUS_ASSIGN ) {
+			a = new AddToList(this, getListLabel(m.label), m);
+		}
+		return Utils.list(m, a);
 	}
 
 	@Override
@@ -43,5 +53,5 @@ public class ParserFactory extends OutputModelFactory {
 		return tokenRef(ID, label, null);
 	}
 
-	public void defineBitSet(BitSetDef b) { ((ParserFile)file).defineBitSet(b); }
+	public void defineBitSet(BitSetDecl b) { ((ParserFile)file).defineBitSet(b); }
 }

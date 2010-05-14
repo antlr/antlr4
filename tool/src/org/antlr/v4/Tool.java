@@ -407,6 +407,8 @@ public class Tool {
 		
 		if ( generate_DFA_dot ) generateDFAs(g);
 
+		if ( g.tool.getNumErrors()>0 ) return;
+
 		// GENERATE CODE
 		CodeGenPipeline gen = new CodeGenPipeline(g);
 		gen.process();

@@ -25,7 +25,7 @@ public abstract class LL1Loop extends LL1Choice {
 		expr = factory.getLL1Test(look, ast);
 		if ( expr instanceof TestSetInline ) {
 			TestSetInline e = (TestSetInline) expr;
-			Decl d = new TokenDecl(e.varName);
+			Decl d = new TokenDecl(factory, e.varName);
 			factory.currentRule.peek().addDecl(d);
 			CaptureNextToken nextToken = new CaptureNextToken(e.varName);
 			addPreambleOp(nextToken);

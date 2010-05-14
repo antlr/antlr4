@@ -2,6 +2,7 @@ package org.antlr.v4.misc;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 /** A HashMap that remembers the order that the elements were added.
@@ -49,7 +50,12 @@ public class OrderedHashSet<T> extends HashSet<T> {
         super.clear();
     }
 
-    /** Return the List holding list of table elements.  Note that you are
+	@Override
+	public Iterator<T> iterator() {
+		return elements.iterator();
+	}
+
+	/** Return the List holding list of table elements.  Note that you are
      *  NOT getting a copy so don't write to the list.
      */
     public List<T> elements() {

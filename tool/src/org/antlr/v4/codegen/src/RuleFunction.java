@@ -7,7 +7,6 @@ import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
 
@@ -19,9 +18,7 @@ import java.util.List;
 public class RuleFunction extends OutputModelObject {
 	public String name;
 	public List<String> modifiers;
-    public Collection<Attribute> args;
-	public Collection<Attribute> retvals;
-	public Collection<Attribute> ruleScopeDecls;
+	public String retType;
 	public List<String> globalScopesUsed;
 	public Collection<String> ruleLabels;
 	public Collection<String> tokenLabels;
@@ -29,7 +26,10 @@ public class RuleFunction extends OutputModelObject {
 	public List<String> exceptions;
 	public String finallyAction;
 
-	public OrderedHashSet<SrcOp> decls;
+	public ArgStruct args;
+	public DynamicScopeStruct scope;
+	public ReturnValueStruct retvals;
+	public OrderedHashSet<Decl> decls;
 	public SrcOp code;
 
 	public RuleFunction(OutputModelFactory factory, Rule r) {
@@ -41,9 +41,16 @@ public class RuleFunction extends OutputModelObject {
 		}
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
-		if ( r.args!=null ) args = r.args.attributes.values();
-		if ( r.retvals!=null ) retvals = r.retvals.attributes.values();
-		if ( r.scope!=null ) ruleScopeDecls = r.scope.attributes.values();
+		if ( r.args!=null ) {
+			args = new ArgStruct(factory, r);
+		}
+		if ( r.retvals!=null ) {
+			retvals = new ReturnValueStruct(factory, r);
+			retType = factory.getReturnStructName(r.name);
+		}
+		if ( r.scope!=null ) {
+			scope = new DynamicScopeStruct(factory, r);
+		}
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
@@ -64,7 +71,7 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public void addDecl(Decl d) {
-		if ( decls==null ) decls = new OrderedHashSet<SrcOp>();
+		if ( decls==null ) decls = new OrderedHashSet<Decl>();
 		decls.add(d);
 	}
 
@@ -72,7 +79,9 @@ public class RuleFunction extends OutputModelObject {
 	public List<String> getChildren() {
 		final List<String> sup = super.getChildren();
 		return new ArrayList<String>() {{
-			if ( sup!=null ) addAll(sup); add("decls"); add("code"); 
+			if ( sup!=null ) addAll(sup);
+			add("args"); add("retvals");
+			add("scope"); add("decls"); add("code");
 		}};
 	}
 }
