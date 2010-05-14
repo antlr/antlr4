@@ -37,25 +37,17 @@ public class <p.name> {
 RuleFunction(f,code,decls,context) ::= <<
 <context>
 
-<if(f.isStartRule)>
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>(<f.args; separator=", ">) {
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>(<f.args:{a|<a>, }>BitSet _follow) {
+<!	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif> !>
 <if(f.retType)>
     _ctx.push(new <f.context.name>(<f.args:{a|<a.name>}; separator=",">));
-    _<f.name>(null);
-    return _ctx.pop();
-<else>
-    _<f.name>(null);
 <endif>
-}
-
-<endif>
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <if(f.isStartRule)>_<endif><f.name>(BitSet _follow) {
-<!	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif> !>
     <decls; separator="\n">
 	try {
 	    <code>
 	}
 	finally {
+        <if(f.retType)>return _ctx.pop();<endif>
 	}
 }
 >>
@@ -148,9 +140,7 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r) ::= <<
-<if(r.ctxName)>_ctx.push(new <r.ctxName>(<r.argExprs; separator=",">));<endif>
-<if(r.label)><r.label> = <endif><r.name>(<r.follow.name>);
-<if(r.ctxName)>_ctx.pop();<endif>
+<if(r.label)><r.label> = <endif><r.name>(<r.argExprs:{a|<a>, }><r.follow.name>);
 >>
 
 MatchToken(m) ::= <<
