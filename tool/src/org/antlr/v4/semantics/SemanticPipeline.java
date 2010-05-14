@@ -75,6 +75,7 @@ public class SemanticPipeline {
 
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
 		symcheck.checkRuleArgs(g, collector.rulerefs);
+		identifyStartRules(collector);
 		symcheck.checkForQualifiedRuleIssues(g, collector.qualifiedRulerefs);
 
 		// don't continue if we got symbol errors
@@ -89,6 +90,14 @@ public class SemanticPipeline {
 
 		UseDefAnalyzer usedef = new UseDefAnalyzer();
 		usedef.checkRewriteElementsPresentOnLeftSide(g, collector.rules);
+	}
+
+	void identifyStartRules(CollectSymbols collector) {
+		for (GrammarAST ref : collector.rulerefs) {
+			String ruleName = ref.getText();
+			Rule r = g.getRule(ruleName);
+			if ( r!=null ) r.isStartRule = false;
+		}
 	}
 
 	void assignLexerTokenTypes(Grammar g, CollectSymbols collector) {

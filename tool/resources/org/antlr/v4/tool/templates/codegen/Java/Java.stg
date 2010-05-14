@@ -20,6 +20,7 @@ import org.antlr.runtime.*;
 
 Parser(p, funcs) ::= <<
 public class <p.name> {
+    public QStack _ctx;
     <funcs; separator="\n">
     <dfaDecls; separator="\n">
     <bitSetDecls; separator="\n">
@@ -33,20 +34,28 @@ public class <p.name> {
         S.b_return retval = new S.b_return();
 */
 
-RuleFunction(f,code,decls,args,retvals,scope) ::= <<
-<args>
-<retvals>
-<scope>
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>() {
-	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif>
+RuleFunction(f,code,decls,context) ::= <<
+<context>
+
+<if(f.isStartRule)>
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>(<f.args; separator=", ">) {
+<if(f.retType)>
+    _ctx.push(new <f.context.name>(<f.args:{a|<a.name>}; separator=",">));
+    _<f.name>(null);
+    return _ctx.pop();
+<else>
+    _<f.name>(null);
+<endif>
+}
+
+<endif>
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <if(f.isStartRule)>_<endif><f.name>(BitSet _follow) {
+<!	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif> !>
     <decls; separator="\n">
 	try {
 	    <code>
 	}
 	finally {
-		<if(f.scope)><f.scope.name>.pop();<endif>
-		<if(f.args)>_args.pop();<endif>
-		_follow.pop();
 	}
 }
 >>
@@ -139,9 +148,9 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r) ::= <<
-_follow.push(<r.follow.name>);
-<if(r.args)>_args.push(new );<endif>
-<if(r.label)><r.label> = <endif><r.name>();
+<if(r.ctxName)>_ctx.push(new <r.ctxName>(<r.argExprs; separator=",">));<endif>
+<if(r.label)><r.label> = <endif><r.name>(<r.follow.name>);
+<if(r.ctxName)>_ctx.pop();<endif>
 >>
 
 MatchToken(m) ::= <<
@@ -162,18 +171,14 @@ TokenListDecl(t) ::= "List\<Token> <t.varName> = new ArrayList\<Token>();"
 
 CaptureNextToken(d) ::= "<d.varName> = input.LA(1);"
 
-ArgStruct(rv,attrs) ::= <<
-public static class <rv.name> {
+StructDecl(s,attrs) ::= <<
+public static class <s.name> extends ParserContextScope {
     <attrs:{a | <a>;}; separator="\n">
-    public <rv.name>(<attrs; separator=", ">) {
-        <rv.attrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+    <if(s.ctorAttrs)>
+    public <s.name>(<s.ctorAttrs; separator=", ">) {
+        <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-};
->>
-
-ReturnValueStruct(rv,attrs) ::= <<
-public static class <rv.name> extends ParserRuleReturnScope {
-    <attrs:{a | <a>;}; separator="\n">
+    <endif>
 };
 >>
 

@@ -16,6 +16,11 @@ public class QStack<T> {
 		elements[++sp] = fset;
 	}
 
+	public T peek() {
+		if ( sp<0 ) throw new EmptyStackException();
+		return (T)elements[sp];
+	}
+
 	public T pop() {
 		if ( sp<0 ) throw new EmptyStackException();
 		return (T)elements[sp--];

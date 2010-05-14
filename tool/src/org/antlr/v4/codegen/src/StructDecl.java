@@ -10,6 +10,7 @@ import java.util.List;
 /** */
 public class StructDecl extends Decl {
 	public List<Decl> attrs = new ArrayList<Decl>();
+	public Collection<Attribute> ctorAttrs;
 
 	public StructDecl(OutputModelFactory factory, String name, Collection<Attribute> attrList) {
 		super(factory, name);

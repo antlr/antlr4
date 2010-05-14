@@ -7,6 +7,7 @@ import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
 
@@ -25,32 +26,42 @@ public class RuleFunction extends OutputModelObject {
 	public List<String> elementsReferencedInRewrite;
 	public List<String> exceptions;
 	public String finallyAction;
+	public boolean isStartRule;
 
-	public ArgStruct args;
-	public DynamicScopeStruct scope;
-	public ReturnValueStruct retvals;
+	public StructDecl context;
+
+	public Collection<Attribute> args = null;
 	public OrderedHashSet<Decl> decls;
 	public SrcOp code;
 
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
+		this.isStartRule = r.isStartRule;
 		if ( r.modifiers!=null && r.modifiers.size()>0 ) {
 			this.modifiers = new ArrayList<String>();
 			for (GrammarAST t : r.modifiers) modifiers.add(t.getText());
 		}
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
+		List<Attribute> argsDynScopeAndReturnValues = new ArrayList<Attribute>();
 		if ( r.args!=null ) {
-			args = new ArgStruct(factory, r);
+			this.args = r.args.attributes.values();
+			argsDynScopeAndReturnValues.addAll(r.args.attributes.values());
 		}
 		if ( r.retvals!=null ) {
-			retvals = new ReturnValueStruct(factory, r);
-			retType = factory.getReturnStructName(r.name);
+			retType = factory.getRuleFunctionContextStructName(r.name);
+			argsDynScopeAndReturnValues.addAll(r.retvals.attributes.values());
 		}
 		if ( r.scope!=null ) {
-			scope = new DynamicScopeStruct(factory, r);
+			argsDynScopeAndReturnValues.addAll(r.scope.attributes.values());
 		}
+		if ( argsDynScopeAndReturnValues.size()>0 ) {
+			context = new StructDecl(factory, factory.getRuleFunctionContextStructName(r.name),
+									 argsDynScopeAndReturnValues);
+			context.ctorAttrs = args;
+		}
+
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
@@ -80,8 +91,7 @@ public class RuleFunction extends OutputModelObject {
 		final List<String> sup = super.getChildren();
 		return new ArrayList<String>() {{
 			if ( sup!=null ) addAll(sup);
-			add("args"); add("retvals");
-			add("scope"); add("decls"); add("code");
+			add("context"); add("decls"); add("code");
 		}};
 	}
 }

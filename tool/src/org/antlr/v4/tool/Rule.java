@@ -72,6 +72,8 @@ public class Rule implements AttributeResolver {
 
     public int numberOfAlts;
 
+	public boolean isStartRule = true; // nobody calls us
+
     /** Labels are visible to all alts in a rule. Record all defs here.
      *  We need to ensure labels are used to track same kind of symbols.
      *  Tracks all label defs for a label.

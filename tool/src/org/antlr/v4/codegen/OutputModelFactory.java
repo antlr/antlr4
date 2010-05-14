@@ -96,8 +96,7 @@ public abstract class OutputModelFactory {
 	}
 
 	public String getListLabel(String label) { return label+"_list"; }
-	public String getReturnStructName(String ruleName) { return ruleName+"_return"; }
-	public String getArgStructName(String ruleName) { return ruleName+"_args"; }
+	public String getRuleFunctionContextStructName(String ruleName) { return ruleName+"_ctx"; }
 	public String getDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
 
 	public BitSetDecl createFollowBitSet(GrammarAST ast, IntSet set) {
