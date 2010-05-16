@@ -67,15 +67,23 @@ public class CodeGenerator {
 //		}		
 	}
 
-	public void write() {
-		OutputModelFactory factory = null;
-		if ( g.isParser() ) factory = new ParserFactory(this);
-		// ...
-		OutputModelObject outputModel = factory.buildOutputModel();
+	public ST generate() {
+		ST outputFileST = null;
+		if ( g.isParser() || g.isTreeGrammar() ) {
+			ParserFactory pf = new ParserFactory(this);
+			OutputModelObject outputModel = pf.buildOutputModel();
+			OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
+			outputFileST = walker.walk(outputModel);
+		}
+		else if ( g.isLexer() ) {
+			LexerFactory lf = new LexerFactory(this);
+			outputFileST = lf.build();
+		}
 
-		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
-		ST outputFileST = walker.walk(outputModel);
-		
+		return outputFileST;
+	}	
+
+	public void write(ST outputFileST) {
 		// WRITE FILES
 		try {
 			target.genRecognizerFile(this,g,outputFileST);

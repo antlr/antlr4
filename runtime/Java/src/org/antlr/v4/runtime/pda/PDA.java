@@ -1,4 +1,4 @@
-package org.antlr.v4.runtime.nfa;
+package org.antlr.v4.runtime.pda;
 
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.Token;
@@ -9,8 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-/** http://swtch.com/~rsc/regexp/regexp2.html */
-public class NFA {
+/** A (nondeterministic) pushdown bytecode machine for lexing and LL prediction.
+ *  Derived partially from Cox' description of Thompson's 1960s work:
+ *  http://swtch.com/~rsc/regexp/regexp2.html
+ */
+public class PDA {
 	public byte[] code;
 	public Map<String, Integer> ruleToAddr;
 	public int[] tokenTypeToAddr;
@@ -20,10 +23,19 @@ public class NFA {
 	/** If we hit an action, we'll have to rewind and do the winning rule again */
 	boolean bypassedAction;
 
-
-	public NFA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels) {
+    public PDA() {;}
+	
+	public PDA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels) {
 		this.code = code;
 		this.ruleToAddr = ruleToAddr;
+		this.tokenTypeToAddr = tokenTypeToAddr;
+		this.nLabels = nLabels;
+		labelValues = new CommonToken[nLabels];
+	}
+
+	public PDA(byte[] code, int[] tokenTypeToAddr, int nLabels) {
+		System.out.println("code="+Arrays.toString(code));
+		this.code = code;
 		this.tokenTypeToAddr = tokenTypeToAddr;
 		this.nLabels = nLabels;
 		labelValues = new CommonToken[nLabels];

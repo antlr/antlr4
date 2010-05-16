@@ -11,6 +11,7 @@ javaTypeInitMap ::= [
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
+
 ParserFile(file, parser, dfaDecls, bitSetDecls) ::= <<
 // $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
 import org.antlr.v4.runtime.Parser;
@@ -213,6 +214,58 @@ DFADecl(dfa) ::= <<
 
 BitSetDecl(b) ::= <<
 public static final LABitSet <b.name>=new LABitSet(new long[]{<b.fset.bits:{<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
+>>
+
+LexerFile(fileName, lexer) ::= <<
+// $ANTLR ANTLRVersion> <fileName> generatedTimestamp>
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.RecognizerSharedState;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.pda.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.runtime.*;
+
+<lexer>
+>>
+
+Lexer(lexerName,modes,pdas) ::= <<
+public class <lexerName> extends Lexer {
+    public static enum Mode { <modes:{m|<m>(<i0>)}; separator=", ">; int mode; Mode(int m) {mode=m;\}}
+    public Mode _mode = Mode.DEFAULT_MODE;
+
+    public <lexerName>() {;}
+    public <lexerName>(CharStream input) {
+        this(input, new RecognizerSharedState());
+    }
+    public <lexerName>(CharStream input, RecognizerSharedState state) {
+        super(input,state);
+    }
+    public String getGrammarFileName() { return "<fileName>"; }
+
+	public void _nextToken() throws RecognitionException {
+	    state.type = modeToPDA[_mode.ordinal()].execThompson(input);
+	}
+	
+    <pdas>
+
+    public static PDA[] modeToPDA = { <modes:{m | new <m>_PDA()}; separator=", "> };
+}
+>>
+
+PDA(name, model) ::= <<
+public static final byte[] <name>_code = {
+    <model.code; separator=", ">
+};
+public static final int[] <name>_tokenTypeToAddr = {
+    <model.tokenTypeToAddr; separator=", ">
+};
+public static final class <name>_PDA extends PDA {
+<!byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels!>
+    public <name>_PDA() {
+        super(<name>_code, <name>_tokenTypeToAddr, <model.nLabels>);
+    }
+}
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

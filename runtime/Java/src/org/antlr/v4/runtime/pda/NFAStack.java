@@ -1,4 +1,4 @@
-package org.antlr.v4.runtime.nfa;
+package org.antlr.v4.runtime.pda;
 
 /** Identical to ANTLR's static grammar analysis NFAContext object */
 public class NFAStack {

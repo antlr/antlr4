@@ -1,10 +1,7 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.Token;
-import org.antlr.v4.runtime.nfa.NFA;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
+import org.stringtemplate.v4.ST;
 
 public class CodeGenPipeline {
 	Grammar g;
@@ -12,27 +9,24 @@ public class CodeGenPipeline {
 		this.g = g;
 	}
 	public void process() {
-		if ( g.isLexer() ) processLexer();
-		else if ( g.isParser() ) processParser();
+		CodeGenerator gen = new CodeGenerator(g);
+		ST outputFileST = gen.generate();
+		gen.write(outputFileST);
+//		if ( g.isLexer() ) processLexer();
+//		else if ( g.isParser() ) processParser();
 	}
 
 	void processParser() {
 		CodeGenerator gen = new CodeGenerator(g);
-		gen.write();
+		ST outputFileST = gen.generate();
+		gen.write(outputFileST);
+
 	}
 
 	void processLexer() {
-		LexerGrammar lg = (LexerGrammar)g;
-		for (String modeName : lg.modes.keySet()) { // for each mode
-			NFA nfa = NFABytecodeGenerator.getBytecode(lg, modeName);
-			//ANTLRStringStream input = new ANTLRStringStream("32");
-			ANTLRStringStream input = new ANTLRStringStream("/*x*/!ab");
-			//ANTLRStringStream input = new ANTLRStringStream("abc32ab");
-			int ttype = 0;
-			while ( ttype!= Token.EOF ) {
-				ttype = nfa.execThompson(input);
-				System.out.println("ttype="+ttype);
-			}
-		}
+		CodeGenerator gen = new CodeGenerator(g);
+		ST outputFileST = gen.generate();
+		gen.write(outputFileST);
+
 	}
 }

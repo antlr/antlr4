@@ -4,7 +4,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.NFABytecodeGenerator;
-import org.antlr.v4.runtime.nfa.NFA;
+import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -202,12 +202,12 @@ public class TestNFABytecodeInterp extends BaseTest {
 			}
 		}
 
-		NFA nfa = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
 		do {
-			ttype = nfa.execThompson(in);
+			ttype = PDA.execThompson(in);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
 		assertEquals(expectingTokenTypes, tokenTypes);
@@ -236,15 +236,15 @@ public class TestNFABytecodeInterp extends BaseTest {
 			}
 		}
 
-		NFA nfa = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
-		int ttype = nfa.execThompson(in);
+		int ttype = PDA.execThompson(in);
 		tokenTypes.add(ttype);
 		assertEquals(expectingTokenTypes, tokenTypes);
 
 		if ( expectingTokens!=null ) {
-			assertEquals(expectingTokens, Arrays.toString(nfa.labelValues));
+			assertEquals(expectingTokens, Arrays.toString(PDA.labelValues));
 		}
 	}
 }

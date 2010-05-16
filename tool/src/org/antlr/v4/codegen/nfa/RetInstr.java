@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.nfa;
 
-import org.antlr.v4.runtime.nfa.Bytecode;
+import org.antlr.v4.runtime.pda.Bytecode;
 
 /** */
 public class RetInstr extends Instr {

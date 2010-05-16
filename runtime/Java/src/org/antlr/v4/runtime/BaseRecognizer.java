@@ -46,10 +46,6 @@ public abstract class BaseRecognizer {
 	public static final int MEMO_RULE_UNKNOWN = -1;
 	public static final int INITIAL_FOLLOW_STACK_SIZE = 100;
 
-	// copies from Token object for convenience in actions
-	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
-	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
-
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
 	public IntStream input;
@@ -731,7 +727,7 @@ public abstract class BaseRecognizer {
 		int i = 0;
 		for (i=stack.length-1; i>=0; i--) {
 			StackTraceElement t = stack[i];
-			if ( t.getClassName().startsWith("org.antlr.runtime.") ) {
+			if ( t.getClassName().startsWith("org.antlr.v4.runtime.") ) {
 				continue; // skip support code such as this method
 			}
 			if ( t.getMethodName().equals(NEXT_TOKEN_RULE_NAME) ) {

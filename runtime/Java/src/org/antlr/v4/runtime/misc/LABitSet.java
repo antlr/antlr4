@@ -33,12 +33,13 @@ public class LABitSet {
 
 	/** Construction from a static array of longs */
 	public LABitSet(long[] bits_) {
-		bits = bits_;
+		if ( bits_==null || bits_.length==0 ) bits = new long[1];
+		else bits = bits_;
 	}
 
 	/** Construction from a static array of longs */
 	public LABitSet(long[] bits_, boolean EOF) {
-		bits = bits_;
+		this(bits_);
 		this.EOF = EOF;
 	}
 

@@ -1,4 +1,4 @@
-package org.antlr.v4.runtime.nfa;
+package org.antlr.v4.runtime.pda;
 
 /** NFA simulation thread state */
 public class ThreadState {

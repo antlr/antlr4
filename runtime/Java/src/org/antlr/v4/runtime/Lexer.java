@@ -27,7 +27,9 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenSource;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -88,7 +90,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
                 return eof;
 			}
 			try {
-				mTokens();
+				_nextToken();
 				if ( state.token==null ) {
 					emit();
 				}
@@ -119,7 +121,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	}
 
 	/** This is the lexer entry point that sets instance var 'token' */
-	public abstract void mTokens() throws RecognitionException;
+	public abstract void _nextToken() throws RecognitionException;
 
 	/** Set the char stream and reset the lexer */
 	public void setCharStream(CharStream input) {
@@ -161,61 +163,6 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		t.setCharPositionInLine(state.tokenStartCharPositionInLine);
 		emit(t);
 		return t;
-	}
-
-	public void match(String s) throws MismatchedTokenException {
-		int i = 0;
-		while ( i<s.length() ) {
-			if ( input.LA(1)!=s.charAt(i) ) {
-				if ( state.backtracking>0 ) {
-					state.failed = true;
-					return;
-				}
-				MismatchedTokenException mte =
-					new MismatchedTokenException(s.charAt(i), input);
-				recover(mte);
-				throw mte;
-			}
-			i++;
-			input.consume();
-			state.failed = false;
-		}
-	}
-
-	public void matchAny() {
-		input.consume();
-	}
-
-	public void match(int c) throws MismatchedTokenException {
-		if ( input.LA(1)!=c ) {
-			if ( state.backtracking>0 ) {
-				state.failed = true;
-				return;
-			}
-			MismatchedTokenException mte =
-				new MismatchedTokenException(c, input);
-			recover(mte);  // don't really recover; just consume in lexer
-			throw mte;
-		}
-		input.consume();
-		state.failed = false;
-	}
-
-	public void matchRange(int a, int b)
-		throws MismatchedRangeException
-	{
-		if ( input.LA(1)<a || input.LA(1)>b ) {
-			if ( state.backtracking>0 ) {
-				state.failed = true;
-				return;
-			}
-			MismatchedRangeException mre =
-				new MismatchedRangeException(a,b,input);
-			recover(mre);
-			throw mre;
-		}
-		input.consume();
-		state.failed = false;
 	}
 
 	public int getLine() {

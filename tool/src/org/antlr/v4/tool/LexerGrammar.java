@@ -9,7 +9,6 @@ public class LexerGrammar extends Grammar {
 	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
 
 	public MultiMap<String, Rule> modes = new MultiMap<String, Rule>();
-	//public Map<String, Integer> modeToDecision = new HashMap<String, Integer>();
 
 	public LexerGrammar(Tool tool, GrammarRootAST ast) {
 		super(tool, ast);

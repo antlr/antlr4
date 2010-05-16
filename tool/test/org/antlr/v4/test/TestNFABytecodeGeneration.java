@@ -2,8 +2,8 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.NFABytecodeGenerator;
-import org.antlr.v4.runtime.nfa.Bytecode;
-import org.antlr.v4.runtime.nfa.NFA;
+import org.antlr.v4.runtime.pda.Bytecode;
+import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -215,7 +215,7 @@ public class TestNFABytecodeGeneration extends BaseTest {
 				}
 			}
 		}
-		NFA nfa = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
-		assertEquals(expecting, Bytecode.disassemble(nfa.code));
+		PDA PDA = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		assertEquals(expecting, Bytecode.disassemble(PDA.code));
 	}
 }

@@ -9,8 +9,8 @@ import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.runtime.nfa.Bytecode;
-import org.antlr.v4.runtime.nfa.NFA;
+import org.antlr.v4.runtime.pda.Bytecode;
+import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.runtime.tree.TreeParser;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.LexerGrammar;
@@ -115,7 +115,7 @@ public class NFABytecodeGenerator extends TreeParser {
 		return code;
 	}
 
-	public static NFA getBytecode(LexerGrammar lg, String modeName) {
+	public static PDA getBytecode(LexerGrammar lg, String modeName) {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		NFABytecodeTriggers gen = new NFABytecodeTriggers(null);
 		gen.lg = lg;
@@ -158,7 +158,7 @@ public class NFABytecodeGenerator extends TreeParser {
 		System.out.println(Bytecode.disassemble(code));
 		System.out.println("rule addrs="+gen.ruleToAddr);
 
-		return new NFA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.labelIndex);
+		return new PDA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.labelIndex);
 	}
 
 	/** Write value at index into a byte array highest to lowest byte,

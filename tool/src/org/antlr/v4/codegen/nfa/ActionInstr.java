@@ -2,7 +2,7 @@ package org.antlr.v4.codegen.nfa;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.NFABytecodeGenerator;
-import org.antlr.v4.runtime.nfa.Bytecode;
+import org.antlr.v4.runtime.pda.Bytecode;
 
 /** */
 public class ActionInstr extends Instr {
