@@ -1,6 +1,6 @@
 lexer grammar ActionSplitter;
 
-options { filter=true; superClass='org.antlr.v4.runtime.Lexer'; }
+options { filter=true; }
 
 @header {
 package org.antlr.v4.parse;

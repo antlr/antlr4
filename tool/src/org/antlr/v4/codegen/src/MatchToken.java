@@ -28,7 +28,7 @@ public class MatchToken extends SrcOp implements LabeledOp {
 
 		LinearApproximator approx = new LinearApproximator(factory.g, -1);
 		IntervalSet fset = approx.LOOK(ast.nfaState.transition(0).target);
-		System.out.println("follow="+follow);
+		System.out.println("follow="+fset);
 		follow = factory.createFollowBitSet(ast, fset);
 		factory.defineBitSet(follow);
 	}

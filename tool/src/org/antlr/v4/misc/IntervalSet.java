@@ -28,6 +28,7 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.automata.Label;
+import org.antlr.v4.runtime.misc.LABitSet;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
@@ -684,9 +685,9 @@ public class IntervalSet implements IntSet {
 		return values;
 	}
 
-	public org.antlr.runtime.BitSet toRuntimeBitSet() {
-		org.antlr.runtime.BitSet s =
-			new org.antlr.runtime.BitSet(getMaxElement()+1);
+	public LABitSet toRuntimeBitSet() {
+		LABitSet s =
+			new LABitSet(getMaxElement()+1);
 		int n = intervals.size();
 		for (int i = 0; i < n; i++) {
 			Interval I = (Interval) intervals.get(i);

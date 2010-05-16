@@ -2,7 +2,6 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.codegen.src.*;
-import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.BlockAST;
@@ -99,7 +98,7 @@ public abstract class OutputModelFactory {
 	public String getRuleFunctionContextStructName(String ruleName) { return ruleName+"_ctx"; }
 	public String getDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
 
-	public BitSetDecl createFollowBitSet(GrammarAST ast, IntSet set) {
+	public BitSetDecl createFollowBitSet(GrammarAST ast, IntervalSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String elementName = ast.getText(); // assume rule ref
 		if ( ast.getType() == ANTLRParser.TOKEN_REF ) {
@@ -110,7 +109,7 @@ public abstract class OutputModelFactory {
 		return b;
 	}
 
-	public BitSetDecl createTestBitSet(GrammarAST ast, IntSet set) {
+	public BitSetDecl createTestBitSet(GrammarAST ast, IntervalSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
 		BitSetDecl b = new BitSetDecl(this, name, set);

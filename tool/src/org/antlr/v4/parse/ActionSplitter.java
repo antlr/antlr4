@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ActionSplitter.g 2010-04-19 15:55:56
+// $ANTLR ${project.version} ${buildNumber} ActionSplitter.g 2010-05-16 13:12:33
 
 package org.antlr.v4.parse;
 
@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CommonToken;
 
 import java.util.ArrayList;
 import java.util.List;
-public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
+public class ActionSplitter extends Lexer {
     public static final int INDIRECT_TEMPLATE_INSTANCE=24;
     public static final int LINE_COMMENT=5;
     public static final int ESC=6;
@@ -336,21 +336,21 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:51:4: '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart133 = getCharIndex();
-            int xStartLine133 = getLine();
-            int xStartCharPos133 = getCharPositionInLine();
+            int xStart128 = getCharIndex();
+            int xStartLine128 = getLine();
+            int xStartCharPos128 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart133, getCharIndex()-1);
-            x.setLine(xStartLine133);
-            x.setCharPositionInLine(xStartCharPos133);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart128, getCharIndex()-1);
+            x.setLine(xStartLine128);
+            x.setCharPositionInLine(xStartCharPos128);
             match('.'); if (state.failed) return ;
-            int yStart139 = getCharIndex();
-            int yStartLine139 = getLine();
-            int yStartCharPos139 = getCharPositionInLine();
+            int yStart134 = getCharIndex();
+            int yStartLine134 = getLine();
+            int yStartCharPos134 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart139, getCharIndex()-1);
-            y.setLine(yStartLine139);
-            y.setCharPositionInLine(yStartCharPos139);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart134, getCharIndex()-1);
+            y.setLine(yStartLine134);
+            y.setCharPositionInLine(yStartCharPos134);
             // ActionSplitter.g:51:22: ( WS )?
             int alt5=2;
             int LA5_0 = input.LA(1);
@@ -370,13 +370,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart148 = getCharIndex();
-            int exprStartLine148 = getLine();
-            int exprStartCharPos148 = getCharPositionInLine();
+            int exprStart143 = getCharIndex();
+            int exprStartLine143 = getLine();
+            int exprStartCharPos143 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart148, getCharIndex()-1);
-            expr.setLine(exprStartLine148);
-            expr.setCharPositionInLine(exprStartCharPos148);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart143, getCharIndex()-1);
+            expr.setLine(exprStartLine143);
+            expr.setCharPositionInLine(exprStartCharPos143);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setQualifiedAttr(getText(), x, y, expr);
@@ -404,21 +404,21 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:56:4: '$' x= ID '.' y= ID {...}?
             {
             match('$'); if (state.failed) return ;
-            int xStart169 = getCharIndex();
-            int xStartLine169 = getLine();
-            int xStartCharPos169 = getCharPositionInLine();
+            int xStart164 = getCharIndex();
+            int xStartLine164 = getLine();
+            int xStartCharPos164 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart169, getCharIndex()-1);
-            x.setLine(xStartLine169);
-            x.setCharPositionInLine(xStartCharPos169);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart164, getCharIndex()-1);
+            x.setLine(xStartLine164);
+            x.setCharPositionInLine(xStartCharPos164);
             match('.'); if (state.failed) return ;
-            int yStart175 = getCharIndex();
-            int yStartLine175 = getLine();
-            int yStartCharPos175 = getCharPositionInLine();
+            int yStart170 = getCharIndex();
+            int yStartLine170 = getLine();
+            int yStartCharPos170 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart175, getCharIndex()-1);
-            y.setLine(yStartLine175);
-            y.setCharPositionInLine(yStartCharPos175);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart170, getCharIndex()-1);
+            y.setLine(yStartLine170);
+            y.setCharPositionInLine(yStartCharPos170);
             if ( !((input.LA(1)!='(')) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "QUALIFIED_ATTR", "input.LA(1)!='('");
@@ -450,22 +450,22 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:60:4: '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart194 = getCharIndex();
-            int xStartLine194 = getLine();
-            int xStartCharPos194 = getCharPositionInLine();
+            int xStart189 = getCharIndex();
+            int xStartLine189 = getLine();
+            int xStartCharPos189 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart194, getCharIndex()-1);
-            x.setLine(xStartLine194);
-            x.setCharPositionInLine(xStartCharPos194);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart189, getCharIndex()-1);
+            x.setLine(xStartLine189);
+            x.setCharPositionInLine(xStartCharPos189);
             match("::"); if (state.failed) return ;
 
-            int yStart200 = getCharIndex();
-            int yStartLine200 = getLine();
-            int yStartCharPos200 = getCharPositionInLine();
+            int yStart195 = getCharIndex();
+            int yStartLine195 = getLine();
+            int yStartCharPos195 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart200, getCharIndex()-1);
-            y.setLine(yStartLine200);
-            y.setCharPositionInLine(yStartCharPos200);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart195, getCharIndex()-1);
+            y.setLine(yStartLine195);
+            y.setCharPositionInLine(yStartCharPos195);
             // ActionSplitter.g:60:23: ( WS )?
             int alt6=2;
             int LA6_0 = input.LA(1);
@@ -485,13 +485,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart209 = getCharIndex();
-            int exprStartLine209 = getLine();
-            int exprStartCharPos209 = getCharPositionInLine();
+            int exprStart204 = getCharIndex();
+            int exprStartLine204 = getLine();
+            int exprStartCharPos204 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart209, getCharIndex()-1);
-            expr.setLine(exprStartLine209);
-            expr.setCharPositionInLine(exprStartCharPos209);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart204, getCharIndex()-1);
+            expr.setLine(exprStartLine204);
+            expr.setCharPositionInLine(exprStartCharPos204);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setDynamicScopeAttr(getText(), x, y, expr);
@@ -519,22 +519,22 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:65:4: '$' x= ID '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart230 = getCharIndex();
-            int xStartLine230 = getLine();
-            int xStartCharPos230 = getCharPositionInLine();
+            int xStart225 = getCharIndex();
+            int xStartLine225 = getLine();
+            int xStartCharPos225 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart230, getCharIndex()-1);
-            x.setLine(xStartLine230);
-            x.setCharPositionInLine(xStartCharPos230);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart225, getCharIndex()-1);
+            x.setLine(xStartLine225);
+            x.setCharPositionInLine(xStartCharPos225);
             match("::"); if (state.failed) return ;
 
-            int yStart236 = getCharIndex();
-            int yStartLine236 = getLine();
-            int yStartCharPos236 = getCharPositionInLine();
+            int yStart231 = getCharIndex();
+            int yStartLine231 = getLine();
+            int yStartCharPos231 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart236, getCharIndex()-1);
-            y.setLine(yStartLine236);
-            y.setCharPositionInLine(yStartCharPos236);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart231, getCharIndex()-1);
+            y.setLine(yStartLine231);
+            y.setCharPositionInLine(yStartCharPos231);
             if ( state.backtracking==1 ) {
               delegate.dynamicScopeAttr(getText(), x, y);
             }
@@ -563,32 +563,32 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:77:4: '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart255 = getCharIndex();
-            int xStartLine255 = getLine();
-            int xStartCharPos255 = getCharPositionInLine();
+            int xStart250 = getCharIndex();
+            int xStartLine250 = getLine();
+            int xStartCharPos250 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart255, getCharIndex()-1);
-            x.setLine(xStartLine255);
-            x.setCharPositionInLine(xStartCharPos255);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart250, getCharIndex()-1);
+            x.setLine(xStartLine250);
+            x.setCharPositionInLine(xStartCharPos250);
             match('['); if (state.failed) return ;
             match('-'); if (state.failed) return ;
-            int indexStart263 = getCharIndex();
-            int indexStartLine263 = getLine();
-            int indexStartCharPos263 = getCharPositionInLine();
+            int indexStart258 = getCharIndex();
+            int indexStartLine258 = getLine();
+            int indexStartCharPos258 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart263, getCharIndex()-1);
-            index.setLine(indexStartLine263);
-            index.setCharPositionInLine(indexStartCharPos263);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart258, getCharIndex()-1);
+            index.setLine(indexStartLine258);
+            index.setCharPositionInLine(indexStartCharPos258);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart271 = getCharIndex();
-            int yStartLine271 = getLine();
-            int yStartCharPos271 = getCharPositionInLine();
+            int yStart266 = getCharIndex();
+            int yStartLine266 = getLine();
+            int yStartCharPos266 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart271, getCharIndex()-1);
-            y.setLine(yStartLine271);
-            y.setCharPositionInLine(yStartCharPos271);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart266, getCharIndex()-1);
+            y.setLine(yStartLine266);
+            y.setCharPositionInLine(yStartCharPos266);
             // ActionSplitter.g:78:3: ( WS )?
             int alt7=2;
             int LA7_0 = input.LA(1);
@@ -608,13 +608,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart282 = getCharIndex();
-            int exprStartLine282 = getLine();
-            int exprStartCharPos282 = getCharPositionInLine();
+            int exprStart277 = getCharIndex();
+            int exprStartLine277 = getLine();
+            int exprStartCharPos277 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart282, getCharIndex()-1);
-            expr.setLine(exprStartLine282);
-            expr.setCharPositionInLine(exprStartCharPos282);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart277, getCharIndex()-1);
+            expr.setLine(exprStartLine277);
+            expr.setCharPositionInLine(exprStartCharPos277);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setDynamicNegativeIndexedScopeAttr(getText(), x, y, index, expr);
@@ -643,32 +643,32 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:83:4: '$' x= ID '[' '-' index= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart303 = getCharIndex();
-            int xStartLine303 = getLine();
-            int xStartCharPos303 = getCharPositionInLine();
+            int xStart298 = getCharIndex();
+            int xStartLine298 = getLine();
+            int xStartCharPos298 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart303, getCharIndex()-1);
-            x.setLine(xStartLine303);
-            x.setCharPositionInLine(xStartCharPos303);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart298, getCharIndex()-1);
+            x.setLine(xStartLine298);
+            x.setCharPositionInLine(xStartCharPos298);
             match('['); if (state.failed) return ;
             match('-'); if (state.failed) return ;
-            int indexStart311 = getCharIndex();
-            int indexStartLine311 = getLine();
-            int indexStartCharPos311 = getCharPositionInLine();
+            int indexStart306 = getCharIndex();
+            int indexStartLine306 = getLine();
+            int indexStartCharPos306 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart311, getCharIndex()-1);
-            index.setLine(indexStartLine311);
-            index.setCharPositionInLine(indexStartCharPos311);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart306, getCharIndex()-1);
+            index.setLine(indexStartLine306);
+            index.setCharPositionInLine(indexStartCharPos306);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart319 = getCharIndex();
-            int yStartLine319 = getLine();
-            int yStartCharPos319 = getCharPositionInLine();
+            int yStart314 = getCharIndex();
+            int yStartLine314 = getLine();
+            int yStartCharPos314 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart319, getCharIndex()-1);
-            y.setLine(yStartLine319);
-            y.setCharPositionInLine(yStartCharPos319);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart314, getCharIndex()-1);
+            y.setLine(yStartLine314);
+            y.setCharPositionInLine(yStartCharPos314);
             if ( state.backtracking==1 ) {
               delegate.dynamicNegativeIndexedScopeAttr(getText(), x, y, index);
             }
@@ -697,31 +697,31 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:88:4: '$' x= ID '[' index= SCOPE_INDEX_EXPR ']' '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart338 = getCharIndex();
-            int xStartLine338 = getLine();
-            int xStartCharPos338 = getCharPositionInLine();
+            int xStart333 = getCharIndex();
+            int xStartLine333 = getLine();
+            int xStartCharPos333 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart338, getCharIndex()-1);
-            x.setLine(xStartLine338);
-            x.setCharPositionInLine(xStartCharPos338);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart333, getCharIndex()-1);
+            x.setLine(xStartLine333);
+            x.setCharPositionInLine(xStartCharPos333);
             match('['); if (state.failed) return ;
-            int indexStart344 = getCharIndex();
-            int indexStartLine344 = getLine();
-            int indexStartCharPos344 = getCharPositionInLine();
+            int indexStart339 = getCharIndex();
+            int indexStartLine339 = getLine();
+            int indexStartCharPos339 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart344, getCharIndex()-1);
-            index.setLine(indexStartLine344);
-            index.setCharPositionInLine(indexStartCharPos344);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart339, getCharIndex()-1);
+            index.setLine(indexStartLine339);
+            index.setCharPositionInLine(indexStartCharPos339);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart352 = getCharIndex();
-            int yStartLine352 = getLine();
-            int yStartCharPos352 = getCharPositionInLine();
+            int yStart347 = getCharIndex();
+            int yStartLine347 = getLine();
+            int yStartCharPos347 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart352, getCharIndex()-1);
-            y.setLine(yStartLine352);
-            y.setCharPositionInLine(yStartCharPos352);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart347, getCharIndex()-1);
+            y.setLine(yStartLine347);
+            y.setCharPositionInLine(yStartCharPos347);
             // ActionSplitter.g:89:3: ( WS )?
             int alt8=2;
             int LA8_0 = input.LA(1);
@@ -741,13 +741,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart363 = getCharIndex();
-            int exprStartLine363 = getLine();
-            int exprStartCharPos363 = getCharPositionInLine();
+            int exprStart358 = getCharIndex();
+            int exprStartLine358 = getLine();
+            int exprStartCharPos358 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart363, getCharIndex()-1);
-            expr.setLine(exprStartLine363);
-            expr.setCharPositionInLine(exprStartCharPos363);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart358, getCharIndex()-1);
+            expr.setLine(exprStartLine358);
+            expr.setCharPositionInLine(exprStartCharPos358);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setDynamicAbsoluteIndexedScopeAttr(getText(), x, y, index, expr);
@@ -776,31 +776,31 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:94:4: '$' x= ID '[' index= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart384 = getCharIndex();
-            int xStartLine384 = getLine();
-            int xStartCharPos384 = getCharPositionInLine();
+            int xStart379 = getCharIndex();
+            int xStartLine379 = getLine();
+            int xStartCharPos379 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart384, getCharIndex()-1);
-            x.setLine(xStartLine384);
-            x.setCharPositionInLine(xStartCharPos384);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart379, getCharIndex()-1);
+            x.setLine(xStartLine379);
+            x.setCharPositionInLine(xStartCharPos379);
             match('['); if (state.failed) return ;
-            int indexStart390 = getCharIndex();
-            int indexStartLine390 = getLine();
-            int indexStartCharPos390 = getCharPositionInLine();
+            int indexStart385 = getCharIndex();
+            int indexStartLine385 = getLine();
+            int indexStartCharPos385 = getCharPositionInLine();
             mSCOPE_INDEX_EXPR(); if (state.failed) return ;
-            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart390, getCharIndex()-1);
-            index.setLine(indexStartLine390);
-            index.setCharPositionInLine(indexStartCharPos390);
+            index = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, indexStart385, getCharIndex()-1);
+            index.setLine(indexStartLine385);
+            index.setCharPositionInLine(indexStartCharPos385);
             match(']'); if (state.failed) return ;
             match("::"); if (state.failed) return ;
 
-            int yStart398 = getCharIndex();
-            int yStartLine398 = getLine();
-            int yStartCharPos398 = getCharPositionInLine();
+            int yStart393 = getCharIndex();
+            int yStartLine393 = getLine();
+            int yStartCharPos393 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart398, getCharIndex()-1);
-            y.setLine(yStartLine398);
-            y.setCharPositionInLine(yStartCharPos398);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart393, getCharIndex()-1);
+            y.setLine(yStartLine393);
+            y.setCharPositionInLine(yStartCharPos393);
             if ( state.backtracking==1 ) {
               delegate.dynamicAbsoluteIndexedScopeAttr(getText(), x, y, index);
             }
@@ -827,13 +827,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:99:4: '$' x= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('$'); if (state.failed) return ;
-            int xStart417 = getCharIndex();
-            int xStartLine417 = getLine();
-            int xStartCharPos417 = getCharPositionInLine();
+            int xStart412 = getCharIndex();
+            int xStartLine412 = getLine();
+            int xStartCharPos412 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart417, getCharIndex()-1);
-            x.setLine(xStartLine417);
-            x.setCharPositionInLine(xStartCharPos417);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart412, getCharIndex()-1);
+            x.setLine(xStartLine412);
+            x.setCharPositionInLine(xStartCharPos412);
             // ActionSplitter.g:99:13: ( WS )?
             int alt9=2;
             int LA9_0 = input.LA(1);
@@ -853,13 +853,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart426 = getCharIndex();
-            int exprStartLine426 = getLine();
-            int exprStartCharPos426 = getCharPositionInLine();
+            int exprStart421 = getCharIndex();
+            int exprStartLine421 = getLine();
+            int exprStartCharPos421 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart426, getCharIndex()-1);
-            expr.setLine(exprStartLine426);
-            expr.setCharPositionInLine(exprStartCharPos426);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart421, getCharIndex()-1);
+            expr.setLine(exprStartLine421);
+            expr.setCharPositionInLine(exprStartCharPos421);
             match(';'); if (state.failed) return ;
             if ( state.backtracking==1 ) {
               delegate.setAttr(getText(), x, expr);
@@ -886,13 +886,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:103:4: '$' x= ID
             {
             match('$'); if (state.failed) return ;
-            int xStart445 = getCharIndex();
-            int xStartLine445 = getLine();
-            int xStartCharPos445 = getCharPositionInLine();
+            int xStart440 = getCharIndex();
+            int xStartLine440 = getLine();
+            int xStartCharPos440 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart445, getCharIndex()-1);
-            x.setLine(xStartLine445);
-            x.setCharPositionInLine(xStartCharPos445);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart440, getCharIndex()-1);
+            x.setLine(xStartLine440);
+            x.setCharPositionInLine(xStartCharPos440);
             if ( state.backtracking==1 ) {
               delegate.attr(getText(), x);
             }
@@ -1163,13 +1163,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:118:4: '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
-            int aStart552 = getCharIndex();
-            int aStartLine552 = getLine();
-            int aStartCharPos552 = getCharPositionInLine();
+            int aStart547 = getCharIndex();
+            int aStartLine547 = getLine();
+            int aStartCharPos547 = getCharPositionInLine();
             mACTION(); if (state.failed) return ;
-            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart552, getCharIndex()-1);
-            a.setLine(aStartLine552);
-            a.setCharPositionInLine(aStartCharPos552);
+            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart547, getCharIndex()-1);
+            a.setLine(aStartLine547);
+            a.setCharPositionInLine(aStartCharPos547);
             match('.'); if (state.failed) return ;
             mID(); if (state.failed) return ;
             // ActionSplitter.g:118:24: ( WS )?
@@ -1191,13 +1191,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart565 = getCharIndex();
-            int exprStartLine565 = getLine();
-            int exprStartCharPos565 = getCharPositionInLine();
+            int exprStart560 = getCharIndex();
+            int exprStartLine560 = getLine();
+            int exprStartCharPos560 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart565, getCharIndex()-1);
-            expr.setLine(exprStartLine565);
-            expr.setCharPositionInLine(exprStartCharPos565);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart560, getCharIndex()-1);
+            expr.setLine(exprStartLine560);
+            expr.setCharPositionInLine(exprStartCharPos560);
             match(';'); if (state.failed) return ;
 
             }
@@ -1223,21 +1223,21 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:126:4: '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
-            int xStart585 = getCharIndex();
-            int xStartLine585 = getLine();
-            int xStartCharPos585 = getCharPositionInLine();
+            int xStart580 = getCharIndex();
+            int xStartLine580 = getLine();
+            int xStartCharPos580 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart585, getCharIndex()-1);
-            x.setLine(xStartLine585);
-            x.setCharPositionInLine(xStartCharPos585);
+            x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart580, getCharIndex()-1);
+            x.setLine(xStartLine580);
+            x.setCharPositionInLine(xStartCharPos580);
             match('.'); if (state.failed) return ;
-            int yStart591 = getCharIndex();
-            int yStartLine591 = getLine();
-            int yStartCharPos591 = getCharPositionInLine();
+            int yStart586 = getCharIndex();
+            int yStartLine586 = getLine();
+            int yStartCharPos586 = getCharPositionInLine();
             mID(); if (state.failed) return ;
-            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart591, getCharIndex()-1);
-            y.setLine(yStartLine591);
-            y.setCharPositionInLine(yStartCharPos591);
+            y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart586, getCharIndex()-1);
+            y.setLine(yStartLine586);
+            y.setCharPositionInLine(yStartCharPos586);
             // ActionSplitter.g:126:22: ( WS )?
             int alt21=2;
             int LA21_0 = input.LA(1);
@@ -1257,13 +1257,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             }
 
             match('='); if (state.failed) return ;
-            int exprStart600 = getCharIndex();
-            int exprStartLine600 = getLine();
-            int exprStartCharPos600 = getCharPositionInLine();
+            int exprStart595 = getCharIndex();
+            int exprStartLine595 = getLine();
+            int exprStartCharPos595 = getCharPositionInLine();
             mATTR_VALUE_EXPR(); if (state.failed) return ;
-            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart600, getCharIndex()-1);
-            expr.setLine(exprStartLine600);
-            expr.setCharPositionInLine(exprStartCharPos600);
+            expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart595, getCharIndex()-1);
+            expr.setLine(exprStartLine595);
+            expr.setCharPositionInLine(exprStartCharPos595);
             match(';'); if (state.failed) return ;
 
             }
@@ -1287,13 +1287,13 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             // ActionSplitter.g:131:4: '%' a= ACTION
             {
             match('%'); if (state.failed) return ;
-            int aStart619 = getCharIndex();
-            int aStartLine619 = getLine();
-            int aStartCharPos619 = getCharPositionInLine();
+            int aStart614 = getCharIndex();
+            int aStartLine614 = getLine();
+            int aStartCharPos614 = getCharPositionInLine();
             mACTION(); if (state.failed) return ;
-            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart619, getCharIndex()-1);
-            a.setLine(aStartLine619);
-            a.setCharPositionInLine(aStartCharPos619);
+            a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart614, getCharIndex()-1);
+            a.setLine(aStartLine614);
+            a.setCharPositionInLine(aStartCharPos614);
 
             }
 
@@ -2329,11 +2329,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred8_ActionSplitter() {
+    public final boolean synpred2_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred8_ActionSplitter_fragment(); // can never throw exception
+            synpred2_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2343,11 +2343,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred2_ActionSplitter() {
+    public final boolean synpred8_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred2_ActionSplitter_fragment(); // can never throw exception
+            synpred8_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2399,11 +2399,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred3_ActionSplitter() {
+    public final boolean synpred15_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred3_ActionSplitter_fragment(); // can never throw exception
+            synpred15_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2413,11 +2413,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred15_ActionSplitter() {
+    public final boolean synpred3_ActionSplitter() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred15_ActionSplitter_fragment(); // can never throw exception
+            synpred3_ActionSplitter_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2491,21 +2491,25 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
         }
     }
     static final String DFA29_eotS =
-        "\32\uffff";
+        "\31\uffff";
     static final String DFA29_eofS =
-        "\32\uffff";
+        "\31\uffff";
     static final String DFA29_minS =
-        "\2\0\12\uffff\1\0\3\uffff\1\0\6\uffff\1\0\2\uffff";
+        "\1\0\1\uffff\1\0\2\uffff\1\0\12\uffff\1\0\1\uffff\1\0\6\uffff";
     static final String DFA29_maxS =
-        "\1\uffff\1\0\12\uffff\1\0\3\uffff\1\0\6\uffff\1\0\2\uffff";
+        "\1\uffff\1\uffff\1\0\2\uffff\1\0\12\uffff\1\0\1\uffff\1\0\6\uffff";
     static final String DFA29_acceptS =
-        "\2\uffff\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\15\1\uffff\1"+
-        "\1\1\2\1\24\1\uffff\1\16\1\17\1\20\1\21\1\22\1\23\1\uffff\1\3\1"+
-        "\24";
+        "\1\uffff\1\24\1\uffff\1\1\1\2\1\uffff\1\4\1\5\1\6\1\7\1\10\1\11"+
+        "\1\12\1\13\1\14\1\15\1\uffff\1\3\1\uffff\1\16\1\17\1\20\1\21\1\22"+
+        "\1\23";
     static final String DFA29_specialS =
-        "\1\0\1\1\12\uffff\1\2\3\uffff\1\3\6\uffff\1\4\2\uffff}>";
+        "\1\0\1\uffff\1\1\2\uffff\1\2\12\uffff\1\3\1\uffff\1\4\6\uffff}>";
     static final String[] DFA29_transitionS = {
-            "\44\31\1\1\1\20\11\31\1\14\54\31\1\27\uffa3\31",
+            "\44\1\1\5\1\22\11\1\1\2\54\1\1\20\uffa3\1",
+            "",
+            "\1\uffff",
+            "",
+            "",
             "\1\uffff",
             "",
             "",
@@ -2519,16 +2523,11 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
             "",
             "\1\uffff",
             "",
-            "",
-            "",
             "\1\uffff",
             "",
             "",
             "",
             "",
-            "",
-            "",
-            "\1\uffff",
             "",
             ""
     };
@@ -2573,64 +2572,64 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                         int LA29_0 = input.LA(1);
 
                         s = -1;
-                        if ( (LA29_0=='$') ) {s = 1;}
+                        if ( ((LA29_0>='\u0000' && LA29_0<='#')||(LA29_0>='&' && LA29_0<='.')||(LA29_0>='0' && LA29_0<='[')||(LA29_0>=']' && LA29_0<='\uFFFF')) ) {s = 1;}
 
-                        else if ( (LA29_0=='/') ) {s = 12;}
+                        else if ( (LA29_0=='/') ) {s = 2;}
 
-                        else if ( (LA29_0=='%') ) {s = 16;}
+                        else if ( (LA29_0=='$') ) {s = 5;}
 
-                        else if ( (LA29_0=='\\') ) {s = 23;}
+                        else if ( (LA29_0=='\\') ) {s = 16;}
 
-                        else if ( ((LA29_0>='\u0000' && LA29_0<='#')||(LA29_0>='&' && LA29_0<='.')||(LA29_0>='0' && LA29_0<='[')||(LA29_0>=']' && LA29_0<='\uFFFF')) ) {s = 25;}
+                        else if ( (LA29_0=='%') ) {s = 18;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA29_1 = input.LA(1);
+                        int LA29_2 = input.LA(1);
 
                          
-                        int index29_1 = input.index();
+                        int index29_2 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred4_ActionSplitter()) ) {s = 2;}
+                        if ( (synpred1_ActionSplitter()) ) {s = 3;}
 
-                        else if ( (synpred5_ActionSplitter()) ) {s = 3;}
+                        else if ( (synpred2_ActionSplitter()) ) {s = 4;}
 
-                        else if ( (synpred6_ActionSplitter()) ) {s = 4;}
-
-                        else if ( (synpred7_ActionSplitter()) ) {s = 5;}
-
-                        else if ( (synpred8_ActionSplitter()) ) {s = 6;}
-
-                        else if ( (synpred9_ActionSplitter()) ) {s = 7;}
-
-                        else if ( (synpred10_ActionSplitter()) ) {s = 8;}
-
-                        else if ( (synpred11_ActionSplitter()) ) {s = 9;}
-
-                        else if ( (synpred12_ActionSplitter()) ) {s = 10;}
-
-                        else if ( (synpred13_ActionSplitter()) ) {s = 11;}
+                        else if ( (true) ) {s = 1;}
 
                          
-                        input.seek(index29_1);
+                        input.seek(index29_2);
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
-                        int LA29_12 = input.LA(1);
+                        int LA29_5 = input.LA(1);
 
                          
-                        int index29_12 = input.index();
+                        int index29_5 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred1_ActionSplitter()) ) {s = 13;}
+                        if ( (synpred4_ActionSplitter()) ) {s = 6;}
 
-                        else if ( (synpred2_ActionSplitter()) ) {s = 14;}
+                        else if ( (synpred5_ActionSplitter()) ) {s = 7;}
 
-                        else if ( (true) ) {s = 15;}
+                        else if ( (synpred6_ActionSplitter()) ) {s = 8;}
+
+                        else if ( (synpred7_ActionSplitter()) ) {s = 9;}
+
+                        else if ( (synpred8_ActionSplitter()) ) {s = 10;}
+
+                        else if ( (synpred9_ActionSplitter()) ) {s = 11;}
+
+                        else if ( (synpred10_ActionSplitter()) ) {s = 12;}
+
+                        else if ( (synpred11_ActionSplitter()) ) {s = 13;}
+
+                        else if ( (synpred12_ActionSplitter()) ) {s = 14;}
+
+                        else if ( (synpred13_ActionSplitter()) ) {s = 15;}
 
                          
-                        input.seek(index29_12);
+                        input.seek(index29_5);
                         if ( s>=0 ) return s;
                         break;
                     case 3 : 
@@ -2640,35 +2639,35 @@ public class ActionSplitter extends org.antlr.v4.runtime.Lexer {
                         int index29_16 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred14_ActionSplitter()) ) {s = 17;}
+                        if ( (synpred3_ActionSplitter()) ) {s = 17;}
 
-                        else if ( (synpred15_ActionSplitter()) ) {s = 18;}
-
-                        else if ( (synpred16_ActionSplitter()) ) {s = 19;}
-
-                        else if ( (synpred17_ActionSplitter()) ) {s = 20;}
-
-                        else if ( (synpred18_ActionSplitter()) ) {s = 21;}
-
-                        else if ( (synpred19_ActionSplitter()) ) {s = 22;}
+                        else if ( (true) ) {s = 1;}
 
                          
                         input.seek(index29_16);
                         if ( s>=0 ) return s;
                         break;
                     case 4 : 
-                        int LA29_23 = input.LA(1);
+                        int LA29_18 = input.LA(1);
 
                          
-                        int index29_23 = input.index();
+                        int index29_18 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred3_ActionSplitter()) ) {s = 24;}
+                        if ( (synpred14_ActionSplitter()) ) {s = 19;}
 
-                        else if ( (true) ) {s = 15;}
+                        else if ( (synpred15_ActionSplitter()) ) {s = 20;}
+
+                        else if ( (synpred16_ActionSplitter()) ) {s = 21;}
+
+                        else if ( (synpred17_ActionSplitter()) ) {s = 22;}
+
+                        else if ( (synpred18_ActionSplitter()) ) {s = 23;}
+
+                        else if ( (synpred19_ActionSplitter()) ) {s = 24;}
 
                          
-                        input.seek(index29_23);
+                        input.seek(index29_18);
                         if ( s>=0 ) return s;
                         break;
             }

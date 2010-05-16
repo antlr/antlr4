@@ -11,19 +11,44 @@ javaTypeInitMap ::= [
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
-ParserFile(f, parser, dfaDecls, bitSetDecls) ::= <<
-// $ANTLR ANTLRVersion> <f.fileName> generatedTimestamp>
+ParserFile(file, parser, dfaDecls, bitSetDecls) ::= <<
+// $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognizerSharedState;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.runtime.*;
 
 <parser>
 >>
 
 Parser(p, funcs) ::= <<
-public class <p.name> {
-    public QStack _ctx;
+public class <p.name> extends Parser {
+<!
+	public enum TokenType {
+		EOF(-1),
+	    <p.tokens.keys:{k | <k>(<p.tokens.(k)>)}; separator=", ">
+	    ;
+    	public int type;
+		TokenType(int type) { this.type = type; }
+	}
+!>	
+    <p.tokens.keys:{k | public static final int <k>=<p.tokens.(k)>;}; separator="\n">
+    public QStack\<ParserRuleReturnScope> _ctx = new QStack\<ParserRuleReturnScope>();
+    <p:ctor()>
     <funcs; separator="\n">
     <dfaDecls; separator="\n">
     <bitSetDecls; separator="\n">
+}
+>>
+
+ctor(p) ::= <<
+public <p.name>(TokenStream input) {
+    this(input, new RecognizerSharedState());
+}
+public <p.name>(TokenStream input, RecognizerSharedState state) {
+    super(input, state);
 }
 >>
 
@@ -37,7 +62,7 @@ public class <p.name> {
 RuleFunction(f,code,decls,context) ::= <<
 <context>
 
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>(<f.args:{a|<a>, }>BitSet _follow) {
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>(<f.args:{a|<a>, }>LABitSet _follow) throws RecognitionException {
 <!	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif> !>
 <if(f.retType)>
     _ctx.push(new <f.context.name>(<f.args:{a|<a.name>}; separator=",">));
@@ -47,7 +72,7 @@ RuleFunction(f,code,decls,context) ::= <<
 	    <code>
 	}
 	finally {
-        <if(f.retType)>return _ctx.pop();<endif>
+        <if(f.retType)>return (<f.retType>)_ctx.pop();<endif>
 	}
 }
 >>
@@ -144,7 +169,7 @@ InvokeRule(r) ::= <<
 >>
 
 MatchToken(m) ::= <<
-<if(m.label)><m.label> = <endif>match(<m.name>, <m.follow.name>);
+<if(m.label)><m.label> = (Token)<endif>match(<m.name>, <m.follow.name>);
 >>
 
 Action(a) ::= "<a.ast.text>"
@@ -156,13 +181,14 @@ AddToList(a) ::= "<a.listName>.add(<a.opWithResultToAdd.label>);"
 
 //Decl(d) ::= "<d.type> <d.varName> = <d.type:initValue()>;"
 
-TokenDecl(t) ::= "Token <t.varName>;"
-TokenListDecl(t) ::= "List\<Token> <t.varName> = new ArrayList\<Token>();"
+TokenDecl(t) ::= "Token <t.name>;"
+TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
+RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 
 CaptureNextToken(d) ::= "<d.varName> = input.LA(1);"
 
 StructDecl(s,attrs) ::= <<
-public static class <s.name> extends ParserContextScope {
+public static class <s.name> extends ParserRuleReturnScope {
     <attrs:{a | <a>;}; separator="\n">
     <if(s.ctorAttrs)>
     public <s.name>(<s.ctorAttrs; separator=", ">) {
@@ -186,7 +212,7 @@ DFADecl(dfa) ::= <<
 >>
 
 BitSetDecl(b) ::= <<
-// define <b.name>
+public static final LABitSet <b.name>=new LABitSet(new long[]{<b.fset.bits:{<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

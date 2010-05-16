@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} NFABuilder.g 2010-04-19 15:55:56
+// $ANTLR ${project.version} ${buildNumber} NFABuilder.g 2010-05-16 13:12:33
 
 /*
  [The "BSD license"]

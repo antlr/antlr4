@@ -158,7 +158,7 @@ public class Grammar implements AttributeResolver {
 //		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SET, "<SET>");
 //		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "EOF");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "EOR");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.DOWN-1, "DOWN");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.UP-1, "UP");
 		tokenNameToTypeMap.put("<INVALID>", Label.INVALID);
@@ -168,7 +168,7 @@ public class Grammar implements AttributeResolver {
 //		tokenNameToTypeMap.put("<SET>", Label.SET);
 		tokenNameToTypeMap.put("<EOT>", Label.EOT);
 		tokenNameToTypeMap.put("EOF", Label.EOF);
-		tokenNameToTypeMap.put("<EOR>", Label.EOR_TOKEN_TYPE);
+		tokenNameToTypeMap.put("EOR", Label.EOR_TOKEN_TYPE);
 		tokenNameToTypeMap.put("DOWN", Token.DOWN);
 		tokenNameToTypeMap.put("UP", Token.UP);
 	}
