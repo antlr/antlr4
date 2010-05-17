@@ -229,11 +229,11 @@ import org.antlr.runtime.*;
 <lexer>
 >>
 
-Lexer(lexerName,modes,pdas, actions, sempreds) ::= <<
+Lexer(lexerName, modes, pdas, tokens, actions, sempreds) ::= <<
 public class <lexerName> extends Lexer {
+    <tokens.keys:{k | public static final int <k>=<tokens.(k)>;}; separator="\n">
     <modes:{m| public static final int <m> = <i0>;}; separator="\n">
 
-    public <lexerName>() {;}
     public <lexerName>(CharStream input) {
         this(input, new RecognizerSharedState());
     }

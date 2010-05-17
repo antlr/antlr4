@@ -66,7 +66,7 @@ import org.antlr.runtime.tree.TreeNodeStream;
  *  Better to just say the recognizer had a problem and then let the parser
  *  figure out a fancy report.
  */
-public class RecognitionException extends Throwable {
+public class RecognitionException extends RuntimeException {
 	/** What input stream did the error occur in? */
 	public transient IntStream input;
 

@@ -37,16 +37,12 @@ import org.antlr.v4.runtime.misc.LABitSet;
  *  of this.
  */
 public class Parser extends BaseRecognizer {
-	public TokenStream input;
-
 	public Parser(TokenStream input) {
-		super(); // highlight that we go to super to set state object
-		setTokenStream(input);
+		super(input);
     }
 
 	public Parser(TokenStream input, RecognizerSharedState state) {
-		super(state); // share the state object with another parser
-		this.input = input;
+		super(input, state); // share the state object with another parser
     }
 
 	public void reset() {
@@ -56,7 +52,7 @@ public class Parser extends BaseRecognizer {
 		}
 	}
 
-	protected Object getCurrentInputSymbol(IntStream input) {
+	protected Object getCurrentInputSymbol() {
 		return ((TokenStream)input).LT(1);
 	}
 
@@ -87,7 +83,7 @@ public class Parser extends BaseRecognizer {
 	}
 
     public TokenStream getTokenStream() {
-		return input;
+		return (TokenStream)input;
 	}
 
 	public String getSourceName() {
@@ -95,10 +91,10 @@ public class Parser extends BaseRecognizer {
 	}
 
 	public void traceIn(String ruleName, int ruleIndex)  {
-		super.traceIn(ruleName, ruleIndex, input.LT(1));
+		super.traceIn(ruleName, ruleIndex, ((TokenStream)input).LT(1));
 	}
 
 	public void traceOut(String ruleName, int ruleIndex)  {
-		super.traceOut(ruleName, ruleIndex, input.LT(1));
+		super.traceOut(ruleName, ruleIndex, ((TokenStream)input).LT(1));
 	}
 }

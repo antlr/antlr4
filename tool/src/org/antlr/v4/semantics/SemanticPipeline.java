@@ -5,6 +5,7 @@ import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ASTVerifier;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.TokenVocabParser;
 import org.antlr.v4.tool.*;
 
 import java.util.Map;
@@ -85,6 +86,16 @@ public class SemanticPipeline {
 		AttributeChecks.checkAllAttributeExpressions(g);
 
 		// ASSIGN TOKEN TYPES
+		String vocab = g.getOption("tokenVocab");
+		if ( vocab!=null ) {
+			TokenVocabParser vparser = new TokenVocabParser(g.tool, vocab);
+			Map<String,Integer> tokens = vparser.load();
+			System.out.println("tokens="+tokens);
+			for (String t : tokens.keySet()) {
+				if ( t.charAt(0)=='\'' ) g.defineStringLiteral(t, tokens.get(t));
+				else g.defineTokenName(t, tokens.get(t));
+			}
+		}
 		if ( g.isLexer() ) assignLexerTokenTypes(g, collector);
 		else assignTokenTypes(g, collector, symcheck);
 

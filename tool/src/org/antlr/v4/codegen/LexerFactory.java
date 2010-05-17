@@ -5,6 +5,7 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
 
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 /** */
@@ -48,6 +49,12 @@ public class LexerFactory {
 			pdaST.add("name", modeName);
 			pdaST.add("model", pda);
 			lexerST.add("pdas", pdaST);
+			LinkedHashMap<String,Integer> tokens = new LinkedHashMap<String,Integer>();
+			for (String t : gen.g.tokenNameToTypeMap.keySet()) {
+				Integer ttype = gen.g.tokenNameToTypeMap.get(t);
+				if ( ttype>0 ) tokens.put(t, ttype);
+			}
+			lexerST.add("tokens", tokens);
 		}
 		return fileST;
 	}

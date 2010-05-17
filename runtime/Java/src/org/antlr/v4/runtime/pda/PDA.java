@@ -1,6 +1,7 @@
 package org.antlr.v4.runtime.pda;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.CommonToken;
 
@@ -47,7 +48,7 @@ public class PDA {
 		labelValues = new CommonToken[nLabels];
 	}
 
-	public int execThompson(CharStream input) {
+	public int execThompson(IntStream input) {
 		int m = input.mark();
 		Arrays.fill(labelValues, null);
 		int ttype = execThompson(input, 0, false);
@@ -67,7 +68,7 @@ public class PDA {
 		return ttype;
 	}
 
-	public int execThompson(CharStream input, int ip, boolean doActions) {
+	public int execThompson(IntStream input, int ip, boolean doActions) {
 		int c = input.LA(1);
 		if ( c==Token.EOF ) return Token.EOF;
 
@@ -118,10 +119,10 @@ processOneChar:
 							addToClosure(reach, ip, alt, context);
 						}
 						break;
-					case Bytecode.LABEL :
+					case Bytecode.LABEL : // lexers only
 						int labelIndex = getShort(code, ip);
 						labelValues[labelIndex] =
-							new CommonToken(input, 0, 0, input.index(), -1);
+							new CommonToken(((CharStream)input), 0, 0, input.index(), -1);
 						break;
 					case Bytecode.SAVE :
 						labelIndex = getShort(code, ip);

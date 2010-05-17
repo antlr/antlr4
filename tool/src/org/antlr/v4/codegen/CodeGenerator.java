@@ -1,12 +1,16 @@
 package org.antlr.v4.codegen;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.src.OutputModelObject;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.*;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -14,8 +18,8 @@ public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	public final static String vocabFilePattern =
-		"<tokens:{<attr.name>=<attr.type>\n}>" +
-		"<literals:{<attr.name>=<attr.type>\n}>";
+		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
+		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
 	public Grammar g;
 	public Target target;
@@ -81,7 +85,39 @@ public class CodeGenerator {
 		}
 
 		return outputFileST;
-	}	
+	}
+
+	/** Generate a token vocab file with all the token names/types.  For example:
+	 *  ID=7
+	 *  FOR=8
+	 *  'for'=8
+	 *
+	 *  This is independent of the target language; used by antlr internally
+	 */
+	ST getTokenVocabOutput() {
+		ST vocabFileST = new ST(vocabFilePattern);
+		Map<String,Integer> tokens = new HashMap<String,Integer>();
+		// make constants for the token names
+		for (String t : g.tokenNameToTypeMap.keySet()) {
+			int tokenType = g.tokenNameToTypeMap.get(t);
+			if ( tokenType>=Token.MIN_TOKEN_TYPE ) {
+				tokens.put(t, Utils.integer(tokenType));
+			}
+		}
+		vocabFileST.add("tokens", tokens);
+
+		// now dump the strings
+		Map<String,Integer> literals = new HashMap<String,Integer>();
+		for (String literal : g.stringLiteralToTypeMap.keySet()) {
+			int tokenType = g.stringLiteralToTypeMap.get(literal);
+			if ( tokenType>=Token.MIN_TOKEN_TYPE ) {
+				literals.put(literal, Utils.integer(tokenType));
+			}
+		}
+		vocabFileST.add("literals", literals);
+
+		return vocabFileST;
+	}
 
 	public void write(ST outputFileST) {
 		// WRITE FILES
@@ -92,14 +128,13 @@ public class CodeGenerator {
 				ST headerFileST = null;
 				target.genRecognizerHeaderFile(this,g,headerFileST,extST.render());
 			}
-//			// write out the vocab interchange file; used by antlr,
-//			// does not change per target
-//			ST tokenVocabSerialization = genTokenVocabOutput();
-//			String vocabFileName = getVocabFileName();
-//			if ( vocabFileName!=null ) {
-//				write(tokenVocabSerialization, vocabFileName);
-//			}
-			//System.out.println(outputFileST.getDOTForDependencyGraph(false));
+			// write out the vocab interchange file; used by antlr,
+			// does not change per target
+			ST tokenVocabSerialization = getTokenVocabOutput();
+			String vocabFileName = getVocabFileName();
+			if ( vocabFileName!=null ) {
+				write(tokenVocabSerialization, vocabFileName);
+			}
 		}
 		catch (IOException ioe) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,

@@ -626,6 +626,27 @@ public class Tool {
 	}
 
 	/**
+	 * Return the Path to the directory in which ANTLR will search for ancillary
+	 * files such as .tokens vocab files and imported grammar files.
+	 *
+	 * @return the lib Directory
+	 */
+	public String getLibraryDirectory() {
+		return libDirectory;
+	}
+
+	/**
+	 * Return the Path to the base output directory, where ANTLR
+	 * will generate all the output files for the current language target as
+	 * well as any ancillary files such as .tokens vocab files.
+	 *
+	 * @return the output Directory
+	 */
+	public String getOutputDirectory() {
+		return outputDirectory;
+	}
+	
+	/**
 	 * Return the location where ANTLR will generate output files for a given file. This is a
 	 * base directory and output files will be relative to here in some cases
 	 * such as when -o option is used and input files are given relative

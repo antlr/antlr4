@@ -29,6 +29,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.LABitSet;
 
 import java.util.ArrayList;
@@ -58,11 +59,13 @@ public abstract class BaseRecognizer {
 	 */
 	protected RecognizerSharedState state;
 
-	public BaseRecognizer() {
+	public BaseRecognizer(IntStream input) {
+		this.input = input;
 		state = new RecognizerSharedState();
 	}
 
-	public BaseRecognizer(RecognizerSharedState state) {
+	public BaseRecognizer(IntStream input, RecognizerSharedState state) {
+		this.input = input;
 		if ( state==null ) {
 			state = new RecognizerSharedState();
 		}
@@ -102,8 +105,8 @@ public abstract class BaseRecognizer {
 	public Object match(int ttype, LABitSet follow)
 		throws RecognitionException
 	{
-		//System.out.println("match "+((TokenStream)input).LT(1));
-		Object matchedSymbol = getCurrentInputSymbol(input);
+		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
+		Object matchedSymbol = getCurrentInputSymbol();
 		if ( input.LA(1)==ttype ) {
 			input.consume();
 			state.errorRecovery = false;
@@ -601,7 +604,7 @@ public abstract class BaseRecognizer {
 			endResync();
 			reportError(e);  // report after consuming so AW sees the token in the exception
 			// we want to return the token we're actually matching
-			Object matchedSymbol = getCurrentInputSymbol(input);
+			Object matchedSymbol = getCurrentInputSymbol();
 			input.consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
@@ -638,10 +641,8 @@ public abstract class BaseRecognizer {
 	 *  for input stream type or change the IntStream interface, I use
 	 *  a simple method to ask the recognizer to tell me what the current
 	 *  input symbol is.
-	 * 
-	 *  This is ignored for lexers.
 	 */
-	protected Object getCurrentInputSymbol(IntStream input) { return null; }
+	protected Object getCurrentInputSymbol() { return null; }
 
 	/** Conjure up a missing token during error recovery.
 	 *

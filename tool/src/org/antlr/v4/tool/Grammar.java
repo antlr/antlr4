@@ -97,9 +97,6 @@ public class Grammar implements AttributeResolver {
      */
     public Map<String,ActionAST> namedActions = new HashMap<String,ActionAST>();
 
-    /** A list of options specified at the grammar level such as language=Java. */
-    public Map<String, String> options;
-
     public Map<String, AttributeDict> scopes = new LinkedHashMap<String, AttributeDict>();
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 	
@@ -159,8 +156,10 @@ public class Grammar implements AttributeResolver {
 //		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "EOF");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "EOR");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.DOWN-1, "DOWN");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.UP-1, "UP");
+		if ( isTreeGrammar() ) {
+			typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.DOWN-1, "DOWN");
+			typeToTokenList.set(Label.NUM_FAUX_LABELS+Token.UP-1, "UP");
+		}
 		tokenNameToTypeMap.put("<INVALID>", Label.INVALID);
 //		tokenNameToTypeMap.put("<ACTION>", Label.ACTION);
 //		tokenNameToTypeMap.put("<EPSILON>", Label.EPSILON);
@@ -169,8 +168,10 @@ public class Grammar implements AttributeResolver {
 		tokenNameToTypeMap.put("<EOT>", Label.EOT);
 		tokenNameToTypeMap.put("EOF", Label.EOF);
 		tokenNameToTypeMap.put("EOR", Label.EOR_TOKEN_TYPE);
-		tokenNameToTypeMap.put("DOWN", Token.DOWN);
-		tokenNameToTypeMap.put("UP", Token.UP);
+		if ( isTreeGrammar() ) {
+			tokenNameToTypeMap.put("DOWN", Token.DOWN);
+			tokenNameToTypeMap.put("UP", Token.UP);
+		}
 	}
 
     public void loadImportedGrammars() {
@@ -432,17 +433,23 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public int defineTokenName(String name) {
+		return defineTokenName(name, getNewTokenType());
+	}
+
+	public int defineTokenName(String name, int ttype) {
 		Integer prev = tokenNameToTypeMap.get(name);
 		if ( prev!=null ) return prev;
-		int ttype = getNewTokenType();
 		tokenNameToTypeMap.put(name, ttype);
 		setTokenForType(ttype, name);
 		return ttype;
 	}
 
 	public int defineStringLiteral(String lit) {
+		return defineStringLiteral(lit, getNewTokenType());
+	}
+
+	public int defineStringLiteral(String lit, int ttype) {
 		if ( !stringLiteralToTypeMap.containsKey(lit) ) {
-			int ttype = getNewTokenType();
 			stringLiteralToTypeMap.put(lit, ttype);
 			// track in reverse index too
 			if ( ttype>=typeToStringLiteralList.size() ) {
@@ -537,13 +544,13 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public String getOption(String key) {
-		if ( options==null ) return null;
-		return options.get(key);
+		if ( ast.options==null ) return null;
+		return ast.options.get(key);
 	}
 
 	public String getOption(String key, String defaultValue) {
-		if ( options==null ) return defaultValue;
-		String v = options.get(key);
+		if ( ast.options==null ) return defaultValue;
+		String v = ast.options.get(key);
 		if ( v!=null ) return v;
 		return defaultValue;
 	}

@@ -40,23 +40,16 @@ import org.antlr.v4.runtime.pda.PDA;
 public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	public static final int DEFAULT_MODE = 0;
 
-	/** Where is the lexer drawing characters from? */
-	public CharStream input;
-
 	public int _mode = DEFAULT_MODE;
 
 	public static PDA[] modeToPDA;
 
-	public Lexer() {
-	}
-
 	public Lexer(CharStream input) {
-		this.input = input;
+		super(input);
 	}
 
 	public Lexer(CharStream input, RecognizerSharedState state) {
-		super(state);
-		this.input = input;
+		super(input, state);
 	}
 
 	public void reset() {
@@ -85,8 +78,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			state.token = null;
 			state.channel = Token.DEFAULT_CHANNEL;
 			state.tokenStartCharIndex = input.index();
-			state.tokenStartCharPositionInLine = input.getCharPositionInLine();
-			state.tokenStartLine = input.getLine();
+			state.tokenStartCharPositionInLine = ((CharStream)input).getCharPositionInLine();
+			state.tokenStartLine = ((CharStream)input).getLine();
 			state.text = null;
 			if ( input.LA(1)==CharStream.EOF ) {
                 Token eof = new CommonToken((CharStream)input,Token.EOF,
@@ -135,7 +128,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	}
 
 	public CharStream getCharStream() {
-		return this.input;
+		return ((CharStream)input);
 	}
 
 	public String getSourceName() {
@@ -161,7 +154,9 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  Parser or TreeParser.getMissingSymbol().
 	 */
 	public Token emit() {
-		Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+		Token t = new CommonToken(((CharStream)input), state.type,
+								  state.channel, state.tokenStartCharIndex,
+								  getCharIndex()-1);
 		t.setLine(state.tokenStartLine);
 		t.setText(state.text);
 		t.setCharPositionInLine(state.tokenStartCharPositionInLine);
@@ -170,11 +165,11 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	}
 
 	public int getLine() {
-		return input.getLine();
+		return ((CharStream)input).getLine();
 	}
 
 	public int getCharPositionInLine() {
-		return input.getCharPositionInLine();
+		return ((CharStream)input).getCharPositionInLine();
 	}
 
 	/** What is the index of the current character of lookahead? */
@@ -189,7 +184,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		if ( state.text!=null ) {
 			return state.text;
 		}
-		return input.substring(state.tokenStartCharIndex,getCharIndex()-1);
+		return ((CharStream)input).substring(state.tokenStartCharIndex,getCharIndex()-1);
 	}
 
 	/** Set the complete text of this token; it wipes any previous
@@ -282,12 +277,12 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	}
 
 	public void traceIn(String ruleName, int ruleIndex)  {
-		String inputSymbol = ((char)input.LT(1))+" line="+getLine()+":"+getCharPositionInLine();
+		String inputSymbol = ((char)((CharStream)input).LT(1))+" line="+getLine()+":"+getCharPositionInLine();
 		super.traceIn(ruleName, ruleIndex, inputSymbol);
 	}
 
 	public void traceOut(String ruleName, int ruleIndex)  {
-		String inputSymbol = ((char)input.LT(1))+" line="+getLine()+":"+getCharPositionInLine();
+		String inputSymbol = ((char)((CharStream)input).LT(1))+" line="+getLine()+":"+getCharPositionInLine();
 		super.traceOut(ruleName, ruleIndex, inputSymbol);
 	}
 }

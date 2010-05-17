@@ -15,7 +15,8 @@ public class MatchToken extends SrcOp implements LabeledOp {
 
 	public MatchToken(OutputModelFactory factory, TerminalAST ast, GrammarAST labelAST) {
 		this.factory = factory;
-		name = ast.getText();
+		int ttype = factory.g.getTokenType(ast.getText());
+		name = factory.gen.target.getTokenTypeAsTargetLabel(factory.g, ttype);
 		if ( labelAST!=null ) {
 			label = labelAST.getText();
 			TokenDecl d = new TokenDecl(factory, label);

@@ -101,8 +101,8 @@ public abstract class OutputModelFactory {
 	public BitSetDecl createFollowBitSet(GrammarAST ast, IntervalSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String elementName = ast.getText(); // assume rule ref
-		if ( ast.getType() == ANTLRParser.TOKEN_REF ) {
-			elementName = gen.target.getTokenTypeAsTargetLabel(g, g.tokenNameToTypeMap.get(elementName));
+		if ( ast.getType() == ANTLRParser.STRING_LITERAL ) {
+			elementName = gen.target.getTokenTypeAsTargetLabel(g, g.stringLiteralToTypeMap.get(elementName));
 		}
 		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+"_"+ast.token.getTokenIndex();
 		BitSetDecl b = new BitSetDecl(this, name, set);
