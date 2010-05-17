@@ -1,7 +1,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -9,7 +9,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
-public class TestNFABytecodeGeneration extends BaseTest {
+public class TestPDABytecodeGeneration extends BaseTest {
 	@Test public void testString() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -215,7 +215,7 @@ public class TestNFABytecodeGeneration extends BaseTest {
 				}
 			}
 		}
-		PDA PDA = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = PDABytecodeGenerator.getPDA(g, LexerGrammar.DEFAULT_MODE_NAME);
 		assertEquals(expecting, Bytecode.disassemble(PDA.code));
 	}
 }

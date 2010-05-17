@@ -229,10 +229,9 @@ import org.antlr.runtime.*;
 <lexer>
 >>
 
-Lexer(lexerName,modes,pdas) ::= <<
+Lexer(lexerName,modes,pdas, actions, sempreds) ::= <<
 public class <lexerName> extends Lexer {
-    public static enum Mode { <modes:{m|<m>(<i0>)}; separator=", ">; int mode; Mode(int m) {mode=m;\}}
-    public Mode _mode = Mode.DEFAULT_MODE;
+    <modes:{m| public static final int <m> = <i0>;}; separator="\n">
 
     public <lexerName>() {;}
     public <lexerName>(CharStream input) {
@@ -243,27 +242,68 @@ public class <lexerName> extends Lexer {
     }
     public String getGrammarFileName() { return "<fileName>"; }
 
-	public void _nextToken() throws RecognitionException {
-	    state.type = modeToPDA[_mode.ordinal()].execThompson(input);
-	}
-	
+    <actions>
+    <sempreds>
     <pdas>
 
-    public static PDA[] modeToPDA = { <modes:{m | new <m>_PDA()}; separator=", "> };
+    static {
+	    modeToPDA = new PDA[] { <modes:{m | new <m>_PDA()}; separator=", "> };
+    }
 }
 >>
 
-PDA(name, model) ::= <<
-public static final byte[] <name>_code = {
-    <model.code; separator=", ">
-};
-public static final int[] <name>_tokenTypeToAddr = {
-    <model.tokenTypeToAddr; separator=", ">
-};
+PDA(name, model, actions, sempreds) ::= <<
 public static final class <name>_PDA extends PDA {
-<!byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels!>
+	public static final byte[] code = {
+	    <model.code; separator=", ">
+	};
+	public static final int[] tokenTypeToAddr = {
+	    <model.tokenTypeToAddr; separator=", ">
+	};
+	<if(actions)>
+    public void action(int r, int a) {
+	    <actions:{a |
+        switch ( r ) {
+	    case <i0> : <a.name>_actions(a); break;
+	    }>
+	    }
+	}
+	<endif>
+	<if(sempreds)>
+    public void sempred(int r, int a) {
+	    <sempreds:{p |
+        switch ( r ) {
+	    case <i0> : return <p.name>_sempreds(a);
+	    }>
+	    }
+	}
+	<endif>
     public <name>_PDA() {
-        super(<name>_code, <name>_tokenTypeToAddr, <model.nLabels>);
+    	super(code, tokenTypeToAddr, <model.nLabels>);
+    }
+}
+>>
+
+actionMethod(name, actions) ::= <<
+public void <name>_actions(int action) {
+    switch ( action ) {
+    <actions:{a |
+    case <i0> :
+        <a>
+        break;
+    }>
+    }
+}
+>>
+
+sempredMethod(name, preds) ::= <<
+public boolean <name>_sempreds(int pred) {
+    switch ( pred ) {
+    <preds:{p |
+    case <i0> :
+        return <p>;
+    }>
+    default : return false;
     }
 }
 >>

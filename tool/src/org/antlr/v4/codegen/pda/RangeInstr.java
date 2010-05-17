@@ -1,7 +1,7 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.runtime.pda.Bytecode;
 
@@ -24,8 +24,8 @@ public class RangeInstr extends Instr {
 			code[addr+2] = (byte)(b&0xFF);
 		}
 		else {
-			NFABytecodeGenerator.writeShort(code, addr+1, (short)a);
-			NFABytecodeGenerator.writeShort(code, addr+1+charSize(a,b), (short)b);
+			PDABytecodeGenerator.writeShort(code, addr+1, (short)a);
+			PDABytecodeGenerator.writeShort(code, addr+1+charSize(a,b), (short)b);
 		}
 	}
 

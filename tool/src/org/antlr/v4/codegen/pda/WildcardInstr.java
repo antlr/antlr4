@@ -1,4 +1,4 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.pda.Bytecode;

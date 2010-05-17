@@ -1,13 +1,13 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.tool.Rule;
 
 /** */
 public abstract class Instr {
 	public int addr;
 	public Rule rule;
-	public NFABytecodeGenerator gen;
+	public PDABytecodeGenerator gen;
 	
 	public abstract short opcode();
 	public abstract int nBytes();

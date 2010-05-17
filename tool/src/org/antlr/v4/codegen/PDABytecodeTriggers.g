@@ -1,14 +1,14 @@
-tree grammar NFABytecodeTriggers;
+tree grammar PDABytecodeTriggers;
 options {
 	language     = Java;
 	tokenVocab   = ANTLRParser;
 	ASTLabelType = GrammarAST;
-	superClass   = NFABytecodeGenerator;
+	superClass   = PDABytecodeGenerator;
 }
 
 @header {
 package org.antlr.v4.codegen;
-import org.antlr.v4.codegen.nfa.*;
+import org.antlr.v4.codegen.pda.*;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.GrammarASTWithOptions;
 import org.antlr.v4.tool.LexerGrammar;
@@ -29,7 +29,7 @@ block
     		if ( nAlts>1 ) {
 	    		S = new SplitInstr(nAlts);
 	    		emit(S);
-	    		S.addrs.add(ip);
+	    		S.addrs.add(pda.ip);
     		}
     		int alt = 1;
     		}
@@ -39,13 +39,13 @@ block
 	    			JumpInstr J = new JumpInstr();
 	    			jumps.add(J);
 	    			emit(J);
-	    			S.addrs.add(ip);
+	    			S.addrs.add(pda.ip);
     			}
     			alt++;
     			}
     		)+
     		{
-    		int END = ip;
+    		int END = pda.ip;
     		for (JumpInstr J : jumps) J.target = END;
     		}
     	)
@@ -87,17 +87,17 @@ ebnf
 	|	{
 	   	SplitInstr S = new SplitInstr(2);
 		emit(S);
-   		S.addrs.add(ip);
+   		S.addrs.add(pda.ip);
 		}
 		^(OPTIONAL block)			
 		{
-   		S.addrs.add(ip);
+   		S.addrs.add(pda.ip);
 		}
 	|	{
-		int start=ip;
+		int start=pda.ip;
 	   	SplitInstr S = new SplitInstr(2);
 		emit(S);
-		int blkStart = ip;
+		int blkStart = pda.ip;
 		}
 		^(CLOSURE block)			
 		{
@@ -105,14 +105,14 @@ ebnf
 	    emit(J);
 	    J.target = start;
    		S.addrs.add(blkStart);
-	    S.addrs.add(ip);
+	    S.addrs.add(pda.ip);
 	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
 		}
-	|	{int start=ip;} ^(POSITIVE_CLOSURE block)
+	|	{int start=pda.ip;} ^(POSITIVE_CLOSURE block)
 		{
    		SplitInstr S = new SplitInstr(2);
 		emit(S);
-		int stop = ip;
+		int stop = pda.ip;
    		S.addrs.add(start);
    		S.addrs.add(stop);
 	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);

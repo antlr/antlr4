@@ -3,7 +3,7 @@ package org.antlr.v4.test;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** */
-public class TestNFABytecodeInterp extends BaseTest {
+public class TestPDABytecodeInterp extends BaseTest {
 	@Test public void testString() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -202,7 +202,7 @@ public class TestNFABytecodeInterp extends BaseTest {
 			}
 		}
 
-		PDA PDA = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = PDABytecodeGenerator.getPDA(g, LexerGrammar.DEFAULT_MODE_NAME);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
@@ -236,7 +236,7 @@ public class TestNFABytecodeInterp extends BaseTest {
 			}
 		}
 
-		PDA PDA = NFABytecodeGenerator.getBytecode(g, LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = PDABytecodeGenerator.getPDA(g, LexerGrammar.DEFAULT_MODE_NAME);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = PDA.execThompson(in);

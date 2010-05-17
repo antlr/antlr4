@@ -12,8 +12,14 @@ import java.util.Map;
 /** A (nondeterministic) pushdown bytecode machine for lexing and LL prediction.
  *  Derived partially from Cox' description of Thompson's 1960s work:
  *  http://swtch.com/~rsc/regexp/regexp2.html
+ *
+ *  Primary difference is that I've extended to have actions, semantic predicates
+ *  and a stack for rule invocation.
  */
 public class PDA {
+	public interface action_fptr { void exec(int action); }
+	public interface sempred_fptr { boolean eval(int predIndex); }
+
 	public byte[] code;
 	public Map<String, Integer> ruleToAddr;
 	public int[] tokenTypeToAddr;
@@ -163,12 +169,12 @@ processOneChar:
 						// then, move to next char, looking for longer match
 						// (we continue processing if there are states in reach)
 						break;
-					case Bytecode.JMP : // ignore
-					case Bytecode.SPLIT :
-					case Bytecode.CALL :
-					case Bytecode.RET :
-					case Bytecode.SEMPRED :
-						break;
+//					case Bytecode.JMP : // ignore
+//					case Bytecode.SPLIT :
+//					case Bytecode.CALL :
+//					case Bytecode.RET :
+//					case Bytecode.SEMPRED :
+//						break;
 					default :
 						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
 				}
@@ -248,9 +254,9 @@ processOneChar:
 			case Bytecode.SEMPRED :
 				// add next instruction only if sempred succeeds
 				int ruleIndex = getShort(code, ip);
-				int actionIndex = getShort(code, ip+2);
-				System.out.println("eval sempred "+ ruleIndex+", "+actionIndex);
-				if ( sempred(ruleIndex, actionIndex) ) {
+				int predIndex = getShort(code, ip+2);
+				System.out.println("eval sempred "+ ruleIndex+", "+predIndex);
+				if ( sempred(ruleIndex, predIndex) ) {
 					addToClosure(closure, ip+4, alt, context);
 				}
 				break;
@@ -425,15 +431,6 @@ processOneChar:
 		}
 	}
 
-	void trace(int ip) {
-		String instr = Bytecode.disassembleInstruction(code, ip);
-		System.out.println(instr);
-	}
-
-	public static int getShort(byte[] memory, int index) {
-		return (memory[index]&0xFF) <<(8*1) | (memory[index+1]&0xFF); // prevent sign extension with mask
-	}
-
 	// subclass needs to override these if there are sempreds or actions in lexer rules
 
 	public boolean sempred(int ruleIndex, int actionIndex) {
@@ -441,6 +438,15 @@ processOneChar:
 	}
 
 	public void action(int ruleIndex, int actionIndex) {
+	}
+	
+	void trace(int ip) {
+		String instr = Bytecode.disassembleInstruction(code, ip);
+		System.out.println(instr);
+	}
+
+	public static int getShort(byte[] memory, int index) {
+		return (memory[index]&0xFF) <<(8*1) | (memory[index+1]&0xFF); // prevent sign extension with mask
 	}
 
 /*

@@ -1,7 +1,7 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.runtime.pda.Bytecode;
 
 /** */
@@ -16,7 +16,7 @@ public class LabelInstr extends Instr {
 	public void write(byte[] code) {
 		super.write(code);
 		labelIndex = gen.getLabelIndex(rule, token.getText());
-		NFABytecodeGenerator.writeShort(code, addr+1, (short)labelIndex);
+		PDABytecodeGenerator.writeShort(code, addr+1, (short)labelIndex);
 	}
 	public String toString() { return addr+":LabelInstr "+ labelIndex; }
 }

@@ -1,7 +1,7 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.runtime.pda.Bytecode;
 
 /** */
@@ -14,7 +14,7 @@ public class MatchInstr extends Instr {
 	public void write(byte[] code) {
 		super.write(code);
 		if ( charSize(c)==1 ) code[addr+1] = (byte)(c&0xFF);
-		else NFABytecodeGenerator.writeShort(code, addr+1, (short)c);
+		else PDABytecodeGenerator.writeShort(code, addr+1, (short)c);
 	}
 
 	@Override

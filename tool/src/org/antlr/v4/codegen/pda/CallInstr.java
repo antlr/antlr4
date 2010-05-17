@@ -1,7 +1,7 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.runtime.pda.Bytecode;
 
 /** */
@@ -13,7 +13,7 @@ public class CallInstr extends Instr {
 	public int nBytes() { return 1+Bytecode.ADDR_SIZE; }
 	public void write(byte[] code) {
 		super.write(code);
-		NFABytecodeGenerator.writeShort(code, addr+1, (short)target);
+		PDABytecodeGenerator.writeShort(code, addr+1, (short)target);
 	}
 
 	@Override

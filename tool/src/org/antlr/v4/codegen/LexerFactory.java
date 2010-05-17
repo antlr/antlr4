@@ -1,8 +1,11 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.runtime.pda.PDA;
+import org.antlr.runtime.Token;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
+
+import java.util.Set;
 
 /** */
 public class LexerFactory {
@@ -20,8 +23,28 @@ public class LexerFactory {
 		fileST.add("fileName", gen.getRecognizerFileName());
 		fileST.add("lexer", lexerST);
 		for (String modeName : lg.modes.keySet()) { // for each mode
-			PDA pda = NFABytecodeGenerator.getBytecode(lg, modeName);
+			CompiledPDA pda = PDABytecodeGenerator.compileLexerMode(lg, modeName);
 			ST pdaST = gen.templates.getInstanceOf("PDA");
+			for (Rule r : pda.ruleActions.keySet()) {
+				Set<Token> actionTokens = pda.ruleActions.keySet(r);
+				ST actionST = gen.templates.getInstanceOf("actionMethod");
+				actionST.add("name", r.name);
+				for (Token t : actionTokens) {
+					actionST.add("actions", t.getText());
+				}
+				pdaST.add("actions", actionST);
+				lexerST.add("actions", actionST);
+			}
+			for (Rule r : pda.ruleSempreds.keySet()) {
+				Set<Token> sempredTokens = pda.ruleSempreds.keySet(r);
+				ST sempredST = gen.templates.getInstanceOf("sempredMethod");
+				sempredST.add("name", r.name);
+				for (Token t : sempredTokens) {
+					sempredST.add("preds", t.getText());
+				}
+				pdaST.add("sempreds", sempredST);
+				lexerST.add("sempreds", sempredST);
+			}
 			pdaST.add("name", modeName);
 			pdaST.add("model", pda);
 			lexerST.add("pdas", pdaST);

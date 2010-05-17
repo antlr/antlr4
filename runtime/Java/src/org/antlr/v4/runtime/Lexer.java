@@ -30,6 +30,7 @@ package org.antlr.v4.runtime;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
+import org.antlr.v4.runtime.pda.PDA;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -37,8 +38,14 @@ import org.antlr.runtime.TokenSource;
  *  of speed.
  */
 public abstract class Lexer extends BaseRecognizer implements TokenSource {
+	public static final int DEFAULT_MODE = 0;
+
 	/** Where is the lexer drawing characters from? */
-	protected CharStream input;
+	public CharStream input;
+
+	public int _mode = DEFAULT_MODE;
+
+	public static PDA[] modeToPDA;
 
 	public Lexer() {
 	}
@@ -89,8 +96,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
                 eof.setCharPositionInLine(getCharPositionInLine());
                 return eof;
 			}
-			try {
-				_nextToken();
+			 {
+				state.type = modeToPDA[_mode].execThompson(input);
 				if ( state.token==null ) {
 					emit();
 				}
@@ -99,14 +106,14 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 				}
 				return state.token;
 			}
-			catch (NoViableAltException nva) {
-				reportError(nva);
-				recover(nva); // throw out current char and try again
-			}
-			catch (RecognitionException re) {
-				reportError(re);
-				// match() routine has already called recover()
-			}
+//			catch (NoViableAltException nva) {
+//				reportError(nva);
+//				recover(nva); // throw out current char and try again
+//			}
+//			catch (RecognitionException re) {
+//				reportError(re);
+//				// match() routine has already called recover()
+//			}
 		}
 	}
 
@@ -119,9 +126,6 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	public void skip() {
 		state.token = Token.SKIP_TOKEN;
 	}
-
-	/** This is the lexer entry point that sets instance var 'token' */
-	public abstract void _nextToken() throws RecognitionException;
 
 	/** Set the char stream and reset the lexer */
 	public void setCharStream(CharStream input) {

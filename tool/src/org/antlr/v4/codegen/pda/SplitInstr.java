@@ -1,6 +1,6 @@
-package org.antlr.v4.codegen.nfa;
+package org.antlr.v4.codegen.pda;
 
-import org.antlr.v4.codegen.NFABytecodeGenerator;
+import org.antlr.v4.codegen.PDABytecodeGenerator;
 import org.antlr.v4.runtime.pda.Bytecode;
 
 import java.util.ArrayList;
@@ -16,10 +16,10 @@ public class SplitInstr extends Instr {
 	public void write(byte[] code) {
 		super.write(code);
 		int a = addr + 1;
-		NFABytecodeGenerator.writeShort(code, a, (short)addrs.size());
+		PDABytecodeGenerator.writeShort(code, a, (short)addrs.size());
 		a += 2;
 		for (int x : addrs) {
-			NFABytecodeGenerator.writeShort(code, a, (short)x);
+			PDABytecodeGenerator.writeShort(code, a, (short)x);
 			a += Bytecode.ADDR_SIZE;
 		}
 	}

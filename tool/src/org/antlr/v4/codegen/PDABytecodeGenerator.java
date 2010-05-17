@@ -4,9 +4,8 @@ import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
-import org.antlr.v4.codegen.nfa.*;
+import org.antlr.v4.codegen.pda.*;
 import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.pda.Bytecode;
@@ -16,64 +15,47 @@ import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /** http://swtch.com/~rsc/regexp/regexp2.html */
-public class NFABytecodeGenerator extends TreeParser {
-	LexerGrammar lg;
-	public List<Instr> instrs = new ArrayList<Instr>();
-	public int ip = 0; // where to write next
-	Map<String, Integer> ruleToAddr = new HashMap<String, Integer>();
-	int[] tokenTypeToAddr;
-
-	DoubleKeyMap<Rule, String, Integer> ruleLabels = new DoubleKeyMap<Rule, String, Integer>();
-	DoubleKeyMap<Rule, Token, Integer> ruleActions = new DoubleKeyMap<Rule, Token, Integer>();
-	DoubleKeyMap<Rule, Token, Integer> ruleSempreds = new DoubleKeyMap<Rule, Token, Integer>();
-
+public class PDABytecodeGenerator extends TreeParser {
 	public Rule currentRule;
+
+	CompiledPDA pda = new CompiledPDA();
 
 	public int labelIndex = 0; // first time we ask for labels we index
 
-//	public abstract class LabelMaker<Key,Label> {
-//		Map<Key,Label> labels = new HashMap<Key,Label>();
-//		public LabelMaker(Collection<Key> keys) {
-//			for (Key k : keys) labels.put(k, computeLabel(k));
-//		}
-//		public abstract Label computeLabel(Key k);
-//	}
-
-	public NFABytecodeGenerator(TreeNodeStream input, RecognizerSharedState state) {
+	public PDABytecodeGenerator(TreeNodeStream input, RecognizerSharedState state) {
 		super(input, state);
 	}
 
 	public void emit(Instr I) {
-		I.addr = ip;
+		I.addr = pda.ip;
 		I.rule = currentRule;
 		I.gen = this;
-		ip += I.nBytes();
-		instrs.add(I);
+		pda.ip += I.nBytes();
+		pda.instrs.add(I);
 	}
 
 	// indexed from 0 per rule
 	public int getActionIndex(Rule r, Token actionToken) {
-		Integer I = ruleActions.get(r, actionToken);
+		Integer I = pda.ruleActions.get(r, actionToken);
 		if ( I!=null ) return I; // already got its label
-		Map<Token, Integer> labels = ruleActions.get(r);
-		int i = labels.size();
-		ruleActions.put(r, actionToken, i);
+		Map<Token, Integer> labels = pda.ruleActions.get(r);
+		int i = 0;
+		if ( labels!=null ) i = labels.size();
+		pda.ruleActions.put(r, actionToken, i);
 		return i;
 	}
 
 	// indexed from 0 per rule
 	public int getSempredIndex(Rule r, Token actionToken) {
-		Integer I = ruleSempreds.get(r, actionToken);
+		Integer I = pda.ruleSempreds.get(r, actionToken);
 		if ( I!=null ) return I; // already got its label
-		Map<Token, Integer> labels = ruleSempreds.get(r);
-		int i = labels.size();
-		ruleSempreds.put(r, actionToken, i);
+		Map<Token, Integer> labels = pda.ruleSempreds.get(r);
+		int i = 0;
+		if ( labels!=null ) i = labels.size();
+		pda.ruleSempreds.put(r, actionToken, i);
 		return i;
 	}
 
@@ -82,10 +64,10 @@ public class NFABytecodeGenerator extends TreeParser {
 	 *  to an index in an action.
 	 */
 	public int getLabelIndex(Rule r, String labelName) {
-		Integer I = ruleLabels.get(r, labelName);
+		Integer I = pda.ruleLabels.get(r, labelName);
 		if ( I!=null ) return I; // already got its label
 		int i = labelIndex++;
-		ruleLabels.put(r, labelName, i);
+		pda.ruleLabels.put(r, labelName, i);
 		return i;
 	}
 
@@ -96,30 +78,29 @@ public class NFABytecodeGenerator extends TreeParser {
 		}
 	}
 
-	public byte[] getBytecode() {
-		Instr last = instrs.get(instrs.size() - 1);
+	public byte[] convertInstrsToBytecode() {
+		Instr last = pda.instrs.get(pda.instrs.size() - 1);
 		int size = last.addr + last.nBytes();
 		byte[] code = new byte[size];
 
 		// resolve CALL instruction targets before generating code
-		for (Instr I : instrs) {
+		for (Instr I : pda.instrs) {
 			if ( I instanceof CallInstr ) {
 				CallInstr C = (CallInstr) I;
 				String ruleName = C.token.getText();
-				C.target = ruleToAddr.get(ruleName);
+				C.target = pda.ruleToAddr.get(ruleName);
 			}
 		}
-		for (Instr I : instrs) {
+		for (Instr I : pda.instrs) {
 			I.write(code);
 		}
 		return code;
 	}
 
-	public static PDA getBytecode(LexerGrammar lg, String modeName) {
+	public static CompiledPDA compileLexerMode(LexerGrammar lg, String modeName) {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		NFABytecodeTriggers gen = new NFABytecodeTriggers(null);
-		gen.lg = lg;
-		gen.tokenTypeToAddr = new int[lg.getMaxTokenType()+1];
+		PDABytecodeTriggers gen = new PDABytecodeTriggers(null);
+		gen.pda.tokenTypeToAddr = new int[lg.getMaxTokenType()+1];
 
 		// add split for s0 to hook up rules (fill in operands as we gen rules)
 		int numRules = lg.modes.get(modeName).size();
@@ -135,10 +116,10 @@ public class NFABytecodeGenerator extends TreeParser {
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			gen.setTreeNodeStream(nodes);
 			int ttype = lg.getTokenType(r.name);
-			gen.ruleToAddr.put(r.name, gen.ip);
+			gen.pda.ruleToAddr.put(r.name, gen.pda.ip);
 			if ( !r.isFragment() ) {
-				s0.addrs.add(gen.ip);
-				gen.tokenTypeToAddr[ttype] = gen.ip;
+				s0.addrs.add(gen.pda.ip);
+				gen.pda.tokenTypeToAddr[ttype] = gen.pda.ip;
 			}
 			try {
 				gen.block(); // GEN Instr OBJECTS
@@ -154,11 +135,17 @@ public class NFABytecodeGenerator extends TreeParser {
 				e.printStackTrace(System.err);
 			}
 		}
-		byte[] code = gen.getBytecode();
-		System.out.println(Bytecode.disassemble(code));
-		System.out.println("rule addrs="+gen.ruleToAddr);
+		gen.pda.code = gen.convertInstrsToBytecode();
+		gen.pda.nLabels = gen.labelIndex;
+		System.out.println(Bytecode.disassemble(gen.pda.code));
+		System.out.println("rule addrs="+gen.pda.ruleToAddr);
+		return gen.pda;
+	}
 
-		return new PDA(code, gen.ruleToAddr, gen.tokenTypeToAddr, gen.labelIndex);
+	// testing
+	public static PDA getPDA(LexerGrammar lg, String modeName) {
+		CompiledPDA info = compileLexerMode(lg, modeName);
+		return new PDA(info.code, info.ruleToAddr, info.tokenTypeToAddr, info.nLabels);
 	}
 
 	/** Write value at index into a byte array highest to lowest byte,
