@@ -17,6 +17,7 @@ ParserFile(file, parser, dfaDecls, bitSetDecls) ::= <<
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognizerSharedState;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.runtime.*;
@@ -36,7 +37,6 @@ public class <p.name> extends Parser {
 	}
 !>	
     <p.tokens.keys:{k | public static final int <k>=<p.tokens.(k)>;}; separator="\n">
-    public QStack\<ParserRuleReturnScope> _ctx = new QStack\<ParserRuleReturnScope>();
     <p:ctor()>
     <funcs; separator="\n">
     <dfaDecls; separator="\n">
@@ -60,20 +60,24 @@ public <p.name>(TokenStream input, RecognizerSharedState state) {
         S.b_return retval = new S.b_return();
 */
 
-RuleFunction(f,code,decls,context) ::= <<
+RuleFunction(f,code,decls,context,scope) ::= <<
 <context>
+<scope>
 
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.retType)><f.retType><else>void<endif> <f.name>(<f.args:{a|<a>, }>LABitSet _follow) throws RecognitionException {
-<!	<if(f.scope)><f.scope.name>.push(new <f.scope.name>);<endif> !>
-<if(f.retType)>
-    _ctx.push(new <f.context.name>(<f.args:{a|<a.name>}; separator=",">));
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.ctxType)><f.ctxType><else>void<endif> <f.name>(<f.ctxType> _ctx) throws RecognitionException {
+<if(f.scope)>
+    <f.scope.name>_stack.push(new <f.scope.name>());
+<endif>
+<if(f.ctxType)>
+    state.ctx.push(_ctx);
 <endif>
     <decls; separator="\n">
 	try {
 	    <code>
 	}
 	finally {
-        <if(f.retType)>return (<f.retType>)_ctx.pop();<endif>
+        <if(f.scope)><f.scope.name>_stack.pop();<endif>
+        <if(f.ctxType)>return (<f.ctxType>)state.ctx.pop();<endif>
 	}
 }
 >>
@@ -166,7 +170,7 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r) ::= <<
-<if(r.label)><r.label> = <endif><r.name>(<r.argExprs:{a|<a>, }><r.follow.name>);
+<if(r.label)><r.label> = <endif><r.name>(new <r.ctxName>(<r.argExprs:{e|<e>,}><r.follow.name>));
 >>
 
 MatchToken(m) ::= <<
@@ -189,21 +193,21 @@ RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 CaptureNextToken(d) ::= "<d.varName> = input.LA(1);"
 
 StructDecl(s,attrs) ::= <<
-public static class <s.name> extends ParserRuleReturnScope {
+public static class <s.name> extends ParserRuleContext {
     <attrs:{a | <a>;}; separator="\n">
-    <if(s.ctorAttrs)>
+<if(s.ctorAttrs)>
     public <s.name>(<s.ctorAttrs; separator=", ">) {
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-    <endif>
+<endif>
 };
 >>
 
-DynamicScopeStruct(rv,attrs) ::= <<
-public static class <rv.name> {
+DynamicScopeStruct(d,attrs) ::= <<
+public static class <d.name> {
     <attrs:{a | <a>;}; separator="\n">
 };
-QStack b_stack = new QStack();
+public QStack\<<f.scope.name>\> <f.scope.name>_stack = new QStack\<<f.scope.name>\>();
 >>
 
 AttributeDecl(d) ::= "<d.decl>"
@@ -219,7 +223,7 @@ public static final LABitSet <b.name>=new LABitSet(new long[]{<b.fset.bits:{<it>
 LexerFile(fileName, lexer) ::= <<
 // $ANTLR ANTLRVersion> <fileName> generatedTimestamp>
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.RecognizerSharedState;
+import org.antlr.v4.runtime.LexerSharedState;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.pda.*;
@@ -235,9 +239,9 @@ public class <lexerName> extends Lexer {
     <modes:{m| public static final int <m> = <i0>;}; separator="\n">
 
     public <lexerName>(CharStream input) {
-        this(input, new RecognizerSharedState());
+        this(input, new LexerSharedState());
     }
-    public <lexerName>(CharStream input, RecognizerSharedState state) {
+    public <lexerName>(CharStream input, LexerSharedState state) {
         super(input,state);
     }
     public String getGrammarFileName() { return "<fileName>"; }

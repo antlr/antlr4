@@ -21,9 +21,7 @@ public class InvokeRule extends SrcOp implements LabeledOp {
 		this.ast = ast;
 		this.name = ast.getText();
 		Rule r = factory.g.getRule(name);
-		if ( r.retvals!=null || r.args!=null ) {
-			ctxName = factory.getRuleFunctionContextStructName(r.name);
-		}
+		ctxName = factory.gen.target.getRuleFunctionContextStructName(r);
 
 		if ( labelAST!=null ) {
 			label = labelAST.getText();

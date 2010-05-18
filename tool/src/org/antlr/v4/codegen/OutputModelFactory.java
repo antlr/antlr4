@@ -86,18 +86,6 @@ public abstract class OutputModelFactory {
 //		outputModel.dfaDefs.add(d);
 	}
 
-	public String getLoopLabel(GrammarAST ast) {
-		return "loop"+ ast.token.getTokenIndex();
-	}
-
-	public String getLoopCounter(GrammarAST ast) {
-		return "cnt"+ ast.token.getTokenIndex();
-	}
-
-	public String getListLabel(String label) { return label+"_list"; }
-	public String getRuleFunctionContextStructName(String ruleName) { return ruleName+"_ctx"; }
-	public String getDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
-
 	public BitSetDecl createFollowBitSet(GrammarAST ast, IntervalSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String elementName = ast.getText(); // assume rule ref

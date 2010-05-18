@@ -3,6 +3,8 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.automata.Label;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
@@ -120,5 +122,20 @@ public class Target {
 		return buf.toString();
 	}
 
+	public String getLoopLabel(GrammarAST ast) {
+		return "loop"+ ast.token.getTokenIndex();
+	}
+
+	public String getLoopCounter(GrammarAST ast) {
+		return "cnt"+ ast.token.getTokenIndex();
+	}
+
+	public String getListLabel(String label) { return label+"_list"; }
+	public String getRuleFunctionContextStructName(Rule r) {
+		if ( r.args==null && r.retvals==null ) return "ParserRuleContext";
+		return r.name+"_ctx";
+	}
+	public String getDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
+	
 	public int getInlineTestsVsBitsetThreshold() { return 20; }
 }

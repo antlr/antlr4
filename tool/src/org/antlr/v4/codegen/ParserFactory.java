@@ -33,7 +33,7 @@ public class ParserFactory extends OutputModelFactory {
 		InvokeRule r = new InvokeRule(this, ID, label);
 		AddToList a = null;
 		if ( label!=null && label.parent.getType()== ANTLRParser.PLUS_ASSIGN ) {
-			a = new AddToList(this, getListLabel(r.label), r);
+			a = new AddToList(this, gen.target.getListLabel(r.label), r);
 		}
 		return Utils.list(r, a);
 	}
@@ -43,7 +43,7 @@ public class ParserFactory extends OutputModelFactory {
 		MatchToken m = new MatchToken(this, (TerminalAST) ID, label);
 		AddToList a = null;
 		if ( label!=null && label.parent.getType()== ANTLRParser.PLUS_ASSIGN ) {
-			a = new AddToList(this, getListLabel(m.label), m);
+			a = new AddToList(this, gen.target.getListLabel(m.label), m);
 		}
 		return Utils.list(m, a);
 	}

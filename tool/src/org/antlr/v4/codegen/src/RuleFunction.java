@@ -7,6 +7,7 @@ import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
@@ -19,7 +20,7 @@ import java.util.List;
 public class RuleFunction extends OutputModelObject {
 	public String name;
 	public List<String> modifiers;
-	public String retType;
+	public String ctxType;
 	public List<String> globalScopesUsed;
 	public Collection<String> ruleLabels;
 	public Collection<String> tokenLabels;
@@ -29,6 +30,7 @@ public class RuleFunction extends OutputModelObject {
 	public boolean isStartRule;
 
 	public StructDecl context;
+	public DynamicScopeStruct scope;
 
 	public Collection<Attribute> args = null;
 	public OrderedHashSet<Decl> decls;
@@ -44,23 +46,31 @@ public class RuleFunction extends OutputModelObject {
 		}
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
-		List<Attribute> argsDynScopeAndReturnValues = new ArrayList<Attribute>();
+		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
+
+		List<Attribute> argsAndReturnValues = new ArrayList<Attribute>();
+		List<Attribute> ctorAttrs = new ArrayList<Attribute>();
+
 		if ( r.args!=null ) {
-			this.args = r.args.attributes.values();
-			argsDynScopeAndReturnValues.addAll(r.args.attributes.values());
+			argsAndReturnValues.addAll(r.args.attributes.values());
+			args = r.args.attributes.values();
+			ctorAttrs.addAll(args);
 		}
 		if ( r.retvals!=null ) {
-			retType = factory.getRuleFunctionContextStructName(r.name);
-			argsDynScopeAndReturnValues.addAll(r.retvals.attributes.values());
+			argsAndReturnValues.addAll(r.retvals.attributes.values());
 		}
 		if ( r.scope!=null ) {
-			argsDynScopeAndReturnValues.addAll(r.scope.attributes.values());
+			scope = new DynamicScopeStruct(factory, factory.gen.target.getDynamicScopeStructName(r.name),
+										   r.scope.attributes.values());
 		}
-		if ( argsDynScopeAndReturnValues.size()>0 ) {
-			context = new StructDecl(factory, factory.getRuleFunctionContextStructName(r.name),
-									 argsDynScopeAndReturnValues);
-			context.ctorAttrs = args;
+
+		if ( argsAndReturnValues.size()>0 ) {
+			context = new StructDecl(factory, factory.gen.target.getRuleFunctionContextStructName(r),
+									 argsAndReturnValues);
+			ctorAttrs.add(ScopeParser.parseAttributeDef("LABitSet follow"));
+			context.ctorAttrs = ctorAttrs;
 		}
+
 
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
@@ -91,7 +101,7 @@ public class RuleFunction extends OutputModelObject {
 		final List<String> sup = super.getChildren();
 		return new ArrayList<String>() {{
 			if ( sup!=null ) addAll(sup);
-			add("context"); add("decls"); add("code");
+			add("context"); add("scope"); add("decls"); add("code");
 		}};
 	}
 }

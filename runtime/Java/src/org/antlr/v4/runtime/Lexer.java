@@ -28,6 +28,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.v4.runtime.pda.PDA;
@@ -37,26 +38,31 @@ import org.antlr.v4.runtime.pda.PDA;
  *  uses simplified match() and error recovery mechanisms in the interest
  *  of speed.
  */
-public abstract class Lexer extends BaseRecognizer implements TokenSource {
+public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource {
 	public static final int DEFAULT_MODE = 0;
+
+	public LexerSharedState state;
 
 	public int _mode = DEFAULT_MODE;
 
 	public static PDA[] modeToPDA;
 
-	public Lexer(CharStream input) {
-		super(input);
+	public Lexer(IntStream input) {
+		this(input, new LexerSharedState());
 	}
 
-	public Lexer(CharStream input, RecognizerSharedState state) {
-		super(input, state);
+	public Lexer(IntStream input, LexerSharedState state) {
+		if ( state==null ) {
+			state = new LexerSharedState();
+		}
+		this.state = state;
+		state.input = input;
 	}
 
 	public void reset() {
-		super.reset(); // reset all recognizer state variables
 		// wack Lexer state variables
-		if ( input!=null ) {
-			input.seek(0); // rewind the input
+		if ( state.input!=null ) {
+			state.input.seek(0); // rewind the input
 		}
 		if ( state==null ) {
 			return; // no shared state work to do
@@ -77,20 +83,20 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		while (true) {
 			state.token = null;
 			state.channel = Token.DEFAULT_CHANNEL;
-			state.tokenStartCharIndex = input.index();
-			state.tokenStartCharPositionInLine = ((CharStream)input).getCharPositionInLine();
-			state.tokenStartLine = ((CharStream)input).getLine();
+			state.tokenStartCharIndex = state.input.index();
+			state.tokenStartCharPositionInLine = ((CharStream)state.input).getCharPositionInLine();
+			state.tokenStartLine = ((CharStream)state.input).getLine();
 			state.text = null;
-			if ( input.LA(1)==CharStream.EOF ) {
-                Token eof = new CommonToken((CharStream)input,Token.EOF,
+			if ( state.input.LA(1)==CharStream.EOF ) {
+                Token eof = new CommonToken((CharStream)state.input,Token.EOF,
                                             Token.DEFAULT_CHANNEL,
-                                            input.index(),input.index());
+                                            state.input.index(),state.input.index());
                 eof.setLine(getLine());
                 eof.setCharPositionInLine(getCharPositionInLine());
                 return eof;
 			}
 			 {
-				state.type = modeToPDA[_mode].execThompson(input);
+				state.type = modeToPDA[_mode].execThompson(state.input);
 				if ( state.token==null ) {
 					emit();
 				}
@@ -122,17 +128,17 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 
 	/** Set the char stream and reset the lexer */
 	public void setCharStream(CharStream input) {
-		this.input = null;
+		this.state.input = null;
 		reset();
-		this.input = input;
+		this.state.input = input;
 	}
 
 	public CharStream getCharStream() {
-		return ((CharStream)input);
+		return ((CharStream)state.input);
 	}
 
 	public String getSourceName() {
-		return input.getSourceName();
+		return state.input.getSourceName();
 	}
 
 	/** Currently does not support multiple emits per nextToken invocation
@@ -154,7 +160,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  Parser or TreeParser.getMissingSymbol().
 	 */
 	public Token emit() {
-		Token t = new CommonToken(((CharStream)input), state.type,
+		Token t = new CommonToken(((CharStream)state.input), state.type,
 								  state.channel, state.tokenStartCharIndex,
 								  getCharIndex()-1);
 		t.setLine(state.tokenStartLine);
@@ -165,16 +171,16 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	}
 
 	public int getLine() {
-		return ((CharStream)input).getLine();
+		return ((CharStream)state.input).getLine();
 	}
 
 	public int getCharPositionInLine() {
-		return ((CharStream)input).getCharPositionInLine();
+		return ((CharStream)state.input).getCharPositionInLine();
 	}
 
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
-		return input.index();
+		return state.input.index();
 	}
 
 	/** Return the text matched so far for the current token or any
@@ -184,7 +190,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		if ( state.text!=null ) {
 			return state.text;
 		}
-		return ((CharStream)input).substring(state.tokenStartCharIndex,getCharIndex()-1);
+		return ((CharStream)state.input).substring(state.tokenStartCharIndex,getCharIndex()-1);
 	}
 
 	/** Set the complete text of this token; it wipes any previous
@@ -206,7 +212,15 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		errorRecovery = true;
 		 */
 
-		displayRecognitionError(this.getTokenNames(), e);
+		//displayRecognitionError(this.getTokenNames(), e);
+	}
+
+	/** Used to print out token names like ID during debugging and
+	 *  error reporting.  The generated parsers implement a method
+	 *  that overrides this to point to their String[] tokenNames.
+	 */
+	public String[] getTokenNames() {
+		return null;
 	}
 
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
@@ -241,7 +255,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 				  getCharErrorDisplay(mre.a)+".."+getCharErrorDisplay(mre.b);
 		}
 		else {
-			msg = super.getErrorMessage(e, tokenNames);
+			//msg = super.getErrorMessage(e, tokenNames);
 		}
 		return msg;
 	}
@@ -271,18 +285,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  to do sophisticated error recovery if you are in a fragment rule.
 	 */
 	public void recover(RecognitionException re) {
-		//System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
+		//System.out.println("consuming char "+(char)state.input.LA(1)+" during recovery");
 		//re.printStackTrace();
-		input.consume();
-	}
-
-	public void traceIn(String ruleName, int ruleIndex)  {
-		String inputSymbol = ((char)((CharStream)input).LT(1))+" line="+getLine()+":"+getCharPositionInLine();
-		super.traceIn(ruleName, ruleIndex, inputSymbol);
-	}
-
-	public void traceOut(String ruleName, int ruleIndex)  {
-		String inputSymbol = ((char)((CharStream)input).LT(1))+" line="+getLine()+":"+getCharPositionInLine();
-		super.traceOut(ruleName, ruleIndex, inputSymbol);
+		state.input.consume();
 	}
 }

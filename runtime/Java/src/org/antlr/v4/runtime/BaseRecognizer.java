@@ -45,11 +45,8 @@ import java.util.Map;
 public abstract class BaseRecognizer {
 	public static final int MEMO_RULE_FAILED = -2;
 	public static final int MEMO_RULE_UNKNOWN = -1;
-	public static final int INITIAL_FOLLOW_STACK_SIZE = 100;
 
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
-
-	public IntStream input;
 
 	/** State of a lexer, parser, or tree parser are collected into a state
 	 *  object so the state can be shared.  This sharing is needed to
@@ -57,19 +54,18 @@ public abstract class BaseRecognizer {
 	 *  and other state variables.  It's a kind of explicit multiple
 	 *  inheritance via delegation of methods and shared state.
 	 */
-	protected RecognizerSharedState state;
+	public RecognizerSharedState state;
 
 	public BaseRecognizer(IntStream input) {
-		this.input = input;
-		state = new RecognizerSharedState();
+		this(input, new RecognizerSharedState());
 	}
 
 	public BaseRecognizer(IntStream input, RecognizerSharedState state) {
-		this.input = input;
 		if ( state==null ) {
 			state = new RecognizerSharedState();
 		}
 		this.state = state;
+		state.input = input;
 	}
 
 	/** reset the parser's state; subclasses must rewinds the input stream */
@@ -78,7 +74,7 @@ public abstract class BaseRecognizer {
 		if ( state==null ) {
 			return; // no shared state work to do
 		}
-		state._fsp = -1;
+		state.ctx.clear();
 		state.errorRecovery = false;
 		state.lastErrorIndex = -1;
 		state.failed = false;
@@ -105,10 +101,10 @@ public abstract class BaseRecognizer {
 	public Object match(int ttype, LABitSet follow)
 		throws RecognitionException
 	{
-		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
+		System.out.println("match "+((TokenStream)state.input).LT(1)+" vs expected "+ttype);
 		Object matchedSymbol = getCurrentInputSymbol();
-		if ( input.LA(1)==ttype ) {
-			input.consume();
+		if ( state.input.LA(1)==ttype ) {
+			state.input.consume();
 			state.errorRecovery = false;
 			state.failed = false;
 			return matchedSymbol;
@@ -122,14 +118,14 @@ public abstract class BaseRecognizer {
 	}
 
 	/** Match the wildcard: in a symbol */
-	public void matchAny(IntStream input) {
+	public void matchAny() {
 		state.errorRecovery = false;
 		state.failed = false;
-		input.consume();
+		state.input.consume();
 	}
 
 	public boolean mismatchIsUnwantedToken(int ttype) {
-		return input.LA(2)==ttype;
+		return state.input.LA(2)==ttype;
 	}
 
 	public boolean mismatchIsMissingToken(LABitSet follow) {
@@ -142,7 +138,7 @@ public abstract class BaseRecognizer {
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
 			LABitSet viableTokensFollowingThisRule = computeContextSensitiveRuleFOLLOW();
 			follow = follow.or(viableTokensFollowingThisRule);
-            if ( state._fsp>=0 ) { // remove EOR if we're not the start symbol
+            if ( state.ctx.sp>=0 ) { // remove EOR if we're not the start symbol
                 follow.remove(Token.EOR_TOKEN_TYPE);
             }
 		}
@@ -151,13 +147,13 @@ public abstract class BaseRecognizer {
 		// "insert" the missing token
 
 		//System.out.println("viable tokens="+follow.toString(getTokenNames()));
-		//System.out.println("LT(1)="+((TokenStream)input).LT(1));
+		//System.out.println("LT(1)="+((TokenStream)state.input).LT(1));
 
 		// LABitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
 		// in follow set to indicate that the fall of the start symbol is
 		// in the set (EOF can follow).
-		if ( follow.member(input.LA(1)) || follow.member(Token.EOR_TOKEN_TYPE) ) {
-			//System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
+		if ( follow.member(state.input.LA(1)) || follow.member(Token.EOR_TOKEN_TYPE) ) {
+			//System.out.println("LT(1)=="+((TokenStream)state.input).LT(1)+" is consistent with what follows; inserting...");
 			return true;
 		}
 		return false;
@@ -353,14 +349,14 @@ public abstract class BaseRecognizer {
 	 *  token that the match() routine could not recover from.
 	 */
 	public void recover(RecognitionException re) {
-		if ( state.lastErrorIndex==input.index() ) {
+		if ( state.lastErrorIndex==state.input.index() ) {
 			// uh oh, another error at same token index; must be a case
 			// where LT(1) is in the recovery token set so nothing is
 			// consumed; consume a single token so at least to prevent
 			// an infinite loop; this is a failsafe.
-			input.consume();
+			state.input.consume();
 		}
-		state.lastErrorIndex = input.index();
+		state.lastErrorIndex = state.input.index();
 		LABitSet followSet = computeErrorRecoverySet();
 		beginResync();
 		consumeUntil(followSet);
@@ -527,15 +523,15 @@ public abstract class BaseRecognizer {
 		return combineFollows(true);
 	}
 
-	// what is exact? it seems to only add sets from above on stack
+	// TODO: what is exact? it seems to only add sets from above on stack
 	// if EOR is in set i.  When it sees a set w/o EOR, it stops adding.
 	// Why would we ever want them all?  Maybe no viable alt instead of
 	// mismatched token?
 	protected LABitSet combineFollows(boolean exact) {
-		int top = state._fsp;
+		int top = state.ctx.sp;
 		LABitSet followSet = new LABitSet();
 		for (int i=top; i>=0; i--) {
-			LABitSet localFollowSet = (LABitSet)state.following[i];
+			LABitSet localFollowSet = (LABitSet)state.ctx.get(i).follow;
 			/*
 			System.out.println("local follow depth "+i+"="+
 							   localFollowSet.toString(getTokenNames())+")");
@@ -593,30 +589,30 @@ public abstract class BaseRecognizer {
 		RecognitionException e = null;
 		// if next token is what we are looking for then "delete" this token
 		if ( mismatchIsUnwantedToken(ttype) ) {
-			e = new UnwantedTokenException(ttype, input);
+			e = new UnwantedTokenException(ttype, state.input);
 			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
 							   ((TokenStream)input).LT(1)+
 							   " since "+((TokenStream)input).LT(2)+" is what we want");
 			 */
 			beginResync();
-			input.consume(); // simply delete extra token
+			state.input.consume(); // simply delete extra token
 			endResync();
 			reportError(e);  // report after consuming so AW sees the token in the exception
 			// we want to return the token we're actually matching
 			Object matchedSymbol = getCurrentInputSymbol();
-			input.consume(); // move past ttype token as if all were ok
+			state.input.consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
 		// can't recover with single token deletion, try insertion
 		if ( mismatchIsMissingToken(follow) ) {
 			Object inserted = getMissingSymbol(e, ttype, follow);
-			e = new MissingTokenException(ttype, input, inserted);
+			e = new MissingTokenException(ttype, state.input, inserted);
 			reportError(e);  // report after inserting so AW sees the token in the exception
 			return inserted;
 		}
 		// even that didn't work; must throw the exception
-		e = new MismatchedTokenException(ttype, input);
+		e = new MismatchedTokenException(ttype, state.input);
 		throw e;
 	}
 
@@ -672,32 +668,22 @@ public abstract class BaseRecognizer {
 
 	public void consumeUntil(int tokenType) {
 		//System.out.println("consumeUntil "+tokenType);
-		int ttype = input.LA(1);
+		int ttype = state.input.LA(1);
 		while (ttype != Token.EOF && ttype != tokenType) {
-			input.consume();
-			ttype = input.LA(1);
+			state.input.consume();
+			ttype = state.input.LA(1);
 		}
 	}
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(LABitSet set) {
 		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
-		int ttype = input.LA(1);
+		int ttype = state.input.LA(1);
 		while (ttype != Token.EOF && !set.member(ttype) ) {
-			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
-			input.consume();
-			ttype = input.LA(1);
+			//System.out.println("consume during recover LA(1)="+getTokenNames()[state.input.LA(1)]);
+			state.input.consume();
+			ttype = state.input.LA(1);
 		}
-	}
-
-	/** Push a rule's follow set using our own hardcoded stack */
-	protected void pushFollow(LABitSet fset) {
-		if ( (state._fsp +1)>=state.following.length ) {
-			LABitSet[] f = new LABitSet[state.following.length*2];
-			System.arraycopy(state.following, 0, f, 0, state.following.length);
-			state.following = f;
-		}
-		state.following[++state._fsp] = fset;
 	}
 
 	/** Return List<String> of the rules in your parser instance
@@ -809,8 +795,8 @@ public abstract class BaseRecognizer {
 	 *  this rule and successfully parsed before, then seek ahead to
 	 *  1 past the stop token matched for this rule last time.
 	 */
-	public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
-		int stopIndex = getRuleMemoization(ruleIndex, input.index());
+	public boolean alreadyParsedRule(int ruleIndex) {
+		int stopIndex = getRuleMemoization(ruleIndex, state.input.index());
 		if ( stopIndex==MEMO_RULE_UNKNOWN ) {
 			return false;
 		}
@@ -820,7 +806,7 @@ public abstract class BaseRecognizer {
 		}
 		else {
 			//System.out.println("seen rule "+ruleIndex+" before; skipping ahead to @"+(stopIndex+1)+" failed="+state.failed);
-			input.seek(stopIndex+1); // jump to one past stop token
+			state.input.seek(stopIndex+1); // jump to one past stop token
 		}
 		return true;
 	}

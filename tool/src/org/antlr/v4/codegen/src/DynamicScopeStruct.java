@@ -1,11 +1,13 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.Attribute;
+
+import java.util.Collection;
 
 /** */
 public class DynamicScopeStruct extends StructDecl {
-	public DynamicScopeStruct(OutputModelFactory factory, Rule r) {
-		super(factory, factory.getDynamicScopeStructName(r.name), r.scope.attributes.values());
+	public DynamicScopeStruct(OutputModelFactory factory, String name, Collection<Attribute> attrList) {
+		super(factory, name, attrList);
 	}
 }

@@ -22,7 +22,7 @@ public class LL1PlusBlock extends LL1Loop {
 		IntervalSet exitLook = dfa.startState.edge(1).label;
 		this.exitLook = factory.gen.target.getTokenTypesAsTargetLabels(factory.g, exitLook.toArray());
 
-		loopLabel = factory.getLoopLabel(blkAST);
-		loopCounterVar = factory.getLoopCounter(blkAST);
+		loopLabel = factory.gen.target.getLoopLabel(blkAST);
+		loopCounterVar = factory.gen.target.getLoopCounter(blkAST);
 	}
 }

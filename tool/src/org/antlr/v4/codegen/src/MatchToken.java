@@ -22,7 +22,7 @@ public class MatchToken extends SrcOp implements LabeledOp {
 			TokenDecl d = new TokenDecl(factory, label);
 			factory.currentRule.peek().addDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
-				TokenListDecl l = new TokenListDecl(factory, factory.getListLabel(label));
+				TokenListDecl l = new TokenListDecl(factory, factory.gen.target.getListLabel(label));
 				factory.currentRule.peek().addDecl(l);
 			}
 		}

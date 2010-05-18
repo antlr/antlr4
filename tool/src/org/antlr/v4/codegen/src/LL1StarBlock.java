@@ -25,7 +25,7 @@ public class LL1StarBlock extends LL1Loop {
 		IntervalSet exitLook = dfa.startState.edge(1).label;
 		this.exitLook = factory.gen.target.getTokenTypesAsTargetLabels(factory.g, exitLook.toArray());
 
-		loopLabel = factory.getLoopLabel(blkAST);
+		loopLabel = factory.gen.target.getLoopLabel(blkAST);
 	}
 
 }

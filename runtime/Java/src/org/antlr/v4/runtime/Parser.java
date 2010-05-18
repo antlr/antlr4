@@ -27,7 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
@@ -47,17 +46,16 @@ public class Parser extends BaseRecognizer {
 
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
-		if ( input!=null ) {
-			input.seek(0); // rewind the input
+		if ( state.input!=null ) {
+			state.input.seek(0); // rewind the input
 		}
 	}
 
 	protected Object getCurrentInputSymbol() {
-		return ((TokenStream)input).LT(1);
+		return ((TokenStream)state.input).LT(1);
 	}
 
-	protected Object getMissingSymbol(IntStream input,
-									  RecognitionException e,
+	protected Object getMissingSymbol(RecognitionException e,
 									  int expectedTokenType,
 									  LABitSet follow)
 	{
@@ -65,9 +63,9 @@ public class Parser extends BaseRecognizer {
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+getTokenNames()[expectedTokenType]+">";
 		CommonToken t = new CommonToken(expectedTokenType, tokenText);
-		Token current = ((TokenStream)input).LT(1);
+		Token current = ((TokenStream)state.input).LT(1);
 		if ( current.getType() == Token.EOF ) {
-			current = ((TokenStream)input).LT(-1);
+			current = ((TokenStream)state.input).LT(-1);
 		}
 		t.line = current.getLine();
 		t.charPositionInLine = current.getCharPositionInLine();
@@ -77,24 +75,24 @@ public class Parser extends BaseRecognizer {
 
 	/** Set the token stream and reset the parser */
 	public void setTokenStream(TokenStream input) {
-		this.input = null;
+		this.state.input = null;
 		reset();
-		this.input = input;
+		this.state.input = input;
 	}
 
     public TokenStream getTokenStream() {
-		return (TokenStream)input;
+		return (TokenStream)state.input;
 	}
 
 	public String getSourceName() {
-		return input.getSourceName();
+		return state.input.getSourceName();
 	}
 
 	public void traceIn(String ruleName, int ruleIndex)  {
-		super.traceIn(ruleName, ruleIndex, ((TokenStream)input).LT(1));
+		super.traceIn(ruleName, ruleIndex, ((TokenStream)state.input).LT(1));
 	}
 
 	public void traceOut(String ruleName, int ruleIndex)  {
-		super.traceOut(ruleName, ruleIndex, ((TokenStream)input).LT(1));
+		super.traceOut(ruleName, ruleIndex, ((TokenStream)state.input).LT(1));
 	}
 }

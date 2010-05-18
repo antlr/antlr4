@@ -76,7 +76,7 @@ public class ScopeParser {
      *  but if the separator is ',' you cannot use ',' in the initvalue
      *  unless you escape use "\," escape.
      */
-    protected static Attribute parseAttributeDef(String decl) {
+    public static Attribute parseAttributeDef(String decl) {
         if ( decl==null ) return null;
         Attribute attr = new Attribute();
         boolean inID = false;
