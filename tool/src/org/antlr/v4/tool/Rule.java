@@ -10,7 +10,7 @@ public class Rule implements AttributeResolver {
      *  the return values and args.
      */
     public static AttributeDict predefinedRulePropertiesDict =
-        new AttributeDict() {{
+        new AttributeDict(AttributeDict.DictType.PREDEFINED_RULE) {{
             add(new Attribute("text"));
             add(new Attribute("start"));
             add(new Attribute("stop"));
@@ -19,7 +19,7 @@ public class Rule implements AttributeResolver {
         }};
 
     public static AttributeDict predefinedTreeRulePropertiesDict =
-        new AttributeDict() {{
+        new AttributeDict(AttributeDict.DictType.PREDEFINED_TREE_RULE) {{
             add(new Attribute("text"));
             add(new Attribute("start")); // note: no stop; not meaningful
             add(new Attribute("tree"));
@@ -27,7 +27,7 @@ public class Rule implements AttributeResolver {
         }};
 
     public static AttributeDict predefinedLexerRulePropertiesDict =
-        new AttributeDict() {{
+        new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
             add(new Attribute("text"));
             add(new Attribute("type"));
             add(new Attribute("line"));

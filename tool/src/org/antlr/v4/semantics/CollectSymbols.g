@@ -121,6 +121,7 @@ globalScope
 	:	{inContext("GRAMMAR")}? ^(SCOPE ID ACTION)
 		{
 		AttributeDict s = ScopeParser.parseDynamicScope($ACTION.text);
+		s.type = AttributeDict.DictType.GLOBAL_SCOPE;
 		s.name = $ID.text;
 		s.ast = $ACTION;
 		scopes.add(s);
@@ -211,6 +212,7 @@ ruleArg
 	:	{inContext("RULE")}? ARG_ACTION
 		{
 		currentRule.args = ScopeParser.parseTypeList($ARG_ACTION.text);
+		currentRule.args.type = AttributeDict.DictType.ARG;
 		currentRule.args.ast = $ARG_ACTION;
 		}
 	;
@@ -219,6 +221,7 @@ ruleReturns
 	:	^(RETURNS ARG_ACTION)
 		{
 		currentRule.retvals = ScopeParser.parseTypeList($ARG_ACTION.text);
+		currentRule.retvals.type = AttributeDict.DictType.RET;
 		currentRule.retvals.ast = $ARG_ACTION;
 		}
 	;
@@ -228,6 +231,7 @@ ruleScopeSpec
 		(	^(SCOPE ACTION)
 			{
 			currentRule.scope = ScopeParser.parseDynamicScope($ACTION.text);
+			currentRule.scope.type = AttributeDict.DictType.RULE_SCOPE;
 			currentRule.scope.name = currentRule.name;
 			currentRule.scope.ast = $ACTION;
 			}

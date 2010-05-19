@@ -22,7 +22,7 @@ public void emit(Token token) {
 }
 
 /** force filtering (and return tokens). triggers all above actions. */
-public List<Token> getActionChunks() { 
+public List<Token> getActionTokens() { 
     List<Token> chunks = new ArrayList<Token>();
     Token t = nextToken();
     while ( t.getType()!=Token.EOF ) {

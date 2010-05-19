@@ -177,14 +177,20 @@ MatchToken(m) ::= <<
 <if(m.label)><m.label> = (Token)<endif>match(<m.name>, <m.follow.name>);
 >>
 
-Action(a) ::= "<a.ast.text>"
+// ACTION STUFF
+
+Action(a, chunks) ::= "<chunks>"
+
 SemPred(p) ::= <<
 if (!(<p.ast.text>)) throw new FailedPredicateException(input, "<ruleName>", "<description>");
 >>
 
-AddToList(a) ::= "<a.listName>.add(<a.opWithResultToAdd.label>);"
+ActionText(t) ::= "<t.text>"
+ArgRef(a) ::= "_ctx.<a.name>"
+RetValueRef(a) ::= "_ctx.<a.name>"
+SetAttr(s,rhsChunks) ::= "_ctx.<s.name> = <rhsChunks>;"
 
-//Decl(d) ::= "<d.type> <d.varName> = <d.type:initValue()>;"
+AddToList(a) ::= "<a.listName>.add(<a.opWithResultToAdd.label>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"

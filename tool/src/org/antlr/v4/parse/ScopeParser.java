@@ -65,7 +65,7 @@ public class ScopeParser {
             //System.out.println("def="+ def);
             if ( def.trim().length()>0 ) {
                 Attribute a = parseAttributeDef(def);
-                dict.attributes.put(a.name, a);
+                dict.add(a);
             }
         }
         return dict;

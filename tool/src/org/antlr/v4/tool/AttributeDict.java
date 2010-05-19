@@ -15,13 +15,13 @@ import java.util.Set;
 public class AttributeDict {
     public String name;
     public GrammarAST ast;
-//	public Type type;
+	public DictType type;
 
     /** All token scopes (token labels) share the same fixed scope of
      *  of predefined attributes.  I keep this out of the runtime.Token
      *  object to avoid a runtime type leakage.
      */
-    public static AttributeDict predefinedTokenDict = new AttributeDict() {{
+    public static AttributeDict predefinedTokenDict = new AttributeDict(DictType.TOKEN) {{
         add(new Attribute("text"));
         add(new Attribute("type"));
         add(new Attribute("line"));
@@ -32,11 +32,12 @@ public class AttributeDict {
         add(new Attribute("int"));
     }};
 
-//    public static enum Type {
-//        ARG, RET, TOKEN, PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
-//        GLOBAL_SCOPE,   // scope symbols { ...}
-//        RULE_SCOPE;     // scope { int i; int j; }
-//    }
+    public static enum DictType {
+        ARG, RET, TOKEN,
+		PREDEFINED_RULE, PREDEFINED_TREE_RULE, PREDEFINED_LEXER_RULE,
+        GLOBAL_SCOPE,   // scope symbols { ...}
+        RULE_SCOPE;     // scope { int i; int j; }
+    }
 
     /** The list of Attribute objects */
 
@@ -44,8 +45,9 @@ public class AttributeDict {
         new LinkedHashMap<String, Attribute>();
 
 	public AttributeDict() {;}
+	public AttributeDict(DictType type) { this.type = type; }
 
-	public Attribute add(Attribute a) { return attributes.put(a.name, a); }
+	public Attribute add(Attribute a) { a.dict = this; return attributes.put(a.name, a); }
     public Attribute get(String name) { return attributes.get(name); }
 
     public String getName() {
@@ -67,7 +69,7 @@ public class AttributeDict {
         if ( other==null || other.size()==0 || size()==0 ) {
             return null;
         }
-        Set inter = new HashSet();
+        Set<String> inter = new HashSet<String>();
         Set thisKeys = attributes.keySet();
         for (Iterator it = thisKeys.iterator(); it.hasNext();) {
             String key = (String) it.next();

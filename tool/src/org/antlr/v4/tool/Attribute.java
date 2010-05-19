@@ -16,6 +16,9 @@ public class Attribute {
     /** The optional attribute intialization expression */
     public String initValue;
 
+	/** Who contains us? */
+	public AttributeDict dict;
+
     public Attribute() {;}
 
     public Attribute(String name) { this(name,null); }
