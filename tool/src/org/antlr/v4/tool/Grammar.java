@@ -95,7 +95,8 @@ public class Grammar implements AttributeResolver {
      *  I track the AST node for the action in case I need the line number
      *  for errors.
      */
-    public Map<String,ActionAST> namedActions = new HashMap<String,ActionAST>();
+	public Map<String,ActionAST> namedActions = new HashMap<String,ActionAST>();
+	////public DoubleKeyMap<String,String,ActionAST> namedActions = new DoubleKeyMap<String,String,ActionAST>();
 
     public Map<String, AttributeDict> scopes = new LinkedHashMap<String, AttributeDict>();
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
@@ -211,8 +212,11 @@ public class Grammar implements AttributeResolver {
             namedActions.put(name, (ActionAST)atAST.getChild(1));
         }
         else {
-            String name = atAST.getChild(1).getText();
-            namedActions.put(name, (ActionAST)atAST.getChild(2));
+			String scope = atAST.getChild(0).getText();
+			if ( scope.equals(getTypeString()) ) {
+				String name = atAST.getChild(1).getText();
+				namedActions.put(name, (ActionAST)atAST.getChild(2));
+			}
         }
     }
 

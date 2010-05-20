@@ -12,9 +12,7 @@ import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -26,8 +24,9 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<String> tokenLabels;
 	public List<String> elementsReferencedInRewrite;
 	public List<String> exceptions;
-	public String finallyAction;
+	public Action finallyAction;
 	public boolean isStartRule;
+	public Map<String, Action> namedActions;	
 
 	public StructDecl context;
 	public DynamicScopeStruct scope;
@@ -75,8 +74,14 @@ public class RuleFunction extends OutputModelObject {
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
-		if ( r.finallyAction!=null ) finallyAction = r.finallyAction.getText();
+		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
 
+		namedActions = new HashMap<String, Action>();
+		for (String name : r.namedActions.keySet()) {
+			GrammarAST ast = r.namedActions.get(name);
+			namedActions.put(name, new Action(factory, ast));
+		}
+		
 		factory.currentRule.push(this);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
 		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
@@ -102,6 +107,7 @@ public class RuleFunction extends OutputModelObject {
 		return new ArrayList<String>() {{
 			if ( sup!=null ) addAll(sup);
 			add("context"); add("scope"); add("decls"); add("code");
+			add("finallyAction"); add("namedActions");
 		}};
 	}
 }

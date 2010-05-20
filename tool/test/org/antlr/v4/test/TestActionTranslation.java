@@ -1,12 +1,66 @@
 package org.antlr.v4.test;
 
+import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.automata.LexerNFAFactory;
+import org.antlr.v4.automata.NFAFactory;
+import org.antlr.v4.automata.ParserNFAFactory;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
+import org.stringtemplate.v4.ST;
 
 /** */
-public class TestAttributes extends BaseTest {
+public class TestActionTranslation extends BaseTest {
+	String attributeTemplate =
+		"parser grammar A;\n"+
+		"@members {#members#<members>#end-members#}\n" +
+		"a[int x] returns [int y]\n" +
+		"@init {#init#<init>#end-init#}\n" +
+		"    :   id=ID ids+=ID lab=b[34] {\n" +
+		"		 #inline#<inline>#end-inline#\n" +
+		"		 }\n" +
+		"		 c\n" +
+		"    ;\n" +
+		"    finally {#finally#<finally>#end-finally#}\n" +
+		"b[int d] returns [int e]\n" +
+		"    :   {#inline2#<inline2>#end-inline2#}\n" +
+		"    ;\n" +
+		"c   :   ;\n" +
+		"d	 :   ;\n";
+
+	String scopeTemplate =
+		"parser grammar A;\n"+
+		"@members {\n" +
+		"<members>\n" +
+		"}\n" +
+		"scope S { int i; }\n" +
+		"a[int x] returns [int y]\n" +
+		"scope { int z; }\n" +
+		"scope S;\n" +
+		"@init {<init>}\n" +
+		"    :   lab=b[34] {\n" +
+		"		 <inline>" +
+		"		 }\n" +
+		"    ;\n" +
+		"    finally {<finally>}\n" +
+		"b[int d] returns [int e]\n" +
+		"scope { int f; }\n" +
+		"    :   {<inline2>}\n" +
+		"    ;\n" +
+		"c   :   ;";
+	
     @Test public void testEscapedLessThanInAction() throws Exception {
         String action = "i<3; '<xmltag>'";
+		String expected = "i<3; '<xmltag>'";
+		testActions(attributeTemplate, "members", action, expected);
+		testActions(attributeTemplate, "init", action, expected);
+		testActions(attributeTemplate, "inline", action, expected);
+		testActions(attributeTemplate, "finally", action, expected);
+		testActions(attributeTemplate, "inline2", action, expected);
     }
+
     @Test public void testEscaped$InAction() throws Exception {
         String action = "int \\$n; \"\\$in string\\$\"";
     }
@@ -379,5 +433,38 @@ public class TestAttributes extends BaseTest {
         String action = "int x = $b::n;";
     }
 
+	public void testActions(String template, String actionName, String action, String expected) {
+		ST st = new ST(template);
+		st.add(actionName, action);
+		String grammar = st.render();
+		try {
+			ErrorQueue equeue = new ErrorQueue();
+			Grammar g = new Grammar(grammar);
+			if ( g.ast!=null && !g.ast.hasErrors ) {
+				SemanticPipeline sem = new SemanticPipeline(g);
+				sem.process();
 
+				NFAFactory factory = new ParserNFAFactory(g);
+				if ( g.isLexer() ) factory = new LexerNFAFactory((LexerGrammar)g);
+				g.nfa = factory.createNFA();
+						
+				CodeGenerator gen = new CodeGenerator(g);
+				ST outputFileST = gen.generate();
+				String output = outputFileST.render();
+				System.out.println(output);
+				String b = "#" + actionName + "#";
+				int start = output.indexOf(b);
+				String e = "#end-" + actionName + "#";
+				int end = output.indexOf(e);
+				String snippet = output.substring(start+b.length(),end);
+				assertEquals(expected, snippet);
+			}
+			if ( equeue.size()>0 ) {
+				System.err.println(equeue.toString(g.tool));				
+			}
+		}
+		catch (RecognitionException re) {
+			re.printStackTrace(System.err);
+		}	
+	}
 }

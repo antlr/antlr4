@@ -139,22 +139,22 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(new SetAttr(x.getText(), rhsChunks));
 	}
 
-	public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
-	}
-
 	public void dynamicScopeAttr(String expr, Token x, Token y) {
 	}
 
-	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
+	public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
 	}
 
 	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index) {
 	}
 
-	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
+	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
 	}
 
 	public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index) {
+	}
+
+	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
 	}
 
 	public void templateInstance(String expr) {

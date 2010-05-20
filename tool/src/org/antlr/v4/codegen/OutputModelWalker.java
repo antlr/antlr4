@@ -87,6 +87,15 @@ public class OutputModelWalker {
 						st.add(fieldName, nestedST);
 					}
 				}
+				else if ( o instanceof Map ) {
+					Map<Object, OutputModelObject> nestedOmoMap = (Map<Object, OutputModelObject>)o;
+					Map<Object, ST> m = new HashMap<Object, ST>();
+					for (Object key : nestedOmoMap.keySet()) {
+						ST nestedST = walk(nestedOmoMap.get(key));
+						m.put(key, nestedST);
+					}
+					st.add(fieldName, m);
+				}
 				else if ( o!=null ) {
 					tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, fieldName);
 				}

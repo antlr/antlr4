@@ -14,8 +14,9 @@ public class Action extends SrcOp {
 	public List<ActionChunk> chunks;
 	public Action(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		RuleFunction rf = factory.currentRule.peek();
-		chunks = ActionTranslator.translateAction(factory,rf, ast.token, (ActionAST)ast);
+		RuleFunction rf = null;
+		if ( factory.currentRule.size()>0 ) rf = factory.currentRule.peek();
+		chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
 		System.out.println("actions="+chunks);
 	}
 
