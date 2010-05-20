@@ -80,6 +80,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	public void attr(String expr, Token x) {
+		// TODO: $SCOPENAME
 		System.out.println("attr "+x);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), node);
 		if ( a!=null ) {
@@ -125,7 +126,13 @@ public class ActionTranslator implements ActionSplitterListener {
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(y.getText())); break; // has to be current rule
-			case RET: chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
+			case RET:
+				if ( factory.currentRule.size()>0 && factory.currentRule.peek().name.equals(x.getText()) ) {
+					chunks.add(new RetValueRef(y.getText())); break;
+				}
+				else {
+					chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
+				}
 			case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x, y));	break;
 			case TOKEN: chunks.add(getTokenPropertyRef(x, y));	break;
 //			case PREDEFINED_LEXER_RULE: chunks.add(new RetValueRef(x.getText())); break;
@@ -140,18 +147,30 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	public void dynamicScopeAttr(String expr, Token x, Token y) {
+		System.out.println("scoped "+x+"."+y);
+		// we assume valid, just gen code
+		String scope = x.getText();
+		if ( factory.g.getRule(x.getText())!=null ) {
+			scope = factory.gen.target.getRuleDynamicScopeStructName(scope);
+		}
+		chunks.add(new DynScopeAttrRef(scope, y.getText()));
 	}
 
 	public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
 	}
 
 	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index) {
+		List<ActionChunk> indexChunks = translateActionChunk(factory,rf,index.getText(),node);
+		chunks.add(new DynScopeAttrRef_negIndex(x.getText(), y.getText(), indexChunks));
 	}
 
 	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
+
 	}
 
 	public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index) {
+		List<ActionChunk> indexChunks = translateActionChunk(factory,rf,index.getText(),node);
+		chunks.add(new DynScopeAttrRef_index(x.getText(), y.getText(), indexChunks));
 	}
 
 	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {

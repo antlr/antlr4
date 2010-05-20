@@ -16,9 +16,9 @@ public class TestActionTranslation extends BaseTest {
 	String attributeTemplate =
 		"parser grammar A;\n"+
 		"@members {#members#<members>#end-members#}\n" +
-		"a[int x] returns [int y]\n" +
+		"a[int x, int x1] returns [int y]\n" +
 		"@init {#init#<init>#end-init#}\n" +
-		"    :   id=ID ids+=ID lab=b[34] {\n" +
+		"    :   id=ID ids+=ID lab=b[34] c d {\n" +
 		"		 #inline#<inline>#end-inline#\n" +
 		"		 }\n" +
 		"		 c\n" +
@@ -27,29 +27,24 @@ public class TestActionTranslation extends BaseTest {
 		"b[int d] returns [int e]\n" +
 		"    :   {#inline2#<inline2>#end-inline2#}\n" +
 		"    ;\n" +
-		"c   :   ;\n" +
+		"c returns [int x, int y] : ;\n" +
 		"d	 :   ;\n";
 
 	String scopeTemplate =
 		"parser grammar A;\n"+
 		"@members {\n" +
-		"<members>\n" +
+		"#members#<members>#end-members#\n" +
 		"}\n" +
 		"scope S { int i; }\n" +
-		"a[int x] returns [int y]\n" +
+		"a\n" +
 		"scope { int z; }\n" +
 		"scope S;\n" +
-		"@init {<init>}\n" +
-		"    :   lab=b[34] {\n" +
-		"		 <inline>" +
+		"@init {#init#<init>#end-init#}\n" +
+		"    :   {\n" +
+		"		 #inline#<inline>#end-inline#" +
 		"		 }\n" +
 		"    ;\n" +
-		"    finally {<finally>}\n" +
-		"b[int d] returns [int e]\n" +
-		"scope { int f; }\n" +
-		"    :   {<inline2>}\n" +
-		"    ;\n" +
-		"c   :   ;";
+		"    finally {#finally#<finally>#end-finally#}\n";
 	
     @Test public void testEscapedLessThanInAction() throws Exception {
         String action = "i<3; '<xmltag>'";
@@ -62,133 +57,125 @@ public class TestActionTranslation extends BaseTest {
     }
 
     @Test public void testEscaped$InAction() throws Exception {
-        String action = "int \\$n; \"\\$in string\\$\"";
+		String action = "int \\$n; \"\\$in string\\$\"";
+		String expected = "int \\$n; \"\\$in string\\$\"";
+		testActions(attributeTemplate, "members", action, expected);
+		testActions(attributeTemplate, "init", action, expected);
+		testActions(attributeTemplate, "inline", action, expected);
+		testActions(attributeTemplate, "finally", action, expected);
+		testActions(attributeTemplate, "inline2", action, expected);
     }
-    @Test public void testArguments() throws Exception {
-        String action = "$i; $i.x; $u; $u.x";
-    }
-    @Test public void testComplicatedArgParsing() throws Exception {
-        String action = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
-                        "\"a,oo\\nick\", {bl, \"fdkj\"eck}";
-    }
-    @Test public void testBracketArgParsing() throws Exception {
-    }
-    @Test public void testStringArgParsing() throws Exception {
-        String action = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
-    }
-    @Test public void testComplicatedSingleArgParsing() throws Exception {
-        String action = "(*a).foo(21,33,\",\")";
-    }
-    @Test public void testArgWithLT() throws Exception {
-        String action = "34<50";
-    }
-    @Test public void testGenericsAsArgumentDefinition() throws Exception {
-        String action = "$foo.get(\"ick\");";
-    }
-    @Test public void testGenericsAsArgumentDefinition2() throws Exception {
-        String action = "$foo.get(\"ick\"); x=3;";
-    }
-    @Test public void testGenericsAsReturnValue() throws Exception {
-    }
-    @Test public void testComplicatedArgParsingWithTranslation() throws Exception {
-        String action = "x, $A.text+\"3242\", (*$A).foo(21,33), 3.2+1, '\\n', "+
-                        "\"a,oo\\nick\", {bl, \"fdkj\"eck}";
-    }
-    @Test public void testRefToReturnValueBeforeRefToPredefinedAttr() throws Exception {
-        String action = "$x.foo";
-    }
-    @Test public void testRuleLabelBeforeRefToPredefinedAttr() throws Exception {
-        String action = "$x.text";
-    }
-    @Test public void testInvalidArguments() throws Exception {
-        String action = "$x";
-    }
-    @Test public void testReturnValue() throws Exception {
-        String action = "$x.i";
-    }
-    @Test public void testReturnValueWithNumber() throws Exception {
-        String action = "$x.i1";
-    }
-    @Test public void testReturnValues() throws Exception {
-        String action = "$i; $i.x; $u; $u.x";
-    }
+
+	@Test public void testComplicatedArgParsing() throws Exception {
+		String action = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expected = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		testActions(attributeTemplate, "members", action, expected);
+		testActions(attributeTemplate, "init", action, expected);
+		testActions(attributeTemplate, "inline", action, expected);
+		testActions(attributeTemplate, "finally", action, expected);
+		testActions(attributeTemplate, "inline2", action, expected);
+	}
+
+	@Test public void testComplicatedArgParsingWithTranslation() throws Exception {
+		String action = "x, $ID.text+\"3242\", (*$ID).foo(21,33), 3.2+1, '\\n', "+
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expected = "x, (_rID!=null?_rID.getText():null)+\"3242\"," +
+						  " (*_tID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+
+	@Test public void testArguments() throws Exception {
+		String action = "$x; $a.x";
+		String expected = "_ctx.x; _ctx.x";
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+
+	@Test public void testReturnValue() throws Exception {
+		String action = "$x; $a.x";
+		String expected = "_ctx.x; _ctx.x";
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+	
+	@Test public void testReturnValueWithNumber() throws Exception {
+		String action = "$a.x1";
+		String expected = "_ctx.x1";
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+
+	@Test public void testReturnValuesCurrentRule() throws Exception {
+		String action = "$y; $a.y;";
+		String expected = "_ctx.y; _ctx.y;";
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+
+	@Test public void testReturnValues() throws Exception {
+		String action = "$lab.e; $b.e;";
+		String expected = "lab.e; _rb.e;";
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+
     @Test public void testReturnWithMultipleRuleRefs() throws Exception {
-        String action1 = "$obj = $rule2.obj;";
-        String action2 = "$obj = $rule3.obj;";
-        String expecting1 = "obj = rule21;";
-        String expecting2 = "obj = rule32;";
-        String action = action1;
+		String action = "$c.x; $c.y;";
+		String expected = "_rc.x; _rc.y;";
+		testActions(attributeTemplate, "inline", action, expected);
     }
-    @Test public void testInvalidReturnValues() throws Exception {
-        String action = "$x";
+
+    @Test public void testTokenRefs() throws Exception {
+		String action = "$id; $ID; $id.text; $id.getText(); $id.line;";
+		String expected = "id; _tID; (id!=null?id.getText():null); id.getText(); (id!=null?id.getLine():0);";
+		testActions(attributeTemplate, "inline", action, expected);
     }
-    @Test public void testTokenLabels() throws Exception {
-        String action = "$id; $f; $id.text; $id.getText(); $id.dork " +
-                        "$id.type; $id.line; $id.pos; " +
-                        "$id.channel; $id.index;";
+
+    @Test public void testRuleRefs() throws Exception {
+        String action = "$lab.start; $c.tree;";
+		String expected = "(lab!=null?(()lab.start):null); (_rc!=null?(()_rc.tree):null);";
+		testActions(attributeTemplate, "inline", action, expected);
     }
-    @Test public void testRuleLabels() throws Exception {
-        String action = "$r.x; $r.start;\n $r.stop;\n $r.tree; $a.x; $a.stop;";
-    }
-    @Test public void testAmbiguRuleRef() throws Exception {
-    }
-    @Test public void testRuleLabelsWithSpecialToken() throws Exception {
-        String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-    }
-    @Test public void testForwardRefRuleLabels() throws Exception {
-        String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
-    }
-    @Test public void testInvalidRuleLabelAccessesParameter() throws Exception {
-        String action = "$r.z";
-    }
-    @Test public void testInvalidRuleLabelAccessesScopeAttribute() throws Exception {
-        String action = "$r.n";
-    }
-    @Test public void testInvalidRuleAttribute() throws Exception {
-        String action = "$r.blort";
-    }
-    @Test public void testMissingRuleAttribute() throws Exception {
-        String action = "$r";
-    }
-    @Test public void testMissingUnlabeledRuleAttribute() throws Exception {
-        String action = "$a";
-    }
-    @Test public void testNonDynamicAttributeOutsideRule() throws Exception {
-        String action = "public void foo() { $x; }";
-    }
-    @Test public void testNonDynamicAttributeOutsideRule2() throws Exception {
-        String action = "public void foo() { $x.y; }";
-    }
+	
     @Test public void testBasicGlobalScope() throws Exception {
-        String action = "$Symbols::names.add($id.text);";
+		String action = "$S::i";
+		String expected = "((S)S_stack.peek()).i";
+		testActions(scopeTemplate, "members", action, expected);
     }
-    @Test public void testUnknownGlobalScope() throws Exception {
-        String action = "$Symbols::names.add($id.text);";
-    }
-    @Test public void testIndexedGlobalScope() throws Exception {
-        String action = "$Symbols[-1]::names.add($id.text);";
-    }
+	
     @Test public void test0IndexedGlobalScope() throws Exception {
-        String action = "$Symbols[0]::names.add($id.text);";
+        String action = "$S[0]::i";
+		String expected = "(S_stack.elementAt(0)).i";
+		testActions(scopeTemplate, "members", action, expected);
     }
+
     @Test public void testAbsoluteIndexedGlobalScope() throws Exception {
-        String action = "$Symbols[3]::names.add($id.text);";
+        String action = "$S[3]::i";
+		String expected = "(S_stack.elementAt(3)).i";
+		testActions(scopeTemplate, "members", action, expected);
     }
-    @Test public void testScopeAndAttributeWithUnderscore() throws Exception {
-        String action = "$foo_bar::a_b;";
-    }
-    @Test public void testSharedGlobalScope() throws Exception {
-        String action = "$Symbols::x;";
-    }
-    @Test public void testGlobalScopeOutsideRule() throws Exception {
-        String action = "public void foo() {$Symbols::names.add('foo');}";
-    }
-    @Test public void testRuleScopeOutsideRule() throws Exception {
-        String action = "public void foo() {$a::name;}";
-    }
+
+	@Test public void testNegIndexedGlobalScope() throws Exception {
+		String action = "$S[-1]::i";
+		String expected = "(S_stack.elementAt(S_stack.size()-1-1)).i";
+		testActions(scopeTemplate, "members", action, expected);
+	}
+
+	@Test public void testNegIndexedGlobalScope2() throws Exception {
+		String action = "$S[-$S::i]::i";
+		String expected = "(S_stack.elementAt(S_stack.size()-(S_stack.peek()).i-1)).i";
+		testActions(scopeTemplate, "members", action, expected);
+	}
+
     @Test public void testBasicRuleScope() throws Exception {
-        String action = "$a::n;";
+        String action = "$a::z";
+		String expected = "(a_scope_stack.peek()).z";
+		testActions(scopeTemplate, "inline", action, expected);
     }
+
+	@Test public void testBasicGlobalScopeInRule() throws Exception {
+		String action = "$S::i";
+		String expected = "(S_stack.peek()).i";
+		testActions(scopeTemplate, "inline", action, expected);
+	}
+
     @Test public void testUnqualifiedRuleScopeAccessInsideRule() throws Exception {
         String action = "$n;";
     }
@@ -250,14 +237,6 @@ public class TestActionTranslation extends BaseTest {
     @Test public void testRuleLabelFromMultipleAlts() throws Exception {
         String action = "$b.text;"; // must be qualified
     }
-    @Test public void testUnknownDynamicAttribute() throws Exception {
-        String action = "$a::x";
-    }
-
-    @Test public void testUnknownGlobalDynamicAttribute() throws Exception {
-        String action = "$Symbols::x";
-    }
-
     @Test public void testUnqualifiedRuleScopeAttribute() throws Exception {
         String action = "$n;"; // must be qualified
     }
@@ -433,6 +412,29 @@ public class TestActionTranslation extends BaseTest {
         String action = "int x = $b::n;";
     }
 
+	@Test public void testBracketArgParsing() throws Exception {
+	}
+
+	@Test public void testStringArgParsing() throws Exception {
+		String action = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
+	}
+	@Test public void testComplicatedSingleArgParsing() throws Exception {
+		String action = "(*a).foo(21,33,\",\")";
+	}
+	@Test public void testArgWithLT() throws Exception {
+		String action = "34<50";
+	}
+	@Test public void testGenericsAsArgumentDefinition() throws Exception {
+		String action = "$foo.get(\"ick\");";
+	}
+	@Test public void testGenericsAsArgumentDefinition2() throws Exception {
+		String action = "$foo.get(\"ick\"); x=3;";
+	}
+	@Test public void testGenericsAsReturnValue() throws Exception {
+	}
+
+
+
 	public void testActions(String template, String actionName, String action, String expected) {
 		ST st = new ST(template);
 		st.add(actionName, action);
@@ -451,7 +453,7 @@ public class TestActionTranslation extends BaseTest {
 				CodeGenerator gen = new CodeGenerator(g);
 				ST outputFileST = gen.generate();
 				String output = outputFileST.render();
-				System.out.println(output);
+				//System.out.println(output);
 				String b = "#" + actionName + "#";
 				int start = output.indexOf(b);
 				String e = "#end-" + actionName + "#";

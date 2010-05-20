@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -13,7 +14,8 @@ public class Parser extends OutputModelObject {
 	public String name;
 	public Map<String,Integer> tokens;
 	public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
-	ParserFile file;
+	public List<DynamicScopeStruct> scopes = new ArrayList<DynamicScopeStruct>();
+	public ParserFile file;
 
 	public Parser(OutputModelFactory factory, ParserFile file) {
 		this.factory = factory;
@@ -24,12 +26,15 @@ public class Parser extends OutputModelObject {
 			Integer ttype = factory.g.tokenNameToTypeMap.get(t);
 			if ( ttype>0 ) tokens.put(t, ttype);
 		}
+		for (AttributeDict d : factory.g.scopes.values()) {
+			scopes.add( new DynamicScopeStruct(factory, d.name, d.attributes.values()) );
+		}
 		for (Rule r : factory.g.rules.values()) funcs.add( new RuleFunction(factory, r) );
 	}
 
 	@Override
 	public List<String> getChildren() {
 		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("funcs"); }};
+		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("funcs"); add("scopes"); }};
 	}
 }

@@ -59,9 +59,13 @@ public class RuleFunction extends OutputModelObject {
 			argsAndReturnValues.addAll(r.retvals.attributes.values());
 		}
 		if ( r.scope!=null ) {
-			scope = new DynamicScopeStruct(factory, factory.gen.target.getDynamicScopeStructName(r.name),
+			scope = new DynamicScopeStruct(factory, factory.gen.target.getRuleDynamicScopeStructName(r.name),
 										   r.scope.attributes.values());
 		}
+
+		//globalScopesUsed = new ArrayList<String>();
+		//for (Token t : r.useScopes) globalScopesUsed.add(t.getText());
+		globalScopesUsed = Utils.apply(r.useScopes, "getText");
 
 		if ( argsAndReturnValues.size()>0 ) {
 			context = new StructDecl(factory, factory.gen.target.getRuleFunctionContextStructName(r),

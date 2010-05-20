@@ -2,6 +2,7 @@ package org.antlr.v4.misc;
 
 import org.antlr.v4.tool.GrammarAST;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -116,5 +117,21 @@ public class Utils {
 			if ( v!=null ) x.add(v);
 		}
 		return x;
+	}
+
+	public static <From,To> List<To> apply(List<From> list, String methodName) {
+		if ( list==null ) return null;
+		List<To> b = new ArrayList<To>();
+		for (From f : list) {
+			try {
+				Method m = f.getClass().getMethod(methodName, (Class[])null);
+				To r = (To)m.invoke(f, (Object[])null);
+				b.add(r);
+			}
+			catch (Exception e) {
+				e.printStackTrace(System.err);
+			}
+		}
+		return b;
 	}
 }

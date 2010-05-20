@@ -26,7 +26,7 @@ import org.antlr.runtime.*;
 <parser>
 >>
 
-Parser(parser, funcs) ::= <<
+Parser(parser, scopes, funcs) ::= <<
 public class <parser.name> extends Parser {
 <!
 	public enum TokenType {
@@ -38,6 +38,7 @@ public class <parser.name> extends Parser {
 	}
 !>	
     <parser.tokens.keys:{k | public static final int <k>=<parser.tokens.(k)>;}; separator="\n">
+    <scopes>
     <namedActions.members>
     <parser:ctor()>
     <funcs; separator="\n">
@@ -67,12 +68,13 @@ RuleFunction(f,code,decls,context,scope,namedActions,finallyAction) ::= <<
 <scope>
 
 <if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.ctxType)><f.ctxType><else>void<endif> <f.name>(<f.ctxType> _ctx) throws RecognitionException {
-<if(f.scope)>
-    <f.scope.name>_stack.push(new <f.scope.name>());
-<endif>
 <if(f.ctxType)>
     state.ctx.push(_ctx);
 <endif>
+<if(f.scope)>
+    <f.scope.name>_stack.push(new <f.scope.name>());
+<endif>
+    <f.globalScopesUsed:{s | <s>_stack.push(new <s>());}; separator="\n">
     <namedActions.init>
     <decls; separator="\n">
 	try {
@@ -80,6 +82,7 @@ RuleFunction(f,code,decls,context,scope,namedActions,finallyAction) ::= <<
 	}
 	finally {
         <namedActions.after>
+        <f.globalScopesUsed:{s | <s>_stack.pop();}; separator="\n">
         <if(f.scope)><f.scope.name>_stack.pop();<endif>
         <finallyAction>
         <if(f.ctxType)>return (<f.ctxType>)state.ctx.pop();<endif>
@@ -214,6 +217,13 @@ RulePropertyRef_tree(r)  ::= "(<r.label>!=null?((<file.ASTLabelType>)<r.label>.t
 RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)state.input).toString(<r.label>.start,<r.label>.stop):null)"
 RulePropertyRef_st(r)    ::= "(<r.label>!=null?<r.label>.st:null)"
 
+DynScopeAttrRef(s)       ::= "(<s.scope>_stack.peek()).<s.attr>"
+DynScopeAttrRef_negIndex(s, indexChunks) ::= <<
+(<s.scope>_stack.elementAt(<s.scope>_stack.size()-<indexChunks>-1)).<s.attr>
+>>
+DynScopeAttrRef_index(s, indexChunks) ::=
+    "(<s.scope>_stack.elementAt(<indexChunks>)).<s.attr>"
+
 AddToList(a) ::= "<a.listName>.add(<first(a.opWithResultToAdd.labels)>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
@@ -237,7 +247,7 @@ DynamicScopeStruct(d,attrs) ::= <<
 public static class <d.name> {
     <attrs:{a | <a>;}; separator="\n">
 };
-public QStack\<<f.scope.name>\> <f.scope.name>_stack = new QStack\<<f.scope.name>\>();
+public QStack\<<d.name>\> <d.name>_stack = new QStack\<<d.name>\>();
 >>
 
 AttributeDecl(d) ::= "<d.decl>"

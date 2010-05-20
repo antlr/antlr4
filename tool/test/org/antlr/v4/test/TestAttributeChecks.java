@@ -62,11 +62,12 @@ public class TestAttributeChecks extends BaseTest {
 		"$a.q",			"error(31): A.g:4:10: unknown attribute q for rule a in $a.q\n",
     };
 
-    String[] inlineChecks = {
+	String[] inlineChecks = {
 		"$text",		"",
 		"$start",		"",
 		"$x = $y",		"",
 		"$y = $x",		"",
+		"$a.x = $a.y",	"",
 		"$lab.e",		"",
 		"$lab.text",	"",
 		"$b.e",			"",
@@ -76,24 +77,26 @@ public class TestAttributeChecks extends BaseTest {
 		"$id",			"",
 		"$id.text",		"",
 		"$ids",			"",
+	};
 
+	String[] bad_inlineChecks = {
 		"$a",			"error(33): A.g:6:4: missing attribute access on rule reference a in $a\n",
 		"$b",           "error(33): A.g:6:4: missing attribute access on rule reference b in $b\n",
 		"$lab",			"error(33): A.g:6:4: missing attribute access on rule reference lab in $lab\n",
 		"$c",			"error(33): A.g:6:4: missing attribute access on rule reference c in $c\n", // no scope
 		"$q",           "error(29): A.g:6:4: unknown attribute reference q in $q\n",
-        "$q.y",         "error(29): A.g:6:4: unknown attribute reference q in $q.y\n",
-        "$q = 3",       "error(29): A.g:6:4: unknown attribute reference q in $q\n",
-        "$q = 3;",      "error(29): A.g:6:4: unknown attribute reference q in $q = 3;\n",
-        "$q.y = 3;",    "error(29): A.g:6:4: unknown attribute reference q in $q.y = 3;\n",
-        "$q = $blort;", "error(29): A.g:6:4: unknown attribute reference q in $q = $blort;\n" +
+		"$q.y",         "error(29): A.g:6:4: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(29): A.g:6:4: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(29): A.g:6:4: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(29): A.g:6:4: unknown attribute reference q in $q.y = 3;\n",
+		"$q = $blort;", "error(29): A.g:6:4: unknown attribute reference q in $q = $blort;\n" +
 						"error(29): A.g:6:9: unknown attribute reference blort in $blort\n",
-        "$a.ick",       "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick\n",
-        "$a.ick = 3;",  "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick = 3;\n",
-        "$b.d",         "error(30): A.g:6:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
+		"$a.ick",       "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick = 3;\n",
+		"$b.d",         "error(30): A.g:6:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
 		"$d.text",      "error(29): A.g:6:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
 		"$lab.d",		"error(30): A.g:6:8: cannot access rule d's parameter: $lab.d\n",
-    };
+	};
 
 	String[] finallyChecks = {
 		"$text",		"",
@@ -213,6 +216,10 @@ public class TestAttributeChecks extends BaseTest {
 		testActions("inline", inlineChecks, attributeTemplate);
 	}
 
+	@Test public void testBadInlineActions() throws RecognitionException {
+		testActions("inline", bad_inlineChecks, attributeTemplate);
+	}
+
 	@Test public void testFinallyActions() throws RecognitionException {
 		testActions("finally", finallyChecks, attributeTemplate);
 	}
@@ -242,6 +249,24 @@ public class TestAttributeChecks extends BaseTest {
 		testErrors(new String[] {grammar, expected}, false);
 	}
 
+	@Test public void testNonDynamicAttributeOutsideRule() throws Exception {
+		String action = "public void foo() { $x; }";
+	}
+	@Test public void testNonDynamicAttributeOutsideRule2() throws Exception {
+		String action = "public void foo() { $x.y; }";
+	}
+    @Test public void testUnknownGlobalScope() throws Exception {
+        String action = "$Symbols::names.add($id.text);";
+    }
+	@Test public void testUnknownDynamicAttribute() throws Exception {
+		String action = "$a::x";
+	}
+
+	@Test public void testUnknownGlobalDynamicAttribute() throws Exception {
+		String action = "$Symbols::x";
+	}
+
+	
     public void testActions(String location, String[] pairs, String template) {
         for (int i = 0; i < pairs.length; i+=2) {
             String action = pairs[i];

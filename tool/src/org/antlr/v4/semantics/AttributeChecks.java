@@ -82,7 +82,8 @@ public class AttributeChecks implements ActionSplitterListener {
 		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
 			Rule rref = isolatedRuleRef(x.getText());
 			if ( rref!=null ) {
-				if ( rref!=null && rref.args!=null && rref.args.get(y.getText())!=null ) {
+				//if ( r.name.equals(x.getText()) ) return; // $a.x in rule a is ok
+				if ( rref.args!=null && rref.args.get(y.getText())!=null ) {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
 											  g.fileName, y, y.getText(), expr);
 				}

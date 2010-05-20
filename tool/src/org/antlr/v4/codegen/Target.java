@@ -135,7 +135,7 @@ public class Target {
 		if ( r.args==null && r.retvals==null ) return "ParserRuleContext";
 		return r.name+"_ctx";
 	}
-	public String getDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
+	public String getRuleDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
 
 	// should be same for all refs to same token like $ID within single rule function
 	public String getImplicitTokenLabel(String tokenName) { return "_t"+tokenName; }

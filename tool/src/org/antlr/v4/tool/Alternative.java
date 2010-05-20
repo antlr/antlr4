@@ -78,8 +78,7 @@ public class Alternative implements AttributeResolver {
 	 */
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
 		if ( rule.name.equals(x) ) { // x is this rule?
-			AttributeDict d = rule.getPredefinedScope(LabelType.RULE_LABEL);
-			return d.get(y);
+			return rule.resolveToAttribute(x, y, node);
 		}
         if ( tokenRefs.get(x)!=null ) { // token ref in this alt?
             return rule.getPredefinedScope(LabelType.TOKEN_LABEL).get(y);

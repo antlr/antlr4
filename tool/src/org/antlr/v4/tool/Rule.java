@@ -186,8 +186,7 @@ public class Rule implements AttributeResolver {
 	/** $x.y	Attribute: x is surrounding rule, label ref (in any alts) */
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
 		if ( this.name.equals(x) ) { // x is this rule?
-			AttributeDict d = getPredefinedScope(LabelType.RULE_LABEL);
-			return d.get(y);
+			return resolveToAttribute(y, node);
 		}
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		if ( anyLabelDef!=null ) {
@@ -221,7 +220,7 @@ public class Rule implements AttributeResolver {
 
 	public boolean resolvesToToken(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
-		if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
+		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
 		return false;
 	}
 
