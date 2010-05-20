@@ -43,7 +43,7 @@ public class BlankActionSplitterListener implements ActionSplitterListener {
 	public void setExprAttribute(String expr) {
 	}
 
-	public void setAttribute(String expr) {
+	public void setSTAttribute(String expr) {
 	}
 
 	public void templateExpr(String expr) {

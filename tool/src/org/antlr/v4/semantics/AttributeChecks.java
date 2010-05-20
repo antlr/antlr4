@@ -187,7 +187,7 @@ public class AttributeChecks implements ActionSplitterListener {
     public void templateInstance(String expr) {   }
     public void indirectTemplateInstance(String expr) {   }
     public void setExprAttribute(String expr) {   }
-    public void setAttribute(String expr) {  }
+    public void setSTAttribute(String expr) {  }
     public void templateExpr(String expr) {  }
 
 	// SUPPORT

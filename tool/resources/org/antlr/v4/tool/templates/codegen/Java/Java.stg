@@ -188,9 +188,26 @@ if (!(<p.ast.text>)) throw new FailedPredicateException(input, "<ruleName>", "<d
 ActionText(t) ::= "<t.text>"
 ArgRef(a) ::= "_ctx.<a.name>"
 RetValueRef(a) ::= "_ctx.<a.name>"
+QRetValueRef(a) ::= "<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<t.name>"
 SetAttr(s,rhsChunks) ::= "_ctx.<s.name> = <rhsChunks>;"
+SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
+
+TokenPropertyRef_text(t) ::= "(<t.label>!=null?<t.label>.getText():null)"
+TokenPropertyRef_type(t) ::= "(<t.label>!=null?<t.label>.getType():0)"
+TokenPropertyRef_line(t) ::= "(<t.label>!=null?<t.label>.getLine():0)"
+TokenPropertyRef_pos(t) ::= "(<t.label>!=null?<t.label>.getCharPositionInLine():0)"
+TokenPropertyRef_channel(t) ::= "(<t.label>!=null?<t.label>.getChannel():0)"
+TokenPropertyRef_index(t) ::= "(<t.label>!=null?<t.label>.getTokenIndex():0)"
+TokenPropertyRef_tree(t) ::= "<t.label>_tree"
+TokenPropertyRef_int(t) ::= "(<t.label>!=null?Integer.valueOf(<t.label>.getText()):0)"
+
+RulePropertyRef_start(r) ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.start):null)"
+RulePropertyRef_stop(r)  ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.stop):null)"
+RulePropertyRef_tree(r)  ::= "(<r.label>!=null?((<file.ASTLabelType>)<r.label>.tree):null)"
+RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)state.input).toString(<r.label>.start,<r.label>.stop):null)"
+RulePropertyRef_st(r)    ::= "(<r.label>!=null?<r.label>.st:null)"
 
 AddToList(a) ::= "<a.listName>.add(<a.opWithResultToAdd.label>);"
 

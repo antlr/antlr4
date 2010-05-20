@@ -11,11 +11,15 @@ public class ParserFile extends OutputModelObject {
 	public Parser parser;
 	public List<DFADecl> dfaDecls = new ArrayList<DFADecl>();
 	public List<BitSetDecl> bitSetDecls = new ArrayList<BitSetDecl>();
-	
+	public String TokenLabelType;
+	public String ASTLabelType;
+
 	public ParserFile(OutputModelFactory factory, String fileName) {
 		super(factory);
 		this.fileName = fileName;
 		factory.file = this;
+		TokenLabelType = factory.gen.g.getOption("TokenLabelType");
+		ASTLabelType = factory.gen.g.getOption("ASTLabelType");
 		parser = new Parser(factory, this);
 	}
 

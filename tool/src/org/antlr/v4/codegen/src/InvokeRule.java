@@ -39,7 +39,7 @@ public class InvokeRule extends SrcOp implements LabeledOp {
 			argExprs = ast.getChild(0).getText();
 		}
 
-		// If action refs as rulename not label, we need to define implicit label
+		// If action refs rule as rulename not label, we need to define implicit label
 		if ( factory.currentAlt.ruleRefsInActions.containsKey(ast.getText()) ) {
 			String label = factory.gen.target.getImplicitRuleLabel(ast.getText());
 			labels.add(label);

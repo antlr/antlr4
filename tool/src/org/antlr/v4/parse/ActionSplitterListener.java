@@ -18,8 +18,8 @@ public interface ActionSplitterListener {
 
     void templateInstance(String expr);
     void indirectTemplateInstance(String expr);
-    void setExprAttribute(String expr);
-    void setAttribute(String expr);
+    void setExprAttribute(String expr); // TODO: rename
+    void setSTAttribute(String expr);
     void templateExpr(String expr);
 
     void unknownSyntax(Token t);

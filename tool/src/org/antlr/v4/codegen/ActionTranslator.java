@@ -9,13 +9,34 @@ import org.antlr.v4.parse.ActionSplitterListener;
 import org.antlr.v4.tool.ActionAST;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Rule;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
+	public static final Map<String, Class> rulePropToModelMap = new HashMap<String, Class>() {{
+		put("start", RulePropertyRef_start.class);
+		put("stop", RulePropertyRef_stop.class);
+		put("tree", RulePropertyRef_tree.class);
+		put("text", RulePropertyRef_text.class);
+		put("st", RulePropertyRef_st.class);
+	}};
+
+	public static final Map<String, Class> tokenPropToModelMap = new HashMap<String, Class>() {{
+		put("text", TokenPropertyRef_text.class);
+		put("type", TokenPropertyRef_type.class);
+		put("line", TokenPropertyRef_line.class);
+		put("index", TokenPropertyRef_index.class);
+		put("pos", TokenPropertyRef_pos.class);
+		put("channel", TokenPropertyRef_channel.class);
+		put("tree", TokenPropertyRef_tree.class);
+		put("int", TokenPropertyRef_int.class);
+	}};
+
 	ActionAST node;
 	RuleFunction rf;
 	List<ActionChunk> chunks = new ArrayList<ActionChunk>();
@@ -60,7 +81,6 @@ public class ActionTranslator implements ActionSplitterListener {
 
 	public void attr(String expr, Token x) {
 		System.out.println("attr "+x);
-
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), node);
 		if ( a!=null ) {
 			switch ( a.dict.type ) {
@@ -70,21 +90,15 @@ public class ActionTranslator implements ActionSplitterListener {
 //			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
 			}
 		}
-		if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
-			return; // $S for scope S is ok
-		}
 		if ( node.resolver.resolvesToToken(x.getText(), node) ) {
-			if ( node.resolver.resolvesToLabel(x.getText(), node) ) {
-				chunks.add(new TokenRef(x.getText())); // $label
-			}
-			else { // $ID for token ref or label of token; find label
-				String label = factory.gen.target.getImplicitTokenLabel(x.getText());
-				chunks.add(new TokenRef(label)); // $label
-			}
+			chunks.add(new TokenRef(getTokenLabel(x.getText()))); // $label
 			return;
 		}
 		if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
 			return; // $ids for ids+=ID etc...
+		}
+		if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
+			return; // $S for scope S is ok
 		}
 //		switch ( a.dict.type ) {
 //			case ARG: chunks.add(new ArgRef(x.getText())); break;
@@ -98,38 +112,31 @@ public class ActionTranslator implements ActionSplitterListener {
 //		}
 	}
 
+	/** $x.y = expr; */
 	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
+		System.out.println("setQAttr "+x+"."+y+"="+rhs);
+		// x has to be current rule; just set y attr
+		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
+		chunks.add(new SetAttr(y.getText(), rhsChunks));
 	}
 
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		System.out.println("qattr "+x+"."+y);
-		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
-			Rule rref = isolatedRuleRef(x.getText());
-			if ( rref!=null ) {
-				if ( rref!=null && rref.args!=null && rref.args.get(y.getText())!=null ) {
-					g.tool.errMgr.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
-											  g.fileName, y, y.getText(), expr);
-				}
-				else {
-					errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
-											  g.fileName, y, y.getText(), rref.name, expr);
-				}
-			}
-			else if ( !node.resolver.resolvesToAttributeDict(x.getText(), node) ) {
-				errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-										  g.fileName, x, x.getText(), expr);
-			}
-			else {
-				errMgr.grammarError(ErrorType.UNKNOWN_ATTRIBUTE_IN_SCOPE,
-										  g.fileName, y, y.getText(), expr);
-			}
+		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
+		switch ( a.dict.type ) {
+			case ARG: chunks.add(new ArgRef(y.getText())); break; // has to be current rule
+			case RET: chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
+			case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x, y));	break;
+			case TOKEN: chunks.add(getTokenPropertyRef(x, y));	break;
+//			case PREDEFINED_LEXER_RULE: chunks.add(new RetValueRef(x.getText())); break;
+//			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
 		}
 	}
 
 	public void setAttr(String expr, Token x, Token rhs) {
 		System.out.println("setAttr "+x+" "+rhs);
-		List<ActionChunk> exprchunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetAttr(x.getText(), exprchunks));
+		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
+		chunks.add(new SetAttr(x.getText(), rhsChunks));
 	}
 
 	public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
@@ -159,7 +166,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	public void setExprAttribute(String expr) {
 	}
 
-	public void setAttribute(String expr) {
+	public void setSTAttribute(String expr) {
 	}
 
 	public void templateExpr(String expr) {
@@ -170,6 +177,44 @@ public class ActionTranslator implements ActionSplitterListener {
 
 	public void text(String text) {
 		chunks.add(new ActionText(text));
+	}
+
+	TokenPropertyRef getTokenPropertyRef(Token x, Token y) {
+		try {
+			Class c = tokenPropToModelMap.get(y.getText());
+			Constructor ctor = c.getConstructor(new Class[] {String.class});
+			TokenPropertyRef ref =
+				(TokenPropertyRef)ctor.newInstance(getRuleLabel(x.getText()));
+			return ref;
+		}
+		catch (Exception e) {
+			factory.g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+		}
+		return null;
+	}
+
+	RulePropertyRef getRulePropertyRef(Token x, Token y) {
+		try {
+			Class c = rulePropToModelMap.get(y.getText());
+			Constructor ctor = c.getConstructor(new Class[] {String.class});
+			RulePropertyRef ref =
+				(RulePropertyRef)ctor.newInstance(getRuleLabel(x.getText()));
+			return ref;
+		}
+		catch (Exception e) {
+			factory.g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+		}
+		return null;
+	}
+
+	public String getTokenLabel(String x) {
+		if ( node.resolver.resolvesToLabel(x, node) ) return x;
+		return factory.gen.target.getImplicitTokenLabel(x);
+	}
+
+	public String getRuleLabel(String x) {
+		if ( node.resolver.resolvesToLabel(x, node) ) return x;
+		return factory.gen.target.getImplicitRuleLabel(x);
 	}
 
 //	public String getTokenLabel(String x, ActionAST node) {
