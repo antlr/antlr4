@@ -170,11 +170,11 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r) ::= <<
-<if(r.label)><r.label> = <endif><r.name>(new <r.ctxName>(<r.argExprs:{e|<e>,}><r.follow.name>));
+<if(r.labels)><r.labels:{l | <l> = }><endif><r.name>(new <r.ctxName>(<r.argExprs:{e|<e>,}><r.follow.name>));
 >>
 
 MatchToken(m) ::= <<
-<if(m.label)><m.label> = (Token)<endif>match(<m.name>, <m.follow.name>);
+<if(m.labels)><m.labels:{l | <l> = }>(Token)<endif>match(<m.name>, <m.follow.name>);
 >>
 
 // ACTION STUFF
@@ -188,6 +188,8 @@ if (!(<p.ast.text>)) throw new FailedPredicateException(input, "<ruleName>", "<d
 ActionText(t) ::= "<t.text>"
 ArgRef(a) ::= "_ctx.<a.name>"
 RetValueRef(a) ::= "_ctx.<a.name>"
+/** How to translate $tokenLabel */
+TokenRef(t) ::= "<t.name>"
 SetAttr(s,rhsChunks) ::= "_ctx.<s.name> = <rhsChunks>;"
 
 AddToList(a) ::= "<a.listName>.add(<a.opWithResultToAdd.label>);"

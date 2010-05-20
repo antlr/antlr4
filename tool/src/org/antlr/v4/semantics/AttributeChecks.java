@@ -8,7 +8,9 @@ import org.antlr.v4.tool.*;
 
 import java.util.List;
 
-/** Trigger checks for various kinds of attribute expressions. no side-effects */
+/** Trigger checks for various kinds of attribute expressions.
+ *  no side-effects.
+ */
 public class AttributeChecks implements ActionSplitterListener {
     public Grammar g;
     public Rule r;          // null if action outside of rule
@@ -89,7 +91,7 @@ public class AttributeChecks implements ActionSplitterListener {
 											  g.fileName, y, y.getText(), rref.name, expr);
 				}
 			}
-			else if ( !resolvesToAttributeDict(x.getText()) ) {
+			else if ( !node.resolver.resolvesToAttributeDict(x.getText(), node) ) {
 				errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
 										  g.fileName, x, x.getText(), expr);
 			}
@@ -113,7 +115,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
 				return; // $S for scope S is ok
 			}
-			if ( resolvesToToken(x.getText()) ) {
+			if ( node.resolver.resolvesToToken(x.getText(), node) ) {
 				return; // $ID for token ref or label of token
 			}
 			if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
@@ -214,38 +216,5 @@ public class AttributeChecks implements ActionSplitterListener {
 		}
         return null;
     }
-
-	public boolean resolvesToAttributeDict(String x) {
-		if ( resolvesToToken(x) ) return true;
-		if ( node.resolver instanceof Grammar ) return g.scopes.get(x)!=null;
-
-		if ( x.equals(r.name) ) return true; // $r for action in rule r, $r is a dict
-		Rule r = g.getRule(x);
-		if ( r!=null && r.scope!=null ) return true;
-		if ( g.scopes.get(x)!=null ) return true;
-		return false;
-	}
-
-	public boolean resolvesToToken(String x) {
-		if ( node.resolver instanceof Grammar ) return false;
-
-		if ( node.resolver instanceof Alternative &&
-			 ((Alternative)node.resolver).tokenRefs.get(x)!=null )
-		{
-			return true;
-		}
-		List<LabelElementPair> labels = null;
-		if ( node.resolver instanceof Rule ) {
-			labels = r.getLabelDefs().get(x);
-		}
-		else if ( node.resolver instanceof Alternative ) {
-			labels = ((Alternative)node.resolver).labelDefs.get(x);
-		}
-		if ( labels!=null ) { // it's a label ref. is it a token label?
-			LabelElementPair anyLabelDef = labels.get(0);
-			if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
-		}
-		return false;
-	}
 
 }

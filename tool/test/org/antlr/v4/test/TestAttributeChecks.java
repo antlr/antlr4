@@ -233,6 +233,15 @@ public class TestAttributeChecks extends BaseTest {
 		testActions("finally", dynFinallyChecks, scopeTemplate);
 	}
 
+	@Test public void testTokenRef() throws RecognitionException {
+		String grammar =
+			"parser grammar S;\n" +
+			"a : x=ID {Token t = $x; t = $ID;} ;\n";
+		String expected =
+			"";
+		testErrors(new String[] {grammar, expected}, false);
+	}
+
     public void testActions(String location, String[] pairs, String template) {
         for (int i = 0; i < pairs.length; i+=2) {
             String action = pairs[i];

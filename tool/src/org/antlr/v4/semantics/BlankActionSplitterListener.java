@@ -1,4 +1,4 @@
-package org.antlr.v4.test;
+package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ActionSplitterListener;

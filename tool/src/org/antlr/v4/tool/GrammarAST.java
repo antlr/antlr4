@@ -50,6 +50,14 @@ public class GrammarAST extends CommonTree {
 		return nodes;
 	}
 
+	public AltAST getOutermostAltNode() {
+		if ( this instanceof AltAST && parent.parent instanceof RuleAST ) {
+			return (AltAST)this;
+		}
+		if ( parent!=null ) return ((GrammarAST)parent).getOutermostAltNode();
+		return null;
+	}
+
 //	@Override
 //	public boolean equals(Object obj) {
 //		return super.equals(obj);

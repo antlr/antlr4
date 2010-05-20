@@ -25,7 +25,7 @@
 */
 
 /** Collects rules, terminals, strings, actions, scopes etc... from AST
- *  Side-effects: None
+ *  No side-effects
  */
 tree grammar CollectSymbols;
 options {
@@ -167,7 +167,10 @@ rule
 
 setAlt
 	:	{inContext("RULE BLOCK")}? ( ALT | ALT_REWRITE )
-		{currentAlt = $start.getChildIndex()+1;}
+		{
+		currentAlt = $start.getChildIndex()+1;
+		currentRule.alt[currentAlt].ast = (AltAST)$start;
+		}
 	;
 	
 finishRule
@@ -264,7 +267,7 @@ terminal
     	terminals.add($start);
     	strings.add($STRING_LITERAL.text);
     	if ( currentRule!=null ) {
-    		currentRule.alt[currentAlt].tokenRefs.map($STRING_LITERAL.text, $STRING_LITERAL);
+    		currentRule.alt[currentAlt].tokenRefs.map($STRING_LITERAL.text, (TerminalAST)$STRING_LITERAL);
     	}
     	}
     |	TOKEN_REF
@@ -272,7 +275,7 @@ terminal
     	terminals.add($TOKEN_REF);
     	tokenIDRefs.add($TOKEN_REF);
     	if ( currentRule!=null ) {
-    		currentRule.alt[currentAlt].tokenRefs.map($TOKEN_REF.text, $TOKEN_REF);
+    		currentRule.alt[currentAlt].tokenRefs.map($TOKEN_REF.text, (TerminalAST)$TOKEN_REF);
     	}
     	}
     ;

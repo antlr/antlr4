@@ -10,6 +10,19 @@ public class CodeGenPipeline {
 	}
 	public void process() {
 		CodeGenerator gen = new CodeGenerator(g);
+
+//		for (Rule r : g.rules.values()) {
+//			for (int i=1; i<=r.numberOfAlts; i++) {
+//				Alternative alt = r.alt[i];
+//				for (String ref : alt.tokenRefs.keySet()) {
+//					if ( alt.tokenRefsInActions.get(ref)!=null ) {
+//						String label = gen.target.getImplicitTokenLabel(ast);
+//						alt.implicitTokenLabels.put(, label);
+//					}
+//				}
+//			}
+//		}
+
 		ST outputFileST = gen.generate();
 		gen.write(outputFileST);
 //		if ( g.isLexer() ) processLexer();

@@ -4,6 +4,7 @@ import org.antlr.v4.automata.DFA;
 import org.antlr.v4.codegen.src.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.BlockAST;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
@@ -18,7 +19,8 @@ public abstract class OutputModelFactory {
 
 	// Context ptrs
 	public OutputModelObject file; // root
-	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();	
+	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
+	public Alternative currentAlt; 
 
 	protected OutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;

@@ -37,6 +37,7 @@ import org.antlr.v4.analysis.DFAMinimizer;
 import org.antlr.v4.analysis.LexerNFAToDFAConverter;
 import org.antlr.v4.analysis.PredictionDFAFactory;
 import org.antlr.v4.automata.*;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 import org.junit.After;
@@ -545,9 +546,28 @@ public abstract class BaseTest {
 			msg = msg.replaceAll("\n","\\\\n");
 			msg = msg.replaceAll("\r","\\\\r");
 			msg = msg.replaceAll("\t","\\\\t");
+
+			// ignore error number
+			expect = stripErrorNum(expect);
+			actual = stripErrorNum(actual);
             assertEquals("error in: "+msg,expect,actual);
         }
     }
+
+	// can be multi-line
+	//error(29): A.g:2:11: unknown attribute reference a in $a
+	//error(29): A.g:2:11: unknown attribute reference a in $a
+	String stripErrorNum(String errs) {
+		String[] lines = errs.split("\n");
+		for (int i=0; i<lines.length; i++) {
+			String s = lines[i];
+			int lp = s.indexOf('(');
+			int rp = s.indexOf(')', lp);
+			if ( lp<0 || rp<0 ) return s;
+			lines[i] = s.substring(0, lp) + s.substring(rp+1, s.length());
+		}
+		return Utils.join(lines, "\n");
+	}
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "<string>";

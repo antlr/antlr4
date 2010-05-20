@@ -36,7 +36,11 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo]
     ;
 
 alternative returns [CodeBlock omo]
-@init {List<SrcOp> elems = new ArrayList<SrcOp>();}
+@init {
+	List<SrcOp> elems = new ArrayList<SrcOp>();
+	if ( ((AltAST)$start).alt!=null ) factory.currentAlt = ((AltAST)$start).alt;
+
+}
     :	^(ALT_REWRITE a=alternative .)	
     |	^(ALT EPSILON) {$omo = factory.epsilon();}
     |   ^( ALT ( element {elems.addAll($element.omos);} )+ ) {$omo = factory.alternative(elems);}

@@ -121,7 +121,7 @@ public class Grammar implements AttributeResolver {
 		this("<string>", grammarText, listener);
 	}
 
-	/** For testing */
+	/** For testing; only builds trees; no sem anal */
 	public Grammar(String fileName, String grammarText, ANTLRToolListener listener)
 		throws RecognitionException
 	{
@@ -496,9 +496,17 @@ public class Grammar implements AttributeResolver {
 		return scopes.get(x);
 	}
 
+	public boolean resolvesToLabel(String x, ActionAST node) { return false; }
+
 	public boolean resolvesToListLabel(String x, ActionAST node) { return false; }
-	
-    /** Given a grammar type, what should be the default action scope?
+
+	public boolean resolvesToToken(String x, ActionAST node) { return false; }
+
+	public boolean resolvesToAttributeDict(String x, ActionAST node) {
+		return scopes.get(x)!=null;
+	}	
+
+	/** Given a grammar type, what should be the default action scope?
      *  If I say @members in a COMBINED grammar, for example, the
      *  default scope should be "parser".
      */

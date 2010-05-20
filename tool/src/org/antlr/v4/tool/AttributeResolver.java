@@ -31,6 +31,9 @@ package org.antlr.v4.tool;
  */
 public interface AttributeResolver {
 	public boolean resolvesToListLabel(String x, ActionAST node);
+	public boolean resolvesToLabel(String x, ActionAST node);
+	public boolean resolvesToAttributeDict(String x, ActionAST node);
+	public boolean resolvesToToken(String x, ActionAST node);
 	public Attribute resolveToAttribute(String x, ActionAST node);
 	public Attribute resolveToAttribute(String x, String y, ActionAST node);
 	public AttributeDict resolveToDynamicScope(String x, ActionAST node);

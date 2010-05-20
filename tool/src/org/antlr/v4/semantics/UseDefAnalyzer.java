@@ -23,5 +23,19 @@ public class UseDefAnalyzer {
 				}
 			}
 		}
-	}	
+	}
+
+	// side-effect: updates Alternative with refs in actions
+	public void trackTokenRuleRefsInActions(Grammar g) {
+		for (Rule r : g.rules.values()) {
+			for (int i=1; i<=r.numberOfAlts; i++) {
+				Alternative alt = r.alt[i];
+				for (ActionAST a : alt.actions) {
+					ActionSniffer sniffer =	new ActionSniffer(g, r, alt, a, a.token);
+					sniffer.examineAction();
+				}
+			}
+		}
+	}
+
 }

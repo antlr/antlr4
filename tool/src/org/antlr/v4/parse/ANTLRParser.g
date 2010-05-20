@@ -549,15 +549,15 @@ alternative
 @init { paraphrases.push("matching alternative"); }
 @after { paraphrases.pop(); }
     :	elements
-    	(	rewrite -> ^(ALT_REWRITE elements rewrite)
+    	(	rewrite -> ^(ALT_REWRITE<AltAST> elements rewrite)
     	|			-> elements
     	)
-    |	rewrite		-> ^(ALT_REWRITE ^(ALT EPSILON) rewrite) // empty alt with rewrite
-    |				-> ^(ALT EPSILON) // empty alt
+    |	rewrite		-> ^(ALT_REWRITE<AltAST> ^(ALT<AltAST> EPSILON) rewrite) // empty alt with rewrite
+    |				-> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
 elements
-    : e+=element+ -> ^(ALT $e+)
+    : e+=element+ -> ^(ALT<AltAST> $e+)
     ;
   
 element

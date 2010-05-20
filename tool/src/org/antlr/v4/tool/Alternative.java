@@ -12,11 +12,19 @@ import java.util.List;
 public class Alternative implements AttributeResolver {
     Rule rule;
 
+	public AltAST ast;
+
     // token IDs, string literals in this alt
-    public MultiMap<String, GrammarAST> tokenRefs = new MultiMap<String, GrammarAST>();
+    public MultiMap<String, TerminalAST> tokenRefs = new MultiMap<String, TerminalAST>();
+
+	// does not include labels
+	public MultiMap<String, GrammarAST> tokenRefsInActions = new MultiMap<String, GrammarAST>();
 
     // all rule refs in this alt
     public MultiMap<String, GrammarAST> ruleRefs = new MultiMap<String, GrammarAST>();
+
+	// does not include labels
+	public MultiMap<String, GrammarAST> ruleRefsInActions = new MultiMap<String, GrammarAST>();
 
     /** A list of all LabelElementPair attached to tokens like id=ID, ids+=ID */
     public MultiMap<String, LabelElementPair> labelDefs = new MultiMap<String, LabelElementPair>();
@@ -33,15 +41,36 @@ public class Alternative implements AttributeResolver {
 
     public Alternative(Rule r) { this.rule = r; }
 
+	public boolean resolvesToToken(String x, ActionAST node) {
+		if ( tokenRefs.get(x)!=null ) return true;
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
+		return false;
+	}
+
+//	public String getTokenLabel(String x, ActionAST node) {
+//		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+//		if ( anyLabelDef!=null ) return anyLabelDef.label.getText();
+//		if ( tokenRefs.get(x)!=null ) {
+//
+//		}
+//		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+//		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
+//		return false;
+//	}
+
+	public boolean resolvesToAttributeDict(String x, ActionAST node) {
+		if ( resolvesToToken(x, node) ) return true;
+		if ( x.equals(rule.name) ) return true; // $r for action in rule r, $r is a dict
+		if ( rule!=null && rule.scope!=null ) return true;
+		if ( rule.g.scopes.get(x)!=null ) return true;
+		return false;
+	}
+
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		return rule.resolveToAttribute(x, node); // reuse that code
-//		if ( rule.args==null ) return null;
-//		Attribute a = rule.args.get(x);   if ( a!=null ) return a;
-//		a = rule.retvals.get(x);          if ( a!=null ) return a;
-//		AttributeDict properties = rule.getPredefinedScope(LabelType.RULE_LABEL);
-//		return properties.get(x);
 	}
 
 	/** $x.y, x can be surrounding rule, token/rule/label ref. y is visible
@@ -73,6 +102,13 @@ public class Alternative implements AttributeResolver {
 		Rule r = resolveToRule(x);
 		if ( r!=null && r.scope !=null ) return r.scope;
 		return rule.resolveToDynamicScope(x, node);
+	}
+
+	public boolean resolvesToLabel(String x, ActionAST node) {
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		return anyLabelDef!=null &&
+			   (anyLabelDef.type==LabelType.TOKEN_LABEL ||
+				anyLabelDef.type==LabelType.RULE_LABEL);
 	}
 
 	public boolean resolvesToListLabel(String x, ActionAST node) {

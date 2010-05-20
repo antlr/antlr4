@@ -74,6 +74,13 @@ public class SemanticPipeline {
 		for (AttributeDict s : collector.scopes) g.defineScope(s);
 		for (GrammarAST a : collector.actions) g.defineAction(a);
 
+		// LINK ALT NODES WITH Alternatives
+		for (Rule r : g.rules.values()) {
+			for (int i=1; i<=r.numberOfAlts; i++) {
+				r.alt[i].ast.alt = r.alt[i];
+			}
+		}
+
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
 		symcheck.checkRuleArgs(g, collector.rulerefs);
 		identifyStartRules(collector);
@@ -101,6 +108,7 @@ public class SemanticPipeline {
 
 		UseDefAnalyzer usedef = new UseDefAnalyzer();
 		usedef.checkRewriteElementsPresentOnLeftSide(g, collector.rules);
+		usedef.trackTokenRuleRefsInActions(g);
 	}
 
 	void identifyStartRules(CollectSymbols collector) {

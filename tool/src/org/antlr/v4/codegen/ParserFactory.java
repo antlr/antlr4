@@ -32,8 +32,8 @@ public class ParserFactory extends OutputModelFactory {
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		InvokeRule r = new InvokeRule(this, ID, label);
 		AddToList a = null;
-		if ( label!=null && label.parent.getType()== ANTLRParser.PLUS_ASSIGN ) {
-			a = new AddToList(this, gen.target.getListLabel(r.label), r);
+		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
+			a = new AddToList(this, gen.target.getListLabel(label.getText()), r);
 		}
 		return Utils.list(r, a);
 	}
@@ -42,8 +42,8 @@ public class ParserFactory extends OutputModelFactory {
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		MatchToken m = new MatchToken(this, (TerminalAST) ID, label);
 		AddToList a = null;
-		if ( label!=null && label.parent.getType()== ANTLRParser.PLUS_ASSIGN ) {
-			a = new AddToList(this, gen.target.getListLabel(m.label), m);
+		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
+			a = new AddToList(this, gen.target.getListLabel(label.getText()), m);
 		}
 		return Utils.list(m, a);
 	}

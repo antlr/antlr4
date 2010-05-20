@@ -118,7 +118,7 @@ public class Rule implements AttributeResolver {
 	public Attribute resolveRetvalOrProperty(String y) {
 		if ( retvals!=null ) {
 			Attribute a = retvals.get(y);
-			if ( a!=null ) return retvals.get(y);
+			if ( a!=null ) return a;
 		}
 		AttributeDict d = getPredefinedScope(LabelType.RULE_LABEL);
 		return d.get(y);
@@ -163,8 +163,14 @@ public class Rule implements AttributeResolver {
         return defs;
     }
 
-	/**  $x		Attribute: rule arguments, return values, predefined rule prop,
-	 * 			or a token/rule list label.
+	public AttributeDict getUniqueDictFor(String x, ActionAST node) {
+		if ( name.equals(x) ) { // x is this rule?
+			return getPredefinedScope(LabelType.RULE_LABEL);
+		}
+		return null;
+	}
+
+	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		if ( args!=null ) {
@@ -202,11 +208,29 @@ public class Rule implements AttributeResolver {
 		return g.scopes.get(x);
 	}
 
+	public boolean resolvesToLabel(String x, ActionAST node) {
+		return false;
+	}
+
 	public boolean resolvesToListLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&
 			   (anyLabelDef.type==LabelType.RULE_LIST_LABEL ||
 				anyLabelDef.type==LabelType.TOKEN_LIST_LABEL);
+	}
+
+	public boolean resolvesToToken(String x, ActionAST node) {
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		if ( anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
+		return false;
+	}
+
+	public boolean resolvesToAttributeDict(String x, ActionAST node) {
+		if ( resolvesToToken(x, node) ) return true;
+		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict
+		if ( scope!=null ) return true;
+		if ( g.scopes.get(x)!=null ) return true;
+		return false;
 	}
 
 	public Rule resolveToRule(String x) {
