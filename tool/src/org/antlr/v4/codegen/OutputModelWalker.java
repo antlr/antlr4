@@ -55,7 +55,7 @@ public class OutputModelWalker {
 		// ENSURE TEMPLATE ARGS AND CHILD FIELDS MATCH UP
 		while ( it.hasNext() ) {
 			String argName = it.next();
-			if ( !kids.contains(argName) ) {
+			if ( kids==null || !kids.contains(argName) ) {
 				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, argName);
 				return st;
 			}

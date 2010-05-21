@@ -217,12 +217,18 @@ RulePropertyRef_tree(r)  ::= "(<r.label>!=null?((<file.ASTLabelType>)<r.label>.t
 RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)state.input).toString(<r.label>.start,<r.label>.stop):null)"
 RulePropertyRef_st(r)    ::= "(<r.label>!=null?<r.label>.st:null)"
 
-DynScopeAttrRef(s)       ::= "(<s.scope>_stack.peek()).<s.attr>"
-DynScopeAttrRef_negIndex(s, indexChunks) ::= <<
-(<s.scope>_stack.elementAt(<s.scope>_stack.size()-<indexChunks>-1)).<s.attr>
->>
-DynScopeAttrRef_index(s, indexChunks) ::=
-    "(<s.scope>_stack.elementAt(<indexChunks>)).<s.attr>"
+DynScopeRef(s)           ::= "<s.scope>_stack"
+DynScopeAttrRef(s)       ::= "<s.scope>_stack.peek().<s.attr>"
+DynScopeAttrRef_negIndex(s, indexChunks) ::= 
+    "<s.scope>_stack.get(<s.scope>_stack.size()-<indexChunks>-1).<s.attr>"
+DynScopeAttrRef_index(s, indexChunks)    ::=
+    "<s.scope>_stack.get(<indexChunks>).<s.attr>"
+SetDynScopeAttr(s, rhsChunks)            ::=
+    "<s.scope>_stack.peek().<s.attr> =<rhsChunks>;"
+SetDynScopeAttr_negIndex(s, indexChunks, rhsChunks) ::=
+    "<s.scope>_stack.get(<s.scope>_stack.size()-<indexChunks>-1).<s.attr> =<rhsChunks>;"
+SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
+    "<s.scope>_stack.get(<indexChunks>).<s.attr> =<rhsChunks>;"
 
 AddToList(a) ::= "<a.listName>.add(<first(a.opWithResultToAdd.labels)>);"
 

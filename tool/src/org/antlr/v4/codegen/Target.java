@@ -136,6 +136,7 @@ public class Target {
 		return r.name+"_ctx";
 	}
 	public String getRuleDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
+	public String getGlobalDynamicScopeStructName(String scopeName) { return scopeName; }
 
 	// should be same for all refs to same token like $ID within single rule function
 	public String getImplicitTokenLabel(String tokenName) { return "_t"+tokenName; }
