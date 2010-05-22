@@ -2,6 +2,7 @@ package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.analysis.LinearApproximator;
 import org.antlr.v4.automata.DFA;
+import org.antlr.v4.automata.DecisionState;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
@@ -18,6 +19,7 @@ public class LL1Choice extends Choice {
 	
 	public LL1Choice(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
+		this.decision = ((DecisionState)blkAST.nfaState).decision;
 		DFA dfa = factory.g.decisionDFAs.get(decision);
 		altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);
 		altLook = new ArrayList<String[]>();

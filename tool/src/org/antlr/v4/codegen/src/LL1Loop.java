@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** */
-public abstract class LL1Loop extends LL1Choice {
+public abstract class LL1Loop extends Choice {
 	public OutputModelObject expr;
 	public List<SrcOp> iteration;
 

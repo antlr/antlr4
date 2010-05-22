@@ -1,7 +1,6 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.analysis.LinearApproximator;
-import org.antlr.v4.automata.BlockStartState;
 import org.antlr.v4.automata.NFAState;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
@@ -22,7 +21,6 @@ public abstract class Choice extends SrcOp {
 	public Choice(OutputModelFactory factory, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
 		super(factory, blkOrEbnfRootAST);
 		this.alts = alts;
-		this.decision = ((BlockStartState)blkOrEbnfRootAST.nfaState).decision;
 
 		// TODO: use existing lookahead! don't compute
 		LinearApproximator approx = new LinearApproximator(factory.g, decision);
@@ -30,7 +28,7 @@ public abstract class Choice extends SrcOp {
 		expecting = approx.LOOK(decisionState);
 		System.out.println(blkOrEbnfRootAST.toStringTree()+" loop expecting="+expecting);
 
-		this.error = new ThrowNoViableAlt(factory, blkOrEbnfRootAST, expecting); 
+//		this.error = new ThrowNoViableAlt(factory, blkOrEbnfRootAST, expecting); 
 		this.sync = new Sync(factory, blkOrEbnfRootAST, expecting);
 	}
 
