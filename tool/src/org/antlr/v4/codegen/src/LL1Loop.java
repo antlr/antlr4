@@ -35,12 +35,12 @@ public abstract class LL1Loop extends LL1Choice {
 		}
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{
-			if ( sup!=null ) addAll(sup); add("expr"); add("iteration");
-		}};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup); add("expr"); add("iteration");
+//		}};
+//	}
 
 }

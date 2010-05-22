@@ -43,6 +43,12 @@ public class LABitSet {
 		this.EOF = EOF;
 	}
 
+	public static LABitSet of(int el) {
+		LABitSet s = new LABitSet(el + 1);
+		s.add(el);
+		return s;
+	}
+	
 	/** or this element into this set (grow as necessary to accommodate) */
 	public void add(int el) {
 		//System.out.println("add("+el+")");
@@ -57,7 +63,7 @@ public class LABitSet {
 	}
 	
 	public boolean member(int el) {
-		if ( el == Token.EOF && EOF ) return true;
+		if ( el == Token.EOF ) return EOF;
 		int n = wordNumber(el);
 		if (n >= bits.length) return false;
 		return (bits[n] & bitMask(el)) != 0;
@@ -123,24 +129,35 @@ public class LABitSet {
 		bits = newbits;
 	}
 
+	/** Get the first element you find and return it. */
+	public int getSingleElement() {
+		for (int i = 0; i < (bits.length << LOG_BITS); i++) {
+			if (member(i)) {
+				return i;
+			}
+		}
+		return Token.INVALID_TOKEN_TYPE;
+	}	
+
 	/** Transform a bit set into a string by formatting each element as an integer
 	 * separator The string to put in between elements
 	 * @return A commma-separated list of values
 	 */
 	public String toString() {
+		System.out.println("toStr");
 		StringBuffer buf = new StringBuffer();
 		String separator = ",";
 		boolean havePrintedAnElement = false;
 		buf.append('{');
+		if ( EOF ) { buf.append("EOF"); havePrintedAnElement=true; }
 
 		for (int i = 0; i < (bits.length << LOG_BITS); i++) {
+			System.out.println("i="+i);
 			if (member(i)) {
-				if (i > 0 && havePrintedAnElement ) {
+				if ( havePrintedAnElement ) {
 					buf.append(separator);
 				}
-				else {
-					buf.append(i);
-				}
+				buf.append(i);
 				havePrintedAnElement = true;
 			}
 		}

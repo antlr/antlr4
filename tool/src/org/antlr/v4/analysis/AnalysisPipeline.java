@@ -51,7 +51,7 @@ public class AnalysisPipeline {
 			System.out.println("\nDECISION "+s.decision);
 
 			// TRY LINEAR APPROX FIXED LOOKAHEAD FIRST
-			LinearApproximator lin = new LinearApproximator(g, s.decision);
+			LinearApproximator lin = new LinearApproximator(g);
 			DFA dfa = lin.createDFA(s);
 
 			// IF NOT LINEAR APPROX, TRY NFA TO DFA CONVERSION

@@ -32,9 +32,9 @@ public class Parser extends OutputModelObject {
 		for (Rule r : factory.g.rules.values()) funcs.add( new RuleFunction(factory, r) );
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("funcs"); add("scopes"); }};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("funcs"); add("scopes"); }};
+//	}
 }

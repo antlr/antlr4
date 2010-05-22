@@ -3,8 +3,6 @@ package org.antlr.v4.codegen.src;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
-import java.util.List;
-
 /** */
 public abstract class OutputModelObject {
 	public OutputModelFactory factory;
@@ -27,7 +25,7 @@ public abstract class OutputModelObject {
 	 *  of type OutputModelObject that should be walked to complete model.
 	 */
 	// TODO: make list of Fields to avoid repeated look up
-	public List<String> getChildren() {
-		return null;
-	}
+//	public List<String> getChildren() {
+//		return null;
+//	}
 }

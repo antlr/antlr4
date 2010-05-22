@@ -27,18 +27,15 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.misc.LABitSet;
 
 /** A mismatched char or Token or tree node */
 public class MismatchedTokenException extends RecognitionException {
-	public int expecting = Token.INVALID_TOKEN_TYPE;
-
 	/** Used for remote debugger deserialization */
 	public MismatchedTokenException() {;}
 
 	public MismatchedTokenException(BaseRecognizer recognizer, int expecting) {
-		super(recognizer);
-		this.expecting = expecting;
+		super(recognizer, LABitSet.of(expecting));
 	}
 
 	public String toString() {

@@ -13,6 +13,8 @@ public class LL1PlusBlock extends LL1Loop {
 	public String loopLabel;
 	public String loopCounterVar;
 	public String[] exitLook;
+	public ThrowEarlyExitException earlyExitError;
+
 	public LL1PlusBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
 		PlusBlockStartState plusStart = (PlusBlockStartState)blkAST.nfaState;
@@ -24,5 +26,15 @@ public class LL1PlusBlock extends LL1Loop {
 
 		loopLabel = factory.gen.target.getLoopLabel(blkAST);
 		loopCounterVar = factory.gen.target.getLoopCounter(blkAST);
+
+		this.earlyExitError = new ThrowEarlyExitException(factory, blkAST, expecting);
 	}
+
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup); add("earlyExitError");
+//		}};
+//	}	
 }

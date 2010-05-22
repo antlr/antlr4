@@ -106,11 +106,12 @@ public abstract class BaseRecognizer {
 			state.failed = false;
 			return matchedSymbol;
 		}
-		if ( state.backtracking>0 ) {
-			state.failed = true;
-			return matchedSymbol;
-		}
+//		if ( state.backtracking>0 ) {
+//			state.failed = true;
+//			return matchedSymbol;
+//		}
 		matchedSymbol = recoverFromMismatchedToken(ttype, follow);
+		System.out.println("rsync'd to "+matchedSymbol);
 		return matchedSymbol;
 	}
 
@@ -205,16 +206,16 @@ public abstract class BaseRecognizer {
 	 *  exception types.
 	 */
 	public String getErrorMessage(RecognitionException e) {
-		String[] tokenNames = getTokenNames(); 
+		String[] tokenNames = getTokenNames();
 		String msg = e.getMessage();
 		if ( e instanceof UnwantedTokenException ) {
 			UnwantedTokenException ute = (UnwantedTokenException)e;
 			String tokenName="<unknown>";
-			if ( ute.expecting== Token.EOF ) {
+			if ( ute.expecting.member(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {
-				tokenName = tokenNames[ute.expecting];
+				tokenName = tokenNames[ute.expecting.getSingleElement()];
 			}
 			msg = "extraneous input "+getTokenErrorDisplay(ute.getUnexpectedToken())+
 				" expecting "+tokenName;
@@ -222,22 +223,22 @@ public abstract class BaseRecognizer {
 		else if ( e instanceof MissingTokenException ) {
 			MissingTokenException mte = (MissingTokenException)e;
 			String tokenName="<unknown>";
-			if ( mte.expecting== Token.EOF ) {
+			if ( mte.expecting.member(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {
-				tokenName = tokenNames[mte.expecting];
+				tokenName = tokenNames[mte.expecting.getSingleElement()];
 			}
 			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			String tokenName="<unknown>";
-			if ( mte.expecting== Token.EOF ) {
+			if ( mte.expecting.member(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {
-				tokenName = tokenNames[mte.expecting];
+				tokenName = tokenNames[mte.expecting.getSingleElement()];
 			}
 			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
 				" expecting "+tokenName;
@@ -245,11 +246,11 @@ public abstract class BaseRecognizer {
 		else if ( e instanceof MismatchedTreeNodeException ) {
 			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
 			String tokenName="<unknown>";
-			if ( mtne.expecting==Token.EOF ) {
+			if ( mtne.expecting.member(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {
-				tokenName = tokenNames[mtne.expecting];
+				tokenName = tokenNames[mtne.expecting.getSingleElement()];
 			}
 			msg = "mismatched tree node: "+mtne.node+
 				" expecting "+tokenName;
@@ -310,6 +311,7 @@ public abstract class BaseRecognizer {
 	 *  so that it creates a new Java type.
 	 */
 	public String getTokenErrorDisplay(Token t) {
+		System.err.println("mmmm3");		
 		String s = t.getText();
 		if ( s==null ) {
 			if ( t.getType()==Token.EOF ) {
@@ -331,7 +333,7 @@ public abstract class BaseRecognizer {
 	 *  handle mismatched symbol exceptions but there could be a mismatched
 	 *  token that the match() routine could not recover from.
 	 */
-	public void recover(RecognitionException re) {
+	public void recover() {
 		if ( state.lastErrorIndex==state.input.index() ) {
 			// uh oh, another error at same token index; must be a case
 			// where LT(1) is in the recovery token set so nothing is
@@ -575,9 +577,9 @@ public abstract class BaseRecognizer {
 			e = new UnwantedTokenException(this, ttype);
 			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
-							   ((TokenStream)input).LT(1)+
-							   " since "+((TokenStream)input).LT(2)+" is what we want");
-			 */
+							   ((TokenStream)state.input).LT(1)+
+							   " since "+((TokenStream)state.input).LT(2)+" is what we want");
+							   */
 			beginResync();
 			state.input.consume(); // simply delete extra token
 			endResync();

@@ -567,11 +567,11 @@ element
 }
 @after { paraphrases.pop(); }
 	:	labeledElement
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$labeledElement.start,"BLOCK"] ^(ALT labeledElement ) ))
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$labeledElement.start,"BLOCK"] ^(ALT<AltAST> labeledElement ) ))
 		|				-> labeledElement
 		)
 	|	atom
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$atom.start,"BLOCK"] ^(ALT atom) ) )
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$atom.start,"BLOCK"] ^(ALT<AltAST> atom) ) )
 		|				-> atom
 		)
 	|	ebnf
@@ -581,7 +581,7 @@ element
 		|				-> SEMPRED
 		)
 	|   treeSpec
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT treeSpec ) ) )
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT<AltAST> treeSpec ) ) )
 		|				-> treeSpec
 		)
 	;

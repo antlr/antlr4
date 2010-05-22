@@ -48,7 +48,7 @@ public class InvokeRule extends SrcOp implements LabeledOp {
 		}
 
 		// compute follow
-		LinearApproximator approx = new LinearApproximator(factory.g, -1);
+		LinearApproximator approx = new LinearApproximator(factory.g);
 		IntervalSet fset = approx.LOOK(ast.nfaState.transition(0).target);
 		System.out.println("follow="+follow);
 		follow = factory.createFollowBitSet(ast, fset);

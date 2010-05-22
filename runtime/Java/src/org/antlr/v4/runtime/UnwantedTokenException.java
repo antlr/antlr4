@@ -44,9 +44,6 @@ public class UnwantedTokenException extends MismatchedTokenException {
 
 	public String toString() {
 		String exp = ", expected "+expecting;
-		if ( expecting==Token.INVALID_TOKEN_TYPE ) {
-			exp = "";
-		}
 		if ( token==null ) {
 			return "UnwantedTokenException(found="+null+exp+")";
 		}

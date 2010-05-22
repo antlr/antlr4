@@ -41,7 +41,7 @@ public class MissingTokenException extends MismatchedTokenException {
 	}
 
 	public int getMissingType() {
-		return expecting;
+		return expecting.getSingleElement();
 	}
 
 	public String toString() {

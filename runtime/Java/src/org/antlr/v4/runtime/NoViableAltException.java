@@ -28,32 +28,24 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.v4.runtime.misc.LABitSet;
 
 public class NoViableAltException extends RecognitionException {
-	public String grammarDecisionDescription;
-	public int decisionNumber;
-	public int stateNumber;
-
 	/** Used for remote debugger deserialization */
 	public NoViableAltException() {;}
 	
 	public NoViableAltException(BaseRecognizer recognizer,
-								String grammarDecisionDescription,
-								int decisionNumber,
-								int stateNumber)
+								LABitSet expecting)
 	{
-		super(recognizer);
-		this.grammarDecisionDescription = grammarDecisionDescription;
-		this.decisionNumber = decisionNumber;
-		this.stateNumber = stateNumber;
+		super(recognizer, expecting);
 	}
 
 	public String toString() {
 		if ( recognizer.state.input instanceof CharStream) {
-			return "NoViableAltException('"+(char)getUnexpectedType()+"'@["+grammarDecisionDescription+"])";
+			return "NoViableAltException('"+(char)getUnexpectedType()+", expecting "+expecting+")";
 		}
 		else {
-			return "NoViableAltException("+getUnexpectedType()+"@["+grammarDecisionDescription+"])";
+			return "NoViableAltException('"+getUnexpectedType()+", expecting "+expecting+")";
 		}
 	}
 }

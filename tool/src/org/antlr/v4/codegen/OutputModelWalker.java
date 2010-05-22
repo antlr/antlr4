@@ -11,18 +11,32 @@ import org.stringtemplate.v4.misc.BlankST;
 import java.lang.reflect.Field;
 import java.util.*;
 
-/** Convert output model tree to template hierarchy */
+/** Convert an output model tree to template hierarchy by walking
+ *  the output model. Each output model object has a corresponding template
+ *  of the same name.  An output model object can have nested objects.
+ *  We identify those nested objects by the list of arguments in the template
+ *  definition. For example, here is the definition of the parser template:
+ *
+ *  Parser(parser, scopes, funcs) ::= <<...>>
+ *
+ *  The first template argument is always the output model object from which
+ *  this walker will create the template. Any other arguments identify
+ *  the field names within the output model object of nested model objects.
+ *  So, in this case, template Parser is saying that output model object
+ *  Parser has two fields the walker should chase called a scopes and funcs.
+ *
+ *  This simple mechanism means we don't have to include code in every
+ *  output model object that says how to create the corresponding template.
+ */
 public class OutputModelWalker {
 	Tool tool;
 	STGroup templates;
-	//Map<Class, String> modelToTemplateMap;
 
 	public OutputModelWalker(Tool tool,
 							 STGroup templates)
 	{
 		this.tool = tool;
 		this.templates = templates;
-		//this.modelToTemplateMap = modelToTemplateMap;
 	}
 	
 	public ST walk(OutputModelObject omo) {
@@ -42,28 +56,17 @@ public class OutputModelWalker {
 			return st;
 		}
 
-		List<String> kids = omo.getChildren();
-
 		LinkedHashMap<String,FormalArgument> formalArgs = st.impl.formalArguments;
 		Set<String> argNames = formalArgs.keySet();
-		Iterator<String> it = argNames.iterator();
+		Iterator<String> arg_it = argNames.iterator();
 
 		// PASS IN OUTPUT MODEL OBJECT TO TEMPLATE
-		String modelArgName = it.next(); // ordered so this is first arg
+		String modelArgName = arg_it.next(); // ordered so this is first arg
 		st.add(modelArgName, omo);
 
-		// ENSURE TEMPLATE ARGS AND CHILD FIELDS MATCH UP
-		while ( it.hasNext() ) {
-			String argName = it.next();
-			if ( kids==null || !kids.contains(argName) ) {
-				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, argName);
-				return st;
-			}
-		}
-
 		// COMPUTE STs FOR EACH NESTED MODEL OBJECT NAMED AS ARG BY TEMPLATE
-		if ( kids!=null ) for (String fieldName : kids) {
-			if ( !argNames.contains(fieldName) ) continue; // they won't use so don't compute
+		while ( arg_it.hasNext() ) {
+			String fieldName = arg_it.next();
 			//System.out.println("computing ST for field "+fieldName+" of "+omo.getClass());
 			try {
 				Field fi = omo.getClass().getField(fieldName);

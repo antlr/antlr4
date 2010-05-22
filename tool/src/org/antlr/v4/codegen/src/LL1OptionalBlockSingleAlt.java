@@ -4,7 +4,6 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /** */
@@ -21,9 +20,9 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 		}
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("expr"); }};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup); add("expr"); }};
+//	}
 }

@@ -35,6 +35,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.v4.runtime.misc.LABitSet;
 
 /** The root of the ANTLR exception hierarchy.
  *
@@ -70,8 +71,7 @@ public class RecognitionException extends RuntimeException {
 	/** Who threw the exception? */
 	public BaseRecognizer recognizer;
 
-	/** What input stream did the error occur in? */
-	//public transient IntStream input;
+	public LABitSet expecting;
 
 	/** What is index of token/char were we looking at when the error occurred? */
 	public int index;
@@ -110,7 +110,12 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	public RecognitionException(BaseRecognizer recognizer) {
+		this(recognizer, null);
+	}
+
+	public RecognitionException(BaseRecognizer recognizer, LABitSet expecting) {
 		this.recognizer = recognizer;
+		this.expecting = expecting;
 		IntStream input = recognizer.state.input;
 		this.index = input.index();
 		if ( input instanceof TokenStream ) {
@@ -130,10 +135,6 @@ public class RecognitionException extends RuntimeException {
 			this.c = input.LA(1);
 		}
 	}
-
-//	public RecognitionException(IntStream input) {
-//		this.input = input;
-//	}
 
 	protected void extractInformationFromTreeNodeStream(IntStream input) {
 		TreeNodeStream nodes = (TreeNodeStream)input;

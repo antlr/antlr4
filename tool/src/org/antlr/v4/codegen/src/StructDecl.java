@@ -19,11 +19,11 @@ public class StructDecl extends Decl {
 		}
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{
-			if ( sup!=null ) addAll(sup); add("attrs");
-		}};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup); add("attrs");
+//		}};
+//	}
 }

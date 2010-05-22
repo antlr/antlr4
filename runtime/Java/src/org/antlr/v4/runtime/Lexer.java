@@ -227,7 +227,8 @@ public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource 
 		String msg = null;
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
-			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting "+getCharErrorDisplay(mte.expecting);
+			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting "+
+				  getCharErrorDisplay(mte.expecting.getSingleElement());
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;

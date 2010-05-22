@@ -105,13 +105,13 @@ public class RuleFunction extends OutputModelObject {
 		decls.add(d);
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{
-			if ( sup!=null ) addAll(sup);
-			add("context"); add("scope"); add("decls"); add("code");
-			add("finallyAction"); add("namedActions");
-		}};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup);
+//			add("context"); add("scope"); add("decls"); add("code");
+//			add("finallyAction"); add("namedActions");
+//		}};
+//	}
 }

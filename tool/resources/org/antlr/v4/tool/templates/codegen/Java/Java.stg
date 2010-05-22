@@ -80,6 +80,10 @@ RuleFunction(f,code,decls,context,scope,namedActions,finallyAction) ::= <<
 	try {
 	    <code>
 	}
+	catch (RecognitionException re) {
+		reportError(re);
+		recover();
+	}
 	finally {
         <namedActions.after>
         <f.globalScopesUsed:{s | <s>_stack.pop();}; separator="\n">
@@ -94,45 +98,45 @@ CodeBlock(c, ops) ::= <<
 <ops; separator="\n">
 >>
 
-LL1Choice(choice, alts) ::= <<
-switch ( input.LA(1) ) {
+LL1Choice(choice, alts, error) ::= <<
+switch ( state.input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
 	default :
-	    error
+		<error>
 }
 >>
 
 // follow set included as choice by analysis
 LL1OptionalBlock ::= LL1Choice
 
-LL1OptionalBlockSingleAlt(choice, expr, alts, preamble) ::= <<
+LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error) ::= <<
 <preamble; separator="\n">
 if ( <expr> ) {
     <alts; separator="\n">
 }
 else {
-    NoViableAltException nvae = new NoViableAltException("", 4, 0, input);
+    <error>
 }
 >>
 
-LL1StarBlock(choice, alts) ::= <<
+LL1StarBlock(choice, alts, error) ::= <<
 <choice.loopLabel>:
 while (true) {
-	switch ( input.LA(1) ) {
+	switch ( state.input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 		<alt>
 		break;}; separator="\n">
 		<cases(ttypes=choice.exitLook)>
 		    break <choice.loopLabel>;
 		default :
-		    error
+		    <error>
 	}
 }
 >>
 
-LL1StarBlockSingleAlt(choice, expr, alts, preamble, iteration) ::= <<
+LL1StarBlockSingleAlt(choice, expr, alts, preamble, iteration, error) ::= <<
 <preamble; separator="\n">
 while ( <expr> ) {
     <alts; separator="\n">
@@ -140,24 +144,26 @@ while ( <expr> ) {
 }
 >>
 
-LL1PlusBlock(choice, alts) ::= <<
+LL1PlusBlock(choice, alts, error, earlyExitError) ::= <<
 int <choice.loopCounterVar> = 0;
 <choice.loopLabel>:
 while (true) {
-	switch ( input.LA(1) ) {
+	switch ( state.input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
 		<cases(ttypes=choice.exitLook)>
 		    if ( <choice.loopCounterVar> >= 1 ) break <choice.loopLabel>;
-		    else error
+		    else <earlyExitError>
 		default :
-		    error
+		    <error>
 	}
 }
 >>
 
-LL1PlusBlockSingleAlt(choice, expr, alts, preamble, iteration) ::= <<
+LL1PlusBlockSingleAlt(choice, expr, alts, preamble, iteration,
+                      error, earlyExitError) ::=
+<<
 <preamble; separator="\n">
 do {
     <alts; separator="\n">
@@ -165,8 +171,11 @@ do {
 } while ( <expr> );
 >>
 
+ThrowNoViableAlt(t) ::= "throw new NoViableAlt(this, <t.expecting.name>);"
+ThrowEarlyExitException(t) ::= "throw new ThrowEarlyExitException(this, <t.expecting.name>);"
+
 TestSet(s) ::= <<
-<s.set.name>.member(input.LA(1))
+<s.set.name>.member(state.input.LA(1))
 >>
 
 TestSetInline(s) ::= <<
@@ -190,7 +199,7 @@ MatchToken(m) ::= <<
 Action(a, chunks) ::= "<chunks>"
 
 SemPred(p) ::= <<
-if (!(<p.ast.text>)) throw new FailedPredicateException(input, "<ruleName>", "<description>");
+if (!(<p.ast.text>)) throw new FailedPredicateException(this,"<ruleName>", "<description>");
 >>
 
 ActionText(t) ::= "<t.text>"
@@ -236,7 +245,7 @@ TokenDecl(t) ::= "Token <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 
-CaptureNextToken(d) ::= "<d.varName> = input.LA(1);"
+CaptureNextToken(d) ::= "<d.varName> = state.input.LA(1);"
 
 StructDecl(s,attrs) ::= <<
 public static class <s.name> extends ParserRuleContext {

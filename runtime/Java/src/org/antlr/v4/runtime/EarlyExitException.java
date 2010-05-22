@@ -27,15 +27,14 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.LABitSet;
+
 /**  The recognizer did not match anything for a (..)+ loop. */
 public class EarlyExitException extends RecognitionException {
-	public int decisionNumber;
-
 	/** Used for remote debugger deserialization */
 	public EarlyExitException() {;}
 	
-	public EarlyExitException(BaseRecognizer recognizer, int decisionNumber) {
-		super(recognizer);
-		this.decisionNumber = decisionNumber;
+	public EarlyExitException(BaseRecognizer recognizer, LABitSet expecting) {
+		super(recognizer, expecting);
 	}
 }

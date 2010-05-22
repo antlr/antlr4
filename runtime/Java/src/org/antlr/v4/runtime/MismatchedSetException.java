@@ -30,14 +30,11 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.LABitSet;
 
 public class MismatchedSetException extends RecognitionException {
-	public LABitSet expecting;
-
 	/** Used for remote debugger deserialization */
 	public MismatchedSetException() {;}
 
 	public MismatchedSetException(BaseRecognizer recognizer, LABitSet expecting) {
-		super(recognizer);
-		this.expecting = expecting;
+		super(recognizer, expecting);
 	}
 
 	public String toString() {

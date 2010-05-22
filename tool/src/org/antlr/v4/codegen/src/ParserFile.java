@@ -36,15 +36,15 @@ public class ParserFile extends OutputModelObject {
 		bitSetDecls.add(b);
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{
-			if ( sup!=null ) addAll(sup);
-			add("parser");
-			add("dfaDecls");
-			add("namedActions");
-			add("bitSetDecls");
-		}};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup);
+//			add("parser");
+//			add("dfaDecls");
+//			add("namedActions");
+//			add("bitSetDecls");
+//		}};
+//	}
 }

@@ -27,19 +27,18 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.LABitSet;
+
 /**
  */
 public class MismatchedTreeNodeException extends RecognitionException {
-	public int expecting;
-
 	public MismatchedTreeNodeException() {
 	}
 
 	public MismatchedTreeNodeException(BaseRecognizer recognizer,
 									   int expecting)
 	{
-		super(recognizer);
-		this.expecting = expecting;
+		super(recognizer, LABitSet.of(expecting));
 	}
 
 	public String toString() {

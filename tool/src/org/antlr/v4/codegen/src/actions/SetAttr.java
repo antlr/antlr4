@@ -1,6 +1,5 @@
 package org.antlr.v4.codegen.src.actions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /** */
@@ -13,12 +12,12 @@ public class SetAttr extends ActionChunk {
 		this.rhsChunks = rhsChunks;
 	}
 
-	@Override
-	public List<String> getChildren() {
-		final List<String> sup = super.getChildren();
-		return new ArrayList<String>() {{
-			if ( sup!=null ) addAll(sup);
-			add("rhsChunks");
-		}};
-	}
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup);
+//			add("rhsChunks");
+//		}};
+//	}
 }

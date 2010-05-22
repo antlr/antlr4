@@ -15,6 +15,7 @@ public class LL1Choice extends Choice {
 	public List<String[]> altLook;
 	/** Lookahead for each alt 1..n */
 	public IntervalSet[] altLookSets;
+	
 	public LL1Choice(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
 		DFA dfa = factory.g.decisionDFAs.get(decision);

@@ -65,13 +65,13 @@ public class LinearApproximator {
 	 */
 	OrderedHashSet<NFAConfig>[] configs;
 
-	public LinearApproximator(Grammar g, int decision) {
+	public LinearApproximator(Grammar g) {
 		this.g = g;
 		this.decision = decision;
 	}
 
-	public LinearApproximator(Grammar g, int decision, int k) {
-		this(g,decision);
+	public LinearApproximator(Grammar g, int k) {
+		this(g);
 		max_k = k;
 	}
 
