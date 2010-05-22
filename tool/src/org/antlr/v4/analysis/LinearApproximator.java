@@ -1,5 +1,6 @@
 package org.antlr.v4.analysis;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
@@ -65,13 +66,13 @@ public class LinearApproximator {
 	 */
 	OrderedHashSet<NFAConfig>[] configs;
 
-	public LinearApproximator(Grammar g) {
+	public LinearApproximator(Grammar g, int decision) {
 		this.g = g;
 		this.decision = decision;
 	}
 
-	public LinearApproximator(Grammar g, int k) {
-		this(g);
+	public LinearApproximator(Grammar g, int decision, int k) {
+		this(g, decision);
 		max_k = k;
 	}
 
@@ -212,6 +213,10 @@ public class LinearApproximator {
 		}
 	}
 
+	/** Compute FOLLOW of element but don't leave rule to compute global
+	 *  context-free FOLLOW.  Used for rule invocation, match token, and
+	 *  error sync'ing.
+	 */
 	public IntervalSet LOOK(NFAState s) {
 		System.out.println("LOOK("+s.stateNumber+")");
 		lookBusy.clear();
@@ -226,8 +231,9 @@ public class LinearApproximator {
 		if ( lookBusy.contains(ac) ) return;
 		lookBusy.add(ac);
 
-		if ( s instanceof RuleStopState && !context.isEmpty() ) {
-			_LOOK(context.returnState, context.parent, fset);
+		if ( s instanceof RuleStopState ) {
+			if ( !context.isEmpty() ) _LOOK(context.returnState, context.parent, fset);
+			else fset.add(Token.EOR_TOKEN_TYPE); // hit end of rule
 			return;
 		}
 

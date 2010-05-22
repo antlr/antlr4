@@ -102,7 +102,7 @@ public class TestLinearApproximateLookahead extends BaseTest {
 			return;
 		}
 		DecisionState blk = (DecisionState)s.transition(0).target;
-		LinearApproximator lin = new LinearApproximator(g);
+		LinearApproximator lin = new LinearApproximator(g,blk.decision);
 		DFA dfa = lin.createDFA(blk);
 		String result = null;
 		if ( dfa!=null ) result = dfa.toString();

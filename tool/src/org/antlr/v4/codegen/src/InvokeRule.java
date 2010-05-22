@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.analysis.LinearApproximator;
+import org.antlr.v4.automata.NFA;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.RuleContextDecl;
 import org.antlr.v4.misc.IntervalSet;
@@ -47,8 +48,7 @@ public class InvokeRule extends SrcOp implements LabeledOp {
 			factory.currentRule.peek().addDecl(d);
 		}
 
-		// compute follow
-		LinearApproximator approx = new LinearApproximator(factory.g);
+		LinearApproximator approx = new LinearApproximator(factory.g, NFA.INVALID_DECISION_NUMBER);
 		IntervalSet fset = approx.LOOK(ast.nfaState.transition(0).target);
 		System.out.println("follow="+follow);
 		follow = factory.createFollowBitSet(ast, fset);

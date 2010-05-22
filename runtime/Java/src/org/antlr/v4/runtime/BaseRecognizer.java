@@ -83,7 +83,6 @@ public abstract class BaseRecognizer {
 		}
 	}
 
-
 	/** Match current input symbol against ttype.  Attempt
 	 *  single token insertion or deletion error recovery.  If
 	 *  that fails, throw MismatchedTokenException.
@@ -113,6 +112,15 @@ public abstract class BaseRecognizer {
 		matchedSymbol = recoverFromMismatchedToken(ttype, follow);
 		System.out.println("rsync'd to "+matchedSymbol);
 		return matchedSymbol;
+	}
+
+	// like matchSet but w/o consume; error checking routine.
+	public void sync(LABitSet expecting) {
+		if ( expecting.member(state.input.LA(1)) ) return;
+		LABitSet followSet = computeErrorRecoverySet();
+		followSet.orInPlace(expecting);
+		NoViableAltException e = new NoViableAltException(this, followSet);
+		recoverFromMismatchedSet(e, followSet);
 	}
 
 	/** Match the wildcard: in a symbol */
@@ -601,7 +609,6 @@ public abstract class BaseRecognizer {
 		throw e;
 	}
 
-	/** Not currently used */
 	public Object recoverFromMismatchedSet(RecognitionException e,
 										   LABitSet follow)
 		throws RecognitionException

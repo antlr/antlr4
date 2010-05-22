@@ -11,6 +11,7 @@ import java.util.Map;
 /** */
 public class NFA {
 	public static final int INVALID_ALT_NUMBER = -1;
+	public static final int INVALID_DECISION_NUMBER = -1;
 	
 	public Grammar g;
 	public List<NFAState> states = new ArrayList<NFAState>();
@@ -38,6 +39,7 @@ public class NFA {
 	public int defineDecisionState(DecisionState s) {
 		decisionToNFAState.add(s);
 		s.decision = decisionToNFAState.size()-1;
+		System.out.println("dec state "+s.stateNumber+" gets dec # "+s.decision);
 		return s.decision;
 	}
 }

@@ -17,18 +17,21 @@ public abstract class Choice extends SrcOp {
 	public List<SrcOp> preamble;
 	public IntervalSet expecting;
 	public ThrowNoViableAlt error;
+	public Sync sync;
 
 	public Choice(OutputModelFactory factory, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
 		super(factory, blkOrEbnfRootAST);
 		this.alts = alts;
 		this.decision = ((BlockStartState)blkOrEbnfRootAST.nfaState).decision;
 
-		LinearApproximator approx = new LinearApproximator(factory.g);
+		// TODO: use existing lookahead! don't compute
+		LinearApproximator approx = new LinearApproximator(factory.g, decision);
 		NFAState decisionState = ast.nfaState;
 		expecting = approx.LOOK(decisionState);
-		System.out.println("expecting="+expecting);
+		System.out.println(blkOrEbnfRootAST.toStringTree()+" loop expecting="+expecting);
 
 		this.error = new ThrowNoViableAlt(factory, blkOrEbnfRootAST, expecting); 
+		this.sync = new Sync(factory, blkOrEbnfRootAST, expecting);
 	}
 
 	public void addPreambleOp(SrcOp op) {

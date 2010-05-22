@@ -121,7 +121,7 @@ else {
 }
 >>
 
-LL1StarBlock(choice, alts, error) ::= <<
+LL1StarBlock(choice, alts, error, sync) ::= <<
 <choice.loopLabel>:
 while (true) {
 	switch ( state.input.LA(1) ) {
@@ -130,21 +130,22 @@ while (true) {
 		break;}; separator="\n">
 		<cases(ttypes=choice.exitLook)>
 		    break <choice.loopLabel>;
-		default :
-		    <error>
 	}
+    <sync>
 }
 >>
 
-LL1StarBlockSingleAlt(choice, expr, alts, preamble, iteration, error) ::= <<
+LL1StarBlockSingleAlt(choice, expr, alts, preamble, iteration, error, sync) ::= <<
 <preamble; separator="\n">
 while ( <expr> ) {
     <alts; separator="\n">
     <iteration>
+    <sync>
 }
 >>
 
-LL1PlusBlock(choice, alts, error, earlyExitError) ::= <<
+LL1PlusBlock(choice, alts, error, earlyExitError, sync) ::= <<
+<sync>
 int <choice.loopCounterVar> = 0;
 <choice.loopLabel>:
 while (true) {
@@ -155,21 +156,24 @@ while (true) {
 		<cases(ttypes=choice.exitLook)>
 		    if ( <choice.loopCounterVar> >= 1 ) break <choice.loopLabel>;
 		    else <earlyExitError>
-		default :
-		    <error>
 	}
+    <sync>
 }
 >>
 
 LL1PlusBlockSingleAlt(choice, expr, alts, preamble, iteration,
-                      error, earlyExitError) ::=
+                      error, earlyExitError, sync) ::=
 <<
+<sync>
 <preamble; separator="\n">
 do {
     <alts; separator="\n">
     <iteration>
+    <sync>
 } while ( <expr> );
 >>
+
+Sync(s) ::= "sync(<s.expecting.name>);"
 
 ThrowNoViableAlt(t) ::= "throw new NoViableAlt(this, <t.expecting.name>);"
 ThrowEarlyExitException(t) ::= "throw new ThrowEarlyExitException(this, <t.expecting.name>);"

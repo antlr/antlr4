@@ -9,7 +9,7 @@ import java.util.List;
 
 /** */
 public abstract class LL1Loop extends LL1Choice {
-	public Object expr;
+	public OutputModelObject expr;
 	public List<SrcOp> iteration;
 
 	public LL1Loop(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
@@ -21,7 +21,7 @@ public abstract class LL1Loop extends LL1Choice {
 		iteration.add(op);
 	}
 
-	public void addLookaheadTempVar(IntervalSet look) {
+	public void addCodeForLookaheadTempVar(IntervalSet look) {
 		expr = factory.getLL1Test(look, ast);
 		if ( expr instanceof TestSetInline ) {
 			TestSetInline e = (TestSetInline) expr;
@@ -30,8 +30,6 @@ public abstract class LL1Loop extends LL1Choice {
 			CaptureNextToken nextToken = new CaptureNextToken(e.varName);
 			addPreambleOp(nextToken);
 			addIterationOp(nextToken);
-			iteration = new ArrayList<SrcOp>();
-			iteration.add(nextToken);
 		}
 	}
 

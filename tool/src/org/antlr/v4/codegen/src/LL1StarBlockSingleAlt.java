@@ -11,6 +11,6 @@ public class LL1StarBlockSingleAlt extends LL1Loop {
 	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
 		IntervalSet look = altLookSets[1];
-		addLookaheadTempVar(look);
+		addCodeForLookaheadTempVar(look);
 	}
 }
