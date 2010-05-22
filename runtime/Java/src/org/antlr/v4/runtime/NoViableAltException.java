@@ -28,7 +28,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.runtime.CharStream;
-import org.antlr.runtime.IntStream;
 
 public class NoViableAltException extends RecognitionException {
 	public String grammarDecisionDescription;
@@ -38,19 +37,19 @@ public class NoViableAltException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public NoViableAltException() {;}
 	
-	public NoViableAltException(String grammarDecisionDescription,
+	public NoViableAltException(BaseRecognizer recognizer,
+								String grammarDecisionDescription,
 								int decisionNumber,
-								int stateNumber,
-								IntStream input)
+								int stateNumber)
 	{
-		super(input);
+		super(recognizer);
 		this.grammarDecisionDescription = grammarDecisionDescription;
 		this.decisionNumber = decisionNumber;
 		this.stateNumber = stateNumber;
 	}
 
 	public String toString() {
-		if ( input instanceof CharStream) {
+		if ( recognizer.state.input instanceof CharStream) {
 			return "NoViableAltException('"+(char)getUnexpectedType()+"'@["+grammarDecisionDescription+"])";
 		}
 		else {

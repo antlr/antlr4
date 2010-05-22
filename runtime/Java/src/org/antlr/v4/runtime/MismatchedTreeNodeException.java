@@ -27,8 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.tree.TreeNodeStream;
-
 /**
  */
 public class MismatchedTreeNodeException extends RecognitionException {
@@ -37,8 +35,10 @@ public class MismatchedTreeNodeException extends RecognitionException {
 	public MismatchedTreeNodeException() {
 	}
 
-	public MismatchedTreeNodeException(int expecting, TreeNodeStream input) {
-		super(input);
+	public MismatchedTreeNodeException(BaseRecognizer recognizer,
+									   int expecting)
+	{
+		super(recognizer);
 		this.expecting = expecting;
 	}
 

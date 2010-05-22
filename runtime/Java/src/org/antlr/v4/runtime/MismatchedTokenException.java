@@ -27,7 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 
 /** A mismatched char or Token or tree node */
@@ -37,8 +36,8 @@ public class MismatchedTokenException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public MismatchedTokenException() {;}
 
-	public MismatchedTokenException(int expecting, IntStream input) {
-		super(input);
+	public MismatchedTokenException(BaseRecognizer recognizer, int expecting) {
+		super(recognizer);
 		this.expecting = expecting;
 	}
 

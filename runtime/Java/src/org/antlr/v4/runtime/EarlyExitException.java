@@ -27,8 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
-
 /**  The recognizer did not match anything for a (..)+ loop. */
 public class EarlyExitException extends RecognitionException {
 	public int decisionNumber;
@@ -36,8 +34,8 @@ public class EarlyExitException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public EarlyExitException() {;}
 	
-	public EarlyExitException(int decisionNumber, IntStream input) {
-		super(input);
+	public EarlyExitException(BaseRecognizer recognizer, int decisionNumber) {
+		super(recognizer);
 		this.decisionNumber = decisionNumber;
 	}
 }

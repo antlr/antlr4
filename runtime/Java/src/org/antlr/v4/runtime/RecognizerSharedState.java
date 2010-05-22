@@ -30,6 +30,7 @@ package org.antlr.v4.runtime;
 import org.antlr.runtime.IntStream;
 import org.antlr.v4.runtime.misc.QStack;
 
+import java.util.List;
 import java.util.Map;
 
 /** The set of fields needed by an abstract recognizer to recognize input
@@ -76,6 +77,8 @@ public class RecognizerSharedState {
 	 *  This is only used if rule memoization is on (which it is by default).
 	 */
 	public Map[] ruleMemo;
+
+	List<ANTLRParserListener> listeners;
 
 	public RecognizerSharedState() {
         this.ctx = new QStack<RuleContext>();		

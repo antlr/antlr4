@@ -67,8 +67,11 @@ import org.antlr.runtime.tree.TreeNodeStream;
  *  figure out a fancy report.
  */
 public class RecognitionException extends RuntimeException {
+	/** Who threw the exception? */
+	public BaseRecognizer recognizer;
+
 	/** What input stream did the error occur in? */
-	public transient IntStream input;
+	//public transient IntStream input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
 	public int index;
@@ -106,8 +109,9 @@ public class RecognitionException extends RuntimeException {
 	public RecognitionException() {
 	}
 
-	public RecognitionException(IntStream input) {
-		this.input = input;
+	public RecognitionException(BaseRecognizer recognizer) {
+		this.recognizer = recognizer;
+		IntStream input = recognizer.state.input;
 		this.index = input.index();
 		if ( input instanceof TokenStream ) {
 			this.token = ((TokenStream)input).LT(1);
@@ -126,6 +130,10 @@ public class RecognitionException extends RuntimeException {
 			this.c = input.LA(1);
 		}
 	}
+
+//	public RecognitionException(IntStream input) {
+//		this.input = input;
+//	}
 
 	protected void extractInformationFromTreeNodeStream(IntStream input) {
 		TreeNodeStream nodes = (TreeNodeStream)input;
@@ -172,11 +180,11 @@ public class RecognitionException extends RuntimeException {
 
 	/** Return the token type or char of the unexpected input element */
 	public int getUnexpectedType() {
-		if ( input instanceof TokenStream) {
+		if ( recognizer.state.input instanceof TokenStream) {
 			return token.getType();
 		}
-		else if ( input instanceof TreeNodeStream ) {
-			TreeNodeStream nodes = (TreeNodeStream)input;
+		else if ( recognizer.state.input instanceof TreeNodeStream ) {
+			TreeNodeStream nodes = (TreeNodeStream)recognizer.state.input;
 			TreeAdaptor adaptor = nodes.getTreeAdaptor();
 			return adaptor.getType(node);
 		}

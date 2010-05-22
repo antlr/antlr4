@@ -32,10 +32,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.LABitSet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** A generic recognizer that can handle recognizers generated from
  *  parser and tree grammars.  This is all the parsing
@@ -171,8 +168,6 @@ public abstract class BaseRecognizer {
 	 * 		3. consume until token found in resynch set
 	 * 		4. try to resume parsing
 	 * 		5. next match() will reset errorRecovery mode
-	 *
-	 *  If you override, make sure to update syntaxErrors if you care about that.
 	 */
 	public void reportError(RecognitionException e) {
 		// if we've already reported an error and have not matched a token
@@ -184,15 +179,7 @@ public abstract class BaseRecognizer {
 		state.syntaxErrors++; // don't count spurious
 		state.errorRecovery = true;
 
-		displayRecognitionError(this.getTokenNames(), e);
-	}
-
-	public void displayRecognitionError(String[] tokenNames,
-										RecognitionException e)
-	{
-		String hdr = getErrorHeader(e);
-		String msg = getErrorMessage(e, tokenNames);
-		emitErrorMessage(hdr+" "+msg);
+		notifyListeners(e);
 	}
 
 	/** What error message should be generated for the various
@@ -217,7 +204,8 @@ public abstract class BaseRecognizer {
 	 *  Override this to change the message generated for one or more
 	 *  exception types.
 	 */
-	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+	public String getErrorMessage(RecognitionException e) {
+		String[] tokenNames = getTokenNames(); 
 		String msg = e.getMessage();
 		if ( e instanceof UnwantedTokenException ) {
 			UnwantedTokenException ute = (UnwantedTokenException)e;
@@ -335,11 +323,6 @@ public abstract class BaseRecognizer {
 		s = s.replaceAll("\r","\\\\r");
 		s = s.replaceAll("\t","\\\\t");
 		return "'"+s+"'";
-	}
-
-	/** Override this method to change where error messages go */
-	public void emitErrorMessage(String msg) {
-		System.err.println(msg);
 	}
 
 	/** Recover from an error found on the input stream.  This is
@@ -589,7 +572,7 @@ public abstract class BaseRecognizer {
 		RecognitionException e = null;
 		// if next token is what we are looking for then "delete" this token
 		if ( mismatchIsUnwantedToken(ttype) ) {
-			e = new UnwantedTokenException(ttype, state.input);
+			e = new UnwantedTokenException(this, ttype);
 			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
 							   ((TokenStream)input).LT(1)+
@@ -607,12 +590,12 @@ public abstract class BaseRecognizer {
 		// can't recover with single token deletion, try insertion
 		if ( mismatchIsMissingToken(follow) ) {
 			Object inserted = getMissingSymbol(e, ttype, follow);
-			e = new MissingTokenException(ttype, state.input, inserted);
+			e = new MissingTokenException(this, ttype, inserted);
 			reportError(e);  // report after inserting so AW sees the token in the exception
 			return inserted;
 		}
 		// even that didn't work; must throw the exception
-		e = new MismatchedTokenException(ttype, state.input);
+		e = new MismatchedTokenException(this, ttype);
 		throw e;
 	}
 
@@ -867,4 +850,52 @@ public abstract class BaseRecognizer {
 		System.out.println();
 	}
 
+	/* In v3, programmers altered error messages by overriding
+	   displayRecognitionError() and possibly getTokenErrorDisplay().
+	   They overrode emitErrorMessage(String) to change where the output goes.
+
+	   Now, in v4, we're going to use a listener mechanism. This makes it
+	   easier for language applications to have parsers notify them
+	   upon error without having to override the parsers. If you don't specify
+	   a listener, ANTLR calls the v3 legacy displayRecognitionError()
+	   method. All that does is format a message and call emitErrorMessage().
+	   Otherwise, your listener will receive RecognitionException
+	   exceptions and you can do what ever you want with them including
+	   reproducing the same behavior by calling the legacy methods.
+	   (In v4, RecognitionException includes the recognizer object).
+
+	   Grammar tools can have a listeners without having to worry about
+	   messing up the programmers' error handling.
+	 */
+
+	public void displayRecognitionError(RecognitionException e) {
+		String hdr = getErrorHeader(e);
+		String msg = getErrorMessage(e);
+		emitErrorMessage(hdr+" "+msg);
+	}
+
+	/** Override this method to change where error messages go */
+	public void emitErrorMessage(String msg) {
+		System.err.println(msg);
+	}
+	
+	public void addListener(ANTLRParserListener pl) {
+		if ( state.listeners==null ) {
+			state.listeners =
+				Collections.synchronizedList(new ArrayList<ANTLRParserListener>(2));
+		}
+		if ( pl!=null ) state.listeners.add(pl);
+	}
+	public void removeListener(ANTLRParserListener pl) { state.listeners.remove(pl); }
+	public void removeListeners() { state.listeners.clear(); }
+	public List<ANTLRParserListener> getListeners() { return state.listeners; }
+
+	public void notifyListeners(RecognitionException re) {
+		if ( state.listeners==null || state.listeners.size()==0 ) {
+			// call legacy v3 func; this calls emitErrorMessage(String msg)
+			displayRecognitionError(re);
+			return;
+		}
+		for (ANTLRParserListener pl : state.listeners) pl.error(re);
+	}
 }

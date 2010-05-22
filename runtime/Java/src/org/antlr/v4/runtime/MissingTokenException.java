@@ -27,8 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
-
 /** We were expecting a token but it's not found.  The current token
  *  is actually what we wanted next.  Used for tree node errors too.
  */
@@ -37,8 +35,8 @@ public class MissingTokenException extends MismatchedTokenException {
 	/** Used for remote debugger deserialization */
 	public MissingTokenException() {;}
 
-	public MissingTokenException(int expecting, IntStream input, Object inserted) {
-		super(expecting, input);
+	public MissingTokenException(BaseRecognizer recognizer, int expecting, Object inserted) {
+		super(recognizer,expecting);
 		this.inserted = inserted;
 	}
 

@@ -27,7 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 
 /** An extra token while parsing a TokenStream */
@@ -35,8 +34,8 @@ public class UnwantedTokenException extends MismatchedTokenException {
 	/** Used for remote debugger deserialization */
 	public UnwantedTokenException() {;}
 
-	public UnwantedTokenException(int expecting, IntStream input) {
-		super(expecting, input);
+	public UnwantedTokenException(BaseRecognizer recognizer, int expecting) {
+		super(recognizer, expecting);
 	}
 
 	public Token getUnexpectedToken() {

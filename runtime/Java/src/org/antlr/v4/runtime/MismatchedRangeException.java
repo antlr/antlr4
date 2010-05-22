@@ -27,16 +27,14 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
-
 public class MismatchedRangeException extends RecognitionException {
 	public int a,b;
 
 	/** Used for remote debugger deserialization */
 	public MismatchedRangeException() {;}
 
-	public MismatchedRangeException(int a, int b, IntStream input) {
-		super(input);
+	public MismatchedRangeException(BaseRecognizer recognizer, int a, int b) {
+		super(recognizer);
 		this.a = a;
 		this.b = b;
 	}

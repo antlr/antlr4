@@ -27,7 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
 import org.antlr.v4.runtime.misc.LABitSet;
 
 public class MismatchedSetException extends RecognitionException {
@@ -36,8 +35,8 @@ public class MismatchedSetException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public MismatchedSetException() {;}
 
-	public MismatchedSetException(LABitSet expecting, IntStream input) {
-		super(input);
+	public MismatchedSetException(BaseRecognizer recognizer, LABitSet expecting) {
+		super(recognizer);
 		this.expecting = expecting;
 	}
 

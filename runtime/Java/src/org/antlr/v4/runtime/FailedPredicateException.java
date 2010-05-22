@@ -27,8 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
-
 /** A semantic predicate failed during validation.  Validation of predicates
  *  occurs when normally parsing the alternative just like matching a token.
  *  Disambiguating predicate evaluation occurs when we hoist a predicate into
@@ -41,11 +39,11 @@ public class FailedPredicateException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public FailedPredicateException() {;}
 
-	public FailedPredicateException(IntStream input,
+	public FailedPredicateException(BaseRecognizer recognizer,
 									String ruleName,
 									String predicateText)
 	{
-		super(input);
+		super(recognizer);
 		this.ruleName = ruleName;
 		this.predicateText = predicateText;
 	}

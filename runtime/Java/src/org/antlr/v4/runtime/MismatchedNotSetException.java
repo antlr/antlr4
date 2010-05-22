@@ -27,15 +27,14 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
 import org.antlr.v4.runtime.misc.LABitSet;
 
 public class MismatchedNotSetException extends MismatchedSetException {
 	/** Used for remote debugger deserialization */
 	public MismatchedNotSetException() {;}
 
-	public MismatchedNotSetException(LABitSet expecting, IntStream input) {
-		super(expecting, input);
+	public MismatchedNotSetException(BaseRecognizer recognizer, LABitSet expecting) {
+		super(recognizer, expecting);
 	}
 
 	public String toString() {
