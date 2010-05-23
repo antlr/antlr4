@@ -37,6 +37,7 @@ public class <parser.name> extends Parser {
 		TokenType(int type) { this.type = type; }
 	}
 !>	
+    public static final int EOF=-1;
     <parser.tokens.keys:{k | public static final int <k>=<parser.tokens.(k)>;}; separator="\n">
     <scopes>
     <namedActions.members>
@@ -246,10 +247,12 @@ SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
 AddToList(a) ::= "<a.listName>.add(<first(a.opWithResultToAdd.labels)>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
+TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 
-CaptureNextToken(d) ::= "<d.varName> = state.input.LA(1);"
+CaptureNextToken(d) ::= "<d.varName> = state.input.LT(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = state.input.LA(1);"
 
 StructDecl(s,attrs) ::= <<
 public static class <s.name> extends ParserRuleContext {
@@ -276,7 +279,7 @@ DFADecl(dfa) ::= <<
 >>
 
 BitSetDecl(b) ::= <<
-public static final LABitSet <b.name>=new LABitSet(new long[]{<b.fset.bits:{<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
+public static final LABitSet <b.name>=new LABitSet(new long[]{<b.hexWords:{<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
 >>
 
 LexerFile(fileName, lexer) ::= <<

@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class ParserFile extends OutputModelObject {
 	public String fileName;
 	public Parser parser;
 	public List<DFADecl> dfaDecls = new ArrayList<DFADecl>();
-	public List<BitSetDecl> bitSetDecls = new ArrayList<BitSetDecl>();
+	public OrderedHashSet<BitSetDecl> bitSetDecls = new OrderedHashSet<BitSetDecl>();
 	public String TokenLabelType;
 	public String ASTLabelType;
 	public Map<String, Action> namedActions;
@@ -35,16 +36,4 @@ public class ParserFile extends OutputModelObject {
 	public void defineBitSet(BitSetDecl b) {
 		bitSetDecls.add(b);
 	}
-
-//	@Override
-//	public List<String> getChildren() {
-//		final List<String> sup = super.getChildren();
-//		return new ArrayList<String>() {{
-//			if ( sup!=null ) addAll(sup);
-//			add("parser");
-//			add("dfaDecls");
-//			add("namedActions");
-//			add("bitSetDecls");
-//		}};
-//	}
 }

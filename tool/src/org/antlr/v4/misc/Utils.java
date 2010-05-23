@@ -119,14 +119,16 @@ public class Utils {
 		return x;
 	}
 
+	/** apply methodName to list and return list of results. method has
+	 *  no args.  This pulls data out of a list essentially.
+	 */
 	public static <From,To> List<To> apply(List<From> list, String methodName) {
 		if ( list==null ) return null;
 		List<To> b = new ArrayList<To>();
 		for (From f : list) {
 			try {
 				Method m = f.getClass().getMethod(methodName, (Class[])null);
-				To r = (To)m.invoke(f, (Object[])null);
-				b.add(r);
+				b.add( (To)m.invoke(f, (Object[])null) );
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -134,4 +136,5 @@ public class Utils {
 		}
 		return b;
 	}
+
 }

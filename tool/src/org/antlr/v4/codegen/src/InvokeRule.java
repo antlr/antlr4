@@ -2,6 +2,7 @@ package org.antlr.v4.codegen.src;
 
 import org.antlr.v4.analysis.LinearApproximator;
 import org.antlr.v4.automata.NFA;
+import org.antlr.v4.automata.RuleTransition;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.RuleContextDecl;
 import org.antlr.v4.misc.IntervalSet;
@@ -49,8 +50,9 @@ public class InvokeRule extends SrcOp implements LabeledOp {
 		}
 
 		LinearApproximator approx = new LinearApproximator(factory.g, NFA.INVALID_DECISION_NUMBER);
-		IntervalSet fset = approx.LOOK(ast.nfaState.transition(0).target);
-		System.out.println("follow="+follow);
+		RuleTransition call = (RuleTransition)ast.nfaState.transition(0);
+		IntervalSet fset = approx.LOOK(call.followState);
+		System.out.println("follow rule ref "+name+"="+fset);
 		follow = factory.createFollowBitSet(ast, fset);
 		factory.defineBitSet(follow);
 	}

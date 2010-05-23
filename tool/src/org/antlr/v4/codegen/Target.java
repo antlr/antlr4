@@ -122,6 +122,24 @@ public class Target {
 		return buf.toString();
 	}
 
+	/** Convert long to 0xNNNNNNNNNNNNNNNN by default for spitting out
+	 *  with bitsets.  I.e., convert bytes to hex string.
+	 */
+	public String getTarget64BitStringFromValue(long word) {
+		int numHexDigits = 8*2;
+		StringBuffer buf = new StringBuffer(numHexDigits+2);
+		buf.append("0x");
+		String digits = Long.toHexString(word);
+		digits = digits.toUpperCase();
+		int padding = numHexDigits - digits.length();
+		// pad left with zeros
+		for (int i=1; i<=padding; i++) {
+			buf.append('0');
+		}
+		buf.append(digits);
+		return buf.toString();
+	}
+	
 	public String getLoopLabel(GrammarAST ast) {
 		return "loop"+ ast.token.getTokenIndex();
 	}

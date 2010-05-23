@@ -21,8 +21,10 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 		expr = factory.getLL1Test(look, blkAST);
 		if ( expr instanceof TestSetInline ) {
 			TestSetInline e = (TestSetInline)expr;
-			CaptureNextToken nextToken = new CaptureNextToken(e.varName);
-			addPreambleOp(nextToken);
+			Decl d = new TokenTypeDecl(factory, e.varName);
+			factory.currentRule.peek().addDecl(d);
+			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
+			addPreambleOp(nextType);
 		}
 	}
 }
