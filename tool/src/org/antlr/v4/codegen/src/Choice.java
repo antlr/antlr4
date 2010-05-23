@@ -15,8 +15,6 @@ public abstract class Choice extends SrcOp {
 	public List<CodeBlock> alts;
 	public List<SrcOp> preamble;
 	public IntervalSet expecting;
-	public ThrowNoViableAlt error;
-	public Sync sync;
 
 	public Choice(OutputModelFactory factory, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
 		super(factory, blkOrEbnfRootAST);
@@ -26,10 +24,7 @@ public abstract class Choice extends SrcOp {
 		LinearApproximator approx = new LinearApproximator(factory.g, decision);
 		NFAState decisionState = ast.nfaState;
 		expecting = approx.LOOK(decisionState);
-		System.out.println(blkOrEbnfRootAST.toStringTree()+" loop expecting="+expecting);
-
-//		this.error = new ThrowNoViableAlt(factory, blkOrEbnfRootAST, expecting); 
-		this.sync = new Sync(factory, blkOrEbnfRootAST, expecting);
+		System.out.println(blkOrEbnfRootAST.toStringTree()+" choice expecting="+expecting);
 	}
 
 	public void addPreambleOp(SrcOp op) {
@@ -43,4 +38,13 @@ public abstract class Choice extends SrcOp {
 //		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup);
 //			add("alts"); add("preamble"); add("error"); }};
 //	}
+
+	public List<String[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
+		List<String[]> altLook = new ArrayList<String[]>();
+		for (int a=1; a<altLookSets.length; a++) {
+			IntervalSet s = altLookSets[a];
+			altLook.add(factory.gen.target.getTokenTypesAsTargetLabels(factory.g, s.toArray()));
+		}
+		return altLook;
+	}
 }

@@ -121,7 +121,7 @@ else {
 }
 >>
 
-LL1StarBlock(choice, alts, error, sync) ::= <<
+LL1StarBlock(choice, alts, sync) ::= <<
 <choice.loopLabel>:
 while (true) {
 	switch ( state.input.LA(1) ) {
@@ -135,7 +135,7 @@ while (true) {
 }
 >>
 
-LL1StarBlockSingleAlt(choice, expr, alts, preamble, iteration, error, sync) ::= <<
+LL1StarBlockSingleAlt(choice, expr, alts, preamble, iteration, sync) ::= <<
 <preamble; separator="\n">
 while ( <expr> ) {
     <alts; separator="\n">
@@ -144,7 +144,7 @@ while ( <expr> ) {
 }
 >>
 
-LL1PlusBlock(choice, alts, error, earlyExitError, sync) ::= <<
+LL1PlusBlock(choice, alts, earlyExitError, sync) ::= <<
 <sync>
 int <choice.loopCounterVar> = 0;
 <choice.loopLabel>:
@@ -162,7 +162,7 @@ while (true) {
 >>
 
 LL1PlusBlockSingleAlt(choice, expr, alts, preamble, iteration,
-                      error, earlyExitError, sync) ::=
+                      earlyExitError, sync) ::=
 <<
 <sync>
 <preamble; separator="\n">

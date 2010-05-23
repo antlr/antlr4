@@ -11,9 +11,11 @@ import java.util.List;
 public abstract class LL1Loop extends Choice {
 	public OutputModelObject expr;
 	public List<SrcOp> iteration;
+	public Sync sync;	
 
 	public LL1Loop(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
+		this.sync = new Sync(factory, blkAST, expecting);		
 	}
 
 	public void addIterationOp(SrcOp op) {
@@ -32,13 +34,5 @@ public abstract class LL1Loop extends Choice {
 			addIterationOp(nextToken);
 		}
 	}
-
-//	@Override
-//	public List<String> getChildren() {
-//		final List<String> sup = super.getChildren();
-//		return new ArrayList<String>() {{
-//			if ( sup!=null ) addAll(sup); add("expr"); add("iteration");
-//		}};
-//	}
 
 }
