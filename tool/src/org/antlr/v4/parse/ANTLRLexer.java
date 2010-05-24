@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} ANTLRLexer.g 2010-05-21 18:40:58
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 ANTLRLexer.g 2010-05-24 16:31:55
 
 /*
  [The "BSD licence"]

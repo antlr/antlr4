@@ -38,8 +38,9 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
 
     public Object dupNode(Object t) {
         if ( t==null ) return null;
-        return create(((GrammarAST)t).token);
+        return ((GrammarAST)t).dupNode(); //create(((GrammarAST)t).token);
     }
+
     public Object errorNode(TokenStream input, Token start, Token stop,
                             RecognitionException e)
     {

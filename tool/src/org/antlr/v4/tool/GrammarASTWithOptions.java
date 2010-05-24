@@ -8,7 +8,12 @@ import java.util.Map;
 public class GrammarASTWithOptions extends GrammarAST {
     protected Map<String, String> options;
 
-    public GrammarASTWithOptions(Token t) { super(t); }
+	public GrammarASTWithOptions(GrammarAST node) {
+		super(node);
+		this.options = ((GrammarASTWithOptions)node).options;
+	}
+
+	public GrammarASTWithOptions(Token t) { super(t); }
     public GrammarASTWithOptions(int type) { super(type); }
     public GrammarASTWithOptions(int type, Token t) { super(type, t); }
     public GrammarASTWithOptions(int type, Token t, String text) { super(type,t,text); }

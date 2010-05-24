@@ -351,7 +351,6 @@ public class Tool {
     public void processGrammarsOnCommandLine() {
 		// TODO: process all files
         GrammarAST t = load(grammarFileNames.get(0));
-        GrammarRootAST lexerAST = null;
 		if ( t instanceof GrammarASTErrorNode ) return; // came back as error node
 		if ( ((GrammarRootAST)t).hasErrors ) return;
 
@@ -360,7 +359,7 @@ public class Tool {
         g.fileName = grammarFileNames.get(0);
 		process(g);
 		if ( ast!=null && ast.grammarType==ANTLRParser.COMBINED && !ast.hasErrors ) {
-			lexerAST = extractImplicitLexer(g); // alters ast
+			GrammarRootAST lexerAST = extractImplicitLexer(g); // alters ast
 			if ( lexerAST!=null ) {
 				LexerGrammar lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = grammarFileNames.get(0);

@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} CollectSymbols.g 2010-05-19 15:10:21
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 CollectSymbols.g 2010-05-24 16:31:59
 
 /*
  [The "BSD license"]
