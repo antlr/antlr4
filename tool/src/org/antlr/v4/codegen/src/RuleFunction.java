@@ -33,6 +33,10 @@ public class RuleFunction extends OutputModelObject {
 	public OrderedHashSet<Decl> decls;
 	public SrcOp code;
 
+	public RuleFunction(OutputModelFactory factory) {
+		super(factory);
+	}
+
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
