@@ -3,7 +3,7 @@ package org.antlr.v4.runtime.misc;
 import org.antlr.runtime.Token;
 
 /** */
-public class LABitSet {
+public class LABitSet implements Cloneable {
 	public final static int BITS = 64;    // number of bits / long
 	public final static int LOG_BITS = 6; // 2^6 == 64
 
@@ -113,11 +113,12 @@ public class LABitSet {
 			s.bits = new long[bits.length];
 			System.arraycopy(bits, 0, s.bits, 0, bits.length);
 			s.EOF = EOF;
+			return s;
 		}
 		catch (CloneNotSupportedException e) {
-			throw new InternalError();
+			e.printStackTrace(System.err);
 		}
-		return s;
+		return null;
 	}
 
 	/**

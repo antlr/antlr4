@@ -321,7 +321,6 @@ public abstract class BaseRecognizer {
 	 *  so that it creates a new Java type.
 	 */
 	public String getTokenErrorDisplay(Token t) {
-		System.err.println("mmmm3");		
 		String s = t.getText();
 		if ( s==null ) {
 			if ( t.getType()==Token.EOF ) {
