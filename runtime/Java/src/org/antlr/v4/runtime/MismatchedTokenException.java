@@ -34,8 +34,8 @@ public class MismatchedTokenException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public MismatchedTokenException() {;}
 
-	public MismatchedTokenException(BaseRecognizer recognizer, int expecting) {
-		super(recognizer, LABitSet.of(expecting));
+	public MismatchedTokenException(BaseRecognizer recognizer, int firstSet) {
+		super(recognizer, LABitSet.of(firstSet));
 	}
 
 	public String toString() {

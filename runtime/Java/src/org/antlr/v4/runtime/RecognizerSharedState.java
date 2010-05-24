@@ -40,6 +40,9 @@ import java.util.Map;
 public class RecognizerSharedState {
 	public IntStream input;
 
+	/** First on stack is fake a call to start rule from S' : S EOF ;
+	 *  Generated start rule does this.
+	 */
 	public QStack<RuleContext> ctx;
 
 	/** This is true when we see an error and before having successfully
@@ -81,19 +84,19 @@ public class RecognizerSharedState {
 	List<ANTLRParserListener> listeners;
 
 	public RecognizerSharedState() {
-        this.ctx = new QStack<RuleContext>();		
+        ctx = new QStack<RuleContext>();
 	}
     
-    public RecognizerSharedState(RecognizerSharedState state) {
-		this.ctx = state.ctx;
-		this.errorRecovery = state.errorRecovery;
-        this.lastErrorIndex = state.lastErrorIndex;
-        this.failed = state.failed;
-        this.syntaxErrors = state.syntaxErrors;
-        this.backtracking = state.backtracking;
-        if ( state.ruleMemo!=null ) {
-            this.ruleMemo = new Map[state.ruleMemo.length];
-            System.arraycopy(state.ruleMemo, 0, this.ruleMemo, 0, state.ruleMemo.length);
-        }
-    }
+//    public RecognizerSharedState(RecognizerSharedState state) {
+//		this.ctx = state.ctx;
+//		this.errorRecovery = state.errorRecovery;
+//        this.lastErrorIndex = state.lastErrorIndex;
+//        this.failed = state.failed;
+//        this.syntaxErrors = state.syntaxErrors;
+//        this.backtracking = state.backtracking;
+//        if ( state.ruleMemo!=null ) {
+//            this.ruleMemo = new Map[state.ruleMemo.length];
+//            System.arraycopy(state.ruleMemo, 0, this.ruleMemo, 0, state.ruleMemo.length);
+//        }
+//    }
 }

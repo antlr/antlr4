@@ -40,6 +40,8 @@ import java.util.*;
  *  backtracking.
  */
 public abstract class BaseRecognizer {
+	public static final int EOF=-1;
+	
 	public static final int MEMO_RULE_FAILED = -2;
 	public static final int MEMO_RULE_UNKNOWN = -1;
 
@@ -142,7 +144,7 @@ public abstract class BaseRecognizer {
 		}
 		// compute what can follow this grammar element reference
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
-			LABitSet viableTokensFollowingThisRule = computeContextSensitiveRuleFOLLOW();
+			LABitSet viableTokensFollowingThisRule = computeNextViableTokenSet();
 			follow = follow.or(viableTokensFollowingThisRule);
             if ( state.ctx.sp>=0 ) { // remove EOR if we're not the start symbol
                 follow.remove(Token.EOR_TOKEN_TYPE);
@@ -369,7 +371,8 @@ public abstract class BaseRecognizer {
 	 *  rule invocation, the parser pushes the set of tokens that can
 	 *  follow that rule reference on the stack; this amounts to
 	 *  computing FIRST of what follows the rule reference in the
-	 *  enclosing rule. This local follow set only includes tokens
+	 *  enclosing rule. See LinearApproximator.FIRST().
+	 *  This local follow set only includes tokens
 	 *  from within the rule; i.e., the FIRST computation done by
 	 *  ANTLR stops at the end of a rule.
 	 *
@@ -394,8 +397,8 @@ public abstract class BaseRecognizer {
 	 *    ;
 	 *
 	 *  At each rule invocation, the set of tokens that could follow
-	 *  that rule is pushed on a stack.  Here are the various "local"
-	 *  follow sets:
+	 *  that rule is pushed on a stack.  Here are the various
+	 *  context-sensitive follow sets:
 	 *
 	 *  FOLLOW(b1_in_a) = FIRST(']') = ']'
 	 *  FOLLOW(b2_in_a) = FIRST(')') = ')'
@@ -407,10 +410,10 @@ public abstract class BaseRecognizer {
 	 *
 	 *  and, hence, the follow context stack is:
 	 *
-	 *  depth  local follow set     after call to rule
+	 *  depth     follow set       start of rule execution
 	 *    0         <EOF>                    a (from main())
 	 *    1          ']'                     b
-	 *    3          '^'                     c
+	 *    2          '^'                     c
 	 *
 	 *  Notice that ')' is not included, because b would have to have
 	 *  been called from a different context in rule a for ')' to be
@@ -423,9 +426,9 @@ public abstract class BaseRecognizer {
 	 *  resync to one of those tokens.  Note that FOLLOW(c)='^' and if
 	 *  we resync'd to that token, we'd consume until EOF.  We need to
 	 *  sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
-	 *  In this case, for input "[]", LA(1) is in this set so we would
-	 *  not consume anything and after printing an error rule c would
-	 *  return normally.  It would not find the required '^' though.
+	 *  In this case, for input "[]", LA(1) is ']' and in the set, so we would
+	 *  not consume anything. After printing an error, rule c would
+	 *  return normally.  Rule b would not find the required '^' though.
 	 *  At this point, it gets a mismatched token error and throws an
 	 *  exception (since LA(1) is not in the viable following token
 	 *  set).  The rule exception handler tries to recover, but finds
@@ -433,7 +436,7 @@ public abstract class BaseRecognizer {
 	 *  exits normally returning to rule a.  Now it finds the ']' (and
 	 *  with the successful match exits errorRecovery mode).
 	 *
-	 *  So, you cna see that the parser walks up call chain looking
+	 *  So, you can see that the parser walks up the call chain looking
 	 *  for the token that was a member of the recovery set.
 	 *
 	 *  Errors are not generated in errorRecovery mode.
@@ -453,11 +456,17 @@ public abstract class BaseRecognizer {
 	 *  Parsers":
 	 *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
 	 *
-	 *  Like Grosch I implemented local FOLLOW sets that are combined
+	 *  Like Grosch I implement context-sensitive FOLLOW sets that are combined
 	 *  at run-time upon error to avoid overhead during parsing.
 	 */
 	protected LABitSet computeErrorRecoverySet() {
-		return combineFollows(false);
+		int top = state.ctx.sp;
+		LABitSet followSet = new LABitSet();
+		for (int i=top; i>=0; i--) { // i==0 is EOF context for start rule invocation
+			LABitSet f = (LABitSet)state.ctx.get(i).follow;
+			followSet.orInPlace(f);
+		}
+		return followSet;
 	}
 
 	/** Compute the context-sensitive FOLLOW set for current rule.
@@ -512,37 +521,17 @@ public abstract class BaseRecognizer {
 	 *  a missing token in the input stream.  "Insert" one by just not
 	 *  throwing an exception.
 	 */
-	protected LABitSet computeContextSensitiveRuleFOLLOW() {
-		return combineFollows(true);
-	}
-
-	// TODO: what is exact? it seems to only add sets from above on stack
-	// if EOR is in set i.  When it sees a set w/o EOR, it stops adding.
-	// Why would we ever want them all?  Maybe no viable alt instead of
-	// mismatched token?
-	protected LABitSet combineFollows(boolean exact) {
+	public LABitSet computeNextViableTokenSet() {
 		int top = state.ctx.sp;
 		LABitSet followSet = new LABitSet();
-		for (int i=top; i>=0; i--) {
-			LABitSet localFollowSet = (LABitSet)state.ctx.get(i).follow;
-			/*
-			System.out.println("local follow depth "+i+"="+
-							   localFollowSet.toString(getTokenNames())+")");
-			 */
-			followSet.orInPlace(localFollowSet);
-			if ( exact ) {
-				// can we see end of rule?
-				if ( localFollowSet.member(Token.EOR_TOKEN_TYPE) ) {
-					// Only leave EOR in set if at top (start rule); this lets
-					// us know if have to include follow(start rule); i.e., EOF
-					if ( i>0 ) {
-						followSet.remove(Token.EOR_TOKEN_TYPE);
-					}
-				}
-				else { // can't see end of rule, quit
-					break;
-				}
-			}
+		for (int i=top; i>=0; i--) { // i==0 is EOF context for start rule invocation
+			LABitSet f = (LABitSet)state.ctx.get(i).follow;
+			followSet.orInPlace(f);
+			// can we see end of rule? if not, don't include follow of this rule
+			if ( !f.member(Token.EOR_TOKEN_TYPE) ) break;
+			// else combine with tokens that can follow this rule (rm EOR also)
+			// EOR indicates we have to include follow(start rule); i.e., EOF
+			followSet.remove(Token.EOR_TOKEN_TYPE);
 		}
 		return followSet;
 	}

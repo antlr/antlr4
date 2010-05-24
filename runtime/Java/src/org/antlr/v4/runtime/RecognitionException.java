@@ -113,9 +113,12 @@ public class RecognitionException extends RuntimeException {
 		this(recognizer, null);
 	}
 
-	public RecognitionException(BaseRecognizer recognizer, LABitSet expecting) {
+	public RecognitionException(BaseRecognizer recognizer, LABitSet firstSet) {
 		this.recognizer = recognizer;
-		this.expecting = expecting;
+		// firstSet is what can we're expecting within rule that calls this ctor.
+		// must combine with context-sensitive FOLLOW of that rule.
+		LABitSet viableTokensFollowingThisRule = recognizer.computeNextViableTokenSet();
+		this.expecting = viableTokensFollowingThisRule.or(firstSet);
 		IntStream input = recognizer.state.input;
 		this.index = input.index();
 		if ( input instanceof TokenStream ) {

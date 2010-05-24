@@ -33,8 +33,8 @@ public class MismatchedSetException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public MismatchedSetException() {;}
 
-	public MismatchedSetException(BaseRecognizer recognizer, LABitSet expecting) {
-		super(recognizer, expecting);
+	public MismatchedSetException(BaseRecognizer recognizer, LABitSet firstSet) {
+		super(recognizer, firstSet);
 	}
 
 	public String toString() {

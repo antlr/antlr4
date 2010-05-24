@@ -26,6 +26,25 @@ public class LinearApproximator {
 
 	int max_k = MAX_LINEAR_APPROXIMATE_DEPTH;
 
+	/** Used during LOOK to detect computation cycles. E.g., ()* causes
+	 *  infinite loop without it.  If we get to same state with same k
+	 *  and same context, must be infinite loop.  Analogous to
+	 *  closureBusy in NFA to DFA conversion.
+	 */
+	Set<LookaheadNFAConfig> lookBusy = new HashSet<LookaheadNFAConfig>();
+
+	/** The lookahead associated with an alternative, 1..k. A WORK ARRAY. */
+	IntervalSet[] look;
+
+	/** Our goal is to produce a DFA that looks like we created the
+	 *  usual way through subset construction. To look the same, we
+	 *  have to store a set of NFA configurations within each DFA state.
+	 *
+	 *  A WORK ARRAY. Stores the NFA configurations for each lookahead
+	 *  depth, 1..k.
+	 */
+	OrderedHashSet<NFAConfig>[] configs;
+
 	/** Records state of a LOOK operation; used just for lookahead busy checks */
 	static class LookaheadNFAConfig {
 		public NFAState s;
@@ -46,25 +65,6 @@ public class LinearApproximator {
 				   this.context.equals(ac.context);
 		}
 	}
-
-	/** Used during LOOK to detect computation cycles. E.g., ()* causes
-	 *  infinite loop without it.  If we get to same state with same k
-	 *  and same context, must be infinite loop.  Analogous to
-	 *  closureBusy in NFA to DFA conversion.
-	 */
-	Set<LookaheadNFAConfig> lookBusy = new HashSet<LookaheadNFAConfig>();
-
-	/** The lookahead associated with an alternative, 1..k. A WORK ARRAY. */
-	IntervalSet[] look;
-
-	/** Our goal is to produce a DFA that looks like we created the
-	 *  usual way through subset construction. To look the same, we
-	 *  have to store a set of NFA configurations within each DFA state.
-	 *
-	 *  A WORK ARRAY. Stores the NFA configurations for each lookahead
-	 *  depth, 1..k.
-	 */
-	OrderedHashSet<NFAConfig>[] configs;
 
 	public LinearApproximator(Grammar g, int decision) {
 		this.g = g;
@@ -213,26 +213,43 @@ public class LinearApproximator {
 		}
 	}
 
-	/** Compute FOLLOW of element but don't leave rule to compute global
-	 *  context-free FOLLOW.  Used for rule invocation, match token, and
-	 *  error sync'ing.
+	/* A bit set used for prediction contains all possible tokens
+	   that can predict a particular alternative or set of alternatives.
+	   Bit sets used for error recovery and expecting, however, are incomplete.
+	   They only contain tokens extracted from the current rule. They don't include
+	   any tokens from rules that invoke it (when the lookahead computation
+	   reaches the end of the rule). Instead, the dynamic follow is used
+	   because it contains the exact set of tokens that can follow an
+	   invocation instead of all possible. It's the true expected set
+	   of tokens at runtime. To indicate that a bit set is incomplete,
+	   we include EOR (end of rule) token type.  If we reach end of
+	   a start rule, include EOF.
+
+	   See BaseRecognizer.computeErrorRecoverySet() and friends for more
+	   information on combining run-time bit sets.
 	 */
-	public IntervalSet LOOK(NFAState s) {
-		System.out.println("LOOK("+s.stateNumber+")");
+
+	/** Compute set of tokens that we can reach from s, but don't leave rule
+	 *  to compute global, context-free FOLLOW.  Used for error handling
+	 *  after rule invocation and match tokens.  Also used in exceptions
+	 *  to show what we were expecting.
+	 */
+	public IntervalSet FIRST(NFAState s) {
+		//System.out.println("FIRST("+s.stateNumber+")");
 		lookBusy.clear();
 		IntervalSet fset = new IntervalSet();
-		_LOOK(s, NFAContext.EMPTY(), fset);
+		_FIRST(s, NFAContext.EMPTY(), fset);
 		return fset;
 	}
 
-	void _LOOK(NFAState s, NFAContext context, IntervalSet fset) {
-		//System.out.println("_LOOK("+s.stateNumber+", "+k+", ctx="+context);
+	void _FIRST(NFAState s, NFAContext context, IntervalSet fset) {
+		//System.out.println("_FIRST("+s.stateNumber+", "+k+", ctx="+context);
 		LookaheadNFAConfig ac = new LookaheadNFAConfig(s,1,context);
 		if ( lookBusy.contains(ac) ) return;
 		lookBusy.add(ac);
 
 		if ( s instanceof RuleStopState ) {
-			if ( !context.isEmpty() ) _LOOK(context.returnState, context.parent, fset);
+			if ( !context.isEmpty() ) _FIRST(context.returnState, context.parent, fset);
 			else fset.add(Token.EOR_TOKEN_TYPE); // hit end of rule
 			return;
 		}
@@ -243,10 +260,10 @@ public class LinearApproximator {
 			if ( t instanceof RuleTransition ) {
 				NFAContext newContext =
 					new NFAContext(context, ((RuleTransition)t).followState);
-				_LOOK(t.target, newContext, fset);
+				_FIRST(t.target, newContext, fset);
 			}
 			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, context, fset);
+				_FIRST(t.target, context, fset);
 			}
 			else {
 				fset.addAll( t.label() );

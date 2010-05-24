@@ -30,8 +30,8 @@ package org.antlr.v4.runtime;
 import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.misc.LABitSet;
 
-/** Rules that return more than a single value must return an object
- *  containing all the values.  Besides the properties defined in
+/** Rules return values in an object containing all the values.
+ *  Besides the properties defined in
  *  RuleLabelScope.predefinedRulePropertiesScope there may be user-defined
  *  return values.  This class simply defines the minimum properties that
  *  are always defined and methods to access the others that might be
@@ -52,6 +52,6 @@ public class ParserRuleContext extends RuleContext {
 	public Token start, stop;
 	public Object getStart() { return start; }
 	public Object getStop() { return stop; }
-	public ParserRuleContext() {;}
+	public ParserRuleContext() { super(); }
 	public ParserRuleContext(LABitSet follow) { super(follow); }
 }

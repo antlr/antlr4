@@ -7,7 +7,6 @@ import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
@@ -25,7 +24,6 @@ public class RuleFunction extends OutputModelObject {
 	public List<String> elementsReferencedInRewrite;
 	public List<String> exceptions;
 	public Action finallyAction;
-	public boolean isStartRule;
 	public Map<String, Action> namedActions;	
 
 	public StructDecl context;
@@ -38,7 +36,6 @@ public class RuleFunction extends OutputModelObject {
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
-		this.isStartRule = r.isStartRule;
 		if ( r.modifiers!=null && r.modifiers.size()>0 ) {
 			this.modifiers = new ArrayList<String>();
 			for (GrammarAST t : r.modifiers) modifiers.add(t.getText());
@@ -63,17 +60,13 @@ public class RuleFunction extends OutputModelObject {
 										   r.scope.attributes.values());
 		}
 
-		//globalScopesUsed = new ArrayList<String>();
-		//for (Token t : r.useScopes) globalScopesUsed.add(t.getText());
 		globalScopesUsed = Utils.apply(r.useScopes, "getText");
 
 		if ( argsAndReturnValues.size()>0 ) {
 			context = new StructDecl(factory, factory.gen.target.getRuleFunctionContextStructName(r),
 									 argsAndReturnValues);
-			ctorAttrs.add(ScopeParser.parseAttributeDef("LABitSet follow"));
 			context.ctorAttrs = ctorAttrs;
 		}
-
 
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();

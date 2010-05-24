@@ -99,17 +99,18 @@ public abstract class OutputModelFactory {
 		return b;
 	}
 
-	public BitSetDecl createTestBitSet(GrammarAST ast, IntervalSet set) {
-		String inRuleName = ast.nfaState.rule.name;
-		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDecl b = new BitSetDecl(this, name, set);
-		return b;
-	}
-
 	public BitSetDecl createExpectingBitSet(GrammarAST ast, int decision, IntervalSet set) {
 		String inRuleName = ast.nfaState.rule.name;
 		String name = "EXPECTING_in_"+inRuleName+"_"+decision;
 		BitSetDecl b = new BitSetDecl(this, name, set);
 		return b;
 	}
+
+	public BitSetDecl createTestBitSet(GrammarAST ast, IntervalSet set) {
+		String inRuleName = ast.nfaState.rule.name;
+		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
+		BitSetDecl b = new BitSetDecl(this, name, set);
+		return b;
+	}
 }
+

@@ -36,9 +36,9 @@ public class MismatchedTreeNodeException extends RecognitionException {
 	}
 
 	public MismatchedTreeNodeException(BaseRecognizer recognizer,
-									   int expecting)
+									   int firstSet)
 	{
-		super(recognizer, LABitSet.of(expecting));
+		super(recognizer, LABitSet.of(firstSet));
 	}
 
 	public String toString() {

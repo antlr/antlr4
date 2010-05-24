@@ -51,7 +51,7 @@ public class InvokeRule extends SrcOp implements LabeledOp {
 
 		LinearApproximator approx = new LinearApproximator(factory.g, NFA.INVALID_DECISION_NUMBER);
 		RuleTransition call = (RuleTransition)ast.nfaState.transition(0);
-		IntervalSet fset = approx.LOOK(call.followState);
+		IntervalSet fset = approx.FIRST(call.followState);
 		System.out.println("follow rule ref "+name+"="+fset);
 		follow = factory.createFollowBitSet(ast, fset);
 		factory.defineBitSet(follow);

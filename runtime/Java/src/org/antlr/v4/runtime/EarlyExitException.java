@@ -34,7 +34,7 @@ public class EarlyExitException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public EarlyExitException() {;}
 	
-	public EarlyExitException(BaseRecognizer recognizer, LABitSet expecting) {
-		super(recognizer, expecting);
+	public EarlyExitException(BaseRecognizer recognizer, LABitSet firstSet) {
+		super(recognizer, firstSet);
 	}
 }

@@ -23,7 +23,7 @@ public abstract class Choice extends SrcOp {
 		// TODO: use existing lookahead! don't compute
 		LinearApproximator approx = new LinearApproximator(factory.g, decision);
 		NFAState decisionState = ast.nfaState;
-		expecting = approx.LOOK(decisionState);
+		expecting = approx.FIRST(decisionState);
 		System.out.println(blkOrEbnfRootAST.toStringTree()+" choice expecting="+expecting);
 	}
 

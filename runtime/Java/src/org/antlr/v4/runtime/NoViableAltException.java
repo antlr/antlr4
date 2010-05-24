@@ -35,9 +35,9 @@ public class NoViableAltException extends RecognitionException {
 	public NoViableAltException() {;}
 	
 	public NoViableAltException(BaseRecognizer recognizer,
-								LABitSet expecting)
+								LABitSet firstSet)
 	{
-		super(recognizer, expecting);
+		super(recognizer, firstSet);
 	}
 
 	public String toString() {

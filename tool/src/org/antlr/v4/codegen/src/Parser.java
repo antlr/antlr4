@@ -29,7 +29,10 @@ public class Parser extends OutputModelObject {
 		for (AttributeDict d : factory.g.scopes.values()) {
 			scopes.add( new DynamicScopeStruct(factory, d.name, d.attributes.values()) );
 		}
-		for (Rule r : factory.g.rules.values()) funcs.add( new RuleFunction(factory, r) );
+		for (Rule r : factory.g.rules.values()) {
+			if ( r.isStartRule ) funcs.add( new StartRuleFunction(factory, r) );
+			funcs.add( new RuleFunction(factory, r) );
+		}
 	}
 
 //	@Override

@@ -29,7 +29,9 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.LABitSet;
 
-/** Rules can return start/stop info as well as possible trees and templates */
+/** Rules can return start/stop info as well as possible trees and templates.
+ *  Each context must have a FOLLOW context.  It's EOF if none is specified.
+ */
 public class RuleContext {
 	/** Track the set of token types that can follow any rule invocation. */	
 	public LABitSet follow;
@@ -48,6 +50,6 @@ public class RuleContext {
 	 */
 	public Object getTemplate() { return null; }
 
-	public RuleContext() {;}
+	public RuleContext() { this(LABitSet.EOF_SET); }
 	public RuleContext(LABitSet follow) { this.follow = follow; }
 }

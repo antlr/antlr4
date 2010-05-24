@@ -39,7 +39,6 @@ public class NFA {
 	public int defineDecisionState(DecisionState s) {
 		decisionToNFAState.add(s);
 		s.decision = decisionToNFAState.size()-1;
-		System.out.println("dec state "+s.stateNumber+" gets dec # "+s.decision);
 		return s.decision;
 	}
 }

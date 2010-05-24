@@ -14,6 +14,8 @@ public class LABitSet {
 	 */
 	public final static int MOD_MASK = BITS - 1;
 
+	public static final LABitSet EOF_SET = LABitSet.of(Token.EOF);
+
 	/** The actual data bits */
 	public long bits[];
 

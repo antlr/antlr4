@@ -37,7 +37,6 @@ public class <parser.name> extends Parser {
 		TokenType(int type) { this.type = type; }
 	}
 !>	
-    public static final int EOF=-1;
     <parser.tokens.keys:{k | public static final int <k>=<parser.tokens.(k)>;}; separator="\n">
     <scopes>
     <namedActions.members>
@@ -68,10 +67,8 @@ RuleFunction(f,code,decls,context,scope,namedActions,finallyAction) ::= <<
 <context>
 <scope>
 
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><if(f.ctxType)><f.ctxType><else>void<endif> <f.name>(<f.ctxType> _ctx) throws RecognitionException {
-<if(f.ctxType)>
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><f.ctxType> <f.name>(<f.ctxType> _ctx) throws RecognitionException {
     state.ctx.push(_ctx);
-<endif>
 <if(f.scope)>
     <f.scope.name>_stack.push(new <f.scope.name>());
 <endif>
@@ -92,6 +89,13 @@ RuleFunction(f,code,decls,context,scope,namedActions,finallyAction) ::= <<
         <finallyAction>
         <if(f.ctxType)>return (<f.ctxType>)state.ctx.pop();<endif>
 	}
+}
+>>
+
+/** Convenience method to call from outside */
+StartRuleFunction(f) ::= <<
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><f.ctxType> <f.name>(<f.args; separator=", ">) throws RecognitionException {
+    return <f.name>(new <f.ctxType>(<f.args:{a | <a.name>, }>LABitSet.EOF_SET));
 }
 >>
 
@@ -258,7 +262,8 @@ StructDecl(s,attrs) ::= <<
 public static class <s.name> extends ParserRuleContext {
     <attrs:{a | <a>;}; separator="\n">
 <if(s.ctorAttrs)>
-    public <s.name>(<s.ctorAttrs; separator=", ">) {
+    public <s.name>(<s.ctorAttrs:{a | <a>,}> LABitSet follow) {
+        super(follow);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
 <endif>
