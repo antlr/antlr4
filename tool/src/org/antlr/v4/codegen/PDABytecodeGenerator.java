@@ -6,11 +6,13 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.pda.*;
 import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.runtime.tree.TreeParser;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -19,6 +21,8 @@ import java.util.Map;
 
 /** http://swtch.com/~rsc/regexp/regexp2.html */
 public class PDABytecodeGenerator extends TreeParser {
+	public Grammar g;
+
 	public Rule currentRule;
 
 	CompiledPDA pda = new CompiledPDA();
@@ -71,11 +75,37 @@ public class PDABytecodeGenerator extends TreeParser {
 		return i;
 	}
 
-	public void emitString(Token t) {
+	public void emitString(Token t, boolean not) {
 		String chars = CharSupport.getStringFromGrammarStringLiteral(t.getText());
+		if ( not && chars.length()==1 ) {
+			emitNotChar(t, chars);
+			return;
+		}
 		for (char c : chars.toCharArray()) {
 			emit(new MatchInstr(t, c));
 		}
+	}
+
+	public void emitNotChar(Token t, String chars) {
+		IntervalSet all = (IntervalSet)g.getTokenTypes();
+		int c = chars.charAt(0);
+		SplitInstr s = new SplitInstr(2);
+		RangeInstr left = new RangeInstr(t, t);
+		left.a = all.getMinElement();
+		left.b = c-1;
+		RangeInstr right = new RangeInstr(t, t);
+		right.a = c+1;
+		right.b = 127; // all.getMaxElement();
+		emit(s);
+		emit(left);
+		JumpInstr J = new JumpInstr();
+		emit(J);
+		emit(right);
+		s.addrs.add(left.addr);
+		s.addrs.add(right.addr);
+		int END = pda.ip;
+		J.target = END;
+		return;
 	}
 
 	public byte[] convertInstrsToBytecode() {
@@ -100,6 +130,7 @@ public class PDABytecodeGenerator extends TreeParser {
 	public static CompiledPDA compileLexerMode(LexerGrammar lg, String modeName) {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		PDABytecodeTriggers gen = new PDABytecodeTriggers(null);
+		gen.g = lg;
 		gen.pda.tokenTypeToAddr = new int[lg.getMaxTokenType()+1];
 
 		// add split for s0 to hook up rules (fill in operands as we gen rules)

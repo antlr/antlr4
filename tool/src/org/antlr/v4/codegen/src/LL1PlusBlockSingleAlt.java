@@ -14,7 +14,7 @@ public class LL1PlusBlockSingleAlt extends LL1Loop {
 	public ThrowEarlyExitException earlyExitError;
 
 	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
-		super(factory, blkAST, alts);
+		super(factory, blkAST, alts, ((PlusBlockStartState)blkAST.nfaState).loopBackState.decision);
 		PlusBlockStartState plus = (PlusBlockStartState)blkAST.nfaState;
 		DFA dfa = factory.g.decisionDFAs.get(plus.loopBackState.decision);
 		IntervalSet[] altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);

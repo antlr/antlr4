@@ -33,6 +33,7 @@ public class LexerFactory {
 				actionST.add("name", r.name);
 				for (Token t : actionTokens) {
 					actionST.add("actions", Misc.strip(t.getText(),1));
+					actionST.add("ruleIndex", r.index);
 				}
 				pdaST.add("actions", actionST);
 				lexerST.add("actions", actionST);
@@ -41,6 +42,7 @@ public class LexerFactory {
 				Set<Token> sempredTokens = pda.ruleSempreds.keySet(r);
 				ST sempredST = gen.templates.getInstanceOf("sempredMethod");
 				sempredST.add("name", r.name);
+				sempredST.add("ruleIndex", r.index);
 				for (Token t : sempredTokens) {
 					sempredST.add("preds", t.getText());
 				}

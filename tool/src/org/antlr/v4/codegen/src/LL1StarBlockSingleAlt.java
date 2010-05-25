@@ -12,11 +12,11 @@ import java.util.List;
 /** */
 public class LL1StarBlockSingleAlt extends LL1Loop {
 	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
-		super(factory, blkAST, alts);
+		super(factory, blkAST, alts, ((StarBlockStartState)blkAST.nfaState).loopBackState.decision);
 		StarBlockStartState star = (StarBlockStartState)blkAST.nfaState;
 		DFA dfa = factory.g.decisionDFAs.get(star.loopBackState.decision);
 		IntervalSet[] altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);
-		IntervalSet look = altLookSets[1];
+		IntervalSet look = altLookSets[2];
 		addCodeForLookaheadTempVar(look);
 	}
 }

@@ -133,16 +133,16 @@ atom
 	|	^(BANG notSet)			
 	|	notSet					
 	|	range					
-	|	^(DOT ID terminal)		
+	|	^(DOT ID terminal[false])		
 	|	^(DOT ID ruleref)		
     |	^(WILDCARD .)		{emit(new WildcardInstr($WILDCARD.token));}		
     |	WILDCARD			{emit(new WildcardInstr($WILDCARD.token));}	
-    |   terminal				
+    |   terminal[false]				
     |   ruleref					
     ;
 
 notSet
-    : ^(NOT terminal)		
+    : ^(NOT terminal[true])
     | ^(NOT block)			
     ;
 
@@ -157,12 +157,12 @@ range
     	{emit(new RangeInstr($a.token, $b.token));}
     ;
 
-terminal
-    :  ^(STRING_LITERAL .)			{emitString($STRING_LITERAL.token);}
-    |	STRING_LITERAL				{emitString($STRING_LITERAL.token);}
+terminal[boolean not]
+    :  ^(STRING_LITERAL .)			{emitString($STRING_LITERAL.token, $not);}
+    |	STRING_LITERAL				{emitString($STRING_LITERAL.token, $not);}
     |	^(TOKEN_REF ARG_ACTION .)	{emit(new CallInstr($TOKEN_REF.token));}
     |	^(TOKEN_REF .)				{emit(new CallInstr($TOKEN_REF.token));}
     |	TOKEN_REF					{emit(new CallInstr($TOKEN_REF.token));}
-    |	^(ROOT terminal)			
-    |	^(BANG terminal)			
+    |	^(ROOT terminal[false])			
+    |	^(BANG terminal[false])			
     ;

@@ -185,8 +185,8 @@ processOneChar:
 			if ( reach.size()>0 ) { // if we reached other states, consume and process them
 				input.consume();
 			}
-			else if ( !accepted) {
-				System.out.println("!!!!! no match for char "+(char)c+" at "+input.index());
+			else if ( !accepted ) {
+				System.err.println("!!!!! no match for char "+(char)c+" at "+input.index());
 				input.consume();
 			}
 			// else reach.size==0 && matched, don't consume: accepted

@@ -14,10 +14,9 @@ public class LL1Choice extends Choice {
 	/** Token names for each alt 0..n-1 */
 	public List<String[]> altLook;
 	public ThrowNoViableAlt error;
-	
+
 	public LL1Choice(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
-		super(factory, blkAST, alts);
-		this.decision = ((DecisionState)blkAST.nfaState).decision;
+		super(factory, blkAST, alts, ((DecisionState)blkAST.nfaState).decision);
 		DFA dfa = factory.g.decisionDFAs.get(decision);
 		/** Lookahead for each alt 1..n */
 		IntervalSet[] altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);

@@ -15,13 +15,14 @@ public class LL1PlusBlock extends LL1Loop {
 	/** Token names for each alt 0..n-1 */
 	public List<String[]> altLook;
 
+	public Sync iterationSync;	
 	public String loopLabel;
 	public String loopCounterVar;
 	public String[] exitLook;
 	public ThrowEarlyExitException earlyExitError;
 
 	public LL1PlusBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
-		super(factory, blkAST, alts);
+		super(factory, blkAST, alts, ((BlockStartState)blkAST.nfaState.transition(0).target).decision);
 		PlusBlockStartState plus = (PlusBlockStartState)blkAST.nfaState;
 		BlockStartState blkStart = (BlockStartState)plus.transition(0).target;
 
@@ -32,10 +33,14 @@ public class LL1PlusBlock extends LL1Loop {
 
 		dfa = factory.g.decisionDFAs.get(plus.loopBackState.decision);
 		IntervalSet exitLook = dfa.startState.edge(0).label;
+		IntervalSet loopbackLook = dfa.startState.edge(1).label;
 		this.exitLook = factory.gen.target.getTokenTypesAsTargetLabels(factory.g, exitLook.toArray());
 
 		loopLabel = factory.gen.target.getLoopLabel(blkAST);
 		loopCounterVar = factory.gen.target.getLoopCounter(blkAST);
+
+		IntervalSet iterationExpected = (IntervalSet) loopbackLook.or(exitLook);
+		this.iterationSync = new Sync(factory, blkAST, iterationExpected, decision, "iter");
 
 		this.earlyExitError = new ThrowEarlyExitException(factory, blkAST, expecting);
 	}

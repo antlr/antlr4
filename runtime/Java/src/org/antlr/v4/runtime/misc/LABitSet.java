@@ -147,7 +147,6 @@ public class LABitSet implements Cloneable {
 	 * @return A commma-separated list of values
 	 */
 	public String toString() {
-		System.out.println("toStr");
 		StringBuffer buf = new StringBuffer();
 		String separator = ",";
 		boolean havePrintedAnElement = false;
@@ -155,7 +154,6 @@ public class LABitSet implements Cloneable {
 		if ( EOF ) { buf.append("EOF"); havePrintedAnElement=true; }
 
 		for (int i = 0; i < (bits.length << LOG_BITS); i++) {
-			System.out.println("i="+i);
 			if (member(i)) {
 				if ( havePrintedAnElement ) {
 					buf.append(separator);

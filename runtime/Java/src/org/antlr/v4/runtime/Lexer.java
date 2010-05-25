@@ -40,6 +40,8 @@ import org.antlr.v4.runtime.pda.PDA;
  */
 public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource {
 	public static final int DEFAULT_MODE = 0;
+	public static final int MORE = -2;
+	public static final int SKIP = -3; 
 
 	public LexerSharedState state;
 
@@ -80,6 +82,7 @@ public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource 
 	 *  stream.
 	 */
 	public Token nextToken() {
+		outer:
 		while (true) {
 			state.token = null;
 			state.channel = Token.DEFAULT_CHANNEL;
@@ -87,24 +90,27 @@ public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource 
 			state.tokenStartCharPositionInLine = ((CharStream)state.input).getCharPositionInLine();
 			state.tokenStartLine = ((CharStream)state.input).getLine();
 			state.text = null;
-			if ( state.input.LA(1)==CharStream.EOF ) {
-                Token eof = new CommonToken((CharStream)state.input,Token.EOF,
-                                            Token.DEFAULT_CHANNEL,
-                                            state.input.index(),state.input.index());
-                eof.setLine(getLine());
-                eof.setCharPositionInLine(getCharPositionInLine());
-                return eof;
-			}
-			 {
-				state.type = modeToPDA[_mode].execThompson(state.input);
-				if ( state.token==null ) {
-					emit();
+			do {
+				state.type = Token.INVALID_TOKEN_TYPE;
+				if ( state.input.LA(1)==CharStream.EOF ) {
+					Token eof = new CommonToken((CharStream)state.input,Token.EOF,
+												Token.DEFAULT_CHANNEL,
+												state.input.index(),state.input.index());
+					eof.setLine(getLine());
+					eof.setCharPositionInLine(getCharPositionInLine());
+					return eof;
 				}
-				else if ( state.token==Token.SKIP_TOKEN ) {
-					continue;
+				int ttype = modeToPDA[_mode].execThompson(state.input);
+				if ( state.type == Token.INVALID_TOKEN_TYPE ) state.type = ttype;
+				if ( state.type==SKIP ) {
+					continue outer;
 				}
-				return state.token;
-			}
+//				if ( state.token==null ) {
+//					emit();
+//				}
+			} while ( state.type==MORE );
+			emit();
+			return state.token;
 //			catch (NoViableAltException nva) {
 //				reportError(nva);
 //				recover(nva); // throw out current char and try again

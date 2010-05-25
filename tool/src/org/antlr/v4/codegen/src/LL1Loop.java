@@ -13,9 +13,13 @@ public abstract class LL1Loop extends Choice {
 	public List<SrcOp> iteration;
 	public Sync sync;	
 
-	public LL1Loop(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
-		super(factory, blkAST, alts);
-		this.sync = new Sync(factory, blkAST, expecting);		
+	public LL1Loop(OutputModelFactory factory,
+				   GrammarAST blkAST,
+				   List<CodeBlock> alts,
+				   int decision)
+	{
+		super(factory, blkAST, alts, decision);
+		this.sync = new Sync(factory, blkAST, expecting, decision, "enter");		
 	}
 
 	public void addIterationOp(SrcOp op) {

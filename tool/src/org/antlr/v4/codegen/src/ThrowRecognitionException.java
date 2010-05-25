@@ -18,7 +18,7 @@ public class ThrowRecognitionException extends SrcOp {
 		grammarLine = ast.getLine();
 		grammarLine = ast.getCharPositionInLine();
 		grammarFile = factory.g.fileName;
-		this.expecting = factory.createExpectingBitSet(ast, decision, expecting);
+		this.expecting = factory.createExpectingBitSet(ast, decision, expecting, "error");
 		factory.defineBitSet(this.expecting);
 	}
 }

@@ -119,6 +119,7 @@ public abstract class BaseRecognizer {
 	// like matchSet but w/o consume; error checking routine.
 	public void sync(LABitSet expecting) {
 		if ( expecting.member(state.input.LA(1)) ) return;
+		System.out.println("failed sync to "+expecting);
 		LABitSet followSet = computeErrorRecoverySet();
 		followSet.orInPlace(expecting);
 		NoViableAltException e = new NoViableAltException(this, followSet);

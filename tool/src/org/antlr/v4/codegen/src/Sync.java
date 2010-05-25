@@ -8,12 +8,15 @@ import org.antlr.v4.tool.GrammarAST;
 public class Sync extends SrcOp {
 	public int decision;
 	public BitSetDecl expecting;
-	public Sync(OutputModelFactory factory, GrammarAST blkOrEbnfRootAST,
-							IntervalSet expecting)
+	public Sync(OutputModelFactory factory,
+				GrammarAST blkOrEbnfRootAST,
+				IntervalSet expecting,
+				int decision,
+				String position)
 	{
 		super(factory, blkOrEbnfRootAST);
-//		this.decision = ((BlockStartState)blkOrEbnfRootAST.nfaState).decision;
-		this.expecting = factory.createExpectingBitSet(ast, decision, expecting);
+		this.decision = decision;
+		this.expecting = factory.createExpectingBitSet(ast, decision, expecting, position);
 		factory.defineBitSet(this.expecting);
 	}
 }

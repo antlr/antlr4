@@ -99,9 +99,10 @@ public abstract class OutputModelFactory {
 		return b;
 	}
 
-	public BitSetDecl createExpectingBitSet(GrammarAST ast, int decision, IntervalSet set) {
+	public BitSetDecl createExpectingBitSet(GrammarAST ast, int decision, IntervalSet set, String position) {
 		String inRuleName = ast.nfaState.rule.name;
-		String name = "EXPECTING_in_"+inRuleName+"_"+decision;
+		String name = "EXPECTING_in_"+inRuleName+"_"+position+"_"+decision;
+		//System.out.println("!!!!!!!! create "+name);
 		BitSetDecl b = new BitSetDecl(this, name, set);
 		return b;
 	}

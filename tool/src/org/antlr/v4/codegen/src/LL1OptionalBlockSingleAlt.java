@@ -11,13 +11,15 @@ import java.util.List;
 
 /** */
 public class LL1OptionalBlockSingleAlt extends LL1Choice {
-	public Object expr;
+	public OutputModelObject expr;
+	public OutputModelObject followExpr;
 	public LL1OptionalBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);
 		DFA dfa = factory.g.decisionDFAs.get(((BlockStartState)blkAST.nfaState).decision);
 		/** Lookahead for each alt 1..n */
 		IntervalSet[] altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);
 		IntervalSet look = altLookSets[1];
+		IntervalSet followLook = altLookSets[2];
 		expr = factory.getLL1Test(look, blkAST);
 		if ( expr instanceof TestSetInline ) {
 			TestSetInline e = (TestSetInline)expr;
@@ -26,5 +28,6 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
 			addPreambleOp(nextType);
 		}
+		followExpr = factory.getLL1Test(followLook, blkAST);
 	}
 }

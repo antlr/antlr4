@@ -1,4 +1,4 @@
-// $ANTLR ${project.version} ${buildNumber} SourceGenTriggers.g 2010-05-19 15:23:17
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 SourceGenTriggers.g 2010-05-25 13:12:36
 
 package org.antlr.v4.codegen;
 

@@ -15,7 +15,9 @@ javaTypeInitMap ::= [
 ParserFile(file, parser, dfaDecls, bitSetDecls, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
 <namedActions.header>
+import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.EarlyExitException;
 import org.antlr.v4.runtime.RecognizerSharedState;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -116,14 +118,12 @@ switch ( state.input.LA(1) ) {
 // follow set included as choice by analysis
 LL1OptionalBlock ::= LL1Choice
 
-LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error) ::= <<
+LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 <preamble; separator="\n">
 if ( <expr> ) {
     <alts; separator="\n">
 }
-else {
-    <error>
-}
+else if ( !(<followExpr>) ) <error>
 >>
 
 LL1StarBlock(choice, alts, sync) ::= <<
@@ -149,7 +149,7 @@ while ( <expr> ) {
 }
 >>
 
-LL1PlusBlock(choice, alts, earlyExitError, sync) ::= <<
+LL1PlusBlock(choice, alts, earlyExitError, sync, iterationSync) ::= <<
 <sync>
 int <choice.loopCounterVar> = 0;
 <choice.loopLabel>:
@@ -162,7 +162,8 @@ while (true) {
 		    if ( <choice.loopCounterVar> >= 1 ) break <choice.loopLabel>;
 		    else <earlyExitError>
 	}
-    <sync>
+	<choice.loopCounterVar>++;
+    <iterationSync>
 }
 >>
 
@@ -180,8 +181,8 @@ do {
 
 Sync(s) ::= "sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw new NoViableAlt(this, <t.expecting.name>);"
-ThrowEarlyExitException(t) ::= "throw new ThrowEarlyExitException(this, <t.expecting.name>);"
+ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this, <t.expecting.name>);"
+ThrowEarlyExitException(t) ::= "throw new EarlyExitException(this, <t.expecting.name>);"
 
 TestSet(s) ::= <<
 <s.set.name>.member(state.input.LA(1))
@@ -333,18 +334,18 @@ public static final int[] <name>_tokenTypeToAddr = {
 public final class <name>_PDA extends PDA {
 	<if(actions)>
     public void action(int r, int a) {
-	    <actions:{a |
         switch ( r ) {
-	    case <i0> : <a.name>_actions(a); break;
+	    <actions:{a |
+	    case <a.ruleIndex> : <a.name>_actions(a); break;
 	    }>
 	    }
 	}
 	<endif>
 	<if(sempreds)>
     public void sempred(int r, int a) {
-	    <sempreds:{p |
         switch ( r ) {
-	    case <i0> : return <p.name>_sempreds(a);
+	    <sempreds:{p |
+	    case <p.ruleIndex> : return <p.name>_sempreds(a);
 	    }>
 	    }
 	}
@@ -355,7 +356,7 @@ public final class <name>_PDA extends PDA {
 }<\n>
 >>
 
-actionMethod(name, actions) ::= <<
+actionMethod(name, actions, ruleIndex) ::= <<
 public void <name>_actions(int action) {
     switch ( action ) {
     <actions:{a |

@@ -11,14 +11,19 @@ import java.util.List;
 
 /** */
 public abstract class Choice extends SrcOp {
-	public int decision;
+	public int decision = -1;
 	public List<CodeBlock> alts;
 	public List<SrcOp> preamble;
 	public IntervalSet expecting;
 
-	public Choice(OutputModelFactory factory, GrammarAST blkOrEbnfRootAST, List<CodeBlock> alts) {
+	public Choice(OutputModelFactory factory,
+				  GrammarAST blkOrEbnfRootAST,
+				  List<CodeBlock> alts,
+				  int decision)
+	{
 		super(factory, blkOrEbnfRootAST);
 		this.alts = alts;
+		this.decision = decision;
 
 		// TODO: use existing lookahead! don't compute
 		LinearApproximator approx = new LinearApproximator(factory.g, decision);

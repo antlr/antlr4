@@ -19,7 +19,10 @@ public class LL1StarBlock extends LL1Loop {
 	public String[] exitLook;
 	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		// point at choice block inside outermost enter-exit choice
-		super(factory, ((StarBlockStartState)blkAST.nfaState).transition(0).target.ast, alts);
+		super(factory,
+			  ((StarBlockStartState)blkAST.nfaState).transition(0).target.ast,
+			  alts,
+			  ((StarBlockStartState) blkAST.nfaState).decision);			  
 		StarBlockStartState star = (StarBlockStartState)blkAST.nfaState;
 		int enterExitDecision = star.decision;
 		BlockStartState blkStart = (BlockStartState)star.transition(0).target;
