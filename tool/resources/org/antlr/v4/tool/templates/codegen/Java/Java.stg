@@ -300,7 +300,7 @@ import org.antlr.runtime.*;
 <lexer>
 >>
 
-Lexer(lexerName, modes, pdas, tokens, actions, sempreds) ::= <<
+Lexer(lexerName, modes, pdas, tokens, actions, sempreds, namedActions) ::= <<
 public class <lexerName> extends Lexer {
     <tokens.keys:{k | public static final int <k>=<tokens.(k)>;}; separator="\n">
     <modes:{m| public static final int <m> = <i0>;}; separator="\n">
@@ -310,27 +310,27 @@ public class <lexerName> extends Lexer {
     }
     public <lexerName>(CharStream input, LexerSharedState state) {
         super(input,state);
+	    modeToPDA = new PDA[] { <modes:{m | new <m>_PDA()}; separator=", "> };
     }
     public String getGrammarFileName() { return "<fileName>"; }
+
+    <namedActions.members>
 
     <actions>
     <sempreds>
     <pdas>
-
-    static {
-	    modeToPDA = new PDA[] { <modes:{m | new <m>_PDA()}; separator=", "> };
-    }
 }
 >>
 
 PDA(name, model, actions, sempreds) ::= <<
-public static final class <name>_PDA extends PDA {
-	public static final byte[] code = {
-	    <model.code; separator=", ">
-	};
-	public static final int[] tokenTypeToAddr = {
-	    <model.tokenTypeToAddr; separator=", ">
-	};
+public static final byte[] <name>_code = {
+    <model.code; separator=", ">
+};
+public static final int[] <name>_tokenTypeToAddr = {
+    <model.tokenTypeToAddr; separator=", ">
+};
+
+public final class <name>_PDA extends PDA {
 	<if(actions)>
     public void action(int r, int a) {
 	    <actions:{a |
@@ -350,9 +350,9 @@ public static final class <name>_PDA extends PDA {
 	}
 	<endif>
     public <name>_PDA() {
-    	super(code, tokenTypeToAddr, <model.nLabels>);
+    	super(<name>_code, <name>_tokenTypeToAddr, <model.nLabels>);
     }
-}
+}<\n>
 >>
 
 actionMethod(name, actions) ::= <<
