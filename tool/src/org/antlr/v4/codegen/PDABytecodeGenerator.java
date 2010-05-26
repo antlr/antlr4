@@ -3,6 +3,7 @@ package org.antlr.v4.codegen;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.pda.*;
 import org.antlr.v4.misc.CharSupport;
@@ -12,10 +13,7 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.runtime.tree.TreeParser;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 import java.util.Map;
 
@@ -171,6 +169,20 @@ public class PDABytecodeGenerator extends TreeParser {
 		System.out.println(Bytecode.disassemble(gen.pda.code));
 		System.out.println("rule addrs="+gen.pda.ruleToAddr);
 		return gen.pda;
+	}
+
+	// (BLOCK (ALT .)) or (BLOCK (ALT 'a') (ALT .))
+	public boolean blockHasWildcardAlt(GrammarAST block) {
+		for (Object alt : block.getChildren()) {
+			AltAST altAST = (AltAST)alt;
+			if ( altAST.getChildCount()==1 ) {
+				Tree e = altAST.getChild(0);
+				if ( e.getChildCount()==0 && e.getType()==ANTLRParser.WILDCARD ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	// testing

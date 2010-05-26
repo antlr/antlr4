@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 PDABytecodeTriggers.g 2010-05-25 13:12:36
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 PDABytecodeTriggers.g 2010-05-26 14:22:40
 
 package org.antlr.v4.codegen;
 
@@ -676,9 +676,10 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
         	GrammarASTWithOptions blk = (GrammarASTWithOptions)((GrammarAST)retval.start).getChild(0);
         	String greedyOption = blk.getOption("greedy");
+        	if ( blockHasWildcardAlt(blk) && greedyOption==null ) greedyOption = "false";
 
         try {
-            // PDABytecodeTriggers.g:86:2: ( ^( astBlockSuffix block ) | ^( OPTIONAL block ) | ^( CLOSURE block ) | ^( POSITIVE_CLOSURE block ) | block )
+            // PDABytecodeTriggers.g:87:2: ( ^( astBlockSuffix block ) | ^( OPTIONAL block ) | ^( CLOSURE block ) | ^( POSITIVE_CLOSURE block ) | block )
             int alt9=5;
             switch ( input.LA(1) ) {
             case IMPLIES:
@@ -717,7 +718,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
             switch (alt9) {
                 case 1 :
-                    // PDABytecodeTriggers.g:86:4: ^( astBlockSuffix block )
+                    // PDABytecodeTriggers.g:87:4: ^( astBlockSuffix block )
                     {
                     pushFollow(FOLLOW_astBlockSuffix_in_ebnf398);
                     astBlockSuffix();
@@ -737,7 +738,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // PDABytecodeTriggers.g:87:4: ^( OPTIONAL block )
+                    // PDABytecodeTriggers.g:88:4: ^( OPTIONAL block )
                     {
 
                     	   	SplitInstr S = new SplitInstr(2);
@@ -761,7 +762,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // PDABytecodeTriggers.g:96:4: ^( CLOSURE block )
+                    // PDABytecodeTriggers.g:97:4: ^( CLOSURE block )
                     {
 
                     		int start=pda.ip;
@@ -791,7 +792,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // PDABytecodeTriggers.g:111:4: ^( POSITIVE_CLOSURE block )
+                    // PDABytecodeTriggers.g:112:4: ^( POSITIVE_CLOSURE block )
                     {
                     int start=pda.ip;
                     match(input,POSITIVE_CLOSURE,FOLLOW_POSITIVE_CLOSURE_in_ebnf451); 
@@ -816,7 +817,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 5 :
-                    // PDABytecodeTriggers.g:120:5: block
+                    // PDABytecodeTriggers.g:121:5: block
                     {
                     pushFollow(FOLLOW_block_in_ebnf464);
                     block();
@@ -841,10 +842,10 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
 
     // $ANTLR start "astBlockSuffix"
-    // PDABytecodeTriggers.g:123:1: astBlockSuffix : ( ROOT | IMPLIES | BANG );
+    // PDABytecodeTriggers.g:124:1: astBlockSuffix : ( ROOT | IMPLIES | BANG );
     public final void astBlockSuffix() throws RecognitionException {
         try {
-            // PDABytecodeTriggers.g:124:5: ( ROOT | IMPLIES | BANG )
+            // PDABytecodeTriggers.g:125:5: ( ROOT | IMPLIES | BANG )
             // PDABytecodeTriggers.g:
             {
             if ( input.LA(1)==IMPLIES||input.LA(1)==BANG||input.LA(1)==ROOT ) {
@@ -872,18 +873,18 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
 
     // $ANTLR start "atom"
-    // PDABytecodeTriggers.g:129:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref );
+    // PDABytecodeTriggers.g:130:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref );
     public final void atom() throws RecognitionException {
         GrammarAST WILDCARD5=null;
         GrammarAST WILDCARD6=null;
 
         try {
-            // PDABytecodeTriggers.g:130:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref )
+            // PDABytecodeTriggers.g:131:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref )
             int alt10=12;
             alt10 = dfa10.predict(input);
             switch (alt10) {
                 case 1 :
-                    // PDABytecodeTriggers.g:130:4: ^( ROOT range )
+                    // PDABytecodeTriggers.g:131:4: ^( ROOT range )
                     {
                     match(input,ROOT,FOLLOW_ROOT_in_atom518); 
 
@@ -899,7 +900,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // PDABytecodeTriggers.g:131:4: ^( BANG range )
+                    // PDABytecodeTriggers.g:132:4: ^( BANG range )
                     {
                     match(input,BANG,FOLLOW_BANG_in_atom530); 
 
@@ -915,7 +916,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // PDABytecodeTriggers.g:132:4: ^( ROOT notSet )
+                    // PDABytecodeTriggers.g:133:4: ^( ROOT notSet )
                     {
                     match(input,ROOT,FOLLOW_ROOT_in_atom542); 
 
@@ -931,7 +932,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // PDABytecodeTriggers.g:133:4: ^( BANG notSet )
+                    // PDABytecodeTriggers.g:134:4: ^( BANG notSet )
                     {
                     match(input,BANG,FOLLOW_BANG_in_atom554); 
 
@@ -947,7 +948,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 5 :
-                    // PDABytecodeTriggers.g:134:4: notSet
+                    // PDABytecodeTriggers.g:135:4: notSet
                     {
                     pushFollow(FOLLOW_notSet_in_atom565);
                     notSet();
@@ -958,7 +959,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 6 :
-                    // PDABytecodeTriggers.g:135:4: range
+                    // PDABytecodeTriggers.g:136:4: range
                     {
                     pushFollow(FOLLOW_range_in_atom575);
                     range();
@@ -969,7 +970,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 7 :
-                    // PDABytecodeTriggers.g:136:4: ^( DOT ID terminal[false] )
+                    // PDABytecodeTriggers.g:137:4: ^( DOT ID terminal[false] )
                     {
                     match(input,DOT,FOLLOW_DOT_in_atom586); 
 
@@ -986,7 +987,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 8 :
-                    // PDABytecodeTriggers.g:137:4: ^( DOT ID ruleref )
+                    // PDABytecodeTriggers.g:138:4: ^( DOT ID ruleref )
                     {
                     match(input,DOT,FOLLOW_DOT_in_atom600); 
 
@@ -1003,7 +1004,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 9 :
-                    // PDABytecodeTriggers.g:138:7: ^( WILDCARD . )
+                    // PDABytecodeTriggers.g:139:7: ^( WILDCARD . )
                     {
                     WILDCARD5=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom616); 
 
@@ -1016,7 +1017,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 10 :
-                    // PDABytecodeTriggers.g:139:7: WILDCARD
+                    // PDABytecodeTriggers.g:140:7: WILDCARD
                     {
                     WILDCARD6=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom632); 
                     emit(new WildcardInstr(WILDCARD6.token));
@@ -1024,7 +1025,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 11 :
-                    // PDABytecodeTriggers.g:140:9: terminal[false]
+                    // PDABytecodeTriggers.g:141:9: terminal[false]
                     {
                     pushFollow(FOLLOW_terminal_in_atom647);
                     terminal(false);
@@ -1035,7 +1036,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 12 :
-                    // PDABytecodeTriggers.g:141:9: ruleref
+                    // PDABytecodeTriggers.g:142:9: ruleref
                     {
                     pushFollow(FOLLOW_ruleref_in_atom662);
                     ruleref();
@@ -1060,10 +1061,10 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
 
     // $ANTLR start "notSet"
-    // PDABytecodeTriggers.g:144:1: notSet : ( ^( NOT terminal[true] ) | ^( NOT block ) );
+    // PDABytecodeTriggers.g:145:1: notSet : ( ^( NOT terminal[true] ) | ^( NOT block ) );
     public final void notSet() throws RecognitionException {
         try {
-            // PDABytecodeTriggers.g:145:5: ( ^( NOT terminal[true] ) | ^( NOT block ) )
+            // PDABytecodeTriggers.g:146:5: ( ^( NOT terminal[true] ) | ^( NOT block ) )
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -1101,7 +1102,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
             }
             switch (alt11) {
                 case 1 :
-                    // PDABytecodeTriggers.g:145:7: ^( NOT terminal[true] )
+                    // PDABytecodeTriggers.g:146:7: ^( NOT terminal[true] )
                     {
                     match(input,NOT,FOLLOW_NOT_in_notSet685); 
 
@@ -1117,7 +1118,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // PDABytecodeTriggers.g:146:7: ^( NOT block )
+                    // PDABytecodeTriggers.g:147:7: ^( NOT block )
                     {
                     match(input,NOT,FOLLOW_NOT_in_notSet698); 
 
@@ -1147,10 +1148,10 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
 
     // $ANTLR start "ruleref"
-    // PDABytecodeTriggers.g:149:1: ruleref : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
+    // PDABytecodeTriggers.g:150:1: ruleref : ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) );
     public final void ruleref() throws RecognitionException {
         try {
-            // PDABytecodeTriggers.g:150:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
+            // PDABytecodeTriggers.g:151:5: ( ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) ) | ^( BANG ^( RULE_REF ( ARG_ACTION )? ) ) | ^( RULE_REF ( ARG_ACTION )? ) )
             int alt15=3;
             switch ( input.LA(1) ) {
             case ROOT:
@@ -1177,7 +1178,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
             switch (alt15) {
                 case 1 :
-                    // PDABytecodeTriggers.g:150:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
+                    // PDABytecodeTriggers.g:151:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
                     {
                     match(input,ROOT,FOLLOW_ROOT_in_ruleref722); 
 
@@ -1186,7 +1187,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // PDABytecodeTriggers.g:150:25: ( ARG_ACTION )?
+                        // PDABytecodeTriggers.g:151:25: ( ARG_ACTION )?
                         int alt12=2;
                         int LA12_0 = input.LA(1);
 
@@ -1195,7 +1196,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                         }
                         switch (alt12) {
                             case 1 :
-                                // PDABytecodeTriggers.g:150:25: ARG_ACTION
+                                // PDABytecodeTriggers.g:151:25: ARG_ACTION
                                 {
                                 match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref727); 
 
@@ -1213,7 +1214,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // PDABytecodeTriggers.g:151:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
+                    // PDABytecodeTriggers.g:152:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
                     {
                     match(input,BANG,FOLLOW_BANG_in_ruleref740); 
 
@@ -1222,7 +1223,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // PDABytecodeTriggers.g:151:25: ( ARG_ACTION )?
+                        // PDABytecodeTriggers.g:152:25: ( ARG_ACTION )?
                         int alt13=2;
                         int LA13_0 = input.LA(1);
 
@@ -1231,7 +1232,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                         }
                         switch (alt13) {
                             case 1 :
-                                // PDABytecodeTriggers.g:151:25: ARG_ACTION
+                                // PDABytecodeTriggers.g:152:25: ARG_ACTION
                                 {
                                 match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref745); 
 
@@ -1249,13 +1250,13 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // PDABytecodeTriggers.g:152:7: ^( RULE_REF ( ARG_ACTION )? )
+                    // PDABytecodeTriggers.g:153:7: ^( RULE_REF ( ARG_ACTION )? )
                     {
                     match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref758); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // PDABytecodeTriggers.g:152:18: ( ARG_ACTION )?
+                        // PDABytecodeTriggers.g:153:18: ( ARG_ACTION )?
                         int alt14=2;
                         int LA14_0 = input.LA(1);
 
@@ -1264,7 +1265,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                         }
                         switch (alt14) {
                             case 1 :
-                                // PDABytecodeTriggers.g:152:18: ARG_ACTION
+                                // PDABytecodeTriggers.g:153:18: ARG_ACTION
                                 {
                                 match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref760); 
 
@@ -1294,14 +1295,14 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
 
     // $ANTLR start "range"
-    // PDABytecodeTriggers.g:155:1: range : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
+    // PDABytecodeTriggers.g:156:1: range : ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) ;
     public final void range() throws RecognitionException {
         GrammarAST a=null;
         GrammarAST b=null;
 
         try {
-            // PDABytecodeTriggers.g:156:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
-            // PDABytecodeTriggers.g:156:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
+            // PDABytecodeTriggers.g:157:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
+            // PDABytecodeTriggers.g:157:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
             {
             match(input,RANGE,FOLLOW_RANGE_in_range783); 
 
@@ -1327,7 +1328,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
 
 
     // $ANTLR start "terminal"
-    // PDABytecodeTriggers.g:160:1: terminal[boolean not] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) );
+    // PDABytecodeTriggers.g:161:1: terminal[boolean not] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) );
     public final void terminal(boolean not) throws RecognitionException {
         GrammarAST STRING_LITERAL7=null;
         GrammarAST STRING_LITERAL8=null;
@@ -1336,12 +1337,12 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
         GrammarAST TOKEN_REF11=null;
 
         try {
-            // PDABytecodeTriggers.g:161:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) )
+            // PDABytecodeTriggers.g:162:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) )
             int alt16=7;
             alt16 = dfa16.predict(input);
             switch (alt16) {
                 case 1 :
-                    // PDABytecodeTriggers.g:161:8: ^( STRING_LITERAL . )
+                    // PDABytecodeTriggers.g:162:8: ^( STRING_LITERAL . )
                     {
                     STRING_LITERAL7=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal819); 
 
@@ -1354,7 +1355,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 2 :
-                    // PDABytecodeTriggers.g:162:7: STRING_LITERAL
+                    // PDABytecodeTriggers.g:163:7: STRING_LITERAL
                     {
                     STRING_LITERAL8=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal834); 
                     emitString(STRING_LITERAL8.token, not);
@@ -1362,7 +1363,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 3 :
-                    // PDABytecodeTriggers.g:163:7: ^( TOKEN_REF ARG_ACTION . )
+                    // PDABytecodeTriggers.g:164:7: ^( TOKEN_REF ARG_ACTION . )
                     {
                     TOKEN_REF9=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal848); 
 
@@ -1376,7 +1377,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 4 :
-                    // PDABytecodeTriggers.g:164:7: ^( TOKEN_REF . )
+                    // PDABytecodeTriggers.g:165:7: ^( TOKEN_REF . )
                     {
                     TOKEN_REF10=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal864); 
 
@@ -1389,7 +1390,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 5 :
-                    // PDABytecodeTriggers.g:165:7: TOKEN_REF
+                    // PDABytecodeTriggers.g:166:7: TOKEN_REF
                     {
                     TOKEN_REF11=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal880); 
                     emit(new CallInstr(TOKEN_REF11.token));
@@ -1397,7 +1398,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 6 :
-                    // PDABytecodeTriggers.g:166:7: ^( ROOT terminal[false] )
+                    // PDABytecodeTriggers.g:167:7: ^( ROOT terminal[false] )
                     {
                     match(input,ROOT,FOLLOW_ROOT_in_terminal895); 
 
@@ -1413,7 +1414,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
                     }
                     break;
                 case 7 :
-                    // PDABytecodeTriggers.g:167:7: ^( BANG terminal[false] )
+                    // PDABytecodeTriggers.g:168:7: ^( BANG terminal[false] )
                     {
                     match(input,BANG,FOLLOW_BANG_in_terminal911); 
 
@@ -1653,7 +1654,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
             this.transition = DFA10_transition;
         }
         public String getDescription() {
-            return "129:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref );";
+            return "130:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref );";
         }
     }
     static final String DFA16_eotS =
@@ -1719,7 +1720,7 @@ public class PDABytecodeTriggers extends PDABytecodeGenerator {
             this.transition = DFA16_transition;
         }
         public String getDescription() {
-            return "160:1: terminal[boolean not] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) );";
+            return "161:1: terminal[boolean not] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) );";
         }
     }
  

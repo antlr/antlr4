@@ -82,6 +82,7 @@ ebnf
 @init {
 	GrammarASTWithOptions blk = (GrammarASTWithOptions)$start.getChild(0);
 	String greedyOption = blk.getOption("greedy");
+	if ( blockHasWildcardAlt(blk) && greedyOption==null ) greedyOption = "false";
 }
 	:	^(astBlockSuffix block)		
 	|	{
