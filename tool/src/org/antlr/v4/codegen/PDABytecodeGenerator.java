@@ -177,7 +177,7 @@ public class PDABytecodeGenerator extends TreeParser {
 			AltAST altAST = (AltAST)alt;
 			if ( altAST.getChildCount()==1 ) {
 				Tree e = altAST.getChild(0);
-				if ( e.getChildCount()==0 && e.getType()==ANTLRParser.WILDCARD ) {
+				if ( e.getType()==ANTLRParser.WILDCARD ) {
 					return true;
 				}
 			}
