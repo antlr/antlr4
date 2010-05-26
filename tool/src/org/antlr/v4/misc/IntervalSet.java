@@ -190,9 +190,16 @@ public class IntervalSet implements IntSet {
     }
 */
 
-	public void addAll(IntSet set) {
+	/** combine all sets in the array returned the or'd value */
+	public static IntervalSet or(IntervalSet[] sets) {
+		IntervalSet r = new IntervalSet();
+		for (IntervalSet s : sets) r.addAll(s);
+		return r;
+	}
+
+	public IntSet addAll(IntSet set) {
 		if ( set==null ) {
-			return;
+			return this;
 		}
         if ( !(set instanceof IntervalSet) ) {
             throw new IllegalArgumentException("can't add non IntSet ("+
@@ -206,6 +213,7 @@ public class IntervalSet implements IntSet {
 			Interval I = (Interval) other.intervals.get(i);
 			this.add(I.a,I.b);
 		}
+		return this;
     }
 
     public IntSet complement(int minElement, int maxElement) {

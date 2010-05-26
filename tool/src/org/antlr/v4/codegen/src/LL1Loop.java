@@ -15,11 +15,9 @@ public abstract class LL1Loop extends Choice {
 
 	public LL1Loop(OutputModelFactory factory,
 				   GrammarAST blkAST,
-				   List<CodeBlock> alts,
-				   int decision)
+				   List<CodeBlock> alts)
 	{
-		super(factory, blkAST, alts, decision);
-		this.sync = new Sync(factory, blkAST, expecting, decision, "enter");		
+		super(factory, blkAST, alts);
 	}
 
 	public void addIterationOp(SrcOp op) {
@@ -27,16 +25,13 @@ public abstract class LL1Loop extends Choice {
 		iteration.add(op);
 	}
 
-	public void addCodeForLookaheadTempVar(IntervalSet look) {
-		expr = factory.getLL1Test(look, ast);
+	public OutputModelObject addCodeForLoopLookaheadTempVar(IntervalSet look) {
+		OutputModelObject expr = addCodeForLookaheadTempVar(look);
 		if ( expr instanceof TestSetInline ) {
-			TestSetInline e = (TestSetInline) expr;
-			Decl d = new TokenTypeDecl(factory, e.varName);
-			factory.currentRule.peek().addDecl(d);
+			TestSetInline e = (TestSetInline)expr;
 			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
-			addPreambleOp(nextType);
 			addIterationOp(nextType);
 		}
+		return expr;
 	}
-
 }

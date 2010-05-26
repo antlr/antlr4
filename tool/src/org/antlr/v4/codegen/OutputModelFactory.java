@@ -62,7 +62,7 @@ public abstract class OutputModelFactory {
 				else c = new LL1PlusBlock(this, ebnfRoot, alts);
 				break;
 			default :
-				c = new LL1Choice(this, blkAST, alts);
+				c = new LL1AltBlock(this, blkAST, alts);
 				break;
 		}
 		return c;

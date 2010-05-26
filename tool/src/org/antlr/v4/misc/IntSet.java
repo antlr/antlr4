@@ -45,9 +45,9 @@ public interface IntSet {
     void add(int el);
 
     /** Add all elements from incoming set to this set.  Can limit
-     *  to set of its own type.
+     *  to set of its own type. Return "this" so we can chain calls.
      */
-    void addAll(IntSet set);
+    IntSet addAll(IntSet set);
 
     /** Return the intersection of this set with the argument, creating
      *  a new set.

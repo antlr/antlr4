@@ -1,7 +1,5 @@
 package org.antlr.v4.codegen.src;
 
-import org.antlr.v4.analysis.LinearApproximator;
-import org.antlr.v4.automata.NFAState;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
@@ -9,40 +7,33 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.ArrayList;
 import java.util.List;
 
-/** */
+/** The class hierarchy underneath SrcOp is pretty deep but makes sense that,
+ *  for example LL1StarBlock is a kind of LL1Loop which is a kind of Choice
+ *  which is a kind of Choice. The problem is it's impossible to figure
+ *  out how to construct one of these deeply nested objects because of the
+ *  long super constructor call chain. Instead, I decided to in-line all of
+ *  this and then look for opportunities to re-factor code into functions.
+ *  It makes sense to use a class hierarchy to share data fields, but I don't
+ * think it makes sense to factor code using super  constructors because
+ * it has too much work to do.
+ */
 public abstract class Choice extends SrcOp {
 	public int decision = -1;
 	public List<CodeBlock> alts;
 	public List<SrcOp> preamble;
-	public IntervalSet expecting;
 
 	public Choice(OutputModelFactory factory,
 				  GrammarAST blkOrEbnfRootAST,
-				  List<CodeBlock> alts,
-				  int decision)
+				  List<CodeBlock> alts)
 	{
 		super(factory, blkOrEbnfRootAST);
 		this.alts = alts;
-		this.decision = decision;
-
-		// TODO: use existing lookahead! don't compute
-		LinearApproximator approx = new LinearApproximator(factory.g, decision);
-		NFAState decisionState = ast.nfaState;
-		expecting = approx.FIRST(decisionState);
-		System.out.println(blkOrEbnfRootAST.toStringTree()+" choice expecting="+expecting);
 	}
 
 	public void addPreambleOp(SrcOp op) {
 		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
 		preamble.add(op);
 	}
-
-//	@Override
-//	public List<String> getChildren() {
-//		final List<String> sup = super.getChildren();
-//		return new ArrayList<String>() {{ if ( sup!=null ) addAll(sup);
-//			add("alts"); add("preamble"); add("error"); }};
-//	}
 
 	public List<String[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
 		List<String[]> altLook = new ArrayList<String[]>();
@@ -52,4 +43,17 @@ public abstract class Choice extends SrcOp {
 		}
 		return altLook;
 	}
+
+	public OutputModelObject addCodeForLookaheadTempVar(IntervalSet look) {
+		OutputModelObject expr = factory.getLL1Test(look, ast);
+		if ( expr instanceof TestSetInline) {
+			TestSetInline e = (TestSetInline)expr;
+			Decl d = new TokenTypeDecl(factory, e.varName);
+			factory.currentRule.peek().addDecl(d);
+			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
+			addPreambleOp(nextType);
+		}
+		return expr;
+	}
+
 }

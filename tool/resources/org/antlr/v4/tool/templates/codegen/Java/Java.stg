@@ -105,7 +105,7 @@ CodeBlock(c, ops) ::= <<
 <ops; separator="\n">
 >>
 
-LL1Choice(choice, alts, error) ::= <<
+LL1AltBlock(choice, alts, error) ::= <<
 switch ( state.input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
@@ -116,7 +116,7 @@ switch ( state.input.LA(1) ) {
 >>
 
 // follow set included as choice by analysis
-LL1OptionalBlock ::= LL1Choice
+LL1OptionalBlock ::= LL1AltBlock
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 <preamble; separator="\n">
@@ -168,14 +168,14 @@ while (true) {
 >>
 
 LL1PlusBlockSingleAlt(choice, expr, alts, preamble, iteration,
-                      earlyExitError, sync) ::=
+                      earlyExitError, sync, iterationSync) ::=
 <<
 <sync>
 <preamble; separator="\n">
 do {
     <alts; separator="\n">
     <iteration>
-    <sync>
+    <iterationSync>
 } while ( <expr> );
 >>
 

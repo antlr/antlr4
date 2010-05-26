@@ -93,7 +93,7 @@ public class BitSet implements IntSet, Cloneable {
         bits[n] |= bitMask(el);
     }
 
-    public void addAll(IntSet set) {
+    public IntSet addAll(IntSet set) {
         if ( set instanceof BitSet ) {
             this.orInPlace((BitSet)set);
         }
@@ -110,21 +110,23 @@ public class BitSet implements IntSet, Cloneable {
 											   set.getClass().getName()+
 											   " to BitSet");
 		}
+		return this;
     }
 
-	public void addAll(int[] elements) {
+	public IntSet addAll(int[] elements) {
 		if ( elements==null ) {
-			return;
+			return this;
 		}
 		for (int i = 0; i < elements.length; i++) {
 			int e = elements[i];
 			add(e);
 		}
+		return this;
 	}
 
-	public void addAll(Iterable elements) {
+	public IntSet addAll(Iterable elements) {
 		if ( elements==null ) {
-			return;
+			return this;
 		}
 		Iterator it = elements.iterator();
 		while (it.hasNext()) {
@@ -135,17 +137,7 @@ public class BitSet implements IntSet, Cloneable {
 			Integer eI = (Integer)o;
 			add(eI.intValue());
 		}
-		/*
-		int n = elements.size();
-		for (int i = 0; i < n; i++) {
-			Object o = elements.get(i);
-			if ( !(o instanceof Integer) ) {
-				throw new IllegalArgumentException();
-			}
-			Integer eI = (Integer)o;
-			add(eI.intValue());
-		}
-		 */
+		return this;
 	}
 
     public IntSet and(IntSet a) {
