@@ -31,21 +31,22 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
+import org.antlr.v4.runtime.misc.QStack;
 import org.antlr.v4.runtime.pda.PDA;
+
+import java.util.EmptyStackException;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
  *  uses simplified match() and error recovery mechanisms in the interest
  *  of speed.
  */
-public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource {
+public abstract class Lexer implements TokenSource {
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
 	public static final int SKIP = -3; 
 
 	public LexerSharedState state;
-
-	public int _mode = DEFAULT_MODE;
 
 	public static PDA[] modeToPDA;
 
@@ -100,25 +101,14 @@ public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource 
 					eof.setCharPositionInLine(getCharPositionInLine());
 					return eof;
 				}
-				int ttype = modeToPDA[_mode].execThompson(state.input);
+				int ttype = modeToPDA[state.mode].execThompson(state.input);
 				if ( state.type == Token.INVALID_TOKEN_TYPE ) state.type = ttype;
 				if ( state.type==SKIP ) {
 					continue outer;
 				}
-//				if ( state.token==null ) {
-//					emit();
-//				}
 			} while ( state.type==MORE );
-			emit();
+			if ( state.token==null ) emit();
 			return state.token;
-//			catch (NoViableAltException nva) {
-//				reportError(nva);
-//				recover(nva); // throw out current char and try again
-//			}
-//			catch (RecognitionException re) {
-//				reportError(re);
-//				// match() routine has already called recover()
-//			}
 		}
 	}
 
@@ -129,7 +119,23 @@ public abstract class Lexer /* extends BaseRecognizer */ implements TokenSource 
 	 *  and emits it.
 	 */
 	public void skip() {
-		state.token = Token.SKIP_TOKEN;
+		state.type = SKIP;
+	}
+
+	public void more() {
+		state.type = MORE;
+	}
+
+	public void mode(int m) { state.mode = m; }
+	public void pushMode(int m) {
+		if ( state.modeStack==null ) state.modeStack = new QStack<Integer>();
+		state.modeStack.push(state.mode);
+		state.mode = m;
+	}
+	public int popMode() {
+		if ( state.modeStack==null ) throw new EmptyStackException();
+		state.mode = state.modeStack.pop();
+		return state.mode;
 	}
 
 	/** Set the char stream and reset the lexer */
