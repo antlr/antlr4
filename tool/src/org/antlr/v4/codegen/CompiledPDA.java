@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /** */
-public class CompiledPDA {		public List<Instr> instrs = new ArrayList<Instr>();
+public class CompiledPDA {
+	public List<Instr> instrs = new ArrayList<Instr>();
 	public byte[] code; // instrs in bytecode form
 	public int ip = 0; // where to write next
 	public Map<String, Integer> ruleToAddr = new HashMap<String, Integer>();

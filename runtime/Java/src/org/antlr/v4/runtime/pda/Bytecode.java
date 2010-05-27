@@ -74,25 +74,29 @@ public class Bytecode {
 		new Instruction("action", OperandType.SHORT, OperandType.SHORT), // action ruleIndex, actionIndex
 	};
 
-	public static String disassemble(byte[] code, int start) {
+	public static String disassemble(byte[] code, int start, boolean operandsAreChars) {
 		StringBuilder buf = new StringBuilder();
 		int i=start;
 		while (i<code.length) {
-			i = disassembleInstruction(buf, code, i);
+			i = disassembleInstruction(buf, code, i, operandsAreChars);
 			buf.append('\n');
 		}
 		return buf.toString();
 	}
 
-	public static String disassemble(byte[] code) { return disassemble(code, 0); }
+	public static String disassemble(byte[] code) { return disassemble(code, 0, true); }
 
-	public static String disassembleInstruction(byte[] code, int ip) {
+	public static String disassemble(byte[] code, boolean operandsAreChars) {
+		return disassemble(code, 0, operandsAreChars);
+	}
+
+	public static String disassembleInstruction(byte[] code, int ip, boolean operandsAreChars) {
 		StringBuilder buf = new StringBuilder();
-		disassembleInstruction(buf, code, ip);
+		disassembleInstruction(buf, code, ip, operandsAreChars);
 		return buf.toString();
 	}
 
-	public static int disassembleInstruction(StringBuilder buf, byte[] code, int ip) {
+	public static int disassembleInstruction(StringBuilder buf, byte[] code, int ip, boolean operandsAreChars) {
 		int opcode = code[ip];
 		if ( ip>=code.length ) {
 			throw new IllegalArgumentException("ip out of range: "+ip);
@@ -126,13 +130,16 @@ public class Bytecode {
 					case NONE:
 						break;
 					case BYTE:
-						operands.add("'"+(char)code[ip]+"'");
+						if ( operandsAreChars ) operands.add("'"+(char)code[ip]+"'");
+						else operands.add(String.valueOf(code[ip]));
 						break;
 					case CHAR :
-						operands.add("'"+(char)getShort(code, ip)+"'");
+						if ( operandsAreChars ) operands.add("'"+(char)getShort(code, ip)+"'");
+						else operands.add(String.valueOf(getShort(code, ip)));
 						break;
 					case INT :
-						operands.add("'"+(char)getInt(code, ip)+"'");
+						if ( operandsAreChars ) operands.add("'"+(char)getInt(code, ip)+"'");
+						else operands.add(String.valueOf(getInt(code, ip)));
 					case SHORT :
 					case ADDR :
 						operands.add(String.valueOf(getShort(code, ip)));

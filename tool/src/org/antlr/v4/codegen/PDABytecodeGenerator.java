@@ -5,6 +5,9 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.v4.automata.DFA;
+import org.antlr.v4.automata.DFAState;
+import org.antlr.v4.automata.Edge;
 import org.antlr.v4.codegen.pda.*;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.IntervalSet;
@@ -197,5 +200,68 @@ public class PDABytecodeGenerator extends TreeParser {
 	public static void writeShort(byte[] memory, int index, short value) {
 		memory[index+0] = (byte)((value>>(8*1))&0xFF);
 		memory[index+1] = (byte)(value&0xFF);
+	}
+
+	// ----------
+
+	public static PDA getPDA(DFA dfa) {
+		PDABytecodeTriggers gen = new PDABytecodeTriggers(null);
+		gen.g = dfa.g;
+		gen.pda.tokenTypeToAddr = new int[gen.g.getMaxTokenType()+1];
+		gen.walk(dfa);
+		gen.pda.code = gen.convertInstrsToBytecode();
+		CompiledPDA c = gen.pda;
+		return new PDA(c.code, c.ruleToAddr, c.tokenTypeToAddr, c.nLabels);
+	}
+
+	boolean[] marked;
+	int[] stateToAddr;
+
+	public PDA walk(DFA dfa) {
+		marked = new boolean[dfa.stateSet.size()+1];
+		stateToAddr = new int[dfa.stateSet.size()+1];
+		walk(dfa.startState);
+
+		// walk code, update jump targets.
+		for (Instr I : pda.instrs) {
+			System.out.println("instr "+I);
+			if ( I instanceof JumpInstr ) {
+				JumpInstr J = (JumpInstr)I;
+				J.target = stateToAddr[J.target];
+			}
+		}
+
+		return null;
+	}
+
+	// recursive so we follow chains in DFA, leading to fewer
+	// jmp instructions.
+	// start by assuming state num is bytecode addr then translate after
+	// in one pass
+	public void walk(DFAState d) {
+		if ( marked[d.stateNumber] ) return;
+		marked[d.stateNumber] = true;
+		stateToAddr[d.stateNumber] = pda.ip;
+		System.out.println("visit "+d.stateNumber+" @"+pda.ip);
+		if ( d.isAcceptState ) {
+			AcceptInstr A = new AcceptInstr(d.predictsAlt);
+			emit(A);
+			return;
+		}
+		SplitInstr S = null;
+		if ( d.edges.size()>1 ) {
+			S = new SplitInstr(d.edges.size());
+			emit(S);
+		}
+		for (Edge e : d.edges) {
+			if ( S!=null ) S.addrs.add(pda.ip);
+			// TODO: assumes no sets yet!
+			MatchInstr M = new MatchInstr(e.label.getSingleElement());
+			JumpInstr J = new JumpInstr(e.target.stateNumber);
+			emit(M);
+			emit(J);
+			walk(e.target);
+		}
+
 	}
 }

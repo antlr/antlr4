@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.pda.Bytecode;
 public class MatchInstr extends Instr {
 	public Token token;
 	public int c;
+	public MatchInstr(int c) { super(); this.c = c; }
 	public MatchInstr(Token t, int c) { super(); this.token = t; this.c = c; }
 	public short opcode() { return charSize(c)==1? Bytecode.MATCH8:Bytecode.MATCH16; };
 	public int nBytes() { return 1+charSize(c); }

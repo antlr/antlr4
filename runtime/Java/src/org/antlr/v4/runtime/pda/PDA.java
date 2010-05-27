@@ -442,7 +442,7 @@ processOneChar:
 	}
 	
 	void trace(int ip) {
-		String instr = Bytecode.disassembleInstruction(code, ip);
+		String instr = Bytecode.disassembleInstruction(code, ip, true);
 		System.out.println(instr);
 	}
 
