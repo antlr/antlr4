@@ -1,13 +1,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.Token;
-import org.antlr.v4.Tool;
-import org.antlr.v4.codegen.CompiledPDA;
-import org.antlr.v4.codegen.LexerCompiler;
 import org.antlr.v4.runtime.pda.PDA;
-import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
@@ -191,74 +185,41 @@ public class TestPDABytecodeInterp extends BaseTest {
 	}
 
 	void checkMatches(LexerGrammar g, String input, String expecting) {
-		if ( g.ast!=null && !g.ast.hasErrors ) {
-			System.out.println(g.ast.toStringTree());
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.process(imp);
-				}
-			}
-		}
+		PDA pda = getLexerPDA(g);
 
-		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
-		if ( expecting!=null && !expecting.trim().equals("") ) {
-			for (String tname : expecting.replace(" ", "").split(",")) {
-				int ttype = g.getTokenType(tname);
-				expectingTokenTypes.add(ttype);
-			}
-		}
+		List<Integer> expectingTokenTypes = getTypesFromString(g, expecting);
 
-		LexerCompiler comp = new LexerCompiler(g);
-		CompiledPDA obj = comp.compileMode(LexerGrammar.DEFAULT_MODE_NAME);
-		PDA PDA = new PDA(obj.code, obj.altToAddr, obj.nLabels);
-
-		ANTLRStringStream in = new ANTLRStringStream(input);
-		List<Integer> tokenTypes = new ArrayList<Integer>();
-		int ttype = 0;
-		do {
-			ttype = PDA.execThompson(in);
-			tokenTypes.add(ttype);
-		} while ( ttype!= Token.EOF );
+		List<Integer> tokenTypes = getTokenTypes(input, pda);
 		assertEquals(expectingTokenTypes, tokenTypes);
 	}
 
 	void checkLabels(LexerGrammar g, String input, String expecting,
 					  String expectingTokens)
 	{
-		if ( g.ast!=null && !g.ast.hasErrors ) {
-			System.out.println(g.ast.toStringTree());
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.process(imp);
-				}
-			}
-		}
-
-		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
-		if ( expecting!=null && !expecting.trim().equals("") ) {
-			for (String tname : expecting.replace(" ", "").split(",")) {
-				int ttype = g.getTokenType(tname);
-				expectingTokenTypes.add(ttype);
-			}
-		}
-
-		LexerCompiler comp = new LexerCompiler(g);
-		CompiledPDA obj = comp.compileMode(LexerGrammar.DEFAULT_MODE_NAME);
-		PDA PDA = new PDA(obj.code, obj.altToAddr, obj.nLabels);
+		PDA pda = getLexerPDA(g);
+		List<Integer> expectingTokenTypes = getTypesFromString(g, expecting);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
-		int ttype = PDA.execThompson(in);
+		int ttype = pda.execThompson(in);
 		tokenTypes.add(ttype);
 		assertEquals(expectingTokenTypes, tokenTypes);
 
 		if ( expectingTokens!=null ) {
-			assertEquals(expectingTokens, Arrays.toString(PDA.labelValues));
+			assertEquals(expectingTokens, Arrays.toString(pda.labelValues));
 		}
 	}
+
+	
+
+//	List<Token> getTokens(String input, PDA lexerPDA) {
+//		ANTLRStringStream in = new ANTLRStringStream(input);
+//		List<Token> tokens = new ArrayList<Token>();
+//		int ttype = 0;
+//		do {
+//			ttype = lexerPDA.execThompson(in);
+//			tokens.add(new CommonToken(ttype,""));
+//		} while ( ttype!= Token.EOF );
+//		return tokens;
+//	}
+
 }

@@ -28,16 +28,17 @@
 package org.antlr.v4.test;
 
 
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenSource;
+import org.antlr.runtime.*;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.DFAMinimizer;
 import org.antlr.v4.analysis.LexerNFAToDFAConverter;
 import org.antlr.v4.analysis.PredictionDFAFactory;
+import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.*;
+import org.antlr.v4.codegen.CompiledPDA;
+import org.antlr.v4.codegen.LexerCompiler;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 import org.junit.After;
@@ -133,6 +134,37 @@ public abstract class BaseTest {
 		dfa.minimized = dmin.minimize();
 	}
 
+	PDA getLexerPDA(LexerGrammar g) {
+		NFA nfa = createNFA(g);
+
+		LexerCompiler comp = new LexerCompiler(g);
+		CompiledPDA obj = comp.compileMode(LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = new PDA(obj.code, obj.altToAddr, obj.nLabels);
+		return PDA;
+	}
+
+	List<Integer> getTypesFromString(Grammar g, String expecting) {
+		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
+		if ( expecting!=null && !expecting.trim().equals("") ) {
+			for (String tname : expecting.replace(" ", "").split(",")) {
+				int ttype = g.getTokenType(tname);
+				expectingTokenTypes.add(ttype);
+			}
+		}
+		return expectingTokenTypes;
+	}
+
+	List<Integer> getTokenTypes(String input, PDA lexerPDA) {
+		ANTLRStringStream in = new ANTLRStringStream(input);
+		List<Integer> tokenTypes = new ArrayList<Integer>();
+		int ttype = 0;
+		do {
+			ttype = lexerPDA.execThompson(in);
+			tokenTypes.add(ttype);
+		} while ( ttype!= Token.EOF );
+		return tokenTypes;
+	}
+	
 	List<Message> checkRuleDFA(String gtext, String ruleName, String expecting)
 		throws Exception
 	{

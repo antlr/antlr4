@@ -4,6 +4,7 @@ import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DFAState;
 import org.antlr.v4.automata.Edge;
 import org.antlr.v4.codegen.pda.*;
+import org.antlr.v4.runtime.pda.Bytecode;
 
 /** */
 public class DFACompiler {
@@ -20,6 +21,8 @@ public class DFACompiler {
 	public CompiledPDA compile() {
 		walk();
 		gen.compile();
+		System.out.println("DFA: ");
+		System.out.println(Bytecode.disassemble(gen.obj.code,false));		
 		return gen.obj;
 	}
 
@@ -30,7 +33,6 @@ public class DFACompiler {
 
 		// walk code, update jump targets.
 		for (Instr I : gen.obj.instrs) {
-			System.out.println("instr "+I);
 			if ( I instanceof JumpInstr) {
 				JumpInstr J = (JumpInstr)I;
 				J.target = stateToAddr[J.target];

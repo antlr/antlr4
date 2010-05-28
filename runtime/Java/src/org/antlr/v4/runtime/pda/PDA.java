@@ -3,6 +3,7 @@ package org.antlr.v4.runtime.pda;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 import org.antlr.v4.runtime.CommonToken;
 
 import java.util.ArrayList;
@@ -121,10 +122,6 @@ processOneChar:
 							addToClosure(reach, ip, alt, context);
 						}
 						break;
-					case Bytecode.SET :
-						System.err.println("not impl");
-						notNextMatch = false;
-						break;
 					case Bytecode.LABEL : // lexers only
 						int labelIndex = getShort(code, ip);
 						labelValues[labelIndex] =
@@ -225,7 +222,9 @@ processOneChar:
 		switch (opcode) {
 			case Bytecode.NOT : // see thru NOT but include in closure so we exec during reach
 				closure.add(t);	// add to closure; need to execute during reach
-				addToClosure(closure, ip, alt, context);				
+				// add NOT and next instruction since reach only looks at
+				// what's in closure (it doesn't jump to ip after NOT)
+				addToClosure(closure, ip, alt, context);
 				break;
 			case Bytecode.JMP :
 				addToClosure(closure, getShort(code, ip), alt, context);
@@ -302,6 +301,7 @@ processOneChar:
 
 	// this stuff below can't do SAVE nor CALL/RET but faster.  (nor preds)
 	
+/*
 	public int execThompson_no_stack(CharStream input, int ip) {
 		int c = input.LA(1);
 		if ( c==Token.EOF ) return Token.EOF;
@@ -441,7 +441,7 @@ processOneChar:
 				break;
 		}
 	}
-
+*/
 	// subclass needs to override these if there are sempreds or actions in lexer rules
 
 	public boolean sempred(int ruleIndex, int actionIndex) {
@@ -456,8 +456,89 @@ processOneChar:
 		System.out.println(instr);
 	}
 
+	void traceDFA(int ip) {
+		String instr = Bytecode.disassembleInstruction(code, ip, false);
+		System.out.println(instr);
+	}
+
 	public static int getShort(byte[] memory, int index) {
 		return (memory[index]&0xFF) <<(8*1) | (memory[index+1]&0xFF); // prevent sign extension with mask
+	}
+
+	public static class Context {
+		public int ip;
+		public int inputMarker;
+		public Context(int ip, int inputMarker) {
+			this.ip = ip;
+			this.inputMarker = inputMarker;
+		}
+	}
+
+	public int execNoRecursion(TokenStream input, int ip) {
+		System.out.println("execNoRecursion @"+ip);
+		List<Context> work = new ArrayList<Context>();
+		work.add(new Context(ip, input.mark()));
+workLoop:
+		while ( work.size()>0 ) {
+			Context ctx = work.remove(work.size()-1); // treat like stack
+			ip = ctx.ip;
+			input.rewind(ctx.inputMarker);
+			while ( ip < code.length ) {
+				int c = input.LA(1);
+				traceDFA(ip);
+				short opcode = code[ip];
+				ip++; // move to next instruction or first byte of operand
+				switch (opcode) {
+					case Bytecode.MATCH8 :
+						if ( c != code[ip] ) continue workLoop;
+						ip++;
+						input.consume();
+						break;
+					case Bytecode.MATCH16 :
+						if ( c != getShort(code, ip) ) continue workLoop;
+						ip += 2;
+						input.consume();
+						break;
+					case Bytecode.RANGE8 :
+						if ( c<code[ip] || c>code[ip+1] ) continue workLoop;
+						ip += 2;
+						input.consume();
+						break;
+					case Bytecode.RANGE16 :
+						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) continue workLoop;
+						ip += 4;
+						input.consume();
+						break;
+					case Bytecode.ACCEPT :
+						int ruleIndex = getShort(code, ip);
+						ip += 2;
+						System.out.println("accept "+ruleIndex);
+						// returning gives first match not longest; i.e., like PEG
+						return ruleIndex;
+					case Bytecode.JMP :
+						int target = getShort(code, ip);
+						ip = target;
+						continue;
+					case Bytecode.SPLIT :
+						int nopnds = getShort(code, ip);
+						ip += 2;
+						// add split addresses to work queue in reverse order ('cept first one)
+						for (int i=nopnds-1; i>=1; i--) {
+							int addr = getShort(code, ip+i*2);
+							//System.out.println("try alt "+i+" at "+addr);
+							work.add(new Context(addr, input.mark()));
+						}
+						// try first alternative (w/o adding to work list)
+						int addr = getShort(code, ip);
+						ip = addr;
+						//System.out.println("try alt "+nopnds+" at "+addr);
+						continue;
+					default :
+						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
+				}
+			}
+		}
+		return 0;
 	}
 
 /*
@@ -527,80 +608,6 @@ processOneChar:
 		return 0;
 	}
 
-	public static class Context {
-		public int ip;
-		public int inputMarker;
-		public Context(int ip, int inputMarker) {
-			this.ip = ip;
-			this.inputMarker = inputMarker;
-		}
-	}
-
-	public int execNoRecursion(CharStream input, int ip) {
-		List<Context> work = new ArrayList<Context>();
-		work.add(new Context(ip, input.mark()));
-workLoop:
-		while ( work.size()>0 ) {
-			Context ctx = work.remove(work.size()-1); // treat like stack
-			ip = ctx.ip;
-			input.rewind(ctx.inputMarker);
-			while ( ip < code.length ) {
-				int c = input.LA(1);
-				trace(ip);
-				short opcode = code[ip];
-				ip++; // move to next instruction or first byte of operand
-				switch (opcode) {
-					case Bytecode.MATCH8 :
-						if ( c != code[ip] ) continue workLoop;
-						ip++;
-						input.consume();
-						break;
-					case Bytecode.MATCH16 :
-						if ( c != getShort(code, ip) ) continue workLoop;
-						ip += 2;
-						input.consume();
-						break;
-					case Bytecode.RANGE8 :
-						if ( c<code[ip] || c>code[ip+1] ) continue workLoop;
-						ip += 2;
-						input.consume();
-						break;
-					case Bytecode.RANGE16 :
-						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) continue workLoop;
-						ip += 4;
-						input.consume();
-						break;
-					case Bytecode.ACCEPT :
-						int ruleIndex = getShort(code, ip);
-						ip += 2;
-						System.out.println("accept "+ruleIndex);
-						// returning gives first match not longest; i.e., like PEG
-						return ruleIndex;
-					case Bytecode.JMP :
-						int target = getShort(code, ip);
-						ip = target;
-						continue;
-					case Bytecode.SPLIT :
-						int nopnds = getShort(code, ip);
-						ip += 2;
-						// add split addresses to work queue in reverse order ('cept first one)
-						for (int i=nopnds-1; i>=1; i--) {
-							int addr = getShort(code, ip+i*2);
-							//System.out.println("try alt "+i+" at "+addr);
-							work.add(new Context(addr, input.mark()));
-						}
-						// try first alternative (w/o adding to work list)
-						int addr = getShort(code, ip);
-						ip = addr;
-						//System.out.println("try alt "+nopnds+" at "+addr);
-						continue;
-					default :
-						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
-				}
-			}
-		}
-		return 0;
-	}
 */
 	
 }

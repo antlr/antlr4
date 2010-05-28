@@ -2,6 +2,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
+import org.antlr.v4.automata.Edge;
 import org.antlr.v4.automata.NFA;
 import org.antlr.v4.codegen.CompiledPDA;
 import org.antlr.v4.codegen.DFACompiler;
@@ -21,10 +22,38 @@ public class TestDFAtoPDABytecodeGeneration extends BaseTest {
 			"0007:\tset           0\n" +
 			"0010:\tjmp           13\n" +
 			"0013:\taccept        1\n" +
-			"0016:\tmatch8        5\n" +
+			"0016:\tmatch8        4\n" +
 			"0018:\tjmp           21\n" +
 			"0021:\taccept        2\n";
 		checkBytecode(g, 0, expecting);
+	}
+
+	@Test public void testAorBToSameState() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : A | B ;");
+		String expecting =
+			"0000:\tsplit         7, 15\n" +
+			"0007:\tmatch8        4\n" +
+			"0009:\tjmp           12\n" +
+			"0012:\taccept        2\n" +
+			"0015:\tmatch8        5\n" +
+			"0017:\tjmp           12\n";
+
+		NFA nfa = createNFA(g);
+		DecisionState blk = nfa.decisionToNFAState.get(0);
+		DFA dfa = createDFA(g, blk);
+
+		// make S0 go to S1 on both A and B (pinch alts back to single state)
+		Edge e0 = dfa.states.get(0).edge(0);
+		Edge e1 = dfa.states.get(0).edge(1);
+		e0.target = e1.target;
+		System.out.print("altered DFA="+dfa);
+
+		DFACompiler comp = new DFACompiler(dfa);
+		CompiledPDA obj = comp.compile();
+		PDA pda = new PDA(obj.code, obj.altToAddr, obj.nLabels);
+		assertEquals(expecting, Bytecode.disassemble(pda.code, false));
 	}
 
 	@Test public void testAorB() throws Exception {
@@ -33,12 +62,12 @@ public class TestDFAtoPDABytecodeGeneration extends BaseTest {
 			"a : A | B ;");
 		String expecting =
 			"0000:\tsplit         7, 15\n" +
-			"0007:\tmatch8        5\n" +
+			"0007:\tmatch8        4\n" +
 			"0009:\tjmp           12\n" +
-			"0012:\taccept        2\n" +
-			"0015:\tmatch8        4\n" +
+			"0012:\taccept        1\n" +
+			"0015:\tmatch8        5\n" +
 			"0017:\tjmp           20\n" +
-			"0020:\taccept        1\n";
+			"0020:\taccept        2\n";
 		checkBytecode(g, 0, expecting);
 	}
 
@@ -82,10 +111,6 @@ public class TestDFAtoPDABytecodeGeneration extends BaseTest {
 		NFA nfa = createNFA(g);
 		DecisionState blk = nfa.decisionToNFAState.get(decision);
 		DFA dfa = createDFA(g, blk);
-//		Edge e0 = dfa.states.get(1).edge(0);
-//		Edge e1 = dfa.states.get(1).edge(1);
-//		e0.target = e1.target;
-//		System.out.print("altered DFA="+dfa);
 		DFACompiler comp = new DFACompiler(dfa);
 		CompiledPDA obj = comp.compile();
 		PDA pda = new PDA(obj.code, obj.altToAddr, obj.nLabels);
