@@ -3,7 +3,8 @@ package org.antlr.v4.test;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
-import org.antlr.v4.codegen.PDABytecodeGenerator;
+import org.antlr.v4.codegen.CompiledPDA;
+import org.antlr.v4.codegen.LexerCompiler;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
@@ -22,6 +23,14 @@ public class TestPDABytecodeInterp extends BaseTest {
 			"A : 'ab' ;");
 		String expecting = "A, A, EOF";
 		checkMatches(g, "abab", expecting);
+	}
+
+	@Test public void testNotChar() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : ~'a' ;");
+		String expecting = "A, EOF";
+		checkMatches(g, "b", expecting);
 	}
 
 	@Test public void testIDandIntandKeyword() throws Exception {
@@ -202,7 +211,10 @@ public class TestPDABytecodeInterp extends BaseTest {
 			}
 		}
 
-		PDA PDA = PDABytecodeGenerator.getPDA(g, LexerGrammar.DEFAULT_MODE_NAME);
+		LexerCompiler comp = new LexerCompiler(g);
+		CompiledPDA obj = comp.compileMode(LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = new PDA(obj.code, obj.altToAddr, obj.nLabels);
+
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
@@ -236,7 +248,9 @@ public class TestPDABytecodeInterp extends BaseTest {
 			}
 		}
 
-		PDA PDA = PDABytecodeGenerator.getPDA(g, LexerGrammar.DEFAULT_MODE_NAME);
+		LexerCompiler comp = new LexerCompiler(g);
+		CompiledPDA obj = comp.compileMode(LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = new PDA(obj.code, obj.altToAddr, obj.nLabels);
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = PDA.execThompson(in);

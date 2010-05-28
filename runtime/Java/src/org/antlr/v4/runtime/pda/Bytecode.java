@@ -39,21 +39,22 @@ public class Bytecode {
 	// be an array of objects (Bytecode[]). We want it to be byte[].
 
 	// INSTRUCTION BYTECODES (byte is signed; use a short to keep 0..255)
-	public static final short ACCEPT	= 1;
-	public static final short JMP		= 2;
-	public static final short SPLIT		= 3;
-	public static final short MATCH8	= 4;
-	public static final short MATCH16	= 5;
-	public static final short RANGE8	= 6;
-	public static final short RANGE16	= 7;
-	public static final short WILDCARD	= 8;
-	//public static final short NOT	= 8; ???
-	public static final short CALL		= 9; // JMP with a push
-	public static final short RET		= 10; // an accept instr for fragment rules
-	public static final short LABEL		= 11;
-	public static final short SAVE		= 12;
-	public static final short SEMPRED	= 13;
-	public static final short ACTION	= 14;
+	public static final short ACCEPT	 = 1;
+	public static final short JMP		 = 2;
+	public static final short SPLIT		 = 3;
+	public static final short MATCH8	 = 4;
+	public static final short MATCH16	 = 5;
+	public static final short RANGE8	 = 6;
+	public static final short RANGE16	 = 7;
+	public static final short WILDCARD	 = 8;
+	public static final short SET	     = 9;
+	public static final short CALL		 = 10; // JMP with a push
+	public static final short RET		 = 11; // an accept instr for fragment rules
+	public static final short LABEL		 = 12;
+	public static final short SAVE		 = 13;
+	public static final short SEMPRED	 = 14;
+	public static final short ACTION	 = 15;
+	public static final short NOT	     = 16; // not next match instr
 
 	/** Used for disassembly; describes instruction set */
 	public static Instruction[] instructions = new Instruction[] {
@@ -66,12 +67,14 @@ public class Bytecode {
 		new Instruction("range8", OperandType.BYTE, OperandType.BYTE),
 		new Instruction("range16", OperandType.CHAR, OperandType.CHAR),
 		new Instruction("wildcard"),
+		new Instruction("set", OperandType.SHORT),
 		new Instruction("call", OperandType.ADDR),
 		new Instruction("ret"),
 		new Instruction("label", OperandType.SHORT),
 		new Instruction("save", OperandType.SHORT),
 		new Instruction("sempred", OperandType.SHORT, OperandType.SHORT), // sempred ruleIndex, predIndex
 		new Instruction("action", OperandType.SHORT, OperandType.SHORT), // action ruleIndex, actionIndex
+		new Instruction("not"),
 	};
 
 	public static String disassemble(byte[] code, int start, boolean operandsAreChars) {

@@ -1,7 +1,8 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.codegen.PDABytecodeGenerator;
+import org.antlr.v4.codegen.CompiledPDA;
+import org.antlr.v4.codegen.LexerCompiler;
 import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -19,6 +20,18 @@ public class TestPDABytecodeGeneration extends BaseTest {
 			"0005:\tmatch8        'a'\n" +
 			"0007:\tmatch8        'b'\n" +
 			"0009:\taccept        4\n";
+		checkBytecode(g, expecting);
+	}
+
+	@Test public void testNotChar() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : ~'a' ;");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tnot             \n" +
+			"0006:\tmatch8        'a'\n" +
+			"0008:\taccept        4\n";
 		checkBytecode(g, expecting);
 	}
 
@@ -215,7 +228,9 @@ public class TestPDABytecodeGeneration extends BaseTest {
 				}
 			}
 		}
-		PDA PDA = PDABytecodeGenerator.getPDA(g, LexerGrammar.DEFAULT_MODE_NAME);
+		LexerCompiler comp = new LexerCompiler(g);
+		CompiledPDA obj = comp.compileMode(LexerGrammar.DEFAULT_MODE_NAME);
+		PDA PDA = new PDA(obj.code, obj.altToAddr, obj.nLabels);
 		assertEquals(expecting, Bytecode.disassemble(PDA.code));
 	}
 }

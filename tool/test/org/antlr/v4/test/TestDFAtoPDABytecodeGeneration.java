@@ -3,7 +3,8 @@ package org.antlr.v4.test;
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
 import org.antlr.v4.automata.NFA;
-import org.antlr.v4.codegen.PDABytecodeGenerator;
+import org.antlr.v4.codegen.CompiledPDA;
+import org.antlr.v4.codegen.DFACompiler;
 import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
 import org.antlr.v4.tool.Grammar;
@@ -11,6 +12,21 @@ import org.junit.Test;
 
 /** */
 public class TestDFAtoPDABytecodeGeneration extends BaseTest {
+	@Test public void testNotAisSet() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : ~A B C | A ;");
+		String expecting =
+			"0000:\tsplit         7, 16\n" +
+			"0007:\tset           0\n" +
+			"0010:\tjmp           13\n" +
+			"0013:\taccept        1\n" +
+			"0016:\tmatch8        5\n" +
+			"0018:\tjmp           21\n" +
+			"0021:\taccept        2\n";
+		checkBytecode(g, 0, expecting);
+	}
+
 	@Test public void testAorB() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
@@ -62,8 +78,6 @@ public class TestDFAtoPDABytecodeGeneration extends BaseTest {
 		checkBytecode(g, 2, expecting);
 	}
 
-	// TODO: ORDER OF TESTS MATTERS? DFA edge orders get changed. ack!
-
 	void checkBytecode(Grammar g, int decision, String expecting) {
 		NFA nfa = createNFA(g);
 		DecisionState blk = nfa.decisionToNFAState.get(decision);
@@ -71,8 +85,10 @@ public class TestDFAtoPDABytecodeGeneration extends BaseTest {
 //		Edge e0 = dfa.states.get(1).edge(0);
 //		Edge e1 = dfa.states.get(1).edge(1);
 //		e0.target = e1.target;
-//		System.out.print("altered DFA="+dfa);		
-		PDA PDA = PDABytecodeGenerator.getPDA(dfa);
-		assertEquals(expecting, Bytecode.disassemble(PDA.code, false));
+//		System.out.print("altered DFA="+dfa);
+		DFACompiler comp = new DFACompiler(dfa);
+		CompiledPDA obj = comp.compile();
+		PDA pda = new PDA(obj.code, obj.altToAddr, obj.nLabels);
+		assertEquals(expecting, Bytecode.disassemble(pda.code, false));
 	}	
 }

@@ -25,7 +25,8 @@ public class LexerFactory {
 		fileST.add("fileName", gen.getRecognizerFileName());
 		fileST.add("lexer", lexerST);
 		for (String modeName : lg.modes.keySet()) { // for each mode
-			CompiledPDA pda = PDABytecodeGenerator.compileLexerMode(lg, modeName);
+			LexerCompiler comp = new LexerCompiler(lg);
+			CompiledPDA pda = comp.compileMode(modeName);
 			ST pdaST = gen.templates.getInstanceOf("PDA");
 			for (Rule r : pda.ruleActions.keySet()) {
 				Set<Token> actionTokens = pda.ruleActions.keySet(r);

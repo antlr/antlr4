@@ -8,7 +8,6 @@ import org.antlr.v4.runtime.CommonToken;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /** A (nondeterministic) pushdown bytecode machine for lexing and LL prediction.
  *  Derived partially from Cox' description of Thompson's 1960s work:
@@ -22,28 +21,20 @@ public class PDA {
 	public interface sempred_fptr { boolean eval(int predIndex); }
 
 	public byte[] code;
-	public Map<String, Integer> ruleToAddr;
-	public int[] tokenTypeToAddr;
+	//public Map<String, Integer> ruleToAddr;
+	public int[] altToAddr; // either token type (in lexer) or alt num for DFA in parser
 	public CommonToken[] labelValues;
 	public int nLabels;
 
 	/** If we hit an action, we'll have to rewind and do the winning rule again */
 	boolean bypassedAction;
 
-    public PDA() {;}
-	
-	public PDA(byte[] code, Map<String, Integer> ruleToAddr, int[] tokenTypeToAddr, int nLabels) {
-		this.code = code;
-		this.ruleToAddr = ruleToAddr;
-		this.tokenTypeToAddr = tokenTypeToAddr;
-		this.nLabels = nLabels;
-		labelValues = new CommonToken[nLabels];
-	}
+	boolean notNextMatch;
 
-	public PDA(byte[] code, int[] tokenTypeToAddr, int nLabels) {
+	public PDA(byte[] code, int[] altToAddr, int nLabels) {
 		System.out.println("code="+Arrays.toString(code));
 		this.code = code;
-		this.tokenTypeToAddr = tokenTypeToAddr;
+		this.altToAddr = altToAddr;
 		this.nLabels = nLabels;
 		labelValues = new CommonToken[nLabels];
 	}
@@ -58,7 +49,7 @@ public class PDA {
 			System.out.println("Bypassed action; rewinding to "+input.index()+" doing with feeling");
 			bypassedAction = false;
 			Arrays.fill(labelValues, null);
-			int ttype2 = execThompson(input, tokenTypeToAddr[ttype], true);
+			int ttype2 = execThompson(input, altToAddr[ttype], true);
 			if ( ttype!=ttype2 ) {
 				System.err.println("eh? token diff with action(s)");
 			}
@@ -92,32 +83,47 @@ processOneChar:
 				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
 				trace(ip);
 				short opcode = code[ip];
+				boolean matched;
 				ip++; // move to next instruction or first byte of operand
 				switch (opcode) {
+					case Bytecode.NOT :
+						notNextMatch = true;
+						break;
 					case Bytecode.MATCH8 :
-						if ( c == code[ip] ) {
+						if ( c == code[ip] || (notNextMatch && c != code[ip]) ) {
 							addToClosure(reach, ip+1, alt, context);
 						}
+						notNextMatch = false;
 						break;
 					case Bytecode.MATCH16 :
-						if ( c == getShort(code, ip) ) {
+						matched = c == getShort(code, ip);
+						if ( matched || (notNextMatch && matched) ) {
 							addToClosure(reach, ip+2, alt, context);
 						}
+						notNextMatch = false;
 						break;
 					case Bytecode.RANGE8 :
-						if ( c>=code[ip] && c<=code[ip+1] ) {
+						matched = c >= code[ip] && c <= code[ip + 1];
+						if ( matched || (notNextMatch && matched) ) {
 							addToClosure(reach, ip+2, alt, context);
 						}
+						notNextMatch = false;
 						break;
 					case Bytecode.RANGE16 :
-						if ( c<getShort(code, ip) || c>getShort(code, ip+2) ) {
+						matched = c < getShort(code, ip) || c > getShort(code, ip + 2);
+						if ( matched || (notNextMatch && matched) ) {
 							addToClosure(reach, ip+4, alt, context);
 						}
+						notNextMatch = false;
 						break;
 					case Bytecode.WILDCARD :
 						if ( c!=Token.EOF ) {
 							addToClosure(reach, ip, alt, context);
 						}
+						break;
+					case Bytecode.SET :
+						System.err.println("not impl");
+						notNextMatch = false;
 						break;
 					case Bytecode.LABEL : // lexers only
 						int labelIndex = getShort(code, ip);
@@ -217,6 +223,10 @@ processOneChar:
 		short opcode = code[ip];
 		ip++; // move to next instruction or first byte of operand
 		switch (opcode) {
+			case Bytecode.NOT : // see thru NOT but include in closure so we exec during reach
+				closure.add(t);	// add to closure; need to execute during reach
+				addToClosure(closure, ip, alt, context);				
+				break;
 			case Bytecode.JMP :
 				addToClosure(closure, getShort(code, ip), alt, context);
 				break;
@@ -360,10 +370,10 @@ processOneChar:
 						}
 						// if we reach accept state, toss out any addresses in rest
 						// of work list associated with accept's rule; that rule is done
-						int ruleStart = tokenTypeToAddr[ttype];
+						int ruleStart = altToAddr[ttype];
 						int ruleStop = code.length;
-						if ( ttype+1 < tokenTypeToAddr.length ) {
-							ruleStop = tokenTypeToAddr[ttype+1]-1;
+						if ( ttype+1 < altToAddr.length ) {
+							ruleStop = altToAddr[ttype+1]-1;
 						}
 						System.out.println("kill range "+ruleStart+".."+ruleStop);
 						int j=i+1;

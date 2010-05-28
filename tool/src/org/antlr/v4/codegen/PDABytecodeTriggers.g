@@ -3,18 +3,43 @@ options {
 	language     = Java;
 	tokenVocab   = ANTLRParser;
 	ASTLabelType = GrammarAST;
-	superClass   = PDABytecodeGenerator;
+//	superClass   = PDABytecodeGenerator;
 }
 
 @header {
 package org.antlr.v4.codegen;
 import org.antlr.v4.codegen.pda.*;
 import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.AltAST;
 import org.antlr.v4.tool.GrammarASTWithOptions;
 import org.antlr.v4.tool.LexerGrammar;
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
+}
+
+@members {
+	PDABytecodeGenerator gen;
+	
+	public PDABytecodeTriggers(TreeNodeStream input, PDABytecodeGenerator gen) {
+		this(input);
+		this.gen = gen;
+	}
+
+	// (BLOCK (ALT .)) or (BLOCK (ALT 'a') (ALT .))
+	public boolean blockHasWildcardAlt(GrammarAST block) {
+		for (Object alt : block.getChildren()) {
+			if ( !(alt instanceof AltAST) ) continue;
+			AltAST altAST = (AltAST)alt;
+			if ( altAST.getChildCount()==1 ) {
+				Tree e = altAST.getChild(0);
+				if ( e.getType()==WILDCARD ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
 
 block
@@ -28,8 +53,8 @@ block
     		SplitInstr S = null;
     		if ( nAlts>1 ) {
 	    		S = new SplitInstr(nAlts);
-	    		emit(S);
-	    		S.addrs.add(pda.ip);
+	    		gen.emit(S);
+	    		S.addrs.add(gen.ip);
     		}
     		int alt = 1;
     		}
@@ -38,14 +63,14 @@ block
     			if ( alt < nAlts ) {
 	    			JumpInstr J = new JumpInstr();
 	    			jumps.add(J);
-	    			emit(J);
-	    			S.addrs.add(pda.ip);
+	    			gen.emit(J);
+	    			S.addrs.add(gen.ip);
     			}
     			alt++;
     			}
     		)+
     		{
-    		int END = pda.ip;
+    		int END = gen.ip;
     		for (JumpInstr J : jumps) J.target = END;
     		}
     	)
@@ -61,14 +86,14 @@ element
 	:	labeledElement				
 	|	atom						
 	|	ebnf						
-	|   ACTION			{emit(new ActionInstr($ACTION.token));}			
-	|   SEMPRED			{emit(new SemPredInstr($SEMPRED.token));}		
-	|	GATED_SEMPRED	{emit(new SemPredInstr($GATED_SEMPRED.token));}
+	|   ACTION			{gen.emit(new ActionInstr($ACTION.token));}			
+	|   SEMPRED			{gen.emit(new SemPredInstr($SEMPRED.token));}		
+	|	GATED_SEMPRED	{gen.emit(new SemPredInstr($GATED_SEMPRED.token));}
 	|	treeSpec					
 	;
 	
 labeledElement
-	:	^(ASSIGN ID {emit(new LabelInstr($ID.token));} atom {emit(new SaveInstr($ID.token));} )
+	:	^(ASSIGN ID {gen.emit(new LabelInstr($ID.token));} atom {gen.emit(new SaveInstr($ID.token));} )
 	|	^(ASSIGN ID block)			
 	|	^(PLUS_ASSIGN ID atom)		
 	|	^(PLUS_ASSIGN ID block)		
@@ -87,33 +112,33 @@ ebnf
 	:	^(astBlockSuffix block)		
 	|	{
 	   	SplitInstr S = new SplitInstr(2);
-		emit(S);
-   		S.addrs.add(pda.ip);
+		gen.emit(S);
+   		S.addrs.add(gen.ip);
 		}
 		^(OPTIONAL block)			
 		{
-   		S.addrs.add(pda.ip);
+   		S.addrs.add(gen.ip);
 		}
 	|	{
-		int start=pda.ip;
+		int start=gen.ip;
 	   	SplitInstr S = new SplitInstr(2);
-		emit(S);
-		int blkStart = pda.ip;
+		gen.emit(S);
+		int blkStart = gen.ip;
 		}
 		^(CLOSURE block)			
 		{
 	    JumpInstr J = new JumpInstr();
-	    emit(J);
+	    gen.emit(J);
 	    J.target = start;
    		S.addrs.add(blkStart);
-	    S.addrs.add(pda.ip);
+	    S.addrs.add(gen.ip);
 	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
 		}
-	|	{int start=pda.ip;} ^(POSITIVE_CLOSURE block)
+	|	{int start=gen.ip;} ^(POSITIVE_CLOSURE block)
 		{
    		SplitInstr S = new SplitInstr(2);
-		emit(S);
-		int stop = pda.ip;
+		gen.emit(S);
+		int stop = gen.ip;
    		S.addrs.add(start);
    		S.addrs.add(stop);
 	    if ( greedyOption!=null && greedyOption.equals("false") ) Collections.reverse(S.addrs);
@@ -136,8 +161,8 @@ atom
 	|	range					
 	|	^(DOT ID terminal[false])		
 	|	^(DOT ID ruleref)		
-    |	^(WILDCARD .)		{emit(new WildcardInstr($WILDCARD.token));}		
-    |	WILDCARD			{emit(new WildcardInstr($WILDCARD.token));}	
+    |	^(WILDCARD .)		{gen.emit(new WildcardInstr($WILDCARD.token));}		
+    |	WILDCARD			{gen.emit(new WildcardInstr($WILDCARD.token));}	
     |   terminal[false]				
     |   ruleref					
     ;
@@ -155,15 +180,15 @@ ruleref
 
 range
     :	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
-    	{emit(new RangeInstr($a.token, $b.token));}
+    	{gen.emit(new RangeInstr($a.token, $b.token));}
     ;
 
 terminal[boolean not]
-    :  ^(STRING_LITERAL .)			{emitString($STRING_LITERAL.token, $not);}
-    |	STRING_LITERAL				{emitString($STRING_LITERAL.token, $not);}
-    |	^(TOKEN_REF ARG_ACTION .)	{emit(new CallInstr($TOKEN_REF.token));}
-    |	^(TOKEN_REF .)				{emit(new CallInstr($TOKEN_REF.token));}
-    |	TOKEN_REF					{emit(new CallInstr($TOKEN_REF.token));}
+    :  ^(STRING_LITERAL .)			{gen.emitString($STRING_LITERAL.token, $not);}
+    |	STRING_LITERAL				{gen.emitString($STRING_LITERAL.token, $not);}
+    |	^(TOKEN_REF ARG_ACTION .)	{gen.emit(new CallInstr($TOKEN_REF.token));}
+    |	^(TOKEN_REF .)				{gen.emit(new CallInstr($TOKEN_REF.token));}
+    |	TOKEN_REF					{gen.emit(new CallInstr($TOKEN_REF.token));}
     |	^(ROOT terminal[false])			
     |	^(BANG terminal[false])			
     ;
