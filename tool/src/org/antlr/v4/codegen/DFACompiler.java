@@ -4,7 +4,6 @@ import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DFAState;
 import org.antlr.v4.automata.Edge;
 import org.antlr.v4.codegen.pda.*;
-import org.antlr.v4.runtime.pda.PDA;
 
 /** */
 public class DFACompiler {
@@ -24,7 +23,7 @@ public class DFACompiler {
 		return gen.obj;
 	}
 
-	public PDA walk() {
+	void walk() {
 		marked = new boolean[dfa.stateSet.size()+1];
 		stateToAddr = new int[dfa.stateSet.size()+1];
 		walk(dfa.startState);
@@ -37,15 +36,13 @@ public class DFACompiler {
 				J.target = stateToAddr[J.target];
 			}
 		}
-
-		return null;
 	}
 
 	// recursive so we follow chains in DFA, leading to fewer
 	// jmp instructions.
 	// start by assuming state num is bytecode addr then translate after
 	// in one pass
-	public void walk(DFAState d) {
+	void walk(DFAState d) {
 		if ( marked[d.stateNumber] ) return;
 		marked[d.stateNumber] = true;
 		stateToAddr[d.stateNumber] = gen.ip;
