@@ -328,7 +328,7 @@ public static final byte[] <name>_code = {
     <model.code; separator=", ">
 };
 public static final int[] <name>_tokenTypeToAddr = {
-    <model.tokenTypeToAddr; separator=", ">
+    <model.altToAddr; separator=", ">
 };
 
 public final class <name>_PDA extends PDA {

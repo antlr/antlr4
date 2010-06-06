@@ -1,9 +1,6 @@
 package org.antlr.v4.runtime.pda;
 
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.IntStream;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.*;
 import org.antlr.v4.runtime.CommonToken;
 
 import java.util.ArrayList;
@@ -75,6 +72,7 @@ public class PDA {
 			c = input.LA(1);
 			int i = 0;
 			boolean accepted = false;
+			System.out.println("input["+input.index()+"]=="+(char)c);
 processOneChar:
 			while ( i<closure.size() ) {
 				ThreadState t = closure.get(i);
@@ -111,7 +109,7 @@ processOneChar:
 						notNextMatch = false;
 						break;
 					case Bytecode.RANGE16 :
-						matched = c < getShort(code, ip) || c > getShort(code, ip + 2);
+						matched = c >= getShort(code, ip) && c <= getShort(code, ip + 2);
 						if ( matched || (notNextMatch && matched) ) {
 							addToClosure(reach, ip+4, alt, context);
 						}
@@ -144,7 +142,8 @@ processOneChar:
 						accepted = true;
 						int tokenLastCharIndex = input.index() - 1;
 						int ttype = getShort(code, ip);
-						System.out.println("ACCEPT "+ ttype +" with last char position "+ tokenLastCharIndex);
+						ANTLRStringStream is = (ANTLRStringStream)input;
+						System.out.println("ACCEPT "+is.substring(firstCharIndex,tokenLastCharIndex)+" as type "+ttype);
 						if ( tokenLastCharIndex > prevAccept.inputIndex ) {
 							prevAccept.inputIndex = tokenLastCharIndex;
 							// choose longest match so far regardless of rule priority
@@ -188,7 +187,7 @@ processOneChar:
 			if ( reach.size()>0 ) { // if we reached other states, consume and process them
 				input.consume();
 			}
-			else if ( !accepted ) {
+			else if ( !accepted && c!=Token.EOF ) {
 				System.err.println("!!!!! no match for char "+(char)c+" at "+input.index());
 				input.consume();
 			}
@@ -510,11 +509,11 @@ workLoop:
 						input.consume();
 						break;
 					case Bytecode.ACCEPT :
-						int ruleIndex = getShort(code, ip);
+						int altIndex = getShort(code, ip);
 						ip += 2;
-						System.out.println("accept "+ruleIndex);
+						System.out.println("accept "+altIndex);
 						// returning gives first match not longest; i.e., like PEG
-						return ruleIndex;
+						return altIndex;
 					case Bytecode.JMP :
 						int target = getShort(code, ip);
 						ip = target;

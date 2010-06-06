@@ -44,7 +44,10 @@ import java.util.EmptyStackException;
 public abstract class Lexer implements TokenSource {
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
-	public static final int SKIP = -3; 
+	public static final int SKIP = -3;
+
+	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
+	public static final int HIDDEN = Token.HIDDEN_CHANNEL;	
 
 	public LexerSharedState state;
 
