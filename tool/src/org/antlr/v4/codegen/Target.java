@@ -92,6 +92,7 @@ public class Target {
 	 *  to an appropriate target char literal.
 	 *
 	 *  Expect single quotes around the incoming literal.
+	 *  TODO: unused and should call CharSupport.getANTLRCharLiteralForChar anyway
 	 */
 	public String getTargetCharLiteralCharValue(int c) {
 		StringBuffer buf = new StringBuffer();

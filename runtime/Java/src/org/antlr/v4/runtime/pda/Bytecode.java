@@ -133,15 +133,15 @@ public class Bytecode {
 					case NONE:
 						break;
 					case BYTE:
-						if ( operandsAreChars ) operands.add("'"+(char)code[ip]+"'");
+						if ( operandsAreChars ) operands.add(quotedCharLiteral(code[ip]));
 						else operands.add(String.valueOf(code[ip]));
 						break;
 					case CHAR :
-						if ( operandsAreChars ) operands.add("'"+(char)getShort(code, ip)+"'");
+						if ( operandsAreChars ) operands.add(quotedCharLiteral(getShort(code, ip)));
 						else operands.add(String.valueOf(getShort(code, ip)));
 						break;
 					case INT :
-						if ( operandsAreChars ) operands.add("'"+(char)getInt(code, ip)+"'");
+						if ( operandsAreChars ) operands.add(quotedCharLiteral(getInt(code, ip)));
 						else operands.add(String.valueOf(getInt(code, ip)));
 					case SHORT :
 					case ADDR :
@@ -173,5 +173,45 @@ public class Bytecode {
 		int b1 = memory[index++]&0xFF; // mask off sign-extended bits
 		int b2 = memory[index++]&0xFF;
 		return b1<<(8*1) | b2;
-	}	
+	}
+
+	public static String LiteralCharValueEscape[] = new String[255];
+
+	static {
+		LiteralCharValueEscape['\n'] = "\\n";
+		LiteralCharValueEscape['\r'] = "\\r";
+		LiteralCharValueEscape['\t'] = "\\t";
+		LiteralCharValueEscape['\b'] = "\\b";
+		LiteralCharValueEscape['\f'] = "\\f";
+		LiteralCharValueEscape['\\'] = "\\\\";
+		LiteralCharValueEscape['\''] = "\\'";		
+	}
+	
+	/** Return a string representing the escaped char for code c.  E.g., If c
+	 *  has value 0x100, you will get "\u0100".  ASCII gets the usual
+	 *  char (non-hex) representation.  Control characters are spit out
+	 *  as unicode.
+	 */
+	public static String quotedCharLiteral(int c) {
+		if ( c<LiteralCharValueEscape.length && LiteralCharValueEscape[c]!=null ) {
+			return '\''+LiteralCharValueEscape[c]+'\'';
+		}
+		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
+			 !Character.isISOControl((char)c) ) {
+			if ( c=='\\' ) {
+				return "'\\\\'";
+			}
+			if ( c=='\'') {
+				return "'\\''";
+			}
+			return '\''+Character.toString((char)c)+'\'';
+		}
+		// turn on the bit above max "\uFFFF" value so that we pad with zeros
+		// then only take last 4 digits
+		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
+		String unicodeStr = "'\\u"+hex+"'";
+		return unicodeStr;
+	}
+
+	
 }

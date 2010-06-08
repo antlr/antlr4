@@ -11,6 +11,25 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 public class TestPDABytecodeGeneration extends BaseTest {
+	@Test public void unicode() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : '\\u0030'..'\\u8000'+ 'a' ;\n" +
+			"B : '\\u0020' | '\\n';");
+		String expecting =
+			"0000:\tsplit         7, 24\n" +
+			"0007:\trange16       '0', '\\u8000'\n" +
+			"0012:\tsplit         7, 19\n" +
+			"0019:\tmatch8        'a'\n" +
+			"0021:\taccept        4\n" +
+			"0024:\tsplit         31, 36\n" +
+			"0031:\tmatch8        ' '\n" +
+			"0033:\tjmp           38\n" +
+			"0036:\tmatch8        '\\n'\n" +
+			"0038:\taccept        5\n";
+		checkBytecode(g, expecting);
+	}
+
 	@Test public void testString() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n"+

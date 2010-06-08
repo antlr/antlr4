@@ -104,14 +104,17 @@ public class CharSupport {
 					i++;
 					if ( literal.charAt(i)=='u' ) { // '\u1234'
 						i++;
-						String unicodeChars = literal.substring(3,literal.length()-1);
-						buf.append((char)Integer.parseInt(unicodeChars, 16));
+						String unicodeChars = literal.substring(i,i+4);
+						int h = Integer.parseInt(unicodeChars, 16);
+						buf.append((char)h);
+						i += 4;
 					}
 					else {
 						char escChar = literal.charAt(i);
 						int charVal = ANTLRLiteralEscapedCharValue[escChar];
 						if ( charVal==0 ) buf.append(escChar); // Unnecessary escapes like '\{' should just yield {
 						else buf.append((char)charVal);
+						i++;
 					}
 					break;
 				default :
@@ -121,6 +124,6 @@ public class CharSupport {
 			}
 		}
 		return buf.toString();
-	}	
+	}
 
 }

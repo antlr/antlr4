@@ -19,6 +19,22 @@ public class TestPDABytecodeInterp extends BaseTest {
 		checkMatches(g, "abab", expecting);
 	}
 
+	@Test public void testUnicode() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : '\\u0020' ;"); // space
+		String expecting = "A, A, EOF";
+		checkMatches(g, "  ", expecting);
+	}
+
+	@Test public void testEscapes() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"WS : '\t'|'\n'|' ' ;");
+		String expecting = "WS, WS, WS, WS, WS, EOF";
+		checkMatches(g, " \t\n\n ", expecting);
+	}
+
 	@Test public void testNotChar() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n"+
