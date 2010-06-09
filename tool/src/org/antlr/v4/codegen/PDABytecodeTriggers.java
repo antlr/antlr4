@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 PDABytecodeTriggers.g 2010-06-05 16:34:04
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 PDABytecodeTriggers.g 2010-06-08 17:24:31
 
 package org.antlr.v4.codegen;
 
@@ -901,13 +901,13 @@ public class PDABytecodeTriggers extends TreeParser {
 
 
     // $ANTLR start "atom"
-    // PDABytecodeTriggers.g:157:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref );
+    // PDABytecodeTriggers.g:157:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref );
     public final void atom() throws RecognitionException {
         GrammarAST WILDCARD5=null;
         GrammarAST WILDCARD6=null;
 
         try {
-            // PDABytecodeTriggers.g:158:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref )
+            // PDABytecodeTriggers.g:158:2: ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref )
             int alt10=12;
             alt10 = dfa10.predict(input);
             switch (alt10) {
@@ -998,14 +998,14 @@ public class PDABytecodeTriggers extends TreeParser {
                     }
                     break;
                 case 7 :
-                    // PDABytecodeTriggers.g:164:4: ^( DOT ID terminal[false] )
+                    // PDABytecodeTriggers.g:164:4: ^( DOT ID terminal )
                     {
                     match(input,DOT,FOLLOW_DOT_in_atom583); 
 
                     match(input, Token.DOWN, null); 
                     match(input,ID,FOLLOW_ID_in_atom585); 
                     pushFollow(FOLLOW_terminal_in_atom587);
-                    terminal(false);
+                    terminal();
 
                     state._fsp--;
 
@@ -1017,11 +1017,11 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 8 :
                     // PDABytecodeTriggers.g:165:4: ^( DOT ID ruleref )
                     {
-                    match(input,DOT,FOLLOW_DOT_in_atom597); 
+                    match(input,DOT,FOLLOW_DOT_in_atom596); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ID,FOLLOW_ID_in_atom599); 
-                    pushFollow(FOLLOW_ruleref_in_atom601);
+                    match(input,ID,FOLLOW_ID_in_atom598); 
+                    pushFollow(FOLLOW_ruleref_in_atom600);
                     ruleref();
 
                     state._fsp--;
@@ -1034,7 +1034,7 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 9 :
                     // PDABytecodeTriggers.g:166:7: ^( WILDCARD . )
                     {
-                    WILDCARD5=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom613); 
+                    WILDCARD5=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom612); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
@@ -1047,16 +1047,16 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 10 :
                     // PDABytecodeTriggers.g:167:7: WILDCARD
                     {
-                    WILDCARD6=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom629); 
+                    WILDCARD6=(GrammarAST)match(input,WILDCARD,FOLLOW_WILDCARD_in_atom628); 
                     gen.emit(new WildcardInstr(WILDCARD6.token));
 
                     }
                     break;
                 case 11 :
-                    // PDABytecodeTriggers.g:168:9: terminal[false]
+                    // PDABytecodeTriggers.g:168:9: terminal
                     {
-                    pushFollow(FOLLOW_terminal_in_atom644);
-                    terminal(false);
+                    pushFollow(FOLLOW_terminal_in_atom643);
+                    terminal();
 
                     state._fsp--;
 
@@ -1066,7 +1066,7 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 12 :
                     // PDABytecodeTriggers.g:169:9: ruleref
                     {
-                    pushFollow(FOLLOW_ruleref_in_atom659);
+                    pushFollow(FOLLOW_ruleref_in_atom656);
                     ruleref();
 
                     state._fsp--;
@@ -1089,10 +1089,10 @@ public class PDABytecodeTriggers extends TreeParser {
 
 
     // $ANTLR start "notSet"
-    // PDABytecodeTriggers.g:172:1: notSet : ( ^( NOT terminal[true] ) | ^( NOT block ) );
+    // PDABytecodeTriggers.g:172:1: notSet : ( ^( NOT terminal ) | ^( NOT block ) );
     public final void notSet() throws RecognitionException {
         try {
-            // PDABytecodeTriggers.g:173:5: ( ^( NOT terminal[true] ) | ^( NOT block ) )
+            // PDABytecodeTriggers.g:173:5: ( ^( NOT terminal ) | ^( NOT block ) )
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -1130,13 +1130,15 @@ public class PDABytecodeTriggers extends TreeParser {
             }
             switch (alt11) {
                 case 1 :
-                    // PDABytecodeTriggers.g:173:7: ^( NOT terminal[true] )
+                    // PDABytecodeTriggers.g:173:7: ^( NOT terminal )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet682); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet679); 
+
+                    gen.emit(new NotInstr());
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_notSet684);
-                    terminal(true);
+                    pushFollow(FOLLOW_terminal_in_notSet683);
+                    terminal();
 
                     state._fsp--;
 
@@ -1148,7 +1150,9 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 2 :
                     // PDABytecodeTriggers.g:174:7: ^( NOT block )
                     {
-                    match(input,NOT,FOLLOW_NOT_in_notSet695); 
+                    match(input,NOT,FOLLOW_NOT_in_notSet693); 
+
+                    gen.emit(new NotInstr());
 
                     match(input, Token.DOWN, null); 
                     pushFollow(FOLLOW_block_in_notSet697);
@@ -1208,10 +1212,10 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 1 :
                     // PDABytecodeTriggers.g:178:7: ^( ROOT ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_ruleref719); 
+                    match(input,ROOT,FOLLOW_ROOT_in_ruleref716); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref722); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref719); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
@@ -1226,7 +1230,7 @@ public class PDABytecodeTriggers extends TreeParser {
                             case 1 :
                                 // PDABytecodeTriggers.g:178:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref724); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref721); 
 
                                 }
                                 break;
@@ -1244,10 +1248,10 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 2 :
                     // PDABytecodeTriggers.g:179:7: ^( BANG ^( RULE_REF ( ARG_ACTION )? ) )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_ruleref737); 
+                    match(input,BANG,FOLLOW_BANG_in_ruleref734); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref740); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref737); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
@@ -1262,7 +1266,7 @@ public class PDABytecodeTriggers extends TreeParser {
                             case 1 :
                                 // PDABytecodeTriggers.g:179:25: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref742); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref739); 
 
                                 }
                                 break;
@@ -1280,7 +1284,7 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 3 :
                     // PDABytecodeTriggers.g:180:7: ^( RULE_REF ( ARG_ACTION )? )
                     {
-                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref755); 
+                    match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref752); 
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
@@ -1295,7 +1299,7 @@ public class PDABytecodeTriggers extends TreeParser {
                             case 1 :
                                 // PDABytecodeTriggers.g:180:18: ARG_ACTION
                                 {
-                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref757); 
+                                match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleref754); 
 
                                 }
                                 break;
@@ -1332,11 +1336,11 @@ public class PDABytecodeTriggers extends TreeParser {
             // PDABytecodeTriggers.g:184:5: ( ^( RANGE a= STRING_LITERAL b= STRING_LITERAL ) )
             // PDABytecodeTriggers.g:184:7: ^( RANGE a= STRING_LITERAL b= STRING_LITERAL )
             {
-            match(input,RANGE,FOLLOW_RANGE_in_range780); 
+            match(input,RANGE,FOLLOW_RANGE_in_range777); 
 
             match(input, Token.DOWN, null); 
-            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range784); 
-            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range788); 
+            a=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range781); 
+            b=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_range785); 
 
             match(input, Token.UP, null); 
             gen.emit(new RangeInstr(a.token, b.token));
@@ -1356,8 +1360,8 @@ public class PDABytecodeTriggers extends TreeParser {
 
 
     // $ANTLR start "terminal"
-    // PDABytecodeTriggers.g:188:1: terminal[boolean not] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) );
-    public final void terminal(boolean not) throws RecognitionException {
+    // PDABytecodeTriggers.g:188:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) );
+    public final void terminal() throws RecognitionException {
         GrammarAST STRING_LITERAL7=null;
         GrammarAST STRING_LITERAL8=null;
         GrammarAST TOKEN_REF9=null;
@@ -1365,38 +1369,38 @@ public class PDABytecodeTriggers extends TreeParser {
         GrammarAST TOKEN_REF11=null;
 
         try {
-            // PDABytecodeTriggers.g:189:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) )
+            // PDABytecodeTriggers.g:189:5: ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) )
             int alt16=7;
             alt16 = dfa16.predict(input);
             switch (alt16) {
                 case 1 :
                     // PDABytecodeTriggers.g:189:8: ^( STRING_LITERAL . )
                     {
-                    STRING_LITERAL7=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal816); 
+                    STRING_LITERAL7=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal812); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
 
                     match(input, Token.UP, null); 
-                    gen.emitString(STRING_LITERAL7.token, not);
+                    gen.emitString(STRING_LITERAL7.token);
 
                     }
                     break;
                 case 2 :
                     // PDABytecodeTriggers.g:190:7: STRING_LITERAL
                     {
-                    STRING_LITERAL8=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal831); 
-                    gen.emitString(STRING_LITERAL8.token, not);
+                    STRING_LITERAL8=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal827); 
+                    gen.emitString(STRING_LITERAL8.token);
 
                     }
                     break;
                 case 3 :
                     // PDABytecodeTriggers.g:191:7: ^( TOKEN_REF ARG_ACTION . )
                     {
-                    TOKEN_REF9=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal845); 
+                    TOKEN_REF9=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal841); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal847); 
+                    match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_terminal843); 
                     matchAny(input); 
 
                     match(input, Token.UP, null); 
@@ -1407,7 +1411,7 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 4 :
                     // PDABytecodeTriggers.g:192:7: ^( TOKEN_REF . )
                     {
-                    TOKEN_REF10=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal861); 
+                    TOKEN_REF10=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal857); 
 
                     match(input, Token.DOWN, null); 
                     matchAny(input); 
@@ -1420,19 +1424,19 @@ public class PDABytecodeTriggers extends TreeParser {
                 case 5 :
                     // PDABytecodeTriggers.g:193:7: TOKEN_REF
                     {
-                    TOKEN_REF11=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal877); 
+                    TOKEN_REF11=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal873); 
                     gen.emit(new CallInstr(TOKEN_REF11.token));
 
                     }
                     break;
                 case 6 :
-                    // PDABytecodeTriggers.g:194:7: ^( ROOT terminal[false] )
+                    // PDABytecodeTriggers.g:194:7: ^( ROOT terminal )
                     {
-                    match(input,ROOT,FOLLOW_ROOT_in_terminal892); 
+                    match(input,ROOT,FOLLOW_ROOT_in_terminal888); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal894);
-                    terminal(false);
+                    pushFollow(FOLLOW_terminal_in_terminal890);
+                    terminal();
 
                     state._fsp--;
 
@@ -1442,13 +1446,13 @@ public class PDABytecodeTriggers extends TreeParser {
                     }
                     break;
                 case 7 :
-                    // PDABytecodeTriggers.g:195:7: ^( BANG terminal[false] )
+                    // PDABytecodeTriggers.g:195:7: ^( BANG terminal )
                     {
-                    match(input,BANG,FOLLOW_BANG_in_terminal908); 
+                    match(input,BANG,FOLLOW_BANG_in_terminal900); 
 
                     match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_terminal_in_terminal910);
-                    terminal(false);
+                    pushFollow(FOLLOW_terminal_in_terminal902);
+                    terminal();
 
                     state._fsp--;
 
@@ -1682,7 +1686,7 @@ public class PDABytecodeTriggers extends TreeParser {
             this.transition = DFA10_transition;
         }
         public String getDescription() {
-            return "157:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal[false] ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal[false] | ruleref );";
+            return "157:1: atom : ( ^( ROOT range ) | ^( BANG range ) | ^( ROOT notSet ) | ^( BANG notSet ) | notSet | range | ^( DOT ID terminal ) | ^( DOT ID ruleref ) | ^( WILDCARD . ) | WILDCARD | terminal | ruleref );";
         }
     }
     static final String DFA16_eotS =
@@ -1748,7 +1752,7 @@ public class PDABytecodeTriggers extends TreeParser {
             this.transition = DFA16_transition;
         }
         public String getDescription() {
-            return "188:1: terminal[boolean not] : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal[false] ) | ^( BANG terminal[false] ) );";
+            return "188:1: terminal : ( ^( STRING_LITERAL . ) | STRING_LITERAL | ^( TOKEN_REF ARG_ACTION . ) | ^( TOKEN_REF . ) | TOKEN_REF | ^( ROOT terminal ) | ^( BANG terminal ) );";
         }
     }
  
@@ -1806,37 +1810,37 @@ public class PDABytecodeTriggers extends TreeParser {
     public static final BitSet FOLLOW_DOT_in_atom583 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_atom585 = new BitSet(new long[]{0x8021000000000000L,0x0000000000000010L});
     public static final BitSet FOLLOW_terminal_in_atom587 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOT_in_atom597 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_atom599 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
-    public static final BitSet FOLLOW_ruleref_in_atom601 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_WILDCARD_in_atom613 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_WILDCARD_in_atom629 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_terminal_in_atom644 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleref_in_atom659 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_notSet682 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_notSet684 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOT_in_notSet695 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOT_in_atom596 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_atom598 = new BitSet(new long[]{0xA1A1000000000000L,0x0000000200000011L});
+    public static final BitSet FOLLOW_ruleref_in_atom600 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_WILDCARD_in_atom612 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_WILDCARD_in_atom628 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_terminal_in_atom643 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ruleref_in_atom656 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_notSet679 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_notSet683 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOT_in_notSet693 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_block_in_notSet697 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ROOT_in_ruleref719 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref722 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref724 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_ruleref737 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref740 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref742 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RULE_REF_in_ruleref755 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref757 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_RANGE_in_range780 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_range784 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_range788 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal816 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal831 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal845 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_terminal847 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal861 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TOKEN_REF_in_terminal877 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROOT_in_terminal892 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal894 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BANG_in_terminal908 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_terminal_in_terminal910 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ROOT_in_ruleref716 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref719 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref721 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_ruleref734 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref737 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref739 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RULE_REF_in_ruleref752 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_ruleref754 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_RANGE_in_range777 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range781 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_range785 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal812 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_in_terminal827 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal841 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_terminal843 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal857 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TOKEN_REF_in_terminal873 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROOT_in_terminal888 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal890 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BANG_in_terminal900 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_terminal_in_terminal902 = new BitSet(new long[]{0x0000000000000008L});
 
 }

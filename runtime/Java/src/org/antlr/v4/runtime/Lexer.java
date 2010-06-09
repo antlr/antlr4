@@ -32,6 +32,7 @@ import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.v4.runtime.misc.QStack;
+import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
 
 import java.util.EmptyStackException;
@@ -104,7 +105,19 @@ public abstract class Lexer implements TokenSource {
 					eof.setCharPositionInLine(getCharPositionInLine());
 					return eof;
 				}
-				int ttype = modeToPDA[state.mode].execThompson(state.input);
+				int ttype = 0;
+				try {
+					ttype = modeToPDA[state.mode].execThompson(state.input);
+				}
+				catch (PDA.InvalidElement re) {
+					CharStream cs = (CharStream)state.input;
+					System.err.println("!!!!! no match for char "+
+									   Bytecode.quotedCharLiteral(state.input.LA(1))+
+									   " at "+state.input.index()+
+									   " line "+cs.getLine()+":"+cs.getCharPositionInLine());
+					state.input.consume();
+					continue;
+				}
 				if ( state.type == Token.INVALID_TOKEN_TYPE ) state.type = ttype;
 				if ( state.type==SKIP ) {
 					continue outer;

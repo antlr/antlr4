@@ -1,5 +1,7 @@
 package org.antlr.v4.runtime.pda;
 
+import org.antlr.runtime.Token;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +135,7 @@ public class Bytecode {
 					case NONE:
 						break;
 					case BYTE:
-						if ( operandsAreChars ) operands.add(quotedCharLiteral(code[ip]));
+						if ( operandsAreChars ) operands.add(quotedCharLiteral((char)code[ip]));
 						else operands.add(String.valueOf(code[ip]));
 						break;
 					case CHAR :
@@ -193,6 +195,7 @@ public class Bytecode {
 	 *  as unicode.
 	 */
 	public static String quotedCharLiteral(int c) {
+		if ( c== Token.EOF ) return "'<EOF>'";
 		if ( c<LiteralCharValueEscape.length && LiteralCharValueEscape[c]!=null ) {
 			return '\''+LiteralCharValueEscape[c]+'\'';
 		}

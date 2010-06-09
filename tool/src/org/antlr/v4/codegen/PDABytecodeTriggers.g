@@ -161,17 +161,17 @@ atom
 	|	^(BANG notSet)			
 	|	notSet					
 	|	range					
-	|	^(DOT ID terminal[false])		
+	|	^(DOT ID terminal)		
 	|	^(DOT ID ruleref)		
     |	^(WILDCARD .)		{gen.emit(new WildcardInstr($WILDCARD.token));}		
     |	WILDCARD			{gen.emit(new WildcardInstr($WILDCARD.token));}	
-    |   terminal[false]				
+    |   terminal			
     |   ruleref					
     ;
 
 notSet
-    : ^(NOT terminal[true])
-    | ^(NOT block)			
+    : ^(NOT {gen.emit(new NotInstr());} terminal)
+    | ^(NOT {gen.emit(new NotInstr());} block)
     ;
 
 ruleref
@@ -185,12 +185,12 @@ range
     	{gen.emit(new RangeInstr($a.token, $b.token));}
     ;
 
-terminal[boolean not]
-    :  ^(STRING_LITERAL .)			{gen.emitString($STRING_LITERAL.token, $not);}
-    |	STRING_LITERAL				{gen.emitString($STRING_LITERAL.token, $not);}
+terminal
+    :  ^(STRING_LITERAL .)			{gen.emitString($STRING_LITERAL.token);}
+    |	STRING_LITERAL				{gen.emitString($STRING_LITERAL.token);}
     |	^(TOKEN_REF ARG_ACTION .)	{gen.emit(new CallInstr($TOKEN_REF.token));}
     |	^(TOKEN_REF .)				{gen.emit(new CallInstr($TOKEN_REF.token));}
     |	TOKEN_REF					{gen.emit(new CallInstr($TOKEN_REF.token));}
-    |	^(ROOT terminal[false])			
-    |	^(BANG terminal[false])			
+    |	^(ROOT terminal)
+    |	^(BANG terminal)
     ;

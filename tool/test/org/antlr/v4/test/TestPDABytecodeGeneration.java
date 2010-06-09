@@ -54,6 +54,38 @@ public class TestPDABytecodeGeneration extends BaseTest {
 		checkBytecode(g, expecting);
 	}
 
+	@Test public void testNotBlock() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : ~('a'|'b') ;");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tnot             \n" +        // not's next match/range
+			"0006:\tsplit         13, 18\n" +
+			"0013:\tmatch8        'a'\n" +
+			"0015:\tjmp           20\n" +
+			"0018:\tmatch8        'b'\n" +
+			"0020:\taccept        4\n";
+		checkBytecode(g, expecting);
+	}
+
+	@Test public void testNotStarBlock() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : ~('a'|'b')* ;");
+		String expecting =
+			"0000:\tsplit         5\n" +
+			"0005:\tsplit         12, 30\n" +
+			"0012:\tnot             \n" +
+			"0013:\tsplit         20, 25\n" +
+			"0020:\tmatch8        'a'\n" +
+			"0022:\tjmp           27\n" +
+			"0025:\tmatch8        'b'\n" +
+			"0027:\tjmp           5\n" +
+			"0030:\taccept        4\n";
+		checkBytecode(g, expecting);
+	}
+
 	@Test public void testIDandIntandKeyword() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n" +

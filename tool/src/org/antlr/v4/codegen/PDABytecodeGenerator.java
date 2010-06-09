@@ -4,7 +4,6 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.pda.CallInstr;
 import org.antlr.v4.codegen.pda.Instr;
 import org.antlr.v4.codegen.pda.MatchInstr;
-import org.antlr.v4.codegen.pda.NotInstr;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.Rule;
@@ -76,9 +75,8 @@ public class PDABytecodeGenerator {
 		return obj.set8table.size()-1;
 	}
 
-	public void emitString(Token t, boolean not) {
+	public void emitString(Token t) {
 		String chars = CharSupport.getStringFromGrammarStringLiteral(t.getText());
-		if ( not && chars.length()==1 ) emit(new NotInstr());
 		for (char c : chars.toCharArray()) {
 			emit(new MatchInstr(t, c));
 		}

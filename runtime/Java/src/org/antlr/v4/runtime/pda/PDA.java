@@ -15,6 +15,9 @@ import java.util.List;
  *  and a stack for rule invocation.
  */
 public class PDA {
+	public static class InvalidElement extends RuntimeException {}
+	public static final InvalidElement INVALID_ELEMENT = new InvalidElement();
+
 	public interface action_fptr { void exec(int action); }
 	public interface sempred_fptr { boolean eval(int predIndex); }
 
@@ -30,7 +33,7 @@ public class PDA {
 	boolean notNextMatch;
 
 	public PDA(byte[] code, int[] altToAddr, int nLabels) {
-		System.out.println("code="+Arrays.toString(code));
+		//System.out.println("code="+Arrays.toString(code));
 		this.code = code;
 		this.altToAddr = altToAddr;
 		this.nLabels = nLabels;
@@ -41,17 +44,17 @@ public class PDA {
 		int m = input.mark();
 		Arrays.fill(labelValues, null);
 		int ttype = execThompson(input, 0, false);
-		System.out.println("first attempt ttype="+ttype);
+//		System.out.println("first attempt ttype="+ttype);
 		if ( bypassedAction ) {
 			input.rewind(m);
-			System.out.println("Bypassed action; rewinding to "+input.index()+" doing with feeling");
+			//System.out.println("Bypassed action; rewinding to "+input.index()+" doing with feeling");
 			bypassedAction = false;
 			Arrays.fill(labelValues, null);
 			int ttype2 = execThompson(input, altToAddr[ttype], true);
 			if ( ttype!=ttype2 ) {
 				System.err.println("eh? token diff with action(s)");
 			}
-			else System.out.println("types are same");
+			//else System.out.println("types are same");
 		}
 		else input.release(m);
 		return ttype;
@@ -72,15 +75,14 @@ public class PDA {
 			c = input.LA(1);
 			int i = 0;
 			boolean accepted = false;
-			System.out.println("input["+input.index()+"]=="+(char)c);
+//			System.out.println("input["+input.index()+"]=="+Bytecode.quotedCharLiteral(c)+
+//							   " closure="+closure);
 processOneChar:
 			while ( i<closure.size() ) {
 				ThreadState t = closure.get(i);
 				ip = t.addr;
 				NFAStack context = t.context;
 				int alt = t.alt;
-				//System.out.println("input["+input.index()+"]=="+(char)c+" closure="+closure+", i="+i+", reach="+ reach);
-				trace(ip);
 				short opcode = code[ip];
 				boolean matched;
 				ip++; // move to next instruction or first byte of operand
@@ -89,28 +91,28 @@ processOneChar:
 						notNextMatch = true;
 						break;
 					case Bytecode.MATCH8 :
-						if ( c == code[ip] || (notNextMatch && c != code[ip]) ) {
+						if ( (!notNextMatch && c == code[ip]) || (notNextMatch && c != code[ip] && c != Token.EOF) ) {
 							addToClosure(reach, ip+1, alt, context);
 						}
 						notNextMatch = false;
 						break;
 					case Bytecode.MATCH16 :
 						matched = c == getShort(code, ip);
-						if ( matched || (notNextMatch && matched) ) {
+						if ( (!notNextMatch && matched) || (notNextMatch && matched && c != Token.EOF) ) {
 							addToClosure(reach, ip+2, alt, context);
 						}
 						notNextMatch = false;
 						break;
 					case Bytecode.RANGE8 :
 						matched = c >= code[ip] && c <= code[ip + 1];
-						if ( matched || (notNextMatch && matched) ) {
+						if ( (!notNextMatch && matched) || (notNextMatch && matched && c != Token.EOF) ) {
 							addToClosure(reach, ip+2, alt, context);
 						}
 						notNextMatch = false;
 						break;
 					case Bytecode.RANGE16 :
 						matched = c >= getShort(code, ip) && c <= getShort(code, ip + 2);
-						if ( matched || (notNextMatch && matched) ) {
+						if ( (!notNextMatch && matched) || (notNextMatch && matched && c != Token.EOF) ) {
 							addToClosure(reach, ip+4, alt, context);
 						}
 						notNextMatch = false;
@@ -143,11 +145,11 @@ processOneChar:
 						int tokenLastCharIndex = input.index() - 1;
 						int ttype = getShort(code, ip);
 						ANTLRStringStream is = (ANTLRStringStream)input;
-						System.out.println("ACCEPT "+is.substring(firstCharIndex,tokenLastCharIndex)+" as type "+ttype);
+//						System.out.println("ACCEPT "+is.substring(firstCharIndex,tokenLastCharIndex)+" as type "+ttype);
 						if ( tokenLastCharIndex > prevAccept.inputIndex ) {
 							prevAccept.inputIndex = tokenLastCharIndex;
 							// choose longest match so far regardless of rule priority
-							System.out.println("replacing old best match @ "+prevAccept.addr);
+//							System.out.println("replacing old best match @ "+prevAccept.addr);
 							prevAccept.addr = ip-1;
 							prevAccept.inputMarker = input.mark();
 							if ( firstAccept==null ) firstAccept = prevAccept;
@@ -155,7 +157,7 @@ processOneChar:
 						else if ( tokenLastCharIndex == prevAccept.inputIndex ) {
 							// choose first rule matched if match is of same length
 							if ( ip-1 < prevAccept.addr ) { // it will see both accepts for ambig rules
-								System.out.println("replacing old best match @ "+prevAccept.addr);
+//								System.out.println("replacing old best match @ "+prevAccept.addr);
 								prevAccept.addr = ip-1;
 								prevAccept.inputMarker = input.mark();
 							}
@@ -182,14 +184,14 @@ processOneChar:
 						throw new RuntimeException("invalid instruction @ "+ip+": "+opcode);
 				}
 				i++;
+//				trace(t,reach);
 			}
 			// if reach is empty, we didn't match anything but might have accepted
 			if ( reach.size()>0 ) { // if we reached other states, consume and process them
 				input.consume();
 			}
 			else if ( !accepted && c!=Token.EOF ) {
-				System.err.println("!!!!! no match for char "+(char)c+" at "+input.index());
-				input.consume();
+				throw INVALID_ELEMENT;
 			}
 			// else reach.size==0 && matched, don't consume: accepted
 			
@@ -450,9 +452,10 @@ processOneChar:
 	public void action(int ruleIndex, int actionIndex) {
 	}
 	
-	void trace(int ip) {
+	void trace(ThreadState t, List<ThreadState> reach) {
+		int ip = t.addr;
 		String instr = Bytecode.disassembleInstruction(code, ip, true);
-		System.out.println(instr);
+		System.out.println(instr+"\t\t reach="+reach);
 	}
 
 	void traceDFA(int ip) {

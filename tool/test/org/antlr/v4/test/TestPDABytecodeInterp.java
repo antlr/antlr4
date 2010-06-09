@@ -53,6 +53,16 @@ public class TestPDABytecodeInterp extends BaseTest {
 		checkMatches(g, "ab32abc", expecting);
 	}
 
+	@Test public void testSLComment() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"\n" +
+			"CMT : '//' ~('\r'|'\n')* '\r'? '\n' ;\n" +
+			"ID  : 'ab' ;\n");
+		String expecting = "ID, CMT, ID, EOF";
+		checkMatches(g, "ab// foo\nab", expecting);
+	}
+
 	@Test public void testNonGreedy() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n" +
