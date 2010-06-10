@@ -75,7 +75,7 @@ public class PredictionDFAFactory {
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
      *  the stack context.
      */
-	Set<NFAConfig> closureBusy;
+	OrderedHashSet<NFAConfig> closureBusy;
 
 	Resolver resolver;
 
@@ -90,7 +90,7 @@ public class PredictionDFAFactory {
 	}
 
 	public DFA createDFA() {
-		closureBusy = new HashSet<NFAConfig>();
+		closureBusy = new OrderedHashSet<NFAConfig>();
 		computeStartState();
 		dfa.addState(dfa.startState); // make sure dfa knows about this state
 		work.add(dfa.startState);
@@ -117,7 +117,6 @@ public class PredictionDFAFactory {
 	 */
 	void reach(DFAState d) {
 		OrderedHashSet<IntervalSet> labels = DFA.getReachableLabels(d);
-
 		for (IntervalSet label : labels) {
 			DFAState t = reach(d, label);
 			if ( debug ) {

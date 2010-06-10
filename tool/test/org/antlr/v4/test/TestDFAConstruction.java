@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+/** NON-OPTIMIZED DFA */
 public class TestDFAConstruction extends BaseTest {
 	@Test public void testSimpleLinearApproxDecisionAsDFA() throws Exception {
 		String g =
@@ -28,17 +29,41 @@ public class TestDFAConstruction extends BaseTest {
 			"e : L e R\n" +
 			"  | I\n" +
 			"  ;";
+//		String expecting =
+//			"s0-I->s2\n" +
+//			"s0-L->s1\n" +
+//			"s1-I->s2\n" +
+//			"s1-L->s1\n" +
+//			"s2-R->s3\n" +
+//			"s2-X->:s5=>1\n" +
+//			"s2-Y->:s4=>2\n" +
+//			"s3-R->s3\n" +
+//			"s3-X->:s5=>1\n" +
+//			"s3-Y->:s4=>2\n";
+//		String expecting =
+//			"s0-I->s1\n" +
+//			"s0-L->s2\n" +
+//			"s1-Y->:s3=>2\n" +
+//			"s1-X->:s4=>1\n" +
+//			"s2-I->s5\n" +
+//			"s2-L->s2\n" +
+//			"s5-Y->:s3=>2\n" +
+//			"s5-X->:s4=>1\n" +
+//			"s5-R->s6\n" +
+//			"s6-Y->:s3=>2\n" +
+//			"s6-X->:s4=>1\n" +
+//			"s6-R->s6\n";
 		String expecting =
-			"s0-I->s2\n" +
 			"s0-L->s1\n" +
-			"s1-I->s2\n" +
+			"s0-I->s2\n" +
 			"s1-L->s1\n" +
-			"s2-R->s3\n" +
-			"s2-X->:s5=>1\n" +
-			"s2-Y->:s4=>2\n" +
-			"s3-R->s3\n" +
-			"s3-X->:s5=>1\n" +
-			"s3-Y->:s4=>2\n";
+			"s1-I->s2\n" +
+			"s2-X->:s3=>1\n" +
+			"s2-R->s4\n" +
+			"s2-Y->:s5=>2\n" +
+			"s4-X->:s3=>1\n" +
+			"s4-R->s4\n" +
+			"s4-Y->:s5=>2\n";
 		checkRuleDFA(g, "a", expecting);
 	}
 
@@ -54,15 +79,15 @@ public class TestDFAConstruction extends BaseTest {
 			"  ;\n" +
 			"c : C | ;";
 		String expecting =
-			"s0-C->s3\n" +
-			"s0-D->s1\n" +
-			"s0-E->s2\n" +
-			"s1-X->:s5=>1\n" +
-			"s1-Y->:s4=>2\n" +
-			"s2-X->:s5=>1\n" +
-			"s2-Y->:s4=>2\n" +
-			"s3-D->s1\n" +
-			"s3-E->s2\n";
+			"s0-C->s1\n" +
+			"s0-D->s2\n" +
+			"s0-E->s3\n" +
+			"s1-D->s2\n" +
+			"s1-E->s3\n" +
+			"s2-X->:s4=>1\n" +
+			"s2-Y->:s5=>2\n" +
+			"s3-X->:s4=>1\n" +
+			"s3-Y->:s5=>2\n";
 		checkRuleDFA(g, "a", expecting);
 	}
 
@@ -78,10 +103,10 @@ public class TestDFAConstruction extends BaseTest {
 			"q : b Q ;";
 		String expecting =
 			"s0-F->s1\n" +
-			"s0-X->:s3=>1\n" +
-			"s0-Y->:s2=>2\n" +
-			"s1-X->:s3=>1\n" +
-			"s1-Y->:s2=>2\n";
+			"s0-X->:s2=>1\n" +
+			"s0-Y->:s3=>2\n" +
+			"s1-X->:s2=>1\n" +
+			"s1-Y->:s3=>2\n";
 		checkRuleDFA(g, "a", expecting);
 	}
 
@@ -119,27 +144,27 @@ public class TestDFAConstruction extends BaseTest {
 			"  | I\n" +
 			"  ;";
 		String expecting =
-			"s0-A->s1\n" +
+			"s0-L->s1\n" +
+			"s0-A->s2\n" +
 			"s0-I->s3\n" +
-			"s0-L->s2\n" +
-			"s1-A->s1\n" +
+			"s1-L->s1\n" +
+			"s1-A->s2\n" +
 			"s1-I->s3\n" +
-			"s1-L->s2\n" +
-			"s2-A->s1\n" +
+			"s2-L->s1\n" +
+			"s2-A->s2\n" +
 			"s2-I->s3\n" +
-			"s2-L->s2\n" +
-			"s3-B->s4\n" +
+			"s3-X->:s4=>1\n" +
 			"s3-R->s5\n" +
-			"s3-X->:s7=>1\n" +
-			"s3-Y->:s6=>2\n" +
-			"s4-B->s4\n" +
-			"s4-R->s5\n" +
-			"s4-X->:s7=>1\n" +
-			"s4-Y->:s6=>2\n" +
-			"s5-B->s4\n" +
+			"s3-B->s6\n" +
+			"s3-Y->:s7=>2\n" +
+			"s5-X->:s4=>1\n" +
 			"s5-R->s5\n" +
-			"s5-X->:s7=>1\n" +
-			"s5-Y->:s6=>2\n";
+			"s5-B->s6\n" +
+			"s5-Y->:s7=>2\n" +
+			"s6-X->:s4=>1\n" +
+			"s6-R->s5\n" +
+			"s6-B->s6\n" +
+			"s6-Y->:s7=>2\n";
 		checkRuleDFA(g, "s", expecting);
 	}
 
@@ -183,10 +208,10 @@ public class TestDFAConstruction extends BaseTest {
 			"  ;";
 		String expecting =
 			"s0-F->s1\n" +
-			"s0-X->:s3=>1\n" +
-			"s0-Y->:s2=>2\n" +
-			"s1-X->:s3=>1\n" +
-			"s1-Y->:s2=>2\n";
+			"s0-X->:s2=>1\n" +
+			"s0-Y->:s3=>2\n" +
+			"s1-X->:s2=>1\n" +
+			"s1-Y->:s3=>2\n";
 		List<Message> msgs = checkRuleDFA(g, "a", expecting);
 		System.out.println(msgs);
 		assertEquals(msgs.size(), 0);
@@ -198,11 +223,11 @@ public class TestDFAConstruction extends BaseTest {
 			"s : a Y | A+ X ;\n" +
 			"a : A a | Q;";
 		String expecting =
-			"s0-A->s2\n" +
-			"s0-Q->:s1=>1\n" +
-			"s2-A->s2\n" +
-			"s2-Q->:s1=>1\n" +
-			"s2-X->:s3=>2\n";
+			"s0-A->s1\n" +
+			"s0-Q->:s2=>1\n" +
+			"s1-A->s1\n" +
+			"s1-Q->:s2=>1\n" +
+			"s1-X->:s3=>2\n";
 		List<Message> msgs = checkRuleDFA(g, "s", expecting);
 		System.out.println(msgs);
 		assertEquals(msgs.size(), 0);
@@ -246,8 +271,8 @@ public class TestDFAConstruction extends BaseTest {
 		// nondeterministic from left edge
 		String expecting =
 			"s0-P->s1\n" +
-			"s1-EOF->:s3=>2\n" +
-			"s1-P->:s2=>1\n";
+			"s1-P->:s2=>1\n" +
+			"s1-EOF->:s3=>2\n";
 		List<Message> msgs = checkRuleDFA(g, "a", expecting);
 		System.out.println(msgs);
 		ambig(msgs, new int[] {1,2}, "P P");
@@ -329,10 +354,10 @@ public class TestDFAConstruction extends BaseTest {
 		String expecting =
 			"s0-C->s1\n" +
 			"s1-B->s2\n" +
-			"s1-X->:s4=>1\n" +
-			"s1-Y->:s3=>2\n" +
-			"s2-X->:s4=>1\n" +
-			"s2-Y->:s3=>2\n";
+			"s1-X->:s3=>1\n" +
+			"s1-Y->:s4=>2\n" +
+			"s2-X->:s3=>1\n" +
+			"s2-Y->:s4=>2\n";
 		List<Message> msgs = checkRuleDFA(g, "a", expecting);
 		System.out.println(msgs);
 		assertEquals(msgs.size(), 0);
@@ -367,8 +392,8 @@ public class TestDFAConstruction extends BaseTest {
 		assertEquals(msgs.size(), 1);
 
 		expecting =
-			"s0-A->:s1=>2\n" +
-			"s0-B->:s2=>1\n";
+			"s0-B->:s1=>1\n" +
+			"s0-A->:s2=>2\n";
 		msgs = checkRuleDFA(g, 1, expecting);
 		System.out.println(msgs);
 		ambig(msgs, new int[] {1,2}, "B");

@@ -21,6 +21,9 @@ public class CompiledPDA {
 
 	public int[] altToAddr; // either token type (in lexer) or alt num for DFA in parser
 
+	// charToAddr['a'] is list of addresses we can reach upon 'a' (only start state)
+	public List[] charToAddr = new List[256];
+
 	public DoubleKeyMap<Rule, String, Integer> ruleLabels = new DoubleKeyMap<Rule, String, Integer>();
 	public DoubleKeyMap<Rule, Token, Integer> ruleActions = new DoubleKeyMap<Rule, Token, Integer>();
 	public DoubleKeyMap<Rule, Token, Integer> ruleSempreds = new DoubleKeyMap<Rule, Token, Integer>();

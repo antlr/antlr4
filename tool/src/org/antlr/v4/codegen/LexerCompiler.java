@@ -30,7 +30,6 @@ public class LexerCompiler {
 		SplitInstr s0 = new SplitInstr(numRules - numFragmentRules);
 		gen.emit(s0);
 
-
 		for (Rule r : lg.modes.get(modeName)) { // for each rule in mode
 			gen.currentRule = r;
 			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
@@ -56,6 +55,29 @@ public class LexerCompiler {
 				e.printStackTrace(System.err);
 			}
 		}
+
+//		for (Rule r : lg.modes.get(modeName)) {
+//			if ( !r.isFragment() ) {
+//				LinearApproximator approx = new LinearApproximator(lg, NFA.INVALID_DECISION_NUMBER);
+//				IntervalSet fset = approx.FIRST(lg.nfa.ruleToStartState.get(r));
+//				System.out.println("first of "+r.name+"="+fset);
+//				for (int c : fset.toArray()) {
+//					if ( c>=0 && c<=255 ) {
+//						int a = gen.obj.ruleToAddr.get(r.name);
+//						List addrs = gen.obj.charToAddr[c];
+//						if ( addrs==null ) {
+//							addrs = new ArrayList();
+//							gen.obj.charToAddr[c] = addrs;
+//						}
+//						addrs.add(a);
+//					}
+//				}
+//			}
+//		}
+//		for (int c=0; c<=255; c++) {
+//			System.out.println(c+": "+gen.obj.charToAddr[c]);
+//		}
+
 		gen.compile();
 		gen.obj.nLabels = gen.labelIndex;
 		System.out.println(Bytecode.disassemble(gen.obj.code));

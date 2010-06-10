@@ -2,7 +2,6 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
-/** TODO: delete since i don't built DFA anymore for lexer */
 public class TestLexerDFAConstruction extends BaseTest {
 
 	@Test public void unicode() throws Exception {
@@ -11,7 +10,12 @@ public class TestLexerDFAConstruction extends BaseTest {
 			"A : '\\u0030'..'\\u8000'+ 'a' ;\n" + // TODO: FAILS; \\u not converted
 			"B : '\\u0020' ;";
 		String expecting =
-			"";
+			"s0-{'0'..'\\u8000'}->s1\n" +
+			"s0-' '->:s2=> B\n" +
+			"s1-'a'->:s3=> A\n" +
+			"s1-{'0'..'`', 'b'..'\\u8000'}->s1\n" +
+			":s3=> A-'a'->:s3=> A\n" +
+			":s3=> A-{'0'..'`', 'b'..'\\u8000'}->s1\n";
 		checkLexerDFA(g, expecting);
 	}
 
@@ -24,20 +28,19 @@ public class TestLexerDFAConstruction extends BaseTest {
 			"public fragment\n" +
 			"DIGIT : '0'..'9' ;";
 		String expecting =
-			":s1=> INT-{'0'..'9'}->:s1=> INT\n" +
+			"s0-'i'->:s1=> ID\n" +
+			"s0-{'a'..'h', 'j'..'z'}->:s2=> ID\n" +
+			"s0-{'0'..'9'}->:s3=> INT\n" +
+			":s1=> ID-'f'->:s4=> IF ID\n" +
+			":s1=> ID-{'a'..'e', 'g'..'z'}->:s2=> ID\n" +
 			":s2=> ID-{'a'..'z'}->:s2=> ID\n" +
-			":s3=> ID-'f'->:s4=> IF ID\n" +
-			":s3=> ID-{'a'..'e', 'g'..'z'}->:s2=> ID\n" +
-			":s4=> IF ID-{'a'..'z'}->:s2=> ID\n" +
-			"s0-'i'->:s3=> ID\n" +
-			"s0-{'0'..'9'}->:s1=> INT\n" +
-			"s0-{'a'..'h', 'j'..'z'}->:s2=> ID\n";
+			":s3=> INT-{'0'..'9'}->:s3=> INT\n" +
+			":s4=> IF ID-{'a'..'z'}->:s2=> ID\n";
 		checkLexerDFA(g, expecting);
 	}
 
 	@Test public void recursiveMatchingTwoAlts() throws Exception {
-		// ambig with ACTION; accept state will try both after matching
-		// since one is recursive
+		// TODO: recursion requires NFA
 		String g =
 			"lexer grammar L3;\n" +
 			"SPECIAL : '{{}}' ;\n" +
@@ -46,25 +49,7 @@ public class TestLexerDFAConstruction extends BaseTest {
 			"FOO : ACTION ;\n" +
 			"LCURLY : '{' ;";
 		String expecting =
-			":s1=> LCURLY-'x'->s4\n" +
-			":s1=> LCURLY-'{'->s3\n" +
-			":s1=> LCURLY-'}'->:s2=> ACTION\n" +
-			"s0-'{'->:s1=> LCURLY\n" +
-			"s3-'x'->s6\n" +
-			"s3-'}'->s5\n" +
-			"s4-'x'->s4\n" +
-			"s4-'{'->s7\n" +
-			"s4-'}'->:s2=> ACTION\n" +
-			"s5-'x'->s4\n" +
-			"s5-'{'->s7\n" +
-			"s5-'}'->:s8=> SPECIAL ACTION\n" +  // order meaningful here: SPECIAL ACTION
-			"s6-'x'->s6\n" +
-			"s6-'}'->s9\n" +
-			"s7-'x'->s6\n" +
-			"s7-'}'->s9\n" +
-			"s9-'x'->s4\n" +
-			"s9-'{'->s7\n" +
-			"s9-'}'->:s2=> ACTION\n";
+			"";
 		checkLexerDFA(g, expecting);
 	}
 

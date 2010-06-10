@@ -16,8 +16,8 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 			"  ;";
 		String expecting =
 			"s0-ID->s1\n" +
-			"s1-true->:s3=>2\n" +
-			"s1-{p1}?->:s2=>1\n";
+			"s1-{p1}?->:s2=>1\n" +
+			"s1-true->:s3=>2\n";
 		checkRuleDFA(g, "a", expecting);
 	}
 
@@ -51,13 +51,13 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 			"\n" +
 			"expr : ID;";
 		String expecting =
-			"s0-';'->:s2=>3\n" +
-			"s0-ID->s1\n" +
-			"s1-ID->s3\n" +
-			"s3-';'->s5\n" +
+			"s0-';'->:s1=>3\n" +
+			"s0-ID->s2\n" +
+			"s2-ID->s3\n" +
 			"s3-ID->:s4=>1\n" +
-			"s5-{CALL}?->:s7=>2\n" +
-			"s5-{IF}?->:s6=>1\n";
+			"s3-';'->s5\n" +
+			"s5-{IF}?->:s6=>1\n" +
+			"s5-{CALL}?->:s7=>2\n";
 		List<Message> msgs = checkRuleDFA(g, "stat", expecting);
 		System.err.println(msgs);
 	}
@@ -76,7 +76,7 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 		String expecting =
 			"s0-ID->s1\n" +
 			"s1-SEMI->s2\n" +
-			"s2-({while}?||{for}?||{do}?)->:s3=>1\n" +
+			"s2-({while}?||{do}?||{for}?)->:s3=>1\n" +
 			"s2-true->:s4=>2\n";
 		checkRuleDFA(g, "a", expecting);
 	}

@@ -27,10 +27,15 @@ public class PDA {
 	public CommonToken[] labelValues;
 	public int nLabels;
 
+	public int[][] charToAddr;
+
 	/** If we hit an action, we'll have to rewind and do the winning rule again */
 	boolean bypassedAction;
 
 	boolean notNextMatch;
+
+	List<ThreadState> s0_closure;
+	List<ThreadState>[] closure_cache;
 
 	public PDA(byte[] code, int[] altToAddr, int nLabels) {
 		//System.out.println("code="+Arrays.toString(code));
@@ -38,6 +43,7 @@ public class PDA {
 		this.altToAddr = altToAddr;
 		this.nLabels = nLabels;
 		labelValues = new CommonToken[nLabels];
+		closure_cache = new ArrayList[255+1];
 	}
 
 	public int execThompson(IntStream input) {
@@ -64,7 +70,39 @@ public class PDA {
 		int c = input.LA(1);
 		if ( c==Token.EOF ) return Token.EOF;
 
-		List<ThreadState> closure = computeStartState(ip);
+//		List<ThreadState> closure = null;
+//		int[] x = charToAddr[c];
+//		//System.out.println("list for "+Bytecode.quotedCharLiteral(c)+" is "+Arrays.toString(x));
+//		if ( closure_cache[c] != null ) {
+//			closure = new ArrayList<ThreadState>();
+//			closure.addAll(closure_cache[c]);
+//		}
+//		else {
+//			if ( x!=null ) {
+//				closure = new ArrayList<ThreadState>();
+//				int i = 1;
+//				for (int v : x) {
+//					//ThreadState t = new ThreadState(v, i, NFAStack.EMPTY);
+//					addToClosure(closure, v, i, NFAStack.EMPTY);
+//					//closure.add(t);
+//					i++;
+//				}
+//				closure_cache[c] = new ArrayList<ThreadState>();
+//				closure_cache[c].addAll(closure);
+//				//System.out.println("caching "+closure);
+//			}
+//			else {
+//				System.err.println("invalid char: "+Bytecode.quotedCharLiteral(c));
+//			}
+//		}
+
+		List<ThreadState> closure = null;
+		if ( s0_closure == null ) {
+			s0_closure = computeStartState(ip);
+		}
+		closure = new ArrayList<ThreadState>();
+		closure.addAll(s0_closure);
+
 		List<ThreadState> reach = new ArrayList<ThreadState>();
 		ThreadState prevAccept = new ThreadState(Integer.MAX_VALUE, -1, NFAStack.EMPTY);
 		ThreadState firstAccept = null;
@@ -256,7 +294,7 @@ processOneChar:
 				// accept is just a ret if we have a stack;
 				// i.e., don't stop; someone called us and we need to use their
 				// accept, not this one
-				closure.add(t);	 // add to closure; need to execute during reach			
+				closure.add(t);	 // add to closure; need to execute during reach
 			case Bytecode.RET :
 				if ( context != NFAStack.EMPTY ) {
 					addToClosure(closure, context.returnAddr, alt, context.parent);
@@ -278,6 +316,7 @@ processOneChar:
 				break;
 		}
 	}
+
 
 	List<ThreadState> computeStartState(int ip) {
 		// if we're starting at a SPLIT, add closure of all SPLIT targets

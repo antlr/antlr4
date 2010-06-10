@@ -29,6 +29,11 @@ public class OrderedHashSet<T> extends HashSet<T> {
         return oldElement;
     }
 
+	public boolean remove(int i) {
+		T o = elements.remove(i);
+        return super.remove(o);
+	}	
+
     /** Add a value to list; keep in hashtable for consistency also;
      *  Key is object itself.  Good for say asking if a certain string is in
      *  a list of strings.
@@ -62,7 +67,12 @@ public class OrderedHashSet<T> extends HashSet<T> {
         return elements;
     }
 
-    public String toString() {
+	@Override
+	public Object[] toArray() {
+		return elements.toArray();
+	}
+
+	public String toString() {
         return elements.toString();
     }
 }

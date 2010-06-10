@@ -337,7 +337,7 @@ public class DOTGenerator {
 				List<Integer> altList = new ArrayList<Integer>();
 				altList.addAll(alts);
 				Collections.sort(altList);
-				Set configurations = ((DFAState) s).nfaConfigs;
+				Set<NFAConfig> configurations = ((DFAState)s).nfaConfigs;
 				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
 					Integer altI = (Integer) altList.get(altIndex);
 					int alt = altI.intValue();

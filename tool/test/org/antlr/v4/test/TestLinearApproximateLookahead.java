@@ -28,8 +28,8 @@ public class TestLinearApproximateLookahead extends BaseTest {
 			"b : c | C ;\n" +
 			"c : D ;";
 		String expecting =
-			"s0-B->:s2=>2\n" +
-			"s0-{D, C}->:s1=>1\n";
+			"s0-{D, C}->:s1=>1\n" +
+			"s0-B->:s2=>2\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -52,8 +52,8 @@ public class TestLinearApproximateLookahead extends BaseTest {
 			"a : b B | X b C ;\n" +
 			"b : A | ;";
 		String expecting =
-			"s0-X->:s2=>2\n" +
-			"s0-{A, B}->:s1=>1\n";
+			"s0-{A, B}->:s1=>1\n" +
+			"s0-X->:s2=>2\n";
 		checkRule(g, "a", expecting);
 	}
 

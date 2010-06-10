@@ -389,7 +389,13 @@ public class Grammar implements AttributeResolver {
 		}
 		//System.out.println("getTokenDisplayName ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
-	}	
+	}
+
+	public List<String> getTokenDisplayNames(Collection<Integer> types) {
+		List<String> names = new ArrayList<String>();
+		for (int t : types) names.add(getTokenDisplayName(t));
+		return names;
+	}
 
 	/** What is the max char value possible for this grammar's target?  Use
 	 *  unicode max if no target defined.

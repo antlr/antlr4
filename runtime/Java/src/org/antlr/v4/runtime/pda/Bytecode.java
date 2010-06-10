@@ -57,6 +57,7 @@ public class Bytecode {
 	public static final short SEMPRED	 = 14;
 	public static final short ACTION	 = 15;
 	public static final short NOT	     = 16; // not next match instr
+	public static final short SWITCH     = 17;
 
 	/** Used for disassembly; describes instruction set */
 	public static Instruction[] instructions = new Instruction[] {
@@ -77,6 +78,7 @@ public class Bytecode {
 		new Instruction("sempred", OperandType.SHORT, OperandType.SHORT), // sempred ruleIndex, predIndex
 		new Instruction("action", OperandType.SHORT, OperandType.SHORT), // action ruleIndex, actionIndex
 		new Instruction("not"),
+		new Instruction("switch", OperandType.SHORT),
 	};
 
 	public static String disassemble(byte[] code, int start, boolean operandsAreChars) {

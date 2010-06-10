@@ -5,7 +5,6 @@ import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.TerminalAST;
-import org.stringtemplate.v4.misc.Misc;
 
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class LexerNFAFactory extends ParserNFAFactory {
 	 */
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		String chars = stringLiteralAST.getText();
-		chars = Misc.strip(chars, 1); // strip quotes
+		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
 		int n = chars.length();
 		BasicState left = newState(stringLiteralAST);
 		BasicState prev = left;

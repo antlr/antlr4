@@ -330,6 +330,9 @@ public static final byte[] <name>_code = {
 public static final int[] <name>_tokenTypeToAddr = {
     <model.altToAddr; separator=", ">
 };
+public static final int[][] <name>charToAddr = {
+    <model.charToAddr:{addrs | /* <i0> */ {<addrs; separator=", ">\}}; null="null", separator=",\n">
+};
 
 public final class <name>_PDA extends PDA {
 	<if(actions)>
@@ -352,6 +355,7 @@ public final class <name>_PDA extends PDA {
 	<endif>
     public <name>_PDA() {
     	super(<name>_code, <name>_tokenTypeToAddr, <model.nLabels>);
+    	this.charToAddr = <name>charToAddr;
     }
 }<\n>
 >>

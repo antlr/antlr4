@@ -119,7 +119,7 @@ public class DFAState {
 	}
 
 	public Set<NFAState> getUniqueNFAStates(int alt) {
-		Set<NFAState> alts = new HashSet<NFAState>();
+		OrderedHashSet<NFAState> alts = new OrderedHashSet<NFAState>();
 		for (NFAConfig c : nfaConfigs) {
 			if ( alt==NFA.INVALID_ALT_NUMBER || c.alt==alt ) alts.add(c.state);
 		}

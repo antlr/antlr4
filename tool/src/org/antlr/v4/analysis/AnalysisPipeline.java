@@ -20,9 +20,8 @@ public class AnalysisPipeline {
 		if ( lr.listOfRecursiveCycles.size()>0 ) return; // bail out
 
 		// BUILD DFA FOR EACH DECISION
-//		if ( g.isLexer() ) processLexer();
-//		else processParserOrTreeParser();
-		// TODO: don't do lexers for now; we can add lookahead analysis to help with NFA simulation later
+		if ( g.isLexer() ) processLexer();
+		else processParserOrTreeParser();
 		if ( !g.isLexer() ) processParserOrTreeParser();
 	}
 
