@@ -3,12 +3,18 @@ package org.antlr.v4.tool;
 import org.antlr.misc.MultiMap;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.Tool;
+import org.antlr.v4.automata.DFA;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /** */
 public class LexerGrammar extends Grammar {
 	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
 
 	public MultiMap<String, Rule> modes = new MultiMap<String, Rule>();
+
+	public Map<String, DFA> modeToDFA = new HashMap<String, DFA>();	
 
 	public LexerGrammar(Tool tool, GrammarRootAST ast) {
 		super(tool, ast);

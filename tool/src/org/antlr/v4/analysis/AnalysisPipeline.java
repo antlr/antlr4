@@ -2,7 +2,6 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.automata.DFA;
 import org.antlr.v4.automata.DecisionState;
-import org.antlr.v4.automata.TokensStartState;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 
@@ -22,7 +21,6 @@ public class AnalysisPipeline {
 		// BUILD DFA FOR EACH DECISION
 		if ( g.isLexer() ) processLexer();
 		else processParserOrTreeParser();
-		if ( !g.isLexer() ) processParserOrTreeParser();
 	}
 
 	void processLexer() {
@@ -30,8 +28,9 @@ public class AnalysisPipeline {
 		for (String modeName : lg.modes.keySet()) {
 			LexerNFAToDFAConverter conv = new LexerNFAToDFAConverter(lg);
 			DFA dfa = conv.createDFA(modeName);
-			TokensStartState startState = g.nfa.modeToStartState.get(modeName);
-			g.setLookaheadDFA(startState.decision, dfa);
+			lg.modeToDFA.put(modeName, dfa);
+			//TokensStartState startState = g.nfa.modeToStartState.get(modeName);
+			//g.setLookaheadDFA(startState.decision, dfa);
 
 			if ( g.tool.minimizeDFA ) {
 				int before = dfa.stateSet.size();

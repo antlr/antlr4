@@ -301,7 +301,7 @@ import org.antlr.runtime.*;
 <lexer>
 >>
 
-Lexer(lexerName, modes, pdas, tokens, actions, sempreds, namedActions) ::= <<
+Lexer(lexerName, modes, dfas, pdas, tokens, actions, sempreds, namedActions) ::= <<
 public class <lexerName> extends Lexer {
     <tokens.keys:{k | public static final int <k>=<tokens.(k)>;}; separator="\n">
     <modes:{m| public static final int <m> = <i0>;}; separator="\n">
@@ -319,8 +319,21 @@ public class <lexerName> extends Lexer {
 
     <actions>
     <sempreds>
+    <dfas>
     <pdas>
 }
+>>
+
+DFA(name, model) ::= <<
+public static final char[] <name>_min = {
+    <model.min; separator=", ">
+};
+public static final char[] <name>_max = {
+    <model.max; separator=", ">
+};
+public static final short[][] <name>_transition = {
+    <model.transition:{t | {<t; separator=", ">\}}; separator=",\n", null="null">
+};
 >>
 
 PDA(name, model, actions, sempreds) ::= <<

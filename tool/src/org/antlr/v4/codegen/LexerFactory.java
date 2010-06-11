@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.automata.DFA;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
@@ -25,34 +26,8 @@ public class LexerFactory {
 		fileST.add("fileName", gen.getRecognizerFileName());
 		fileST.add("lexer", lexerST);
 		for (String modeName : lg.modes.keySet()) { // for each mode
-			LexerCompiler comp = new LexerCompiler(lg);
-			CompiledPDA pda = comp.compileMode(modeName);
-			ST pdaST = gen.templates.getInstanceOf("PDA");
-			for (Rule r : pda.ruleActions.keySet()) {
-				Set<Token> actionTokens = pda.ruleActions.keySet(r);
-				ST actionST = gen.templates.getInstanceOf("actionMethod");
-				actionST.add("name", r.name);
-				for (Token t : actionTokens) {
-					actionST.add("actions", Misc.strip(t.getText(),1));
-					actionST.add("ruleIndex", r.index);
-				}
-				pdaST.add("actions", actionST);
-				lexerST.add("actions", actionST);
-			}
-			for (Rule r : pda.ruleSempreds.keySet()) {
-				Set<Token> sempredTokens = pda.ruleSempreds.keySet(r);
-				ST sempredST = gen.templates.getInstanceOf("sempredMethod");
-				sempredST.add("name", r.name);
-				sempredST.add("ruleIndex", r.index);
-				for (Token t : sempredTokens) {
-					sempredST.add("preds", t.getText());
-				}
-				pdaST.add("sempreds", sempredST);
-				lexerST.add("sempreds", sempredST);
-			}
-			pdaST.add("name", modeName);
-			pdaST.add("model", pda);
-			lexerST.add("pdas", pdaST);
+			injectDFAs(lg, lexerST, modeName);
+			injectPDAs(lg, lexerST, modeName);
 		}
 
 		LinkedHashMap<String,Integer> tokens = new LinkedHashMap<String,Integer>();
@@ -64,5 +39,45 @@ public class LexerFactory {
 		lexerST.add("namedActions", gen.g.namedActions);
 
 		return fileST;
+	}
+
+	void injectDFAs(LexerGrammar lg, ST lexerST, String modeName) {
+		System.out.println("inject dfa for "+modeName);
+		DFA dfa = lg.modeToDFA.get(modeName);
+		ST dfaST = gen.templates.getInstanceOf("DFA");
+		dfaST.add("name", modeName);
+		dfaST.add("model", new CompiledDFA(dfa));
+		lexerST.add("dfas", dfaST);
+	}
+
+	void injectPDAs(LexerGrammar lg, ST lexerST, String modeName) {
+		LexerCompiler comp = new LexerCompiler(lg);
+		CompiledPDA pda = comp.compileMode(modeName);
+		ST pdaST = gen.templates.getInstanceOf("PDA");
+		for (Rule r : pda.ruleActions.keySet()) {
+			Set<Token> actionTokens = pda.ruleActions.keySet(r);
+			ST actionST = gen.templates.getInstanceOf("actionMethod");
+			actionST.add("name", r.name);
+			for (Token t : actionTokens) {
+				actionST.add("actions", Misc.strip(t.getText(),1));
+				actionST.add("ruleIndex", r.index);
+			}
+			pdaST.add("actions", actionST);
+			lexerST.add("actions", actionST);
+		}
+		for (Rule r : pda.ruleSempreds.keySet()) {
+			Set<Token> sempredTokens = pda.ruleSempreds.keySet(r);
+			ST sempredST = gen.templates.getInstanceOf("sempredMethod");
+			sempredST.add("name", r.name);
+			sempredST.add("ruleIndex", r.index);
+			for (Token t : sempredTokens) {
+				sempredST.add("preds", t.getText());
+			}
+			pdaST.add("sempreds", sempredST);
+			lexerST.add("sempreds", sempredST);
+		}
+		pdaST.add("name", modeName);
+		pdaST.add("model", pda);
+		lexerST.add("pdas", pdaST);
 	}
 }
