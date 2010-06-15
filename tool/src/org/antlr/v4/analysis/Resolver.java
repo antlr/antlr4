@@ -1,24 +1,43 @@
 package org.antlr.v4.analysis;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.automata.DFAState;
 import org.antlr.v4.automata.NFA;
-import org.antlr.v4.automata.NFAState;
-import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.Utils;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** Code "module" that knows how to resolve LL(*) nondeterminisms. */
 public class Resolver {
-	PredictionDFAFactory converter;
-
 	PredicateResolver semResolver;
 
-	public Resolver(PredictionDFAFactory converter) {
-		this.converter = converter;
-		semResolver = new PredicateResolver(converter);
+	/** Track all DFA states with ambiguous configurations.
+	 *  By reaching the same DFA state, a path through the NFA for some input
+	 *  is able to reach the same NFA state by starting at more than one
+	 *  alternative's left edge. If the context is the same or conflicts,
+	 *  then we have ambiguity. If the context is different, it's simply
+	 *  nondeterministic and we should keep looking for edges that will
+	 *  render it deterministic. If we run out of things to add to the DFA,
+	 *  we'll get a dangling state; it's non-LL(*). Later we may find that predicates
+	 *  resolve the issue, but track ambiguous states anyway.
+	 */
+	public Set<DFAState> ambiguousStates = new HashSet<DFAState>();
+
+	/** The set of states w/o emanating edges (and w/o resolving sem preds). */
+	public Set<DFAState> danglingStates = new HashSet<DFAState>();
+
+	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
+	 *  state that predicts more than one alternative, must be resolved
+	 *  with predicates or it should be reported to the user.
+	 */
+	public Set<DFAState> resolvedWithSemanticPredicates = new HashSet<DFAState>();
+	
+	public Resolver() {
+		//this.converter = converter;
+		semResolver = new PredicateResolver();
 	}
 	
 	/** Walk each NFA configuration in this DFA state looking for a conflict
@@ -42,7 +61,7 @@ public class Resolver {
 	 *  TODO: suffix degenerates to one empty one nonempty; avoid some tests?
 	 *  TODO: or perhaps check if i, j are already in and don't do compare?
 	 */
-	public Set<Integer> getAmbiguousAlts(DFAState d) {
+	public static Set<Integer> getAmbiguousAlts(DFAState d) {
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
 		 Set<Integer> ambiguousAlts = new HashSet<Integer>();
 
@@ -137,7 +156,7 @@ public class Resolver {
 		// if no problems return
 		if ( ambiguousAlts==null ) return;
 
-		converter.ambiguousStates.add(d);
+		ambiguousStates.add(d);
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
 		boolean resolved =
@@ -147,7 +166,7 @@ public class Resolver {
 				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
 			}
 			d.resolvedWithPredicates = true;
-			converter.resolvedWithSemanticPredicates.add(d);
+			resolvedWithSemanticPredicates.add(d);
 			return;
 		}
 
@@ -159,7 +178,7 @@ public class Resolver {
 		if ( d.resolvedWithPredicates || d.getNumberOfEdges()>0 ) return;
 		
 		System.err.println("dangling DFA state "+d+" after reach / closures");
-		converter.danglingStates.add(d);
+		danglingStates.add(d);
 		// turn off all configurations except for those associated with
 		// min alt number; somebody has to win else some input will not
 		// predict any alt.
@@ -168,7 +187,7 @@ public class Resolver {
 		d.isAcceptState = true;
 		d.predictsAlt = minAlt;
 		// might be adding new accept state for alt, but that's ok
-		converter.dfa.addAcceptState(minAlt, d);
+		d.dfa.addAcceptState(minAlt, d);
 	}
 
 	/** Turn off all configurations associated with the
@@ -181,7 +200,7 @@ public class Resolver {
 	 *
 	 *  Return the min alt found.
 	 */
-	int resolveByPickingMinAlt(DFAState d, Set<Integer> alts) {
+	static int resolveByPickingMinAlt(DFAState d, Set<Integer> alts) {
 		int min = 0;
 		if ( alts !=null ) {
 			min = getMinAlt(alts);
@@ -198,7 +217,7 @@ public class Resolver {
 	/** turn off all states associated with alts other than the good one
 	 *  (as long as they are one of the ones in alts)
 	 */
-	void turnOffOtherAlts(DFAState d, int min, Set<Integer> alts) {
+	static void turnOffOtherAlts(DFAState d, int min, Set<Integer> alts) {
 		int numConfigs = d.nfaConfigs.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfig configuration = d.nfaConfigs.get(i);
@@ -241,60 +260,6 @@ public class Resolver {
 		return alt;
 	}
 
-	public void issueAmbiguityWarnings() {
-		MachineProbe probe = new MachineProbe(converter.dfa);
-
-		for (DFAState d : converter.ambiguousStates) {
-			Set<Integer> alts = getAmbiguousAlts(d);
-			List<Integer> sorted = new ArrayList<Integer>(alts);
-			Collections.sort(sorted);
-			//System.err.println("ambig alts="+sorted);
-			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
-			//System.out.print("path =");
-			for (DFAState d2 : dfaStates) {
-				System.out.print(" "+d2.stateNumber);
-			}
-			//System.out.println("");
-
-			List<IntSet> labels = probe.getEdgeLabels(d);
-
-			String input = probe.getInputSequenceDisplay(converter.g, labels);
-			//System.out.println("input="+ input);
-
-			LinkedHashMap<Integer,List<Token>> altPaths = new LinkedHashMap<Integer,List<Token>>();
-			for (int alt : sorted) {
-				List<Set<NFAState>> nfaStates = new ArrayList<Set<NFAState>>();
-				for (DFAState d2 : dfaStates) {
-					nfaStates.add( d2.getUniqueNFAStates(alt) );
-				}
-				//System.out.println("NFAConfigs per state: "+nfaStates);
-				List<Token> path =
-					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
-				altPaths.put(alt, path);
-				//System.out.println("path = "+path);
-			}
-
-			List<Integer> incompletelyCoveredAlts = converter.statesWithIncompletelyCoveredAlts.get(d);
-			if ( incompletelyCoveredAlts!=null && incompletelyCoveredAlts.size()>0 ) {
-				Map<Integer, Set<Token>> insufficientAltToLocations =
-					semResolver.getInsufficientlyPredicatedLocations(d, incompletelyCoveredAlts);
-				converter.g.tool.errMgr.insufficientPredicates(converter.g.fileName, d, input,
-															   insufficientAltToLocations,
-															   converter.hasPredicateBlockedByAction);
-			}
-
-			if ( !d.resolvedWithPredicates &&
-				 (incompletelyCoveredAlts==null || incompletelyCoveredAlts.size()==0) )
-			{
-				converter.g.tool.errMgr.ambiguity(converter.g.fileName, d, sorted, input, altPaths,
-												  converter.hasPredicateBlockedByAction);
-			}
-		}
-		if ( converter.unreachableAlts!=null && converter.unreachableAlts.size()>0 ) {
-			converter.g.tool.errMgr.unreachableAlts(converter.g.fileName, converter.dfa,
-													converter.unreachableAlts);
-		}
-	}
 
 	/*
 	void issueRecursionWarnings() {

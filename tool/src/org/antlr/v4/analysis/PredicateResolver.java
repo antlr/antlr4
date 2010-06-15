@@ -12,10 +12,7 @@ import java.util.*;
 
 /** */
 public class PredicateResolver {
-	PredictionDFAFactory converter;
-	public PredicateResolver(PredictionDFAFactory converter) {
-		this.converter = converter;
-	}
+	public Map<DFAState, List<Integer>> statesWithIncompletelyCoveredAlts = new HashMap<DFAState, List<Integer>>();
 
 	/** See if a set of nondeterministic alternatives can be disambiguated
 	 *  with the semantic predicate contexts of the alternatives.
@@ -44,8 +41,8 @@ public class PredicateResolver {
 	 *
 	 *  This is done down in getPredicatesPerNonDeterministicAlt().
 	 */
-	protected boolean tryToResolveWithSemanticPredicates(DFAState d,
-														 Set<Integer> ambiguousAlts)
+	public boolean tryToResolveWithSemanticPredicates(DFAState d,
+											   Set<Integer> ambiguousAlts)
 	{
 		Map<Integer, SemanticContext> altToPredMap =
 			getPredicatesPerAmbiguousAlt(d, ambiguousAlts);
@@ -56,7 +53,7 @@ public class PredicateResolver {
 
 		if ( ambiguousAlts.size()-altToPredMap.size()>1 ) {
 			// too few predicates to resolve; just return.
-			// We caught/tracked incompletly covered preds in getPredicatesPerNonDeterministicAlt
+			// We caught/tracked incompletely covered preds in getPredicatesPerNonDeterministicAlt
 			return false;
 		}
 
@@ -207,7 +204,7 @@ public class PredicateResolver {
 				if ( contextsForThisAlt.size()>0 ) {    // && at least one pred
 					incompletelyCoveredAlts.add(alt);   // this alt incompleted covered
 				}
-				continue; // don't include at least 1 config has no ctx
+				continue; // don't include; at least 1 config has no ctx
 			}
 			SemanticContext combinedContext = null;
 			for (Iterator itrSet = contextsForThisAlt.iterator(); itrSet.hasNext();) {
@@ -220,14 +217,14 @@ public class PredicateResolver {
 
 		if ( incompletelyCoveredAlts.size()>0 ) {
 			// track these troublesome states later for reporting.
-			converter.statesWithIncompletelyCoveredAlts.put(d, incompletelyCoveredAlts);
+			statesWithIncompletelyCoveredAlts.put(d, incompletelyCoveredAlts);
 		}
 
 		return altToPredicateContextMap;
 	}
 
-	public Map<Integer, Set<Token>> getInsufficientlyPredicatedLocations(DFAState d,
-																		 List<Integer> incompletelyCoveredAlts)
+	public static Map<Integer, Set<Token>> getInsufficientlyPredicatedLocations(DFAState d,
+																				List<Integer> incompletelyCoveredAlts)
 	{
 		Map<Integer, Set<Token>> altToLocationsReachableWithoutPredicate = new HashMap<Integer, Set<Token>>();
 		for (NFAConfig c : d.nfaConfigs) {
@@ -279,7 +276,7 @@ public class PredicateResolver {
 	/** OR together all predicates from the alts.  Note that the predicate
 	 *  for an alt could itself be a combination of predicates.
 	 */
-	public SemanticContext getUnionOfPredicates(Map altToPredMap) {
+	public static SemanticContext getUnionOfPredicates(Map altToPredMap) {
 		Iterator iter;
 		SemanticContext unionOfPredicatesFromAllAlts = null;
 		iter = altToPredMap.values().iterator();

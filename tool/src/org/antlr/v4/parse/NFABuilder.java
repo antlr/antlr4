@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 NFABuilder.g 2010-05-24 16:31:58
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 NFABuilder.g 2010-06-14 12:35:33
 
 /*
  [The "BSD license"]
@@ -1153,11 +1153,11 @@ public class NFABuilder extends TreeParser {
                 if ( (LA11_1==DOWN) ) {
                     int LA11_2 = input.LA(3);
 
-                    if ( (LA11_2==BLOCK) ) {
-                        alt11=2;
-                    }
-                    else if ( (LA11_2==BANG||LA11_2==ROOT||LA11_2==TOKEN_REF||LA11_2==STRING_LITERAL) ) {
+                    if ( (LA11_2==BANG||LA11_2==ROOT||LA11_2==TOKEN_REF||LA11_2==STRING_LITERAL) ) {
                         alt11=1;
+                    }
+                    else if ( (LA11_2==BLOCK) ) {
+                        alt11=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -1620,7 +1620,7 @@ public class NFABuilder extends TreeParser {
     static final String DFA7_maxS =
         "\1\63\2\2\2\127\2\141\4\uffff";
     static final String DFA7_acceptS =
-        "\7\uffff\1\2\1\1\1\4\1\3";
+        "\7\uffff\1\1\1\2\1\3\1\4";
     static final String DFA7_specialS =
         "\13\uffff}>";
     static final String[] DFA7_transitionS = {
@@ -1629,10 +1629,10 @@ public class NFABuilder extends TreeParser {
             "\1\4",
             "\1\5",
             "\1\6",
-            "\1\10\4\uffff\1\10\1\uffff\2\10\4\uffff\1\10\1\uffff\2\10\3"+
-            "\uffff\1\10\10\uffff\1\7\23\uffff\1\10",
-            "\1\12\4\uffff\1\12\1\uffff\2\12\4\uffff\1\12\1\uffff\2\12\3"+
-            "\uffff\1\12\10\uffff\1\11\23\uffff\1\12",
+            "\1\7\4\uffff\1\7\1\uffff\2\7\4\uffff\1\7\1\uffff\2\7\3\uffff"+
+            "\1\7\10\uffff\1\10\23\uffff\1\7",
+            "\1\11\4\uffff\1\11\1\uffff\2\11\4\uffff\1\11\1\uffff\2\11\3"+
+            "\uffff\1\11\10\uffff\1\12\23\uffff\1\11",
             "",
             "",
             "",
@@ -1683,8 +1683,8 @@ public class NFABuilder extends TreeParser {
         "\1\141\2\2\2\uffff\1\2\1\141\2\uffff\2\104\1\127\6\uffff\1\104\1"+
         "\uffff\2\2\1\uffff\2\104";
     static final String DFA10_acceptS =
-        "\3\uffff\1\5\1\6\2\uffff\1\13\1\14\3\uffff\1\11\1\12\1\1\1\3\1\4"+
-        "\1\2\1\uffff\1\7\2\uffff\1\10\2\uffff";
+        "\3\uffff\1\5\1\6\2\uffff\1\13\1\14\3\uffff\1\11\1\12\1\1\1\3\1\2"+
+        "\1\4\1\uffff\1\7\2\uffff\1\10\2\uffff";
     static final String DFA10_specialS =
         "\31\uffff}>";
     static final String[] DFA10_transitionS = {
@@ -1703,7 +1703,7 @@ public class NFABuilder extends TreeParser {
             "",
             "\1\7\4\uffff\1\7\2\uffff\1\16\4\uffff\1\17\1\uffff\1\7\1\10"+
             "\3\uffff\1\7",
-            "\1\7\4\uffff\1\7\2\uffff\1\21\4\uffff\1\20\1\uffff\1\7\1\10"+
+            "\1\7\4\uffff\1\7\2\uffff\1\20\4\uffff\1\21\1\uffff\1\7\1\10"+
             "\3\uffff\1\7",
             "\1\22",
             "",

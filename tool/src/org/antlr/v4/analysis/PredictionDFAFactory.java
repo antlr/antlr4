@@ -1,6 +1,8 @@
 package org.antlr.v4.analysis;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.automata.*;
+import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
@@ -32,27 +34,6 @@ public class PredictionDFAFactory {
      */
     public Set<Integer> unreachableAlts;
 
-	/** Track all DFA states with ambiguous configurations.
-	 *  By reaching the same DFA state, a path through the NFA for some input
-	 *  is able to reach the same NFA state by starting at more than one
-	 *  alternative's left edge. If the context is the same or conflicts,
-	 *  then we have ambiguity. If the context is different, it's simply
-	 *  nondeterministic and we should keep looking for edges that will
-	 *  render it deterministic. If we run out of things to add to the DFA,
-	 *  we'll get a dangling state; it's non-LL(*). Later we may find that predicates
-	 *  resolve the issue, but track ambiguous states anyway.
-	 */
-	public Set<DFAState> ambiguousStates = new HashSet<DFAState>();
-
-	/** The set of states w/o emanating edges (and w/o resolving sem preds). */
-	public Set<DFAState> danglingStates = new HashSet<DFAState>();
-
-	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
-	 *  state that predicts more than one alternative, must be resolved
-	 *  with predicates or it should be reported to the user.
-	 */
-	public Set<DFAState> resolvedWithSemanticPredicates = new HashSet<DFAState>();
-
 	/** Tracks alts insufficiently covered.
 	 *  For example, p1||true gets reduced to true and so leaves
 	 *  whole alt uncovered.  This maps alt num to the set of (Token)
@@ -77,7 +58,7 @@ public class PredictionDFAFactory {
      */
 	OrderedHashSet<NFAConfig> closureBusy;
 
-	Resolver resolver;
+	public Resolver resolver;
 
 	public static boolean debug = false;
 
@@ -86,7 +67,7 @@ public class PredictionDFAFactory {
 		this.nfaStartState = nfaStartState;
 		dfa = new DFA(g, nfaStartState);
 		dfa.converter = this;
-		resolver = new Resolver(this);
+		resolver = new Resolver();
 	}
 
 	public DFA createDFA() {
@@ -515,5 +496,59 @@ public class PredictionDFAFactory {
 		return unreachable;
 	}
 
-	public void issueAmbiguityWarnings() { resolver.issueAmbiguityWarnings(); }
+	public void issueAmbiguityWarnings() {
+		MachineProbe probe = new MachineProbe(dfa);
+
+		for (DFAState d : resolver.ambiguousStates) {
+			Set<Integer> alts = resolver.getAmbiguousAlts(d);
+			List<Integer> sorted = new ArrayList<Integer>(alts);
+			Collections.sort(sorted);
+			//System.err.println("ambig alts="+sorted);
+			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
+			//System.out.print("path =");
+			for (DFAState d2 : dfaStates) {
+				System.out.print(" "+d2.stateNumber);
+			}
+			//System.out.println("");
+
+			List<IntSet> labels = probe.getEdgeLabels(d);
+
+			String input = probe.getInputSequenceDisplay(g, labels);
+			//System.out.println("input="+ input);
+
+			LinkedHashMap<Integer,List<Token>> altPaths = new LinkedHashMap<Integer,List<Token>>();
+			for (int alt : sorted) {
+				List<Set<NFAState>> nfaStates = new ArrayList<Set<NFAState>>();
+				for (DFAState d2 : dfaStates) {
+					nfaStates.add( d2.getUniqueNFAStates(alt) );
+				}
+				//System.out.println("NFAConfigs per state: "+nfaStates);
+				List<Token> path =
+					probe.getGrammarLocationsForInputSequence(nfaStates, labels);
+				altPaths.put(alt, path);
+				//System.out.println("path = "+path);
+			}
+
+			List<Integer> incompletelyCoveredAlts = statesWithIncompletelyCoveredAlts.get(d);
+			if ( incompletelyCoveredAlts!=null && incompletelyCoveredAlts.size()>0 ) {
+				Map<Integer, Set<Token>> insufficientAltToLocations =
+					PredicateResolver.getInsufficientlyPredicatedLocations(d, incompletelyCoveredAlts);
+				g.tool.errMgr.insufficientPredicates(g.fileName, d, input,
+															   insufficientAltToLocations,
+															   hasPredicateBlockedByAction);
+			}
+
+			if ( !d.resolvedWithPredicates &&
+				 (incompletelyCoveredAlts==null || incompletelyCoveredAlts.size()==0) )
+			{
+				g.tool.errMgr.ambiguity(g.fileName, d, sorted, input, altPaths,
+												  hasPredicateBlockedByAction);
+			}
+		}
+		if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
+			g.tool.errMgr.unreachableAlts(g.fileName, dfa,
+													unreachableAlts);
+		}
+	}
+
 }

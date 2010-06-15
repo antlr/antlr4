@@ -543,6 +543,13 @@ public class Tool {
 	}
 
 	public void generateDFAs(Grammar g) {
+		if ( g.isLexer() ) {
+			LexerGrammar lg = (LexerGrammar)g;
+			for (String modeName : lg.modes.keySet()) {
+				generateDFA(g, lg.modeToDFA.get(modeName));
+			}
+			return;
+		}
 		for (DFA dfa : g.decisionDFAs.values()) {
 			generateDFA(g, dfa);
 		}

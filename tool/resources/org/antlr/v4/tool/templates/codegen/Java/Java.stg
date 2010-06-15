@@ -18,9 +18,10 @@ ParserFile(file, parser, dfaDecls, bitSetDecls, namedActions) ::= <<
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.EarlyExitException;
-import org.antlr.v4.runtime.RecognizerSharedState;
+import org.antlr.v4.runtime.ParserSharedState;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.runtime.*;
@@ -51,9 +52,9 @@ public class <parser.name> extends Parser {
 
 ctor(p) ::= <<
 public <p.name>(TokenStream input) {
-    this(input, new RecognizerSharedState());
+    this(input, new ParserSharedState());
 }
-public <p.name>(TokenStream input, RecognizerSharedState state) {
+public <p.name>(TokenStream input, ParserSharedState state) {
     super(input, state);
 }
 >>
@@ -292,9 +293,9 @@ LexerFile(fileName, lexer) ::= <<
 // $ANTLR ANTLRVersion> <fileName> generatedTimestamp>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.LexerSharedState;
-import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.pda.*;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.runtime.*;
 
@@ -311,7 +312,8 @@ public class <lexerName> extends Lexer {
     }
     public <lexerName>(CharStream input, LexerSharedState state) {
         super(input,state);
-	    modeToPDA = new PDA[] { <modes:{m | new <m>_PDA()}; separator=", "> };
+//	    modeToPDA = new PDA[] { <modes:{m | new <m>_PDA()}; separator=", "> };
+	    modeToDFA = new DFA[] { <modes:{m | new <m>_DFA()}; separator=", "> };
     }
     public String getGrammarFileName() { return "<fileName>"; }
 
@@ -325,8 +327,11 @@ public class <lexerName> extends Lexer {
 >>
 
 DFA(name, model) ::= <<
-public static final char[] <name>_min = {
-    <model.min; separator=", ">
+public static final short[] <name>_accept = {
+    <model.accept; separator=", ">
+};
+public static final short[] <name>_eof = {
+    <model.eof; separator=", ">
 };
 public static final char[] <name>_max = {
     <model.max; separator=", ">
@@ -334,6 +339,50 @@ public static final char[] <name>_max = {
 public static final short[][] <name>_transition = {
     <model.transition:{t | {<t; separator=", ">\}}; separator=",\n", null="null">
 };
+public static final int[][] <name>_set_edges = {
+    <model.set_edges:{edges | {<edges; separator=", ">\}}; separator=",\n", null="null">
+};
+public static final int[][] <name>_pred_edges = {
+    <model.pred_edges:{edges | {<edges; separator=", ">\}}; separator=",\n", null="null">
+};
+public static final short[] <name>_action_index = {
+    <model.action_index; separator=", ">
+};
+
+public final class <name>_DFA extends DFA {
+	<if(model.actions)> <! TODO: FACTOR OUT !>
+    public void action(int action) {
+    	switch ( action ) {
+    	<model.actions:{a |
+    	case <i0> :
+        	<a>
+        	break;
+   		}>
+    	}
+	}
+	<endif>
+	<if(model.sempreds)>
+    public boolean sempred(int sempred) {
+    	switch ( sempred ) {
+    	<model.sempreds:{p |
+    	case <i0> :
+        	return <p>;
+        	break;
+   		}>
+    	}
+    	return false;
+	}
+	<endif>
+    public <name>_DFA() {
+        this.eof = <name>_eof;
+        this.max = <name>_max;
+        this.accept = <name>_accept;
+        this.transition = <name>_transition;
+        this.set_edges = <name>_set_edges;
+        this.pred_edges = <name>_pred_edges;
+        this.action_index = <name>_action_index;
+	}
+}
 >>
 
 PDA(name, model, actions, sempreds) ::= <<
@@ -342,9 +391,6 @@ public static final byte[] <name>_code = {
 };
 public static final int[] <name>_tokenTypeToAddr = {
     <model.altToAddr; separator=", ">
-};
-public static final int[][] <name>charToAddr = {
-    <model.charToAddr:{addrs | /* <i0> */ {<addrs; separator=", ">\}}; null="null", separator=",\n">
 };
 
 public final class <name>_PDA extends PDA {
@@ -368,13 +414,13 @@ public final class <name>_PDA extends PDA {
 	<endif>
     public <name>_PDA() {
     	super(<name>_code, <name>_tokenTypeToAddr, <model.nLabels>);
-    	this.charToAddr = <name>charToAddr;
     }
 }<\n>
 >>
 
-actionMethod(name, actions, ruleIndex) ::= <<
+actionMethod(name, actions) ::= <<
 public void <name>_actions(int action) {
+    System.out.println("exec action "+action);
     switch ( action ) {
     <actions:{a |
     case <i0> :

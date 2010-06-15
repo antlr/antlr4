@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 BasicSemanticTriggers.g 2010-05-24 16:31:59
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 BasicSemanticTriggers.g 2010-06-14 12:35:34
 
 /*
  [The "BSD license"]

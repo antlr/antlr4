@@ -119,6 +119,13 @@ public class Utils {
 		return x;
 	}
 
+	public static int[] toIntArray(List<Integer> list) {
+		if ( list==null ) return null;
+		int[] a = new int[list.size()];
+		for (int i=0; i<list.size(); i++) a[i] = list.get(i);
+		return a;
+	}
+
 	/** apply methodName to list and return list of results. method has
 	 *  no args.  This pulls data out of a list essentially.
 	 */

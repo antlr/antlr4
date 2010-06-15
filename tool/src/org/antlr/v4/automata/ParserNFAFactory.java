@@ -171,7 +171,11 @@ public class ParserNFAFactory implements NFAFactory {
 	}
 
 	public Handle gated_sempred(GrammarAST pred) {
-		return null;
+		BasicState left = newState(pred);
+		NFAState right = newState(pred);
+		left.transition = new PredicateTransition(pred, right);
+		pred.nfaState = left;
+		return new Handle(left, right);
 	}
 
 	/** Build what amounts to an epsilon transition with an action.

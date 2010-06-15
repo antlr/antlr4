@@ -28,9 +28,9 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.runtime.CharStream;
-import org.antlr.runtime.IntStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.QStack;
 import org.antlr.v4.runtime.pda.Bytecode;
 import org.antlr.v4.runtime.pda.PDA;
@@ -53,12 +53,13 @@ public abstract class Lexer implements TokenSource {
 	public LexerSharedState state;
 
 	public static PDA[] modeToPDA;
+	public static DFA[] modeToDFA;
 
-	public Lexer(IntStream input) {
+	public Lexer(CharStream input) {
 		this(input, new LexerSharedState());
 	}
 
-	public Lexer(IntStream input, LexerSharedState state) {
+	public Lexer(CharStream input, LexerSharedState state) {
 		if ( state==null ) {
 			state = new LexerSharedState();
 		}
@@ -87,6 +88,38 @@ public abstract class Lexer implements TokenSource {
 	 *  stream.
 	 */
 	public Token nextToken() {
+		outer:
+		while (true) {
+			state.token = null;
+			state.channel = Token.DEFAULT_CHANNEL;
+			state.tokenStartCharIndex = state.input.index();
+			state.tokenStartCharPositionInLine = state.input.getCharPositionInLine();
+			state.tokenStartLine = state.input.getLine();
+			state.text = null;
+			do {
+				state.type = Token.INVALID_TOKEN_TYPE;
+				if ( state.input.LA(1)==CharStream.EOF ) {
+					Token eof = new org.antlr.runtime.CommonToken(state.input,Token.EOF,
+																  Token.DEFAULT_CHANNEL,
+																  state.input.index(),state.input.index());
+					eof.setLine(getLine());
+					eof.setCharPositionInLine(getCharPositionInLine());
+					return eof;
+				}
+				System.err.println("predict mode "+state.mode+" at index "+state.input.index());
+				int ttype = modeToDFA[state.mode].predict(state.input);
+				System.err.println("returns "+ttype);
+				if ( state.type == Token.INVALID_TOKEN_TYPE ) state.type = ttype;
+				if ( state.type==SKIP ) {
+					continue outer;
+				}
+			} while ( state.type==MORE );
+			if ( state.token==null ) emit();
+			return state.token;
+		}
+	}
+
+	public Token nextToken_PDA() {
 		outer:
 		while (true) {
 			state.token = null;
@@ -142,15 +175,19 @@ public abstract class Lexer implements TokenSource {
 		state.type = MORE;
 	}
 
-	public void mode(int m) { state.mode = m; }
+	public void mode(int m) {
+		state.mode = m;
+	}
+
 	public void pushMode(int m) {
 		if ( state.modeStack==null ) state.modeStack = new QStack<Integer>();
 		state.modeStack.push(state.mode);
-		state.mode = m;
+		mode(m);
 	}
+
 	public int popMode() {
 		if ( state.modeStack==null ) throw new EmptyStackException();
-		state.mode = state.modeStack.pop();
+		mode( state.modeStack.pop() );
 		return state.mode;
 	}
 
@@ -175,6 +212,7 @@ public abstract class Lexer implements TokenSource {
 	 *  than a single variable as this implementation does).
 	 */
 	public void emit(Token token) {
+		//System.err.println("emit "+token);
 		state.token = token;
 	}
 
@@ -251,7 +289,7 @@ public abstract class Lexer implements TokenSource {
 		return null;
 	}
 
-	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+	public String getErrorMessage(RecognitionException e) {
 		String msg = null;
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;

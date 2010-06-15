@@ -40,7 +40,7 @@ public class Parser extends BaseRecognizer {
 		super(input);
     }
 
-	public Parser(TokenStream input, RecognizerSharedState state) {
+	public Parser(TokenStream input, ParserSharedState state) {
 		super(input, state); // share the state object with another parser
     }
 

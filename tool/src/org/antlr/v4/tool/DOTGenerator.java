@@ -2,6 +2,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.NFAConfig;
+import org.antlr.v4.analysis.SemanticContext;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.Utils;
 import org.stringtemplate.v4.ST;
@@ -170,7 +171,7 @@ public class DOTGenerator {
 			DFAState d = work.get(0);
 			if ( markedStates.contains(d) ) { work.remove(0); continue; }
 			markedStates.add(d);
-			
+
 			// make a DOT edge for each transition
 			for (int i = 0; i < d.getNumberOfEdges(); i++) {
 				Edge edge = d.edge(i);
@@ -178,15 +179,16 @@ public class DOTGenerator {
 				System.out.println("dfa "+s.dfa.decisionNumber+
 					" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
 				*/
+				String label = getEdgeLabel(edge.toString(grammar));
 				ST st = stlib.getInstanceOf("edge");
-//			SemanticContext preds = s.getGatedPredicatesInNFAConfigurations();
-//			if ( preds!=null ) {
-//				String predsStr = "";
-//				predsStr = "&&{"+preds.toString()+"}?";
-//				label += predsStr;
-//			}
+				SemanticContext preds = edge.semanticContext; //edge.target.getGatedPredicatesInNFAConfigurations();
+				if ( preds!=null ) {
+					String predsStr = "";
+					predsStr = "&&"+preds.toString();
+					label += predsStr;
+				}
 
-				st.add("label", getEdgeLabel(edge.toString(grammar)));
+				st.add("label", label);
 				st.add("src", "s"+d.stateNumber);
 				st.add("target", "s"+edge.target.stateNumber);
 				st.add("arrowhead", arrowhead);
@@ -321,14 +323,12 @@ public class DOTGenerator {
 		if ( s.isAcceptState ) {
 			if ( s instanceof LexerState ) {
 				buf.append("=>");
-				for (Rule r : ((LexerState)s).matchesRules) {
-					buf.append(" "+r.name);
-				}
+				buf.append(((LexerState)s).predictsRule.name);
 			}
 			else {
 				buf.append("=>"+s.getUniquelyPredictedAlt());
 			}
-        }
+		}
 		if ( Tool.internalOption_ShowNFAConfigsInDFA ) {
 			Set<Integer> alts = ((DFAState)s).getAltSet();
 			if ( alts!=null ) {

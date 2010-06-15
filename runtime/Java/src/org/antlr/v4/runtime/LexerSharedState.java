@@ -1,11 +1,11 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.IntStream;
+import org.antlr.runtime.CharStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.misc.QStack;
 
 public class LexerSharedState {
-	public IntStream input;
+	public CharStream input;
 
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to

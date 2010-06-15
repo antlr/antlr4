@@ -38,6 +38,8 @@ import java.util.*;
  *  parser and tree grammars.  This is all the parsing
  *  support code essentially; most of it is error recovery stuff and
  *  backtracking.
+ *
+ *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
 public abstract class BaseRecognizer {
 	public static final int EOF=-1;
@@ -53,15 +55,15 @@ public abstract class BaseRecognizer {
 	 *  and other state variables.  It's a kind of explicit multiple
 	 *  inheritance via delegation of methods and shared state.
 	 */
-	public RecognizerSharedState state;
+	public ParserSharedState state;
 
 	public BaseRecognizer(IntStream input) {
-		this(input, new RecognizerSharedState());
+		this(input, new ParserSharedState());
 	}
 
-	public BaseRecognizer(IntStream input, RecognizerSharedState state) {
+	public BaseRecognizer(IntStream input, ParserSharedState state) {
 		if ( state==null ) {
-			state = new RecognizerSharedState();
+			state = new ParserSharedState();
 		}
 		this.state = state;
 		state.input = input;

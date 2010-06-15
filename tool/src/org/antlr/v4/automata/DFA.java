@@ -5,7 +5,6 @@ import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ public class DFA {
 
 	public int nAlts = 0;
 
-	/** We only want one accept state per predicted alt; track here */
+	/** accept state(s) per predicted alt; track here */
 	public List<DFAState>[] altToAcceptStates;
 
 	/** Did DFA minimization do anything? */
@@ -61,13 +60,13 @@ public class DFA {
 		this.decisionNFAStartState = startState;
 		nAlts = startState.getNumberOfTransitions();
 		decision = startState.decision;
-		altToAcceptStates = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
+		altToAcceptStates = new ArrayList[nAlts+1]; //(ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
 	}
 
 	public DFA(Grammar g, int nAlts) {
 		this.g = g;
 		this.nAlts = nAlts;
-		altToAcceptStates = (ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
+		altToAcceptStates = new ArrayList[nAlts+1]; //(ArrayList<DFAState>[])Array.newInstance(ArrayList.class,nAlts+1);
 	}
 
 	/** Add a new DFA state to this DFA (doesn't check if already present). */
@@ -101,19 +100,19 @@ public class DFA {
 		return n;
 	}
 
-	// could imply converter.unreachableAlts.size()>0 too
-	public boolean isAmbiguous() {
-		boolean resolvedWithPredicates = true;
-		// flip resolvedWithPredicates if we find an ambig state not resolve with pred
-		for (DFAState d : converter.ambiguousStates) {
-			if ( !d.resolvedWithPredicates ) resolvedWithPredicates = false;
-		}
-		return converter.ambiguousStates.size()>0 && !resolvedWithPredicates;
-	}
+//	// could imply converter.unreachableAlts.size()>0 too
+//	public boolean isAmbiguous() {
+//		boolean resolvedWithPredicates = true;
+//		// flip resolvedWithPredicates if we find an ambig state not resolve with pred
+//		for (DFAState d : converter.ambiguousStates) {
+//			if ( !d.resolvedWithPredicates ) resolvedWithPredicates = false;
+//		}
+//		return converter.ambiguousStates.size()>0 && !resolvedWithPredicates;
+//	}
 
 	public boolean valid() {
 		return
-			converter.danglingStates.size()==0;
+			converter.resolver.danglingStates.size()==0;
 //			converter.abortedDueToMultipleRecursiveAltsAt ==null &&
 //			converter.recursionOverflowState ==null;
 	}

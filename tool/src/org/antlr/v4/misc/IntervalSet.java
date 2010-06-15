@@ -145,51 +145,6 @@ public class IntervalSet implements IntSet {
 		intervals.add(addition);
 	}
 
-	/*
-	protected void add(Interval addition) {
-        //System.out.println("add "+addition+" to "+intervals.toString());
-        if ( addition.b<addition.a ) {
-            return;
-        }
-        // find position in list
-        //for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
-		int n = intervals.size();
-		for (int i=0; i<n; i++) {
-			Interval r = (Interval)intervals.get(i);
-            if ( addition.equals(r) ) {
-                return;
-            }
-            if ( addition.adjacent(r) || !addition.disjoint(r) ) {
-                // next to each other, make a single larger interval
-                Interval bigger = addition.union(r);
-				intervals.set(i, bigger);
-                // make sure we didn't just create an interval that
-                // should be merged with next interval in list
-				if ( (i+1)<n ) {
-					i++;
-					Interval next = (Interval)intervals.get(i);
-                    if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
-                        // if we bump up against or overlap next, merge
-						intervals.remove(i); // remove next one
-						i--;
-						intervals.set(i, bigger.union(next)); // set to 3 merged ones
-                    }
-                }
-                return;
-            }
-            if ( addition.startsBeforeDisjoint(r) ) {
-                // insert before r
-				intervals.add(i, addition);
-                return;
-            }
-            // if disjoint and after r, a future iteration will handle it
-        }
-        // ok, must be after last interval (and disjoint from last interval)
-        // just add it
-        intervals.add(addition);
-    }
-*/
-
 	/** combine all sets in the array returned the or'd value */
 	public static IntervalSet or(IntervalSet[] sets) {
 		IntervalSet r = new IntervalSet();
@@ -280,125 +235,6 @@ public class IntervalSet implements IntSet {
 		// will prevent this.
 		return this.and(((IntervalSet)other).complement(COMPLETE_SET));
 	}
-
-	/** return a new set containing all elements in this but not in other.
-     *  Intervals may have to be broken up when ranges in this overlap
-     *  with ranges in other.  other is assumed to be a subset of this;
-     *  anything that is in other but not in this will be ignored.
-	 *
-	 *  Keep around, but 10-20-2005, I decided to make complement work w/o
-	 *  subtract and so then subtract can simply be a&~b
-	 *
-    public IntSet subtract(IntSet other) {
-        if ( other==null || !(other instanceof IntervalSet) ) {
-            return null; // nothing in common with null set
-        }
-
-        IntervalSet diff = new IntervalSet();
-
-        // iterate down both interval lists
-        ListIterator thisIter = this.intervals.listIterator();
-        ListIterator otherIter = ((IntervalSet)other).intervals.listIterator();
-        Interval mine=null;
-        Interval theirs=null;
-        if ( thisIter.hasNext() ) {
-            mine = (Interval)thisIter.next();
-        }
-        if ( otherIter.hasNext() ) {
-            theirs = (Interval)otherIter.next();
-        }
-        while ( mine!=null ) {
-            //System.out.println("mine="+mine+", theirs="+theirs);
-            // CASE 1: nothing in theirs removes a chunk from mine
-            if ( theirs==null || mine.disjoint(theirs) ) {
-                // SUBCASE 1a: finished traversing theirs; keep adding mine now
-                if ( theirs==null ) {
-                    // add everything in mine to difference since theirs done
-                    diff.add(mine);
-                    mine = null;
-                    if ( thisIter.hasNext() ) {
-                        mine = (Interval)thisIter.next();
-                    }
-                }
-                else {
-                    // SUBCASE 1b: mine is completely to the left of theirs
-                    // so we can add to difference; move mine, but not theirs
-                    if ( mine.startsBeforeDisjoint(theirs) ) {
-                        diff.add(mine);
-                        mine = null;
-                        if ( thisIter.hasNext() ) {
-                            mine = (Interval)thisIter.next();
-                        }
-                    }
-                    // SUBCASE 1c: theirs is completely to the left of mine
-                    else {
-                        // keep looking in theirs
-                        theirs = null;
-                        if ( otherIter.hasNext() ) {
-                            theirs = (Interval)otherIter.next();
-                        }
-                    }
-                }
-            }
-            else {
-                // CASE 2: theirs breaks mine into two chunks
-                if ( mine.properlyContains(theirs) ) {
-                    // must add two intervals: stuff to left and stuff to right
-                    diff.add(mine.a, theirs.a-1);
-                    // don't actually add stuff to right yet as next 'theirs'
-                    // might overlap with it
-                    // The stuff to the right might overlap with next "theirs".
-                    // so it is considered next
-                    Interval right = new Interval(theirs.b+1, mine.b);
-                    mine = right;
-                    // move theirs forward
-                    theirs = null;
-                    if ( otherIter.hasNext() ) {
-                        theirs = (Interval)otherIter.next();
-                    }
-                }
-
-                // CASE 3: theirs covers mine; nothing to add to diff
-                else if ( theirs.properlyContains(mine) ) {
-                    // nothing to add, theirs forces removal totally of mine
-                    // just move mine looking for an overlapping interval
-                    mine = null;
-                    if ( thisIter.hasNext() ) {
-                        mine = (Interval)thisIter.next();
-                    }
-                }
-
-                // CASE 4: non proper overlap
-                else {
-                    // overlap, but not properly contained
-                    diff.add(mine.differenceNotProperlyContained(theirs));
-                    // update iterators
-                    boolean moveTheirs = true;
-                    if ( mine.startsBeforeNonDisjoint(theirs) ||
-                         theirs.b > mine.b )
-                    {
-                        // uh oh, right of theirs extends past right of mine
-                        // therefore could overlap with next of mine so don't
-                        // move theirs iterator yet
-                        moveTheirs = false;
-                    }
-                    // always move mine
-                    mine = null;
-                    if ( thisIter.hasNext() ) {
-                        mine = (Interval)thisIter.next();
-                    }
-                    if ( moveTheirs ) {
-                        theirs = null;
-                        if ( otherIter.hasNext() ) {
-                            theirs = (Interval)otherIter.next();
-                        }
-                    }
-                }
-            }
-        }
-        return diff;
-    }
-	 */
 
 	public IntSet or(IntSet a) {
 		IntervalSet o = new IntervalSet();
@@ -711,11 +547,4 @@ public class IntervalSet implements IntSet {
 	public void remove(int el) {
         throw new NoSuchMethodError("IntervalSet.remove() unimplemented");
     }
-
-	/*
-	protected void finalize() throws Throwable {
-		super.finalize();
-		System.out.println("size "+intervals.size()+" "+size());
-	}
-	*/
 }

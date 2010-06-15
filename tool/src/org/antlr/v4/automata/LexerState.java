@@ -1,20 +1,18 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.tool.ActionAST;
 import org.antlr.v4.tool.Rule;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/** Lexer DFA states track just NFAStates not config with stack/alt etc... like
- *  DFA used for prediction.
- */
 public class LexerState extends DFAState {
 	/** For ambiguous lexer rules, the accept state matches a set of rules,
-	 *  not just one. Means we can't use predictsAlt (an int).  The
-	 *  order of rules is order given in grammar.  So, gives precedence to
-	 *  keywords vs IDs if keywords are first.
-	 */
+	 *  not just one. So, gives precedence to keywords vs IDs if keywords are first.
 	public List<Rule> matchesRules = new ArrayList<Rule>();
+	 */
+	
+	public Rule predictsRule;
+
+	/** Single action sitting at extreme right edge of lexer rule */
+	public ActionAST action;
 
 	public LexerState(DFA dfa) {
 		super(dfa);

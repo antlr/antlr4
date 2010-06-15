@@ -6,6 +6,8 @@ import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.RuleAST;
 
 import java.util.*;
 
@@ -18,18 +20,24 @@ public class LexerNFAToDFAConverter {
 
 	/** A list of DFA states we still need to process during NFA conversion */
 	List<LexerState> work = new LinkedList<LexerState>();
-	List<LexerState> accepts = new LinkedList<LexerState>();
+	/** The set of rule stop NFA states we encountered during conversion.
+	 *  Walk this list to find ambig stop states (split if we have preds).
+	 */
+	Set<LexerState> accepts = new HashSet<LexerState>();
+
+	//int[] altToRuleIndex;
 
 	/** Used to prevent the closure operation from looping to itself and
-     *  hence looping forever.  Sensitive to the NFA state, the alt, and
-     *  the stack context.
-     */
-	Set<NFAConfig> closureBusy;	
+	 *  hence looping forever.  Sensitive to the NFA state, the alt, and
+	 *  the stack context.
+	 */
+	Set<NFAConfig> closureBusy;
 
-	public static boolean debug = false;	
+	public static boolean debug = false;
 
 	public LexerNFAToDFAConverter(LexerGrammar g) {
 		this.g = g;
+		//altToRuleIndex = new int[g.getNumRules()+1]; // alts <= num rules
 	}
 
 	public DFA createDFA() { return createDFA(LexerGrammar.DEFAULT_MODE_NAME); }
@@ -50,47 +58,95 @@ public class LexerNFAToDFAConverter {
 			work.remove(0); // we're done with this DFA state
 		}
 
-		// walk accept states, informing DFA
-		for (LexerState d : accepts) {
-			Set<Integer> nfaAcceptStates = new HashSet<Integer>();
-			for (NFAConfig c : d.nfaConfigs) {
-				NFAState s = c.state;
-				if ( s instanceof RuleStopState && !s.rule.isFragment() ) {
-					dfa.defineAcceptState(c.alt, d);
-					nfaAcceptStates.add(Utils.integer(s.stateNumber));
-				}
-			}
-			List<Integer> sorted = new ArrayList<Integer>();
-			sorted.addAll(nfaAcceptStates);
-			Collections.sort(sorted);
-			for (int i : sorted) {
-				NFAState s = g.nfa.states.get(i);
-				d.matchesRules.add(s.rule);
-			}
-		}
+		defineLexerAcceptStates();
 
 		closureBusy = null; // wack all that memory used during closure			
 
 		return dfa;
 	}
 
+	// walk accept states, informing DFA.
+	// get list of NFA states per each DFA accept so we can get list of
+	// rules matched (sorted by NFA state num, which gives priority to
+	// rules appearing first in grammar).
+	// Also, track any extreme right edge actions in
+	// DFA accept state (pick action of first of any ambig rules).
+	void defineLexerAcceptStates() {
+		int aaa = 0;
+		System.out.println("accepts ="+accepts);
+		for (LexerState d : accepts) {
+			if ( d.edges.size()==0 ) aaa++;
+			// First get NFA accept states and associated DFA alts for this DFA state
+			SortedSet<Integer> nfaAcceptStates = new TreeSet<Integer>();
+			SortedSet<Integer> sortedAlts = new TreeSet<Integer>();
+			OrderedHashSet<Rule> predictedRules = new OrderedHashSet<Rule>();
+			for (NFAConfig c : d.nfaConfigs) {
+				NFAState s = c.state;
+				if ( s instanceof RuleStopState && !s.rule.isFragment() ) {
+					nfaAcceptStates.add(Utils.integer(s.stateNumber));
+					sortedAlts.add(c.alt);
+					predictedRules.add(s.rule);
+				}
+			}
+
+			// Look for and count preds
+			Map<Integer, SemanticContext> predsPerAlt = d.getPredicatesForAlts();
+			int npreds = 0;
+			for (SemanticContext ctx : predsPerAlt.values()) if ( ctx!=null ) npreds++;
+
+			// If unambiguous, make it a DFA accept state, else resolve with preds if possible
+			if ( predictedRules.size()==1 || npreds==0 ) { // unambig or no preds
+				d.predictsRule = predictedRules.get(0);
+				d.action = ((RuleAST)d.predictsRule.ast).getLexerAction();
+				Integer minAlt = sortedAlts.first();
+				dfa.defineAcceptState(minAlt, d);
+			}
+			if ( predictedRules.size()>1 && npreds>0 ) {
+				System.out.println(d.stateNumber+" ambig upon "+ predictedRules+" but we have preds");
+				// has preds; add new accept states
+				d.isAcceptState = false; // this state isn't a stop state anymore
+				d.resolvedWithPredicates = true;
+				for (Rule r : predictedRules) {
+					SemanticContext preds = predsPerAlt.get(r.index);
+					LexerState predDFATarget = dfa.newLexerState();
+					predDFATarget.predictsRule = r;
+					for (NFAConfig c : d.getNFAConfigsForAlt(r.index)) {
+						predDFATarget.addNFAConfig(c);
+					}
+					// new DFA state is a target of the predicate from d
+					//predDFATarget.addNFAConfig(c);
+					dfa.addAcceptState(r.index, predDFATarget);
+					// add a transition to pred target from d
+					if ( preds!=null ) {
+						d.addEdge(new PredicateEdge(preds, predDFATarget));
+					}
+					else {
+						d.addEdge(new PredicateEdge(new SemanticContext.TruePredicate(), predDFATarget));
+					}
+				}
+			}
+		}
+		System.out.println("#accepts ="+accepts.size()+" and "+aaa+" with no edges");
+	}
+
 	/** */
 	public LexerState computeStartState() {
 		LexerState d = dfa.newLexerState();
 		// add config for each alt start, then add closure for those states
-		for (int ruleIndex=1; ruleIndex<=dfa.nAlts; ruleIndex++) {
-			Transition t = dfa.decisionNFAStartState.transition(ruleIndex-1);
+		for (int alt=1; alt<=dfa.nAlts; alt++) {
+			Transition t = dfa.decisionNFAStartState.transition(alt-1);
 			NFAState altStart = t.target;
+			//altToRuleIndex[alt] = altStart.rule.index;
 			d.addNFAConfig(
-				new NFAConfig(altStart, ruleIndex,
+				new NFAConfig(altStart, alt,
 							  NFAContext.EMPTY(),
 							  SemanticContext.EMPTY_SEMANTIC_CONTEXT));
 		}
 
-		closure(d);
+		closure(d, true);
 		return d;
 	}
-	
+
 	/** From this node, add a d--a-->t transition for all
 	 *  labels 'a' where t is a DFA node created
 	 *  from the set of NFA states reachable from any NFA
@@ -105,7 +161,7 @@ public class LexerNFAToDFAConverter {
 				System.out.println("DFA state after reach -" +
 								   label.toString(g)+"->"+t);
 			}
-			closure(t);  // add any NFA states reachable via epsilon
+			closure(t, true);  // add any NFA states reachable via epsilon
 			addTransition(d, label, t); // make d-label->t transition
 		}
 	}
@@ -146,19 +202,19 @@ public class LexerNFAToDFAConverter {
 					//System.out.println("found edge with "+label.toString(g)+" from NFA state "+s);
 					// add NFA target to (potentially) new DFA state
 					labelTarget.addNFAConfig(
-						new NFAConfig(c, t.target, SemanticContext.EMPTY_SEMANTIC_CONTEXT));
+						new NFAConfig(c, t.target, c.semanticContext));
 				}
 			}
 		}
 
 		return labelTarget;
 	}
-	
+
 	/** For all NFA states in d, compute the epsilon closure; that is, find
 	 *  all NFA states reachable from the NFA states in d purely via epsilon
 	 *  transitions.
 	 */
-	public void closure(LexerState d) {
+	public void closure(LexerState d, boolean collectPredicates) {
 		if ( debug ) {
 			System.out.println("closure("+d+")");
 		}
@@ -166,7 +222,7 @@ public class LexerNFAToDFAConverter {
 		List<NFAConfig> configs = new ArrayList<NFAConfig>();
 		configs.addAll(d.nfaConfigs.elements()); // dup initial list; avoid walk/update issue
 		for (NFAConfig c : configs) {
-			closure(d, c.state, c.alt, c.context); // update d.nfaStates
+			closure(d, c.state, c.alt, c.context, c.semanticContext, collectPredicates); // update d.nfaStates
 		}
 
 		closureBusy.clear();
@@ -178,9 +234,10 @@ public class LexerNFAToDFAConverter {
 	}
 
 	// TODO: make pass NFAConfig like other DFA
-	public void closure(LexerState d, NFAState s, int ruleIndex, NFAContext context) {
+	public void closure(LexerState d, NFAState s, int ruleIndex, NFAContext context,
+						SemanticContext semanticContext, boolean collectPredicates) {
 		NFAConfig proposedNFAConfig =
-			new NFAConfig(s, ruleIndex, context, SemanticContext.EMPTY_SEMANTIC_CONTEXT);
+			new NFAConfig(s, ruleIndex, context, semanticContext);
 
 		if ( closureBusy.contains(proposedNFAConfig) ) return;
 		closureBusy.add(proposedNFAConfig);
@@ -191,7 +248,7 @@ public class LexerNFAToDFAConverter {
 		if ( s instanceof RuleStopState ) {
 			// TODO: chase FOLLOW links if recursive
 			if ( !context.isEmpty() ) {
-				closure(d, context.returnState, ruleIndex, context.parent);
+				closure(d, context.returnState, ruleIndex, context.parent, semanticContext, collectPredicates);
 				// do nothing if context not empty and already added to nfaStates
 			}
 			else {
@@ -209,15 +266,55 @@ public class LexerNFAToDFAConverter {
 					if ( !context.contains(((RuleTransition)t).followState) ) {
 						NFAContext newContext =
 							new NFAContext(context, ((RuleTransition)t).followState);
-						closure(d, t.target, ruleIndex, newContext);
+						closure(d, t.target, ruleIndex, newContext, semanticContext, collectPredicates);
 					}
 				}
+				else if ( t instanceof ActionTransition ) {
+					collectPredicates = false; // can't see past actions
+					closure(d, t.target, ruleIndex, context, semanticContext, collectPredicates);
+				}
+				else if ( t instanceof PredicateTransition ) {
+					SemanticContext labelContext = ((PredicateTransition)t).semanticContext;
+					SemanticContext newSemanticContext = semanticContext;
+					if ( collectPredicates ) {
+						// AND the previous semantic context with new pred
+						//System.out.println("&"+labelContext+" enclosingRule="+c.state.rule);
+						newSemanticContext =
+							SemanticContext.and(semanticContext, labelContext);
+					}
+					closure(d, t.target, ruleIndex, context, newSemanticContext, collectPredicates);
+				}
 				else if ( t.isEpsilon() ) {
-					closure(d, t.target, ruleIndex, context);
+					closure(d, t.target, ruleIndex, context, semanticContext, collectPredicates);
 				}
 			}
 		}
 	}
+
+//	public void resolveAmbiguities(DFAState d) {
+//		Resolver resolver = new Resolver(null);
+//		PredicateResolver semResolver = new PredicateResolver();
+//		Set<Integer> ambiguousAlts = resolver.getAmbiguousAlts(d);
+//		if ( PredictionDFAFactory.debug && ambiguousAlts!=null ) {
+//			System.out.println("ambig alts="+ambiguousAlts);
+//		}
+//
+//		// if no problems return
+//		if ( ambiguousAlts==null ) return;
+//
+//		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
+//		boolean resolved =
+//			semResolver.tryToResolveWithSemanticPredicates(d, ambiguousAlts);
+//		if ( resolved ) {
+//			if ( PredictionDFAFactory.debug ) {
+//				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
+//			}
+//			d.resolvedWithPredicates = true;
+//			return;
+//		}
+//
+//		// RESOLVE SYNTACTIC CONFLICT BY REMOVING ALL BUT ONE ALT
+//	}
 
 //	void ruleStopStateClosure(LexerState d, NFAState s) {
 //		//System.out.println("FOLLOW of "+s+" context="+context);

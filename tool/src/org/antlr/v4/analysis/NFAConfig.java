@@ -119,6 +119,10 @@ public class NFAConfig {
             buf.append("|");
             buf.append(context);
         }
+		if ( semanticContext!=null && semanticContext!=SemanticContext.EMPTY_SEMANTIC_CONTEXT ) {
+            buf.append("|");
+            buf.append(semanticContext);
+        }
         if ( resolved ) {
             buf.append("|resolved");
         }

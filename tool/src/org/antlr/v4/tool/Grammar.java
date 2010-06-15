@@ -226,6 +226,15 @@ public class Grammar implements AttributeResolver {
 		r.index = ruleNumber++;
 	}
 
+//	public int getNumRules() {
+//		int n = rules.size();
+//		List<Grammar> imports = getAllImportedGrammars();
+//		if ( imports!=null ) {
+//			for (Grammar g : imports) n += g.getNumRules();
+//		}
+//		return n;
+//	}
+
     public Rule getRule(String name) {
 		Rule r = rules.get(name);
 		if ( r!=null ) return r;

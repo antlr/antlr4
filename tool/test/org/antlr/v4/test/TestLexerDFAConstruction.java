@@ -7,15 +7,15 @@ public class TestLexerDFAConstruction extends BaseTest {
 	@Test public void unicode() throws Exception {
 		String g =
 			"lexer grammar L;\n" +
-			"A : '\\u0030'..'\\u8000'+ 'a' ;\n" + // TODO: FAILS; \\u not converted
+			"A : '\\u0030'..'\\u8000'+ 'a' ;\n" +
 			"B : '\\u0020' ;";
 		String expecting =
 			"s0-{'0'..'\\u8000'}->s1\n" +
-			"s0-' '->:s2=> B\n" +
-			"s1-'a'->:s3=> A\n" +
+			"s0-' '->:s2=>B\n" +
+			"s1-'a'->:s3=>A\n" +
 			"s1-{'0'..'`', 'b'..'\\u8000'}->s1\n" +
-			":s3=> A-'a'->:s3=> A\n" +
-			":s3=> A-{'0'..'`', 'b'..'\\u8000'}->s1\n";
+			":s3=>A-'a'->:s3=>A\n" +
+			":s3=>A-{'0'..'`', 'b'..'\\u8000'}->s1\n";
 		checkLexerDFA(g, expecting);
 	}
 
@@ -28,14 +28,14 @@ public class TestLexerDFAConstruction extends BaseTest {
 			"public fragment\n" +
 			"DIGIT : '0'..'9' ;";
 		String expecting =
-			"s0-'i'->:s1=> ID\n" +
-			"s0-{'a'..'h', 'j'..'z'}->:s2=> ID\n" +
-			"s0-{'0'..'9'}->:s3=> INT\n" +
-			":s1=> ID-'f'->:s4=> IF ID\n" +
-			":s1=> ID-{'a'..'e', 'g'..'z'}->:s2=> ID\n" +
-			":s2=> ID-{'a'..'z'}->:s2=> ID\n" +
-			":s3=> INT-{'0'..'9'}->:s3=> INT\n" +
-			":s4=> IF ID-{'a'..'z'}->:s2=> ID\n";
+			"s0-'i'->:s1=>ID\n" +
+			"s0-{'a'..'h', 'j'..'z'}->:s2=>ID\n" +
+			"s0-{'0'..'9'}->:s3=>INT\n" +
+			":s1=>ID-'f'->:s4=>IF\n" +
+			":s1=>ID-{'a'..'e', 'g'..'z'}->:s2=>ID\n" +
+			":s2=>ID-{'a'..'z'}->:s2=>ID\n" +
+			":s3=>INT-{'0'..'9'}->:s3=>INT\n" +
+			":s4=>IF-{'a'..'z'}->:s2=>ID\n";
 		checkLexerDFA(g, expecting);
 	}
 
@@ -62,9 +62,52 @@ public class TestLexerDFAConstruction extends BaseTest {
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n";
 		String expecting =
-			"s0-'b'->:s1=> B\n" +
-			"s0-'c'->:s2=> C\n";
+			"s0-'b'->:s1=>B\n" +
+			"s0-'c'->:s2=>C\n";
 		checkLexerDFA(g, "FOO", expecting);
+	}
+
+	@Test public void pred() throws Exception {
+		String g =
+			"lexer grammar L;\n" +
+			"A : {p1}? 'a' 'b' ;\n" +
+			"B :  'a' 'b'  ;";
+		String expecting =
+			"s0-'a'->s1\n" +
+			"s1-'b'->s2\n" +
+			"s2-{p1}?->:s3=>A\n" +
+			"s2-true->:s4=>B\n";
+		checkLexerDFA(g, expecting);
+	}
+
+	@Test public void gated_pred() throws Exception {
+		String g =
+			"lexer grammar pred;\n" +
+			"A : {p1}?=> 'a' 'b'\n" +
+			"  | 'a' 'c' \n" +
+			"  | 'b'\n" +
+			"  ;";
+		String expecting =
+			"s0-'a'->s1\n" +
+			"s0-'b'->:s2=>A\n" +
+			"s1-'b'&&{p1}?->:s3=>A\n" +
+			"s1-'c'->:s4=>A\n";
+		checkLexerDFA(g, expecting);
+	}
+
+	@Test public void gated_pred2() throws Exception {
+		String g =
+			"lexer grammar T;\n" +
+			"A : {p1}?=> 'a' 'b'\n" +
+			"  | 'b'\n" +
+			"  ;\n" +
+			"B : 'a' 'c' ;";
+		String expecting =
+			"s0-'a'->s1\n" +
+			"s0-'b'->:s2=>A\n" +
+			"s1-'b'&&{p1}?->:s3=>A\n" +
+			"s1-'c'->:s4=>B\n";
+		checkLexerDFA(g, expecting);
 	}
 
 

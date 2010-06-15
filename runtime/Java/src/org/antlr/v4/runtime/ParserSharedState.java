@@ -37,7 +37,7 @@ import java.util.Map;
  *  and recover from errors etc...  As a separate state object, it can be
  *  shared among multiple grammars; e.g., when one grammar imports another.
  */
-public class RecognizerSharedState {
+public class ParserSharedState {
 	public IntStream input;
 
 	/** First on stack is fake a call to start rule from S' : S EOF ;
@@ -83,7 +83,7 @@ public class RecognizerSharedState {
 
 	List<ANTLRParserListener> listeners;
 
-	public RecognizerSharedState() {
+	public ParserSharedState() {
         ctx = new QStack<RuleContext>();
 	}
     

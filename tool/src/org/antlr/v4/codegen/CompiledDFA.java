@@ -1,38 +1,76 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.automata.DFA;
-import org.antlr.v4.automata.DFAState;
-import org.antlr.v4.automata.Edge;
-import org.antlr.v4.automata.Label;
+import org.antlr.v4.analysis.SemanticContext;
+import org.antlr.v4.automata.*;
+import org.antlr.v4.misc.Interval;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.ErrorManager;
+import org.stringtemplate.v4.misc.Misc;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /** From a DFA, create transition table etc... */
 public class CompiledDFA {
+	/** How big can char get before DFA states overflow and we need a set? */
+	public static int MAX_EDGE_VALUE_FOR_TABLE = 255;
+	
 	public DFA dfa;
-	public Vector<Vector<Integer>> transition;
-	public Vector<Integer> min;
-	public Vector<Integer> max;
+	public int[][] transition;
+	public int[][] set_edges;
+	public int[][] pred_edges; // 'a'&&{p1}?
+	public int[] accept;
+	public int[] eof;
+	public int[] max;
+	public int[] action_index;
+	public List<String> actions;
+	public List<String> sempreds;
 
 	public CompiledDFA(DFA dfa) {
 		this.dfa = dfa;
 
 		int n = dfa.states.size();
-		min = new Vector<Integer>(n); min.setSize(n);
-		max = new Vector<Integer>(n); max.setSize(n);
-		transition = new Vector<Vector<Integer>>(n); transition.setSize(n);
+		accept = new int[n];
+		eof = new int[n];
+		Arrays.fill(eof, -1);
+		//min = new int[n];
+		max = new int[n];
+		transition = new int[n][];
+		set_edges = new int[n][];
+		pred_edges = new int[n][];
+		action_index = new int[n];
+		Arrays.fill(action_index, -1);
+		actions = new ArrayList<String>();
+		sempreds = new ArrayList<String>();
 
 		for (DFAState d : dfa.states) {
 			if ( d == null ) continue;
+			if ( d.isAcceptState ) createAcceptTable(d);
 			createMinMaxTables(d);
-			createTransitionTableEntryForState(d);
+			createEOFTable(d);
+			if ( d.edges.size() > 0 ) {
+				createTransitionTableEntryForState(d);
+				createSetTable(d);
+				createPredTable(d);
+			}
+			if ( dfa.g.isLexer() ) createActionTable((LexerState)d);
 		}
 	}
 
-	protected void createMinMaxTables(DFAState d) {
+	void createAcceptTable(DFAState d) {
+		int predicts = d.predictsAlt;
+		if ( d.dfa.g.isLexer() ) {
+			// for lexer, we don't use predicted alt; we use token type
+			LexerState ld = (LexerState)d;
+			String predictedLexerRuleName = ld.predictsRule.name;
+			predicts = d.dfa.g.getTokenType(predictedLexerRuleName);
+		}
+		accept[d.stateNumber] = predicts;
+	}
+
+	void createMinMaxTables(DFAState d) {
 		int smin = Label.MAX_CHAR_VALUE + 1;
 		int smax = Label.MIN_ATOM_VALUE - 1;
 		int n = d.edges.size();
@@ -55,38 +93,42 @@ public class CompiledDFA {
 			smax = Label.MIN_CHAR_VALUE;
 		}
 
-		min.set(d.stateNumber, Utils.integer((char)smin));
-		max.set(d.stateNumber, Utils.integer((char)smax));
+		//min[d.stateNumber] = smin;
+		max[d.stateNumber] = smax;
 
-		if ( smax<0 || smin>Label.MAX_CHAR_VALUE || smin<0 ) {
-			ErrorManager.internalError("messed up: min="+min+", max="+max);
+		if ( smax<0 || smin<0 ) {
+			ErrorManager.internalError("messed up: max="+Arrays.toString(max));
 		}
 	}
 
-	void createTransitionTableEntryForState(DFAState s) {
+	void createTransitionTableEntryForState(DFAState d) {
 		/*
 		System.out.println("createTransitionTableEntryForState s"+s.stateNumber+
 			" dec "+s.dfa.decisionNumber+" cyclic="+s.dfa.isCyclic());
 			*/
-		if ( s.edges.size() == 0 ) return;
-		int smax = ((Integer)max.get(s.stateNumber)).intValue();
-		int smin = ((Integer)min.get(s.stateNumber)).intValue();
+		int max = Math.min(this.max[d.stateNumber], MAX_EDGE_VALUE_FOR_TABLE);
 
-		Vector<Integer> stateTransitions = new Vector<Integer>(smax-smin+1);
-		stateTransitions.setSize(smax-smin+1);
-		transition.set(s.stateNumber, stateTransitions);
-		for (Edge e : s.edges) {
-			int[] atoms = e.label.toArray();
-			for (int a = 0; a < atoms.length; a++) {
-				// set the transition if the label is valid (don't do EOF)
-				if ( atoms[a] >= Label.MIN_CHAR_VALUE ) {
-					int labelIndex = atoms[a]-smin; // offset from 0
-					stateTransitions.set(labelIndex,
-										 Utils.integer(e.target.stateNumber));
-				}
+		int[] stateTransitions = new int[max+1]; // make table only up to max
+		Arrays.fill(stateTransitions, -1);		
+		transition[d.stateNumber] = stateTransitions;
+
+		int[] predTransitions = new int[max+1];
+		Arrays.fill(stateTransitions, -1);
+		transition[d.stateNumber] = stateTransitions;
+
+		for (Edge e : d.edges) {
+			for (Interval I : e.label.getIntervals()) {
+				SemanticContext preds =	e.target.getGatedPredicatesInNFAConfigurations();
+				if ( I.a > MAX_EDGE_VALUE_FOR_TABLE || preds!=null ) break;
+				// make sure range is MIN_CHAR_VALUE..MAX_EDGE_VALUE_FOR_TABLE and no preds
+				int a = Math.max(I.a, Label.MIN_CHAR_VALUE);
+				int b = Math.min(I.b, MAX_EDGE_VALUE_FOR_TABLE);
+				//System.out.println("interval "+I+"->"+a+":"+b);
+				for (int i=a; i<=b; i++) stateTransitions[i] = e.target.stateNumber;
 			}
 		}
-		// track unique state transition tables so we can reuse
+
+		// TODO: track unique state transition tables so we can reuse
 //		Integer edgeClass = (Integer)edgeTransitionClassMap.get(stateTransitions);
 //		if ( edgeClass!=null ) {
 //			//System.out.println("we've seen this array before; size="+stateTransitions.size());
@@ -98,5 +140,72 @@ public class CompiledDFA {
 //			edgeTransitionClassMap.put(stateTransitions, edgeClass);
 //			edgeTransitionClass++;
 //		}
+	}
+
+	/** Set up the EOF table; we cannot use -1 min/max values so
+	 *  we need another way to test that in the DFA transition function.
+	 */
+	void createEOFTable(DFAState d) {
+		for (Edge e : d.edges) {
+			int[] atoms = e.label.toArray();
+			for (int a : atoms) {
+				if ( a==Label.EOF ) eof[d.stateNumber] = e.target.stateNumber;
+			}
+		}
+	}
+
+	void createSetTable(DFAState d) {
+		// only pay attention if at least one edge's max char is > MAX
+		if ( max[d.stateNumber] > MAX_EDGE_VALUE_FOR_TABLE ) {
+			List<Integer> edges = new ArrayList<Integer>();
+			// { target1, npairs1, range-pairs1,
+			//   target2, npairs2, range-pairs2, ... }
+			for (Edge e : d.edges) {
+				// don't gen target if edge has all edges <= max
+				if ( e.label.getMaxElement() <= MAX_EDGE_VALUE_FOR_TABLE ) continue;
+				edges.add(e.target.stateNumber);
+				edges.add(0); // leave whole for n
+				List<Interval> intervals = e.label.getIntervals();
+				int n = 0;
+				for (Interval I : intervals) {
+					// make sure range is beyond max or truncate left side to be above max
+					if ( I.b <= MAX_EDGE_VALUE_FOR_TABLE ) continue;
+					int a = Math.max(I.a, MAX_EDGE_VALUE_FOR_TABLE+1);
+					edges.add(a);
+					edges.add(I.b);
+					n++;
+				}
+				edges.set(1, n);
+			}
+			if ( edges.size()>0 ) set_edges[d.stateNumber] = Utils.toIntArray(edges);
+		}
+	}
+
+	void createPredTable(DFAState d) {
+		List<Integer> edges = new ArrayList<Integer>();
+		// { target1, sempred_index1, target2, sempred_index2, ... }
+		for (Edge e : d.edges) {
+			if ( e.semanticContext!=null ) {
+				System.out.println("gated preds for "+e.target.stateNumber+": "+e.semanticContext);
+				// TODO: translate sempreds and gen proper && expressions for target
+				String p = e.semanticContext.toString();
+				edges.add(e.target.stateNumber);
+				int prevIndex = sempreds.indexOf(p);
+				int i = prevIndex;
+				if ( prevIndex<0 ) {
+					i = sempreds.size();
+					sempreds.add(p);
+				}
+				edges.add(i);
+			}
+		}
+		if ( edges.size()>0 ) pred_edges[d.stateNumber] = Utils.toIntArray(edges);
+	}
+
+	void createActionTable(LexerState d) {
+		if ( d.isAcceptState && d.action!=null ) {
+			action_index[d.stateNumber] = actions.size();
+			actions.add(Misc.strip(d.action.getText(),1)); // TODO: translate action
+		}
 	}
 }

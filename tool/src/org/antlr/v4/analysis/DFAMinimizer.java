@@ -9,9 +9,7 @@ import org.antlr.v4.misc.Interval;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.misc.OrderedHashSet;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** First consolidate accept states, which leads to smaller DFA. Also,
  *  consolidate all edges from p to q into a single edge with set.
@@ -60,7 +58,7 @@ public class DFAMinimizer {
 
 		// Nobody can merge with a state resolved with predicates to be safe
 		if ( dfa.converter!=null ) {
-			for (DFAState d : dfa.converter.resolvedWithSemanticPredicates) {
+			for (DFAState d : dfa.converter.resolver.resolvedWithSemanticPredicates) {
 				for (int i=1; i<n; i++) {
 					distinct[d.stateNumber][i] = true;
 					distinct[i][d.stateNumber] = true;
@@ -96,10 +94,14 @@ public class DFAMinimizer {
 					DFAState p = dfa.states.get(i);
 					DFAState q = dfa.states.get(j);
 					for (IntSet label : labels) {
+						// leave all states with gated pred transitions on this label as distinct
+						SemanticContext p_preds = p.getGatedPredicatesInNFAConfigurations();
+						SemanticContext q_preds = q.getGatedPredicatesInNFAConfigurations();
+						boolean preds_present = p_preds!=null || q_preds!=null;
 						DFAState pt = p.target(label);
 						DFAState qt = q.target(label);
-//						System.out.println(p.stateNumber+"-"+label.toString(dfa.g)+"->"+pt);
-//						System.out.println(q.stateNumber+"-"+label.toString(dfa.g)+"->"+qt);
+						System.out.println(p.stateNumber+"-"+label.toString(dfa.g)+"->"+pt);
+						System.out.println(q.stateNumber+"-"+label.toString(dfa.g)+"->"+qt);
 						// if DISTINCT(p,q) is empty and
 						//    DISTINCT(?(p, a),?(q, a)) is not empty
 						// then DISTINCT(p,q) = a.
@@ -113,8 +115,10 @@ public class DFAMinimizer {
 						// so leave as equiv (nondistinct).  If one goes to
 						// error (pt or qt is null) and other doesn't, must
 						// be in distinct sets so p,q are distinct.
-						if ( pt==null && qt==null ) continue;
+						boolean bothTargetsAreErrors = pt == null && qt == null;
+						if ( bothTargetsAreErrors && !preds_present ) continue;
 						if ( pt==null || qt==null ||
+							 preds_present ||
 							 distinct[pt.stateNumber][qt.stateNumber] )
 						{
 							distinct[i][j] = true;
@@ -163,41 +167,72 @@ public class DFAMinimizer {
 
 		// minimize the DFA (combine equiv sets)
 		// merge all edges from a set to first state in set
-		DFAState[] states = new DFAState[n];
+		// newstates[oldstate] = new state number for oldstate
+		DFAState[] oldToNewStateMap = new DFAState[n];
+		OrderedHashSet<DFAState> uniqNewStates = new OrderedHashSet<DFAState>();
+
 		// first map all states in set to same DFA state (old min)
 		for (IntervalSet s : uniq) {
-			int min = s.getMinElement();
-			states[min] = dfa.states.get(min);
+			int newStateNum = s.getMinElement();
+			uniqNewStates.add(dfa.states.get(newStateNum));
+			oldToNewStateMap[newStateNum] = dfa.states.get(newStateNum);
 			List<Interval> intervals = s.getIntervals();
 			for (Interval I : intervals) {
 				for (int i=I.a; i<=I.b; i++) {
-					states[i] = states[min];
+					oldToNewStateMap[i] = oldToNewStateMap[newStateNum];
 				}
 			}
 		}
-		for (DFAState s : states) System.out.println(s);
+		for (DFAState s : oldToNewStateMap) System.out.println(s);
 		// now do edges
-		for (IntervalSet s : uniq) {
-			List<Interval> intervals = s.getIntervals();
-			System.out.println("do set "+s);
-			for (Interval I : intervals) {
-				for (int i=I.a; i<=I.b; i++) {
-					DFAState p = dfa.states.get(i);
-					for (Edge e : p.edges) {
-						System.out.println(p.stateNumber+" upon "+e.toString(dfa.g)+
-										   " used to point at "+e.target.stateNumber+
-										   " now points at "+states[e.target.stateNumber].stateNumber);
-						e.target = states[e.target.stateNumber];
-					}
-				}
+//		for (IntervalSet equivStates : uniq) {
+//			List<Interval> intervals_in_state_set = equivStates.getIntervals();
+//			System.out.println("do set "+equivStates);
+//			// for each state in equiv state set, make all edges point at new state
+//			for (Interval I : intervals_in_state_set) {
+//				for (int i=I.a; i<=I.b; i++) {
+//					DFAState p = dfa.states.get(i);
+//					for (Edge e : p.edges) {
+//						System.out.println(p.stateNumber+" upon "+e.toString(dfa.g)+
+//										   " used to point at "+e.target.stateNumber+
+//										   " now points at "+ newstates[e.target.stateNumber].stateNumber);
+//						e.target = newstates[e.target.stateNumber];
+//					}
+//				}
+//			}
+//		}
+
+		// simpler version of above 
+		for (DFAState d : uniqNewStates) {
+			for (Edge e : d.edges) {
+//				System.out.println(d.stateNumber+" upon "+e.toString(dfa.g)+
+//								   " used to point at "+e.target.stateNumber+
+//								   " now points at "+ oldToNewStateMap[e.target.stateNumber].stateNumber);
+				e.target = oldToNewStateMap[e.target.stateNumber];
 			}
 		}
+
+		// merge all edges from p to q
+		for (DFAState d : uniqNewStates) {
+			Map<DFAState, IntervalSet> targetToEdges = new HashMap<DFAState, IntervalSet>();
+			for (Edge e : d.edges) {
+				IntervalSet s = targetToEdges.get(e.target);
+				if ( s==null ) { s = new IntervalSet(e.label); targetToEdges.put(e.target, s); }
+				else s.addAll(e.label);
+			}
+			System.out.println("state "+d.stateNumber+" has "+d.edges.size()+" edges but "+targetToEdges.size()+" targets");
+			d.edges.clear();
+			for (DFAState target : targetToEdges.keySet()) {
+				d.addEdge(new Edge(target, targetToEdges.get(target)));
+			}
+		}
+
 		// now kill unused states
-		for (IntervalSet s : uniq) {
-			List<Interval> intervals = s.getIntervals();
-			for (Interval I : intervals) {
+		for (IntervalSet equivStates : uniq) {
+			List<Interval> intervals_in_state_set = equivStates.getIntervals();
+			for (Interval I : intervals_in_state_set) {
 				for (int i=I.a; i<=I.b; i++) {
-					if ( states[i].stateNumber != i ) { // if not one of our merged states
+					if ( oldToNewStateMap[i].stateNumber != i ) { // if not one of our merged states
 						System.out.println("kill "+i);
 						DFAState d = dfa.states.get(i);
 						dfa.stateSet.remove(d);

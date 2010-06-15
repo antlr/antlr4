@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 ASTVerifier.g 2010-05-24 16:31:58
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 ASTVerifier.g 2010-06-14 12:35:33
 
 /*
  [The "BSD license"]
@@ -2543,11 +2543,11 @@ public class ASTVerifier extends TreeParser {
                 if ( (LA34_1==DOWN) ) {
                     int LA34_2 = input.LA(3);
 
-                    if ( (LA34_2==BLOCK) ) {
-                        alt34=2;
-                    }
-                    else if ( (LA34_2==TOKEN_REF||LA34_2==STRING_LITERAL) ) {
+                    if ( (LA34_2==TOKEN_REF||LA34_2==STRING_LITERAL) ) {
                         alt34=1;
+                    }
+                    else if ( (LA34_2==BLOCK) ) {
+                        alt34=2;
                     }
                     else {
                         NoViableAltException nvae =
@@ -4251,8 +4251,8 @@ public class ASTVerifier extends TreeParser {
         "\1\141\2\2\2\uffff\1\2\1\141\2\uffff\2\104\1\127\10\uffff\1\104"+
         "\2\uffff";
     static final String DFA33_acceptS =
-        "\3\uffff\1\5\1\10\2\uffff\1\15\1\16\3\uffff\1\13\1\14\1\3\1\1\1"+
-        "\6\1\2\1\7\1\4\1\uffff\1\11\1\12";
+        "\3\uffff\1\5\1\10\2\uffff\1\15\1\16\3\uffff\1\13\1\14\1\1\1\3\1"+
+        "\6\1\2\1\4\1\7\1\uffff\1\11\1\12";
     static final String DFA33_specialS =
         "\27\uffff}>";
     static final String[] DFA33_transitionS = {
@@ -4269,8 +4269,8 @@ public class ASTVerifier extends TreeParser {
             "\3\15\14\uffff\1\15\2\uffff\1\15",
             "",
             "",
-            "\1\17\4\uffff\1\16\1\uffff\1\20\1\10\3\uffff\1\20",
-            "\1\21\4\uffff\1\23\1\uffff\1\22\1\10\3\uffff\1\22",
+            "\1\16\4\uffff\1\17\1\uffff\1\20\1\10\3\uffff\1\20",
+            "\1\21\4\uffff\1\22\1\uffff\1\23\1\10\3\uffff\1\23",
             "\1\24",
             "",
             "",

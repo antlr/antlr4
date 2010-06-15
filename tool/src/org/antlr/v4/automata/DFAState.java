@@ -2,13 +2,11 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.analysis.NFAConfig;
 import org.antlr.v4.analysis.Resolver;
+import org.antlr.v4.analysis.SemanticContext;
 import org.antlr.v4.misc.IntSet;
 import org.antlr.v4.misc.OrderedHashSet;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** A DFA state represents a set of possible NFA configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -125,6 +123,95 @@ public class DFAState {
 		}
 		if ( alts.size()==0 ) return null;
 		return alts;
+	}
+
+	public Map<Integer, SemanticContext> getPredicatesForAlts() {
+		// map alt to combined SemanticContext
+		Map<Integer, SemanticContext> altToPredicateContextMap =
+			new HashMap<Integer, SemanticContext>();
+		Set<Integer> alts = getAltSet();
+		for (Integer alt : alts) {
+			SemanticContext ctx = getPredicatesForAlt(alt);
+			altToPredicateContextMap.put(alt, ctx);
+		}
+		return altToPredicateContextMap;
+	}
+
+	public SemanticContext getPredicatesForAlt(int alt) {
+		SemanticContext preds = null;
+		for (NFAConfig c : nfaConfigs) {
+			if ( c.alt == alt &&
+				 c.semanticContext!=SemanticContext.EMPTY_SEMANTIC_CONTEXT )
+			{
+				if ( preds == null ) preds = c.semanticContext;
+				else preds = SemanticContext.or(preds, c.semanticContext);
+			}
+		}
+		return preds;
+	}
+
+	public List<NFAConfig> getNFAConfigsForAlt(int alt) {
+		List<NFAConfig> configs = new ArrayList<NFAConfig>();
+		for (NFAConfig c : nfaConfigs) {
+			if ( c.alt == alt ) configs.add(c);
+		}
+		return configs;
+	}
+
+	/** For gated productions, we need an OR'd list of all predicates for the
+	 *  target of an edge so we can gate the edge based upon the predicates
+	 *  associated with taking that path (if any).
+	 *
+	 *  For syntactic predicates, we only want to generate predicate
+	 *  evaluations as we transitions to an accept state; it's a waste to
+	 *  do it earlier.  So, only add gated preds derived from manually-
+	 *  specified syntactic predicates if this is an accept state.
+	 *
+	 *  Also, since configurations w/o gated predicates are like true
+	 *  gated predicates, finding a configuration whose alt has no gated
+	 *  predicate implies we should evaluate the predicate to true. This
+	 *  means the whole edge has to be ungated. Consider:
+	 *
+	 *	 X : ('a' | {p}?=> 'a')
+	 *	   | 'a' 'b'
+	 *	   ;
+	 *
+	 *  Here, you 'a' gets you from s0 to s1 but you can't test p because
+	 *  plain 'a' is ok.  It's also ok for starting alt 2.  Hence, you can't
+	 *  test p.  Even on the edge going to accept state for alt 1 of X, you
+	 *  can't test p.  You can get to the same place with and w/o the context.
+	 *  Therefore, it is never ok to test p in this situation.
+	 */
+	public SemanticContext getGatedPredicatesInNFAConfigurations() {
+		SemanticContext unionOfPredicatesFromAllAlts = null;
+		for (NFAConfig c : nfaConfigs) {
+			SemanticContext gatedPredExpr =
+				c.semanticContext.getGatedPredicateContext();
+			if ( gatedPredExpr==null ) {
+				// if we ever find a configuration w/o a gated predicate
+				// (even if it's a nongated predicate), we cannot gate
+				// the indident edges.
+				return null;
+			}
+			else if ( isAcceptState || !c.semanticContext.isSyntacticPredicate() ) {
+				// at this point we have a gated predicate and, due to elseif,
+				// we know it's an accept and not a syn pred.  In this case,
+				// it's safe to add the gated predicate to the union.  We
+				// only want to add syn preds if it's an accept state.  Other
+				// gated preds can be used with edges leading to accept states.
+				if ( unionOfPredicatesFromAllAlts==null ) {
+					unionOfPredicatesFromAllAlts = gatedPredExpr;
+				}
+				else {
+					unionOfPredicatesFromAllAlts =
+						SemanticContext.or(unionOfPredicatesFromAllAlts,gatedPredExpr);
+				}
+			}
+		}
+		if ( unionOfPredicatesFromAllAlts instanceof SemanticContext.TruePredicate ) {
+			return null;
+		}
+		return unionOfPredicatesFromAllAlts;
 	}
 
 	public int getNumberOfEdges() { return edges.size(); }

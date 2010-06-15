@@ -27,7 +27,7 @@ public class LexerFactory {
 		fileST.add("lexer", lexerST);
 		for (String modeName : lg.modes.keySet()) { // for each mode
 			injectDFAs(lg, lexerST, modeName);
-			injectPDAs(lg, lexerST, modeName);
+			//injectPDAs(lg, lexerST, modeName);
 		}
 
 		LinkedHashMap<String,Integer> tokens = new LinkedHashMap<String,Integer>();
@@ -46,7 +46,12 @@ public class LexerFactory {
 		DFA dfa = lg.modeToDFA.get(modeName);
 		ST dfaST = gen.templates.getInstanceOf("DFA");
 		dfaST.add("name", modeName);
-		dfaST.add("model", new CompiledDFA(dfa));
+		CompiledDFA obj = new CompiledDFA(dfa);
+		dfaST.add("model", obj);
+//		ST actionST = gen.templates.getInstanceOf("actionMethod");
+//		actionST.add("name", modeName);
+//		actionST.add("actions", obj.actions);
+//		lexerST.add("actions", actionST);
 		lexerST.add("dfas", dfaST);
 	}
 

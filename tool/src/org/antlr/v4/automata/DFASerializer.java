@@ -1,7 +1,7 @@
 package org.antlr.v4.automata;
 
+import org.antlr.v4.analysis.SemanticContext;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,8 +37,16 @@ public class DFASerializer {
 			for (int i=0; i<n; i++) {
 				buf.append(getStateString(s));
 				Edge t = s.edge(i);
-				work.add( t.target );				
-				buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
+				work.add( t.target );
+				String label = t.toString(g);
+				SemanticContext preds = t.semanticContext; //t.target.getGatedPredicatesInNFAConfigurations();
+				if ( preds!=null ) {
+					String predsStr = "";
+					predsStr = "&&"+preds.toString();
+					label += predsStr;
+				}
+
+				buf.append("-"+label+"->"+ getStateString(t.target)+'\n');
 			}
 		}
 		String output = buf.toString();
@@ -52,11 +60,7 @@ public class DFASerializer {
 		if ( s.isAcceptState ) {
 			if ( s instanceof LexerState ) {
 				stateStr = ":s"+n+"=>";
-				StringBuilder buf = new StringBuilder();
-				for (Rule r : ((LexerState)s).matchesRules) {
-					buf.append(" "+r.name);
-				}
-				stateStr += buf.toString();
+				stateStr += ((LexerState)s).predictsRule.name;
 			}
 			else {
 				stateStr = ":s"+n+"=>"+s.getUniquelyPredictedAlt();

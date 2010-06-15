@@ -577,7 +577,7 @@ element
 	|	ebnf
 	|   ACTION<ActionAST>
 	|   SEMPRED
-		(	IMPLIES		-> GATED_SEMPRED[$IMPLIES]
+		(	IMPLIES		-> GATED_SEMPRED[$SEMPRED]
 		|				-> SEMPRED
 		)
 	|   treeSpec
