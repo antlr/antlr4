@@ -21,17 +21,6 @@ public class TestPredicatedDFAConstruction extends BaseTest {
 		checkRuleDFA(g, "a", expecting);
 	}
 
-	@Test public void ambigButPredicatedTokens() throws Exception {
-		// accept state matches both; try them in order since at least 1 has pred
-		String g =
-			"lexer grammar L4;\n" +
-			"A : {p1}? 'a' ; \n" +
-			"B : {p2}? 'a' ;";
-		String expecting =
-			"s0-'a'->:s1=> A B\n";
-		checkLexerDFA(g, expecting);
-	}
-
 	@Test public void hoistPredIntoCallingRule() throws Exception {
 		String g =
 			"grammar Q;\n" +

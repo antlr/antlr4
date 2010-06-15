@@ -110,6 +110,17 @@ public class TestLexerDFAConstruction extends BaseTest {
 		checkLexerDFA(g, expecting);
 	}
 
+	@Test public void ambigButPredicatedTokens() throws Exception {
+		String g =
+			"lexer grammar L4;\n" +
+			"A : {p1}? 'a' ; \n" +
+			"B : {p2}? 'a' ;";
+		String expecting =
+			"s0-'a'->s1\n" +
+			"s1-{p1}?->:s2=>A\n" +
+			"s1-{p2}?->:s3=>B\n";
+		checkLexerDFA(g, expecting);
+	}	
 
 	public void _template() throws Exception {
 		String g =
