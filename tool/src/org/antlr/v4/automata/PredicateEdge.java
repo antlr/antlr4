@@ -11,6 +11,7 @@ public class PredicateEdge extends Edge {
 	}
 
 	public String toString(Grammar g) {
-		return semanticContext.toString();
+		return super.toString(g)+
+			   (semanticContext!=null?semanticContext:"");
 	}	
 }

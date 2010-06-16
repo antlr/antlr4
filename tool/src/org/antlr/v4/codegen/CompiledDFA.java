@@ -77,6 +77,7 @@ public class CompiledDFA {
 		for (int j = 0; j < n; j++) {
 			Edge edge = d.edge(j);
 			IntervalSet label = edge.label;
+			if ( label==null ) continue; // must be pred only transition
 			int lmin = label.getMinElement();
 			// if valid char (don't do EOF) and less than current min
 			if ( lmin<smin && lmin>=Label.MIN_CHAR_VALUE ) {
@@ -117,6 +118,7 @@ public class CompiledDFA {
 		transition[d.stateNumber] = stateTransitions;
 
 		for (Edge e : d.edges) {
+			if ( e.label==null ) continue; // must be pred only transition
 			for (Interval I : e.label.getIntervals()) {
 				SemanticContext preds =	e.target.getGatedPredicatesInNFAConfigurations();
 				if ( I.a > MAX_EDGE_VALUE_FOR_TABLE || preds!=null ) break;
@@ -147,6 +149,7 @@ public class CompiledDFA {
 	 */
 	void createEOFTable(DFAState d) {
 		for (Edge e : d.edges) {
+			if ( e.label==null ) continue; // must be pred only transition			
 			int[] atoms = e.label.toArray();
 			for (int a : atoms) {
 				if ( a==Label.EOF ) eof[d.stateNumber] = e.target.stateNumber;
@@ -185,6 +188,7 @@ public class CompiledDFA {
 		List<Integer> edges = new ArrayList<Integer>();
 		// { target1, sempred_index1, target2, sempred_index2, ... }
 		for (Edge e : d.edges) {
+			System.out.println("edge pred "+e.semanticContext);
 			if ( e.semanticContext!=null ) {
 				System.out.println("gated preds for "+e.target.stateNumber+": "+e.semanticContext);
 				// TODO: translate sempreds and gen proper && expressions for target

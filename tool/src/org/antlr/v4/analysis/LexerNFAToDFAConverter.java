@@ -291,31 +291,6 @@ public class LexerNFAToDFAConverter {
 		}
 	}
 
-//	public void resolveAmbiguities(DFAState d) {
-//		Resolver resolver = new Resolver(null);
-//		PredicateResolver semResolver = new PredicateResolver();
-//		Set<Integer> ambiguousAlts = resolver.getAmbiguousAlts(d);
-//		if ( PredictionDFAFactory.debug && ambiguousAlts!=null ) {
-//			System.out.println("ambig alts="+ambiguousAlts);
-//		}
-//
-//		// if no problems return
-//		if ( ambiguousAlts==null ) return;
-//
-//		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
-//		boolean resolved =
-//			semResolver.tryToResolveWithSemanticPredicates(d, ambiguousAlts);
-//		if ( resolved ) {
-//			if ( PredictionDFAFactory.debug ) {
-//				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
-//			}
-//			d.resolvedWithPredicates = true;
-//			return;
-//		}
-//
-//		// RESOLVE SYNTACTIC CONFLICT BY REMOVING ALL BUT ONE ALT
-//	}
-
 //	void ruleStopStateClosure(LexerState d, NFAState s) {
 //		//System.out.println("FOLLOW of "+s+" context="+context);
 //		// follow all static FOLLOW links

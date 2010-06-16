@@ -23,6 +23,6 @@ public class Edge {
 	public String toString() { return label.toString(); }	
 
 	public String toString(Grammar g) {
-		return label.toString(g);
+		return label!=null?label.toString(g):"";
 	}
 }
