@@ -8,8 +8,6 @@ import org.antlr.v4.tool.TerminalAST;
 
 import java.util.List;
 
-// TODO: i don't think we create lexer NFAs anymore
-
 public class LexerNFAFactory extends ParserNFAFactory {
 	public LexerNFAFactory(LexerGrammar g) { super(g); }
 
@@ -41,6 +39,7 @@ public class LexerNFAFactory extends ParserNFAFactory {
 		return nfa;
 	}
 
+	@Override
 	public Handle range(GrammarAST a, GrammarAST b) {
 		BasicState left = newState(a);
 		BasicState right = newState(b);
@@ -57,6 +56,7 @@ public class LexerNFAFactory extends ParserNFAFactory {
 	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
 	 *  for n characters.
 	 */
+	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		String chars = stringLiteralAST.getText();
 		chars = CharSupport.getStringFromGrammarStringLiteral(chars);

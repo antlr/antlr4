@@ -25,6 +25,7 @@ public class LexerFactory {
 		lexerST.add("modes", lg.modes.keySet());
 		fileST.add("fileName", gen.getRecognizerFileName());
 		fileST.add("lexer", lexerST);
+
 		for (String modeName : lg.modes.keySet()) { // for each mode
 			injectDFAs(lg, lexerST, modeName);
 			//injectPDAs(lg, lexerST, modeName);

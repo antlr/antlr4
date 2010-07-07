@@ -63,7 +63,7 @@ public class Resolver {
 	 */
 	public static Set<Integer> getAmbiguousAlts(DFAState d) {
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
-		 Set<Integer> ambiguousAlts = new HashSet<Integer>();
+		Set<Integer> ambiguousAlts = new HashSet<Integer>();
 
 		// If only 1 NFA conf then no way it can be nondeterministic;
 		// save the overhead.  There are many o-a->o NFA transitions
@@ -142,6 +142,19 @@ public class Resolver {
 
 		if ( ambiguousAlts.size()==0 ) return null;
 		return ambiguousAlts;
+	}
+
+	public static Set<Integer> getAltsWithApproximateContext(DFAState d) {
+		Set<Integer> approxContextAlts = new HashSet<Integer>();
+
+		for (NFAConfig c : d.nfaConfigs) {
+			if ( c.context.approximated ) {
+				approxContextAlts.add(Utils.integer(c.alt));
+			}
+		}
+
+		if ( approxContextAlts.size()==0 ) return null;
+		return approxContextAlts;
 	}
 
 	public void resolveAmbiguities(DFAState d) {

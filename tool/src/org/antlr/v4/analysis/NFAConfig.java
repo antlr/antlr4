@@ -129,6 +129,9 @@ public class NFAConfig {
 		if (resolvedWithPredicate) {
 			buf.append("|resolveWithPredicate");
 		}
+		if ( context.approximated ) {
+			buf.append("|approx");
+		}
 		return buf.toString();
     }
 }

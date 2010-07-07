@@ -1,14 +1,15 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.automata.Label;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
-import java.util.List;
+import java.util.*;
 
 /** Look for errors and deadcode stuff */
 public class UseDefAnalyzer {
-	public void checkRewriteElementsPresentOnLeftSide(Grammar g, List<Rule> rules) {
-		for (Rule r : rules) {
+	public static void checkRewriteElementsPresentOnLeftSide(Grammar g) {
+		for (Rule r : g.rules.values()) {
 			for (int a=1; a<=r.numberOfAlts; a++) {
 				Alternative alt = r.alt[a];
 				for (GrammarAST e : alt.rewriteElements) {
@@ -26,7 +27,7 @@ public class UseDefAnalyzer {
 	}
 
 	// side-effect: updates Alternative with refs in actions
-	public void trackTokenRuleRefsInActions(Grammar g) {
+	public static void trackTokenRuleRefsInActions(Grammar g) {
 		for (Rule r : g.rules.values()) {
 			for (int i=1; i<=r.numberOfAlts; i++) {
 				Alternative alt = r.alt[i];
@@ -36,6 +37,33 @@ public class UseDefAnalyzer {
 				}
 			}
 		}
+	}
+
+	/** Find all rules reachable from r directly or indirectly for all r in g */
+	public static Map<Rule, Set<Rule>> getRuleDependencies(Grammar g) {
+		return getRuleDependencies(g, g.rules.values());
+	}
+
+	public static Map<Rule, Set<Rule>> getRuleDependencies(LexerGrammar g, String modeName) {
+		return getRuleDependencies(g, g.modes.get(modeName));
+	}
+
+	public static Map<Rule, Set<Rule>> getRuleDependencies(Grammar g, Collection<Rule> rules) {
+		Map<Rule, Set<Rule>> dependencies = new HashMap<Rule, Set<Rule>>();
+		
+		for (Rule r : rules) {
+			List<GrammarAST> tokenRefs = r.ast.getNodesWithType(ANTLRParser.TOKEN_REF);
+			for (GrammarAST tref : tokenRefs) {
+				Set<Rule> calls = dependencies.get(r);
+				if ( calls==null ) {
+					calls = new HashSet<Rule>();
+					dependencies.put(r, calls);
+				}
+				calls.add(g.getRule(tref.getText()));
+			}
+		}
+
+		return dependencies;
 	}
 
 }

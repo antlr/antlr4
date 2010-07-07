@@ -42,7 +42,7 @@ public class Rule implements AttributeResolver {
     public String name;
 	public List<GrammarAST> modifiers;
 	
-    public GrammarASTWithOptions ast;
+    public RuleAST ast;
     public AttributeDict args;
     public AttributeDict retvals;
     public AttributeDict scope; // scope { int i; }
@@ -86,7 +86,7 @@ public class Rule implements AttributeResolver {
 	/** All rules have unique index 1..n */
 	public int index;
 
-	public Rule(Grammar g, String name, GrammarASTWithOptions ast, int numberOfAlts) {
+	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
         this.g = g;
         this.name = name;
         this.ast = ast;

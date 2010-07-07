@@ -46,6 +46,34 @@ import org.antlr.v4.automata.NFAState;
  *  on the path from this node thru the parent pointers to the root.
  */
 public class NFAContext {
+	/** This is similar to Bermudez's m constant in his LAR(m) where
+	 *  he bounds the stack so your state sets don't explode.  The main difference
+	 *  is that I bound only recursion on the stack, not the simple stack size.
+	 *  This looser constraint will let the conversion roam further to find
+	 *  lookahead to resolve a decision.
+	 *
+	 *  We restrict the size of an NFA configuration to be finite because a
+	 *  stack component may mention the same NFA invocation state at
+	 *  most m times.  Hence, the number of DFA states will not grow forever.
+	 *
+	 *  m=0 implies you can make as many calls as you want--you just
+	 *      can't ever visit a state that is on your rule invocation stack.
+	 * 	    I.e., you cannot ever recurse.
+	 *  m=1 implies you are able to recurse once (i.e., call a rule twice
+	 *      from the same place).
+	 *  ...
+	 *
+	 *  This tracks recursion to a rule specific to an invocation site!
+	 *  It does not detect multiple calls to a rule from different rule
+	 *  invocation states.  We are guaranteed to terminate because the
+	 *  stack can only grow as big as the number of NFA states * m.
+	 *
+	 *  I noticed that the Java grammar didn't work with m=1 in ANTLR v3,
+	 *  but it did work with m=4.  Let's set to 4. Recursion is sometimes
+	 *  needed to resolve some fixed lookahead decisions.
+	 */
+	public static int MAX_RECURSION_DEPTH_PER_NFA_CONFIG_STACK = 0;
+
 	public NFAContext parent;
 
     /** The NFA state following state that invoked another rule's start state
@@ -56,7 +84,7 @@ public class NFAContext {
 	/** Indicates this config led to recursive closure request. Everything
 	 *  derived from here is approximation.
 	 */
-	public boolean recursed;
+	public boolean approximated;
 
     /** Computing the hashCode is very expensive and closureBusy()
      *  uses it to track when it's seen a state|ctx before to avoid
@@ -152,19 +180,12 @@ public class NFAContext {
 		return true;
 	}
 
-	/** Given an NFA state number, how many times has the NFA-to-DFA
-	 *  conversion pushed that state on the stack?  In other words,
-	 *  the NFA state must be a rule invocation state and this method
-	 *  tells you how many times you've been to this state.  If none,
-	 *  then you have not called the target rule from this state before
-	 *  (though another NFA state could have called that target rule).
-	 *  If n=1, then you've been to this state before during this
-	 *  DFA construction and are going to invoke that rule again.
-	 *
-	 *  Note that many NFA states can invoke rule r, but we ignore recursion
-	 *  unless you hit the same rule invocation state again.
+	/** Given an NFA state number, how many times does it appear on stack?
+	 *  The NFA-to-DFA conversion pushes "return" states as it does
+	 *  rule invocations.  The NFA state number must be a rule return state
+	 *  (following state from invocation state).
 	 */
-	public int recursionDepthEmanatingFromState(int state) {
+	public int occurrences(int state) {
 		NFAContext sp = this;
 		int n = 0; // track recursive invocations of target from this state
 		//System.out.println("this.context is "+sp);

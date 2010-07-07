@@ -156,7 +156,7 @@ rule
 	     )
 		{
 		int numAlts = $RULE.getFirstChildWithType(BLOCK).getChildCount();
-		Rule r = new Rule(g, $name.text, (GrammarASTWithOptions)$RULE, numAlts);
+		Rule r = new Rule(g, $name.text, (RuleAST)$RULE, numAlts);
 		if ( g.isLexer() ) r.mode = currentMode;
 		if ( modifiers.size()>0 ) r.modifiers = modifiers;
 		rules.add(r);

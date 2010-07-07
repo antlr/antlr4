@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 NFABuilder.g 2010-06-14 12:35:33
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 NFABuilder.g 2010-06-16 13:46:55
 
 /*
  [The "BSD license"]
@@ -579,7 +579,7 @@ public class NFABuilder extends TreeParser {
 
 
                     match(input, Token.UP, null); 
-                    p = (atom10!=null?atom10.p:null);
+                    p = factory.label((atom10!=null?atom10.p:null));
 
                     }
                     break;
@@ -597,7 +597,7 @@ public class NFABuilder extends TreeParser {
 
 
                     match(input, Token.UP, null); 
-                    p = block11;
+                    p = factory.label(block11);
 
                     }
                     break;
@@ -615,7 +615,7 @@ public class NFABuilder extends TreeParser {
 
 
                     match(input, Token.UP, null); 
-                    p = (atom12!=null?atom12.p:null);
+                    p = factory.listLabel((atom12!=null?atom12.p:null));
 
                     }
                     break;
@@ -633,7 +633,7 @@ public class NFABuilder extends TreeParser {
 
 
                     match(input, Token.UP, null); 
-                    p = block13;
+                    p = factory.listLabel(block13);
 
                     }
                     break;

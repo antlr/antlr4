@@ -403,6 +403,14 @@ public class ParserNFAFactory implements NFAFactory {
 		return n;
 	}
 
+	public Handle label(Handle t) {
+		return t;
+	}
+
+	public Handle listLabel(Handle t) {
+		return t;
+	}
+
 	public NFAState newState(Class nodeType, GrammarAST node) {
 		try {
 			Constructor ctor = nodeType.getConstructor(NFA.class);

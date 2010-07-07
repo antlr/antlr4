@@ -106,9 +106,8 @@ public class SemanticPipeline {
 		if ( g.isLexer() ) assignLexerTokenTypes(g, collector);
 		else assignTokenTypes(g, collector, symcheck);
 
-		UseDefAnalyzer usedef = new UseDefAnalyzer();
-		usedef.checkRewriteElementsPresentOnLeftSide(g, collector.rules);
-		usedef.trackTokenRuleRefsInActions(g);
+		UseDefAnalyzer.checkRewriteElementsPresentOnLeftSide(g);
+		UseDefAnalyzer.trackTokenRuleRefsInActions(g);
 	}
 
 	void identifyStartRules(CollectSymbols collector) {

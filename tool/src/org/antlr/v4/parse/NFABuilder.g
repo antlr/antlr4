@@ -98,10 +98,10 @@ element returns [NFAFactory.Handle p]
 	;
 	
 labeledElement returns [NFAFactory.Handle p]
-	:	^(ASSIGN ID atom)			{$p = $atom.p;}
-	|	^(ASSIGN ID block)			{$p = $block.p;}
-	|	^(PLUS_ASSIGN ID atom)		{$p = $atom.p;}
-	|	^(PLUS_ASSIGN ID block)		{$p = $block.p;}
+	:	^(ASSIGN ID atom)			{$p = factory.label($atom.p);}
+	|	^(ASSIGN ID block)			{$p = factory.label($block.p);}
+	|	^(PLUS_ASSIGN ID atom)		{$p = factory.listLabel($atom.p);}
+	|	^(PLUS_ASSIGN ID block)		{$p = factory.listLabel($block.p);}
 	;
 
 treeSpec returns [NFAFactory.Handle p]

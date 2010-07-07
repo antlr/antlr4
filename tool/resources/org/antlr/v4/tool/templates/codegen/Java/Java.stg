@@ -319,9 +319,9 @@ public class <lexerName> extends Lexer {
 
     <namedActions.members>
 
+    <dfas>
     <actions>
     <sempreds>
-    <dfas>
     <pdas>
 }
 >>

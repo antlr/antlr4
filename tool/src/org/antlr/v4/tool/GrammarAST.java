@@ -1,10 +1,10 @@
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.BitSet;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.automata.NFAState;
+import org.antlr.v4.misc.BitSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.tree.CommonTree;
 
@@ -44,8 +44,8 @@ public class GrammarAST extends CommonTree {
 		GrammarAST t = null;
 		while ( work.size()>0 ) {
 			t = work.remove(0);
-			if ( types.member(t.getType()) ) nodes.add(this);
-			work.addAll(children);
+			if ( types.member(t.getType()) ) nodes.add(t);
+			if ( t.children!=null ) work.addAll(t.children);
 		}
 		return nodes;
 	}

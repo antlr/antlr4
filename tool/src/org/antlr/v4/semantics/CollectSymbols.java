@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 CollectSymbols.g 2010-06-14 12:35:34
+// $ANTLR 3.2.1-SNAPSHOT May 24, 2010 15:02:05 CollectSymbols.g 2010-06-16 13:46:56
 
 /*
  [The "BSD license"]
@@ -864,7 +864,7 @@ public class CollectSymbols extends org.antlr.v4.runtime.tree.TreeFilter {
             if ( state.backtracking==1 ) {
 
               		int numAlts = RULE8.getFirstChildWithType(BLOCK).getChildCount();
-              		Rule r = new Rule(g, (name!=null?name.getText():null), (GrammarASTWithOptions)RULE8, numAlts);
+              		Rule r = new Rule(g, (name!=null?name.getText():null), (RuleAST)RULE8, numAlts);
               		if ( g.isLexer() ) r.mode = currentMode;
               		if ( modifiers.size()>0 ) r.modifiers = modifiers;
               		rules.add(r);

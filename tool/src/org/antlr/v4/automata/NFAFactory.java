@@ -33,6 +33,10 @@ public interface NFAFactory {
 
 	NFAState newState();
 
+	Handle label(Handle t);
+
+	Handle listLabel(Handle t);
+
 	Handle tokenRef(TerminalAST node);
 
 	/** From set build single edge graph o->o-set->o.  To conform to

@@ -338,7 +338,7 @@ public class PredictionDFAFactory {
 	// if we have context info and we're at rule stop state, do
 	// local follow for invokingRule and global follow for other links
 	void ruleStopStateClosure(DFAState d, NFAConfig c, boolean collectPredicates) {
-		if ( !c.context.recursed ) {
+		if ( !c.context.approximated ) {
 			//System.out.println("dynamic FOLLOW of "+c.state+" context="+c.context);
 			if ( c.context.isEmpty() ) {
 				commonClosure(d, c, collectPredicates); // do global FOLLOW
@@ -389,25 +389,59 @@ public class PredictionDFAFactory {
 		for (int i=0; i<n; i++) {
 			Transition t = c.state.transition(i);
 			if ( t instanceof RuleTransition) {
-				NFAState retState = ((RuleTransition)t).followState;
+				RuleTransition rt = (RuleTransition) t;
+				// have we called rt.target before? If so, rt.followState will be in c.context
+				int depth = c.context.occurrences(rt.followState.stateNumber);
+				System.out.println("ctx "+c.context+" c.state "+c.state+" ret state is "+rt.followState.stateNumber);
+				// Even if not on context stack already, must consider self-recursion.
+				// If a state in rule r's NFA invokes r's start state (only state
+				// rule trans can invoke) then it's yet more recursion.
+				// So we count previous invocations of r first and then
+				// increment if we're jumping to start state from within r.
+				if ( c.state.rule == t.target.rule ) depth++;
+				System.out.println("recur depth "+depth);
+				// Detect an attempt to recurse too high
+				// if this context has hit the max recursions,
+				// don't allow it to enter rule again
 				NFAContext newContext = c.context;
-				if ( c.state.rule != t.target.rule &&
-					 !c.context.contains(((RuleTransition)t).followState) ) { // !recursive?
+				if ( depth > NFAContext.MAX_RECURSION_DEPTH_PER_NFA_CONFIG_STACK ) {
+					//System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+					// don't record recursion, but record we approximated so we know
+					// what to do at end of rule and for error msgs.
+					c.context.approximated = true;
+				}
+				else {
+					// otherwise, it's cool to (re)enter target of this rule ref
 					// first create a new context and push onto call tree,
 					// recording the fact that we are invoking a rule and
 					// from which state.
 					//System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+					NFAState retState = ((RuleTransition)t).followState;
 					newContext = new NFAContext(c.context, retState);
-				}
-				else {
-					//System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
-					// don't record recursion, but record we did so we know
-					// what to do at end of rule.
-					c.context.recursed = true;
 				}
 				// traverse epsilon edge to new rule
 				closure(d, new NFAConfig(c, t.target, newContext),
 						collectPredicates);
+
+//				NFAState retState = ((RuleTransition)t).followState;
+//				NFAContext newContext = c.context;
+//				if ( c.state.rule != t.target.rule &&
+//					 !c.context.contains(((RuleTransition)t).followState) ) { // !recursive?
+//					// first create a new context and push onto call tree,
+//					// recording the fact that we are invoking a rule and
+//					// from which state.
+//					//System.out.println("nonrecursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+//					newContext = new NFAContext(c.context, retState);
+//				}
+//				else {
+//					//System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+//					// don't record recursion, but record we did so we know
+//					// what to do at end of rule.
+//					c.context.recursed = true;
+//				}
+//				// traverse epsilon edge to new rule
+//				closure(d, new NFAConfig(c, t.target, newContext),
+//						collectPredicates);
 			}
 			else if ( t instanceof ActionTransition ) {
 				collectPredicates = false; // can't see past actions
@@ -500,14 +534,14 @@ public class PredictionDFAFactory {
 		MachineProbe probe = new MachineProbe(dfa);
 
 		for (DFAState d : resolver.ambiguousStates) {
-			Set<Integer> alts = resolver.getAmbiguousAlts(d);
-			List<Integer> sorted = new ArrayList<Integer>(alts);
+			Set<Integer> ambigAlts = Resolver.getAmbiguousAlts(d);
+			List<Integer> sorted = new ArrayList<Integer>(ambigAlts);
 			Collections.sort(sorted);
 			//System.err.println("ambig alts="+sorted);
 			List<DFAState> dfaStates = probe.getAnyDFAPathToTarget(d);
 			//System.out.print("path =");
 			for (DFAState d2 : dfaStates) {
-				System.out.print(" "+d2.stateNumber);
+				// System.out.print(" "+d2.stateNumber);
 			}
 			//System.out.println("");
 
@@ -541,6 +575,10 @@ public class PredictionDFAFactory {
 			if ( !d.resolvedWithPredicates &&
 				 (incompletelyCoveredAlts==null || incompletelyCoveredAlts.size()==0) )
 			{
+				Set<Integer> approxContextAlts = Resolver.getAltsWithApproximateContext(d);
+				Set<Integer> certainAmbiguousAlt = ambigAlts;
+				if ( approxContextAlts!=null ) certainAmbiguousAlt.removeAll(approxContextAlts);
+				//if ( ambigAlts.containsAll()
 				g.tool.errMgr.ambiguity(g.fileName, d, sorted, input, altPaths,
 												  hasPredicateBlockedByAction);
 			}
