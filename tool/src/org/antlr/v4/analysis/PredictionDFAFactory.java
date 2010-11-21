@@ -117,9 +117,9 @@ public class PredictionDFAFactory {
 //				closure(t);  // add any NFA states reachable via epsilon
 //			}
 
-			try {
+			//try {
 				closure(t);  // add any NFA states reachable via epsilon
-			}
+			//}
 //			catch (RecursionOverflowSignal ros) {
 //				recursionOverflowState = d;
 //				ErrorManager.recursionOverflow(g.fileName, d, ros.state, ros.altNum, ros.depth);
@@ -128,9 +128,6 @@ public class PredictionDFAFactory {
 //				abortedDueToMultipleRecursiveAltsAt = d;
 //				ErrorManager.multipleRecursiveAlts(g.fileName, d, mras.recursiveAltSet);
 //			}
-			catch (AnalysisTimeoutSignal at) {// TODO: nobody throws yet
-				g.tool.errMgr.analysisTimeout();
-			}
 
 			addTransition(d, label, t); // make d-label->t transition
 		}
@@ -301,6 +298,7 @@ public class PredictionDFAFactory {
 	 *  Rather than pass closureBusy everywhere, I use a field of this object.
 	 */
 	public void closure(DFAState d, NFAConfig c, boolean collectPredicates) {
+		System.out.println("closure of "+c+" in "+d);
 		if ( closureBusy.contains(c) ) return; // don't re-attempt same closure(c)
 		closureBusy.add(c);
 
@@ -358,7 +356,7 @@ public class PredictionDFAFactory {
 			invokingRule = c.context.returnState.rule;
 		}
 
-		//System.out.println("FOLLOW of "+c.state+" context="+c.context);
+		System.out.println("FOLLOW of "+c+" invoking rule="+invokingRule);
 		// follow all static FOLLOW links
 		int n = c.state.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
@@ -367,12 +365,12 @@ public class PredictionDFAFactory {
 			// Chase global FOLLOW links if they don't point at invoking rule
 			// else follow link to context state only
 			if ( t.target.rule != invokingRule ) {
-				//System.out.println("OFF TO "+t.target);
+				System.out.println("OFF TO "+t.target);
 				closure(d, new NFAConfig(c, t.target), collectPredicates);
 			}
 			else { // t.target is in invoking rule; only follow context's link
 				if ( t.target == c.context.returnState ) {
-					//System.out.println("OFF TO CALL SITE "+t.target);
+					System.out.println("OFF TO CALL SITE "+t.target);
 					// go only to specific call site; pop context
 					NFAContext newContext = c.context.parent; // "pop" invoking state
 					closure(d, new NFAConfig(c, t.target, newContext),
@@ -385,6 +383,7 @@ public class PredictionDFAFactory {
 
 
 	void commonClosure(DFAState d, NFAConfig c, boolean collectPredicates) {
+		//System.out.println("closure of "+c);
 		int n = c.state.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
 			Transition t = c.state.transition(i);
@@ -392,25 +391,26 @@ public class PredictionDFAFactory {
 				RuleTransition rt = (RuleTransition) t;
 				// have we called rt.target before? If so, rt.followState will be in c.context
 				int depth = c.context.occurrences(rt.followState.stateNumber);
-				System.out.println("ctx "+c.context+" c.state "+c.state+" ret state is "+rt.followState.stateNumber);
+				//System.out.println("ctx "+c.context+" c.state "+c.state+" ret state is "+rt.followState.stateNumber);
 				// Even if not on context stack already, must consider self-recursion.
 				// If a state in rule r's NFA invokes r's start state (only state
 				// rule trans can invoke) then it's yet more recursion.
 				// So we count previous invocations of r first and then
 				// increment if we're jumping to start state from within r.
 				if ( c.state.rule == t.target.rule ) depth++;
-				System.out.println("recur depth "+depth);
+//				System.out.println("recur depth "+depth);
 				// Detect an attempt to recurse too high
 				// if this context has hit the max recursions,
 				// don't allow it to enter rule again
-				NFAContext newContext = c.context;
-				if ( depth > NFAContext.MAX_RECURSION_DEPTH_PER_NFA_CONFIG_STACK ) {
-					//System.out.println("# recursive invoke of "+t.target+" ret to "+retState+" ctx="+c.context);
+				NFAContext newContext = null;
+				if ( c.context.approximated || depth > NFAContext.MAX_RECURSION_DEPTH_PER_NFA_CONFIG_STACK ) {
+//					System.out.println("# recursive invoke of "+t.target+" ret to "+rt.followState+" ctx="+c.context);
 					// don't record recursion, but record we approximated so we know
 					// what to do at end of rule and for error msgs.
-					c.context.approximated = true;
+					newContext = new NFAContext(c.context);
+					newContext.approximated = true;
 				}
-				else {
+				else if ( !c.context.approximated ) {// if not already approximating
 					// otherwise, it's cool to (re)enter target of this rule ref
 					// first create a new context and push onto call tree,
 					// recording the fact that we are invoking a rule and
