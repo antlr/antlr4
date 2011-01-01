@@ -10,7 +10,7 @@ public class jUnitBaseTest {
     public String lexerClassName;
     public String parserClassName;
     public String adaptorClassName;
-    
+
     public Object execParser(
         String ruleName,
         String input,
@@ -22,7 +22,7 @@ public class jUnitBaseTest {
         Class[] lexArgTypes = new Class[]{CharStream.class};
         Constructor lexConstructor = lexerClass.getConstructor(lexArgTypes);
         Object[] lexArgs = new Object[]{is};
-        Lexer lexer = (Lexer)lexConstructor.newInstance(lexArgs);
+		TokenSource lexer = (TokenSource)lexConstructor.newInstance(lexArgs);
         is.setLine(scriptLine);
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
