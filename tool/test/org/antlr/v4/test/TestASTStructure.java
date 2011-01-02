@@ -2,11 +2,12 @@ package org.antlr.v4.test;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
+import org.antlr.v4.gunit.gUnitBase;
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.*;
 
-public class TestASTStructure extends org.antlr.v4.gunit.jUnitBaseTest {	
+public class TestASTStructure extends gUnitBase {
 	@Before public void setup() {
 	    lexerClassName = "org.antlr.v4.parse.ANTLRLexer";
 	    parserClassName = "org.antlr.v4.parse.ANTLRParser";
@@ -423,5 +424,5 @@ public class TestASTStructure extends org.antlr.v4.gunit.jUnitBaseTest {
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
 		Object expecting = "(= x (^ A))";
 		assertEquals("testing rule element", expecting, actual);
-	} 
+	}
 }

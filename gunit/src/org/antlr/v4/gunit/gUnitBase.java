@@ -6,7 +6,7 @@ import org.antlr.runtime.tree.TreeAdaptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-public class jUnitBaseTest {
+public class gUnitBase {
     public String lexerClassName;
     public String parserClassName;
     public String adaptorClassName;

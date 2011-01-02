@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.*;
 
-public class <className> extends org.antlr.v4.gunit.jUnitBaseTest {	
+public class <className> extends org.antlr.v4.gunit.gUnitBase {
 	@Before public void setup() {
 	    lexerClassName = "<options.lexer>";
 	    parserClassName = "<options.parser>";
