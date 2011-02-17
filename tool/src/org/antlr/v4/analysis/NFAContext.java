@@ -72,7 +72,7 @@ public class NFAContext {
 	 *  but it did work with m=4.  Let's set to 4. Recursion is sometimes
 	 *  needed to resolve some fixed lookahead decisions.
 	 */
-	public static int MAX_RECURSION_DEPTH_PER_NFA_CONFIG_STACK = 0;
+	public static int MAX_RECURSION_DEPTH_PER_NFA_CONFIG_STACK = 1;
 
 	public NFAContext parent;
 
@@ -107,6 +107,14 @@ public class NFAContext {
             this.cachedHashCode += parent.cachedHashCode;
         }
     }
+
+	/** Dup context so we can turn on approximated or whatever */
+	public NFAContext(NFAContext proto) {
+		this.parent = proto.parent;
+		this.returnState = proto.returnState;
+		this.cachedHashCode = proto.cachedHashCode;
+		this.approximated = proto.approximated;
+	}
 
 	public static NFAContext EMPTY() { return new NFAContext(null, null); }
 

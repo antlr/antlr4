@@ -100,8 +100,8 @@ public class DFAMinimizer {
 						boolean preds_present = p_preds!=null || q_preds!=null;
 						DFAState pt = p.target(label);
 						DFAState qt = q.target(label);
-						System.out.println(p.stateNumber+"-"+label.toString(dfa.g)+"->"+pt);
-						System.out.println(q.stateNumber+"-"+label.toString(dfa.g)+"->"+qt);
+//						System.out.println(p.stateNumber+"-"+label.toString(dfa.g)+"->"+pt);
+//						System.out.println(q.stateNumber+"-"+label.toString(dfa.g)+"->"+qt);
 						// if DISTINCT(p,q) is empty and
 						//    DISTINCT(?(p, a),?(q, a)) is not empty
 						// then DISTINCT(p,q) = a.
@@ -137,11 +137,11 @@ public class DFAMinimizer {
 		IntervalSet[] stateToSet = new IntervalSet[n];
 		for (int i=0; i<n; i++) stateToSet[i] = new IntervalSet();
 
-		System.out.println("equiv pairs:");
+		//System.out.println("equiv pairs:");
 		for (int i=1; i<n; i++) {
 			for (int j=0; j<i; j++) {
 				if ( !distinct[i][j] ) {
-					System.out.println(i+","+j);
+		//			System.out.println(i+","+j);
 					stateToSet[i].add(i);
 					stateToSet[i].add(j);
 					stateToSet[j].add(i);
@@ -150,7 +150,7 @@ public class DFAMinimizer {
 			}
 		}
 
-		System.out.println("equiv sets:");
+		//System.out.println("equiv sets:");
 		OrderedHashSet<IntervalSet> uniq = new OrderedHashSet<IntervalSet>();
 		for (int i=0; i<stateToSet.length; i++) {
 			IntervalSet s = stateToSet[i];
@@ -159,7 +159,7 @@ public class DFAMinimizer {
 			System.out.println(s);
 			uniq.add(s);
 		}
-		System.out.println("uniq sets = "+uniq);
+		//System.out.println("uniq sets = "+uniq);
 		if ( uniq.size()==dfa.states.size() ) {
 			System.out.println("was already minimal");
 			return false;
@@ -183,7 +183,8 @@ public class DFAMinimizer {
 				}
 			}
 		}
-		for (DFAState s : oldToNewStateMap) System.out.println(s);
+//		for (DFAState s : oldToNewStateMap) System.out.println(s);
+
 		// now do edges
 //		for (IntervalSet equivStates : uniq) {
 //			List<Interval> intervals_in_state_set = equivStates.getIntervals();
@@ -220,7 +221,7 @@ public class DFAMinimizer {
 				if ( s==null ) { s = new IntervalSet(e.label); targetToEdges.put(e.target, s); }
 				else s.addAll(e.label);
 			}
-			System.out.println("state "+d.stateNumber+" has "+d.edges.size()+" edges but "+targetToEdges.size()+" targets");
+//			System.out.println("state "+d.stateNumber+" has "+d.edges.size()+" edges but "+targetToEdges.size()+" targets");
 			d.edges.clear();
 			for (DFAState target : targetToEdges.keySet()) {
 				d.addEdge(new Edge(target, targetToEdges.get(target)));
@@ -233,7 +234,7 @@ public class DFAMinimizer {
 			for (Interval I : intervals_in_state_set) {
 				for (int i=I.a; i<=I.b; i++) {
 					if ( oldToNewStateMap[i].stateNumber != i ) { // if not one of our merged states
-						System.out.println("kill "+i);
+//						System.out.println("kill "+i);
 						DFAState d = dfa.states.get(i);
 						dfa.stateSet.remove(d);
 						if ( d.isAcceptState ) {

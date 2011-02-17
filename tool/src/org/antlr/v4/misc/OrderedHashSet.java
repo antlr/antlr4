@@ -1,16 +1,13 @@
 package org.antlr.v4.misc;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /** A HashMap that remembers the order that the elements were added.
  *  You can alter the ith element with set(i,value) too :)  Unique list.
  *  I need the replace/set-element-i functionality so I'm subclassing
  *  OrderedHashSet.
  */
-public class OrderedHashSet<T> extends HashSet<T> {
+public class OrderedHashSet<T> extends LinkedHashSet<T> {
     /** Track the elements as they are added to the set */
     protected List<T> elements = new ArrayList<T>();
 
