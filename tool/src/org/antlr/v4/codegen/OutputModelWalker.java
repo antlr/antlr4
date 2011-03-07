@@ -5,8 +5,8 @@ import org.antlr.v4.codegen.src.OutputModelObject;
 import org.antlr.v4.tool.ErrorType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.compiler.CompiledST;
 import org.stringtemplate.v4.compiler.FormalArgument;
-import org.stringtemplate.v4.misc.BlankST;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -44,19 +44,19 @@ public class OutputModelWalker {
 		String templateName = omo.getClass().getSimpleName();
 		if ( templateName == null ) {
 			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, omo.getClass().getSimpleName());
-			return new BlankST();
+			return new ST();
 		}
 		ST st = templates.getInstanceOf(templateName);
 		if ( st == null ) {
 			tool.errMgr.toolError(ErrorType.CODE_GEN_TEMPLATES_INCOMPLETE, templateName);
-			return new BlankST();
+			return new ST();
 		}
-		if ( st.impl.formalArguments == FormalArgument.UNKNOWN ) {
+		if ( st.impl.formalArguments == null ) {
 			tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, "<none>");
 			return st;
 		}
 
-		LinkedHashMap<String,FormalArgument> formalArgs = st.impl.formalArguments;
+		Map<String,FormalArgument> formalArgs = st.impl.formalArguments;
 		Set<String> argNames = formalArgs.keySet();
 		Iterator<String> arg_it = argNames.iterator();
 

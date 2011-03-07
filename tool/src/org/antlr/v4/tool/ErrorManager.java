@@ -92,7 +92,7 @@ public class ErrorManager {
 
 	public ErrorManager(Tool tool) {
 		this.tool = tool;
-		org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
+		//org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
 		// it is inefficient to set the default locale here if another
 		// piece of code is going to set the locale, but that would
 		// require that a user call an init() function or something.  I prefer
@@ -102,7 +102,7 @@ public class ErrorManager {
 		// the user might have specified one on the command line
 		// if not, or if the user has given an illegal value, we will fall back to "antlr"
 		setFormat("antlr");
-		org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);
+		//org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);
 	}
 
 	public void resetErrorState() {

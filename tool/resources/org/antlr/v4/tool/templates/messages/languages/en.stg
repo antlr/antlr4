@@ -305,7 +305,7 @@ TOKEN_NONDETERMINISM(input,conflictingTokens,paths,disabled,hasPredicateBlockedB
 <<
 <if(paths)>
 Decision can match input such as "<input>" using multiple alternatives:
-<paths:{  alt <it.alt> via NFA path <it.states; separator=","><\n>}>
+<paths:{it |  alt <it.alt> via NFA path <it.states; separator=","><\n>}>
 <else>
 Multiple token rules can match input such as "<input>": <conflictingTokens; separator=", "><\n>
 <endif>
