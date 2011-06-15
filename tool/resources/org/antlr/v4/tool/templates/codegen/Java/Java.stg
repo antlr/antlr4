@@ -1,0 +1,491 @@
+javaTypeInitMap ::= [
+	"int":"0",
+	"long":"0",
+	"float":"0.0f",
+	"double":"0.0",
+	"boolean":"false",
+	"byte":"0",
+	"short":"0",
+	"char":"0",
+	default:"null" // anything other than an atomic type
+]
+
+// args must be <object-model-object>, <fields-resulting-in-STs>
+
+ParserFile(file, parser, namedActions) ::= <<
+// $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
+<namedActions.header>
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.EarlyExitException;
+import org.antlr.v4.runtime.ParserSharedState;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.FailedPredicateException;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.runtime.*;
+
+<parser>
+>>
+
+Parser(parser, scopes, funcs, atn, actions, sempreds) ::= <<
+public class <parser.name> extends Parser {
+    public static final int
+        <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
+    public static final String[] tokenNames = {
+        "\<INVALID>", "\<INVALID>", "\<INVALID>",
+        <parser.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>
+    };
+    public static final String[] ruleNames = {
+        "\<INVALID>",
+        <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
+    };
+    <scopes>
+    <namedActions.members>
+    <parser:ctor()>
+    <funcs; separator="\n">
+
+    @Override
+    public String[] getTokenNames() { return tokenNames; }
+    @Override
+    public String[] getRuleNames() { return ruleNames; }
+	@Override
+	public ATN getATN() { return _ATN; }
+
+    <dumpActions(actions,sempreds)>
+    <atn>
+}
+>>
+
+dumpActions(actions,sempreds) ::= <<
+<if(sempreds)>
+	public boolean sempred(int ruleIndex, int predIndex) {
+		switch ( predIndex ) {
+		    <sempreds:{index|
+case <index> : return <sempreds.(index)>;}; separator="\n">
+    	}
+		return true;
+	}
+<endif>
+<if(actions)>
+	public void action(int ruleIndex, int actionIndex) {
+		switch ( actionIndex ) {
+		    <actions:{index|
+case <index> : <actions.(index)> break;}; separator="\n">
+    	}
+	}
+<endif>
+>>
+
+ctor(p) ::= <<
+public <p.name>(TokenStream input) {
+    this(input, new ParserSharedState());
+}
+public <p.name>(TokenStream input, ParserSharedState state) {
+    super(input, state);
+    _interp = new ParserInterpreter(this,_ATN);
+}
+>>
+
+/*
+   // S.g:5:1: b returns [String q, float x] : A ;
+    public final S.b_return b() throws RecognitionException {
+        b_stack.push(new b_scope());
+        S.b_return retval = new S.b_return();
+*/
+
+RuleFunction(currentRule,code,decls,context,scope,namedActions,finallyAction) ::= <<
+<context>
+<scope>
+
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(ParserRuleContext _ctx) throws RecognitionException {
+    _ctx = new ParserRuleContext(_ctx, <currentRule.startState>);
+    state.ctx = _ctx;
+<if(currentRule.scope)>
+    <currentRule.scope.name>_stack.push(new <currentRule.scope.name>());
+<endif>
+    //System.out.println("enter "+ruleNames[<currentRule.index>]);
+    <currentRule.globalScopesUsed:{s | <s>_stack.push(new <s>());}; separator="\n">
+    <namedActions.init>
+    <decls; separator="\n">
+	try {
+	    <code>
+	}
+	catch (RecognitionException re) {
+		reportError(re);
+		recover();
+	}
+	finally {
+        <namedActions.after>
+        <currentRule.globalScopesUsed:{s | <s>_stack.pop();}; separator="\n">
+        <if(currentRule.scope)><currentRule.scope.name>_stack.pop();<endif>
+        <finallyAction>
+        state.ctx = (ParserRuleContext)_ctx.parent;
+    	//System.out.println("exit "+ruleNames[<currentRule.index>]);
+	}
+    return _ctx;
+}
+>>
+
+/** Convenience method to call from outside */
+StartRuleFunction(f) ::= <<
+<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><f.ctxType> <f.name>(<f.args; separator=", ">) throws RecognitionException {
+    return <f.name>(new <f.ctxType>(<f.args:{a | <a.name>, }>LABitSet.EOF_SET));
+}
+>>
+
+CodeBlock(c, ops) ::= <<
+<ops; separator="\n">
+>>
+
+LL1AltBlock(choice, alts, error) ::= <<
+switch ( state.input.LA(1) ) {
+	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n">
+	default :
+		<error>
+}
+>>
+
+LL1OptionalBlock(choice, alts, error) ::= <<
+switch ( state.input.LA(1) ) {
+	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n">
+	default :
+		<error>
+}
+>>
+
+LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
+<preamble; separator="\n">
+if ( <expr> ) {
+    <alts; separator="\n">
+}
+<!else if ( !(<followExpr>) ) <error>!>
+>>
+
+LL1StarBlock(choice, alts, sync) ::= <<
+<choice.loopLabel>:
+while (true) {
+	switch ( state.input.LA(1) ) {
+		<choice.altLook,alts:{look,alt| <cases(look)>
+	<alt>
+		break;}; separator="\n">
+		<cases(choice.exitLook)>
+		    break <choice.loopLabel>;
+	}
+    //<sync>
+}
+>>
+
+LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration, sync) ::= <<
+<preamble; separator="\n">
+while ( <loopExpr> ) {
+    <alts; separator="\n">
+    <iteration>
+    //<sync>
+}
+>>
+
+LL1PlusBlock(choice, alts, iteration, loopExpr, sync, error, iterationSync) ::= <<
+//<sync>
+do {
+	switch ( state.input.LA(1) ) {
+		<choice.altLook,alts:{look,alt| <cases(look)>
+	<alt>
+	break;}; separator="\n">
+        default :
+            <error>
+	}
+    <iteration>
+    //<iterationSync>
+} while ( <loopExpr> );
+>>
+
+LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration,
+                      sync, iterationSync) ::=
+<<
+//<sync>
+<preamble; separator="\n">
+do {
+    <alts; separator="\n">
+    <iteration>
+//    <iterationSync>
+} while ( <loopExpr> );
+>>
+
+// LL(*) stuff
+
+AltBlock(choice, alts, error) ::= <<
+switch ( _interp.adaptivePredict(state.input,<choice.decision>,_ctx) ) {
+	<alts:{alt |
+case <i>:
+	<alt>
+	break;}; separator="\n">
+	default :
+		<error>
+}
+>>
+
+OptionalBlock(choice, alts, error) ::= <<
+switch ( _interp.adaptivePredict(state.input,<choice.decision>,_ctx) ) {
+	<alts:{alt |
+case <i>:
+	<alt>
+	break;}; separator="\n">
+}
+>>
+
+StarBlock(choice, alts, sync) ::= <<
+int _alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+while ( _alt<choice.uniqueID>!=<choice.exitAlt> ) {
+	switch ( _alt<choice.uniqueID> ) {
+		<alts:{alt|
+case <i>:
+	<alt>
+	break;}; separator="\n">
+	}
+	_alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+}
+>>
+
+PlusBlock(choice, alts, error) ::= <<
+int _alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+do {
+	switch ( _alt<choice.uniqueID> ) {
+		<alts:{alt|
+case <i>:
+	<alt>
+	break;}; separator="\n">
+	    default :
+		    <error>
+	}
+	_alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+} while ( _alt<choice.uniqueID>!=<choice.exitAlt> );
+>>
+
+Sync(s) ::= "sync(<s.expecting.name>);"
+
+ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this,_ctx);"
+
+TestSet(s) ::= <<
+_ctx.s = <s.stateNumber>;
+<s.set.name>.member(state.input.LA(1))
+>>
+
+TestSetInline(s) ::= <<
+<s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+>>
+
+cases(ttypes) ::= <<
+<ttypes:{t | case <t>:}; separator="\n">
+>>
+
+InvokeRule(r) ::= <<
+_ctx.s = <r.stateNumber>;
+<if(r.labels)><r.labels:{l | <l> = }><endif><r.name>(_ctx<r.argExprs:{e| ,<e>}>);
+>>
+
+MatchToken(m) ::= <<
+_ctx.s = <m.stateNumber>;
+<if(m.labels)><m.labels:{l | <l> = }>(Token)<endif>match(<m.name>);
+>>
+
+// ACTION STUFF
+
+Action(a, chunks) ::= "<chunks>"
+
+ForcedAction(a, chunks) ::= "<chunks>"
+
+SemPred(p, chunks) ::= <<
+if (!(<chunks>)) throw new FailedPredicateException(this, state.input, "<currentRule.name>", ""<!"<chunks>"!>);
+>>
+
+ActionText(t) ::= "<t.text>"
+ArgRef(a) ::= "_ctx.<a.name>"
+RetValueRef(a) ::= "_ctx.<a.name>"
+QRetValueRef(a) ::= "<a.dict>.<a.name>"
+/** How to translate $tokenLabel */
+TokenRef(t) ::= "<t.name>"
+SetAttr(s,rhsChunks) ::= "_ctx.<s.name> = <rhsChunks>;"
+SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
+
+TokenPropertyRef_text(t) ::= "(<t.label>!=null?<t.label>.getText():null)"
+TokenPropertyRef_type(t) ::= "(<t.label>!=null?<t.label>.getType():0)"
+TokenPropertyRef_line(t) ::= "(<t.label>!=null?<t.label>.getLine():0)"
+TokenPropertyRef_pos(t) ::= "(<t.label>!=null?<t.label>.getCharPositionInLine():0)"
+TokenPropertyRef_channel(t) ::= "(<t.label>!=null?<t.label>.getChannel():0)"
+TokenPropertyRef_index(t) ::= "(<t.label>!=null?<t.label>.getTokenIndex():0)"
+TokenPropertyRef_tree(t) ::= "<t.label>_tree"
+TokenPropertyRef_int(t) ::= "(<t.label>!=null?Integer.valueOf(<t.label>.getText()):0)"
+
+RulePropertyRef_start(r) ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.start):null)"
+RulePropertyRef_stop(r)  ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.stop):null)"
+RulePropertyRef_tree(r)  ::= "(<r.label>!=null?((<file.ASTLabelType>)<r.label>.tree):null)"
+RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)state.input).toString(<r.label>.start,<r.label>.stop):null)"
+RulePropertyRef_st(r)    ::= "(<r.label>!=null?<r.label>.st:null)"
+
+DynScopeRef(s)           ::= "<s.scope>_stack"
+DynScopeAttrRef(s)       ::= "<s.scope>_stack.peek().<s.attr>"
+DynScopeAttrRef_negIndex(s, indexChunks) ::=
+    "<s.scope>_stack.get(<s.scope>_stack.size()-<indexChunks>-1).<s.attr>"
+DynScopeAttrRef_index(s, indexChunks)    ::=
+    "<s.scope>_stack.get(<indexChunks>).<s.attr>"
+SetDynScopeAttr(s, rhsChunks)            ::=
+    "<s.scope>_stack.peek().<s.attr> =<rhsChunks>;"
+SetDynScopeAttr_negIndex(s, indexChunks, rhsChunks) ::=
+    "<s.scope>_stack.get(<s.scope>_stack.size()-<indexChunks>-1).<s.attr> =<rhsChunks>;"
+SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
+    "<s.scope>_stack.get(<indexChunks>).<s.attr> =<rhsChunks>;"
+
+AddToList(a) ::= "<a.listName>.add(<first(a.opWithResultToAdd.labels)>);"
+
+TokenDecl(t) ::= "Token <t.name>;"
+TokenTypeDecl(t) ::= "int <t.name>;"
+TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
+RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
+
+CaptureNextToken(d) ::= "<d.varName> = state.input.LT(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = state.input.LA(1);"
+
+StructDecl(s,attrs) ::= <<
+public static class <s.name> extends ParserRuleContext {
+    <attrs:{a | <a>;}; separator="\n">
+<if(s.ctorAttrs)>
+    public <s.name>(<s.ctorAttrs:{a | <a>,}> LABitSet follow) {
+        super(follow);
+        <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+    }
+<endif>
+};
+>>
+
+DynamicScopeStruct(d,attrs) ::= <<
+public static class <d.name> {
+    <attrs:{a | <a>;}; separator="\n">
+};
+public QStack\<<d.name>\> <d.name>_stack = new QStack\<<d.name>\>();
+>>
+
+AttributeDecl(d) ::= "<d.decl>"
+
+DFADecl(dfa) ::= <<
+// define <dfa.name>
+>>
+
+BitSetDecl(b) ::= <<
+public static final LABitSet <b.name>=new LABitSet(new long[]{<b.hexWords:{it|<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
+>>
+
+LexerFile(lexerFile, lexer, namedActions) ::= <<
+// $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>
+<namedActions.header>
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.LexerSharedState;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.runtime.*;
+
+<lexer>
+>>
+
+Lexer(lexer, atn, actions, sempreds) ::= <<
+public class <lexer.name> extends Lexer {
+    public static final int
+        <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+    <lexer.modes:{m| public static final int <m> = <i0>;}; separator="\n">
+
+    public static final String[] tokenNames = {
+        "\<INVALID>", "\<INVALID>", "\<INVALID>",
+        <lexer.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>
+    };
+    public static final String[] ruleNames = {
+        "\<INVALID>",
+        <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
+    };
+
+    <namedActions.members>
+
+    public <lexer.name>(CharStream input) {
+        this(input, new LexerSharedState());
+    }
+    public <lexer.name>(CharStream input, LexerSharedState state) {
+        super(input,state);
+		_interp = new LexerInterpreter(this,_ATN);
+    }
+
+    public String getGrammarFileName() { return "<lexerFile.fileName>"; }
+    @Override
+    public String[] getTokenNames() { return tokenNames; }
+    @Override
+    public String[] getRuleNames() { return ruleNames; }
+	@Override
+	public ATN getATN() { return _ATN; }
+
+    <lexer.namedActions.members>
+
+    <dumpActions(actions,sempreds)>
+    <atn>
+}
+>>
+
+
+SerializedATN(model) ::= <<
+public static final String _serializedATN =
+	"<model.serialized; wrap={"+<\n>"}, anchor>";
+public static final ATN _ATN =
+    ATNInterpreter.deserialize(_serializedATN.toCharArray());
+static {
+    org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
+	//System.out.println(dot.getDOT(_ATN.decisionToATNState.get(0)));
+}
+>>
+
+actionMethod(name, ruleIndex, actions) ::= <<
+public void <name>_actions(int action) {
+    System.out.println("exec action "+action);
+    switch ( action ) {
+    <actions:{a |
+    case <i0> :
+        <a>
+        break;
+    }>
+    }
+}<\n>
+>>
+
+sempredMethod(name, ruleIndex, preds) ::= <<
+public boolean <name>_sempreds(int pred) {
+    switch ( pred ) {
+    <preds:{p |
+    case <i0> :
+        return <p>;
+    }>
+    default : return false;
+    }
+}<\n>
+>>
+
+/** Using a type to init value map, try to init a type; if not in table
+ *  must be an object, default value is "null".
+ */
+initValue(typeName) ::= <<
+<javaTypeInitMap.(typeName)>
+>>
+
+codeFileExtension() ::= ".java"
+
+true() ::= "true"
+false() ::= "false"
