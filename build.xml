@@ -1,0 +1,5 @@
+<project name="ANTLRv4">
+
+<property file="build.properties"/>
+
+</project>

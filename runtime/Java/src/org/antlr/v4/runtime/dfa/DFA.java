@@ -1,0 +1,107 @@
+/*
+ [BSD]
+  Copyright (c) 2010 Terence Parr
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.antlr.v4.runtime.dfa;
+
+import org.antlr.v4.runtime.atn.ATNState;
+
+import java.util.*;
+
+public class DFA {
+	/** A set of all DFA states. Use Map so we can get old state back
+	 *  (Set only allows you to see if it's there).
+     */
+    public Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
+	public DFAState s0;
+	public int decision;
+//	public int maxTokenType;
+
+	/** From which ATN state did we create this DFA? */
+	public ATNState atnStartState;
+
+	/** Does at least one state have a conflict? Mainly used as return value
+	 *  from predictATN()
+	 */
+	public boolean conflict;
+
+	public DFA(ATNState atnStartState) { this.atnStartState = atnStartState; }
+//	public DFA(int maxTokenType) { this.maxTokenType = maxTokenType; }
+
+/*
+	public void addAll(Collection<DFAState> states) {
+		for (DFAState p : states) {
+			//addDFAEdge(p, t, q);
+		}
+	}
+
+	public void addDFAEdge(OrderedHashSet<ATNConfig> p,
+						   int t,
+						   OrderedHashSet<ATNConfig> q)
+	{
+//		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
+		DFAState from = addDFAState(p);
+		DFAState to = addDFAState(q);
+		addDFAEdge(from, t, to);
+	}
+
+	public void addDFAEdge(DFAState p, int t, DFAState q) {
+		if ( p.edges==null ) {
+			p.edges = new DFAState[maxTokenType+1]; // TODO: make adaptive
+		}
+		p.edges[t] = q; // connect
+	}
+
+	protected DFAState addDFAState(OrderedHashSet<ATNConfig> configs) {
+		DFAState proposed = new DFAState(configs);
+		DFAState existing = states.get(proposed);
+		DFAState p;
+		if ( existing!=null ) p = existing;
+		else {
+			proposed.stateNumber = states.size();
+			proposed.configs = new OrderedHashSet<ATNConfig>();
+			proposed.configs.addAll(configs);
+			states.put(proposed, proposed);
+			p = proposed;
+		}
+		return p;
+	}
+	 */
+
+	public String toString() { return toString(null); }
+
+	public String toString(String[] tokenNames) {
+		if ( s0==null ) return "";
+		DFASerializer serializer = new DFASerializer(this,tokenNames);
+		return serializer.toString();
+	}
+
+	public String toLexerString() {
+		if ( s0==null ) return "";
+		DFASerializer serializer = new LexerDFASerializer(this);
+		return serializer.toString();
+	}
+}
