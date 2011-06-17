@@ -27,8 +27,6 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import org.antlr.runtime.misc.FastQueue;
-
 import java.util.NoSuchElementException;
 
 /** A lookahead queue that knows how to mark/release locations

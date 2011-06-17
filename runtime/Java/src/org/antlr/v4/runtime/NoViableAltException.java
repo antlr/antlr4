@@ -27,8 +27,8 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.analysis.ATNConfig;
 import org.antlr.v4.misc.OrderedHashSet;
+import org.antlr.v4.runtime.atn.ATNConfig;
 
 public class NoViableAltException extends RecognitionException {
 	/** Prediction began at what input index? */

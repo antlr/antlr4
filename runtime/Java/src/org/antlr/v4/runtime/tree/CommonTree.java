@@ -27,9 +27,10 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.runtime.BitSet;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.gui.ASTViewer;
+
+import java.util.Set;
 
 /** A tree node that is wrapper for a Token object.  After 3.0 release
  *  while building tree rewrite stuff, it became clear that computing
@@ -194,12 +195,12 @@ public class CommonTree extends BaseTree {
     }
 
 	// TODO: don't include this node!!
-	public CommonTree getFirstDescendantWithType(BitSet types) {
-		if ( types.member(getType()) ) return this;
+	public CommonTree getFirstDescendantWithType(Set<Integer> types) {
+		if ( types.contains(getType()) ) return this;
 		if ( children==null ) return null;
 		for (Object c : children) {
 			CommonTree t = (CommonTree)c;
-			if ( types.member(t.getType()) ) return t;
+			if ( types.contains(t.getType()) ) return t;
 			CommonTree d = t.getFirstDescendantWithType(types);
 			if ( d!=null ) return d;
 		}

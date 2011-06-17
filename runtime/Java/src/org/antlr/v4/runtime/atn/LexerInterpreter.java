@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.analysis.ATNConfig;
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;

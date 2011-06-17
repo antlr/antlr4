@@ -1,11 +1,8 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.runtime.CharStream;
-import org.antlr.v4.analysis.ATNConfig;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.tool.DOTGenerator;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -37,7 +34,7 @@ public class ParserInterpreter extends ATNInterpreter {
 		this.parser = parser;
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
 		decisionToDFA = new DFA[atn.getNumberOfDecisions()+1];
-		DOTGenerator dot = new DOTGenerator(null);
+//		DOTGenerator dot = new DOTGenerator(null);
 //		System.out.println(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}

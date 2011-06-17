@@ -38,7 +38,6 @@ public class DFA {
     public Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
 	public DFAState s0;
 	public int decision;
-//	public int maxTokenType;
 
 	/** From which ATN state did we create this DFA? */
 	public ATNState atnStartState;
@@ -49,47 +48,6 @@ public class DFA {
 	public boolean conflict;
 
 	public DFA(ATNState atnStartState) { this.atnStartState = atnStartState; }
-//	public DFA(int maxTokenType) { this.maxTokenType = maxTokenType; }
-
-/*
-	public void addAll(Collection<DFAState> states) {
-		for (DFAState p : states) {
-			//addDFAEdge(p, t, q);
-		}
-	}
-
-	public void addDFAEdge(OrderedHashSet<ATNConfig> p,
-						   int t,
-						   OrderedHashSet<ATNConfig> q)
-	{
-//		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
-		DFAState from = addDFAState(p);
-		DFAState to = addDFAState(q);
-		addDFAEdge(from, t, to);
-	}
-
-	public void addDFAEdge(DFAState p, int t, DFAState q) {
-		if ( p.edges==null ) {
-			p.edges = new DFAState[maxTokenType+1]; // TODO: make adaptive
-		}
-		p.edges[t] = q; // connect
-	}
-
-	protected DFAState addDFAState(OrderedHashSet<ATNConfig> configs) {
-		DFAState proposed = new DFAState(configs);
-		DFAState existing = states.get(proposed);
-		DFAState p;
-		if ( existing!=null ) p = existing;
-		else {
-			proposed.stateNumber = states.size();
-			proposed.configs = new OrderedHashSet<ATNConfig>();
-			proposed.configs.addAll(configs);
-			states.put(proposed, proposed);
-			p = proposed;
-		}
-		return p;
-	}
-	 */
 
 	public String toString() { return toString(null); }
 

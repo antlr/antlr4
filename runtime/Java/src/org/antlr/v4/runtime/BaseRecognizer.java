@@ -27,9 +27,8 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.analysis.ATNConfig;
 import org.antlr.v4.misc.*;
-import org.antlr.v4.runtime.atn.ParserInterpreter;
+import org.antlr.v4.runtime.atn.*;
 
 import java.util.*;
 

@@ -1,10 +1,9 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.analysis.ATNConfig;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
 
 import java.util.*;
 

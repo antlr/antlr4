@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.analysis.LL1Analyzer;
 import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.runtime.RuleContext;
