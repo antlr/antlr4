@@ -190,9 +190,8 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** Build what amounts to an epsilon transition with an action.
-	 *  The action goes into ATN though it is ignored during analysis.
-	 *  It slows things down a bit, but I must ignore predicates after
-	 *  having seen an action (5-5-2008).
+	 *  The action goes into ATN though it is ignored during prediction
+	 *  if actionIndex < 0.  Only forced are executed during prediction.
 	 */
 	public Handle action(ActionAST action) {
 		//System.out.println("action: "+action);

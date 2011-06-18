@@ -42,8 +42,6 @@ public abstract class ATNInterpreter {
 			int s = toInt(data[p++]);
 			ATNState startState = atn.states.get(s);
 			atn.rules.add(startState);
-			if ( atn.ruleToTokenType.size()==0 ) atn.ruleToTokenType.add(0); // we're indexed from 1
-			if ( atn.ruleToActionIndex.size()==0 ) atn.ruleToActionIndex.add(0); // we're indexed from 1
 			if ( atn.grammarType==ANTLRParser.LEXER ) {
 				int tokenType = toInt(data[p++]);
 				atn.ruleToTokenType.add(tokenType);
@@ -106,7 +104,7 @@ public abstract class ATNInterpreter {
 		switch (type) {
 			case Transition.EPSILON : return new EpsilonTransition(target);
 			case Transition.RANGE : return new RangeTransition(arg1, arg2, target);
-			case Transition.RULE : return new RuleTransition(arg1, atn.states.get(arg1), target);
+			case Transition.RULE : return new RuleTransition(arg2, atn.states.get(arg1), target);
 			case Transition.PREDICATE : return new PredicateTransition(target, arg1, arg2);
 			case Transition.ATOM : return new AtomTransition(arg1, target);
 			case Transition.ACTION : return new ActionTransition(target, arg1, arg2);

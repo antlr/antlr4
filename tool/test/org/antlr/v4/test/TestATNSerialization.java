@@ -12,13 +12,13 @@ public class TestATNSerialization extends BaseTest {
 			"a : A B ;");
 		String expecting =
 			"max type 4\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:BASIC 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
-			"5:BASIC 1\n" +
-			"6:BASIC 1\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
 			"rule 1:0 0,0\n" +
 			"0->2 EPSILON 0,0\n" +
 			"1->6 ATOM -1,0\n" +
@@ -38,11 +38,11 @@ public class TestATNSerialization extends BaseTest {
 			"a : ~A ;");
 		String expecting =
 			"max type 5\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:BASIC 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
 			"rule 1:0 0,0\n" +
 			"0->2 EPSILON 0,0\n" +
 			"1->4 ATOM -1,0\n" +
@@ -60,11 +60,11 @@ public class TestATNSerialization extends BaseTest {
 			"a : . ;");
 		String expecting =
 			"max type 5\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:BASIC 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
 			"rule 1:0 0,0\n" +
 			"0->2 EPSILON 0,0\n" +
 			"1->4 ATOM -1,0\n" +
@@ -81,17 +81,17 @@ public class TestATNSerialization extends BaseTest {
 			"a : A | A B ;");
 		String expecting =
 			"max type 4\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:BASIC 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
-			"5:BASIC 1\n" +
-			"6:BASIC 1\n" +
-			"7:BASIC 1\n" +
-			"8:BLOCK_START 1\n" +
-			"9:BLOCK_END 1\n" +
-			"10:BASIC 1\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"7:BASIC 0\n" +
+			"8:BLOCK_START 0\n" +
+			"9:BLOCK_END 0\n" +
+			"10:BASIC 0\n" +
 			"rule 1:0 0,0\n" +
 			"0->8 EPSILON 0,0\n" +
 			"1->10 ATOM -1,0\n" +
@@ -116,23 +116,23 @@ public class TestATNSerialization extends BaseTest {
 			"a : A | A B | A B C ;");
 		String expecting =
 			"max type 5\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:BASIC 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
-			"5:BASIC 1\n" +
-			"6:BASIC 1\n" +
-			"7:BASIC 1\n" +
-			"8:BASIC 1\n" +
-			"9:BASIC 1\n" +
-			"10:BASIC 1\n" +
-			"11:BASIC 1\n" +
-			"12:BASIC 1\n" +
-			"13:BASIC 1\n" +
-			"14:BLOCK_START 1\n" +
-			"15:BLOCK_END 1\n" +
-			"16:BASIC 1\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"7:BASIC 0\n" +
+			"8:BASIC 0\n" +
+			"9:BASIC 0\n" +
+			"10:BASIC 0\n" +
+			"11:BASIC 0\n" +
+			"12:BASIC 0\n" +
+			"13:BASIC 0\n" +
+			"14:BLOCK_START 0\n" +
+			"15:BLOCK_END 0\n" +
+			"16:BASIC 0\n" +
 			"rule 1:0 0,0\n" +
 			"0->14 EPSILON 0,0\n" +
 			"1->16 ATOM -1,0\n" +
@@ -164,17 +164,17 @@ public class TestATNSerialization extends BaseTest {
 			"a : A+ B ;");
 		String expecting =
 			"max type 4\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:BASIC 1\n" +
-			"3:BASIC 1\n" +
-			"4:PLUS_BLOCK_START 1\n" +
-			"5:BLOCK_END 1\n" +
-			"6:PLUS_LOOP_BACK 1\n" +
-			"7:BASIC 1\n" +
-			"8:BASIC 1\n" +
-			"9:BASIC 1\n" +
-			"10:BASIC 1\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:PLUS_BLOCK_START 0\n" +
+			"5:BLOCK_END 0\n" +
+			"6:PLUS_LOOP_BACK 0\n" +
+			"7:BASIC 0\n" +
+			"8:BASIC 0\n" +
+			"9:BASIC 0\n" +
+			"10:BASIC 0\n" +
 			"rule 1:0 0,0\n" +
 			"0->4 EPSILON 0,0\n" +
 			"1->10 ATOM -1,0\n" +
@@ -202,22 +202,22 @@ public class TestATNSerialization extends BaseTest {
 			"e : E ;\n");
 		String expecting =
 			"max type 3\n" +
-			"0:RULE_START 1\n" +
-			"1:RULE_STOP 1\n" +
-			"2:RULE_START 2\n" +
-			"3:RULE_STOP 2\n" +
-			"4:BASIC 1\n" +
-			"5:BASIC 1\n" +
-			"6:BASIC 2\n" +
-			"7:BASIC 2\n" +
-			"8:BASIC 2\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:RULE_START 1\n" +
+			"3:RULE_STOP 1\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 1\n" +
+			"7:BASIC 1\n" +
+			"8:BASIC 1\n" +
 			"rule 1:0 0,0\n" +
 			"rule 2:2 0,0\n" +
 			"0->4 EPSILON 0,0\n" +
 			"1->8 ATOM -1,0\n" +
 			"2->6 EPSILON 0,0\n" +
 			"3->5 EPSILON 0,0\n" +
-			"4->5 RULE 2,2\n" +
+			"4->5 RULE 2,1\n" +
 			"5->1 EPSILON 0,0\n" +
 			"6->7 ATOM 3,0\n" +
 			"7->3 EPSILON 0,0\n";
@@ -234,14 +234,14 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 4\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:RULE_START 2\n" +
-			"4:RULE_STOP 2\n" +
-			"5:BASIC 1\n" +
-			"6:BASIC 1\n" +
-			"7:BASIC 2\n" +
-			"8:BASIC 2\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:RULE_START 1\n" +
+			"4:RULE_STOP 1\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"7:BASIC 1\n" +
+			"8:BASIC 1\n" +
 			"rule 1:1 3,0\n" +
 			"rule 2:3 4,0\n" +
 			"mode 0:0\n" +
@@ -266,10 +266,10 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 3\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
 			"rule 1:1 3,0\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
@@ -289,14 +289,14 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 3\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
-			"5:PLUS_BLOCK_START 1\n" +
-			"6:BLOCK_END 1\n" +
-			"7:PLUS_LOOP_BACK 1\n" +
-			"8:BASIC 1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:PLUS_BLOCK_START 0\n" +
+			"6:BLOCK_END 0\n" +
+			"7:PLUS_LOOP_BACK 0\n" +
+			"8:BASIC 0\n" +
 			"rule 1:1 3,0\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
@@ -326,20 +326,20 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 5\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:RULE_START 2\n" +
-			"4:RULE_STOP 2\n" +
-			"5:RULE_START 3\n" +
-			"6:RULE_STOP 3\n" +
-			"7:BASIC 1\n" +
-			"8:BASIC 1\n" +
-			"9:BASIC 1\n" +
-			"10:BASIC 2\n" +
-			"11:BASIC 2\n" +
-			"12:BASIC 3\n" +
-			"13:BASIC 3\n" +
-			"14:BASIC 3\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:RULE_START 1\n" +
+			"4:RULE_STOP 1\n" +
+			"5:RULE_START 2\n" +
+			"6:RULE_STOP 2\n" +
+			"7:BASIC 0\n" +
+			"8:BASIC 0\n" +
+			"9:BASIC 0\n" +
+			"10:BASIC 1\n" +
+			"11:BASIC 1\n" +
+			"12:BASIC 2\n" +
+			"13:BASIC 2\n" +
+			"14:BASIC 2\n" +
 			"rule 1:1 3,1\n" +
 			"rule 2:3 4,0\n" +
 			"rule 3:5 5,2\n" +
@@ -371,10 +371,10 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 3\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
 			"rule 1:1 3,0\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
@@ -395,10 +395,10 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 3\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
 			"rule 1:1 3,0\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
@@ -419,12 +419,12 @@ public class TestATNSerialization extends BaseTest {
 		String expecting =
 			"max type 3\n" +
 			"0:TOKEN_START 0\n" +
-			"1:RULE_START 1\n" +
-			"2:RULE_STOP 1\n" +
-			"3:BASIC 1\n" +
-			"4:BASIC 1\n" +
-			"5:BASIC 1\n" +
-			"6:BASIC 1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
 			"rule 1:1 3,0\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
@@ -454,18 +454,18 @@ public class TestATNSerialization extends BaseTest {
 			"0:TOKEN_START 0\n" +
 			"1:TOKEN_START 0\n" +
 			"2:TOKEN_START 0\n" +
-			"3:RULE_START 1\n" +
-			"4:RULE_STOP 1\n" +
-			"5:RULE_START 2\n" +
-			"6:RULE_STOP 2\n" +
-			"7:RULE_START 3\n" +
-			"8:RULE_STOP 3\n" +
-			"9:BASIC 1\n" +
-			"10:BASIC 1\n" +
-			"11:BASIC 2\n" +
-			"12:BASIC 2\n" +
-			"13:BASIC 3\n" +
-			"14:BASIC 3\n" +
+			"3:RULE_START 0\n" +
+			"4:RULE_STOP 0\n" +
+			"5:RULE_START 1\n" +
+			"6:RULE_STOP 1\n" +
+			"7:RULE_START 2\n" +
+			"8:RULE_STOP 2\n" +
+			"9:BASIC 0\n" +
+			"10:BASIC 0\n" +
+			"11:BASIC 1\n" +
+			"12:BASIC 1\n" +
+			"13:BASIC 2\n" +
+			"14:BASIC 2\n" +
 			"rule 1:3 3,0\n" +
 			"rule 2:5 4,0\n" +
 			"rule 3:7 5,0\n" +

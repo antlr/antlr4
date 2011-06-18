@@ -44,8 +44,6 @@ public class ATN {
 	public ATN(Grammar g) {
 		this.g = g;
 		if ( g.isLexer() ) {
-			ruleToTokenType.add(0); // no rule index 0
-			ruleToActionIndex.add(0); // no action index 0
 			for (Rule r : g.rules.values()) {
 				ruleToTokenType.add(g.getTokenType(r.name));
 				if ( r.actionIndex>0 ) ruleToActionIndex.add(r.actionIndex);

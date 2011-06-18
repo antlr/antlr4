@@ -53,7 +53,7 @@ public class Grammar implements AttributeResolver {
 	 *  not include lexical rules if combined.
 	 */
     public OrderedHashMap<String, Rule> rules = new OrderedHashMap<String, Rule>();
-	int ruleNumber = 1;
+	int ruleNumber = 0; // used to get rule indexes (0..n-1)
 
 	/** The ATN that represents the grammar with edges labelled with tokens
 	 *  or epsilon.  It is more suitable to analysis than an AST representation.

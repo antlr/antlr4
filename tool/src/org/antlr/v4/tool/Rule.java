@@ -77,7 +77,7 @@ public class Rule implements AttributeResolver {
 
 	public Alternative[] alt;
 
-	/** All rules have unique index 1..n */
+	/** All rules have unique index 0..n-1 */
 	public int index;
 
 	public int actionIndex; // if lexer

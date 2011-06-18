@@ -56,12 +56,12 @@ public class ATNSerializer {
 		}
 		int nrules = atn.rules.size();
 		data.add(nrules);
-		for (int r=1; r<=nrules; r++) {
-			ATNState ruleStartState = atn.rules.get(r-1);
+		for (int r=0; r<nrules; r++) {
+			ATNState ruleStartState = atn.rules.get(r);
 			data.add(ruleStartState.stateNumber);
 			if ( atn.g.isLexer() ) {
 				data.add(atn.ruleToTokenType.get(r));
-				String ruleName = atn.g.rules.getKey(r-1);
+				String ruleName = atn.g.rules.getKey(r);
 				Rule rule = atn.g.getRule(ruleName);
 				data.add(rule.actionIndex);
 			}
