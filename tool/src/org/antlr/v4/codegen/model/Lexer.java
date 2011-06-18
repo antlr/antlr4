@@ -12,9 +12,10 @@ public class Lexer extends OutputModelObject {
 	public String[] tokenNames;
 	public Set<String> ruleNames;
 	public Collection<String> modes;
-	public LinkedHashMap<Integer, Action> actions;
-	public LinkedHashMap<Integer, Action> sempreds;
-	public SerializedATN atn;
+
+	@ModelElement public SerializedATN atn;
+	@ModelElement public LinkedHashMap<Integer, Action> actions;
+	@ModelElement public LinkedHashMap<Integer, Action> sempreds;
 
 	public Lexer(OutputModelFactory factory, LexerFile file) {
 		this.factory = factory;

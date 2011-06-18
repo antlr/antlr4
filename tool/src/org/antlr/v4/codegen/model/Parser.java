@@ -11,12 +11,13 @@ public class Parser extends OutputModelObject {
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
-	public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
-	public List<DynamicScopeStruct> scopes = new ArrayList<DynamicScopeStruct>();
 	public ParserFile file;
-	public SerializedATN atn;
-	public LinkedHashMap<Integer, ForcedAction> actions;
-	public LinkedHashMap<Integer, Action> sempreds;
+
+	@ModelElement public List<DynamicScopeStruct> scopes = new ArrayList<DynamicScopeStruct>();
+	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
+	@ModelElement public SerializedATN atn;
+	@ModelElement public LinkedHashMap<Integer, ForcedAction> actions;
+	@ModelElement public LinkedHashMap<Integer, Action> sempreds;
 
 	public Parser(OutputModelFactory factory, ParserFile file) {
 		this.factory = factory;

@@ -1,10 +1,13 @@
 package org.antlr.v4.codegen.model.actions;
 
+import org.antlr.v4.codegen.model.ModelElement;
+
 import java.util.List;
 
 /** */
 public class SetDynScopeAttr_index extends SetDynScopeAttr {
-	public List<ActionChunk> indexChunks;
+	@ModelElement public List<ActionChunk> indexChunks;
+
 	public SetDynScopeAttr_index(String scope, String attr, List<ActionChunk> indexChunks, List<ActionChunk> rhsChunks) {
 		super(scope, attr, rhsChunks);
 		this.indexChunks = indexChunks;

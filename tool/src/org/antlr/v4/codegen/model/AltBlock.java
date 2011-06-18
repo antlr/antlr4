@@ -7,7 +7,7 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.List;
 
 public class AltBlock extends Choice {
-	public ThrowNoViableAlt error;
+	@ModelElement public ThrowNoViableAlt error;
 
 	public AltBlock(OutputModelFactory factory,
 					GrammarAST blkOrEbnfRootAST,

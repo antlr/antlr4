@@ -9,7 +9,7 @@ import java.util.List;
 
 /** */
 public class LL1PlusBlockSingleAlt extends LL1Loop {
-	public Sync iterationSync;
+	@ModelElement public Sync iterationSync;
 
 	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlock> alts) {
 		super(factory, blkAST, alts);

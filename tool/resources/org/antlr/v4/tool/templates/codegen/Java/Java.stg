@@ -132,13 +132,6 @@ RuleFunction(currentRule,code,decls,context,scope,namedActions,finallyAction) ::
 }
 >>
 
-/** Convenience method to call from outside */
-StartRuleFunction(f) ::= <<
-<if(f.modifiers)><f.modifiers:{f | <f> }><else>public final <endif><f.ctxType> <f.name>(<f.args; separator=", ">) throws RecognitionException {
-    return <f.name>(new <f.ctxType>(<f.args:{a | <a.name>, }>LABitSet.EOF_SET));
-}
->>
-
 CodeBlock(c, ops) ::= <<
 <ops; separator="\n">
 >>
@@ -275,11 +268,6 @@ Sync(s) ::= "sync(<s.expecting.name>);"
 
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this,_ctx);"
 
-TestSet(s) ::= <<
-_ctx.s = <s.stateNumber>;
-<s.set.name>.member(state.input.LA(1))
->>
-
 TestSetInline(s) ::= <<
 <s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
 >>
@@ -315,7 +303,7 @@ QRetValueRef(a) ::= "<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<t.name>"
 SetAttr(s,rhsChunks) ::= "_ctx.<s.name> = <rhsChunks>;"
-SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
+//SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
 
 TokenPropertyRef_text(t) ::= "(<t.label>!=null?<t.label>.getText():null)"
 TokenPropertyRef_type(t) ::= "(<t.label>!=null?<t.label>.getType():0)"

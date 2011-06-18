@@ -6,7 +6,7 @@ import java.util.*;
 
 /** */
 public class CodeBlock extends SrcOp {
-	public List<SrcOp> ops;
+	@ModelElement public List<SrcOp> ops;
 
 	public CodeBlock(OutputModelFactory factory) { this.factory = factory; }
 

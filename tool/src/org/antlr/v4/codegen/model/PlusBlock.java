@@ -7,7 +7,8 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.List;
 
 public class PlusBlock extends Loop {
-	public ThrowNoViableAlt error;
+	@ModelElement public ThrowNoViableAlt error;
+
 	public PlusBlock(OutputModelFactory factory,
 					 GrammarAST ebnfRootAST,
 					 List<CodeBlock> alts)

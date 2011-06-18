@@ -125,9 +125,12 @@ public class CodeGenerator {
 
 	public void write(ST outputFileST) {
 		// WRITE FILES
+		String fileName = "unknown";
 		try {
+			fileName = getRecognizerFileName();
 			target.genRecognizerFile(this,g,outputFileST);
 			if ( templates.isDefined("headerFile") ) {
+				fileName = getHeaderFileName();
 				ST extST = templates.getInstanceOf("headerFileExtension");
 				ST headerFileST = null;
 				target.genRecognizerHeaderFile(this,g,headerFileST,extST.render(lineWidth));
@@ -135,15 +138,15 @@ public class CodeGenerator {
 			// write out the vocab interchange file; used by antlr,
 			// does not change per target
 			ST tokenVocabSerialization = getTokenVocabOutput();
-			String vocabFileName = getVocabFileName();
-			if ( vocabFileName!=null ) {
-				write(tokenVocabSerialization, vocabFileName);
+			fileName = getVocabFileName();
+			if ( fileName!=null ) {
+				write(tokenVocabSerialization, fileName);
 			}
 		}
 		catch (IOException ioe) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
-						 getVocabFileName(),
-						 ioe);
+									fileName,
+									ioe);
 		}
 	}
 
@@ -174,4 +177,9 @@ public class CodeGenerator {
 		return g.name+VOCAB_FILE_EXTENSION;
 	}
 
+	public String getHeaderFileName() {
+		ST extST = templates.getInstanceOf("headerFileExtension");
+		String recognizerName = g.getRecognizerName();
+		return recognizerName+extST.render();
+	}
 }

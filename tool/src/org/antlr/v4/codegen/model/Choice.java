@@ -18,8 +18,9 @@ import java.util.*;
  */
 public abstract class Choice extends RuleElement {
 	public int decision = -1;
-	public List<CodeBlock> alts;
-	public List<SrcOp> preamble;
+
+	@ModelElement public List<CodeBlock> alts;
+	@ModelElement public List<SrcOp> preamble;
 
 	public Choice(OutputModelFactory factory,
 				  GrammarAST blkOrEbnfRootAST,

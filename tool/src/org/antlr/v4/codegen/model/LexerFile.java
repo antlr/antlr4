@@ -7,8 +7,9 @@ import java.util.*;
 
 public class LexerFile extends OutputModelObject {
 	public String fileName;
-	public Lexer lexer;
-	public Map<String, Action> namedActions;
+
+	@ModelElement public Lexer lexer;
+	@ModelElement public Map<String, Action> namedActions;
 
 	public LexerFile(OutputModelFactory factory, String fileName) {
 		super(factory);

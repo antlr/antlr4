@@ -8,12 +8,11 @@ import java.util.*;
 /** */
 public class ParserFile extends OutputModelObject {
 	public String fileName;
-	public Parser parser;
-//	public List<DFADecl> dfaDecls = new ArrayList<DFADecl>();
-//	public OrderedHashSet<BitSetDecl> bitSetDecls = new OrderedHashSet<BitSetDecl>();
 	public String TokenLabelType;
 	public String ASTLabelType;
-	public Map<String, Action> namedActions;
+
+	@ModelElement public Parser parser;
+	@ModelElement public Map<String, Action> namedActions;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {
 		super(factory);

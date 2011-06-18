@@ -6,6 +6,7 @@ import org.antlr.v4.tool.ErrorType;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.compiler.FormalArgument;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -39,9 +40,10 @@ public class OutputModelWalker {
 
 	public ST walk(OutputModelObject omo) {
 		// CREATE TEMPLATE FOR THIS OUTPUT OBJECT
-		String templateName = omo.getClass().getSimpleName();
+		Class<? extends OutputModelObject> cl = omo.getClass();
+		String templateName = cl.getSimpleName();
 		if ( templateName == null ) {
-			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, omo.getClass().getSimpleName());
+			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, cl.getSimpleName());
 			return new ST("["+templateName+" invalid]");
 		}
 		ST st = templates.getInstanceOf(templateName);
@@ -55,21 +57,22 @@ public class OutputModelWalker {
 		}
 
 		Map<String,FormalArgument> formalArgs = st.impl.formalArguments;
+
+		// PASS IN OUTPUT MODEL OBJECT TO TEMPLATE AS FIRST ARG
 		Set<String> argNames = formalArgs.keySet();
 		Iterator<String> arg_it = argNames.iterator();
-
-		// PASS IN OUTPUT MODEL OBJECT TO TEMPLATE
 		String modelArgName = arg_it.next(); // ordered so this is first arg
 		st.add(modelArgName, omo);
 
-		// COMPUTE STs FOR EACH NESTED MODEL OBJECT NAMED AS ARG BY TEMPLATE
-		while ( arg_it.hasNext() ) {
-			String fieldName = arg_it.next();
-			if ( fieldName.equals("actions") ) {
-				System.out.println("computing ST for field "+fieldName+" of "+omo.getClass());
-			}
+		// COMPUTE STs FOR EACH NESTED MODEL OBJECT MARKED WITH @ModelElement AND MAKE ST ATTRIBUTE
+		Field fields[] = cl.getFields();
+		for (Field fi : fields) {
+			Annotation[] annotations = fi.getAnnotations();
+			if ( annotations.length==0 ) continue;
+			String fieldName = fi.getName();
+			// Just don't set @ModelElement fields w/o formal arg in target ST
+			if ( formalArgs.get(fieldName)==null ) continue;
 			try {
-				Field fi = omo.getClass().getField(fieldName);
 				Object o = fi.get(omo);
 				if ( o instanceof OutputModelObject ) {  // SINGLE MODEL OBJECT?
 					OutputModelObject nestedOmo = (OutputModelObject)o;
@@ -83,9 +86,7 @@ public class OutputModelWalker {
 					}
 					Collection<? extends OutputModelObject> nestedOmos = (Collection)o;
 					for (OutputModelObject nestedOmo : nestedOmos) {
-						if ( nestedOmo==null ) {
-							System.out.println("collection has nulls: "+nestedOmos);
-						}
+						if ( nestedOmo==null ) continue;
 						ST nestedST = walk(nestedOmo);
 						st.add(fieldName, nestedST);
 					}
@@ -100,11 +101,8 @@ public class OutputModelWalker {
 					st.add(fieldName, m);
 				}
 				else if ( o!=null ) {
-					tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, fieldName);
+					tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "not recognized nested model element: "+fieldName);
 				}
-			}
-			catch (NoSuchFieldException nsfe) {
-				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, nsfe.getMessage());
 			}
 			catch (IllegalAccessException iae) {
 				tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, fieldName);

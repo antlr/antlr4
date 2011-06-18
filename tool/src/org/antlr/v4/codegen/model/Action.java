@@ -8,7 +8,8 @@ import java.util.List;
 
 /** */
 public class Action extends RuleElement {
-	public List<ActionChunk> chunks;
+	@ModelElement public List<ActionChunk> chunks;
+
 	public Action(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
 		RuleFunction rf = null;

@@ -9,8 +9,8 @@ import java.util.List;
 
 /** (A B C)? */
 public class LL1OptionalBlockSingleAlt extends LL1Choice {
-	public OutputModelObject expr;
-	public OutputModelObject followExpr;
+	@ModelElement public OutputModelObject expr;
+	@ModelElement public OutputModelObject followExpr;
 
 	public LL1OptionalBlockSingleAlt(OutputModelFactory factory,
 									 GrammarAST blkAST,

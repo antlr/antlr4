@@ -1,11 +1,13 @@
 package org.antlr.v4.codegen.model.actions;
 
+import org.antlr.v4.codegen.model.ModelElement;
+
 import java.util.List;
 
 /** */
 public class SetAttr extends ActionChunk {
 	public String name;
-	public List<ActionChunk> rhsChunks;
+	@ModelElement public List<ActionChunk> rhsChunks;
 
 	public SetAttr(String name, List<ActionChunk> rhsChunks) {
 		this.name = name;

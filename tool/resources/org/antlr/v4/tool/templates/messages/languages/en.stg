@@ -36,7 +36,7 @@ INVALID() ::= <<this can never be printed>>
 
 // TOOL ERRORS
 // file errors
-CANNOT_WRITE_FILE(arg,arg2) ::= <<
+CANNOT_WRITE_FILE(arg,arg2,exception,stackTrace) ::= <<
 cannot write file <arg>: <exception>
 <stackTrace; separator="\n">
 >>
@@ -84,7 +84,7 @@ CODE_GEN_TEMPLATES_INCOMPLETE(arg) ::=
 CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::=
 	"cannot create target <arg> code generator: <exception>"
 CODE_TEMPLATE_ARG_ISSUE(arg,arg2) ::=
-    "code generation template <arg> has missing, misnamed, or incomplete arg list: <arg2>"
+    "code generation template <arg> has missing, misnamed, or incomplete arg list; missing <arg2>"
 NO_MODEL_TO_TEMPLATE_MAPPING(arg) ::=
     "no mapping to template name for output model class <arg>"
 

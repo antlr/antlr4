@@ -19,19 +19,16 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<String> tokenLabels;
 	public List<String> elementsReferencedInRewrite;
 	public List<String> exceptions;
-	public Action finallyAction;
-	public Map<String, Action> namedActions;
-
 	public ATNState startState;
-
-	public StructDecl context;
-	public DynamicScopeStruct scope;
-
 	public int index;
-
 	public Collection<Attribute> args = null;
-	public OrderedHashSet<Decl> decls;
-	public SrcOp code;
+
+	@ModelElement public SrcOp code;
+	@ModelElement public OrderedHashSet<Decl> decls;
+	@ModelElement public StructDecl context;
+	@ModelElement public DynamicScopeStruct scope;
+	@ModelElement public Map<String, Action> namedActions;
+	@ModelElement public Action finallyAction;
 
 	public RuleFunction(OutputModelFactory factory) {
 		super(factory);
