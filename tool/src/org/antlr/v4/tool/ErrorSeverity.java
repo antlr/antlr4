@@ -35,13 +35,10 @@ package org.antlr.v4.tool;
  * @author Jim Idle - Temporal Wave LLC (jimi@temporal-wave.com)
  */
 public enum ErrorSeverity {
-    INFO    ("Info"),
-    
-    WARNING ("Warning"),
-
-    ERROR   ("Error"),
-
-    FATAL   ("Fatal"),  // TODO: add fatal for which phase? sync with ErrorManager
+    INFO    ("info"),
+    WARNING ("warning"),
+    ERROR   ("error"),
+    FATAL   ("fatal"),  // TODO: add fatal for which phase? sync with ErrorManager
     ;
 
     /**

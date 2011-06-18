@@ -2,61 +2,18 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STErrorListener;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.misc.ErrorBuffer;
-import org.stringtemplate.v4.misc.STMessage;
+import org.stringtemplate.v4.*;
+import org.stringtemplate.v4.misc.*;
 
 import java.net.URL;
-import java.util.Collection;
-import java.util.Locale;
+import java.util.*;
 
-/** Defines all the errors ANTLR can generator for both the tool and for
- *  issues with a grammar.
- *
- *  Here is a list of language names:
- *
- *  http://ftp.ics.uci.edu/pub/ietf/http/related/iso639.txt
- *
- *  Here is a list of country names:
- *
- *  http://www.chemie.fu-berlin.de/diverse/doc/ISO_3166.html
- *
- *  I use constants not strings to identify messages as the compiler will
- *  find any errors/mismatches rather than leaving a mistyped string in
- *  the code to be found randomly in the future.  Further, Intellij can
- *  do field name expansion to save me some typing.  I have to map
- *  int constants to template names, however, which could introduce a mismatch.
- *  Someone could provide a .stg file that had a template name wrong.  When
- *  I load the group, then, I must verify that all messages are there.
- *
- *  This is essentially the functionality of the resource bundle stuff Java
- *  has, but I don't want to load a property file--I want to load a template
- *  group file and this is so simple, why mess with their junk.
- *
- *  I use the default Locale as defined by java to compute a group file name
- *  in the org/antlr/tool/templates/messages dir called en_US.stg and so on.
- *
- *  Normally we want to use the default locale, but often a message file will
- *  not exist for it so we must fall back on the US local.
- *
- *  During initialization of this class, all errors go straight to System.err.
- *  There is no way around this.  If I have not set up the error system, how
- *  can I do errors properly?  For example, if the string template group file
- *  full of messages has an error, how could I print to anything but System.err?
- */
 public class ErrorManager {
 	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
-	public static final String MESSAGES_DIR = "org/antlr/v4/tool/templates/messages/languages/";
 
 	public Tool tool;
 	public int errors;
 	public int warnings;
-
-	/** The group of templates that represent all possible ANTLR errors. */
-    STGroup messages;
 
     /** The group of templates that represent the current message format. */
     STGroup format;
@@ -64,8 +21,6 @@ public class ErrorManager {
     /** Messages should be sensitive to the locale. */
     Locale locale;
     String formatName;
-
-
 
     ErrorBuffer initSTListener = new ErrorBuffer();
 
@@ -90,12 +45,6 @@ public class ErrorManager {
 
 	public ErrorManager(Tool tool) {
 		this.tool = tool;
-		//org.stringtemplate.v4.misc.ErrorManager.setErrorListener(initSTListener);
-		// it is inefficient to set the default locale here if another
-		// piece of code is going to set the locale, but that would
-		// require that a user call an init() function or something.  I prefer
-		// that this class be ready to go when loaded as I'm absentminded ;)
-		setLocale(Locale.getDefault());
 		// try to load the message format group
 		// the user might have specified one on the command line
 		// if not, or if the user has given an illegal value, we will fall back to "antlr"
@@ -109,9 +58,9 @@ public class ErrorManager {
 	}
 
 	public ST getMessageTemplate(ANTLRMessage msg) {
-		ST messageST = getMessageTemplate(msg.errorType);
+		ST messageST = new ST(msg.errorType.msg);
 		ST locationST = getLocationFormat();
-		ST reportST = getReportFormat(msg.errorType.getSeverity());
+		ST reportST = getReportFormat(msg.errorType.severity);
 		ST messageFormatST = getMessageFormat();
 
 		if ( msg.args!=null ) { // fill in arg1, arg2, ...
@@ -162,23 +111,18 @@ public class ErrorManager {
 
     public ST getReportFormat(ErrorSeverity severity) {
         ST st = format.getInstanceOf("report");
-        ST type = messages.getInstanceOf(severity.toString());
-        st.add("type", type);
+        st.add("type", severity.getText());
         return st;
-
     }
+
     public ST getMessageFormat() {
         return format.getInstanceOf("message");
     }
     public boolean formatWantsSingleLineMessage() {
         return format.getInstanceOf("wantsSingleLineMessage").render().equals("true");
     }
-    public ST getMessageTemplate(ErrorType etype) {
-        String msgName = etype.toString();
-		return messages.getInstanceOf(msgName);
-    }
 
-    public void info(String msg) { tool.info(msg); }
+	public void info(String msg) { tool.info(msg); }
 
 	public void syntaxError(ErrorType etype,
 								   String fileName,
@@ -265,49 +209,6 @@ public class ErrorManager {
 
     // S U P P O R T  C O D E
 
-    /** We really only need a single locale for entire running ANTLR code
-     *  in a single VM.  Only pay attention to the language, not the country
-     *  so that French Canadians and French Frenchies all get the same
-     *  template file, fr.stg.  Just easier this way.
-     */
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-        String language = locale.getLanguage();
-        String fileName = MESSAGES_DIR +language+".stg";
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        URL url = cl.getResource(fileName);
-        if ( url==null ) {
-            cl = ErrorManager.class.getClassLoader();
-            url = cl.getResource(fileName);
-        }
-        if ( url==null && language.equals(Locale.US.getLanguage()) ) {
-            rawError("ANTLR installation corrupted; cannot find English messages file "+fileName);
-            panic();
-        }
-        else if ( url==null ) {
-            //rawError("no such locale file "+fileName+" retrying with English locale");
-            setLocale(Locale.US); // recurse on this rule, trying the US locale
-            return;
-        }
-
-        messages = new STGroupFile(fileName, "UTF-8");
-        messages.load();
-        if ( initSTListener.errors.size()>0 ) {
-            rawError("ANTLR installation corrupted; can't load messages format file:\n"+
-                     initSTListener.toString());
-            panic();
-        }
-
-        boolean messagesOK = verifyMessages();
-        if ( !messagesOK && language.equals(Locale.US.getLanguage()) ) {
-            rawError("ANTLR installation corrupted; English messages file "+language+".stg incomplete");
-            panic();
-        }
-        else if ( !messagesOK ) {
-            setLocale(Locale.US); // try US to see if that will work
-        }
-    }
-
     /** The format gets reset either from the Tool if the user supplied a command line option to that effect
      *  Otherwise we just use the default "antlr".
      */
@@ -347,32 +248,6 @@ public class ErrorManager {
         else if ( !formatOK ) {
             setFormat("antlr"); // recurse on this rule, trying the default message format
         }
-    }
-
-    /** Use reflection to find list of MSG_ fields and then verify a
-     *  template exists for each one from the locale's group.
-     */
-    protected boolean verifyMessages() {
-        boolean ok = true;
-        ErrorType[] errors = ErrorType.values();
-        for (int i = 0; i < errors.length; i++) {
-            ErrorType e = errors[i];
-            if ( !messages.isDefined(e.toString()) ) {
-                System.err.println("Message "+e.toString()+" in locale "+
-                                   locale+" not found");
-                ok = false;
-            }
-        }
-        // check for special templates
-        if (!messages.isDefined("WARNING")) {
-            System.err.println("Message template 'warning' not found in locale "+ locale);
-            ok = false;
-        }
-        if (!messages.isDefined("ERROR")) {
-            System.err.println("Message template 'error' not found in locale "+ locale);
-            ok = false;
-        }
-        return ok;
     }
 
     /** Verify the message format template group */
