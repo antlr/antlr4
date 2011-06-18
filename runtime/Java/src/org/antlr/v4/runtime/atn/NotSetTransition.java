@@ -1,8 +1,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.misc.IntervalSet;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.*;
 
 public class NotSetTransition extends SetTransition {
 	public NotSetTransition(GrammarAST ast, IntervalSet label, ATNState target) {

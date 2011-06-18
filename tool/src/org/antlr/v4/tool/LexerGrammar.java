@@ -1,9 +1,8 @@
 package org.antlr.v4.tool;
 
-import org.antlr.misc.MultiMap;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.tool.Rule;
 import org.antlr.v4.Tool;
+import org.stringtemplate.v4.misc.MultiMap;
 
 /** */
 public class LexerGrammar extends Grammar {

@@ -3,8 +3,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /** An ATN transition between any two ATN states.  Subclasses define
  *  atom, set, epsilon, action, predicate, rule transitions.
@@ -18,7 +17,7 @@ import java.util.Map;
  *  the states. We'll use the term Edge for the DFA to distinguish them from
  *  ATN transitions.
  */
-public abstract class Transition implements Comparable {
+public abstract class Transition {
 	// constants for serialization
 	public static final int EPSILON			= 1;
 	public static final int RANGE			= 2;

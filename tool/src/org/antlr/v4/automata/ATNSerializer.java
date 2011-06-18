@@ -215,4 +215,21 @@ public class ATNSerializer {
 		if ( atn.g!=null ) return atn.g.getTokenDisplayName(t);
 		return String.valueOf(t);
 	}
+
+	/** Used by Java target to encode short/int array as chars in string. */
+	public static String getSerializedAsString(ATN atn) {
+		return new String(Utils.toCharArray(getSerialized(atn)));
+	}
+
+	public static List<Integer> getSerialized(ATN atn) {
+		return new ATNSerializer(atn).serialize();
+	}
+
+	public static char[] getSerializedAsChars(ATN atn) {
+		return Utils.toCharArray(new ATNSerializer(atn).serialize());
+	}
+
+	public static String getDecoded(ATN atn) {
+		return new ATNSerializer(atn).decode(Utils.toCharArray(getSerialized(atn)));
+	}
 }

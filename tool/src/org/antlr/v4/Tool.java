@@ -2,7 +2,11 @@ package org.antlr.v4;
 
 import org.antlr.runtime.*;
 import org.antlr.tool.DOTGenerator;
+import org.antlr.v4.analysis.AnalysisPipeline;
+import org.antlr.v4.automata.*;
+import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.parse.*;
+import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
 import java.io.IOException;
@@ -64,6 +68,10 @@ public class Tool {
 	new Option("saveLexer",			"-savelexer", "save temp lexer file created for combined grammars"),
 	new Option("launch_ST_inspector", "-dbgST", "launch StringTemplate visualizer on generated code"),
 	};
+
+    // The internal options are for my use on the command line during dev
+    public static boolean internalOption_PrintGrammarTree = false;
+    public static boolean internalOption_ShowATNConfigsInDFA = false;
 
 	public final String[] args;
 

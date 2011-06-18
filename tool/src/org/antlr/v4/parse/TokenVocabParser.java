@@ -118,7 +118,7 @@ public class TokenVocabParser {
 	 */
 	public File getImportedVocabFile() {
 
-		File f = new File(tool.getLibraryDirectory(),
+		File f = new File(tool.libDirectory,
 						  File.separator +
 						  vocabName +
 						  CodeGenerator.VOCAB_FILE_EXTENSION);
@@ -131,12 +131,7 @@ public class TokenVocabParser {
 		// files are generated (in the base, not relative to the input
 		// location.)
 		//
-		if (tool.haveOutputDir) {
-			f = new File(tool.getOutputDirectory(), vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
-		}
-		else {
-			f = new File(vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
-		}
+		f = new File(tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
 		return f;
 	}
 }

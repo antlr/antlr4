@@ -1,7 +1,6 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.misc.IntervalSet;
+import org.antlr.v4.misc.*;
 
 public class RangeTransition extends Transition {
 	public int from;
@@ -13,10 +12,6 @@ public class RangeTransition extends Transition {
 	}
 	public RangeTransition(ATNState target) {
 		super(target);
-	}
-
-	public int compareTo(Object o) {
-		return 0;
 	}
 
 	@Override

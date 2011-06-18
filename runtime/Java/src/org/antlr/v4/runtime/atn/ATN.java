@@ -1,7 +1,6 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.automata.ATNSerializer;
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.tool.*;
 
@@ -85,22 +84,4 @@ public class ATN {
 	public int getNumberOfDecisions() {
 		return decisionToATNState.size();
 	}
-
-	/** Used by Java target to encode short/int array as chars in string. */
-	public String getSerializedAsString() {
-		return new String(Utils.toCharArray(getSerialized()));
-	}
-
-	public List<Integer> getSerialized() {
-		return new ATNSerializer(this).serialize();
-	}
-
-	public char[] getSerializedAsChars() {
-		return Utils.toCharArray(new ATNSerializer(this).serialize());
-	}
-
-	public String getDecoded() {
-		return new ATNSerializer(this).decode(Utils.toCharArray(getSerialized()));
-	}
-
 }

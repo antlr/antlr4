@@ -27,7 +27,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.LABitSet;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
@@ -53,8 +52,7 @@ public class Parser extends BaseRecognizer {
 	}
 
 	protected Object getMissingSymbol(RecognitionException e,
-									  int expectedTokenType,
-									  LABitSet follow)
+									  int expectedTokenType)
 	{
 		String tokenText = null;
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";

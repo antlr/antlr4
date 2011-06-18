@@ -2,8 +2,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.runtime.dfa.DFAState;
 
 import java.util.*;
 
@@ -138,6 +137,7 @@ public abstract class ATNInterpreter {
 		return s;
 	}
 
+/*
 	public static void dump(DFA dfa, Grammar g) {
 		DOTGenerator dot = new DOTGenerator(g);
 		String output = dot.getDOT(dfa, false);
@@ -147,4 +147,5 @@ public abstract class ATNInterpreter {
 	public static void dump(DFA dfa) {
 		dump(dfa, null);
 	}
+	 */
 }

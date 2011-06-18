@@ -34,8 +34,4 @@ public class RuleTransition extends Transition {
 	}
 
 	public boolean isEpsilon() { return true; }
-
-	public int compareTo(Object o) {
-		return 0;
-	}
 }

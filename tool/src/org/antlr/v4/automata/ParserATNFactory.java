@@ -1,7 +1,7 @@
 package org.antlr.v4.automata;
 
 
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;

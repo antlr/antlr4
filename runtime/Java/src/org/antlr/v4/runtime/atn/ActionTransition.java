@@ -22,10 +22,6 @@ public class ActionTransition extends Transition {
 		return true; // we are to be ignored by analysis 'cept for predicates
 	}
 
-	public int compareTo(Object o) {
-		return 0;
-	}
-
 	public String toString() {
 		if ( actionAST!=null ) return "{"+actionAST.getText()+"}";
 		return "action_"+ruleIndex+":"+actionIndex;
