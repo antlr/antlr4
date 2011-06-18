@@ -1,10 +1,9 @@
 package org.antlr.v4.test;
 
+import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ParserInterpreter;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.tool.*;
 import org.junit.Test;
 
 public class TestATNDeserialization extends BaseTest {
@@ -116,11 +115,11 @@ public class TestATNDeserialization extends BaseTest {
 
 	protected void checkDeserializationIsStable(Grammar g) {
 		ATN atn = createATN(g);
-		char[] data = Utils.toCharArray(atn.getSerialized());
-		String atnData = atn.getDecoded();
+		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(atn));
+		String atnData = ATNSerializer.getDecoded(atn);
 		ATN atn2 = ParserInterpreter.deserialize(data);
 		atn2.g = g;
-		String atn2Data = atn2.getDecoded();
+		String atn2Data = ATNSerializer.getDecoded(atn2);
 
 		assertEquals(atnData, atn2Data);
 	}

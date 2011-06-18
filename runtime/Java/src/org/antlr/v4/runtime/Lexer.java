@@ -134,7 +134,7 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	}
 
 	public void pushMode(int m) {
-//		System.out.println("pushMode "+m);
+		System.out.println("pushMode "+m);
 		if ( state.modeStack==null ) state.modeStack = new QStack<Integer>();
 		state.modeStack.push(state.mode);
 		mode(m);
@@ -142,7 +142,7 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 
 	public int popMode() {
 		if ( state.modeStack==null ) throw new EmptyStackException();
-//		System.out.println("popMode back to "+state.modeStack.peek());
+		System.out.println("popMode back to "+state.modeStack.peek());
 		mode( state.modeStack.pop() );
 		return state.mode;
 	}

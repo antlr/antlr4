@@ -28,11 +28,7 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.runtime.BitSet;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /** Buffer all input tokens but do on-demand fetching of new tokens from
  *  lexer. Useful when the parser or lexer has to set context/mode info before
@@ -195,14 +191,14 @@ public class BufferedTokenStream implements TokenStream {
     public List getTokens() { return tokens; }
 
     public List getTokens(int start, int stop) {
-        return getTokens(start, stop, (BitSet)null);
+        return getTokens(start, stop, (Set<Integer>)null);
     }
 
     /** Given a start and stop index, return a List of all tokens in
      *  the token type BitSet.  Return null if no tokens were found.  This
      *  method looks at both on and off channel tokens.
      */
-    public List getTokens(int start, int stop, BitSet types) {
+    public List getTokens(int start, int stop, Set<Integer> types) {
         if ( p == -1 ) setup();
         if ( stop>=tokens.size() ) stop=tokens.size()-1;
         if ( start<0 ) start=0;
@@ -212,7 +208,7 @@ public class BufferedTokenStream implements TokenStream {
         List<Token> filteredTokens = new ArrayList<Token>();
         for (int i=start; i<=stop; i++) {
             Token t = tokens.get(i);
-            if ( types==null || types.member(t.getType()) ) {
+            if ( types==null || types.contains(t.getType()) ) {
                 filteredTokens.add(t);
             }
         }
@@ -222,12 +218,10 @@ public class BufferedTokenStream implements TokenStream {
         return filteredTokens;
     }
 
-    public List getTokens(int start, int stop, List types) {
-        return getTokens(start,stop,new BitSet(types));
-    }
-
     public List getTokens(int start, int stop, int ttype) {
-        return getTokens(start,stop,BitSet.of(ttype));
+		HashSet<Integer> s = new HashSet<Integer>(ttype);
+		s.add(ttype);
+		return getTokens(start,stop, s);
     }
 
     public String getSourceName() {	return tokenSource.getSourceName();	}

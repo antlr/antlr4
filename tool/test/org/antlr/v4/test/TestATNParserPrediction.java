@@ -579,7 +579,6 @@ public class TestATNParserPrediction extends BaseTest {
 				nvae.printStackTrace(System.err);
 			}
 			DFA dfa = interp.decisionToDFA[decision];
-			ATNInterpreter.dump(dfa,g);
 			assertEquals(dfaString[i], dfa.toString(g.getTokenDisplayNames()));
 		}
 	}

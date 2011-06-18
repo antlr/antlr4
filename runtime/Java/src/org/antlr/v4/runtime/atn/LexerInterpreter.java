@@ -6,8 +6,8 @@ import org.antlr.v4.runtime.dfa.*;
 
 /** "dup" of ParserInterpreter */
 public class LexerInterpreter extends ATNInterpreter {
-	public static boolean debug = false;
-	public static boolean dfa_debug = false;
+	public static boolean debug = true;
+	public static boolean dfa_debug = true;
 	public static final int NUM_EDGES = 255;
 
 	protected Lexer recog;

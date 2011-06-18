@@ -29,6 +29,7 @@ package org.antlr.v4.test;
 
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.automata.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
@@ -79,13 +80,11 @@ public abstract class BaseTest {
 
     protected org.antlr.v4.Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
-		tool.setOutputDirectory(tmpdir);
 		return tool;
 	}
 
 	protected Tool newTool() {
-		org.antlr.v4.Tool tool = new Tool();
-		tool.setOutputDirectory(tmpdir);
+		org.antlr.v4.Tool tool = new Tool(new String[] {"-o", tmpdir});
 		return tool;
 	}
 
