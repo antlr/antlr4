@@ -1,15 +1,15 @@
 package org.antlr.v4;
 
 import org.antlr.runtime.*;
-import org.antlr.tool.DOTGenerator;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
+import org.stringtemplate.v4.STGroup;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -21,30 +21,24 @@ public class Tool {
 		String fieldName;
 		String name;
 		OptionArgType argType;
-		Object defaultArgValue;
 		String description;
 
 		public Option(String fieldName, String name, String description) {
-			this(fieldName, name, OptionArgType.NONE, null, description);
+			this(fieldName, name, OptionArgType.NONE, description);
 		}
 
 		public Option(String fieldName, String name, OptionArgType argType, String description) {
-			this(fieldName, name, argType, null, description);
-		}
-
-		public Option(String fieldName, String name, OptionArgType argType, Object defaultArgValue, String description) {
 			this.fieldName = fieldName;
 			this.name = name;
 			this.argType = argType;
-			this.defaultArgValue = defaultArgValue;
 			this.description = description;
 		}
 	}
 
 	// fields set by option manager
 
-	public String outputDirectory = ".";
-	public String libDirectory = ".";
+	public String outputDirectory;
+	public String libDirectory;
 	public boolean report = false;
 	public boolean printGrammar = false;
 	public boolean debug = false;
@@ -56,22 +50,27 @@ public class Tool {
 	public boolean launch_ST_inspector = false;
 
 	public static Option[] optionDefs = {
-	new Option("outputDirectory",	"-o", OptionArgType.STRING, ".", "specify output directory where all output is generated"),
-	new Option("libDirectory",		"-lib", OptionArgType.STRING, ".", "specify location of .token files"),
+	new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+	new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
 	new Option("report",			"-report", "print out a report about the grammar(s) processed"),
 	new Option("printGrammar",		"-print", "print out the grammar without actions"),
 	new Option("debug",				"-debug", "generate a parser that emits debugging events"),
 	new Option("profile",			"-profile", "generate a parser that computes profiling information"),
 	new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
 	new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
-	new Option("msgFormat",			"-message-format", OptionArgType.STRING, "antlr", "specify output style for messages"),
-	new Option("saveLexer",			"-savelexer", "save temp lexer file created for combined grammars"),
-	new Option("launch_ST_inspector", "-dbgST", "launch StringTemplate visualizer on generated code"),
+	new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+	new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
+	new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
 	};
+
+	// helper vars for option management
+	protected boolean haveOutputDir = false;
+	protected boolean return_dont_exit = false;
 
     // The internal options are for my use on the command line during dev
     public static boolean internalOption_PrintGrammarTree = false;
     public static boolean internalOption_ShowATNConfigsInDFA = false;
+
 
 	public final String[] args;
 
@@ -93,25 +92,22 @@ public class Tool {
 
 		antlr.processGrammarsOnCommandLine();
 
+		if ( antlr.return_dont_exit ) return;
+
 		if (antlr.errMgr.getNumErrors() > 0) {
 			antlr.exit(1);
 		}
 		antlr.exit(0);
-
-//		if (!exitNow) {
-//			antlr.processGrammarsOnCommandLine();
-//			if ( return_dont_exit ) return;
-//		}
 	}
 
 	public Tool() { this(null); }
 
 	public Tool(String[] args) {
 		this.args = args;
-		parseArgs();
+		handleArgs();
 	}
 
-	protected void parseArgs() {
+	protected void handleArgs() {
 		int i=0;
 		while ( args!=null && i<args.length ) {
 			String arg = args[i];
@@ -140,6 +136,40 @@ public class Tool {
 				}
 			}
 		}
+		if ( outputDirectory!=null ) {
+			if (outputDirectory.endsWith("/") ||
+				outputDirectory.endsWith("\\")) {
+				outputDirectory =
+					outputDirectory.substring(0, outputDirectory.length() - 1);
+			}
+			File outDir = new File(outputDirectory);
+			haveOutputDir = true;
+			if (outDir.exists() && !outDir.isDirectory()) {
+				errMgr.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
+				libDirectory = ".";
+			}
+		}
+		else {
+			outputDirectory = ".";
+		}
+		if ( libDirectory!=null ) {
+			if (libDirectory.endsWith("/") ||
+				libDirectory.endsWith("\\")) {
+				libDirectory = libDirectory.substring(0, libDirectory.length() - 1);
+			}
+			File outDir = new File(libDirectory);
+			if (!outDir.exists()) {
+				errMgr.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
+				libDirectory = ".";
+			}
+		}
+		else {
+			libDirectory = ".";
+		}
+		if ( launch_ST_inspector ) {
+			STGroup.trackCreationEvents = true;
+			return_dont_exit = true;
+		}
 	}
 
 	public void processGrammarsOnCommandLine() {
@@ -150,7 +180,7 @@ public class Tool {
 
 			GrammarRootAST ast = (GrammarRootAST)t;
 			Grammar g = createGrammar(ast);
-			g.fileName = grammarFileNames.get(0);
+			g.fileName = fileName;
 			process(g);
 		}
 	}
@@ -391,6 +421,117 @@ public class Tool {
 		}
 	}
 
+	/** This method is used by all code generators to create new output
+	 *  files. If the outputDir set by -o is not present it will be created.
+	 *  The final filename is sensitive to the output directory and
+	 *  the directory where the grammar file was found.  If -o is /tmp
+	 *  and the original grammar file was foo/t.g then output files
+	 *  go in /tmp/foo.
+	 *
+	 *  The output dir -o spec takes precedence if it's absolute.
+	 *  E.g., if the grammar file dir is absolute the output dir is given
+	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
+	 *  output (assuming t.g holds T.java).
+	 *
+	 *  If no -o is specified, then just write to the directory where the
+	 *  grammar file was found.
+	 *
+	 *  If outputDirectory==null then write a String.
+	 */
+	public Writer getOutputFile(Grammar g, String fileName) throws IOException {
+		if (outputDirectory == null) {
+			return new StringWriter();
+		}
+		// output directory is a function of where the grammar file lives
+		// for subdir/T.g, you get subdir here.  Well, depends on -o etc...
+		// But, if this is a .tokens file, then we force the output to
+		// be the base output directory (or current directory if there is not a -o)
+		//
+		File outputDir;
+		if ( fileName.endsWith(".tokens") ) {// CodeGenerator.VOCAB_FILE_EXTENSION)) {
+			outputDir = new File(outputDirectory);
+		}
+		else {
+			outputDir = getOutputDirectory(g.fileName);
+		}
+		File outputFile = new File(outputDir, fileName);
+
+		if (!outputDir.exists()) {
+			outputDir.mkdirs();
+		}
+		FileWriter fw = new FileWriter(outputFile);
+		return new BufferedWriter(fw);
+	}
+
+	/**
+	 * Return the location where ANTLR will generate output files for a given
+	 * file. This is a base directory and output files will be relative to
+	 * here in some cases such as when -o option is used and input files are
+	 * given relative to the input directory.
+	 *
+	 * @param fileNameWithPath path to input source
+	 * @return
+	 */
+	public File getOutputDirectory(String fileNameWithPath) {
+		File outputDir = new File(outputDirectory);
+		String fileDirectory;
+
+		// Some files are given to us without a PATH but should should
+		// still be written to the output directory in the relative path of
+		// the output directory. The file directory is either the set of sub directories
+		// or just or the relative path recorded for the parent grammar. This means
+		// that when we write the tokens files, or the .java files for imported grammars
+		// taht we will write them in the correct place.
+		if (fileNameWithPath.lastIndexOf(File.separatorChar) == -1) {
+			// No path is included in the file name, so make the file
+			// directory the same as the parent grammar (which might sitll be just ""
+			// but when it is not, we will write the file in the correct place.
+			fileDirectory = ".";
+
+		}
+		else {
+			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
+		}
+		if ( haveOutputDir ) {
+			// -o /tmp /var/lib/t.g => /tmp/T.java
+			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
+			// -o . /usr/lib/t.g => ./T.java
+			if (fileDirectory != null &&
+				(new File(fileDirectory).isAbsolute() ||
+				 fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
+				// somebody set the dir, it takes precendence; write new file there
+				outputDir = new File(outputDirectory);
+			}
+			else {
+				// -o /tmp subdir/t.g => /tmp/subdir/t.g
+				if (fileDirectory != null) {
+					outputDir = new File(outputDirectory, fileDirectory);
+				}
+				else {
+					outputDir = new File(outputDirectory);
+				}
+			}
+		}
+		else {
+			// they didn't specify a -o dir so just write to location
+			// where grammar is, absolute or relative, this will only happen
+			// with command line invocation as build tools will always
+			// supply an output directory.
+			outputDir = new File(fileDirectory);
+		}
+		return outputDir;
+	}
+
+	protected void writeDOTFile(Grammar g, Rule r, String dot) throws IOException {
+		writeDOTFile(g, r.g.name + "." + r.name, dot);
+	}
+
+	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {
+		Writer fw = getOutputFile(g, name + ".dot");
+		fw.write(dot);
+		fw.close();
+	}
+
 	public void help() {
 		info("ANTLR Parser Generator  Version " + new Tool().VERSION);
 		for (Option o : optionDefs) {
@@ -399,6 +540,8 @@ public class Tool {
 			info(s);
 		}
 	}
+
+	public int getNumErrors() { return errMgr.getNumErrors(); }
 
 	public void addListener(ANTLRToolListener tl) {
 		if ( tl!=null ) listeners.add(tl);

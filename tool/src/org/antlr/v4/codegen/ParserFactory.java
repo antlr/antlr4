@@ -52,7 +52,4 @@ public class ParserFactory extends OutputModelFactory {
 		return tokenRef(ID, label, null);
 	}
 
-	public void defineBitSet(BitSetDecl b) {
-//		((ParserFile)file).defineBitSet(b);
-	}
 }

@@ -171,9 +171,6 @@ public class CodeGenerator {
 	 *  Returns null if no .tokens file should be generated.
 	 */
 	public String getVocabFileName() {
-//		if ( g.isBuiltFromString() ) {
-//			return null;
-//		}
 		return g.name+VOCAB_FILE_EXTENSION;
 	}
 

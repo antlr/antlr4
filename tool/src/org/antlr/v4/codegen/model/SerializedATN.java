@@ -1,5 +1,6 @@
 package org.antlr.v4.codegen.model;
 
+import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.ATN;
 
@@ -10,7 +11,7 @@ public class SerializedATN extends OutputModelObject {
 	public List<String> serialized;
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
 		super(factory);
-		List<Integer> data = atn.getSerialized();
+		List<Integer> data = ATNSerializer.getSerialized(atn);
 		serialized = new ArrayList<String>(data.size());
 		for (int c : data) {
 			String encoded = factory.gen.target.encodeIntAsCharEscape(c);

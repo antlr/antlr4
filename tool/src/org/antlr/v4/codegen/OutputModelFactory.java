@@ -118,50 +118,8 @@ public abstract class OutputModelFactory {
 		return c;
 	}
 
-	public abstract void defineBitSet(BitSetDecl b);
-
 	public SrcOp getLL1Test(IntervalSet look, GrammarAST blkAST) {
 		return new TestSetInline(this, blkAST, look);
-//		OutputModelObject expr;
-//		if ( look.size() < gen.target.getInlineTestsVsBitsetThreshold() ) {
-//			expr = new TestSetInline(this, blkAST, look);
-//		}
-//		else {
-//			expr = new TestSet(this, blkAST, look);
-//		}
-//		return expr;
-	}
-
-//	public DFADecl defineDFA(GrammarAST ast, DFA dfa) {
-//		return null;
-////		DFADef d = new DFADef(name, dfa);
-////		outputModel.dfaDefs.add(d);
-//	}
-//
-	public BitSetDecl createFollowBitSet(GrammarAST ast, IntervalSet set) {
-		String inRuleName = ast.atnState.rule.name;
-		String elementName = ast.getText(); // assume rule ref
-		if ( ast.getType() == ANTLRParser.STRING_LITERAL ) {
-			elementName = gen.target.getTokenTypeAsTargetLabel(g, g.stringLiteralToTypeMap.get(elementName));
-		}
-		String name = "FOLLOW_"+elementName+"_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDecl b = new BitSetDecl(this, name, set);
-		return b;
-	}
-
-	public BitSetDecl createExpectingBitSet(GrammarAST ast, int decision, IntervalSet set, String position) {
-		String inRuleName = ast.atnState.rule.name;
-		String name = "EXPECTING_in_"+inRuleName+"_"+position+"_"+decision;
-		//System.out.println("!!!!!!!! create "+name);
-		BitSetDecl b = new BitSetDecl(this, name, set);
-		return b;
-	}
-
-	public BitSetDecl createTestBitSet(GrammarAST ast, IntervalSet set) {
-		String inRuleName = ast.atnState.rule.name;
-		String name = "LOOK_in_"+inRuleName+"_"+ast.token.getTokenIndex();
-		BitSetDecl b = new BitSetDecl(this, name, set);
-		return b;
 	}
 }
 

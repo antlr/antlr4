@@ -108,8 +108,4 @@ public class LexerFactory extends OutputModelFactory {
 	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {
 		return null;
 	}
-
-	@Override
-	public void defineBitSet(BitSetDecl b) {
-	}
 }

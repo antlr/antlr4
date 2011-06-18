@@ -9,7 +9,6 @@ import java.util.*;
 /** */
 public class MatchToken extends RuleElement implements LabeledOp {
 	public String name;
-	public BitSetDecl follow;
 	public List<String> labels = new ArrayList<String>();
 
 	public MatchToken(OutputModelFactory factory, TerminalAST ast, GrammarAST labelAST) {

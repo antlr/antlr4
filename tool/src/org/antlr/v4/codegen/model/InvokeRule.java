@@ -12,7 +12,6 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 	public String name;
 	public List<String> labels = new ArrayList<String>();
 	public String argExprs;
-	public BitSetDecl follow;
 	public String ctxName;
 
 	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
