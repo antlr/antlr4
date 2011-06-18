@@ -74,7 +74,7 @@ public class Grammar implements AttributeResolver {
 	 *  like EPSILON. Char/String literals and token types overlap in the same
 	 *  space, however.
 	 */
-	int maxTokenType = Token.MIN_TOKEN_TYPE-1;
+	int maxTokenType = Token.MIN_USER_TOKEN_TYPE -1;
 
 	/** Map token like ID (but not literals like "while") to its token type */
 	public Map<String, Integer> tokenNameToTypeMap = new LinkedHashMap<String, Integer>();
@@ -436,7 +436,7 @@ public class Grammar implements AttributeResolver {
 		if ( isLexer() ) {
 			return getAllCharValues();
 		}
-		return IntervalSet.of(Token.MIN_TOKEN_TYPE, getMaxTokenType());
+		return IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, getMaxTokenType());
 	}
 
 	/** Return min to max char as defined by the target.

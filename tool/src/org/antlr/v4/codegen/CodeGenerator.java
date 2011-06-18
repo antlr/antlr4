@@ -104,7 +104,7 @@ public class CodeGenerator {
 		// make constants for the token names
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			int tokenType = g.tokenNameToTypeMap.get(t);
-			if ( tokenType>=Token.MIN_TOKEN_TYPE ) {
+			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
 				tokens.put(t, Utils.integer(tokenType));
 			}
 		}
@@ -114,7 +114,7 @@ public class CodeGenerator {
 		Map<String,Integer> literals = new HashMap<String,Integer>();
 		for (String literal : g.stringLiteralToTypeMap.keySet()) {
 			int tokenType = g.stringLiteralToTypeMap.get(literal);
-			if ( tokenType>=Token.MIN_TOKEN_TYPE ) {
+			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
 				literals.put(literal, Utils.integer(tokenType));
 			}
 		}

@@ -29,17 +29,18 @@ package org.antlr.v4.runtime;
  */
 
 public interface Token {
+	public static final int INVALID_TYPE = 0;
+	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
+	public static final int MIN_TOKEN_TYPE = 1;
+
 	/** imaginary tree navigation type; traverse "get child" link */
 	public static final int DOWN = 1;
 	/** imaginary tree navigation type; finish with a child list */
 	public static final int UP = 2;
 
-	public static final int MIN_TOKEN_TYPE = UP+1;
+	public static final int MIN_USER_TOKEN_TYPE = UP+1;
 
     public static final int EOF = CharStream.EOF;
-
-	public static final int INVALID_TYPE = 0;
-	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
 
 	/** All tokens go to the parser (unless skip() is called in that rule)
 	 *  on a particular "channel".  The parser tunes to a particular channel

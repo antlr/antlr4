@@ -186,7 +186,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		for (Iterator iter = tokens.iterator(); iter.hasNext();) {
 			String tokenName = (String) iter.next();
 			assertTrue("unexpected token name "+tokenName,
-					   g.getTokenType(tokenName) < Token.MIN_TOKEN_TYPE);
+					   g.getTokenType(tokenName) < Token.MIN_USER_TOKEN_TYPE);
 		}
 
 		// make sure all expected rules are there
