@@ -8,6 +8,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 public class LexerGrammar extends Grammar {
 	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
 
+	/** DEFAULT_MODE rules are added first due to grammar syntax order */
 	public MultiMap<String, Rule> modes = new MultiMap<String, Rule>();
 
 	public LexerGrammar(Tool tool, GrammarRootAST ast) {
@@ -25,7 +26,6 @@ public class LexerGrammar extends Grammar {
 	public LexerGrammar(String fileName, String grammarText, ANTLRToolListener listener) throws RecognitionException {
 		super(fileName, grammarText, listener);
 	}
-
 
 	@Override
 	public void defineRule(Rule r) {

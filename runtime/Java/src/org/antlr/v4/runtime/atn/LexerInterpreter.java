@@ -6,8 +6,8 @@ import org.antlr.v4.runtime.dfa.*;
 
 /** "dup" of ParserInterpreter */
 public class LexerInterpreter extends ATNInterpreter {
-	public static boolean debug = true;
-	public static boolean dfa_debug = true;
+	public static boolean debug = false;
+	public static boolean dfa_debug = false;
 	public static final int NUM_EDGES = 255;
 
 	protected Lexer recog;
@@ -54,7 +54,7 @@ public class LexerInterpreter extends ATNInterpreter {
 	}
 
 	public int exec(CharStream input, DFAState s0) {
-		if ( dfa_debug ) System.out.println("DFA[mode "+recog.state.mode+"] exec LA(1)=="+
+		if ( dfa_debug ) System.out.println("DFA[mode "+(recog==null?0:recog.state.mode)+"] exec LA(1)=="+
 											(char)input.LA(1));
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
 		int prevAcceptMarker = -1;
