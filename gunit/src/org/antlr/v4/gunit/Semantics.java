@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 Semantics.g 2010-01-27 17:03:31
+// $ANTLR 3.4 Semantics.g 2011-06-20 18:31:51
 
 package org.antlr.v4.gunit;
 import java.util.Map;
@@ -6,64 +6,70 @@ import java.util.HashMap;
 
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;import java.util.Stack;
+import org.antlr.runtime.tree.*;
+import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+
+@SuppressWarnings({"all", "warnings", "unchecked"})
 public class Semantics extends TreeFilter {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SUITE", "TEST_OK", "TEST_FAIL", "TEST_RETVAL", "TEST_STDOUT", "TEST_TREE", "TEST_ACTION", "DOC_COMMENT", "ID", "OPTIONS", "STRING", "ACTION", "RETVAL", "ML_STRING", "TREE", "FILENAME", "NESTED_RETVAL", "NESTED_AST", "STRING_", "WS", "ID_", "SL_COMMENT", "ML_COMMENT", "XDIGIT", "'gunit'", "';'", "'}'", "'='", "'@header'", "'walks'", "':'", "'OK'", "'FAIL'", "'returns'", "'->'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ACTION", "DOC_COMMENT", "FILENAME", "ID", "ID_", "ML_COMMENT", "ML_STRING", "NESTED_AST", "NESTED_RETVAL", "OPTIONS", "RETVAL", "SL_COMMENT", "STRING", "STRING_", "SUITE", "TEST_ACTION", "TEST_FAIL", "TEST_OK", "TEST_RETVAL", "TEST_STDOUT", "TEST_TREE", "TREE", "WS", "XDIGIT", "'->'", "':'", "';'", "'='", "'@header'", "'FAIL'", "'OK'", "'gunit'", "'returns'", "'walks'", "'}'"
     };
-    public static final int T__29=29;
-    public static final int T__28=28;
-    public static final int RETVAL=16;
-    public static final int TEST_TREE=9;
-    public static final int STRING_=22;
-    public static final int NESTED_AST=21;
-    public static final int ML_STRING=17;
-    public static final int TEST_FAIL=6;
-    public static final int ID=12;
+
     public static final int EOF=-1;
-    public static final int NESTED_RETVAL=20;
-    public static final int TEST_RETVAL=7;
-    public static final int TEST_STDOUT=8;
-    public static final int ACTION=15;
-    public static final int TEST_OK=5;
-    public static final int ML_COMMENT=26;
+    public static final int T__28=28;
+    public static final int T__29=29;
     public static final int T__30=30;
     public static final int T__31=31;
     public static final int T__32=32;
     public static final int T__33=33;
-    public static final int WS=23;
     public static final int T__34=34;
     public static final int T__35=35;
     public static final int T__36=36;
-    public static final int TREE=18;
     public static final int T__37=37;
     public static final int T__38=38;
-    public static final int FILENAME=19;
-    public static final int ID_=24;
-    public static final int XDIGIT=27;
-    public static final int SL_COMMENT=25;
-    public static final int DOC_COMMENT=11;
-    public static final int TEST_ACTION=10;
-    public static final int SUITE=4;
+    public static final int ACTION=4;
+    public static final int DOC_COMMENT=5;
+    public static final int FILENAME=6;
+    public static final int ID=7;
+    public static final int ID_=8;
+    public static final int ML_COMMENT=9;
+    public static final int ML_STRING=10;
+    public static final int NESTED_AST=11;
+    public static final int NESTED_RETVAL=12;
     public static final int OPTIONS=13;
-    public static final int STRING=14;
+    public static final int RETVAL=14;
+    public static final int SL_COMMENT=15;
+    public static final int STRING=16;
+    public static final int STRING_=17;
+    public static final int SUITE=18;
+    public static final int TEST_ACTION=19;
+    public static final int TEST_FAIL=20;
+    public static final int TEST_OK=21;
+    public static final int TEST_RETVAL=22;
+    public static final int TEST_STDOUT=23;
+    public static final int TEST_TREE=24;
+    public static final int TREE=25;
+    public static final int WS=26;
+    public static final int XDIGIT=27;
 
     // delegates
+    public TreeFilter[] getDelegates() {
+        return new TreeFilter[] {};
+    }
+
     // delegators
 
 
-        public Semantics(TreeNodeStream input) {
-            this(input, new RecognizerSharedState());
-        }
-        public Semantics(TreeNodeStream input, RecognizerSharedState state) {
-            super(input, state);
-             
-        }
-        
+    public Semantics(TreeNodeStream input) {
+        this(input, new RecognizerSharedState());
+    }
+    public Semantics(TreeNodeStream input, RecognizerSharedState state) {
+        super(input, state);
+    }
 
     public String[] getTokenNames() { return Semantics.tokenNames; }
     public String getGrammarFileName() { return "Semantics.g"; }
@@ -85,7 +91,7 @@ public class Semantics extends TreeFilter {
             if ( (LA1_0==OPTIONS) ) {
                 alt1=1;
             }
-            else if ( (LA1_0==28) ) {
+            else if ( (LA1_0==35) ) {
                 alt1=2;
             }
             else {
@@ -94,6 +100,7 @@ public class Semantics extends TreeFilter {
                     new NoViableAltException("", 1, 0, input);
 
                 throw nvae;
+
             }
             switch (alt1) {
                 case 1 :
@@ -125,11 +132,14 @@ public class Semantics extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "topdown"
+
 
 
     // $ANTLR start "gUnitDef"
@@ -141,17 +151,18 @@ public class Semantics extends TreeFilter {
             // Semantics.g:26:2: ( ^( 'gunit' ID ( . )* ) )
             // Semantics.g:26:4: ^( 'gunit' ID ( . )* )
             {
-            match(input,28,FOLLOW_28_in_gUnitDef67); if (state.failed) return ;
+            match(input,35,FOLLOW_35_in_gUnitDef67); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             ID1=(CommonTree)match(input,ID,FOLLOW_ID_in_gUnitDef69); if (state.failed) return ;
+
             // Semantics.g:26:17: ( . )*
             loop2:
             do {
                 int alt2=2;
                 int LA2_0 = input.LA(1);
 
-                if ( ((LA2_0>=SUITE && LA2_0<=38)) ) {
+                if ( ((LA2_0 >= ACTION && LA2_0 <= 38)) ) {
                     alt2=1;
                 }
                 else if ( (LA2_0==UP) ) {
@@ -175,9 +186,9 @@ public class Semantics extends TreeFilter {
 
 
             match(input, Token.UP, null); if (state.failed) return ;
-            if ( state.backtracking==1 ) {
-              name = (ID1!=null?ID1.getText():null);
-            }
+
+
+            if ( state.backtracking==1 ) {name = (ID1!=null?ID1.getText():null);}
 
             }
 
@@ -186,11 +197,14 @@ public class Semantics extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "gUnitDef"
+
 
 
     // $ANTLR start "optionsSpec"
@@ -241,6 +255,7 @@ public class Semantics extends TreeFilter {
 
             match(input, Token.UP, null); if (state.failed) return ;
 
+
             }
 
         }
@@ -248,11 +263,14 @@ public class Semantics extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "optionsSpec"
+
 
 
     // $ANTLR start "option"
@@ -287,6 +305,7 @@ public class Semantics extends TreeFilter {
                                 new NoViableAltException("", 4, 3, input);
 
                             throw nvae;
+
                         }
                     }
                     else {
@@ -295,6 +314,7 @@ public class Semantics extends TreeFilter {
                             new NoViableAltException("", 4, 2, input);
 
                         throw nvae;
+
                     }
                 }
                 else {
@@ -303,6 +323,7 @@ public class Semantics extends TreeFilter {
                         new NoViableAltException("", 4, 1, input);
 
                     throw nvae;
+
                 }
             }
             else {
@@ -311,6 +332,7 @@ public class Semantics extends TreeFilter {
                     new NoViableAltException("", 4, 0, input);
 
                 throw nvae;
+
             }
             switch (alt4) {
                 case 1 :
@@ -320,12 +342,13 @@ public class Semantics extends TreeFilter {
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
                     o=(CommonTree)match(input,ID,FOLLOW_ID_in_option113); if (state.failed) return ;
+
                     v=(CommonTree)match(input,ID,FOLLOW_ID_in_option117); if (state.failed) return ;
 
                     match(input, Token.UP, null); if (state.failed) return ;
-                    if ( state.backtracking==1 ) {
-                      options.put((o!=null?o.getText():null), (v!=null?v.getText():null));
-                    }
+
+
+                    if ( state.backtracking==1 ) {options.put((o!=null?o.getText():null), (v!=null?v.getText():null));}
 
                     }
                     break;
@@ -336,12 +359,13 @@ public class Semantics extends TreeFilter {
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
                     o=(CommonTree)match(input,ID,FOLLOW_ID_in_option136); if (state.failed) return ;
+
                     v=(CommonTree)match(input,STRING,FOLLOW_STRING_in_option140); if (state.failed) return ;
 
                     match(input, Token.UP, null); if (state.failed) return ;
-                    if ( state.backtracking==1 ) {
-                      options.put((o!=null?o.getText():null), (v!=null?v.getText():null));
-                    }
+
+
+                    if ( state.backtracking==1 ) {options.put((o!=null?o.getText():null), (v!=null?v.getText():null));}
 
                     }
                     break;
@@ -352,7 +376,9 @@ public class Semantics extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
@@ -365,15 +391,15 @@ public class Semantics extends TreeFilter {
 
     public static final BitSet FOLLOW_optionsSpec_in_topdown50 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_gUnitDef_in_topdown55 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_28_in_gUnitDef67 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_35_in_gUnitDef67 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_gUnitDef69 = new BitSet(new long[]{0x0000007FFFFFFFF8L});
     public static final BitSet FOLLOW_OPTIONS_in_optionsSpec88 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_option_in_optionsSpec90 = new BitSet(new long[]{0x0000000080000008L});
     public static final BitSet FOLLOW_31_in_option109 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option113 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_option113 = new BitSet(new long[]{0x0000000000000080L});
     public static final BitSet FOLLOW_ID_in_option117 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_31_in_option132 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_option136 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_ID_in_option136 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_STRING_in_option140 = new BitSet(new long[]{0x0000000000000008L});
 
 }

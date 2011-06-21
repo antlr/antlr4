@@ -1,4 +1,4 @@
-// $ANTLR 3.2.1-SNAPSHOT Jan 26, 2010 15:12:28 gUnit.g 2010-01-27 17:03:31
+// $ANTLR 3.4 gUnit.g 2011-06-20 18:31:50
 
 package org.antlr.v4.gunit;
 
@@ -8,54 +8,57 @@ import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 
+@SuppressWarnings({"all", "warnings", "unchecked"})
 public class gUnitLexer extends Lexer {
-    public static final int T__29=29;
-    public static final int T__28=28;
-    public static final int RETVAL=16;
-    public static final int TEST_TREE=9;
-    public static final int STRING_=22;
-    public static final int NESTED_AST=21;
-    public static final int ML_STRING=17;
-    public static final int TEST_FAIL=6;
-    public static final int ID=12;
     public static final int EOF=-1;
-    public static final int NESTED_RETVAL=20;
-    public static final int TEST_RETVAL=7;
-    public static final int TEST_STDOUT=8;
-    public static final int ACTION=15;
-    public static final int TEST_OK=5;
-    public static final int ML_COMMENT=26;
+    public static final int T__28=28;
+    public static final int T__29=29;
     public static final int T__30=30;
     public static final int T__31=31;
     public static final int T__32=32;
     public static final int T__33=33;
-    public static final int WS=23;
     public static final int T__34=34;
     public static final int T__35=35;
     public static final int T__36=36;
-    public static final int TREE=18;
     public static final int T__37=37;
     public static final int T__38=38;
-    public static final int FILENAME=19;
-    public static final int ID_=24;
-    public static final int XDIGIT=27;
-    public static final int SL_COMMENT=25;
-    public static final int DOC_COMMENT=11;
-    public static final int TEST_ACTION=10;
-    public static final int SUITE=4;
+    public static final int ACTION=4;
+    public static final int DOC_COMMENT=5;
+    public static final int FILENAME=6;
+    public static final int ID=7;
+    public static final int ID_=8;
+    public static final int ML_COMMENT=9;
+    public static final int ML_STRING=10;
+    public static final int NESTED_AST=11;
+    public static final int NESTED_RETVAL=12;
     public static final int OPTIONS=13;
-    public static final int STRING=14;
+    public static final int RETVAL=14;
+    public static final int SL_COMMENT=15;
+    public static final int STRING=16;
+    public static final int STRING_=17;
+    public static final int SUITE=18;
+    public static final int TEST_ACTION=19;
+    public static final int TEST_FAIL=20;
+    public static final int TEST_OK=21;
+    public static final int TEST_RETVAL=22;
+    public static final int TEST_STDOUT=23;
+    public static final int TEST_TREE=24;
+    public static final int TREE=25;
+    public static final int WS=26;
+    public static final int XDIGIT=27;
 
     // delegates
     // delegators
+    public Lexer[] getDelegates() {
+        return new Lexer[] {};
+    }
 
-    public gUnitLexer() {;} 
+    public gUnitLexer() {} 
     public gUnitLexer(CharStream input) {
         this(input, new RecognizerSharedState());
     }
     public gUnitLexer(CharStream input, RecognizerSharedState state) {
         super(input,state);
-
     }
     public String getGrammarFileName() { return "gUnit.g"; }
 
@@ -64,10 +67,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__28;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:7:7: ( 'gunit' )
-            // gUnit.g:7:9: 'gunit'
+            // gUnit.g:6:7: ( '->' )
+            // gUnit.g:6:9: '->'
             {
-            match("gunit"); 
+            match("->"); 
+
 
 
             }
@@ -76,6 +80,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__28"
@@ -84,6 +89,27 @@ public class gUnitLexer extends Lexer {
     public final void mT__29() throws RecognitionException {
         try {
             int _type = T__29;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // gUnit.g:7:7: ( ':' )
+            // gUnit.g:7:9: ':'
+            {
+            match(':'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__29"
+
+    // $ANTLR start "T__30"
+    public final void mT__30() throws RecognitionException {
+        try {
+            int _type = T__30;
             int _channel = DEFAULT_TOKEN_CHANNEL;
             // gUnit.g:8:7: ( ';' )
             // gUnit.g:8:9: ';'
@@ -96,26 +122,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
-        }
-    }
-    // $ANTLR end "T__29"
-
-    // $ANTLR start "T__30"
-    public final void mT__30() throws RecognitionException {
-        try {
-            int _type = T__30;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:9:7: ( '}' )
-            // gUnit.g:9:9: '}'
-            {
-            match('}'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__30"
@@ -125,8 +132,8 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__31;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:10:7: ( '=' )
-            // gUnit.g:10:9: '='
+            // gUnit.g:9:7: ( '=' )
+            // gUnit.g:9:9: '='
             {
             match('='); 
 
@@ -136,6 +143,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__31"
@@ -145,10 +153,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__32;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:11:7: ( '@header' )
-            // gUnit.g:11:9: '@header'
+            // gUnit.g:10:7: ( '@header' )
+            // gUnit.g:10:9: '@header'
             {
             match("@header"); 
+
 
 
             }
@@ -157,6 +166,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__32"
@@ -166,10 +176,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__33;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:12:7: ( 'walks' )
-            // gUnit.g:12:9: 'walks'
+            // gUnit.g:11:7: ( 'FAIL' )
+            // gUnit.g:11:9: 'FAIL'
             {
-            match("walks"); 
+            match("FAIL"); 
+
 
 
             }
@@ -178,6 +189,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__33"
@@ -187,10 +199,12 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__34;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:13:7: ( ':' )
-            // gUnit.g:13:9: ':'
+            // gUnit.g:12:7: ( 'OK' )
+            // gUnit.g:12:9: 'OK'
             {
-            match(':'); 
+            match("OK"); 
+
+
 
             }
 
@@ -198,6 +212,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__34"
@@ -207,10 +222,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__35;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:14:7: ( 'OK' )
-            // gUnit.g:14:9: 'OK'
+            // gUnit.g:13:7: ( 'gunit' )
+            // gUnit.g:13:9: 'gunit'
             {
-            match("OK"); 
+            match("gunit"); 
+
 
 
             }
@@ -219,6 +235,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__35"
@@ -228,10 +245,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__36;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:15:7: ( 'FAIL' )
-            // gUnit.g:15:9: 'FAIL'
+            // gUnit.g:14:7: ( 'returns' )
+            // gUnit.g:14:9: 'returns'
             {
-            match("FAIL"); 
+            match("returns"); 
+
 
 
             }
@@ -240,6 +258,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__36"
@@ -249,10 +268,11 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__37;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:16:7: ( 'returns' )
-            // gUnit.g:16:9: 'returns'
+            // gUnit.g:15:7: ( 'walks' )
+            // gUnit.g:15:9: 'walks'
             {
-            match("returns"); 
+            match("walks"); 
+
 
 
             }
@@ -261,6 +281,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__37"
@@ -270,11 +291,10 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = T__38;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:17:7: ( '->' )
-            // gUnit.g:17:9: '->'
+            // gUnit.g:16:7: ( '}' )
+            // gUnit.g:16:9: '}'
             {
-            match("->"); 
-
+            match('}'); 
 
             }
 
@@ -282,6 +302,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "T__38"
@@ -291,11 +312,12 @@ public class gUnitLexer extends Lexer {
         try {
             int _type = ACTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // gUnit.g:59:2: ( '{' ( '\\\\}' | '\\\\' ~ '}' | ~ ( '\\\\' | '}' ) )* '}' )
-            // gUnit.g:59:4: '{' ( '\\\\}' | '\\\\' ~ '}' | ~ ( '\\\\' | '}' ) )* '}'
+            // gUnit.g:59:2: ( '{' ( '\\\\}' | '\\\\' ~ '}' |~ ( '\\\\' | '}' ) )* '}' )
+            // gUnit.g:59:4: '{' ( '\\\\}' | '\\\\' ~ '}' |~ ( '\\\\' | '}' ) )* '}'
             {
             match('{'); 
-            // gUnit.g:59:8: ( '\\\\}' | '\\\\' ~ '}' | ~ ( '\\\\' | '}' ) )*
+
+            // gUnit.g:59:8: ( '\\\\}' | '\\\\' ~ '}' |~ ( '\\\\' | '}' ) )*
             loop1:
             do {
                 int alt1=4;
@@ -307,13 +329,13 @@ public class gUnitLexer extends Lexer {
                     if ( (LA1_2=='}') ) {
                         alt1=1;
                     }
-                    else if ( ((LA1_2>='\u0000' && LA1_2<='|')||(LA1_2>='~' && LA1_2<='\uFFFF')) ) {
+                    else if ( ((LA1_2 >= '\u0000' && LA1_2 <= '|')||(LA1_2 >= '~' && LA1_2 <= '\uFFFF')) ) {
                         alt1=2;
                     }
 
 
                 }
-                else if ( ((LA1_0>='\u0000' && LA1_0<='[')||(LA1_0>=']' && LA1_0<='|')||(LA1_0>='~' && LA1_0<='\uFFFF')) ) {
+                else if ( ((LA1_0 >= '\u0000' && LA1_0 <= '[')||(LA1_0 >= ']' && LA1_0 <= '|')||(LA1_0 >= '~' && LA1_0 <= '\uFFFF')) ) {
                     alt1=3;
                 }
 
@@ -325,20 +347,22 @@ public class gUnitLexer extends Lexer {
             	    match("\\}"); 
 
 
+
             	    }
             	    break;
             	case 2 :
             	    // gUnit.g:59:15: '\\\\' ~ '}'
             	    {
             	    match('\\'); 
-            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='|')||(input.LA(1)>='~' && input.LA(1)<='\uFFFF') ) {
-            	        input.consume();
 
+            	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '|')||(input.LA(1) >= '~' && input.LA(1) <= '\uFFFF') ) {
+            	        input.consume();
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
@@ -346,14 +370,14 @@ public class gUnitLexer extends Lexer {
             	case 3 :
             	    // gUnit.g:59:25: ~ ( '\\\\' | '}' )
             	    {
-            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='|')||(input.LA(1)>='~' && input.LA(1)<='\uFFFF') ) {
+            	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '|')||(input.LA(1) >= '~' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
-
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
@@ -364,7 +388,9 @@ public class gUnitLexer extends Lexer {
                 }
             } while (true);
 
+
             match('}'); 
+
             setText(getText().substring(1, getText().length()-1));
 
             }
@@ -373,6 +399,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "ACTION"
@@ -386,6 +413,8 @@ public class gUnitLexer extends Lexer {
             // gUnit.g:63:4: NESTED_RETVAL
             {
             mNESTED_RETVAL(); 
+
+
             setText(getText().substring(1, getText().length()-1));
 
             }
@@ -394,6 +423,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "RETVAL"
@@ -401,11 +431,12 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "NESTED_RETVAL"
     public final void mNESTED_RETVAL() throws RecognitionException {
         try {
-            // gUnit.g:67:15: ( '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']' )
-            // gUnit.g:68:2: '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']'
+            // gUnit.g:68:15: ( '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']' )
+            // gUnit.g:69:2: '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']'
             {
             match('['); 
-            // gUnit.g:69:2: ( options {greedy=false; } : NESTED_RETVAL | . )*
+
+            // gUnit.g:70:2: ( options {greedy=false; } : NESTED_RETVAL | . )*
             loop2:
             do {
                 int alt2=3;
@@ -417,21 +448,22 @@ public class gUnitLexer extends Lexer {
                 else if ( (LA2_0=='[') ) {
                     alt2=1;
                 }
-                else if ( ((LA2_0>='\u0000' && LA2_0<='Z')||LA2_0=='\\'||(LA2_0>='^' && LA2_0<='\uFFFF')) ) {
+                else if ( ((LA2_0 >= '\u0000' && LA2_0 <= 'Z')||LA2_0=='\\'||(LA2_0 >= '^' && LA2_0 <= '\uFFFF')) ) {
                     alt2=2;
                 }
 
 
                 switch (alt2) {
             	case 1 :
-            	    // gUnit.g:70:4: NESTED_RETVAL
+            	    // gUnit.g:71:4: NESTED_RETVAL
             	    {
             	    mNESTED_RETVAL(); 
+
 
             	    }
             	    break;
             	case 2 :
-            	    // gUnit.g:71:4: .
+            	    // gUnit.g:72:4: .
             	    {
             	    matchAny(); 
 
@@ -443,12 +475,15 @@ public class gUnitLexer extends Lexer {
                 }
             } while (true);
 
+
             match(']'); 
 
             }
 
+
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "NESTED_RETVAL"
@@ -462,6 +497,8 @@ public class gUnitLexer extends Lexer {
             // gUnit.g:76:8: NESTED_AST ( ( ' ' )? NESTED_AST )*
             {
             mNESTED_AST(); 
+
+
             // gUnit.g:76:19: ( ( ' ' )? NESTED_AST )*
             loop4:
             do {
@@ -495,7 +532,9 @@ public class gUnitLexer extends Lexer {
 
             	    }
 
+
             	    mNESTED_AST(); 
+
 
             	    }
             	    break;
@@ -512,6 +551,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "TREE"
@@ -519,11 +559,12 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "NESTED_AST"
     public final void mNESTED_AST() throws RecognitionException {
         try {
-            // gUnit.g:80:2: ( '(' ( NESTED_AST | STRING_ | ~ ( '(' | ')' | '\"' ) )* ')' )
-            // gUnit.g:80:4: '(' ( NESTED_AST | STRING_ | ~ ( '(' | ')' | '\"' ) )* ')'
+            // gUnit.g:81:2: ( '(' ( NESTED_AST | STRING_ |~ ( '(' | ')' | '\"' ) )* ')' )
+            // gUnit.g:81:4: '(' ( NESTED_AST | STRING_ |~ ( '(' | ')' | '\"' ) )* ')'
             {
             match('('); 
-            // gUnit.g:81:3: ( NESTED_AST | STRING_ | ~ ( '(' | ')' | '\"' ) )*
+
+            // gUnit.g:82:3: ( NESTED_AST | STRING_ |~ ( '(' | ')' | '\"' ) )*
             loop5:
             do {
                 int alt5=4;
@@ -535,37 +576,39 @@ public class gUnitLexer extends Lexer {
                 else if ( (LA5_0=='\"') ) {
                     alt5=2;
                 }
-                else if ( ((LA5_0>='\u0000' && LA5_0<='!')||(LA5_0>='#' && LA5_0<='\'')||(LA5_0>='*' && LA5_0<='\uFFFF')) ) {
+                else if ( ((LA5_0 >= '\u0000' && LA5_0 <= '!')||(LA5_0 >= '#' && LA5_0 <= '\'')||(LA5_0 >= '*' && LA5_0 <= '\uFFFF')) ) {
                     alt5=3;
                 }
 
 
                 switch (alt5) {
             	case 1 :
-            	    // gUnit.g:81:5: NESTED_AST
+            	    // gUnit.g:82:5: NESTED_AST
             	    {
             	    mNESTED_AST(); 
+
 
             	    }
             	    break;
             	case 2 :
-            	    // gUnit.g:82:7: STRING_
+            	    // gUnit.g:83:7: STRING_
             	    {
             	    mSTRING_(); 
+
 
             	    }
             	    break;
             	case 3 :
-            	    // gUnit.g:83:5: ~ ( '(' | ')' | '\"' )
+            	    // gUnit.g:84:5: ~ ( '(' | ')' | '\"' )
             	    {
-            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\'')||(input.LA(1)>='*' && input.LA(1)<='\uFFFF') ) {
+            	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '\'')||(input.LA(1) >= '*' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
-
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
@@ -576,12 +619,15 @@ public class gUnitLexer extends Lexer {
                 }
             } while (true);
 
+
             match(')'); 
 
             }
 
+
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "NESTED_AST"
@@ -596,13 +642,15 @@ public class gUnitLexer extends Lexer {
             {
             match("options"); 
 
+
+
             // gUnit.g:88:21: ( WS )*
             loop6:
             do {
                 int alt6=2;
                 int LA6_0 = input.LA(1);
 
-                if ( ((LA6_0>='\t' && LA6_0<='\n')||LA6_0=='\r'||LA6_0==' ') ) {
+                if ( ((LA6_0 >= '\t' && LA6_0 <= '\n')||LA6_0=='\r'||LA6_0==' ') ) {
                     alt6=1;
                 }
 
@@ -613,6 +661,7 @@ public class gUnitLexer extends Lexer {
             	    {
             	    mWS(); 
 
+
             	    }
             	    break;
 
@@ -620,6 +669,7 @@ public class gUnitLexer extends Lexer {
             	    break loop6;
                 }
             } while (true);
+
 
             match('{'); 
 
@@ -629,6 +679,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "OPTIONS"
@@ -642,6 +693,8 @@ public class gUnitLexer extends Lexer {
             // gUnit.g:90:6: ID_ ( '.' ID_ )*
             {
             mID_(); 
+
+
             // gUnit.g:90:10: ( '.' ID_ )*
             loop7:
             do {
@@ -658,7 +711,9 @@ public class gUnitLexer extends Lexer {
             	    // gUnit.g:90:11: '.' ID_
             	    {
             	    match('.'); 
+
             	    mID_(); 
+
 
             	    }
             	    break;
@@ -675,6 +730,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "ID"
@@ -682,25 +738,26 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "ID_"
     public final void mID_() throws RecognitionException {
         try {
-            // gUnit.g:93:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-            // gUnit.g:93:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // gUnit.g:94:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+            // gUnit.g:94:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             {
-            if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
+            if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
                 input.consume();
-
             }
             else {
                 MismatchedSetException mse = new MismatchedSetException(null,input);
                 recover(mse);
-                throw mse;}
+                throw mse;
+            }
 
-            // gUnit.g:93:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+
+            // gUnit.g:94:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             loop8:
             do {
                 int alt8=2;
                 int LA8_0 = input.LA(1);
 
-                if ( ((LA8_0>='0' && LA8_0<='9')||(LA8_0>='A' && LA8_0<='Z')||LA8_0=='_'||(LA8_0>='a' && LA8_0<='z')) ) {
+                if ( ((LA8_0 >= '0' && LA8_0 <= '9')||(LA8_0 >= 'A' && LA8_0 <= 'Z')||LA8_0=='_'||(LA8_0 >= 'a' && LA8_0 <= 'z')) ) {
                     alt8=1;
                 }
 
@@ -709,14 +766,14 @@ public class gUnitLexer extends Lexer {
             	case 1 :
             	    // gUnit.g:
             	    {
-            	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
+            	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
             	        input.consume();
-
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
@@ -730,8 +787,10 @@ public class gUnitLexer extends Lexer {
 
             }
 
+
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "ID_"
@@ -744,14 +803,15 @@ public class gUnitLexer extends Lexer {
             // gUnit.g:96:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
             // gUnit.g:96:9: ( ' ' | '\\t' | '\\r' | '\\n' )
             {
-            if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
+            if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
                 input.consume();
-
             }
             else {
                 MismatchedSetException mse = new MismatchedSetException(null,input);
                 recover(mse);
-                throw mse;}
+                throw mse;
+            }
+
 
             _channel=HIDDEN;
 
@@ -761,6 +821,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "WS"
@@ -775,29 +836,31 @@ public class gUnitLexer extends Lexer {
             {
             match("//"); 
 
+
+
             // gUnit.g:104:10: (~ ( '\\r' | '\\n' ) )*
             loop9:
             do {
                 int alt9=2;
                 int LA9_0 = input.LA(1);
 
-                if ( ((LA9_0>='\u0000' && LA9_0<='\t')||(LA9_0>='\u000B' && LA9_0<='\f')||(LA9_0>='\u000E' && LA9_0<='\uFFFF')) ) {
+                if ( ((LA9_0 >= '\u0000' && LA9_0 <= '\t')||(LA9_0 >= '\u000B' && LA9_0 <= '\f')||(LA9_0 >= '\u000E' && LA9_0 <= '\uFFFF')) ) {
                     alt9=1;
                 }
 
 
                 switch (alt9) {
             	case 1 :
-            	    // gUnit.g:104:10: ~ ( '\\r' | '\\n' )
+            	    // gUnit.g:
             	    {
-            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
+            	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
-
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
@@ -807,6 +870,7 @@ public class gUnitLexer extends Lexer {
             	    break loop9;
                 }
             } while (true);
+
 
             // gUnit.g:104:24: ( '\\r' )?
             int alt10=2;
@@ -826,7 +890,9 @@ public class gUnitLexer extends Lexer {
 
             }
 
+
             match('\n'); 
+
             _channel=HIDDEN;
 
             }
@@ -835,6 +901,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "SL_COMMENT"
@@ -849,6 +916,8 @@ public class gUnitLexer extends Lexer {
             {
             match("/**"); 
 
+
+
             // gUnit.g:108:10: ( options {greedy=false; } : . )*
             loop11:
             do {
@@ -861,13 +930,13 @@ public class gUnitLexer extends Lexer {
                     if ( (LA11_1=='/') ) {
                         alt11=2;
                     }
-                    else if ( ((LA11_1>='\u0000' && LA11_1<='.')||(LA11_1>='0' && LA11_1<='\uFFFF')) ) {
+                    else if ( ((LA11_1 >= '\u0000' && LA11_1 <= '.')||(LA11_1 >= '0' && LA11_1 <= '\uFFFF')) ) {
                         alt11=1;
                     }
 
 
                 }
-                else if ( ((LA11_0>='\u0000' && LA11_0<=')')||(LA11_0>='+' && LA11_0<='\uFFFF')) ) {
+                else if ( ((LA11_0 >= '\u0000' && LA11_0 <= ')')||(LA11_0 >= '+' && LA11_0 <= '\uFFFF')) ) {
                     alt11=1;
                 }
 
@@ -886,7 +955,9 @@ public class gUnitLexer extends Lexer {
                 }
             } while (true);
 
+
             match("*/"); 
+
 
 
             }
@@ -895,6 +966,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "DOC_COMMENT"
@@ -909,14 +981,17 @@ public class gUnitLexer extends Lexer {
             {
             match("/*"); 
 
-            if ( (input.LA(1)>='\u0000' && input.LA(1)<=')')||(input.LA(1)>='+' && input.LA(1)<='\uFFFF') ) {
-                input.consume();
 
+
+            if ( (input.LA(1) >= '\u0000' && input.LA(1) <= ')')||(input.LA(1) >= '+' && input.LA(1) <= '\uFFFF') ) {
+                input.consume();
             }
             else {
                 MismatchedSetException mse = new MismatchedSetException(null,input);
                 recover(mse);
-                throw mse;}
+                throw mse;
+            }
+
 
             // gUnit.g:112:14: ( options {greedy=false; } : . )*
             loop12:
@@ -930,13 +1005,13 @@ public class gUnitLexer extends Lexer {
                     if ( (LA12_1=='/') ) {
                         alt12=2;
                     }
-                    else if ( ((LA12_1>='\u0000' && LA12_1<='.')||(LA12_1>='0' && LA12_1<='\uFFFF')) ) {
+                    else if ( ((LA12_1 >= '\u0000' && LA12_1 <= '.')||(LA12_1 >= '0' && LA12_1 <= '\uFFFF')) ) {
                         alt12=1;
                     }
 
 
                 }
-                else if ( ((LA12_0>='\u0000' && LA12_0<=')')||(LA12_0>='+' && LA12_0<='\uFFFF')) ) {
+                else if ( ((LA12_0 >= '\u0000' && LA12_0 <= ')')||(LA12_0 >= '+' && LA12_0 <= '\uFFFF')) ) {
                     alt12=1;
                 }
 
@@ -955,7 +1030,10 @@ public class gUnitLexer extends Lexer {
                 }
             } while (true);
 
+
             match("*/"); 
+
+
 
             _channel=HIDDEN;
 
@@ -965,6 +1043,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "ML_COMMENT"
@@ -978,6 +1057,8 @@ public class gUnitLexer extends Lexer {
             // gUnit.g:115:10: STRING_
             {
             mSTRING_(); 
+
+
             setText(getText().substring(1, getText().length()-1));
 
             }
@@ -986,6 +1067,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "STRING"
@@ -993,11 +1075,12 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "STRING_"
     public final void mSTRING_() throws RecognitionException {
         try {
-            // gUnit.g:119:2: ( '\"' ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+ '\"' )
-            // gUnit.g:119:4: '\"' ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+ '\"'
+            // gUnit.g:120:2: ( '\"' ( '\\\\\"' | '\\\\' ~ '\"' |~ ( '\\\\' | '\"' ) )+ '\"' )
+            // gUnit.g:120:4: '\"' ( '\\\\\"' | '\\\\' ~ '\"' |~ ( '\\\\' | '\"' ) )+ '\"'
             {
             match('\"'); 
-            // gUnit.g:119:8: ( '\\\\\"' | '\\\\' ~ '\"' | ~ ( '\\\\' | '\"' ) )+
+
+            // gUnit.g:120:8: ( '\\\\\"' | '\\\\' ~ '\"' |~ ( '\\\\' | '\"' ) )+
             int cnt13=0;
             loop13:
             do {
@@ -1010,53 +1093,55 @@ public class gUnitLexer extends Lexer {
                     if ( (LA13_2=='\"') ) {
                         alt13=1;
                     }
-                    else if ( ((LA13_2>='\u0000' && LA13_2<='!')||(LA13_2>='#' && LA13_2<='\uFFFF')) ) {
+                    else if ( ((LA13_2 >= '\u0000' && LA13_2 <= '!')||(LA13_2 >= '#' && LA13_2 <= '\uFFFF')) ) {
                         alt13=2;
                     }
 
 
                 }
-                else if ( ((LA13_0>='\u0000' && LA13_0<='!')||(LA13_0>='#' && LA13_0<='[')||(LA13_0>=']' && LA13_0<='\uFFFF')) ) {
+                else if ( ((LA13_0 >= '\u0000' && LA13_0 <= '!')||(LA13_0 >= '#' && LA13_0 <= '[')||(LA13_0 >= ']' && LA13_0 <= '\uFFFF')) ) {
                     alt13=3;
                 }
 
 
                 switch (alt13) {
             	case 1 :
-            	    // gUnit.g:119:9: '\\\\\"'
+            	    // gUnit.g:120:9: '\\\\\"'
             	    {
             	    match("\\\""); 
+
 
 
             	    }
             	    break;
             	case 2 :
-            	    // gUnit.g:119:15: '\\\\' ~ '\"'
+            	    // gUnit.g:120:15: '\\\\' ~ '\"'
             	    {
             	    match('\\'); 
-            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFF') ) {
-            	        input.consume();
 
+            	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '\uFFFF') ) {
+            	        input.consume();
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
             	    break;
             	case 3 :
-            	    // gUnit.g:119:25: ~ ( '\\\\' | '\"' )
+            	    // gUnit.g:120:25: ~ ( '\\\\' | '\"' )
             	    {
-            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
+            	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
-
             	    }
             	    else {
             	        MismatchedSetException mse = new MismatchedSetException(null,input);
             	        recover(mse);
-            	        throw mse;}
+            	        throw mse;
+            	    }
 
 
             	    }
@@ -1071,12 +1156,15 @@ public class gUnitLexer extends Lexer {
                 cnt13++;
             } while (true);
 
+
             match('\"'); 
 
             }
 
+
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "STRING_"
@@ -1091,6 +1179,8 @@ public class gUnitLexer extends Lexer {
             {
             match("<<"); 
 
+
+
             // gUnit.g:123:9: ( . )*
             loop14:
             do {
@@ -1103,13 +1193,13 @@ public class gUnitLexer extends Lexer {
                     if ( (LA14_1=='>') ) {
                         alt14=2;
                     }
-                    else if ( ((LA14_1>='\u0000' && LA14_1<='=')||(LA14_1>='?' && LA14_1<='\uFFFF')) ) {
+                    else if ( ((LA14_1 >= '\u0000' && LA14_1 <= '=')||(LA14_1 >= '?' && LA14_1 <= '\uFFFF')) ) {
                         alt14=1;
                     }
 
 
                 }
-                else if ( ((LA14_0>='\u0000' && LA14_0<='=')||(LA14_0>='?' && LA14_0<='\uFFFF')) ) {
+                else if ( ((LA14_0 >= '\u0000' && LA14_0 <= '=')||(LA14_0 >= '?' && LA14_0 <= '\uFFFF')) ) {
                     alt14=1;
                 }
 
@@ -1128,7 +1218,10 @@ public class gUnitLexer extends Lexer {
                 }
             } while (true);
 
+
             match(">>"); 
+
+
 
             setText(getText().substring(2, getText().length()-2));
 
@@ -1138,6 +1231,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "ML_STRING"
@@ -1154,7 +1248,7 @@ public class gUnitLexer extends Lexer {
             if ( (LA17_0=='/') ) {
                 alt17=1;
             }
-            else if ( ((LA17_0>='A' && LA17_0<='Z')||LA17_0=='_'||(LA17_0>='a' && LA17_0<='z')) ) {
+            else if ( ((LA17_0 >= 'A' && LA17_0 <= 'Z')||LA17_0=='_'||(LA17_0 >= 'a' && LA17_0 <= 'z')) ) {
                 alt17=2;
             }
             else {
@@ -1162,13 +1256,17 @@ public class gUnitLexer extends Lexer {
                     new NoViableAltException("", 17, 0, input);
 
                 throw nvae;
+
             }
             switch (alt17) {
                 case 1 :
                     // gUnit.g:127:4: '/' ID ( '/' ID )*
                     {
                     match('/'); 
+
                     mID(); 
+
+
                     // gUnit.g:127:11: ( '/' ID )*
                     loop15:
                     do {
@@ -1185,7 +1283,9 @@ public class gUnitLexer extends Lexer {
                     	    // gUnit.g:127:12: '/' ID
                     	    {
                     	    match('/'); 
+
                     	    mID(); 
+
 
                     	    }
                     	    break;
@@ -1202,6 +1302,8 @@ public class gUnitLexer extends Lexer {
                     // gUnit.g:128:4: ID ( '/' ID )+
                     {
                     mID(); 
+
+
                     // gUnit.g:128:7: ( '/' ID )+
                     int cnt16=0;
                     loop16:
@@ -1219,7 +1321,9 @@ public class gUnitLexer extends Lexer {
                     	    // gUnit.g:128:8: '/' ID
                     	    {
                     	    match('/'); 
+
                     	    mID(); 
+
 
                     	    }
                     	    break;
@@ -1242,6 +1346,7 @@ public class gUnitLexer extends Lexer {
             state.channel = _channel;
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "FILENAME"
@@ -1249,23 +1354,25 @@ public class gUnitLexer extends Lexer {
     // $ANTLR start "XDIGIT"
     public final void mXDIGIT() throws RecognitionException {
         try {
-            // gUnit.g:150:8: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // gUnit.g:151:8: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
             // gUnit.g:
             {
-            if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f') ) {
+            if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
                 input.consume();
-
             }
             else {
                 MismatchedSetException mse = new MismatchedSetException(null,input);
                 recover(mse);
-                throw mse;}
+                throw mse;
+            }
 
 
             }
 
+
         }
         finally {
+        	// do for sure before leaving
         }
     }
     // $ANTLR end "XDIGIT"
@@ -1280,12 +1387,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mT__28(); 
 
+
                 }
                 break;
             case 2 :
                 // gUnit.g:1:16: T__29
                 {
                 mT__29(); 
+
 
                 }
                 break;
@@ -1294,12 +1403,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mT__30(); 
 
+
                 }
                 break;
             case 4 :
                 // gUnit.g:1:28: T__31
                 {
                 mT__31(); 
+
 
                 }
                 break;
@@ -1308,12 +1419,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mT__32(); 
 
+
                 }
                 break;
             case 6 :
                 // gUnit.g:1:40: T__33
                 {
                 mT__33(); 
+
 
                 }
                 break;
@@ -1322,12 +1435,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mT__34(); 
 
+
                 }
                 break;
             case 8 :
                 // gUnit.g:1:52: T__35
                 {
                 mT__35(); 
+
 
                 }
                 break;
@@ -1336,12 +1451,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mT__36(); 
 
+
                 }
                 break;
             case 10 :
                 // gUnit.g:1:64: T__37
                 {
                 mT__37(); 
+
 
                 }
                 break;
@@ -1350,12 +1467,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mT__38(); 
 
+
                 }
                 break;
             case 12 :
                 // gUnit.g:1:76: ACTION
                 {
                 mACTION(); 
+
 
                 }
                 break;
@@ -1364,12 +1483,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mRETVAL(); 
 
+
                 }
                 break;
             case 14 :
                 // gUnit.g:1:90: TREE
                 {
                 mTREE(); 
+
 
                 }
                 break;
@@ -1378,12 +1499,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mOPTIONS(); 
 
+
                 }
                 break;
             case 16 :
                 // gUnit.g:1:103: ID
                 {
                 mID(); 
+
 
                 }
                 break;
@@ -1392,12 +1515,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mWS(); 
 
+
                 }
                 break;
             case 18 :
                 // gUnit.g:1:109: SL_COMMENT
                 {
                 mSL_COMMENT(); 
+
 
                 }
                 break;
@@ -1406,12 +1531,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mDOC_COMMENT(); 
 
+
                 }
                 break;
             case 20 :
                 // gUnit.g:1:132: ML_COMMENT
                 {
                 mML_COMMENT(); 
+
 
                 }
                 break;
@@ -1420,6 +1547,7 @@ public class gUnitLexer extends Lexer {
                 {
                 mSTRING(); 
 
+
                 }
                 break;
             case 22 :
@@ -1427,12 +1555,14 @@ public class gUnitLexer extends Lexer {
                 {
                 mML_STRING(); 
 
+
                 }
                 break;
             case 23 :
                 // gUnit.g:1:160: FILENAME
                 {
                 mFILENAME(); 
+
 
                 }
                 break;
@@ -1444,47 +1574,46 @@ public class gUnitLexer extends Lexer {
 
     protected DFA18 dfa18 = new DFA18(this);
     static final String DFA18_eotS =
-        "\1\uffff\1\27\4\uffff\1\27\1\uffff\3\27\4\uffff\2\27\4\uffff\2\27"+
-        "\3\uffff\1\27\1\44\3\27\2\uffff\3\27\1\uffff\3\27\2\uffff\3\27\1"+
-        "\62\2\27\1\65\1\66\1\uffff\2\27\2\uffff\2\27\1\73\1\27\2\uffff";
+        "\6\uffff\5\27\4\uffff\2\27\4\uffff\2\27\3\uffff\1\43\4\27\2\uffff"+
+        "\2\27\1\uffff\4\27\2\uffff\1\60\5\27\1\uffff\1\65\1\27\1\67\1\27"+
+        "\1\uffff\1\27\1\uffff\1\27\1\73\1\27\2\uffff";
     static final String DFA18_eofS =
         "\75\uffff";
     static final String DFA18_minS =
-        "\1\11\1\56\4\uffff\1\56\1\uffff\3\56\4\uffff\2\56\1\uffff\1\52\2"+
-        "\uffff\2\56\1\uffff\1\101\1\uffff\5\56\1\uffff\1\0\3\56\1\uffff"+
-        "\3\56\2\uffff\10\56\1\uffff\2\56\2\uffff\3\56\1\11\2\uffff";
+        "\1\11\5\uffff\5\56\4\uffff\2\56\1\uffff\1\52\2\uffff\2\56\1\uffff"+
+        "\1\101\1\uffff\5\56\1\uffff\1\0\2\56\1\uffff\4\56\2\uffff\6\56\1"+
+        "\uffff\4\56\1\uffff\1\56\1\uffff\2\56\1\11\2\uffff";
     static final String DFA18_maxS =
-        "\1\175\1\172\4\uffff\1\172\1\uffff\3\172\4\uffff\2\172\1\uffff\1"+
-        "\172\2\uffff\2\172\1\uffff\1\172\1\uffff\5\172\1\uffff\1\uffff\3"+
-        "\172\1\uffff\3\172\2\uffff\10\172\1\uffff\2\172\2\uffff\3\172\1"+
-        "\173\2\uffff";
+        "\1\175\5\uffff\5\172\4\uffff\2\172\1\uffff\1\172\2\uffff\2\172\1"+
+        "\uffff\1\172\1\uffff\5\172\1\uffff\1\uffff\2\172\1\uffff\4\172\2"+
+        "\uffff\6\172\1\uffff\4\172\1\uffff\1\172\1\uffff\2\172\1\173\2\uffff";
     static final String DFA18_acceptS =
-        "\2\uffff\1\2\1\3\1\4\1\5\1\uffff\1\7\3\uffff\1\13\1\14\1\15\1\16"+
-        "\2\uffff\1\21\1\uffff\1\25\1\26\2\uffff\1\20\1\uffff\1\27\5\uffff"+
-        "\1\22\4\uffff\1\10\3\uffff\1\23\1\24\10\uffff\1\11\2\uffff\1\1\1"+
-        "\6\4\uffff\1\12\1\17";
+        "\1\uffff\1\1\1\2\1\3\1\4\1\5\5\uffff\1\13\1\14\1\15\1\16\2\uffff"+
+        "\1\21\1\uffff\1\25\1\26\2\uffff\1\20\1\uffff\1\27\5\uffff\1\22\3"+
+        "\uffff\1\7\4\uffff\1\23\1\24\6\uffff\1\6\4\uffff\1\10\1\uffff\1"+
+        "\12\3\uffff\1\11\1\17";
     static final String DFA18_specialS =
         "\40\uffff\1\0\34\uffff}>";
     static final String[] DFA18_transitionS = {
             "\2\21\2\uffff\1\21\22\uffff\1\21\1\uffff\1\23\5\uffff\1\16\4"+
-            "\uffff\1\13\1\uffff\1\22\12\uffff\1\7\1\2\1\24\1\4\2\uffff\1"+
-            "\5\5\20\1\11\10\20\1\10\13\20\1\15\3\uffff\1\20\1\uffff\6\20"+
-            "\1\1\7\20\1\17\2\20\1\12\4\20\1\6\3\20\1\14\1\uffff\1\3",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\24\26\1"+
-            "\25\5\26",
+            "\uffff\1\1\1\uffff\1\22\12\uffff\1\2\1\3\1\24\1\4\2\uffff\1"+
+            "\5\5\20\1\6\10\20\1\7\13\20\1\15\3\uffff\1\20\1\uffff\6\20\1"+
+            "\10\7\20\1\17\2\20\1\11\4\20\1\12\3\20\1\14\1\uffff\1\13",
             "",
             "",
             "",
             "",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\1\32\31"+
+            "",
+            "\1\30\1\31\12\26\7\uffff\1\25\31\26\4\uffff\1\26\1\uffff\32"+
             "\26",
-            "",
-            "\1\30\1\31\12\26\7\uffff\12\26\1\33\17\26\4\uffff\1\26\1\uffff"+
+            "\1\30\1\31\12\26\7\uffff\12\26\1\32\17\26\4\uffff\1\26\1\uffff"+
             "\32\26",
-            "\1\30\1\31\12\26\7\uffff\1\34\31\26\4\uffff\1\26\1\uffff\32"+
-            "\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\24\26\1"+
+            "\33\5\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\4\26\1"+
-            "\35\25\26",
+            "\34\25\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\1\35\31"+
+            "\26",
             "",
             "",
             "",
@@ -1496,58 +1625,58 @@ public class gUnitLexer extends Lexer {
             "\1\40\4\uffff\1\37\21\uffff\32\31\4\uffff\1\31\1\uffff\32\31",
             "",
             "",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\15\26\1"+
-            "\41\14\26",
+            "\1\30\1\31\12\26\7\uffff\10\26\1\41\21\26\4\uffff\1\26\1\uffff"+
+            "\32\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
             "",
             "\32\42\4\uffff\1\42\1\uffff\32\42",
             "",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\13\26\1"+
-            "\43\16\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
-            "\1\30\1\31\12\26\7\uffff\10\26\1\45\21\26\4\uffff\1\26\1\uffff"+
-            "\32\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\15\26\1"+
+            "\44\14\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\23\26\1"+
-            "\46\6\26",
+            "\45\6\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\13\26\1"+
+            "\46\16\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\23\26\1"+
             "\47\6\26",
             "",
             "\52\51\1\50\uffd5\51",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\10\26\1"+
-            "\52\21\26",
-            "\1\30\1\31\12\53\7\uffff\32\53\4\uffff\1\53\1\uffff\32\53",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\12\26\1"+
-            "\54\17\26",
-            "",
-            "\1\30\1\31\12\26\7\uffff\13\26\1\55\16\26\4\uffff\1\26\1\uffff"+
+            "\1\30\1\31\12\26\7\uffff\13\26\1\52\16\26\4\uffff\1\26\1\uffff"+
             "\32\26",
+            "\1\30\1\31\12\53\7\uffff\32\53\4\uffff\1\53\1\uffff\32\53",
+            "",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\10\26\1"+
+            "\54\21\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\24\26\1"+
-            "\56\5\26",
+            "\55\5\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\12\26\1"+
+            "\56\17\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\10\26\1"+
             "\57\21\26",
             "",
             "",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\23\26\1"+
-            "\60\6\26",
-            "\1\30\1\31\12\53\7\uffff\32\53\4\uffff\1\53\1\uffff\32\53",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\22\26\1"+
-            "\61\7\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
+            "\1\30\1\31\12\53\7\uffff\32\53\4\uffff\1\53\1\uffff\32\53",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\23\26\1"+
+            "\61\6\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\21\26\1"+
-            "\63\10\26",
+            "\62\10\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\22\26\1"+
+            "\63\7\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\16\26\1"+
             "\64\13\26",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
-            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
             "",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\15\26\1"+
-            "\67\14\26",
+            "\66\14\26",
+            "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\15\26\1"+
             "\70\14\26",
             "",
-            "",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\22\26\1"+
             "\71\7\26",
+            "",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\22\26\1"+
             "\72\7\26",
             "\1\30\1\31\12\26\7\uffff\32\26\4\uffff\1\26\1\uffff\32\26",
@@ -1599,7 +1728,7 @@ public class gUnitLexer extends Lexer {
                         s = -1;
                         if ( (LA18_32=='*') ) {s = 40;}
 
-                        else if ( ((LA18_32>='\u0000' && LA18_32<=')')||(LA18_32>='+' && LA18_32<='\uFFFF')) ) {s = 41;}
+                        else if ( ((LA18_32 >= '\u0000' && LA18_32 <= ')')||(LA18_32 >= '+' && LA18_32 <= '\uFFFF')) ) {s = 41;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -1609,6 +1738,7 @@ public class gUnitLexer extends Lexer {
             error(nvae);
             throw nvae;
         }
+
     }
  
 

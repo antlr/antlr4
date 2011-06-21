@@ -1,4 +1,4 @@
-// $ANTLR 3.4 BasicSemanticTriggers.g 2011-06-20 18:31:16
+// $ANTLR 3.4 BasicSemanticTriggers.g 2011-06-20 18:47:15
 
 /*
  [The "BSD license"]
@@ -26,13 +26,16 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.semantics;
-
-import org.antlr.runtime.BitSet;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
 import org.antlr.v4.tool.*;
 
-import java.util.*;
+
+import org.antlr.runtime.*;
+import org.antlr.runtime.tree.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /** Triggers for the basic semantics of the input.  Side-effects:
  *  Set token, block, rule options in the tree.  Load field option
@@ -1800,7 +1803,7 @@ public class BasicSemanticTriggers extends TreeFilter {
     // Delegated rules
 
 
-
+ 
 
     public static final BitSet FOLLOW_grammarSpec_in_topdown87 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rules_in_topdown92 = new BitSet(new long[]{0x0000000000000002L});

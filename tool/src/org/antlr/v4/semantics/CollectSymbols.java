@@ -1,4 +1,4 @@
-// $ANTLR 3.4 CollectSymbols.g 2011-06-20 18:31:15
+// $ANTLR 3.4 CollectSymbols.g 2011-06-20 18:47:15
 
 /*
  [The "BSD license"]
@@ -26,14 +26,20 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.semantics;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.parse.*;
+import java.util.Set;
+import java.util.HashSet;
+import org.stringtemplate.v4.misc.MultiMap;
+
 
 import org.antlr.runtime.*;
-import org.antlr.runtime.BitSet;
 import org.antlr.runtime.tree.*;
-import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.*;
-
-import java.util.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /** Collects rules, terminals, strings, actions, scopes etc... from AST
  *  No side-effects
@@ -2216,7 +2222,7 @@ public class CollectSymbols extends TreeFilter {
             return "()* loopback of 152:17: ( options {greedy=false; } : . )*";
         }
     }
-
+ 
 
     public static final BitSet FOLLOW_globalScope_in_topdown89 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_globalNamedAction_in_topdown97 = new BitSet(new long[]{0x0000000000000002L});

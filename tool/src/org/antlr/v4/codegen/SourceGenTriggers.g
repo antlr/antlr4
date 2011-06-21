@@ -8,7 +8,7 @@ options {
 @header {
 package org.antlr.v4.codegen;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.codegen.src.*;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.tool.*;
 import java.util.Collections;
 import java.util.Map;
@@ -23,6 +23,8 @@ import java.util.HashMap;
     	this.factory = factory;
     }
 }
+
+dummy : block[null, null] ;
 
 block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo]
     :	^( blk=BLOCK (^(OPTIONS .+))?
