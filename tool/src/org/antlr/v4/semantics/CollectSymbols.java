@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 CollectSymbols.g 2011-06-11 10:28:59
+// $ANTLR 3.4 CollectSymbols.g 2011-06-20 18:31:15
 
 /*
  [The "BSD license"]
@@ -34,126 +34,131 @@ import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
+
 /** Collects rules, terminals, strings, actions, scopes etc... from AST
  *  No side-effects
  */
+@SuppressWarnings({"all", "warnings", "unchecked"})
 public class CollectSymbols extends TreeFilter {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "SEMPRED", "FORCED_ACTION", "DOC_COMMENT", "SRC", "NLCHARS", "COMMENT", "DOUBLE_QUOTE_STRING_LITERAL", "DOUBLE_ANGLE_STRING_LITERAL", "ACTION_STRING_LITERAL", "ACTION_CHAR_LITERAL", "ARG_ACTION", "NESTED_ACTION", "ACTION", "ACTION_ESC", "WSNLCHARS", "OPTIONS", "TOKENS", "SCOPE", "IMPORT", "FRAGMENT", "LEXER", "PARSER", "TREE", "GRAMMAR", "PROTECTED", "PUBLIC", "PRIVATE", "RETURNS", "THROWS", "CATCH", "FINALLY", "TEMPLATE", "MODE", "COLON", "COLONCOLON", "COMMA", "SEMI", "LPAREN", "RPAREN", "IMPLIES", "LT", "GT", "ASSIGN", "QUESTION", "BANG", "STAR", "PLUS", "PLUS_ASSIGN", "OR", "ROOT", "DOLLAR", "DOT", "RANGE", "ETC", "RARROW", "TREE_BEGIN", "AT", "NOT", "RBRACE", "TOKEN_REF", "RULE_REF", "INT", "WSCHARS", "ESC_SEQ", "STRING_LITERAL", "HEX_DIGIT", "UNICODE_ESC", "WS", "ERRCHAR", "RULE", "RULES", "RULEMODIFIERS", "RULEACTIONS", "BLOCK", "REWRITE_BLOCK", "OPTIONAL", "CLOSURE", "POSITIVE_CLOSURE", "SYNPRED", "CHAR_RANGE", "EPSILON", "ALT", "ALTLIST", "ID", "ARG", "ARGLIST", "RET", "COMBINED", "INITACTION", "LABEL", "GATED_SEMPRED", "SYN_SEMPRED", "BACKTRACK_SEMPRED", "WILDCARD", "LIST", "ELEMENT_OPTIONS", "ST_RESULT", "RESULT", "ALT_REWRITE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ACTION", "ACTION_CHAR_LITERAL", "ACTION_ESC", "ACTION_STRING_LITERAL", "ARG_ACTION", "ASSIGN", "AT", "BANG", "CATCH", "COLON", "COLONCOLON", "COMMA", "COMMENT", "DOC_COMMENT", "DOLLAR", "DOT", "DOUBLE_ANGLE_STRING_LITERAL", "DOUBLE_QUOTE_STRING_LITERAL", "ERRCHAR", "ESC_SEQ", "ETC", "FINALLY", "FORCED_ACTION", "FRAGMENT", "GRAMMAR", "GT", "HEX_DIGIT", "IMPLIES", "IMPORT", "INT", "LEXER", "LPAREN", "LT", "MODE", "NESTED_ACTION", "NLCHARS", "NOT", "OPTIONS", "OR", "PARSER", "PLUS", "PLUS_ASSIGN", "PRIVATE", "PROTECTED", "PUBLIC", "QUESTION", "RANGE", "RARROW", "RBRACE", "RETURNS", "ROOT", "RPAREN", "RULE_REF", "SCOPE", "SEMI", "SEMPRED", "SRC", "STAR", "STRING_LITERAL", "TEMPLATE", "THROWS", "TOKENS", "TOKEN_REF", "TREE", "TREE_BEGIN", "UNICODE_ESC", "WS", "WSCHARS", "WSNLCHARS", "ALT", "ALTLIST", "ALT_REWRITE", "ARG", "ARGLIST", "BACKTRACK_SEMPRED", "BLOCK", "CHAR_RANGE", "CLOSURE", "COMBINED", "ELEMENT_OPTIONS", "EPSILON", "GATED_SEMPRED", "ID", "INITACTION", "LABEL", "LIST", "OPTIONAL", "POSITIVE_CLOSURE", "RESULT", "RET", "REWRITE_BLOCK", "RULE", "RULEACTIONS", "RULEMODIFIERS", "RULES", "ST_RESULT", "SYNPRED", "SYN_SEMPRED", "WILDCARD"
     };
+
     public static final int EOF=-1;
-    public static final int SEMPRED=4;
-    public static final int FORCED_ACTION=5;
-    public static final int DOC_COMMENT=6;
-    public static final int SRC=7;
-    public static final int NLCHARS=8;
-    public static final int COMMENT=9;
-    public static final int DOUBLE_QUOTE_STRING_LITERAL=10;
-    public static final int DOUBLE_ANGLE_STRING_LITERAL=11;
-    public static final int ACTION_STRING_LITERAL=12;
-    public static final int ACTION_CHAR_LITERAL=13;
-    public static final int ARG_ACTION=14;
-    public static final int NESTED_ACTION=15;
-    public static final int ACTION=16;
-    public static final int ACTION_ESC=17;
-    public static final int WSNLCHARS=18;
-    public static final int OPTIONS=19;
-    public static final int TOKENS=20;
-    public static final int SCOPE=21;
-    public static final int IMPORT=22;
-    public static final int FRAGMENT=23;
-    public static final int LEXER=24;
-    public static final int PARSER=25;
-    public static final int TREE=26;
-    public static final int GRAMMAR=27;
-    public static final int PROTECTED=28;
-    public static final int PUBLIC=29;
-    public static final int PRIVATE=30;
-    public static final int RETURNS=31;
-    public static final int THROWS=32;
-    public static final int CATCH=33;
-    public static final int FINALLY=34;
-    public static final int TEMPLATE=35;
-    public static final int MODE=36;
-    public static final int COLON=37;
-    public static final int COLONCOLON=38;
-    public static final int COMMA=39;
-    public static final int SEMI=40;
-    public static final int LPAREN=41;
-    public static final int RPAREN=42;
-    public static final int IMPLIES=43;
-    public static final int LT=44;
-    public static final int GT=45;
-    public static final int ASSIGN=46;
-    public static final int QUESTION=47;
-    public static final int BANG=48;
-    public static final int STAR=49;
-    public static final int PLUS=50;
-    public static final int PLUS_ASSIGN=51;
-    public static final int OR=52;
-    public static final int ROOT=53;
-    public static final int DOLLAR=54;
-    public static final int DOT=55;
-    public static final int RANGE=56;
-    public static final int ETC=57;
-    public static final int RARROW=58;
-    public static final int TREE_BEGIN=59;
-    public static final int AT=60;
-    public static final int NOT=61;
-    public static final int RBRACE=62;
-    public static final int TOKEN_REF=63;
-    public static final int RULE_REF=64;
-    public static final int INT=65;
-    public static final int WSCHARS=66;
-    public static final int ESC_SEQ=67;
-    public static final int STRING_LITERAL=68;
-    public static final int HEX_DIGIT=69;
-    public static final int UNICODE_ESC=70;
-    public static final int WS=71;
-    public static final int ERRCHAR=72;
-    public static final int RULE=73;
-    public static final int RULES=74;
-    public static final int RULEMODIFIERS=75;
-    public static final int RULEACTIONS=76;
-    public static final int BLOCK=77;
-    public static final int REWRITE_BLOCK=78;
-    public static final int OPTIONAL=79;
-    public static final int CLOSURE=80;
-    public static final int POSITIVE_CLOSURE=81;
-    public static final int SYNPRED=82;
-    public static final int CHAR_RANGE=83;
+    public static final int ACTION=4;
+    public static final int ACTION_CHAR_LITERAL=5;
+    public static final int ACTION_ESC=6;
+    public static final int ACTION_STRING_LITERAL=7;
+    public static final int ARG_ACTION=8;
+    public static final int ASSIGN=9;
+    public static final int AT=10;
+    public static final int BANG=11;
+    public static final int CATCH=12;
+    public static final int COLON=13;
+    public static final int COLONCOLON=14;
+    public static final int COMMA=15;
+    public static final int COMMENT=16;
+    public static final int DOC_COMMENT=17;
+    public static final int DOLLAR=18;
+    public static final int DOT=19;
+    public static final int DOUBLE_ANGLE_STRING_LITERAL=20;
+    public static final int DOUBLE_QUOTE_STRING_LITERAL=21;
+    public static final int ERRCHAR=22;
+    public static final int ESC_SEQ=23;
+    public static final int ETC=24;
+    public static final int FINALLY=25;
+    public static final int FORCED_ACTION=26;
+    public static final int FRAGMENT=27;
+    public static final int GRAMMAR=28;
+    public static final int GT=29;
+    public static final int HEX_DIGIT=30;
+    public static final int IMPLIES=31;
+    public static final int IMPORT=32;
+    public static final int INT=33;
+    public static final int LEXER=34;
+    public static final int LPAREN=35;
+    public static final int LT=36;
+    public static final int MODE=37;
+    public static final int NESTED_ACTION=38;
+    public static final int NLCHARS=39;
+    public static final int NOT=40;
+    public static final int OPTIONS=41;
+    public static final int OR=42;
+    public static final int PARSER=43;
+    public static final int PLUS=44;
+    public static final int PLUS_ASSIGN=45;
+    public static final int PRIVATE=46;
+    public static final int PROTECTED=47;
+    public static final int PUBLIC=48;
+    public static final int QUESTION=49;
+    public static final int RANGE=50;
+    public static final int RARROW=51;
+    public static final int RBRACE=52;
+    public static final int RETURNS=53;
+    public static final int ROOT=54;
+    public static final int RPAREN=55;
+    public static final int RULE_REF=56;
+    public static final int SCOPE=57;
+    public static final int SEMI=58;
+    public static final int SEMPRED=59;
+    public static final int SRC=60;
+    public static final int STAR=61;
+    public static final int STRING_LITERAL=62;
+    public static final int TEMPLATE=63;
+    public static final int THROWS=64;
+    public static final int TOKENS=65;
+    public static final int TOKEN_REF=66;
+    public static final int TREE=67;
+    public static final int TREE_BEGIN=68;
+    public static final int UNICODE_ESC=69;
+    public static final int WS=70;
+    public static final int WSCHARS=71;
+    public static final int WSNLCHARS=72;
+    public static final int ALT=73;
+    public static final int ALTLIST=74;
+    public static final int ALT_REWRITE=75;
+    public static final int ARG=76;
+    public static final int ARGLIST=77;
+    public static final int BACKTRACK_SEMPRED=78;
+    public static final int BLOCK=79;
+    public static final int CHAR_RANGE=80;
+    public static final int CLOSURE=81;
+    public static final int COMBINED=82;
+    public static final int ELEMENT_OPTIONS=83;
     public static final int EPSILON=84;
-    public static final int ALT=85;
-    public static final int ALTLIST=86;
-    public static final int ID=87;
-    public static final int ARG=88;
-    public static final int ARGLIST=89;
-    public static final int RET=90;
-    public static final int COMBINED=91;
-    public static final int INITACTION=92;
-    public static final int LABEL=93;
-    public static final int GATED_SEMPRED=94;
-    public static final int SYN_SEMPRED=95;
-    public static final int BACKTRACK_SEMPRED=96;
-    public static final int WILDCARD=97;
-    public static final int LIST=98;
-    public static final int ELEMENT_OPTIONS=99;
-    public static final int ST_RESULT=100;
-    public static final int RESULT=101;
-    public static final int ALT_REWRITE=102;
+    public static final int GATED_SEMPRED=85;
+    public static final int ID=86;
+    public static final int INITACTION=87;
+    public static final int LABEL=88;
+    public static final int LIST=89;
+    public static final int OPTIONAL=90;
+    public static final int POSITIVE_CLOSURE=91;
+    public static final int RESULT=92;
+    public static final int RET=93;
+    public static final int REWRITE_BLOCK=94;
+    public static final int RULE=95;
+    public static final int RULEACTIONS=96;
+    public static final int RULEMODIFIERS=97;
+    public static final int RULES=98;
+    public static final int ST_RESULT=99;
+    public static final int SYNPRED=100;
+    public static final int SYN_SEMPRED=101;
+    public static final int WILDCARD=102;
 
     // delegates
+    public TreeFilter[] getDelegates() {
+        return new TreeFilter[] {};
+    }
+
     // delegators
 
 
-        public CollectSymbols(TreeNodeStream input) {
-            this(input, new RecognizerSharedState());
-        }
-        public CollectSymbols(TreeNodeStream input, RecognizerSharedState state) {
-            super(input, state);
-
-        }
-
+    public CollectSymbols(TreeNodeStream input) {
+        this(input, new RecognizerSharedState());
+    }
+    public CollectSymbols(TreeNodeStream input, RecognizerSharedState state) {
+        super(input, state);
+    }
 
     public String[] getTokenNames() { return CollectSymbols.tokenNames; }
     public String getGrammarFileName() { return "CollectSymbols.g"; }
@@ -185,7 +190,330 @@ public class CollectSymbols extends TreeFilter {
         try {
             // CollectSymbols.g:96:5: ( globalScope | globalNamedAction | tokensSection | mode | rule | ruleArg | ruleReturns | ruleNamedAction | ruleScopeSpec | ruleref | rewriteElement | terminal | labeledElement | setAlt | ruleAction | sempred | finallyClause | exceptionHandler )
             int alt1=18;
-            alt1 = dfa1.predict(input);
+            switch ( input.LA(1) ) {
+            case SCOPE:
+                {
+                int LA1_1 = input.LA(2);
+
+                if ( (LA1_1==DOWN) ) {
+                    int LA1_19 = input.LA(3);
+
+                    if ( (LA1_19==ID) ) {
+                        int LA1_24 = input.LA(4);
+
+                        if ( (LA1_24==ACTION) ) {
+                            alt1=1;
+                        }
+                        else if ( (LA1_24==UP||LA1_24==ID) ) {
+                            alt1=9;
+                        }
+                        else {
+                            if (state.backtracking>0) {state.failed=true; return ;}
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 1, 24, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else if ( (LA1_19==ACTION) ) {
+                        alt1=9;
+                    }
+                    else {
+                        if (state.backtracking>0) {state.failed=true; return ;}
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 1, 19, input);
+
+                        throw nvae;
+
+                    }
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return ;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 1, 1, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case AT:
+                {
+                int LA1_2 = input.LA(2);
+
+                if ( (LA1_2==DOWN) ) {
+                    int LA1_20 = input.LA(3);
+
+                    if ( (LA1_20==ID) ) {
+                        int LA1_26 = input.LA(4);
+
+                        if ( (LA1_26==ACTION) ) {
+                            int LA1_29 = input.LA(5);
+
+                            if ( (LA1_29==UP) ) {
+                                int LA1_32 = input.LA(6);
+
+                                if ( ((inContext("GRAMMAR"))) ) {
+                                    alt1=2;
+                                }
+                                else if ( ((inContext("RULE"))) ) {
+                                    alt1=8;
+                                }
+                                else {
+                                    if (state.backtracking>0) {state.failed=true; return ;}
+                                    NoViableAltException nvae =
+                                        new NoViableAltException("", 1, 32, input);
+
+                                    throw nvae;
+
+                                }
+                            }
+                            else {
+                                if (state.backtracking>0) {state.failed=true; return ;}
+                                NoViableAltException nvae =
+                                    new NoViableAltException("", 1, 29, input);
+
+                                throw nvae;
+
+                            }
+                        }
+                        else if ( (LA1_26==ID) ) {
+                            alt1=2;
+                        }
+                        else {
+                            if (state.backtracking>0) {state.failed=true; return ;}
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 1, 26, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else {
+                        if (state.backtracking>0) {state.failed=true; return ;}
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 1, 20, input);
+
+                        throw nvae;
+
+                    }
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return ;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 1, 2, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case ASSIGN:
+                {
+                int LA1_3 = input.LA(2);
+
+                if ( (LA1_3==DOWN) ) {
+                    int LA1_21 = input.LA(3);
+
+                    if ( (LA1_21==ID) ) {
+                        int LA1_27 = input.LA(4);
+
+                        if ( (LA1_27==STRING_LITERAL) ) {
+                            int LA1_31 = input.LA(5);
+
+                            if ( (LA1_31==UP) ) {
+                                int LA1_33 = input.LA(6);
+
+                                if ( ((inContext("TOKENS"))) ) {
+                                    alt1=3;
+                                }
+                                else if ( ((inContext("RULE ..."))) ) {
+                                    alt1=13;
+                                }
+                                else {
+                                    if (state.backtracking>0) {state.failed=true; return ;}
+                                    NoViableAltException nvae =
+                                        new NoViableAltException("", 1, 33, input);
+
+                                    throw nvae;
+
+                                }
+                            }
+                            else if ( (LA1_31==DOWN) ) {
+                                alt1=13;
+                            }
+                            else {
+                                if (state.backtracking>0) {state.failed=true; return ;}
+                                NoViableAltException nvae =
+                                    new NoViableAltException("", 1, 31, input);
+
+                                throw nvae;
+
+                            }
+                        }
+                        else if ( ((LA1_27 >= ACTION && LA1_27 <= STAR)||(LA1_27 >= TEMPLATE && LA1_27 <= WILDCARD)) ) {
+                            alt1=13;
+                        }
+                        else {
+                            if (state.backtracking>0) {state.failed=true; return ;}
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 1, 27, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else {
+                        if (state.backtracking>0) {state.failed=true; return ;}
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 1, 21, input);
+
+                        throw nvae;
+
+                    }
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return ;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 1, 3, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case ID:
+                {
+                alt1=3;
+                }
+                break;
+            case MODE:
+                {
+                alt1=4;
+                }
+                break;
+            case RULE:
+                {
+                alt1=5;
+                }
+                break;
+            case ARG_ACTION:
+                {
+                alt1=6;
+                }
+                break;
+            case RETURNS:
+                {
+                alt1=7;
+                }
+                break;
+            case RULE_REF:
+                {
+                int LA1_9 = input.LA(2);
+
+                if ( (!(((inContext("RESULT ..."))))) ) {
+                    alt1=10;
+                }
+                else if ( ((inContext("RESULT ..."))) ) {
+                    alt1=11;
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return ;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 1, 9, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case STRING_LITERAL:
+                {
+                int LA1_10 = input.LA(2);
+
+                if ( ((inContext("RESULT ..."))) ) {
+                    alt1=11;
+                }
+                else if ( ((!inContext("TOKENS ASSIGN"))) ) {
+                    alt1=12;
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return ;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 1, 10, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case TOKEN_REF:
+                {
+                int LA1_11 = input.LA(2);
+
+                if ( ((inContext("RESULT ..."))) ) {
+                    alt1=11;
+                }
+                else if ( (true) ) {
+                    alt1=12;
+                }
+                else {
+                    if (state.backtracking>0) {state.failed=true; return ;}
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 1, 11, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case LABEL:
+                {
+                alt1=11;
+                }
+                break;
+            case PLUS_ASSIGN:
+                {
+                alt1=13;
+                }
+                break;
+            case ALT:
+            case ALT_REWRITE:
+                {
+                alt1=14;
+                }
+                break;
+            case ACTION:
+            case FORCED_ACTION:
+                {
+                alt1=15;
+                }
+                break;
+            case SEMPRED:
+                {
+                alt1=16;
+                }
+                break;
+            case FINALLY:
+                {
+                alt1=17;
+                }
+                break;
+            case CATCH:
+                {
+                alt1=18;
+                }
+                break;
+            default:
+                if (state.backtracking>0) {state.failed=true; return ;}
+                NoViableAltException nvae =
+                    new NoViableAltException("", 1, 0, input);
+
+                throw nvae;
+
+            }
+
             switch (alt1) {
                 case 1 :
                     // CollectSymbols.g:96:7: globalScope
@@ -392,11 +720,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "topdown"
+
 
 
     // $ANTLR start "bottomup"
@@ -419,15 +750,18 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "bottomup"
 
 
+
     // $ANTLR start "globalScope"
-    // CollectSymbols.g:121:1: globalScope : {...}? ^( SCOPE ID ACTION ) ;
+    // CollectSymbols.g:121:1: globalScope :{...}? ^( SCOPE ID ACTION ) ;
     public final void globalScope() throws RecognitionException {
         GrammarAST ACTION1=null;
         GrammarAST ID2=null;
@@ -440,22 +774,24 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "globalScope", "inContext(\"GRAMMAR\")");
             }
+
             match(input,SCOPE,FOLLOW_SCOPE_in_globalScope265); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             ID2=(GrammarAST)match(input,ID,FOLLOW_ID_in_globalScope267); if (state.failed) return ;
+
             ACTION1=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_globalScope269); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             if ( state.backtracking==1 ) {
-
-              		AttributeDict s = ScopeParser.parseDynamicScope((ACTION1!=null?ACTION1.getText():null));
-              		s.type = AttributeDict.DictType.GLOBAL_SCOPE;
-              		s.name = (ID2!=null?ID2.getText():null);
-              		s.ast = ACTION1;
-              		scopes.add(s);
-
-            }
+            		AttributeDict s = ScopeParser.parseDynamicScope((ACTION1!=null?ACTION1.getText():null));
+            		s.type = AttributeDict.DictType.GLOBAL_SCOPE;
+            		s.name = (ID2!=null?ID2.getText():null);
+            		s.ast = ACTION1;
+            		scopes.add(s);
+            		}
 
             }
 
@@ -464,15 +800,18 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "globalScope"
 
 
+
     // $ANTLR start "globalNamedAction"
-    // CollectSymbols.g:132:1: globalNamedAction : {...}? ^( AT ( ID )? ID ACTION ) ;
+    // CollectSymbols.g:132:1: globalNamedAction :{...}? ^( AT ( ID )? ID ACTION ) ;
     public final void globalNamedAction() throws RecognitionException {
         GrammarAST AT3=null;
         GrammarAST ACTION4=null;
@@ -485,6 +824,7 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "globalNamedAction", "inContext(\"GRAMMAR\")");
             }
+
             AT3=(GrammarAST)match(input,AT,FOLLOW_AT_in_globalNamedAction288); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
@@ -510,13 +850,15 @@ public class CollectSymbols extends TreeFilter {
 
             }
 
+
             match(input,ID,FOLLOW_ID_in_globalNamedAction293); if (state.failed) return ;
+
             ACTION4=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_globalNamedAction295); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
-            if ( state.backtracking==1 ) {
-              actions.add(AT3); ((ActionAST)ACTION4).resolver = g;
-            }
+
+
+            if ( state.backtracking==1 ) {actions.add(AT3); ((ActionAST)ACTION4).resolver = g;}
 
             }
 
@@ -525,29 +867,33 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "globalNamedAction"
 
 
+
     // $ANTLR start "tokensSection"
-    // CollectSymbols.g:137:1: tokensSection : {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID ) ;
+    // CollectSymbols.g:137:1: tokensSection :{...}? ( ^( ASSIGN t= ID STRING_LITERAL ) |t= ID ) ;
     public final void tokensSection() throws RecognitionException {
         GrammarAST t=null;
         GrammarAST ASSIGN5=null;
         GrammarAST STRING_LITERAL6=null;
 
         try {
-            // CollectSymbols.g:138:2: ({...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID ) )
-            // CollectSymbols.g:138:4: {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID )
+            // CollectSymbols.g:138:2: ({...}? ( ^( ASSIGN t= ID STRING_LITERAL ) |t= ID ) )
+            // CollectSymbols.g:138:4: {...}? ( ^( ASSIGN t= ID STRING_LITERAL ) |t= ID )
             {
             if ( !((inContext("TOKENS"))) ) {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "tokensSection", "inContext(\"TOKENS\")");
             }
-            // CollectSymbols.g:139:3: ( ^( ASSIGN t= ID STRING_LITERAL ) | t= ID )
+
+            // CollectSymbols.g:139:3: ( ^( ASSIGN t= ID STRING_LITERAL ) |t= ID )
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -563,6 +909,7 @@ public class CollectSymbols extends TreeFilter {
                     new NoViableAltException("", 3, 0, input);
 
                 throw nvae;
+
             }
             switch (alt3) {
                 case 1 :
@@ -572,13 +919,14 @@ public class CollectSymbols extends TreeFilter {
 
                     match(input, Token.DOWN, null); if (state.failed) return ;
                     t=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokensSection322); if (state.failed) return ;
+
                     STRING_LITERAL6=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_tokensSection324); if (state.failed) return ;
 
                     match(input, Token.UP, null); if (state.failed) return ;
-                    if ( state.backtracking==1 ) {
-                      terminals.add(t); tokenIDRefs.add(t);
-                      			 tokensDefs.add(ASSIGN5); strings.add((STRING_LITERAL6!=null?STRING_LITERAL6.getText():null));
-                    }
+
+
+                    if ( state.backtracking==1 ) {terminals.add(t); tokenIDRefs.add(t);
+                    			 tokensDefs.add(ASSIGN5); strings.add((STRING_LITERAL6!=null?STRING_LITERAL6.getText():null));}
 
                     }
                     break;
@@ -586,9 +934,8 @@ public class CollectSymbols extends TreeFilter {
                     // CollectSymbols.g:142:5: t= ID
                     {
                     t=(GrammarAST)match(input,ID,FOLLOW_ID_in_tokensSection338); if (state.failed) return ;
-                    if ( state.backtracking==1 ) {
-                      terminals.add(t); tokenIDRefs.add(t); tokensDefs.add(t);
-                    }
+
+                    if ( state.backtracking==1 ) {terminals.add(t); tokenIDRefs.add(t); tokensDefs.add(t);}
 
                     }
                     break;
@@ -603,11 +950,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "tokensSection"
+
 
 
     // $ANTLR start "mode"
@@ -623,6 +973,7 @@ public class CollectSymbols extends TreeFilter {
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             ID7=(GrammarAST)match(input,ID,FOLLOW_ID_in_mode359); if (state.failed) return ;
+
             // CollectSymbols.g:147:17: ( . )+
             int cnt4=0;
             loop4:
@@ -630,7 +981,7 @@ public class CollectSymbols extends TreeFilter {
                 int alt4=2;
                 int LA4_0 = input.LA(1);
 
-                if ( ((LA4_0>=SEMPRED && LA4_0<=ALT_REWRITE)) ) {
+                if ( ((LA4_0 >= ACTION && LA4_0 <= WILDCARD)) ) {
                     alt4=1;
                 }
                 else if ( (LA4_0==UP) ) {
@@ -659,9 +1010,9 @@ public class CollectSymbols extends TreeFilter {
 
 
             match(input, Token.UP, null); if (state.failed) return ;
-            if ( state.backtracking==1 ) {
-              currentMode = (ID7!=null?ID7.getText():null);
-            }
+
+
+            if ( state.backtracking==1 ) {currentMode = (ID7!=null?ID7.getText():null);}
 
             }
 
@@ -670,11 +1021,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "mode"
+
 
 
     // $ANTLR start "rule"
@@ -693,6 +1047,7 @@ public class CollectSymbols extends TreeFilter {
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             name=(GrammarAST)match(input,ID,FOLLOW_ID_in_rule396); if (state.failed) return ;
+
             // CollectSymbols.g:152:17: ( options {greedy=false; } : . )*
             loop5:
             do {
@@ -711,6 +1066,7 @@ public class CollectSymbols extends TreeFilter {
             	    break loop5;
                 }
             } while (true);
+
 
             // CollectSymbols.g:153:9: ( ^( RULEMODIFIERS (m= . )+ ) )?
             int alt7=2;
@@ -733,7 +1089,7 @@ public class CollectSymbols extends TreeFilter {
                         int alt6=2;
                         int LA6_0 = input.LA(1);
 
-                        if ( ((LA6_0>=SEMPRED && LA6_0<=ALT_REWRITE)) ) {
+                        if ( ((LA6_0 >= ACTION && LA6_0 <= WILDCARD)) ) {
                             alt6=1;
                         }
 
@@ -743,10 +1099,10 @@ public class CollectSymbols extends TreeFilter {
                     	    // CollectSymbols.g:153:27: m= .
                     	    {
                     	    m=(GrammarAST)input.LT(1);
+
                     	    matchAny(input); if (state.failed) return ;
-                    	    if ( state.backtracking==1 ) {
-                    	      modifiers.add(m);
-                    	    }
+
+                    	    if ( state.backtracking==1 ) {modifiers.add(m);}
 
                     	    }
                     	    break;
@@ -764,10 +1120,12 @@ public class CollectSymbols extends TreeFilter {
 
                     match(input, Token.UP, null); if (state.failed) return ;
 
+
                     }
                     break;
 
             }
+
 
             // CollectSymbols.g:154:9: ( ^( AT ID ACTION ) )*
             loop8:
@@ -788,9 +1146,11 @@ public class CollectSymbols extends TreeFilter {
 
             	    match(input, Token.DOWN, null); if (state.failed) return ;
             	    match(input,ID,FOLLOW_ID_in_rule446); if (state.failed) return ;
+
             	    match(input,ACTION,FOLLOW_ACTION_in_rule448); if (state.failed) return ;
 
             	    match(input, Token.UP, null); if (state.failed) return ;
+
 
             	    }
             	    break;
@@ -799,6 +1159,7 @@ public class CollectSymbols extends TreeFilter {
             	    break loop8;
                 }
             } while (true);
+
 
             match(input,BLOCK,FOLLOW_BLOCK_in_rule462); if (state.failed) return ;
 
@@ -810,7 +1171,7 @@ public class CollectSymbols extends TreeFilter {
                 int alt9=2;
                 int LA9_0 = input.LA(1);
 
-                if ( ((LA9_0>=SEMPRED && LA9_0<=ALT_REWRITE)) ) {
+                if ( ((LA9_0 >= ACTION && LA9_0 <= WILDCARD)) ) {
                     alt9=1;
                 }
                 else if ( (LA9_0==UP) ) {
@@ -839,13 +1200,15 @@ public class CollectSymbols extends TreeFilter {
 
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             // CollectSymbols.g:156:9: ( . )*
             loop10:
             do {
                 int alt10=2;
                 int LA10_0 = input.LA(1);
 
-                if ( ((LA10_0>=SEMPRED && LA10_0<=ALT_REWRITE)) ) {
+                if ( ((LA10_0 >= ACTION && LA10_0 <= WILDCARD)) ) {
                     alt10=1;
                 }
                 else if ( (LA10_0==UP) ) {
@@ -869,17 +1232,17 @@ public class CollectSymbols extends TreeFilter {
 
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             if ( state.backtracking==1 ) {
-
-              		int numAlts = RULE8.getFirstChildWithType(BLOCK).getChildCount();
-              		Rule r = new Rule(g, (name!=null?name.getText():null), (RuleAST)RULE8, numAlts);
-              		if ( g.isLexer() ) r.mode = currentMode;
-              		if ( modifiers.size()>0 ) r.modifiers = modifiers;
-              		rules.add(r);
-              		currentRule = r;
-              		currentAlt = 1;
-
-            }
+            		int numAlts = RULE8.getFirstChildWithType(BLOCK).getChildCount();
+            		Rule r = new Rule(g, (name!=null?name.getText():null), (RuleAST)RULE8, numAlts);
+            		if ( g.isLexer() ) r.mode = currentMode;
+            		if ( modifiers.size()>0 ) r.modifiers = modifiers;
+            		rules.add(r);
+            		currentRule = r;
+            		currentAlt = 1;
+            		}
 
             }
 
@@ -888,20 +1251,25 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "rule"
 
+
     public static class setAlt_return extends TreeRuleReturnScope {
     };
 
+
     // $ANTLR start "setAlt"
-    // CollectSymbols.g:169:1: setAlt : {...}? ( ALT | ALT_REWRITE ) ;
+    // CollectSymbols.g:169:1: setAlt :{...}? ( ALT | ALT_REWRITE ) ;
     public final CollectSymbols.setAlt_return setAlt() throws RecognitionException {
         CollectSymbols.setAlt_return retval = new CollectSymbols.setAlt_return();
         retval.start = input.LT(1);
+
 
         try {
             // CollectSymbols.g:170:2: ({...}? ( ALT | ALT_REWRITE ) )
@@ -911,9 +1279,11 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 throw new FailedPredicateException(input, "setAlt", "inContext(\"RULE BLOCK\")");
             }
+
             if ( input.LA(1)==ALT||input.LA(1)==ALT_REWRITE ) {
                 input.consume();
-                state.errorRecovery=false;state.failed=false;
+                state.errorRecovery=false;
+                state.failed=false;
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return retval;}
@@ -921,12 +1291,11 @@ public class CollectSymbols extends TreeFilter {
                 throw mse;
             }
 
+
             if ( state.backtracking==1 ) {
-
-              		currentAlt = ((GrammarAST)retval.start).getChildIndex()+1;
-              		currentRule.alt[currentAlt].ast = (AltAST)((GrammarAST)retval.start);
-
-            }
+            		currentAlt = ((GrammarAST)retval.start).getChildIndex()+1;
+            		currentRule.alt[currentAlt].ast = (AltAST)((GrammarAST)retval.start);
+            		}
 
             }
 
@@ -935,11 +1304,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return retval;
     }
     // $ANTLR end "setAlt"
+
 
 
     // $ANTLR start "finishRule"
@@ -950,9 +1322,8 @@ public class CollectSymbols extends TreeFilter {
             // CollectSymbols.g:178:4: RULE
             {
             match(input,RULE,FOLLOW_RULE_in_finishRule528); if (state.failed) return ;
-            if ( state.backtracking==1 ) {
-              currentRule = null;
-            }
+
+            if ( state.backtracking==1 ) {currentRule = null;}
 
             }
 
@@ -961,15 +1332,18 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "finishRule"
 
 
+
     // $ANTLR start "ruleNamedAction"
-    // CollectSymbols.g:181:1: ruleNamedAction : {...}? ^( AT ID ACTION ) ;
+    // CollectSymbols.g:181:1: ruleNamedAction :{...}? ^( AT ID ACTION ) ;
     public final void ruleNamedAction() throws RecognitionException {
         GrammarAST ID9=null;
         GrammarAST ACTION10=null;
@@ -982,19 +1356,21 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "ruleNamedAction", "inContext(\"RULE\")");
             }
+
             match(input,AT,FOLLOW_AT_in_ruleNamedAction544); if (state.failed) return ;
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             ID9=(GrammarAST)match(input,ID,FOLLOW_ID_in_ruleNamedAction546); if (state.failed) return ;
+
             ACTION10=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_ruleNamedAction548); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             if ( state.backtracking==1 ) {
-
-              		currentRule.namedActions.put((ID9!=null?ID9.getText():null),(ActionAST)ACTION10);
-              		((ActionAST)ACTION10).resolver = currentRule;
-
-            }
+            		currentRule.namedActions.put((ID9!=null?ID9.getText():null),(ActionAST)ACTION10);
+            		((ActionAST)ACTION10).resolver = currentRule;
+            		}
 
             }
 
@@ -1003,11 +1379,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "ruleNamedAction"
+
 
 
     // $ANTLR start "ruleAction"
@@ -1033,6 +1412,7 @@ public class CollectSymbols extends TreeFilter {
                     new NoViableAltException("", 11, 0, input);
 
                 throw nvae;
+
             }
             switch (alt11) {
                 case 1 :
@@ -1043,13 +1423,13 @@ public class CollectSymbols extends TreeFilter {
                         if (state.backtracking>0) {state.failed=true; return ;}
                         throw new FailedPredicateException(input, "ruleAction", "inContext(\"RULE ...\")&&!inContext(\"SCOPE\")&&\n\t\t !inContext(\"CATCH\")&&!inContext(\"FINALLY\")&&!inContext(\"AT\")");
                     }
+
                     ACTION11=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_ruleAction568); if (state.failed) return ;
+
                     if ( state.backtracking==1 ) {
-
-                      		currentRule.defineActionInAlt(currentAlt, (ActionAST)ACTION11);
-                      		((ActionAST)ACTION11).resolver = currentRule.alt[currentAlt];
-
-                    }
+                    		currentRule.defineActionInAlt(currentAlt, (ActionAST)ACTION11);
+                    		((ActionAST)ACTION11).resolver = currentRule.alt[currentAlt];
+                    		}
 
                     }
                     break;
@@ -1057,12 +1437,11 @@ public class CollectSymbols extends TreeFilter {
                     // CollectSymbols.g:197:9: FORCED_ACTION
                     {
                     FORCED_ACTION12=(GrammarAST)match(input,FORCED_ACTION,FOLLOW_FORCED_ACTION_in_ruleAction582); if (state.failed) return ;
+
                     if ( state.backtracking==1 ) {
-
-                      		currentRule.defineActionInAlt(currentAlt, (ActionAST)FORCED_ACTION12);
-                      		((ActionAST)FORCED_ACTION12).resolver = currentRule.alt[currentAlt];
-
-                    }
+                    		currentRule.defineActionInAlt(currentAlt, (ActionAST)FORCED_ACTION12);
+                    		((ActionAST)FORCED_ACTION12).resolver = currentRule.alt[currentAlt];
+                    		}
 
                     }
                     break;
@@ -1073,15 +1452,18 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "ruleAction"
 
 
+
     // $ANTLR start "sempred"
-    // CollectSymbols.g:204:1: sempred : {...}? SEMPRED ;
+    // CollectSymbols.g:204:1: sempred :{...}? SEMPRED ;
     public final void sempred() throws RecognitionException {
         GrammarAST SEMPRED13=null;
 
@@ -1093,13 +1475,13 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "sempred", "inContext(\"RULE ...\")");
             }
+
             SEMPRED13=(GrammarAST)match(input,SEMPRED,FOLLOW_SEMPRED_in_sempred601); if (state.failed) return ;
+
             if ( state.backtracking==1 ) {
-
-              		currentRule.definePredicateInAlt(currentAlt, (PredAST)SEMPRED13);
-              		((PredAST)SEMPRED13).resolver = currentRule.alt[currentAlt];
-
-            }
+            		currentRule.definePredicateInAlt(currentAlt, (PredAST)SEMPRED13);
+            		((PredAST)SEMPRED13).resolver = currentRule.alt[currentAlt];
+            		}
 
             }
 
@@ -1108,11 +1490,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "sempred"
+
 
 
     // $ANTLR start "exceptionHandler"
@@ -1128,15 +1513,16 @@ public class CollectSymbols extends TreeFilter {
 
             match(input, Token.DOWN, null); if (state.failed) return ;
             match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_exceptionHandler619); if (state.failed) return ;
+
             ACTION14=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_exceptionHandler621); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             if ( state.backtracking==1 ) {
-
-              		currentRule.exceptionActions.add((ActionAST)ACTION14);
-              		((ActionAST)ACTION14).resolver = currentRule;
-
-            }
+            		currentRule.exceptionActions.add((ActionAST)ACTION14);
+            		((ActionAST)ACTION14).resolver = currentRule;
+            		}
 
             }
 
@@ -1145,11 +1531,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "exceptionHandler"
+
 
 
     // $ANTLR start "finallyClause"
@@ -1167,12 +1556,12 @@ public class CollectSymbols extends TreeFilter {
             ACTION15=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_finallyClause640); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             if ( state.backtracking==1 ) {
-
-              		currentRule.finallyAction = (ActionAST)ACTION15;
-              		((ActionAST)ACTION15).resolver = currentRule;
-
-            }
+            		currentRule.finallyAction = (ActionAST)ACTION15;
+            		((ActionAST)ACTION15).resolver = currentRule;
+            		}
 
             }
 
@@ -1181,15 +1570,18 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "finallyClause"
 
 
+
     // $ANTLR start "ruleArg"
-    // CollectSymbols.g:229:1: ruleArg : {...}? ARG_ACTION ;
+    // CollectSymbols.g:229:1: ruleArg :{...}? ARG_ACTION ;
     public final void ruleArg() throws RecognitionException {
         GrammarAST ARG_ACTION16=null;
 
@@ -1201,14 +1593,14 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "ruleArg", "inContext(\"RULE\")");
             }
+
             ARG_ACTION16=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleArg658); if (state.failed) return ;
+
             if ( state.backtracking==1 ) {
-
-              		currentRule.args = ScopeParser.parseTypeList((ARG_ACTION16!=null?ARG_ACTION16.getText():null));
-              		currentRule.args.type = AttributeDict.DictType.ARG;
-              		currentRule.args.ast = ARG_ACTION16;
-
-            }
+            		currentRule.args = ScopeParser.parseTypeList((ARG_ACTION16!=null?ARG_ACTION16.getText():null));
+            		currentRule.args.type = AttributeDict.DictType.ARG;
+            		currentRule.args.ast = ARG_ACTION16;
+            		}
 
             }
 
@@ -1217,11 +1609,14 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "ruleArg"
+
 
 
     // $ANTLR start "ruleReturns"
@@ -1239,13 +1634,13 @@ public class CollectSymbols extends TreeFilter {
             ARG_ACTION17=(GrammarAST)match(input,ARG_ACTION,FOLLOW_ARG_ACTION_in_ruleReturns676); if (state.failed) return ;
 
             match(input, Token.UP, null); if (state.failed) return ;
+
+
             if ( state.backtracking==1 ) {
-
-              		currentRule.retvals = ScopeParser.parseTypeList((ARG_ACTION17!=null?ARG_ACTION17.getText():null));
-              		currentRule.retvals.type = AttributeDict.DictType.RET;
-              		currentRule.retvals.ast = ARG_ACTION17;
-
-            }
+            		currentRule.retvals = ScopeParser.parseTypeList((ARG_ACTION17!=null?ARG_ACTION17.getText():null));
+            		currentRule.retvals.type = AttributeDict.DictType.RET;
+            		currentRule.retvals.ast = ARG_ACTION17;
+            		}
 
             }
 
@@ -1254,15 +1649,18 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "ruleReturns"
 
 
+
     // $ANTLR start "ruleScopeSpec"
-    // CollectSymbols.g:247:1: ruleScopeSpec : {...}? ( ^( SCOPE ACTION ) | ^( SCOPE (ids+= ID )+ ) ) ;
+    // CollectSymbols.g:247:1: ruleScopeSpec :{...}? ( ^( SCOPE ACTION ) | ^( SCOPE (ids+= ID )+ ) ) ;
     public final void ruleScopeSpec() throws RecognitionException {
         GrammarAST ACTION18=null;
         GrammarAST ids=null;
@@ -1276,6 +1674,7 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return ;}
                 throw new FailedPredicateException(input, "ruleScopeSpec", "inContext(\"RULE\")");
             }
+
             // CollectSymbols.g:249:3: ( ^( SCOPE ACTION ) | ^( SCOPE (ids+= ID )+ ) )
             int alt13=2;
             int LA13_0 = input.LA(1);
@@ -1298,6 +1697,7 @@ public class CollectSymbols extends TreeFilter {
                             new NoViableAltException("", 13, 2, input);
 
                         throw nvae;
+
                     }
                 }
                 else {
@@ -1306,6 +1706,7 @@ public class CollectSymbols extends TreeFilter {
                         new NoViableAltException("", 13, 1, input);
 
                     throw nvae;
+
                 }
             }
             else {
@@ -1314,6 +1715,7 @@ public class CollectSymbols extends TreeFilter {
                     new NoViableAltException("", 13, 0, input);
 
                 throw nvae;
+
             }
             switch (alt13) {
                 case 1 :
@@ -1325,14 +1727,14 @@ public class CollectSymbols extends TreeFilter {
                     ACTION18=(GrammarAST)match(input,ACTION,FOLLOW_ACTION_in_ruleScopeSpec701); if (state.failed) return ;
 
                     match(input, Token.UP, null); if (state.failed) return ;
+
+
                     if ( state.backtracking==1 ) {
-
-                      			currentRule.scope = ScopeParser.parseDynamicScope((ACTION18!=null?ACTION18.getText():null));
-                      			currentRule.scope.type = AttributeDict.DictType.RULE_SCOPE;
-                      			currentRule.scope.name = currentRule.name;
-                      			currentRule.scope.ast = ACTION18;
-
-                    }
+                    			currentRule.scope = ScopeParser.parseDynamicScope((ACTION18!=null?ACTION18.getText():null));
+                    			currentRule.scope.type = AttributeDict.DictType.RULE_SCOPE;
+                    			currentRule.scope.name = currentRule.name;
+                    			currentRule.scope.ast = ACTION18;
+                    			}
 
                     }
                     break;
@@ -1378,9 +1780,9 @@ public class CollectSymbols extends TreeFilter {
 
 
                     match(input, Token.UP, null); if (state.failed) return ;
-                    if ( state.backtracking==1 ) {
-                      currentRule.useScopes = list_ids;
-                    }
+
+
+                    if ( state.backtracking==1 ) {currentRule.useScopes = list_ids;}
 
                     }
                     break;
@@ -1395,20 +1797,25 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
     // $ANTLR end "ruleScopeSpec"
 
+
     public static class rewriteElement_return extends TreeRuleReturnScope {
     };
 
+
     // $ANTLR start "rewriteElement"
-    // CollectSymbols.g:260:1: rewriteElement : {...}? ( TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL ) ;
+    // CollectSymbols.g:260:1: rewriteElement :{...}? ( TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL ) ;
     public final CollectSymbols.rewriteElement_return rewriteElement() throws RecognitionException {
         CollectSymbols.rewriteElement_return retval = new CollectSymbols.rewriteElement_return();
         retval.start = input.LT(1);
+
 
         try {
             // CollectSymbols.g:262:2: ({...}? ( TOKEN_REF | RULE_REF | STRING_LITERAL | LABEL ) )
@@ -1418,9 +1825,11 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 throw new FailedPredicateException(input, "rewriteElement", "inContext(\"RESULT ...\")");
             }
-            if ( (input.LA(1)>=TOKEN_REF && input.LA(1)<=RULE_REF)||input.LA(1)==STRING_LITERAL||input.LA(1)==LABEL ) {
+
+            if ( input.LA(1)==RULE_REF||input.LA(1)==STRING_LITERAL||input.LA(1)==TOKEN_REF||input.LA(1)==LABEL ) {
                 input.consume();
-                state.errorRecovery=false;state.failed=false;
+                state.errorRecovery=false;
+                state.failed=false;
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return retval;}
@@ -1428,9 +1837,8 @@ public class CollectSymbols extends TreeFilter {
                 throw mse;
             }
 
-            if ( state.backtracking==1 ) {
-              currentRule.alt[currentAlt].rewriteElements.add(((GrammarAST)retval.start));
-            }
+
+            if ( state.backtracking==1 ) {currentRule.alt[currentAlt].rewriteElements.add(((GrammarAST)retval.start));}
 
             }
 
@@ -1439,20 +1847,25 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return retval;
     }
     // $ANTLR end "rewriteElement"
 
+
     public static class labeledElement_return extends TreeRuleReturnScope {
     };
 
+
     // $ANTLR start "labeledElement"
-    // CollectSymbols.g:267:1: labeledElement : {...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) ) ;
+    // CollectSymbols.g:267:1: labeledElement :{...}? ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) ) ;
     public final CollectSymbols.labeledElement_return labeledElement() throws RecognitionException {
         CollectSymbols.labeledElement_return retval = new CollectSymbols.labeledElement_return();
         retval.start = input.LT(1);
+
 
         GrammarAST id=null;
         GrammarAST e=null;
@@ -1465,6 +1878,7 @@ public class CollectSymbols extends TreeFilter {
                 if (state.backtracking>0) {state.failed=true; return retval;}
                 throw new FailedPredicateException(input, "labeledElement", "inContext(\"RULE ...\")");
             }
+
             // CollectSymbols.g:274:3: ( ^( ASSIGN id= ID e= . ) | ^( PLUS_ASSIGN id= ID e= . ) )
             int alt14=2;
             int LA14_0 = input.LA(1);
@@ -1481,6 +1895,7 @@ public class CollectSymbols extends TreeFilter {
                     new NoViableAltException("", 14, 0, input);
 
                 throw nvae;
+
             }
             switch (alt14) {
                 case 1 :
@@ -1490,10 +1905,13 @@ public class CollectSymbols extends TreeFilter {
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
                     id=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement784); if (state.failed) return retval;
+
                     e=(GrammarAST)input.LT(1);
+
                     matchAny(input); if (state.failed) return retval;
 
                     match(input, Token.UP, null); if (state.failed) return retval;
+
 
                     }
                     break;
@@ -1504,10 +1922,13 @@ public class CollectSymbols extends TreeFilter {
 
                     match(input, Token.DOWN, null); if (state.failed) return retval;
                     id=(GrammarAST)match(input,ID,FOLLOW_ID_in_labeledElement800); if (state.failed) return retval;
+
                     e=(GrammarAST)input.LT(1);
+
                     matchAny(input); if (state.failed) return retval;
 
                     match(input, Token.UP, null); if (state.failed) return retval;
+
 
                     }
                     break;
@@ -1518,31 +1939,34 @@ public class CollectSymbols extends TreeFilter {
             }
 
             if ( state.backtracking==1 ) {
-
-              LabelElementPair lp = new LabelElementPair(g, id, e, ((GrammarAST)retval.start).getType());
-              //currentRule.labelDefs.map((id!=null?id.getText():null), lp);
-              currentRule.alt[currentAlt].labelDefs.map((id!=null?id.getText():null), lp);
-
+            LabelElementPair lp = new LabelElementPair(g, id, e, ((GrammarAST)retval.start).getType());
+            //currentRule.labelDefs.map((id!=null?id.getText():null), lp);
+            currentRule.alt[currentAlt].labelDefs.map((id!=null?id.getText():null), lp);
             }
         }
         catch (RecognitionException re) {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return retval;
     }
     // $ANTLR end "labeledElement"
 
+
     public static class terminal_return extends TreeRuleReturnScope {
     };
+
 
     // $ANTLR start "terminal"
     // CollectSymbols.g:279:1: terminal : ({...}? STRING_LITERAL | TOKEN_REF );
     public final CollectSymbols.terminal_return terminal() throws RecognitionException {
         CollectSymbols.terminal_return retval = new CollectSymbols.terminal_return();
         retval.start = input.LT(1);
+
 
         GrammarAST STRING_LITERAL19=null;
         GrammarAST TOKEN_REF20=null;
@@ -1564,6 +1988,7 @@ public class CollectSymbols extends TreeFilter {
                     new NoViableAltException("", 15, 0, input);
 
                 throw nvae;
+
             }
             switch (alt15) {
                 case 1 :
@@ -1573,16 +1998,16 @@ public class CollectSymbols extends TreeFilter {
                         if (state.backtracking>0) {state.failed=true; return retval;}
                         throw new FailedPredicateException(input, "terminal", "!inContext(\"TOKENS ASSIGN\")");
                     }
+
                     STRING_LITERAL19=(GrammarAST)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_terminal825); if (state.failed) return retval;
+
                     if ( state.backtracking==1 ) {
-
-                          	terminals.add(((GrammarAST)retval.start));
-                          	strings.add((STRING_LITERAL19!=null?STRING_LITERAL19.getText():null));
-                          	if ( currentRule!=null ) {
-                          		currentRule.alt[currentAlt].tokenRefs.map((STRING_LITERAL19!=null?STRING_LITERAL19.getText():null), (TerminalAST)STRING_LITERAL19);
-                          	}
-
-                    }
+                        	terminals.add(((GrammarAST)retval.start));
+                        	strings.add((STRING_LITERAL19!=null?STRING_LITERAL19.getText():null));
+                        	if ( currentRule!=null ) {
+                        		currentRule.alt[currentAlt].tokenRefs.map((STRING_LITERAL19!=null?STRING_LITERAL19.getText():null), (TerminalAST)STRING_LITERAL19);
+                        	}
+                        	}
 
                     }
                     break;
@@ -1590,15 +2015,14 @@ public class CollectSymbols extends TreeFilter {
                     // CollectSymbols.g:288:7: TOKEN_REF
                     {
                     TOKEN_REF20=(GrammarAST)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_terminal840); if (state.failed) return retval;
+
                     if ( state.backtracking==1 ) {
-
-                          	terminals.add(TOKEN_REF20);
-                          	tokenIDRefs.add(TOKEN_REF20);
-                          	if ( currentRule!=null ) {
-                          		currentRule.alt[currentAlt].tokenRefs.map((TOKEN_REF20!=null?TOKEN_REF20.getText():null), (TerminalAST)TOKEN_REF20);
-                          	}
-
-                    }
+                        	terminals.add(TOKEN_REF20);
+                        	tokenIDRefs.add(TOKEN_REF20);
+                        	if ( currentRule!=null ) {
+                        		currentRule.alt[currentAlt].tokenRefs.map((TOKEN_REF20!=null?TOKEN_REF20.getText():null), (TerminalAST)TOKEN_REF20);
+                        	}
+                        	}
 
                     }
                     break;
@@ -1609,23 +2033,26 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return retval;
     }
     // $ANTLR end "terminal"
 
 
+
     // $ANTLR start "ruleref"
-    // CollectSymbols.g:298:1: ruleref : ({...}?r= RULE_REF | r= RULE_REF ) ;
+    // CollectSymbols.g:298:1: ruleref : ({...}?r= RULE_REF |r= RULE_REF ) ;
     public final void ruleref() throws RecognitionException {
         GrammarAST r=null;
 
         try {
-            // CollectSymbols.g:300:5: ( ({...}?r= RULE_REF | r= RULE_REF ) )
-            // CollectSymbols.g:300:7: ({...}?r= RULE_REF | r= RULE_REF )
+            // CollectSymbols.g:300:5: ( ({...}?r= RULE_REF |r= RULE_REF ) )
+            // CollectSymbols.g:300:7: ({...}?r= RULE_REF |r= RULE_REF )
             {
-            // CollectSymbols.g:300:7: ({...}?r= RULE_REF | r= RULE_REF )
+            // CollectSymbols.g:300:7: ({...}?r= RULE_REF |r= RULE_REF )
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -1644,6 +2071,7 @@ public class CollectSymbols extends TreeFilter {
                         new NoViableAltException("", 16, 1, input);
 
                     throw nvae;
+
                 }
             }
             else {
@@ -1652,6 +2080,7 @@ public class CollectSymbols extends TreeFilter {
                     new NoViableAltException("", 16, 0, input);
 
                 throw nvae;
+
             }
             switch (alt16) {
                 case 1 :
@@ -1661,10 +2090,10 @@ public class CollectSymbols extends TreeFilter {
                         if (state.backtracking>0) {state.failed=true; return ;}
                         throw new FailedPredicateException(input, "ruleref", "inContext(\"DOT ...\")");
                     }
+
                     r=(GrammarAST)match(input,RULE_REF,FOLLOW_RULE_REF_in_ruleref877); if (state.failed) return ;
-                    if ( state.backtracking==1 ) {
-                      qualifiedRulerefs.add((GrammarAST)r.getParent());
-                    }
+
+                    if ( state.backtracking==1 ) {qualifiedRulerefs.add((GrammarAST)r.getParent());}
 
                     }
                     break;
@@ -1678,14 +2107,13 @@ public class CollectSymbols extends TreeFilter {
 
             }
 
+
             if ( state.backtracking==1 ) {
-
-                  	rulerefs.add(r);
-                  	if ( currentRule!=null ) {
-                  		currentRule.alt[currentAlt].ruleRefs.map((r!=null?r.getText():null), r);
-                  	}
-
-            }
+                	rulerefs.add(r);
+                	if ( currentRule!=null ) {
+                		currentRule.alt[currentAlt].ruleRefs.map((r!=null?r.getText():null), r);
+                	}
+                	}
 
             }
 
@@ -1694,7 +2122,9 @@ public class CollectSymbols extends TreeFilter {
             reportError(re);
             recover(input,re);
         }
+
         finally {
+        	// do for sure before leaving
         }
         return ;
     }
@@ -1703,184 +2133,7 @@ public class CollectSymbols extends TreeFilter {
     // Delegated rules
 
 
-    protected DFA1 dfa1 = new DFA1(this);
     protected DFA5 dfa5 = new DFA5(this);
-    static final String DFA1_eotS =
-        "\43\uffff";
-    static final String DFA1_eofS =
-        "\43\uffff";
-    static final String DFA1_minS =
-        "\1\4\3\2\5\uffff\3\0\7\uffff\1\20\2\127\2\uffff\1\3\1\uffff\1\20"+
-        "\1\4\1\uffff\1\3\1\uffff\1\2\2\0\1\uffff";
-    static final String DFA1_maxS =
-        "\1\146\3\2\5\uffff\3\0\7\uffff\3\127\2\uffff\1\127\1\uffff\1\127"+
-        "\1\146\1\uffff\1\3\1\uffff\1\3\2\0\1\uffff";
-    static final String DFA1_acceptS =
-        "\4\uffff\1\3\1\4\1\5\1\6\1\7\3\uffff\1\13\1\15\1\16\1\17\1\20\1"+
-        "\21\1\22\3\uffff\1\12\1\14\1\uffff\1\11\2\uffff\1\1\1\uffff\1\2"+
-        "\3\uffff\1\10";
-    static final String DFA1_specialS =
-        "\11\uffff\1\4\1\0\1\2\24\uffff\1\3\1\1\1\uffff}>";
-    static final String[] DFA1_transitionS = {
-            "\1\20\1\17\10\uffff\1\7\1\uffff\1\17\4\uffff\1\1\11\uffff\1"+
-            "\10\1\uffff\1\22\1\21\1\uffff\1\5\11\uffff\1\3\4\uffff\1\15"+
-            "\10\uffff\1\2\2\uffff\1\13\1\11\3\uffff\1\12\4\uffff\1\6\13"+
-            "\uffff\1\16\1\uffff\1\4\5\uffff\1\14\10\uffff\1\16",
-            "\1\23",
-            "\1\24",
-            "\1\25",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\uffff",
-            "\1\uffff",
-            "\1\uffff",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\31\106\uffff\1\30",
-            "\1\32",
-            "\1\33",
-            "",
-            "",
-            "\1\31\14\uffff\1\34\106\uffff\1\31",
-            "",
-            "\1\35\106\uffff\1\36",
-            "\100\15\1\37\42\15",
-            "",
-            "\1\40",
-            "",
-            "\1\15\1\41",
-            "\1\uffff",
-            "\1\uffff",
-            ""
-    };
-
-    static final short[] DFA1_eot = DFA.unpackEncodedString(DFA1_eotS);
-    static final short[] DFA1_eof = DFA.unpackEncodedString(DFA1_eofS);
-    static final char[] DFA1_min = DFA.unpackEncodedStringToUnsignedChars(DFA1_minS);
-    static final char[] DFA1_max = DFA.unpackEncodedStringToUnsignedChars(DFA1_maxS);
-    static final short[] DFA1_accept = DFA.unpackEncodedString(DFA1_acceptS);
-    static final short[] DFA1_special = DFA.unpackEncodedString(DFA1_specialS);
-    static final short[][] DFA1_transition;
-
-    static {
-        int numStates = DFA1_transitionS.length;
-        DFA1_transition = new short[numStates][];
-        for (int i=0; i<numStates; i++) {
-            DFA1_transition[i] = DFA.unpackEncodedString(DFA1_transitionS[i]);
-        }
-    }
-
-    class DFA1 extends DFA {
-
-        public DFA1(BaseRecognizer recognizer) {
-            this.recognizer = recognizer;
-            this.decisionNumber = 1;
-            this.eot = DFA1_eot;
-            this.eof = DFA1_eof;
-            this.min = DFA1_min;
-            this.max = DFA1_max;
-            this.accept = DFA1_accept;
-            this.special = DFA1_special;
-            this.transition = DFA1_transition;
-        }
-        public String getDescription() {
-            return "94:1: topdown : ( globalScope | globalNamedAction | tokensSection | mode | rule | ruleArg | ruleReturns | ruleNamedAction | ruleScopeSpec | ruleref | rewriteElement | terminal | labeledElement | setAlt | ruleAction | sempred | finallyClause | exceptionHandler );";
-        }
-        public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
-            TreeNodeStream input = (TreeNodeStream)_input;
-        	int _s = s;
-            switch ( s ) {
-                    case 0 :
-                        int LA1_10 = input.LA(1);
-
-
-                        int index1_10 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((inContext("RESULT ..."))) ) {s = 12;}
-
-                        else if ( ((!inContext("TOKENS ASSIGN"))) ) {s = 23;}
-
-
-                        input.seek(index1_10);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 1 :
-                        int LA1_33 = input.LA(1);
-
-
-                        int index1_33 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((inContext("TOKENS"))) ) {s = 4;}
-
-                        else if ( ((inContext("RULE ..."))) ) {s = 13;}
-
-
-                        input.seek(index1_33);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 2 :
-                        int LA1_11 = input.LA(1);
-
-
-                        int index1_11 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((inContext("RESULT ..."))) ) {s = 12;}
-
-                        else if ( (true) ) {s = 23;}
-
-
-                        input.seek(index1_11);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 3 :
-                        int LA1_32 = input.LA(1);
-
-
-                        int index1_32 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( ((inContext("GRAMMAR"))) ) {s = 30;}
-
-                        else if ( ((inContext("RULE"))) ) {s = 34;}
-
-
-                        input.seek(index1_32);
-                        if ( s>=0 ) return s;
-                        break;
-                    case 4 :
-                        int LA1_9 = input.LA(1);
-
-
-                        int index1_9 = input.index();
-                        input.rewind();
-                        s = -1;
-                        if ( (!(((inContext("RESULT ..."))))) ) {s = 22;}
-
-                        else if ( ((inContext("RESULT ..."))) ) {s = 12;}
-
-
-                        input.seek(index1_9);
-                        if ( s>=0 ) return s;
-                        break;
-            }
-            if (state.backtracking>0) {state.failed=true; return -1;}
-            NoViableAltException nvae =
-                new NoViableAltException(getDescription(), 1, _s, input);
-            error(nvae);
-            throw nvae;
-        }
-    }
     static final String DFA5_eotS =
         "\41\uffff";
     static final String DFA5_eofS =
@@ -1895,39 +2148,39 @@ public class CollectSymbols extends TreeFilter {
     static final String DFA5_specialS =
         "\41\uffff}>";
     static final String[] DFA5_transitionS = {
-            "\70\4\1\2\16\4\1\1\1\4\1\3\31\4",
+            "\6\4\1\2\104\4\1\3\21\4\1\1\5\4",
             "\1\5\1\uffff\143\4",
             "\1\6\1\uffff\143\4",
             "\1\7\1\uffff\143\4",
             "",
             "\143\10",
-            "\123\4\1\11\17\4",
+            "\122\4\1\11\20\4",
             "\143\12",
             "\1\13\1\14\143\10",
-            "\15\4\1\15\126\4",
+            "\1\4\1\15\142\4",
             "\1\14\1\16\143\12",
             "",
             "",
             "\1\17\143\4",
-            "\1\17\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
+            "\1\17\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
             "",
-            "\1\24\1\17\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
-            "\1\25\1\17\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
-            "\1\26\1\17\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
-            "\1\27\1\17\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
+            "\1\24\1\17\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
+            "\1\25\1\17\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
+            "\1\26\1\17\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
+            "\1\27\1\17\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
             "\143\30",
-            "\123\32\1\31\17\32",
+            "\122\32\1\31\20\32",
             "\143\33",
             "\143\32",
             "\1\4\1\34\143\30",
-            "\1\36\14\32\1\35\126\32",
+            "\1\36\1\35\142\32",
             "\1\36\143\32",
             "\1\4\1\37\143\33",
-            "\1\37\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
+            "\1\37\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
             "\1\40\143\32",
-            "\1\37\70\23\1\21\16\23\1\20\1\23\1\22\31\23",
+            "\1\37\6\23\1\21\104\23\1\22\21\23\1\20\5\23",
             "",
-            "\1\37\70\23\1\21\16\23\1\20\1\23\1\22\31\23"
+            "\1\37\6\23\1\21\104\23\1\22\21\23\1\20\5\23"
     };
 
     static final short[] DFA5_eot = DFA.unpackEncodedString(DFA5_eotS);
@@ -1985,14 +2238,14 @@ public class CollectSymbols extends TreeFilter {
     public static final BitSet FOLLOW_exceptionHandler_in_topdown240 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_finishRule_in_bottomup251 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_SCOPE_in_globalScope265 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_globalScope267 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ID_in_globalScope267 = new BitSet(new long[]{0x0000000000000010L});
     public static final BitSet FOLLOW_ACTION_in_globalScope269 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_AT_in_globalNamedAction288 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_globalNamedAction290 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_ID_in_globalNamedAction293 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ID_in_globalNamedAction290 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_ID_in_globalNamedAction293 = new BitSet(new long[]{0x0000000000000010L});
     public static final BitSet FOLLOW_ACTION_in_globalNamedAction295 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ASSIGN_in_tokensSection318 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_tokensSection322 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_tokensSection322 = new BitSet(new long[]{0x4000000000000000L});
     public static final BitSet FOLLOW_STRING_LITERAL_in_tokensSection324 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ID_in_tokensSection338 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_MODE_in_mode357 = new BitSet(new long[]{0x0000000000000004L});
@@ -2001,19 +2254,19 @@ public class CollectSymbols extends TreeFilter {
     public static final BitSet FOLLOW_ID_in_rule396 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});
     public static final BitSet FOLLOW_RULEMODIFIERS_in_rule420 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_AT_in_rule444 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_rule446 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ID_in_rule446 = new BitSet(new long[]{0x0000000000000010L});
     public static final BitSet FOLLOW_ACTION_in_rule448 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_BLOCK_in_rule462 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_set_in_setAlt505 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_RULE_in_finishRule528 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_AT_in_ruleNamedAction544 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_ruleNamedAction546 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ID_in_ruleNamedAction546 = new BitSet(new long[]{0x0000000000000010L});
     public static final BitSet FOLLOW_ACTION_in_ruleNamedAction548 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ACTION_in_ruleAction568 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_FORCED_ACTION_in_ruleAction582 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_SEMPRED_in_sempred601 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_CATCH_in_exceptionHandler617 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ARG_ACTION_in_exceptionHandler619 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_ARG_ACTION_in_exceptionHandler619 = new BitSet(new long[]{0x0000000000000010L});
     public static final BitSet FOLLOW_ACTION_in_exceptionHandler621 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_FINALLY_in_finallyClause638 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ACTION_in_finallyClause640 = new BitSet(new long[]{0x0000000000000008L});
@@ -2023,7 +2276,7 @@ public class CollectSymbols extends TreeFilter {
     public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec699 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ACTION_in_ruleScopeSpec701 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_SCOPE_in_ruleScopeSpec714 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_ruleScopeSpec718 = new BitSet(new long[]{0x0000000000000008L,0x0000000000800000L});
+    public static final BitSet FOLLOW_ID_in_ruleScopeSpec718 = new BitSet(new long[]{0x0000000000000008L,0x0000000000400000L});
     public static final BitSet FOLLOW_set_in_rewriteElement745 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ASSIGN_in_labeledElement780 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_ID_in_labeledElement784 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000007FFFFFFFFFL});

@@ -73,6 +73,8 @@ import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
     }
 }
 
+dummy : block[null] ; // avoid error about no start rule
+
 block[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> alts = new ArrayList<ATNFactory.Handle>();}
     :	^(BLOCK (^(OPTIONS .+))? (a=alternative {alts.add($a.p);})+)
