@@ -77,7 +77,7 @@ public abstract class Lexer extends Recognizer<LexerInterpreter>
 	/** The token type for the current token */
 	public int type;
 
-	public QStack<Integer> modeStack;
+	public QStack<Integer> modeStack; // TODO: List?
 	public int mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in

@@ -43,13 +43,13 @@ public class CodeGenerator {
 		}
 		catch (InstantiationException ie) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 targetName,
-						 ie);
+						 ie,
+						 targetName);
 		}
 		catch (IllegalAccessException cnfe) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 targetName,
-						 cnfe);
+						 cnfe,
+						 targetName);
 		}
 	}
 
@@ -60,7 +60,8 @@ public class CodeGenerator {
 		}
 		catch (IllegalArgumentException iae) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 language);
+									iae,
+						 			language);
 		}
 
 //		if ( EMIT_TEMPLATE_DELIMITERS ) {
@@ -145,8 +146,8 @@ public class CodeGenerator {
 		}
 		catch (IOException ioe) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
-									fileName,
-									ioe);
+									ioe,
+									fileName);
 		}
 	}
 

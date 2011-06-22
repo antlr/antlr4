@@ -1,0 +1,217 @@
+/** Test ANTLRParser's AST construction.  Translate to junit tests with:
+ *
+ *  $ java org.antlr.v4.gunit.Gen TestASTStructure.gunit
+ */
+gunit TestASTStructure;
+
+@header {package org.antlr.v4.test;}
+options {
+	adaptor = org.antlr.v4.parse.GrammarASTAdaptor;
+	parser = org.antlr.v4.parse.ANTLRParser;
+	lexer = org.antlr.v4.parse.ANTLRLexer;
+}
+
+grammarSpec:
+    "parser grammar P; a : A;"
+    -> (PARSER_GRAMMAR P (RULES (RULE a (BLOCK (ALT A)))))
+
+    <<
+    parser grammar P;
+    options {k=2; output=AST;}
+    scope S {int x}
+    tokens { A; B='33'; }
+    @header {foo}
+    a : A;
+    >>
+    ->
+    (PARSER_GRAMMAR P
+    (OPTIONS (= k 2) (= output AST))
+    (scope S {int x})
+    (tokens { A (= B '33'))
+    (@ header {foo})
+    (RULES (RULE a (BLOCK (ALT A)))))
+
+    <<
+    parser grammar P;
+    @header {foo}
+    tokens { A; B='33'; }
+    options {k=2; ASTLabel=a.b.c; output=AST;}
+    scope S {int x}
+    a : A;
+    >>
+    ->
+    (PARSER_GRAMMAR P
+    (@ header {foo})
+    (tokens { A (= B '33'))
+    (OPTIONS (= k 2) (= ASTLabel a.b.c) (= output AST))
+    (scope S {int x})
+    (RULES (RULE a (BLOCK (ALT A)))))
+
+    <<
+    parser grammar P;
+    import A=B, C;
+    a : A;
+    >>
+    ->
+    (PARSER_GRAMMAR P
+    (import (= A B) C)
+    (RULES (RULE a (BLOCK (ALT A)))))
+
+delegateGrammars:
+	"import A;" -> (import A)
+
+rule:
+	"a : A<X,Y=a.b.c>;" ->
+	(RULE a (BLOCK (ALT (A (ELEMENT_OPTIONS X (= Y a.b.c))))))
+	"A : B+;"   -> (RULE A (BLOCK (ALT (+ (BLOCK (ALT B))))))
+
+    <<
+    public a[int i] returns [int y]
+    options {backtrack=true;}
+    scope {int ss;}
+    scope S,T;
+    @init {blort}
+      : ID ;
+    >>
+    ->
+    (RULE a
+    (RULEMODIFIERS public)
+    int i
+    (returns int y)
+    (OPTIONS (= backtrack true))
+    (scope {int ss;})
+    (scope S T)
+    (@ init {blort})
+    (BLOCK (ALT ID)))
+
+    <<
+    a[int i] returns [int y]
+    @init {blort}
+    scope {int ss;}
+    options {backtrack=true;}
+    scope S,T;
+      : ID;
+    >>
+    ->
+    (RULE a int i
+    (returns int y)
+    (@ init {blort})
+    (scope {int ss;})
+    (OPTIONS (= backtrack true))
+    (scope S T)
+    (BLOCK (ALT ID)))
+
+    <<
+    a : ID ;
+      catch[A b] {foo}
+      finally {bar}
+    >>
+    ->
+    (RULE a (BLOCK (ALT ID))
+    (catch A b {foo}) (finally {bar}))
+
+    <<
+    a : ID ;
+      catch[A a] {foo}
+      catch[B b] {fu}
+      finally {bar}
+    >>
+    ->
+    (RULE a (BLOCK (ALT ID))
+    (catch A a {foo}) (catch B b {fu}) (finally {bar}))
+
+block:
+	"( ^(A B) | ^(b C) )" -> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
+	
+alternative:
+	"x+=ID* -> $x*" ->
+	    (ALT_REWRITE
+		    (ALT (* (BLOCK (ALT (+= x ID)))))
+            (-> (ALT (* (REWRITE_BLOCK (ALT x))))))
+
+	"A -> ..." -> (ALT_REWRITE (ALT A) (-> ...))
+	"A -> "	   -> (ALT_REWRITE (ALT A) (-> EPSILON))
+
+	"A -> foo(a={x}, b={y})" ->
+	    (ALT_REWRITE
+ 	        (ALT A)
+		    (-> (TEMPLATE foo (ARGLIST (= a {x}) (= b {y})))))
+
+	"A -> template(a={x}, b={y}) <<ick>>" ->
+	    (ALT_REWRITE
+	   	    (ALT A)
+		 	(-> (TEMPLATE (ARGLIST (= a {x}) (= b {y})) <<ick>>)))
+
+	"A -> ({name})()" -> (ALT_REWRITE (ALT A) (-> (TEMPLATE {name})))
+
+	"A -> {expr}" -> (ALT_REWRITE (ALT A) (-> {expr}))
+
+    <<
+    A -> {p1}? {e1}
+    -> {e2}
+    ->
+    >>
+    ->
+    (ALT_REWRITE
+        (ALT A)
+        (-> {p1}? {e1})
+        (-> {e2}))
+
+	"A -> A" -> (ALT_REWRITE (ALT A) (-> (ALT A)))
+
+	"a -> a" -> (ALT_REWRITE (ALT a) (-> (ALT a)))
+
+	"a A X? Y* -> A a ^(TOP X)? Y*" ->
+        (ALT_REWRITE
+            (ALT a A (? (BLOCK (ALT X))) (* (BLOCK (ALT Y))))
+            (-> (ALT
+                A a
+                (? (REWRITE_BLOCK (ALT ("^(" TOP X))))
+                (* (REWRITE_BLOCK (ALT Y))))))
+
+	"A -> A[33]" -> (ALT_REWRITE (ALT A) (-> (ALT (A 33))))
+
+	"A -> 'int' ^(A A)*" ->
+        (ALT_REWRITE
+            (ALT A)
+            (-> (ALT 'int' (* (REWRITE_BLOCK (ALT ("^(" A A)))))))
+
+    <<
+    A -> {p1}? A
+      -> {p2}? B
+      ->
+    >>
+    ->
+    (ALT_REWRITE (ALT A)
+    (-> {p1}? (ALT A))
+    (-> {p2}? (ALT B))
+    (-> EPSILON))
+
+element:
+	"b+"		-> (+ (BLOCK (ALT b)))
+	"(b)+"		-> (+ (BLOCK (ALT b)))
+	"b?"  		-> (? (BLOCK (ALT b)))
+	"(b)?"		-> (? (BLOCK (ALT b)))
+	"(b)*"		-> (* (BLOCK (ALT b)))
+	"b*"		-> (* (BLOCK (ALT b)))
+	"'while'*"	-> (* (BLOCK (ALT 'while')))
+	"'a'+"		-> (+ (BLOCK (ALT 'a')))
+	"a[3]"		-> (a 3)
+	"'a'..'z'+" -> (+ (BLOCK (ALT (.. 'a' 'z'))))
+	"x=ID"		-> (= x ID)
+	"x=ID?"		-> (? (BLOCK (ALT (= x ID))))
+	"x=ID*"		-> (* (BLOCK (ALT (= x ID))))
+	"x=b"		-> (= x b)
+	"x=(A|B)"	-> (= x (BLOCK (ALT A) (ALT B)))
+	"x=~(A|B)"	-> (= x (~ (BLOCK (ALT A) (ALT B))))
+	"x+=~(A|B)"	-> (+= x (~ (BLOCK (ALT A) (ALT B))))
+	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK (ALT A) (ALT B)))))))
+	"x=b+"		-> (+ (BLOCK (ALT (= x b))))
+	"x+=ID*"	-> (* (BLOCK (ALT (+= x ID))))
+	"x+='int'*"	-> (* (BLOCK (ALT (+= x 'int'))))
+	"x+=b+"		-> (+ (BLOCK (ALT (+= x b))))
+	"('*'^)*"	-> (* (BLOCK (ALT (^ '*'))))
+	"({blort} 'x')*" -> (* (BLOCK (ALT {blort} 'x')))
+	"A!"	    -> (! A)
+	"A^"		-> (^ A)
+	"x=A^"		-> (= x (^ A))

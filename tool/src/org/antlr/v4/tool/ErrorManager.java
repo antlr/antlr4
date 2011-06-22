@@ -163,6 +163,11 @@ public class ErrorManager {
         tool.error(new ToolMessage(errorType, args));
 	}
 
+	public void toolError(ErrorType errorType, Throwable e, Object... args) {
+        errors++;
+        tool.error(new ToolMessage(errorType, e, args));
+	}
+
     public void grammarError(ErrorType etype,
 							 String fileName,
 							 org.antlr.runtime.Token token,

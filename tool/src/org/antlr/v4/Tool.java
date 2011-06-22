@@ -256,7 +256,7 @@ public class Tool {
 			in = new ANTLRFileStream(fileName);
 		}
 		catch (IOException ioe) {
-			errMgr.toolError(ErrorType.CANNOT_OPEN_FILE, fileName, ioe);
+			errMgr.toolError(ErrorType.CANNOT_OPEN_FILE, ioe, fileName);
 		}
 		return load(in);
 	}
