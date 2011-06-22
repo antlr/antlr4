@@ -44,7 +44,7 @@ public class FailedPredicateException extends RecognitionException {
 									String ruleName,
 									String predicateText)
 	{
-		super(recognizer, input, recognizer.state.ctx);
+		super(recognizer, input, recognizer._ctx);
 		this.ruleName = ruleName;
 		this.predicateText = predicateText;
 	}

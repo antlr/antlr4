@@ -742,7 +742,7 @@ public abstract class BaseTest {
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
-			"        parser.<parserStartRuleName>(null);\n" +
+			"        parser.<parserStartRuleName>();\n" +
 			"    }\n" +
 			"}"
 			);
@@ -804,7 +804,7 @@ public abstract class BaseTest {
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        TokenRewriteStream tokens = new TokenRewriteStream(lex);\n" +
 			"        <createParser>\n"+
-			"        ParserRuleContext r = parser.<parserStartRuleName>(null);\n" +
+			"        ParserRuleContext r = parser.<parserStartRuleName>();\n" +
 			"        <if(!treeParserStartRuleName)>\n" +
 			"        if ( r.tree!=null ) {\n" +
 			"            System.out.println(((Tree)r.tree).toStringTree());\n" +
@@ -860,7 +860,7 @@ public abstract class BaseTest {
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        TokenRewriteStream tokens = new TokenRewriteStream(lex);\n" +
 			"        <createParser>\n"+
-			"        ParserRuleContext r = parser.<parserStartRuleName>(null);\n" +
+			"        ParserRuleContext r = parser.<parserStartRuleName>();\n" +
 			"        ((CommonTree)r.tree).sanityCheckParentAndChildIndexes();\n" +
 			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
 			"        nodes.setTokenStream(tokens);\n" +
@@ -918,7 +918,7 @@ public abstract class BaseTest {
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
 			"		 parser.setTemplateLib(group);\n"+
-			"        ParserRuleContext r = parser.<parserStartRuleName>(null);\n" +
+			"        ParserRuleContext r = parser.<parserStartRuleName>();\n" +
 			"        if ( r.st!=null )\n" +
 			"            System.out.print(r.st.toString());\n" +
 			"	 	 else\n" +

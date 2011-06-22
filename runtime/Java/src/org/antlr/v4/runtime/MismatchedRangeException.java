@@ -34,7 +34,7 @@ public class MismatchedRangeException extends RecognitionException {
 	public MismatchedRangeException() {;}
 
 	public MismatchedRangeException(BaseRecognizer recognizer, IntStream input, int a, int b) {
-		super(recognizer, input, recognizer.state.ctx);
+		super(recognizer, input, recognizer._ctx);
 		this.a = a;
 		this.b = b;
 	}

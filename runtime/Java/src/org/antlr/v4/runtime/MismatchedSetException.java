@@ -32,7 +32,7 @@ public class MismatchedSetException extends RecognitionException {
 	public MismatchedSetException() {;}
 
 	public MismatchedSetException(BaseRecognizer recognizer, IntStream input) {
-		super(recognizer, input, recognizer.state.ctx);
+		super(recognizer, input, recognizer._ctx);
 	}
 
 	public String toString() {

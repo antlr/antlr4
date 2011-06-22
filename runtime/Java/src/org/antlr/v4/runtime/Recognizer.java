@@ -4,20 +4,12 @@ import org.antlr.v4.runtime.atn.ATN;
 
 import java.util.*;
 
-public class Recognizer<SharedState extends RecognizerSharedState, ATNInterpreter> {
+public class Recognizer<ATNInterpreter> {
 	public static final int EOF=-1;
 
 	protected List<ANTLRParserListener> listeners;
 
 	protected ATNInterpreter _interp;
-
-	/** State of a lexer, parser, or tree parser are collected into a state
-	 *  object so the state can be shared.  This sharing is needed to
-	 *  have one grammar import others and share same error variables
-	 *  and other state variables.  It's a kind of explicit multiple
-	 *  inheritance via delegation of methods and shared state.
-	 */
-	public SharedState state;
 
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method

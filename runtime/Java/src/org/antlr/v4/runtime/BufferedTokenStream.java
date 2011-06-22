@@ -129,8 +129,8 @@ public class BufferedTokenStream implements TokenStream {
     protected void fetch(int n) {
         for (int i=1; i<=n; i++) {
             Token t = tokenSource.nextToken();
+//            System.out.println("adding "+t+" at index "+tokens.size());
             t.setTokenIndex(tokens.size());
-            //System.out.println("adding "+t+" at index "+tokens.size());
             tokens.add(t);
             if ( t.getType()==Token.EOF ) break;
         }

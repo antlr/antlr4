@@ -19,7 +19,6 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.EarlyExitException;
-import org.antlr.v4.runtime.ParserSharedState;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.Token;
@@ -28,7 +27,6 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
-import org.antlr.runtime.*;
 
 <parser>
 >>
@@ -84,10 +82,7 @@ case <index> : <actions.(index)> break;}; separator="\n">
 
 ctor(p) ::= <<
 public <p.name>(TokenStream input) {
-    this(input, new ParserSharedState());
-}
-public <p.name>(TokenStream input, ParserSharedState state) {
-    super(input, state);
+    super(input);
     _interp = new ParserInterpreter(this,_ATN);
 }
 >>
@@ -103,9 +98,9 @@ RuleFunction(currentRule,code,decls,context,scope,namedActions,finallyAction) ::
 <context>
 <scope>
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(ParserRuleContext _ctx) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>() throws RecognitionException {
     _ctx = new ParserRuleContext(_ctx, <currentRule.startState>);
-    state.ctx = _ctx;
+    ParserRuleContext _thisctx = _ctx;
 <if(currentRule.scope)>
     <currentRule.scope.name>_stack.push(new <currentRule.scope.name>());
 <endif>
@@ -125,10 +120,10 @@ RuleFunction(currentRule,code,decls,context,scope,namedActions,finallyAction) ::
         <currentRule.globalScopesUsed:{s | <s>_stack.pop();}; separator="\n">
         <if(currentRule.scope)><currentRule.scope.name>_stack.pop();<endif>
         <finallyAction>
-        state.ctx = (ParserRuleContext)_ctx.parent;
+        _ctx = (ParserRuleContext)_ctx.parent;
     	//System.out.println("exit "+ruleNames[<currentRule.index>]);
 	}
-    return _ctx;
+    return _thisctx;
 }
 >>
 
@@ -137,7 +132,7 @@ CodeBlock(c, ops) ::= <<
 >>
 
 LL1AltBlock(choice, alts, error) ::= <<
-switch ( state.input.LA(1) ) {
+switch ( input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -147,7 +142,7 @@ switch ( state.input.LA(1) ) {
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
-switch ( state.input.LA(1) ) {
+switch ( input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -167,7 +162,7 @@ if ( <expr> ) {
 LL1StarBlock(choice, alts, sync) ::= <<
 <choice.loopLabel>:
 while (true) {
-	switch ( state.input.LA(1) ) {
+	switch ( input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(look)>
 	<alt>
 		break;}; separator="\n">
@@ -190,7 +185,7 @@ while ( <loopExpr> ) {
 LL1PlusBlock(choice, alts, iteration, loopExpr, sync, error, iterationSync) ::= <<
 //<sync>
 do {
-	switch ( state.input.LA(1) ) {
+	switch ( input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(look)>
 	<alt>
 	break;}; separator="\n">
@@ -217,7 +212,7 @@ do {
 // LL(*) stuff
 
 AltBlock(choice, alts, error) ::= <<
-switch ( _interp.adaptivePredict(state.input,<choice.decision>,_ctx) ) {
+switch ( _interp.adaptivePredict(input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
 	<alt>
@@ -228,7 +223,7 @@ case <i>:
 >>
 
 OptionalBlock(choice, alts, error) ::= <<
-switch ( _interp.adaptivePredict(state.input,<choice.decision>,_ctx) ) {
+switch ( _interp.adaptivePredict(input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
 	<alt>
@@ -237,7 +232,7 @@ case <i>:
 >>
 
 StarBlock(choice, alts, sync) ::= <<
-int _alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+int _alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> ) {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
@@ -245,12 +240,12 @@ case <i>:
 	<alt>
 	break;}; separator="\n">
 	}
-	_alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+	_alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
-int _alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+int _alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
 do {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
@@ -260,7 +255,7 @@ case <i>:
 	    default :
 		    <error>
 	}
-	_alt<choice.uniqueID> = _interp.adaptivePredict(state.input,<choice.decision>,_ctx);
+	_alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
 } while ( _alt<choice.uniqueID>!=<choice.exitAlt> );
 >>
 
@@ -278,7 +273,7 @@ cases(ttypes) ::= <<
 
 InvokeRule(r) ::= <<
 _ctx.s = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <l> = }><endif><r.name>(_ctx<r.argExprs:{e| ,<e>}>);
+<if(r.labels)><r.labels:{l | <l> = }><endif><r.name>(<r.argExprs:{e| ,<e>}>);
 >>
 
 MatchToken(m) ::= <<
@@ -293,7 +288,7 @@ Action(a, chunks) ::= "<chunks>"
 ForcedAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks) ::= <<
-if (!(<chunks>)) throw new FailedPredicateException(this, state.input, "<currentRule.name>", ""<!"<chunks>"!>);
+if (!(<chunks>)) throw new FailedPredicateException(this, input, "<currentRule.name>", ""<!"<chunks>"!>);
 >>
 
 ActionText(t) ::= "<t.text>"
@@ -317,7 +312,7 @@ TokenPropertyRef_int(t) ::= "(<t.label>!=null?Integer.valueOf(<t.label>.getText(
 RulePropertyRef_start(r) ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.start):null)"
 RulePropertyRef_stop(r)  ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.stop):null)"
 RulePropertyRef_tree(r)  ::= "(<r.label>!=null?((<file.ASTLabelType>)<r.label>.tree):null)"
-RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)state.input).toString(<r.label>.start,<r.label>.stop):null)"
+RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)input).toString(<r.label>.start,<r.label>.stop):null)"
 RulePropertyRef_st(r)    ::= "(<r.label>!=null?<r.label>.st:null)"
 
 DynScopeRef(s)           ::= "<s.scope>_stack"
@@ -340,8 +335,8 @@ TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 
-CaptureNextToken(d) ::= "<d.varName> = state.input.LT(1);"
-CaptureNextTokenType(d) ::= "<d.varName> = state.input.LA(1);"
+CaptureNextToken(d) ::= "<d.varName> = input.LT(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = input.LA(1);"
 
 StructDecl(s,attrs) ::= <<
 public static class <s.name> extends ParserRuleContext {
@@ -377,14 +372,12 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 <namedActions.header>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.LexerSharedState;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
-import org.antlr.runtime.*;
 
 <lexer>
 >>
@@ -407,10 +400,7 @@ public class <lexer.name> extends Lexer {
     <namedActions.members>
 
     public <lexer.name>(CharStream input) {
-        this(input, new LexerSharedState());
-    }
-    public <lexer.name>(CharStream input, LexerSharedState state) {
-        super(input,state);
+        super(input);
 		_interp = new LexerInterpreter(this,_ATN);
     }
 

@@ -33,7 +33,7 @@ public class MismatchedTokenException extends RecognitionException {
 	public MismatchedTokenException() {;}
 
 	public MismatchedTokenException(BaseRecognizer recognizer, IntStream input, int expecting) {
-		super(recognizer, input, recognizer.state.ctx);
+		super(recognizer, input, recognizer._ctx);
 	}
 
 	public String toString() {

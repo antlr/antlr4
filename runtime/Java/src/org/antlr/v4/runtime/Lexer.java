@@ -37,7 +37,7 @@ import java.util.EmptyStackException;
  *  uses simplified match() and error recovery mechanisms in the interest
  *  of speed.
  */
-public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterpreter>
+public abstract class Lexer extends Recognizer<LexerInterpreter>
 	implements TokenSource
 {
 	public static final int DEFAULT_MODE = 0;
@@ -47,35 +47,60 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
 
-	public LexerSharedState state;
+	public CharStream input;
+
+	/** The goal of all lexer rules/methods is to create a token object.
+	 *  This is an instance variable as multiple rules may collaborate to
+	 *  create a single token.  nextToken will return this object after
+	 *  matching lexer rule(s).  If you subclass to allow multiple token
+	 *  emissions, then set this to the last token to be matched or
+	 *  something nonnull so that the auto token emit mechanism will not
+	 *  emit another token.
+	 */
+	public Token token;
+
+	/** What character index in the stream did the current token start at?
+	 *  Needed, for example, to get the text for current token.  Set at
+	 *  the start of nextToken.
+	 */
+	public int tokenStartCharIndex = -1;
+
+	/** The line on which the first character of the token resides */
+	public int tokenStartLine;
+
+	/** The character position of first character within the line */
+	public int tokenStartCharPositionInLine;
+
+	/** The channel number for the current token */
+	public int channel;
+
+	/** The token type for the current token */
+	public int type;
+
+	public QStack<Integer> modeStack;
+	public int mode = Lexer.DEFAULT_MODE;
+
+	/** You can set the text for the current token to override what is in
+	 *  the input char buffer.  Use setText() or can set this instance var.
+	 */
+	public String text;
 
 	public Lexer(CharStream input) {
-		this(input, new LexerSharedState());
-	}
-
-	public Lexer(CharStream input, LexerSharedState state) {
-		if ( state==null ) {
-			state = new LexerSharedState();
-		}
-		this.state = state;
-		state.input = input;
+		this.input = input;
 	}
 
 	public void reset() {
 		// wack Lexer state variables
-		if ( state.input!=null ) {
-			state.input.seek(0); // rewind the input
+		if ( input!=null ) {
+			input.seek(0); // rewind the input
 		}
-		if ( state==null ) {
-			return; // no shared state work to do
-		}
-		state.token = null;
-		state.type = Token.INVALID_TYPE;
-		state.channel = Token.DEFAULT_CHANNEL;
-		state.tokenStartCharIndex = -1;
-		state.tokenStartCharPositionInLine = -1;
-		state.tokenStartLine = -1;
-		state.text = null;
+		token = null;
+		type = Token.INVALID_TYPE;
+		channel = Token.DEFAULT_CHANNEL;
+		tokenStartCharIndex = -1;
+		tokenStartCharPositionInLine = -1;
+		tokenStartLine = -1;
+		text = null;
 	}
 
 	/** Return a token from this source; i.e., match a token on the char
@@ -84,34 +109,34 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	public Token nextToken() {
 		outer:
 		while (true) {
-			state.token = null;
-			state.channel = Token.DEFAULT_CHANNEL;
-			state.tokenStartCharIndex = state.input.index();
-			state.tokenStartCharPositionInLine = state.input.getCharPositionInLine();
-			state.tokenStartLine = state.input.getLine();
-			state.text = null;
+			token = null;
+			channel = Token.DEFAULT_CHANNEL;
+			tokenStartCharIndex = input.index();
+			tokenStartCharPositionInLine = input.getCharPositionInLine();
+			tokenStartLine = input.getLine();
+			text = null;
 			do {
-				state.type = Token.INVALID_TYPE;
-				if ( state.input.LA(1)==CharStream.EOF ) {
-					Token eof = new CommonToken(state.input,Token.EOF,
+				type = Token.INVALID_TYPE;
+				if ( input.LA(1)==CharStream.EOF ) {
+					Token eof = new CommonToken(input,Token.EOF,
 												Token.DEFAULT_CHANNEL,
-												state.input.index(),state.input.index());
+												input.index(),input.index());
 					eof.setLine(getLine());
 					eof.setCharPositionInLine(getCharPositionInLine());
 					return eof;
 				}
-//				System.out.println("nextToken at "+((char)state.input.LA(1))+
-//								   " in mode "+state.mode+
-//								   " at index "+state.input.index());
-				int ttype = _interp.match(state.input, state.mode);
+//				System.out.println("nextToken at "+((char)input.LA(1))+
+//								   " in mode "+mode+
+//								   " at index "+input.index());
+				int ttype = _interp.match(input, mode);
 //				System.out.println("accepted ttype "+ttype);
-				if ( state.type == Token.INVALID_TYPE) state.type = ttype;
-				if ( state.type==SKIP ) {
+				if ( type == Token.INVALID_TYPE) type = ttype;
+				if ( type==SKIP ) {
 					continue outer;
 				}
-			} while ( state.type==MORE );
-			if ( state.token==null ) emit();
-			return state.token;
+			} while ( type==MORE );
+			if ( token==null ) emit();
+			return token;
 		}
 	}
 
@@ -122,44 +147,44 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	 *  and emits it.
 	 */
 	public void skip() {
-		state.type = SKIP;
+		type = SKIP;
 	}
 
 	public void more() {
-		state.type = MORE;
+		type = MORE;
 	}
 
 	public void mode(int m) {
-		state.mode = m;
+		mode = m;
 	}
 
 	public void pushMode(int m) {
 //		System.out.println("pushMode "+m);
-		if ( state.modeStack==null ) state.modeStack = new QStack<Integer>();
-		state.modeStack.push(state.mode);
+		if ( modeStack==null ) modeStack = new QStack<Integer>();
+		modeStack.push(mode);
 		mode(m);
 	}
 
 	public int popMode() {
-		if ( state.modeStack==null ) throw new EmptyStackException();
-//		System.out.println("popMode back to "+state.modeStack.peek());
-		mode( state.modeStack.pop() );
-		return state.mode;
+		if ( modeStack==null ) throw new EmptyStackException();
+//		System.out.println("popMode back to "+modeStack.peek());
+		mode( modeStack.pop() );
+		return mode;
 	}
 
 	/** Set the char stream and reset the lexer */
 	public void setCharStream(CharStream input) {
-		this.state.input = null;
+		this.input = null;
 		reset();
-		this.state.input = input;
+		this.input = input;
 	}
 
 	public CharStream getCharStream() {
-		return ((CharStream)state.input);
+		return ((CharStream)input);
 	}
 
 	public String getSourceName() {
-		return state.input.getSourceName();
+		return input.getSourceName();
 	}
 
 	/** Currently does not support multiple emits per nextToken invocation
@@ -169,7 +194,7 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	 */
 	public void emit(Token token) {
 		//System.err.println("emit "+token);
-		state.token = token;
+		this.token = token;
 	}
 
 	/** The standard method called to automatically emit a token at the
@@ -182,44 +207,44 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	 *  Parser or TreeParser.getMissingSymbol().
 	 */
 	public Token emit() {
-		Token t = new CommonToken(((CharStream)state.input), state.type,
-								  state.channel, state.tokenStartCharIndex,
+		Token t = new CommonToken(((CharStream)input), type,
+								  channel, tokenStartCharIndex,
 								  getCharIndex()-1);
-		t.setLine(state.tokenStartLine);
-		t.setText(state.text);
-		t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+		t.setLine(tokenStartLine);
+		t.setText(text);
+		t.setCharPositionInLine(tokenStartCharPositionInLine);
 		emit(t);
 		return t;
 	}
 
 	public int getLine() {
-		return ((CharStream)state.input).getLine();
+		return ((CharStream)input).getLine();
 	}
 
 	public int getCharPositionInLine() {
-		return ((CharStream)state.input).getCharPositionInLine();
+		return ((CharStream)input).getCharPositionInLine();
 	}
 
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
-		return state.input.index();
+		return input.index();
 	}
 
 	/** Return the text matched so far for the current token or any
 	 *  text override.
 	 */
 	public String getText() {
-		if ( state.text!=null ) {
-			return state.text;
+		if ( text!=null ) {
+			return text;
 		}
-		return ((CharStream)state.input).substring(state.tokenStartCharIndex,getCharIndex()-1);
+		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 
 	/** Set the complete text of this token; it wipes any previous
 	 *  changes to the text.
 	 */
 	public void setText(String text) {
-		state.text = text;
+		text = text;
 	}
 
 	public void reportError(RecognitionException e) {
@@ -308,8 +333,8 @@ public abstract class Lexer extends Recognizer<LexerSharedState, LexerInterprete
 	 *  to do sophisticated error recovery if you are in a fragment rule.
 	 */
 	public void recover(RecognitionException re) {
-		//System.out.println("consuming char "+(char)state.input.LA(1)+" during recovery");
+		//System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
 		//re.printStackTrace();
-		state.input.consume();
+		input.consume();
 	}
 }

@@ -27,11 +27,9 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.runtime.BitSet;
 import org.antlr.v4.runtime.*;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
@@ -85,8 +83,7 @@ public class TreeParser extends BaseRecognizer {
 
 	protected Object getMissingSymbol(IntStream input,
 									  RecognitionException e,
-									  int expectedTokenType,
-									  BitSet follow)
+									  int expectedTokenType)
 	{
 		String tokenText =
 			"<missing "+getTokenNames()[expectedTokenType]+">";
@@ -99,8 +96,8 @@ public class TreeParser extends BaseRecognizer {
 	 *  corresponding UP node.
 	 */
 	public void matchAny(IntStream ignore) { // ignore stream, copy of input
-		state.errorRecovery = false;
-		state.failed = false;
+		errorRecovery = false;
+		failed = false;
 		Object look = input.LT(1);
 		if ( input.getTreeAdaptor().getChildCount(look)==0 ) {
 			input.consume(); // not subtree, consume 1 node and return
@@ -129,8 +126,7 @@ public class TreeParser extends BaseRecognizer {
 	 *  from tree parser errors inline...
      */
     protected Object recoverFromMismatchedToken(IntStream input,
-                                                int ttype,
-                                                BitSet follow)
+                                                int ttype)
         throws RecognitionException
     {
         //throw new MismatchedTreeNodeException(ttype, (TreeNodeStream)input);

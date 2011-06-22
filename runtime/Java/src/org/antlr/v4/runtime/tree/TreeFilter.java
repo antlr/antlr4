@@ -27,10 +27,7 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.ParserSharedState;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.RecognizerSharedState;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 
 /**
  Cut-n-paste from material I'm not using in the book anymore (edit later
@@ -97,7 +94,6 @@ public class TreeFilter extends TreeParser {
         if ( t==null ) return;
         try {
             // share TreeParser object but not parsing-related state
-            state = new ParserSharedState();
             input = new CommonTreeNodeStream(originalAdaptor, t);
             ((CommonTreeNodeStream)input).setTokenStream(originalTokenStream);
             whichRule.rule();

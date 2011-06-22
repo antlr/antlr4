@@ -36,7 +36,7 @@ public class MismatchedTreeNodeException extends RecognitionException {
 	public MismatchedTreeNodeException(BaseRecognizer  recognizer,
 									   IntStream input, int firstSet)
 	{
-		super(recognizer, input, recognizer.state.ctx);
+		super(recognizer, input, recognizer._ctx);
 	}
 
 	public String toString() {

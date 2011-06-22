@@ -33,6 +33,6 @@ public class EarlyExitException extends RecognitionException {
 	public EarlyExitException() {;}
 
 	public EarlyExitException(BaseRecognizer  recognizer, IntStream input) {
-		super(recognizer, input, recognizer.state.ctx);
+		super(recognizer, input, recognizer._ctx);
 	}
 }

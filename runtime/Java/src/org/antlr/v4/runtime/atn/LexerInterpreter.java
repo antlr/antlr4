@@ -54,7 +54,7 @@ public class LexerInterpreter extends ATNInterpreter {
 	}
 
 	public int exec(CharStream input, DFAState s0) {
-		if ( dfa_debug ) System.out.println("DFA[mode "+(recog==null?0:recog.state.mode)+"] exec LA(1)=="+
+		if ( dfa_debug ) System.out.println("DFA[mode "+(recog==null?0:recog.mode)+"] exec LA(1)=="+
 											(char)input.LA(1));
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
 		int prevAcceptMarker = -1;

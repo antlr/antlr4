@@ -39,28 +39,50 @@ import java.util.*;
  *
  *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
-public abstract class BaseRecognizer extends Recognizer<ParserSharedState, ParserInterpreter> {
+public abstract class BaseRecognizer extends Recognizer<ParserInterpreter> {
 
 	public static final int MEMO_RULE_FAILED = -2;
 	public static final int MEMO_RULE_UNKNOWN = -1;
 
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
+	public TokenStream input;
+
+	public ParserRuleContext _ctx; // current _ctx of executing rule
+
+	/** This is true when we see an error and before having successfully
+	 *  matched a token.  Prevents generation of more than one error message
+	 *  per error.
+	 */
+	public boolean errorRecovery = false;
+
+	/** The index into the input stream where the last error occurred.
+	 * 	This is used to prevent infinite loops where an error is found
+	 *  but no token is consumed during recovery...another error is found,
+	 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
+	 *  one token/tree node is consumed for two errors.
+	 */
+	public int lastErrorIndex = -1;
+
+	/** In lieu of a return value, this indicates that a rule or token
+	 *  has failed to match.  Reset to false upon valid token match.
+	 */
+	public boolean failed = false;
+
+	/** Did the recognizer encounter a syntax error?  Track how many. */
+	public int syntaxErrors = 0;
+
 	public BaseRecognizer(TokenStream input) {
-		this(input, new ParserSharedState());
+		this.input = input;
 	}
 
-	public BaseRecognizer(TokenStream input, ParserSharedState state) {
-		if ( state==null ) {
-			state = new ParserSharedState();
-		}
-		this.state = state;
-		state.input = input;
-	}
-
-	/** reset the parser's state; subclasses must rewinds the input stream */
+	/** reset the parser's state */
 	public void reset() {
-		state = new ParserSharedState();
+		input.seek(0);
+		errorRecovery = false;
+		_ctx = null;
+		lastErrorIndex = -1;
+		failed = false;
 	}
 
 	/** Match current input symbol against ttype.  Attempt
@@ -75,17 +97,17 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
      *  to the set of symbols that can follow rule ref.
 	 */
 	public Object match(int ttype) throws RecognitionException {
-//		System.out.println("match "+((TokenStream)state.input).LT(1)+" vs expected "+ttype);
+//		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
 		Object matchedSymbol = getCurrentInputSymbol();
-		if ( state.input.LA(1)==ttype ) {
-			state.input.consume();
-			state.errorRecovery = false;
-			state.failed = false;
+		if ( input.LA(1)==ttype ) {
+			input.consume();
+			errorRecovery = false;
+			failed = false;
 			return matchedSymbol;
 		}
-		System.out.println("MATCH failure at state "+state.ctx.s+
-			", ctx="+state.ctx.toString(this));
-		IntervalSet expecting = _interp.atn.nextTokens(state.ctx);
+		System.out.println("MATCH failure at state "+_ctx.s+
+			", ctx="+_ctx.toString(this));
+		IntervalSet expecting = _interp.atn.nextTokens(_ctx);
 		System.out.println("could match "+expecting);
 
 		matchedSymbol = recoverFromMismatchedToken(ttype, expecting);
@@ -95,23 +117,23 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 
 	// like matchSet but w/o consume; error checking routine.
 	public void sync(IntervalSet expecting) {
-		if ( expecting.member(state.input.LA(1)) ) return;
+		if ( expecting.member(input.LA(1)) ) return;
 		System.out.println("failed sync to "+expecting);
 		IntervalSet followSet = computeErrorRecoverySet();
 		followSet.addAll(expecting);
-		NoViableAltException e = new NoViableAltException(this, state.ctx);
+		NoViableAltException e = new NoViableAltException(this, _ctx);
 		recoverFromMismatchedSet(e, followSet);
 	}
 
 	/** Match the wildcard: in a symbol */
 	public void matchAny() {
-		state.errorRecovery = false;
-		state.failed = false;
-		state.input.consume();
+		errorRecovery = false;
+		failed = false;
+		input.consume();
 	}
 
 	public boolean mismatchIsUnwantedToken(int ttype) {
-		return state.input.LA(2)==ttype;
+		return input.LA(2)==ttype;
 	}
 
 	public boolean mismatchIsMissingToken(IntervalSet follow) {
@@ -126,7 +148,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
 			IntervalSet viableTokensFollowingThisRule = computeNextViableTokenSet();
 			follow = follow.or(viableTokensFollowingThisRule);
-            if ( state.ctx.sp>=0 ) { // remove EOR if we're not the start symbol
+            if ( ctx.sp>=0 ) { // remove EOR if we're not the start symbol
                 follow.remove(Token.EOR_TOKEN_TYPE);
             }
 		}
@@ -135,13 +157,13 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 		// "insert" the missing token
 
 		//System.out.println("viable tokens="+follow.toString(getTokenNames()));
-		//System.out.println("LT(1)="+((TokenStream)state.input).LT(1));
+		//System.out.println("LT(1)="+((TokenStream)input).LT(1));
 
 		// IntervalSet cannot handle negative numbers like -1 (EOF) so I leave EOR
 		// in follow set to indicate that the fall of the start symbol is
 		// in the set (EOF can follow).
-		if ( follow.member(state.input.LA(1)) || follow.member(Token.EOR_TOKEN_TYPE) ) {
-			//System.out.println("LT(1)=="+((TokenStream)state.input).LT(1)+" is consistent with what follows; inserting...");
+		if ( follow.member(input.LA(1)) || follow.member(Token.EOR_TOKEN_TYPE) ) {
+			//System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
 			return true;
 		}
 		return false;
@@ -164,12 +186,12 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 	public void reportError(RecognitionException e) {
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if ( state.errorRecovery ) {
+		if ( errorRecovery ) {
 			//System.err.print("[SPURIOUS] ");
 			return;
 		}
-		state.syntaxErrors++; // don't count spurious
-		state.errorRecovery = true;
+		syntaxErrors++; // don't count spurious
+		errorRecovery = true;
 
 		notifyListeners(e);
 	}
@@ -183,7 +205,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 	 *  See also reportError()
 	 */
 	public int getNumberOfSyntaxErrors() {
-		return state.syntaxErrors;
+		return syntaxErrors;
 	}
 
 
@@ -194,16 +216,16 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 	 *  token that the match() routine could not recover from.
 	 */
 	public void recover() {
-		state.input.consume();
+		input.consume();
 		/*
-		if ( state.lastErrorIndex==state.input.index() ) {
+		if ( lastErrorIndex==input.index() ) {
 			// uh oh, another error at same token index; must be a case
 			// where LT(1) is in the recovery token set so nothing is
 			// consumed; consume a single token so at least to prevent
 			// an infinite loop; this is a failsafe.
-			state.input.consume();
+			input.consume();
 		}
-		state.lastErrorIndex = state.input.index();
+		lastErrorIndex = input.index();
 		IntervalSet followSet = computeErrorRecoverySet();
 		beginResync();
 		consumeUntil(followSet);
@@ -314,10 +336,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 	 */
 	protected IntervalSet computeErrorRecoverySet() {
 		return null;
-//		int top = state.ctx.sp;
+//		int top = ctx.sp;
 //		IntervalSet followSet = new IntervalSet();
 //		for (int i=top; i>=0; i--) { // i==0 is EOF context for start rule invocation
-//			IntervalSet f = (IntervalSet)state.ctx.get(i).follow;
+//			IntervalSet f = (IntervalSet)ctx.get(i).follow;
 //			followSet.orInPlace(f);
 //		}
 //		return followSet;
@@ -377,10 +399,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 	 */
 	public IntervalSet computeNextViableTokenSet() {
 		return null;
-//		int top = state.ctx.sp;
+//		int top = ctx.sp;
 //		IntervalSet followSet = new IntervalSet();
 //		for (int i=top; i>=0; i--) { // i==0 is EOF context for start rule invocation
-//			IntervalSet f = (IntervalSet)state.ctx.get(i).follow;
+//			IntervalSet f = (IntervalSet)ctx.get(i).follow;
 //			followSet.orInPlace(f);
 //			// can we see end of rule? if not, don't include follow of this rule
 //			if ( !f.member(Token.EOR_TOKEN_TYPE) ) break;
@@ -426,30 +448,30 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 		RecognitionException e = null;
 		// if next token is what we are looking for then "delete" this token
 		if ( mismatchIsUnwantedToken(ttype) ) {
-			e = new UnwantedTokenException(this, state.input, ttype);
+			e = new UnwantedTokenException(this, input, ttype);
 			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
-							   ((TokenStream)state.input).LT(1)+
-							   " since "+((TokenStream)state.input).LT(2)+" is what we want");
+							   ((TokenStream)input).LT(1)+
+							   " since "+((TokenStream)input).LT(2)+" is what we want");
 							   */
 			beginResync();
-			state.input.consume(); // simply delete extra token
+			input.consume(); // simply delete extra token
 			endResync();
 			reportError(e);  // report after consuming so AW sees the token in the exception
 			// we want to return the token we're actually matching
 			Object matchedSymbol = getCurrentInputSymbol();
-			state.input.consume(); // move past ttype token as if all were ok
+			input.consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
 		// can't recover with single token deletion, try insertion
 		if ( mismatchIsMissingToken(follow) ) {
 			Object inserted = getMissingSymbol(e, ttype, follow);
-			e = new MissingTokenException(this, state.input, ttype, inserted);
+			e = new MissingTokenException(this, input, ttype, inserted);
 			reportError(e);  // report after inserting so AW sees the token in the exception
 			return inserted;
 		}
 		// even that didn't work; must throw the exception
-		e = new MismatchedTokenException(this, state.input, ttype);
+		e = new MismatchedTokenException(this, input, ttype);
 		throw e;
 	}
 
@@ -504,21 +526,21 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 
 	public void consumeUntil(int tokenType) {
 		//System.out.println("consumeUntil "+tokenType);
-		int ttype = state.input.LA(1);
+		int ttype = input.LA(1);
 		while (ttype != Token.EOF && ttype != tokenType) {
-			state.input.consume();
-			ttype = state.input.LA(1);
+			input.consume();
+			ttype = input.LA(1);
 		}
 	}
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(IntervalSet set) {
 		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
-		int ttype = state.input.LA(1);
+		int ttype = input.LA(1);
 		while (ttype != Token.EOF && !set.member(ttype) ) {
-			//System.out.println("consume during recover LA(1)="+getTokenNames()[state.input.LA(1)]);
-			state.input.consume();
-			ttype = state.input.LA(1);
+			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
+			input.consume();
+			ttype = input.LA(1);
 		}
 	}
 
@@ -565,7 +587,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserSharedState, Parse
 	}
 
     /** Return whether or not a backtracking attempt failed. */
-    public boolean failed() { return state.failed; }
+    public boolean failed() { return failed; }
 
 	/** For debugging and other purposes, might want the grammar name.
 	 *  Have ANTLR generate an implementation for this method.
