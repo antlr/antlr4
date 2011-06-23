@@ -1,11 +1,7 @@
-lexer grammar T;
+parser grammar T;
 
-STRING_START : '"' {pushMode(STRING_MODE); more();} ;
+r[int a] returns [int b]
+	:	x=ID y=r[34] {$b = 99;}
+	;
 
-WS : ' ' | '\n' {skip();} ;
-
-mode STRING_MODE;
-
-STRING : '"' {popMode();} ;
-
-ANY : . {more();} ;
+b	: r[34] ;

@@ -78,7 +78,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserInterpreter> {
 
 	/** reset the parser's state */
 	public void reset() {
-		input.seek(0);
+		if ( input!=null ) input.seek(0);
 		errorRecovery = false;
 		_ctx = null;
 		lastErrorIndex = -1;

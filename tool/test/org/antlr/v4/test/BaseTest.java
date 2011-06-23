@@ -514,6 +514,39 @@ public abstract class BaseTest {
 		return execClass("Test");
 	}
 
+	public String execRecognizer() {
+		try {
+			String inputFile = new File(tmpdir, "input").getAbsolutePath();
+			String[] args = new String[] {
+				"java", "-classpath", tmpdir+pathSep+CLASSPATH,
+				"Test", inputFile
+			};
+			//String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
+			//System.out.println("execParser: "+cmdLine);
+			Process process =
+				Runtime.getRuntime().exec(args, null, new File(tmpdir));
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+			stdoutVacuum.start();
+			stderrVacuum.start();
+			process.waitFor();
+			stdoutVacuum.join();
+			stderrVacuum.join();
+			String output = null;
+			output = stdoutVacuum.toString();
+			if ( stderrVacuum.toString().length()>0 ) {
+				this.stderrDuringParse = stderrVacuum.toString();
+				System.err.println("exec stderrVacuum: "+ stderrVacuum);
+			}
+			return output;
+		}
+		catch (Exception e) {
+			System.err.println("can't exec recognizer");
+			e.printStackTrace(System.err);
+		}
+		return null;
+	}
+
 	public String execClass(String className) {
 		try {
 			String[] args = new String[] {
@@ -936,8 +969,8 @@ public abstract class BaseTest {
 			"        profiler.setParser(parser);\n");
 		if ( !debug ) {
 			createParserST =
-				new ST(
-				"        <parserName> parser = new <parserName>(tokens);\n");
+			new ST(
+			"        <parserName> parser = new <parserName>(tokens);\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -945,6 +978,43 @@ public abstract class BaseTest {
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
 		writeFile(tmpdir, "Test.java", outputFileST.render());
 	}
+
+	public void writeRecognizerAndCompile(String parserName, String treeParserName, String lexerName, String parserStartRuleName, String treeParserStartRuleName, boolean parserBuildsTrees, boolean parserBuildsTemplate, boolean treeParserBuildsTrees, boolean debug) {
+		if ( treeParserBuildsTrees && parserBuildsTrees ) {
+			writeTreeAndTreeTestFile(parserName,
+									 treeParserName,
+									 lexerName,
+									 parserStartRuleName,
+									 treeParserStartRuleName,
+									 debug);
+		}
+		else if ( parserBuildsTrees ) {
+			writeTreeTestFile(parserName,
+							  treeParserName,
+							  lexerName,
+							  parserStartRuleName,
+							  treeParserStartRuleName,
+							  debug);
+		}
+		else if ( parserBuildsTemplate ) {
+			writeTemplateTestFile(parserName,
+								  lexerName,
+								  parserStartRuleName,
+								  debug);
+		}
+		else if ( parserName==null ) {
+			writeLexerTestFile(lexerName, debug);
+		}
+		else {
+			writeTestFile(parserName,
+						  lexerName,
+						  parserStartRuleName,
+						  debug);
+		}
+
+		compile("Test.java");
+	}
+
 
     protected void eraseFiles(final String filesEndingWith) {
         File tmpdirF = new File(tmpdir);
