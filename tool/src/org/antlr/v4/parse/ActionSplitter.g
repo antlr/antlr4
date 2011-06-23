@@ -42,11 +42,6 @@ LINE_COMMENT
     : '//' ~('\n'|'\r')* '\r'? '\n' {delegate.text($text);}
     ;
 
-ESC
-	:	'\\$' {delegate.text("$");}
-	|	'\\%' {delegate.text("\%");}
-	;
-
 SET_QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
 		{delegate.setQualifiedAttr($text, $x, $y, $expr);}
@@ -138,8 +133,13 @@ UNKNOWN_SYNTAX
 
 // Anything else is just random text
 TEXT
-@after {delegate.text($text);}
-	:	~('$'|'%') // can't do (...)+ here since it gobbles \$, \%
+@init {StringBuilder buf = new StringBuilder();}
+@after {delegate.text(buf.toString());}
+	:	(	c=~('\\'| '$'|'%') {buf.append((char)$c);}
+		|	'\\$' {buf.append("$");}
+		|	'\\%' {buf.append("\%");}
+		|	'\\' c=~('$'|'%') {buf.append("\\"+(char)$c);}
+		)+
 	;
 
 fragment

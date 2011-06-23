@@ -1,11 +1,11 @@
 package org.antlr.v4.test;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.RuleReturnScope;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.gunit.gUnitBase;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestASTStructure extends gUnitBase {
 	@Before public void setup() {
@@ -334,7 +334,7 @@ public class TestASTStructure extends gUnitBase {
 		// gunit test on line 206
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x=~(A|B)", 206);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(= x (~ (BLOCK (ALT A) (ALT B))))";
+		Object expecting = "(= x (~ (BLOCK A B)))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 
@@ -342,7 +342,7 @@ public class TestASTStructure extends gUnitBase {
 		// gunit test on line 207
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x+=~(A|B)", 207);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(+= x (~ (BLOCK (ALT A) (ALT B))))";
+		Object expecting = "(+= x (~ (BLOCK A B)))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 
@@ -350,7 +350,7 @@ public class TestASTStructure extends gUnitBase {
 		// gunit test on line 208
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x+=~(A|B)+", 208);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(+ (BLOCK (ALT (+= x (~ (BLOCK (ALT A) (ALT B)))))))";
+		Object expecting = "(+ (BLOCK (ALT (+= x (~ (BLOCK A B))))))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 

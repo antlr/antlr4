@@ -1,17 +1,12 @@
 package org.antlr.v4.test;
 
 import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.automata.ATNFactory;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.*;
 import org.junit.Test;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
+import org.stringtemplate.v4.*;
 
 /** */
 public class TestActionTranslation extends BaseTest {
@@ -64,13 +59,23 @@ public class TestActionTranslation extends BaseTest {
 
     @Test public void testEscaped$InAction() throws Exception {
 		String action = "int \\$n; \"\\$in string\\$\"";
-		String expected = "int \\$n; \"\\$in string\\$\"";
+		String expected = "int $n; \"$in string$\"";
 		testActions(attributeTemplate, "members", action, expected);
 		testActions(attributeTemplate, "init", action, expected);
 		testActions(attributeTemplate, "inline", action, expected);
 		testActions(attributeTemplate, "finally", action, expected);
 		testActions(attributeTemplate, "inline2", action, expected);
     }
+
+	@Test public void testEscapedSlash() throws Exception {
+		String action   = "x = '\\n';";  // x = '\n'; -> x = '\n';
+		String expected = "x = '\\n';";
+		testActions(attributeTemplate, "members", action, expected);
+		testActions(attributeTemplate, "init", action, expected);
+		testActions(attributeTemplate, "inline", action, expected);
+		testActions(attributeTemplate, "finally", action, expected);
+		testActions(attributeTemplate, "inline2", action, expected);
+	}
 
 	@Test public void testComplicatedArgParsing() throws Exception {
 		String action = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
