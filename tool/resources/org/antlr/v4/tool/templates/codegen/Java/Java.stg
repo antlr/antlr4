@@ -298,6 +298,7 @@ QRetValueRef(a) ::= "<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<t.name>"
 SetAttr(s,rhsChunks) ::= "_ctx.<s.name> = <rhsChunks>;"
+LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
 //SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
 
 TokenPropertyRef_text(t) ::= "(<t.label>!=null?<t.label>.getText():null)"

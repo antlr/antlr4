@@ -136,7 +136,9 @@ public class ActionTranslator implements ActionSplitterListener {
 	public void setAttr(String expr, Token x, Token rhs) {
 		System.out.println("setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetAttr(x.getText(), rhsChunks));
+		SetAttr s = new SetAttr(x.getText(), rhsChunks);
+		if ( factory.g.isLexer() ) s = new LexerSetAttr(x.getText(), rhsChunks);
+		chunks.add(s);
 	}
 
 	public void dynamicScopeAttr(String expr, Token x, Token y) {
