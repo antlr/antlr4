@@ -24,9 +24,9 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<Attribute> args = null;
 
 	@ModelElement public SrcOp code;
-	@ModelElement public OrderedHashSet<Decl> decls;
-	@ModelElement public StructDecl context;
-	@ModelElement public DynamicScopeStruct scope;
+	@ModelElement public OrderedHashSet<Decl> decls; // TODO: move into ctx?
+	@ModelElement public StructDecl ruleCtx;
+	//@ModelElement public DynamicScopeStruct scope;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public Action finallyAction;
 
@@ -45,31 +45,29 @@ public class RuleFunction extends OutputModelObject {
 
 		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
 
-		List<Attribute> argsAndReturnValues = new ArrayList<Attribute>();
-		List<Attribute> ctorAttrs = new ArrayList<Attribute>();
-
 		index = r.index;
 
+		// might need struct; build but drop later if no elements
+		ruleCtx = new StructDecl(factory, ctxType);
+
 		if ( r.args!=null ) {
-			argsAndReturnValues.addAll(r.args.attributes.values());
+			ruleCtx.addDecls(r.args.attributes.values());
 			args = r.args.attributes.values();
-			ctorAttrs.addAll(args);
+			ruleCtx.ctorAttrs = args;
 		}
 		if ( r.retvals!=null ) {
-			argsAndReturnValues.addAll(r.retvals.attributes.values());
+			ruleCtx.addDecls(r.retvals.attributes.values());
 		}
 		if ( r.scope!=null ) {
-			scope = new DynamicScopeStruct(factory, factory.gen.target.getRuleDynamicScopeStructName(r.name),
-										   r.scope.attributes.values());
+			String scopeType = factory.gen.target.getRuleDynamicScopeStructName(r.name);
+//			scope = new DynamicScopeStruct(factory, scopeType);
+//			scope.addDecls(r.scope.attributes.values());
+			ruleCtx.addDecls(r.scope.attributes.values());
 		}
 
 		globalScopesUsed = Utils.apply(r.useScopes, "getText");
 
-		if ( argsAndReturnValues.size()>0 ) {
-			context = new StructDecl(factory, factory.gen.target.getRuleFunctionContextStructName(r),
-									 argsAndReturnValues);
-			context.ctorAttrs = ctorAttrs;
-		}
+		if ( ruleCtx.isEmpty() ) ruleCtx = null;
 
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
@@ -99,17 +97,8 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public void addDecl(Decl d) {
-		if ( decls==null ) decls = new OrderedHashSet<Decl>();
-		decls.add(d);
+		ruleCtx.addDecl(d);
+//		if ( decls==null ) decls = new OrderedHashSet<Decl>();
+//		decls.add(d);
 	}
-
-//	@Override
-//	public List<String> getChildren() {
-//		final List<String> sup = super.getChildren();
-//		return new ArrayList<String>() {{
-//			if ( sup!=null ) addAll(sup);
-//			add("context"); add("scope"); add("decls"); add("code");
-//			add("finallyAction"); add("namedActions");
-//		}};
-//	}
 }

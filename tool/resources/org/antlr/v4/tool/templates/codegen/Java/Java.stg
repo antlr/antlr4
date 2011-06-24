@@ -27,6 +27,8 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
+import java.util.List;
+import java.util.ArrayList;
 
 <parser>
 >>
@@ -87,25 +89,16 @@ public <p.name>(TokenStream input) {
 }
 >>
 
-/*
-   // S.g:5:1: b returns [String q, float x] : A ;
-    public final S.b_return b() throws RecognitionException {
-        b_stack.push(new b_scope());
-        S.b_return retval = new S.b_return();
-*/
-
-RuleFunction(currentRule,code,decls,context,scope,namedActions,finallyAction) ::= <<
-<context>
-<scope>
+RuleFunction(currentRule,code,decls,ruleCtx,namedActions,finallyAction) ::= <<
+<ruleCtx>
+public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<currentRule.ctxType>\>();
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
     <currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
     _ctx = _localctx;
-<if(currentRule.scope)>
-    <currentRule.scope.name>_stack.push(new <currentRule.scope.name>());
-<endif>
+    <currentRule.name>_stk.push(_localctx);
+    _localctx.start = input.LT(1);
     //System.out.println("enter "+ruleNames[<currentRule.index>]);
-    <currentRule.globalScopesUsed:{s | <s>_stack.push(new <s>());}; separator="\n">
     <namedActions.init>
     <decls; separator="\n">
 	try {
@@ -116,9 +109,9 @@ RuleFunction(currentRule,code,decls,context,scope,namedActions,finallyAction) ::
 		recover();
 	}
 	finally {
+        _localctx.stop = input.LT(-1);
         <namedActions.after>
-        <currentRule.globalScopesUsed:{s | <s>_stack.pop();}; separator="\n">
-        <if(currentRule.scope)><currentRule.scope.name>_stack.pop();<endif>
+        <currentRule.name>_stk.pop();
         <finallyAction>
         _ctx = (ParserRuleContext)_ctx.parent;
     	//System.out.println("exit "+ruleNames[<currentRule.index>]);
@@ -273,12 +266,12 @@ cases(ttypes) ::= <<
 
 InvokeRule(r) ::= <<
 _ctx.s = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <l> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
+<if(r.labels)><r.labels:{l | _localctx.<l> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
 >>
 
 MatchToken(m) ::= <<
 _ctx.s = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | <l> = }>(Token)<endif>match(<m.name>);
+<if(m.labels)><m.labels:{l | _localctx.<l> = }>(Token)<endif>match(<m.name>);
 >>
 
 // ACTION STUFF
@@ -296,45 +289,54 @@ ArgRef(a) ::= "_localctx.<a.name>"
 RetValueRef(a) ::= "_localctx.<a.name>"
 QRetValueRef(a) ::= "<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<t.name>"
+TokenRef(t) ::= "_localctx.<t.name>"
 SetAttr(s,rhsChunks) ::= "_localctx.<s.name> = <rhsChunks>;"
 LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
 //SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
 
-TokenPropertyRef_text(t) ::= "(<t.label>!=null?<t.label>.getText():null)"
-TokenPropertyRef_type(t) ::= "(<t.label>!=null?<t.label>.getType():0)"
-TokenPropertyRef_line(t) ::= "(<t.label>!=null?<t.label>.getLine():0)"
-TokenPropertyRef_pos(t) ::= "(<t.label>!=null?<t.label>.getCharPositionInLine():0)"
-TokenPropertyRef_channel(t) ::= "(<t.label>!=null?<t.label>.getChannel():0)"
-TokenPropertyRef_index(t) ::= "(<t.label>!=null?<t.label>.getTokenIndex():0)"
-TokenPropertyRef_tree(t) ::= "<t.label>_tree"
-TokenPropertyRef_int(t) ::= "(<t.label>!=null?Integer.valueOf(<t.label>.getText()):0)"
+TokenPropertyRef_text(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getText():null)"
+TokenPropertyRef_type(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getType():0)"
+TokenPropertyRef_line(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getLine():0)"
+TokenPropertyRef_pos(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getCharPositionInLine():0)"
+TokenPropertyRef_channel(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getChannel():0)"
+TokenPropertyRef_index(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getTokenIndex():0)"
+TokenPropertyRef_tree(t) ::= "_localctx.<t.label>_tree"
+TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localctx.<t.label>.getText()):0)"
 
-RulePropertyRef_start(r) ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.start):null)"
-RulePropertyRef_stop(r)  ::= "(<r.label>!=null?((<file.TokenLabelType>)<r.label>.stop):null)"
-RulePropertyRef_tree(r)  ::= "(<r.label>!=null?((<file.ASTLabelType>)<r.label>.tree):null)"
-RulePropertyRef_text(r)  ::= "(<r.label>!=null?((TokenStream)input).toString(<r.label>.start,<r.label>.stop):null)"
-RulePropertyRef_st(r)    ::= "(<r.label>!=null?<r.label>.st:null)"
+RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.start):null)"
+RulePropertyRef_stop(r)  ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.stop):null)"
+RulePropertyRef_tree(r)  ::= "(_localctx.<r.label>!=null?((<file.ASTLabelType>)_localctx.<r.label>.tree):null)"
+RulePropertyRef_text(r)  ::= "(_localctx.<r.label>!=null?((TokenStream)input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
+RulePropertyRef_st(r)    ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 
-DynScopeRef(s)           ::= "<s.scope>_stack"
-DynScopeAttrRef(s)       ::= "<s.scope>_stack.peek().<s.attr>"
+DynScopeRef(s)           ::= "<s.scope>"
+DynScopeAttrRef(s)       ::= "<s.scope>.peek().<s.attr>"
 DynScopeAttrRef_negIndex(s, indexChunks) ::=
-    "<s.scope>_stack.get(<s.scope>_stack.size()-<indexChunks>-1).<s.attr>"
+    "<s.scope>.get(<s.scope>.size()-<indexChunks>-1).<s.attr>"
 DynScopeAttrRef_index(s, indexChunks)    ::=
-    "<s.scope>_stack.get(<indexChunks>).<s.attr>"
+    "<s.scope>.get(<indexChunks>).<s.attr>"
 SetDynScopeAttr(s, rhsChunks)            ::=
-    "<s.scope>_stack.peek().<s.attr> =<rhsChunks>;"
+    "<s.scope>.peek().<s.attr> =<rhsChunks>;"
 SetDynScopeAttr_negIndex(s, indexChunks, rhsChunks) ::=
-    "<s.scope>_stack.get(<s.scope>_stack.size()-<indexChunks>-1).<s.attr> =<rhsChunks>;"
+    "<s.scope>.get(<s.scope>.size()-<indexChunks>-1).<s.attr> =<rhsChunks>;"
 SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
-    "<s.scope>_stack.get(<indexChunks>).<s.attr> =<rhsChunks>;"
+    "<s.scope>.get(<indexChunks>).<s.attr> =<rhsChunks>;"
 
-AddToList(a) ::= "<a.listName>.add(<first(a.opWithResultToAdd.labels)>);"
+AddToLabelList(a) ::= "_localctx.<a.listName>.add(_localctx.<first(a.opWithResultToAdd.labels)>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
+RuleContextListDecl(rdecl) ::= "List\<<rdecl.decl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.decl.ctxName>>();"
+
+/** Default RuleContext type name for a Parser rule */
+ParserRuleContext() ::= "ParserRuleContext"
+
+
+RuleDynamicScopeStructName(ruleName) ::= "<ruleName>_stk"
+ImplicitTokenLabel(tokenName) ::= "_t<tokenName>"
+ImplicitRuleLabel(ruleName)   ::= "_r<ruleName>"
 
 CaptureNextToken(d) ::= "<d.varName> = input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = input.LA(1);"
@@ -348,14 +350,7 @@ public static class <s.name> extends ParserRuleContext {
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
 <endif>
-};
->>
-
-DynamicScopeStruct(d,attrs) ::= <<
-public static class <d.name> {
-    <attrs:{a | <a>;}; separator="\n">
-};
-public QStack\<<d.name>\> <d.name>_stack = new QStack\<<d.name>\>();
+}
 >>
 
 AttributeDecl(d) ::= "<d.decl>"

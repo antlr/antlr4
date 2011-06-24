@@ -26,13 +26,15 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		ctxName = factory.gen.target.getRuleFunctionContextStructName(r);
 
 		if ( labelAST!=null ) {
+			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();
 			labels.add(label);
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			factory.currentRule.peek().addDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
-//				TokenListDecl l = new TokenListDecl(factory.getListLabel(label));
-//				factory.currentRule.peek().addDecl(l);
+				String listLabel = factory.gen.target.getListLabel(label);
+				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, d);
+				factory.currentRule.peek().addDecl(l);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {

@@ -21,7 +21,9 @@ public class Target {
 	 */
 	protected String[] targetCharValueEscape = new String[255];
 
-	public Target() {
+	public CodeGenerator gen;
+
+	public Target(CodeGenerator gen) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
 		targetCharValueEscape['\t'] = "\\t";
@@ -30,19 +32,18 @@ public class Target {
 		targetCharValueEscape['\\'] = "\\\\";
 		targetCharValueEscape['\''] = "\\'";
 		targetCharValueEscape['"'] = "\\\"";
+		this.gen = gen;
 	}
 
-	protected void genRecognizerFile(CodeGenerator generator,
-									 Grammar g,
+	protected void genRecognizerFile(Grammar g,
 									 ST outputFileST)
 		throws IOException
 	{
-		String fileName = generator.getRecognizerFileName();
-		generator.write(outputFileST, fileName);
+		String fileName = gen.getRecognizerFileName();
+		gen.write(outputFileST, fileName);
 	}
 
-	protected void genRecognizerHeaderFile(CodeGenerator generator,
-										   Grammar g,
+	protected void genRecognizerHeaderFile(Grammar g,
 										   ST headerFileST,
 										   String extName) // e.g., ".h"
 		throws IOException
@@ -162,15 +163,30 @@ public class Target {
 
 	public String getListLabel(String label) { return label+"_list"; }
 	public String getRuleFunctionContextStructName(Rule r) {
-		if ( r.args==null && r.retvals==null ) return "ParserRuleContext";
+		if ( r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null ) {
+			return gen.templates.getInstanceOf("ParserRuleContext").render();
+		}
 		return r.name+"_ctx";
 	}
-	public String getRuleDynamicScopeStructName(String ruleName) { return ruleName+"_scope"; }
+	public String getRuleDynamicScopeStructName(String ruleName) {
+		ST st = gen.templates.getInstanceOf("RuleDynamicScopeStructName");
+		st.add("ruleName", ruleName);
+		return st.render();
+	}
 	public String getGlobalDynamicScopeStructName(String scopeName) { return scopeName; }
 
 	// should be same for all refs to same token like $ID within single rule function
-	public String getImplicitTokenLabel(String tokenName) { return "_t"+tokenName; }
-	public String getImplicitRuleLabel(String ruleName) { return "_r"+ruleName; }
+	public String getImplicitTokenLabel(String tokenName) {
+		ST st = gen.templates.getInstanceOf("ImplicitTokenLabel");
+		st.add("tokenName", tokenName);
+		return st.render();
+	}
+
+	public String getImplicitRuleLabel(String ruleName) {
+		ST st = gen.templates.getInstanceOf("ImplicitRuleLabel");
+		st.add("ruleName", ruleName);
+		return st.render();
+	}
 
 	public int getInlineTestsVsBitsetThreshold() { return 20; }
 }

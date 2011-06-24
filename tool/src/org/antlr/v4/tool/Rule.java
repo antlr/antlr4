@@ -126,6 +126,7 @@ public class Rule implements AttributeResolver {
         for (int i=1; i<=numberOfAlts; i++) {
             refs.addAll(alt[i].labelDefs.keySet());
         }
+		if ( refs.size()==0 ) return null;
         return refs;
     }
 

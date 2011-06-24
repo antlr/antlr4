@@ -13,7 +13,6 @@ public class Parser extends OutputModelObject {
 	public Set<String> ruleNames;
 	public ParserFile file;
 
-	@ModelElement public List<DynamicScopeStruct> scopes = new ArrayList<DynamicScopeStruct>();
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Integer, ForcedAction> actions;
@@ -37,11 +36,7 @@ public class Parser extends OutputModelObject {
 //		}
 		tokenNames = factory.g.getTokenDisplayNames();
 		ruleNames = factory.g.rules.keySet();
-		for (AttributeDict d : factory.g.scopes.values()) {
-			scopes.add( new DynamicScopeStruct(factory, d.name, d.attributes.values()) );
-		}
 		for (Rule r : factory.g.rules.values()) {
-			//if ( r.isStartRule ) funcs.add( new StartRuleFunction(factory, r) );
 			funcs.add( new RuleFunction(factory, r) );
 		}
 		atn = new SerializedATN(factory, factory.g.atn);

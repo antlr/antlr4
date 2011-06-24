@@ -7,6 +7,7 @@ import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
@@ -36,10 +37,19 @@ public class CodeGenerator {
 		String targetName = "org.antlr.v4.codegen."+language+"Target";
 		try {
 			Class c = Class.forName(targetName);
-			target = (Target)c.newInstance();
+			Constructor ctor = c.getConstructor(CodeGenerator.class);
+			target = (Target)ctor.newInstance(this);
 		}
 		catch (ClassNotFoundException cnfe) {
-			target = new Target(); // use default
+			target = new Target(this); // use default
+		}
+		catch (NoSuchMethodException nsme) {
+			target = new Target(this); // use default
+		}
+		catch (InvocationTargetException ite) {
+			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 ite,
+						 targetName);
 		}
 		catch (InstantiationException ie) {
 			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
@@ -63,12 +73,6 @@ public class CodeGenerator {
 									iae,
 						 			language);
 		}
-
-//		if ( EMIT_TEMPLATE_DELIMITERS ) {
-//			templates.emitDebugStartStopStrings(true);
-//			templates.doNotEmitDebugStringsForTemplate("codeFileExtension");
-//			templates.doNotEmitDebugStringsForTemplate("headerFileExtension");
-//		}
 	}
 
 	public ST generate() {
@@ -129,12 +133,12 @@ public class CodeGenerator {
 		String fileName = "unknown";
 		try {
 			fileName = getRecognizerFileName();
-			target.genRecognizerFile(this,g,outputFileST);
+			target.genRecognizerFile(g,outputFileST);
 			if ( templates.isDefined("headerFile") ) {
 				fileName = getHeaderFileName();
 				ST extST = templates.getInstanceOf("headerFileExtension");
 				ST headerFileST = null;
-				target.genRecognizerHeaderFile(this,g,headerFileST,extST.render(lineWidth));
+				target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
 			}
 			// write out the vocab interchange file; used by antlr,
 			// does not change per target
