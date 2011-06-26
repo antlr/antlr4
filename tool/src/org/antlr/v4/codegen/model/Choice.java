@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
 
@@ -49,7 +50,7 @@ public abstract class Choice extends RuleElement {
 		if ( expr instanceof TestSetInline) {
 			TestSetInline e = (TestSetInline)expr;
 			Decl d = new TokenTypeDecl(factory, e.varName);
-			factory.currentRule.peek().addDecl(d);
+			factory.currentRule.peek().addContextDecl(d);
 			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
 			addPreambleOp(nextType);
 		}

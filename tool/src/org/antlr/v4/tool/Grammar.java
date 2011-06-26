@@ -599,6 +599,11 @@ public class Grammar implements AttributeResolver {
 		return defaultValue;
 	}
 
+	public boolean hasASTOption() {
+		String outputOption = getOption("output");
+		return outputOption!=null && outputOption.equals("AST");
+	}
+
 	public static Map<String,String> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
 		GrammarAST combinedRulesRoot =
 			(GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);

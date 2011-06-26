@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.tool.*;
@@ -10,7 +11,7 @@ import java.util.*;
 /** */
 public class InvokeRule extends RuleElement implements LabeledOp {
 	public String name;
-	public List<String> labels = new ArrayList<String>();
+	public List<Decl> labels = new ArrayList<Decl>();
 	public String argExprs;
 	public String ctxName;
 
@@ -28,13 +29,13 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		if ( labelAST!=null ) {
 			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();
-			labels.add(label);
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
-			factory.currentRule.peek().addDecl(d);
+			labels.add(d);
+			factory.currentRule.peek().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				String listLabel = factory.gen.target.getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, d);
-				factory.currentRule.peek().addDecl(l);
+				factory.currentRule.peek().addContextDecl(l);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {
@@ -44,9 +45,9 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		// If action refs rule as rulename not label, we need to define implicit label
 		if ( factory.currentAlt.ruleRefsInActions.containsKey(ast.getText()) ) {
 			String label = factory.gen.target.getImplicitRuleLabel(ast.getText());
-			labels.add(label);
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
-			factory.currentRule.peek().addDecl(d);
+			labels.add(d);
+			factory.currentRule.peek().addContextDecl(d);
 		}
 
 //		LinearApproximator approx = new LinearApproximator(factory.g, ATN.INVALID_DECISION_NUMBER);
@@ -57,7 +58,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 //		factory.defineBitSet(follow);
 	}
 
-	public List<String> getLabels() {
+	public List<Decl> getLabels() {
 		return labels;
 	}
 }

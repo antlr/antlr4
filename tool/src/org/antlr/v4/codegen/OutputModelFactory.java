@@ -11,6 +11,7 @@ import java.util.*;
 
 /** Create output objects wthin rule functions */
 public abstract class OutputModelFactory {
+	//TODO: lexer doesn't gen code anymore; refactor
 	public Grammar g;
 	public CodeGenerator gen;
 

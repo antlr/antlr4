@@ -89,7 +89,7 @@ public <p.name>(TokenStream input) {
 }
 >>
 
-RuleFunction(currentRule,code,decls,ruleCtx,namedActions,finallyAction) ::= <<
+RuleFunction(currentRule,code,locals,ruleCtx,namedActions,finallyAction) ::= <<
 <ruleCtx>
 public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<currentRule.ctxType>\>();
 
@@ -100,7 +100,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     _localctx.start = input.LT(1);
     //System.out.println("enter "+ruleNames[<currentRule.index>]);
     <namedActions.init>
-    <decls; separator="\n">
+    <locals; separator="\n">
 	try {
 	    <code>
 	}
@@ -266,12 +266,12 @@ cases(ttypes) ::= <<
 
 InvokeRule(r) ::= <<
 _ctx.s = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | _localctx.<l> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
+<if(r.labels)><r.labels:{l | <if(!l.isLocal)>_localctx.<endif><l.name> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
 >>
 
 MatchToken(m) ::= <<
 _ctx.s = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | _localctx.<l> = }>(Token)<endif>match(<m.name>);
+<if(m.labels)><m.labels:{l | <if(!l.isLocal)>_localctx.<endif><l.name> = }>(Token)<endif>match(<m.name>);
 >>
 
 // ACTION STUFF
@@ -289,7 +289,7 @@ ArgRef(a) ::= "_localctx.<a.name>"
 RetValueRef(a) ::= "_localctx.<a.name>"
 QRetValueRef(a) ::= "<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "_localctx.<t.name>"
+TokenRef(t) ::= "<if(!t.isLocal)>_localctx.<endif><t.name>"
 SetAttr(s,rhsChunks) ::= "_localctx.<s.name> = <rhsChunks>;"
 LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
 //SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
@@ -333,7 +333,6 @@ RuleContextListDecl(rdecl) ::= "List\<<rdecl.decl.ctxName>> <rdecl.name> = new A
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
 
-
 RuleDynamicScopeStructName(ruleName) ::= "<ruleName>_stk"
 ImplicitTokenLabel(tokenName) ::= "_t<tokenName>"
 ImplicitRuleLabel(ruleName)   ::= "_r<ruleName>"
@@ -344,24 +343,30 @@ CaptureNextTokenType(d) ::= "<d.varName> = input.LA(1);"
 StructDecl(s,attrs) ::= <<
 public static class <s.name> extends ParserRuleContext {
     <attrs:{a | public <a>;}; separator="\n">
-<if(s.ctorAttrs)>
-    public <s.name>(ParserRuleContext parent, int state, <s.ctorAttrs:{a | <a>}; separator=",">) {
+    public <s.name>(ParserRuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-<endif>
 }
 >>
 
 AttributeDecl(d) ::= "<d.decl>"
 
-DFADecl(dfa) ::= <<
-// define <dfa.name>
->>
+// AST stuff (TODO: separate?)
 
+AddLeaf(a) ::= "_kids0.add(<if(!a.label.isLocal)>_localctx.<endif><a.label.name>);"
+
+KidsListDecl(d) ::= "List <d.name> = new ArrayList(5);"
+RootDecl(d)     ::= "Object <d.name> = null;"
+
+RootName(level)     ::= "_root<level>"
+KidsListName(level) ::= "_kids<level>"
+
+/*
 BitSetDecl(b) ::= <<
 public static final LABitSet <b.name>=new LABitSet(new long[]{<b.hexWords:{it|<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
 >>
+*/
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>

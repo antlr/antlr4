@@ -46,7 +46,7 @@ public class Rule implements AttributeResolver {
     public RuleAST ast;
     public AttributeDict args;
     public AttributeDict retvals;
-    public AttributeDict scope; // scope { int i; }
+    public AttributeDict scope; // scope { int i; } // TODO: remove
 
 	/** A list of scope names used by this rule */
     public List<Token> useScopes;

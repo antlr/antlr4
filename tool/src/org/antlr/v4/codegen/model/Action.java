@@ -17,14 +17,4 @@ public class Action extends RuleElement {
 		chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
 		//System.out.println("actions="+chunks);
 	}
-
-//	@Override
-//	public List<String> getChildren() {
-//		final List<String> sup = super.getChildren();
-//		return new ArrayList<String>() {{
-//			if ( sup!=null ) addAll(sup);
-//			add("chunks");
-//		}};
-//	}
-
 }

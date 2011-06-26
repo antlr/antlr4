@@ -16,7 +16,6 @@ import java.util.HashMap;
 }
 
 @members {
-// TODO: identical grammar to ATNBytecodeTriggers; would be nice to combine
 	public OutputModelFactory factory;
     public SourceGenTriggers(TreeNodeStream input, OutputModelFactory factory) {
     	this(input);

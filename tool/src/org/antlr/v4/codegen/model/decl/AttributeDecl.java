@@ -1,4 +1,4 @@
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 

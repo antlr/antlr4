@@ -1,6 +1,6 @@
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.decl;
 
-import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.OutputModelFactory;
 
 public class RuleContextListDecl extends Decl {
 	public RuleContextDecl decl;

@@ -2,6 +2,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -24,7 +25,7 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<Attribute> args = null;
 
 	@ModelElement public SrcOp code;
-	@ModelElement public OrderedHashSet<Decl> decls; // TODO: move into ctx?
+	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
 	@ModelElement public StructDecl ruleCtx;
 	//@ModelElement public DynamicScopeStruct scope;
 	@ModelElement public Map<String, Action> namedActions;
@@ -43,12 +44,10 @@ public class RuleFunction extends OutputModelObject {
 		}
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
-		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
-
 		index = r.index;
 
 		// might need struct; build but drop later if no elements
-		ruleCtx = new StructDecl(factory, ctxType);
+		ruleCtx = new StructDecl(factory);
 
 		if ( r.args!=null ) {
 			ruleCtx.addDecls(r.args.attributes.values());
@@ -59,15 +58,10 @@ public class RuleFunction extends OutputModelObject {
 			ruleCtx.addDecls(r.retvals.attributes.values());
 		}
 		if ( r.scope!=null ) {
-			String scopeType = factory.gen.target.getRuleDynamicScopeStructName(r.name);
-//			scope = new DynamicScopeStruct(factory, scopeType);
-//			scope.addDecls(r.scope.attributes.values());
 			ruleCtx.addDecls(r.scope.attributes.values());
 		}
 
 		globalScopesUsed = Utils.apply(r.useScopes, "getText");
-
-		if ( ruleCtx.isEmpty() ) ruleCtx = null;
 
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();
@@ -78,6 +72,11 @@ public class RuleFunction extends OutputModelObject {
 		for (String name : r.namedActions.keySet()) {
 			GrammarAST ast = r.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
+		}
+
+		if ( factory.g.hasASTOption() ) {
+			addLocalDecl(new RootDecl(factory, 0));
+			addLocalDecl(new KidsListDecl(factory, 0));
 		}
 
 		startState = factory.g.atn.ruleToStartState.get(r);
@@ -93,12 +92,23 @@ public class RuleFunction extends OutputModelObject {
 		catch (Exception e){
 			e.printStackTrace(System.err);
 		}
+
+		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
+		ruleCtx.name = ctxType;
+
+		if ( ruleCtx.isEmpty() ) ruleCtx = null;
 		factory.currentRule.pop();
 	}
 
-	public void addDecl(Decl d) {
+	/** Add local var decl */
+	public void addLocalDecl(Decl d) {
+		if ( locals ==null ) locals = new OrderedHashSet<Decl>();
+		locals.add(d);
+		d.isLocal = true;
+	}
+
+	/** Add decl to struct ctx */
+	public void addContextDecl(Decl d) {
 		ruleCtx.addDecl(d);
-//		if ( decls==null ) decls = new OrderedHashSet<Decl>();
-//		decls.add(d);
 	}
 }

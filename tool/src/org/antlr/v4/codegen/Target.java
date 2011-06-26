@@ -188,5 +188,17 @@ public class Target {
 		return st.render();
 	}
 
-	public int getInlineTestsVsBitsetThreshold() { return 20; }
+	// AST
+
+	public String getRootName(int level) {
+		ST st = gen.templates.getInstanceOf("RootName");
+		st.add("level", level);
+		return st.render();
+	}
+
+	public String getKidsListName(int level) {
+		ST st = gen.templates.getInstanceOf("KidsListName");
+		st.add("level", level);
+		return st.render();
+	}
 }
