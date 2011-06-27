@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.atn.StarBlockStartState;
 import org.antlr.v4.tool.GrammarAST;
@@ -9,7 +9,7 @@ import java.util.List;
 
 /** */
 public class LL1StarBlockSingleAlt extends LL1Loop {
-	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST starRoot, List<CodeBlock> alts) {
+	public LL1StarBlockSingleAlt(CoreOutputModelFactory factory, GrammarAST starRoot, List<CodeBlock> alts) {
 		super(factory, starRoot, alts);
 
 		StarBlockStartState star = (StarBlockStartState)starRoot.atnState;

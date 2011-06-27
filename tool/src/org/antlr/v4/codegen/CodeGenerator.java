@@ -76,7 +76,7 @@ public class CodeGenerator {
 	}
 
 	public ST generate() {
-		OutputModelFactory factory;
+		CoreOutputModelFactory factory;
 		if ( g.isParser() || g.isCombined() || g.isTreeGrammar() ) {
 			factory = new ParserFactory(this);
 		}

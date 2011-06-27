@@ -31,11 +31,11 @@ public class RuleFunction extends OutputModelObject {
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public Action finallyAction;
 
-	public RuleFunction(OutputModelFactory factory) {
+	public RuleFunction(CoreOutputModelFactory factory) {
 		super(factory);
 	}
 
-	public RuleFunction(OutputModelFactory factory, Rule r) {
+	public RuleFunction(CoreOutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
 		if ( r.modifiers!=null && r.modifiers.size()>0 ) {

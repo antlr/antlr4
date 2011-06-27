@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.tool.GrammarAST;
 
@@ -9,7 +9,7 @@ import java.util.List;
 public class PlusBlock extends Loop {
 	@ModelElement public ThrowNoViableAlt error;
 
-	public PlusBlock(OutputModelFactory factory,
+	public PlusBlock(CoreOutputModelFactory factory,
 					 GrammarAST ebnfRootAST,
 					 List<CodeBlock> alts)
 	{

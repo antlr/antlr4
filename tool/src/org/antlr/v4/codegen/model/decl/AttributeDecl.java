@@ -1,10 +1,10 @@
 package org.antlr.v4.codegen.model.decl;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 
 /** */
 public class AttributeDecl extends Decl {
-	public AttributeDecl(OutputModelFactory factory, String name, String decl) {
+	public AttributeDecl(CoreOutputModelFactory factory, String name, String decl) {
 		super(factory, name, decl);
 	}
 }

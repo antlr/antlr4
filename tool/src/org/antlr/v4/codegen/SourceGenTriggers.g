@@ -56,19 +56,19 @@ alternative returns [CodeBlock omo]
 element returns [List<SrcOp> omos]
 	:	labeledElement					{$omos = $labeledElement.omos;}
 	|	atom[null]						{$omos = $atom.omos;}
-	|	ebnf							{$omos = Utils.list($ebnf.omo);}
-	|   ACTION							{$omos = Utils.list(factory.action($ACTION));}
-	|   FORCED_ACTION					{$omos = Utils.list(factory.forcedAction($FORCED_ACTION));}
-	|   SEMPRED							{$omos = Utils.list(factory.sempred($SEMPRED));}
+	|	ebnf							{$omos = factory.list($ebnf.omo);}
+	|   ACTION							{$omos = factory.list(factory.action($ACTION));}
+	|   FORCED_ACTION					{$omos = factory.list(factory.forcedAction($FORCED_ACTION));}
+	|   SEMPRED							{$omos = factory.list(factory.sempred($SEMPRED));}
 	|	GATED_SEMPRED
 	|	treeSpec
 	;
 
 labeledElement returns [List<SrcOp> omos]
 	:	^(ASSIGN ID atom[$ID] )				{$omos = $atom.omos;}
-	|	^(ASSIGN ID block[$ID,null])		{$omos = Utils.list($block.omo);}
+	|	^(ASSIGN ID block[$ID,null])		{$omos = factory.list($block.omo);}
 	|	^(PLUS_ASSIGN ID atom[$ID])			{$omos = $atom.omos;}
-	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omos = Utils.list($block.omo);}
+	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omos = factory.list($block.omo);}
 	;
 
 treeSpec returns [SrcOp omo]

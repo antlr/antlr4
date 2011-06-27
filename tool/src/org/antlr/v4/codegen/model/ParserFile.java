@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.*;
@@ -14,10 +14,10 @@ public class ParserFile extends OutputModelObject {
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 
-	public ParserFile(OutputModelFactory factory, String fileName) {
+	public ParserFile(CoreOutputModelFactory factory, String fileName) {
 		super(factory);
 		this.fileName = fileName;
-		factory.file = this;
+		factory.root = this;
 		TokenLabelType = factory.gen.g.getOption("TokenLabelType");
 		ASTLabelType = factory.gen.g.getOption("ASTLabelType");
 		namedActions = new HashMap<String, Action>();

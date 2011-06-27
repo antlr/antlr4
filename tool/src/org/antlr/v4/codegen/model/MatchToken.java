@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
@@ -12,7 +12,7 @@ public class MatchToken extends RuleElement implements LabeledOp {
 	public String name;
 	public List<Decl> labels = new ArrayList<Decl>();
 
-	public MatchToken(OutputModelFactory factory, TerminalAST ast, GrammarAST labelAST) {
+	public MatchToken(CoreOutputModelFactory factory, TerminalAST ast, GrammarAST labelAST) {
 		super(factory, ast);
 		int ttype = factory.g.getTokenType(ast.getText());
 		name = factory.gen.target.getTokenTypeAsTargetLabel(factory.g, ttype);

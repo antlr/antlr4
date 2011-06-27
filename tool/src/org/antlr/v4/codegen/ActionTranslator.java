@@ -33,14 +33,14 @@ public class ActionTranslator implements ActionSplitterListener {
 	ActionAST node;
 	RuleFunction rf;
 	List<ActionChunk> chunks = new ArrayList<ActionChunk>();
-	OutputModelFactory factory;
+	CoreOutputModelFactory factory;
 
-	public ActionTranslator(OutputModelFactory factory, ActionAST node) {
+	public ActionTranslator(CoreOutputModelFactory factory, ActionAST node) {
 		this.factory = factory;
 		this.node = node;
 	}
 
-	public static List<ActionChunk> translateAction(OutputModelFactory factory,
+	public static List<ActionChunk> translateAction(CoreOutputModelFactory factory,
 													RuleFunction rf,
 													Token tokenWithinAction,
 													ActionAST node)
@@ -54,7 +54,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		return translateActionChunk(factory, rf, action, node);
 	}
 
-	public static List<ActionChunk> translateActionChunk(OutputModelFactory factory,
+	public static List<ActionChunk> translateActionChunk(CoreOutputModelFactory factory,
 														 RuleFunction rf,
 														 String action,
 														 ActionAST node)

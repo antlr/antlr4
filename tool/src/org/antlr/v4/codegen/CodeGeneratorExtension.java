@@ -1,0 +1,67 @@
+package org.antlr.v4.codegen;
+
+
+import org.antlr.v4.codegen.model.*;
+
+import java.util.List;
+
+/** Filter list of SrcOps and return; default is pass-through filter */
+public class CodeGeneratorExtension {
+	public CoreOutputModelFactory factory;
+
+	public CodeGeneratorExtension(CoreOutputModelFactory factory) {
+		this.factory = factory;
+	}
+
+	public OutputModelObject buildOutputModel(OutputModelObject root) {
+		return null;
+	}
+
+	public List<SrcOp> alternative(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> ruleRef(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> tokenRef(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> stringRef(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> epsilon(List<SrcOp> ops) { return ops; }
+
+	// ACTIONS
+
+	public List<SrcOp> action(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> forcedAction(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> sempred(List<SrcOp> ops) { return ops; }
+
+	// AST OPS
+
+	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
+
+	// BLOCKS
+
+	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getEBNFBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getLL1ChoiceBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getLLStarChoiceBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getLL1EBNFBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getLLStarEBNFBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getLL1Test(List<SrcOp> ops) { return ops; }
+
+	/** Find exact object type in list */
+	public static SrcOp find(List<SrcOp> ops, Class cl) {
+		for (SrcOp op : ops) {
+			if ( op.getClass() == cl ) return op;
+		}
+		return null;
+	}
+}

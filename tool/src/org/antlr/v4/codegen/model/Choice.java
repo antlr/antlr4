@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
@@ -23,7 +23,7 @@ public abstract class Choice extends RuleElement {
 	@ModelElement public List<CodeBlock> alts;
 	@ModelElement public List<SrcOp> preamble;
 
-	public Choice(OutputModelFactory factory,
+	public Choice(CoreOutputModelFactory factory,
 				  GrammarAST blkOrEbnfRootAST,
 				  List<CodeBlock> alts)
 	{

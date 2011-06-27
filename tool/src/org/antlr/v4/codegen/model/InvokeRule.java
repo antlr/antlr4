@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.RuleTransition;
@@ -15,7 +15,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 	public String argExprs;
 	public String ctxName;
 
-	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
+	public InvokeRule(CoreOutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
 		super(factory, ast);
 		if ( ast.atnState!=null ) {
 			RuleTransition ruleTrans = (RuleTransition)ast.atnState.transition(0);

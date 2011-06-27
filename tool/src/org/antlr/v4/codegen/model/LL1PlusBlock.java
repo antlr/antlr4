@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.tool.GrammarAST;
@@ -20,7 +20,7 @@ public class LL1PlusBlock extends LL1Loop {
 	@ModelElement public SrcOp loopExpr;
 	@ModelElement public ThrowNoViableAlt error;
 
-	public LL1PlusBlock(OutputModelFactory factory, GrammarAST plusRoot, List<CodeBlock> alts) {
+	public LL1PlusBlock(CoreOutputModelFactory factory, GrammarAST plusRoot, List<CodeBlock> alts) {
 		super(factory, plusRoot, alts);
 
 		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;

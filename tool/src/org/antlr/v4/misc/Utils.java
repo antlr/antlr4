@@ -108,14 +108,6 @@ public class Utils {
 //		return x;
 //	}
 
-	public static List list(Object... values) {
-		List x = new ArrayList(values.length);
-		for (Object v : values) {
-			if ( v!=null ) x.add(v);
-		}
-		return x;
-	}
-
 	public static int[] toIntArray(List<Integer> list) {
 		if ( list==null ) return null;
 		int[] a = new int[list.size()];

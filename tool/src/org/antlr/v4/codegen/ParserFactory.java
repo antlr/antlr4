@@ -2,8 +2,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.AddLeaf;
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.tool.*;
@@ -11,7 +10,7 @@ import org.antlr.v4.tool.*;
 import java.util.List;
 
 /** */
-public class ParserFactory extends OutputModelFactory {
+public class ParserFactory extends CoreOutputModelFactory {
 	public ParserFactory(CodeGenerator gen) { super(gen); }
 
 	public OutputModelObject buildOutputModel() {
@@ -22,11 +21,11 @@ public class ParserFactory extends OutputModelFactory {
 
 	public CodeBlock alternative(List<SrcOp> elems) { return new CodeBlock(this, elems); }
 
-	public SrcOp action(GrammarAST ast) { return new Action(this, ast); }
+	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
 
-	public SrcOp forcedAction(GrammarAST ast) { return new ForcedAction(this, ast); }
+	public List<SrcOp> forcedAction(GrammarAST ast) { return list(new ForcedAction(this, ast)); }
 
-	public SrcOp sempred(GrammarAST ast) { return new SemPred(this, ast); }
+	public List<SrcOp> sempred(GrammarAST ast) { return list(new SemPred(this, ast)); }
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		InvokeRule r = new InvokeRule(this, ID, label);
@@ -34,7 +33,7 @@ public class ParserFactory extends OutputModelFactory {
 		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
 			a = new AddToLabelList(this, gen.target.getListLabel(label.getText()), r);
 		}
-		return Utils.list(r, a);
+		return list(r, a);
 	}
 
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
@@ -44,11 +43,14 @@ public class ParserFactory extends OutputModelFactory {
 			String listLabel = gen.target.getListLabel(label.getText());
 			labelOp = new AddToLabelList(this, listLabel, matchOp);
 		}
+		/*
 		SrcOp treeOp = null;
 		if ( g.hasASTOption() ) {
 			treeOp = new AddLeaf(this, ID, matchOp);
 		}
-		return Utils.list(matchOp, labelOp, treeOp);
+		return list(matchOp, labelOp, treeOp);
+		*/
+		return list(matchOp, labelOp);
 	}
 
 	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {

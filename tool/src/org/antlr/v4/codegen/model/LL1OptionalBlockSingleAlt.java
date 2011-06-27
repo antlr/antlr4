@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.tool.GrammarAST;
@@ -12,7 +12,7 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 	@ModelElement public OutputModelObject expr;
 	@ModelElement public OutputModelObject followExpr;
 
-	public LL1OptionalBlockSingleAlt(OutputModelFactory factory,
+	public LL1OptionalBlockSingleAlt(CoreOutputModelFactory factory,
 									 GrammarAST blkAST,
 									 List<CodeBlock> alts)
 	{

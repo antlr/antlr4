@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.CoreOutputModelFactory;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -18,7 +18,7 @@ public class Parser extends OutputModelObject {
 	@ModelElement public LinkedHashMap<Integer, ForcedAction> actions;
 	@ModelElement public LinkedHashMap<Integer, Action> sempreds;
 
-	public Parser(OutputModelFactory factory, ParserFile file) {
+	public Parser(CoreOutputModelFactory factory, ParserFile file) {
 		this.factory = factory;
 		this.file = file; // who contains us?
 		name = factory.g.getRecognizerName();
