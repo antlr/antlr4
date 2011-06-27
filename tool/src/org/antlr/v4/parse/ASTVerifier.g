@@ -292,9 +292,7 @@ ebnfSuffix
    	|	POSITIVE_CLOSURE
 	;
 
-atom:	^(ROOT range)
-	|	^(BANG range)
-	|	^(ROOT notSet)
+atom:	^(ROOT notSet)
 	|	^(BANG notSet)
 	|	notSet
     |	^(ROOT terminal)

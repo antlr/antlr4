@@ -84,8 +84,8 @@ public class CodeGenerator {
 			factory = new LexerFactory(this);
 		}
 
-		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
 		OutputModelObject outputModel = factory.buildOutputModel();
+		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
 		ST st = walker.walk(outputModel);
 
 		if (CodeGenerator.LAUNCH_ST_INSPECTOR) {

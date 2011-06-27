@@ -81,6 +81,7 @@ public class RuleFunction extends OutputModelObject {
 
 		startState = factory.g.atn.ruleToStartState.get(r);
 
+		// TRIGGER factory functions for rule elements
 		factory.currentRule.push(this);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
 		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);

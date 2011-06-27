@@ -27,8 +27,4 @@ public class ParserFile extends OutputModelObject {
 		}
 		parser = new Parser(factory, this);
 	}
-
-//	public void defineBitSet(BitSetDecl b) {
-//		bitSetDecls.add(b);
-//	}
 }

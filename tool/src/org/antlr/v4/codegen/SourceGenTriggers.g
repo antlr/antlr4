@@ -26,8 +26,8 @@ import java.util.HashMap;
 dummy : block[null, null] ;
 
 block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo]
-    :	^( blk=BLOCK (^(OPTIONS .+))?
-		{List<CodeBlock> alts = new ArrayList<CodeBlock>();}
+    :	^(	blk=BLOCK (^(OPTIONS .+))?
+			{List<CodeBlock> alts = new ArrayList<CodeBlock>();}
     		( alternative {alts.add($alternative.omo);} )+
     	)
     	{
@@ -49,7 +49,8 @@ alternative returns [CodeBlock omo]
 }
     :	^(ALT_REWRITE a=alternative .)
     |	^(ALT EPSILON) {$omo = factory.epsilon();}
-    |   ^( ALT ( element {elems.addAll($element.omos);} )+ ) {$omo = factory.alternative(elems);}
+    |   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
+    	{$omo = factory.alternative(elems);}
     ;
 
 element returns [List<SrcOp> omos]
@@ -92,9 +93,7 @@ astBlockSuffix
 // TODO: combine ROOT/BANG into one then just make new op ref'ing return value of atom/terminal...
 // TODO: same for NOT
 atom[GrammarAST label] returns [List<SrcOp> omos]
-	:	^(ROOT range[label])
-	|	^(BANG range[label])		{$omos = $range.omos;}
-	|	^(ROOT notSet[label])
+	:	^(ROOT notSet[label])
 	|	^(BANG notSet[label])		{$omos = $notSet.omos;}
 	|	notSet[label]
 	|	range[label]				{$omos = $range.omos;}
@@ -102,7 +101,11 @@ atom[GrammarAST label] returns [List<SrcOp> omos]
 	|	^(DOT ID ruleref[label])
     |	^(WILDCARD .)
     |	WILDCARD
+    |	^(ROOT terminal[label])		{$omos = factory.rootToken($terminal.omos);}
+    |	^(BANG terminal[label])		{$omos = $terminal.omos;}
     |   terminal[label]				{$omos = $terminal.omos;}
+    |	^(ROOT ruleref[label])		{$omos = factory.rootRule($ruleref.omos);}
+    |	^(BANG ruleref[label])		{$omos = $ruleref.omos;}
     |   ruleref[label]				{$omos = $ruleref.omos;}
     ;
 
@@ -112,9 +115,7 @@ notSet[GrammarAST label] returns [List<SrcOp> omos]
     ;
 
 ruleref[GrammarAST label] returns [List<SrcOp> omos]
-    :	^(ROOT ^(RULE_REF ARG_ACTION?))
-    |	^(BANG ^(RULE_REF ARG_ACTION?))	{$omos = factory.ruleRef($RULE_REF, $label, $ARG_ACTION);}
-    |	^(RULE_REF ARG_ACTION?)			{$omos = factory.ruleRef($RULE_REF, $label, $ARG_ACTION);}
+    :	^(RULE_REF ARG_ACTION?)		{$omos = factory.ruleRef($RULE_REF, $label, $ARG_ACTION);}
     ;
 
 range[GrammarAST label] returns [List<SrcOp> omos]
@@ -127,6 +128,4 @@ terminal[GrammarAST label] returns [List<SrcOp> omos]
     |	^(TOKEN_REF ARG_ACTION .)	{$omos = factory.tokenRef($TOKEN_REF, $label, $ARG_ACTION);}
     |	^(TOKEN_REF .)				{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
     |	TOKEN_REF					{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
-    |	^(ROOT terminal[label])
-    |	^(BANG terminal[label])
     ;
