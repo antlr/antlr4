@@ -1,9 +1,9 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.*;
 
 import java.util.List;
 
@@ -20,14 +20,16 @@ public class LL1PlusBlock extends LL1Loop {
 	@ModelElement public SrcOp loopExpr;
 	@ModelElement public ThrowNoViableAlt error;
 
-	public LL1PlusBlock(CoreOutputModelFactory factory, GrammarAST plusRoot, List<CodeBlock> alts) {
+	public LL1PlusBlock(OutputModelFactory factory, GrammarAST plusRoot, List<SrcOp> alts) {
 		super(factory, plusRoot, alts);
 
 		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
 
 		this.decision = blkStart.decision;
+		Grammar g = factory.getGrammar();
+		CodeGenerator gen = factory.getGenerator();
 		/** Lookahead for each alt 1..n */
-		IntervalSet[] altLookSets = factory.g.decisionLOOK.get(decision);
+		IntervalSet[] altLookSets = g.decisionLOOK.get(decision);
 		altLook = getAltLookaheadAsStringLists(altLookSets);
 		IntervalSet all = new IntervalSet();
 		for (IntervalSet s : altLookSets) all.addAll(s);
@@ -36,12 +38,12 @@ public class LL1PlusBlock extends LL1Loop {
 
 		loopExpr = addCodeForLoopLookaheadTempVar(all);
 
-		loopLabel = factory.gen.target.getLoopLabel(plusRoot);
-		loopCounterVar = factory.gen.target.getLoopCounter(plusRoot);
+		loopLabel = gen.target.getLoopLabel(plusRoot);
+		loopCounterVar = gen.target.getLoopCounter(plusRoot);
 
 		IntervalSet exitLookSet = altLookSets[altLookSets.length-1];
-		this.exitLook = factory.gen.target.getTokenTypesAsTargetLabels(factory.g,
-																	   exitLookSet.toArray());
+		this.exitLook = gen.target.getTokenTypesAsTargetLabels(g,
+															   exitLookSet.toArray());
 
 		//IntervalSet iterationExpected = (IntervalSet)loopBackLook.or(exitLookSet);
 //		this.sync = new Sync(factory, plusRoot, loopBackLook, decision, "enter");

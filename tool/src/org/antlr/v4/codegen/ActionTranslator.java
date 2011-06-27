@@ -33,14 +33,14 @@ public class ActionTranslator implements ActionSplitterListener {
 	ActionAST node;
 	RuleFunction rf;
 	List<ActionChunk> chunks = new ArrayList<ActionChunk>();
-	CoreOutputModelFactory factory;
+	OutputModelFactory factory;
 
-	public ActionTranslator(CoreOutputModelFactory factory, ActionAST node) {
+	public ActionTranslator(OutputModelFactory factory, ActionAST node) {
 		this.factory = factory;
 		this.node = node;
 	}
 
-	public static List<ActionChunk> translateAction(CoreOutputModelFactory factory,
+	public static List<ActionChunk> translateAction(OutputModelFactory factory,
 													RuleFunction rf,
 													Token tokenWithinAction,
 													ActionAST node)
@@ -54,7 +54,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		return translateActionChunk(factory, rf, action, node);
 	}
 
-	public static List<ActionChunk> translateActionChunk(CoreOutputModelFactory factory,
+	public static List<ActionChunk> translateActionChunk(OutputModelFactory factory,
 														 RuleFunction rf,
 														 String action,
 														 ActionAST node)
@@ -120,7 +120,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(y.getText())); break; // has to be current rule
 			case RET:
-				if ( factory.currentRule.size()>0 && factory.currentRule.peek().name.equals(x.getText()) ) {
+				if ( factory.getCurrentRule()!=null && factory.getCurrentRule().name.equals(x.getText()) ) {
 					chunks.add(new RetValueRef(y.getText())); break;
 				}
 				else {
@@ -137,7 +137,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		System.out.println("setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		SetAttr s = new SetAttr(x.getText(), rhsChunks);
-		if ( factory.g.isLexer() ) s = new LexerSetAttr(x.getText(), rhsChunks);
+		if ( factory.getGrammar().isLexer() ) s = new LexerSetAttr(x.getText(), rhsChunks);
 		chunks.add(s);
 	}
 
@@ -205,7 +205,7 @@ public class ActionTranslator implements ActionSplitterListener {
 			return ref;
 		}
 		catch (Exception e) {
-			factory.g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
 		}
 		return null;
 	}
@@ -219,28 +219,28 @@ public class ActionTranslator implements ActionSplitterListener {
 			return ref;
 		}
 		catch (Exception e) {
-			factory.g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
 		}
 		return null;
 	}
 
 	public String getTokenLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.gen.target.getImplicitTokenLabel(x);
+		return factory.getGenerator().target.getImplicitTokenLabel(x);
 	}
 
 	public String getRuleLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.gen.target.getImplicitRuleLabel(x);
+		return factory.getGenerator().target.getImplicitRuleLabel(x);
 	}
 
 	public String getDynamicScopeName(String x) {
 		String scope;
-		if ( factory.g.getRule(x)==null ) {
-			scope = factory.gen.target.getGlobalDynamicScopeStructName(x);
+		if ( factory.getGrammar().getRule(x)==null ) {
+			scope = factory.getGenerator().target.getGlobalDynamicScopeStructName(x);
 		}
 		else {
-			scope = factory.gen.target.getRuleDynamicScopeStructName(x);
+			scope = factory.getGenerator().target.getRuleDynamicScopeStructName(x);
 		}
 		return scope;
 	}

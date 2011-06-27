@@ -1,10 +1,8 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.*;
-import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.*;
 
@@ -24,18 +22,18 @@ public class RuleFunction extends OutputModelObject {
 	public int index;
 	public Collection<Attribute> args = null;
 
-	@ModelElement public SrcOp code;
+	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
 	@ModelElement public StructDecl ruleCtx;
 	//@ModelElement public DynamicScopeStruct scope;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public Action finallyAction;
 
-	public RuleFunction(CoreOutputModelFactory factory) {
+	public RuleFunction(OutputModelFactory factory) {
 		super(factory);
 	}
 
-	public RuleFunction(CoreOutputModelFactory factory, Rule r) {
+	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
 		if ( r.modifiers!=null && r.modifiers.size()>0 ) {
@@ -74,31 +72,31 @@ public class RuleFunction extends OutputModelObject {
 			namedActions.put(name, new Action(factory, ast));
 		}
 
-		if ( factory.g.hasASTOption() ) {
+		if ( factory.getGrammar().hasASTOption() ) {
 			addLocalDecl(new RootDecl(factory, 0));
 			addLocalDecl(new KidsListDecl(factory, 0));
 		}
 
-		startState = factory.g.atn.ruleToStartState.get(r);
+		startState = factory.getGrammar().atn.ruleToStartState.get(r);
 
-		// TRIGGER factory functions for rule elements
-		factory.currentRule.push(this);
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
-		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
-		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-		SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, factory);
-		try {
-			code = genTriggers.block(null,null); // GEN Instr OBJECTS
-		}
-		catch (Exception e){
-			e.printStackTrace(System.err);
-		}
+//		// TRIGGER factory functions for rule elements
+//		factory.currentRule.push(this);
+//		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
+//		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
+//		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
+//		SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, factory);
+//		try {
+//			code = genTriggers.block(null,null); // GEN Instr OBJECTS
+//		}
+//		catch (Exception e){
+//			e.printStackTrace(System.err);
+//		}
 
-		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
-		ruleCtx.name = ctxType;
-
-		if ( ruleCtx.isEmpty() ) ruleCtx = null;
-		factory.currentRule.pop();
+//		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
+//		ruleCtx.name = ctxType;
+//
+//		if ( ruleCtx.isEmpty() ) ruleCtx = null;
+//		factory.currentRule.pop();
 	}
 
 	/** Add local var decl */

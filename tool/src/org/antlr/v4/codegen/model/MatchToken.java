@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
@@ -12,31 +12,33 @@ public class MatchToken extends RuleElement implements LabeledOp {
 	public String name;
 	public List<Decl> labels = new ArrayList<Decl>();
 
-	public MatchToken(CoreOutputModelFactory factory, TerminalAST ast, GrammarAST labelAST) {
+	public MatchToken(OutputModelFactory factory, TerminalAST ast, GrammarAST labelAST) {
 		super(factory, ast);
-		int ttype = factory.g.getTokenType(ast.getText());
-		name = factory.gen.target.getTokenTypeAsTargetLabel(factory.g, ttype);
+		Grammar g = factory.getGrammar();
+		CodeGenerator gen = factory.getGenerator();
+		int ttype = g.getTokenType(ast.getText());
+		name = gen.target.getTokenTypeAsTargetLabel(g, ttype);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
 			TokenDecl d = new TokenDecl(factory, label);
 			labels.add(d);
-			factory.currentRule.peek().addContextDecl(d);
+			factory.getCurrentRule().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
-				TokenListDecl l = new TokenListDecl(factory, factory.gen.target.getListLabel(label));
-				factory.currentRule.peek().addContextDecl(l);
+				TokenListDecl l = new TokenListDecl(factory, gen.target.getListLabel(label));
+				factory.getCurrentRule().addContextDecl(l);
 			}
 		}
 
 		// If action refs as token not label, we need to define implicit label
 		boolean needsImplicitLabel =
 			labels.size()==0 &&
-			(factory.currentAlt.tokenRefsInActions.containsKey(ast.getText()) ||
-			 factory.g.hasASTOption());
+			(factory.getCurrentAlt().tokenRefsInActions.containsKey(ast.getText()) ||
+			 g.hasASTOption());
 		if ( needsImplicitLabel ) {
-			String label = factory.gen.target.getImplicitTokenLabel(ast.getText());
+			String label = gen.target.getImplicitTokenLabel(ast.getText());
 			TokenDecl d = new TokenDecl(factory, label);
 			labels.add(d);
-			factory.currentRule.peek().addLocalDecl(d);
+			factory.getCurrentRule().addLocalDecl(d);
 		}
 	}
 

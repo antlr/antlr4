@@ -25,63 +25,62 @@ import java.util.HashMap;
 
 dummy : block[null, null] ;
 
-block[GrammarAST label, GrammarAST ebnfRoot] returns [SrcOp omo]
+block[GrammarAST label, GrammarAST ebnfRoot] returns [List<SrcOp> omos]
     :	^(	blk=BLOCK (^(OPTIONS .+))?
-			{List<CodeBlock> alts = new ArrayList<CodeBlock>();}
-    		( alternative {alts.add($alternative.omo);} )+
+			{List<SrcOp> alts = new ArrayList<SrcOp>();}
+    		( alternative {alts.addAll($alternative.omos);} )+
     	)
     	{
-    	if ( alts.size()==1 && ebnfRoot==null) return alts.get(0);
+    	if ( alts.size()==1 && ebnfRoot==null) return alts;
     	if ( ebnfRoot==null ) {
-    	    $omo = factory.getChoiceBlock((BlockAST)$blk, alts);
+    	    $omos = factory.getChoiceBlock((BlockAST)$blk, alts);
     	}
     	else {
-    	    $omo = factory.getEBNFBlock($ebnfRoot, alts);
+    	    $omos = factory.getEBNFBlock($ebnfRoot, alts);
     	}
     	}
     ;
 
-alternative returns [CodeBlock omo]
+alternative returns [List<SrcOp> omos]
 @init {
 	List<SrcOp> elems = new ArrayList<SrcOp>();
-	if ( ((AltAST)$start).alt!=null ) factory.currentAlt = ((AltAST)$start).alt;
-
+	if ( ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
 }
     :	^(ALT_REWRITE a=alternative .)
-    |	^(ALT EPSILON) {$omo = factory.epsilon();}
+    |	^(ALT EPSILON) {$omos = factory.epsilon();}
     |   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
-    	{$omo = factory.alternative(elems);}
+    	{$omos = factory.alternative(elems);}
     ;
 
 element returns [List<SrcOp> omos]
 	:	labeledElement					{$omos = $labeledElement.omos;}
 	|	atom[null]						{$omos = $atom.omos;}
-	|	ebnf							{$omos = factory.list($ebnf.omo);}
-	|   ACTION							{$omos = factory.list(factory.action($ACTION));}
-	|   FORCED_ACTION					{$omos = factory.list(factory.forcedAction($FORCED_ACTION));}
-	|   SEMPRED							{$omos = factory.list(factory.sempred($SEMPRED));}
+	|	ebnf							{$omos = $ebnf.omos;}
+	|   ACTION							{$omos = factory.action($ACTION);}
+	|   FORCED_ACTION					{$omos = factory.forcedAction($FORCED_ACTION);}
+	|   SEMPRED							{$omos = factory.sempred($SEMPRED);}
 	|	GATED_SEMPRED
 	|	treeSpec
 	;
 
 labeledElement returns [List<SrcOp> omos]
 	:	^(ASSIGN ID atom[$ID] )				{$omos = $atom.omos;}
-	|	^(ASSIGN ID block[$ID,null])		{$omos = factory.list($block.omo);}
+	|	^(ASSIGN ID block[$ID,null])		{$omos = $block.omos;}
 	|	^(PLUS_ASSIGN ID atom[$ID])			{$omos = $atom.omos;}
-	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omos = factory.list($block.omo);}
+	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omos = $block.omos;}
 	;
 
 treeSpec returns [SrcOp omo]
     : ^(TREE_BEGIN  (e=element )+)
     ;
 
-ebnf returns [SrcOp omo]
+ebnf returns [List<SrcOp> omos]
 	:	^(astBlockSuffix block[null,null])
-	|	^(OPTIONAL block[null,$OPTIONAL])	{$omo = $block.omo;}
-	|	^(CLOSURE block[null,$CLOSURE])		{$omo = $block.omo;}
+	|	^(OPTIONAL block[null,$OPTIONAL])	{$omos = $block.omos;}
+	|	^(CLOSURE block[null,$CLOSURE])		{$omos = $block.omos;}
 	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE])
-										    {$omo = $block.omo;}
-	| 	block[null, null]					{$omo = $block.omo;}
+										    {$omos = $block.omos;}
+	| 	block[null, null]					{$omos = $block.omos;}
     ;
 
 astBlockSuffix

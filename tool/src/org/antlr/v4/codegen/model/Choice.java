@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
@@ -20,12 +20,12 @@ import java.util.*;
 public abstract class Choice extends RuleElement {
 	public int decision = -1;
 
-	@ModelElement public List<CodeBlock> alts;
+	@ModelElement public List<SrcOp> alts;
 	@ModelElement public List<SrcOp> preamble;
 
-	public Choice(CoreOutputModelFactory factory,
+	public Choice(OutputModelFactory factory,
 				  GrammarAST blkOrEbnfRootAST,
-				  List<CodeBlock> alts)
+				  List<SrcOp> alts)
 	{
 		super(factory, blkOrEbnfRootAST);
 		this.alts = alts;
@@ -40,17 +40,17 @@ public abstract class Choice extends RuleElement {
 		List<String[]> altLook = new ArrayList<String[]>();
 		for (int a=1; a<altLookSets.length; a++) {
 			IntervalSet s = altLookSets[a];
-			altLook.add(factory.gen.target.getTokenTypesAsTargetLabels(factory.g, s.toArray()));
+			altLook.add(factory.getGenerator().target.getTokenTypesAsTargetLabels(factory.getGrammar(), s.toArray()));
 		}
 		return altLook;
 	}
 
 	public SrcOp addCodeForLookaheadTempVar(IntervalSet look) {
-		SrcOp expr = factory.getLL1Test(look, ast);
+		SrcOp expr = DefaultOutputModelFactory.find(factory.getLL1Test(look, ast), TestSetInline.class);
 		if ( expr instanceof TestSetInline) {
 			TestSetInline e = (TestSetInline)expr;
 			Decl d = new TokenTypeDecl(factory, e.varName);
-			factory.currentRule.peek().addContextDecl(d);
+			factory.getCurrentRule().addContextDecl(d);
 			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
 			addPreambleOp(nextType);
 		}

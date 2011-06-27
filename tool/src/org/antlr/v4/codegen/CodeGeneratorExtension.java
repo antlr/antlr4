@@ -7,14 +7,14 @@ import java.util.List;
 
 /** Filter list of SrcOps and return; default is pass-through filter */
 public class CodeGeneratorExtension {
-	public CoreOutputModelFactory factory;
+	public OutputModelFactory factory;
 
-	public CodeGeneratorExtension(CoreOutputModelFactory factory) {
+	public CodeGeneratorExtension(OutputModelFactory factory) {
 		this.factory = factory;
 	}
 
 	public OutputModelObject buildOutputModel(OutputModelObject root) {
-		return null;
+		return root;
 	}
 
 	public List<SrcOp> alternative(List<SrcOp> ops) { return ops; }
@@ -56,12 +56,4 @@ public class CodeGeneratorExtension {
 	public List<SrcOp> getLLStarEBNFBlock(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> getLL1Test(List<SrcOp> ops) { return ops; }
-
-	/** Find exact object type in list */
-	public static SrcOp find(List<SrcOp> ops, Class cl) {
-		for (SrcOp op : ops) {
-			if ( op.getClass() == cl ) return op;
-		}
-		return null;
-	}
 }

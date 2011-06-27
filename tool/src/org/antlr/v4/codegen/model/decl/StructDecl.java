@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model.decl;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.ModelElement;
 import org.antlr.v4.tool.Attribute;
 
@@ -11,11 +11,11 @@ public class StructDecl extends Decl {
 	@ModelElement public List<Decl> attrs = new ArrayList<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 
-	public StructDecl(CoreOutputModelFactory factory) {
+	public StructDecl(OutputModelFactory factory) {
 		super(factory, null);
 	}
 
-	public StructDecl(CoreOutputModelFactory factory, String name) {
+	public StructDecl(OutputModelFactory factory, String name) {
 		super(factory, name);
 	}
 

@@ -10,10 +10,9 @@ import java.util.List;
 public class Action extends RuleElement {
 	@ModelElement public List<ActionChunk> chunks;
 
-	public Action(CoreOutputModelFactory factory, GrammarAST ast) {
+	public Action(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		RuleFunction rf = null;
-		if ( factory.currentRule.size()>0 ) rf = factory.currentRule.peek();
+		RuleFunction rf = factory.getCurrentRule();
 		chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
 		//System.out.println("actions="+chunks);
 	}

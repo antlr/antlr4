@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.RuleTransition;
@@ -15,7 +15,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 	public String argExprs;
 	public String ctxName;
 
-	public InvokeRule(CoreOutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
+	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
 		super(factory, ast);
 		if ( ast.atnState!=null ) {
 			RuleTransition ruleTrans = (RuleTransition)ast.atnState.transition(0);
@@ -23,19 +23,20 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		}
 
 		this.name = ast.getText();
-		Rule r = factory.g.getRule(name);
-		ctxName = factory.gen.target.getRuleFunctionContextStructName(r);
+		CodeGenerator gen = factory.getGenerator();
+		Rule r = factory.getGrammar().getRule(name);
+		ctxName = gen.target.getRuleFunctionContextStructName(r);
 
 		if ( labelAST!=null ) {
 			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			factory.currentRule.peek().addContextDecl(d);
+			factory.getCurrentRule().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
-				String listLabel = factory.gen.target.getListLabel(label);
+				String listLabel = gen.target.getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, d);
-				factory.currentRule.peek().addContextDecl(l);
+				factory.getCurrentRule().addContextDecl(l);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {
@@ -43,11 +44,11 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		}
 
 		// If action refs rule as rulename not label, we need to define implicit label
-		if ( factory.currentAlt.ruleRefsInActions.containsKey(ast.getText()) ) {
-			String label = factory.gen.target.getImplicitRuleLabel(ast.getText());
+		if ( factory.getCurrentAlt().ruleRefsInActions.containsKey(ast.getText()) ) {
+			String label = gen.target.getImplicitRuleLabel(ast.getText());
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			factory.currentRule.peek().addContextDecl(d);
+			factory.getCurrentRule().addContextDecl(d);
 		}
 
 //		LinearApproximator approx = new LinearApproximator(factory.g, ATN.INVALID_DECISION_NUMBER);

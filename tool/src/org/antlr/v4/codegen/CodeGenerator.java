@@ -76,15 +76,24 @@ public class CodeGenerator {
 	}
 
 	public ST generate() {
-		CoreOutputModelFactory factory;
+		OutputModelFactory factory = null;
 		if ( g.isParser() || g.isCombined() || g.isTreeGrammar() ) {
 			factory = new ParserFactory(this);
 		}
 		else {
 			factory = new LexerFactory(this);
 		}
+		// TODO: let someone add their own factory?
 
-		OutputModelObject outputModel = factory.buildOutputModel();
+		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
+		OutputModelController controller = new OutputModelController(factory);
+		if ( g.hasASTOption() ) {
+			controller.addExtension( new ParserASTExtension(factory) );
+		}
+
+		OutputModelObject outputModel = controller.buildOutputModel();
+
+		// CREATE TEMPLATES BY WALKING MODEL
 		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
 		ST st = walker.walk(outputModel);
 

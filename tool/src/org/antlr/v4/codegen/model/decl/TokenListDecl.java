@@ -1,10 +1,10 @@
 package org.antlr.v4.codegen.model.decl;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.OutputModelFactory;
 
 /** */
 public class TokenListDecl extends Decl {
-	public TokenListDecl(CoreOutputModelFactory factory, String varName) {
+	public TokenListDecl(OutputModelFactory factory, String varName) {
 		super(factory, varName);
 	}
 }

@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
 
@@ -11,12 +11,12 @@ public class ThrowRecognitionException extends SrcOp {
 	public int grammarLine;
 	public int grammarCharPosInLine;
 
-	public ThrowRecognitionException(CoreOutputModelFactory factory, GrammarAST ast, IntervalSet expecting) {
+	public ThrowRecognitionException(OutputModelFactory factory, GrammarAST ast, IntervalSet expecting) {
 		super(factory, ast);
 		//this.decision = ((BlockStartState)ast.ATNState).decision;
 		grammarLine = ast.getLine();
 		grammarLine = ast.getCharPositionInLine();
-		grammarFile = factory.g.fileName;
+		grammarFile = factory.getGrammar().fileName;
 		//this.expecting = factory.createExpectingBitSet(ast, decision, expecting, "error");
 //		factory.defineBitSet(this.expecting);
 	}

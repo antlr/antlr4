@@ -1,25 +1,59 @@
 package org.antlr.v4.codegen;
 
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.misc.IntervalSet;
-import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.tool.*;
 
 import java.util.List;
 
 /** */
-public class ParserFactory extends CoreOutputModelFactory {
+public class ParserFactory extends DefaultOutputModelFactory {
 	public ParserFactory(CodeGenerator gen) { super(gen); }
 
-	public OutputModelObject buildOutputModel() {
-		return new ParserFile(this, gen.getRecognizerFileName());
+	/** Build a file with a parser containing rule functions. Use the
+	 *  controller as factory in SourceGenTriggers so it triggers codegen
+	 *  extensions too, not just the factory functions in this factory.
+	 **/
+	public OutputModelObject buildOutputModel(OutputModelController controller) {
+		ParserFile file = new ParserFile(this, gen.getRecognizerFileName());
+		setRoot(file);
+		Parser parser = new Parser(this, file);
+		file.parser = parser;
+		for (Rule r : g.rules.values()) {
+			RuleFunction function = new RuleFunction(this, r);
+			parser.funcs.add(function);
+
+			// TRIGGER factory functions for rule alts, elements
+			currentRule.push(function);
+			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
+			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
+			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
+			SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, controller);
+			try {
+				function.code = genTriggers.block(null,null); // walk AST of rule alts/elements
+			}
+			catch (Exception e){
+				e.printStackTrace(System.err);
+			}
+
+			function.ctxType = gen.target.getRuleFunctionContextStructName(r);
+			function.ruleCtx.name = function.ctxType;
+
+			if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
+			currentRule.pop();
+		}
+
+		return file;
 	}
 
-	public CodeBlock epsilon() { return new CodeBlock(this); }
 
-	public CodeBlock alternative(List<SrcOp> elems) { return new CodeBlock(this, elems); }
+	public List<SrcOp> epsilon() { return list(new CodeBlock(this)); }
+
+	public List<SrcOp> alternative(List<SrcOp> elems) { return list(new CodeBlock(this, elems)); }
 
 	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
 
@@ -57,7 +91,7 @@ public class ParserFactory extends CoreOutputModelFactory {
 		return tokenRef(ID, label, null);
 	}
 
-	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlock> alts) {
+	public List<SrcOp> getChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
 		int decision = ((DecisionState)blkAST.atnState).decision;
 		if ( AnalysisPipeline.disjoint(g.decisionLOOK.get(decision)) ) {
 			return getLL1ChoiceBlock(blkAST, alts);
@@ -67,7 +101,7 @@ public class ParserFactory extends CoreOutputModelFactory {
 		}
 	}
 
-	public Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlock> alts) {
+	public List<SrcOp> getEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
 		int decision;
 		if ( ebnfRoot.getType()==ANTLRParser.POSITIVE_CLOSURE ) {
 			decision = ((PlusBlockStartState)ebnfRoot.atnState).loopBackState.decision;
@@ -86,15 +120,15 @@ public class ParserFactory extends CoreOutputModelFactory {
 		}
 	}
 
-	public Choice getLL1ChoiceBlock(BlockAST blkAST, List<CodeBlock> alts) {
-		return new LL1AltBlock(this, blkAST, alts);
+	public List<SrcOp> getLL1ChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
+		return list(new LL1AltBlock(this, blkAST, alts));
 	}
 
-	public Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlock> alts) {
-		return new AltBlock(this, blkAST, alts);
+	public List<SrcOp> getLLStarChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
+		return list(new AltBlock(this, blkAST, alts));
 	}
 
-	public Choice getLL1EBNFBlock(GrammarAST ebnfRoot, List<CodeBlock> alts) {
+	public List<SrcOp> getLL1EBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
 		int ebnf = 0;
 		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
 		Choice c = null;
@@ -112,10 +146,10 @@ public class ParserFactory extends CoreOutputModelFactory {
 				else c = new LL1PlusBlock(this, ebnfRoot, alts);
 				break;
 		}
-		return c;
+		return list(c);
 	}
 
-	public Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlock> alts) {
+	public List<SrcOp> getLLStarEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
 		int ebnf = 0;
 		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
 		Choice c = null;
@@ -130,10 +164,10 @@ public class ParserFactory extends CoreOutputModelFactory {
 				c = new PlusBlock(this, ebnfRoot, alts);
 				break;
 		}
-		return c;
+		return list(c);
 	}
 
-	public SrcOp getLL1Test(IntervalSet look, GrammarAST blkAST) {
-		return new TestSetInline(this, blkAST, look);
+	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) {
+		return list(new TestSetInline(this, blkAST, look));
 	}
 }

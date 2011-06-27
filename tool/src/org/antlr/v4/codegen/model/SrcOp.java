@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CoreOutputModelFactory;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
 /** */
@@ -9,8 +9,8 @@ public abstract class SrcOp extends OutputModelObject {
 	public int uniqueID;
 
 	public SrcOp() {;}
-	public SrcOp(CoreOutputModelFactory factory) { super(factory); }
-	public SrcOp(CoreOutputModelFactory factory, GrammarAST ast) {
+	public SrcOp(OutputModelFactory factory) { super(factory); }
+	public SrcOp(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
 		uniqueID = ast.token.getTokenIndex();
 	}
