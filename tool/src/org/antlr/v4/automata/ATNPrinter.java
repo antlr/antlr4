@@ -3,10 +3,7 @@ package org.antlr.v4.automata;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** An ATN walker that knows how to dump them to serialized strings. */
 public class ATNPrinter {
@@ -55,10 +52,12 @@ public class ATNPrinter {
 				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
-					buf.append("-"+a.toString(g)+"->"+ getStateString(t.target)+'\n');
+					String label = a.toString();
+					if ( g!=null ) label = g.getTokenDisplayName(a.label);
+					buf.append("-"+label+"->"+ getStateString(t.target)+'\n');
 				}
 				else {
-					buf.append("-"+t.toString(g)+"->"+ getStateString(t.target)+'\n');
+					buf.append("-"+t.toString()+"->"+ getStateString(t.target)+'\n');
 				}
 			}
 		}
@@ -76,8 +75,8 @@ public class ATNPrinter {
 		else if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
 		else if ( s instanceof BlockStartState) stateStr = "BlockStart_"+n;
 		else if ( s instanceof BlockEndState ) stateStr = "BlockEnd_"+n;
-		else if ( s instanceof RuleStartState) stateStr = "RuleStart_"+s.rule.name+"_"+n;
-		else if ( s instanceof RuleStopState ) stateStr = "RuleStop_"+s.rule.name+"_"+n;
+		else if ( s instanceof RuleStartState) stateStr = "RuleStart_"+g.getRule(s.ruleIndex).name+"_"+n;
+		else if ( s instanceof RuleStopState ) stateStr = "RuleStop_"+g.getRule(s.ruleIndex).name+"_"+n;
 		else if ( s instanceof PlusLoopbackState) stateStr = "PlusLoopBack_"+n;
 		else if ( s instanceof StarLoopbackState) stateStr = "StarLoopBack_"+n;
 		return stateStr;

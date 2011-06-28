@@ -31,7 +31,7 @@ public class LeftRecursionDetector {
 			//FASerializer ser = new FASerializer(atn.g, start);
 			//System.out.print(":\n"+ser+"\n");
 
-			check(start.rule, start, new HashSet<ATNState>());
+			check(g.getRule(start.ruleIndex), start, new HashSet<ATNState>());
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
 		if ( listOfRecursiveCycles.size()>0 ) {
@@ -62,7 +62,7 @@ public class LeftRecursionDetector {
 			Transition t = s.transition(i);
 			if ( t instanceof RuleTransition ) {
 				RuleTransition rt = (RuleTransition) t;
-				Rule r = rt.rule;
+				Rule r = g.getRule(rt.ruleIndex);
 				if ( rulesVisitedPerRuleCheck.contains((RuleStartState)t.target) ) {
 					addRulesToCycle(enclosingRule, r);
 				}

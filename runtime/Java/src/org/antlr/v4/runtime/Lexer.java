@@ -46,6 +46,8 @@ public abstract class Lexer extends Recognizer<LexerInterpreter>
 
 	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
+	public static final int MIN_CHAR_VALUE = '\u0000';
+	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	public CharStream input;
 

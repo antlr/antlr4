@@ -27,7 +27,7 @@ public class AnalysisPipeline {
 		g.decisionLOOK =
 			new Vector<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
 		for (DecisionState s : g.atn.decisionToState) {
-			System.out.println("\nDECISION "+s.decision+" in rule "+s.rule.name);
+			System.out.println("\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
 
 			LL1Analyzer anal = new LL1Analyzer(g.atn);
 			IntervalSet[] look = anal.getDecisionLookahead(s);

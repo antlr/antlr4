@@ -25,9 +25,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.misc;
+package org.antlr.v4.runtime.misc;
 
-import org.antlr.v4.tool.Grammar;
 
 import java.util.List;
 
@@ -37,7 +36,6 @@ import java.util.List;
  *  ranges with large values like unicode char sets, this is not very efficient.
  *  Consider using IntervalSet.  Not all methods in IntervalSet are implemented.
  *
- *  @see org.antlr.misc.BitSet
  *  @see org.antlr.misc.IntervalSet
  */
 public interface IntSet {
@@ -79,6 +77,4 @@ public interface IntSet {
     List toList();
 
     String toString();
-
-    String toString(Grammar g);
 }

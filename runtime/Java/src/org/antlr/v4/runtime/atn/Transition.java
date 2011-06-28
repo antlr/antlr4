@@ -1,7 +1,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Grammar;
 
 import java.util.*;
 
@@ -74,6 +73,4 @@ public abstract class Transition {
 	public boolean isEpsilon() { return false; }
 
 	public IntervalSet label() { return null; }
-
-	public String toString(Grammar g) { return toString(); }
 }

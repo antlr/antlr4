@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -289,7 +288,7 @@ public class ParserInterpreter extends ATNInterpreter {
 	protected int resolveToMinAlt(OrderedHashSet<ATNConfig> reach, Set<Integer> ambigAlts) {
 		int min = getMinAlt(ambigAlts);
 		// if predicting, create DFA accept state for resolved alt
-		ambigAlts.remove(Utils.integer(min));
+		ambigAlts.remove(min);
 		// kill dead alts so we don't chase them ever
 		killAlts(ambigAlts, reach);
 		if ( debug ) System.out.println("RESOLVED TO "+reach);
@@ -494,8 +493,7 @@ public class ParserInterpreter extends ATNInterpreter {
 		MultiMap<Integer, ATNConfig> stateToConfigListMap =
 			new MultiMap<Integer, ATNConfig>();
 		for (ATNConfig c : configs) {
-			Integer stateI = Utils.integer(c.state.stateNumber);
-			stateToConfigListMap.map(stateI, c);
+			stateToConfigListMap.map(c.state.stateNumber, c);
 		}
 		// potential conflicts are states with > 1 configuration and diff alts
 		for (List<ATNConfig> configsPerAlt : stateToConfigListMap.values()) {

@@ -1,11 +1,10 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
 
 public class NotSetTransition extends SetTransition {
-	public NotSetTransition(GrammarAST ast, IntervalSet label, ATNState target) {
-		super(ast, label, target);
+	public NotSetTransition(IntervalSet label, ATNState target) {
+		super(label, target);
 	}
 
 	public NotSetTransition(ATNState target) {
@@ -13,7 +12,7 @@ public class NotSetTransition extends SetTransition {
 	}
 
 	@Override
-	public String toString(Grammar g) {
-		return '~'+super.toString(g);
+	public String toString() {
+		return '~'+super.toString();
 	}
 }

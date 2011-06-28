@@ -151,7 +151,7 @@ public class DOTGenerator {
 		ST dot = null;
 		Set<ATNState> markedStates = new HashSet<ATNState>();
 		dot = stlib.getInstanceOf("atn");
-		dot.add("startState", Utils.integer(startState.stateNumber));
+		dot.add("startState", startState.stateNumber);
 		dot.add("rankdir", rankdir);
 
 		List<ATNState> work = new LinkedList<ATNState>();
@@ -207,7 +207,7 @@ public class DOTGenerator {
 				else {
 					edgeST = stlib.getInstanceOf("edge");
 				}
-				edgeST.add("label", getEdgeLabel(edge.toString(grammar)));
+				edgeST.add("label", getEdgeLabel(edge.toString()));
 				edgeST.add("src", "s"+s.stateNumber);
 				edgeST.add("target", "s"+edge.target.stateNumber);
 				edgeST.add("arrowhead", arrowhead);

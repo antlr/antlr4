@@ -1,14 +1,16 @@
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.*;
 
 import java.util.*;
 
@@ -34,8 +36,6 @@ public class Grammar implements AttributeResolver {
             put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
             put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
 		}};
-	public static final int MIN_CHAR_VALUE = '\u0000';
-	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	public String name;
     public GrammarRootAST ast;
@@ -54,6 +54,8 @@ public class Grammar implements AttributeResolver {
 	 *  not include lexical rules if combined.
 	 */
     public OrderedHashMap<String, Rule> rules = new OrderedHashMap<String, Rule>();
+	public List<Rule> indexToRule = new ArrayList<Rule>();
+
 	int ruleNumber = 0; // used to get rule indexes (0..n-1)
 
 	/** The ATN that represents the grammar with edges labelled with tokens
@@ -217,6 +219,7 @@ public class Grammar implements AttributeResolver {
 		if ( rules.get(r.name)!=null ) return;
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
+		indexToRule.add(r);
 	}
 
 //	public int getNumRules() {
@@ -239,6 +242,8 @@ public class Grammar implements AttributeResolver {
 		}
 		return null;
 	}
+
+	public Rule getRule(int index) { return indexToRule.get(index); }
 
 	public Rule getRule(String grammarName, String ruleName) {
 		if ( grammarName!=null ) { // scope override
@@ -364,7 +369,7 @@ public class Grammar implements AttributeResolver {
 		int index=0;
 		// inside any target's char range and is lexer grammar?
 		if ( isLexer() &&
-			 ttype >= MIN_CHAR_VALUE && ttype <= MAX_CHAR_VALUE )
+			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
 		{
 			return CharSupport.getANTLRCharLiteralForChar(ttype);
 		}
@@ -423,7 +428,7 @@ public class Grammar implements AttributeResolver {
 	 *  unicode max if no target defined.
 	 */
 	public int getMaxCharValue() {
-		return MAX_CHAR_VALUE;
+		return org.antlr.v4.runtime.Lexer.MAX_CHAR_VALUE;
 //		if ( generator!=null ) {
 //			return generator.target.getMaxCharValue(generator);
 //		}
@@ -444,7 +449,7 @@ public class Grammar implements AttributeResolver {
 	 *  If no target, use max unicode char value.
 	 */
 	public IntSet getAllCharValues() {
-		return IntervalSet.of(MIN_CHAR_VALUE, getMaxCharValue());
+		return IntervalSet.of(Lexer.MIN_CHAR_VALUE, getMaxCharValue());
 	}
 
 	/** How many token types have been allocated so far? */
@@ -633,6 +638,6 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
-		decisionDFAs.put(Utils.integer(decision), lookaheadDFA);
+		decisionDFAs.put(decision, lookaheadDFA);
 	}
 }

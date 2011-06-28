@@ -233,7 +233,7 @@ public class TestATNSerialization extends BaseTest {
 			"B : 'b' ;\n");
 		String expecting =
 			"max type 4\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:RULE_START 1\n" +
@@ -265,7 +265,7 @@ public class TestATNSerialization extends BaseTest {
 			"INT : '0'..'9' ;\n");
 		String expecting =
 			"max type 3\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
@@ -288,7 +288,7 @@ public class TestATNSerialization extends BaseTest {
 			"INT : '0'..'9'+ ;\n");
 		String expecting =
 			"max type 3\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
@@ -325,7 +325,7 @@ public class TestATNSerialization extends BaseTest {
 			"C : 'c' {c} ;\n");
 		String expecting =
 			"max type 5\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:RULE_START 1\n" +
@@ -370,7 +370,7 @@ public class TestATNSerialization extends BaseTest {
 			"ID : ~('a'|'b')\n ;");
 		String expecting =
 			"max type 3\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
@@ -394,7 +394,7 @@ public class TestATNSerialization extends BaseTest {
 			"ID : ~('a'|'b'|'e'|'p'..'t')\n ;");
 		String expecting =
 			"max type 3\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
@@ -418,7 +418,7 @@ public class TestATNSerialization extends BaseTest {
 			"ID : ~('a'|'b') ~('e'|'p'..'t')\n ;");
 		String expecting =
 			"max type 3\n" +
-			"0:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
 			"1:RULE_START 0\n" +
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
@@ -451,9 +451,9 @@ public class TestATNSerialization extends BaseTest {
 			"C : 'c';\n");
 		String expecting =
 			"max type 5\n" +
-			"0:TOKEN_START 0\n" +
-			"1:TOKEN_START 0\n" +
-			"2:TOKEN_START 0\n" +
+			"0:TOKEN_START -1\n" +
+			"1:TOKEN_START -1\n" +
+			"2:TOKEN_START -1\n" +
 			"3:RULE_START 0\n" +
 			"4:RULE_STOP 0\n" +
 			"5:RULE_START 1\n" +

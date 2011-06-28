@@ -27,9 +27,7 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import org.antlr.v4.misc.*;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
@@ -48,7 +46,7 @@ import java.util.*;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
-	public static final IntervalSet COMPLETE_SET = IntervalSet.of(0, Grammar.MAX_CHAR_VALUE);
+	public static final IntervalSet COMPLETE_SET = IntervalSet.of(0, Lexer.MAX_CHAR_VALUE);
 	public static final IntervalSet EMPTY_SET = new IntervalSet();
 
 	/** The list of sorted, disjoint intervals. */
@@ -412,13 +410,39 @@ public class IntervalSet implements IntSet {
             return false;
         }
         IntervalSet other = (IntervalSet)obj;
-        return this.intervals.equals(other.intervals);
-    }
+		return this.intervals.equals(other.intervals);
+	}
 
-    public String toString() {
-        return toString((Grammar)null);
-    }
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		if ( this.intervals==null || this.intervals.size()==0 ) {
+			return "{}";
+		}
+		if ( this.size()>1 ) {
+			buf.append("{");
+		}
+		Iterator iter = this.intervals.iterator();
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			if ( a==b ) {
+				buf.append(a);
+			}
+			else {
+				buf.append(a+".."+b);
+			}
+			if ( iter.hasNext() ) {
+				buf.append(", ");
+			}
+		}
+		if ( this.size()>1 ) {
+			buf.append("}");
+		}
+		return buf.toString();
+	}
 
+	/*
     public String toString(Grammar g) {
         StringBuffer buf = new StringBuffer();
 		if ( this.intervals==null || this.intervals.size()==0 ) {
@@ -465,6 +489,7 @@ public class IntervalSet implements IntSet {
         }
         return buf.toString();
     }
+    */
 
     public int size() {
 		int n = 0;
@@ -488,7 +513,7 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
-				values.add(Utils.integer(v));
+				values.add(v);
 			}
 		}
 		return values;

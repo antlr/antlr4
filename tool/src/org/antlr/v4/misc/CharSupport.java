@@ -1,6 +1,6 @@
 package org.antlr.v4.misc;
 
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.runtime.Lexer;
 
 /** */
 public class CharSupport {
@@ -38,7 +38,7 @@ public class CharSupport {
 	 *  it can be used by any language target that has the same syntax. :)
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c< Grammar.MIN_CHAR_VALUE ) {
+		if ( c< Lexer.MIN_CHAR_VALUE ) {
 			return "'<INVALID>'";
 		}
 		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {

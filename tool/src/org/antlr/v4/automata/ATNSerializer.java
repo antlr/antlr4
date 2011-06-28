@@ -1,9 +1,9 @@
 package org.antlr.v4.automata;
 
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -51,8 +51,7 @@ public class ATNSerializer {
 		// dump states, count edges and collect sets while doing so
 		for (ATNState s : atn.states) {
 			data.add(ATNState.serializationTypes.get(s.getClass()));
-			if ( s.rule!=null ) data.add(s.rule.index);
-			else data.add(s.ruleIndex);
+			data.add(s.ruleIndex);
 			nedges += s.getNumberOfTransitions();
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
@@ -109,12 +108,7 @@ public class ATNSerializer {
 					case Transition.RULE :
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
-						if ( ((RuleTransition)t).rule!=null ) {
-							arg2 = ((RuleTransition)t).rule.index;
-						}
-						else {
-							arg2 = ((RuleTransition)t).ruleIndex;
-						}
+						arg2 = ((RuleTransition)t).ruleIndex;
 						break;
 					case Transition.PREDICATE :
 						PredicateTransition pt = (PredicateTransition)t;

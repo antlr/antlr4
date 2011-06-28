@@ -14,7 +14,6 @@ public class Utils {
 	 *  same value up to some max size.  Use an array as a perfect hash.
 	 *  Return shared object for 0..INTEGER_POOL_MAX_VALUE or a new
 	 *  Integer object with x in it.  Java's autoboxing only caches up to 127.
-	 */
 	public static Integer integer(int x) {
 		if ( x<0 || x>INTEGER_POOL_MAX_VALUE ) {
 			return new Integer(x);
@@ -24,6 +23,7 @@ public class Utils {
 		}
 		return ints[x];
 	}
+	 */
 
     public static String stripFileExtension(String name) {
         if ( name==null ) return null;

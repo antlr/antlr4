@@ -1,7 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.tool.Rule;
-
 import java.util.*;
 
 public class ATNState {
@@ -49,8 +47,7 @@ public class ATNState {
 
 	public int stateNumber = INVALID_STATE_NUMBER;
 
-	public Rule rule;
-	// TODO: split runtime / from analysis or cleanup
+//	public Rule rule;
 	public int ruleIndex; // at runtime, we don't have Rule objects
 
 	/** Which ATN are we in? */
@@ -104,8 +101,5 @@ public class ATNState {
 		transition = e;
 	}
 
-	public void setRule(Rule r) {
-		this.rule = r;
-		if ( r!=null ) this.ruleIndex = r.index;
-	}
+	public void setRuleIndex(int ruleIndex) { this.ruleIndex = ruleIndex; }
 }

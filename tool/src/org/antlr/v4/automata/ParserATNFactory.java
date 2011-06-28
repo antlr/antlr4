@@ -85,7 +85,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle set(IntervalSet set, GrammarAST associatedAST) {
 		ATNState left = newState(associatedAST);
 		ATNState right = newState(associatedAST);
-		left.transition = new SetTransition(associatedAST, set, right);
+		left.transition = new SetTransition(set, right);
 		right.incidentTransition = left.transition;
 		associatedAST.atnState = left;
 		return new Handle(left, right);
@@ -144,7 +144,7 @@ public class ParserATNFactory implements ATNFactory {
 		RuleStartState start = atn.ruleToStartState[r.index];
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		RuleTransition call = new RuleTransition(r, start, right);
+		RuleTransition call = new RuleTransition(r.index, start, right);
 		left.addTransition(call);
 
 		node.atnState = left;
@@ -287,7 +287,7 @@ public class ParserATNFactory implements ATNFactory {
 
 		ATNState left = newState(notAST);
 		ATNState right = newState(notAST);
-		left.transition = new NotSetTransition(notAST, notSet, right);
+		left.transition = new NotSetTransition(notSet, right);
 		right.incidentTransition = left.transition;
 		notAST.atnState = left;
 		return new Handle(left, right);
@@ -419,8 +419,8 @@ public class ParserATNFactory implements ATNFactory {
 			RuleStartState start = (RuleStartState)newState(RuleStartState.class, r.ast);
 			RuleStopState stop = (RuleStopState)newState(RuleStopState.class, r.ast);
 			start.stopState = stop;
-			start.setRule(r);
-			stop.setRule(r);
+			start.setRuleIndex(r.index);
+			stop.setRuleIndex(r.index);
 			atn.ruleToStartState[r.index] = start;
 			atn.ruleToStopState[r.index] = stop;
 		}
@@ -459,7 +459,8 @@ public class ParserATNFactory implements ATNFactory {
 		try {
 			Constructor ctor = nodeType.getConstructor();
 			ATNState s = (ATNState)ctor.newInstance();
-			s.setRule(currentRule);
+			if ( currentRule==null ) s.setRuleIndex(-1);
+			else s.setRuleIndex(currentRule.index);
 			atn.addState(s);
 			return s;
 		}
@@ -471,7 +472,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	public ATNState newState(GrammarAST node) {
 		ATNState n = new ATNState();
-		n.setRule(currentRule);
+		n.setRuleIndex(currentRule.index);
 		atn.addState(n);
 		return n;
 	}

@@ -1,7 +1,6 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.OutputModelObject;
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.*;
@@ -119,7 +118,7 @@ public class CodeGenerator {
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			int tokenType = g.tokenNameToTypeMap.get(t);
 			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
-				tokens.put(t, Utils.integer(tokenType));
+				tokens.put(t, tokenType);
 			}
 		}
 		vocabFileST.add("tokens", tokens);
@@ -129,7 +128,7 @@ public class CodeGenerator {
 		for (String literal : g.stringLiteralToTypeMap.keySet()) {
 			int tokenType = g.stringLiteralToTypeMap.get(literal);
 			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
-				literals.put(literal, Utils.integer(tokenType));
+				literals.put(literal, tokenType);
 			}
 		}
 		vocabFileST.add("literals", literals);

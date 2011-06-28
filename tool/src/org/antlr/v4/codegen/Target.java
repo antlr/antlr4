@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.ST;
 
@@ -98,7 +99,7 @@ public class Target {
 	public String getTargetCharLiteralCharValue(int c) {
 		StringBuffer buf = new StringBuffer();
 		buf.append('\'');
-		if ( c< Grammar.MIN_CHAR_VALUE ) return "'\u0000'";
+		if ( c< Lexer.MIN_CHAR_VALUE ) return "'\u0000'";
 		if ( c<targetCharValueEscape.length &&
 			 targetCharValueEscape[c]!=null )
 		{

@@ -1,7 +1,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Grammar;
 
 /** TODO: make all transitions sets? no, should remove set edges */
 public class AtomTransition extends Transition {
@@ -18,12 +17,6 @@ public class AtomTransition extends Transition {
 	}
 
 	public IntervalSet label() { return IntervalSet.of(label); }
-
-	@Override
-	public String toString(Grammar g) {
-		if (g!=null ) return g.getTokenDisplayName(label);
-		return toString();
-	}
 
 	public String toString() {
 		return String.valueOf(label);
