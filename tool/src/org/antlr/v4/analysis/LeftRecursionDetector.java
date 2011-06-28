@@ -1,7 +1,7 @@
 package org.antlr.v4.analysis;
 
-import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -24,7 +24,7 @@ public class LeftRecursionDetector {
 	}
 
 	public void check() {
-		for (RuleStartState start : atn.ruleToStartState.values()) {
+		for (RuleStartState start : atn.ruleToStartState) {
 			//System.out.print("check "+start.rule.name);
 			rulesVisitedPerRuleCheck.clear();
 			rulesVisitedPerRuleCheck.add(start);

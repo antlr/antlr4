@@ -1,8 +1,8 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerInterpreter extends ATNInterpreter {
@@ -113,12 +113,13 @@ public class LexerInterpreter extends ATNInterpreter {
 			return -1;
 		}
 		if ( recog!=null ) {
+			int actionIndex = atn.ruleToActionIndex[prevAcceptState.ruleIndex];
 			if ( dfa_debug ) {
 				System.out.println("ACTION "+
 								   recog.getRuleNames()[prevAcceptState.ruleIndex]+
-								   ":"+atn.ruleToActionIndex.get(prevAcceptState.ruleIndex));
+								   ":"+ actionIndex);
 			}
-			recog.action(prevAcceptState.ruleIndex, atn.ruleToActionIndex.get(prevAcceptState.ruleIndex));
+			if ( actionIndex>=0 ) recog.action(prevAcceptState.ruleIndex, actionIndex);
 		}
 		input.seek(prevAcceptMarker);
 		return prevAcceptState.prediction;
@@ -201,13 +202,13 @@ public class LexerInterpreter extends ATNInterpreter {
 		if ( debug ) System.out.println("ACCEPT " + prevAccept.toString(recog, true) + " index " + prevAcceptIndex);
 
 		int ruleIndex = prevAccept.state.ruleIndex;
-		int ttype = atn.ruleToTokenType.get(ruleIndex);
+		int ttype = atn.ruleToTokenType[ruleIndex];
 		if ( debug ) {
 			if ( recog!=null ) System.out.println("ACTION "+recog.getRuleNames()[ruleIndex]+":"+ruleIndex);
 			else System.out.println("ACTION "+ruleIndex+":"+ruleIndex);
 		}
-		int actionIndex = atn.ruleToActionIndex.get(ruleIndex);
-		if ( actionIndex>0 ) recog.action(ruleIndex, actionIndex);
+		int actionIndex = atn.ruleToActionIndex[ruleIndex];
+		if ( actionIndex>=0 ) recog.action(ruleIndex, actionIndex);
 		return ttype;
 	}
 
@@ -386,7 +387,7 @@ public class LexerInterpreter extends ATNInterpreter {
 		if ( firstConfigWithRuleStopState!=null ) {
 			newState.isAcceptState = true;
 			newState.ruleIndex = firstConfigWithRuleStopState.state.ruleIndex;
-			newState.prediction = atn.ruleToTokenType.get(newState.ruleIndex);
+			newState.prediction = atn.ruleToTokenType[newState.ruleIndex];
 		}
 
 		if ( traversedPredicate ) return null; // cannot cache

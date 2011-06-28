@@ -6,39 +6,38 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import java.util.*;
 
 /** */
-// TODO: split into runtime / analysis time?
 public class ATN {
-	public static final int INVALID_ALT_NUMBER = -1;
-	public static final int INVALID_DECISION_NUMBER = -1;
+	public static final int INVALID_ALT_NUMBER = 0;
+//	public static final int INVALID_DECISION_NUMBER = -1;
+
+	public static final int PARSER = 1;
+	public static final int LEXER = 2;
+	public static final int TREE_PARSER = 3;
 
 	public List<ATNState> states = new ArrayList<ATNState>();
-	public List<ATNState> rules = new ArrayList<ATNState>(); // rule index to start state
 
 	/** Each subrule/rule is a decision point and we must track them so we
 	 *  can go back later and build DFA predictors for them.  This includes
 	 *  all the rules, subrules, optional blocks, ()+, ()* etc...
 	 */
-	public List<DecisionState> decisionToATNState = new ArrayList<DecisionState>();
+	public List<DecisionState> decisionToState = new ArrayList<DecisionState>();
 
-	public Map<Integer, RuleStartState> ruleToStartState = new LinkedHashMap<Integer, RuleStartState>();
-	public Map<Integer, RuleStopState> ruleToStopState = new LinkedHashMap<Integer, RuleStopState>();
-
-//	public RuleStartState[] ruleToStartState = new LinkedHashMap<Integer, RuleStartState>();
-//	public RuleStopState[] ruleToStopState = new LinkedHashMap<Integer, RuleStopState>();
+	public RuleStartState[] ruleToStartState;
+	public RuleStopState[] ruleToStopState;
 
 	public Map<String, TokensStartState> modeNameToStartState =
 		new LinkedHashMap<String, TokensStartState>();
 
-	// runtime
-	public int grammarType; // ANTLRParser.LEXER, ...
-	public List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
-
-	// runtime for lexer
-	public List<Integer> ruleToTokenType = new ArrayList<Integer>();
-	public List<Integer> ruleToActionIndex = new ArrayList<Integer>();
-
+	// runtime for parsers, lexers
+	public int grammarType; // ATN.LEXER, ...
 	public int maxTokenType;
 
+	// runtime for lexer only
+	public int[] ruleToTokenType;
+	public int[] ruleToActionIndex;
+	public List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
+
+	/** used during construction from grammar AST */
 	int stateNumber = 0;
 
 	/** Used for runtime deserialization of ATNs from strings */
@@ -63,12 +62,12 @@ public class ATN {
 	}
 
 	public int defineDecisionState(DecisionState s) {
-		decisionToATNState.add(s);
-		s.decision = decisionToATNState.size()-1;
+		decisionToState.add(s);
+		s.decision = decisionToState.size()-1;
 		return s.decision;
 	}
 
 	public int getNumberOfDecisions() {
-		return decisionToATNState.size();
+		return decisionToState.size();
 	}
 }

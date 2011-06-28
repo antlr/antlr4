@@ -1,4 +1,4 @@
-package org.antlr.v4.misc;
+package org.antlr.v4.runtime.misc;
 
 import java.util.*;
 

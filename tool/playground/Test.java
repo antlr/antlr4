@@ -48,7 +48,7 @@ public class Test {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("d").index)));
+		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("d").index]));
 	}
 
 	public static class IntTokenStream implements TokenStream {

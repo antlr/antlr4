@@ -242,8 +242,8 @@ public class TestATNSerialization extends BaseTest {
 			"6:BASIC 0\n" +
 			"7:BASIC 1\n" +
 			"8:BASIC 1\n" +
-			"rule 1:1 3,0\n" +
-			"rule 2:3 4,0\n" +
+			"rule 1:1 3,-1\n" +
+			"rule 2:3 4,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"0->3 EPSILON 0,0\n" +
@@ -270,7 +270,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:1 3,0\n" +
+			"rule 1:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"1->3 EPSILON 0,0\n" +
@@ -297,7 +297,7 @@ public class TestATNSerialization extends BaseTest {
 			"6:BLOCK_END 0\n" +
 			"7:PLUS_LOOP_BACK 0\n" +
 			"8:BASIC 0\n" +
-			"rule 1:1 3,0\n" +
+			"rule 1:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"1->5 EPSILON 0,0\n" +
@@ -340,9 +340,9 @@ public class TestATNSerialization extends BaseTest {
 			"12:BASIC 2\n" +
 			"13:BASIC 2\n" +
 			"14:BASIC 2\n" +
-			"rule 1:1 3,1\n" +
-			"rule 2:3 4,0\n" +
-			"rule 3:5 5,2\n" +
+			"rule 1:1 3,0\n" +
+			"rule 2:3 4,-1\n" +
+			"rule 3:5 5,1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"0->3 EPSILON 0,0\n" +
@@ -375,7 +375,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:1 3,0\n" +
+			"rule 1:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
 			"0->1 EPSILON 0,0\n" +
@@ -399,7 +399,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:1 3,0\n" +
+			"rule 1:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
 			"0->1 EPSILON 0,0\n" +
@@ -425,7 +425,7 @@ public class TestATNSerialization extends BaseTest {
 			"4:BASIC 0\n" +
 			"5:BASIC 0\n" +
 			"6:BASIC 0\n" +
-			"rule 1:1 3,0\n" +
+			"rule 1:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
 			"1:'e'..'e', 'p'..'t'\n" +
@@ -466,9 +466,9 @@ public class TestATNSerialization extends BaseTest {
 			"12:BASIC 1\n" +
 			"13:BASIC 2\n" +
 			"14:BASIC 2\n" +
-			"rule 1:3 3,0\n" +
-			"rule 2:5 4,0\n" +
-			"rule 3:7 5,0\n" +
+			"rule 1:3 3,-1\n" +
+			"rule 2:5 4,-1\n" +
+			"rule 3:7 5,-1\n" +
 			"mode 0:0\n" +
 			"mode 1:1\n" +
 			"mode 2:2\n" +

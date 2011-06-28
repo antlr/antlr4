@@ -1,9 +1,7 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.OrderedHashSet;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.*;
 
 import java.util.*;
 
@@ -39,15 +37,20 @@ public abstract class ATNInterpreter {
 			atn.addState(s);
 		}
 		int nrules = toInt(data[p++]);
-		for (int i=1; i<=nrules; i++) {
+		if ( atn.grammarType == ATN.LEXER ) {
+			atn.ruleToTokenType = new int[nrules];
+			atn.ruleToActionIndex = new int[nrules];
+		}
+		atn.ruleToStartState = new RuleStartState[nrules];
+		for (int i=0; i<nrules; i++) {
 			int s = toInt(data[p++]);
-			ATNState startState = atn.states.get(s);
-			atn.rules.add(startState);
-			if ( atn.grammarType==ANTLRParser.LEXER ) {
+			RuleStartState startState = (RuleStartState)atn.states.get(s);
+			atn.ruleToStartState[i] = startState;
+			if ( atn.grammarType == ATN.LEXER ) {
 				int tokenType = toInt(data[p++]);
-				atn.ruleToTokenType.add(tokenType);
+				atn.ruleToTokenType[i] = tokenType;
 				int actionIndex = toInt(data[p++]);
-				atn.ruleToActionIndex.add(actionIndex);
+				atn.ruleToActionIndex[i] = actionIndex;
 			}
 			else {
 				p += 2;
@@ -85,7 +88,7 @@ public abstract class ATNInterpreter {
 		for (int i=1; i<=ndecisions; i++) {
 			int s = toInt(data[p++]);
 			DecisionState decState = (DecisionState)atn.states.get(s);
-			atn.decisionToATNState.add((DecisionState) decState);
+			atn.decisionToState.add((DecisionState) decState);
 			decState.decision = i-1;
 		}
 //		System.out.println(atn.getDecoded());

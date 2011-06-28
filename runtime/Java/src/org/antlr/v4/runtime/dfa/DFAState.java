@@ -1,8 +1,8 @@
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.*;
 

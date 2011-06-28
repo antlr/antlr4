@@ -269,9 +269,9 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		RuleStartState aStart = atn.ruleToStartState.get(g.getRule("a").index);
-		RuleStartState bStart = atn.ruleToStartState.get(g.getRule("b").index);
-		RuleStartState eStart = atn.ruleToStartState.get(g.getRule("e").index);
+		RuleStartState aStart = atn.ruleToStartState[g.getRule("a").index];
+		RuleStartState bStart = atn.ruleToStartState[g.getRule("b").index];
+		RuleStartState eStart = atn.ruleToStartState[g.getRule("e").index];
 		ATNState a_e_invoke = aStart.transition(0).target; //
 		ATNState b_e_invoke = bStart.transition(0).target; //
 		RuleContext a_ctx = new RuleContext(null, -1, a_e_invoke.stateNumber);
@@ -491,16 +491,16 @@ public class TestATNParserPrediction extends BaseTest {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a").index)));
+		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("a").index]));
 		Rule r = g.getRule("b");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState.get(r.index)));
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 		r = g.getRule("e");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState.get(r.index)));
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
 		ParserInterpreter interp = new ParserInterpreter(atn);
 		TokenStream input = new IntTokenStream(types);
-		ATNState startState = atn.decisionToATNState.get(decision);
+		ATNState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
 		int alt = interp.predictATN(dfa, input, decision, RuleContext.EMPTY, false);
 
@@ -542,7 +542,7 @@ public class TestATNParserPrediction extends BaseTest {
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
 		try {
-			ATNState startState = atn.decisionToATNState.get(0);
+			ATNState startState = atn.decisionToState.get(0);
 			DFA dfa = new DFA(startState);
 //			Rule r = g.getRule(ruleName);
 			//ATNState startState = atn.ruleToStartState.get(r);

@@ -1,8 +1,9 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -43,7 +44,7 @@ public class ParserInterpreter extends ATNInterpreter {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
-			ATNState startState = atn.decisionToATNState.get(decision);
+			ATNState startState = atn.decisionToState.get(decision);
 			decisionToDFA[decision] = dfa = new DFA(startState);
 			dfa.decision = decision;
 			return predictATN(dfa, input, decision, ctx, false);

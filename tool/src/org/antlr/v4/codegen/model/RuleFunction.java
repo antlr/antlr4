@@ -2,8 +2,9 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -77,7 +78,7 @@ public class RuleFunction extends OutputModelObject {
 			addLocalDecl(new KidsListDecl(factory, 0));
 		}
 
-		startState = factory.getGrammar().atn.ruleToStartState.get(r.index);
+		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 
 	/** Add local var decl */

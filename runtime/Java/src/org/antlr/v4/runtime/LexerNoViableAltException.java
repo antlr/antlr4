@@ -1,7 +1,7 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 public class LexerNoViableAltException extends LexerRecognitionExeption {
 	/** Prediction began at what input index? */

@@ -80,7 +80,7 @@ public class Rule implements AttributeResolver {
 	/** All rules have unique index 0..n-1 */
 	public int index;
 
-	public int actionIndex; // if lexer
+	public int actionIndex = -1; // if lexer; 0..n-1
 
 	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
 		this.g = g;
@@ -94,7 +94,7 @@ public class Rule implements AttributeResolver {
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {
 		alt[currentAlt].actions.add(actionAST);
 		if ( g.isLexer() || actionAST.getType()== ANTLRParser.FORCED_ACTION ) {
-			actionIndex = g.actions.size() + 1;
+			actionIndex = g.actions.size();
 			g.actions.put(actionAST, actionIndex);
 		}
 	}

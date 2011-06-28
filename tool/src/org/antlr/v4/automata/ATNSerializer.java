@@ -1,6 +1,7 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.*;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
@@ -40,7 +41,10 @@ public class ATNSerializer {
 	 */
 	public List<Integer> serialize() {
 		List<Integer> data = new ArrayList<Integer>();
-		data.add(g.getType());
+		// convert grammar type to ATN const to avoid dependence on ANTLRParser
+		if ( g.getType()== ANTLRParser.LEXER ) data.add(ATN.LEXER);
+		else if ( g.getType()== ANTLRParser.PARSER ) data.add(ATN.PARSER);
+		else data.add(ATN.TREE_PARSER);
 		data.add(g.getMaxTokenType());
 		data.add(atn.states.size());
 		int nedges = 0;
@@ -59,13 +63,13 @@ public class ATNSerializer {
 				}
 			}
 		}
-		int nrules = atn.rules.size();
+		int nrules = atn.ruleToStartState.length;
 		data.add(nrules);
 		for (int r=0; r<nrules; r++) {
-			ATNState ruleStartState = atn.rules.get(r);
+			ATNState ruleStartState = atn.ruleToStartState[r];
 			data.add(ruleStartState.stateNumber);
 			if ( g.isLexer() ) {
-				data.add(atn.ruleToTokenType.get(r));
+				data.add(atn.ruleToTokenType[r]);
 				String ruleName = g.rules.getKey(r);
 				Rule rule = g.getRule(ruleName);
 				data.add(rule.actionIndex);
@@ -148,9 +152,9 @@ public class ATNSerializer {
 				data.add(arg2);
 			}
 		}
-		int ndecisions = atn.decisionToATNState.size();
+		int ndecisions = atn.decisionToState.size();
 		data.add(ndecisions);
-		for (ATNState decStartState : atn.decisionToATNState) {
+		for (ATNState decStartState : atn.decisionToState) {
 			data.add(decStartState.stateNumber);
 		}
 		return data;

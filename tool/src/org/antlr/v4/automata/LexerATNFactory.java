@@ -21,10 +21,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		// INIT ACTION, RULE->TOKEN_TYPE MAP
+		atn.ruleToTokenType = new int[g.rules.size()];
+		atn.ruleToActionIndex = new int[g.rules.size()];
 		for (Rule r : g.rules.values()) {
-			atn.ruleToTokenType.add(g.getTokenType(r.name));
-			if ( r.actionIndex>0 ) atn.ruleToActionIndex.add(r.actionIndex);
-			else atn.ruleToActionIndex.add(0);
+			atn.ruleToTokenType[r.index] = g.getTokenType(r.name);
+			atn.ruleToActionIndex[r.index] = r.actionIndex;
 		}
 
 		// CREATE ATN FOR EACH RULE
@@ -36,7 +37,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			TokensStartState startState = atn.modeNameToStartState.get(modeName);
 			for (Rule r : rules) {
 				if ( !r.isFragment() ) {
-					RuleStartState s = atn.ruleToStartState.get(r.index);
+					RuleStartState s = atn.ruleToStartState[r.index];
 					epsilon(startState, s);
 				}
 			}
