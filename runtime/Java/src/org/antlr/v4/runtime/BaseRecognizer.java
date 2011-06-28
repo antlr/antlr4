@@ -27,8 +27,9 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
 

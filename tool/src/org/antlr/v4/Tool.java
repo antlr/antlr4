@@ -410,7 +410,7 @@ public class Tool {
 		for (Grammar ig : grammars) {
 			for (Rule r : ig.rules.values()) {
 				try {
-					String dot = dotGenerator.getDOT(g.atn.ruleToStartState.get(r));
+					String dot = dotGenerator.getDOT(g.atn.ruleToStartState.get(r.index));
 					if (dot != null) {
 						writeDOTFile(g, r, dot);
 					}

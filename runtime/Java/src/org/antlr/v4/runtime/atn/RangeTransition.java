@@ -1,6 +1,7 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 public class RangeTransition extends Transition {
 	public int from;
@@ -15,7 +16,7 @@ public class RangeTransition extends Transition {
 	}
 
 	@Override
-	public IntervalSet label() { return IntervalSet.of(from,to); }
+	public IntervalSet label() { return IntervalSet.of(from, to); }
 
 	@Override
 	public String toString() {

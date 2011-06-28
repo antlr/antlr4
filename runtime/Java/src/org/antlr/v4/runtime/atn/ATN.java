@@ -1,8 +1,7 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
 
@@ -21,8 +20,12 @@ public class ATN {
 	 */
 	public List<DecisionState> decisionToATNState = new ArrayList<DecisionState>();
 
-	public Map<Rule, RuleStartState> ruleToStartState = new LinkedHashMap<Rule, RuleStartState>();
-	public Map<Rule, RuleStopState> ruleToStopState = new LinkedHashMap<Rule, RuleStopState>();
+	public Map<Integer, RuleStartState> ruleToStartState = new LinkedHashMap<Integer, RuleStartState>();
+	public Map<Integer, RuleStopState> ruleToStopState = new LinkedHashMap<Integer, RuleStopState>();
+
+//	public RuleStartState[] ruleToStartState = new LinkedHashMap<Integer, RuleStartState>();
+//	public RuleStopState[] ruleToStopState = new LinkedHashMap<Integer, RuleStopState>();
+
 	public Map<String, TokensStartState> modeNameToStartState =
 		new LinkedHashMap<String, TokensStartState>();
 
@@ -37,8 +40,6 @@ public class ATN {
 	public int maxTokenType;
 
 	int stateNumber = 0;
-
-	// TODO: for runtime all we need is states, decisionToATNState I think
 
 	/** Used for runtime deserialization of ATNs from strings */
 	public ATN() { }

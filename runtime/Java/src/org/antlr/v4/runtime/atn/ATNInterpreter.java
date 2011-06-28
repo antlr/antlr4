@@ -1,8 +1,9 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
 

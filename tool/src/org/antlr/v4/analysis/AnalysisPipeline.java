@@ -1,7 +1,7 @@
 package org.antlr.v4.analysis;
 
-import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.*;

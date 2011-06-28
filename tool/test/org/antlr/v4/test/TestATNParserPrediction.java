@@ -269,9 +269,9 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		RuleStartState aStart = atn.ruleToStartState.get(g.getRule("a"));
-		RuleStartState bStart = atn.ruleToStartState.get(g.getRule("b"));
-		RuleStartState eStart = atn.ruleToStartState.get(g.getRule("e"));
+		RuleStartState aStart = atn.ruleToStartState.get(g.getRule("a").index);
+		RuleStartState bStart = atn.ruleToStartState.get(g.getRule("b").index);
+		RuleStartState eStart = atn.ruleToStartState.get(g.getRule("e").index);
 		ATNState a_e_invoke = aStart.transition(0).target; //
 		ATNState b_e_invoke = bStart.transition(0).target; //
 		RuleContext a_ctx = new RuleContext(null, -1, a_e_invoke.stateNumber);
@@ -491,9 +491,11 @@ public class TestATNParserPrediction extends BaseTest {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a"))));
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
+		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a").index)));
+		Rule r = g.getRule("b");
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState.get(r.index)));
+		r = g.getRule("e");
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState.get(r.index)));
 
 		// Check ATN prediction
 		ParserInterpreter interp = new ParserInterpreter(atn);

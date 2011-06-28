@@ -3,9 +3,9 @@ package org.antlr.v4.codegen;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
 import java.util.List;

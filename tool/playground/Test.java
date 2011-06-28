@@ -1,13 +1,9 @@
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.DOTGenerator;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 
 import java.util.List;
 
@@ -52,7 +48,7 @@ public class Test {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("d"))));
+		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("d").index)));
 	}
 
 	public static class IntTokenStream implements TokenStream {

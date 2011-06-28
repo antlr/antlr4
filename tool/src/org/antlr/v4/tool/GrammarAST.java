@@ -2,9 +2,9 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
-import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
 

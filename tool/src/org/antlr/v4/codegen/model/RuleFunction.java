@@ -77,7 +77,7 @@ public class RuleFunction extends OutputModelObject {
 			addLocalDecl(new KidsListDecl(factory, 0));
 		}
 
-		startState = factory.getGrammar().atn.ruleToStartState.get(r);
+		startState = factory.getGrammar().atn.ruleToStartState.get(r.index);
 	}
 
 	/** Add local var decl */

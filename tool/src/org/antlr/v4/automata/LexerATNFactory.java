@@ -36,7 +36,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			TokensStartState startState = atn.modeNameToStartState.get(modeName);
 			for (Rule r : rules) {
 				if ( !r.isFragment() ) {
-					RuleStartState s = atn.ruleToStartState.get(r);
+					RuleStartState s = atn.ruleToStartState.get(r.index);
 					epsilon(startState, s);
 				}
 			}

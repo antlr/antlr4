@@ -274,14 +274,15 @@ public class TestATNInterpreter extends BaseTest {
 
 		ParserInterpreter interp = new ParserInterpreter(atn);
 		TokenStream input = new IntTokenStream(types);
-		ATNState startState = atn.ruleToStartState.get(g.getRule("a"));
+		ATNState startState = atn.ruleToStartState.get(g.getRule("a").index);
 		if ( startState.transition(0).target instanceof BlockStartState ) {
 			startState = startState.transition(0).target;
 		}
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a"))));
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
+		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a").index)));
+		Rule r = g.getRule("e");
+		if ( r!=null ) System.out.println(dot.getDOT(atn.ruleToStartState.get(r.index)));
 
 		int result = interp.matchATN(input, startState);
 		assertEquals(expected, result);

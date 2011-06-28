@@ -941,10 +941,10 @@ public class TestATNConstruction extends BaseTest {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule(ruleName))));
+		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule(ruleName).index)));
 
 		Rule r = g.getRule(ruleName);
-		ATNState startState = atn.ruleToStartState.get(r);
+		ATNState startState = atn.ruleToStartState.get(r.index);
 		ATNPrinter serializer = new ATNPrinter(g, startState);
 		String result = serializer.toString();
 

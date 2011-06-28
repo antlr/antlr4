@@ -25,8 +25,9 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.misc;
+package org.antlr.v4.runtime.misc;
 
+import org.antlr.v4.misc.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.Grammar;
 

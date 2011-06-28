@@ -1,8 +1,8 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.*;
-import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
 import java.util.List;

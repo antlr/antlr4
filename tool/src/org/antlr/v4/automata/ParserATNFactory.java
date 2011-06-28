@@ -3,9 +3,10 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
 import java.lang.reflect.Constructor;
@@ -56,9 +57,9 @@ public class ParserATNFactory implements ATNFactory {
 	/* start->ruleblock->end */
 	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {
 		Rule r = g.getRule(name);
-		RuleStartState start = atn.ruleToStartState.get(r);
+		RuleStartState start = atn.ruleToStartState.get(r.index);
 		epsilon(start, blk.left);
-		RuleStopState stop = atn.ruleToStopState.get(r);
+		RuleStopState stop = atn.ruleToStopState.get(r.index);
 		epsilon(blk.right, stop);
 		Handle h = new Handle(start, stop);
 //		FASerializer ser = new FASerializer(g, h.left);
@@ -140,7 +141,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	public Handle _ruleRef(GrammarAST node) {
 		Rule r = g.getRule(node.getText());
-		RuleStartState start = atn.ruleToStartState.get(r);
+		RuleStartState start = atn.ruleToStartState.get(r.index);
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		RuleTransition call = new RuleTransition(r, start, right);
@@ -152,7 +153,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	public void addFollowLink(Rule r, ATNState right) {
 		// add follow edge from end of invoked rule
-		RuleStopState stop = atn.ruleToStopState.get(r);
+		RuleStopState stop = atn.ruleToStopState.get(r.index);
 		epsilon(stop, right);
 	}
 
@@ -393,7 +394,6 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle wildcard(GrammarAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		int ttype = g.getTokenType(node.getText());
 		left.transition = new WildcardTransition(right);
 		right.incidentTransition = left.transition;
 		node.atnState = left;
@@ -419,9 +419,9 @@ public class ParserATNFactory implements ATNFactory {
 			start.stopState = stop;
 			start.setRule(r);
 			stop.setRule(r);
-			atn.ruleToStartState.put(r, start);
+			atn.ruleToStartState.put(r.index, start);
 			atn.rules.add(start);
-			atn.ruleToStopState.put(r, stop);
+			atn.ruleToStopState.put(r.index, stop);
 		}
 	}
 
@@ -437,7 +437,7 @@ public class ParserATNFactory implements ATNFactory {
 		int n = 0;
 		ATNState eofTarget = newState(null); // one unique EOF target for all rules
 		for (Rule r : g.rules.values()) {
-			ATNState stop = atn.ruleToStopState.get(r);
+			ATNState stop = atn.ruleToStopState.get(r.index);
 			if ( stop.getNumberOfTransitions()>0 ) continue;
 			n++;
 			Transition t = new AtomTransition(Token.EOF, eofTarget);

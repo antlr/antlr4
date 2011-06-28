@@ -174,7 +174,7 @@ public abstract class BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		Grammar g = new Grammar(gtext, equeue);
 		ATN atn = createATN(g);
-		ATNState s = atn.ruleToStartState.get(g.getRule(ruleName));
+		ATNState s = atn.ruleToStartState.get(g.getRule(ruleName).index);
 		if ( s==null ) {
 			System.err.println("no such rule: "+ruleName);
 			return null;
