@@ -90,7 +90,7 @@ public class CodeGenerator {
 			controller.addExtension( new ParserASTExtension(factory) );
 		}
 
-		OutputModelObject outputModel = controller.buildOutputModel(controller);
+		OutputModelObject outputModel = controller.buildOutputModel();
 
 		// CREATE TEMPLATES BY WALKING MODEL
 		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);

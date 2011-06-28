@@ -1,9 +1,9 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
@@ -17,7 +17,6 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	/** Build a file with a parser containing rule functions. Use the
 	 *  controller as factory in SourceGenTriggers so it triggers codegen
 	 *  extensions too, not just the factory functions in this factory.
-	 **/
 	public OutputModelObject buildOutputModel(OutputModelController controller) {
 		ParserFile file = new ParserFile(this, gen.getRecognizerFileName());
 		setRoot(file);
@@ -49,7 +48,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 		return file;
 	}
-
+	 **/
 
 	public List<SrcOp> epsilon() { return list(new CodeBlock(this)); }
 
@@ -62,29 +61,17 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public List<SrcOp> sempred(GrammarAST ast) { return list(new SemPred(this, ast)); }
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
-		InvokeRule r = new InvokeRule(this, ID, label);
-		AddToLabelList a = null;
-		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
-			a = new AddToLabelList(this, gen.target.getListLabel(label.getText()), r);
-		}
-		return list(r, a);
+		InvokeRule invokeOp = new InvokeRule(this, ID, label);
+		defineImplicitLabel(ID, invokeOp);
+		AddToLabelList listLabelOp = getListLabel(invokeOp, label);
+		return list(invokeOp, listLabelOp);
 	}
 
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
-		MatchToken matchOp = new MatchToken(this, (TerminalAST) ID, label);
-		AddToLabelList labelOp = null;
-		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
-			String listLabel = gen.target.getListLabel(label.getText());
-			labelOp = new AddToLabelList(this, listLabel, matchOp);
-		}
-		/*
-		SrcOp treeOp = null;
-		if ( g.hasASTOption() ) {
-			treeOp = new AddLeaf(this, ID, matchOp);
-		}
-		return list(matchOp, labelOp, treeOp);
-		*/
-		return list(matchOp, labelOp);
+		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID, label);
+		defineImplicitLabel(ID, matchOp);
+		AddToLabelList listLabelOp = getListLabel(matchOp, label);
+		return list(matchOp, listLabelOp);
 	}
 
 	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {
@@ -170,4 +157,42 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) {
 		return list(new TestSetInline(this, blkAST, look));
 	}
+
+	// support
+
+	/** If no manual label and action refs as token/rule not label or
+	 *  we're adding to trees, we need to define implicit label
+	 */
+	public void defineImplicitLabel(GrammarAST ID, LabeledOp op) {
+		boolean needsImplicitLabel =
+			op.getLabels().size()==0 &&
+			(getCurrentAlt().tokenRefsInActions.containsKey(ID.getText()) ||
+			 getCurrentAlt().ruleRefsInActions.containsKey(ID.getText()) ||
+			 g.hasASTOption());
+		if ( needsImplicitLabel ) {
+			Decl d;
+			Rule r = g.getRule(ID.getText());
+			if ( r!=null ) {
+				String implLabel = gen.target.getImplicitRuleLabel(ID.getText());
+				String ctxName = gen.target.getRuleFunctionContextStructName(r);
+				d = new RuleContextDecl(this, implLabel, ctxName);
+			}
+			else {
+				String implLabel = gen.target.getImplicitTokenLabel(ID.getText());
+				d = new TokenDecl(this, implLabel);
+			}
+			op.getLabels().add(d);
+			getCurrentRule().addLocalDecl(d);
+		}
+	}
+
+	public AddToLabelList getListLabel(LabeledOp op, GrammarAST label) {
+		AddToLabelList labelOp = null;
+		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
+			String listLabel = gen.target.getListLabel(label.getText());
+			labelOp = new AddToLabelList(this, listLabel, op);
+		}
+		return labelOp;
+	}
+
 }

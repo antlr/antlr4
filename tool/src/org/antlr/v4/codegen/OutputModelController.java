@@ -1,6 +1,8 @@
 package org.antlr.v4.codegen;
 
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
@@ -13,8 +15,8 @@ public class OutputModelController implements OutputModelFactory {
 	/** Who does the work? Doesn't have to be CoreOutputModelFactory. */
 	public OutputModelFactory delegate;
 
-	/** Post-processing CodeGeneratorExtension objects */
-	List<CodeGeneratorExtension> extensions = new ArrayList<CodeGeneratorExtension>();
+	/** Post-processing CodeGeneratorExtension objects; done in order given. */
+	public List<CodeGeneratorExtension> extensions = new ArrayList<CodeGeneratorExtension>();
 
 	public OutputModelController(OutputModelFactory factory) {
 		this.delegate = factory;
@@ -22,10 +24,69 @@ public class OutputModelController implements OutputModelFactory {
 
 	public void addExtension(CodeGeneratorExtension ext) { extensions.add(ext); }
 
-	public OutputModelObject buildOutputModel(OutputModelController controller) {
-		OutputModelObject root = delegate.buildOutputModel(this);
-		for (CodeGeneratorExtension ext : extensions) root = ext.buildOutputModel(root);
-		return root;
+	/** Build a file with a parser containing rule functions. Use the
+	 *  controller as factory in SourceGenTriggers so it triggers codegen
+	 *  extensions too, not just the factory functions in this factory.
+	 */
+	public OutputModelObject buildOutputModel() {
+		Grammar g = delegate.getGrammar();
+		CodeGenerator gen = delegate.getGenerator();
+		ParserFile file = parserFile(gen.getRecognizerFileName());
+		setRoot(file);
+		Parser parser = parser(file);
+		file.parser = parser;
+
+		for (Rule r : g.rules.values()) {
+			RuleFunction function = rule(r);
+			parser.funcs.add(function);
+
+			// TRIGGER factory functions for rule alts, elements
+			pushCurrentRule(function);
+			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
+			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
+			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
+			SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, this);
+			try {
+				function.code = genTriggers.block(null,null); // walk AST of rule alts/elements
+			}
+			catch (Exception e){
+				e.printStackTrace(System.err);
+			}
+
+			function.ctxType = gen.target.getRuleFunctionContextStructName(r);
+			function.ruleCtx.name = function.ctxType;
+
+			function.postamble = rulePostamble(function, r);
+
+			if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
+			popCurrentRule();
+		}
+
+		return file;
+	}
+
+	public ParserFile parserFile(String fileName) {
+		ParserFile f = delegate.parserFile(fileName);
+		for (CodeGeneratorExtension ext : extensions) f = ext.parserFile(f);
+		return f;
+	}
+
+	public Parser parser(ParserFile file) {
+		Parser p = delegate.parser(file);
+		for (CodeGeneratorExtension ext : extensions) p = ext.parser(p);
+		return p;
+	}
+
+	public RuleFunction rule(Rule r) {
+		RuleFunction rf = delegate.rule(r);
+		for (CodeGeneratorExtension ext : extensions) rf = ext.rule(rf);
+		return rf;
+	}
+
+	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) {
+		List<SrcOp> ops = delegate.rulePostamble(function, r);
+		for (CodeGeneratorExtension ext : extensions) ops = ext.rulePostamble(ops);
+		return ops;
 	}
 
 	public Grammar getGrammar() { return delegate.getGrammar(); }

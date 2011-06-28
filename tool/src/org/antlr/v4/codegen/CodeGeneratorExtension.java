@@ -13,9 +13,13 @@ public class CodeGeneratorExtension {
 		this.factory = factory;
 	}
 
-	public OutputModelObject buildOutputModel(OutputModelObject root) {
-		return root;
-	}
+	public ParserFile parserFile(ParserFile f) { return f; }
+
+	public Parser parser(Parser p) { return p; }
+
+	public RuleFunction rule(RuleFunction rf) { return rf; }
+
+	public List<SrcOp> rulePostamble(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> alternative(List<SrcOp> ops) { return ops; }
 

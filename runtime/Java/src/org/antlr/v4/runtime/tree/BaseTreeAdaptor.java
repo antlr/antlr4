@@ -27,12 +27,9 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /** A TreeAdaptor that works with any Tree implementation. */
 public abstract class BaseTreeAdaptor implements TreeAdaptor {
@@ -42,6 +39,18 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 */
 	protected Map treeToUniqueIDMap;
 	protected int uniqueNodeID = 1;
+
+	// BEGIN v4 stuff
+
+	public Object becomeRoot(Object newRoot, Object oldRoot, List kids) {
+		return null;
+	}
+
+	public Object createWithChildren(Object root, List kids) {
+		return null;
+	}
+
+	// END v4 stuff
 
 	public Object nil() {
 		return create(null);

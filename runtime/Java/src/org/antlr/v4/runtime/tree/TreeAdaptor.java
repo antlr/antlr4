@@ -27,9 +27,9 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+
+import java.util.List;
 
 /** How to create and navigate trees.  Rather than have a separate factory
  *  and adaptor, I've merged them.  Makes sense to encapsulate.
@@ -41,6 +41,15 @@ import org.antlr.v4.runtime.TokenStream;
  *  generic Objects.  This may increase the amount of typecasting needed. :(
  */
 public interface TreeAdaptor {
+	// BEGIN new v4 stuff
+	// x^
+	public Object becomeRoot(Object newRoot, Object oldRoot, List kids);
+
+	// end of outer rule block, set return value
+	public Object createWithChildren(Object root, List kids);
+
+	// END new v4 stuff
+
 	// C o n s t r u c t i o n
 
 	/** Create a tree node from Token object; for CommonTree type trees,

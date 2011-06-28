@@ -24,17 +24,10 @@ public class Parser extends OutputModelObject {
 		Grammar g = factory.getGrammar();
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
-		//tokens.putAll( g.tokenNameToTypeMap );
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			Integer ttype = g.tokenNameToTypeMap.get(t);
 			if ( ttype>0 ) tokens.put(t, ttype);
 		}
-//		int numTokens = g.getTokenTypes().size();
-//		for (int t=Token.MIN_TOKEN_TYPE; t<numTokens; t++) {
-//			String lit = g.typeToStringLiteralList.get(t);
-//			if ( lit!=null ) tokens.put(lit, t);
-//			tokens.put(g.typeToTokenList.get(t), t);
-//		}
 		tokenNames = g.getTokenDisplayNames();
 		ruleNames = g.rules.keySet();
 		atn = new SerializedATN(factory, g.atn);

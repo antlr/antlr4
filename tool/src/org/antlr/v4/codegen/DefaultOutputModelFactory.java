@@ -26,15 +26,25 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 		this.g = gen.g;
 	}
 
-	// MAIN ROOT OBJECT
-
-	public OutputModelObject buildOutputModel(OutputModelController controller) {
-		return null;
-	}
-
 	public Grammar getGrammar() { return g; }
 
 	public CodeGenerator getGenerator() { return gen; }
+
+	public ParserFile parserFile(String fileName) {
+		return new ParserFile(this, fileName);
+	}
+
+	public Parser parser(ParserFile file) {
+		return new Parser(this, file);
+	}
+
+	public RuleFunction rule(Rule r) {
+		return new RuleFunction(this, r);
+	}
+
+	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) {
+		return null;
+	}
 
 	// ALTERNATIVES / ELEMENTS
 

@@ -89,7 +89,7 @@ public <p.name>(TokenStream input) {
 }
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,namedActions,finallyAction) ::= <<
+RuleFunction(currentRule,code,locals,ruleCtx,namedActions,finallyAction,postamble) ::= <<
 <ruleCtx>
 public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<currentRule.ctxType>\>();
 
@@ -103,6 +103,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     <locals; separator="\n">
 	try {
 	    <code>
+	    <postamble; separator="\n">
 	}
 	catch (RecognitionException re) {
 		reportError(re);
@@ -266,12 +267,12 @@ cases(ttypes) ::= <<
 
 InvokeRule(r) ::= <<
 _ctx.s = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <if(!l.isLocal)>_localctx.<endif><l.name> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
 >>
 
 MatchToken(m) ::= <<
 _ctx.s = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | <if(!l.isLocal)>_localctx.<endif><l.name> = }>(Token)<endif>match(<m.name>);
+<if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
 >>
 
 // ACTION STUFF
@@ -352,15 +353,19 @@ public static class <s.name> extends ParserRuleContext {
 
 AttributeDecl(d) ::= "<d.decl>"
 
-// AST stuff (TODO: separate?)
+/** If we don't know location of label def, use this template */
+labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 
-AddLeaf(a) ::= "_kids0.add(<if(!a.label.isLocal)>_localctx.<endif><a.label.name>);"
+// AST stuff (TODO: separate?)
 
 KidsListDecl(d) ::= "List <d.name> = new ArrayList(5);"
 RootDecl(d)     ::= "Object <d.name> = null;"
-
 RootName(level)     ::= "_root<level>"
 KidsListName(level) ::= "_kids<level>"
+
+AddLeaf(a) ::= "_kids0.add(<labelref(a.label)>);"
+BecomeRoot(r) ::= "_root0 = _root0==null ? <labelref(r.label)> : _adaptor.becomeRoot(_root0, <labelref(r.label)>, _kids0);"
+AssignTreeResult(a) ::= "_localctx.tree = _adaptor.createWithChildren(_root0, _kids0);"
 
 /*
 BitSetDecl(b) ::= <<

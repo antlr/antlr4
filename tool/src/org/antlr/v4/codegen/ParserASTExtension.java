@@ -1,7 +1,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.AddLeaf;
+import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.misc.Utils;
 
 import java.util.List;
@@ -12,8 +12,16 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
+	public List<SrcOp> rulePostamble(List<SrcOp> ops) {
+		AssignTreeResult setReturn = new AssignTreeResult(factory);
+		return DefaultOutputModelFactory.list(ops, setReturn);
+	}
+
+	@Override
 	public List<SrcOp> ruleRef(List<SrcOp> ops) {
-		return super.ruleRef(ops);
+		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
+		SrcOp treeOp = new BecomeRoot(factory, invokeOp.ast, invokeOp);
+		return DefaultOutputModelFactory.list(ops, treeOp);
 	}
 
 	@Override

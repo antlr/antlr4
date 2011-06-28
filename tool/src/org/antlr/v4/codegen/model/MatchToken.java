@@ -28,18 +28,6 @@ public class MatchToken extends RuleElement implements LabeledOp {
 				factory.getCurrentRule().addContextDecl(l);
 			}
 		}
-
-		// If action refs as token not label, we need to define implicit label
-		boolean needsImplicitLabel =
-			labels.size()==0 &&
-			(factory.getCurrentAlt().tokenRefsInActions.containsKey(ast.getText()) ||
-			 g.hasASTOption());
-		if ( needsImplicitLabel ) {
-			String label = gen.target.getImplicitTokenLabel(ast.getText());
-			TokenDecl d = new TokenDecl(factory, label);
-			labels.add(d);
-			factory.getCurrentRule().addLocalDecl(d);
-		}
 	}
 
 	public List<Decl> getLabels() { return labels; }

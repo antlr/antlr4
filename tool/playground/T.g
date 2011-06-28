@@ -1,6 +1,8 @@
 parser grammar T;
 options {output=AST;}
-a : A^ ;
+a : A^ b ;
+
+b : B ;
 /*
 r[int a] returns [int b]
 scope {int qq;}

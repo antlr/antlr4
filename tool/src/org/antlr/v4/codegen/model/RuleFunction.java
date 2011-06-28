@@ -25,10 +25,10 @@ public class RuleFunction extends OutputModelObject {
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
-	@ModelElement public StructDecl ruleCtx;
-	//@ModelElement public DynamicScopeStruct scope;
+	@ModelElement public StructDecl ruleCtx;	//@ModelElement public DynamicScopeStruct scope;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public Action finallyAction;
+	@ModelElement public List<SrcOp> postamble;
 
 	public RuleFunction(OutputModelFactory factory) {
 		super(factory);
