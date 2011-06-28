@@ -1,8 +1,8 @@
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
-import org.antlr.v4.misc.IntervalSet;
+import org.antlr.v4.misc.*;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.*;
@@ -46,7 +46,8 @@ public abstract class Choice extends RuleElement {
 	}
 
 	public SrcOp addCodeForLookaheadTempVar(IntervalSet look) {
-		SrcOp expr = DefaultOutputModelFactory.find(factory.getLL1Test(look, ast), TestSetInline.class);
+		List<SrcOp> testOps = factory.getLL1Test(look, ast);
+		SrcOp expr = (SrcOp)Utils.find(testOps, TestSetInline.class);
 		if ( expr instanceof TestSetInline) {
 			TestSetInline e = (TestSetInline)expr;
 			Decl d = new TokenTypeDecl(factory, e.varName);

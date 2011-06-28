@@ -142,4 +142,11 @@ public class Utils {
 		return b;
 	}
 
+	/** Find exact object type in list */
+	public static Object find(List<?> ops, Class cl) {
+		for (Object o : ops) {
+			if ( o.getClass() == cl ) return o;
+		}
+		return null;
+	}
 }

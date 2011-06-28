@@ -99,14 +99,6 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 
 	// MISC
 
-	/** Find exact object type in list */
-	public static SrcOp find(List<SrcOp> ops, Class cl) {
-		for (SrcOp op : ops) {
-			if ( op.getClass() == cl ) return op;
-		}
-		return null;
-	}
-
 	public static List<SrcOp> list(Object... values) {
 		List<SrcOp> x = new ArrayList<SrcOp>(values.length);
 		for (Object v : values) {
