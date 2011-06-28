@@ -2,11 +2,12 @@ package org.antlr.v4.analysis;
 
 import org.antlr.v4.misc.OrderedHashSet;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
 public class LeftRecursionDetector {
+	Grammar g;
 	public ATN atn;
 
 	/** Holds a list of cycles (sets of rule names). */
@@ -17,7 +18,10 @@ public class LeftRecursionDetector {
 	 */
 	Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<RuleStartState>();
 
-	public LeftRecursionDetector(ATN atn) {	this.atn = atn; }
+	public LeftRecursionDetector(Grammar g, ATN atn) {
+		this.g = g;
+		this.atn = atn;
+	}
 
 	public void check() {
 		for (RuleStartState start : atn.ruleToStartState.values()) {
@@ -31,7 +35,7 @@ public class LeftRecursionDetector {
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
 		if ( listOfRecursiveCycles.size()>0 ) {
-			atn.g.tool.errMgr.leftRecursionCycles(atn.g.fileName, listOfRecursiveCycles);
+			g.tool.errMgr.leftRecursionCycles(g.fileName, listOfRecursiveCycles);
 		}
 	}
 

@@ -2,7 +2,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.misc.IntervalSet;
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Rule;
 
 import java.util.*;
 
@@ -12,7 +12,6 @@ public class ATN {
 	public static final int INVALID_ALT_NUMBER = -1;
 	public static final int INVALID_DECISION_NUMBER = -1;
 
-	public Grammar g;
 	public List<ATNState> states = new ArrayList<ATNState>();
 	public List<ATNState> rules = new ArrayList<ATNState>(); // rule index to start state
 
@@ -40,17 +39,6 @@ public class ATN {
 	int stateNumber = 0;
 
 	// TODO: for runtime all we need is states, decisionToATNState I think
-
-	public ATN(Grammar g) {
-		this.g = g;
-		if ( g.isLexer() ) {
-			for (Rule r : g.rules.values()) {
-				ruleToTokenType.add(g.getTokenType(r.name));
-				if ( r.actionIndex>0 ) ruleToActionIndex.add(r.actionIndex);
-				else ruleToActionIndex.add(0);
-			}
-		}
-	}
 
 	/** Used for runtime deserialization of ATNs from strings */
 	public ATN() { }

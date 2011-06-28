@@ -1,7 +1,8 @@
 lexer grammar L;
 
-WS : ' '+ {skip();} ;
+STRING_START : '"' {pushMode(STRING_MODE); more();} ;
+WS : ' '|'\n' {skip();} ;
 
-StringLiteral
-    :  '"' ( ~('\\'|'"') )* '"'
-    ;
+mode STRING_MODE;
+STRING : '"' {popMode();} ;
+ANY : . {more();} ;

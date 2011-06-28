@@ -2,15 +2,19 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.*;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
 public class ATNSerializer {
+	public Grammar g;
 	public ATN atn;
 	public List<IntervalSet> sets = new ArrayList<IntervalSet>();
 
-	public ATNSerializer(ATN atn) { this.atn = atn; }
+	public ATNSerializer(Grammar g, ATN atn) {
+		this.g = g;
+		this.atn = atn;
+	}
 
 	/** Serialize state descriptors, edge descriptors, and decision->state map
 	 *  into list of ints:
@@ -35,8 +39,8 @@ public class ATNSerializer {
 	 */
 	public List<Integer> serialize() {
 		List<Integer> data = new ArrayList<Integer>();
-		data.add(atn.g.getType());
-		data.add(atn.g.getMaxTokenType());
+		data.add(g.getType());
+		data.add(g.getMaxTokenType());
 		data.add(atn.states.size());
 		int nedges = 0;
 		// dump states, count edges and collect sets while doing so
@@ -59,10 +63,10 @@ public class ATNSerializer {
 		for (int r=0; r<nrules; r++) {
 			ATNState ruleStartState = atn.rules.get(r);
 			data.add(ruleStartState.stateNumber);
-			if ( atn.g.isLexer() ) {
+			if ( g.isLexer() ) {
 				data.add(atn.ruleToTokenType.get(r));
-				String ruleName = atn.g.rules.getKey(r);
-				Rule rule = atn.g.getRule(ruleName);
+				String ruleName = g.rules.getKey(r);
+				Rule rule = g.getRule(ruleName);
 				data.add(rule.actionIndex);
 			}
 			else {
@@ -212,24 +216,24 @@ public class ATNSerializer {
 
 	public String getTokenName(int t) {
 		if ( t==-1 ) return "EOF";
-		if ( atn.g!=null ) return atn.g.getTokenDisplayName(t);
+		if ( g!=null ) return g.getTokenDisplayName(t);
 		return String.valueOf(t);
 	}
 
 	/** Used by Java target to encode short/int array as chars in string. */
-	public static String getSerializedAsString(ATN atn) {
-		return new String(Utils.toCharArray(getSerialized(atn)));
+	public static String getSerializedAsString(Grammar g, ATN atn) {
+		return new String(Utils.toCharArray(getSerialized(g, atn)));
 	}
 
-	public static List<Integer> getSerialized(ATN atn) {
-		return new ATNSerializer(atn).serialize();
+	public static List<Integer> getSerialized(Grammar g, ATN atn) {
+		return new ATNSerializer(g, atn).serialize();
 	}
 
-	public static char[] getSerializedAsChars(ATN atn) {
-		return Utils.toCharArray(new ATNSerializer(atn).serialize());
+	public static char[] getSerializedAsChars(Grammar g, ATN atn) {
+		return Utils.toCharArray(new ATNSerializer(g, atn).serialize());
 	}
 
-	public static String getDecoded(ATN atn) {
-		return new ATNSerializer(atn).decode(Utils.toCharArray(getSerialized(atn)));
+	public static String getDecoded(Grammar g, ATN atn) {
+		return new ATNSerializer(g, atn).decode(Utils.toCharArray(getSerialized(g, atn)));
 	}
 }

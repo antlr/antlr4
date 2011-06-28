@@ -1,6 +1,6 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Rule;
 
 import java.util.*;
 
@@ -57,7 +57,7 @@ public class ATNState {
 	public ATN atn = null;
 
 	/** ATN state is associated with which node in AST? */
-	public GrammarAST ast;
+//	public GrammarAST ast;
 	public Transition transition;
 	/** For o-A->o type ATN tranitions, record the label that leads to this
 	 *  state.  Useful for creating rich error messages when we find

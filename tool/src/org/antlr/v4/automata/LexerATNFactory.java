@@ -20,6 +20,13 @@ public class LexerATNFactory extends ParserATNFactory {
 			atn.defineDecisionState(startState);
 		}
 
+		// INIT ACTION, RULE->TOKEN_TYPE MAP
+		for (Rule r : g.rules.values()) {
+			atn.ruleToTokenType.add(g.getTokenType(r.name));
+			if ( r.actionIndex>0 ) atn.ruleToActionIndex.add(r.actionIndex);
+			else atn.ruleToActionIndex.add(0);
+		}
+
 		// CREATE ATN FOR EACH RULE
 		_createATN(g.rules.values());
 

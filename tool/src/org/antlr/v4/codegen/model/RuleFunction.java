@@ -78,25 +78,6 @@ public class RuleFunction extends OutputModelObject {
 		}
 
 		startState = factory.getGrammar().atn.ruleToStartState.get(r);
-
-//		// TRIGGER factory functions for rule elements
-//		factory.currentRule.push(this);
-//		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
-//		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
-//		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-//		SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, factory);
-//		try {
-//			code = genTriggers.block(null,null); // GEN Instr OBJECTS
-//		}
-//		catch (Exception e){
-//			e.printStackTrace(System.err);
-//		}
-
-//		ctxType = factory.gen.target.getRuleFunctionContextStructName(r);
-//		ruleCtx.name = ctxType;
-//
-//		if ( ruleCtx.isEmpty() ) ruleCtx = null;
-//		factory.currentRule.pop();
 	}
 
 	/** Add local var decl */

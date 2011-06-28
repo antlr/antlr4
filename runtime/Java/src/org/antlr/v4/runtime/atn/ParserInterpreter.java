@@ -601,8 +601,7 @@ public class ParserInterpreter extends ATNInterpreter {
 
 	public String getTokenName(int t) {
 		if ( t==-1 ) return "EOF";
-		if ( atn.g!=null ) return atn.g.getTokenDisplayName(t);
-		if ( parser !=null && parser.getTokenNames()!=null ) return parser.getTokenNames()[t]+"<"+t+">";
+		if ( parser!=null && parser.getTokenNames()!=null ) return parser.getTokenNames()[t]+"<"+t+">";
 		return String.valueOf(t);
 	}
 

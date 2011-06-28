@@ -20,6 +20,5 @@ public class LexerFile extends OutputModelObject {
 			GrammarAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
-		lexer = new Lexer(factory, this);
 	}
 }

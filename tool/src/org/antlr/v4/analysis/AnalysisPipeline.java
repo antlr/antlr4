@@ -15,7 +15,7 @@ public class AnalysisPipeline {
 
 	public void process() {
 		// LEFT-RECURSION CHECK
-		LeftRecursionDetector lr = new LeftRecursionDetector(g.atn);
+		LeftRecursionDetector lr = new LeftRecursionDetector(g, g.atn);
 		lr.check();
 		if ( lr.listOfRecursiveCycles.size()>0 ) return; // bail out
 

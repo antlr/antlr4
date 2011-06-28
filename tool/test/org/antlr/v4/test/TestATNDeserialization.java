@@ -115,11 +115,10 @@ public class TestATNDeserialization extends BaseTest {
 
 	protected void checkDeserializationIsStable(Grammar g) {
 		ATN atn = createATN(g);
-		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(atn));
-		String atnData = ATNSerializer.getDecoded(atn);
+		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(g, atn));
+		String atnData = ATNSerializer.getDecoded(g, atn);
 		ATN atn2 = ParserInterpreter.deserialize(data);
-		atn2.g = g;
-		String atn2Data = ATNSerializer.getDecoded(atn2);
+		String atn2Data = ATNSerializer.getDecoded(g, atn2);
 
 		assertEquals(atnData, atn2Data);
 	}

@@ -39,8 +39,10 @@ public class QStack<T> {
 
 	public T pop() {
 		if ( sp<0 ) throw new EmptyStackException();
+		T o = elements[sp];
 		elements[sp] = null; // let gc reclaim that element
-		return elements[sp--];
+		sp--;
+		return o;
 	}
 
 	public void clear() { sp = -1; }

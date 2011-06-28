@@ -20,7 +20,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Rule currentRule;
 	ATN atn;
 
-	public ParserATNFactory(Grammar g) { this.g = g; atn = new ATN(g); }
+	public ParserATNFactory(Grammar g) { this.g = g; atn = new ATN(); }
 
 	public ATN createATN() {
 		_createATN(g.rules.values());
@@ -458,7 +458,6 @@ public class ParserATNFactory implements ATNFactory {
 		try {
 			Constructor ctor = nodeType.getConstructor();
 			ATNState s = (ATNState)ctor.newInstance();
-			s.ast = node;
 			s.setRule(currentRule);
 			atn.addState(s);
 			return s;
@@ -472,7 +471,6 @@ public class ParserATNFactory implements ATNFactory {
 	public ATNState newState(GrammarAST node) {
 		ATNState n = new ATNState();
 		n.setRule(currentRule);
-		n.ast = node;
 		atn.addState(n);
 		return n;
 	}

@@ -84,7 +84,10 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 
 	public void setRoot(OutputModelObject root) { this.root = root;	}
 
-	public RuleFunction getCurrentRule() { return currentRule.peek(); }
+	public RuleFunction getCurrentRule() {
+		if ( currentRule.size()>0 )	return currentRule.peek();
+		return null;
+	}
 
 	public void pushCurrentRule(RuleFunction r) { currentRule.push(r); }
 

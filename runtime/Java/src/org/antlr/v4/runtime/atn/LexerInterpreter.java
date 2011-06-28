@@ -225,7 +225,7 @@ public class LexerInterpreter extends ATNInterpreter {
 		else if ( trans.getClass() == RangeTransition.class ) {
 			RangeTransition rt = (RangeTransition)trans;
 			if ( t>=rt.from && t<=rt.to ) {
-				if ( debug ) System.out.println("match range "+rt.toString(atn.g));
+				if ( debug ) System.out.println("match range "+rt.toString());
 				return rt.target;
 			}
 		}
@@ -233,7 +233,7 @@ public class LexerInterpreter extends ATNInterpreter {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
 			if ( !not && st.label.member(t) || not && !st.label.member(t) ) {
-				if ( debug ) System.out.println("match set "+st.label.toString(atn.g));
+				if ( debug ) System.out.println("match set "+st.label.toString());
 				return st.target;
 			}
 		}

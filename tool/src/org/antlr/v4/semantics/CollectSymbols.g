@@ -270,7 +270,7 @@ LabelElementPair lp = new LabelElementPair(g, $id, $e, $start.getType());
 //currentRule.labelDefs.map($id.text, lp);
 currentRule.alt[currentAlt].labelDefs.map($id.text, lp);
 }
-	:	{inContext("RULE ...")}?
+	:	{inContext("RULE ...") && !inContext("OPTIONS ...")}?
 		(	^(ASSIGN id=ID e=.)
 		|	^(PLUS_ASSIGN id=ID e=.)
 		)

@@ -11,7 +11,7 @@ public class SerializedATN extends OutputModelObject {
 	public List<String> serialized;
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
 		super(factory);
-		List<Integer> data = ATNSerializer.getSerialized(atn);
+		List<Integer> data = ATNSerializer.getSerialized(factory.getGrammar(), atn);
 		serialized = new ArrayList<String>(data.size());
 		for (int c : data) {
 			String encoded = factory.getGenerator().target.encodeIntAsCharEscape(c);
