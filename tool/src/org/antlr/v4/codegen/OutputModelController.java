@@ -22,12 +22,7 @@ public class OutputModelController implements OutputModelFactory {
 
 	public void addExtension(CodeGeneratorExtension ext) { extensions.add(ext); }
 
-	/** Dummy to satisfy interface; controller never calls this. */
 	public OutputModelObject buildOutputModel(OutputModelController controller) {
-		return buildOutputModel();
-	}
-
-	public OutputModelObject buildOutputModel() {
 		OutputModelObject root = delegate.buildOutputModel(this);
 		for (CodeGeneratorExtension ext : extensions) root = ext.buildOutputModel(root);
 		return root;
