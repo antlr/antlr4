@@ -110,7 +110,8 @@ public class Grammar implements AttributeResolver {
  	 */
 	public LinkedHashMap<ActionAST, Integer> actions = new LinkedHashMap<ActionAST, Integer>();
 
-	/** All sempreds found in grammar; maps tree node to sempred index */
+	/** All sempreds found in grammar; maps tree node to sempred index;
+	 *  sempred index is 0..n-1 */
 	public LinkedHashMap<PredAST, Integer> sempreds = new LinkedHashMap<PredAST, Integer>();
 
     public Map<String, AttributeDict> scopes = new LinkedHashMap<String, AttributeDict>();

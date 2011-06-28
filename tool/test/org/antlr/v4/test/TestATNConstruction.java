@@ -48,7 +48,7 @@ public class TestATNConstruction extends BaseTest {
 			"s3->BlockEnd_9\n" +
 			"s5->s6\n" +
 			"BlockEnd_9->RuleStop_a_1\n" +
-			"s6-{;}->s7\n" +
+			"s6-action_0:-1->s7\n" + // actionIndex -1 since not forced action
 			"RuleStop_a_1-EOF->s10\n" +
 			"s7->BlockEnd_9\n";
 		checkRule(g, "a", expecting);
@@ -363,8 +363,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_10\n" +
 			"BlockStart_10->s2\n" +
 			"BlockStart_10->s6\n" +
-			"s2-{p1}?->s3\n" +
-			"s6-{p2}?->s7\n" +
+			"s2-pred-0:0->s3\n" +
+			"s6-pred-0:1->s7\n" +
 			"s3->s4\n" +
 			"s7->s8\n" +
 			"s4-A->s5\n" +

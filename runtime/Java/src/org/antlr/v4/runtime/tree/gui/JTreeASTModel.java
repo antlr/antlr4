@@ -1,11 +1,9 @@
 package org.antlr.v4.runtime.tree.gui;
 
-import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.tree.*;
 
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 
 public class JTreeASTModel implements TreeModel {
     TreeAdaptor adaptor;

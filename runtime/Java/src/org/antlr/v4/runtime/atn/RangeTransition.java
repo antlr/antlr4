@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 public class RangeTransition extends Transition {
@@ -20,7 +19,6 @@ public class RangeTransition extends Transition {
 
 	@Override
 	public String toString() {
-		return CharSupport.getANTLRCharLiteralForChar(from)+".."+
-			   CharSupport.getANTLRCharLiteralForChar(to);
+		return "'"+(char)from+"'..'"+(char)to+"'";
 	}
 }

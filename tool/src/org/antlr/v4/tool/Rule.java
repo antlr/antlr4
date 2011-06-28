@@ -101,7 +101,7 @@ public class Rule implements AttributeResolver {
 
 	public void definePredicateInAlt(int currentAlt, PredAST predAST) {
 		alt[currentAlt].actions.add(predAST);
-		g.sempreds.put(predAST, g.sempreds.size() + 1);
+		g.sempreds.put(predAST, g.sempreds.size());
 	}
 
 	public Attribute resolveRetvalOrProperty(String y) {

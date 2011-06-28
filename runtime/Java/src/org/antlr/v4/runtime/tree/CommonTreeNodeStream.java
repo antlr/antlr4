@@ -27,10 +27,10 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.runtime.misc.IntArray;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.LookaheadStream;
+
+import java.util.Stack;
 
 public class CommonTreeNodeStream extends LookaheadStream<Object> implements TreeNodeStream {
 	public static final int DEFAULT_INITIAL_BUFFER_SIZE = 100;
@@ -49,7 +49,7 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
     protected TreeIterator it;
 
     /** Stack of indexes used for push/pop calls */
-    protected IntArray calls;
+    protected Stack<Integer> calls;
 
     /** Tree (nil A B C) trees like flat A B C streams */
     protected boolean hasNilRoot = false;
@@ -122,7 +122,7 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
      */
     public void push(int index) {
         if ( calls==null ) {
-            calls = new IntArray();
+            calls = new Stack<Integer>();
         }
         calls.push(p); // save current index
         seek(index);

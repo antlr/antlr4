@@ -174,7 +174,7 @@ public class ParserATNFactory implements ATNFactory {
 		//System.out.println("sempred: "+ pred);
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
-		PredicateTransition p = new PredicateTransition(pred, right);
+		PredicateTransition p = new PredicateTransition(right);
 		p.ruleIndex = currentRule.index;
 		p.predIndex = g.sempreds.get(pred);
 		left.transition = p;
@@ -185,7 +185,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle gated_sempred(GrammarAST pred) {
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
-		left.transition = new PredicateTransition(pred, right);
+		left.transition = new PredicateTransition(right);
 		pred.atnState = left;
 		return new Handle(left, right);
 	}
@@ -198,7 +198,7 @@ public class ParserATNFactory implements ATNFactory {
 		//System.out.println("action: "+action);
 		ATNState left = newState(action);
 		ATNState right = newState(action);
-		ActionTransition a = new ActionTransition(action, right);
+		ActionTransition a = new ActionTransition(right);
 		a.ruleIndex = currentRule.index;
 		if ( action.getType()==ANTLRParser.FORCED_ACTION ) {
 			a.actionIndex = g.actions.get(action);

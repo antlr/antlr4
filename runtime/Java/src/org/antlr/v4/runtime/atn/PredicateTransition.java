@@ -1,7 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.tool.*;
-
 /** TODO: this is old comment:
  *  A tree of semantic predicates from the grammar AST if label==SEMPRED.
  *  In the ATN, labels will always be exactly one predicate, but the DFA
@@ -11,11 +9,9 @@ import org.antlr.v4.tool.*;
 public class PredicateTransition extends Transition {
 	public int ruleIndex;
 	public int predIndex;
-	public GrammarAST predAST;
 
-	public PredicateTransition(GrammarAST predicateASTNode, ATNState target) {
+	public PredicateTransition(ATNState target) {
 		super(target);
-		this.predAST = predicateASTNode;
 	}
 
 	public PredicateTransition(ATNState target, int ruleIndex, int predIndex) {
@@ -27,11 +23,7 @@ public class PredicateTransition extends Transition {
 	public boolean isEpsilon() { return true; }
 
 	public String toString() {
-		if ( predAST!=null ) return predAST.getText();
 		return "pred-"+ruleIndex+":"+predIndex;
 	}
 
-	public String toString(Grammar g) {
-		return toString();
-	}
 }

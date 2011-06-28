@@ -48,7 +48,7 @@ public class ATNPrinter {
 				}
 				else if ( t instanceof ActionTransition ) {
 					ActionTransition a = (ActionTransition)t;
-					buf.append("-"+a.actionAST.getText()+"->"+ getStateString(t.target)+'\n');
+					buf.append("-"+a.toString()+"->"+ getStateString(t.target)+'\n');
 				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;

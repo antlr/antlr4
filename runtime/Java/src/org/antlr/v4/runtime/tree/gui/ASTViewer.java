@@ -1,7 +1,6 @@
 package org.antlr.v4.runtime.tree.gui;
 
-import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.tree.*;
 
 /** */
 public class ASTViewer {
@@ -17,12 +16,12 @@ public class ASTViewer {
         this.adaptor = new CommonTreeAdaptor();
         this.root = root;
     }
-    
+
     public void open() {
         ASTViewFrame m = new ASTViewFrame();
         m.tree.setModel(new JTreeASTModel(adaptor, root));
         m.pack();
         m.setSize(800,600);
-        m.setVisible(true); 
+        m.setVisible(true);
     }
 }
