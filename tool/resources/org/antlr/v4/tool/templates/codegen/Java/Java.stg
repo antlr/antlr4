@@ -365,8 +365,10 @@ KidsListName(level) ::= "_kids<level>"
 
 AddTokenLeaf(a) ::= "_kids0.add(_adaptor.create(<labelref(a.label)>));"
 AddRuleLeaf(a) ::= "_kids0.add(<labelref(a.label)>.tree);"
-BecomeRoot(r) ::= "_root0 = _root0==null ? <labelref(r.label)> : _adaptor.becomeRoot(_root0, <labelref(r.label)>, _kids0);"
+// TODO: need RuleBecomeRoot
+BecomeRoot(r) ::= "_root0 = _root0==null ? _adaptor.create(<labelref(r.label)>) : _adaptor.becomeRoot(_root0, <labelref(r.label)>, _kids0);"
 AssignTreeResult(a) ::= <<
+if ( _root0==null && _kids0.size()>0 ) _root0 = _adaptor.nil();
 _adaptor.addChildren(_root0, _kids0);
 _localctx.tree = _root0;
 >>

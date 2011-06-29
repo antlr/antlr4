@@ -28,14 +28,14 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.tree.*;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */
 public class Parser extends BaseRecognizer {
 
-	public TreeAdaptor _adaptor;
+	public TreeAdaptor _adaptor = new CommonTreeAdaptor();
 
 	public Parser(TokenStream input) {
 		super(input);

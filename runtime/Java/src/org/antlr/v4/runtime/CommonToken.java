@@ -100,13 +100,12 @@ public class CommonToken implements Token, Serializable {
 		if ( input==null ) {
 			return null;
 		}
-        if ( start<input.size() && stop<input.size() ) {
-		    text = input.substring(start,stop);
-        }
-        else {
-            text = "<EOF>";
-        }
-		return text;
+		if ( start<input.size() && stop<input.size() ) {
+			return input.substring(start,stop);
+		}
+		else {
+			return "<EOF>";
+		}
 	}
 
 	/** Override the text for this token.  getText() will return this text

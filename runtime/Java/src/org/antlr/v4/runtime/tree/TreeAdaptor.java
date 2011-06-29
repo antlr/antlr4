@@ -45,18 +45,20 @@ public interface TreeAdaptor {
 	// x^
 	public Object becomeRoot(Object oldRoot, Object newRoot, List kids);
 
-	/** if oldRoot is null then:
-	 * 		create root for rootToken using kids.
+	/** if oldRoot is nil then:
+	 * 		create newRoot for rootToken
+	 *  	add kids to newRoot
+	 *   	clear kids
 	 *  	return as new root
-	 *  if oldRoot not null then:
+	 *  if oldRoot not nil then:
 	 *  	add kids to oldRoot
 	 *  	clear kids
-	 *  	create rootToken using kids
+	 *  	create rootToken
 	 *  	return as new root
 	 */
 	public Object becomeRoot(Object oldRoot, Token rootToken, List kids);
 
-	// end of outer rule block, set return value
+	// If not null root, add kids to it
 	public void addChildren(Object root, List kids);
 
 	// END new v4 stuff

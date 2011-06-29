@@ -27,8 +27,7 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** A generic tree implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
@@ -130,6 +129,7 @@ public abstract class BaseTree implements Tree {
 
 	/** Add all elements of kids list as children of this node */
 	public void addChildren(List kids) {
+		if ( kids==null ) return;
 		for (int i = 0; i < kids.size(); i++) {
 			Tree t = (Tree) kids.get(i);
 			addChild(t);

@@ -1,11 +1,13 @@
 grammar T;
 options {output=AST;}
-a : x+=A^ y+=b B! B b!;
+a : A^ C^ D ;
 
 b : B ;
 
 A : 'a';
 B : 'b';
+C : 'c';
+D : 'd';
 WS : ' '|'\t'|'\n' {skip();} ;
 
 /*

@@ -42,27 +42,34 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	// BEGIN v4 stuff
 
-	public Object becomeRoot(Object newRoot, Object oldRoot, List kids) {
+	public Object becomeRoot(Object oldRoot, Object newRoot, List kids) {
 		return null;
 	}
 
-	/** if oldRoot is null then:
-	 * 		create root for rootToken using kids.
+	/** if oldRoot is nil then:
+	 * 		create newRoot for rootToken
+	 *  	add kids to newRoot
+	 *   	clear kids
 	 *  	return as new root
-	 *  if oldRoot not null then:
+	 *  if oldRoot not nil then:
 	 *  	add kids to oldRoot
 	 *  	clear kids
-	 *  	create rootToken using kids
+	 *  	create rootToken
 	 *  	return as new root
 	 */
-	public Object becomeRoot(Object newRoot, Token rootToken, List kids) {
-		if ( newRoot==null ) {
-			newRoot = create(rootToken);
-			addChildren(newRoot, kids);
+	public Object becomeRoot(Object oldRoot, Token rootToken, List kids) {
+		// first flush all previous children onto old root
+		if ( ((Tree)oldRoot).isNil() ) {
+			oldRoot = create(rootToken);
+			addChildren(oldRoot, kids);
 			kids.clear();
-			return newRoot;
+			return oldRoot;
 		}
-		return null;
+		addChildren(oldRoot, kids);
+		kids.clear();
+		Object newRoot = create(rootToken);
+		addChild(newRoot, oldRoot); // newRoot becomes root of old root
+		return newRoot;
 	}
 
 	public void addChildren(Object root, List kids) {
