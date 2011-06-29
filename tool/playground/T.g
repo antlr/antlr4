@@ -1,6 +1,6 @@
 parser grammar T;
 options {output=AST;}
-a : A^ b ;
+a : x+=A^ y+=b B! b!;
 
 b : B ;
 /*

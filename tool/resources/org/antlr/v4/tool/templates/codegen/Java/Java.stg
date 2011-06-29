@@ -104,17 +104,17 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 	try {
 	    <code>
 	    <postamble; separator="\n">
+        _localctx.stop = input.LT(-1);
+        <namedActions.after>
 	}
 	catch (RecognitionException re) {
 		reportError(re);
 		recover();
 	}
 	finally {
-        _localctx.stop = input.LT(-1);
-        <namedActions.after>
         <currentRule.name>_stk.pop();
-        <finallyAction>
         _ctx = (ParserRuleContext)_ctx.parent;
+        <finallyAction>
     	//System.out.println("exit "+ruleNames[<currentRule.index>]);
 	}
     return _localctx;
@@ -266,12 +266,12 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r) ::= <<
-_ctx.s = <r.stateNumber>;
+_localctx.s = <r.stateNumber>;
 <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
 >>
 
 MatchToken(m) ::= <<
-_ctx.s = <m.stateNumber>;
+_localctx.s = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
 >>
 
@@ -323,7 +323,7 @@ SetDynScopeAttr_negIndex(s, indexChunks, rhsChunks) ::=
 SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
     "<s.scope>.get(<indexChunks>).<s.attr> =<rhsChunks>;"
 
-AddToLabelList(a) ::= "_localctx.<a.listName>.add(_localctx.<first(a.opWithResultToAdd.labels)>);"
+AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(first(a.opWithResultToAdd.labels))>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
