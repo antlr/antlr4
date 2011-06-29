@@ -363,9 +363,13 @@ RootDecl(d)     ::= "Object <d.name> = null;"
 RootName(level)     ::= "_root<level>"
 KidsListName(level) ::= "_kids<level>"
 
-AddLeaf(a) ::= "_kids0.add(<labelref(a.label)>);"
+AddTokenLeaf(a) ::= "_kids0.add(_adaptor.create(<labelref(a.label)>));"
+AddRuleLeaf(a) ::= "_kids0.add(<labelref(a.label)>.tree);"
 BecomeRoot(r) ::= "_root0 = _root0==null ? <labelref(r.label)> : _adaptor.becomeRoot(_root0, <labelref(r.label)>, _kids0);"
-AssignTreeResult(a) ::= "_localctx.tree = _adaptor.createWithChildren(_root0, _kids0);"
+AssignTreeResult(a) ::= <<
+_adaptor.addChildren(_root0, _kids0);
+_localctx.tree = _root0;
+>>
 
 /*
 BitSetDecl(b) ::= <<

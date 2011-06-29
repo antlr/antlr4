@@ -46,8 +46,27 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		return null;
 	}
 
-	public Object createWithChildren(Object root, List kids) {
+	/** if oldRoot is null then:
+	 * 		create root for rootToken using kids.
+	 *  	return as new root
+	 *  if oldRoot not null then:
+	 *  	add kids to oldRoot
+	 *  	clear kids
+	 *  	create rootToken using kids
+	 *  	return as new root
+	 */
+	public Object becomeRoot(Object newRoot, Token rootToken, List kids) {
+		if ( newRoot==null ) {
+			newRoot = create(rootToken);
+			addChildren(newRoot, kids);
+			kids.clear();
+			return newRoot;
+		}
 		return null;
+	}
+
+	public void addChildren(Object root, List kids) {
+		if ( root!=null ) ((Tree)root).addChildren(kids);
 	}
 
 	// END v4 stuff

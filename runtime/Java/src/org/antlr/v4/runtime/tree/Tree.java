@@ -44,6 +44,11 @@ import java.util.List;
 public interface Tree {
 	public static final Tree INVALID_NODE = new CommonTree(Token.INVALID_TOKEN);
 
+	// BEGIN v4
+	void addChildren(List t);
+
+	// END v4
+
 	Tree getChild(int i);
 
 	int getChildCount();

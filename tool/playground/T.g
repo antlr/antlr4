@@ -1,8 +1,13 @@
-parser grammar T;
+grammar T;
 options {output=AST;}
-a : x+=A^ y+=b B! b!;
+a : x+=A^ y+=b B! B b!;
 
 b : B ;
+
+A : 'a';
+B : 'b';
+WS : ' '|'\t'|'\n' {skip();} ;
+
 /*
 r[int a] returns [int b]
 scope {int qq;}

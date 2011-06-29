@@ -17,6 +17,10 @@ public class CodeGeneratorExtension {
 
 	public Parser parser(Parser p) { return p; }
 
+	public LexerFile lexerFile(LexerFile f) { return f; }
+
+	public Lexer lexer(Lexer l) { return l; }
+
 	public RuleFunction rule(RuleFunction rf) { return rf; }
 
 	public List<SrcOp> rulePostamble(List<SrcOp> ops) { return ops; }
@@ -44,6 +48,10 @@ public class CodeGeneratorExtension {
 	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> leafToken(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> leafRule(List<SrcOp> ops) { return ops; }
 
 	// BLOCKS
 

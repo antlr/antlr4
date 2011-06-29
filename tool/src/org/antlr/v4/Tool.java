@@ -226,8 +226,9 @@ public class Tool {
 		}
 
 		// BUILD ATN FROM AST
-		ATNFactory factory = new ParserATNFactory(g);
+		ATNFactory factory;
 		if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+		else factory = new ParserATNFactory(g);
 		g.atn = factory.createATN();
 
 		if ( generate_ATN_dot ) generateATNs(g);

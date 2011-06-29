@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -28,7 +28,7 @@ public class OutputModelController implements OutputModelFactory {
 	 *  controller as factory in SourceGenTriggers so it triggers codegen
 	 *  extensions too, not just the factory functions in this factory.
 	 */
-	public OutputModelObject buildOutputModel() {
+	public OutputModelObject buildParserOutputModel() {
 		Grammar g = delegate.getGrammar();
 		CodeGenerator gen = delegate.getGenerator();
 		ParserFile file = parserFile(gen.getRecognizerFileName());
@@ -65,6 +65,14 @@ public class OutputModelController implements OutputModelFactory {
 		return file;
 	}
 
+	public OutputModelObject buildLexerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		LexerFile file = lexerFile(gen.getRecognizerFileName());
+		setRoot(file);
+		file.lexer = lexer(file);
+		return file;
+	}
+
 	public ParserFile parserFile(String fileName) {
 		ParserFile f = delegate.parserFile(fileName);
 		for (CodeGeneratorExtension ext : extensions) f = ext.parserFile(f);
@@ -75,6 +83,14 @@ public class OutputModelController implements OutputModelFactory {
 		Parser p = delegate.parser(file);
 		for (CodeGeneratorExtension ext : extensions) p = ext.parser(p);
 		return p;
+	}
+
+	public LexerFile lexerFile(String fileName) {
+		return new LexerFile(this, getGenerator().getRecognizerFileName());
+	}
+
+	public Lexer lexer(LexerFile file) {
+		return new Lexer(this, file);
 	}
 
 	public RuleFunction rule(Rule r) {
@@ -101,13 +117,29 @@ public class OutputModelController implements OutputModelFactory {
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		List<SrcOp> ops = delegate.ruleRef(ID, label, args);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.ruleRef(ops);
+		for (CodeGeneratorExtension ext : extensions) {
+			ops = ext.ruleRef(ops);
+			Tree parent = ID.getParent();
+			if ( parent!=null && parent.getType()!=ANTLRParser.BANG &&
+				 parent.getType()!=ANTLRParser.ROOT )
+			{
+				ops = ext.leafRule(ops);
+			}
+		}
 		return ops;
 	}
 
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		List<SrcOp> ops = delegate.tokenRef(ID, label, args);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.tokenRef(ops);
+		for (CodeGeneratorExtension ext : extensions) {
+			ops = ext.tokenRef(ops);
+			Tree parent = ID.getParent();
+			if ( parent!=null && parent.getType()!=ANTLRParser.BANG &&
+				 parent.getType()!=ANTLRParser.ROOT )
+			{
+				ops = ext.leafToken(ops);
+			}
+		}
 		return ops;
 	}
 

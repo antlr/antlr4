@@ -43,10 +43,21 @@ import java.util.List;
 public interface TreeAdaptor {
 	// BEGIN new v4 stuff
 	// x^
-	public Object becomeRoot(Object newRoot, Object oldRoot, List kids);
+	public Object becomeRoot(Object oldRoot, Object newRoot, List kids);
+
+	/** if oldRoot is null then:
+	 * 		create root for rootToken using kids.
+	 *  	return as new root
+	 *  if oldRoot not null then:
+	 *  	add kids to oldRoot
+	 *  	clear kids
+	 *  	create rootToken using kids
+	 *  	return as new root
+	 */
+	public Object becomeRoot(Object oldRoot, Token rootToken, List kids);
 
 	// end of outer rule block, set return value
-	public Object createWithChildren(Object root, List kids);
+	public void addChildren(Object root, List kids);
 
 	// END new v4 stuff
 

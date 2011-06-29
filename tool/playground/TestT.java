@@ -7,15 +7,10 @@ import org.antlr.v4.tool.*;
 
 import java.util.List;
 
-public class Test {
+public class TestT {
 	public static void main(String[] args) throws Exception {
-//		T t = new T(new ANTLRFileStream(args[0]));
+//		TLexer t = new TLexer(new ANTLRFileStream(args[0]));
 //		CommonTokenStream tokens = new CommonTokenStream(t);
-//		tokens.fill();
-//		for (Object tok : tokens.getTokens()) {
-//			System.out.println(tok);
-//		}
-
 	}
 
 	public static void dump() throws Exception {

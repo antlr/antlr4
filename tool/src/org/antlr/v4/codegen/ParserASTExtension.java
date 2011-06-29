@@ -1,10 +1,8 @@
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
 
 import java.util.List;
 
@@ -34,20 +32,16 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
-	public List<SrcOp> ruleRef(List<SrcOp> ops) {
+	public List<SrcOp> leafRule(List<SrcOp> ops) {
 		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-		Tree parent = invokeOp.ast.getParent();
-		if ( parent!=null && parent.getType()==ANTLRParser.BANG ) return ops;
-		SrcOp treeOp = new AddLeaf(factory, invokeOp.ast, invokeOp);
+		SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, invokeOp);
 		return DefaultOutputModelFactory.list(ops, treeOp);
 	}
 
 	@Override
-	public List<SrcOp> tokenRef(List<SrcOp> ops) {
+	public List<SrcOp> leafToken(List<SrcOp> ops) {
 		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-		Tree parent = matchOp.ast.getParent();
-		if ( parent!=null && parent.getType()==ANTLRParser.BANG ) return ops;
-		SrcOp treeOp = new AddLeaf(factory, matchOp.ast, matchOp);
+		SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, matchOp);
 		return DefaultOutputModelFactory.list(ops, treeOp);
 	}
 }

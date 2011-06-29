@@ -30,21 +30,17 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 
 	public CodeGenerator getGenerator() { return gen; }
 
-	public ParserFile parserFile(String fileName) {
-		return new ParserFile(this, fileName);
-	}
+	public ParserFile parserFile(String fileName) { return null; }
 
-	public Parser parser(ParserFile file) {
-		return new Parser(this, file);
-	}
+	public Parser parser(ParserFile file) { return null; }
 
-	public RuleFunction rule(Rule r) {
-		return new RuleFunction(this, r);
-	}
+	public RuleFunction rule(Rule r) { return null; }
 
-	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) {
-		return null;
-	}
+	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) { return null; }
+
+	public LexerFile lexerFile(String fileName) { return null; }
+
+	public Lexer lexer(LexerFile file) { return null; }
 
 	// ALTERNATIVES / ELEMENTS
 

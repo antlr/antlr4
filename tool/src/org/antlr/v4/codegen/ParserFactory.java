@@ -14,41 +14,17 @@ import java.util.List;
 public class ParserFactory extends DefaultOutputModelFactory {
 	public ParserFactory(CodeGenerator gen) { super(gen); }
 
-	/** Build a file with a parser containing rule functions. Use the
-	 *  controller as factory in SourceGenTriggers so it triggers codegen
-	 *  extensions too, not just the factory functions in this factory.
-	public OutputModelObject buildOutputModel(OutputModelController controller) {
-		ParserFile file = new ParserFile(this, gen.getRecognizerFileName());
-		setRoot(file);
-		Parser parser = new Parser(this, file);
-		file.parser = parser;
-		for (Rule r : g.rules.values()) {
-			RuleFunction function = new RuleFunction(this, r);
-			parser.funcs.add(function);
-
-			// TRIGGER factory functions for rule alts, elements
-			currentRule.push(function);
-			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
-			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
-			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-			SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, controller);
-			try {
-				function.code = genTriggers.block(null,null); // walk AST of rule alts/elements
-			}
-			catch (Exception e){
-				e.printStackTrace(System.err);
-			}
-
-			function.ctxType = gen.target.getRuleFunctionContextStructName(r);
-			function.ruleCtx.name = function.ctxType;
-
-			if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
-			currentRule.pop();
-		}
-
-		return file;
+	public ParserFile parserFile(String fileName) {
+		return new ParserFile(this, fileName);
 	}
-	 **/
+
+	public Parser parser(ParserFile file) {
+		return new Parser(this, file);
+	}
+
+	public RuleFunction rule(Rule r) {
+		return new RuleFunction(this, r);
+	}
 
 	public List<SrcOp> epsilon() { return list(new CodeBlock(this)); }
 
