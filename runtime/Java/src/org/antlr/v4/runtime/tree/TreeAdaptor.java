@@ -63,6 +63,14 @@ public interface TreeAdaptor {
 	// If not null root, add kids to it
 	public void addChildren(Object root, List kids);
 
+	public List getChildren(Object root);
+
+	/** Add remaining kids to non-null root.  If null root, add kids to
+	 *  new nil root.  If only one kid, make it the root.  Return the
+	 *  root.
+	 */
+	public Object rulePostProcessing(Object root, List kids);
+
 	// END new v4 stuff
 
 	// C o n s t r u c t i o n

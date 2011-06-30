@@ -27,50 +27,20 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.codegen.model.ast;
 
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.*;
-import org.antlr.v4.misc.Utils;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.tool.GrammarAST;
 
-import java.util.List;
+public class RuleBecomeRoot extends SrcOp {
+	public LabeledOp opWithResultToAdd;
+	public Decl label;
 
-public class ParserASTExtension extends CodeGeneratorExtension {
-	public ParserASTExtension(OutputModelFactory factory) {
-		super(factory);
-	}
-
-	@Override
-	public List<SrcOp> rulePostamble(List<SrcOp> ops) {
-		AssignTreeResult setReturn = new AssignTreeResult(factory);
-		return DefaultOutputModelFactory.list(ops, setReturn);
-	}
-
-	@Override
-	public List<SrcOp> rootRule(List<SrcOp> ops) {
-		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-		SrcOp treeOp = new RuleBecomeRoot(factory, invokeOp.ast, invokeOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
-	}
-
-	@Override
-	public List<SrcOp> rootToken(List<SrcOp> ops) {
-		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-		SrcOp treeOp = new TokenBecomeRoot(factory, matchOp.ast, matchOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
-	}
-
-	@Override
-	public List<SrcOp> leafRule(List<SrcOp> ops) {
-		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-		SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, invokeOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
-	}
-
-	@Override
-	public List<SrcOp> leafToken(List<SrcOp> ops) {
-		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-		SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, matchOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
+	public RuleBecomeRoot(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
+		super(factory, ast);
+		this.opWithResultToAdd = opWithResultToAdd;
+		label = opWithResultToAdd.getLabels().get(0);
 	}
 }

@@ -1,6 +1,6 @@
 grammar T;
 options {output=AST;}
-a : A^ C^ D ;
+a : D^ b^ C D b;
 
 b : B ;
 

@@ -103,8 +103,8 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     <locals; separator="\n">
 	try {
 	    <code>
-	    <postamble; separator="\n">
         _localctx.stop = input.LT(-1);
+	    <postamble; separator="\n">
         <namedActions.after>
 	}
 	catch (RecognitionException re) {
@@ -359,18 +359,18 @@ labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 // AST stuff (TODO: separate?)
 
 KidsListDecl(d) ::= "List <d.name> = new ArrayList(5);"
-RootDecl(d)     ::= "Object <d.name> = null;"
+RootDecl(d)     ::= "Object <d.name> = _adaptor.nil();"
 RootName(level)     ::= "_root<level>"
 KidsListName(level) ::= "_kids<level>"
 
-AddTokenLeaf(a) ::= "_kids0.add(_adaptor.create(<labelref(a.label)>));"
-AddRuleLeaf(a) ::= "_kids0.add(<labelref(a.label)>.tree);"
-// TODO: need RuleBecomeRoot
-BecomeRoot(r) ::= "_root0 = _root0==null ? _adaptor.create(<labelref(r.label)>) : _adaptor.becomeRoot(_root0, <labelref(r.label)>, _kids0);"
+AddTokenLeaf(a) ::= "_adaptor.addChild(_root0, _adaptor.create(<labelref(a.label)>));"
+AddRuleLeaf(a) ::= "_adaptor.addChild(_root0, <labelref(a.label)>.tree);"
+RuleBecomeRoot(r) ::= "_root0 = _adaptor.becomeRoot(<labelref(r.label)>.tree, _root0);"
+TokenBecomeRoot(t) ::= "_root0 = _adaptor.becomeRoot(_adaptor.create(<labelref(t.label)>), _root0);"
 AssignTreeResult(a) ::= <<
-if ( _root0==null && _kids0.size()>0 ) _root0 = _adaptor.nil();
-_adaptor.addChildren(_root0, _kids0);
+_root0 = _adaptor.rulePostProcessing(_root0);
 _localctx.tree = _root0;
+_adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 >>
 
 /*

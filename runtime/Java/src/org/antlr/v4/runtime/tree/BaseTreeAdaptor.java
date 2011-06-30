@@ -44,29 +44,71 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	// BEGIN v4 stuff
 
+	/* Upon B^ in these cases:
+		A B^	add kids to newRoot B
+				return B
+		A^ B^	add any remaining kids to A
+				clear kids
+				add A as child of B
+				return B
+		r B^	add kids to B
+				clear kids
+				return B
+		r^ B^
+
+	   Upon r^ in these cases:
+	    A r^
+	    A^ r^
+	    s r^
+	    s^ r^
+
+	    A r^ B, r is (C D). result = (C D A B)
+	    becomeRoot((C D), (nil A))
+
+	    A r^ B, r is (nil C D). result = (A C D B)
+	    becomeRoot((nil C D), (nil A))
+
+todo: ref to r must chk if ^(nil list); can't just add to List<Tree>
+	 */
 	public Object becomeRoot(Object oldRoot, Object newRoot, List kids) {
-		return null;
+		// old root can be nil rooted if root set by r^ call like "r^ A"; implies a list
+		if ( ((Tree)oldRoot).isNil() ) {
+			addChildren(newRoot, getChildren(oldRoot)); // add old children to new root
+			addChildren(newRoot, kids);					// add unattached kids also
+			kids.clear();
+			return oldRoot;
+		}
+		// must be from previous root match like "A^ B^" or single node
+		// result from r^ or rooted/non-nil root from r^ in "r^ A^".
+		addChildren(oldRoot, kids);
+		kids.clear();
+		addChild(newRoot, oldRoot); // newRoot becomes root of old root
+		return newRoot;
 	}
 
-	/** if oldRoot is nil then:
+	/** if oldRoot is nil then (oldRoot must be r^ result):
 	 * 		create newRoot for rootToken
 	 *  	add kids to newRoot
 	 *   	clear kids
 	 *  	return as new root
-	 *  if oldRoot not nil then:
+	 *  if oldRoot not nil then (must have created from A^):
 	 *  	add kids to oldRoot
 	 *  	clear kids
 	 *  	create rootToken
 	 *  	return as new root
 	 */
 	public Object becomeRoot(Object oldRoot, Token rootToken, List kids) {
-		// first flush all previous children onto old root
+
+		// old root can be nil rooted if root set by r^ call like "r^ A"; implies a list
 		if ( ((Tree)oldRoot).isNil() ) {
-			oldRoot = create(rootToken);
-			addChildren(oldRoot, kids);
+			Tree newRoot = (Tree)create(rootToken);
+			addChildren(newRoot, getChildren(oldRoot)); // add old children to new root
+			addChildren(newRoot, kids);					// add unattached kids also
 			kids.clear();
 			return oldRoot;
 		}
+		// must be from previous root match like "A^ B^" or single node
+		// result from r^ or rooted/non-nil root from r^ in "r^ A^".
 		addChildren(oldRoot, kids);
 		kids.clear();
 		Object newRoot = create(rootToken);
@@ -76,6 +118,31 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	public void addChildren(Object root, List kids) {
 		if ( root!=null ) ((Tree)root).addChildren(kids);
+	}
+
+	public List getChildren(Object root) { return ((Tree)root).getChildren(); }
+
+	/** Add remaining kids to non-null root.  If null root, add kids to
+	 *  new nil root.  If only one kid, make it the root.  Return the
+	 *  root.
+	 */
+	public Object rulePostProcessing(Object root, List kids) {
+		if ( root!=null ) {
+			addChildren(root, kids);
+		}
+		else {
+			if ( kids.size()==1 ) {
+				root = kids.get(0);
+				// whoever invokes rule will set parent and child index
+				((Tree)root).setParent(null);
+				((Tree)root).setChildIndex(-1);
+			}
+			if ( kids.size()>1 ) {
+				root = nil();
+				addChildren(root, kids);
+			}
+		}
+		return root;
 	}
 
 	// END v4 stuff

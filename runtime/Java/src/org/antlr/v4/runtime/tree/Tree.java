@@ -49,6 +49,8 @@ public interface Tree {
 	// BEGIN v4
 	void addChildren(List t);
 
+	List getChildren();
+
 	// END v4
 
 	Tree getChild(int i);
