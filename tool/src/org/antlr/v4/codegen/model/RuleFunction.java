@@ -102,11 +102,6 @@ public class RuleFunction extends OutputModelObject {
 			namedActions.put(name, new Action(factory, ast));
 		}
 
-		if ( factory.getGrammar().hasASTOption() ) {
-			addLocalDecl(new RootDecl(factory, 0));
-			addLocalDecl(new KidsListDecl(factory, 0));
-		}
-
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 

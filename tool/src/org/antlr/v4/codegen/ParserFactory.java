@@ -67,14 +67,16 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		InvokeRule invokeOp = new InvokeRule(this, ID, label);
-		defineImplicitLabel(ID, invokeOp);
+		// If no manual label and action refs as token/rule not label or
+		// we're adding to trees, we need to define implicit label
+		if ( controller.needsImplicitLabel(ID, invokeOp) ) defineImplicitLabel(ID, invokeOp);
 		AddToLabelList listLabelOp = getListLabel(invokeOp, label);
 		return list(invokeOp, listLabelOp);
 	}
 
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID, label);
-		defineImplicitLabel(ID, matchOp);
+		if ( controller.needsImplicitLabel(ID, matchOp) ) defineImplicitLabel(ID, matchOp);
 		AddToLabelList listLabelOp = getListLabel(matchOp, label);
 		return list(matchOp, listLabelOp);
 	}
@@ -163,32 +165,28 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(new TestSetInline(this, blkAST, look));
 	}
 
+	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {
+		return op.getLabels().size()==0 &&
+		(getCurrentAlt().tokenRefsInActions.containsKey(ID.getText()) ||
+		getCurrentAlt().ruleRefsInActions.containsKey(ID.getText()));
+	}
+
 	// support
 
-	/** If no manual label and action refs as token/rule not label or
-	 *  we're adding to trees, we need to define implicit label
-	 */
 	public void defineImplicitLabel(GrammarAST ID, LabeledOp op) {
-		boolean needsImplicitLabel =
-			op.getLabels().size()==0 &&
-			(getCurrentAlt().tokenRefsInActions.containsKey(ID.getText()) ||
-			 getCurrentAlt().ruleRefsInActions.containsKey(ID.getText()) ||
-			 g.hasASTOption());
-		if ( needsImplicitLabel ) {
-			Decl d;
-			Rule r = g.getRule(ID.getText());
-			if ( r!=null ) {
-				String implLabel = gen.target.getImplicitRuleLabel(ID.getText());
-				String ctxName = gen.target.getRuleFunctionContextStructName(r);
-				d = new RuleContextDecl(this, implLabel, ctxName);
-			}
-			else {
-				String implLabel = gen.target.getImplicitTokenLabel(ID.getText());
-				d = new TokenDecl(this, implLabel);
-			}
-			op.getLabels().add(d);
-			getCurrentRule().addLocalDecl(d);
+		Decl d;
+		Rule r = g.getRule(ID.getText());
+		if ( r!=null ) {
+			String implLabel = gen.target.getImplicitRuleLabel(ID.getText());
+			String ctxName = gen.target.getRuleFunctionContextStructName(r);
+			d = new RuleContextDecl(this, implLabel, ctxName);
 		}
+		else {
+			String implLabel = gen.target.getImplicitTokenLabel(ID.getText());
+			d = new TokenDecl(this, implLabel);
+		}
+		op.getLabels().add(d);
+		getCurrentRule().addLocalDecl(d);
 	}
 
 	public AddToLabelList getListLabel(LabeledOp op, GrammarAST label) {

@@ -115,6 +115,7 @@ public class CodeGenerator {
 		if ( g.hasASTOption() ) {
 			controller.addExtension( new ParserASTExtension(factory) );
 		}
+		factory.setController(controller);
 
 		OutputModelObject outputModel;
 		if ( g.isLexer() ) outputModel = controller.buildLexerOutputModel();

@@ -256,6 +256,12 @@ public class OutputModelController implements OutputModelFactory {
 		return ops;
 	}
 
+	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {
+		boolean needs = delegate.needsImplicitLabel(ID, op);
+		for (CodeGeneratorExtension ext : extensions) needs |= ext.needsImplicitLabel(ID, op);
+		return needs;
+	}
+
 	public OutputModelObject getRoot() { return delegate.getRoot(); }
 
 	public void setRoot(OutputModelObject root) { delegate.setRoot(root); }
@@ -269,4 +275,6 @@ public class OutputModelController implements OutputModelFactory {
 	public Alternative getCurrentAlt() { return delegate.getCurrentAlt(); }
 
 	public void setCurrentAlt(Alternative alt) { delegate.setCurrentAlt(alt); }
+
+	public void setController(OutputModelController controller) { } // nop; we are controller
 }

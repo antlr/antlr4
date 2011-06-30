@@ -31,13 +31,21 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
+import org.antlr.v4.codegen.model.decl.RootDecl;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
 
 public class ParserASTExtension extends CodeGeneratorExtension {
 	public ParserASTExtension(OutputModelFactory factory) {
 		super(factory);
+	}
+
+	@Override
+	public RuleFunction rule(RuleFunction rf) {
+		rf.addLocalDecl(new RootDecl(factory, 0));
+		return rf;
 	}
 
 	@Override
@@ -72,5 +80,10 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
 		SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, matchOp);
 		return DefaultOutputModelFactory.list(ops, treeOp);
+	}
+
+	@Override
+	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {
+		return op.getLabels().size()==0 && factory.getGrammar().hasASTOption();
 	}
 }

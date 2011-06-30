@@ -31,6 +31,7 @@ package org.antlr.v4.codegen;
 
 
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
 
@@ -97,4 +98,6 @@ public class CodeGeneratorExtension {
 	public List<SrcOp> getLLStarEBNFBlock(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> getLL1Test(List<SrcOp> ops) { return ops; }
+
+	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
 }

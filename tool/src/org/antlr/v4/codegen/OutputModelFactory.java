@@ -88,6 +88,8 @@ public interface OutputModelFactory {
 
 	List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST);
 
+	boolean needsImplicitLabel(GrammarAST ID, LabeledOp op);
+
 	// CONTEXT MANIPULATION
 
 	OutputModelObject getRoot();
@@ -103,4 +105,6 @@ public interface OutputModelFactory {
 	Alternative getCurrentAlt();
 
 	void setCurrentAlt(Alternative currentAlt);
+
+	void setController(OutputModelController controller);
 }

@@ -44,6 +44,7 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 	// Interface to outside world
 	public Grammar g;
 	public CodeGenerator gen;
+	public OutputModelController controller;
 
 	// Context ptrs
 	public OutputModelObject root; // normally ParserFile, LexerFile, ...
@@ -113,6 +114,9 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) { return null; }
 
+	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
+
+
 	// SET CONTEXT
 
 	public OutputModelObject getRoot() { return root; }
@@ -134,6 +138,10 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 	public Alternative getCurrentAlt() { return currentAlt; }
 
 	public void setCurrentAlt(Alternative currentAlt) { this.currentAlt = currentAlt; }
+
+	public void setController(OutputModelController controller) {
+		this.controller = controller;
+	}
 
 	// MISC
 
