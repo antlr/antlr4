@@ -44,9 +44,10 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<SrcOp> omos]
 alternative returns [List<SrcOp> omos]
 @init {
 	List<SrcOp> elems = new ArrayList<SrcOp>();
-	if ( ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
+	// set alt if outer ALT only
+	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
 }
-    :	^(ALT_REWRITE a=alternative .)
+    :	^(ALT_REWRITE a=alternative {$omos=$a.omos;} (rewrite {DefaultOutputModelFactory.list($omos, $rewrite.omos);} | ))
     |	^(ALT EPSILON) {$omos = factory.epsilon();}
     |   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
     	{$omos = factory.alternative(elems);}
@@ -128,3 +129,92 @@ terminal[GrammarAST label] returns [List<SrcOp> omos]
     |	^(TOKEN_REF .)				{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
     |	TOKEN_REF					{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
     ;
+
+elementOptions
+    :	^(ELEMENT_OPTIONS elementOption+)
+    ;
+
+elementOption
+    :	ID
+    |   ^(ASSIGN ID ID)
+    |   ^(ASSIGN ID STRING_LITERAL)
+    ;
+
+// R E W R I T E  S T U F F
+
+rewrite returns [List<SrcOp> omos]
+	:	predicatedRewrite* nakedRewrite 	{$omos = nakedRewrite.omos;}
+	;
+
+predicatedRewrite returns [List<SrcOp> omos]
+	:	^(ST_RESULT SEMPRED rewriteSTAlt)
+	|	^(RESULT SEMPRED rewriteTreeAlt)
+	;
+
+nakedRewrite returns [List<SrcOp> omos]
+	:	^(ST_RESULT rewriteSTAlt)
+	|	^(RESULT rewriteTreeAlt)			{$omos = $rewriteTreeAlt.omos;}
+	;
+
+rewriteTreeAlt returns [List<SrcOp> omos]
+    :	^(ALT rewriteTreeElement+)
+    |	ETC
+    |	EPSILON
+    ;
+
+rewriteTreeElement returns [List<SrcOp> omos]
+	:	rewriteTreeAtom
+	|	rewriteTree
+	|   rewriteTreeEbnf
+	;
+
+rewriteTreeAtom returns [List<SrcOp> omos]
+    :   ^(TOKEN_REF elementOptions ARG_ACTION)
+    |   ^(TOKEN_REF elementOptions)
+    |   ^(TOKEN_REF ARG_ACTION)
+	|   TOKEN_REF							{$omos = factory.rewrite_tokenRef($TOKEN_REF);}
+    |   RULE_REF							{$omos = factory.rewrite_ruleRef($TOKEN_REF);}
+	|   ^(STRING_LITERAL elementOptions)
+	|   STRING_LITERAL
+	|   LABEL
+	|	ACTION
+	;
+
+rewriteTreeEbnf returns [List<SrcOp> omos]
+	:	^('?' ^(REWRITE_BLOCK rewriteTreeAlt))
+	:	^('*' ^(REWRITE_BLOCK rewriteTreeAlt))
+	;
+	
+rewriteTree returns [List<SrcOp> omos]
+	:	^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )
+	;
+
+rewriteSTAlt returns [List<SrcOp> omos]
+    :	rewriteTemplate
+    |	ETC
+    |	EPSILON
+    ;
+
+rewriteTemplate returns [List<SrcOp> omos]
+	:	^(TEMPLATE rewriteTemplateArgs? DOUBLE_QUOTE_STRING_LITERAL)
+	|	^(TEMPLATE rewriteTemplateArgs? DOUBLE_ANGLE_STRING_LITERAL)
+	|	rewriteTemplateRef
+	|	rewriteIndirectTemplateHead
+	|	ACTION
+	;
+
+rewriteTemplateRef returns [List<SrcOp> omos]
+	:	^(TEMPLATE ID rewriteTemplateArgs?)
+	;
+
+rewriteIndirectTemplateHead returns [List<SrcOp> omos]
+	:	^(TEMPLATE ACTION rewriteTemplateArgs?)
+	;
+
+rewriteTemplateArgs returns [List<SrcOp> omos]
+	:	^(ARGLIST rewriteTemplateArg+)
+	;
+
+rewriteTemplateArg returns [List<SrcOp> omos]
+	:   ^(ARG ID ACTION)
+	;

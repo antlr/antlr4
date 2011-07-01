@@ -33,8 +33,10 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.LabeledOp;
 import org.antlr.v4.tool.GrammarAST;
 
-public class AddRuleLeaf extends ElementASTOp {
-	public AddRuleLeaf(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
+public class TrackElement extends ElementASTOp {
+	public String name; // ID, r, ...
+	public TrackElement(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
 		super(factory, ast, opWithResultToAdd);
+		name = ast.getText();
 	}
 }

@@ -358,10 +358,8 @@ labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 
 // AST stuff (TODO: separate?)
 
-KidsListDecl(d) ::= "List <d.name> = new ArrayList(5);"
 RootDecl(d)     ::= "Object <d.name> = _adaptor.nil();"
 RootName(level)     ::= "_root<level>"
-KidsListName(level) ::= "_kids<level>"
 
 AddTokenLeaf(a) ::= "_adaptor.addChild(_root0, _adaptor.create(<labelref(a.label)>));"
 AddRuleLeaf(a) ::= "_adaptor.addChild(_root0, <labelref(a.label)>.tree);"
@@ -372,6 +370,10 @@ _root0 = _adaptor.rulePostProcessing(_root0);
 _localctx.tree = _root0;
 _adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 >>
+
+ElementListDecl(d) ::= "List <d.name> = new ArrayList(5);"
+ElementListName(elemName) ::= "_track_<elemName>"
+TrackElement(e) ::= "_track_<e.name>.add(<labelref(e.label)>);"
 
 /*
 BitSetDecl(b) ::= <<

@@ -83,6 +83,12 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> leafRule(List<SrcOp> ops) { return ops; }
 
+	// AST REWRITEs
+
+	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> rewrite_tokenRef(List<SrcOp> ops) { return ops; }
+
 	// BLOCKS
 
 	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }

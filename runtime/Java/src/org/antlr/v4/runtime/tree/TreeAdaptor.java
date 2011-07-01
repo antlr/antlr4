@@ -44,32 +44,14 @@ import java.util.List;
  */
 public interface TreeAdaptor {
 	// BEGIN new v4 stuff
-	// x^
-	public Object becomeRoot(Object oldRoot, Object newRoot, List kids);
-
-	/** if oldRoot is nil then:
-	 * 		create newRoot for rootToken
-	 *  	add kids to newRoot
-	 *   	clear kids
-	 *  	return as new root
-	 *  if oldRoot not nil then:
-	 *  	add kids to oldRoot
-	 *  	clear kids
-	 *  	create rootToken
-	 *  	return as new root
-	 */
-	public Object becomeRoot(Object oldRoot, Token rootToken, List kids);
 
 	// If not null root, add kids to it
-	public void addChildren(Object root, List kids);
+	//public void addChildren(Object root, List kids);
 
-	public List getChildren(Object root);
+	//public List getChildren(Object root);
 
-	/** Add remaining kids to non-null root.  If null root, add kids to
-	 *  new nil root.  If only one kid, make it the root.  Return the
-	 *  root.
-	 */
-	public Object rulePostProcessing(Object root, List kids);
+	/** Used to track elements to left of -> for use in rewrite */
+	public List createElementList();
 
 	// END new v4 stuff
 

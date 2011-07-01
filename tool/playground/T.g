@@ -1,6 +1,7 @@
 grammar T;
 options {output=AST;}
-a : D^ b^ C D b;
+tokens {I;}
+a : A b -> A b ;
 
 b : B ;
 

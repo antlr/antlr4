@@ -90,6 +90,12 @@ public interface OutputModelFactory {
 
 	boolean needsImplicitLabel(GrammarAST ID, LabeledOp op);
 
+	// AST REWRITE TRIGGERS
+
+	List<SrcOp> rewrite_ruleRef(GrammarAST ID);
+
+	List<SrcOp> rewrite_tokenRef(GrammarAST ID);
+
 	// CONTEXT MANIPULATION
 
 	OutputModelObject getRoot();

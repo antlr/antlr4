@@ -31,9 +31,9 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
-import org.antlr.v4.codegen.model.decl.RootDecl;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.*;
 
 import java.util.List;
 
@@ -56,30 +56,57 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 
 	@Override
 	public List<SrcOp> rootRule(List<SrcOp> ops) {
-		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-		SrcOp treeOp = new RuleBecomeRoot(factory, invokeOp.ast, invokeOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() ) {
+			return ops;
+		}
+		else {
+			InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
+			SrcOp treeOp = new RuleBecomeRoot(factory, invokeOp.ast, invokeOp);
+			return DefaultOutputModelFactory.list(ops, treeOp);
+		}
 	}
 
 	@Override
 	public List<SrcOp> rootToken(List<SrcOp> ops) {
-		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-		SrcOp treeOp = new TokenBecomeRoot(factory, matchOp.ast, matchOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() ) {
+			return ops;
+		}
+		else {
+			MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
+			SrcOp treeOp = new TokenBecomeRoot(factory, matchOp.ast, matchOp);
+			return DefaultOutputModelFactory.list(ops, treeOp);
+		}
 	}
 
 	@Override
 	public List<SrcOp> leafRule(List<SrcOp> ops) {
-		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-		SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, invokeOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() ) {
+			return ops;
+		}
+		else {
+			InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
+			SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, invokeOp);
+			return DefaultOutputModelFactory.list(ops, treeOp);
+		}
 	}
 
 	@Override
 	public List<SrcOp> leafToken(List<SrcOp> ops) {
 		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-		SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, matchOp);
-		return DefaultOutputModelFactory.list(ops, treeOp);
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() ) {
+			RuleFunction rf = factory.getCurrentRule();
+			rf.addLocalDecl(new ElementListDecl(factory, matchOp.ast));
+			TrackElement t = new TrackElement(factory, matchOp.ast, matchOp);
+			return DefaultOutputModelFactory.list(ops, t);
+		}
+		else {
+			SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, matchOp);
+			return DefaultOutputModelFactory.list(ops, treeOp);
+		}
 	}
 
 	@Override

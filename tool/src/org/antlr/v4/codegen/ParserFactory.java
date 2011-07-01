@@ -171,6 +171,16 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		getCurrentAlt().ruleRefsInActions.containsKey(ID.getText()));
 	}
 
+	// AST REWRITE
+
+	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
+		return null;
+	}
+
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) {
+		return null;
+	}
+
 	// support
 
 	public void defineImplicitLabel(GrammarAST ID, LabeledOp op) {

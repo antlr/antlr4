@@ -226,9 +226,9 @@ public class Target {
 		return st.render();
 	}
 
-	public String getKidsListName(int level) {
-		ST st = gen.templates.getInstanceOf("KidsListName");
-		st.add("level", level);
+	public String getElementListName(GrammarAST elem) {
+		ST st = gen.templates.getInstanceOf("ElementListName");
+		st.add("elemName", elem.getText()); // TODO: not right for literals
 		return st.render();
 	}
 }

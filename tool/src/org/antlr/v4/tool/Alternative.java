@@ -30,6 +30,7 @@
 package org.antlr.v4.tool;
 
 
+import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -68,6 +69,11 @@ public class Alternative implements AttributeResolver {
     public List<ActionAST> actions = new ArrayList<ActionAST>();
 
     public Alternative(Rule r) { this.rule = r; }
+
+	/** (ALT_REWRITE (ALT ...) (-> (ALT ...))) */
+	public boolean hasRewrite() {
+		return ast!=null && ast.getType()==ANTLRParser.ALT_REWRITE;
+	}
 
 	public boolean resolvesToToken(String x, ActionAST node) {
 		if ( tokenRefs.get(x)!=null ) return true;

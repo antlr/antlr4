@@ -98,6 +98,12 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 
 	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
 
+	// AST REWRITES
+
+	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) { return null; }
+
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) { return null; }
+
 	// BLOCKS
 
 	public List<SrcOp> getChoiceBlock(BlockAST blkAST, List<SrcOp> alts) { return null; }
