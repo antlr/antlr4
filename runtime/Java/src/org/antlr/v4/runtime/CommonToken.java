@@ -101,7 +101,8 @@ public class CommonToken implements Token, Serializable {
 		if ( input==null ) {
 			return null;
 		}
-		if ( start<input.size() && stop<input.size() ) {
+		int n = input.size();
+		if ( start<n && stop<n) {
 			return input.substring(start,stop);
 		}
 		else {
