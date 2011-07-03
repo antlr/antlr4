@@ -38,7 +38,7 @@ import java.util.*;
 public class CodeBlock extends SrcOp {
 	@ModelElement public OrderedHashSet<Decl> locals;
 	@ModelElement public List<SrcOp> preamble;
-	@ModelElement public List ops; // has to be unchecked so we can add different subclasses of SrcOp :(
+	@ModelElement public List<SrcOp> ops;
 
 	public CodeBlock(OutputModelFactory factory) {
 		super(factory);
@@ -54,5 +54,10 @@ public class CodeBlock extends SrcOp {
 	public void addPreambleOp(SrcOp op) {
 		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
 		preamble.add(op);
+	}
+
+	public void addOp(SrcOp op) {
+		if ( ops==null ) ops = new ArrayList<SrcOp>();
+		ops.add(op);
 	}
 }

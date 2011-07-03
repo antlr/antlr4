@@ -10,6 +10,7 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.tool.*;
 import java.util.Collections;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 }
 
 @members {
-	public int rewriteLevel = 0;
+	public int codeBlockLevel = 0;
 	public OutputModelFactory factory;
     public SourceGenTriggers(TreeNodeStream input, OutputModelFactory factory) {
     	this(input);
@@ -30,7 +31,12 @@ dummy : block[null, null] ;
 block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos]
     :	^(	blk=BLOCK (^(OPTIONS .+))?
 			{List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();}
-    		( alternative {alts.add($alternative.altCodeBlock);} )+
+    		(	alternative
+    			{
+		    	factory.finishAlternative($alternative.altCodeBlock, $alternative.ops);
+    			alts.add($alternative.altCodeBlock);
+    			}
+    		)+
     	)
     	{
     	if ( alts.size()==1 && ebnfRoot==null) return alts;
@@ -43,28 +49,58 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
     	}
     ;
 
+/*
 alternative returns [CodeBlockForAlt altCodeBlock]
 @init {
-	List<SrcOp> elems = new ArrayList<SrcOp>();
+	// set alt if outer ALT only
+	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
+}
+	:	alternative_with_rewrite {$altCodeBlock = $alternative_with_rewrite.altCodeBlock;}
+
+	|	^(ALT EPSILON) {$altCodeBlock = factory.epsilon();}
+
+    |	{
+    	List<SrcOp> elems = new ArrayList<SrcOp>();
+		$altCodeBlock = factory.alternative(factory.getCurrentAlt());
+		$ops = elems;
+		factory.setCurrentBlock($altCodeBlock);
+		}
+		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
+	;
+	
+alternative_with_rewrite returns [CodeBlockForAlt altCodeBlock]
+	:	^(ALT_REWRITE
+    		a=alternative
+    		(	rewrite {$a.ops.add($rewrite.code);} // insert at end of alt's code
+    		|
+    		)
+    		{$altCodeBlock=$a.altCodeBlock; $ops=$a.ops;}
+    	 )
+	;
+*/
+	
+alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
+@init {
 	// set alt if outer ALT only
 	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
 }
     :	^(ALT_REWRITE
     		a=alternative
-    		(	rewrite {$a.altCodeBlock.ops.add($rewrite.code);} // insert at end of alt's code
+    		(	rewrite {$a.ops.add($rewrite.code);} // insert at end of alt's code
     		|
     		)
-    		{$altCodeBlock=$a.altCodeBlock;}
+    		{$altCodeBlock=$a.altCodeBlock; $ops=$a.ops;}
     	 )
 
     |	^(ALT EPSILON) {$altCodeBlock = factory.epsilon();}
 
     |	{
-    	$altCodeBlock = factory.alternative(factory.getCurrentAlt());
+    	List<SrcOp> elems = new ArrayList<SrcOp>();
+		$altCodeBlock = factory.alternative(factory.getCurrentAlt());
+		$ops = elems;
 		factory.setCurrentBlock($altCodeBlock);
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
-    	{$altCodeBlock.ops = elems;}
     ;
 
 element returns [List<? extends SrcOp> omos]
@@ -158,7 +194,7 @@ elementOption
 
 rewrite returns [Rewrite code]
 	:	{
-		$code = factory.treeRewrite($start, rewriteLevel++);
+		$code = factory.treeRewrite($start, codeBlockLevel++);
 		CodeBlock save = factory.getCurrentBlock();
 		factory.setCurrentBlock($code);
 		}
@@ -166,6 +202,7 @@ rewrite returns [Rewrite code]
 		{
 		$code.ops = $nakedRewrite.omos;
 		factory.setCurrentBlock(save);
+		codeBlockLevel--;
 		}
 	;
 
@@ -213,12 +250,22 @@ rewriteTreeEbnf returns [List<SrcOp> omos]
 	;
 	
 rewriteTree returns [List<SrcOp> omos]
-	:	{List<SrcOp> elems = new ArrayList<SrcOp>();}
+	:	{
+		List<SrcOp> elems = new ArrayList<SrcOp>();
+		RewriteTreeStructure t = factory.rewrite_tree($start, codeBlockLevel++);
+		CodeBlock save = factory.getCurrentBlock();
+		factory.setCurrentBlock(t);
+		}
 		^(	TREE_BEGIN
 			rewriteTreeAtom[true] {elems.addAll($rewriteTreeAtom.omos);}
 			( rewriteTreeElement {elems.addAll($rewriteTreeElement.omos);} )*
 		 )
-		{$omos = factory.rewrite_tree($TREE_BEGIN, elems);}
+		{
+		t.ops = elems;
+		$omos = DefaultOutputModelFactory.list(t);
+		factory.setCurrentBlock(save);
+		codeBlockLevel--;
+		}
 	;
 
 rewriteSTAlt returns [List<SrcOp> omos]

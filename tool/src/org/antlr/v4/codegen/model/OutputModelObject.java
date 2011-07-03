@@ -39,7 +39,7 @@ public abstract class OutputModelObject {
 
 	public OutputModelObject() {;}
 
-	public OutputModelObject(OutputModelFactory factory) { this.factory = factory; }
+	public OutputModelObject(OutputModelFactory factory) { this(factory, null); }
 
 	public OutputModelObject(OutputModelFactory factory, GrammarAST ast) {
 		this.factory = factory;

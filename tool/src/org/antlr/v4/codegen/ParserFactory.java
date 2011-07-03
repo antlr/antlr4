@@ -60,6 +60,12 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public CodeBlockForAlt alternative(Alternative alt) { return new CodeBlockForAlt(this); }
 
+	@Override
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops) {
+		blk.ops = ops;
+		return blk;
+	}
+
 	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
 
 	public List<SrcOp> forcedAction(GrammarAST ast) { return list(new ForcedAction(this, ast)); }
@@ -177,8 +183,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops) {
-		return list(new RewriteTreeStructure(this, root, ops));
+	public RewriteTreeStructure rewrite_tree(GrammarAST root, int rewriteLevel) {
+		return new RewriteTreeStructure(this, root, rewriteLevel);
 	}
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {

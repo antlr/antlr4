@@ -123,9 +123,11 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 >>
 
 CodeBlockForAlt(c, locals, preamble, ops) ::= <<
+{
 <locals; separator="\n">
 <preamble; separator="\n">
 <ops; separator="\n">
+}
 >>
 
 LL1AltBlock(choice, alts, error) ::= <<
@@ -368,9 +370,9 @@ AddTokenLeaf(a) ::= "_adaptor.addChild(_root0, _adaptor.create(<labelref(a.label
 AddRuleLeaf(a) ::= "_adaptor.addChild(_root0, <labelref(a.label)>.tree);"
 RuleBecomeRoot(r) ::= "_root0 = _adaptor.becomeRoot(<labelref(r.label)>.tree, _root0);"
 TokenBecomeRoot(t) ::= "_root0 = _adaptor.becomeRoot(_adaptor.create(<labelref(t.label)>), _root0);"
-AssignTreeResult(a) ::= <<
-_root0 = _adaptor.rulePostProcessing(_root0);
-_localctx.tree = _root0;
+AssignTreeResult(a) ::= "_localctx.tree = _root0;"
+RuleASTCleanup(r) ::= <<
+_localctx.tree = _adaptor.rulePostProcessing(_localctx.tree);
 _adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 >>
 
@@ -381,11 +383,19 @@ TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
 TreeRewrite(tr, locals, preamble, ops) ::= <<
 // rewrite: ...
-<CodeBlockForAlt(tr, locals, preamble, ops)>
+<locals; separator="\n">
+<preamble; separator="\n">
+<ops; separator="\n">
+_localctx.tree = _root0;
 >>
 
-RewriteTreeStructure(t, ops) ::= <<
-<ops; separator="\n">
+RewriteTreeStructure(t, locals, preamble, ops) ::= <<
+{
+    <locals; separator="\n">
+    <preamble; separator="\n">
+    <ops; separator="\n">
+    _adaptor.addChild(<labelref(t.enclosingBlock.rootDecl)>, <labelref(t.rootDecl)>);
+}
 >>
 RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
 RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"

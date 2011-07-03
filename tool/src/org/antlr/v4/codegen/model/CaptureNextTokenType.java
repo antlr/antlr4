@@ -29,8 +29,13 @@
 
 package org.antlr.v4.codegen.model;
 
+import org.antlr.v4.codegen.OutputModelFactory;
+
 /** */
 public class CaptureNextTokenType extends SrcOp {
 	public String varName;
-	public CaptureNextTokenType(String varName) { this.varName = varName; }
+	public CaptureNextTokenType(OutputModelFactory factory, String varName) {
+		super(factory);
+		this.varName = varName;
+	}
 }

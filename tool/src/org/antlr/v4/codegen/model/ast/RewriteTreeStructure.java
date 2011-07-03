@@ -30,17 +30,14 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.tool.GrammarAST;
 
-import java.util.List;
-
 /** ^(A B C) */
-public class RewriteTreeStructure extends SrcOp {
-	@ModelElement public List<? extends SrcOp> ops;
-
-	public RewriteTreeStructure(OutputModelFactory factory, GrammarAST ast, List<? extends SrcOp> ops) {
-		super(factory, ast);
-		this.ops = ops;
+public class RewriteTreeStructure extends TreeRewrite {
+	public RewriteTreeStructure(OutputModelFactory factory,
+								GrammarAST ast,
+								int level)
+	{
+		super(factory, level);
 	}
 }

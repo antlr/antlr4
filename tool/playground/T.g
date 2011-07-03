@@ -1,9 +1,11 @@
 grammar T;
 options {output=AST;}
 tokens {I;}
-a : A b C -> ^(A b C) ;
+a : A b C -> ^(A ^(b C))
+  | B
+  ;
 
-b : B ;
+b : B | C ;
 
 A : 'a';
 B : 'b';

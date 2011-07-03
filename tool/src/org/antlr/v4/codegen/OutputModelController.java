@@ -31,7 +31,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.TreeRewrite;
+import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -141,9 +141,15 @@ public class OutputModelController implements OutputModelFactory {
 	public CodeGenerator getGenerator() { return delegate.getGenerator(); }
 
 	public CodeBlockForAlt alternative(Alternative alt) {
-		CodeBlockForAlt code = delegate.alternative(alt);
-		for (CodeGeneratorExtension ext : extensions) code = ext.alternative(code);
-		return code;
+		CodeBlockForAlt blk = delegate.alternative(alt);
+		for (CodeGeneratorExtension ext : extensions) blk = ext.alternative(blk);
+		return blk;
+	}
+
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops) {
+		blk = delegate.finishAlternative(blk, ops);
+		for (CodeGeneratorExtension ext : extensions) blk = ext.finishAlternative(blk);
+		return blk;
 	}
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
@@ -278,10 +284,10 @@ public class OutputModelController implements OutputModelFactory {
 		return r;
 	}
 
-	public List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops) {
-		ops = delegate.rewrite_tree(root, ops);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_tree(ops);
-		return ops;
+	public RewriteTreeStructure rewrite_tree(GrammarAST root, int rewriteLevel) {
+		RewriteTreeStructure t = delegate.rewrite_tree(root, rewriteLevel);
+		for (CodeGeneratorExtension ext : extensions) t = ext.rewrite_tree(t);
+		return t;
 	}
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {

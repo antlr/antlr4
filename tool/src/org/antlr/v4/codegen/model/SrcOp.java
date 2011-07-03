@@ -46,8 +46,7 @@ public abstract class SrcOp extends OutputModelObject {
 	 */
 	public SrcOp enclosingBlock;
 
-	public SrcOp() {;}
-	public SrcOp(OutputModelFactory factory) { super(factory); }
+	public SrcOp(OutputModelFactory factory) { this(factory,null); }
 	public SrcOp(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
 		//uniqueID = ast.token.getTokenIndex();

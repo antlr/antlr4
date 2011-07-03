@@ -106,6 +106,7 @@ public class OutputModelWalker {
 				if ( o instanceof OutputModelObject ) {  // SINGLE MODEL OBJECT?
 					OutputModelObject nestedOmo = (OutputModelObject)o;
 					ST nestedST = walk(nestedOmo);
+//					System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 					st.add(fieldName, nestedST);
 				}
 				else if ( o instanceof Collection || o instanceof OutputModelObject[] ) {
@@ -117,6 +118,7 @@ public class OutputModelWalker {
 					for (OutputModelObject nestedOmo : nestedOmos) {
 						if ( nestedOmo==null ) continue;
 						ST nestedST = walk(nestedOmo);
+//						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						st.add(fieldName, nestedST);
 					}
 				}
@@ -125,6 +127,7 @@ public class OutputModelWalker {
 					Map<Object, ST> m = new HashMap<Object, ST>();
 					for (Object key : nestedOmoMap.keySet()) {
 						ST nestedST = walk(nestedOmoMap.get(key));
+//						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						m.put(key, nestedST);
 					}
 					st.add(fieldName, m);

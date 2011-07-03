@@ -41,7 +41,6 @@ import java.util.*;
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
 public class CodeGenerator {
-	public static boolean LAUNCH_ST_INSPECTOR = false;
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	public final static String vocabFilePattern =
@@ -125,7 +124,7 @@ public class CodeGenerator {
 		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
 		ST st = walker.walk(outputModel);
 
-		if (CodeGenerator.LAUNCH_ST_INSPECTOR) {
+		if ( g.tool.launch_ST_inspector ) {
 			st.inspect();
 			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
 		}

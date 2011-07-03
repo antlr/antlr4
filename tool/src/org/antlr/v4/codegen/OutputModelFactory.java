@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.TreeRewrite;
+import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
@@ -57,6 +57,8 @@ public interface OutputModelFactory {
 	// ELEMENT TRIGGERS
 
 	CodeBlockForAlt alternative(Alternative alt);
+
+	CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops);
 
 	CodeBlockForAlt epsilon();
 
@@ -98,7 +100,7 @@ public interface OutputModelFactory {
 
 	TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel);
 
-	List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops);
+	RewriteTreeStructure rewrite_tree(GrammarAST root, int rewriteLevel);
 
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot);
 

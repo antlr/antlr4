@@ -32,14 +32,7 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 
-import java.util.List;
-
 /** Contains Rewrite block (usually as last op) */
 public class CodeBlockForAlt extends CodeBlock {
 	public CodeBlockForAlt(OutputModelFactory factory) { super(factory); }
-
-	public CodeBlockForAlt(OutputModelFactory factory, List<SrcOp> ops) {
-		super(factory);
-		this.ops = ops;
-	}
 }

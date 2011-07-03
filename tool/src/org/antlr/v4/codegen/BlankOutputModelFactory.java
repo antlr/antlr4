@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.TreeRewrite;
+import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
@@ -52,6 +52,8 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 	// ALTERNATIVES / ELEMENTS
 
 	public CodeBlockForAlt alternative(Alternative alt) { return null; }
+
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops) { return blk; }
 
 	public CodeBlockForAlt epsilon() { return null; }
 
@@ -79,7 +81,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel) { return null; }
 
-	public List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops) {	return null; }
+	public RewriteTreeStructure rewrite_tree(GrammarAST root, int rewriteLevel) {	return null; }
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) { return null; }
 

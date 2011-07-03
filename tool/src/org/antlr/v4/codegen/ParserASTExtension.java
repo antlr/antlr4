@@ -50,9 +50,16 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk) {
+		Alternative alt = factory.getCurrentAlt();
+		if ( !alt.hasRewrite() ) blk.addOp(new AssignTreeResult(factory));
+		return blk;
+	}
+
+	@Override
 	public List<SrcOp> rulePostamble(List<SrcOp> ops) {
-		AssignTreeResult setReturn = new AssignTreeResult(factory);
-		return DefaultOutputModelFactory.list(ops, setReturn);
+		RuleASTCleanup cleanup = new RuleASTCleanup(factory);
+		return DefaultOutputModelFactory.list(ops, cleanup);
 	}
 
 	@Override
@@ -122,19 +129,4 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	// REWRITES
-
-	@Override
-	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) {
-		return super.rewrite_ruleRef(ops);
-	}
-
-	@Override
-	public List<SrcOp> rewrite_tokenRef(List<SrcOp> ops) {
-		return super.rewrite_tokenRef(ops);
-	}
-
-	@Override
-	public List<SrcOp> rewrite_stringRef(List<SrcOp> ops) {
-		return super.rewrite_stringRef(ops);
-	}
 }
