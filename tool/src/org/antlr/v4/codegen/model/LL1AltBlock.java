@@ -38,7 +38,7 @@ import java.util.List;
 
 /** (A | B | C) */
 public class LL1AltBlock extends LL1Choice {
-	public LL1AltBlock(OutputModelFactory factory, GrammarAST blkAST, List<SrcOp> alts) {
+	public LL1AltBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 		this.decision = ((DecisionState)blkAST.atnState).decision;
 

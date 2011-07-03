@@ -40,7 +40,7 @@ import java.util.List;
 public class LL1PlusBlockSingleAlt extends LL1Loop {
 	@ModelElement public Sync iterationSync;
 
-	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<SrcOp> alts) {
+	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 
 		PlusBlockStartState plus = (PlusBlockStartState)blkAST.atnState;

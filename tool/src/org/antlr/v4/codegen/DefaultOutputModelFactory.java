@@ -30,7 +30,6 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -40,7 +39,7 @@ import java.util.*;
  *  objects such as RuleFunction that surround elements in rule
  *  functions.
  */
-public abstract class DefaultOutputModelFactory implements OutputModelFactory {
+public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory {
 	// Interface to outside world
 	public Grammar g;
 	public CodeGenerator gen;
@@ -59,71 +58,6 @@ public abstract class DefaultOutputModelFactory implements OutputModelFactory {
 	public Grammar getGrammar() { return g; }
 
 	public CodeGenerator getGenerator() { return gen; }
-
-	public ParserFile parserFile(String fileName) { return null; }
-
-	public Parser parser(ParserFile file) { return null; }
-
-	public RuleFunction rule(Rule r) { return null; }
-
-	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) { return null; }
-
-	public LexerFile lexerFile(String fileName) { return null; }
-
-	public Lexer lexer(LexerFile file) { return null; }
-
-	// ALTERNATIVES / ELEMENTS
-
-	public List<SrcOp> alternative(List<SrcOp> elems) { return null; }
-
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
-
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
-
-	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) { return null; }
-
-	public List<SrcOp> epsilon() { return null; }
-
-	// ACTIONS
-
-	public List<SrcOp> action(GrammarAST ast) { return null; }
-
-	public List<SrcOp> forcedAction(GrammarAST ast) { return null; }
-
-	public List<SrcOp> sempred(GrammarAST ast) { return null; }
-
-	// AST OPS
-
-	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
-
-	// AST REWRITES
-
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) { return null; }
-
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) { return null; }
-
-	// BLOCKS
-
-	public List<SrcOp> getChoiceBlock(BlockAST blkAST, List<SrcOp> alts) { return null; }
-
-	public List<SrcOp> getEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) { return null; }
-
-	public List<SrcOp> getLL1ChoiceBlock(BlockAST blkAST, List<SrcOp> alts) { return null; }
-
-	public List<SrcOp> getLLStarChoiceBlock(BlockAST blkAST, List<SrcOp> alts) { return null; }
-
-	public List<SrcOp> getLL1EBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) { return null; }
-
-	public List<SrcOp> getLLStarEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) { return null; }
-
-	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) { return null; }
-
-	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
-
-
-	// SET CONTEXT
 
 	public OutputModelObject getRoot() { return root; }
 

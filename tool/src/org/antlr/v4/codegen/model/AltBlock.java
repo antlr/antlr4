@@ -40,7 +40,7 @@ public class AltBlock extends Choice {
 
 	public AltBlock(OutputModelFactory factory,
 					GrammarAST blkOrEbnfRootAST,
-					List<SrcOp> alts)
+					List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST, alts);
 		decision = ((BlockStartState)blkOrEbnfRootAST.atnState).decision;

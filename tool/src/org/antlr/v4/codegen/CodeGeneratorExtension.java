@@ -31,6 +31,7 @@ package org.antlr.v4.codegen;
 
 
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ast.TreeRewrite;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
@@ -55,7 +56,9 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> rulePostamble(List<SrcOp> ops) { return ops; }
 
-	public List<SrcOp> alternative(List<SrcOp> ops) { return ops; }
+	public CodeBlockForAlt alternative(CodeBlockForAlt blk) { return blk; }
+
+	public CodeBlockForAlt epsilon(CodeBlockForAlt blk) { return blk; }
 
 	public List<SrcOp> ruleRef(List<SrcOp> ops) { return ops; }
 
@@ -63,7 +66,6 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> stringRef(List<SrcOp> ops) { return ops; }
 
-	public List<SrcOp> epsilon(List<SrcOp> ops) { return ops; }
 
 	// ACTIONS
 
@@ -85,9 +87,13 @@ public class CodeGeneratorExtension {
 
 	// AST REWRITEs
 
+	public TreeRewrite treeRewrite(TreeRewrite code) { return code; }
+
 	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> rewrite_tokenRef(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> rewrite_stringRef(List<SrcOp> ops) { return ops; }
 
 	// BLOCKS
 

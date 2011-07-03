@@ -49,7 +49,7 @@ public class LL1PlusBlock extends LL1Loop {
 	@ModelElement public SrcOp loopExpr;
 	@ModelElement public ThrowNoViableAlt error;
 
-	public LL1PlusBlock(OutputModelFactory factory, GrammarAST plusRoot, List<SrcOp> alts) {
+	public LL1PlusBlock(OutputModelFactory factory, GrammarAST plusRoot, List<CodeBlockForAlt> alts) {
 		super(factory, plusRoot, alts);
 
 		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;

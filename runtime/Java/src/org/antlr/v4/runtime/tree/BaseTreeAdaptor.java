@@ -52,8 +52,8 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	public List getChildren(Object root) { return ((Tree)root).getChildren(); }
 	 */
 
-	public List createElementList() {
-		return new ArrayList(5);
+	public List<Object> createElementList() {
+		return new ArrayList(3);
 	}
 
 	// END v4 stuff

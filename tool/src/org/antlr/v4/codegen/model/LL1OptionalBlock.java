@@ -40,7 +40,7 @@ import java.util.List;
  *  (A | B | C)?
  */
 public class LL1OptionalBlock extends LL1AltBlock {
-	public LL1OptionalBlock(OutputModelFactory factory, GrammarAST blkAST, List<SrcOp> alts) {
+	public LL1OptionalBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 	}
 }

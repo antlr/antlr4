@@ -43,7 +43,7 @@ public class LL1StarBlock extends LL1Loop {
 	public String loopLabel;
 	public String[] exitLook;
 
-	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<SrcOp> alts) {
+	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 
 		StarBlockStartState blkStart = (StarBlockStartState)blkAST.atnState;

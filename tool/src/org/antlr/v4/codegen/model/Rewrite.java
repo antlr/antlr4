@@ -27,16 +27,17 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model.ast;
+package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.LabeledOp;
-import org.antlr.v4.tool.GrammarAST;
 
-public class TrackElement extends ElementASTOp {
-	public String name; // ID, r, ...
-	public TrackElement(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
-		super(factory, ast, opWithResultToAdd);
-		name = ast.getText();
+import java.util.List;
+
+public class Rewrite extends SrcOp {
+	@ModelElement public List<? extends SrcOp> ops;
+
+	public Rewrite(OutputModelFactory factory, List<SrcOp> ops) {
+		super(factory);
+		this.ops = ops;
 	}
 }

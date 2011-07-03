@@ -30,6 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ast.TreeRewrite;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
@@ -54,15 +55,15 @@ public interface OutputModelFactory {
 
 	// ELEMENT TRIGGERS
 
-	List<SrcOp> alternative(List<SrcOp> elems);
+	CodeBlockForAlt alternative(List<SrcOp> elems);
+
+	CodeBlockForAlt epsilon();
 
 	List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args);
 
 	List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args);
 
 	List<SrcOp> stringRef(GrammarAST ID, GrammarAST label);
-
-	List<SrcOp> epsilon();
 
 	List<SrcOp> action(GrammarAST ast);
 
@@ -74,17 +75,17 @@ public interface OutputModelFactory {
 
 	List<SrcOp> rootRule(List<SrcOp> ops);
 
-	List<SrcOp> getChoiceBlock(BlockAST blkAST, List<SrcOp> alts);
+	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
 
-	List<SrcOp> getEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts);
+	Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
 
-	List<SrcOp> getLL1ChoiceBlock(BlockAST blkAST, List<SrcOp> alts);
+	Choice getLL1ChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
 
-	List<SrcOp> getLLStarChoiceBlock(BlockAST blkAST, List<SrcOp> alts);
+	Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
 
-	List<SrcOp> getLL1EBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts);
+	Choice getLL1EBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
 
-	List<SrcOp> getLLStarEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts);
+	Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
 
 	List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST);
 
@@ -92,9 +93,13 @@ public interface OutputModelFactory {
 
 	// AST REWRITE TRIGGERS
 
+	TreeRewrite treeRewrite(List<SrcOp> ops);
+
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID);
 
 	List<SrcOp> rewrite_tokenRef(GrammarAST ID);
+
+	List<SrcOp> rewrite_stringRef(GrammarAST ID);
 
 	// CONTEXT MANIPULATION
 

@@ -208,7 +208,9 @@ public class Target {
 	// should be same for all refs to same token like $ID within single rule function
 	public String getImplicitTokenLabel(String tokenName) {
 		ST st = gen.templates.getInstanceOf("ImplicitTokenLabel");
-		st.add("tokenName", tokenName);
+		int ttype = gen.g.getTokenType(tokenName);
+		String text = getTokenTypeAsTargetLabel(gen.g, ttype);
+		st.add("tokenName", text);
 		return st.render();
 	}
 
@@ -228,7 +230,13 @@ public class Target {
 
 	public String getElementListName(GrammarAST elem) {
 		ST st = gen.templates.getInstanceOf("ElementListName");
-		st.add("elemName", elem.getText()); // TODO: not right for literals
+		String text = elem.getText();
+		if ( gen.g.getRule(text)!=null ) st.add("elemName", text);
+		else {
+			int ttype = gen.g.getTokenType(text);
+			text = getTokenTypeAsTargetLabel(gen.g, ttype);
+			st.add("elemName", text);
+		}
 		return st.render();
 	}
 }

@@ -31,6 +31,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
@@ -55,9 +56,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return new RuleFunction(this, r);
 	}
 
-	public List<SrcOp> epsilon() { return list(new CodeBlock(this)); }
+	public CodeBlockForAlt epsilon() { return new CodeBlockForAlt(this); }
 
-	public List<SrcOp> alternative(List<SrcOp> elems) { return list(new CodeBlock(this, elems)); }
+	public CodeBlockForAlt alternative(List<SrcOp> elems) { return new CodeBlockForAlt(this, elems); }
 
 	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
 
@@ -81,11 +82,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(matchOp, listLabelOp);
 	}
 
-	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {
-		return tokenRef(ID, label, null);
-	}
-
-	public List<SrcOp> getChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
+	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
 		int decision = ((DecisionState)blkAST.atnState).decision;
 		if ( AnalysisPipeline.disjoint(g.decisionLOOK.get(decision)) ) {
 			return getLL1ChoiceBlock(blkAST, alts);
@@ -95,7 +92,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		}
 	}
 
-	public List<SrcOp> getEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
+	public Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
 		int decision;
 		if ( ebnfRoot.getType()==ANTLRParser.POSITIVE_CLOSURE ) {
 			decision = ((PlusBlockStartState)ebnfRoot.atnState).loopBackState.decision;
@@ -114,15 +111,15 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		}
 	}
 
-	public List<SrcOp> getLL1ChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
-		return list(new LL1AltBlock(this, blkAST, alts));
+	public Choice getLL1ChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+		return new LL1AltBlock(this, blkAST, alts);
 	}
 
-	public List<SrcOp> getLLStarChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
-		return list(new AltBlock(this, blkAST, alts));
+	public Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+		return new AltBlock(this, blkAST, alts);
 	}
 
-	public List<SrcOp> getLL1EBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
+	public Choice getLL1EBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
 		int ebnf = 0;
 		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
 		Choice c = null;
@@ -140,10 +137,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				else c = new LL1PlusBlock(this, ebnfRoot, alts);
 				break;
 		}
-		return list(c);
+		return c;
 	}
 
-	public List<SrcOp> getLLStarEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
+	public Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
 		int ebnf = 0;
 		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
 		Choice c = null;
@@ -158,7 +155,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				c = new PlusBlock(this, ebnfRoot, alts);
 				break;
 		}
-		return list(c);
+		return c;
 	}
 
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) {
@@ -173,12 +170,18 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	// AST REWRITE
 
+
+	@Override
+	public TreeRewrite treeRewrite(List<SrcOp> ops) {
+		return new TreeRewrite(this, ops);
+	}
+
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
-		return null;
+		return list(new RewriteRuleRef(this, ID));
 	}
 
 	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) {
-		return null;
+		return list(new RewriteTokenRef(this, ID));
 	}
 
 	// support

@@ -40,7 +40,7 @@ public class PlusBlock extends Loop {
 
 	public PlusBlock(OutputModelFactory factory,
 					 GrammarAST ebnfRootAST,
-					 List<SrcOp> alts)
+					 List<CodeBlockForAlt> alts)
 	{
 		super(factory, ebnfRootAST, alts);
 		PlusLoopbackState loop = ((PlusBlockStartState)ebnfRootAST.atnState).loopBackState;

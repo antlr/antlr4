@@ -27,39 +27,16 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.codegen.model.LabeledOp;
 import org.antlr.v4.tool.GrammarAST;
 
-import java.util.*;
-
-/** */
-public abstract class LL1Loop extends Choice {
-	@ModelElement public OutputModelObject loopExpr;
-	@ModelElement public List<SrcOp> iteration;
-	@ModelElement public Sync sync;
-
-	public LL1Loop(OutputModelFactory factory,
-				   GrammarAST blkAST,
-				   List<CodeBlockForAlt> alts)
-	{
-		super(factory, blkAST, alts);
-	}
-
-	public void addIterationOp(SrcOp op) {
-		if ( iteration==null ) iteration = new ArrayList<SrcOp>();
-		iteration.add(op);
-	}
-
-	public SrcOp addCodeForLoopLookaheadTempVar(IntervalSet look) {
-		SrcOp expr = addCodeForLookaheadTempVar(look);
-		if ( expr instanceof TestSetInline ) {
-			TestSetInline e = (TestSetInline)expr;
-			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
-			addIterationOp(nextType);
-		}
-		return expr;
+public class TrackTokenElement extends ElementASTOp {
+	public String name;
+	public TrackTokenElement(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
+		super(factory, ast, opWithResultToAdd);
+		name = factory.getGenerator().target.getElementListName(ast);
 	}
 }

@@ -40,7 +40,7 @@ public abstract class LL1Choice extends Choice {
 	@ModelElement public ThrowNoViableAlt error;
 
 	public LL1Choice(OutputModelFactory factory, GrammarAST blkAST,
-					 List<SrcOp> alts)
+					 List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkAST, alts);
 	}

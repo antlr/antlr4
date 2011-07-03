@@ -25,35 +25,41 @@ import java.util.HashMap;
 
 dummy : block[null, null] ;
 
-block[GrammarAST label, GrammarAST ebnfRoot] returns [List<SrcOp> omos]
+block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos]
     :	^(	blk=BLOCK (^(OPTIONS .+))?
-			{List<SrcOp> alts = new ArrayList<SrcOp>();}
-    		( alternative {alts.addAll($alternative.omos);} )+
+			{List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();}
+    		( alternative {alts.add($alternative.altCodeBlock);} )+
     	)
     	{
     	if ( alts.size()==1 && ebnfRoot==null) return alts;
     	if ( ebnfRoot==null ) {
-    	    $omos = factory.getChoiceBlock((BlockAST)$blk, alts);
+    	    $omos = DefaultOutputModelFactory.list(factory.getChoiceBlock((BlockAST)$blk, alts));
     	}
     	else {
-    	    $omos = factory.getEBNFBlock($ebnfRoot, alts);
+    	    $omos = DefaultOutputModelFactory.list(factory.getEBNFBlock($ebnfRoot, alts));
     	}
     	}
     ;
 
-alternative returns [List<SrcOp> omos]
+alternative returns [CodeBlockForAlt altCodeBlock]
 @init {
 	List<SrcOp> elems = new ArrayList<SrcOp>();
 	// set alt if outer ALT only
 	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
 }
-    :	^(ALT_REWRITE a=alternative {$omos=$a.omos;} (rewrite {DefaultOutputModelFactory.list($omos, $rewrite.omos);} | ))
-    |	^(ALT EPSILON) {$omos = factory.epsilon();}
+    :	^(ALT_REWRITE
+    		a=alternative
+    		(	rewrite {$a.altCodeBlock.ops.add($rewrite.code);} // insert at end of alt's code
+    		|
+    		)
+    		{$altCodeBlock=$a.altCodeBlock;}
+    	 )
+    |	^(ALT EPSILON) {$altCodeBlock = factory.epsilon();}
     |   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
-    	{$omos = factory.alternative(elems);}
+    	{$altCodeBlock = factory.alternative(elems);}
     ;
 
-element returns [List<SrcOp> omos]
+element returns [List<? extends SrcOp> omos]
 	:	labeledElement					{$omos = $labeledElement.omos;}
 	|	atom[null]						{$omos = $atom.omos;}
 	|	ebnf							{$omos = $ebnf.omos;}
@@ -64,7 +70,7 @@ element returns [List<SrcOp> omos]
 	|	treeSpec
 	;
 
-labeledElement returns [List<SrcOp> omos]
+labeledElement returns [List<? extends SrcOp> omos]
 	:	^(ASSIGN ID atom[$ID] )				{$omos = $atom.omos;}
 	|	^(ASSIGN ID block[$ID,null])		{$omos = $block.omos;}
 	|	^(PLUS_ASSIGN ID atom[$ID])			{$omos = $atom.omos;}
@@ -75,7 +81,7 @@ treeSpec returns [SrcOp omo]
     : ^(TREE_BEGIN  (e=element )+)
     ;
 
-ebnf returns [List<SrcOp> omos]
+ebnf returns [List<? extends SrcOp> omos]
 	:	^(astBlockSuffix block[null,null])
 	|	^(OPTIONAL block[null,$OPTIONAL])	{$omos = $block.omos;}
 	|	^(CLOSURE block[null,$CLOSURE])		{$omos = $block.omos;}
@@ -142,8 +148,8 @@ elementOption
 
 // R E W R I T E  S T U F F
 
-rewrite returns [List<SrcOp> omos]
-	:	predicatedRewrite* nakedRewrite 	{$omos = nakedRewrite.omos;}
+rewrite returns [Rewrite code]
+	:	predicatedRewrite* nakedRewrite 	{$code = factory.treeRewrite($nakedRewrite.omos);}
 	;
 
 predicatedRewrite returns [List<SrcOp> omos]
@@ -157,15 +163,19 @@ nakedRewrite returns [List<SrcOp> omos]
 	;
 
 rewriteTreeAlt returns [List<SrcOp> omos]
-    :	^(ALT rewriteTreeElement+)
+    :	^(ALT
+    		{List<SrcOp> elems = new ArrayList<SrcOp>();}
+    		( rewriteTreeElement {elems.addAll($rewriteTreeElement.omos);} )+
+    	)
+    	{$omos = elems;}
     |	ETC
     |	EPSILON
     ;
 
 rewriteTreeElement returns [List<SrcOp> omos]
-	:	rewriteTreeAtom
-	|	rewriteTree
-	|   rewriteTreeEbnf
+	:	rewriteTreeAtom						{$omos = $rewriteTreeAtom.omos;}
+	|	rewriteTree							{$omos = $rewriteTree.omos;}
+	|   rewriteTreeEbnf						{$omos = $rewriteTreeEbnf.omos;}
 	;
 
 rewriteTreeAtom returns [List<SrcOp> omos]
@@ -173,16 +183,16 @@ rewriteTreeAtom returns [List<SrcOp> omos]
     |   ^(TOKEN_REF elementOptions)
     |   ^(TOKEN_REF ARG_ACTION)
 	|   TOKEN_REF							{$omos = factory.rewrite_tokenRef($TOKEN_REF);}
-    |   RULE_REF							{$omos = factory.rewrite_ruleRef($TOKEN_REF);}
-	|   ^(STRING_LITERAL elementOptions)
-	|   STRING_LITERAL
+    |   RULE_REF							{$omos = factory.rewrite_ruleRef($RULE_REF);}
+	|   ^(STRING_LITERAL elementOptions)	{$omos = factory.rewrite_stringRef($STRING_LITERAL);}
+	|   STRING_LITERAL						{$omos = factory.rewrite_stringRef($STRING_LITERAL);}
 	|   LABEL
 	|	ACTION
 	;
 
 rewriteTreeEbnf returns [List<SrcOp> omos]
 	:	^('?' ^(REWRITE_BLOCK rewriteTreeAlt))
-	:	^('*' ^(REWRITE_BLOCK rewriteTreeAlt))
+	|	^('*' ^(REWRITE_BLOCK rewriteTreeAlt))
 	;
 	
 rewriteTree returns [List<SrcOp> omos]

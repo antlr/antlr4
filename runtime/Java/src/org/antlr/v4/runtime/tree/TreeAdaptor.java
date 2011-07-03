@@ -51,7 +51,7 @@ public interface TreeAdaptor {
 	//public List getChildren(Object root);
 
 	/** Used to track elements to left of -> for use in rewrite */
-	public List createElementList();
+	public List<Object> createElementList();
 
 	// END new v4 stuff
 

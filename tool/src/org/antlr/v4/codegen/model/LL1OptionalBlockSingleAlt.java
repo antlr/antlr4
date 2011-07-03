@@ -43,7 +43,7 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 
 	public LL1OptionalBlockSingleAlt(OutputModelFactory factory,
 									 GrammarAST blkAST,
-									 List<SrcOp> alts)
+									 List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkAST, alts);
 		this.decision = ((DecisionState)blkAST.atnState).decision;

@@ -50,12 +50,12 @@ import java.util.*;
 public abstract class Choice extends RuleElement {
 	public int decision = -1;
 
-	@ModelElement public List<SrcOp> alts;
+	@ModelElement public List<CodeBlockForAlt> alts;
 	@ModelElement public List<SrcOp> preamble;
 
 	public Choice(OutputModelFactory factory,
 				  GrammarAST blkOrEbnfRootAST,
-				  List<SrcOp> alts)
+				  List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST);
 		this.alts = alts;

@@ -38,7 +38,7 @@ public class Loop extends Choice {
 	public int exitAlt;
 	public Loop(OutputModelFactory factory,
 				GrammarAST blkOrEbnfRootAST,
-				List<SrcOp> alts)
+				List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST, alts);
 	}

@@ -38,7 +38,7 @@ import java.util.List;
 public class OptionalBlock extends AltBlock {
 	public OptionalBlock(OutputModelFactory factory,
 						 GrammarAST questionAST,
-						 List<SrcOp> alts)
+						 List<CodeBlockForAlt> alts)
 	{
 		super(factory, questionAST, alts);
 	}

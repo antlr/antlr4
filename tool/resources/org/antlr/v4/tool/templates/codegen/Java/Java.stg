@@ -121,7 +121,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 }
 >>
 
-CodeBlock(c, ops) ::= <<
+CodeBlockForAlt(c, ops) ::= <<
 <ops; separator="\n">
 >>
 
@@ -353,7 +353,7 @@ public static class <s.name> extends ParserRuleContext {
 
 AttributeDecl(d) ::= "<d.decl>"
 
-/** If we don't know location of label def, use this template */
+/** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 
 // AST stuff (TODO: separate?)
@@ -371,9 +371,18 @@ _localctx.tree = _root0;
 _adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 >>
 
-ElementListDecl(d) ::= "List <d.name> = new ArrayList(5);"
+ElementListDecl(d) ::= "List\<Object> <d.name> = _adaptor.createElementList();"
 ElementListName(elemName) ::= "_track_<elemName>"
-TrackElement(e) ::= "_track_<e.name>.add(<labelref(e.label)>);"
+TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>);"
+TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
+
+TreeRewrite(tr, ops) ::= <<
+// rewrite: ...
+<ops; separator="\n">
+>>
+
+RewriteTokenRef(t) ::= "/* tokenref */"
+RewriteRuleRef(r) ::= "/* ruleref */"
 
 /*
 BitSetDecl(b) ::= <<

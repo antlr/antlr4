@@ -82,12 +82,15 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 
 	@Override
 	public List<SrcOp> leafRule(List<SrcOp> ops) {
+		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
 		Alternative alt = factory.getCurrentAlt();
 		if ( alt.hasRewrite() ) {
-			return ops;
+			RuleFunction rf = factory.getCurrentRule();
+			rf.addLocalDecl(new ElementListDecl(factory, invokeOp.ast));
+			TrackRuleElement t = new TrackRuleElement(factory, invokeOp.ast, invokeOp);
+			return DefaultOutputModelFactory.list(ops, t);
 		}
 		else {
-			InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
 			SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, invokeOp);
 			return DefaultOutputModelFactory.list(ops, treeOp);
 		}
@@ -100,7 +103,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		if ( alt.hasRewrite() ) {
 			RuleFunction rf = factory.getCurrentRule();
 			rf.addLocalDecl(new ElementListDecl(factory, matchOp.ast));
-			TrackElement t = new TrackElement(factory, matchOp.ast, matchOp);
+			TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, matchOp);
 			return DefaultOutputModelFactory.list(ops, t);
 		}
 		else {
@@ -110,7 +113,28 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
+	public List<SrcOp> stringRef(List<SrcOp> ops) {	return leafToken(ops); }
+
+	@Override
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {
 		return op.getLabels().size()==0 && factory.getGrammar().hasASTOption();
+	}
+
+	// REWRITES
+
+
+	@Override
+	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) {
+		return super.rewrite_ruleRef(ops);
+	}
+
+	@Override
+	public List<SrcOp> rewrite_tokenRef(List<SrcOp> ops) {
+		return super.rewrite_tokenRef(ops);
+	}
+
+	@Override
+	public List<SrcOp> rewrite_stringRef(List<SrcOp> ops) {
+		return super.rewrite_stringRef(ops);
 	}
 }

@@ -31,6 +31,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ast.TreeRewrite;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
@@ -76,7 +77,7 @@ public class OutputModelController implements OutputModelFactory {
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, this);
 			try {
-				function.code = genTriggers.block(null,null); // walk AST of rule alts/elements
+				function.code = DefaultOutputModelFactory.list(genTriggers.block(null, null)); // walk AST of rule alts/elements
 			}
 			catch (Exception e){
 				e.printStackTrace(System.err);
@@ -138,10 +139,10 @@ public class OutputModelController implements OutputModelFactory {
 
 	public CodeGenerator getGenerator() { return delegate.getGenerator(); }
 
-	public List<SrcOp> alternative(List<SrcOp> elems) {
-		List<SrcOp> ops = delegate.alternative(elems);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.alternative(ops);
-		return ops;
+	public CodeBlockForAlt alternative(List<SrcOp> elems) {
+		CodeBlockForAlt code = delegate.alternative(elems);
+		for (CodeGeneratorExtension ext : extensions) code = ext.alternative(code);
+		return code;
 	}
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
@@ -178,10 +179,10 @@ public class OutputModelController implements OutputModelFactory {
 		return ops;
 	}
 
-	public List<SrcOp> epsilon() {
-		List<SrcOp> ops = delegate.epsilon();
-		for (CodeGeneratorExtension ext : extensions) ops = ext.epsilon(ops);
-		return ops;
+	public CodeBlockForAlt epsilon() {
+		CodeBlockForAlt blk = delegate.epsilon();
+		for (CodeGeneratorExtension ext : extensions) blk = ext.epsilon(blk);
+		return blk;
 	}
 
 	public List<SrcOp> action(GrammarAST ast) {
@@ -214,40 +215,46 @@ public class OutputModelController implements OutputModelFactory {
 		return ops;
 	}
 
-	public List<SrcOp> getChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
-		List<SrcOp> ops = delegate.getChoiceBlock(blkAST, alts);
+	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+		Choice c = delegate.getChoiceBlock(blkAST, alts);
+		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.getChoiceBlock(ops);
-		return ops;
+		return c;
 	}
 
-	public List<SrcOp> getEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
-		List<SrcOp> ops = delegate.getEBNFBlock(ebnfRoot, alts);
+	public Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
+		Choice c = delegate.getEBNFBlock(ebnfRoot, alts);
+		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.getEBNFBlock(ops);
-		return ops;
+		return c;
 	}
 
-	public List<SrcOp> getLL1ChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
-		List<SrcOp> ops = delegate.getLL1ChoiceBlock(blkAST, alts);
+	public Choice getLL1ChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+		Choice c = delegate.getLL1ChoiceBlock(blkAST, alts);
+		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.getLL1ChoiceBlock(ops);
-		return ops;
+		return c;
 	}
 
-	public List<SrcOp> getLLStarChoiceBlock(BlockAST blkAST, List<SrcOp> alts) {
-		List<SrcOp> ops = delegate.getLLStarChoiceBlock(blkAST, alts);
+	public Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+		Choice c = delegate.getLLStarChoiceBlock(blkAST, alts);
+		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.getLLStarChoiceBlock(ops);
-		return ops;
+		return c;
 	}
 
-	public List<SrcOp> getLL1EBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
-		List<SrcOp> ops = delegate.getLL1EBNFBlock(ebnfRoot, alts);
+	public Choice getLL1EBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
+		Choice c = delegate.getLL1EBNFBlock(ebnfRoot, alts);
+		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.getLL1EBNFBlock(ops);
-		return ops;
+		return c;
 	}
 
-	public List<SrcOp> getLLStarEBNFBlock(GrammarAST ebnfRoot, List<SrcOp> alts) {
-		List<SrcOp> ops = delegate.getLLStarEBNFBlock(ebnfRoot, alts);
+	public Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
+		Choice c = delegate.getLLStarEBNFBlock(ebnfRoot, alts);
+		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.getLLStarEBNFBlock(ops);
-		return ops;
+		return c;
 	}
 
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) {
@@ -262,6 +269,14 @@ public class OutputModelController implements OutputModelFactory {
 		return needs;
 	}
 
+	// REWRITES
+
+	public TreeRewrite treeRewrite(List<SrcOp> ops) {
+		TreeRewrite r = delegate.treeRewrite(ops);
+		for (CodeGeneratorExtension ext : extensions) r = ext.treeRewrite(r);
+		return r;
+	}
+
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
 		List<SrcOp> ops = delegate.rewrite_ruleRef(ID);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_ruleRef(ops);
@@ -273,6 +288,8 @@ public class OutputModelController implements OutputModelFactory {
 		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_tokenRef(ops);
 		return ops;
 	}
+
+	public List<SrcOp> rewrite_stringRef(GrammarAST ID) { return rewrite_tokenRef(ID); }
 
 	public OutputModelObject getRoot() { return delegate.getRoot(); }
 

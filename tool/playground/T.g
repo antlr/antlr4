@@ -1,7 +1,7 @@
 grammar T;
 options {output=AST;}
 tokens {I;}
-a : A b -> A b ;
+a : A b ';' -> A b ';' ;
 
 b : B ;
 

@@ -40,7 +40,7 @@ public class StarBlock extends Loop {
 
 	public StarBlock(OutputModelFactory factory,
 					 GrammarAST blkOrEbnfRootAST,
-					 List<SrcOp> alts)
+					 List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST, alts);
 		loopLabel = factory.getGenerator().target.getLoopLabel(blkOrEbnfRootAST);

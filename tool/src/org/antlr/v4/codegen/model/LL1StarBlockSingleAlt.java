@@ -38,7 +38,7 @@ import java.util.List;
 
 /** */
 public class LL1StarBlockSingleAlt extends LL1Loop {
-	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST starRoot, List<SrcOp> alts) {
+	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST starRoot, List<CodeBlockForAlt> alts) {
 		super(factory, starRoot, alts);
 
 		StarBlockStartState star = (StarBlockStartState)starRoot.atnState;
