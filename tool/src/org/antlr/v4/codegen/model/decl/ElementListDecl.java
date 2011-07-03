@@ -33,7 +33,6 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
 public class ElementListDecl extends Decl {
-	public int level;
 	public ElementListDecl(OutputModelFactory factory, GrammarAST elem) {
 		super(factory, factory.getGenerator().target.getElementListName(elem));
 	}

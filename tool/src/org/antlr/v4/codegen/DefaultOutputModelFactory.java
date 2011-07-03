@@ -30,6 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -49,7 +50,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	public OutputModelObject root; // normally ParserFile, LexerFile, ...
 	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
 	public Alternative currentAlt;
-	public Rewrite currentRewrite;
+	public CodeBlock currentBlock;
 
 	protected DefaultOutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
@@ -84,12 +85,12 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 		this.controller = controller;
 	}
 
-	public void setCurrentRewriteBlock(Rewrite rew) {
-		currentRewrite = rew;
+	public void setCurrentBlock(CodeBlock blk) {
+		currentBlock = blk;
 	}
 
-	public Rewrite getCurrentRewriteBlock() {
-		return currentRewrite;
+	public CodeBlock getCurrentBlock() {
+		return currentBlock;
 	}
 
 	// MISC

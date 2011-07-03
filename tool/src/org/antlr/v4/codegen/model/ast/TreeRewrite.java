@@ -31,9 +31,16 @@ package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.Rewrite;
+import org.antlr.v4.codegen.model.decl.RootDecl;
 
 public class TreeRewrite extends Rewrite {
-	public TreeRewrite(OutputModelFactory factory) {
+	public int level;
+	public RootDecl rootDecl;
+
+	public TreeRewrite(OutputModelFactory factory, int level) {
 		super(factory);
+		this.level = level;
+		rootDecl = new RootDecl(factory, level); // track here too for easy access in template
+		addLocalDecl(rootDecl);
 	}
 }

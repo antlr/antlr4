@@ -32,6 +32,7 @@ package org.antlr.v4.codegen;
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.TreeRewrite;
+import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
@@ -139,8 +140,8 @@ public class OutputModelController implements OutputModelFactory {
 
 	public CodeGenerator getGenerator() { return delegate.getGenerator(); }
 
-	public CodeBlockForAlt alternative(List<SrcOp> elems) {
-		CodeBlockForAlt code = delegate.alternative(elems);
+	public CodeBlockForAlt alternative(Alternative alt) {
+		CodeBlockForAlt code = delegate.alternative(alt);
 		for (CodeGeneratorExtension ext : extensions) code = ext.alternative(code);
 		return code;
 	}
@@ -271,8 +272,8 @@ public class OutputModelController implements OutputModelFactory {
 
 	// REWRITES
 
-	public TreeRewrite treeRewrite(GrammarAST ast) {
-		TreeRewrite r = delegate.treeRewrite(ast);
+	public TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel) {
+		TreeRewrite r = delegate.treeRewrite(ast, rewriteLevel);
 		for (CodeGeneratorExtension ext : extensions) r = ext.treeRewrite(r);
 		return r;
 	}
@@ -307,7 +308,7 @@ public class OutputModelController implements OutputModelFactory {
 
 	public void setController(OutputModelController controller) { } // nop; we are controller
 
-	public void setCurrentRewriteBlock(Rewrite rew) { delegate.setCurrentRewriteBlock(rew); }
+	public void setCurrentBlock(CodeBlock blk) { delegate.setCurrentBlock(blk); }
 
-	public Rewrite getCurrentRewriteBlock() { return delegate.getCurrentRewriteBlock(); }
+	public CodeBlock getCurrentBlock() { return delegate.getCurrentBlock(); }
 }

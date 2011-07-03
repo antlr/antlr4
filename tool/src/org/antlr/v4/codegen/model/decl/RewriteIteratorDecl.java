@@ -32,12 +32,10 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
-public class RewriteIteratorDecl extends Decl {
-	public int level;
+public class RewriteIteratorDecl extends NestedDecl {
 	public String listName;
 	public RewriteIteratorDecl(OutputModelFactory factory, GrammarAST elem, int level) {
-		super(factory, factory.getGenerator().target.getRewriteIteratorName(elem, level));
+		super(factory, factory.getGenerator().target.getRewriteIteratorName(elem, level), level);
 		listName = factory.getGenerator().target.getElementListName(elem);
-		this.level = level;
 	}
 }

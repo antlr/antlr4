@@ -43,9 +43,10 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
-	public RuleFunction rule(RuleFunction rf) {
-		rf.addLocalDecl(new RootDecl(factory, 0));
-		return rf;
+	public CodeBlockForAlt alternative(CodeBlockForAlt blk) {
+		Alternative alt = factory.getCurrentAlt();
+		if ( !alt.hasRewrite() ) blk.addLocalDecl( new RootDecl(factory, 0) );
+		return blk;
 	}
 
 	@Override

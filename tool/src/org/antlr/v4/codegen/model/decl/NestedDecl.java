@@ -27,30 +27,15 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
 
-/** */
-public abstract class SrcOp extends OutputModelObject {
-	/** Used to create unique var names etc... */
-//	public int uniqueID;
+public class NestedDecl extends Decl {
+	public int level;
 
-	/** All operations know in which block they live:
-	 *
-	 *  	CodeBlockForAlt, TreeRewrite, STRewrite
-	 *
-	 *  Templates might need to know block nesting level or find
-	 *  a specific declaration, etc...
-	 */
-	public SrcOp enclosingBlock;
-
-	public SrcOp() {;}
-	public SrcOp(OutputModelFactory factory) { super(factory); }
-	public SrcOp(OutputModelFactory factory, GrammarAST ast) {
-		super(factory,ast);
-		//uniqueID = ast.token.getTokenIndex();
-		enclosingBlock = factory.getCurrentBlock();
+	public NestedDecl(OutputModelFactory factory, String name, int level) {
+		super(factory, name);
+		this.level = level;
 	}
 }

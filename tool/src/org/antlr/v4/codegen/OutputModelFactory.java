@@ -31,6 +31,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.TreeRewrite;
+import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
@@ -55,7 +56,7 @@ public interface OutputModelFactory {
 
 	// ELEMENT TRIGGERS
 
-	CodeBlockForAlt alternative(List<SrcOp> elems);
+	CodeBlockForAlt alternative(Alternative alt);
 
 	CodeBlockForAlt epsilon();
 
@@ -95,7 +96,7 @@ public interface OutputModelFactory {
 	// Though dealing with ASTs, we must deal with here since these are
 	// triggered from elements in ANTLR's internal GrammarAST
 
-	TreeRewrite treeRewrite(GrammarAST ast);
+	TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel);
 
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID);
 
@@ -121,7 +122,7 @@ public interface OutputModelFactory {
 
 	void setController(OutputModelController controller);
 
-	void setCurrentRewriteBlock(Rewrite rew);
+	void setCurrentBlock(CodeBlock blk);
 
-	Rewrite getCurrentRewriteBlock();
+	CodeBlock getCurrentBlock();
 }

@@ -27,30 +27,32 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-/** */
-public abstract class SrcOp extends OutputModelObject {
-	/** Used to create unique var names etc... */
-//	public int uniqueID;
+import java.util.*;
 
-	/** All operations know in which block they live:
-	 *
-	 *  	CodeBlockForAlt, TreeRewrite, STRewrite
-	 *
-	 *  Templates might need to know block nesting level or find
-	 *  a specific declaration, etc...
-	 */
-	public SrcOp enclosingBlock;
+public class CodeBlock extends SrcOp {
+	@ModelElement public OrderedHashSet<Decl> locals;
+	@ModelElement public List<SrcOp> preamble;
+	@ModelElement public List ops; // has to be unchecked so we can add different subclasses of SrcOp :(
 
-	public SrcOp() {;}
-	public SrcOp(OutputModelFactory factory) { super(factory); }
-	public SrcOp(OutputModelFactory factory, GrammarAST ast) {
-		super(factory,ast);
-		//uniqueID = ast.token.getTokenIndex();
-		enclosingBlock = factory.getCurrentBlock();
+	public CodeBlock(OutputModelFactory factory) {
+		super(factory);
+	}
+
+	/** Add local var decl */
+	public void addLocalDecl(Decl d) {
+		if ( locals==null ) locals = new OrderedHashSet<Decl>();
+		locals.add(d);
+		d.isLocal = true;
+	}
+
+	public void addPreambleOp(SrcOp op) {
+		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
+		preamble.add(op);
 	}
 }

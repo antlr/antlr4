@@ -30,29 +30,10 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.codegen.model.decl.CodeBlock;
 
-import java.util.*;
-
-public class Rewrite extends SrcOp {
-	@ModelElement public OrderedHashSet<Decl> locals;
-	@ModelElement public List<SrcOp> preamble;
-	@ModelElement public List<? extends SrcOp> ops;
-
+public class Rewrite extends CodeBlock {
 	public Rewrite(OutputModelFactory factory) {
 		super(factory);
-	}
-
-	/** Add local var decl */
-	public void addLocalDecl(Decl d) {
-		if ( locals==null ) locals = new OrderedHashSet<Decl>();
-		locals.add(d);
-		d.isLocal = true;
-	}
-
-	public void addPreambleOp(SrcOp op) {
-		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
-		preamble.add(op);
 	}
 }

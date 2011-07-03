@@ -237,7 +237,6 @@ public class Target {
 
 	public String getElementListName(GrammarAST elem) {
 		ST st = gen.templates.getInstanceOf("ElementListName");
-		String text = elem.getText();
 		st.add("elemName", getElementName(elem));
 		return st.render();
 	}

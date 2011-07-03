@@ -122,7 +122,9 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 }
 >>
 
-CodeBlockForAlt(c, ops) ::= <<
+CodeBlockForAlt(c, locals, preamble, ops) ::= <<
+<locals; separator="\n">
+<preamble; separator="\n">
 <ops; separator="\n">
 >>
 
@@ -379,16 +381,14 @@ TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
 TreeRewrite(tr, locals, preamble, ops) ::= <<
 // rewrite: ...
-<locals; separator="\n">
-<preamble; separator="\n">
-<ops; separator="\n">
+<CodeBlockForAlt(tr, locals, preamble, ops)>
 >>
 
 RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
 RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
 RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
 
-RewriteTokenRef(t) ::= "_adaptor.addChild(<t.decl.name>.next());"
+RewriteTokenRef(t) ::= "_adaptor.addChild(<t.enclosingBlock.rootDecl.name>, <t.decl.name>.next());"
 RewriteRuleRef(r) ::= "/* ruleref */"
 
 /*

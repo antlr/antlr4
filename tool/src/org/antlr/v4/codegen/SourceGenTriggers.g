@@ -9,6 +9,7 @@ options {
 package org.antlr.v4.codegen;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.tool.*;
 import java.util.Collections;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 }
 
 @members {
+	public int rewriteLevel = 0;
 	public OutputModelFactory factory;
     public SourceGenTriggers(TreeNodeStream input, OutputModelFactory factory) {
     	this(input);
@@ -54,9 +56,15 @@ alternative returns [CodeBlockForAlt altCodeBlock]
     		)
     		{$altCodeBlock=$a.altCodeBlock;}
     	 )
+
     |	^(ALT EPSILON) {$altCodeBlock = factory.epsilon();}
-    |   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
-    	{$altCodeBlock = factory.alternative(elems);}
+
+    |	{
+    	$altCodeBlock = factory.alternative(factory.getCurrentAlt());
+		factory.setCurrentBlock($altCodeBlock);
+		}
+	   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
+    	{$altCodeBlock.ops = elems;}
     ;
 
 element returns [List<? extends SrcOp> omos]
@@ -150,11 +158,15 @@ elementOption
 
 rewrite returns [Rewrite code]
 	:	{
-		$code = factory.treeRewrite($start);
-		factory.setCurrentRewriteBlock($code);
+		$code = factory.treeRewrite($start, rewriteLevel++);
+		CodeBlock save = factory.getCurrentBlock();
+		factory.setCurrentBlock($code);
 		}
 		predicatedRewrite* nakedRewrite 	
-		{$code.ops = $nakedRewrite.omos;}
+		{
+		$code.ops = $nakedRewrite.omos;
+		factory.setCurrentBlock(save);
+		}
 	;
 
 predicatedRewrite returns [List<SrcOp> omos]

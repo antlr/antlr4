@@ -58,7 +58,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public CodeBlockForAlt epsilon() { return new CodeBlockForAlt(this); }
 
-	public CodeBlockForAlt alternative(List<SrcOp> elems) { return new CodeBlockForAlt(this, elems); }
+	public CodeBlockForAlt alternative(Alternative alt) { return new CodeBlockForAlt(this); }
 
 	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
 
@@ -172,21 +172,23 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 
 	@Override
-	public TreeRewrite treeRewrite(GrammarAST ast) {
-		return new TreeRewrite(this);
+	public TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel) {
+		return new TreeRewrite(this, rewriteLevel);
 	}
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
-		Decl d = new RewriteIteratorDecl(this, ID, 0);
-		getCurrentRewriteBlock().addLocalDecl(d);
+		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID, 0);
+		getCurrentBlock().addLocalDecl(d);
+		RewriteIteratorInit init = new RewriteIteratorInit(this, d);
+		getCurrentBlock().addPreambleOp(init);
 		return list(new RewriteRuleRef(this, ID));
 	}
 
 	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) {
 		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID, 0);
-		getCurrentRewriteBlock().addLocalDecl(d);
+		getCurrentBlock().addLocalDecl(d);
 		RewriteIteratorInit init = new RewriteIteratorInit(this, d);
-		getCurrentRewriteBlock().addPreambleOp(init);
+		getCurrentBlock().addPreambleOp(init);
 		return list(new RewriteTokenRef(this, ID, d));
 	}
 

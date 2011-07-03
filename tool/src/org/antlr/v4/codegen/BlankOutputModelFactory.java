@@ -51,7 +51,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	// ALTERNATIVES / ELEMENTS
 
-	public CodeBlockForAlt alternative(List<SrcOp> elems) { return null; }
+	public CodeBlockForAlt alternative(Alternative alt) { return null; }
 
 	public CodeBlockForAlt epsilon() { return null; }
 
@@ -77,7 +77,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	// AST REWRITES
 
-	public TreeRewrite treeRewrite(GrammarAST ast) { return null; }
+	public TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel) { return null; }
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) { return null; }
 
