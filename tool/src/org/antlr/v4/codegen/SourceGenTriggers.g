@@ -63,7 +63,7 @@ alternative returns [CodeBlockForAlt altCodeBlock]
     	$altCodeBlock = factory.alternative(factory.getCurrentAlt());
 		factory.setCurrentBlock($altCodeBlock);
 		}
-	   ^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
+		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
     	{$altCodeBlock.ops = elems;}
     ;
 
@@ -190,19 +190,19 @@ rewriteTreeAlt returns [List<SrcOp> omos]
     ;
 
 rewriteTreeElement returns [List<SrcOp> omos]
-	:	rewriteTreeAtom						{$omos = $rewriteTreeAtom.omos;}
+	:	rewriteTreeAtom[false]				{$omos = $rewriteTreeAtom.omos;}
 	|	rewriteTree							{$omos = $rewriteTree.omos;}
 	|   rewriteTreeEbnf						{$omos = $rewriteTreeEbnf.omos;}
 	;
 
-rewriteTreeAtom returns [List<SrcOp> omos]
+rewriteTreeAtom[boolean isRoot] returns [List<SrcOp> omos]
     :   ^(TOKEN_REF elementOptions ARG_ACTION)
     |   ^(TOKEN_REF elementOptions)
     |   ^(TOKEN_REF ARG_ACTION)
-	|   TOKEN_REF							{$omos = factory.rewrite_tokenRef($TOKEN_REF);}
-    |   RULE_REF							{$omos = factory.rewrite_ruleRef($RULE_REF);}
-	|   ^(STRING_LITERAL elementOptions)	{$omos = factory.rewrite_stringRef($STRING_LITERAL);}
-	|   STRING_LITERAL						{$omos = factory.rewrite_stringRef($STRING_LITERAL);}
+	|   TOKEN_REF							{$omos = factory.rewrite_tokenRef($TOKEN_REF, $isRoot);}
+    |   RULE_REF							{$omos = factory.rewrite_ruleRef($RULE_REF, $isRoot);}
+	|   ^(STRING_LITERAL elementOptions)	{$omos = factory.rewrite_stringRef($STRING_LITERAL, $isRoot);}
+	|   STRING_LITERAL						{$omos = factory.rewrite_stringRef($STRING_LITERAL, $isRoot);}
 	|   LABEL
 	|	ACTION
 	;
@@ -213,7 +213,12 @@ rewriteTreeEbnf returns [List<SrcOp> omos]
 	;
 	
 rewriteTree returns [List<SrcOp> omos]
-	:	^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )
+	:	{List<SrcOp> elems = new ArrayList<SrcOp>();}
+		^(	TREE_BEGIN
+			rewriteTreeAtom[true] {elems.addAll($rewriteTreeAtom.omos);}
+			( rewriteTreeElement {elems.addAll($rewriteTreeElement.omos);} )*
+		 )
+		{$omos = factory.rewrite_tree($TREE_BEGIN, elems);}
 	;
 
 rewriteSTAlt returns [List<SrcOp> omos]

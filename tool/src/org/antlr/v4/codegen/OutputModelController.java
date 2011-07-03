@@ -278,19 +278,25 @@ public class OutputModelController implements OutputModelFactory {
 		return r;
 	}
 
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
-		List<SrcOp> ops = delegate.rewrite_ruleRef(ID);
+	public List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops) {
+		ops = delegate.rewrite_tree(root, ops);
+		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_tree(ops);
+		return ops;
+	}
+
+	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {
+		List<SrcOp> ops = delegate.rewrite_ruleRef(ID, isRoot);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_ruleRef(ops);
 		return ops;
 	}
 
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) {
-		List<SrcOp> ops = delegate.rewrite_tokenRef(ID);
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot) {
+		List<SrcOp> ops = delegate.rewrite_tokenRef(ID, isRoot);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_tokenRef(ops);
 		return ops;
 	}
 
-	public List<SrcOp> rewrite_stringRef(GrammarAST ID) { return rewrite_tokenRef(ID); }
+	public List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot) { return rewrite_tokenRef(ID, isRoot); }
 
 	public OutputModelObject getRoot() { return delegate.getRoot(); }
 

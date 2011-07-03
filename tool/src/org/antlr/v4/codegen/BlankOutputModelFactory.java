@@ -79,11 +79,13 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel) { return null; }
 
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) { return null; }
+	public List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops) {	return null; }
 
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) { return null; }
+	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) { return null; }
 
-	public List<SrcOp> rewrite_stringRef(GrammarAST ID) { return rewrite_tokenRef(ID); }
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot) { return null; }
+
+	public List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot) { return rewrite_tokenRef(ID, isRoot); }
 
 	// BLOCKS
 

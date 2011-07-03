@@ -98,11 +98,13 @@ public interface OutputModelFactory {
 
 	TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel);
 
-	List<SrcOp> rewrite_ruleRef(GrammarAST ID);
+	List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops);
 
-	List<SrcOp> rewrite_tokenRef(GrammarAST ID);
+	List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot);
 
-	List<SrcOp> rewrite_stringRef(GrammarAST ID);
+	List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot);
+
+	List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot);
 
 	// CONTEXT MANIPULATION
 

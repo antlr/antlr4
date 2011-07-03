@@ -376,7 +376,7 @@ _adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 
 ElementListDecl(d) ::= "List\<Object> <d.name> = _adaptor.createElementList();"
 ElementListName(elemName) ::= "_track_<elemName>"
-TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>);"
+TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>.tree);"
 TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
 TreeRewrite(tr, locals, preamble, ops) ::= <<
@@ -384,12 +384,23 @@ TreeRewrite(tr, locals, preamble, ops) ::= <<
 <CodeBlockForAlt(tr, locals, preamble, ops)>
 >>
 
+RewriteTreeStructure(t, ops) ::= <<
+<ops; separator="\n">
+>>
 RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
 RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
 RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
 
 RewriteTokenRef(t) ::= "_adaptor.addChild(<t.enclosingBlock.rootDecl.name>, <t.decl.name>.next());"
-RewriteRuleRef(r) ::= "/* ruleref */"
+RewriteTokenRefIsRoot(t) ::= <%
+<labelref(t.enclosingBlock.rootDecl)> =
+	_adaptor.becomeRoot(<t.decl.name>.next(), <labelref(t.enclosingBlock.rootDecl)>);
+%>
+RewriteRuleRef(r) ::= "_adaptor.addChild(<r.enclosingBlock.rootDecl.name>, <r.decl.name>.next());"
+RewriteRuleRefIsRoot(r) ::= <%
+<labelref(r.enclosingBlock.rootDecl)> =
+	_adaptor.becomeRoot(<r.decl.name>.next(), <labelref(r.enclosingBlock.rootDecl)>);
+%>
 
 /*
 BitSetDecl(b) ::= <<

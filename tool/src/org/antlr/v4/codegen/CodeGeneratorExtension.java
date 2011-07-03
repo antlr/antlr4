@@ -89,6 +89,8 @@ public class CodeGeneratorExtension {
 
 	public TreeRewrite treeRewrite(TreeRewrite r) { return r; }
 
+	public List<SrcOp> rewrite_tree(List<SrcOp> ops) { return ops; }
+
 	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> rewrite_tokenRef(List<SrcOp> ops) { return ops; }

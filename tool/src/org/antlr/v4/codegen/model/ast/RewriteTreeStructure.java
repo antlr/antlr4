@@ -30,15 +30,17 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.SrcOp;
-import org.antlr.v4.codegen.model.decl.RewriteIteratorDecl;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.tool.GrammarAST;
 
-public class RewriteRuleRef extends SrcOp {
-	/** Which iterator decl are we associated with? */
-	public RewriteIteratorDecl decl;
-	public RewriteRuleRef(OutputModelFactory factory, GrammarAST ast, RewriteIteratorDecl decl) {
+import java.util.List;
+
+/** ^(A B C) */
+public class RewriteTreeStructure extends SrcOp {
+	@ModelElement public List<? extends SrcOp> ops;
+
+	public RewriteTreeStructure(OutputModelFactory factory, GrammarAST ast, List<? extends SrcOp> ops) {
 		super(factory, ast);
-		this.decl = decl;
+		this.ops = ops;
 	}
 }

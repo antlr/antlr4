@@ -176,20 +176,31 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return new TreeRewrite(this, rewriteLevel);
 	}
 
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
-		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID, 0);
-		getCurrentBlock().addLocalDecl(d);
-		RewriteIteratorInit init = new RewriteIteratorInit(this, d);
-		getCurrentBlock().addPreambleOp(init);
-		return list(new RewriteRuleRef(this, ID));
+	@Override
+	public List<SrcOp> rewrite_tree(GrammarAST root, List<SrcOp> ops) {
+		return list(new RewriteTreeStructure(this, root, ops));
 	}
 
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) {
+	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {
 		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID, 0);
 		getCurrentBlock().addLocalDecl(d);
 		RewriteIteratorInit init = new RewriteIteratorInit(this, d);
 		getCurrentBlock().addPreambleOp(init);
-		return list(new RewriteTokenRef(this, ID, d));
+		RewriteRuleRef ruleRef;
+		if ( isRoot ) ruleRef = new RewriteRuleRefIsRoot(this, ID, d);
+		else ruleRef = new RewriteRuleRef(this, ID, d);
+		return list(ruleRef);
+	}
+
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot) {
+		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID, 0);
+		getCurrentBlock().addLocalDecl(d);
+		RewriteIteratorInit init = new RewriteIteratorInit(this, d);
+		getCurrentBlock().addPreambleOp(init);
+		RewriteTokenRef tokenRef;
+		if ( isRoot ) tokenRef = new RewriteTokenRefIsRoot(this, ID, d);
+		else tokenRef = new RewriteTokenRef(this, ID, d);
+		return list(tokenRef);
 	}
 
 	// support
