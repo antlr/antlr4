@@ -27,32 +27,17 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.tool.GrammarAST;
 
-import java.util.*;
-
-public class Rewrite extends SrcOp {
-	@ModelElement public OrderedHashSet<Decl> locals;
-	@ModelElement public List<SrcOp> preamble;
-	@ModelElement public List<? extends SrcOp> ops;
-
-	public Rewrite(OutputModelFactory factory) {
-		super(factory);
-	}
-
-	/** Add local var decl */
-	public void addLocalDecl(Decl d) {
-		if ( locals==null ) locals = new OrderedHashSet<Decl>();
-		locals.add(d);
-		d.isLocal = true;
-	}
-
-	public void addPreambleOp(SrcOp op) {
-		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
-		preamble.add(op);
+public class RewriteIteratorDecl extends Decl {
+	public int level;
+	public String listName;
+	public RewriteIteratorDecl(OutputModelFactory factory, GrammarAST elem, int level) {
+		super(factory, factory.getGenerator().target.getRewriteIteratorName(elem, level));
+		listName = factory.getGenerator().target.getElementListName(elem);
+		this.level = level;
 	}
 }

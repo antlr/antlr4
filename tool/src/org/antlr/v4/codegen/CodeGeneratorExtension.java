@@ -87,7 +87,7 @@ public class CodeGeneratorExtension {
 
 	// AST REWRITEs
 
-	public TreeRewrite treeRewrite(TreeRewrite code) { return code; }
+	public TreeRewrite treeRewrite(TreeRewrite r) { return r; }
 
 	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }
 

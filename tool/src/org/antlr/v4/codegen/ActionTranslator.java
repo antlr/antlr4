@@ -149,7 +149,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(y.getText())); break; // has to be current rule
 			case RET:
-				if ( factory.getCurrentRule()!=null && factory.getCurrentRule().name.equals(x.getText()) ) {
+				if ( factory.getCurrentRuleFunction()!=null && factory.getCurrentRuleFunction().name.equals(x.getText()) ) {
 					chunks.add(new RetValueRef(y.getText())); break;
 				}
 				else {

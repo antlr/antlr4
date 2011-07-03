@@ -81,7 +81,7 @@ public abstract class Choice extends RuleElement {
 		if ( expr instanceof TestSetInline) {
 			TestSetInline e = (TestSetInline)expr;
 			Decl d = new TokenTypeDecl(factory, e.varName);
-			factory.getCurrentRule().addLocalDecl(d);
+			factory.getCurrentRuleFunction().addLocalDecl(d);
 			CaptureNextTokenType nextType = new CaptureNextTokenType(e.varName);
 			addPreambleOp(nextType);
 		}

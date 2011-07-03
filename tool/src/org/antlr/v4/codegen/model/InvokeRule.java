@@ -61,11 +61,11 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			String label = labelAST.getText();
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			factory.getCurrentRule().addContextDecl(d);
+			factory.getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				String listLabel = gen.target.getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, d);
-				factory.getCurrentRule().addContextDecl(l);
+				factory.getCurrentRuleFunction().addContextDecl(l);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {
@@ -77,7 +77,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			String label = gen.target.getImplicitRuleLabel(ast.getText());
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			factory.getCurrentRule().addContextDecl(d);
+			factory.getCurrentRuleFunction().addContextDecl(d);
 		}
 
 //		LinearApproximator approx = new LinearApproximator(factory.g, ATN.INVALID_DECISION_NUMBER);

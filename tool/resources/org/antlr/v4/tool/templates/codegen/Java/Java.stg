@@ -28,6 +28,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import java.util.List;
+import java.util.Iterator;
 import java.util.ArrayList;
 
 <parser>
@@ -376,12 +377,18 @@ ElementListName(elemName) ::= "_track_<elemName>"
 TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>);"
 TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
-TreeRewrite(tr, ops) ::= <<
+TreeRewrite(tr, locals, preamble, ops) ::= <<
 // rewrite: ...
+<locals; separator="\n">
+<preamble; separator="\n">
 <ops; separator="\n">
 >>
 
-RewriteTokenRef(t) ::= "/* tokenref */"
+RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
+RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
+RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
+
+RewriteTokenRef(t) ::= "_adaptor.addChild(<t.decl.name>.next());"
 RewriteRuleRef(r) ::= "/* ruleref */"
 
 /*

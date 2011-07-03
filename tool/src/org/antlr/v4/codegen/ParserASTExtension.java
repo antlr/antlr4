@@ -85,7 +85,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
 		Alternative alt = factory.getCurrentAlt();
 		if ( alt.hasRewrite() ) {
-			RuleFunction rf = factory.getCurrentRule();
+			RuleFunction rf = factory.getCurrentRuleFunction();
 			rf.addLocalDecl(new ElementListDecl(factory, invokeOp.ast));
 			TrackRuleElement t = new TrackRuleElement(factory, invokeOp.ast, invokeOp);
 			return DefaultOutputModelFactory.list(ops, t);
@@ -101,7 +101,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
 		Alternative alt = factory.getCurrentAlt();
 		if ( alt.hasRewrite() ) {
-			RuleFunction rf = factory.getCurrentRule();
+			RuleFunction rf = factory.getCurrentRuleFunction();
 			rf.addLocalDecl(new ElementListDecl(factory, matchOp.ast));
 			TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, matchOp);
 			return DefaultOutputModelFactory.list(ops, t);
@@ -121,7 +121,6 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	// REWRITES
-
 
 	@Override
 	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) {

@@ -92,8 +92,10 @@ public interface OutputModelFactory {
 	boolean needsImplicitLabel(GrammarAST ID, LabeledOp op);
 
 	// AST REWRITE TRIGGERS
+	// Though dealing with ASTs, we must deal with here since these are
+	// triggered from elements in ANTLR's internal GrammarAST
 
-	TreeRewrite treeRewrite(List<SrcOp> ops);
+	TreeRewrite treeRewrite(GrammarAST ast);
 
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID);
 
@@ -107,7 +109,7 @@ public interface OutputModelFactory {
 
 	void setRoot(OutputModelObject root);
 
-	RuleFunction getCurrentRule();
+	RuleFunction getCurrentRuleFunction();
 
 	void pushCurrentRule(RuleFunction r);
 
@@ -118,4 +120,8 @@ public interface OutputModelFactory {
 	void setCurrentAlt(Alternative currentAlt);
 
 	void setController(OutputModelController controller);
+
+	void setCurrentRewriteBlock(Rewrite rew);
+
+	Rewrite getCurrentRewriteBlock();
 }

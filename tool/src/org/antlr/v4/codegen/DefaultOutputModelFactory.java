@@ -49,6 +49,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	public OutputModelObject root; // normally ParserFile, LexerFile, ...
 	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
 	public Alternative currentAlt;
+	public Rewrite currentRewrite;
 
 	protected DefaultOutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
@@ -63,7 +64,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	public void setRoot(OutputModelObject root) { this.root = root;	}
 
-	public RuleFunction getCurrentRule() {
+	public RuleFunction getCurrentRuleFunction() {
 		if ( currentRule.size()>0 )	return currentRule.peek();
 		return null;
 	}
@@ -81,6 +82,14 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	public void setController(OutputModelController controller) {
 		this.controller = controller;
+	}
+
+	public void setCurrentRewriteBlock(Rewrite rew) {
+		currentRewrite = rew;
+	}
+
+	public Rewrite getCurrentRewriteBlock() {
+		return currentRewrite;
 	}
 
 	// MISC

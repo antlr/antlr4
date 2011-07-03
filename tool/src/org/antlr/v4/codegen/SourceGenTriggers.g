@@ -149,7 +149,12 @@ elementOption
 // R E W R I T E  S T U F F
 
 rewrite returns [Rewrite code]
-	:	predicatedRewrite* nakedRewrite 	{$code = factory.treeRewrite($nakedRewrite.omos);}
+	:	{
+		$code = factory.treeRewrite($start);
+		factory.setCurrentRewriteBlock($code);
+		}
+		predicatedRewrite* nakedRewrite 	
+		{$code.ops = $nakedRewrite.omos;}
 	;
 
 predicatedRewrite returns [List<SrcOp> omos]

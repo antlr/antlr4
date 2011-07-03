@@ -51,10 +51,10 @@ public class MatchToken extends RuleElement implements LabeledOp {
 			String label = labelAST.getText();
 			TokenDecl d = new TokenDecl(factory, label);
 			labels.add(d);
-			factory.getCurrentRule().addContextDecl(d);
+			factory.getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
 				TokenListDecl l = new TokenListDecl(factory, gen.target.getListLabel(label));
-				factory.getCurrentRule().addContextDecl(l);
+				factory.getCurrentRuleFunction().addContextDecl(l);
 			}
 		}
 	}

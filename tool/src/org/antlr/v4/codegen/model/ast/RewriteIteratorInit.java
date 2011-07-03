@@ -27,32 +27,16 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.codegen.model.SrcOp;
+import org.antlr.v4.codegen.model.decl.RewriteIteratorDecl;
 
-import java.util.*;
-
-public class Rewrite extends SrcOp {
-	@ModelElement public OrderedHashSet<Decl> locals;
-	@ModelElement public List<SrcOp> preamble;
-	@ModelElement public List<? extends SrcOp> ops;
-
-	public Rewrite(OutputModelFactory factory) {
+public class RewriteIteratorInit extends SrcOp {
+	public RewriteIteratorDecl decl;
+	public RewriteIteratorInit(OutputModelFactory factory, RewriteIteratorDecl decl) {
 		super(factory);
-	}
-
-	/** Add local var decl */
-	public void addLocalDecl(Decl d) {
-		if ( locals==null ) locals = new OrderedHashSet<Decl>();
-		locals.add(d);
-		d.isLocal = true;
-	}
-
-	public void addPreambleOp(SrcOp op) {
-		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
-		preamble.add(op);
+		this.decl = decl;
 	}
 }

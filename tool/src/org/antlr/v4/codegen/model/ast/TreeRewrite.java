@@ -30,12 +30,10 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
-
-import java.util.List;
+import org.antlr.v4.codegen.model.Rewrite;
 
 public class TreeRewrite extends Rewrite {
-	public TreeRewrite(OutputModelFactory factory, List<SrcOp> ops) {
-		super(factory, ops);
+	public TreeRewrite(OutputModelFactory factory) {
+		super(factory);
 	}
 }

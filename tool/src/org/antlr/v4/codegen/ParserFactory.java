@@ -172,16 +172,22 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 
 	@Override
-	public TreeRewrite treeRewrite(List<SrcOp> ops) {
-		return new TreeRewrite(this, ops);
+	public TreeRewrite treeRewrite(GrammarAST ast) {
+		return new TreeRewrite(this);
 	}
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID) {
+		Decl d = new RewriteIteratorDecl(this, ID, 0);
+		getCurrentRewriteBlock().addLocalDecl(d);
 		return list(new RewriteRuleRef(this, ID));
 	}
 
 	public List<SrcOp> rewrite_tokenRef(GrammarAST ID) {
-		return list(new RewriteTokenRef(this, ID));
+		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID, 0);
+		getCurrentRewriteBlock().addLocalDecl(d);
+		RewriteIteratorInit init = new RewriteIteratorInit(this, d);
+		getCurrentRewriteBlock().addPreambleOp(init);
+		return list(new RewriteTokenRef(this, ID, d));
 	}
 
 	// support
@@ -199,7 +205,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			d = new TokenDecl(this, implLabel);
 		}
 		op.getLabels().add(d);
-		getCurrentRule().addLocalDecl(d);
+		getCurrentRuleFunction().addLocalDecl(d);
 	}
 
 	public AddToLabelList getListLabel(LabeledOp op, GrammarAST label) {

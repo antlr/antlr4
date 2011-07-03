@@ -41,7 +41,7 @@ public class Action extends RuleElement {
 
 	public Action(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		RuleFunction rf = factory.getCurrentRule();
+		RuleFunction rf = factory.getCurrentRuleFunction();
 		chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
 		//System.out.println("actions="+chunks);
 	}

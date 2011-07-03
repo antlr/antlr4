@@ -228,15 +228,26 @@ public class Target {
 		return st.render();
 	}
 
+	public String getRewriteIteratorName(GrammarAST elem, int level) {
+		ST st = gen.templates.getInstanceOf("RewriteIteratorName");
+		st.add("elemName", getElementName(elem));
+		st.add("level", level);
+		return st.render();
+	}
+
 	public String getElementListName(GrammarAST elem) {
 		ST st = gen.templates.getInstanceOf("ElementListName");
 		String text = elem.getText();
-		if ( gen.g.getRule(text)!=null ) st.add("elemName", text);
-		else {
+		st.add("elemName", getElementName(elem));
+		return st.render();
+	}
+
+	public String getElementName(GrammarAST elem) {
+		String text = elem.getText();
+		if ( gen.g.getRule(text)==null ) {
 			int ttype = gen.g.getTokenType(text);
 			text = getTokenTypeAsTargetLabel(gen.g, ttype);
-			st.add("elemName", text);
 		}
-		return st.render();
+		return text;
 	}
 }

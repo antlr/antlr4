@@ -271,8 +271,8 @@ public class OutputModelController implements OutputModelFactory {
 
 	// REWRITES
 
-	public TreeRewrite treeRewrite(List<SrcOp> ops) {
-		TreeRewrite r = delegate.treeRewrite(ops);
+	public TreeRewrite treeRewrite(GrammarAST ast) {
+		TreeRewrite r = delegate.treeRewrite(ast);
 		for (CodeGeneratorExtension ext : extensions) r = ext.treeRewrite(r);
 		return r;
 	}
@@ -295,7 +295,7 @@ public class OutputModelController implements OutputModelFactory {
 
 	public void setRoot(OutputModelObject root) { delegate.setRoot(root); }
 
-	public RuleFunction getCurrentRule() { return delegate.getCurrentRule(); }
+	public RuleFunction getCurrentRuleFunction() { return delegate.getCurrentRuleFunction(); }
 
 	public void pushCurrentRule(RuleFunction r) { delegate.pushCurrentRule(r); }
 
@@ -306,4 +306,8 @@ public class OutputModelController implements OutputModelFactory {
 	public void setCurrentAlt(Alternative alt) { delegate.setCurrentAlt(alt); }
 
 	public void setController(OutputModelController controller) { } // nop; we are controller
+
+	public void setCurrentRewriteBlock(Rewrite rew) { delegate.setCurrentRewriteBlock(rew); }
+
+	public Rewrite getCurrentRewriteBlock() { return delegate.getCurrentRewriteBlock(); }
 }
