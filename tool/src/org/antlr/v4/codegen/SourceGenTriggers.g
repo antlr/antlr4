@@ -18,7 +18,8 @@ import java.util.HashMap;
 }
 
 @members {
-	public int codeBlockLevel = 0;
+	public int codeBlockLevel = -1;
+	public int treeLevel = -1;
 	public OutputModelFactory factory;
     public SourceGenTriggers(TreeNodeStream input, OutputModelFactory factory) {
     	this(input);
@@ -194,7 +195,9 @@ elementOption
 
 rewrite returns [Rewrite code]
 	:	{
-		$code = factory.treeRewrite($start, codeBlockLevel++);
+		treeLevel = 0;
+		codeBlockLevel++;
+		$code = factory.treeRewrite($start);
 		CodeBlock save = factory.getCurrentBlock();
 		factory.setCurrentBlock($code);
 		}
@@ -229,7 +232,7 @@ rewriteTreeAlt returns [List<SrcOp> omos]
 rewriteTreeElement returns [List<SrcOp> omos]
 	:	rewriteTreeAtom[false]				{$omos = $rewriteTreeAtom.omos;}
 	|	rewriteTree							{$omos = $rewriteTree.omos;}
-	|   rewriteTreeEbnf						{$omos = $rewriteTreeEbnf.omos;}
+	|   rewriteTreeEbnf						{$omos = DefaultOutputModelFactory.list($rewriteTreeEbnf.op);}
 	;
 
 rewriteTreeAtom[boolean isRoot] returns [List<SrcOp> omos]
@@ -244,15 +247,32 @@ rewriteTreeAtom[boolean isRoot] returns [List<SrcOp> omos]
 	|	ACTION
 	;
 
-rewriteTreeEbnf returns [List<SrcOp> omos]
-	:	^('?' ^(REWRITE_BLOCK rewriteTreeAlt))
-	|	^('*' ^(REWRITE_BLOCK rewriteTreeAlt))
+rewriteTreeEbnf returns [CodeBlock op]
+	:	^(	(a=OPTIONAL|a=CLOSURE)
+			^(	REWRITE_BLOCK
+				{
+				codeBlockLevel++;
+				if ( $a.getType()==OPTIONAL ) $op = factory.rewrite_optional($start);
+				else $op = factory.rewrite_closure($start);
+				CodeBlock save = factory.getCurrentBlock();
+				factory.setCurrentBlock($op);
+				}
+				alt=rewriteTreeAlt
+			)
+		)
+		{
+		$op.addOps($alt.omos);
+		factory.setCurrentBlock(save);
+		codeBlockLevel--;
+		}
 	;
 	
 rewriteTree returns [List<SrcOp> omos]
 	:	{
+		codeBlockLevel++;
+		treeLevel++;
 		List<SrcOp> elems = new ArrayList<SrcOp>();
-		RewriteTreeStructure t = factory.rewrite_tree($start, codeBlockLevel++);
+		RewriteTreeStructure t = factory.rewrite_tree($start);
 		CodeBlock save = factory.getCurrentBlock();
 		factory.setCurrentBlock(t);
 		}
@@ -264,6 +284,7 @@ rewriteTree returns [List<SrcOp> omos]
 		t.ops = elems;
 		$omos = DefaultOutputModelFactory.list(t);
 		factory.setCurrentBlock(save);
+		treeLevel--;
 		codeBlockLevel--;
 		}
 	;

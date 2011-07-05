@@ -34,10 +34,14 @@ import org.antlr.v4.tool.GrammarAST;
 
 /** ^(A B C) */
 public class RewriteTreeStructure extends TreeRewrite {
+	public int treeLevel;
+
 	public RewriteTreeStructure(OutputModelFactory factory,
 								GrammarAST ast,
-								int level)
+								int treeLevel,
+								int codeBlockLevel)
 	{
-		super(factory, level);
+		super(factory, treeLevel, codeBlockLevel);
+		this.treeLevel = treeLevel;
 	}
 }

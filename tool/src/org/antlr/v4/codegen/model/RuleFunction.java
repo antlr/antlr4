@@ -51,6 +51,7 @@ public class RuleFunction extends OutputModelObject {
 	public ATNState startState;
 	public int index;
 	public Collection<Attribute> args = null;
+	public Rule rule;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -59,13 +60,10 @@ public class RuleFunction extends OutputModelObject {
 	@ModelElement public Action finallyAction;
 	@ModelElement public List<SrcOp> postamble;
 
-	public RuleFunction(OutputModelFactory factory) {
-		super(factory);
-	}
-
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
+		this.rule = r;
 		if ( r.modifiers!=null && r.modifiers.size()>0 ) {
 			this.modifiers = new ArrayList<String>();
 			for (GrammarAST t : r.modifiers) modifiers.add(t.getText());

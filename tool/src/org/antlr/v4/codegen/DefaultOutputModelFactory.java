@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -93,6 +93,10 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 		return currentBlock;
 	}
 
+	public int getCodeBlockLevel() { return controller.walker.codeBlockLevel; }
+
+	public int getTreeLevel() { return controller.walker.treeLevel; }
+
 	// MISC
 
 	public static List<SrcOp> list(Object... values) {
@@ -105,5 +109,13 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 		}
 		return x;
 	}
+
+	public Decl getCurrentDeclForName(String name) {
+		for (Decl d : getCurrentBlock().locals.elements()) {
+			if ( d.name.equals(name) ) return d;
+		}
+		return null;
+	}
+
 }
 

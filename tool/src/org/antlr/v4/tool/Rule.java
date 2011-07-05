@@ -159,7 +159,6 @@ public class Rule implements AttributeResolver {
         return refs;
     }
 
-	// TODO: called frequently; make it more efficient
     public MultiMap<String, LabelElementPair> getLabelDefs() {
         MultiMap<String, LabelElementPair> defs =
             new MultiMap<String, LabelElementPair>();

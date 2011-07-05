@@ -1,11 +1,15 @@
 grammar T;
 options {output=AST;}
 tokens {I;}
+/*
 a : A b C -> ^(A ^(b C))
   | B
   ;
 
 b : B | C ;
+*/
+
+c : A B C -> (A B C*)* ;
 
 A : 'a';
 B : 'b';

@@ -27,15 +27,21 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model.decl;
+package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.tool.GrammarAST;
 
-public class NestedDecl extends Decl {
-	public int level;
+import java.util.*;
 
-	public NestedDecl(OutputModelFactory factory, String name, int level) {
-		super(factory, name);
-		this.level = level;
+public class RewriteTreeClosure extends CodeBlock {
+	public List<Decl> iteratorDecls = new ArrayList<Decl>();
+
+	public RewriteTreeClosure(OutputModelFactory factory, GrammarAST ast,
+							  int treeLevel, int codeBlockLevel)
+	{
+		super(factory, treeLevel, codeBlockLevel);
+		this.ast = ast;
 	}
 }

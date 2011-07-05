@@ -91,6 +91,10 @@ public class CodeGeneratorExtension {
 
 	public TreeRewrite treeRewrite(TreeRewrite r) { return r; }
 
+	public RewriteTreeOptional rewrite_optional(RewriteTreeOptional o) { return o; }
+
+	public RewriteTreeClosure rewrite_closure(RewriteTreeClosure c) { return c; }
+
 	public RewriteTreeStructure rewrite_tree(RewriteTreeStructure t) { return t; }
 
 	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }

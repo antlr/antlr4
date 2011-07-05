@@ -37,8 +37,12 @@ import org.antlr.v4.tool.GrammarAST;
 public class RewriteTokenRef extends SrcOp {
 	/** Which iterator decl are we associated with? */
 	public RewriteIteratorDecl decl;
-	public RewriteTokenRef(OutputModelFactory factory, GrammarAST ast, RewriteIteratorDecl decl) {
+	public String rootName;
+	public RewriteTokenRef(OutputModelFactory factory, GrammarAST ast,
+						   String rootName, RewriteIteratorDecl decl)
+	{
 		super(factory, ast);
+		this.rootName = rootName;
 		this.decl = decl;
 	}
 }

@@ -27,13 +27,19 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.tool.GrammarAST;
 
-public class Rewrite extends CodeBlock {
-	public Rewrite(OutputModelFactory factory, int treeLevel, int codeBlockLevel) {
-		super(factory, treeLevel, codeBlockLevel);
+import java.util.*;
+
+public class RewriteTreeOptional extends CodeBlock {
+	public List<Decl> iteratorDecls = new ArrayList<Decl>();
+
+	public RewriteTreeOptional(OutputModelFactory factory, GrammarAST ast) {
+		super(factory);
+		this.ast = ast;
 	}
 }

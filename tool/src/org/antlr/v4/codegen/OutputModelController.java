@@ -49,6 +49,11 @@ public class OutputModelController implements OutputModelFactory {
 	/** Post-processing CodeGeneratorExtension objects; done in order given. */
 	public List<CodeGeneratorExtension> extensions = new ArrayList<CodeGeneratorExtension>();
 
+	/** While walking code in rules, this is set to the tree walker that
+	 *  triggers actions.
+	 */
+	public SourceGenTriggers walker;
+
 	public OutputModelController(OutputModelFactory factory) {
 		this.delegate = factory;
 	}
@@ -76,9 +81,9 @@ public class OutputModelController implements OutputModelFactory {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
 			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-			SourceGenTriggers genTriggers = new SourceGenTriggers(nodes, this);
+			walker = new SourceGenTriggers(nodes, this);
 			try {
-				function.code = DefaultOutputModelFactory.list(genTriggers.block(null, null)); // walk AST of rule alts/elements
+				function.code = DefaultOutputModelFactory.list(walker.block(null, null)); // walk AST of rule alts/elements
 			}
 			catch (Exception e){
 				e.printStackTrace(System.err);
@@ -278,14 +283,27 @@ public class OutputModelController implements OutputModelFactory {
 
 	// REWRITES
 
-	public TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel) {
-		TreeRewrite r = delegate.treeRewrite(ast, rewriteLevel);
+	public TreeRewrite treeRewrite(GrammarAST ast) {
+		TreeRewrite r = delegate.treeRewrite(ast);
 		for (CodeGeneratorExtension ext : extensions) r = ext.treeRewrite(r);
 		return r;
 	}
 
-	public RewriteTreeStructure rewrite_tree(GrammarAST root, int rewriteLevel) {
-		RewriteTreeStructure t = delegate.rewrite_tree(root, rewriteLevel);
+	public RewriteTreeOptional rewrite_optional(GrammarAST ast) {
+		RewriteTreeOptional o = delegate.rewrite_optional(ast);
+		for (CodeGeneratorExtension ext : extensions) o = ext.rewrite_optional(o);
+		return o;
+	}
+
+	public RewriteTreeClosure rewrite_closure(GrammarAST ast) {
+		List<GrammarAST> refs = getElementReferencesShallow(ast);
+		RewriteTreeClosure c = delegate.rewrite_closure(ast);
+		for (CodeGeneratorExtension ext : extensions) c = ext.rewrite_closure(c);
+		return c;
+	}
+
+	public RewriteTreeStructure rewrite_tree(GrammarAST root) {
+		RewriteTreeStructure t = delegate.rewrite_tree(root);
 		for (CodeGeneratorExtension ext : extensions) t = ext.rewrite_tree(t);
 		return t;
 	}
@@ -323,4 +341,76 @@ public class OutputModelController implements OutputModelFactory {
 	public void setCurrentBlock(CodeBlock blk) { delegate.setCurrentBlock(blk); }
 
 	public CodeBlock getCurrentBlock() { return delegate.getCurrentBlock(); }
+
+	public int getCodeBlockLevel() { return delegate.getCodeBlockLevel(); }
+
+	public int getTreeLevel() { return delegate.getTreeLevel(); }
+
+	// SUPPORT
+
+	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
+	 *  top level of REWRITE_BLOCK.
+	 */
+	public List<GrammarAST> getElementReferencesShallow(GrammarAST ebnfRoot) {
+		if ( ebnfRoot.getType()!=ANTLRParser.CLOSURE &&
+		     ebnfRoot.getType()!=ANTLRParser.OPTIONAL )
+		{
+			return null;
+		}
+		GrammarAST blkAST = (GrammarAST)ebnfRoot.getChild(0);
+		if ( blkAST.getType()!=ANTLRParser.REWRITE_BLOCK ) return null;
+		GrammarAST altAST = (GrammarAST)blkAST.getChild(0);
+		if ( altAST.getType()!=ANTLRParser.ALT ) return null;
+
+		IntervalSet elementTokenTypes = getRewriteElementTokenTypeSet();
+		Alternative alt = getCurrentAlt();
+		List<GrammarAST> elems = new ArrayList<GrammarAST>();
+		for (Object o : altAST.getChildren()) {
+			GrammarAST ref = (GrammarAST)o;
+			if ( elementTokenTypes.member(ref.getType()) ) {
+				boolean imaginary = ref.getType()==ANTLRParser.TOKEN_REF &&
+									!alt.tokenRefs.containsKey(ref.getText());
+				if ( !imaginary ) elems.add(ref);
+			}
+		}
+
+		return elems;
+	}
+
+	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
+	 *  or below toplevel REWRITE_BLOCK.
+	 */
+	public List<GrammarAST> getElementReferencesDeep(GrammarAST ebnfRoot) {
+		if ( ebnfRoot.getType()!=ANTLRParser.CLOSURE &&
+		     ebnfRoot.getType()!=ANTLRParser.OPTIONAL )
+		{
+			return null;
+		}
+		GrammarAST blkAST = (GrammarAST)ebnfRoot.getChild(0);
+		if ( blkAST.getType()!=ANTLRParser.REWRITE_BLOCK ) return null;
+		GrammarAST altAST = (GrammarAST)blkAST.getChild(0);
+		if ( altAST.getType()!=ANTLRParser.ALT ) return null;
+
+		List<GrammarAST> elems = new ArrayList<GrammarAST>();
+		Alternative alt = getCurrentAlt();
+		IntervalSet elementTokenTypes = getRewriteElementTokenTypeSet();
+		List<GrammarAST> refs = altAST.getNodesWithType(elementTokenTypes);
+		if ( refs!=null ) {
+			for (GrammarAST ref : refs) {
+				boolean imaginary = ref.getType()==ANTLRParser.TOKEN_REF &&
+									!alt.tokenRefs.containsKey(ref.getText());
+				if ( !imaginary ) elems.add(ref);
+			}
+		}
+		return elems;
+	}
+
+	public IntervalSet getRewriteElementTokenTypeSet() {
+		IntervalSet elementTokenTypes = new IntervalSet();
+		elementTokenTypes.add(ANTLRParser.TOKEN_REF); // might be imaginary
+		elementTokenTypes.add(ANTLRParser.RULE_REF);
+		elementTokenTypes.add(ANTLRParser.STRING_LITERAL);
+		elementTokenTypes.add(ANTLRParser.LABEL);
+		return elementTokenTypes;
+	}
 }

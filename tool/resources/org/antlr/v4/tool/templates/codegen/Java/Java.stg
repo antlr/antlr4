@@ -389,6 +389,28 @@ TreeRewrite(tr, locals, preamble, ops) ::= <<
 _localctx.tree = _root0;
 >>
 
+RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
+RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
+RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
+
+RewriteTreeOptional(o, locals, preamble, ops) ::= <<
+// ?
+<locals; separator="\n">
+<preamble; separator="\n">
+//if ( true ) {
+	<ops; separator="\n">
+//}
+>>
+
+RewriteTreeClosure(c, locals, preamble, ops) ::= <<
+// *
+<locals; separator="\n">
+<preamble; separator="\n">
+//while ( <c.iteratorDecls:{d | <d.name>.hasNext()}; separator=" || "> ) {
+	<ops; separator="\n">
+//}
+>>
+
 RewriteTreeStructure(t, locals, preamble, ops) ::= <<
 {
     <locals; separator="\n">
@@ -397,15 +419,11 @@ RewriteTreeStructure(t, locals, preamble, ops) ::= <<
     _adaptor.addChild(<labelref(t.enclosingBlock.rootDecl)>, <labelref(t.rootDecl)>);
 }
 >>
-RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
-RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
-RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
 
-RewriteTokenRef(t) ::= "_adaptor.addChild(<t.enclosingBlock.rootDecl.name>, <t.decl.name>.next());"
-RewriteTokenRefIsRoot(t) ::= <%
-<labelref(t.enclosingBlock.rootDecl)> =
-	_adaptor.becomeRoot(<t.decl.name>.next(), <labelref(t.enclosingBlock.rootDecl)>);
-%>
+RewriteTokenRef(t) ::= "_adaptor.addChild(<t.rootName>, <t.decl.name>.next());"
+RewriteTokenRefIsRoot(t) ::= <<
+<t.rootName> = _adaptor.becomeRoot(<t.decl.name>.next(), <t.rootName>);
+>>
 RewriteRuleRef(r) ::= "_adaptor.addChild(<r.enclosingBlock.rootDecl.name>, <r.decl.name>.next());"
 RewriteRuleRefIsRoot(r) ::= <%
 <labelref(r.enclosingBlock.rootDecl)> =

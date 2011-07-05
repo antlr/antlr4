@@ -98,9 +98,13 @@ public interface OutputModelFactory {
 	// Though dealing with ASTs, we must deal with here since these are
 	// triggered from elements in ANTLR's internal GrammarAST
 
-	TreeRewrite treeRewrite(GrammarAST ast, int rewriteLevel);
+	TreeRewrite treeRewrite(GrammarAST ast);
 
-	RewriteTreeStructure rewrite_tree(GrammarAST root, int rewriteLevel);
+	RewriteTreeOptional rewrite_optional(GrammarAST ast);
+
+	RewriteTreeClosure rewrite_closure(GrammarAST ast);
+
+	RewriteTreeStructure rewrite_tree(GrammarAST root);
 
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot);
 
@@ -109,6 +113,8 @@ public interface OutputModelFactory {
 	List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot);
 
 	// CONTEXT MANIPULATION
+
+	// TODO: move to controller?
 
 	OutputModelObject getRoot();
 
@@ -129,4 +135,8 @@ public interface OutputModelFactory {
 	void setCurrentBlock(CodeBlock blk);
 
 	CodeBlock getCurrentBlock();
+
+	int getCodeBlockLevel();
+
+	int getTreeLevel();
 }

@@ -36,12 +36,21 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 import java.util.*;
 
 public class CodeBlock extends SrcOp {
+	public int codeBlockLevel;
+	public int treeLevel;
+
 	@ModelElement public OrderedHashSet<Decl> locals;
 	@ModelElement public List<SrcOp> preamble;
 	@ModelElement public List<SrcOp> ops;
 
 	public CodeBlock(OutputModelFactory factory) {
 		super(factory);
+	}
+
+	public CodeBlock(OutputModelFactory factory, int treeLevel, int codeBlockLevel) {
+		super(factory);
+		this.treeLevel = treeLevel;
+		this.codeBlockLevel = codeBlockLevel;
 	}
 
 	/** Add local var decl */
@@ -59,5 +68,10 @@ public class CodeBlock extends SrcOp {
 	public void addOp(SrcOp op) {
 		if ( ops==null ) ops = new ArrayList<SrcOp>();
 		ops.add(op);
+	}
+
+	public void addOps(List<SrcOp> ops) {
+		if ( this.ops==null ) this.ops = new ArrayList<SrcOp>();
+		this.ops.addAll(ops);
 	}
 }

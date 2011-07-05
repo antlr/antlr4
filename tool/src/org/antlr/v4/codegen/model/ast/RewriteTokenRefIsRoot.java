@@ -34,7 +34,9 @@ import org.antlr.v4.codegen.model.decl.RewriteIteratorDecl;
 import org.antlr.v4.tool.GrammarAST;
 
 public class RewriteTokenRefIsRoot extends RewriteTokenRef {
-	public RewriteTokenRefIsRoot(OutputModelFactory factory, GrammarAST ast, RewriteIteratorDecl decl) {
-		super(factory, ast, decl);
+	public RewriteTokenRefIsRoot(OutputModelFactory factory, GrammarAST ast,
+								 String rootName, RewriteIteratorDecl decl)
+	{
+		super(factory, ast, rootName, decl);
 	}
 }
