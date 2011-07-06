@@ -53,7 +53,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 */
 
 	public List<Object> createElementList() {
-		return new ArrayList(3);
+		return new ElementList<Object>(this);
 	}
 
 	// END v4 stuff

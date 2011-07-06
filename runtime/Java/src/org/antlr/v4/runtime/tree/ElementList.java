@@ -27,19 +27,53 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model.decl;
+package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import java.util.*;
 
-public class RewriteIteratorDecl extends Decl {
-	public String listName;
-	public RewriteIteratorDecl(OutputModelFactory factory,
-							   GrammarAST elem,
-							   int codeBlockLevel)
-	{
-		super(factory, factory.getGenerator().target
-			  				.getRewriteIteratorName(elem, codeBlockLevel));
-		listName = factory.getGenerator().target.getElementListName(elem);
+/** This list tracks elements to left of -> for use on right of -> */
+public class ElementList<E> extends ArrayList<E> {
+	protected TreeAdaptor adaptor;
+
+	public class ElementListIterator implements Iterator<E> {
+		int cursor = 0;
+
+		public boolean hasNext() {
+			int n = size();
+			return (n==1 && cursor<1) || (n>1 && cursor<n);
+		}
+
+		public E next() {
+			int n = size();
+			if ( n == 0 ) throw new RewriteEmptyStreamException("n/a");
+			if ( cursor >= n) { // out of elements?
+				if ( n == 1 ) { // if size is 1, it's ok; return and we'll dup
+					return (E)adaptor.dupTree( get(0) );
+				}
+				// out of elements and size was not 1, so we can't dup
+				throw new RewriteCardinalityException("size=="+n+" and out of elements");
+			}
+
+			// we have elements
+			if ( n == 1 ) {
+				cursor++; // move cursor even for single element list
+				return (E)adaptor.dupTree( get(0) );
+			}
+			// must have more than one in list, pull from elements
+			E e = get(cursor);
+			cursor++;
+			return e;
+		}
+
+		public void remove() { throw new UnsupportedOperationException(); }
+	}
+
+	public ElementList(TreeAdaptor adaptor) {
+		this.adaptor = adaptor;
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		return new ElementListIterator();
 	}
 }

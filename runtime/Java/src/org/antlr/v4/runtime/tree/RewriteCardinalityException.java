@@ -27,19 +27,23 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model.decl;
+package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+/** Base class for all exceptions thrown during AST rewrite construction.
+ *  This signifies a case where the cardinality of two or more elements
+ *  in a subrule are different: (ID INT)* where |ID|!=|INT|
+ */
+public class RewriteCardinalityException extends RuntimeException {
+	public String elementDescription;
 
-public class RewriteIteratorDecl extends Decl {
-	public String listName;
-	public RewriteIteratorDecl(OutputModelFactory factory,
-							   GrammarAST elem,
-							   int codeBlockLevel)
-	{
-		super(factory, factory.getGenerator().target
-			  				.getRewriteIteratorName(elem, codeBlockLevel));
-		listName = factory.getGenerator().target.getElementListName(elem);
+	public RewriteCardinalityException(String elementDescription) {
+		this.elementDescription = elementDescription;
+	}
+
+	public String getMessage() {
+		if ( elementDescription!=null ) {
+			return elementDescription;
+		}
+		return null;
 	}
 }

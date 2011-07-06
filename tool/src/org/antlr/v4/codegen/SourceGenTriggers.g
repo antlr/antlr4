@@ -269,12 +269,12 @@ rewriteTreeEbnf returns [CodeBlock op]
 	
 rewriteTree returns [List<SrcOp> omos]
 	:	{
-		codeBlockLevel++;
+//		codeBlockLevel++;
 		treeLevel++;
 		List<SrcOp> elems = new ArrayList<SrcOp>();
 		RewriteTreeStructure t = factory.rewrite_tree($start);
-		CodeBlock save = factory.getCurrentBlock();
-		factory.setCurrentBlock(t);
+//		CodeBlock save = factory.getCurrentBlock();
+//		factory.setCurrentBlock(t);
 		}
 		^(	TREE_BEGIN
 			rewriteTreeAtom[true] {elems.addAll($rewriteTreeAtom.omos);}
@@ -283,9 +283,9 @@ rewriteTree returns [List<SrcOp> omos]
 		{
 		t.ops = elems;
 		$omos = DefaultOutputModelFactory.list(t);
-		factory.setCurrentBlock(save);
+//		factory.setCurrentBlock(save);
 		treeLevel--;
-		codeBlockLevel--;
+//		codeBlockLevel--;
 		}
 	;
 

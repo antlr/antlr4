@@ -111,6 +111,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	}
 
 	public Decl getCurrentDeclForName(String name) {
+		if ( getCurrentBlock().locals==null ) return null;
 		for (Decl d : getCurrentBlock().locals.elements()) {
 			if ( d.name.equals(name) ) return d;
 		}

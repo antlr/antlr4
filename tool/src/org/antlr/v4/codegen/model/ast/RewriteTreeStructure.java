@@ -30,18 +30,37 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.GrammarAST;
 
+import java.util.List;
+
 /** ^(A B C) */
-public class RewriteTreeStructure extends TreeRewrite {
+public class RewriteTreeStructure extends SrcOp {
 	public int treeLevel;
+	public int codeBlockLevel;
+
+	@ModelElement public List<SrcOp> ops;
+	@ModelElement public OrderedHashSet<Decl> locals;
 
 	public RewriteTreeStructure(OutputModelFactory factory,
 								GrammarAST ast,
 								int treeLevel,
 								int codeBlockLevel)
 	{
-		super(factory, treeLevel, codeBlockLevel);
+		super(factory, ast);
 		this.treeLevel = treeLevel;
+		this.codeBlockLevel = codeBlockLevel;
 	}
+
+	/** Add local var decl */
+	public void addLocalDecl(Decl d) {
+		if ( locals==null ) locals = new OrderedHashSet<Decl>();
+		locals.add(d);
+		d.isLocal = true;
+	}
+
+	public int getEnclosingTreeLevel() { return treeLevel - 1; }
 }

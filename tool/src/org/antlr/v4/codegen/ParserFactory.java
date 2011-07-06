@@ -36,6 +36,7 @@ import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.*;
 
 import java.util.List;
@@ -179,23 +180,53 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public TreeRewrite treeRewrite(GrammarAST ast) {
-		return new TreeRewrite(this, getTreeLevel(), getCodeBlockLevel());
+		TreeRewrite tr = new TreeRewrite(this, getTreeLevel(), getCodeBlockLevel());
+		tr.addLocalDecl(new RootDecl(this, 0));
+		List<GrammarAST> refs =
+			UseDefAnalyzer.getElementReferencesShallowInOuterAlt(getGrammar(), ast);
+		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentAlt(), refs);
+		if ( refs!=null ) {
+			for (GrammarAST ref : refs) {
+				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
+				tr.addLocalDecl(d);
+				RewriteIteratorInit init = new RewriteIteratorInit(this, d);
+				tr.addPreambleOp(init);
+			}
+		}
+		return tr;
 	}
 
 	@Override
 	public RewriteTreeOptional rewrite_optional(GrammarAST ast) {
-		List<GrammarAST> refs = controller.getElementReferencesDeep(ast);
-		return new RewriteTreeOptional(this, ast);
+		RewriteTreeOptional o =
+			new RewriteTreeOptional(this, ast, getTreeLevel(), getCodeBlockLevel());
+		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(getGrammar(),
+																		  ast,
+																		  true);
+		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentAlt(), refs);
+		if ( refs!=null ) {
+			for (GrammarAST ref : refs) {
+				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
+				o.addLocalDecl(d);
+				o.conditionalDecls.add(d);
+				RewriteIteratorInit init = new RewriteIteratorInit(this, d);
+				o.addPreambleOp(init);
+			}
+		}
+		return o;
 	}
 
 	@Override
 	public RewriteTreeClosure rewrite_closure(GrammarAST ast) {
 		RewriteTreeClosure c =
 			new RewriteTreeClosure(this, ast, getTreeLevel(), getCodeBlockLevel());
-		List<GrammarAST> refs = controller.getElementReferencesShallow(ast);
+		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(getGrammar(),
+																		  ast,
+																		  false);
+		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
-				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref);
+				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
 				c.addLocalDecl(d);
 				c.iteratorDecls.add(d);
 				RewriteIteratorInit init = new RewriteIteratorInit(this, d);
@@ -207,24 +238,34 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public RewriteTreeStructure rewrite_tree(GrammarAST root) {
-		return new RewriteTreeStructure(this, root, getTreeLevel(), getCodeBlockLevel());
+		RewriteTreeStructure t = new RewriteTreeStructure(this, root, getTreeLevel(), getCodeBlockLevel());
+		t.addLocalDecl( new RootDecl(this, getTreeLevel()) );
+		return t;
 	}
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {
-		RewriteIteratorDecl d = new RewriteIteratorDecl(this, ID);
+		String rootName = gen.target.getRootName(getTreeLevel());
 		RewriteRuleRef ruleRef;
-		if ( isRoot ) ruleRef = new RewriteRuleRefIsRoot(this, ID, d);
-		else ruleRef = new RewriteRuleRef(this, ID, d);
+		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
+		if ( isRoot ) ruleRef = new RewriteRuleRefIsRoot(this, ID, rootName, iterName);
+		else ruleRef = new RewriteRuleRef(this, ID, rootName, iterName);
 		return list(ruleRef);
 	}
 
 	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot) {
-		String itName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
+		Alternative alt = getCurrentAlt();
 		String rootName = gen.target.getRootName(getTreeLevel());
-		RewriteIteratorDecl d = (RewriteIteratorDecl)getCurrentDeclForName(itName);
+		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
+		if ( alt.tokenRefs.get(ID.getText())==null ) { // not ref'd on left hand side; imaginary
+			RewriteImagTokenRef tokenRef;
+			if ( isRoot ) tokenRef = new RewriteImagTokenRefIsRoot(this, ID, rootName);
+			else tokenRef = new RewriteImagTokenRef(this, ID, rootName);
+			return list(tokenRef);
+		}
+		// must be token ref on left of ->
 		RewriteTokenRef tokenRef;
-		if ( isRoot ) tokenRef = new RewriteTokenRefIsRoot(this, ID, rootName, d);
-		else tokenRef = new RewriteTokenRef(this, ID, rootName, d);
+		if ( isRoot ) tokenRef = new RewriteTokenRefIsRoot(this, ID, rootName, iterName);
+		else tokenRef = new RewriteTokenRef(this, ID, rootName, iterName);
 		return list(tokenRef);
 	}
 

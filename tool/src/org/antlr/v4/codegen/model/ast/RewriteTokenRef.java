@@ -31,18 +31,16 @@ package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.SrcOp;
-import org.antlr.v4.codegen.model.decl.RewriteIteratorDecl;
 import org.antlr.v4.tool.GrammarAST;
 
 public class RewriteTokenRef extends SrcOp {
-	/** Which iterator decl are we associated with? */
-	public RewriteIteratorDecl decl;
 	public String rootName;
+	public String iterName;
 	public RewriteTokenRef(OutputModelFactory factory, GrammarAST ast,
-						   String rootName, RewriteIteratorDecl decl)
+						   String rootName, String iterName)
 	{
 		super(factory, ast);
 		this.rootName = rootName;
-		this.decl = decl;
+		this.iterName = iterName;
 	}
 }

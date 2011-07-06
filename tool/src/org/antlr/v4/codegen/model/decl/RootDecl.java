@@ -32,8 +32,7 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 
 public class RootDecl extends Decl {
-	public RootDecl(OutputModelFactory factory) {
-		super(factory,
-			  factory.getGenerator().target.getRootName(factory.getCodeBlockLevel()));
+	public RootDecl(OutputModelFactory factory, int treeLevel) {
+		super(factory, factory.getGenerator().target.getRootName(treeLevel));
 	}
 }

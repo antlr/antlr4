@@ -29,6 +29,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
@@ -42,11 +43,12 @@ public class UseDefAnalyzer {
 			for (int a=1; a<=r.numberOfAlts; a++) {
 				Alternative alt = r.alt[a];
 				for (GrammarAST e : alt.rewriteElements) {
-					if ( !(alt.ruleRefs.containsKey(e.getText()) ||
-						   g.getTokenType(e.getText())!= Token.INVALID_TYPE ||
-						   alt.labelDefs.containsKey(e.getText()) ||
-						   e.getText().equals(r.name)) ) // $r ok in rule r
-					{
+					boolean ok =
+						alt.ruleRefs.containsKey(e.getText()) ||
+						g.getTokenType(e.getText()) != Token.INVALID_TYPE ||
+						alt.labelDefs.containsKey(e.getText()) ||
+						e.getText().equals(r.name);
+					if ( !ok ) { // $r ok in rule r
 						g.tool.errMgr.grammarError(ErrorType.REWRITE_ELEMENT_NOT_PRESENT_ON_LHS,
 												   g.fileName, e.token, e.getText());
 					}
@@ -66,6 +68,61 @@ public class UseDefAnalyzer {
 				}
 			}
 		}
+	}
+
+	/** Given -> (ALT ...),  return list of element refs at
+	 *  top level
+	 */
+	public static List<GrammarAST> getElementReferencesShallowInOuterAlt(Grammar g,
+																		 GrammarAST altAST)
+	{
+		return UseDefAnalyzer.getRewriteElementRefs(g, altAST, 0, false);
+	}
+
+	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
+	 *  top level of REWRITE_BLOCK. Must see into (nested) tree structures if
+	 *  optional but not if closure (that might lead to inf loop when building tree).
+	 */
+	public static List<GrammarAST> getElementReferencesInEBNF(Grammar g,
+															  GrammarAST ebnfRoot,
+															  boolean deep)
+	{
+		return UseDefAnalyzer.getRewriteElementRefs(g, ebnfRoot, 1, deep);
+	}
+
+	public static List<GrammarAST> filterForRuleAndTokenRefs(Alternative alt,
+															 List<GrammarAST> refs)
+	{
+		List<GrammarAST> elems = new ArrayList<GrammarAST>();
+		if ( refs!=null ) {
+			for (GrammarAST ref : refs) {
+				boolean imaginary = ref.getType()== ANTLRParser.TOKEN_REF &&
+				!alt.tokenRefs.containsKey(ref.getText());
+				if ( !imaginary ) elems.add(ref);
+			}
+		}
+		return elems;
+	}
+
+	public static List<GrammarAST> getRewriteElementRefs(Grammar g,
+														 GrammarAST root,
+														 int desiredShallowLevel,
+														 boolean deep)
+	{
+		CommonTreeNodeStream nodes = new CommonTreeNodeStream(root);
+		Refs collector = new Refs(nodes, desiredShallowLevel);
+		try {
+			collector.start();
+		}
+		catch (org.antlr.runtime.RecognitionException re) {
+			g.tool.errMgr.grammarError(ErrorType.INTERNAL_ERROR,
+									   g.fileName, re.token, re);
+
+		}
+//		System.out.println("from "+root.toStringTree());
+//		System.out.println("shallow: "+collector.shallow);
+//		System.out.println("deep: "+collector.deep);
+		return deep ? collector.deep : collector.shallow;
 	}
 
 	/** Find all rules reachable from r directly or indirectly for all r in g */

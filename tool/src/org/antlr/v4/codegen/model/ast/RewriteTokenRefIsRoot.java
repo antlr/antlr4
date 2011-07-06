@@ -30,13 +30,12 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.RewriteIteratorDecl;
 import org.antlr.v4.tool.GrammarAST;
 
 public class RewriteTokenRefIsRoot extends RewriteTokenRef {
 	public RewriteTokenRefIsRoot(OutputModelFactory factory, GrammarAST ast,
-								 String rootName, RewriteIteratorDecl decl)
+								 String rootName, String iterName)
 	{
-		super(factory, ast, rootName, decl);
+		super(factory, ast, rootName, iterName);
 	}
 }

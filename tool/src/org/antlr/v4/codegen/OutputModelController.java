@@ -296,7 +296,6 @@ public class OutputModelController implements OutputModelFactory {
 	}
 
 	public RewriteTreeClosure rewrite_closure(GrammarAST ast) {
-		List<GrammarAST> refs = getElementReferencesShallow(ast);
 		RewriteTreeClosure c = delegate.rewrite_closure(ast);
 		for (CodeGeneratorExtension ext : extensions) c = ext.rewrite_closure(c);
 		return c;
@@ -348,69 +347,12 @@ public class OutputModelController implements OutputModelFactory {
 
 	// SUPPORT
 
-	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
-	 *  top level of REWRITE_BLOCK.
-	 */
-	public List<GrammarAST> getElementReferencesShallow(GrammarAST ebnfRoot) {
-		if ( ebnfRoot.getType()!=ANTLRParser.CLOSURE &&
-		     ebnfRoot.getType()!=ANTLRParser.OPTIONAL )
-		{
-			return null;
-		}
-		GrammarAST blkAST = (GrammarAST)ebnfRoot.getChild(0);
-		if ( blkAST.getType()!=ANTLRParser.REWRITE_BLOCK ) return null;
-		GrammarAST altAST = (GrammarAST)blkAST.getChild(0);
-		if ( altAST.getType()!=ANTLRParser.ALT ) return null;
-
-		IntervalSet elementTokenTypes = getRewriteElementTokenTypeSet();
-		Alternative alt = getCurrentAlt();
-		List<GrammarAST> elems = new ArrayList<GrammarAST>();
-		for (Object o : altAST.getChildren()) {
-			GrammarAST ref = (GrammarAST)o;
-			if ( elementTokenTypes.member(ref.getType()) ) {
-				boolean imaginary = ref.getType()==ANTLRParser.TOKEN_REF &&
-									!alt.tokenRefs.containsKey(ref.getText());
-				if ( !imaginary ) elems.add(ref);
-			}
-		}
-
-		return elems;
-	}
-
-	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
-	 *  or below toplevel REWRITE_BLOCK.
-	 */
-	public List<GrammarAST> getElementReferencesDeep(GrammarAST ebnfRoot) {
-		if ( ebnfRoot.getType()!=ANTLRParser.CLOSURE &&
-		     ebnfRoot.getType()!=ANTLRParser.OPTIONAL )
-		{
-			return null;
-		}
-		GrammarAST blkAST = (GrammarAST)ebnfRoot.getChild(0);
-		if ( blkAST.getType()!=ANTLRParser.REWRITE_BLOCK ) return null;
-		GrammarAST altAST = (GrammarAST)blkAST.getChild(0);
-		if ( altAST.getType()!=ANTLRParser.ALT ) return null;
-
-		List<GrammarAST> elems = new ArrayList<GrammarAST>();
-		Alternative alt = getCurrentAlt();
-		IntervalSet elementTokenTypes = getRewriteElementTokenTypeSet();
-		List<GrammarAST> refs = altAST.getNodesWithType(elementTokenTypes);
-		if ( refs!=null ) {
-			for (GrammarAST ref : refs) {
-				boolean imaginary = ref.getType()==ANTLRParser.TOKEN_REF &&
-									!alt.tokenRefs.containsKey(ref.getText());
-				if ( !imaginary ) elems.add(ref);
-			}
-		}
-		return elems;
-	}
-
-	public IntervalSet getRewriteElementTokenTypeSet() {
-		IntervalSet elementTokenTypes = new IntervalSet();
-		elementTokenTypes.add(ANTLRParser.TOKEN_REF); // might be imaginary
-		elementTokenTypes.add(ANTLRParser.RULE_REF);
-		elementTokenTypes.add(ANTLRParser.STRING_LITERAL);
-		elementTokenTypes.add(ANTLRParser.LABEL);
-		return elementTokenTypes;
-	}
+//	public IntervalSet getRewriteElementTokenTypeSet() {
+//		IntervalSet elementTokenTypes = new IntervalSet();
+//		elementTokenTypes.add(ANTLRParser.TOKEN_REF); // might be imaginary
+//		elementTokenTypes.add(ANTLRParser.RULE_REF);
+//		elementTokenTypes.add(ANTLRParser.STRING_LITERAL);
+//		elementTokenTypes.add(ANTLRParser.LABEL);
+//		return elementTokenTypes;
+//	}
 }

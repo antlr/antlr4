@@ -884,7 +884,12 @@ rewriteTreeEbnf
 	$rewriteTreeEbnf.tree.getToken().setLine(firstToken.getLine());
 	$rewriteTreeEbnf.tree.getToken().setCharPositionInLine(firstToken.getCharPositionInLine());
 }
-	:	lp=LPAREN rewriteTreeAlt RPAREN ebnfSuffix -> ^(ebnfSuffix ^(REWRITE_BLOCK[$lp] rewriteTreeAlt))
+	:	lp=LPAREN rewriteTreeAlt RPAREN rewriteEbnfSuffix -> ^(rewriteEbnfSuffix ^(REWRITE_BLOCK[$lp] rewriteTreeAlt))
+	;
+
+rewriteEbnfSuffix
+	:	OPTIONAL
+	|	CLOSURE
 	;
 
 rewriteTree

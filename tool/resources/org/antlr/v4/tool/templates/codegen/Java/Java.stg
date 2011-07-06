@@ -381,8 +381,10 @@ ElementListName(elemName) ::= "_track_<elemName>"
 TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>.tree);"
 TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
+// assume roots are always locals in tree rewrites
+
 TreeRewrite(tr, locals, preamble, ops) ::= <<
-// rewrite: ...
+// rewrite: code level= <tr.codeBlockLevel>, tree level = <tr.treeLevel>
 <locals; separator="\n">
 <preamble; separator="\n">
 <ops; separator="\n">
@@ -394,41 +396,52 @@ RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
 RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
 
 RewriteTreeOptional(o, locals, preamble, ops) ::= <<
-// ?
-<locals; separator="\n">
-<preamble; separator="\n">
-//if ( true ) {
-	<ops; separator="\n">
-//}
->>
-
-RewriteTreeClosure(c, locals, preamble, ops) ::= <<
-// *
-<locals; separator="\n">
-<preamble; separator="\n">
-//while ( <c.iteratorDecls:{d | <d.name>.hasNext()}; separator=" || "> ) {
-	<ops; separator="\n">
-//}
->>
-
-RewriteTreeStructure(t, locals, preamble, ops) ::= <<
+// ? code level= <o.codeBlockLevel>, tree level = <o.treeLevel>
 {
-    <locals; separator="\n">
-    <preamble; separator="\n">
-    <ops; separator="\n">
-    _adaptor.addChild(<labelref(t.enclosingBlock.rootDecl)>, <labelref(t.rootDecl)>);
+	<locals; separator="\n">
+	<preamble; separator="\n">
+	if ( <o.conditionalDecls:{d | <d.name>.hasNext()}; separator=" || "> ) {
+		<ops; separator="\n">
+	}
 }
 >>
 
-RewriteTokenRef(t) ::= "_adaptor.addChild(<t.rootName>, <t.decl.name>.next());"
-RewriteTokenRefIsRoot(t) ::= <<
-<t.rootName> = _adaptor.becomeRoot(<t.decl.name>.next(), <t.rootName>);
+RewriteTreeClosure(c, locals, preamble, ops) ::= <<
+// * code level= <c.codeBlockLevel>, tree level = <c.treeLevel>
+{
+	<locals; separator="\n">
+	<preamble; separator="\n">
+	while ( <c.iteratorDecls:{d | <d.name>.hasNext()}; separator=" || "> ) {
+		<ops; separator="\n">
+	}
+}
 >>
-RewriteRuleRef(r) ::= "_adaptor.addChild(<r.enclosingBlock.rootDecl.name>, <r.decl.name>.next());"
-RewriteRuleRefIsRoot(r) ::= <%
-<labelref(r.enclosingBlock.rootDecl)> =
-	_adaptor.becomeRoot(<r.decl.name>.next(), <labelref(r.enclosingBlock.rootDecl)>);
+
+RewriteTreeStructure(t, locals, ops) ::= <<
+// TREE code level= <t.codeBlockLevel>, tree level = <t.treeLevel>
+{
+    <locals; separator="\n">
+    <ops; separator="\n">
+    _adaptor.addChild(_root<t.enclosingTreeLevel>, _root<t.treeLevel>);
+}
+>>
+
+RewriteTokenRef(t) ::= "_adaptor.addChild(<t.rootName>, <t.iterName>.next());"
+RewriteTokenRefIsRoot(t) ::= <<
+<t.rootName> = _adaptor.becomeRoot(<t.iterName>.next(), <t.rootName>);
+>>
+
+//adaptor.addChild(root_0, (Object)adaptor.create(D, "D"));
+RewriteImagTokenRef(t) ::=
+	"_adaptor.addChild(<t.rootName>, _adaptor.create(<t.ast.text>, \"<t.ast.text>\"));"
+RewriteImagTokenRefIsRoot(t) ::= <%
+<t.rootName> =
+	_adaptor.becomeRoot(_adaptor.create(<t.ast.text>, "<t.ast.text>"),
+					    <t.rootName>);
 %>
+RewriteRuleRef(r) ::= "_adaptor.addChild(<r.rootName>, <r.iterName>.next());"
+RewriteRuleRefIsRoot(r) ::=
+	"<r.rootName> = _adaptor.becomeRoot(<r.iterName>.next(), <r.rootName>);"
 
 /*
 BitSetDecl(b) ::= <<

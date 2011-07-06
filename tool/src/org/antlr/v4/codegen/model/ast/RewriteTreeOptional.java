@@ -36,10 +36,11 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.*;
 
 public class RewriteTreeOptional extends CodeBlock {
-	public List<Decl> iteratorDecls = new ArrayList<Decl>();
+	public List<Decl> conditionalDecls = new ArrayList<Decl>();
 
-	public RewriteTreeOptional(OutputModelFactory factory, GrammarAST ast) {
-		super(factory);
+	public RewriteTreeOptional(OutputModelFactory factory, GrammarAST ast,
+							   int treeLevel, int codeBlockLevel) {
+		super(factory, treeLevel, codeBlockLevel);
 		this.ast = ast;
 	}
 }
