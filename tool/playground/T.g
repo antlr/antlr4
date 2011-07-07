@@ -2,7 +2,7 @@ grammar T;
 options {output=AST;}
 tokens {I;D;}
 
-a : A B+ -> ^(A B)*
+a : A B+ -> B["foo"]
   ;
 
 b : B | C ;

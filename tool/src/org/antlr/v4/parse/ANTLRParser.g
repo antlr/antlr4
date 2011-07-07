@@ -412,7 +412,7 @@ rule
 
       exceptionGroup
 
-      -> ^( RULE<RuleAST> id DOC_COMMENT? ruleModifiers? ARG_ACTION?
+      -> ^( RULE<RuleAST> id DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
       		ruleReturns? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
@@ -430,7 +430,7 @@ exceptionGroup
 // Specifies a handler for a particular type of exception
 // thrown by a rule
 exceptionHandler
-	: CATCH ARG_ACTION ACTION -> ^(CATCH ARG_ACTION ACTION<ActionAST>)
+	: CATCH ARG_ACTION ACTION -> ^(CATCH ARG_ACTION<ActionAST> ACTION<ActionAST>)
 	;
 
 // Specifies a block of code to run after the rule and any
@@ -462,7 +462,7 @@ rulePrequel
 // as a single lexical action element, to be processed later.
 //
 ruleReturns
-	: RETURNS^ ARG_ACTION
+	: RETURNS^ ARG_ACTION<ActionAST>
 	;
 
 // --------------
@@ -641,7 +641,7 @@ int m = input.mark();
 @after {
 //state.backtracking--;
 }
-	:	(	DOC_COMMENT? ruleModifiers? id ARG_ACTION? ruleReturns? rulePrequel* COLON
+	:	(	DOC_COMMENT? ruleModifiers? id ARG_ACTION<ActionAST>? ruleReturns? rulePrequel* COLON
 		|	exceptionGroup
 		)
 		{reportError(missingSemi); recover(input,null);}
@@ -779,8 +779,8 @@ block
 //
 ruleref
     :	RULE_REF ARG_ACTION?
-		(	(op=ROOT|op=BANG)	-> ^($op ^(RULE_REF ARG_ACTION?))
-		|						-> ^(RULE_REF ARG_ACTION?)
+		(	(op=ROOT|op=BANG)	-> ^($op ^(RULE_REF ARG_ACTION<ActionAST>?))
+		|						-> ^(RULE_REF ARG_ACTION<ActionAST>?)
 		)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
@@ -800,7 +800,7 @@ range
 
 terminal
     :   // Args are only valid for lexer rules
-		TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION? elementOptions?)
+		TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION<ActionAST>? elementOptions?)
 	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	;
 
@@ -869,7 +869,7 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
-    :   TOKEN_REF elementOptions? ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> elementOptions? ARG_ACTION?) // for imaginary nodes
+    :   TOKEN_REF elementOptions? ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> elementOptions? ARG_ACTION<ActionAST>?) // for imaginary nodes
     |   RULE_REF
 	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	|   DOLLAR id -> LABEL[$DOLLAR,$id.text] // reference to a label in a rewrite rule

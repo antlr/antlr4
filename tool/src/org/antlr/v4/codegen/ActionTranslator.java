@@ -69,17 +69,32 @@ public class ActionTranslator implements ActionSplitterListener {
 		this.node = node;
 	}
 
+	public static String toString(List<ActionChunk> chunks) {
+		StringBuilder buf = new StringBuilder();
+		for (ActionChunk c : chunks) buf.append(c.toString());
+		return buf.toString();
+	}
+
 	public static List<ActionChunk> translateAction(OutputModelFactory factory,
 													RuleFunction rf,
 													Token tokenWithinAction,
 													ActionAST node)
 	{
 		String action = tokenWithinAction.getText();
-		int firstCurly = action.indexOf('{');
-		int lastCurly = action.lastIndexOf('}');
-		if ( firstCurly>=0 && lastCurly>=0 ) {
-			action = action.substring(firstCurly+1, lastCurly); // trim {...}
+		if ( action.charAt(0)=='{' ) {
+			int firstCurly = action.indexOf('{');
+			int lastCurly = action.lastIndexOf('}');
+			if ( firstCurly>=0 && lastCurly>=0 ) {
+				action = action.substring(firstCurly+1, lastCurly); // trim {...}
+			}
 		}
+//		else if ( action.charAt(0)=='"' ) {
+//			int firstQuote = action.indexOf('"');
+//			int lastQuote = action.lastIndexOf('"');
+//			if ( firstQuote>=0 && lastQuote>=0 ) {
+//				action = action.substring(firstQuote+1, lastQuote); // trim "..."
+//			}
+//		}
 		return translateActionChunk(factory, rf, action, node);
 	}
 

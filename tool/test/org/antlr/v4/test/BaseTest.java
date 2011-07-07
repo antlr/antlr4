@@ -727,6 +727,28 @@ public abstract class BaseTest {
 		}
 	}
 
+	protected void checkError(ErrorQueue equeue,
+							  ANTLRMessage expectedMessage)
+		throws Exception
+	{
+		//System.out.println("errors="+equeue);
+		ANTLRMessage foundMsg = null;
+		for (int i = 0; i < equeue.errors.size(); i++) {
+			ANTLRMessage m = (ANTLRMessage)equeue.errors.get(i);
+			if (m.errorType==expectedMessage.errorType ) {
+				foundMsg = m;
+			}
+		}
+		assertTrue("no error; "+expectedMessage.errorType+" expected", equeue.errors.size()>0);
+		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
+		assertNotNull("couldn't find expected error: "+expectedMessage.errorType, foundMsg);
+		/*
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		 */
+		assertTrue(Arrays.equals(expectedMessage.args, foundMsg.args));
+	}
+
     public static class FilteringTokenStream extends CommonTokenStream {
         public FilteringTokenStream(TokenSource src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();

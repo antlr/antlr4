@@ -108,7 +108,7 @@ public interface OutputModelFactory {
 
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot);
 
-	List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot);
+	List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST);
 
 	List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot);
 

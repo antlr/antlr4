@@ -252,14 +252,22 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(ruleRef);
 	}
 
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot) {
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) {
 		Alternative alt = getCurrentAlt();
 		String rootName = gen.target.getRootName(getTreeLevel());
 		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
-		if ( alt.tokenRefs.get(ID.getText())==null ) { // not ref'd on left hand side; imaginary
+		// not ref'd on left hand side or it is but we have an argument like ID["x"]
+		// implies create new node
+		if ( alt.tokenRefs.get(ID.getText())==null || argAST!=null ) {
 			RewriteImagTokenRef tokenRef;
-			if ( isRoot ) tokenRef = new RewriteImagTokenRefIsRoot(this, ID, rootName);
-			else tokenRef = new RewriteImagTokenRef(this, ID, rootName);
+			if ( isRoot ) {
+				tokenRef = new RewriteImagTokenRefIsRoot(this, ID, rootName,
+														 ID.getText(), argAST);
+			}
+			else {
+				tokenRef = new RewriteImagTokenRef(this, ID, rootName,
+												   ID.getText(), argAST);
+			}
 			return list(tokenRef);
 		}
 		// must be token ref on left of ->

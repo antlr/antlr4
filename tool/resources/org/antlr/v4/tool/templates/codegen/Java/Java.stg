@@ -432,12 +432,19 @@ RewriteTokenRefIsRoot(t) ::= <<
 >>
 
 //adaptor.addChild(root_0, (Object)adaptor.create(D, "D"));
-RewriteImagTokenRef(t) ::=
-	"_adaptor.addChild(<t.rootName>, _adaptor.create(<t.ast.text>, \"<t.ast.text>\"));"
-RewriteImagTokenRefIsRoot(t) ::= <%
+RewriteImagTokenRef(t, argChunks) ::= <%
+_adaptor.addChild(<t.rootName>,
+	_adaptor.create(<t.tokenType>,
+					<if(argChunks)><argChunks><else>"<t.tokenType>"<endif>)
+);
+%>
+RewriteImagTokenRefIsRoot(t, argChunks) ::= <%
 <t.rootName> =
-	_adaptor.becomeRoot(_adaptor.create(<t.ast.text>, "<t.ast.text>"),
-					    <t.rootName>);
+	_adaptor.becomeRoot(
+		_adaptor.create(<t.tokenType>,
+						<if(argChunks)><argChunks><else>"<t.tokenType>"<endif>),
+		<t.rootName>
+	);
 %>
 RewriteRuleRef(r) ::= "_adaptor.addChild(<r.rootName>, <r.iterName>.next());"
 RewriteRuleRefIsRoot(r) ::=

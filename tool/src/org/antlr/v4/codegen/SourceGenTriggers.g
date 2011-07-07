@@ -20,10 +20,10 @@ import java.util.HashMap;
 @members {
 	public int codeBlockLevel = -1;
 	public int treeLevel = -1;
-	public OutputModelFactory factory;
-    public SourceGenTriggers(TreeNodeStream input, OutputModelFactory factory) {
+	public OutputModelController controller;
+    public SourceGenTriggers(TreeNodeStream input, OutputModelController controller) {
     	this(input);
-    	this.factory = factory;
+    	this.controller = controller;
     }
 }
 
@@ -34,7 +34,7 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
 			{List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();}
     		(	alternative
     			{
-		    	factory.finishAlternative($alternative.altCodeBlock, $alternative.ops);
+		    	controller.finishAlternative($alternative.altCodeBlock, $alternative.ops);
     			alts.add($alternative.altCodeBlock);
     			}
     		)+
@@ -42,10 +42,10 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
     	{
     	if ( alts.size()==1 && ebnfRoot==null) return alts;
     	if ( ebnfRoot==null ) {
-    	    $omos = DefaultOutputModelFactory.list(factory.getChoiceBlock((BlockAST)$blk, alts));
+    	    $omos = DefaultOutputModelFactory.list(controller.getChoiceBlock((BlockAST)$blk, alts));
     	}
     	else {
-    	    $omos = DefaultOutputModelFactory.list(factory.getEBNFBlock($ebnfRoot, alts));
+    	    $omos = DefaultOutputModelFactory.list(controller.getEBNFBlock($ebnfRoot, alts));
     	}
     	}
     ;
@@ -54,17 +54,17 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
 alternative returns [CodeBlockForAlt altCodeBlock]
 @init {
 	// set alt if outer ALT only
-	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
+	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) controller.setCurrentAlt(((AltAST)$start).alt);
 }
 	:	alternative_with_rewrite {$altCodeBlock = $alternative_with_rewrite.altCodeBlock;}
 
-	|	^(ALT EPSILON) {$altCodeBlock = factory.epsilon();}
+	|	^(ALT EPSILON) {$altCodeBlock = controller.epsilon();}
 
     |	{
     	List<SrcOp> elems = new ArrayList<SrcOp>();
-		$altCodeBlock = factory.alternative(factory.getCurrentAlt());
+		$altCodeBlock = controller.alternative(controller.getCurrentAlt());
 		$ops = elems;
-		factory.setCurrentBlock($altCodeBlock);
+		controller.setCurrentBlock($altCodeBlock);
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
 	;
@@ -83,7 +83,7 @@ alternative_with_rewrite returns [CodeBlockForAlt altCodeBlock]
 alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 @init {
 	// set alt if outer ALT only
-	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) factory.setCurrentAlt(((AltAST)$start).alt);
+	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) controller.setCurrentAlt(((AltAST)$start).alt);
 }
     :	^(ALT_REWRITE
     		a=alternative
@@ -93,13 +93,13 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
     		{$altCodeBlock=$a.altCodeBlock; $ops=$a.ops;}
     	 )
 
-    |	^(ALT EPSILON) {$altCodeBlock = factory.epsilon();}
+    |	^(ALT EPSILON) {$altCodeBlock = controller.epsilon();}
 
     |	{
     	List<SrcOp> elems = new ArrayList<SrcOp>();
-		$altCodeBlock = factory.alternative(factory.getCurrentAlt());
+		$altCodeBlock = controller.alternative(controller.getCurrentAlt());
 		$ops = elems;
-		factory.setCurrentBlock($altCodeBlock);
+		controller.setCurrentBlock($altCodeBlock);
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
     ;
@@ -108,9 +108,9 @@ element returns [List<? extends SrcOp> omos]
 	:	labeledElement					{$omos = $labeledElement.omos;}
 	|	atom[null]						{$omos = $atom.omos;}
 	|	ebnf							{$omos = $ebnf.omos;}
-	|   ACTION							{$omos = factory.action($ACTION);}
-	|   FORCED_ACTION					{$omos = factory.forcedAction($FORCED_ACTION);}
-	|   SEMPRED							{$omos = factory.sempred($SEMPRED);}
+	|   ACTION							{$omos = controller.action($ACTION);}
+	|   FORCED_ACTION					{$omos = controller.forcedAction($FORCED_ACTION);}
+	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
 	|	GATED_SEMPRED
 	|	treeSpec
 	;
@@ -152,10 +152,10 @@ atom[GrammarAST label] returns [List<SrcOp> omos]
 	|	^(DOT ID ruleref[label])
     |	^(WILDCARD .)
     |	WILDCARD
-    |	^(ROOT terminal[label])		{$omos = factory.rootToken($terminal.omos);}
+    |	^(ROOT terminal[label])		{$omos = controller.rootToken($terminal.omos);}
     |	^(BANG terminal[label])		{$omos = $terminal.omos;}
     |   terminal[label]				{$omos = $terminal.omos;}
-    |	^(ROOT ruleref[label])		{$omos = factory.rootRule($ruleref.omos);}
+    |	^(ROOT ruleref[label])		{$omos = controller.rootRule($ruleref.omos);}
     |	^(BANG ruleref[label])		{$omos = $ruleref.omos;}
     |   ruleref[label]				{$omos = $ruleref.omos;}
     ;
@@ -166,7 +166,7 @@ notSet[GrammarAST label] returns [List<SrcOp> omos]
     ;
 
 ruleref[GrammarAST label] returns [List<SrcOp> omos]
-    :	^(RULE_REF ARG_ACTION?)		{$omos = factory.ruleRef($RULE_REF, $label, $ARG_ACTION);}
+    :	^(RULE_REF ARG_ACTION?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION);}
     ;
 
 range[GrammarAST label] returns [List<SrcOp> omos]
@@ -174,11 +174,11 @@ range[GrammarAST label] returns [List<SrcOp> omos]
     ;
 
 terminal[GrammarAST label] returns [List<SrcOp> omos]
-    :  ^(STRING_LITERAL .)			{$omos = factory.stringRef($STRING_LITERAL, $label);}
-    |	STRING_LITERAL				{$omos = factory.stringRef($STRING_LITERAL, $label);}
-    |	^(TOKEN_REF ARG_ACTION .)	{$omos = factory.tokenRef($TOKEN_REF, $label, $ARG_ACTION);}
-    |	^(TOKEN_REF .)				{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
-    |	TOKEN_REF					{$omos = factory.tokenRef($TOKEN_REF, $label, null);}
+    :  ^(STRING_LITERAL .)			{$omos = controller.stringRef($STRING_LITERAL, $label);}
+    |	STRING_LITERAL				{$omos = controller.stringRef($STRING_LITERAL, $label);}
+    |	^(TOKEN_REF ARG_ACTION .)	{$omos = controller.tokenRef($TOKEN_REF, $label, $ARG_ACTION);}
+    |	^(TOKEN_REF .)				{$omos = controller.tokenRef($TOKEN_REF, $label, null);}
+    |	TOKEN_REF					{$omos = controller.tokenRef($TOKEN_REF, $label, null);}
     ;
 
 elementOptions
@@ -197,14 +197,14 @@ rewrite returns [Rewrite code]
 	:	{
 		treeLevel = 0;
 		codeBlockLevel++;
-		$code = factory.treeRewrite($start);
-		CodeBlock save = factory.getCurrentBlock();
-		factory.setCurrentBlock($code);
+		$code = controller.treeRewrite($start);
+		CodeBlock save = controller.getCurrentBlock();
+		controller.setCurrentBlock($code);
 		}
 		predicatedRewrite* nakedRewrite 	
 		{
 		$code.ops = $nakedRewrite.omos;
-		factory.setCurrentBlock(save);
+		controller.setCurrentBlock(save);
 		codeBlockLevel--;
 		}
 	;
@@ -236,13 +236,13 @@ rewriteTreeElement returns [List<SrcOp> omos]
 	;
 
 rewriteTreeAtom[boolean isRoot] returns [List<SrcOp> omos]
-    :   ^(TOKEN_REF elementOptions ARG_ACTION)
-    |   ^(TOKEN_REF elementOptions)
-    |   ^(TOKEN_REF ARG_ACTION)
-	|   TOKEN_REF							{$omos = factory.rewrite_tokenRef($TOKEN_REF, $isRoot);}
-    |   RULE_REF							{$omos = factory.rewrite_ruleRef($RULE_REF, $isRoot);}
-	|   ^(STRING_LITERAL elementOptions)	{$omos = factory.rewrite_stringRef($STRING_LITERAL, $isRoot);}
-	|   STRING_LITERAL						{$omos = factory.rewrite_stringRef($STRING_LITERAL, $isRoot);}
+    :   ^(TOKEN_REF elementOptions ARG_ACTION) {$omos = controller.rewrite_tokenRef($TOKEN_REF, $isRoot, (ActionAST)$ARG_ACTION);}
+    |   ^(TOKEN_REF elementOptions)			{$omos = controller.rewrite_tokenRef($TOKEN_REF, $isRoot, null);}
+    |   ^(TOKEN_REF ARG_ACTION)				{$omos = controller.rewrite_tokenRef($TOKEN_REF, $isRoot, (ActionAST)$ARG_ACTION);}
+	|   TOKEN_REF							{$omos = controller.rewrite_tokenRef($TOKEN_REF, $isRoot, null);}
+    |   RULE_REF							{$omos = controller.rewrite_ruleRef($RULE_REF, $isRoot);}
+	|   ^(STRING_LITERAL elementOptions)	{$omos = controller.rewrite_stringRef($STRING_LITERAL, $isRoot);}
+	|   STRING_LITERAL						{$omos = controller.rewrite_stringRef($STRING_LITERAL, $isRoot);}
 	|   LABEL
 	|	ACTION
 	;
@@ -252,17 +252,17 @@ rewriteTreeEbnf returns [CodeBlock op]
 			^(	REWRITE_BLOCK
 				{
 				codeBlockLevel++;
-				if ( $a.getType()==OPTIONAL ) $op = factory.rewrite_optional($start);
-				else $op = factory.rewrite_closure($start);
-				CodeBlock save = factory.getCurrentBlock();
-				factory.setCurrentBlock($op);
+				if ( $a.getType()==OPTIONAL ) $op = controller.rewrite_optional($start);
+				else $op = controller.rewrite_closure($start);
+				CodeBlock save = controller.getCurrentBlock();
+				controller.setCurrentBlock($op);
 				}
 				alt=rewriteTreeAlt
 			)
 		)
 		{
 		$op.addOps($alt.omos);
-		factory.setCurrentBlock(save);
+		controller.setCurrentBlock(save);
 		codeBlockLevel--;
 		}
 	;
@@ -272,9 +272,9 @@ rewriteTree returns [List<SrcOp> omos]
 //		codeBlockLevel++;
 		treeLevel++;
 		List<SrcOp> elems = new ArrayList<SrcOp>();
-		RewriteTreeStructure t = factory.rewrite_tree($start);
-//		CodeBlock save = factory.getCurrentBlock();
-//		factory.setCurrentBlock(t);
+		RewriteTreeStructure t = controller.rewrite_tree($start);
+//		CodeBlock save = controller.getCurrentBlock();
+//		controller.setCurrentBlock(t);
 		}
 		^(	TREE_BEGIN
 			rewriteTreeAtom[true] {elems.addAll($rewriteTreeAtom.omos);}
@@ -283,7 +283,7 @@ rewriteTree returns [List<SrcOp> omos]
 		{
 		t.ops = elems;
 		$omos = DefaultOutputModelFactory.list(t);
-//		factory.setCurrentBlock(save);
+//		controller.setCurrentBlock(save);
 		treeLevel--;
 //		codeBlockLevel--;
 		}

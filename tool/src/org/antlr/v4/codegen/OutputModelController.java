@@ -42,7 +42,7 @@ import java.util.*;
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
  **/
-public class OutputModelController implements OutputModelFactory {
+public class OutputModelController {
 	/** Who does the work? Doesn't have to be CoreOutputModelFactory. */
 	public OutputModelFactory delegate;
 
@@ -122,11 +122,11 @@ public class OutputModelController implements OutputModelFactory {
 	}
 
 	public LexerFile lexerFile(String fileName) {
-		return new LexerFile(this, getGenerator().getRecognizerFileName());
+		return new LexerFile(delegate, getGenerator().getRecognizerFileName());
 	}
 
 	public Lexer lexer(LexerFile file) {
-		return new Lexer(this, file);
+		return new Lexer(delegate, file);
 	}
 
 	public RuleFunction rule(Rule r) {
@@ -313,13 +313,15 @@ public class OutputModelController implements OutputModelFactory {
 		return ops;
 	}
 
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot) {
-		List<SrcOp> ops = delegate.rewrite_tokenRef(ID, isRoot);
+	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) {
+		List<SrcOp> ops = delegate.rewrite_tokenRef(ID, isRoot, argAST);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_tokenRef(ops);
 		return ops;
 	}
 
-	public List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot) { return rewrite_tokenRef(ID, isRoot); }
+	public List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot) {
+		return rewrite_tokenRef(ID, isRoot, null);
+	}
 
 	public OutputModelObject getRoot() { return delegate.getRoot(); }
 

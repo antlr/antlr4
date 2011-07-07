@@ -30,13 +30,15 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.*;
 
 public class RewriteImagTokenRefIsRoot extends RewriteImagTokenRef {
 	public RewriteImagTokenRefIsRoot(OutputModelFactory factory,
 									 GrammarAST ast,
-									 String rootName)
+									 String rootName,
+									 String tokenType,
+									 ActionAST argAST)
 	{
-		super(factory, ast, rootName);
+		super(factory, ast, rootName, tokenType, argAST);
 	}
 }
