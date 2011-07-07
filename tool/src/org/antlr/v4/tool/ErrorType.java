@@ -50,8 +50,8 @@ public enum ErrorType {
 	DIR_NOT_FOUND("directory not found: <arg>", ErrorSeverity.ERROR),
 	OUTPUT_DIR_IS_FILE("output directory is a file: <arg>", ErrorSeverity.ERROR),
 	CANNOT_OPEN_FILE("cannot find or open file: <arg><if(arg2)>; reason: <arg2><endif>", ErrorSeverity.ERROR),
-	FILE_AND_GRAMMAR_NAME_DIFFER("", ErrorSeverity.ERROR),
-	FILENAME_EXTENSION_ERROR("", ErrorSeverity.ERROR),
+	FILE_AND_GRAMMAR_NAME_DIFFER("grammar name <arg> and file name <arg2> differ", ErrorSeverity.ERROR),
+//	FILENAME_EXTENSION_ERROR("", ErrorSeverity.ERROR),
 
 	INTERNAL_ERROR("internal error: <arg> <arg2><if(exception)>: <exception><endif>\n" +
 				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),

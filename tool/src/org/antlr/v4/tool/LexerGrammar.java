@@ -37,6 +37,9 @@ import org.stringtemplate.v4.misc.MultiMap;
 public class LexerGrammar extends Grammar {
 	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
 
+	/** The grammar from which this lexer grammar was derived (if implicit) */
+    public Grammar implicitLexerOwner;
+
 	/** DEFAULT_MODE rules are added first due to grammar syntax order */
 	public MultiMap<String, Rule> modes = new MultiMap<String, Rule>();
 

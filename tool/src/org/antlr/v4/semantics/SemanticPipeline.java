@@ -166,39 +166,33 @@ public class SemanticPipeline {
 	}
 
 	void assignTokenTypes(Grammar g, CollectSymbols collector, SymbolChecks symcheck) {
-		if ( g.implicitLexerOwner!=null ) {
-			// copy vocab from combined to implicit lexer
-			g.importVocab(g.implicitLexerOwner);
-			System.out.println("tokens="+g.tokenNameToTypeMap);
-			System.out.println("strings="+g.stringLiteralToTypeMap);
-		}
-		else {
-			Grammar G = g.getOutermostGrammar(); // put in root, even if imported
+		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
-			// DEFINE tokens { X='x'; } ALIASES
-			for (GrammarAST alias : collector.tokensDefs) {
-				if ( alias.getType()== ANTLRParser.ASSIGN ) {
-					String name = alias.getChild(0).getText();
-					String lit = alias.getChild(1).getText();
-					G.defineTokenAlias(name, lit);
-				}
+		// DEFINE tokens { X='x'; } ALIASES
+		for (GrammarAST alias : collector.tokensDefs) {
+			if ( alias.getType()== ANTLRParser.ASSIGN ) {
+				String name = alias.getChild(0).getText();
+				String lit = alias.getChild(1).getText();
+				G.defineTokenAlias(name, lit);
 			}
-
-			// DEFINE TOKEN TYPES FOR X : 'x' ; RULES
-			Map<String,String> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
-			if ( litAliases!=null ) {
-				for (String lit : litAliases.keySet()) {
-					G.defineTokenAlias(litAliases.get(lit), lit);
-				}
-			}
-
-			// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
-			for (String id : symcheck.tokenIDs) { G.defineTokenName(id); }
-
-			// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
-			for (String s : collector.strings) { G.defineStringLiteral(s); }
-//			System.out.println("tokens="+G.tokenNameToTypeMap);
-//			System.out.println("strings="+G.stringLiteralToTypeMap);
 		}
+
+		// DEFINE TOKEN TYPES FOR X : 'x' ; RULES
+		/* done by previous import
+		   Map<String,String> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
+		   if ( litAliases!=null ) {
+			   for (String lit : litAliases.keySet()) {
+				   G.defineTokenAlias(litAliases.get(lit), lit);
+			   }
+		   }
+		   */
+
+		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
+		for (String id : symcheck.tokenIDs) { G.defineTokenName(id); }
+
+		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
+		for (String s : collector.strings) { G.defineStringLiteral(s); }
+		System.out.println("tokens="+G.tokenNameToTypeMap);
+		System.out.println("strings="+G.stringLiteralToTypeMap);
 	}
 }

@@ -156,7 +156,8 @@ public class BasicSemanticChecks {
 		String fullyQualifiedName = nameToken.getInputStream().getSourceName();
 		File f = new File(fullyQualifiedName);
 		String fileName = f.getName();
-		if ( !Utils.stripFileExtension(fileName).equals(nameToken.getText()) ) {
+		if ( !Utils.stripFileExtension(fileName).equals(nameToken.getText()) &&
+		     !fileName.equals(Grammar.GRAMMAR_FROM_STRING_NAME)) {
 			g.tool.errMgr.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,
 									   fileName, nameToken, nameToken.getText(), fileName);
 		}

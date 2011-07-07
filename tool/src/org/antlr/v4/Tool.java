@@ -215,26 +215,30 @@ public class Tool {
 	}
 
 	public void process(Grammar g) {
+		LexerGrammar lexerg = null;
 		GrammarRootAST lexerAST = null;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
-		!g.ast.hasErrors )
+			 !g.ast.hasErrors )
 		{
-			lexerAST = extractImplicitLexer(g); // alters ast
-		}
-		processNonCombinedGrammar(g);
-		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
-		!g.ast.hasErrors )
-		{
+			lexerAST = extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
-				LexerGrammar lexerg = new LexerGrammar(this, lexerAST);
+				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
-				lexerg.importVocab(g);
+
+//			// copy vocab from combined to implicit lexer
+//			g.importVocab(g.implicitLexerOwner); // TODO: don't need i don't think; done in tool process()
+
 				processNonCombinedGrammar(lexerg);
-				g.importVocab(lexerg);
+				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
+				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
 			}
 		}
+		if ( g.implicitLexer!=null ) g.importVocab(g.implicitLexer);
+		System.out.println("tokens="+g.tokenNameToTypeMap);
+		System.out.println("strings="+g.stringLiteralToTypeMap);
+		processNonCombinedGrammar(g);
 	}
 
 	public void processNonCombinedGrammar(Grammar g) {
@@ -337,24 +341,24 @@ public class Tool {
 		GrammarRootAST combinedAST = combinedGrammar.ast;
 		//System.out.println("before="+combinedAST.toStringTree());
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
-		List<org.antlr.v4.tool.GrammarAST> elements = combinedAST.getChildren();
+		List<GrammarAST> elements = combinedAST.getChildren();
 
 		// MAKE A GRAMMAR ROOT and ID
 		String lexerName = combinedAST.getChild(0).getText()+"Lexer";
 		GrammarRootAST lexerAST =
-		new GrammarRootAST(new CommonToken(ANTLRParser.GRAMMAR,"LEXER_GRAMMAR"));
+		    new GrammarRootAST(new CommonToken(ANTLRParser.GRAMMAR,"LEXER_GRAMMAR"));
 		lexerAST.grammarType = ANTLRParser.LEXER;
 		lexerAST.token.setInputStream(combinedAST.token.getInputStream());
-		lexerAST.addChild((org.antlr.v4.tool.GrammarAST)adaptor.create(ANTLRParser.ID, lexerName));
+		lexerAST.addChild((GrammarAST)adaptor.create(ANTLRParser.ID, lexerName));
 
 		// MOVE OPTIONS
-		org.antlr.v4.tool.GrammarAST optionsRoot =
-		(org.antlr.v4.tool.GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
+		GrammarAST optionsRoot =
+		(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
 		if ( optionsRoot!=null ) {
-			org.antlr.v4.tool.GrammarAST lexerOptionsRoot = (org.antlr.v4.tool.GrammarAST)adaptor.dupNode(optionsRoot);
+			GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
 			lexerAST.addChild(lexerOptionsRoot);
-			List<org.antlr.v4.tool.GrammarAST> options = optionsRoot.getChildren();
-			for (org.antlr.v4.tool.GrammarAST o : options) {
+			List<GrammarAST> options = optionsRoot.getChildren();
+			for (GrammarAST o : options) {
 				String optionName = o.getChild(0).getText();
 				if ( !Grammar.doNotCopyOptionsToLexer.contains(optionName) ) {
 					lexerOptionsRoot.addChild(o);
@@ -363,8 +367,8 @@ public class Tool {
 		}
 
 		// MOVE lexer:: actions
-		List<org.antlr.v4.tool.GrammarAST> actionsWeMoved = new ArrayList<org.antlr.v4.tool.GrammarAST>();
-		for (org.antlr.v4.tool.GrammarAST e : elements) {
+		List<GrammarAST> actionsWeMoved = new ArrayList<GrammarAST>();
+		for (GrammarAST e : elements) {
 			if ( e.getType()==ANTLRParser.AT ) {
 				if ( e.getChild(0).getText().equals("lexer") ) {
 					lexerAST.addChild(e);
@@ -373,16 +377,16 @@ public class Tool {
 			}
 		}
 		elements.removeAll(actionsWeMoved);
-		org.antlr.v4.tool.GrammarAST combinedRulesRoot =
-		(org.antlr.v4.tool.GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.RULES);
+		GrammarAST combinedRulesRoot =
+			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.RULES);
 		if ( combinedRulesRoot==null ) return lexerAST;
 
 		// MOVE lexer rules
 
-		org.antlr.v4.tool.GrammarAST lexerRulesRoot =
-		(org.antlr.v4.tool.GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
+		GrammarAST lexerRulesRoot =
+			(GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
 		lexerAST.addChild(lexerRulesRoot);
-		List<org.antlr.v4.tool.GrammarAST> rulesWeMoved = new ArrayList<org.antlr.v4.tool.GrammarAST>();
+		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
 		List<GrammarASTWithOptions> rules = combinedRulesRoot.getChildren();
 		for (GrammarASTWithOptions r : rules) {
 			String ruleName = r.getChild(0).getText();
@@ -396,22 +400,24 @@ public class Tool {
 
 		// Will track 'if' from IF : 'if' ; rules to avoid defining new token for 'if'
 		Map<String,String> litAliases =
-		Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
+			Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
 
 		if ( nLexicalRules==0 && (litAliases==null||litAliases.size()==0) &&
-		combinedGrammar.stringLiteralToTypeMap.size()==0 )
+			 combinedGrammar.stringLiteralToTypeMap.size()==0 )
 		{
 			// no rules, tokens{}, or 'literals' in grammar
 			return null;
 		}
 
-		// add strings from combined grammar (and imported grammars) into to lexer
-		for (String lit : combinedGrammar.stringLiteralToTypeMap.keySet()) {
+		Set<String> stringLiterals = combinedGrammar.getStringLiterals();
+		// add strings from combined grammar (and imported grammars) into lexer
+		// put them first as they are keywords; must resolve ambigs to these rules
+		for (String lit : stringLiterals) {
 			if ( litAliases!=null && litAliases.containsKey(lit) ) continue; // already has rule
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
 			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
 			// can't use wizard; need special node types
-			org.antlr.v4.tool.GrammarAST litRule = new RuleAST(ANTLRParser.RULE);
+			GrammarAST litRule = new RuleAST(ANTLRParser.RULE);
 			BlockAST blk = new BlockAST(ANTLRParser.BLOCK);
 			AltAST alt = new AltAST(ANTLRParser.ALT);
 			TerminalAST slit = new TerminalAST(new org.antlr.runtime.CommonToken(ANTLRParser.STRING_LITERAL, lit));
@@ -420,10 +426,7 @@ public class Tool {
 			CommonToken idToken = new CommonToken(ANTLRParser.ID, rname);
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
-			lexerRulesRoot.addChild(litRule);
-
-//			(GrammarAST)
-//				wiz.create("(RULE ID["+rname+"] (BLOCK (ALT STRING_LITERAL["+lit+"])))");
+			lexerRulesRoot.getChildren().add(0, litRule); // add first
 		}
 
 		System.out.println("after ="+combinedAST.toStringTree());

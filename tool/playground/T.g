@@ -1,9 +1,8 @@
 grammar T;
 options {output=AST;}
-tokens {I;D;}
+tokens {I;}
 
-a : A B+ -> B["foo"]
-  ;
+a : x=A -> $a ;
 
 b : B | C ;
 

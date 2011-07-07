@@ -95,7 +95,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		String[] typeToTokenName = g.getTokenNames();
 		Set<String> tokens = new HashSet<String>();
 		for (String t : typeToTokenName) if ( t!=null ) tokens.add(t);
-		assertEquals("[E]", tokens.toString());
+		assertEquals("[E, 'x']", tokens.toString());
 	}
 
 	@Test public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
@@ -155,7 +155,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 			"tokens { B='}'; }\n"+
 			"a : A '}' {System.out.println(input);} ;\n"+
 			"A : 'a' ;\n" +
-			"B : '}' {/* */} ;\n"+
+			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
 		String found = execParser("P.g", grammar, "PParser", "PLexer",
 								  "a", "a}", false);
@@ -164,7 +164,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 
 	protected void checkSymbols(Grammar g,
 								String rulesStr,
-								String tokensStr)
+								String allValidTokensStr)
 		throws Exception
 	{
 		Tool antlr = new Tool();
@@ -175,7 +175,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		for (String t : typeToTokenName) if ( t!=null ) tokens.add(t);
 
 		// make sure expected tokens are there
-		StringTokenizer st = new StringTokenizer(tokensStr, ", ");
+		StringTokenizer st = new StringTokenizer(allValidTokensStr, ", ");
 		while ( st.hasMoreTokens() ) {
 			String tokenName = st.nextToken();
 			assertTrue("token "+tokenName+" expected, but was undefined",

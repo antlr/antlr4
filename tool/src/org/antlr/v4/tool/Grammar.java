@@ -31,7 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.TreeWizard;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;
@@ -40,10 +40,13 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.semantics.CollectSymbols;
 
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
+	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
+
 	public static final Set doNotCopyOptionsToLexer =
         new HashSet() {
             {
@@ -71,9 +74,10 @@ public class Grammar implements AttributeResolver {
     public String text; // testing only
     public String fileName;
 
-    /** Was this created from a COMBINED grammar? */
-    public Grammar implicitLexer;
-    public Grammar implicitLexerOwner;
+    /** Was this parser grammar created from a COMBINED grammar?  If so,
+	 *  this is what we derived.
+	 */
+    public LexerGrammar implicitLexer;
 
     /** If we're imported, who imported us? If null, implies grammar is root */
     public Grammar parent;
@@ -86,6 +90,7 @@ public class Grammar implements AttributeResolver {
 	public List<Rule> indexToRule = new ArrayList<Rule>();
 
 	int ruleNumber = 0; // used to get rule indexes (0..n-1)
+	int stringLiteralRuleNumber = 0; // used to invent rule names for 'keyword', ';', ... (0..n-1)
 
 	/** The ATN that represents the grammar with edges labelled with tokens
 	 *  or epsilon.  It is more suitable to analysis than an AST representation.
@@ -156,14 +161,14 @@ public class Grammar implements AttributeResolver {
 
 	/** For testing */
 	public Grammar(String grammarText) throws org.antlr.runtime.RecognitionException {
-		this("<string>", grammarText, null);
+		this(GRAMMAR_FROM_STRING_NAME, grammarText, null);
 	}
 
 	/** For testing */
 	public Grammar(String grammarText, ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
-		this("<string>", grammarText, listener);
+		this(GRAMMAR_FROM_STRING_NAME, grammarText, listener);
 	}
 
 	/** For testing; only builds trees; no sem anal */
@@ -365,8 +370,7 @@ public class Grammar implements AttributeResolver {
     }
 
 	public String getStringLiteralLexerRuleName(String lit) {
-		int ttype = getTokenType(lit);
-		return AUTO_GENERATED_TOKEN_NAME_PREFIX +ttype;
+		return AUTO_GENERATED_TOKEN_NAME_PREFIX + stringLiteralRuleNumber++;
 	}
 
     /** Return grammar directly imported by this grammar */
@@ -396,7 +400,6 @@ public class Grammar implements AttributeResolver {
 	 */
 	public String getTokenDisplayName(int ttype) {
 		String tokenName = null;
-		int index=0;
 		// inside any target's char range and is lexer grammar?
 		if ( isLexer() &&
 			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
@@ -411,6 +414,7 @@ public class Grammar implements AttributeResolver {
 				tokenName = typeToTokenList.get(ttype);
 				if ( tokenName!=null &&
 					 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) &&
+					 ttype < typeToStringLiteralList.size() &&
 				     typeToStringLiteralList.get(ttype)!=null)
 				{
 					tokenName = typeToStringLiteralList.get(ttype);
@@ -420,7 +424,7 @@ public class Grammar implements AttributeResolver {
 				tokenName = String.valueOf(ttype);
 			}
 		}
-		//System.out.println("getTokenDisplayName ttype="+ttype+", index="+index+", name="+tokenName);
+//		System.out.println("getTokenDisplayName ttype="+ttype+", name="+tokenName);
 		return tokenName;
 	}
 
@@ -433,9 +437,12 @@ public class Grammar implements AttributeResolver {
 	public String[] getTokenNames() {
 		int numTokens = getMaxTokenType();
 		String[] tokenNames = new String[numTokens+1];
-		for (String t : tokenNameToTypeMap.keySet()) {
-			Integer ttype = tokenNameToTypeMap.get(t);
-			if ( ttype>0 ) tokenNames[ttype] = t;
+		for (String tokenName : tokenNameToTypeMap.keySet()) {
+			Integer ttype = tokenNameToTypeMap.get(tokenName);
+			if ( tokenName!=null && tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) ) {
+				tokenName = typeToStringLiteralList.get(ttype);
+			}
+			if ( ttype>0 ) tokenNames[ttype] = tokenName;
 		}
 		return tokenNames;
 	}
@@ -493,14 +500,20 @@ public class Grammar implements AttributeResolver {
 		return maxTokenType;
 	}
 
-	public void importVocab(Grammar g) {
-		this.tokenNameToTypeMap.putAll( g.tokenNameToTypeMap );
-		this.stringLiteralToTypeMap.putAll( g.stringLiteralToTypeMap );
-		int max = Math.max(this.typeToTokenList.size(), g.typeToTokenList.size());
+	public void importVocab(Grammar importG) {
+		for (String tokenName: importG.tokenNameToTypeMap.keySet()) {
+			defineTokenName(tokenName, importG.tokenNameToTypeMap.get(tokenName));
+		}
+		for (String tokenName: importG.stringLiteralToTypeMap.keySet()) {
+			defineStringLiteral(tokenName, importG.stringLiteralToTypeMap.get(tokenName));
+		}
+//		this.tokenNameToTypeMap.putAll( importG.tokenNameToTypeMap );
+//		this.stringLiteralToTypeMap.putAll( importG.stringLiteralToTypeMap );
+		int max = Math.max(this.typeToTokenList.size(), importG.typeToTokenList.size());
 		this.typeToTokenList.setSize(max);
-		for (int ttype=0; ttype<g.typeToTokenList.size(); ttype++) {
+		for (int ttype=0; ttype<importG.typeToTokenList.size(); ttype++) {
 			maxTokenType = Math.max(maxTokenType, ttype);
-			this.typeToTokenList.set(ttype, g.typeToTokenList.get(ttype));
+			this.typeToTokenList.set(ttype, importG.typeToTokenList.get(ttype));
 		}
 	}
 
@@ -518,7 +531,11 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public int defineStringLiteral(String lit) {
+		if ( stringLiteralToTypeMap.containsKey(lit) ) {
+			return stringLiteralToTypeMap.get(lit);
+		}
 		return defineStringLiteral(lit, getNewTokenType());
+
 	}
 
 	public int defineStringLiteral(String lit, int ttype) {
@@ -528,7 +545,7 @@ public class Grammar implements AttributeResolver {
 			if ( ttype>=typeToStringLiteralList.size() ) {
 				typeToStringLiteralList.setSize(ttype+1);
 			}
-			typeToStringLiteralList.set(ttype, text);
+			typeToStringLiteralList.set(ttype, lit);
 
 			setTokenForType(ttype, lit);
 			return ttype;
@@ -652,6 +669,7 @@ public class Grammar implements AttributeResolver {
 		Map<String,String> lexerRuleToStringLiteral = new HashMap<String,String>();
 
         for (GrammarASTWithOptions r : ruleNodes) {
+			//System.out.println(r.toStringTree());
             String ruleName = r.getChild(0).getText();
             if ( Character.isUpperCase(ruleName.charAt(0)) ) {
 				Map nodes = new HashMap();
@@ -666,6 +684,15 @@ public class Grammar implements AttributeResolver {
         }
 		return lexerRuleToStringLiteral;
 	}
+
+	public Set<String> getStringLiterals() {
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+		BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(adaptor,ast);
+		CollectSymbols collector = new CollectSymbols(nodes,this);
+		collector.downup(ast); // no side-effects; compute lists
+		return collector.strings;
+	}
+
 
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		decisionDFAs.put(decision, lookaheadDFA);

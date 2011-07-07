@@ -60,6 +60,19 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
+	@Test public void testSingleLabeledToken() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=ID -> $x;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "abc", debug);
+		assertEquals("abc\n", found);
+	}
+
 	@Test public void testSingleTokenToNewNode() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -84,20 +97,6 @@ public class TestRewriteAST extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("(x INT)\n", found);
-	}
-
-	@Test public void testSingleTokenToNewNode2() throws Exception {
-		// Allow creation of new nodes w/o args.
-		String grammar =
-			"grammar TT;\n" +
-			"options {output=AST;}\n" +
-			"a : ID -> ID[ ];\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("TT.g", grammar, "TTParser", "TTLexer",
-				    "a", "abc", debug);
-		assertEquals("ID\n", found);
 	}
 
 	@Test public void testSingleCharLiteral() throws Exception {
@@ -199,7 +198,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {DUH;}\n" +
-			"a : ID INT ID INT -> ^( DUH ID ^( DUH INT) )+ ;\n" +
+			"a : ID INT ID INT -> ^( DUH ID ^( DUH INT) )* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -226,19 +225,6 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID ID -> ID* ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "a b", debug);
-		assertEquals("a b\n", found);
-	}
-
-	@Test public void testPositiveClosureSingleToken() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ID ID -> ID+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -407,7 +393,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : 'var' (ID ':' type ';')+ -> ^('var' ^(':' ID type)+) ;\n" +
+			"a : 'var' (ID ':' type ';')+ -> ^('var' ^(':' ID type)*) ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -422,7 +408,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {VAR;}\n" +
-			"a : ID (',' ID)*-> ^(VAR ID)+ ;\n" +
+			"a : ID (',' ID)*-> ^(VAR ID)* ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -452,7 +438,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {VAR;}\n" +
-			"a : ID (',' ID)*-> ^(VAR[\"var\"] ID)+ ;\n" +
+			"a : ID (',' ID)*-> ^(VAR[\"var\"] ID)* ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -467,7 +453,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID+) ;\n" +
+			"a : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID*) ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -482,7 +468,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : lc='{' ID+ '}' -> ^(BLOCK[$lc,\"block\"] ID+) ;\n" +
+			"a : lc='{' ID+ '}' -> ^(BLOCK[$lc,\"block\"] ID*) ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -551,7 +537,7 @@ public class TestRewriteAST extends BaseTest {
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
 			"a : b b ;\n" +
-			"b : ID ( ID (last=ID -> $last)+ ) ';'\n" + // get last ID
+			"b : ID ( ID (last=ID -> $last)* ) ';'\n" + // get last ID
 			"  | INT\n" + // should still get auto AST construction
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -621,11 +607,11 @@ public class TestRewriteAST extends BaseTest {
 	}
 
 	@Test public void testCopySemanticsForRules2() throws Exception {
-		// copy type as a root for each invocation of (...)+ in rewrite
+		// copy type as a root for each invocation of (...)* in rewrite
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : type ID (',' ID)* ';' -> ^(type ID)+ ;\n" +
+			"a : type ID (',' ID)* ';' -> ^(type ID)* ;\n" +
 			"type : 'int' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -636,11 +622,11 @@ public class TestRewriteAST extends BaseTest {
 
 	@Test public void testCopySemanticsForRules3() throws Exception {
 		// copy type *and* modifier even though it's optional
-		// for each invocation of (...)+ in rewrite
+		// for each invocation of (...)* in rewrite
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : modifier? type ID (',' ID)* ';' -> ^(type modifier? ID)+ ;\n" +
+			"a : modifier? type ID (',' ID)* ';' -> ^(type modifier? ID)* ;\n" +
 			"type : 'int' ;\n" +
 			"modifier : 'public' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -652,11 +638,11 @@ public class TestRewriteAST extends BaseTest {
 
 	@Test public void testCopySemanticsForRules3Double() throws Exception {
 		// copy type *and* modifier even though it's optional
-		// for each invocation of (...)+ in rewrite
+		// for each invocation of (...)* in rewrite
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : modifier? type ID (',' ID)* ';' -> ^(type modifier? ID)+ ^(type modifier? ID)+ ;\n" +
+			"a : modifier? type ID (',' ID)* ';' -> ^(type modifier? ID)* ^(type modifier? ID)* ;\n" +
 			"type : 'int' ;\n" +
 			"modifier : 'public' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -668,12 +654,12 @@ public class TestRewriteAST extends BaseTest {
 
 	@Test public void testCopySemanticsForRules4() throws Exception {
 		// copy type *and* modifier even though it's optional
-		// for each invocation of (...)+ in rewrite
+		// for each invocation of (...)* in rewrite
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {MOD;}\n" +
-			"a : modifier? type ID (',' ID)* ';' -> ^(type ^(MOD modifier)? ID)+ ;\n" +
+			"a : modifier? type ID (',' ID)* ';' -> ^(type ^(MOD modifier)? ID)* ;\n" +
 			"type : 'int' ;\n" +
 			"modifier : 'public' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -688,7 +674,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {MOD;}\n" +
-			"a : ID (',' ID)* ';' -> ID+ ID+ ;\n"+
+			"a : ID (',' ID)* ';' -> ID* ID* ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
@@ -728,7 +714,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : 'int' ID (',' ID)* ';' -> ^('int' ID+) ;\n" +
+			"a : 'int' ID (',' ID)* ';' -> ^('int' ID*) ;\n" +
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -756,7 +742,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : 'int' ID (',' ID)* ';' -> ^('int' ID)+ ;\n" +
+			"a : 'int' ID (',' ID)* ';' -> ^('int' ID)* ;\n" +
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -771,7 +757,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : 'int' ID ':' INT (',' ID ':' INT)* ';' -> ^('int' ID INT)+ ;\n" +
+			"a : 'int' ID ':' INT (',' ID ':' INT)* ';' -> ^('int' ID INT)* ;\n" +
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -993,7 +979,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options { output = AST; } \n" +
-			"a: (INT|ID)+ -> INT+ ID+ ;\n" +
+			"a: (INT|ID)+ -> INT* ID* ;\n" +
 			"INT: '0'..'9'+;\n" +
 			"ID : 'a'..'z'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -1049,8 +1035,6 @@ public class TestRewriteAST extends BaseTest {
 	}
 
 	@Test public void testOptionalSubruleWithoutRealElements() throws Exception {
-		// copy type *and* modifier even though it's optional
-		// for each invocation of (...)+ in rewrite
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;} \n" +
@@ -1074,7 +1058,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : ID ID INT INT INT -> (ID INT)+;\n"+
+			"a : ID ID INT INT INT -> (ID INT)*;\n"+
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+; \n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -1124,7 +1108,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ID? INT -> ID+ INT ;\n" +
+			"a : ID? INT -> ID* INT ;\n" +
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
