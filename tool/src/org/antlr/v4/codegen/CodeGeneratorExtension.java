@@ -103,6 +103,10 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> rewrite_stringRef(List<SrcOp> ops) { return ops; }
 
+	public List<SrcOp> rewrite_labelRef(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> rewrite_action(List<SrcOp> ops) { return ops; }
+
 	// BLOCKS
 
 	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }

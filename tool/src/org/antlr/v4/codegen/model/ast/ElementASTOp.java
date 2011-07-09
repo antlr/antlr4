@@ -30,17 +30,15 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.tool.GrammarAST;
 
 public class ElementASTOp extends SrcOp {
-	public LabeledOp opWithResultToAdd;
 	public Decl label;
 
-	public ElementASTOp(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
+	public ElementASTOp(OutputModelFactory factory, GrammarAST ast, Decl label) {
 		super(factory, ast);
-		this.opWithResultToAdd = opWithResultToAdd;
-		label = opWithResultToAdd.getLabels().get(0);
+		this.label = label;
 	}
 }

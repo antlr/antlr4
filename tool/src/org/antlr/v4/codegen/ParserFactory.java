@@ -78,14 +78,14 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		// If no manual label and action refs as token/rule not label or
 		// we're adding to trees, we need to define implicit label
 		if ( controller.needsImplicitLabel(ID, invokeOp) ) defineImplicitLabel(ID, invokeOp);
-		AddToLabelList listLabelOp = getListLabel(invokeOp, label);
+		AddToLabelList listLabelOp = getListLabelIfPresent(invokeOp, label);
 		return list(invokeOp, listLabelOp);
 	}
 
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID, label);
 		if ( controller.needsImplicitLabel(ID, matchOp) ) defineImplicitLabel(ID, matchOp);
-		AddToLabelList listLabelOp = getListLabel(matchOp, label);
+		AddToLabelList listLabelOp = getListLabelIfPresent(matchOp, label);
 		return list(matchOp, listLabelOp);
 	}
 
@@ -277,6 +277,33 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(tokenRef);
 	}
 
+	@Override
+	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) {
+		String rootName = gen.target.getRootName(getTreeLevel());
+		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
+		if ( ID.getText().equals(getCurrentRuleFunction().rule.name) ) { // $e in rule e
+			RewriteSelfRuleLabelRef labelRef;
+			if ( isRoot ) labelRef = new RewriteSelfRuleLabelRef(this, ID, rootName);
+			else labelRef = new RewriteSelfRuleLabelRef(this, ID, rootName);
+			return list(labelRef);
+		}
+		else { // normal element label
+			RewriteLabelRef labelRef;
+			if ( isRoot ) labelRef = new RewriteLabelRefIsRoot(this, ID, rootName, iterName);
+			else labelRef = new RewriteLabelRef(this, ID, rootName, iterName);
+			return list(labelRef);
+		}
+	}
+
+	@Override
+	public List<SrcOp> rewrite_action(ActionAST actionAST, boolean isRoot) {
+		String rootName = gen.target.getRootName(getTreeLevel());
+		RewriteAction action;
+		if ( isRoot ) action = new RewriteActionIsRoot(this, actionAST, rootName);
+		else action = new RewriteAction(this, actionAST, rootName);
+		return list(action);
+	}
+
 	// support
 
 	public void defineImplicitLabel(GrammarAST ID, LabeledOp op) {
@@ -286,20 +313,22 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			String implLabel = gen.target.getImplicitRuleLabel(ID.getText());
 			String ctxName = gen.target.getRuleFunctionContextStructName(r);
 			d = new RuleContextDecl(this, implLabel, ctxName);
+			((RuleContextDecl)d).isImplicit = true;
 		}
 		else {
 			String implLabel = gen.target.getImplicitTokenLabel(ID.getText());
 			d = new TokenDecl(this, implLabel);
+			((TokenDecl)d).isImplicit = true;
 		}
 		op.getLabels().add(d);
 		getCurrentRuleFunction().addLocalDecl(d);
 	}
 
-	public AddToLabelList getListLabel(LabeledOp op, GrammarAST label) {
+	public AddToLabelList getListLabelIfPresent(LabeledOp op, GrammarAST label) {
 		AddToLabelList labelOp = null;
 		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
 			String listLabel = gen.target.getListLabel(label.getText());
-			labelOp = new AddToLabelList(this, listLabel, op);
+			labelOp = new AddToLabelList(this, listLabel, op.getLabels().get(0));
 		}
 		return labelOp;
 	}

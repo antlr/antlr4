@@ -30,10 +30,9 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
 
 public class ElementListDecl extends Decl {
-	public ElementListDecl(OutputModelFactory factory, GrammarAST elem) {
-		super(factory, factory.getGenerator().target.getElementListName(elem));
+	public ElementListDecl(OutputModelFactory factory, String name) {
+		super(factory, name);
 	}
 }

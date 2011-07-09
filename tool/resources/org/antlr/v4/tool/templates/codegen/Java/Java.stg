@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -328,13 +329,13 @@ SetDynScopeAttr_negIndex(s, indexChunks, rhsChunks) ::=
 SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
     "<s.scope>.get(<indexChunks>).<s.attr> =<rhsChunks>;"
 
-AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(first(a.opWithResultToAdd.labels))>);"
+AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "List\<<rdecl.decl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.decl.ctxName>>();"
+RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
@@ -378,6 +379,7 @@ _adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 
 ElementListDecl(d) ::= "List\<Object> <d.name> = _adaptor.createElementList();"
 ElementListName(elemName) ::= "_track_<elemName>"
+ClearElementList(c) ::= "<c.name>.clear();"
 TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>.tree);"
 TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
@@ -449,6 +451,22 @@ RewriteImagTokenRefIsRoot(t, argChunks) ::= <%
 RewriteRuleRef(r) ::= "_adaptor.addChild(<r.rootName>, <r.iterName>.next());"
 RewriteRuleRefIsRoot(r) ::=
 	"<r.rootName> = _adaptor.becomeRoot(<r.iterName>.next(), <r.rootName>);"
+
+RewriteLabelRef(t) ::= "<RewriteAddChild(t.rootName, {<t.iterName>.next()})>"
+RewriteLabelRefIsRoot(t) ::= "<RewriteBecomeRoot({<t.iterName>.next()}, t.rootName)>"
+
+// -> $e in rule e
+RewriteSelfRuleLabelRef(s) ::= "<RewriteAddChild(s.rootName, {_localctx.tree})>"
+RewriteSelfRuleLabelRefIsRoot(s) ::= "<RewriteBecomeRoot({_localctx.tree}, s.rootName)>"
+
+RewriteAction(a, chunks) ::= "<RewriteAddChild(a.rootName, chunks)>"
+RewriteActionIsRoot(a, chunks) ::= "<RewriteBecomeRoot(chunks, a.rootName)>"
+
+// how to add child, make root
+RewriteAddChild(rootName, child) ::= "_adaptor.addChild(<rootName>, <child>);"
+RewriteBecomeRoot(newRoot, rootName) ::=
+	"<rootName> = _adaptor.becomeRoot(<newRoot>, <rootName>);"
+
 
 /*
 BitSetDecl(b) ::= <<

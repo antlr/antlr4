@@ -90,15 +90,22 @@ public class UseDefAnalyzer {
 		return UseDefAnalyzer.getRewriteElementRefs(g, ebnfRoot, 1, deep);
 	}
 
+	/** Get list of rule refs, token refs mentioned on left, and labels not
+	 *  referring to rule result like $e in rule e.
+	 */
 	public static List<GrammarAST> filterForRuleAndTokenRefs(Alternative alt,
 															 List<GrammarAST> refs)
 	{
 		List<GrammarAST> elems = new ArrayList<GrammarAST>();
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
-				boolean imaginary = ref.getType()== ANTLRParser.TOKEN_REF &&
-				!alt.tokenRefs.containsKey(ref.getText());
-				if ( !imaginary ) elems.add(ref);
+				boolean imaginary =
+					ref.getType()== ANTLRParser.TOKEN_REF &&
+					!alt.tokenRefs.containsKey(ref.getText());
+				boolean selfLabel =
+					ref.getType()==ANTLRParser.LABEL &&
+					ref.getText().equals(alt.rule.name);
+				if ( !imaginary && !selfLabel ) elems.add(ref);
 			}
 		}
 		return elems;

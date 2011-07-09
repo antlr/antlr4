@@ -51,6 +51,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
 	public Alternative currentAlt;
 	public CodeBlock currentBlock;
+	public CodeBlock currentAlternativeBlock;
 
 	protected DefaultOutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
@@ -91,6 +92,14 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	public CodeBlock getCurrentBlock() {
 		return currentBlock;
+	}
+
+	public void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock) {
+		this.currentAlternativeBlock = currentAlternativeBlock;
+	}
+
+	public CodeBlock getCurrentAlternativeBlock() {
+		return currentAlternativeBlock;
 	}
 
 	public int getCodeBlockLevel() { return controller.walker.codeBlockLevel; }

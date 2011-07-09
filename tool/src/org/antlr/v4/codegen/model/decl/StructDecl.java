@@ -31,13 +31,14 @@ package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
 
-import java.util.*;
+import java.util.Collection;
 
 /** */
 public class StructDecl extends Decl {
-	@ModelElement public List<Decl> attrs = new ArrayList<Decl>();
+	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 
 	public StructDecl(OutputModelFactory factory) {

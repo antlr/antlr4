@@ -2,7 +2,9 @@ grammar T;
 options {output=AST;}
 tokens {I;}
 
-a : x=A -> $a ;
+a : x+=b x+=b -> {new CommonTree()} ;
+
+atom : A ;
 
 b : B | C ;
 

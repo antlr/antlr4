@@ -27,19 +27,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model.decl;
+package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.GrammarAST;
 
-public class RewriteIteratorDecl extends Decl {
-	public String listName;
-	public RewriteIteratorDecl(OutputModelFactory factory,
-							   GrammarAST elem,
-							   int codeBlockLevel)
-	{
-		super(factory, factory.getGenerator().target
-			  				.getRewriteIteratorName(elem, codeBlockLevel));
-		listName = factory.getGenerator().target.getElementListName(elem.getText());
+public class RewriteLabelRefIsRoot extends RewriteLabelRef {
+	public RewriteLabelRefIsRoot(OutputModelFactory factory, GrammarAST ast,
+								String rootName, String iterName) {
+		super(factory, ast, rootName, iterName);
 	}
 }

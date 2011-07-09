@@ -32,7 +32,7 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 
 /** */
-public class TokenListDecl extends Decl {
+public class TokenListDecl extends TokenDecl {
 	public TokenListDecl(OutputModelFactory factory, String varName) {
 		super(factory, varName);
 	}

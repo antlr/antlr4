@@ -27,19 +27,27 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model.decl;
+package org.antlr.v4.codegen.model.ast;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.actions.ActionChunk;
+import org.antlr.v4.tool.ActionAST;
 
-public class RewriteIteratorDecl extends Decl {
-	public String listName;
-	public RewriteIteratorDecl(OutputModelFactory factory,
-							   GrammarAST elem,
-							   int codeBlockLevel)
-	{
-		super(factory, factory.getGenerator().target
-			  				.getRewriteIteratorName(elem, codeBlockLevel));
-		listName = factory.getGenerator().target.getElementListName(elem.getText());
+import java.util.List;
+
+public class RewriteAction extends SrcOp {
+	public String rootName;
+
+	@ModelElement public List<ActionChunk> chunks;
+
+	public RewriteAction(OutputModelFactory factory, ActionAST ast, String rootName) {
+		super(factory, ast);
+		this.rootName = rootName;
+		if ( ast!=null ) {
+			chunks = ActionTranslator.translateAction(factory,
+													  factory.getCurrentRuleFunction(),
+													  ast.token, ast);
+		}
 	}
 }

@@ -30,13 +30,13 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.tool.GrammarAST;
 
 public class TrackTokenElement extends ElementASTOp {
 	public String name;
-	public TrackTokenElement(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
-		super(factory, ast, opWithResultToAdd);
-		name = factory.getGenerator().target.getElementListName(ast);
+	public TrackTokenElement(OutputModelFactory factory, GrammarAST ast, String trackName, Decl label) {
+		super(factory, ast, label);
+		name = trackName;
 	}
 }

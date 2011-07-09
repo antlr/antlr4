@@ -30,12 +30,12 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.tool.GrammarAST;
 
 /** */
 public class AddTokenLeaf extends ElementASTOp {
-	public AddTokenLeaf(OutputModelFactory factory, GrammarAST ast, LabeledOp opWithResultToAdd) {
-		super(factory, ast, opWithResultToAdd);
+	public AddTokenLeaf(OutputModelFactory factory, GrammarAST ast, Decl label) {
+		super(factory, ast, label);
 	}
 }

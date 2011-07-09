@@ -29,7 +29,7 @@
 
 package org.antlr.v4.test;
 
-import org.junit.*;
+import org.junit.Test;
 
 public class TestRewriteAST extends BaseTest {
 	protected boolean debug = false;
@@ -288,20 +288,6 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("a\n", found);
 	}
 
-	@Test public void testPositiveClosureSingleRule() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : b b -> b+;\n" +
-			"b : ID ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "a b", debug);
-		assertEquals("a b\n", found);
-	}
-
 	@Test public void testSinglePredicateT() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -501,7 +487,7 @@ public class TestRewriteAST extends BaseTest {
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
 			"a : b b ;\n" +
-			"b : (ID INT -> INT ID | INT INT -> INT+ )\n" +
+			"b : (ID INT -> INT ID | INT INT -> INT* )\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -544,15 +530,15 @@ public class TestRewriteAST extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "a b c d; 42", debug);
-		assertEquals("d 42\n", found);
+				    "a", "a b c; 42", debug);
+		assertEquals("c 42\n", found);
 	}
 
 	@Test public void testRewriteActions() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : atom -> ^({adaptor.create(INT,\"9\")} atom) ;\n" +
+			"a : atom -> ^({_adaptor.create(INT,\"9\")} atom) ;\n" +
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -566,7 +552,7 @@ public class TestRewriteAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : atom -> {adaptor.create(INT,\"9\")} atom ;\n" +
+			"a : atom -> {_adaptor.create(INT,\"9\")} atom ;\n" +
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -786,7 +772,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {VAR;}\n"+
-			"a : first=ID others+=ID* -> $first VAR $others+ ;\n" +
+			"a : first=ID others+=ID* -> $first VAR $others* ;\n" +
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -801,7 +787,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : A A b=B B b=B c+=C C c+=C D {String s=$D.text;} -> A+ B+ C+ D ;\n" +
+			"a : A A b=B B b=B c+=C C c+=C D {String s=$D.text;} -> A* B* C* D ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"A : 'a' ;\n" +
 			"B : 'b' ;\n" +
@@ -868,7 +854,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : x+=b x+=b -> $x+;\n"+
+			"a : x+=b x+=b -> $x*;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -1001,11 +987,7 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("2\n", found);
 	}
 
-	@Ignore
-    // TODO: FAILS. The should probably generate a warning from antlr
-    // See http://www.antlr.org:8888/browse/ANTLR-162
-    //
-    public void testSetWithLabel() throws Exception {
+	@Test public void testSetWithLabel() throws Exception {
 
 		String grammar =
 			"grammar T;\n" +
@@ -1041,7 +1023,7 @@ public class TestRewriteAST extends BaseTest {
 			"tokens {PARMS;} \n" +
 			"\n" +
 			"modulo \n" +
-			" : 'modulo' ID ('(' parms+ ')')? -> ^('modulo' ID ^(PARMS parms+)?) \n" +
+			" : 'modulo' ID ('(' parms+ ')')? -> ^('modulo' ID ^(PARMS parms*)?) \n" +
 			" ; \n" +
 			"parms : '#'|ID; \n" +
 			"ID : ('a'..'z' | 'A'..'Z')+;\n" +

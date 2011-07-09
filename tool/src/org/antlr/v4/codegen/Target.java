@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.ST;
 
@@ -230,23 +230,21 @@ public class Target {
 
 	public String getRewriteIteratorName(GrammarAST elem, int level) {
 		ST st = gen.templates.getInstanceOf("RewriteIteratorName");
-		st.add("elemName", getElementName(elem));
+		st.add("elemName", getElementName(elem.getText()));
 		st.add("level", level);
 		return st.render();
 	}
 
-	public String getElementListName(GrammarAST elem) {
+	public String getElementListName(String name) {
 		ST st = gen.templates.getInstanceOf("ElementListName");
-		st.add("elemName", getElementName(elem));
+		st.add("elemName", getElementName(name));
 		return st.render();
 	}
 
-	public String getElementName(GrammarAST elem) {
-		String text = elem.getText();
-		if ( gen.g.getRule(text)==null ) {
-			int ttype = gen.g.getTokenType(text);
-			text = getTokenTypeAsTargetLabel(gen.g, ttype);
-		}
-		return text;
+	public String getElementName(String name) {
+		if ( gen.g.getRule(name)!=null ) return name;
+		int ttype = gen.g.getTokenType(name);
+		if ( ttype==Token.INVALID_TYPE ) return name;
+		return getTokenTypeAsTargetLabel(gen.g, ttype);
 	}
 }

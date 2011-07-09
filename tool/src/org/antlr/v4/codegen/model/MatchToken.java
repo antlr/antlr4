@@ -47,7 +47,7 @@ public class MatchToken extends RuleElement implements LabeledOp {
 		CodeGenerator gen = factory.getGenerator();
 		int ttype = g.getTokenType(ast.getText());
 		name = gen.target.getTokenTypeAsTargetLabel(g, ttype);
-		if ( labelAST!=null ) {
+		if ( labelAST!=null ) { // TODO: move to factory
 			String label = labelAST.getText();
 			TokenDecl d = new TokenDecl(factory, label);
 			labels.add(d);

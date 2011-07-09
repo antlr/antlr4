@@ -112,6 +112,10 @@ public interface OutputModelFactory {
 
 	List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot);
 
+	List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot);
+
+	List<SrcOp> rewrite_action(ActionAST action, boolean isRoot);
+
 	// CONTEXT MANIPULATION
 
 	// TODO: move to controller?
@@ -135,6 +139,10 @@ public interface OutputModelFactory {
 	void setCurrentBlock(CodeBlock blk);
 
 	CodeBlock getCurrentBlock();
+
+	void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock);
+
+	CodeBlock getCurrentAlternativeBlock();
 
 	int getCodeBlockLevel();
 

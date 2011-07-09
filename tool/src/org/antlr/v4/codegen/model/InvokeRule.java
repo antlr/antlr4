@@ -33,14 +33,15 @@ import org.antlr.v4.codegen.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.*;
 
-import java.util.*;
+import java.util.List;
 
 /** */
 public class InvokeRule extends RuleElement implements LabeledOp {
 	public String name;
-	public List<Decl> labels = new ArrayList<Decl>();
+	public OrderedHashSet<Decl> labels = new OrderedHashSet<Decl>(); // TODO: should need just 1
 	public String argExprs;
 	public String ctxName;
 
@@ -64,7 +65,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			factory.getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				String listLabel = gen.target.getListLabel(label);
-				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, d);
+				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, ctxName);
 				factory.getCurrentRuleFunction().addContextDecl(l);
 			}
 		}
@@ -89,6 +90,6 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 	}
 
 	public List<Decl> getLabels() {
-		return labels;
+		return labels.elements();
 	}
 }

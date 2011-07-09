@@ -39,7 +39,7 @@ import java.util.*;
  *  or rule of a grammar.
  */
 public class Alternative implements AttributeResolver {
-    Rule rule;
+    public Rule rule;
 
 	public AltAST ast;
 
@@ -72,7 +72,7 @@ public class Alternative implements AttributeResolver {
 
 	/** (ALT_REWRITE (ALT ...) (-> (ALT ...))) */
 	public boolean hasRewrite() {
-		return ast!=null && ast.getType()==ANTLRParser.ALT_REWRITE;
+		return ast.getNodesWithType(ANTLRParser.ALT_REWRITE).size()>0;
 	}
 
 	public boolean resolvesToToken(String x, ActionAST node) {

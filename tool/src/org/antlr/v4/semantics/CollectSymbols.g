@@ -232,6 +232,7 @@ ruleArg
 		currentRule.args = ScopeParser.parseTypeList($ARG_ACTION.text);
 		currentRule.args.type = AttributeDict.DictType.ARG;
 		currentRule.args.ast = $ARG_ACTION;
+		((ActionAST)$ARG_ACTION).resolver = currentRule.alt[currentAlt];
 		}
 	;
 
@@ -260,8 +261,16 @@ ruleScopeSpec
 rewriteElement
 //@init {System.out.println("rewriteElement: "+((Tree)input.LT(1)).getText());}
 	:
-    	{inContext("RESULT ...")}? (TOKEN_REF|RULE_REF|STRING_LITERAL|LABEL)
-		{currentRule.alt[currentAlt].rewriteElements.add($start);}
+    	{inContext("RESULT ...")}? t=(TOKEN_REF|RULE_REF|STRING_LITERAL|LABEL)
+		{
+		currentRule.alt[currentAlt].rewriteElements.add($start);
+		if ( $t.getType()==TOKEN_REF && t.getChildCount()>0 ) {
+			GrammarAST arg = (GrammarAST)t.getChild(0);
+			if ( arg.getType()==ARG_ACTION ) {
+				((ActionAST)arg).resolver = currentRule.alt[currentAlt];
+			}
+		}
+		}
 	;
 
 labeledElement
@@ -285,12 +294,13 @@ terminal
     		currentRule.alt[currentAlt].tokenRefs.map($STRING_LITERAL.text, (TerminalAST)$STRING_LITERAL);
     	}
     	}
-    |	TOKEN_REF
+    |	(tref=TOKEN_REF | ^(tref=TOKEN_REF ARG_ACTION .?))
     	{
-    	terminals.add($TOKEN_REF);
-    	tokenIDRefs.add($TOKEN_REF);
+    	terminals.add($tref);
+    	tokenIDRefs.add($tref);
     	if ( currentRule!=null ) {
-    		currentRule.alt[currentAlt].tokenRefs.map($TOKEN_REF.text, (TerminalAST)$TOKEN_REF);
+    		currentRule.alt[currentAlt].tokenRefs.map($tref.text, (TerminalAST)$tref);
+			if ( $ARG_ACTION!=null ) ((ActionAST)$ARG_ACTION).resolver = currentRule.alt[currentAlt];
     	}
     	}
     ;

@@ -323,6 +323,18 @@ public class OutputModelController {
 		return rewrite_tokenRef(ID, isRoot, null);
 	}
 
+	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) {
+		List<SrcOp> ops = delegate.rewrite_labelRef(ID, isRoot);
+		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_labelRef(ops);
+		return ops;
+	}
+
+	public List<SrcOp> rewrite_action(ActionAST action, boolean isRoot) {
+		List<SrcOp> ops = delegate.rewrite_action(action, isRoot);
+		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_action(ops);
+		return ops;
+	}
+
 	public OutputModelObject getRoot() { return delegate.getRoot(); }
 
 	public void setRoot(OutputModelObject root) { delegate.setRoot(root); }
@@ -342,6 +354,12 @@ public class OutputModelController {
 	public void setCurrentBlock(CodeBlock blk) { delegate.setCurrentBlock(blk); }
 
 	public CodeBlock getCurrentBlock() { return delegate.getCurrentBlock(); }
+
+	public void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock) {
+		delegate.setCurrentAlternativeBlock(currentAlternativeBlock);
+	}
+
+	public CodeBlock getCurrentAlternativeBlock() { return delegate.getCurrentAlternativeBlock(); }
 
 	public int getCodeBlockLevel() { return delegate.getCodeBlockLevel(); }
 

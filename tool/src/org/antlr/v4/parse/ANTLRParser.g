@@ -700,12 +700,9 @@ blockSuffixe
     ;
 
 ebnfSuffix
-@init {
-	Token op = input.LT(1);
-}
-	:	QUESTION	-> OPTIONAL[op]
-  	|	STAR 		-> CLOSURE[op]
-   	|	PLUS	 	-> POSITIVE_CLOSURE[op]
+	:	QUESTION	-> OPTIONAL[$start]
+  	|	STAR 		-> CLOSURE[$start]
+   	|	PLUS	 	-> POSITIVE_CLOSURE[$start]
 	;
 
 atom:	// Qualified reference delegate.rule. This must be
@@ -839,15 +836,15 @@ nakedRewrite
 // rule altAndRewrite makes REWRITE root. for ST, we use ST_REWRITE
 rewriteAlt returns [boolean isTemplate]
 options {backtrack=true;}
-    : // try to parse a template rewrite
-      rewriteTemplate {$isTemplate=true;}
-
-    | // If we are not building templates, then we must be
+    : // If we are not building templates, then we must be
       // building ASTs or have rewrites in a grammar that does not
       // have output=AST; options. If that is the case, we will issue
       // errors/warnings in the next phase, so we just eat them here
       rewriteTreeAlt
 
+	| // try to parse a template rewrite
+      rewriteTemplate {$isTemplate=true;} // must be 2nd so "ACTION ..." matches as tree rewrite
+      
     | ETC
 
     | /* empty rewrite */ -> EPSILON
@@ -888,8 +885,8 @@ rewriteTreeEbnf
 	;
 
 rewriteEbnfSuffix
-	:	OPTIONAL
-	|	CLOSURE
+	:	QUESTION	-> OPTIONAL[$start]
+  	|	STAR 		-> CLOSURE[$start]
 	;
 
 rewriteTree

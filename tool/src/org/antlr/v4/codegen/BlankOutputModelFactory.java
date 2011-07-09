@@ -95,6 +95,10 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 		return rewrite_tokenRef(ID, isRoot, null);
 	}
 
+	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) { return null; }
+
+	public List<SrcOp> rewrite_action(ActionAST action, boolean isRoot) { return null; }
+
 	// BLOCKS
 
 	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) { return null; }

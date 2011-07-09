@@ -83,7 +83,9 @@ alternative_with_rewrite returns [CodeBlockForAlt altCodeBlock]
 alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 @init {
 	// set alt if outer ALT only
-	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) controller.setCurrentAlt(((AltAST)$start).alt);
+	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) {
+		controller.setCurrentAlt(((AltAST)$start).alt);
+	}
 }
     :	^(ALT_REWRITE
     		a=alternative
@@ -100,6 +102,9 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 		$altCodeBlock = controller.alternative(controller.getCurrentAlt());
 		$ops = elems;
 		controller.setCurrentBlock($altCodeBlock);
+		if ( inContext("RULE BLOCK") || inContext("RULE BLOCK ALT_REWRITE") ) { // outer block
+			controller.setCurrentAlternativeBlock($altCodeBlock);
+		}
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
     ;
@@ -243,8 +248,8 @@ rewriteTreeAtom[boolean isRoot] returns [List<SrcOp> omos]
     |   RULE_REF							{$omos = controller.rewrite_ruleRef($RULE_REF, $isRoot);}
 	|   ^(STRING_LITERAL elementOptions)	{$omos = controller.rewrite_stringRef($STRING_LITERAL, $isRoot);}
 	|   STRING_LITERAL						{$omos = controller.rewrite_stringRef($STRING_LITERAL, $isRoot);}
-	|   LABEL
-	|	ACTION
+	|   LABEL								{$omos = controller.rewrite_labelRef($LABEL, $isRoot);}
+	|	ACTION								{$omos = controller.rewrite_action((ActionAST)$ACTION, $isRoot);}
 	;
 
 rewriteTreeEbnf returns [CodeBlock op]

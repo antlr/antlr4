@@ -33,6 +33,7 @@ import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
 import java.util.List;
@@ -70,7 +71,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		}
 		else {
 			InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-			SrcOp treeOp = new RuleBecomeRoot(factory, invokeOp.ast, invokeOp);
+			SrcOp treeOp = new RuleBecomeRoot(factory, invokeOp.ast, invokeOp.getLabels().get(0));
 			return DefaultOutputModelFactory.list(ops, treeOp);
 		}
 	}
@@ -83,7 +84,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		}
 		else {
 			MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-			SrcOp treeOp = new TokenBecomeRoot(factory, matchOp.ast, matchOp);
+			SrcOp treeOp = new TokenBecomeRoot(factory, matchOp.ast, matchOp.getLabels().get(0));
 			return DefaultOutputModelFactory.list(ops, treeOp);
 		}
 	}
@@ -92,32 +93,79 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	public List<SrcOp> leafRule(List<SrcOp> ops) {
 		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
 		Alternative alt = factory.getCurrentAlt();
+		RuleContextDecl label = (RuleContextDecl)invokeOp.getLabels().get(0);
 		if ( alt.hasRewrite() ) {
-			RuleFunction rf = factory.getCurrentRuleFunction();
-			rf.addLocalDecl(new ElementListDecl(factory, invokeOp.ast));
-			TrackRuleElement t = new TrackRuleElement(factory, invokeOp.ast, invokeOp);
-			return DefaultOutputModelFactory.list(ops, t);
+			CodeBlock blk = factory.getCurrentAlternativeBlock();
+			String elemListName = factory.getGenerator().target.getElementListName(invokeOp.ast.getText());
+			blk.addLocalDecl(new ElementListDecl(factory, elemListName));
+			// track any explicit label like _track_label but not implicit label
+			if ( !label.isImplicit ) {
+				String labelListName =
+					factory.getGenerator().target.getElementListName(label.name);
+				blk.addLocalDecl(new ElementListDecl(factory, labelListName));
+			}
+			String trackName = factory.getGenerator().target.getElementListName(invokeOp.ast.getText());
+			TrackRuleElement t = new TrackRuleElement(factory, invokeOp.ast, trackName, label);
+			ops.add(t);
+			if ( !label.isImplicit ) {
+				trackName = factory.getGenerator().target.getElementListName(label.name);
+				TrackRuleElement t2 = new TrackRuleElement(factory, invokeOp.ast, trackName,
+														   label);
+				if ( invokeOp.ast.parent.getType() == ANTLRParser.ASSIGN ) {
+					// if x=A must keep it a single-element list; clear before add
+					ClearElementList c = new ClearElementList(factory, invokeOp.ast, trackName);
+					ops.add(c);
+				}
+				ops.add(t2);
+			}
 		}
 		else {
-			SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, invokeOp);
-			return DefaultOutputModelFactory.list(ops, treeOp);
+			SrcOp treeOp = new AddRuleLeaf(factory, invokeOp.ast, label);
+			ops.add(treeOp);
 		}
+		return ops;
 	}
 
 	@Override
 	public List<SrcOp> leafToken(List<SrcOp> ops) {
 		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
+		TokenDecl label = (TokenDecl)matchOp.getLabels().get(0);
 		Alternative alt = factory.getCurrentAlt();
 		if ( alt.hasRewrite() ) {
-			RuleFunction rf = factory.getCurrentRuleFunction();
-			rf.addLocalDecl(new ElementListDecl(factory, matchOp.ast));
-			TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, matchOp);
-			return DefaultOutputModelFactory.list(ops, t);
+			CodeBlock blk = factory.getCurrentAlternativeBlock();
+			// First declare tracking lists for elements, labels
+			// track the named element like _track_A
+			String elemListName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
+			blk.addLocalDecl(new ElementListDecl(factory, elemListName));
+			// track any explicit label like _track_label but not implicit label
+			if ( !label.isImplicit ) {
+				String labelListName =
+				factory.getGenerator().target.getElementListName(label.name);
+				blk.addLocalDecl(new ElementListDecl(factory, labelListName));
+			}
+			// Now, generate track instructions for element and any labels
+			// do element
+			String trackName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
+			TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, trackName,
+														label);
+			ops.add(t);
+			if ( !label.isImplicit ) { // track all explicit labels
+				trackName = factory.getGenerator().target.getElementListName(label.name);
+				TrackTokenElement t2 = new TrackTokenElement(factory, matchOp.ast, trackName,
+															 label);
+				if ( matchOp.ast.parent.getType() == ANTLRParser.ASSIGN ) {
+					// if x=A must keep it a single-element list; clear before add
+					ClearElementList c = new ClearElementList(factory, matchOp.ast, trackName);
+					ops.add(c);
+				}
+				ops.add(t2);
+			}
 		}
 		else {
-			SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, matchOp);
-			return DefaultOutputModelFactory.list(ops, treeOp);
+			SrcOp treeOp = new AddTokenLeaf(factory, matchOp.ast, label);
+			ops.add(treeOp);
 		}
+		return ops;
 	}
 
 	@Override
