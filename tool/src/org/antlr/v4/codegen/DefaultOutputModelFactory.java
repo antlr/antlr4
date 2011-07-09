@@ -46,65 +46,32 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	public CodeGenerator gen;
 	public OutputModelController controller;
 
-	// Context ptrs
-	public OutputModelObject root; // normally ParserFile, LexerFile, ...
-	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
-	public Alternative currentAlt;
-	public CodeBlock currentBlock;
-	public CodeBlock currentAlternativeBlock;
-
 	protected DefaultOutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
 		this.g = gen.g;
+	}
+
+	public void setController(OutputModelController controller) {
+		this.controller = controller;
 	}
 
 	public Grammar getGrammar() { return g; }
 
 	public CodeGenerator getGenerator() { return gen; }
 
-	public OutputModelObject getRoot() { return root; }
+	public OutputModelObject getRoot() { return controller.getRoot(); }
 
-	public void setRoot(OutputModelObject root) { this.root = root;	}
+	public RuleFunction getCurrentRuleFunction() { return controller.getCurrentRuleFunction(); }
 
-	public RuleFunction getCurrentRuleFunction() {
-		if ( currentRule.size()>0 )	return currentRule.peek();
-		return null;
-	}
+	public Alternative getCurrentAlt() { return controller.getCurrentAlt(); }
 
-	public void pushCurrentRule(RuleFunction r) { currentRule.push(r); }
+	public CodeBlock getCurrentBlock() { return controller.getCurrentBlock(); }
 
-	public RuleFunction popCurrentRule() {
-		if ( currentRule.size()>0 ) return currentRule.pop();
-		return null;
-	}
+	public CodeBlock getCurrentAlternativeBlock() { return controller.getCurrentAlternativeBlock(); }
 
-	public Alternative getCurrentAlt() { return currentAlt; }
+	public int getCodeBlockLevel() { return controller.codeBlockLevel; }
 
-	public void setCurrentAlt(Alternative currentAlt) { this.currentAlt = currentAlt; }
-
-	public void setController(OutputModelController controller) {
-		this.controller = controller;
-	}
-
-	public void setCurrentBlock(CodeBlock blk) {
-		currentBlock = blk;
-	}
-
-	public CodeBlock getCurrentBlock() {
-		return currentBlock;
-	}
-
-	public void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock) {
-		this.currentAlternativeBlock = currentAlternativeBlock;
-	}
-
-	public CodeBlock getCurrentAlternativeBlock() {
-		return currentAlternativeBlock;
-	}
-
-	public int getCodeBlockLevel() { return controller.walker.codeBlockLevel; }
-
-	public int getTreeLevel() { return controller.walker.treeLevel; }
+	public int getTreeLevel() { return controller.treeLevel; }
 
 	// MISC
 

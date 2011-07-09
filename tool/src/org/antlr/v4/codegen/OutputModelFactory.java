@@ -42,6 +42,8 @@ public interface OutputModelFactory {
 
 	CodeGenerator getGenerator();
 
+	void setController(OutputModelController controller);
+
 	ParserFile parserFile(String fileName);
 
 	Parser parser(ParserFile file);
@@ -116,35 +118,20 @@ public interface OutputModelFactory {
 
 	List<SrcOp> rewrite_action(ActionAST action, boolean isRoot);
 
-	// CONTEXT MANIPULATION
-
-	// TODO: move to controller?
+	// CONTEXT INFO
 
 	OutputModelObject getRoot();
 
-	void setRoot(OutputModelObject root);
-
 	RuleFunction getCurrentRuleFunction();
-
-	void pushCurrentRule(RuleFunction r);
-
-	RuleFunction popCurrentRule();
 
 	Alternative getCurrentAlt();
 
-	void setCurrentAlt(Alternative currentAlt);
-
-	void setController(OutputModelController controller);
-
-	void setCurrentBlock(CodeBlock blk);
-
 	CodeBlock getCurrentBlock();
-
-	void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock);
 
 	CodeBlock getCurrentAlternativeBlock();
 
 	int getCodeBlockLevel();
 
 	int getTreeLevel();
+
 }

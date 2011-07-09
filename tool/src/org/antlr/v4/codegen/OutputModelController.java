@@ -54,6 +54,16 @@ public class OutputModelController {
 	 */
 	public SourceGenTriggers walker;
 
+	/** Context set by the SourceGenTriggers.g */
+	public int codeBlockLevel = -1;
+	public int treeLevel = -1;
+	public OutputModelObject root; // normally ParserFile, LexerFile, ...
+	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
+	public Alternative currentAlt;
+	public CodeBlock currentBlock;
+	public CodeBlock currentAlternativeBlock;
+
+
 	public OutputModelController(OutputModelFactory factory) {
 		this.delegate = factory;
 	}
@@ -335,44 +345,43 @@ public class OutputModelController {
 		return ops;
 	}
 
-	public OutputModelObject getRoot() { return delegate.getRoot(); }
+	public OutputModelObject getRoot() { return root; }
 
-	public void setRoot(OutputModelObject root) { delegate.setRoot(root); }
+	public void setRoot(OutputModelObject root) { this.root = root; }
 
-	public RuleFunction getCurrentRuleFunction() { return delegate.getCurrentRuleFunction(); }
-
-	public void pushCurrentRule(RuleFunction r) { delegate.pushCurrentRule(r); }
-
-	public RuleFunction popCurrentRule() { return delegate.popCurrentRule(); }
-
-	public Alternative getCurrentAlt() { return delegate.getCurrentAlt(); }
-
-	public void setCurrentAlt(Alternative alt) { delegate.setCurrentAlt(alt); }
-
-	public void setController(OutputModelController controller) { } // nop; we are controller
-
-	public void setCurrentBlock(CodeBlock blk) { delegate.setCurrentBlock(blk); }
-
-	public CodeBlock getCurrentBlock() { return delegate.getCurrentBlock(); }
-
-	public void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock) {
-		delegate.setCurrentAlternativeBlock(currentAlternativeBlock);
+	public RuleFunction getCurrentRuleFunction() {
+		if ( currentRule.size()>0 )	return currentRule.peek();
+		return null;
 	}
 
-	public CodeBlock getCurrentAlternativeBlock() { return delegate.getCurrentAlternativeBlock(); }
+	public void pushCurrentRule(RuleFunction r) { currentRule.push(r); }
 
-	public int getCodeBlockLevel() { return delegate.getCodeBlockLevel(); }
+	public RuleFunction popCurrentRule() {
+		if ( currentRule.size()>0 ) return currentRule.pop();
+		return null;
+	}
 
-	public int getTreeLevel() { return delegate.getTreeLevel(); }
+	public Alternative getCurrentAlt() { return currentAlt; }
 
-	// SUPPORT
+	public void setCurrentAlt(Alternative currentAlt) { this.currentAlt = currentAlt; }
 
-//	public IntervalSet getRewriteElementTokenTypeSet() {
-//		IntervalSet elementTokenTypes = new IntervalSet();
-//		elementTokenTypes.add(ANTLRParser.TOKEN_REF); // might be imaginary
-//		elementTokenTypes.add(ANTLRParser.RULE_REF);
-//		elementTokenTypes.add(ANTLRParser.STRING_LITERAL);
-//		elementTokenTypes.add(ANTLRParser.LABEL);
-//		return elementTokenTypes;
-//	}
+	public void setCurrentBlock(CodeBlock blk) {
+		currentBlock = blk;
+	}
+
+	public CodeBlock getCurrentBlock() {
+		return currentBlock;
+	}
+
+	public void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock) {
+		this.currentAlternativeBlock = currentAlternativeBlock;
+	}
+
+	public CodeBlock getCurrentAlternativeBlock() {
+		return currentAlternativeBlock;
+	}
+
+	public int getCodeBlockLevel() { return codeBlockLevel; }
+
+	public int getTreeLevel() { return treeLevel; }
 }

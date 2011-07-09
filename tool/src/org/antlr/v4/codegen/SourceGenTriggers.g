@@ -18,8 +18,6 @@ import java.util.HashMap;
 }
 
 @members {
-	public int codeBlockLevel = -1;
-	public int treeLevel = -1;
 	public OutputModelController controller;
     public SourceGenTriggers(TreeNodeStream input, OutputModelController controller) {
     	this(input);
@@ -49,36 +47,6 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
     	}
     	}
     ;
-
-/*
-alternative returns [CodeBlockForAlt altCodeBlock]
-@init {
-	// set alt if outer ALT only
-	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) controller.setCurrentAlt(((AltAST)$start).alt);
-}
-	:	alternative_with_rewrite {$altCodeBlock = $alternative_with_rewrite.altCodeBlock;}
-
-	|	^(ALT EPSILON) {$altCodeBlock = controller.epsilon();}
-
-    |	{
-    	List<SrcOp> elems = new ArrayList<SrcOp>();
-		$altCodeBlock = controller.alternative(controller.getCurrentAlt());
-		$ops = elems;
-		controller.setCurrentBlock($altCodeBlock);
-		}
-		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
-	;
-	
-alternative_with_rewrite returns [CodeBlockForAlt altCodeBlock]
-	:	^(ALT_REWRITE
-    		a=alternative
-    		(	rewrite {$a.ops.add($rewrite.code);} // insert at end of alt's code
-    		|
-    		)
-    		{$altCodeBlock=$a.altCodeBlock; $ops=$a.ops;}
-    	 )
-	;
-*/
 	
 alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 @init {
@@ -200,8 +168,8 @@ elementOption
 
 rewrite returns [Rewrite code]
 	:	{
-		treeLevel = 0;
-		codeBlockLevel++;
+		controller.treeLevel = 0;
+		controller.codeBlockLevel++;
 		$code = controller.treeRewrite($start);
 		CodeBlock save = controller.getCurrentBlock();
 		controller.setCurrentBlock($code);
@@ -210,7 +178,7 @@ rewrite returns [Rewrite code]
 		{
 		$code.ops = $nakedRewrite.omos;
 		controller.setCurrentBlock(save);
-		codeBlockLevel--;
+		controller.codeBlockLevel--;
 		}
 	;
 
@@ -256,7 +224,7 @@ rewriteTreeEbnf returns [CodeBlock op]
 	:	^(	(a=OPTIONAL|a=CLOSURE)
 			^(	REWRITE_BLOCK
 				{
-				codeBlockLevel++;
+				controller.codeBlockLevel++;
 				if ( $a.getType()==OPTIONAL ) $op = controller.rewrite_optional($start);
 				else $op = controller.rewrite_closure($start);
 				CodeBlock save = controller.getCurrentBlock();
@@ -268,14 +236,14 @@ rewriteTreeEbnf returns [CodeBlock op]
 		{
 		$op.addOps($alt.omos);
 		controller.setCurrentBlock(save);
-		codeBlockLevel--;
+		controller.codeBlockLevel--;
 		}
 	;
 	
 rewriteTree returns [List<SrcOp> omos]
 	:	{
-//		codeBlockLevel++;
-		treeLevel++;
+//		controller.codeBlockLevel++;
+		controller.treeLevel++;
 		List<SrcOp> elems = new ArrayList<SrcOp>();
 		RewriteTreeStructure t = controller.rewrite_tree($start);
 //		CodeBlock save = controller.getCurrentBlock();
@@ -289,8 +257,8 @@ rewriteTree returns [List<SrcOp> omos]
 		t.ops = elems;
 		$omos = DefaultOutputModelFactory.list(t);
 //		controller.setCurrentBlock(save);
-		treeLevel--;
-//		codeBlockLevel--;
+		controller.treeLevel--;
+//		controller.codeBlockLevel--;
 		}
 	;
 
