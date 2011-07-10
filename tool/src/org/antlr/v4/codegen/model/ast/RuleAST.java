@@ -33,8 +33,8 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.tool.GrammarAST;
 
-public class RuleBecomeRoot extends ElementASTOp {
-	public RuleBecomeRoot(OutputModelFactory factory, GrammarAST ast, Decl label) {
+public class RuleAST extends ElementASTOp {
+	public RuleAST(OutputModelFactory factory, GrammarAST ast, Decl label) {
 		super(factory, ast, label);
 	}
 }

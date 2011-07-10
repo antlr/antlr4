@@ -365,12 +365,10 @@ labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 // AST stuff (TODO: separate?)
 
 RootDecl(d)     ::= "Object <d.name> = _adaptor.nil();"
-RootName(level)     ::= "_root<level>"
+RootName(level) ::= "_root<level>"
 
-AddTokenLeaf(a) ::= "_adaptor.addChild(_root0, _adaptor.create(<labelref(a.label)>));"
-AddRuleLeaf(a) ::= "_adaptor.addChild(_root0, <labelref(a.label)>.tree);"
-RuleBecomeRoot(r) ::= "_root0 = _adaptor.becomeRoot(<labelref(r.label)>.tree, _root0);"
-TokenBecomeRoot(t) ::= "_root0 = _adaptor.becomeRoot(_adaptor.create(<labelref(t.label)>), _root0);"
+TokenAST(t) ::= "_adaptor.create(<labelref(t.label)>)"
+RuleAST(r) ::= "<labelref(r.label)>.tree"
 AssignTreeResult(a) ::= "_localctx.tree = _root0;"
 RuleASTCleanup(r) ::= <<
 _localctx.tree = _adaptor.rulePostProcessing(_localctx.tree);
@@ -444,10 +442,10 @@ RewriteSelfRuleLabelRef(s) ::= "_localctx.tree"
 RewriteAction(a, chunks) ::= "<chunks>"
 
 /** how to add child in rewrite section */
-RewriteAddChild(x, rootName, child) ::= "_adaptor.addChild(<x.rootName>, <child>);"
+AddChild(x, rootName, child) ::= "_adaptor.addChild(<x.rootName>, <child>);"
 
 /** how to make something a new root in rewrite section */
-RewriteBecomeRoot(x, newRoot) ::=
+BecomeRoot(x, rootName, newRoot) ::=
 	"<x.rootName> = _adaptor.becomeRoot(<newRoot>, <x.rootName>);"
 
 

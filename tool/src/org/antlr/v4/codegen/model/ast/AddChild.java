@@ -32,13 +32,13 @@ package org.antlr.v4.codegen.model.ast;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.*;
 
-public class RewriteBecomeRoot extends SrcOp {
+public class AddChild extends SrcOp {
 	public String rootName;
-	@ModelElement public SrcOp newRoot;
+	@ModelElement public SrcOp child;
 
-	public RewriteBecomeRoot(OutputModelFactory factory, String rootName, SrcOp newRoot) {
+	public AddChild(OutputModelFactory factory, String rootName, SrcOp child) {
 		super(factory);
 		this.rootName = rootName;
-		this.newRoot = newRoot;
+		this.child = child;
 	}
 }

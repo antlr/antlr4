@@ -30,12 +30,15 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.codegen.model.*;
 
-/** */
-public class TokenBecomeRoot extends ElementASTOp {
-	public TokenBecomeRoot(OutputModelFactory factory, GrammarAST ast, Decl label) {
-		super(factory, ast, label);
+public class BecomeRoot extends SrcOp {
+	public String rootName;
+	@ModelElement public SrcOp newRoot;
+
+	public BecomeRoot(OutputModelFactory factory, String rootName, SrcOp newRoot) {
+		super(factory);
+		this.rootName = rootName;
+		this.newRoot = newRoot;
 	}
 }

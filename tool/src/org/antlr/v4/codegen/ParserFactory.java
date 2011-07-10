@@ -288,8 +288,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public SrcOp makeChildOrRoot(SrcOp elemToAdd, boolean isRoot) {
 		String rootName = gen.target.getRootName(getTreeLevel());
 		SrcOp op;
-		if ( isRoot ) op = new RewriteBecomeRoot(this, rootName, elemToAdd);
-		else op = new RewriteAddChild(this, rootName, elemToAdd);
+		if ( isRoot ) op = new BecomeRoot(this, rootName, elemToAdd);
+		else op = new AddChild(this, rootName, elemToAdd);
 		return op;
 	}
 
