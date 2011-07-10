@@ -34,10 +34,7 @@ import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.tool.GrammarAST;
 
 public class RewriteSelfRuleLabelRef extends SrcOp {
-	public String rootName;
-
-	public RewriteSelfRuleLabelRef(OutputModelFactory factory, GrammarAST ast, String rootName) {
+	public RewriteSelfRuleLabelRef(OutputModelFactory factory, GrammarAST ast) {
 		super(factory, ast);
-		this.rootName = rootName;
 	}
 }

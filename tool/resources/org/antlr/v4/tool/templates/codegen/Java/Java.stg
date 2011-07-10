@@ -428,44 +428,27 @@ RewriteTreeStructure(t, locals, ops) ::= <<
 }
 >>
 
-RewriteTokenRef(t) ::= "_adaptor.addChild(<t.rootName>, <t.iterName>.next());"
-RewriteTokenRefIsRoot(t) ::= <<
-<t.rootName> = _adaptor.becomeRoot(<t.iterName>.next(), <t.rootName>);
+RewriteTokenRef(t) ::= "<t.iterName>.next()"
+
+RewriteImagTokenRef(t, argChunks) ::= <<
+_adaptor.create(<t.tokenType>, <if(argChunks)><argChunks><else>"<t.tokenType>"<endif>)
 >>
 
-//adaptor.addChild(root_0, (Object)adaptor.create(D, "D"));
-RewriteImagTokenRef(t, argChunks) ::= <%
-_adaptor.addChild(<t.rootName>,
-	_adaptor.create(<t.tokenType>,
-					<if(argChunks)><argChunks><else>"<t.tokenType>"<endif>)
-);
-%>
-RewriteImagTokenRefIsRoot(t, argChunks) ::= <%
-<t.rootName> =
-	_adaptor.becomeRoot(
-		_adaptor.create(<t.tokenType>,
-						<if(argChunks)><argChunks><else>"<t.tokenType>"<endif>),
-		<t.rootName>
-	);
-%>
-RewriteRuleRef(r) ::= "_adaptor.addChild(<r.rootName>, <r.iterName>.next());"
-RewriteRuleRefIsRoot(r) ::=
-	"<r.rootName> = _adaptor.becomeRoot(<r.iterName>.next(), <r.rootName>);"
+RewriteRuleRef(r) ::= "<r.iterName>.next()"
 
-RewriteLabelRef(t) ::= "<RewriteAddChild(t.rootName, {<t.iterName>.next()})>"
-RewriteLabelRefIsRoot(t) ::= "<RewriteBecomeRoot({<t.iterName>.next()}, t.rootName)>"
+RewriteLabelRef(t) ::= "<t.iterName>.next()"
 
 // -> $e in rule e
-RewriteSelfRuleLabelRef(s) ::= "<RewriteAddChild(s.rootName, {_localctx.tree})>"
-RewriteSelfRuleLabelRefIsRoot(s) ::= "<RewriteBecomeRoot({_localctx.tree}, s.rootName)>"
+RewriteSelfRuleLabelRef(s) ::= "_localctx.tree"
 
-RewriteAction(a, chunks) ::= "<RewriteAddChild(a.rootName, chunks)>"
-RewriteActionIsRoot(a, chunks) ::= "<RewriteBecomeRoot(chunks, a.rootName)>"
+RewriteAction(a, chunks) ::= "<chunks>"
 
-// how to add child, make root
-RewriteAddChild(rootName, child) ::= "_adaptor.addChild(<rootName>, <child>);"
-RewriteBecomeRoot(newRoot, rootName) ::=
-	"<rootName> = _adaptor.becomeRoot(<newRoot>, <rootName>);"
+/** how to add child in rewrite section */
+RewriteAddChild(x, rootName, child) ::= "_adaptor.addChild(<x.rootName>, <child>);"
+
+/** how to make something a new root in rewrite section */
+RewriteBecomeRoot(x, newRoot) ::=
+	"<x.rootName> = _adaptor.becomeRoot(<newRoot>, <x.rootName>);"
 
 
 /*

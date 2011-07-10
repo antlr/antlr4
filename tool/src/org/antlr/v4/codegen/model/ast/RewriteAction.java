@@ -37,13 +37,10 @@ import org.antlr.v4.tool.ActionAST;
 import java.util.List;
 
 public class RewriteAction extends SrcOp {
-	public String rootName;
-
 	@ModelElement public List<ActionChunk> chunks;
 
-	public RewriteAction(OutputModelFactory factory, ActionAST ast, String rootName) {
+	public RewriteAction(OutputModelFactory factory, ActionAST ast) {
 		super(factory, ast);
-		this.rootName = rootName;
 		if ( ast!=null ) {
 			chunks = ActionTranslator.translateAction(factory,
 													  factory.getCurrentRuleFunction(),

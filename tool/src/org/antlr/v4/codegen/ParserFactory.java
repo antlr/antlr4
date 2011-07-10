@@ -244,67 +244,54 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {
-		String rootName = gen.target.getRootName(getTreeLevel());
-		RewriteRuleRef ruleRef;
 		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
-		if ( isRoot ) ruleRef = new RewriteRuleRefIsRoot(this, ID, rootName, iterName);
-		else ruleRef = new RewriteRuleRef(this, ID, rootName, iterName);
-		return list(ruleRef);
+		RewriteRuleRef ruleRef = new RewriteRuleRef(this, ID, iterName);
+		return list(makeChildOrRoot(ruleRef, isRoot));
 	}
 
 	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) {
 		Alternative alt = getCurrentAlt();
-		String rootName = gen.target.getRootName(getTreeLevel());
 		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
 		// not ref'd on left hand side or it is but we have an argument like ID["x"]
 		// implies create new node
+		SrcOp tokenRef;
 		if ( alt.tokenRefs.get(ID.getText())==null || argAST!=null ) {
-			RewriteImagTokenRef tokenRef;
-			if ( isRoot ) {
-				tokenRef = new RewriteImagTokenRefIsRoot(this, ID, rootName,
-														 ID.getText(), argAST);
-			}
-			else {
-				tokenRef = new RewriteImagTokenRef(this, ID, rootName,
-												   ID.getText(), argAST);
-			}
-			return list(tokenRef);
+			tokenRef = new RewriteImagTokenRef(this, ID, ID.getText(), argAST);
 		}
-		// must be token ref on left of ->
-		RewriteTokenRef tokenRef;
-		if ( isRoot ) tokenRef = new RewriteTokenRefIsRoot(this, ID, rootName, iterName);
-		else tokenRef = new RewriteTokenRef(this, ID, rootName, iterName);
-		return list(tokenRef);
+		else { // must be token ref on left of ->
+			tokenRef = new RewriteTokenRef(this, ID, iterName);
+		}
+		return list(makeChildOrRoot(tokenRef, isRoot));
 	}
 
 	@Override
 	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) {
-		String rootName = gen.target.getRootName(getTreeLevel());
 		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
+		SrcOp labelRef;
 		if ( ID.getText().equals(getCurrentRuleFunction().rule.name) ) { // $e in rule e
-			RewriteSelfRuleLabelRef labelRef;
-			if ( isRoot ) labelRef = new RewriteSelfRuleLabelRef(this, ID, rootName);
-			else labelRef = new RewriteSelfRuleLabelRef(this, ID, rootName);
-			return list(labelRef);
+			labelRef = new RewriteSelfRuleLabelRef(this, ID);
 		}
 		else { // normal element label
-			RewriteLabelRef labelRef;
-			if ( isRoot ) labelRef = new RewriteLabelRefIsRoot(this, ID, rootName, iterName);
-			else labelRef = new RewriteLabelRef(this, ID, rootName, iterName);
-			return list(labelRef);
+			labelRef = new RewriteLabelRef(this, ID, iterName);
 		}
+		return list(makeChildOrRoot(labelRef, isRoot));
 	}
 
 	@Override
 	public List<SrcOp> rewrite_action(ActionAST actionAST, boolean isRoot) {
-		String rootName = gen.target.getRootName(getTreeLevel());
-		RewriteAction action;
-		if ( isRoot ) action = new RewriteActionIsRoot(this, actionAST, rootName);
-		else action = new RewriteAction(this, actionAST, rootName);
-		return list(action);
+		RewriteAction action = new RewriteAction(this, actionAST);
+		return list(makeChildOrRoot(action, isRoot));
 	}
 
 	// support
+
+	public SrcOp makeChildOrRoot(SrcOp elemToAdd, boolean isRoot) {
+		String rootName = gen.target.getRootName(getTreeLevel());
+		SrcOp op;
+		if ( isRoot ) op = new RewriteBecomeRoot(this, rootName, elemToAdd);
+		else op = new RewriteAddChild(this, rootName, elemToAdd);
+		return op;
+	}
 
 	public void defineImplicitLabel(GrammarAST ID, LabeledOp op) {
 		Decl d;

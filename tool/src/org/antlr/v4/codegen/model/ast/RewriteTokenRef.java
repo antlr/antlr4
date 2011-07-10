@@ -34,13 +34,11 @@ import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.tool.GrammarAST;
 
 public class RewriteTokenRef extends SrcOp {
-	public String rootName;
 	public String iterName;
 	public RewriteTokenRef(OutputModelFactory factory, GrammarAST ast,
-						   String rootName, String iterName)
+						   String iterName)
 	{
 		super(factory, ast);
-		this.rootName = rootName;
 		this.iterName = iterName;
 	}
 }

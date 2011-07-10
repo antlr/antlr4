@@ -30,10 +30,15 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.codegen.model.*;
 
-public class RewriteSelfRuleLabelRefIsRoot extends RewriteSelfRuleLabelRef {
-	public RewriteSelfRuleLabelRefIsRoot(OutputModelFactory factory, GrammarAST ast, String rootName) {
-		super(factory, ast, rootName);
+public class RewriteAddChild extends SrcOp {
+	public String rootName;
+	@ModelElement public SrcOp child;
+
+	public RewriteAddChild(OutputModelFactory factory, String rootName, SrcOp child) {
+		super(factory);
+		this.rootName = rootName;
+		this.child = child;
 	}
 }

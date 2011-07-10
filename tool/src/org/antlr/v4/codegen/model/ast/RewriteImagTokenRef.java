@@ -37,19 +37,16 @@ import org.antlr.v4.tool.*;
 import java.util.List;
 
 public class RewriteImagTokenRef extends SrcOp {
-	public String rootName;
 	public String tokenType;
 
 	@ModelElement public List<ActionChunk> argChunks;
 
 	public RewriteImagTokenRef(OutputModelFactory factory,
 							   GrammarAST ast,
-							   String rootName,
 							   String tokenType,
 							   ActionAST argAST)
 	{
 		super(factory, ast);
-		this.rootName = rootName;
 		this.tokenType = tokenType;
 		if ( argAST!=null ) {
 			argChunks = ActionTranslator.translateAction(factory,

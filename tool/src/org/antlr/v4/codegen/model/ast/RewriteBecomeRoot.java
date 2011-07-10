@@ -30,10 +30,15 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.ActionAST;
+import org.antlr.v4.codegen.model.*;
 
-public class RewriteActionIsRoot extends RewriteAction {
-	public RewriteActionIsRoot(OutputModelFactory factory, ActionAST ast, String rootName) {
-		super(factory, ast, rootName);
+public class RewriteBecomeRoot extends SrcOp {
+	public String rootName;
+	@ModelElement public SrcOp newRoot;
+
+	public RewriteBecomeRoot(OutputModelFactory factory, String rootName, SrcOp newRoot) {
+		super(factory);
+		this.rootName = rootName;
+		this.newRoot = newRoot;
 	}
 }

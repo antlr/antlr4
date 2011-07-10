@@ -34,14 +34,12 @@ import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.tool.GrammarAST;
 
 public class RewriteRuleRef extends SrcOp {
-	public String rootName;
 	public String iterName;
 
 	public RewriteRuleRef(OutputModelFactory factory, GrammarAST ast,
-						  String rootName, String iterName)
+						  String iterName)
 	{
 		super(factory, ast);
-		this.rootName = rootName;
 		this.iterName = iterName;
 	}
 }
