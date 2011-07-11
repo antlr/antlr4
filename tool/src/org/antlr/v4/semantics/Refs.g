@@ -31,9 +31,9 @@ public void track(GrammarAST t, int level) {
 // TODO: visitor would be better here
 }
 
-/*
-rewrite
+start
 	:	predicatedRewrite* nakedRewrite
+	|	rewriteTreeEbnf[0]
 	;
 
 predicatedRewrite
@@ -42,13 +42,6 @@ predicatedRewrite
 
 nakedRewrite
 	:	^(RESULT rewriteAlt)
-	;
-
-    */
-
-start
-	:	^(RESULT rewriteAlt)
-	|	rewriteTreeEbnf[0]
 	;
 
 rewriteAlt

@@ -40,7 +40,7 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
     	{
     	if ( alts.size()==1 && ebnfRoot==null) return alts;
     	if ( ebnfRoot==null ) {
-    	    $omos = DefaultOutputModelFactory.list(controller.getChoiceBlock((BlockAST)$blk, alts));
+    	    $omos = DefaultOutputModelFactory.list(controller.getChoiceBlock((BlockAST)$blk, alts, $label));
     	}
     	else {
     	    $omos = DefaultOutputModelFactory.list(controller.getEBNFBlock($ebnfRoot, alts));
@@ -123,8 +123,8 @@ atom[GrammarAST label] returns [List<SrcOp> omos]
 	|	range[label]				{$omos = $range.omos;}
 	|	^(DOT ID terminal[label])
 	|	^(DOT ID ruleref[label])
-    |	^(WILDCARD .)
-    |	WILDCARD
+    |	^(WILDCARD .)				{$omos = controller.wildcard($WILDCARD, $label);}
+    |	WILDCARD					{$omos = controller.wildcard($WILDCARD, $label);}
     |	^(ROOT terminal[label])		{$omos = controller.rootToken($terminal.omos);}
     |	^(BANG terminal[label])		{$omos = $terminal.omos;}
     |   terminal[label]				{$omos = $terminal.omos;}
@@ -174,22 +174,24 @@ rewrite returns [Rewrite code]
 		CodeBlock save = controller.getCurrentBlock();
 		controller.setCurrentBlock($code);
 		}
-		predicatedRewrite* nakedRewrite 	
+		(	(p=predicatedRewrite {$code.alts.add($p.alt);})+
+			r=nakedRewrite					{$code.alts.add($r.alt);}
+		|	r=nakedRewrite					{$code.alts.add($r.alt);}
+		)
 		{
-		$code.ops = $nakedRewrite.omos;
 		controller.setCurrentBlock(save);
 		controller.codeBlockLevel--;
 		}
 	;
 
-predicatedRewrite returns [List<SrcOp> omos]
-	:	^(ST_RESULT SEMPRED rewriteSTAlt)
-	|	^(RESULT SEMPRED rewriteTreeAlt)
+predicatedRewrite returns [RewriteChoice alt]
+	:	^(ST_RESULT SEMPRED rewriteSTAlt)	
+	|	^(RESULT SEMPRED rewriteTreeAlt)	{$alt = controller.rewrite_choice((PredAST)$SEMPRED, $rewriteTreeAlt.omos);}
 	;
 
-nakedRewrite returns [List<SrcOp> omos]
+nakedRewrite returns [RewriteChoice alt]
 	:	^(ST_RESULT rewriteSTAlt)
-	|	^(RESULT rewriteTreeAlt)			{$omos = $rewriteTreeAlt.omos;}
+	|	^(RESULT rewriteTreeAlt)			{$alt = controller.rewrite_choice(null, $rewriteTreeAlt.omos);}
 	;
 
 rewriteTreeAlt returns [List<SrcOp> omos]
@@ -199,7 +201,7 @@ rewriteTreeAlt returns [List<SrcOp> omos]
     	)
     	{$omos = elems;}
     |	ETC
-    |	EPSILON
+    |	EPSILON								{$omos = controller.rewrite_epsilon($EPSILON);}
     ;
 
 rewriteTreeElement returns [List<SrcOp> omos]
@@ -245,7 +247,7 @@ rewriteTree returns [List<SrcOp> omos]
 //		controller.codeBlockLevel++;
 		controller.treeLevel++;
 		List<SrcOp> elems = new ArrayList<SrcOp>();
-		RewriteTreeStructure t = controller.rewrite_tree($start);
+		RewriteTreeStructure t = controller.rewrite_treeStructure($start);
 //		CodeBlock save = controller.getCurrentBlock();
 //		controller.setCurrentBlock(t);
 		}

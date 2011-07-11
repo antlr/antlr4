@@ -27,19 +27,24 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ast.RewriteChoice;
-import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.*;
 
-import java.util.*;
+import java.util.List;
 
-/** Either an ST or Tree rewrite */
-public class Rewrite extends CodeBlock {
-	@ModelElement public List<RewriteChoice> alts = new ArrayList<RewriteChoice>();
+/** A collection of operations possibly with a predicate
+ *  that indicates whether to apply the rewrite.
+ *  This is a single alternative and a list of predicated choices.
+ */
+public class RewriteChoice extends SrcOp {
+	@ModelElement public SrcOp predicate;
+	@ModelElement public List<SrcOp> ops;
 
-	public Rewrite(OutputModelFactory factory, int treeLevel, int codeBlockLevel) {
-		super(factory, treeLevel, codeBlockLevel);
+	public RewriteChoice(OutputModelFactory factory, SrcOp predicate, List<SrcOp> ops) {
+		super(factory);
+		this.predicate = predicate;
+		this.ops = ops;
 	}
 }

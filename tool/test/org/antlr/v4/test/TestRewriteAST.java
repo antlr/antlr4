@@ -874,7 +874,7 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
-		assertEquals("a b\n", found);
+		assertEquals("a a b\n", found);
 	}
 
 	@Test public void testOptional() throws Exception {
@@ -988,7 +988,6 @@ public class TestRewriteAST extends BaseTest {
 	}
 
 	@Test public void testSetWithLabel() throws Exception {
-
 		String grammar =
 			"grammar T;\n" +
 			"options { output = AST; } \n" +
@@ -1047,7 +1046,7 @@ public class TestRewriteAST extends BaseTest {
 		execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "a b 3 4 5", debug);
 		String expecting =
-			"org.antlr.runtime.tree.RewriteCardinalityException: token ID";
+			"org.antlr.v4.runtime.tree.RewriteCardinalityException: size==2 and out of elements";
 		String found = getFirstLineOfException();
 		assertEquals(expecting, found);
 	}
@@ -1064,7 +1063,7 @@ public class TestRewriteAST extends BaseTest {
 		execParser("T.g", grammar, "TParser", "TLexer",
 				   "a", "a b", debug);
 		String expecting =
-			"org.antlr.runtime.tree.RewriteCardinalityException: token ID";
+			"org.antlr.v4.runtime.tree.RewriteCardinalityException: size==2 and out of elements";
 		String found = getFirstLineOfException();
 		assertEquals(expecting, found);
 	}
@@ -1081,24 +1080,7 @@ public class TestRewriteAST extends BaseTest {
 		execParser("T.g", grammar, "TParser", "TLexer",
 				   "a", "3", debug);
 		String expecting =
-			"org.antlr.runtime.tree.RewriteEmptyStreamException: token ID";
-		String found = getFirstLineOfException();
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testLoopCardinality() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ID? INT -> ID* INT ;\n" +
-			"op : '+'|'-' ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		execParser("T.g", grammar, "TParser", "TLexer",
-				   "a", "3", debug);
-		String expecting =
-			"org.antlr.runtime.tree.RewriteEarlyExitException";
+			"org.antlr.v4.runtime.tree.RewriteEmptyStreamException: n/a";
 		String found = getFirstLineOfException();
 		assertEquals(expecting, found);
 	}
@@ -1114,6 +1096,19 @@ public class TestRewriteAST extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("34\n", found);
+	}
+
+	@Test public void testWildcard2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID c+=. c+=. -> $c*;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "abc 34 def", debug);
+		assertEquals("34 def\n", found);
 	}
 
 	// E R R O R S

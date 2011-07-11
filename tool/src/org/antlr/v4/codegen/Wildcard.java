@@ -27,19 +27,21 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ast.RewriteChoice;
-import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.*;
 
-/** Either an ST or Tree rewrite */
-public class Rewrite extends CodeBlock {
-	@ModelElement public List<RewriteChoice> alts = new ArrayList<RewriteChoice>();
+public class Wildcard extends RuleElement implements LabeledOp {
+	public List<Decl> labels = new ArrayList<Decl>();
 
-	public Rewrite(OutputModelFactory factory, int treeLevel, int codeBlockLevel) {
-		super(factory, treeLevel, codeBlockLevel);
+	public Wildcard(OutputModelFactory factory, GrammarAST ast) {
+		super(factory, ast);
+
 	}
+
+	public List<Decl> getLabels() { return labels; }
 }

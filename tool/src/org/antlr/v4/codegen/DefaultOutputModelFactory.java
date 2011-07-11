@@ -55,6 +55,8 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 		this.controller = controller;
 	}
 
+	// Convenience methods
+
 	public Grammar getGrammar() { return g; }
 
 	public CodeGenerator getGenerator() { return gen; }
@@ -95,4 +97,3 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	}
 
 }
-

@@ -68,6 +68,7 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> stringRef(List<SrcOp> ops) { return ops; }
 
+	public List<SrcOp> wildcard(List<SrcOp> ops) { return ops; }
 
 	// ACTIONS
 
@@ -87,15 +88,35 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> leafRule(List<SrcOp> ops) { return ops; }
 
+	// BLOCKS
+
+	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getEBNFBlock(List<SrcOp> ops) { return ops; }
+
+	/*
+	public List<SrcOp> getLL1ChoiceBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getLL1EBNFBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getComplexChoiceBlock(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> getComplexEBNFBlock(List<SrcOp> ops) { return ops; }
+	*/
+
+	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
+
 	// AST REWRITEs
 
 	public TreeRewrite treeRewrite(TreeRewrite r) { return r; }
+
+	public RewriteChoice rewrite_choice(RewriteChoice r) { return r; }
 
 	public RewriteTreeOptional rewrite_optional(RewriteTreeOptional o) { return o; }
 
 	public RewriteTreeClosure rewrite_closure(RewriteTreeClosure c) { return c; }
 
-	public RewriteTreeStructure rewrite_tree(RewriteTreeStructure t) { return t; }
+	public RewriteTreeStructure rewrite_treeStructure(RewriteTreeStructure t) { return t; }
 
 	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }
 
@@ -107,21 +128,5 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> rewrite_action(List<SrcOp> ops) { return ops; }
 
-	// BLOCKS
-
-	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getEBNFBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getLL1ChoiceBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getLLStarChoiceBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getLL1EBNFBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getLLStarEBNFBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getLL1Test(List<SrcOp> ops) { return ops; }
-
-	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
+	public List<SrcOp> rewrite_epsilon(List<SrcOp> ops) { return ops; }
 }

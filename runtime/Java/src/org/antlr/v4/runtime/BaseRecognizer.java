@@ -106,20 +106,20 @@ public abstract class BaseRecognizer extends Recognizer<ParserInterpreter> {
 			failed = false;
 			return matchedSymbol;
 		}
-		System.out.println("MATCH failure at state "+_ctx.s+
-			", ctx="+_ctx.toString(this));
+//		System.out.println("MATCH failure at state "+_ctx.s+
+//			", ctx="+_ctx.toString(this));
 		IntervalSet expecting = _interp.atn.nextTokens(_ctx);
-		System.out.println("could match "+expecting);
+//		System.out.println("could match "+expecting);
 
 		matchedSymbol = recoverFromMismatchedToken(ttype, expecting);
-		System.out.println("rsync'd to "+matchedSymbol);
+//		System.out.println("rsync'd to "+matchedSymbol);
 		return matchedSymbol;
 	}
 
 	// like matchSet but w/o consume; error checking routine.
 	public void sync(IntervalSet expecting) {
 		if ( expecting.member(input.LA(1)) ) return;
-		System.out.println("failed sync to "+expecting);
+//		System.out.println("failed sync to "+expecting);
 		IntervalSet followSet = computeErrorRecoverySet();
 		followSet.addAll(expecting);
 		NoViableAltException e = new NoViableAltException(this, _ctx);

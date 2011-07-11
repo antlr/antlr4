@@ -45,6 +45,16 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
+	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) {
+		Choice choice = (Choice)Utils.find(ops, Choice.class);
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() && choice.label!=null ) {
+			trackExplicitLabel(choice.preamble, choice.label, choice);
+		}
+		return ops;
+	}
+
+	@Override
 	public CodeBlockForAlt alternative(CodeBlockForAlt blk) {
 		Alternative alt = factory.getCurrentAlt();
 		if ( !alt.hasRewrite() ) blk.addLocalDecl( new RootDecl(factory, 0) );
@@ -133,60 +143,87 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		CodeBlock blk = factory.getCurrentAlternativeBlock();
 		String elemListName = factory.getGenerator().target.getElementListName(invokeOp.ast.getText());
 		blk.addLocalDecl(new ElementListDecl(factory, elemListName));
-		// track any explicit label like _track_label but not implicit label
-		if ( !label.isImplicit ) {
-			String labelListName =
-				factory.getGenerator().target.getElementListName(label.name);
-			blk.addLocalDecl(new ElementListDecl(factory, labelListName));
-		}
+
+		// add code to track rule results in _track_r
 		String trackName = factory.getGenerator().target.getElementListName(invokeOp.ast.getText());
 		TrackRuleElement t = new TrackRuleElement(factory, invokeOp.ast, trackName, label);
+		clearTrackingIfSingularLabel(ops, invokeOp, trackName);
 		ops.add(t);
-		if ( !label.isImplicit ) {
-			trackName = factory.getGenerator().target.getElementListName(label.name);
-			TrackRuleElement t2 = new TrackRuleElement(factory, invokeOp.ast, trackName,
-													   label);
-			if ( invokeOp.ast.parent.getType() == ANTLRParser.ASSIGN ) {
-				// if x=A must keep it a single-element list; clear before add
-				ClearElementList c = new ClearElementList(factory, invokeOp.ast, trackName);
-				ops.add(c);
-			}
-			ops.add(t2);
-		}
+
+		// track any explicit label like _track_label but not implicit label
+		if ( !label.isImplicit ) trackExplicitLabel(ops, label, invokeOp);
+
 		return ops;
 	}
 
-	public List<SrcOp> leafTokenInRewriteAlt(MatchToken matchOp, List<SrcOp> ops) {
+	public List<SrcOp> leafTokenInRewriteAlt(SrcOp matchOp, List<SrcOp> ops) {
 		CodeBlock blk = factory.getCurrentAlternativeBlock();
-		TokenDecl label = (TokenDecl)matchOp.getLabels().get(0);
+		TokenDecl label = (TokenDecl)((LabeledOp)matchOp).getLabels().get(0);
 		// First declare tracking lists for elements, labels
 		// track the named element like _track_A
 		String elemListName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
 		blk.addLocalDecl(new ElementListDecl(factory, elemListName));
-		// track any explicit label like _track_label but not implicit label
-		if ( !label.isImplicit ) {
-			String labelListName =
-			factory.getGenerator().target.getElementListName(label.name);
-			blk.addLocalDecl(new ElementListDecl(factory, labelListName));
-		}
 		// Now, generate track instructions for element and any labels
 		// do element
 		String trackName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
 		TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, trackName,
 													label);
+		clearTrackingIfSingularLabel(ops, matchOp, trackName);
 		ops.add(t);
-		if ( !label.isImplicit ) { // track all explicit labels
-			trackName = factory.getGenerator().target.getElementListName(label.name);
-			TrackTokenElement t2 = new TrackTokenElement(factory, matchOp.ast, trackName,
-														 label);
-			if ( matchOp.ast.parent.getType() == ANTLRParser.ASSIGN ) {
-				// if x=A must keep it a single-element list; clear before add
-				ClearElementList c = new ClearElementList(factory, matchOp.ast, trackName);
-				ops.add(c);
-			}
-			ops.add(t2);
-		}
+		if ( !label.isImplicit ) trackExplicitLabel(ops, label, matchOp);
 		return ops;
+	}
+
+	@Override
+	public List<SrcOp> wildcard(List<SrcOp> ops) {
+		Wildcard wild = (Wildcard)Utils.find(ops, Wildcard.class);
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() ) {
+			TokenDecl label = (TokenDecl)((LabeledOp)wild).getLabels().get(0);
+			if ( !label.isImplicit ) trackExplicitLabel(ops, label, wild);
+			return ops;
+		}
+		else {
+			TokenDecl label = (TokenDecl)wild.getLabels().get(0);
+			SrcOp treeOp = new TokenAST(factory, wild.ast, label);
+			String rootName = factory.getGenerator().target.getRootName(0);
+			SrcOp add = new AddChild(factory, rootName, treeOp);
+			ops.add(add);
+			return ops;
+		}
+	}
+
+	public void trackExplicitLabel(List<SrcOp> ops, Decl label, SrcOp opWithLabel) {
+		CodeBlock blk = factory.getCurrentAlternativeBlock();
+		// declare _track_label
+		String labelListName =
+			factory.getGenerator().target.getElementListName(label.name);
+		blk.addLocalDecl(new ElementListDecl(factory, labelListName));
+
+		// add elements to _track_label
+		SrcOp trk;
+		if ( opWithLabel instanceof InvokeRule ) {
+			trk = new TrackRuleElement(factory, opWithLabel.ast, labelListName, label);
+		}
+		else if ( opWithLabel instanceof Choice ||
+				  opWithLabel instanceof MatchToken ||
+				  opWithLabel instanceof Wildcard )
+		{
+			trk = new TrackTokenElement(factory, opWithLabel.ast, labelListName, label);
+		}
+		else {
+			trk = null;
+		}
+		clearTrackingIfSingularLabel(ops, opWithLabel, labelListName);
+		ops.add(trk);
+	}
+
+	public void clearTrackingIfSingularLabel(List<SrcOp> ops, SrcOp opWithLabel, String trackName) {
+		if ( opWithLabel.ast.parent.getType() == ANTLRParser.ASSIGN ) {
+			// if x=A must keep it a single-element list; clear before add
+			ClearElementList c = new ClearElementList(factory, opWithLabel.ast, trackName);
+			ops.add(c);
+		}
 	}
 
 	@Override

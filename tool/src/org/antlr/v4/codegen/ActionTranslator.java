@@ -245,7 +245,7 @@ public class ActionTranslator implements ActionSplitterListener {
 			Class c = tokenPropToModelMap.get(y.getText());
 			Constructor ctor = c.getConstructor(new Class[] {String.class});
 			TokenPropertyRef ref =
-				(TokenPropertyRef)ctor.newInstance(getRuleLabel(x.getText()));
+				(TokenPropertyRef)ctor.newInstance(getTokenLabel(x.getText()));
 			return ref;
 		}
 		catch (Exception e) {

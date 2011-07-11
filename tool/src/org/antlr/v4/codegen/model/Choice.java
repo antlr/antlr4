@@ -49,9 +49,10 @@ import java.util.*;
  */
 public abstract class Choice extends RuleElement {
 	public int decision = -1;
+	public Decl label;
 
 	@ModelElement public List<CodeBlockForAlt> alts;
-	@ModelElement public List<SrcOp> preamble;
+	@ModelElement public List<SrcOp> preamble = new ArrayList<SrcOp>();
 
 	public Choice(OutputModelFactory factory,
 				  GrammarAST blkOrEbnfRootAST,
@@ -62,7 +63,6 @@ public abstract class Choice extends RuleElement {
 	}
 
 	public void addPreambleOp(SrcOp op) {
-		if ( preamble==null ) preamble = new ArrayList<SrcOp>();
 		preamble.add(op);
 	}
 

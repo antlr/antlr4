@@ -131,7 +131,9 @@ CodeBlockForAlt(c, locals, preamble, ops) ::= <<
 }
 >>
 
-LL1AltBlock(choice, alts, error) ::= <<
+LL1AltBlock(choice, preamble, alts, error) ::= <<
+<if(choice.label)><labelref(choice.label)> = input.LT(1);<endif>
+<preamble; separator="\n">
 switch ( input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
@@ -211,7 +213,9 @@ do {
 
 // LL(*) stuff
 
-AltBlock(choice, alts, error) ::= <<
+AltBlock(choice, preamble, alts, error) ::= <<
+<if(choice.label)><labelref(choice.label)> = input.LT(1);<endif>
+<preamble; separator="\n">
 switch ( _interp.adaptivePredict(input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
@@ -279,6 +283,11 @@ _localctx.s = <r.stateNumber>;
 MatchToken(m) ::= <<
 _localctx.s = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
+>>
+
+Wildcard(w) ::= <<
+_localctx.s = <w.stateNumber>;
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>input.LT(1); input.consume();
 >>
 
 // ACTION STUFF
@@ -381,14 +390,27 @@ ClearElementList(c) ::= "<c.name>.clear();"
 TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>.tree);"
 TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
 
+// REWRITE AST stuff
 // assume roots are always locals in tree rewrites
 
-TreeRewrite(tr, locals, preamble, ops) ::= <<
+TreeRewrite(tr, locals, preamble, alts) ::= <<
 // rewrite: code level= <tr.codeBlockLevel>, tree level = <tr.treeLevel>
 <locals; separator="\n">
 <preamble; separator="\n">
-<ops; separator="\n">
+<alts; separator="else\n">
 _localctx.tree = _root0;
+>>
+
+RewriteChoice(c, predicate, ops) ::= <<
+<if(predicate)>
+if ( <predicate> ) {
+    <ops; separator="\n">
+}
+<else>
+{
+    <ops; separator="\n"> <! empty if EPSILON alt !>
+}
+<endif>
 >>
 
 RewriteIteratorDecl(d) ::= "Iterator <d.name>;"

@@ -29,6 +29,7 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.tool.*;
@@ -193,11 +194,30 @@ public class Target {
 
 	public String getListLabel(String label) { return label+"_list"; }
 	public String getRuleFunctionContextStructName(Rule r) {
-		if ( r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null ) {
+		boolean hasNoExternallyVisibleElements =
+			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
+		if ( hasNoExternallyVisibleElements ) {
 			return gen.templates.getInstanceOf("ParserRuleContext").render();
 		}
 		return r.name+"_ctx";
 	}
+
+	/** If we know which actual function, we can provide the actual ctx type.
+	 *  This will contain implicit labels etc...  From outside, though, we
+	 *  see only ParserRuleContext unless there are externally visible stuff
+	 *  like args, locals, explicit labels, etc...
+	 */
+	public String getRuleFunctionContextStructName(RuleFunction function) {
+		Rule r = function.rule;
+		boolean hasNoExternallyVisibleElements =
+			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
+
+		if ( hasNoExternallyVisibleElements && function.ruleCtx.isEmpty() ) {
+			return gen.templates.getInstanceOf("ParserRuleContext").render();
+		}
+		return r.name+"_ctx";
+	}
+
 	public String getRuleDynamicScopeStructName(String ruleName) {
 		ST st = gen.templates.getInstanceOf("RuleDynamicScopeStructName");
 		st.add("ruleName", ruleName);

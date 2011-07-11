@@ -261,7 +261,7 @@ public abstract class BaseTree implements Tree {
 			throw new IllegalStateException("parents don't match; expected "+parent+" found "+this.getParent());
 		}
 		if ( i!=this.getChildIndex() ) {
-			throw new IllegalStateException("child indexes don't match; expected "+i+" found "+this.getChildIndex());
+			throw new IllegalStateException("child index of "+this.toStringTree()+" doesn't match in "+parent.toStringTree()+"; expected "+i+" found "+this.getChildIndex());
 		}
 		int n = this.getChildCount();
 		for (int c = 0; c < n; c++) {

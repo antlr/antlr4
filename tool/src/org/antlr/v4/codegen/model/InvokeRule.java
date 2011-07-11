@@ -55,8 +55,9 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		this.name = ast.getText();
 		CodeGenerator gen = factory.getGenerator();
 		Rule r = factory.getGrammar().getRule(name);
-		ctxName = gen.target.getRuleFunctionContextStructName(r);
+		ctxName = gen.target.getRuleFunctionContextStructName(factory.getCurrentRuleFunction());
 
+		// TODO: move to factory
 		if ( labelAST!=null ) {
 			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();

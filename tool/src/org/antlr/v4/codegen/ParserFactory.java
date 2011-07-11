@@ -82,21 +82,64 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(invokeOp, listLabelOp);
 	}
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
-		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID, label);
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST labelAST, GrammarAST args) {
+		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
+		if ( labelAST!=null ) {
+			String label = labelAST.getText();
+			TokenDecl d = new TokenDecl(this, label);
+			((MatchToken)matchOp).labels.add(d);
+			getCurrentRuleFunction().addContextDecl(d);
+			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+				TokenListDecl l = new TokenListDecl(this, gen.target.getListLabel(label));
+				getCurrentRuleFunction().addContextDecl(l);
+			}
+		}
 		if ( controller.needsImplicitLabel(ID, matchOp) ) defineImplicitLabel(ID, matchOp);
-		AddToLabelList listLabelOp = getListLabelIfPresent(matchOp, label);
+		AddToLabelList listLabelOp = getListLabelIfPresent(matchOp, labelAST);
 		return list(matchOp, listLabelOp);
 	}
 
-	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+	@Override
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
+		Wildcard wild = new Wildcard(this, ast);
+		// TODO: dup with tokenRef
+		if ( labelAST!=null ) {
+			String label = labelAST.getText();
+			TokenDecl d = new TokenDecl(this, label);
+			wild.labels.add(d);
+			getCurrentRuleFunction().addContextDecl(d);
+			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+				TokenListDecl l = new TokenListDecl(this, gen.target.getListLabel(label));
+				getCurrentRuleFunction().addContextDecl(l);
+			}
+		}
+		AddToLabelList listLabelOp = getListLabelIfPresent(wild, labelAST);
+		return list(wild, listLabelOp);
+	}
+
+	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST labelAST) {
 		int decision = ((DecisionState)blkAST.atnState).decision;
+		Choice c;
 		if ( AnalysisPipeline.disjoint(g.decisionLOOK.get(decision)) ) {
-			return getLL1ChoiceBlock(blkAST, alts);
+			c = getLL1ChoiceBlock(blkAST, alts);
 		}
 		else {
-			return getLLStarChoiceBlock(blkAST, alts);
+			c = getComplexChoiceBlock(blkAST, alts);
 		}
+
+		if ( labelAST!=null ) { // for x=(...), define x or x_list
+			String label = labelAST.getText();
+			TokenDecl d = new TokenDecl(this,label);
+			c.label = d;
+			getCurrentRuleFunction().addContextDecl(d);
+			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
+				String listLabel = gen.target.getListLabel(label);
+				TokenListDecl l = new TokenListDecl(this, listLabel);
+				getCurrentRuleFunction().addContextDecl(l);
+			}
+		}
+
+		return c;
 	}
 
 	public Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
@@ -114,7 +157,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			return getLL1EBNFBlock(ebnfRoot, alts);
 		}
 		else {
-			return getLLStarEBNFBlock(ebnfRoot, alts);
+			return getComplexEBNFBlock(ebnfRoot, alts);
 		}
 	}
 
@@ -122,7 +165,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return new LL1AltBlock(this, blkAST, alts);
 	}
 
-	public Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
+	public Choice getComplexChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) {
 		return new AltBlock(this, blkAST, alts);
 	}
 
@@ -147,7 +190,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return c;
 	}
 
-	public Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
+	public Choice getComplexEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
 		int ebnf = 0;
 		if ( ebnfRoot!=null ) ebnf = ebnfRoot.getType();
 		Choice c = null;
@@ -197,6 +240,14 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
+	public RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops) {
+		RewriteAction predAction = null;
+		if ( pred!=null ) predAction = new RewriteAction(this, pred);
+		RewriteChoice c = new RewriteChoice(this, predAction, ops);
+		return c;
+	}
+
+	@Override
 	public RewriteTreeOptional rewrite_optional(GrammarAST ast) {
 		RewriteTreeOptional o =
 			new RewriteTreeOptional(this, ast, getTreeLevel(), getCodeBlockLevel());
@@ -237,7 +288,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public RewriteTreeStructure rewrite_tree(GrammarAST root) {
+	public RewriteTreeStructure rewrite_treeStructure(GrammarAST root) {
 		RewriteTreeStructure t = new RewriteTreeStructure(this, root, getTreeLevel(), getCodeBlockLevel());
 		t.addLocalDecl( new RootDecl(this, getTreeLevel()) );
 		return t;
@@ -298,7 +349,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		Rule r = g.getRule(ID.getText());
 		if ( r!=null ) {
 			String implLabel = gen.target.getImplicitRuleLabel(ID.getText());
-			String ctxName = gen.target.getRuleFunctionContextStructName(r);
+			String ctxName =
+				gen.target.getRuleFunctionContextStructName(r);
 			d = new RuleContextDecl(this, implLabel, ctxName);
 			((RuleContextDecl)d).isImplicit = true;
 		}
@@ -308,7 +360,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			((TokenDecl)d).isImplicit = true;
 		}
 		op.getLabels().add(d);
-		getCurrentRuleFunction().addLocalDecl(d);
+		// all labels must be in scope struct in case we exec action out of context
+		getCurrentRuleFunction().addContextDecl(d);
 	}
 
 	public AddToLabelList getListLabelIfPresent(LabeledOp op, GrammarAST label) {

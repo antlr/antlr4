@@ -77,15 +77,19 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
 
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) { return null; }
+
 	// AST REWRITES
 
 	public TreeRewrite treeRewrite(GrammarAST ast) { return null; }
+
+	public RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops) {	return null; }
 
 	public RewriteTreeOptional rewrite_optional(GrammarAST ast) { return null; }
 
 	public RewriteTreeClosure rewrite_closure(GrammarAST ast) { return null; }
 
-	public RewriteTreeStructure rewrite_tree(GrammarAST root) { return null; }
+	public RewriteTreeStructure rewrite_treeStructure(GrammarAST root) { return null; }
 
 	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) { return null; }
 
@@ -99,19 +103,21 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public List<SrcOp> rewrite_action(ActionAST action, boolean isRoot) { return null; }
 
+	public List<SrcOp> rewrite_epsilon(GrammarAST epsilon) { return null; }
+
 	// BLOCKS
 
-	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) { return null; }
+	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label) { return null; }
 
 	public Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) { return null; }
 
 	public Choice getLL1ChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) { return null; }
 
-	public Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) { return null; }
+	public Choice getComplexChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts) { return null; }
 
 	public Choice getLL1EBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) { return null; }
 
-	public Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) { return null; }
+	public Choice getComplexEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) { return null; }
 
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) { return null; }
 

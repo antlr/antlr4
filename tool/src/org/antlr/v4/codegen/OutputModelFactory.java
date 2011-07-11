@@ -80,17 +80,19 @@ public interface OutputModelFactory {
 
 	List<SrcOp> rootRule(List<SrcOp> ops);
 
-	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
+	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST);
+
+	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label);
 
 	Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
 
 	Choice getLL1ChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
 
-	Choice getLLStarChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
+	Choice getComplexChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts);
 
 	Choice getLL1EBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
 
-	Choice getLLStarEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
+	Choice getComplexEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts);
 
 	List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST);
 
@@ -102,11 +104,13 @@ public interface OutputModelFactory {
 
 	TreeRewrite treeRewrite(GrammarAST ast);
 
+	RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops);
+
 	RewriteTreeOptional rewrite_optional(GrammarAST ast);
 
 	RewriteTreeClosure rewrite_closure(GrammarAST ast);
 
-	RewriteTreeStructure rewrite_tree(GrammarAST root);
+	RewriteTreeStructure rewrite_treeStructure(GrammarAST root);
 
 	List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot);
 
@@ -117,6 +121,8 @@ public interface OutputModelFactory {
 	List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot);
 
 	List<SrcOp> rewrite_action(ActionAST action, boolean isRoot);
+
+	List<SrcOp> rewrite_epsilon(GrammarAST epsilon);
 
 	// CONTEXT INFO
 
