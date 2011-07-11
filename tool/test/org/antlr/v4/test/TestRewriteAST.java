@@ -1005,13 +1005,13 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T; \n" +
 			"options { output = AST; }\n" +
 			"tokens { FLOAT; }\n" +
-			"r\n" +
+			"a\n" +
 			"    : INT -> {new CommonTree(new CommonToken(FLOAT,$INT.text+\".0\"))} \n" +
 			"    ; \n" +
 			"INT : '0'..'9'+; \n" +
 			"WS: (' ' | '\\n' | '\\t')+ {$channel = HIDDEN;}; \n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "r", "25", debug);
+				    "a", "25", debug);
 		assertEquals("25.0\n", found);
 	}
 
@@ -1021,14 +1021,14 @@ public class TestRewriteAST extends BaseTest {
 			"options {output=AST;} \n" +
 			"tokens {PARMS;} \n" +
 			"\n" +
-			"modulo \n" +
+			"a \n" +
 			" : 'modulo' ID ('(' parms+ ')')? -> ^('modulo' ID ^(PARMS parms*)?) \n" +
 			" ; \n" +
 			"parms : '#'|ID; \n" +
 			"ID : ('a'..'z' | 'A'..'Z')+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "modulo", "modulo abc (x y #)", debug);
+				    "a", "modulo abc (x y #)", debug);
 		assertEquals("(modulo abc (PARMS x y #))\n", found);
 	}
 

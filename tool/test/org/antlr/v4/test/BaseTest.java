@@ -39,6 +39,7 @@ import org.antlr.v4.tool.*;
 import org.junit.*;
 import org.stringtemplate.v4.ST;
 
+import javax.tools.*;
 import java.io.*;
 import java.util.*;
 
@@ -233,17 +234,56 @@ public abstract class BaseTest {
 		return null;
 	}
 
+	/** Wow! much faster than compiling outside of VM. Finicky though.
+	 *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
+	 */
 	protected boolean compile(String fileName) {
-		String compiler = "javac";
 		String classpathOption = "-classpath";
 
 		String[] args = new String[] {
-					compiler, "-d", tmpdir,
+					"javac", "-d", tmpdir,
 					classpathOption, tmpdir+pathSep+CLASSPATH,
 					tmpdir+"/"+fileName
 		};
-		String cmdLine = compiler+" -d "+tmpdir+" "+classpathOption+" "+tmpdir+pathSep+CLASSPATH+" "+fileName;
+		String cmdLine = "javac" +" -d "+tmpdir+" "+classpathOption+" "+tmpdir+pathSep+CLASSPATH+" "+fileName;
 		//System.out.println("compile: "+cmdLine);
+
+
+		File f = new File(tmpdir, fileName);
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		StandardJavaFileManager fileManager =
+			compiler.getStandardFileManager(null, null, null);
+
+		Iterable<? extends JavaFileObject> compilationUnits =
+			fileManager.getJavaFileObjectsFromFiles(Arrays.asList(f));
+		DiagnosticCollector<JavaFileObject> diagnostics =
+			new DiagnosticCollector<JavaFileObject>();
+		JavaCompiler.CompilationTask task =
+			compiler.getTask(null, fileManager, diagnostics, null, null,
+							 compilationUnits);
+		task.call();
+
+		try {
+			fileManager.close();
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
+
+		List<String> errors = new ArrayList<String>();
+		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
+			errors.add(
+				String.valueOf(diagnostic.getLineNumber())+
+				": " + diagnostic.getMessage(null));
+		}
+		if ( errors.size()>0 ) {
+			System.err.println("compile stderr from: "+cmdLine);
+			System.err.println(errors);
+			return false;
+		}
+		return true;
+
+		/*
 		File outputDir = new File(tmpdir);
 		try {
 			Process process =
@@ -271,7 +311,10 @@ public abstract class BaseTest {
 			e.printStackTrace(System.err);
 			return false;
 		}
+		*/
 	}
+
+
 
 	/** Return true if all is ok, no errors */
 	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean debug) {
@@ -548,6 +591,17 @@ public abstract class BaseTest {
 	}
 
 	public String execClass(String className) {
+		/* HOW TO GET STDOUT?
+		try {
+			ClassLoader cl_new = new DirectoryLoader(new File(tmpdir));
+			Class compiledClass = cl_new.loadClass(className);
+			Method m = compiledClass.getMethod("main");
+			m.invoke(null);
+		} catch (Exception ex) {
+			ex.printStackTrace(System.err);
+		}
+		*/
+
 		try {
 			String[] args = new String[] {
 				"java", "-classpath", tmpdir+pathSep+CLASSPATH,

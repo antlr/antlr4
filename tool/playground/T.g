@@ -1,9 +1,7 @@
 grammar T;
 options {output=AST;}
 
-a : 'var' (ID ':' type ';')+ -> ^('var' ^(':' ID type)*) ;
-
-type : ID ;
+a:  A b=B B b=B c+=C C c+=C D {String s=$D.text;} -> A* B* C* D ;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;
 WS : (' '|'\n') {$channel=HIDDEN;} ;

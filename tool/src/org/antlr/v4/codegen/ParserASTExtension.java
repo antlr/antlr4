@@ -147,7 +147,6 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		// add code to track rule results in _track_r
 		String trackName = factory.getGenerator().target.getElementListName(invokeOp.ast.getText());
 		TrackRuleElement t = new TrackRuleElement(factory, invokeOp.ast, trackName, label);
-		clearTrackingIfSingularLabel(ops, invokeOp, trackName);
 		ops.add(t);
 
 		// track any explicit label like _track_label but not implicit label
@@ -168,7 +167,6 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		String trackName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
 		TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, trackName,
 													label);
-		clearTrackingIfSingularLabel(ops, matchOp, trackName);
 		ops.add(t);
 		if ( !label.isImplicit ) trackExplicitLabel(ops, label, matchOp);
 		return ops;
