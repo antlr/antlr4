@@ -58,9 +58,9 @@ public class OutputModelController {
 	public int treeLevel = -1;
 	public OutputModelObject root; // normally ParserFile, LexerFile, ...
 	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
-	public Alternative currentAlt;
+	public Alternative currentOuterMostAlt;
 	public CodeBlock currentBlock;
-	public CodeBlock currentAlternativeBlock;
+	public CodeBlock currentOuterMostAlternativeBlock;
 
 
 	public OutputModelController(OutputModelFactory factory) {
@@ -154,15 +154,18 @@ public class OutputModelController {
 
 	public CodeGenerator getGenerator() { return delegate.getGenerator(); }
 
-	public CodeBlockForAlt alternative(Alternative alt) {
+	public CodeBlockForAlt alternative(Alternative alt, boolean outerMost) {
 		CodeBlockForAlt blk = delegate.alternative(alt);
-		for (CodeGeneratorExtension ext : extensions) blk = ext.alternative(blk);
+		if ( outerMost ) currentOuterMostAlternativeBlock = blk;
+		for (CodeGeneratorExtension ext : extensions) blk = ext.alternative(blk, outerMost);
 		return blk;
 	}
 
-	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops) {
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops,
+											 boolean outerMost)
+	{
 		blk = delegate.finishAlternative(blk, ops);
-		for (CodeGeneratorExtension ext : extensions) blk = ext.finishAlternative(blk);
+		for (CodeGeneratorExtension ext : extensions) blk = ext.finishAlternative(blk, outerMost);
 		return blk;
 	}
 
@@ -356,9 +359,9 @@ public class OutputModelController {
 		return null;
 	}
 
-	public Alternative getCurrentAlt() { return currentAlt; }
+	public Alternative getCurrentOuterMostAlt() { return currentOuterMostAlt; }
 
-	public void setCurrentAlt(Alternative currentAlt) { this.currentAlt = currentAlt; }
+	public void setCurrentOuterMostAlt(Alternative currentOuterMostAlt) { this.currentOuterMostAlt = currentOuterMostAlt; }
 
 	public void setCurrentBlock(CodeBlock blk) {
 		currentBlock = blk;
@@ -368,12 +371,12 @@ public class OutputModelController {
 		return currentBlock;
 	}
 
-	public void setCurrentAlternativeBlock(CodeBlock currentAlternativeBlock) {
-		this.currentAlternativeBlock = currentAlternativeBlock;
+	public void setCurrentOuterMostAlternativeBlock(CodeBlock currentOuterMostAlternativeBlock) {
+		this.currentOuterMostAlternativeBlock = currentOuterMostAlternativeBlock;
 	}
 
-	public CodeBlock getCurrentAlternativeBlock() {
-		return currentAlternativeBlock;
+	public CodeBlock getCurrentOuterMostAlternativeBlock() {
+		return currentOuterMostAlternativeBlock;
 	}
 
 	public int getCodeBlockLevel() { return codeBlockLevel; }

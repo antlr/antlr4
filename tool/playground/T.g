@@ -1,7 +1,7 @@
 grammar T;
 options {output=AST;}
 
-a: b {int x = $b.i;} ;
+a : (ID INT) ;
 b returns [int i] : ID;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;

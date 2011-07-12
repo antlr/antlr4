@@ -130,11 +130,11 @@ public interface OutputModelFactory {
 
 	RuleFunction getCurrentRuleFunction();
 
-	Alternative getCurrentAlt();
+	Alternative getCurrentOuterMostAlt();
 
 	CodeBlock getCurrentBlock();
 
-	CodeBlock getCurrentAlternativeBlock();
+	CodeBlock getCurrentOuterMostAlternativeBlock();
 
 	int getCodeBlockLevel();
 

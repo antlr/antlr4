@@ -47,7 +47,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	@Override
 	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) {
 		Choice choice = (Choice)Utils.find(ops, Choice.class);
-		Alternative alt = factory.getCurrentAlt();
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() && choice.label!=null ) {
 			trackExplicitLabel(choice.preamble, choice.label, choice);
 		}
@@ -55,15 +55,17 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
-	public CodeBlockForAlt alternative(CodeBlockForAlt blk) {
-		Alternative alt = factory.getCurrentAlt();
-		if ( !alt.hasRewrite() ) factory.getCurrentRuleFunction().addLocalDecl( new RootDecl(factory, 0) );
+	public CodeBlockForAlt alternative(CodeBlockForAlt blk, boolean outerMost) {
+		Alternative alt = factory.getCurrentOuterMostAlt();
+		if ( outerMost && !alt.hasRewrite() ) {
+			blk.addLocalDecl(new RootDecl(factory, 0));
+		}
 		return blk;
 	}
 
 	@Override
-	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk) {
-		Alternative alt = factory.getCurrentAlt();
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, boolean outerMost) {
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( !alt.hasRewrite() ) blk.addOp(new AssignTreeResult(factory));
 		return blk;
 	}
@@ -76,7 +78,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 
 	@Override
 	public List<SrcOp> rootRule(List<SrcOp> ops) {
-		Alternative alt = factory.getCurrentAlt();
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() ) {
 			return ops;
 		}
@@ -92,7 +94,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	@Override
 	public List<SrcOp> leafRule(List<SrcOp> ops) {
 		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
-		Alternative alt = factory.getCurrentAlt();
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() ) {
 			return leafRuleInRewriteAlt(invokeOp, ops);
 		}
@@ -108,7 +110,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 
 	@Override
 	public List<SrcOp> rootToken(List<SrcOp> ops) {
-		Alternative alt = factory.getCurrentAlt();
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() ) {
 			return ops;
 		}
@@ -124,7 +126,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	@Override
 	public List<SrcOp> leafToken(List<SrcOp> ops) {
 		MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-		Alternative alt = factory.getCurrentAlt();
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() ) {
 			return leafTokenInRewriteAlt(matchOp, ops);
 		}
@@ -146,7 +148,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 
 	public List<SrcOp> leafRuleInRewriteAlt(InvokeRule invokeOp, List<SrcOp> ops) {
 		RuleContextDecl label = (RuleContextDecl)invokeOp.getLabels().get(0);
-		CodeBlock blk = factory.getCurrentAlternativeBlock();
+		CodeBlock blk = factory.getCurrentOuterMostAlternativeBlock();
 		String elemListName = factory.getGenerator().target.getElementListName(invokeOp.ast.getText());
 		blk.addLocalDecl(new ElementListDecl(factory, elemListName));
 
@@ -162,7 +164,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	public List<SrcOp> leafTokenInRewriteAlt(SrcOp matchOp, List<SrcOp> ops) {
-		CodeBlock blk = factory.getCurrentAlternativeBlock();
+		CodeBlock blk = factory.getCurrentOuterMostAlternativeBlock();
 		TokenDecl label = (TokenDecl)((LabeledOp)matchOp).getLabels().get(0);
 		// First declare tracking lists for elements, labels
 		// track the named element like _track_A
@@ -181,7 +183,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	@Override
 	public List<SrcOp> wildcard(List<SrcOp> ops) {
 		Wildcard wild = (Wildcard)Utils.find(ops, Wildcard.class);
-		Alternative alt = factory.getCurrentAlt();
+		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() ) {
 			TokenDecl label = (TokenDecl)((LabeledOp)wild).getLabels().get(0);
 			if ( !label.isImplicit ) trackExplicitLabel(ops, label, wild);
@@ -198,7 +200,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	public void trackExplicitLabel(List<SrcOp> ops, Decl label, SrcOp opWithLabel) {
-		CodeBlock blk = factory.getCurrentAlternativeBlock();
+		CodeBlock blk = factory.getCurrentOuterMostAlternativeBlock();
 		// declare _track_label
 		String labelListName =
 			factory.getGenerator().target.getElementListName(label.name);

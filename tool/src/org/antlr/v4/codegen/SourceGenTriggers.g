@@ -32,7 +32,8 @@ block[GrammarAST label, GrammarAST ebnfRoot, GrammarAST astOp] returns [List<? e
 			{List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();}
     		(	alternative
     			{
-		    	controller.finishAlternative($alternative.altCodeBlock, $alternative.ops);
+		    	boolean outerMost = inContext("RULE BLOCK") || inContext("RULE BLOCK ALT_REWRITE");
+		    	controller.finishAlternative($alternative.altCodeBlock, $alternative.ops, outerMost);
     			alts.add($alternative.altCodeBlock);
     			}
     		)+
@@ -52,7 +53,7 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 @init {
 	// set alt if outer ALT only
 	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) {
-		controller.setCurrentAlt(((AltAST)$start).alt);
+		controller.setCurrentOuterMostAlt(((AltAST)$start).alt);
 	}
 }
     :	^(ALT_REWRITE
@@ -67,12 +68,10 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 
     |	{
     	List<SrcOp> elems = new ArrayList<SrcOp>();
-		$altCodeBlock = controller.alternative(controller.getCurrentAlt());
-		$ops = elems;
+    	boolean outerMost = inContext("RULE BLOCK") || inContext("RULE BLOCK ALT_REWRITE");
+		$altCodeBlock = controller.alternative(controller.getCurrentOuterMostAlt(), outerMost);
+		$altCodeBlock.ops = $ops = elems;
 		controller.setCurrentBlock($altCodeBlock);
-		if ( inContext("RULE BLOCK") || inContext("RULE BLOCK ALT_REWRITE") ) { // outer block
-			controller.setCurrentAlternativeBlock($altCodeBlock);
-		}
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
     ;

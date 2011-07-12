@@ -218,8 +218,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {
 		return	op.getLabels().size()==0 &&
-				(getCurrentAlt().tokenRefsInActions.containsKey(ID.getText()) ||
-				getCurrentAlt().ruleRefsInActions.containsKey(ID.getText()));
+				(getCurrentOuterMostAlt().tokenRefsInActions.containsKey(ID.getText()) ||
+				getCurrentOuterMostAlt().ruleRefsInActions.containsKey(ID.getText()));
 	}
 
 	// AST REWRITE
@@ -231,7 +231,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		tr.addLocalDecl(new RootDecl(this, 0));
 		List<GrammarAST> refs =
 			UseDefAnalyzer.getElementReferencesShallowInOuterAlt(getGrammar(), ast);
-		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentAlt(), refs);
+		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
 				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
@@ -258,7 +258,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(getGrammar(),
 																		  ast,
 																		  true);
-		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentAlt(), refs);
+		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
 				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
@@ -278,7 +278,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(getGrammar(),
 																		  ast,
 																		  false);
-		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentAlt(), refs);
+		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
 				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
@@ -305,7 +305,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) {
-		Alternative alt = getCurrentAlt();
+		Alternative alt = getCurrentOuterMostAlt();
 		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
 		// not ref'd on left hand side or it is but we have an argument like ID["x"]
 		// implies create new node

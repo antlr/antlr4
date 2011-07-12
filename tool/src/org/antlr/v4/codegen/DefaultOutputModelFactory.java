@@ -65,11 +65,11 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	public RuleFunction getCurrentRuleFunction() { return controller.getCurrentRuleFunction(); }
 
-	public Alternative getCurrentAlt() { return controller.getCurrentAlt(); }
+	public Alternative getCurrentOuterMostAlt() { return controller.getCurrentOuterMostAlt(); }
 
 	public CodeBlock getCurrentBlock() { return controller.getCurrentBlock(); }
 
-	public CodeBlock getCurrentAlternativeBlock() { return controller.getCurrentAlternativeBlock(); }
+	public CodeBlock getCurrentOuterMostAlternativeBlock() { return controller.getCurrentOuterMostAlternativeBlock(); }
 
 	public int getCodeBlockLevel() { return controller.codeBlockLevel; }
 

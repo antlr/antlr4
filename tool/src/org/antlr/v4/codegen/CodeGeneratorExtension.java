@@ -56,9 +56,9 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> rulePostamble(List<SrcOp> ops) { return ops; }
 
-	public CodeBlockForAlt alternative(CodeBlockForAlt blk) { return blk; }
+	public CodeBlockForAlt alternative(CodeBlockForAlt blk, boolean outerMost) { return blk; }
 
-	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk) { return blk; }
+	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, boolean outerMost) { return blk; }
 
 	public CodeBlockForAlt epsilon(CodeBlockForAlt blk) { return blk; }
 
