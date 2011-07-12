@@ -57,11 +57,11 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public CodeBlockForAlt epsilon() { return null; }
 
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp) { return null; }
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp) { return null; }
 
-	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) { return tokenRef(ID, label, null); }
+	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp) { return tokenRef(ID, label, null, astOp); }
 
 	// ACTIONS
 

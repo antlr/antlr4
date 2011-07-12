@@ -73,7 +73,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public List<SrcOp> sempred(GrammarAST ast) { return list(new SemPred(this, ast)); }
 
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args,
+							   GrammarAST astOp)
+	{
 		InvokeRule invokeOp = new InvokeRule(this, ID, label);
 		// If no manual label and action refs as token/rule not label or
 		// we're adding to trees, we need to define implicit label
@@ -82,7 +84,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(invokeOp, listLabelOp);
 	}
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST labelAST, GrammarAST args) {
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST labelAST, GrammarAST args,
+								GrammarAST astOp)
+	{
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();

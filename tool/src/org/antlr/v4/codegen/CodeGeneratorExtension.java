@@ -80,29 +80,23 @@ public class CodeGeneratorExtension {
 
 	// AST OPS
 
-	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
-
 	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> leafRule(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> leafToken(List<SrcOp> ops) { return ops; }
 
-	public List<SrcOp> leafRule(List<SrcOp> ops) { return ops; }
+	public List<SrcOp> rootString(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> leafString(List<SrcOp> ops) { return ops; }
 
 	// BLOCKS
 
 	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> getEBNFBlock(List<SrcOp> ops) { return ops; }
-
-	/*
-	public List<SrcOp> getLL1ChoiceBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getLL1EBNFBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getComplexChoiceBlock(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> getComplexEBNFBlock(List<SrcOp> ops) { return ops; }
-	*/
 
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
 

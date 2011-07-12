@@ -131,8 +131,13 @@ public class ActionTranslator implements ActionSplitterListener {
 			chunks.add(new TokenRef(getTokenLabel(x.getText()))); // $label
 			return;
 		}
+		if ( node.resolver.resolvesToLabel(x.getText(), node) ) {
+			chunks.add(new LabelRef(getTokenLabel(x.getText()))); // $x for x=ID etc...
+			return;
+		}
 		if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
-			return; // $ids for ids+=ID etc...
+			chunks.add(new ListLabelRef(x.getText())); // $ids for ids+=ID etc...
+			return;
 		}
 		if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
 			chunks.add(new DynScopeRef(getDynamicScopeName(x.getText()))); // $S for scope S is ok

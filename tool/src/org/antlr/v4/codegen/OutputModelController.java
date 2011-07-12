@@ -29,7 +29,7 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
@@ -92,7 +92,7 @@ public class OutputModelController {
 			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 			walker = new SourceGenTriggers(nodes, this);
 			try {
-				function.code = DefaultOutputModelFactory.list(walker.block(null, null)); // walk AST of rule alts/elements
+				function.code = DefaultOutputModelFactory.list(walker.block(null, null, null)); // walk AST of rule alts/elements
 			}
 			catch (Exception e){
 				e.printStackTrace(System.err);
@@ -166,37 +166,49 @@ public class OutputModelController {
 		return blk;
 	}
 
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
-		List<SrcOp> ops = delegate.ruleRef(ID, label, args);
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args,
+								GrammarAST astOp)
+	{
+		List<SrcOp> ops = delegate.ruleRef(ID, label, args, astOp);
 		for (CodeGeneratorExtension ext : extensions) {
 			ops = ext.ruleRef(ops);
-			Tree parent = ID.getParent();
-			if ( parent!=null && parent.getType()!=ANTLRParser.BANG &&
-				 parent.getType()!=ANTLRParser.ROOT )
-			{
+			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
+				ops = ext.rootRule(ops);
+			}
+			else if ( astOp==null ) {
 				ops = ext.leafRule(ops);
 			}
 		}
 		return ops;
 	}
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
-		List<SrcOp> ops = delegate.tokenRef(ID, label, args);
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args,
+								GrammarAST astOp)
+	{
+		List<SrcOp> ops = delegate.tokenRef(ID, label, args, astOp);
 		for (CodeGeneratorExtension ext : extensions) {
 			ops = ext.tokenRef(ops);
-			Tree parent = ID.getParent();
-			if ( parent!=null && parent.getType()!=ANTLRParser.BANG &&
-				 parent.getType()!=ANTLRParser.ROOT )
-			{
+			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
+				ops = ext.rootToken(ops);
+			}
+			else if ( astOp==null ) {
 				ops = ext.leafToken(ops);
 			}
 		}
 		return ops;
 	}
 
-	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {
-		List<SrcOp> ops = delegate.stringRef(ID, label);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.stringRef(ops);
+	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp) {
+		List<SrcOp> ops = delegate.stringRef(ID, label, astOp);
+		for (CodeGeneratorExtension ext : extensions) {
+			ops = ext.stringRef(ops);
+			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
+				ops = ext.rootString(ops);
+			}
+			else if ( astOp==null ) {
+				ops = ext.leafString(ops);
+			}
+		}
 		return ops;
 	}
 

@@ -57,7 +57,7 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	@Override
 	public CodeBlockForAlt alternative(CodeBlockForAlt blk) {
 		Alternative alt = factory.getCurrentAlt();
-		if ( !alt.hasRewrite() ) blk.addLocalDecl( new RootDecl(factory, 0) );
+		if ( !alt.hasRewrite() ) factory.getCurrentRuleFunction().addLocalDecl( new RootDecl(factory, 0) );
 		return blk;
 	}
 
@@ -90,21 +90,6 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
-	public List<SrcOp> rootToken(List<SrcOp> ops) {
-		Alternative alt = factory.getCurrentAlt();
-		if ( alt.hasRewrite() ) {
-			return ops;
-		}
-		else {
-			MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
-			SrcOp treeOp = new TokenAST(factory, matchOp.ast, matchOp.getLabels().get(0));
-			String rootName = factory.getGenerator().target.getRootName(0);
-			SrcOp add = new BecomeRoot(factory, rootName, treeOp);
-			return DefaultOutputModelFactory.list(ops, add);
-		}
-	}
-
-	@Override
 	public List<SrcOp> leafRule(List<SrcOp> ops) {
 		InvokeRule invokeOp = (InvokeRule)Utils.find(ops, InvokeRule.class);
 		Alternative alt = factory.getCurrentAlt();
@@ -118,6 +103,21 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 			SrcOp add = new AddChild(factory, rootName, treeOp);
 			ops.add(add);
 			return ops;
+		}
+	}
+
+	@Override
+	public List<SrcOp> rootToken(List<SrcOp> ops) {
+		Alternative alt = factory.getCurrentAlt();
+		if ( alt.hasRewrite() ) {
+			return ops;
+		}
+		else {
+			MatchToken matchOp = (MatchToken)Utils.find(ops, MatchToken.class);
+			SrcOp treeOp = new TokenAST(factory, matchOp.ast, matchOp.getLabels().get(0));
+			String rootName = factory.getGenerator().target.getRootName(0);
+			SrcOp add = new BecomeRoot(factory, rootName, treeOp);
+			return DefaultOutputModelFactory.list(ops, add);
 		}
 	}
 
@@ -137,6 +137,12 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 			return ops;
 		}
 	}
+
+	@Override
+	public List<SrcOp> rootString(List<SrcOp> ops) { return rootToken(ops); }
+
+	@Override
+	public List<SrcOp> leafString(List<SrcOp> ops) { return leafToken(ops); }
 
 	public List<SrcOp> leafRuleInRewriteAlt(InvokeRule invokeOp, List<SrcOp> ops) {
 		RuleContextDecl label = (RuleContextDecl)invokeOp.getLabels().get(0);
@@ -223,9 +229,6 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 			ops.add(c);
 		}
 	}
-
-	@Override
-	public List<SrcOp> stringRef(List<SrcOp> ops) {	return leafToken(ops); }
 
 	@Override
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {

@@ -64,11 +64,11 @@ public interface OutputModelFactory {
 
 	CodeBlockForAlt epsilon();
 
-	List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args);
+	List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp);
 
-	List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args);
+	List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp);
 
-	List<SrcOp> stringRef(GrammarAST ID, GrammarAST label);
+	List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp);
 
 	List<SrcOp> action(GrammarAST ast);
 

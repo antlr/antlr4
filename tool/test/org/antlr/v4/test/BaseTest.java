@@ -251,17 +251,22 @@ public abstract class BaseTest {
 
 		File f = new File(tmpdir, fileName);
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//		DiagnosticCollector<JavaFileObject> diagnostics =
+//			new DiagnosticCollector<JavaFileObject>();
+
 		StandardJavaFileManager fileManager =
 			compiler.getStandardFileManager(null, null, null);
 
 		Iterable<? extends JavaFileObject> compilationUnits =
 			fileManager.getJavaFileObjectsFromFiles(Arrays.asList(f));
-		DiagnosticCollector<JavaFileObject> diagnostics =
-			new DiagnosticCollector<JavaFileObject>();
+
+		Iterable<String> compileOptions =
+			Arrays.asList(new String[]{"-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH} );
+
 		JavaCompiler.CompilationTask task =
-			compiler.getTask(null, fileManager, diagnostics, null, null,
+			compiler.getTask(null, fileManager, null, compileOptions, null,
 							 compilationUnits);
-		task.call();
+		boolean ok = task.call();
 
 		try {
 			fileManager.close();
@@ -270,18 +275,18 @@ public abstract class BaseTest {
 			ioe.printStackTrace(System.err);
 		}
 
-		List<String> errors = new ArrayList<String>();
-		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-			errors.add(
-				String.valueOf(diagnostic.getLineNumber())+
-				": " + diagnostic.getMessage(null));
-		}
-		if ( errors.size()>0 ) {
-			System.err.println("compile stderr from: "+cmdLine);
-			System.err.println(errors);
-			return false;
-		}
-		return true;
+//		List<String> errors = new ArrayList<String>();
+//		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
+//			errors.add(
+//				String.valueOf(diagnostic.getLineNumber())+
+//				": " + diagnostic.getMessage(null));
+//		}
+//		if ( errors.size()>0 ) {
+//			System.err.println("compile stderr from: "+cmdLine);
+//			System.err.println(errors);
+//			return false;
+//		}
+		return ok;
 
 		/*
 		File outputDir = new File(tmpdir);

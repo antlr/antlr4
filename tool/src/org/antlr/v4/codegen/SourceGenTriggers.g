@@ -25,9 +25,9 @@ import java.util.HashMap;
     }
 }
 
-dummy : block[null, null] ;
+dummy : block[null, null, null] ;
 
-block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos]
+block[GrammarAST label, GrammarAST ebnfRoot, GrammarAST astOp] returns [List<? extends SrcOp> omos]
     :	^(	blk=BLOCK (^(OPTIONS .+))?
 			{List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();}
     		(	alternative
@@ -89,10 +89,10 @@ element returns [List<? extends SrcOp> omos]
 	;
 
 labeledElement returns [List<? extends SrcOp> omos]
-	:	^(ASSIGN ID atom[$ID] )				{$omos = $atom.omos;}
-	|	^(ASSIGN ID block[$ID,null])		{$omos = $block.omos;}
-	|	^(PLUS_ASSIGN ID atom[$ID])			{$omos = $atom.omos;}
-	|	^(PLUS_ASSIGN ID block[$ID,null])	{$omos = $block.omos;}
+	:	^(ASSIGN ID atom[$ID] )					{$omos = $atom.omos;}
+	|	^(ASSIGN ID block[$ID,null,null])		{$omos = $block.omos;}
+	|	^(PLUS_ASSIGN ID atom[$ID])				{$omos = $atom.omos;}
+	|	^(PLUS_ASSIGN ID block[$ID,null,null])	{$omos = $block.omos;}
 	;
 
 treeSpec returns [SrcOp omo]
@@ -100,12 +100,12 @@ treeSpec returns [SrcOp omo]
     ;
 
 ebnf returns [List<? extends SrcOp> omos]
-	:	^(astBlockSuffix block[null,null])
-	|	^(OPTIONAL block[null,$OPTIONAL])	{$omos = $block.omos;}
-	|	^(CLOSURE block[null,$CLOSURE])		{$omos = $block.omos;}
-	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE])
-										    {$omos = $block.omos;}
-	| 	block[null, null]					{$omos = $block.omos;}
+	:	^(astBlockSuffix block[null,null,null])
+	|	^(OPTIONAL block[null,$OPTIONAL,null])	{$omos = $block.omos;}
+	|	^(CLOSURE block[null,$CLOSURE,null])	{$omos = $block.omos;}
+	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE,null])
+										    	{$omos = $block.omos;}
+	| 	block[null, null,null]					{$omos = $block.omos;}
     ;
 
 astBlockSuffix
@@ -117,41 +117,42 @@ astBlockSuffix
 // TODO: combine ROOT/BANG into one then just make new op ref'ing return value of atom/terminal...
 // TODO: same for NOT
 atom[GrammarAST label] returns [List<SrcOp> omos]
-	:	^(ROOT notSet[label])
-	|	^(BANG notSet[label])		{$omos = $notSet.omos;}
-	|	notSet[label]
-	|	range[label]				{$omos = $range.omos;}
-	|	^(DOT ID terminal[label])
-	|	^(DOT ID ruleref[label])
-    |	^(WILDCARD .)				{$omos = controller.wildcard($WILDCARD, $label);}
-    |	WILDCARD					{$omos = controller.wildcard($WILDCARD, $label);}
-    |	^(ROOT terminal[label])		{$omos = controller.rootToken($terminal.omos);}
-    |	^(BANG terminal[label])		{$omos = $terminal.omos;}
-    |   terminal[label]				{$omos = $terminal.omos;}
-    |	^(ROOT ruleref[label])		{$omos = controller.rootRule($ruleref.omos);}
-    |	^(BANG ruleref[label])		{$omos = $ruleref.omos;}
-    |   ruleref[label]				{$omos = $ruleref.omos;}
+	:	^(ROOT notSet[label, $ROOT])		{$omos = $notSet.omos;}
+	|	^(BANG notSet[label, $BANG])		{$omos = $notSet.omos;}
+	|	notSet[label, null]					{$omos = $notSet.omos;}
+	|	range[label]						{$omos = $range.omos;}
+	|	^(DOT ID terminal[label, null])
+	|	^(DOT ID ruleref[label, null])
+    |	^(WILDCARD .)						{$omos = controller.wildcard($WILDCARD, $label);}
+    |	WILDCARD							{$omos = controller.wildcard($WILDCARD, $label);}
+    |	^(ROOT terminal[label, $ROOT])		{$omos = $terminal.omos;}
+    |	^(BANG terminal[label, $BANG])		{$omos = $terminal.omos;}
+    |   terminal[label, null]				{$omos = $terminal.omos;}
+    |	^(ROOT ruleref[label, $ROOT])		{$omos = $ruleref.omos;}
+    |	^(BANG ruleref[label, $BANG])		{$omos = $ruleref.omos;}
+    |   ruleref[label, null]				{$omos = $ruleref.omos;}
     ;
 
-notSet[GrammarAST label] returns [List<SrcOp> omos]
-    : ^(NOT terminal[label])
-    | ^(NOT block[label,null])
+// TODO: send NOT to factory methods
+notSet[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
+    : ^(NOT terminal[label, astOp])
+    | ^(NOT block[label,null, astOp])
     ;
 
-ruleref[GrammarAST label] returns [List<SrcOp> omos]
-    :	^(RULE_REF ARG_ACTION?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION);}
+ruleref[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
+    :	^(RULE_REF ARG_ACTION?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION, $astOp);}
     ;
 
 range[GrammarAST label] returns [List<SrcOp> omos]
     :	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
     ;
 
-terminal[GrammarAST label] returns [List<SrcOp> omos]
-    :  ^(STRING_LITERAL .)			{$omos = controller.stringRef($STRING_LITERAL, $label);}
-    |	STRING_LITERAL				{$omos = controller.stringRef($STRING_LITERAL, $label);}
-    |	^(TOKEN_REF ARG_ACTION .)	{$omos = controller.tokenRef($TOKEN_REF, $label, $ARG_ACTION);}
-    |	^(TOKEN_REF .)				{$omos = controller.tokenRef($TOKEN_REF, $label, null);}
-    |	TOKEN_REF					{$omos = controller.tokenRef($TOKEN_REF, $label, null);}
+terminal[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
+    :  ^(STRING_LITERAL .)			{$omos = controller.stringRef($STRING_LITERAL, $label, $astOp);}
+    |	STRING_LITERAL				{$omos = controller.stringRef($STRING_LITERAL, $label, $astOp);}
+    |	^(TOKEN_REF ARG_ACTION .)	{$omos = controller.tokenRef($TOKEN_REF, $label, $ARG_ACTION, $astOp);}
+    |	^(TOKEN_REF .)				{$omos = controller.tokenRef($TOKEN_REF, $label, null, $astOp);}
+    |	TOKEN_REF					{$omos = controller.tokenRef($TOKEN_REF, $label, null, $astOp);}
     ;
 
 elementOptions
@@ -244,12 +245,9 @@ rewriteTreeEbnf returns [CodeBlock op]
 	
 rewriteTree returns [List<SrcOp> omos]
 	:	{
-//		controller.codeBlockLevel++;
 		controller.treeLevel++;
 		List<SrcOp> elems = new ArrayList<SrcOp>();
 		RewriteTreeStructure t = controller.rewrite_treeStructure($start);
-//		CodeBlock save = controller.getCurrentBlock();
-//		controller.setCurrentBlock(t);
 		}
 		^(	TREE_BEGIN
 			rewriteTreeAtom[true] {elems.addAll($rewriteTreeAtom.omos);}
@@ -258,9 +256,7 @@ rewriteTree returns [List<SrcOp> omos]
 		{
 		t.ops = elems;
 		$omos = DefaultOutputModelFactory.list(t);
-//		controller.setCurrentBlock(save);
 		controller.treeLevel--;
-//		controller.codeBlockLevel--;
 		}
 	;
 

@@ -192,7 +192,12 @@ public class Target {
 		return "cnt"+ ast.token.getTokenIndex();
 	}
 
-	public String getListLabel(String label) { return label+"_list"; }
+	public String getListLabel(String label) {
+		ST st = gen.templates.getInstanceOf("ListLabelName");
+		st.add("label", label);
+		return st.render();
+	}
+
 	public String getRuleFunctionContextStructName(Rule r) {
 		boolean hasNoExternallyVisibleElements =
 			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
