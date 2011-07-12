@@ -122,7 +122,7 @@ rule:
 
 block:
 	"( ^(A B) | ^(b C) )" -> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
-	
+
 alternative:
 	"x+=ID* -> $x*" ->
 	    (ALT_REWRITE
@@ -144,7 +144,7 @@ alternative:
 
 	"A -> ({name})()" -> (ALT_REWRITE (ALT A) (-> (TEMPLATE {name})))
 
-	"A -> {expr}" -> (ALT_REWRITE (ALT A) (-> {expr}))
+	"A -> {expr}" -> (ALT_REWRITE (ALT A) (-> (ALT {expr})))
 
     <<
     A -> {p1}? {e1}
@@ -152,10 +152,11 @@ alternative:
     ->
     >>
     ->
-    (ALT_REWRITE
-        (ALT A)
-        (-> {p1}? {e1})
-        (-> {e2}))
+    ( ALT_REWRITE
+      (ALT A)
+      (-> {p1}? (ALT {e1}))
+      (-> (ALT {e2}))
+    )
 
 	"A -> A" -> (ALT_REWRITE (ALT A) (-> (ALT A)))
 
@@ -203,9 +204,9 @@ element:
 	"x=ID*"		-> (* (BLOCK (ALT (= x ID))))
 	"x=b"		-> (= x b)
 	"x=(A|B)"	-> (= x (BLOCK (ALT A) (ALT B)))
-	"x=~(A|B)"	-> (= x (~ (BLOCK (ALT A) (ALT B))))
-	"x+=~(A|B)"	-> (+= x (~ (BLOCK (ALT A) (ALT B))))
-	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK (ALT A) (ALT B)))))))
+	"x=~(A|B)"	-> (= x (~ (BLOCK A B)))
+	"x+=~(A|B)"	-> (+= x (~ (BLOCK A B)))
+	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK A B))))))
 	"x=b+"		-> (+ (BLOCK (ALT (= x b))))
 	"x+=ID*"	-> (* (BLOCK (ALT (+= x ID))))
 	"x+='int'*"	-> (* (BLOCK (ALT (+= x 'int'))))
