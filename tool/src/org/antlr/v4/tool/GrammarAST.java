@@ -56,6 +56,7 @@ public class GrammarAST extends CommonTree {
 		token.setInputStream(t.getInputStream());
 		token.setLine(t.getLine());
 		token.setCharPositionInLine(t.getCharPositionInLine());
+		token.setTokenIndex(t.getTokenIndex());
     }
 
 	public List<GrammarAST> getNodesWithType(int ttype) {

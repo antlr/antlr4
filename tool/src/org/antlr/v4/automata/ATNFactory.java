@@ -30,7 +30,6 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
 import java.util.List;
@@ -68,16 +67,13 @@ public interface ATNFactory {
 
 	Handle tokenRef(TerminalAST node);
 
-	/** From set build single edge graph o->o-set->o.  To conform to
-     *  what an alt block looks like, must have extra state on left.
-     */
-	Handle set(IntervalSet set, GrammarAST associatedAST);
+	Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert);
 
 	Handle tree(List<Handle> els);
 
 	Handle range(GrammarAST a, GrammarAST b);
 
-	Handle not(GrammarAST a);
+//	Handle not(GrammarAST a);
 
 	/** For a non-lexer, just build a simple token reference atom.
 	 *  For a lexer, a string is a sequence of char to match.  That is,
@@ -149,7 +145,7 @@ public interface ATNFactory {
      */
 	Handle block(BlockAST blockAST, GrammarAST ebnfRoot, List<Handle> alternativeGrips);
 
-	Handle notBlock(GrammarAST blockAST, List<GrammarAST> terminals);
+//	Handle notBlock(GrammarAST blockAST, Handle set);
 
 	/** From (A)? build either:
 	 *

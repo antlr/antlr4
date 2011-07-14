@@ -256,26 +256,34 @@ elements
 element
 	:	labeledElement
 	|	atom
-	|	ebnf
+	|	subrule
 	|   ACTION
     |   FORCED_ACTION
 	|   SEMPRED
 	|	GATED_SEMPRED
 	|	treeSpec
+	|	^(ROOT astOperand)
+	|	^(BANG astOperand)
+	|	^(NOT blockSet)
+	|	^(NOT block)
+	;
+
+astOperand
+	:	atom
+	|	^(NOT blockSet)
+	|	^(NOT block)
 	;
 
 labeledElement
-	:	^(ASSIGN ID atom)
-	|	^(ASSIGN ID block)
-	|	^(PLUS_ASSIGN ID atom)
-	|	^(PLUS_ASSIGN ID block)
+	:	^((ASSIGN|PLUS_ASSIGN) ID element)
 	;
 
 treeSpec
     : ^(TREE_BEGIN element+)
     ;
 
-ebnf:	^(blockSuffix block)
+subrule
+	:	^(blockSuffix block)
 	| 	block
     ;
 
@@ -292,33 +300,23 @@ ebnfSuffix
    	|	POSITIVE_CLOSURE
 	;
 
-atom:	^(ROOT notSet)
-	|	^(BANG notSet)
-	|	notSet
-    |	^(ROOT terminal)
-    |	^(BANG terminal)
-	|	range
+atom:	range
 	|	^(DOT ID terminal)
 	|	^(DOT ID ruleref)
     |	^(WILDCARD elementOptions)
     |	WILDCARD
     |   terminal
+    |	blockSet
     |   ruleref
     ;
 
-notSet
-    : ^(NOT setElement)
-    | ^(NOT blockSet)
-    ;
-
 blockSet
-    :	^(BLOCK setElement+)
-    ;
-
+	:	^(SET setElement+)
+	;
+	
 setElement
 	:	STRING_LITERAL
 	|	TOKEN_REF
-	|	^(RANGE STRING_LITERAL STRING_LITERAL)
 	;
 
 block
@@ -326,9 +324,7 @@ block
     ;
 
 ruleref
-    :	^(ROOT ^(RULE_REF ARG_ACTION?))
-    |	^(BANG ^(RULE_REF ARG_ACTION?))
-    |	^(RULE_REF ARG_ACTION?)
+    :	^(RULE_REF ARG_ACTION?)
     ;
 
 range

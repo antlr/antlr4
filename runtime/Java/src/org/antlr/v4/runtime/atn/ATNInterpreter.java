@@ -144,7 +144,7 @@ public abstract class ATNInterpreter {
 			case Transition.FORCED_ACTION : return new ActionTransition(target, arg1, arg2);
 			case Transition.SET : return new SetTransition(sets.get(arg1), target);
 			case Transition.NOT_ATOM : return new NotAtomTransition(arg1, target);
-			case Transition.NOT_SET : return new NotSetTransition(sets.get(arg1), target);
+			case Transition.NOT_SET : return new NotSetTransition(null, sets.get(arg1), target);
 			case Transition.WILDCARD : return new WildcardTransition(target);
 		}
 		return null;

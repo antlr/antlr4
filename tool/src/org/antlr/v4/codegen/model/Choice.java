@@ -77,7 +77,7 @@ public abstract class Choice extends RuleElement {
 
 	public SrcOp addCodeForLookaheadTempVar(IntervalSet look) {
 		List<SrcOp> testOps = factory.getLL1Test(look, ast);
-		SrcOp expr = (SrcOp)Utils.find(testOps, TestSetInline.class);
+		SrcOp expr = (SrcOp) Utils.find(testOps, TestSetInline.class);
 		if ( expr instanceof TestSetInline) {
 			TestSetInline e = (TestSetInline)expr;
 			Decl d = new TokenTypeDecl(factory, e.varName);
@@ -87,5 +87,4 @@ public abstract class Choice extends RuleElement {
 		}
 		return expr;
 	}
-
 }

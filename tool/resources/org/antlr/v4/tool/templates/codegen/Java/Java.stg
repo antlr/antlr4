@@ -235,6 +235,8 @@ case <i>:
 }
 >>
 
+// TODO: we we need uniqueID? a single _alt might work
+
 StarBlock(choice, alts, sync) ::= <<
 int _alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> ) {
@@ -283,6 +285,18 @@ _localctx.s = <r.stateNumber>;
 MatchToken(m) ::= <<
 _localctx.s = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
+>>
+
+MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
+
+MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
+
+CommonSetStuff(m, expr, capture, invert) ::= <<
+_localctx.s = <m.stateNumber>;
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>input.LT(1);
+<capture>
+if ( <if(!invert)>!<endif>(<expr>) ) throw new MismatchedSetException(this, input);
+input.consume();
 >>
 
 Wildcard(w) ::= <<
@@ -354,6 +368,7 @@ ParserRuleContext() ::= "ParserRuleContext"
 RuleDynamicScopeStructName(ruleName) ::= "<ruleName>_stk"
 ImplicitTokenLabel(tokenName) ::= "_t<tokenName>"
 ImplicitRuleLabel(ruleName)   ::= "_r<ruleName>"
+ImplicitSetLabel(id)		  ::= "_tset<id>"
 ListLabelName(label)		  ::= "<label>_list"
 
 CaptureNextToken(d) ::= "<d.varName> = input.LT(1);"

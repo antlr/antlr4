@@ -190,6 +190,9 @@ public class Grammar implements AttributeResolver {
 			this.ast = (GrammarRootAST)r.getTree();
 			this.ast.hasErrors = p.getNumberOfSyntaxErrors()>0;
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
+
+			GrammarTransformPipeline transform = new GrammarTransformPipeline(ast);
+			transform.process();
 		}
 		initTokenSymbolTables();
     }

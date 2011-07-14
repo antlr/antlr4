@@ -65,7 +65,7 @@ public class TestASTOps extends BaseTest {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
-			"a : (ID|INT) ;\n" +
+			"a : (ID{;}|INT) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -496,6 +496,7 @@ public class TestASTOps extends BaseTest {
 			"blort : '+' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
+			"PLUS : '+';\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "3+4+5", debug);

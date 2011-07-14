@@ -63,6 +63,8 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp) { return tokenRef(ID, label, null, astOp); }
 
+	public List<SrcOp> set(GrammarAST setAST, GrammarAST label, GrammarAST astOp, boolean invert) {	return null; }
+
 	// ACTIONS
 
 	public List<SrcOp> action(GrammarAST ast) { return null; }

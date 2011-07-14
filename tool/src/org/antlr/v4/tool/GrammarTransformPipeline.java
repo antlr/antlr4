@@ -27,29 +27,28 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.atn;
+package org.antlr.v4.tool;
 
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.parse.*;
 
-public class NotSetTransition extends SetTransition {
-	// keep both set, notSet; we can only compute at construction time
-	// since only then do we have grammar, which knows token set for complement.
-	public IntervalSet notSet;
+/** Handle left-recursion and block-set transforms */
+public class GrammarTransformPipeline {
+	public GrammarAST ast;
 
-	public NotSetTransition(IntervalSet set, IntervalSet notSet, ATNState target) {
-		super(set, target);
-		this.notSet = notSet;
+	public GrammarTransformPipeline(GrammarAST ast) {
+		this.ast = ast;
 	}
 
-	public NotSetTransition(ATNState target) {
-		super(target);
-	}
+	public void process() {
+		if ( ast==null ) return;
 
-	@Override
-	public IntervalSet label() { return notSet; }
-
-	@Override
-	public String toString() {
-		return '~'+super.toString();
+		org.antlr.runtime.tree.CommonTreeNodeStream nodes =
+			new org.antlr.runtime.tree.CommonTreeNodeStream(ast);
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+		BlockSetTransformer transformer = new BlockSetTransformer(nodes);
+		transformer.setTreeAdaptor(adaptor);
+		System.out.println("before: "+ast.toStringTree());
+		transformer.downup(ast);
+		System.out.println("after: "+ast.toStringTree());
 	}
 }

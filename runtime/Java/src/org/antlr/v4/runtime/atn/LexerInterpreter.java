@@ -262,8 +262,8 @@ public class LexerInterpreter extends ATNInterpreter {
 		else if ( trans instanceof SetTransition ) {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
-			if ( !not && st.label.member(t) || not && !st.label.member(t) ) {
-				if ( debug ) System.out.println("match set "+st.label.toString());
+			if ( !not && st.set.member(t) || not && !st.set.member(t) ) {
+				if ( debug ) System.out.println("match set "+st.set.toString());
 				return st.target;
 			}
 		}

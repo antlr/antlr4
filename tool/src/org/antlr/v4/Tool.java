@@ -206,8 +206,11 @@ public class Tool {
 			GrammarAST t = load(fileName);
 			if ( t instanceof GrammarASTErrorNode ) return; // came back as error node
 			if ( ((GrammarRootAST)t).hasErrors ) return;
-
 			GrammarRootAST ast = (GrammarRootAST)t;
+
+			GrammarTransformPipeline transform = new GrammarTransformPipeline(ast);
+			transform.process();
+
 			Grammar g = createGrammar(ast);
 			g.fileName = fileName;
 			process(g);

@@ -110,11 +110,23 @@ public class ParserATNFactory implements ATNFactory {
 
 	/** From set build single edge graph o->o-set->o.  To conform to
      *  what an alt block looks like, must have extra state on left.
+	 *  This handles ~A also, converted to ~{A} set.
      */
-	public Handle set(IntervalSet set, GrammarAST associatedAST) {
+	public Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert) {
 		ATNState left = newState(associatedAST);
 		ATNState right = newState(associatedAST);
-		left.transition = new SetTransition(set, right);
+		IntervalSet set = new IntervalSet();
+		for (GrammarAST t : terminals) {
+			int ttype = g.getTokenType(t.getText());
+			set.add(ttype);
+		}
+		if ( invert ) {
+			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
+			left.transition = new NotSetTransition(set, notSet, right);
+		}
+		else {
+			left.transition = new SetTransition(set, right);
+		}
 		right.incidentTransition = left.transition;
 		associatedAST.atnState = left;
 		return new Handle(left, right);
@@ -128,6 +140,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle range(GrammarAST a, GrammarAST b) { throw new UnsupportedOperationException(); }
 
 	/** ~atom only */
+	/*
 	public Handle not(GrammarAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
@@ -137,6 +150,7 @@ public class ParserATNFactory implements ATNFactory {
 		node.atnState = left;
 		return new Handle(left, right);
 	}
+	*/
 
 	protected int getTokenType(GrammarAST atom) {
 		int ttype;
@@ -300,27 +314,12 @@ public class ParserATNFactory implements ATNFactory {
 		return h;
 	}
 
-	public Handle notBlock(GrammarAST notAST, List<GrammarAST> terminals) {
-		// assume list of atoms
-		IntervalSet notSet = new IntervalSet();
-		for (GrammarAST elemAST : terminals) {
-			if ( elemAST.getType()==ANTLRParser.RANGE ) {
-				GrammarAST from = (GrammarAST)elemAST.getChild(0);
-				GrammarAST to = (GrammarAST)elemAST.getChild(1);
-				notSet.add(getTokenType(from), getTokenType(to));
-			}
-			else {
-				notSet.add(getTokenType(elemAST));
-			}
-		}
-
-		ATNState left = newState(notAST);
-		ATNState right = newState(notAST);
-		left.transition = new NotSetTransition(notSet, right);
-		right.incidentTransition = left.transition;
-		notAST.atnState = left;
-		return new Handle(left, right);
-	}
+//	public Handle notBlock(GrammarAST notAST, Handle set) {
+//		SetTransition st = (SetTransition)set.left.transition;
+//		set.left.transition = new NotSetTransition(st.label, set.right);
+//		notAST.atnState = set.left;
+//		return set;
+//	}
 
 	public Handle alt(List<Handle> els) {
 		Handle prev = null;

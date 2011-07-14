@@ -79,6 +79,11 @@ public class ATNPrinter {
 					ActionTransition a = (ActionTransition)t;
 					buf.append("-"+a.toString()+"->"+ getStateString(t.target)+'\n');
 				}
+				else if ( t instanceof SetTransition ) {
+					SetTransition st = (SetTransition)t;
+					boolean not = st instanceof NotSetTransition;
+					buf.append("-"+(not?"~":"")+st.toString()+"->"+ getStateString(t.target)+'\n');
+				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
 					String label = a.toString();

@@ -95,7 +95,8 @@ public class LL1Analyzer {
 			}
 			else {
 //				System.out.println("adding "+ t);
-				look.addAll(t.label());
+				IntervalSet set = t.label();
+				look.addAll(set);
 			}
 		}
 	}

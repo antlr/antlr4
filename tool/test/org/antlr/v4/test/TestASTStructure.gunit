@@ -121,7 +121,13 @@ rule:
     (catch A a {foo}) (catch B b {fu}) (finally {bar}))
 
 block:
-	"( ^(A B) | ^(b C) )" -> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
+	"( ^(A B) | ^(b C) )"	-> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
+
+ebnf:
+	"(A|B)"					-> (SET A B)
+	"(A|B)?"				-> ("?" (BLOCK (ALT (SET A B))))
+	"(A|B)*"				-> ("*" (BLOCK (ALT (SET A B))))
+	"(A|B)+"				-> ("+" (BLOCK (ALT (SET A B))))
 
 alternative:
 	"x+=ID* -> $x*" ->
@@ -189,6 +195,7 @@ alternative:
     (-> EPSILON))
 
 element:
+	"~A"		-> (~ (SET A))
 	"b+"		-> (+ (BLOCK (ALT b)))
 	"(b)+"		-> (+ (BLOCK (ALT b)))
 	"b?"  		-> (? (BLOCK (ALT b)))
@@ -203,10 +210,11 @@ element:
 	"x=ID?"		-> (? (BLOCK (ALT (= x ID))))
 	"x=ID*"		-> (* (BLOCK (ALT (= x ID))))
 	"x=b"		-> (= x b)
-	"x=(A|B)"	-> (= x (BLOCK (ALT A) (ALT B)))
-	"x=~(A|B)"	-> (= x (~ (BLOCK A B)))
-	"x+=~(A|B)"	-> (+= x (~ (BLOCK A B)))
-	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK A B))))))
+	"x=(A|B)"	-> (= x (SET A B))
+	"x=(A|B)^"	-> (= x (^ (SET A B)))
+	"x=~(A|B)"	-> (= x (~ (SET A B)))
+	"x+=~(A|B)"	-> (+= x (~ (SET A B)))
+	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK (ALT (SET A B))))))))
 	"x=b+"		-> (+ (BLOCK (ALT (= x b))))
 	"x+=ID*"	-> (* (BLOCK (ALT (+= x ID))))
 	"x+='int'*"	-> (* (BLOCK (ALT (+= x 'int'))))

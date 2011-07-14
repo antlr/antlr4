@@ -69,6 +69,7 @@ tokens {
     POSITIVE_CLOSURE;
     SYNPRED;
     RANGE;
+    SET;
     CHAR_RANGE;
     EPSILON;
     ALT;
@@ -133,6 +134,10 @@ import org.antlr.v4.tool.*;
 
 @members {
 Stack paraphrases = new Stack();
+/** Affects tree construction; no SET collapsing if AST (ID|INT) would hide them from rewrite.
+ *  Could use for just AST ops, but we can't see -> until after building sets.
+boolean buildAST;
+ */
 }
 
 // The main entry point for parsing a V3 grammar from top to toe. This is
@@ -245,6 +250,13 @@ optionsSpec
 
 option
     :   id ASSIGN^ optionValue
+/*
+    	{
+    	if ( $id.text.equals("output") ) {
+    		if ( $optionValue.text.equals("AST") ) buildAST = true;
+    	}
+    	}
+    	*/
     ;
 
 // ------------
@@ -611,53 +623,24 @@ element
 		}
         reportError(re);
         recover(input,re);
-/*
-		input.rewind(m);
-		final List subset = input.get(input.index(), input.range());
-		System.out.println("failed to match as element: '"+subset);
-		CommonTokenStream ns = new CommonTokenStream(
-			new TokenSource() {
-				int i = 0;
-				public Token nextToken() {
-					if ( i>=subset.size() ) return Token.EOF_TOKEN;
-					return (Token)subset.get(i++);
-				}
-				public String getSourceName() { return null; }
-			});
-		ANTLRParser errorParser = new ANTLRParser(ns);
-		errorParser.setTreeAdaptor(this.adaptor);
-		errorParser.element_errors(re);
-        retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
-        */
 	}
 
+labeledElement
+	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
+		(	atom						-> ^($ass id atom)
+		|	block (op=ROOT|op=BANG)?	-> {$op!=null}? ^($ass id ^($op block))
+										->				^($ass id block)
 /*
-element_errors[RecognitionException origError]
-options {backtrack=true;}
-@init {
-int m = input.mark();
-//state.backtracking++;
-}
-@after {
-//state.backtracking--;
-}
-	:	(	DOC_COMMENT? ruleModifiers? id ARG_ACTION<ActionAST>? ruleReturns? rulePrequel* COLON
-		|	exceptionGroup
-		)
-		{reportError(missingSemi); recover(input,null);}
-	;
-	catch [RecognitionException ignore]	{
-		input.rewind(m);
-		input.consume(); // kill at least one token
-		reportError(origError);
-		BitSet followSet = computeErrorRecoverySet();
-		beginResync();
-		consumeUntil(input, followSet);
-		endResync();
-	}
+		|	{buildAST}? blockSet
+			{
+			RecognitionException e =
+				new v4ParserException("can't  '"+
+									  input.LT(1).getText()+" "+input.LT(2).getText()+"'", input);
+			reportError(missingSemi);
+			}
 */
-
-labeledElement : id (ASSIGN^|PLUS_ASSIGN^) (atom|block) ;
+		)
+	;
 
 // Tree specifying alt
 // Tree grammars need to have alts that describe a tree structure they
@@ -682,20 +665,19 @@ ebnf
     : block
       // And now we see if we have any of the optional suffixs and rewrite
       // the AST for this rule accordingly
-      //
-      (	blockSuffixe	-> ^(blockSuffixe block)
-      |					-> block
+      (	blockSuffix	-> ^(blockSuffix block)
+      |				-> block
       )
     ;
 
 // The standard EBNF suffixes with additional components that make
 // sense only to ANTLR, in the context of a grammar block.
-blockSuffixe
+blockSuffix
     : ebnfSuffix // Standard EBNF
 
 	  // ANTLR Specific Suffixes
     | ROOT
-    | IMPLIES   // We will change this to syn/sem pred in the next phase
+//    | IMPLIES   // We will change this to syn/sem pred in the next phase
     | BANG
     ;
 
@@ -720,35 +702,45 @@ atom:	// Qualified reference delegate.rule. This must be
     |   ruleref
     |	notSet   (ROOT^|BANG^)?
 	|   // Wildcard '.' means any character in a lexer, any
-		// token in parser and any token or node in a tree parser
+		// token in parser and any node or subtree in a tree parser
 		// Because the terminal rule is allowed to be the node
 		// specification for the start of a tree rule, we must
 		// later check that wildcard was not used for that.
-	    DOT elementOptions?		 			  -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
+	    DOT elementOptions?		  -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
 
 // --------------------
 // Inverted element set
 //
-// A set of characters (in a lexer) or terminal tokens, if a parser
+// A set of characters (in a lexer) or terminal tokens, if a parser,
 // that are then used to create the inverse set of them.
-//
 notSet
-    : NOT terminal	-> ^(NOT terminal)
-    | NOT blockSet	-> ^(NOT blockSet)
+    : NOT setElement	-> ^(NOT ^(SET[$setElement.start,"SET"] setElement))
+    | NOT blockSet		-> ^(NOT blockSet)
     ;
 
 blockSet
-    : LPAREN
-    	setElement (OR setElement)*
-      RPAREN
-      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] setElement+ )
+@init {
+	Token t;
+	boolean ebnf = false;
+}
+    :	LPAREN setElement (OR setElement)* RPAREN
+/*		{
+		t = input.LT(1);
+		ebnf = t!=null && (t.getType()==QUESTION || t.getType()==STAR || t.getType()==PLUS);
+	    }
+	    */
+		-> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] ^(ALT setElement)+ )
+/*
+		-> {ebnf}?	^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] ^(ALT ^(SET[$LPAREN,"SET"] setElement+ )))
+		-> 			^(SET[$LPAREN,"SET"] setElement+ )
+*/
     ;
 
 setElement
-	:	range
-	|	terminal
+	:	TOKEN_REF<TerminalAST>
+	|	STRING_LITERAL<TerminalAST>
 	;
 
 // -------------
@@ -759,12 +751,10 @@ setElement
 // of options, which apply only to that block.
 //
 block
-    : LPAREN
-         // A new blocked altlist may have a set of options set sepcifically
-         // for it.
-         ( optionsSpec? ra+=ruleAction* COLON )?
-         altList
-      RPAREN
+ 	:	LPAREN
+        ( optionsSpec? ra+=ruleAction* COLON )?
+        altList
+		RPAREN
       -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] optionsSpec? $ra* altList )
     ;
 

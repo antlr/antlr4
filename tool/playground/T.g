@@ -1,10 +1,11 @@
 grammar T;
 options {output=AST;}
 
-a : (ID INT) ;
+a : ('+' | '-')^  ;
 b returns [int i] : ID;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;
+PLUS : '+';
 WS : (' '|'\n') {$channel=HIDDEN;} ;
 
 /*

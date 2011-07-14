@@ -78,8 +78,8 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 
 element returns [List<? extends SrcOp> omos]
 	:	labeledElement					{$omos = $labeledElement.omos;}
-	|	atom[null]						{$omos = $atom.omos;}
-	|	ebnf							{$omos = $ebnf.omos;}
+	|	atom[null,null,false]			{$omos = $atom.omos;}
+	|	subrule							{$omos = $subrule.omos;}
 	|   ACTION							{$omos = controller.action($ACTION);}
 	|   FORCED_ACTION					{$omos = controller.forcedAction($FORCED_ACTION);}
 	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
@@ -88,18 +88,18 @@ element returns [List<? extends SrcOp> omos]
 	;
 
 labeledElement returns [List<? extends SrcOp> omos]
-	:	^(ASSIGN ID atom[$ID] )					{$omos = $atom.omos;}
-	|	^(ASSIGN ID block[$ID,null,null])		{$omos = $block.omos;}
-	|	^(PLUS_ASSIGN ID atom[$ID])				{$omos = $atom.omos;}
-	|	^(PLUS_ASSIGN ID block[$ID,null,null])	{$omos = $block.omos;}
+	:	^(ASSIGN ID atom[$ID,null,false] )			{$omos = $atom.omos;}
+	|	^(PLUS_ASSIGN ID atom[$ID,null,false])		{$omos = $atom.omos;}
+	|	^(ASSIGN ID block[$ID,null,null] )			{$omos = $block.omos;}
+	|	^(PLUS_ASSIGN ID block[$ID,null,null])		{$omos = $block.omos;}
 	;
 
 treeSpec returns [SrcOp omo]
     : ^(TREE_BEGIN  (e=element )+)
     ;
 
-ebnf returns [List<? extends SrcOp> omos]
-	:	^(astBlockSuffix block[null,null,null])
+subrule returns [List<? extends SrcOp> omos]
+	:	^(astBlockSuffix block[null,null,$astBlockSuffix.start]) {$omos = $block.omos;}
 	|	^(OPTIONAL block[null,$OPTIONAL,null])	{$omos = $block.omos;}
 	|	^(CLOSURE block[null,$CLOSURE,null])	{$omos = $block.omos;}
 	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE,null])
@@ -113,31 +113,33 @@ astBlockSuffix
     | BANG
     ;
 
+blockSet[GrammarAST label, GrammarAST astOp, boolean invert] returns [List<SrcOp> omos]
+    :	^(SET atom[null,null,false]+) {$omos = controller.set($SET, $label, $astOp, invert);}
+    ;
+
+/*
+setElement
+	:	STRING_LITERAL
+	|	TOKEN_REF
+	|	^(RANGE STRING_LITERAL STRING_LITERAL)
+	;
+*/
+
 // TODO: combine ROOT/BANG into one then just make new op ref'ing return value of atom/terminal...
 // TODO: same for NOT
-atom[GrammarAST label] returns [List<SrcOp> omos]
-	:	^(ROOT notSet[label, $ROOT])		{$omos = $notSet.omos;}
-	|	^(BANG notSet[label, $BANG])		{$omos = $notSet.omos;}
-	|	notSet[label, null]					{$omos = $notSet.omos;}
-	|	range[label]						{$omos = $range.omos;}
-	|	^(DOT ID terminal[label, null])
-	|	^(DOT ID ruleref[label, null])
-    |	^(WILDCARD .)						{$omos = controller.wildcard($WILDCARD, $label);}
-    |	WILDCARD							{$omos = controller.wildcard($WILDCARD, $label);}
-    |	^(ROOT terminal[label, $ROOT])		{$omos = $terminal.omos;}
-    |	^(BANG terminal[label, $BANG])		{$omos = $terminal.omos;}
-    |   terminal[label, null]				{$omos = $terminal.omos;}
-    |	^(ROOT ruleref[label, $ROOT])		{$omos = $ruleref.omos;}
-    |	^(BANG ruleref[label, $BANG])		{$omos = $ruleref.omos;}
-    |   ruleref[label, null]				{$omos = $ruleref.omos;}
-    ;
-
-// TODO: send NOT to factory methods
-notSet[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
-    : ^(NOT terminal[label, astOp])
-    | ^(NOT block[label,null, astOp])
-    ;
-
+atom[GrammarAST label, GrammarAST astOp, boolean invert] returns [List<SrcOp> omos]
+	:	^(op=(ROOT|BANG) a=atom[$label, $op, $invert] )	{$omos = $a.omos;}
+	|	^(NOT a=atom[$label, $astOp, true])		{$omos = $a.omos;}
+	|	range[label]							{$omos = $range.omos;}
+	|	^(DOT ID terminal[$label, null])
+	|	^(DOT ID ruleref[$label, null])
+    |	^(WILDCARD .)							{$omos = controller.wildcard($WILDCARD, $label);}
+    |	WILDCARD								{$omos = controller.wildcard($WILDCARD, $label);}
+    |   terminal[label, $astOp]					{$omos = $terminal.omos;}
+    |   ruleref[label, $astOp]					{$omos = $ruleref.omos;}
+	|	blockSet[$label, $astOp, invert]		{$omos = $blockSet.omos;}
+	;
+	
 ruleref[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
     :	^(RULE_REF ARG_ACTION?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION, $astOp);}
     ;

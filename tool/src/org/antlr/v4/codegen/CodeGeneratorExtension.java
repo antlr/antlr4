@@ -66,6 +66,8 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> tokenRef(List<SrcOp> ops) { return ops; }
 
+	public List<SrcOp> set(List<SrcOp> ops) { return ops; }
+
 	public List<SrcOp> stringRef(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> wildcard(List<SrcOp> ops) { return ops; }
@@ -92,11 +94,15 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> leafString(List<SrcOp> ops) { return ops; }
 
+	public List<SrcOp> rootSet(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> leafSet(List<SrcOp> ops) { return ops; }
+
 	// BLOCKS
 
-	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) { return ops; }
+	public Choice getChoiceBlock(Choice c) { return c; }
 
-	public List<SrcOp> getEBNFBlock(List<SrcOp> ops) { return ops; }
+	public Choice getEBNFBlock(Choice c) { return c; }
 
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
 

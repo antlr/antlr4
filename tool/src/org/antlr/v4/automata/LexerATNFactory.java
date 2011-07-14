@@ -29,8 +29,10 @@
 
 package org.antlr.v4.automata;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
 import java.util.List;
@@ -95,6 +97,27 @@ public class LexerATNFactory extends ParserATNFactory {
 		left.transition = new RangeTransition(t1, t2, right);
 		a.atnState = left;
 		b.atnState = left;
+		return new Handle(left, right);
+	}
+
+	@Override
+	public Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert) {
+		ATNState left = newState(associatedAST);
+		ATNState right = newState(associatedAST);
+		IntervalSet set = new IntervalSet();
+		for (GrammarAST t : terminals) {
+			int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
+			set.add(c);
+		}
+		if ( invert ) {
+			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
+			left.transition = new NotSetTransition(set, notSet, right);
+		}
+		else {
+			left.transition = new SetTransition(set, right);
+		}
+		right.incidentTransition = left.transition;
+		associatedAST.atnState = left;
 		return new Handle(left, right);
 	}
 

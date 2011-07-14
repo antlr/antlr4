@@ -27,29 +27,13 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.atn;
+package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.GrammarAST;
 
-public class NotSetTransition extends SetTransition {
-	// keep both set, notSet; we can only compute at construction time
-	// since only then do we have grammar, which knows token set for complement.
-	public IntervalSet notSet;
-
-	public NotSetTransition(IntervalSet set, IntervalSet notSet, ATNState target) {
-		super(set, target);
-		this.notSet = notSet;
-	}
-
-	public NotSetTransition(ATNState target) {
-		super(target);
-	}
-
-	@Override
-	public IntervalSet label() { return notSet; }
-
-	@Override
-	public String toString() {
-		return '~'+super.toString();
+public class MatchNotSet extends MatchSet {
+	public MatchNotSet(OutputModelFactory factory, GrammarAST ast) {
+		super(factory, ast);
 	}
 }

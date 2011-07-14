@@ -45,13 +45,12 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 	}
 
 	@Override
-	public List<SrcOp> getChoiceBlock(List<SrcOp> ops) {
-		Choice choice = (Choice)Utils.find(ops, Choice.class);
+	public Choice getChoiceBlock(Choice choice) {
 		Alternative alt = factory.getCurrentOuterMostAlt();
 		if ( alt.hasRewrite() && choice.label!=null ) {
 			trackExplicitLabel(choice.preamble, choice.label, choice);
 		}
-		return ops;
+		return choice;
 	}
 
 	@Override
@@ -168,17 +167,27 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		TokenDecl label = (TokenDecl)((LabeledOp)matchOp).getLabels().get(0);
 		// First declare tracking lists for elements, labels
 		// track the named element like _track_A
-		String elemListName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
+		String elemName = matchOp.ast.getText();
+		if ( matchOp.ast.getType()==ANTLRParser.SET ) {
+			elemName = String.valueOf(matchOp.ast.token.getTokenIndex());
+		}
+		String elemListName = factory.getGenerator().target.getElementListName(elemName);
 		blk.addLocalDecl(new ElementListDecl(factory, elemListName));
 		// Now, generate track instructions for element and any labels
 		// do element
-		String trackName = factory.getGenerator().target.getElementListName(matchOp.ast.getText());
+		String trackName = factory.getGenerator().target.getElementListName(elemName);
 		TrackTokenElement t = new TrackTokenElement(factory, matchOp.ast, trackName,
 													label);
 		ops.add(t);
 		if ( !label.isImplicit ) trackExplicitLabel(ops, label, matchOp);
 		return ops;
 	}
+
+	@Override
+	public List<SrcOp> rootSet(List<SrcOp> ops) { return rootToken(ops); }
+
+	@Override
+	public List<SrcOp> leafSet(List<SrcOp> ops) { return leafToken(ops); }
 
 	@Override
 	public List<SrcOp> wildcard(List<SrcOp> ops) {

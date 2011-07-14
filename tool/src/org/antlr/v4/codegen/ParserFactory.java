@@ -104,6 +104,28 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
+	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST,
+						   GrammarAST astOp, boolean invert)
+	{
+		LabeledOp matchOp;
+		if ( invert ) matchOp = new MatchNotSet(this, setAST);
+		else matchOp = new MatchSet(this, setAST);
+		if ( labelAST!=null ) {
+			String label = labelAST.getText();
+			TokenDecl d = new TokenDecl(this, label);
+			((MatchSet)matchOp).labels.add(d);
+			getCurrentRuleFunction().addContextDecl(d);
+			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+				TokenListDecl l = new TokenListDecl(this, gen.target.getListLabel(label));
+				getCurrentRuleFunction().addContextDecl(l);
+			}
+		}
+		if ( controller.needsImplicitLabel(setAST, matchOp) ) defineImplicitLabel(setAST, matchOp);
+		AddToLabelList listLabelOp = getListLabelIfPresent(matchOp, labelAST);
+		return list(matchOp, listLabelOp);
+	}
+
+	@Override
 	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
 		Wildcard wild = new Wildcard(this, ast);
 		// TODO: dup with tokenRef
@@ -348,18 +370,24 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return op;
 	}
 
-	public void defineImplicitLabel(GrammarAST ID, LabeledOp op) {
+	public void defineImplicitLabel(GrammarAST ast, LabeledOp op) {
 		Decl d;
-		Rule r = g.getRule(ID.getText());
-		if ( r!=null ) {
-			String implLabel = gen.target.getImplicitRuleLabel(ID.getText());
+		Rule r = g.getRule(ast.getText());
+		if ( ast.getType()==ANTLRParser.SET ) {
+			String implLabel =
+				gen.target.getImplicitSetLabel(String.valueOf(ast.token.getTokenIndex()));
+			d = new TokenDecl(this, implLabel);
+			((TokenDecl)d).isImplicit = true;
+		}
+		else if ( r!=null ) {
+			String implLabel = gen.target.getImplicitRuleLabel(ast.getText());
 			String ctxName =
 				gen.target.getRuleFunctionContextStructName(r);
 			d = new RuleContextDecl(this, implLabel, ctxName);
 			((RuleContextDecl)d).isImplicit = true;
 		}
 		else {
-			String implLabel = gen.target.getImplicitTokenLabel(ID.getText());
+			String implLabel = gen.target.getImplicitTokenLabel(ast.getText());
 			d = new TokenDecl(this, implLabel);
 			((TokenDecl)d).isImplicit = true;
 		}

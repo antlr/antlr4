@@ -40,4 +40,5 @@ public class RuleElement extends SrcOp {
 		super(factory, ast);
 		if ( ast.atnState!=null ) stateNumber = ast.atnState.stateNumber;
 	}
+
 }

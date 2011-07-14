@@ -239,6 +239,13 @@ public class Target {
 		return st.render();
 	}
 
+	// x=(A|B)
+	public String getImplicitSetLabel(String id) {
+		ST st = gen.templates.getInstanceOf("ImplicitSetLabel");
+		st.add("id", id);
+		return st.render();
+	}
+
 	public String getImplicitRuleLabel(String ruleName) {
 		ST st = gen.templates.getInstanceOf("ImplicitRuleLabel");
 		st.add("ruleName", ruleName);

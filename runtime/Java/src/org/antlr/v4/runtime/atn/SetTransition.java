@@ -34,21 +34,21 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** A transition containing a set of values */
 public class SetTransition extends Transition {
-	public IntervalSet label;
+	public IntervalSet set;
 
-	public SetTransition(IntervalSet label, ATNState target) {
+	public SetTransition(IntervalSet set, ATNState target) {
 		super(target);
-		if ( label==null ) label = IntervalSet.of(Token.INVALID_TYPE);
-		this.label = label;
+		if ( set == null ) set = IntervalSet.of(Token.INVALID_TYPE);
+		this.set = set;
 	}
 
 	public SetTransition(ATNState target) {
 		super(target);
 	}
 
-	public IntervalSet label() { return label; }
+	public IntervalSet label() { return set; }
 
 	public String toString() {
-		return label.toString();
+		return set.toString();
 	}
 }

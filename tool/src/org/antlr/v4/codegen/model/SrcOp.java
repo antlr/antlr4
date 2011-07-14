@@ -35,7 +35,7 @@ import org.antlr.v4.tool.GrammarAST;
 /** */
 public abstract class SrcOp extends OutputModelObject {
 	/** Used to create unique var names etc... */
-//	public int uniqueID;
+	public int uniqueID; // TODO: do we need?
 
 	/** All operations know in which block they live:
 	 *
@@ -49,7 +49,7 @@ public abstract class SrcOp extends OutputModelObject {
 	public SrcOp(OutputModelFactory factory) { this(factory,null); }
 	public SrcOp(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		//uniqueID = ast.token.getTokenIndex();
+		if ( ast!=null ) uniqueID = ast.token.getTokenIndex();
 		enclosingBlock = factory.getCurrentBlock();
 	}
 }

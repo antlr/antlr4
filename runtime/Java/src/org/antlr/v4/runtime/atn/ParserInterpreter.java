@@ -386,15 +386,15 @@ public class ParserInterpreter extends ATNInterpreter {
 	public ATNState getReachableTarget(Transition trans, int ttype) {
 		if ( trans instanceof AtomTransition ) {
 			AtomTransition at = (AtomTransition)trans;
-			boolean not = trans instanceof NotAtomTransition;
-			if ( !not && at.label == ttype || not && at.label!=ttype ) {
+//			boolean not = trans instanceof NotAtomTransition;
+			if ( at.label == ttype ) {
 				return at.target;
 			}
 		}
 		else if ( trans instanceof SetTransition ) {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
-			if ( !not && st.label.member(ttype) || not && !st.label.member(ttype) ) {
+			if ( !not && st.set.member(ttype) || not && !st.set.member(ttype) ) {
 				return st.target;
 			}
 		}
@@ -648,7 +648,8 @@ public class ParserInterpreter extends ATNInterpreter {
 			}
 			else if ( t instanceof SetTransition ) {
 				SetTransition st = (SetTransition)t;
-				trans = "Set "+st.label.toString();
+				boolean not = st instanceof NotSetTransition;
+				trans = (not?"~":"")+"Set "+st.set.toString();
 			}
 			System.err.println(c.toString(parser, true)+":"+trans);
 		}

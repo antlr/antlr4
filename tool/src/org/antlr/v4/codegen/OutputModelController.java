@@ -215,6 +215,22 @@ public class OutputModelController {
 		return ops;
 	}
 
+	/** (A|B|C) possibly with ebnfRoot and label */
+	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST,
+						   GrammarAST astOp, boolean invert) {
+		List<SrcOp> ops = delegate.set(setAST, labelAST, astOp, invert);
+		for (CodeGeneratorExtension ext : extensions) {
+			ops = ext.set(ops);
+			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
+				ops = ext.rootSet(ops);
+			}
+			else if ( astOp==null ) {
+				ops = ext.leafSet(ops);
+			}
+		}
+		return ops;
+	}
+
 	public CodeBlockForAlt epsilon() {
 		CodeBlockForAlt blk = delegate.epsilon();
 		for (CodeGeneratorExtension ext : extensions) blk = ext.epsilon(blk);
@@ -259,15 +275,13 @@ public class OutputModelController {
 
 	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label) {
 		Choice c = delegate.getChoiceBlock(blkAST, alts, label);
-		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.getChoiceBlock(ops);
+		for (CodeGeneratorExtension ext : extensions) c = ext.getChoiceBlock(c);
 		return c;
 	}
 
 	public Choice getEBNFBlock(GrammarAST ebnfRoot, List<CodeBlockForAlt> alts) {
 		Choice c = delegate.getEBNFBlock(ebnfRoot, alts);
-		List<SrcOp> ops = DefaultOutputModelFactory.list(c);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.getEBNFBlock(ops);
+		for (CodeGeneratorExtension ext : extensions) c = ext.getEBNFBlock(c);
 		return c;
 	}
 

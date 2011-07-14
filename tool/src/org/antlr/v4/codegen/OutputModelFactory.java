@@ -70,6 +70,8 @@ public interface OutputModelFactory {
 
 	List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp);
 
+	List<SrcOp> set(GrammarAST setAST, GrammarAST label, GrammarAST astOp, boolean invert);
+
 	List<SrcOp> action(GrammarAST ast);
 
 	List<SrcOp> forcedAction(GrammarAST ast);
