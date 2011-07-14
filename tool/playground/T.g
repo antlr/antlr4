@@ -1,8 +1,8 @@
 grammar T;
 options {output=AST;}
 
-a : ('+' | '-')^  ;
-b returns [int i] : ID;
+a : 'var' (ID ':' type ';')+ -> ^('var' ^(':' ID type)*) ;
+type returns [int i] : ID;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;
 PLUS : '+';

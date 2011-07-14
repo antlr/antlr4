@@ -76,7 +76,7 @@ public class UseDefAnalyzer {
 	public static List<GrammarAST> getElementReferencesShallowInOuterAlt(Grammar g,
 																		 GrammarAST altAST)
 	{
-		return UseDefAnalyzer.getRewriteElementRefs(g, altAST, 0, false);
+		return getRewriteElementRefs(g, altAST, 0, false);
 	}
 
 	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
@@ -87,7 +87,7 @@ public class UseDefAnalyzer {
 															  GrammarAST ebnfRoot,
 															  boolean deep)
 	{
-		return UseDefAnalyzer.getRewriteElementRefs(g, ebnfRoot, 1, deep);
+		return getRewriteElementRefs(g, ebnfRoot, 1, deep);
 	}
 
 	/** Get list of rule refs, token refs mentioned on left, and labels not
@@ -111,24 +111,19 @@ public class UseDefAnalyzer {
 		return elems;
 	}
 
+	/** Visit either ^(-> ...) or ^(('?'|'*') ...) */
 	public static List<GrammarAST> getRewriteElementRefs(Grammar g,
 														 GrammarAST root,
 														 int desiredShallowLevel,
 														 boolean deep)
 	{
 		CommonTreeNodeStream nodes = new CommonTreeNodeStream(root);
-		Refs collector = new Refs(nodes, desiredShallowLevel);
-		try {
-			collector.start();
-		}
-		catch (org.antlr.runtime.RecognitionException re) {
-			g.tool.errMgr.grammarError(ErrorType.INTERNAL_ERROR,
-									   g.fileName, re.token, re);
-
-		}
-//		System.out.println("from "+root.toStringTree());
-//		System.out.println("shallow: "+collector.shallow);
-//		System.out.println("deep: "+collector.deep);
+		RewriteRefs collector = new RewriteRefs(nodes, desiredShallowLevel);
+		if ( root.getType()==ANTLRParser.RESULT ) collector.visitRewrite(g.tool.errMgr);
+		else collector.visitRewriteEBNF(g.tool.errMgr);
+		System.out.println("from "+root.toStringTree());
+		System.out.println("shallow: "+collector.shallow);
+		System.out.println("deep: "+collector.deep);
 		return deep ? collector.deep : collector.shallow;
 	}
 
