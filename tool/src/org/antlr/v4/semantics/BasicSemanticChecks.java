@@ -177,6 +177,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void tokenAlias(GrammarAST ID, GrammarAST literal) {
+		checkTokenAlias(ID.token);
+	}
+
+	@Override
 	public void importGrammar(GrammarAST label, GrammarAST ID) {
 		checkImport(ID.token);
 	}
@@ -198,7 +203,12 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void discoverRule(GrammarAST rule, GrammarAST ID) {
+	public void discoverRule(RuleAST rule, GrammarAST ID,
+							 List<GrammarAST> modifiers,
+							 ActionAST arg, ActionAST returns,
+							 GrammarAST thrws, GrammarAST options,
+							 List<ActionAST> actions, GrammarAST block)
+	{
 		checkInvalidRuleDef(ID.token);
 	}
 
@@ -223,7 +233,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void discoverAltWithRewrite(GrammarAST alt) {
+	public void discoverAltWithRewrite(AltAST alt) {
 		GrammarAST firstNode = (GrammarAST)alt.getChild(0);
 		checkRewriteForMultiRootAltInTreeGrammar(g.ast.getOptions(),
 												 firstNode.token,
@@ -483,7 +493,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	void checkRewriteOk(Map<String, String> options, GrammarAST elementRoot) {
-		String ruleName = currentRule.getChild(0).getText();
+		String ruleName = currentRuleAST.getChild(0).getText();
 		String fileName = elementRoot.token.getInputStream().getSourceName();
 		if ( options!=null && options.get("output")==null ) {
 			g.tool.errMgr.grammarWarning(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,

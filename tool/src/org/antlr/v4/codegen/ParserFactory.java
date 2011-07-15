@@ -252,7 +252,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		TreeRewrite tr = new TreeRewrite(this, getTreeLevel(), getCodeBlockLevel());
 		tr.addLocalDecl(new RootDecl(this, 0));
 		List<GrammarAST> refs =
-			UseDefAnalyzer.getElementReferencesShallowInOuterAlt(getGrammar(), ast);
+			UseDefAnalyzer.getElementReferencesShallowInOuterAlt(ast);
 		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
@@ -277,9 +277,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public RewriteTreeOptional rewrite_optional(GrammarAST ast) {
 		RewriteTreeOptional o =
 			new RewriteTreeOptional(this, ast, getTreeLevel(), getCodeBlockLevel());
-		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(getGrammar(),
-																		  ast,
-																		  true);
+		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(ast, true);
 		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {
@@ -297,9 +295,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public RewriteTreeClosure rewrite_closure(GrammarAST ast) {
 		RewriteTreeClosure c =
 			new RewriteTreeClosure(this, ast, getTreeLevel(), getCodeBlockLevel());
-		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(getGrammar(),
-																		  ast,
-																		  false);
+		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(ast, false);
 		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
 		if ( refs!=null ) {
 			for (GrammarAST ref : refs) {

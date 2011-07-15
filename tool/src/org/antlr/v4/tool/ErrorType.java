@@ -102,7 +102,7 @@ public enum ErrorType {
 	ILLEGAL_OPTION("illegal option <arg>", ErrorSeverity.ERROR),
 	LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT("", ErrorSeverity.ERROR),
 	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS("reference to rewrite element <arg> not found to left of ->", ErrorSeverity.ERROR),
-    //UNDEFINED_TOKEN_REF_IN_REWRITE("", ErrorSeverity.ERROR),
+    UNDEFINED_TOKEN_REF_IN_REWRITE("token <arg> in rewrite is undefined", ErrorSeverity.ERROR),
 	///UNDEFINED_LABEL_REF_IN_REWRITE("", ErrorSeverity.ERROR), use previous
 	NO_GRAMMAR_START_RULE("", ErrorSeverity.ERROR),
 	EMPTY_COMPLEMENT("", ErrorSeverity.ERROR),

@@ -29,6 +29,13 @@
 
 /** The definitive ANTLR v3 tree grammar to walk/visit ANTLR v4 grammars.
  *  Parses trees created by ANTLRParser.g.
+ *
+ *  Rather than have multiple tree grammars, one for each visit, I'm
+ *  creating this generic visitor that knows about context. All of the
+ *  boilerplate pattern recognition is done here. Then, subclasses can
+ *  override the methods they care about. This prevents a lot of the same
+ *  context tracking stuff like "set current alternative for current
+ *  rule node" that is repeated in lots of tree filters.
  */
 tree grammar GrammarTreeVisitor;
 options {
@@ -75,7 +82,8 @@ import java.lang.reflect.Method;
 
 @members {
 public String grammarName;
-public GrammarAST currentRule;
+public GrammarAST currentRuleAST;
+public String currentModeName = LexerGrammar.DEFAULT_MODE_NAME;
 public String currentRuleName;
 public GrammarAST currentRuleBlock;
 public GrammarAST currentOuterAltRoot;
@@ -100,9 +108,12 @@ public void visit(GrammarAST t, String ruleName) {
 	}
 	catch (Exception e) {
 		ErrorManager errMgr = getErrorManager();
-		if ( errMgr==null ) System.err.println("can't find rule "+ruleName+
-											   " or tree structure error: "+t.toStringTree()
-											  );
+		if ( errMgr==null ) {
+			System.err.println("can't find rule "+ruleName+
+							   " or tree structure error: "+t.toStringTree()
+							   );
+			e.printStackTrace(System.err);
+		}
 		else errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
 	}
 }
@@ -115,39 +126,53 @@ public void grammarOption(GrammarAST ID, String value) { }
 public void ruleOption(GrammarAST ID, String value) { }
 public void blockOption(GrammarAST ID, String value) { }
 public void tokenAlias(GrammarAST ID, GrammarAST literal) { }
-
+public void globalScopeDef(GrammarAST ID, ActionAST elems) { }
+public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) { }
 public void importGrammar(GrammarAST label, GrammarAST ID) { }
 
 public void modeDef(GrammarAST m, GrammarAST ID) { }
 
 public void discoverRules(GrammarAST rules) { }
 public void finishRules(GrammarAST rule) { }
-public void discoverRule(GrammarAST rule, GrammarAST ID) { }
-public void finishRule(GrammarAST rule, GrammarAST ID) { }
-public void discoverAlt(GrammarAST alt) { }
-public void finishAlt(GrammarAST alt) { }
-public void discoverAltWithRewrite(GrammarAST alt) { }
-public void finishAltWithRewrite(GrammarAST alt) { }
+public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
+						 ActionAST arg, ActionAST returns, GrammarAST thrws,
+						 GrammarAST options, List<ActionAST> actions,
+						 GrammarAST block) { }
+public void finishRule(GrammarAST rule, GrammarAST ID, GrammarAST block) { }
+public void ruleCatch(GrammarAST arg, ActionAST action) { }
+public void finallyAction(ActionAST action) { }
+public void ruleNamedAction(GrammarAST ID, ActionAST action) { }
+/** outermost alt */
+public void discoverAlt(AltAST alt) { }
+/** outermost alt */
+public void finishAlt(AltAST alt) { }
+/** outermost alt */
+public void discoverAltWithRewrite(AltAST alt) { }
+/** outermost alt */
+public void finishAltWithRewrite(AltAST alt) { }
 public void discoverSTRewrite(GrammarAST rew) { }
 public void discoverTreeRewrite(GrammarAST rew) { }
 
 public void ruleRef(GrammarAST ref, GrammarAST arg) { }
-public void tokenRef(GrammarAST ref, GrammarAST options) { }
+public void tokenRef(TerminalAST ref, GrammarAST options) { }
 public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
-public void stringRef(GrammarAST ref, GrammarAST options) { }
+public void stringRef(TerminalAST ref, GrammarAST options) { }
 public void wildcardRef(GrammarAST ref, GrammarAST options) { }
+public void actionInAlt(ActionAST action) { }
+public void sempredInAlt(PredAST pred) { }
+public void label(GrammarAST op, GrammarAST ID, GrammarAST element) { }
 
 public void rootOp(GrammarAST op, GrammarAST opnd) { }
 public void bangOp(GrammarAST op, GrammarAST opnd) { }
 
 public void discoverRewrites(GrammarAST result) { }
 public void finishRewrites(GrammarAST result) { }
-public void rewriteTokenRef(GrammarAST ast, GrammarAST options, GrammarAST arg) { }
+public void rewriteTokenRef(TerminalAST ast, GrammarAST options, ActionAST arg) { }
 public void rewriteTerminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
-public void rewriteStringRef(GrammarAST ast, GrammarAST options) { }
+public void rewriteStringRef(TerminalAST ast, GrammarAST options) { }
 public void rewriteRuleRef(GrammarAST ast) { }
 public void rewriteLabelRef(GrammarAST ast) { }
-public void rewriteAction(GrammarAST ast) { }
+public void rewriteAction(ActionAST ast) { }
 }
 
 grammarSpec
@@ -208,27 +233,42 @@ tokensSpec
 
 tokenSpec
 	:	^(ASSIGN ID STRING_LITERAL)	{tokenAlias($ID, $STRING_LITERAL);}
-	|	ID
+	|	ID							{tokenAlias($ID, null);}
 	;
 
 attrScope
-	:	^(SCOPE ID ACTION)
+	:	^(SCOPE ID ACTION)	{if ( inContext("GRAMMAR") ) globalScopeDef($ID, (ActionAST)$ACTION);}
 	;
 
 action
-	:	^(AT ID? ID ACTION)
+	:	^(AT sc=ID? name=ID ACTION) {globalNamedAction($sc, $name, (ActionAST)$ACTION);}
 	;
 
 rules
     : ^(RULES {discoverRules($RULES);} rule* {finishRules($RULES);})
     ;
 
-mode:	^( MODE ID {modeDef($MODE, $ID);} rule+ ) ;
+mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} rule+ ) ;
 
-rule:   ^(	RULE ID {currentRuleName=$ID.text; currentRule=$RULE; discoverRule($RULE, $ID);}
-			DOC_COMMENT? ruleModifiers? ARG_ACTION?
-      		ruleReturns? rulePrequel* ruleBlock exceptionGroup
-      		{finishRule($RULE, $ID);}
+rule
+@init {
+List<GrammarAST> mods = new ArrayList<GrammarAST>();
+List<ActionAST> actions = new ArrayList<ActionAST>();
+}
+	:   ^(	RULE ID {currentRuleName=$ID.text; currentRuleAST=$RULE;}
+			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
+			ARG_ACTION?
+      		ret=ruleReturns?
+      		thr=throwsSpec?
+      		(	ruleScopeSpec
+		    |   opts=optionsSpec
+		    |   a=ruleAction {actions.add((ActionAST)$a.start);}
+		    )* 
+      		{discoverRule((RuleAST)$RULE, $ID, mods, (ActionAST)$ARG_ACTION,
+      					  $ret.start!=null?(ActionAST)$ret.start.getChild(0):null,
+      					  $thr.start, $opts.start, actions, (GrammarAST)input.LT(1));}
+      		ruleBlock exceptionGroup
+      		{finishRule($RULE, $ID, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
       	 )
     ;
 
@@ -237,19 +277,13 @@ exceptionGroup
     ;
 
 exceptionHandler
-	: ^(CATCH ARG_ACTION ACTION)
+	: ^(CATCH ARG_ACTION ACTION)	{ruleCatch($ARG_ACTION, (ActionAST)$ACTION);}
 	;
 
 finallyClause
-	: ^(FINALLY ACTION)
+	: ^(FINALLY ACTION)				{finallyAction((ActionAST)$ACTION);}
 	;
 
-rulePrequel
-    :   throwsSpec
-    |   ruleScopeSpec
-    |   optionsSpec
-    |   ruleAction
-    ;
 
 ruleReturns
 	: ^(RETURNS ARG_ACTION)
@@ -264,22 +298,14 @@ ruleScopeSpec
 	;
 
 ruleAction
-	:	^(AT ID ACTION)
+	:	^(AT ID ACTION)	{ruleNamedAction($ID, (ActionAST)$ACTION);}
 	;
-
-ruleModifiers
-    : ^(RULEMODIFIERS ruleModifier+)
-    ;
 
 ruleModifier
     : PUBLIC
     | PRIVATE
     | PROTECTED
     | FRAGMENT
-    ;
-
-altList
-    : alternative+
     ;
 
 ruleBlock
@@ -295,33 +321,36 @@ ruleBlock
 					currentOuterAltHasRewrite=true;
 				}
 				}
-    			alternative
+    			outerAlternative
     		)+
     	)
     ;
 
-alternative
+outerAlternative
 @init {
-	if ( $start.getType()==ALT_REWRITE ) discoverAltWithRewrite($start);
-	else discoverAlt($start);
+	if ( $start.getType()==ALT_REWRITE ) discoverAltWithRewrite((AltAST)$start.getChild(0));
+	else discoverAlt((AltAST)$start);
 }
 @after {
-	if ( $start.getType()==ALT_REWRITE ) finishAltWithRewrite($start);
-	else finishAlt($start);
+	if ( $start.getType()==ALT_REWRITE ) finishAltWithRewrite((AltAST)$start.getChild(0));
+	else finishAlt((AltAST)$start);
 }
-    :	^(ALT_REWRITE alternative {inRewrite=true;} rewrite)
-    |	^(ALT EPSILON)
-    |   ^(ALT element+)
+	:	alternative
+	;
+	
+alternative
+	:	^(ALT_REWRITE alternative {inRewrite=true;} rewrite {inRewrite=false;})
+	|	^(ALT element+)
+	|	^(ALT EPSILON)
     ;
 
 element
 	:	labeledElement
 	|	atom
 	|	subrule
-	|   ACTION
-    |   FORCED_ACTION
-	|   SEMPRED
-	|	GATED_SEMPRED
+	|   ACTION				{actionInAlt((ActionAST)$ACTION);}
+    |   FORCED_ACTION		{actionInAlt((ActionAST)$FORCED_ACTION);}
+	|   SEMPRED				{sempredInAlt((PredAST)$SEMPRED);}
 	|	treeSpec
 	|	^(ROOT astOperand)	{rootOp($ROOT, $astOperand.start);}
 	|	^(BANG astOperand)	{bangOp($BANG, $astOperand.start);}
@@ -336,7 +365,7 @@ astOperand
 	;
 
 labeledElement
-	:	^((ASSIGN|PLUS_ASSIGN) ID element)
+	:	^((ASSIGN|PLUS_ASSIGN) ID element) {label($start, $ID, $element.start);}
 	;
 
 treeSpec
@@ -381,7 +410,7 @@ setElement
 	;
 
 block
-    :	^(BLOCK optionsSpec? ruleAction* ACTION? altList)
+    :	^(BLOCK optionsSpec? ruleAction* ACTION? alternative+)
     ;
 
 ruleref
@@ -394,10 +423,10 @@ range
 
 terminal
     :  ^(STRING_LITERAL elementOptions)
-    								{stringRef($STRING_LITERAL, $elementOptions.start);}
-    |	STRING_LITERAL				{stringRef($STRING_LITERAL, null);}
-    |	^(TOKEN_REF elementOptions)	{tokenRef($TOKEN_REF, $elementOptions.start);}
-    |	TOKEN_REF	    			{tokenRef($TOKEN_REF, null);}
+    								{stringRef((TerminalAST)$STRING_LITERAL, $elementOptions.start);}
+    |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL, null);}
+    |	^(TOKEN_REF elementOptions)	{tokenRef((TerminalAST)$TOKEN_REF, $elementOptions.start);}
+    |	TOKEN_REF	    			{tokenRef((TerminalAST)$TOKEN_REF, null);}
     ;
 
 elementOptions
@@ -433,7 +462,7 @@ rewriteAlt
     ;
 
 rewriteTreeAlt
-    :	^(ALT rewriteTreeElement+)
+    :	^(REWRITE_SEQ rewriteTreeElement+)
     ;
 
 rewriteTreeElement
@@ -444,16 +473,18 @@ rewriteTreeElement
 
 rewriteTreeAtom
     :   ^(TOKEN_REF rewriteElementOptions ARG_ACTION)
-    										{rewriteTokenRef($start,$rewriteElementOptions.start,$ARG_ACTION);}
-    |   ^(TOKEN_REF rewriteElementOptions)	{rewriteTokenRef($start,$rewriteElementOptions.start,null);}
-    |   ^(TOKEN_REF ARG_ACTION)				{rewriteTokenRef($start,null,$ARG_ACTION);}
-	|   TOKEN_REF							{rewriteTokenRef($start,null,null);}
+    	{rewriteTokenRef((TerminalAST)$start,$rewriteElementOptions.start,(ActionAST)$ARG_ACTION);}
+    |   ^(TOKEN_REF rewriteElementOptions)
+    	{rewriteTokenRef((TerminalAST)$start,$rewriteElementOptions.start,null);}
+    |   ^(TOKEN_REF ARG_ACTION)
+    	{rewriteTokenRef((TerminalAST)$start,null,(ActionAST)$ARG_ACTION);}
+	|   TOKEN_REF							{rewriteTokenRef((TerminalAST)$start,null,null);}
     |   RULE_REF							{rewriteRuleRef($start);}
 	|   ^(STRING_LITERAL rewriteElementOptions)
-											{rewriteStringRef($start,$rewriteElementOptions.start);}
-	|   STRING_LITERAL						{rewriteStringRef($start,null);}
+		{rewriteStringRef((TerminalAST)$start,$rewriteElementOptions.start);}
+	|   STRING_LITERAL						{rewriteStringRef((TerminalAST)$start,null);}
 	|   LABEL								{rewriteLabelRef($start);}
-	|	ACTION								{rewriteAction($start);}
+	|	ACTION								{rewriteAction((ActionAST)$start);}
 	;
 
 rewriteElementOptions

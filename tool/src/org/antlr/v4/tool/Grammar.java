@@ -31,7 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;
@@ -40,7 +40,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.semantics.CollectSymbols;
+import org.antlr.v4.semantics.SymbolCollector;
 
 import java.util.*;
 
@@ -690,9 +690,8 @@ public class Grammar implements AttributeResolver {
 
 	public Set<String> getStringLiterals() {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(adaptor,ast);
-		CollectSymbols collector = new CollectSymbols(nodes,this);
-		collector.downup(ast); // no side-effects; compute lists
+		SymbolCollector collector = new SymbolCollector(this);
+		collector.process(); // no side-effects; find strings
 		return collector.strings;
 	}
 

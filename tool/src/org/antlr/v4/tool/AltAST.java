@@ -31,6 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.parse.ANTLRParser;
 
 /** An ALT or ALT_REWRITE node (left of ->) */
 public class AltAST extends GrammarAST {
@@ -44,6 +45,11 @@ public class AltAST extends GrammarAST {
 	public AltAST(Token t) { super(t); }
 	public AltAST(int type) { super(type); }
 	public AltAST(int type, Token t) { super(type, t); }
+
+	public GrammarAST getRewrite() {
+		if ( getType() == ANTLRParser.ALT ) return null;
+		return (GrammarAST)getChild(1); // ^(ALT_REWRITE ^(ALT ...) ^(-> ...))
+	}
 
 	@Override
 	public Tree dupNode() { return new AltAST(this); }

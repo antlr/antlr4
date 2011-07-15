@@ -38,11 +38,9 @@ public class RewriteRefs extends GrammarTreeVisitor {
 	List<GrammarAST> shallow = new ArrayList<GrammarAST>();
 	List<GrammarAST> deep = new ArrayList<GrammarAST>();
 	int desiredShallowLevel;
-	Grammar g;
 
-	public RewriteRefs(Grammar g, int desiredShallowLevel) {
+	public RewriteRefs(int desiredShallowLevel) {
 		this.desiredShallowLevel = desiredShallowLevel;
-		this.g = g;
 	}
 
 	public void track(GrammarAST t) {
@@ -51,15 +49,12 @@ public class RewriteRefs extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public ErrorManager getErrorManager() { return g.tool.errMgr; }
-
-	@Override
-	public void rewriteTokenRef(GrammarAST ast, GrammarAST options, GrammarAST arg) {
+	public void rewriteTokenRef(TerminalAST ast, GrammarAST options, ActionAST arg) {
 		track(ast);
 	}
 
 	@Override
-	public void rewriteStringRef(GrammarAST ast, GrammarAST options) {
+	public void rewriteStringRef(TerminalAST ast, GrammarAST options) {
 		track(ast);
 	}
 

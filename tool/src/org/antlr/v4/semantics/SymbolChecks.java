@@ -43,14 +43,14 @@ import java.util.*;
  */
 public class SymbolChecks {
     Grammar g;
-    CollectSymbols collector;
+    SymbolCollector collector;
     Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
 	Set<String> tokenIDs = new HashSet<String>();
     Set<String> globalScopeNames = new HashSet<String>();
     Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 	public ErrorManager errMgr;
 
-    public SymbolChecks(Grammar g, CollectSymbols collector) {
+    public SymbolChecks(Grammar g, SymbolCollector collector) {
         this.g = g;
         this.collector = collector;
 		this.errMgr = g.tool.errMgr;
@@ -66,7 +66,7 @@ public class SymbolChecks {
          */
     }
 
-    public void examine() {
+    public void process() {
         // methods affect fields, but no side-effects outside this object
         // So, call order sensitive
         checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames
@@ -153,6 +153,19 @@ public class SymbolChecks {
             }
         }
     }
+
+	public void checkForRewriteIssues() {
+		// Ensure that all tokens refer to on the right if -> have been defined.
+		for (GrammarAST elem : collector.rewriteElements) {
+			if ( elem.getType()==ANTLRParser.TOKEN_REF ) {
+				int ttype = g.getTokenType(elem.getText());
+				if ( ttype == Token.INVALID_TOKEN_TYPE ) {
+				g.tool.errMgr.grammarError(ErrorType.UNDEFINED_TOKEN_REF_IN_REWRITE,
+										   g.fileName, elem.token, elem.getText());
+				}
+			}
+		}
+	}
 
     public void checkActionRedefinitions(List<GrammarAST> actions) {
         if ( actions==null ) return;

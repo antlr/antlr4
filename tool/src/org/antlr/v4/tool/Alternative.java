@@ -59,7 +59,7 @@ public class Alternative implements AttributeResolver {
     public MultiMap<String, LabelElementPair> labelDefs = new MultiMap<String, LabelElementPair>();
 
     // track all token, rule, label refs in rewrite (right of ->)
-    public List<GrammarAST> rewriteElements = new ArrayList<GrammarAST>();
+    //public List<GrammarAST> rewriteElements = new ArrayList<GrammarAST>();
 
     /** Track all executable actions other than named actions like @init
      *  and catch/finally (not in an alt). Also tracks predicates, rewrite actions.
@@ -70,9 +70,12 @@ public class Alternative implements AttributeResolver {
 
     public Alternative(Rule r) { this.rule = r; }
 
-	/** (ALT_REWRITE (ALT ...) (-> (ALT ...))) */
+	/** (ALT_REWRITE (ALT ...) (-> (ALT ...))); rewrite might nested in subrule */
 	public boolean hasRewrite() {
-		return ast.getNodesWithType(ANTLRParser.ALT_REWRITE).size()>0;
+		return
+			ast.parent.getType()==ANTLRParser.ALT_REWRITE ||
+			ast.getNodesWithType(ANTLRParser.ALT_REWRITE).size()>0;
+//		return ast.parent.getType()==ANTLRParser.ALT_REWRITE;
 	}
 
 	public boolean resolvesToToken(String x, ActionAST node) {

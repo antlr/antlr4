@@ -58,13 +58,7 @@ dummy : block[null, null, null] ;
 block[GrammarAST label, GrammarAST ebnfRoot, GrammarAST astOp] returns [List<? extends SrcOp> omos]
     :	^(	blk=BLOCK (^(OPTIONS .+))?
 			{List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();}
-    		(	alternative
-    			{
-		    	boolean outerMost = inContext("RULE BLOCK") || inContext("RULE BLOCK ALT_REWRITE");
-		    	controller.finishAlternative($alternative.altCodeBlock, $alternative.ops, outerMost);
-    			alts.add($alternative.altCodeBlock);
-    			}
-    		)+
+    		( alternative {alts.add($alternative.altCodeBlock);} )+
     	)
     	{
     	if ( alts.size()==1 && ebnfRoot==null) return alts;
@@ -76,32 +70,36 @@ block[GrammarAST label, GrammarAST ebnfRoot, GrammarAST astOp] returns [List<? e
     	}
     	}
     ;
-	
+
 alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 @init {
-	// set alt if outer ALT only
-	if ( inContext("RULE BLOCK") && ((AltAST)$start).alt!=null ) {
-		controller.setCurrentOuterMostAlt(((AltAST)$start).alt);
-	}
+   	boolean outerMost = inContext("RULE BLOCK");
+}
+@after {
+   	controller.finishAlternative($altCodeBlock, $ops, outerMost);
 }
     :	^(ALT_REWRITE
-    		a=alternative
+    		a=alt[outerMost]
     		(	rewrite {$a.ops.add($rewrite.code);} // insert at end of alt's code
     		|
     		)
     		{$altCodeBlock=$a.altCodeBlock; $ops=$a.ops;}
     	 )
+   	|	a=alt[outerMost] {$altCodeBlock=$a.altCodeBlock; $ops=$a.ops;}
+	;
 
-    |	^(ALT EPSILON) {$altCodeBlock = controller.epsilon();}
-
-    |	{
+alt[boolean outerMost] returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
+	:	{
+		// set alt if outer ALT only (the only ones with alt field set to Alternative object)
+		if ( outerMost ) controller.setCurrentOuterMostAlt(((AltAST)$start).alt);
     	List<SrcOp> elems = new ArrayList<SrcOp>();
-    	boolean outerMost = inContext("RULE BLOCK") || inContext("RULE BLOCK ALT_REWRITE");
 		$altCodeBlock = controller.alternative(controller.getCurrentOuterMostAlt(), outerMost);
 		$altCodeBlock.ops = $ops = elems;
 		controller.setCurrentBlock($altCodeBlock);
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
+
+	|	^(ALT EPSILON) {$altCodeBlock = controller.epsilon();}
     ;
 
 element returns [List<? extends SrcOp> omos]
@@ -225,7 +223,7 @@ nakedRewrite returns [RewriteChoice alt]
 	;
 
 rewriteTreeAlt returns [List<SrcOp> omos]
-    :	^(ALT
+    :	^(REWRITE_SEQ
     		{List<SrcOp> elems = new ArrayList<SrcOp>();}
     		( rewriteTreeElement {elems.addAll($rewriteTreeElement.omos);} )+
     	)
@@ -262,11 +260,11 @@ rewriteTreeEbnf returns [CodeBlock op]
 				CodeBlock save = controller.getCurrentBlock();
 				controller.setCurrentBlock($op);
 				}
-				alt=rewriteTreeAlt
+				talt=rewriteTreeAlt
 			)
 		)
 		{
-		$op.addOps($alt.omos);
+		$op.addOps($talt.omos);
 		controller.setCurrentBlock(save);
 		controller.codeBlockLevel--;
 		}

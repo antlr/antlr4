@@ -64,6 +64,7 @@ tokens {
     RULEACTIONS;
     BLOCK;
     REWRITE_BLOCK;
+    REWRITE_SEQ;
     OPTIONAL;
     CLOSURE;
     POSITIVE_CLOSURE;
@@ -398,6 +399,8 @@ rule
 	  ARG_ACTION?
 
 	  ruleReturns?
+	  
+	  throwsSpec?
 
 	  // Now, before the rule specification itself, which is introduced
 	  // with a COLON, we may have zero or more configuration sections.
@@ -461,8 +464,7 @@ rulePrequels
 // rule above.
 //
 rulePrequel
-    : throwsSpec
-    | ruleScopeSpec
+    : ruleScopeSpec
     | optionsSpec
     | ruleAction
     ;
@@ -561,10 +563,10 @@ alternative
 @init { paraphrases.push("matching alternative"); }
 @after { paraphrases.pop(); }
     :	elements
-    	(	rewrite -> ^(ALT_REWRITE<AltAST> elements rewrite)
+    	(	rewrite -> ^(ALT_REWRITE elements rewrite)
     	|			-> elements
     	)
-    |	rewrite		-> ^(ALT_REWRITE<AltAST> ^(ALT<AltAST> EPSILON) rewrite) // empty alt with rewrite
+    |	rewrite		-> ^(ALT_REWRITE ^(ALT<AltAST> EPSILON) rewrite) // empty alt with rewrite
     |				-> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
@@ -840,15 +842,15 @@ options {backtrack=true;}
     ;
 
 rewriteTreeAlt
-    :	rewriteTreeElement+ -> ^(ALT rewriteTreeElement+)
+    :	rewriteTreeElement+ -> ^(REWRITE_SEQ rewriteTreeElement+)
     ;
 
 rewriteTreeElement
 	:	rewriteTreeAtom
-	|	rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTreeAtom)) )
+	|	rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^(REWRITE_BLOCK ^(REWRITE_SEQ rewriteTreeAtom)) )
 	|   rewriteTree
 		(	ebnfSuffix
-			-> ^(ebnfSuffix ^(REWRITE_BLOCK ^(ALT rewriteTree)) )
+			-> ^(ebnfSuffix ^(REWRITE_BLOCK ^(REWRITE_SEQ rewriteTree)) )
 		|	-> rewriteTree
 		)
 	|   rewriteTreeEbnf
@@ -870,7 +872,8 @@ rewriteTreeEbnf
 	$rewriteTreeEbnf.tree.getToken().setLine(firstToken.getLine());
 	$rewriteTreeEbnf.tree.getToken().setCharPositionInLine(firstToken.getCharPositionInLine());
 }
-	:	lp=LPAREN rewriteTreeAlt RPAREN rewriteEbnfSuffix -> ^(rewriteEbnfSuffix ^(REWRITE_BLOCK[$lp] rewriteTreeAlt))
+	:	lp=LPAREN rewriteTreeAlt RPAREN rewriteEbnfSuffix
+		-> ^(rewriteEbnfSuffix ^(REWRITE_BLOCK[$lp,"REWRITE_BLOCK"] rewriteTreeAlt))
 	;
 
 rewriteEbnfSuffix

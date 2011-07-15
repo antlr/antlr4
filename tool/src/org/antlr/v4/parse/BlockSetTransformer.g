@@ -29,8 +29,11 @@ topdown
 	;
 
 setAlt
-	:	{inContext("RULE BLOCK")}? ( ALT | ALT_REWRITE )
-		{currentAlt = (AltAST)$start;}
+	:	{inContext("RULE BLOCK")}?
+		( ALT {currentAlt = (AltAST)$start;}
+		| ALT_REWRITE {currentAlt = (AltAST)$start.getChild(0);}
+		)
+		
 	;
 
 // (BLOCK (ALT (+ (BLOCK (ALT INT) (ALT ID)))))

@@ -370,7 +370,7 @@ rewriteAlt
     ;
 
 rewriteTreeAlt
-    :	^(ALT rewriteTreeElement+)
+    :	^(REWRITE_SEQ rewriteTreeElement+)
     ;
 
 rewriteTreeElement

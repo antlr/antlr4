@@ -29,8 +29,6 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 
@@ -62,6 +60,7 @@ public class SemanticPipeline {
 	public void process() {
 		if ( g.ast==null ) return;
 
+		/*
 		// VALIDATE AST STRUCTURE
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		// use buffered node stream as we will look around in stream
@@ -75,11 +74,9 @@ public class SemanticPipeline {
 											g.ast.toStringTree(),
 											re);
 		}
+		*/
 
 		// DO BASIC / EASY SEMANTIC CHECKS
-//		nodes.reset();
-//		BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
-//		basics.downup(g.ast);
 		BasicSemanticChecks basics = new BasicSemanticChecks(g);
 		basics.process();
 
@@ -87,13 +84,12 @@ public class SemanticPipeline {
 		if ( false ) return;
 
 		// COLLECT SYMBOLS: RULES, ACTIONS, TERMINALS, ...
-		nodes.reset();
-		CollectSymbols collector = new CollectSymbols(nodes,g);
-		collector.downup(g.ast); // no side-effects; compute lists
+		SymbolCollector collector = new SymbolCollector(g);
+		collector.process(); // no side-effects; compute lists
 
 		// CHECK FOR SYMBOL COLLISIONS
 		SymbolChecks symcheck = new SymbolChecks(g, collector);
-		symcheck.examine(); // side-effect: strip away redef'd rules.
+		symcheck.process(); // side-effect: strip away redef'd rules.
 
 		// don't continue if we get symbol errors
 		//if ( ErrorManager.getNumErrors()>0 ) return;
@@ -104,7 +100,7 @@ public class SemanticPipeline {
 		for (AttributeDict s : collector.scopes) g.defineScope(s);
 		for (GrammarAST a : collector.actions) g.defineAction(a);
 
-		// LINK ALT NODES WITH Alternatives
+		// LINK ALT NODES WITH (outermost) Alternatives
 		for (Rule r : g.rules.values()) {
 			for (int i=1; i<=r.numberOfAlts; i++) {
 				r.alt[i].ast.alt = r.alt[i];
@@ -136,11 +132,13 @@ public class SemanticPipeline {
 		if ( g.isLexer() ) assignLexerTokenTypes(g, collector);
 		else assignTokenTypes(g, collector, symcheck);
 
+		symcheck.checkForRewriteIssues();
+
 		UseDefAnalyzer.checkRewriteElementsPresentOnLeftSide(g);
 		UseDefAnalyzer.trackTokenRuleRefsInActions(g);
 	}
 
-	void identifyStartRules(CollectSymbols collector) {
+	void identifyStartRules(SymbolCollector collector) {
 		for (GrammarAST ref : collector.rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
@@ -148,7 +146,7 @@ public class SemanticPipeline {
 		}
 	}
 
-	void assignLexerTokenTypes(Grammar g, CollectSymbols collector) {
+	void assignLexerTokenTypes(Grammar g, SymbolCollector collector) {
 		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 		for (GrammarAST def : collector.tokensDefs) {
 			if ( def.getType()== ANTLRParser.ID ) G.defineTokenName(def.getText());
@@ -169,7 +167,7 @@ public class SemanticPipeline {
 
 	}
 
-	void assignTokenTypes(Grammar g, CollectSymbols collector, SymbolChecks symcheck) {
+	void assignTokenTypes(Grammar g, SymbolCollector collector, SymbolChecks symcheck) {
 		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
 		// DEFINE tokens { X='x'; } ALIASES

@@ -29,8 +29,8 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -41,10 +41,16 @@ public class UseDefAnalyzer {
 		for (Rule r : g.rules.values()) {
 			for (int a=1; a<=r.numberOfAlts; a++) {
 				Alternative alt = r.alt[a];
-				for (GrammarAST e : alt.rewriteElements) {
+				GrammarAST rewNode = alt.ast.getRewrite();
+				if ( rewNode==null ) continue;
+				List<GrammarAST> elems = getAllRewriteElementRefs(rewNode);
+				for (GrammarAST e : elems) {
+					boolean unknownToken = e.getType()==ANTLRParser.TOKEN_REF &&
+						g.getTokenType(e.getText()) == Token.INVALID_TOKEN_TYPE;
+					if ( unknownToken ) continue; // We already checked these
 					boolean ok =
 						alt.ruleRefs.containsKey(e.getText()) ||
-						g.getTokenType(e.getText()) != Token.INVALID_TYPE ||
+						g.getTokenType(e.getText()) != Token.INVALID_TOKEN_TYPE ||
 						alt.labelDefs.containsKey(e.getText()) ||
 						e.getText().equals(r.name);
 					if ( !ok ) { // $r ok in rule r
@@ -72,21 +78,19 @@ public class UseDefAnalyzer {
 	/** Given -> (ALT ...),  return list of element refs at
 	 *  top level
 	 */
-	public static List<GrammarAST> getElementReferencesShallowInOuterAlt(Grammar g,
-																		 GrammarAST altAST)
+	public static List<GrammarAST> getElementReferencesShallowInOuterAlt(GrammarAST altAST)
 	{
-		return getRewriteElementRefs(g, altAST, 0, false);
+		return getRewriteElementRefs(altAST, 0, false);
 	}
 
 	/** Given (('?'|'*') (REWRITE_BLOCK (ALT ...))) return list of element refs at
 	 *  top level of REWRITE_BLOCK. Must see into (nested) tree structures if
 	 *  optional but not if closure (that might lead to inf loop when building tree).
 	 */
-	public static List<GrammarAST> getElementReferencesInEBNF(Grammar g,
-															  GrammarAST ebnfRoot,
+	public static List<GrammarAST> getElementReferencesInEBNF(GrammarAST ebnfRoot,
 															  boolean deep)
 	{
-		return getRewriteElementRefs(g, ebnfRoot, 1, deep);
+		return getRewriteElementRefs(ebnfRoot, 1, deep);
 	}
 
 	/** Get list of rule refs, token refs mentioned on left, and labels not
@@ -110,13 +114,16 @@ public class UseDefAnalyzer {
 		return elems;
 	}
 
+	public static List<GrammarAST> getAllRewriteElementRefs(GrammarAST root) {
+		return getRewriteElementRefs(root, 0, true);
+	}
+
 	/** Visit either ^(-> ...) or ^(('?'|'*') ...) */
-	public static List<GrammarAST> getRewriteElementRefs(Grammar g,
-														 GrammarAST root,
+	public static List<GrammarAST> getRewriteElementRefs(GrammarAST root,
 														 int desiredShallowLevel,
 														 boolean deep)
 	{
-		RewriteRefs collector = new RewriteRefs(g, desiredShallowLevel);
+		RewriteRefs collector = new RewriteRefs(desiredShallowLevel);
 		if ( root.getType()==ANTLRParser.RESULT ) collector.visitRewrite(root);
 		else collector.visitRewriteEBNF(root);
 		System.out.println("from "+root.toStringTree());
