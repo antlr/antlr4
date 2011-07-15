@@ -334,8 +334,6 @@ range
 terminal
     :  ^(STRING_LITERAL elementOptions)
     |	STRING_LITERAL
-    |	^(TOKEN_REF ARG_ACTION elementOptions)
-    |	^(TOKEN_REF ARG_ACTION)
     |	^(TOKEN_REF elementOptions)
     |	TOKEN_REF
     ;

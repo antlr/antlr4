@@ -31,14 +31,17 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.io.File;
 import java.util.*;
 
-/** No side-effects; BasicSemanticTriggers.g invokes check rules for these:
+/** No side-effects except for setting options into the appropriate node.
+ *  TODO:  make the side effects into a separate pass this
+ *
+ * Invokes check rules for these:
  *
  * FILE_AND_GRAMMAR_NAME_DIFFER
  * LEXER_RULES_NOT_ALLOWED
@@ -62,7 +65,7 @@ import java.util.*;
  *
  * TODO: 1 action per lex rule
  */
-public class BasicSemanticChecks {
+public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set legalLexerOptions =
 		new HashSet() {
 			{
@@ -150,6 +153,110 @@ public class BasicSemanticChecks {
 		this.g = g;
 		this.errMgr = g.tool.errMgr;
 	}
+
+	public void process() {	visitGrammar(g.ast); }
+
+	// Routines to route visitor traffic to the checking routines
+
+	@Override
+	public void discoverGrammar(GrammarRootAST root, GrammarAST ID) {
+		checkGrammarName(ID.token);
+	}
+
+	@Override
+	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
+		checkTreeFilterOptions(root, g.ast.getOptions());
+	}
+
+	@Override
+	public void finishPrequels(GrammarAST firstPrequel) {
+		List<GrammarAST> options = firstPrequel.getNodesWithType(OPTIONS);
+		List<GrammarAST> imports = firstPrequel.getNodesWithType(IMPORT);
+		List<GrammarAST> tokens = firstPrequel.getNodesWithType(TOKENS);
+		checkNumPrequels(options, imports, tokens);
+	}
+
+	@Override
+	public void importGrammar(GrammarAST label, GrammarAST ID) {
+		checkImport(ID.token);
+	}
+
+	@Override
+	public void discoverRules(GrammarAST rules) {
+		checkNumRules(rules);
+	}
+
+	@Override
+	public void modeDef(GrammarAST m, GrammarAST ID) {
+		checkMode(ID.token);
+	}
+
+	@Override
+	public void grammarOption(GrammarAST ID, String value) {
+		boolean ok = checkOptions(g.ast, ID.token, value);
+		if ( ok ) g.ast.setOption(ID.getText(), value);
+	}
+
+	@Override
+	public void discoverRule(GrammarAST rule, GrammarAST ID) {
+		checkInvalidRuleDef(ID.token);
+	}
+
+	@Override
+	public void ruleRef(GrammarAST ref, GrammarAST arg) {
+		checkInvalidRuleRef(ref.token);
+	}
+
+	@Override
+	public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) {
+		String v = null;
+		if ( value!=null ) v = value.getText();
+		boolean ok = checkTokenOptions(ID, v);
+		if ( ok ) {
+			if ( v!=null ) {
+				t.setOption(ID.getText(), v);
+			}
+			else {
+				t.setOption(TerminalAST.defaultTokenOption, v);
+			}
+		}
+	}
+
+	@Override
+	public void discoverAltWithRewrite(GrammarAST alt) {
+		GrammarAST firstNode = (GrammarAST)alt.getChild(0);
+		checkRewriteForMultiRootAltInTreeGrammar(g.ast.getOptions(),
+												 firstNode.token,
+												 currentOuterAltNumber);
+	}
+
+	@Override
+	public void rootOp(GrammarAST op, GrammarAST opnd) {
+		checkASTOps(g.ast.getOptions(), op, opnd);
+	}
+
+	@Override
+	public void bangOp(GrammarAST op, GrammarAST opnd) {
+		checkASTOps(g.ast.getOptions(), op, opnd);
+	}
+
+	@Override
+	public void discoverTreeRewrite(GrammarAST rew) {
+		checkRewriteOk(g.ast.getOptions(), rew);
+	}
+
+	@Override
+	public void discoverSTRewrite(GrammarAST rew) {
+		checkRewriteOk(g.ast.getOptions(), rew);
+	}
+
+	@Override
+	public void wildcardRef(GrammarAST ref, GrammarAST options) {
+		checkWildcardRoot(ref.token);
+	}
+
+	// Routines to do the actual work of checking issues with a grammar.
+	// They are triggered by the visitor methods above.
 
 	void checkGrammarName(Token nameToken) {
 		if ( g.implicitLexer==null ) return;
@@ -241,18 +348,6 @@ public class BasicSemanticChecks {
 		}
 	}
 
-	/** At this point, we can only rule out obvious problems like ID[3]
-	 *  in parser.  Might be illegal too in later stage when we see ID
-	 *  isn't a fragment.
-	 */
-	void checkTokenArgs(Token tokenID) {
-		String fileName = tokenID.getInputStream().getSourceName();
-		if ( !g.isLexer() ) {
-			g.tool.errMgr.grammarError(ErrorType.ARGS_ON_TOKEN_REF,
-									   fileName, tokenID, tokenID.getText());
-		}
-	}
-
 	/** Check option is appropriate for grammar, rule, subrule */
 	boolean checkOptions(GrammarAST parent,
 						 Token optionID, String value)
@@ -299,9 +394,8 @@ public class BasicSemanticChecks {
 	}
 
 	/** Check option is appropriate for token; parent is ELEMENT_OPTIONS */
-	boolean checkTokenOptions(GrammarAST parent,
-							  Token optionID, String value)
-	{
+	boolean checkTokenOptions(GrammarAST ID, String value)	{
+		Token optionID = ID.token;
 		String fileName = optionID.getInputStream().getSourceName();
 		// don't care about ID<ASTNodeName> options
 		if ( value!=null && !legalTokenOptions.contains(optionID.getText()) ) {
@@ -312,18 +406,12 @@ public class BasicSemanticChecks {
 			return false;
 		}
 		// example (ALT_REWRITE (ALT (ID (ELEMENT_OPTIONS Foo))) (-> (ALT ID))
-		if ( parent.hasAncestor(ANTLRParser.ALT_REWRITE) ) {
+		if ( inRewrite ) {
 			g.tool.errMgr.grammarError(ErrorType.HETERO_ILLEGAL_IN_REWRITE_ALT,
 									   fileName,
 									   optionID);
-
 		}
 		// TODO: extra checks depending on terminal kind?
-		switch ( parent.getType() ) {
-			case ANTLRParser.TOKEN_REF :
-			case ANTLRParser.STRING_LITERAL :
-			case ANTLRParser.WILDCARD :
-		}
 		return true;
 	}
 
@@ -395,8 +483,7 @@ public class BasicSemanticChecks {
 	}
 
 	void checkRewriteOk(Map<String, String> options, GrammarAST elementRoot) {
-		RuleAST rule = (RuleAST)elementRoot.getAncestor(ANTLRParser.RULE);
-		String ruleName = rule.getChild(0).getText();
+		String ruleName = currentRule.getChild(0).getText();
 		String fileName = elementRoot.token.getInputStream().getSourceName();
 		if ( options!=null && options.get("output")==null ) {
 			g.tool.errMgr.grammarWarning(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,

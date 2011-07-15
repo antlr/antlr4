@@ -1,7 +1,7 @@
 grammar T;
 options {output=AST;}
 
-a : 'var' (ID ':' type ';')+ -> ^('var' ^(':' ID type)*) ;
+a : 'var' (ID ':' type ';')+ -> ^('var' ^(':' ID<Foo> type)*) ;
 type returns [int i] : ID;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;

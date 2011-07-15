@@ -786,9 +786,8 @@ range
     ;
 
 terminal
-    :   // Args are only valid for lexer rules
-		TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF<TerminalAST> ARG_ACTION<ActionAST>? elementOptions?)
-	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
+    :   TOKEN_REF elementOptions?		-> ^(TOKEN_REF<TerminalAST> elementOptions?)
+	|   STRING_LITERAL elementOptions?	-> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	;
 
 // Terminals may be adorned with certain options when

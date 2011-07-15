@@ -77,9 +77,11 @@ public class SemanticPipeline {
 		}
 
 		// DO BASIC / EASY SEMANTIC CHECKS
-		nodes.reset();
-		BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
-		basics.downup(g.ast);
+//		nodes.reset();
+//		BasicSemanticTriggers basics = new BasicSemanticTriggers(nodes,g);
+//		basics.downup(g.ast);
+		BasicSemanticChecks basics = new BasicSemanticChecks(g);
+		basics.process();
 
 		// don't continue if we get errors in this basic check
 		if ( false ) return;

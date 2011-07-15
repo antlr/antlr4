@@ -432,6 +432,8 @@ public class Tool {
 			lexerRulesRoot.getChildren().add(0, litRule); // add first
 		}
 
+		lexerRulesRoot.freshenParentAndChildIndexesDeeply();
+
 		System.out.println("after ="+combinedAST.toStringTree());
 		System.out.println("lexer ="+lexerAST.toStringTree());
 		return lexerAST;

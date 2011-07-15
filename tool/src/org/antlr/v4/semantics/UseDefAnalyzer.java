@@ -29,7 +29,6 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
@@ -117,10 +116,9 @@ public class UseDefAnalyzer {
 														 int desiredShallowLevel,
 														 boolean deep)
 	{
-		CommonTreeNodeStream nodes = new CommonTreeNodeStream(root);
-		RewriteRefs collector = new RewriteRefs(nodes, desiredShallowLevel);
-		if ( root.getType()==ANTLRParser.RESULT ) collector.visitRewrite(g.tool.errMgr);
-		else collector.visitRewriteEBNF(g.tool.errMgr);
+		RewriteRefs collector = new RewriteRefs(g, desiredShallowLevel);
+		if ( root.getType()==ANTLRParser.RESULT ) collector.visitRewrite(root);
+		else collector.visitRewriteEBNF(root);
 		System.out.println("from "+root.toStringTree());
 		System.out.println("shallow: "+collector.shallow);
 		System.out.println("deep: "+collector.deep);

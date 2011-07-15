@@ -70,6 +70,7 @@ options {
 package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.runtime.tree.CommonTree; // use updated v4 one not v3
+import java.lang.reflect.Method;
 }
 
 @members {
@@ -83,29 +84,66 @@ public int rewriteEBNFLevel = 0;
 public boolean inRewrite;
 public boolean currentOuterAltHasRewrite;
 
-public void visitGrammar(ErrorManager errMgr) {
-	try { grammarSpec(); }
-	catch (org.antlr.runtime.RecognitionException re) {
-		errMgr.grammarError(ErrorType.INTERNAL_ERROR,
-								   null, re.token, re);
+public GrammarTreeVisitor() { this(null); }
+
+public ErrorManager getErrorManager() { return null; }
+
+public void visitGrammar(GrammarAST t) { visit(t, "grammarSpec"); }
+public void visitRewrite(GrammarAST t) { visit(t, "rewrite"); }
+public void visitRewriteEBNF(GrammarAST t) { visit(t, "rewriteTreeEbnf"); }
+public void visit(GrammarAST t, String ruleName) {
+	CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
+	setTreeNodeStream(nodes);
+	try {
+		Method m = getClass().getMethod(ruleName);
+		m.invoke(this);
 	}
-}
-public void visitRewrite(ErrorManager errMgr) {
-	try { rewrite(); }
-	catch (org.antlr.runtime.RecognitionException re) {
-		errMgr.grammarError(ErrorType.INTERNAL_ERROR,
-								   null, re.token, re);
-	}
-}
-public void visitRewriteEBNF(ErrorManager errMgr) {
-	try { rewriteTreeEbnf(); }
-	catch (org.antlr.runtime.RecognitionException re) {
-		errMgr.grammarError(ErrorType.INTERNAL_ERROR,
-								   null, re.token, re);
+	catch (Exception e) {
+		ErrorManager errMgr = getErrorManager();
+		if ( errMgr==null ) System.err.println("can't find rule "+ruleName+
+											   " or tree structure error: "+t.toStringTree()
+											  );
+		else errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
 	}
 }
 
+public void discoverGrammar(GrammarRootAST root, GrammarAST ID) { }
+public void finishPrequels(GrammarAST firstPrequel) { }
+public void finishGrammar(GrammarRootAST root, GrammarAST ID) { }
+
+public void grammarOption(GrammarAST ID, String value) { }
+public void ruleOption(GrammarAST ID, String value) { }
+public void blockOption(GrammarAST ID, String value) { }
+public void tokenAlias(GrammarAST ID, GrammarAST literal) { }
+
+public void importGrammar(GrammarAST label, GrammarAST ID) { }
+
+public void modeDef(GrammarAST m, GrammarAST ID) { }
+
+public void discoverRules(GrammarAST rules) { }
+public void finishRules(GrammarAST rule) { }
+public void discoverRule(GrammarAST rule, GrammarAST ID) { }
+public void finishRule(GrammarAST rule, GrammarAST ID) { }
+public void discoverAlt(GrammarAST alt) { }
+public void finishAlt(GrammarAST alt) { }
+public void discoverAltWithRewrite(GrammarAST alt) { }
+public void finishAltWithRewrite(GrammarAST alt) { }
+public void discoverSTRewrite(GrammarAST rew) { }
+public void discoverTreeRewrite(GrammarAST rew) { }
+
+public void ruleRef(GrammarAST ref, GrammarAST arg) { }
+public void tokenRef(GrammarAST ref, GrammarAST options) { }
+public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
+public void stringRef(GrammarAST ref, GrammarAST options) { }
+public void wildcardRef(GrammarAST ref, GrammarAST options) { }
+
+public void rootOp(GrammarAST op, GrammarAST opnd) { }
+public void bangOp(GrammarAST op, GrammarAST opnd) { }
+
+public void discoverRewrites(GrammarAST result) { }
+public void finishRewrites(GrammarAST result) { }
 public void rewriteTokenRef(GrammarAST ast, GrammarAST options, GrammarAST arg) { }
+public void rewriteTerminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
 public void rewriteStringRef(GrammarAST ast, GrammarAST options) { }
 public void rewriteRuleRef(GrammarAST ast) { }
 public void rewriteLabelRef(GrammarAST ast) { }
@@ -113,9 +151,19 @@ public void rewriteAction(GrammarAST ast) { }
 }
 
 grammarSpec
-    :   ^(GRAMMAR ID {grammarName=$ID.text;} DOC_COMMENT? prequelConstruct* rules mode*)
+    :   ^(	GRAMMAR ID {grammarName=$ID.text;} DOC_COMMENT?
+    		{discoverGrammar((GrammarRootAST)$GRAMMAR, $ID);}
+ 		   	prequelConstructs
+    		{finishPrequels($prequelConstructs.start);}
+ 		   	rules mode*
+    		{finishGrammar((GrammarRootAST)$GRAMMAR, $ID);}
+ 		 )
 	;
 
+prequelConstructs
+	:	prequelConstruct*
+	;
+	
 prequelConstruct
 	:   optionsSpec
     |   delegateGrammars
@@ -130,9 +178,15 @@ optionsSpec
 
 option
     :   ^(ASSIGN ID optionValue)
+    	{
+    	if ( inContext("RULE") ) ruleOption($ID, $optionValue.v);
+    	else if ( inContext("BLOCK") ) blockOption($ID, $optionValue.v);
+    	else grammarOption($ID, $optionValue.v);
+    	}
     ;
 
-optionValue
+optionValue returns [String v]
+@init {$v = $start.token.getText();}
     :   ID
     |   STRING_LITERAL
     |   INT
@@ -144,8 +198,8 @@ delegateGrammars
 	;
 
 delegateGrammar
-    :   ^(ASSIGN ID ID)
-    |   ID
+    :   ^(ASSIGN label=ID id=ID)	{importGrammar($label, $id);}
+    |   id=ID						{importGrammar(null, $id);}
     ;
 
 tokensSpec
@@ -153,7 +207,7 @@ tokensSpec
 	;
 
 tokenSpec
-	:	^(ASSIGN ID STRING_LITERAL)
+	:	^(ASSIGN ID STRING_LITERAL)	{tokenAlias($ID, $STRING_LITERAL);}
 	|	ID
 	;
 
@@ -166,14 +220,15 @@ action
 	;
 
 rules
-    : ^(RULES rule*)
+    : ^(RULES {discoverRules($RULES);} rule* {finishRules($RULES);})
     ;
 
-mode:	^( MODE ID rule+ ) ;
+mode:	^( MODE ID {modeDef($MODE, $ID);} rule+ ) ;
 
-rule:   ^(	RULE ID {currentRuleName=$ID.text; currentRule=$RULE;}
+rule:   ^(	RULE ID {currentRuleName=$ID.text; currentRule=$RULE; discoverRule($RULE, $ID);}
 			DOC_COMMENT? ruleModifiers? ARG_ACTION?
       		ruleReturns? rulePrequel* ruleBlock exceptionGroup
+      		{finishRule($RULE, $ID);}
       	 )
     ;
 
@@ -246,7 +301,15 @@ ruleBlock
     ;
 
 alternative
-    :	^(ALT_REWRITE {inRewrite=true;} alternative rewrite)
+@init {
+	if ( $start.getType()==ALT_REWRITE ) discoverAltWithRewrite($start);
+	else discoverAlt($start);
+}
+@after {
+	if ( $start.getType()==ALT_REWRITE ) finishAltWithRewrite($start);
+	else finishAlt($start);
+}
+    :	^(ALT_REWRITE alternative {inRewrite=true;} rewrite)
     |	^(ALT EPSILON)
     |   ^(ALT element+)
     ;
@@ -260,8 +323,8 @@ element
 	|   SEMPRED
 	|	GATED_SEMPRED
 	|	treeSpec
-	|	^(ROOT astOperand)
-	|	^(BANG astOperand)
+	|	^(ROOT astOperand)	{rootOp($ROOT, $astOperand.start);}
+	|	^(BANG astOperand)	{bangOp($BANG, $astOperand.start);}
 	|	^(NOT blockSet)
 	|	^(NOT block)
 	;
@@ -301,8 +364,8 @@ ebnfSuffix
 atom:	range
 	|	^(DOT ID terminal)
 	|	^(DOT ID ruleref)
-    |	^(WILDCARD elementOptions)
-    |	WILDCARD
+    |	^(WILDCARD elementOptions)	{wildcardRef($WILDCARD, $elementOptions.start);}
+    |	WILDCARD					{wildcardRef($WILDCARD, null);}
     |   terminal
     |	blockSet
     |   ruleref
@@ -322,7 +385,7 @@ block
     ;
 
 ruleref
-    :	^(RULE_REF ARG_ACTION?)
+    :	^(RULE_REF ARG_ACTION?) {ruleRef($RULE_REF, $ARG_ACTION);}
     ;
 
 range
@@ -331,30 +394,29 @@ range
 
 terminal
     :  ^(STRING_LITERAL elementOptions)
-    |	STRING_LITERAL
-    |	^(TOKEN_REF ARG_ACTION elementOptions)
-    |	^(TOKEN_REF ARG_ACTION)
-    |	^(TOKEN_REF elementOptions)
-    |	TOKEN_REF
+    								{stringRef($STRING_LITERAL, $elementOptions.start);}
+    |	STRING_LITERAL				{stringRef($STRING_LITERAL, null);}
+    |	^(TOKEN_REF elementOptions)	{tokenRef($TOKEN_REF, $elementOptions.start);}
+    |	TOKEN_REF	    			{tokenRef($TOKEN_REF, null);}
     ;
 
 elementOptions
-    :	^(ELEMENT_OPTIONS elementOption+)
+    :	^(ELEMENT_OPTIONS elementOption[(TerminalAST)$start.getParent()]+)
     ;
 
-elementOption
-    :	ID
-    |   ^(ASSIGN ID ID)
-    |   ^(ASSIGN ID STRING_LITERAL)
+elementOption[TerminalAST t]
+    :	ID								{terminalOption(t, $ID, null);}
+    |   ^(ASSIGN id=ID v=ID)			{terminalOption(t, $id, $v);}
+    |   ^(ASSIGN ID v=STRING_LITERAL)	{terminalOption(t, $ID, $v);}
     ;
 
 rewrite
-	:	predicatedRewrite* nakedRewrite
+	:	{discoverRewrites($start);} predicatedRewrite* nakedRewrite {finishRewrites($start);} 
 	;
 
 predicatedRewrite
-	:	^(ST_RESULT SEMPRED rewriteAlt)
-	|	^(RESULT SEMPRED rewriteAlt)
+	:	^(ST_RESULT SEMPRED {discoverSTRewrite($start);} rewriteAlt)
+	|	^(RESULT SEMPRED {discoverTreeRewrite($start);} rewriteAlt)
 	;
 
 nakedRewrite
@@ -381,16 +443,28 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
-    :   ^(TOKEN_REF elementOptions ARG_ACTION)	{rewriteTokenRef($start,$elementOptions.start,$ARG_ACTION);}
-    |   ^(TOKEN_REF elementOptions)				{rewriteTokenRef($start,$elementOptions.start,null);}
-    |   ^(TOKEN_REF ARG_ACTION)					{rewriteTokenRef($start,null,$ARG_ACTION);}
-	|   TOKEN_REF								{rewriteTokenRef($start,null,null);}
-    |   RULE_REF								{rewriteRuleRef($start);}
-	|   ^(STRING_LITERAL elementOptions)		{rewriteStringRef($start,$elementOptions.start);}
-	|   STRING_LITERAL							{rewriteStringRef($start,null);}
-	|   LABEL									{rewriteLabelRef($start);}
-	|	ACTION									{rewriteAction($start);}
+    :   ^(TOKEN_REF rewriteElementOptions ARG_ACTION)
+    										{rewriteTokenRef($start,$rewriteElementOptions.start,$ARG_ACTION);}
+    |   ^(TOKEN_REF rewriteElementOptions)	{rewriteTokenRef($start,$rewriteElementOptions.start,null);}
+    |   ^(TOKEN_REF ARG_ACTION)				{rewriteTokenRef($start,null,$ARG_ACTION);}
+	|   TOKEN_REF							{rewriteTokenRef($start,null,null);}
+    |   RULE_REF							{rewriteRuleRef($start);}
+	|   ^(STRING_LITERAL rewriteElementOptions)
+											{rewriteStringRef($start,$rewriteElementOptions.start);}
+	|   STRING_LITERAL						{rewriteStringRef($start,null);}
+	|   LABEL								{rewriteLabelRef($start);}
+	|	ACTION								{rewriteAction($start);}
 	;
+
+rewriteElementOptions
+    :	^(ELEMENT_OPTIONS rewriteElementOption[(TerminalAST)$start.getParent()]+)
+    ;
+   
+rewriteElementOption[TerminalAST t]
+    :	ID								{rewriteTerminalOption(t, $ID, null);}
+    |   ^(ASSIGN id=ID v=ID)			{rewriteTerminalOption(t, $id, $v);}
+    |   ^(ASSIGN ID v=STRING_LITERAL)	{rewriteTerminalOption(t, $ID, $v);}
+    ;
 
 rewriteTreeEbnf
 	:	^(ebnfSuffix ^(REWRITE_BLOCK {rewriteEBNFLevel++;} rewriteTreeAlt {rewriteEBNFLevel--;}))

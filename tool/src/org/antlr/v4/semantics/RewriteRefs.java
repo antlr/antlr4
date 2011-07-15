@@ -29,26 +29,29 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
 public class RewriteRefs extends GrammarTreeVisitor {
 	List<GrammarAST> shallow = new ArrayList<GrammarAST>();
 	List<GrammarAST> deep = new ArrayList<GrammarAST>();
-	public int desiredShallowLevel;
+	int desiredShallowLevel;
+	Grammar g;
 
-	public RewriteRefs(TreeNodeStream input, int desiredShallowLevel) {
-		super(input);
+	public RewriteRefs(Grammar g, int desiredShallowLevel) {
 		this.desiredShallowLevel = desiredShallowLevel;
+		this.g = g;
 	}
 
 	public void track(GrammarAST t) {
 		deep.add(t);
 		if ( rewriteEBNFLevel==desiredShallowLevel ) shallow.add(t);
 	}
+
+	@Override
+	public ErrorManager getErrorManager() { return g.tool.errMgr; }
 
 	@Override
 	public void rewriteTokenRef(GrammarAST ast, GrammarAST options, GrammarAST arg) {

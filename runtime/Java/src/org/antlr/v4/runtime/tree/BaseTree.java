@@ -252,6 +252,20 @@ public abstract class BaseTree implements Tree {
 		}
 	}
 
+	public void freshenParentAndChildIndexesDeeply() {
+		freshenParentAndChildIndexesDeeply(0);
+	}
+
+	public void freshenParentAndChildIndexesDeeply(int offset) {
+		int n = getChildCount();
+		for (int c = offset; c < n; c++) {
+			BaseTree child = (BaseTree)getChild(c);
+			child.setChildIndex(c);
+			child.setParent(this);
+			child.freshenParentAndChildIndexesDeeply();
+		}
+	}
+
 	public void sanityCheckParentAndChildIndexes() {
 		sanityCheckParentAndChildIndexes(null, -1);
 	}
