@@ -40,7 +40,7 @@ import java.util.*;
  *
  *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
-public abstract class BaseRecognizer extends Recognizer<ParserInterpreter> {
+public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	public static final int MEMO_RULE_FAILED = -2;
 	public static final int MEMO_RULE_UNKNOWN = -1;

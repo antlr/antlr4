@@ -139,7 +139,7 @@ public abstract class BaseTest {
 		return expectingTokenTypes;
 	}
 
-	public List<Integer> getTokenTypes(String input, LexerInterpreter lexerATN) {
+	public List<Integer> getTokenTypes(String input, LexerATNSimulator lexerATN) {
 		ANTLRStringStream in = new ANTLRStringStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
@@ -155,7 +155,7 @@ public abstract class BaseTest {
 									  CharStream input,
 									  boolean adaptive)
 	{
-		LexerInterpreter interp = new LexerInterpreter(atn);
+		LexerATNSimulator interp = new LexerATNSimulator(atn);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		do {

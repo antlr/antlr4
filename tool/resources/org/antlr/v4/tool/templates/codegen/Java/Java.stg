@@ -87,7 +87,7 @@ case <index> : <actions.(index)> break;}; separator="\n">
 ctor(p) ::= <<
 public <p.name>(TokenStream input) {
     super(input);
-    _interp = new ParserInterpreter(this,_ATN);
+    _interp = new ParserATNSimulator(this,_ATN);
 }
 >>
 
@@ -529,7 +529,7 @@ public class <lexer.name> extends Lexer {
 
     public <lexer.name>(CharStream input) {
         super(input);
-		_interp = new LexerInterpreter(this,_ATN);
+		_interp = new LexerATNSimulator(this,_ATN);
     }
 
     public String getGrammarFileName() { return "<lexerFile.fileName>"; }
@@ -552,7 +552,7 @@ SerializedATN(model) ::= <<
 public static final String _serializedATN =
 	"<model.serialized; wrap={"+<\n>"}, anchor>";
 public static final ATN _ATN =
-    ATNInterpreter.deserialize(_serializedATN.toCharArray());
+    ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
     org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
 	//System.out.println(dot.getDOT(_ATN.decisionToATNState.get(0)));

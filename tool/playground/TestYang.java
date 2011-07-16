@@ -30,10 +30,10 @@ class TestYang {
 			System.out.println("Total time " + (stop - start) + "ms.");
 
 			System.out.println("finished parsing OK");
-			System.out.println(LexerInterpreter.ATN_failover+" lexer failovers");
-			System.out.println(LexerInterpreter.match_calls+" lexer match calls");
-			System.out.println(ParserInterpreter.ATN_failover+" parser failovers");
-			System.out.println(ParserInterpreter.predict_calls +" parser predict calls");
+			System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
+			System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
+			System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
+			System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 			if ( profile ) {
 				System.out.println("num decisions "+profiler.numDecisions);
 			}

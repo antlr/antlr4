@@ -260,7 +260,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"e : A | ;\n"); // TODO: try with three alts
 
 		ATN lexatn = createATN(lg);
-		LexerInterpreter lexInterp = new LexerInterpreter(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 
 		semanticProcess(lg);
 		g.importVocab(lg);
@@ -279,7 +279,7 @@ public class TestATNParserPrediction extends BaseTest {
 		RuleContext a_e_ctx = new RuleContext(a_ctx, a_e_invoke.stateNumber, bStart.stateNumber);
 		RuleContext b_e_ctx = new RuleContext(b_ctx, b_e_invoke.stateNumber, bStart.stateNumber);
 
-		ParserInterpreter interp = new ParserInterpreter(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		interp.setContextSensitive(true);
 		List<Integer> types = getTokenTypes("ab", lexInterp);
 		System.out.println(types);
@@ -479,7 +479,7 @@ public class TestATNParserPrediction extends BaseTest {
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
-		LexerInterpreter lexInterp = new LexerInterpreter(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 		List<Integer> types = getTokenTypes(inputString, lexInterp);
 		System.out.println(types);
 
@@ -498,7 +498,7 @@ public class TestATNParserPrediction extends BaseTest {
 		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
-		ParserInterpreter interp = new ParserInterpreter(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
 		ATNState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
@@ -523,7 +523,7 @@ public class TestATNParserPrediction extends BaseTest {
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
-		LexerInterpreter lexInterp = new LexerInterpreter(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 
 		semanticProcess(lg);
 		g.importVocab(lg);
@@ -537,7 +537,7 @@ public class TestATNParserPrediction extends BaseTest {
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
 
-		ParserInterpreter interp = new ParserInterpreter(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		List<Integer> types = getTokenTypes(inputString, lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
@@ -559,7 +559,7 @@ public class TestATNParserPrediction extends BaseTest {
 	{
 //		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
-		LexerInterpreter lexInterp = new LexerInterpreter(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 
 		semanticProcess(lg);
 		g.importVocab(lg);
@@ -568,7 +568,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		ParserInterpreter interp = new ParserInterpreter(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
 			List<Integer> types = getTokenTypes(inputString[i], lexInterp);

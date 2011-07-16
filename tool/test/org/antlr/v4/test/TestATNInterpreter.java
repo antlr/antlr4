@@ -261,7 +261,7 @@ public class TestATNInterpreter extends BaseTest {
 								int expected)
 	{
 		ATN lexatn = createATN(lg);
-		LexerInterpreter lexInterp = new LexerInterpreter(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 		List<Integer> types = getTokenTypes(inputString, lexInterp);
 		System.out.println(types);
 
@@ -272,7 +272,7 @@ public class TestATNInterpreter extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		ParserInterpreter interp = new ParserInterpreter(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {

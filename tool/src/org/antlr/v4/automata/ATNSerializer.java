@@ -186,57 +186,57 @@ public class ATNSerializer {
 	public String decode(char[] data) {
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
-		int grammarType = ATNInterpreter.toInt(data[p++]);
-		int maxType = ATNInterpreter.toInt(data[p++]);
+		int grammarType = ATNSimulator.toInt(data[p++]);
+		int maxType = ATNSimulator.toInt(data[p++]);
 		buf.append("max type "+maxType+"\n");
-		int nstates = ATNInterpreter.toInt(data[p++]);
+		int nstates = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
-			int stype = ATNInterpreter.toInt(data[p++]);
-			int ruleIndex = ATNInterpreter.toInt(data[p++]);
+			int stype = ATNSimulator.toInt(data[p++]);
+			int ruleIndex = ATNSimulator.toInt(data[p++]);
 			if ( stype==0 ) continue; // ignore bad type of states
 			buf.append((i - 1) + ":" +
 					   ATNState.serializationNames[stype] + " "+
 					   ruleIndex + "\n");
 		}
-		int nrules = ATNInterpreter.toInt(data[p++]);
+		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nrules; i++) {
-			int s = ATNInterpreter.toInt(data[p++]);
-			int arg1 = ATNInterpreter.toInt(data[p++]);
-			int arg2 = ATNInterpreter.toInt(data[p++]);
+			int s = ATNSimulator.toInt(data[p++]);
+			int arg1 = ATNSimulator.toInt(data[p++]);
+			int arg2 = ATNSimulator.toInt(data[p++]);
 			buf.append("rule "+i+":"+s+" "+arg1+","+arg2+'\n');
 		}
-		int nmodes = ATNInterpreter.toInt(data[p++]);
+		int nmodes = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nmodes; i++) {
-			int s = ATNInterpreter.toInt(data[p++]);
+			int s = ATNSimulator.toInt(data[p++]);
 			buf.append("mode "+i+":"+s+'\n');
 		}
-		int nsets = ATNInterpreter.toInt(data[p++]);
+		int nsets = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nsets; i++) {
-			int nintervals = ATNInterpreter.toInt(data[p++]);
+			int nintervals = ATNSimulator.toInt(data[p++]);
 			buf.append((i-1)+":");
 			for (int j=1; j<=nintervals; j++) {
 				if ( j>1 ) buf.append(", ");
-				buf.append(getTokenName(ATNInterpreter.toInt(data[p]))+".."+getTokenName(ATNInterpreter.toInt(data[p+1])));
+				buf.append(getTokenName(ATNSimulator.toInt(data[p]))+".."+getTokenName(ATNSimulator.toInt(data[p + 1])));
 				p += 2;
 			}
 			buf.append("\n");
 		}
-		int nedges = ATNInterpreter.toInt(data[p++]);
+		int nedges = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nedges; i++) {
-			int src = ATNInterpreter.toInt(data[p]);
-			int trg = ATNInterpreter.toInt(data[p+1]);
-			int ttype = ATNInterpreter.toInt(data[p+2]);
-			int arg1 = ATNInterpreter.toInt(data[p+3]);
-			int arg2 = ATNInterpreter.toInt(data[p+4]);
+			int src = ATNSimulator.toInt(data[p]);
+			int trg = ATNSimulator.toInt(data[p + 1]);
+			int ttype = ATNSimulator.toInt(data[p + 2]);
+			int arg1 = ATNSimulator.toInt(data[p + 3]);
+			int arg2 = ATNSimulator.toInt(data[p + 4]);
 			buf.append(src+"->"+trg+
 					   " "+Transition.serializationNames[ttype]+
 					   " "+arg1+","+arg2+
 					   "\n");
 			p += 5;
 		}
-		int ndecisions = ATNInterpreter.toInt(data[p++]);
+		int ndecisions = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {
-			int s = ATNInterpreter.toInt(data[p++]);
+			int s = ATNSimulator.toInt(data[p++]);
 			buf.append((i-1)+":"+s+"\n");
 		}
 		return buf.toString();

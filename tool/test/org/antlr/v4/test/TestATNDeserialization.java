@@ -117,7 +117,7 @@ public class TestATNDeserialization extends BaseTest {
 		ATN atn = createATN(g);
 		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(g, atn));
 		String atnData = ATNSerializer.getDecoded(g, atn);
-		ATN atn2 = ParserInterpreter.deserialize(data);
+		ATN atn2 = ParserATNSimulator.deserialize(data);
 		String atn2Data = ATNSerializer.getDecoded(g, atn2);
 
 		assertEquals(atnData, atn2Data);

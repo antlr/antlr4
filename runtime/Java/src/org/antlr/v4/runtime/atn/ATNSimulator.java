@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.misc.*;
 
 import java.util.*;
 
-public abstract class ATNInterpreter {
+public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	public static DFAState ERROR;
 	public ATN atn;
@@ -47,7 +47,7 @@ public abstract class ATNInterpreter {
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 
-	public ATNInterpreter(ATN atn) {
+	public ATNSimulator(ATN atn) {
 		this.atn = atn;
 	}
 

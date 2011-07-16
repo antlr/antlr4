@@ -28,7 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.LexerInterpreter;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.QStack;
 
 import java.util.EmptyStackException;
@@ -38,7 +38,7 @@ import java.util.EmptyStackException;
  *  uses simplified match() and error recovery mechanisms in the interest
  *  of speed.
  */
-public abstract class Lexer extends Recognizer<LexerInterpreter>
+public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	implements TokenSource
 {
 	public static final int DEFAULT_MODE = 0;

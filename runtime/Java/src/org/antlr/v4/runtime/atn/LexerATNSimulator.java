@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.dfa.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
-public class LexerInterpreter extends ATNInterpreter {
+public class LexerATNSimulator extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static final int NUM_EDGES = 255;
@@ -47,11 +47,11 @@ public class LexerInterpreter extends ATNInterpreter {
 	public static int ATN_failover = 0;
 	public static int match_calls = 0;
 
-	public LexerInterpreter(ATN atn) {
+	public LexerATNSimulator(ATN atn) {
 		this(null, atn);
 	}
 
-	public LexerInterpreter(Lexer recog, ATN atn) {
+	public LexerATNSimulator(Lexer recog, ATN atn) {
 		super(atn);
 		dfa = new DFA[atn.modeToStartState.size()];
 		for (int i=0; i<atn.modeToStartState.size(); i++) {
