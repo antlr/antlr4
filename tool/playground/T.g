@@ -2,6 +2,7 @@ grammar T;
 options {output=AST;}
 tokens {DUH;}
 a : (A|B) ;
+b : (A|B) -> A ;
 /*
 type returns [int i] : ID;
 ID : 'a'..'z'+ ;
