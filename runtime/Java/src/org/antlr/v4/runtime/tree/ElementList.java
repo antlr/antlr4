@@ -35,9 +35,17 @@ import java.util.*;
 public class ElementList<E> extends ArrayList<E> {
 	protected TreeAdaptor adaptor;
 
+	/** Once a node / subtree has been used in a stream, it must be dup'd
+	 *  from then on.
+	 */
+	protected HashSet<Integer> used = new HashSet<Integer>();
+
 	public class ElementListIterator implements Iterator<E> {
 		int cursor = 0;
 
+		/** If just 1 element, we still track cursor; next() will dup if
+		 *  cursor beyond 1 element.
+		 */
 		public boolean hasNext() {
 			int n = size();
 			return (n==1 && cursor<1) || (n>1 && cursor<n);
@@ -70,6 +78,16 @@ public class ElementList<E> extends ArrayList<E> {
 
 	public ElementList(TreeAdaptor adaptor) {
 		this.adaptor = adaptor;
+	}
+
+	@Override
+	public E get(int index) {
+		E o = super.get(index);
+		if ( used.contains(index) ) {
+			return (E)adaptor.dupTree( o );
+		}
+		used.add(index); // any subsequent ref must be dup'd
+		return o;
 	}
 
 	@Override
