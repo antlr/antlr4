@@ -262,7 +262,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void wildcardRef(GrammarAST ref, GrammarAST options) {
-		checkWildcardRoot(ref.token);
+		checkWildcardRoot(ref);
 	}
 
 	// Routines to do the actual work of checking issues with a grammar.
@@ -539,11 +539,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkWildcardRoot(Token wild) {
-		String fileName = wild.getInputStream().getSourceName();
-		g.tool.errMgr.grammarError(ErrorType.WILDCARD_AS_ROOT,
-								   fileName,
-								   wild);
+	void checkWildcardRoot(GrammarAST wild) {
+		if ( wild.getParent().getType()==ANTLRParser.TREE_BEGIN ) {
+			String fileName = wild.token.getInputStream().getSourceName();
+			g.tool.errMgr.grammarError(ErrorType.WILDCARD_AS_ROOT,
+									   fileName,
+									   wild.token);
+		}
 	}
 
 	void checkImport(Token importID) {
