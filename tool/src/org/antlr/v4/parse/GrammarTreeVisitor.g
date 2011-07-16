@@ -405,8 +405,8 @@ blockSet
 	;
 	
 setElement
-	:	STRING_LITERAL
-	|	TOKEN_REF
+	:	STRING_LITERAL	{stringRef((TerminalAST)$STRING_LITERAL, null);}
+	|	TOKEN_REF		{tokenRef((TerminalAST)$TOKEN_REF, null);}
 	;
 
 block

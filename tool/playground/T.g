@@ -1,12 +1,14 @@
 grammar T;
 options {output=AST;}
 tokens {DUH;}
-a : (ID INT -> INT ID | INT INT -> INT* ) ;
+a : (A|B) ;
+/*
 type returns [int i] : ID;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;
 PLUS : '+';
 WS : (' '|'\n') {$channel=HIDDEN;} ;
+*/
 
 /*
 c : A B C -> A ( D A B C*)* (B A*)? ;

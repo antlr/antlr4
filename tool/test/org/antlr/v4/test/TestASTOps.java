@@ -29,7 +29,7 @@
 
 package org.antlr.v4.test;
 
-import org.junit.*;
+import org.junit.Test;
 
 public class TestASTOps extends BaseTest {
 	protected boolean debug = false;
@@ -380,11 +380,8 @@ public class TestASTOps extends BaseTest {
 		assertEquals("(+ abc)\n", found);
 	}
 
-	@Ignore
-    // TODO: FAILS until I rebuild the antlr.g in v3
-    //
+	@Test
     public void testSetRootWithLabel() throws Exception {
-
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
