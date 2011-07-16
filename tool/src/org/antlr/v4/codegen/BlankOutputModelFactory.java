@@ -79,7 +79,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
 
-	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) { return null; }
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp) { return null; }
 
 	// AST REWRITES
 

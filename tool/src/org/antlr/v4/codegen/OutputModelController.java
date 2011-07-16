@@ -255,21 +255,17 @@ public class OutputModelController {
 		return ops;
 	}
 
-	public List<SrcOp> rootToken(List<SrcOp> ops) {
-		ops = delegate.rootToken(ops);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rootToken(ops);
-		return ops;
-	}
-
-	public List<SrcOp> rootRule(List<SrcOp> ops) {
-		ops = delegate.rootRule(ops);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rootRule(ops);
-		return ops;
-	}
-
-	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
-		List<SrcOp> ops = delegate.wildcard(ast, labelAST);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.wildcard(ops);
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp) {
+		List<SrcOp> ops = delegate.wildcard(ast, labelAST, astOp);
+		for (CodeGeneratorExtension ext : extensions) {
+			ops = ext.set(ops);
+			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
+				ops = ext.rootWildcard(ops);
+			}
+			else if ( astOp==null ) {
+				ops = ext.leafWildcard(ops);
+			}
+		}
 		return ops;
 	}
 

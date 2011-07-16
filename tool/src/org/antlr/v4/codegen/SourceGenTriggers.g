@@ -159,8 +159,8 @@ atom[GrammarAST label, GrammarAST astOp, boolean invert] returns [List<SrcOp> om
 	|	range[label]							{$omos = $range.omos;}
 	|	^(DOT ID terminal[$label, null])
 	|	^(DOT ID ruleref[$label, null])
-    |	^(WILDCARD .)							{$omos = controller.wildcard($WILDCARD, $label);}
-    |	WILDCARD								{$omos = controller.wildcard($WILDCARD, $label);}
+    |	^(WILDCARD .)							{$omos = controller.wildcard($WILDCARD, $label, $astOp);}
+    |	WILDCARD								{$omos = controller.wildcard($WILDCARD, $label, $astOp);}
     |   terminal[label, $astOp]					{$omos = $terminal.omos;}
     |   ruleref[label, $astOp]					{$omos = $ruleref.omos;}
 	|	blockSet[$label, $astOp, invert]		{$omos = $blockSet.omos;}

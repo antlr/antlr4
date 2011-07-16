@@ -98,6 +98,10 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> leafSet(List<SrcOp> ops) { return ops; }
 
+	public List<SrcOp> rootWildcard(List<SrcOp> ops) { return ops; }
+
+	public List<SrcOp> leafWildcard(List<SrcOp> ops) { return ops; }
+
 	// BLOCKS
 
 	public Choice getChoiceBlock(Choice c) { return c; }

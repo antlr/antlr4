@@ -182,7 +182,7 @@ public class TestASTOps extends BaseTest {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
-            "a : v='void' x=.^ ';' ;\n" +
+            "a : v='void' x+=.^ ';' ;\n" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+;\n" +
             "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";

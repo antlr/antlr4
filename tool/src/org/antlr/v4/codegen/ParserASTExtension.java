@@ -208,6 +208,12 @@ public class ParserASTExtension extends CodeGeneratorExtension {
 		}
 	}
 
+	@Override
+	public List<SrcOp> rootWildcard(List<SrcOp> ops) { return rootToken(ops); }
+
+	@Override
+	public List<SrcOp> leafWildcard(List<SrcOp> ops) { return leafToken(ops); }
+
 	public void trackExplicitLabel(List<SrcOp> ops, Decl label, SrcOp opWithLabel) {
 		CodeBlock blk = factory.getCurrentOuterMostAlternativeBlock();
 		// declare _track_label

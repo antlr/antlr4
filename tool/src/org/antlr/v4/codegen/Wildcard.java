@@ -29,19 +29,11 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.codegen.model.MatchToken;
 import org.antlr.v4.tool.GrammarAST;
 
-import java.util.*;
-
-public class Wildcard extends RuleElement implements LabeledOp {
-	public List<Decl> labels = new ArrayList<Decl>();
-
+public class Wildcard extends MatchToken {
 	public Wildcard(OutputModelFactory factory, GrammarAST ast) {
 		super(factory, ast);
-
 	}
-
-	public List<Decl> getLabels() { return labels; }
 }

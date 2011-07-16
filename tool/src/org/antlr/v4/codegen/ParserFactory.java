@@ -126,7 +126,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp) {
 		Wildcard wild = new Wildcard(this, ast);
 		// TODO: dup with tokenRef
 		if ( labelAST!=null ) {
@@ -139,6 +139,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				getCurrentRuleFunction().addContextDecl(l);
 			}
 		}
+		if ( controller.needsImplicitLabel(ast, wild) ) defineImplicitLabel(ast, wild);
 		AddToLabelList listLabelOp = getListLabelIfPresent(wild, labelAST);
 		return list(wild, listLabelOp);
 	}
@@ -369,7 +370,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public void defineImplicitLabel(GrammarAST ast, LabeledOp op) {
 		Decl d;
 		Rule r = g.getRule(ast.getText());
-		if ( ast.getType()==ANTLRParser.SET ) {
+		if ( ast.getType()==ANTLRParser.SET || ast.getType()==ANTLRParser.WILDCARD ) {
 			String implLabel =
 				gen.target.getImplicitSetLabel(String.valueOf(ast.token.getTokenIndex()));
 			d = new TokenDecl(this, implLabel);

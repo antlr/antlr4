@@ -708,7 +708,9 @@ atom:	// Qualified reference delegate.rule. This must be
 		// Because the terminal rule is allowed to be the node
 		// specification for the start of a tree rule, we must
 		// later check that wildcard was not used for that.
-	    DOT elementOptions?		  -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
+	    DOT elementOptions?	(astop=ROOT|astop=BANG)?
+	    -> {astop!=null}?	^($astop ^(WILDCARD<TerminalAST>[$DOT] elementOptions?))
+	    -> 					^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
 

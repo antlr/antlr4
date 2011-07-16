@@ -82,7 +82,7 @@ public interface OutputModelFactory {
 
 	List<SrcOp> rootRule(List<SrcOp> ops);
 
-	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST);
+	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp);
 
 	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label);
 

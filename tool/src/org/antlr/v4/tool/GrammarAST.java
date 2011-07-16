@@ -50,6 +50,7 @@ public class GrammarAST extends CommonTree {
 		token.setInputStream(t.getInputStream());
 		token.setLine(t.getLine());
 		token.setCharPositionInLine(t.getCharPositionInLine());
+		token.setTokenIndex(t.getTokenIndex());
 	}
     public GrammarAST(int type, Token t, String text) {
 		this(new CommonToken(type, text));
