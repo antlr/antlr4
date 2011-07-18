@@ -38,6 +38,10 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import java.util.*;
 
 public class GrammarAST extends CommonTree {
+	/** For error msgs, nice to know which grammar this AST lives in */
+	// TODO: try to remove
+	public Grammar g;
+
 	/** If we build an ATN, we make AST node point at left edge of ATN construct */
 	public ATNState atnState;
 

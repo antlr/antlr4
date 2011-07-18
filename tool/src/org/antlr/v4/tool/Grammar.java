@@ -42,6 +42,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.semantics.SymbolCollector;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
@@ -139,7 +140,7 @@ public class Grammar implements AttributeResolver {
 
 
 	/** Tracks all forced actions in all alternatives of all rules.
-	 *  Or if lexer all rules period. Doesn't track sempreds.
+	 *  Or if lexer all actions period. Doesn't track sempreds.
 	 *  maps tree node to action index.
  	 */
 	public LinkedHashMap<ActionAST, Integer> actions = new LinkedHashMap<ActionAST, Integer>();
@@ -191,8 +192,8 @@ public class Grammar implements AttributeResolver {
 			this.ast.hasErrors = p.getNumberOfSyntaxErrors()>0;
 			this.name = ((GrammarAST)ast.getChild(0)).getText();
 
-			GrammarTransformPipeline transform = new GrammarTransformPipeline(ast);
-			transform.process();
+			GrammarTransformPipeline transform = new GrammarTransformPipeline();
+			transform.process(ast);
 		}
 		initTokenSymbolTables();
     }
@@ -223,19 +224,21 @@ public class Grammar implements AttributeResolver {
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
                 System.out.println("import "+t.getText());
-            }
-            try {
-                GrammarAST root = tool.load(importedGrammarName+".g");
-				if ( root instanceof GrammarASTErrorNode ) return; // came back as error node
-				GrammarRootAST ast = (GrammarRootAST)root;
-                Grammar g = tool.createGrammar(ast);
-				g.fileName = importedGrammarName+".g";
-                g.parent = this;
-                importedGrammars.add(g);
-            }
-            catch (Exception e) {
-                System.err.println("can't load grammar "+importedGrammarName);
-            }
+			}
+			GrammarAST grammarAST = null;
+			try {
+				grammarAST = tool.loadImportedGrammar(this, importedGrammarName + ".g");
+			}
+			catch (IOException ioe) {
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, ioe, fileName);
+			}
+			// did it come back as error node or missing?
+			if ( grammarAST==null || grammarAST instanceof GrammarASTErrorNode ) return;
+			GrammarRootAST ast = (GrammarRootAST)grammarAST;
+			Grammar g = tool.createGrammar(ast);
+			g.fileName = importedGrammarName+".g";
+			g.parent = this;
+			importedGrammars.add(g);
         }
     }
 
@@ -272,13 +275,16 @@ public class Grammar implements AttributeResolver {
     public Rule getRule(String name) {
 		Rule r = rules.get(name);
 		if ( r!=null ) return r;
+		return null;
+		/*
 		List<Grammar> imports = getAllImportedGrammars();
 		if ( imports==null ) return null;
 		for (Grammar g : imports) {
-			r = g.rules.get(name);
+			r = g.getRule(name); // recursively walk up hierarchy
 			if ( r!=null ) return r;
 		}
 		return null;
+		*/
 	}
 
 	public Rule getRule(int index) { return indexToRule.get(index); }
@@ -503,6 +509,19 @@ public class Grammar implements AttributeResolver {
 		return maxTokenType;
 	}
 
+	public void importTokensFromTokensFile() {
+		String vocab = getOption("tokenVocab");
+		if ( vocab!=null ) {
+			TokenVocabParser vparser = new TokenVocabParser(tool, vocab);
+			Map<String,Integer> tokens = vparser.load();
+			System.out.println("tokens="+tokens);
+			for (String t : tokens.keySet()) {
+				if ( t.charAt(0)=='\'' ) defineStringLiteral(t, tokens.get(t));
+				else defineTokenName(t, tokens.get(t));
+			}
+		}
+	}
+
 	public void importVocab(Grammar importG) {
 		for (String tokenName: importG.tokenNameToTypeMap.keySet()) {
 			defineTokenName(tokenName, importG.tokenNameToTypeMap.get(tokenName));
@@ -689,9 +708,10 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public Set<String> getStringLiterals() {
+		// TODO: super inefficient way to get these.
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		SymbolCollector collector = new SymbolCollector(this);
-		collector.process(); // no side-effects; find strings
+		collector.process(ast); // no side-effects; find strings
 		return collector.strings;
 	}
 

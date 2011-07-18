@@ -33,13 +33,13 @@ import org.antlr.v4.parse.*;
 
 /** Handle left-recursion and block-set transforms */
 public class GrammarTransformPipeline {
-	public GrammarAST ast;
+	//public GrammarAST ast;
 
-	public GrammarTransformPipeline(GrammarAST ast) {
-		this.ast = ast;
+	public GrammarTransformPipeline() {
+//		this.ast = ast;
 	}
 
-	public void process() {
+	public void process(GrammarAST ast) {
 		if ( ast==null ) return;
 
 		org.antlr.runtime.tree.CommonTreeNodeStream nodes =

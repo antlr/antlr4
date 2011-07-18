@@ -29,17 +29,24 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.Tool;
+import org.antlr.v4.tool.Grammar;
+import org.junit.Test;
+
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
-/*
-	@Test
-	public void testWildcardStillWorks() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
+
+	@Test public void testWildcardStillWorks() throws Exception {
 		String grammar =
 			"parser grammar S;\n" +
 			"a : B . C ;\n"; // not qualified ID
 		Grammar g = new Grammar(grammar);
+
+		ErrorQueue equeue = new ErrorQueue();
+		Tool antlr = new Tool();
+		antlr.addListener(equeue);
+		antlr.process(g);
+
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
@@ -60,6 +67,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
+/*
 	@Test public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		// must generate something like:
 		// public int a(int x) throws RecognitionException { return gS.a(x); }

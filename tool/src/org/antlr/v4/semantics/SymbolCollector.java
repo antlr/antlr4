@@ -35,21 +35,32 @@ import org.antlr.v4.tool.*;
 import java.util.*;
 
 /** Collects (create) rules, terminals, strings, actions, scopes etc... from AST
- *  No side-effects
+ *  side-effects: sets resolver field of asts for actions.
  */
 public class SymbolCollector extends GrammarTreeVisitor {
-	public Grammar g; // which grammar are we checking
+	/** which grammar are we checking */
+	public Grammar g;
 
 	// stuff to collect
 	public List<Rule> rules = new ArrayList<Rule>();
 	public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 	public List<GrammarAST> qualifiedRulerefs = new ArrayList<GrammarAST>();
 	public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
+	public List<GrammarAST> labels = new ArrayList<GrammarAST>();
 	public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 	public Set<String> strings = new HashSet<String>();
 	public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
 	public List<AttributeDict> scopes = new ArrayList<AttributeDict>();
-	public List<GrammarAST> actions = new ArrayList<GrammarAST>();
+
+	/** Tracks named actions like @parser::members {...}.
+	 *  Key is scope::name, value is action ast node.
+	 */
+//	public DoubleKeyMap<String,String,GrammarAST> namedActions =
+//		new DoubleKeyMap<String, String, GrammarAST>();
+
+	/** Track action name node in @parser::members {...} or @members {...} */
+	List<GrammarAST> namedActions = new ArrayList<GrammarAST>();
+
 	/** All labels, rule references, and token references to right of -> */
 	public List<GrammarAST> rewriteElements = new ArrayList<GrammarAST>();
 
@@ -58,7 +69,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 
 	public SymbolCollector(Grammar g) { this.g = g; }
 
-	public void process() {	visitGrammar(g.ast); }
+	public void process(GrammarAST ast) { visitGrammar(ast); }
 
 	@Override
 	public void globalScopeDef(GrammarAST ID, ActionAST elems) {
@@ -71,7 +82,10 @@ public class SymbolCollector extends GrammarTreeVisitor {
 
 	@Override
 	public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) {
-		actions.add((GrammarAST)ID.getParent());
+//		String scopeName = g.getDefaultActionScope();
+//		if ( scope!=null ) scopeName = scope.getText();
+//		namedActions.put(scopeName, ID.getText(), action);
+		namedActions.add(ID);
 		action.resolver = g;
 	}
 
@@ -160,6 +174,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void label(GrammarAST op, GrammarAST ID, GrammarAST element) {
 		LabelElementPair lp = new LabelElementPair(g, ID, element, op.getType());
 		currentRule.alt[currentOuterAltNumber].labelDefs.map(ID.getText(), lp);
+		labels.add(ID);
 	}
 
 	@Override

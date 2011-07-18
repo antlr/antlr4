@@ -178,7 +178,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void tokenAlias(GrammarAST ID, GrammarAST literal) {
-		checkTokenAlias(ID.token);
+		if ( literal!=null ) checkTokenAlias(ID.token);
 	}
 
 	@Override

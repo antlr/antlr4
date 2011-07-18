@@ -30,6 +30,7 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
@@ -47,7 +48,10 @@ public class SymbolChecks {
     Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
 	Set<String> tokenIDs = new HashSet<String>();
     Set<String> globalScopeNames = new HashSet<String>();
-    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+//    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+	DoubleKeyMap<String, String, GrammarAST> namedActions =
+		new DoubleKeyMap<String, String, GrammarAST>();
+
 	public ErrorManager errMgr;
 
     public SymbolChecks(Grammar g, SymbolCollector collector) {
@@ -71,8 +75,8 @@ public class SymbolChecks {
         // So, call order sensitive
         checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames
 		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
+		// done in sem pipe for now
         checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
-        checkActionRedefinitions(collector.actions);    // sets actionScopeToActionNames
         checkTokenAliasRedefinitions(collector.tokensDefs);
         //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
@@ -82,11 +86,13 @@ public class SymbolChecks {
 
     public void checkForRuleConflicts(List<Rule> rules) {
         if ( rules==null ) return;
-        for (Rule r : collector.rules) {
-            if ( nameToRuleMap.get(r.name)==null ) {
+        for (Rule r : rules) {
+			Rule prevRule = nameToRuleMap.get(r.name);
+			if ( prevRule==null ) {
                 nameToRuleMap.put(r.name, r);
             }
-            else {
+            else if ( r.g == prevRule.g ) {
+				// only generate warning if rules in same grammar
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 errMgr.grammarError(ErrorType.RULE_REDEFINITION,
                                           g.fileName, idNode.token, r.name);
@@ -166,35 +172,6 @@ public class SymbolChecks {
 			}
 		}
 	}
-
-    public void checkActionRedefinitions(List<GrammarAST> actions) {
-        if ( actions==null ) return;
-        String scope = g.getDefaultActionScope();
-        String name = null;
-        GrammarAST nameNode = null;
-        for (GrammarAST ampersandAST : actions) {
-            nameNode = (GrammarAST)ampersandAST.getChild(0);
-            if ( ampersandAST.getChildCount()==2 ) {
-                name = nameNode.getText();
-            }
-            else {
-                scope = nameNode.getText();
-                name = ampersandAST.getChild(1).getText();
-            }
-            Set<String> scopeActions = actionScopeToActionNames.get(scope);
-            if ( scopeActions==null ) { // init scope
-                scopeActions = new HashSet<String>();
-                actionScopeToActionNames.put(scope, scopeActions);
-            }
-            if ( !scopeActions.contains(name) ) {
-                scopeActions.add(name);
-            }
-            else {
-                errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
-                                          g.fileName, nameNode.token, name);
-            }
-        }
-    }
 
     /** Make sure a label doesn't conflict with another symbol.
      *  Labels must not conflict with: rules, tokens, scope names,

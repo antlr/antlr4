@@ -30,6 +30,8 @@
 package org.antlr.v4;
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.misc.DoubleKeyMap;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenPipeline;
@@ -203,21 +205,31 @@ public class Tool {
 
 	public void processGrammarsOnCommandLine() {
 		for (String fileName : grammarFiles) {
-			GrammarAST t = load(fileName);
-			if ( t instanceof GrammarASTErrorNode ) return; // came back as error node
+			GrammarAST t = loadGrammar(fileName);
+			if ( t==null || t instanceof GrammarASTErrorNode ) return; // came back as error node
 			if ( ((GrammarRootAST)t).hasErrors ) return;
 			GrammarRootAST ast = (GrammarRootAST)t;
 
-			GrammarTransformPipeline transform = new GrammarTransformPipeline(ast);
-			transform.process();
-
-			Grammar g = createGrammar(ast);
+			final Grammar g = createGrammar(ast);
 			g.fileName = fileName;
 			process(g);
 		}
 	}
 
+	/** To process a grammar, we load all of its imported grammars into
+		subordinate grammar objects. Then we merge the imported rules
+		into the root grammar. If a root grammar is a combined grammar,
+		we have to extract the implicit lexer. Once all this is done, we
+		process the lexer first, if present, and then the parser grammar
+	 */
 	public void process(Grammar g) {
+		g.loadImportedGrammars();
+
+		mergeImportedGrammars(g);
+
+		GrammarTransformPipeline transform = new GrammarTransformPipeline();
+		transform.process(g.ast);
+
 		LexerGrammar lexerg = null;
 		GrammarRootAST lexerAST = null;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
@@ -229,10 +241,6 @@ public class Tool {
 				lexerg.fileName = g.fileName;
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
-
-//			// copy vocab from combined to implicit lexer
-//			g.importVocab(g.implicitLexerOwner); // TODO: don't need i don't think; done in tool process()
-
 				processNonCombinedGrammar(lexerg);
 				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
 				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
@@ -245,7 +253,6 @@ public class Tool {
 	}
 
 	public void processNonCombinedGrammar(Grammar g) {
-		g.loadImportedGrammars();
 		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 		//g.ast.inspect();
 
@@ -254,12 +261,6 @@ public class Tool {
 		sem.process();
 
 		if ( errMgr.getNumErrors()>0 ) return;
-
-		if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-			for (Grammar imp : g.getImportedGrammars()) {
-				processNonCombinedGrammar(imp);
-			}
-		}
 
 		// BUILD ATN FROM AST
 		ATNFactory factory;
@@ -282,19 +283,55 @@ public class Tool {
 		gen.process();
 	}
 
+	/** Given the raw AST of a grammar, create a grammar object
+		associated with the AST. Once we have the grammar object, ensure
+		that all nodes in tree referred to this grammar. Later, we will
+		use it for error handling and generally knowing from where a rule
+		comes from.
+	 */
 	public Grammar createGrammar(GrammarRootAST ast) {
-		if ( ast.grammarType==ANTLRParser.LEXER ) return new LexerGrammar(this, ast);
-		else return new Grammar(this, ast);
+		final Grammar g;
+		if ( ast.grammarType==ANTLRParser.LEXER ) g = new LexerGrammar(this, ast);
+		else g = new Grammar(this, ast);
+
+		// ensure each node has pointer to surrounding grammar
+		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
+		v.visit(ast, new TreeVisitorAction() {
+			public Object pre(Object t) { ((GrammarAST)t).g = g; return t; }
+			public Object post(Object t) { return t; }
+		});
+		return g;
 	}
 
-	public GrammarAST load(String fileName) {
-		ANTLRFileStream in = null;
+	public GrammarAST loadGrammar(String fileName) {
 		try {
-			in = new ANTLRFileStream(fileName);
+			ANTLRFileStream in = new ANTLRFileStream(fileName);
+			GrammarAST t = load(in);
+			return t;
 		}
 		catch (IOException ioe) {
 			errMgr.toolError(ErrorType.CANNOT_OPEN_FILE, ioe, fileName);
 		}
+		return null;
+	}
+
+	/** Try current dir then dir of g then lib dir */
+	public GrammarAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
+		System.out.println("loadImportedGrammar "+fileName+" from "+g.fileName);
+		File importedFile = new File(fileName);
+		if ( !importedFile.exists() ) {
+			File gfile = new File(g.fileName);
+			String parentDir = gfile.getParent();
+			importedFile = new File(parentDir, fileName);
+			if ( !importedFile.exists() ) { // try in lib dir
+				importedFile = new File(libDirectory, fileName);
+				if ( !importedFile.exists() ) {
+					errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, g.fileName, fileName);
+					return null;
+				}
+			}
+		}
+		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
 		return load(in);
 	}
 
@@ -304,10 +341,11 @@ public class Tool {
 
 	public GrammarAST load(CharStream in) {
 		try {
+			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ANTLRLexer lexer = new ANTLRLexer(in);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			ToolANTLRParser p = new ToolANTLRParser(tokens, this);
-			p.setTreeAdaptor(new GrammarASTAdaptor(in));
+			p.setTreeAdaptor(adaptor);
 			ParserRuleReturnScope r = p.grammarSpec();
 			GrammarAST root = (GrammarAST) r.getTree();
 			if ( root instanceof GrammarRootAST ) {
@@ -322,12 +360,129 @@ public class Tool {
 		return null;
 	}
 
+	/** Merge all the rules, token definitions, and named actions from
+		imported grammars into the root grammar tree.  Perform:
+
+	 	(tokens { X (= Y 'y')) + (tokens { Z )	->	(tokens { X (= Y 'y') Z)
+
+	 	(@ members {foo}) + (@ members {bar})	->	(@ members {foobar})
+
+	 	(RULES (RULE x y)) + (RULES (RULE z))	->	(RULES (RULE x y z))
+
+	 	Rules in root prevent same rule from being appended to RULES node.
+
+	 	The goal is a complete combined grammar so we can ignore subordinate
+	 	grammars.
+	 */
+	public void mergeImportedGrammars(Grammar rootGrammar) {
+		GrammarAST root = rootGrammar.ast;
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(root.token.getInputStream());
+
+	 	GrammarAST tokensRoot = (GrammarAST)root.getFirstChildWithType(ANTLRParser.TOKENS);
+
+		List<GrammarAST> actionRoots = root.getNodesWithType(ANTLRParser.AT);
+
+		// Compute list of rules in root grammar and ensure we have a RULES node
+		GrammarAST RULES = (GrammarAST)root.getFirstChildWithType(ANTLRParser.RULES);
+		Set<String> rootRuleNames = new HashSet<String>();
+		if ( RULES==null ) { // no rules in root, make RULES node, hook in
+			RULES = (GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
+			RULES.g = rootGrammar;
+			root.addChild(RULES);
+		}
+		else {
+			List<GrammarAST> rootRules = root.getNodesWithType(ANTLRParser.RULE);
+			for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
+		}
+
+		List<Grammar> imports = rootGrammar.getAllImportedGrammars();
+		if ( imports==null ) return;
+
+		for (Grammar imp : imports) {
+			GrammarAST imp_tokensRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.TOKENS);
+			if ( imp_tokensRoot!=null ) {
+				System.out.println("imported tokens: "+imp_tokensRoot.getChildren());
+				if ( tokensRoot==null ) {
+					tokensRoot = (GrammarAST)adaptor.create(ANTLRParser.TOKENS, "TOKENS");
+					tokensRoot.g = rootGrammar;
+					root.insertChild(1, tokensRoot); // ^(GRAMMAR ID TOKENS...)
+				}
+				tokensRoot.addChildren(imp_tokensRoot.getChildren());
+			}
+
+			List<GrammarAST> all_actionRoots = new ArrayList<GrammarAST>();
+			List<GrammarAST> imp_actionRoots = imp.ast.getNodesWithType(ANTLRParser.AT);
+			if ( actionRoots!=null ) all_actionRoots.addAll(actionRoots);
+			all_actionRoots.addAll(imp_actionRoots);
+
+			if ( imp_actionRoots!=null ) {
+				DoubleKeyMap<String, String, GrammarAST> namedActions =
+					new DoubleKeyMap<String, String, GrammarAST>();
+
+				System.out.println("imported actions: "+imp_actionRoots);
+				for (GrammarAST at : all_actionRoots) {
+					String scopeName = rootGrammar.getDefaultActionScope();
+					GrammarAST scope, name, action;
+					if ( at.getChildCount()>2 ) { // must have a scope
+						scope = (GrammarAST)at.getChild(1);
+						scopeName = scope.getText();
+						name = (GrammarAST)at.getChild(1);
+						action = (GrammarAST)at.getChild(2);
+					}
+					else {
+						name = (GrammarAST)at.getChild(0);
+						action = (GrammarAST)at.getChild(1);
+					}
+					GrammarAST prevAction = namedActions.get(scopeName, name.getText());
+					if ( prevAction==null ) {
+						namedActions.put(scopeName, name.getText(), action);
+					}
+					else {
+						if ( prevAction.g == at.g ) {
+							errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
+												at.g.fileName, name.token, name.getText());
+						}
+						else {
+							String s1 = prevAction.getText();
+							s1 = s1.substring(1, s1.length()-1);
+							String s2 = action.getText();
+							s2 = s2.substring(1, s2.length()-1);
+							String combinedAction = "{"+s1 + '\n'+ s2+"}";
+							prevAction.token.setText(combinedAction);
+						}
+					}
+				}
+				// at this point, we have complete list of combined actions,
+				// some of which are already living in root grammar.
+				// Merge in any actions not in root grammar into root's tree.
+				for (String scopeName : namedActions.keySet()) {
+					for (String name : namedActions.keySet(scopeName)) {
+						GrammarAST action = namedActions.get(scopeName, name);
+						System.out.println(action.g.name+" "+scopeName+":"+name+"="+action.getText());
+						if ( action.g != rootGrammar ) {
+							root.insertChild(1, action.getParent());
+						}
+					}
+				}
+			}
+
+			List<GrammarAST> rules = imp.ast.getNodesWithType(ANTLRParser.RULE);
+			if ( rules!=null ) {
+				for (GrammarAST r : rules) {
+					System.out.println("imported rule: "+r.toStringTree());
+					String name = r.getChild(0).getText();
+					if ( !rootRuleNames.contains(name) ) RULES.addChild(r); // if not overridden
+				}
+			}
+		}
+		System.out.println("Grammar: "+rootGrammar.ast.toStringTree());
+	}
+
 	/** Build lexer grammar from combined grammar that looks like:
 	 *
 	 *  (COMBINED_GRAMMAR A
 	 *      (tokens { X (= Y 'y'))
 	 *      (OPTIONS (= x 'y'))
-	 *      (scope Blort { int x; })
 	 *      (@ members {foo})
 	 *      (@ lexer header {package jj;})
 	 *      (RULES (RULE .+)))
@@ -356,7 +511,7 @@ public class Tool {
 
 		// MOVE OPTIONS
 		GrammarAST optionsRoot =
-		(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
+			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
 		if ( optionsRoot!=null ) {
 			GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
 			lexerAST.addChild(lexerOptionsRoot);

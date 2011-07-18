@@ -80,6 +80,7 @@ public class Rule implements AttributeResolver {
 	/** A list of scope names used by this rule */
     public List<Token> useScopes;
 
+	/** In which grammar does this rule live? */
 	public Grammar g;
 
 	/** If we're in a lexer grammar, we might be in a mode */
@@ -262,7 +263,15 @@ public class Rule implements AttributeResolver {
 		return false;
 	}
 
-    @Override
+	@Override
+	public int hashCode() { return name.hashCode(); }
+
+	@Override
+	public boolean equals(Object obj) {
+		return this==obj || name.equals(((Rule)obj).name);
+	}
+
+	@Override
     public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("Rule{name="+name);

@@ -29,14 +29,14 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
-import java.util.Map;
+import java.util.*;
 
 /** Do as much semantic checking as we can and fill in grammar
- *  with rules, dynamic scopes, actions, and token definitions.
- *  The only side effects are in the grammar pass to process().
+ *  with rules, actions, and token definitions.
+ *  The only side effects are in the grammar passed to process().
  *  We consume a bunch of memory here while we build up data structures
  *  to perform checking, but all of it goes away after this pipeline object
  *  gets garbage collected.
@@ -47,8 +47,15 @@ import java.util.Map;
  *  Note that imported grammars bring in token and rule definitions
  *  but only the root grammar and any implicitly created lexer grammar
  *  get their token definitions filled up. We are treating the
- *  imported grammars like includes (the generated code treats them
- *  as separate objects, however).
+ *  imported grammars like includes.
+ *
+ *  The semantic pipeline works on root grammars (those that do the importing,
+ *  if any). Upon entry to the semantic pipeline, all imported grammars
+ *  should have been loaded into delegate grammar objects with their
+ *  ASTs created.  The pipeline does the BasicSemanticChecks on the
+ *  imported grammar before collecting symbols. We cannot perform the
+ *  simple checks such as undefined rule until we have collected all
+ *  tokens and rules from the imported grammars into a single collection.
  */
 public class SemanticPipeline {
 	public Grammar g;
@@ -60,22 +67,6 @@ public class SemanticPipeline {
 	public void process() {
 		if ( g.ast==null ) return;
 
-		/*
-		// VALIDATE AST STRUCTURE
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		// use buffered node stream as we will look around in stream
-		// to give good error messages.
-		BufferedTreeNodeStream nodes =
-			new BufferedTreeNodeStream(adaptor,g.ast);
-		ASTVerifier walker = new ASTVerifier(nodes);
-		try {walker.grammarSpec();}
-		catch (RecognitionException re) {
-			ErrorManager.fatalInternalError("bad grammar AST structure: "+
-											g.ast.toStringTree(),
-											re);
-		}
-		*/
-
 		// DO BASIC / EASY SEMANTIC CHECKS
 		BasicSemanticChecks basics = new BasicSemanticChecks(g);
 		basics.process();
@@ -85,7 +76,7 @@ public class SemanticPipeline {
 
 		// COLLECT SYMBOLS: RULES, ACTIONS, TERMINALS, ...
 		SymbolCollector collector = new SymbolCollector(g);
-		collector.process(); // no side-effects; compute lists
+		collector.process(g.ast);
 
 		// CHECK FOR SYMBOL COLLISIONS
 		SymbolChecks symcheck = new SymbolChecks(g, collector);
@@ -97,14 +88,25 @@ public class SemanticPipeline {
 
 		// STORE RULES/ACTIONS/SCOPES IN GRAMMAR
 		for (Rule r : collector.rules) g.defineRule(r);
-		for (AttributeDict s : collector.scopes) g.defineScope(s);
-		for (GrammarAST a : collector.actions) g.defineAction(a);
+		for (GrammarAST a : collector.namedActions) {
+			g.defineAction((GrammarAST)a.getParent());
+		}
 
-		// LINK ALT NODES WITH (outermost) Alternatives
+		// LINK (outermost) ALT NODES WITH Alternatives
 		for (Rule r : g.rules.values()) {
 			for (int i=1; i<=r.numberOfAlts; i++) {
 				r.alt[i].ast.alt = r.alt[i];
 			}
+		}
+
+		// ASSIGN TOKEN TYPES
+		g.importTokensFromTokensFile();
+		if ( g.isLexer() ) {
+			assignLexerTokenTypes(g, collector.tokensDefs);
+		}
+		else {
+			assignTokenTypes(g, collector.tokensDefs,
+							 collector.tokenIDRefs, collector.strings);
 		}
 
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
@@ -117,20 +119,6 @@ public class SemanticPipeline {
 
 		// CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
 		AttributeChecks.checkAllAttributeExpressions(g);
-
-		// ASSIGN TOKEN TYPES
-		String vocab = g.getOption("tokenVocab");
-		if ( vocab!=null ) {
-			TokenVocabParser vparser = new TokenVocabParser(g.tool, vocab);
-			Map<String,Integer> tokens = vparser.load();
-			System.out.println("tokens="+tokens);
-			for (String t : tokens.keySet()) {
-				if ( t.charAt(0)=='\'' ) g.defineStringLiteral(t, tokens.get(t));
-				else g.defineTokenName(t, tokens.get(t));
-			}
-		}
-		if ( g.isLexer() ) assignLexerTokenTypes(g, collector);
-		else assignTokenTypes(g, collector, symcheck);
 
 		symcheck.checkForRewriteIssues();
 
@@ -146,9 +134,9 @@ public class SemanticPipeline {
 		}
 	}
 
-	void assignLexerTokenTypes(Grammar g, SymbolCollector collector) {
+	void assignLexerTokenTypes(Grammar g, List<GrammarAST> tokensDefs) {
 		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
-		for (GrammarAST def : collector.tokensDefs) {
+		for (GrammarAST def : tokensDefs) {
 			if ( def.getType()== ANTLRParser.ID ) G.defineTokenName(def.getText());
 		}
 
@@ -167,11 +155,13 @@ public class SemanticPipeline {
 
 	}
 
-	void assignTokenTypes(Grammar g, SymbolCollector collector, SymbolChecks symcheck) {
+	void assignTokenTypes(Grammar g, List<GrammarAST> tokensDefs,
+						  List<GrammarAST> tokenIDs, Set<String> strings)
+	{
 		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
 		// DEFINE tokens { X='x'; } ALIASES
-		for (GrammarAST alias : collector.tokensDefs) {
+		for (GrammarAST alias : tokensDefs) {
 			if ( alias.getType()== ANTLRParser.ASSIGN ) {
 				String name = alias.getChild(0).getText();
 				String lit = alias.getChild(1).getText();
@@ -190,10 +180,10 @@ public class SemanticPipeline {
 		   */
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
-		for (String id : symcheck.tokenIDs) { G.defineTokenName(id); }
+		for (GrammarAST idAST : tokenIDs) { G.defineTokenName(idAST.getText()); }
 
 		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
-		for (String s : collector.strings) { G.defineStringLiteral(s); }
+		for (String s : strings) { G.defineStringLiteral(s); }
 		System.out.println("tokens="+G.tokenNameToTypeMap);
 		System.out.println("strings="+G.stringLiteralToTypeMap);
 	}
