@@ -786,6 +786,32 @@ public abstract class BaseTest {
 		}
 	}
 
+	protected void checkGrammarSemanticsError(ErrorQueue equeue,
+											  GrammarSemanticsMessage expectedMessage)
+		throws Exception
+	{
+		/*
+				System.out.println(equeue.infos);
+				System.out.println(equeue.warnings);
+				System.out.println(equeue.errors);
+				assertTrue("number of errors mismatch", n, equeue.errors.size());
+						   */
+		ANTLRMessage foundMsg = null;
+		for (int i = 0; i < equeue.errors.size(); i++) {
+			ANTLRMessage m = (ANTLRMessage)equeue.errors.get(i);
+			if (m.errorType==expectedMessage.errorType ) {
+				foundMsg = m;
+			}
+		}
+		assertNotNull("no error; "+expectedMessage.errorType+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(Arrays.toString(expectedMessage.args), Arrays.toString(foundMsg.args));
+		if ( equeue.size()!=1 ) {
+			System.err.println(equeue);
+		}
+	}
+
 	protected void checkError(ErrorQueue equeue,
 							  ANTLRMessage expectedMessage)
 		throws Exception
@@ -1159,6 +1185,10 @@ public abstract class BaseTest {
         System.out.println("Tree map looks like: " + nset.toString());
         return nset.toString();
     }
+
+	public List<String> realElements(Vector elements) {
+		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
+	}
 
     // override to track errors
 

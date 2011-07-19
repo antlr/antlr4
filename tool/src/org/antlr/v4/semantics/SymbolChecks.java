@@ -91,16 +91,15 @@ public class SymbolChecks {
 			if ( prevRule==null ) {
                 nameToRuleMap.put(r.name, r);
             }
-            else if ( r.g == prevRule.g ) {
-				// only generate warning if rules in same grammar
+            else {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 errMgr.grammarError(ErrorType.RULE_REDEFINITION,
-                                          g.fileName, idNode.token, r.name);
+                                          r.g.fileName, idNode.token, r.name);
             }
             if ( globalScopeNames.contains(r.name) ) {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 errMgr.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
-                                          g.fileName, idNode.token, r.name);
+                                          r.g.fileName, idNode.token, r.name);
             }
         }
     }
@@ -114,39 +113,59 @@ public class SymbolChecks {
                 globalScopeNames.add(s.getName());
             }
             else {
-                Token idNode = ((GrammarAST) s.ast.getParent().getChild(0)).token;
+                GrammarAST idNode = (GrammarAST) s.ast.getParent().getChild(0);
                 errMgr.grammarError(ErrorType.SCOPE_REDEFINITION,
-                                          g.fileName, idNode, s.getName());
+                                          idNode.g.fileName, idNode.token, s.getName());
             }
         }
     }
 
+	/** Catch:
+		tokens { A='a'; A; }		can't redefine token type if has alias
+	 	tokens { A; A='a'; }
+	 	tokens { A='a'; A='b'; }	can't have two aliases for single token type
+		tokens { A='a'; B='a'; }	can't have to token types for same string alias
+	 */
     public void checkTokenAliasRedefinitions(List<GrammarAST> aliases) {
         if ( aliases==null ) return;
+
+		// map names, strings to root of A or (= A 'a')
         Map<String, GrammarAST> aliasTokenNames = new HashMap<String, GrammarAST>();
-        for (int i=0; i< aliases.size(); i++) {
+		Map<String, GrammarAST> aliasStringValues = new HashMap<String, GrammarAST>();
+        for (int i=0; i<aliases.size(); i++) {
             GrammarAST a = aliases.get(i);
-            GrammarAST idNode = a;
-            if ( a.getType()== ANTLRParser.ASSIGN ) {
+			GrammarAST idNode = a;
+			GrammarAST prevToken = aliasTokenNames.get(idNode.getText());
+			GrammarAST stringNode = null;
+			if ( a.getChildCount()>0 ) stringNode = (GrammarAST)a.getChild(1);
+			GrammarAST prevString = null;
+			if ( stringNode!=null ) prevString = aliasStringValues.get(stringNode.getText());
+            if ( a.getType() == ANTLRParser.ASSIGN ) { // A='a'
                 idNode = (GrammarAST)a.getChild(0);
-				if ( g!=g.getOutermostGrammar() ) {
-					errMgr.grammarError(ErrorType.TOKEN_ALIAS_IN_DELEGATE,
-											  g.fileName, idNode.token, idNode.getText(), g.name);
+				if ( prevString==null ) { // not seen string before
+					if ( stringNode!=null ) aliasStringValues.put(stringNode.getText(), a);
 				}
             }
-            GrammarAST prev = aliasTokenNames.get(idNode.getText());
-            if ( prev==null ) {
-                aliasTokenNames.put(idNode.getText(), a);
-            }
-            else {
-                GrammarAST value = (GrammarAST)prev.getChild(1);
-                String valueText = null;
-                if ( value!=null ) valueText = value.getText();
-                errMgr.grammarError(ErrorType.TOKEN_ALIAS_REASSIGNMENT,
-                                          g.fileName, idNode.token, idNode.getText(), valueText);
-            }
-        }
-    }
+			if ( prevToken==null ) { // not seen before, define it
+				aliasTokenNames.put(idNode.getText(), a);
+			}
+
+			// we've defined token names and strings at this point if not seen previously.
+			// now, look for trouble.
+			if ( prevToken!=null ) {
+				if ( !(prevToken.getChildCount()==0 && a.getChildCount()==0) ) {
+					// one or both have strings; disallow
+					errMgr.grammarError(ErrorType.TOKEN_NAME_REASSIGNMENT,
+										a.g.fileName, idNode.token, idNode.getText());
+				}
+			}
+			if ( prevString!=null ) {
+				errMgr.grammarError(ErrorType.TOKEN_STRING_REASSIGNMENT,
+									a.g.fileName, idNode.token, idNode.getText()+"="+stringNode.getText(),
+									prevString.getChild(0).getText());
+			}
+		}
+	}
 
     public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
         for (GrammarAST a : tokenIDRefs) {

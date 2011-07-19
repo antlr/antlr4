@@ -94,9 +94,6 @@ public class ErrorManager {
 
 		if ( msg.args!=null ) { // fill in arg1, arg2, ...
 			for (int i=0; i<msg.args.length; i++) {
-				if ( i==(msg.args.length-1) && msg.args[i]==null ) { // don't set last if null
-					continue;
-				}
 				String attr = "arg";
 				if ( i>0 ) attr += i + 1;
 				messageST.add(attr, msg.args[i]);
@@ -127,7 +124,7 @@ public class ErrorManager {
 		if (locationValid) reportST.add("location", locationST);
 		reportST.add("message", messageFormatST);
 		//((DebugST)reportST).inspect();
-		//reportST.impl.dump();
+//		reportST.impl.dump();
 		return reportST;
 	}
 

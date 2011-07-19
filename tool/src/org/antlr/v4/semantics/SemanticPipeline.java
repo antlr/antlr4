@@ -87,7 +87,9 @@ public class SemanticPipeline {
 		// hmm...we don't get missing arg errors and such if we bail out here
 
 		// STORE RULES/ACTIONS/SCOPES IN GRAMMAR
-		for (Rule r : collector.rules) g.defineRule(r);
+		for (Rule r : collector.rules) {
+			g.defineRule(r);
+		}
 		for (GrammarAST a : collector.namedActions) {
 			g.defineAction((GrammarAST)a.getParent());
 		}

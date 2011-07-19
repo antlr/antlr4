@@ -303,10 +303,10 @@ public class Tool {
 		return g;
 	}
 
-	public GrammarAST loadGrammar(String fileName) {
+	public GrammarRootAST loadGrammar(String fileName) {
 		try {
 			ANTLRFileStream in = new ANTLRFileStream(fileName);
-			GrammarAST t = load(in);
+			GrammarRootAST t = load(in);
 			return t;
 		}
 		catch (IOException ioe) {
@@ -316,7 +316,7 @@ public class Tool {
 	}
 
 	/** Try current dir then dir of g then lib dir */
-	public GrammarAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
+	public GrammarRootAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
 		System.out.println("loadImportedGrammar "+fileName+" from "+g.fileName);
 		File importedFile = new File(fileName);
 		if ( !importedFile.exists() ) {
@@ -335,11 +335,11 @@ public class Tool {
 		return load(in);
 	}
 
-	public GrammarAST loadFromString(String grammar) {
+	public GrammarRootAST loadFromString(String grammar) {
 		return load(new ANTLRStringStream(grammar));
 	}
 
-	public GrammarAST load(CharStream in) {
+	public GrammarRootAST load(CharStream in) {
 		try {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ANTLRLexer lexer = new ANTLRLexer(in);
@@ -347,7 +347,7 @@ public class Tool {
 			ToolANTLRParser p = new ToolANTLRParser(tokens, this);
 			p.setTreeAdaptor(adaptor);
 			ParserRuleReturnScope r = p.grammarSpec();
-			GrammarAST root = (GrammarAST) r.getTree();
+			GrammarRootAST root = (GrammarRootAST)r.getTree();
 			if ( root instanceof GrammarRootAST ) {
 				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
 			}
@@ -376,7 +376,8 @@ public class Tool {
 	 */
 	public void mergeImportedGrammars(Grammar rootGrammar) {
 		GrammarAST root = rootGrammar.ast;
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(root.token.getInputStream());
+		GrammarAST id = (GrammarAST) root.getChild(0);
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(id.token.getInputStream());
 
 	 	GrammarAST tokensRoot = (GrammarAST)root.getFirstChildWithType(ANTLRParser.TOKENS);
 
@@ -391,7 +392,8 @@ public class Tool {
 			root.addChild(RULES);
 		}
 		else {
-			List<GrammarAST> rootRules = root.getNodesWithType(ANTLRParser.RULE);
+			// make list of rules we have in root grammar
+			List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
 			for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
 		}
 
@@ -471,7 +473,11 @@ public class Tool {
 				for (GrammarAST r : rules) {
 					System.out.println("imported rule: "+r.toStringTree());
 					String name = r.getChild(0).getText();
-					if ( !rootRuleNames.contains(name) ) RULES.addChild(r); // if not overridden
+					boolean rootAlreadyHasRule = rootRuleNames.contains(name);
+					if ( !rootAlreadyHasRule ) {
+						RULES.addChild(r); // merge in if not overridden
+						rootRuleNames.add(name);
+					}
 				}
 			}
 		}
@@ -588,6 +594,7 @@ public class Tool {
 		}
 
 		lexerRulesRoot.freshenParentAndChildIndexesDeeply();
+		combinedRulesRoot.freshenParentAndChildIndexesDeeply();
 
 		System.out.println("after ="+combinedAST.toStringTree());
 		System.out.println("lexer ="+lexerAST.toStringTree());

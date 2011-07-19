@@ -82,9 +82,6 @@ public class SymbolCollector extends GrammarTreeVisitor {
 
 	@Override
 	public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) {
-//		String scopeName = g.getDefaultActionScope();
-//		if ( scope!=null ) scopeName = scope.getText();
-//		namedActions.put(scopeName, ID.getText(), action);
 		namedActions.add(ID);
 		action.resolver = g;
 	}

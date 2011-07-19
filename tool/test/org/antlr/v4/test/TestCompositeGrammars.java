@@ -30,8 +30,9 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 import org.junit.Test;
+import org.stringtemplate.v4.ST;
 
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
@@ -67,7 +68,6 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
-/*
 	@Test public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		// must generate something like:
 		// public int a(int x) throws RecognitionException { return gS.a(x); }
@@ -120,7 +120,7 @@ public class TestCompositeGrammars extends BaseTest {
 		String master =
 			"grammar M;\n" +		// uses no rules from the import
 			"import S;\n" +
-			"s : 'b' {gS.foo();} ;\n" + // gS is import pointer
+			"s : 'b' {foo();} ;\n" + // gS is import pointer
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
 								  "s", "b", debug);
@@ -188,8 +188,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testDelegatesSeeSameTokenType2() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
+		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
 			"tokens { A; B; C; }\n" +
@@ -213,29 +212,31 @@ public class TestCompositeGrammars extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		writeFile(tmpdir, "M.g", master);
 		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
+		antlr.addListener(equeue);
+		GrammarRootAST root = antlr.loadGrammar(tmpdir+"/M.g");
+		Grammar g = antlr.createGrammar(root);
+		g.fileName = "M.g";
+		antlr.process(g);
 
-		String expectedTokenIDToTypeMap = "[A=4, B=5, C=6, WS=7]";
-		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[A, B, C, WS]";
+		String expectedTokenIDToTypeMap = "{EOF=-1, B=3, A=4, C=5, WS=6}";
+		String expectedStringLiteralToTypeMap = "{'c'=5, 'a'=4, 'b'=3}";
+		String expectedTypeToTokenList = "[B, A, C, WS]";
 
-		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
-		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
+		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+
+		String found = execParser("M.g", master, "MParser", "MLexer",
+								  "s", "aa", debug);
+		assertEquals("S.x\n" +
+					 "T.y\n", found);
 	}
 
 	@Test public void testCombinedImportsCombined() throws Exception {
 		// for now, we don't allow combined to import combined
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
+		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"grammar S;\n" + // A, B, C token type order
 			"tokens { A; B; C; }\n" +
@@ -251,20 +252,21 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : x INT ;\n";
 		writeFile(tmpdir, "M.g", master);
 		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
+		antlr.addListener(equeue);
+		GrammarRootAST root = antlr.loadGrammar(tmpdir+"/M.g");
+		Grammar g = antlr.createGrammar(root);
+		g.fileName = "M.g";
+		antlr.process(g);
 
-		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
-		String expectedError = "error(161): "+tmpdir.toString().replaceFirst("\\-[0-9]+","")+"/M.g:2:8: combined grammar M cannot import combined grammar S";
-		assertEquals("unexpected errors: "+equeue, expectedError, equeue.errors.get(0).toString().replaceFirst("\\-[0-9]+",""));
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+
+		String found = execParser("M.g", master, "MParser", "MLexer",
+								  "s", "x 34 9", debug);
+		assertEquals("S.x\n", found);
 	}
 
 	@Test public void testSameStringTwoNames() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
+		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"parser grammar S;\n" +
 			"tokens { A='a'; }\n" +
@@ -285,38 +287,39 @@ public class TestCompositeGrammars extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		writeFile(tmpdir, "M.g", master);
 		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
+		antlr.addListener(equeue);
+		GrammarRootAST root = antlr.loadGrammar(tmpdir+"/M.g");
+		Grammar g = antlr.createGrammar(root);
+		g.fileName = "M.g";
+		antlr.process(g);
 
-		String expectedTokenIDToTypeMap = "[A=4, WS=5, X=6]";
-		String expectedStringLiteralToTypeMap = "{'a'=4}";
-		String expectedTypeToTokenList = "[A, WS, X]";
+		String expectedTokenIDToTypeMap = "{EOF=-1, T__0=3, WS=4, A=5, X=6}";
+		String expectedStringLiteralToTypeMap = "{'a'=6}";
+		String expectedTypeToTokenList = "[T__0, WS, A, X]";
 
-		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
-		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
+		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
 
 		Object expectedArg = "X='a'";
 		Object expectedArg2 = "A";
-		int expectedMsgID = ErrorManager.MSG_TOKEN_ALIAS_CONFLICT;
+		ErrorType expectedMsgID = ErrorType.TOKEN_STRING_REASSIGNMENT;
 		GrammarSemanticsMessage expectedMessage =
-			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+			new GrammarSemanticsMessage(expectedMsgID, g.fileName, null, expectedArg, expectedArg2);
 		checkGrammarSemanticsError(equeue, expectedMessage);
 
 		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
 
 		String expectedError =
-			"error(158): T.g:2:10: cannot alias X='a'; string already assigned to A";
-		assertEquals(expectedError, equeue.errors.get(0).toString());
+			"error(73): T.g:2:9: cannot alias X='a'; string already assigned to A";
+		ST msgST = antlr.errMgr.getMessageTemplate(equeue.errors.get(0));
+		String foundError = msgST.render();
+		assertEquals(expectedError, foundError);
 	}
+/*
 
 	@Test public void testSameNameTwoStrings() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
@@ -369,7 +372,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testImportedTokenVocabIgnoredWithWarning() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
@@ -407,7 +410,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testImportedTokenVocabWorksInRoot() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
@@ -448,7 +451,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testSyntaxErrorsInImportsNotThrownOut() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
@@ -474,7 +477,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testSyntaxErrorsInImportsNotThrownOut2() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
@@ -617,7 +620,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		writeFile(tmpdir, "/M.g", master);
 
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Tool antlr = newTool(new String[] {"-lib", tmpdir});
 		CompositeGrammar composite = new CompositeGrammar();
@@ -657,7 +660,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"a : A ;";
 		writeFile(tmpdir, "/M.g", master);
 
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Tool antlr = newTool(new String[] {"-lib", tmpdir});
 		CompositeGrammar composite = new CompositeGrammar();
@@ -698,7 +701,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testKeywordVSIDGivesNoWarning() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"lexer grammar S;\n" +
@@ -721,7 +724,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testWarningForUndefinedToken() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"lexer grammar S;\n" +
@@ -748,7 +751,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 	// Make sure that M can import S that imports T.
 	@Test public void test3LevelImport() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar T;\n" +
@@ -794,7 +797,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testBigTreeOfImports() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar T;\n" +
@@ -857,7 +860,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testRulesVisibleThroughMultilevelImport() throws Exception {
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar T;\n" +
@@ -899,7 +902,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 	@Test public void testNestedComposite() throws Exception {
 		// Wasn't compiling. http://www.antlr.org/jira/browse/ANTLR-438
-		org.antlr.test.ErrorQueue equeue = new org.antlr.test.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String gstr =
 			"lexer grammar L;\n" +
@@ -955,7 +958,7 @@ public class TestCompositeGrammars extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
-
+*/
 	@Test public void testHeadersPropogatedCorrectlyToImportedGrammars() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
@@ -974,5 +977,4 @@ public class TestCompositeGrammars extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
-	*/
 }
