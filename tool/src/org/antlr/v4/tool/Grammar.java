@@ -29,14 +29,11 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.TreeWizard;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
@@ -172,7 +169,14 @@ public class Grammar implements AttributeResolver {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, listener);
 	}
 
-	/** For testing; only builds trees; no sem anal */
+	/** For testing; builds trees, does sem anal */
+	public Grammar(String fileName, String grammarText)
+		throws org.antlr.runtime.RecognitionException
+	{
+		this(fileName, grammarText, null);
+	}
+
+	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
@@ -182,20 +186,18 @@ public class Grammar implements AttributeResolver {
 		this.tool.addListener(listener);
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
-		ANTLRLexer lexer = new ANTLRLexer(in);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		ToolANTLRParser p = new ToolANTLRParser(tokens,tool);
-		p.setTreeAdaptor(new GrammarASTAdaptor(in));
-		ParserRuleReturnScope r = p.grammarSpec();
-		if ( r.getTree() instanceof GrammarRootAST ) {
-			this.ast = (GrammarRootAST)r.getTree();
-			this.ast.hasErrors = p.getNumberOfSyntaxErrors()>0;
-			this.name = ((GrammarAST)ast.getChild(0)).getText();
 
-			GrammarTransformPipeline transform = new GrammarTransformPipeline();
-			transform.process(ast);
-		}
+		this.ast = tool.load(in);
+		// ensure each node has pointer to surrounding grammar
+		final Grammar thiz = this;
+		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
+		v.visit(ast, new TreeVisitorAction() {
+			public Object pre(Object t) { ((GrammarAST)t).g = thiz; return t; }
+			public Object post(Object t) { return t; }
+		});
 		initTokenSymbolTables();
+
+		tool.process(this);
     }
 
 	protected void initTokenSymbolTables() {

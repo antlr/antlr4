@@ -30,7 +30,6 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 
@@ -48,9 +47,9 @@ public class SymbolChecks {
     Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
 	Set<String> tokenIDs = new HashSet<String>();
     Set<String> globalScopeNames = new HashSet<String>();
-//    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
-	DoubleKeyMap<String, String, GrammarAST> namedActions =
-		new DoubleKeyMap<String, String, GrammarAST>();
+    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+//	DoubleKeyMap<String, String, GrammarAST> namedActions =
+//		new DoubleKeyMap<String, String, GrammarAST>();
 
 	public ErrorManager errMgr;
 
@@ -77,6 +76,7 @@ public class SymbolChecks {
 		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
 		// done in sem pipe for now
         checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
+		checkActionRedefinitions(collector.namedActions);
         checkTokenAliasRedefinitions(collector.tokensDefs);
         //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
@@ -104,6 +104,35 @@ public class SymbolChecks {
         }
     }
 
+	  public void checkActionRedefinitions(List<GrammarAST> actions) {
+        if ( actions==null ) return;
+        String scope = g.getDefaultActionScope();
+        String name = null;
+        GrammarAST nameNode = null;
+        for (GrammarAST ampersandAST : actions) {
+            nameNode = (GrammarAST)ampersandAST.getChild(0);
+            if ( ampersandAST.getChildCount()==2 ) {
+                name = nameNode.getText();
+            }
+            else {
+                scope = nameNode.getText();
+                name = ampersandAST.getChild(1).getText();
+            }
+            Set<String> scopeActions = actionScopeToActionNames.get(scope);
+            if ( scopeActions==null ) { // init scope
+                scopeActions = new HashSet<String>();
+                actionScopeToActionNames.put(scope, scopeActions);
+            }
+            if ( !scopeActions.contains(name) ) {
+                scopeActions.add(name);
+            }
+            else {
+                errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
+                                          g.fileName, nameNode.token, name);
+            }
+        }
+    }
+
     public void checkScopeRedefinitions(List<AttributeDict> dicts) {
         if ( dicts ==null ) return;
         for (int i=0; i< dicts.size(); i++) {
@@ -122,7 +151,7 @@ public class SymbolChecks {
 
 	/** Catch:
 		tokens { A='a'; A; }		can't redefine token type if has alias
-	 	tokens { A; A='a'; }
+	 	tokens { A; A='a'; }		can't redefine token type if has alias
 	 	tokens { A='a'; A='b'; }	can't have two aliases for single token type
 		tokens { A='a'; B='a'; }	can't have to token types for same string alias
 	 */
@@ -135,6 +164,7 @@ public class SymbolChecks {
         for (int i=0; i<aliases.size(); i++) {
             GrammarAST a = aliases.get(i);
 			GrammarAST idNode = a;
+			if ( a.getChildCount()>0 ) idNode = (GrammarAST)a.getChild(0);
 			GrammarAST prevToken = aliasTokenNames.get(idNode.getText());
 			GrammarAST stringNode = null;
 			if ( a.getChildCount()>0 ) stringNode = (GrammarAST)a.getChild(1);
@@ -160,9 +190,12 @@ public class SymbolChecks {
 				}
 			}
 			if ( prevString!=null ) {
-				errMgr.grammarError(ErrorType.TOKEN_STRING_REASSIGNMENT,
-									a.g.fileName, idNode.token, idNode.getText()+"="+stringNode.getText(),
-									prevString.getChild(0).getText());
+				// A='a' and A='a' are ok but not B='a' and A='a' are ok
+				if ( !prevString.getChild(0).getText().equals(idNode.getText()) ) {
+					errMgr.grammarError(ErrorType.TOKEN_STRING_REASSIGNMENT,
+										a.g.fileName, idNode.token, idNode.getText()+"="+stringNode.getText(),
+										prevString.getChild(0).getText());
+				}
 			}
 		}
 	}
@@ -179,14 +212,14 @@ public class SymbolChecks {
         }
     }
 
-	public void checkForRewriteIssues() {
-		// Ensure that all tokens refer to on the right if -> have been defined.
+	public void checkForUndefinedTokensInRewrite() {
+		// Ensure that all tokens refs on the right of -> have been defined.
 		for (GrammarAST elem : collector.rewriteElements) {
 			if ( elem.getType()==ANTLRParser.TOKEN_REF ) {
 				int ttype = g.getTokenType(elem.getText());
 				if ( ttype == Token.INVALID_TOKEN_TYPE ) {
-				g.tool.errMgr.grammarError(ErrorType.UNDEFINED_TOKEN_REF_IN_REWRITE,
-										   g.fileName, elem.token, elem.getText());
+					g.tool.errMgr.grammarError(ErrorType.UNDEFINED_TOKEN_REF_IN_REWRITE,
+											   g.fileName, elem.token, elem.getText());
 				}
 			}
 		}

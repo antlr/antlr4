@@ -366,10 +366,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		if ( optionID.getText().equals("tokenVocab") &&
 			 g.parent!=null ) // only allow tokenVocab option in root grammar
 		{
-			g.tool.errMgr.grammarWarning(ErrorType.TOKEN_VOCAB_IN_DELEGATE,
-										 g.fileName,
-										 optionID,
-										 g.name);
+			g.tool.errMgr.grammarError(ErrorType.TOKEN_VOCAB_IN_DELEGATE,
+									   g.fileName,
+									   optionID,
+									   g.name);
 			ok = false;
 		}
 
@@ -455,10 +455,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			 options.get("rewrite").equals("true") )
 		{
 			String fileName = altStart.getInputStream().getSourceName();
-			g.tool.errMgr.grammarWarning(ErrorType.REWRITE_FOR_MULTI_ELEMENT_ALT,
-										 fileName,
-										 altStart,
-										 alt);
+			g.tool.errMgr.grammarError(ErrorType.REWRITE_FOR_MULTI_ELEMENT_ALT,
+									   fileName,
+									   altStart,
+									   alt);
 		}
 	}
 
@@ -470,25 +470,25 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		String ruleName = rule.getChild(0).getText();
 		String fileName = elementRoot.token.getInputStream().getSourceName();
 		if ( options==null || !options.get("output").equals("AST") ) {
-			g.tool.errMgr.grammarWarning(ErrorType.AST_OP_WITH_NON_AST_OUTPUT_OPTION,
-										 fileName,
-										 elementRoot.token,
-										 op.getText());
+			g.tool.errMgr.grammarError(ErrorType.AST_OP_WITH_NON_AST_OUTPUT_OPTION,
+									   fileName,
+									   elementRoot.token,
+									   op.getText());
 		}
 		if ( options!=null && options.get("output")==null ) {
-			g.tool.errMgr.grammarWarning(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
-										 fileName,
-										 elementRoot.token,
-										 ruleName);
+			g.tool.errMgr.grammarError(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+									   fileName,
+									   elementRoot.token,
+									   ruleName);
 		}
 		if ( op.hasAncestor(ANTLRParser.ALT_REWRITE) ) {
 			GrammarAST rew = (GrammarAST)op.getAncestor(ANTLRParser.ALT_REWRITE);
 			int altNum = rew.getChildIndex() + 1; // alts are 1..n
-			g.tool.errMgr.grammarWarning(ErrorType.AST_OP_IN_ALT_WITH_REWRITE,
-										 fileName,
-										 elementRoot.token,
-										 ruleName,
-										 altNum);
+			g.tool.errMgr.grammarError(ErrorType.AST_OP_IN_ALT_WITH_REWRITE,
+									   fileName,
+									   elementRoot.token,
+									   ruleName,
+									   altNum);
 		}
 	}
 
@@ -496,10 +496,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		String ruleName = currentRuleAST.getChild(0).getText();
 		String fileName = elementRoot.token.getInputStream().getSourceName();
 		if ( options!=null && options.get("output")==null ) {
-			g.tool.errMgr.grammarWarning(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
-										 fileName,
-										 elementRoot.token,
-										 ruleName);
+			g.tool.errMgr.grammarError(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+									   fileName,
+									   elementRoot.token,
+									   ruleName);
 		}
 	}
 

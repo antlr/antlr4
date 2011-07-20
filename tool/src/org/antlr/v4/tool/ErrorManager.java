@@ -29,7 +29,6 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.*;
@@ -98,6 +97,7 @@ public class ErrorManager {
 				if ( i>0 ) attr += i + 1;
 				messageST.add(attr, msg.args[i]);
 			}
+			if ( msg.args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
 		}
 		if ( msg.e!=null ) {
 			messageST.add("exception", msg.e);
@@ -156,7 +156,10 @@ public class ErrorManager {
 								   org.antlr.runtime.RecognitionException antlrException,
 								   Object... args)
 	{
-		errors++;
+		switch ( etype.severity ) {
+			case WARNING: warnings++; break;
+			case ERROR: errors++; break;
+		}
 		ANTLRMessage msg = new GrammarSyntaxMessage(etype,fileName,token,antlrException,args);
 		tool.error(msg);
 	}
@@ -185,12 +188,18 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public void toolError(ErrorType errorType, Object... args) {
-        errors++;
+		switch ( errorType.severity ) {
+			case WARNING: warnings++; break;
+			case ERROR: errors++; break;
+		}
         tool.error(new ToolMessage(errorType, args));
 	}
 
 	public void toolError(ErrorType errorType, Throwable e, Object... args) {
-        errors++;
+		switch ( errorType.severity ) {
+			case WARNING: warnings++; break;
+			case ERROR: errors++; break;
+		}
         tool.error(new ToolMessage(errorType, e, args));
 	}
 
@@ -199,19 +208,12 @@ public class ErrorManager {
 							 org.antlr.runtime.Token token,
 							 Object... args)
 	{
-		errors++;
+		switch ( etype.severity ) {
+			case WARNING: warnings++; break;
+			case ERROR: errors++; break;
+		}
         ANTLRMessage msg = new GrammarSemanticsMessage(etype,fileName,token,args);
         tool.error(msg);
-    }
-
-    public void grammarWarning(ErrorType etype,
-                                      String fileName,
-                                      Token token,
-                                      Object... args)
-    {
-        warnings++;
-        ANTLRMessage msg = new GrammarSemanticsMessage(etype,fileName,token,args);
-        tool.warning(msg);
     }
 
 	public void leftRecursionCycles(String fileName, Collection cycles) {

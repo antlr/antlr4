@@ -137,7 +137,9 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** Not valid for non-lexers */
-	public Handle range(GrammarAST a, GrammarAST b) { throw new UnsupportedOperationException(); }
+	public Handle range(GrammarAST a, GrammarAST b) {
+		throw new UnsupportedOperationException();
+	}
 
 	/** ~atom only */
 	/*

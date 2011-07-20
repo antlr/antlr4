@@ -47,8 +47,8 @@ public class GrammarTransformPipeline {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		BlockSetTransformer transformer = new BlockSetTransformer(nodes);
 		transformer.setTreeAdaptor(adaptor);
-		System.out.println("before: "+ast.toStringTree());
+//		System.out.println("before: "+ast.toStringTree());
 		transformer.downup(ast);
-		System.out.println("after: "+ast.toStringTree());
+//		System.out.println("after: "+ast.toStringTree());
 	}
 }

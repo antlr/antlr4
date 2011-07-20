@@ -648,29 +648,12 @@ public abstract class BaseTest {
                 String[] lines = input.split("\n");
 				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
                 g = new Grammar(fileName, input, equeue);
-
-				if ( printTree ) {
-					if ( g.ast!=null ) System.out.println(g.ast.toStringTree());
-					else System.out.println("null tree");
-				}
-
-				if ( g.ast!=null && !g.ast.hasErrors ) {
-					Tool antlr = new Tool();
-					SemanticPipeline sem = new SemanticPipeline(g);
-					sem.process();
-					if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-						for (Grammar imp : g.getImportedGrammars()) {
-							antlr.processNonCombinedGrammar(imp);
-						}
-					}
-				}
-
-				//g.loadImportedGrammars();
             }
             catch (org.antlr.runtime.RecognitionException re) {
                 re.printStackTrace(System.err);
             }
             String actual = equeue.toString(g.tool);
+			System.err.println(actual);
 			String msg = input;
 			msg = msg.replaceAll("\n","\\\\n");
 			msg = msg.replaceAll("\r","\\\\r");
@@ -690,10 +673,11 @@ public abstract class BaseTest {
 		String[] lines = errs.split("\n");
 		for (int i=0; i<lines.length; i++) {
 			String s = lines[i];
-			int lp = s.indexOf('(');
+			int lp = s.indexOf("error(");
 			int rp = s.indexOf(')', lp);
-			if ( lp<0 || rp<0 ) return s;
-			lines[i] = s.substring(0, lp) + s.substring(rp+1, s.length());
+			if ( lp>=0 && rp>=0 ) {
+				lines[i] = s.substring(0, lp) + s.substring(rp+1, s.length());
+			}
 		}
 		return Utils.join(lines, "\n");
 	}
@@ -846,7 +830,7 @@ public abstract class BaseTest {
         }
     }
 
-	protected void writeFile(String dir, String fileName, String content) {
+	public static void writeFile(String dir, String fileName, String content) {
 		try {
 			File f = new File(dir, fileName);
 			FileWriter w = new FileWriter(f);

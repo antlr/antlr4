@@ -99,7 +99,7 @@ public enum ErrorType {
 	RULE_HAS_NO_ARGS("rule <arg> has no defined parameters", ErrorSeverity.ERROR),
 	ARGS_ON_TOKEN_REF("token reference <arg> may not have parameters", ErrorSeverity.ERROR),
 	RULE_REF_AMBIG_WITH_RULE_IN_ALT("", ErrorSeverity.ERROR),
-	ILLEGAL_OPTION("illegal option <arg>", ErrorSeverity.ERROR),
+	ILLEGAL_OPTION("illegal option <arg>", ErrorSeverity.WARNING),
 	LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT("", ErrorSeverity.ERROR),
 	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS("reference to rewrite element <arg> not found to left of ->", ErrorSeverity.ERROR),
     UNDEFINED_TOKEN_REF_IN_REWRITE("token <arg> in rewrite is undefined", ErrorSeverity.ERROR),

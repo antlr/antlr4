@@ -375,6 +375,9 @@ public class Tool {
 	 	grammars.
 	 */
 	public void mergeImportedGrammars(Grammar rootGrammar) {
+		List<Grammar> imports = rootGrammar.getAllImportedGrammars();
+		if ( imports==null ) return;
+
 		GrammarAST root = rootGrammar.ast;
 		GrammarAST id = (GrammarAST) root.getChild(0);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(id.token.getInputStream());
@@ -396,9 +399,6 @@ public class Tool {
 			List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
 			for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
 		}
-
-		List<Grammar> imports = rootGrammar.getAllImportedGrammars();
-		if ( imports==null ) return;
 
 		for (Grammar imp : imports) {
 			GrammarAST imp_tokensRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.TOKENS);
@@ -498,8 +498,8 @@ public class Tool {
 	 *  tokenVocab or tokens{} section.
 	 *
 	 *  Side-effects: it removes children from GRAMMAR & RULES nodes
-	 *                in combined AST. Careful: nodes are shared between
-	 *                trees after this call.
+	 *                in combined AST.  Anything cut out is dup'd before
+	 *                adding to lexer to avoid "who's ur daddy" issues
 	 */
 	public GrammarRootAST extractImplicitLexer(Grammar combinedGrammar) {
 		GrammarRootAST combinedAST = combinedGrammar.ast;
@@ -525,7 +525,7 @@ public class Tool {
 			for (GrammarAST o : options) {
 				String optionName = o.getChild(0).getText();
 				if ( !Grammar.doNotCopyOptionsToLexer.contains(optionName) ) {
-					lexerOptionsRoot.addChild(o);
+					lexerOptionsRoot.addChild((Tree)adaptor.dupTree(o));
 				}
 			}
 		}
@@ -535,7 +535,7 @@ public class Tool {
 		for (GrammarAST e : elements) {
 			if ( e.getType()==ANTLRParser.AT ) {
 				if ( e.getChild(0).getText().equals("lexer") ) {
-					lexerAST.addChild(e);
+					lexerAST.addChild((Tree)adaptor.dupTree(e));
 					actionsWeMoved.add(e);
 				}
 			}
@@ -555,7 +555,7 @@ public class Tool {
 		for (GrammarASTWithOptions r : rules) {
 			String ruleName = r.getChild(0).getText();
 			if ( Character.isUpperCase(ruleName.charAt(0)) ) {
-				lexerRulesRoot.addChild(r);
+				lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
 				rulesWeMoved.add(r);
 			}
 		}
@@ -593,10 +593,10 @@ public class Tool {
 			lexerRulesRoot.getChildren().add(0, litRule); // add first
 		}
 
-		lexerRulesRoot.freshenParentAndChildIndexesDeeply();
-		combinedRulesRoot.freshenParentAndChildIndexesDeeply();
+		lexerAST.freshenParentAndChildIndexesDeeply();
+		combinedAST.freshenParentAndChildIndexesDeeply();
 
-		System.out.println("after ="+combinedAST.toStringTree());
+		System.out.println("after extract implicit lexer ="+combinedAST.toStringTree());
 		System.out.println("lexer ="+lexerAST.toStringTree());
 		return lexerAST;
 	}

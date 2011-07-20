@@ -91,7 +91,7 @@ public class SemanticPipeline {
 			g.defineRule(r);
 		}
 		for (GrammarAST a : collector.namedActions) {
-			g.defineAction((GrammarAST)a.getParent());
+			g.defineAction(a);
 		}
 
 		// LINK (outermost) ALT NODES WITH Alternatives
@@ -122,7 +122,7 @@ public class SemanticPipeline {
 		// CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
 		AttributeChecks.checkAllAttributeExpressions(g);
 
-		symcheck.checkForRewriteIssues();
+		symcheck.checkForUndefinedTokensInRewrite();
 
 		UseDefAnalyzer.checkRewriteElementsPresentOnLeftSide(g);
 		UseDefAnalyzer.trackTokenRuleRefsInActions(g);

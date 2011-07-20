@@ -33,7 +33,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.ANTLRParser;
 
-/** An ALT or ALT_REWRITE node (left of ->) */
+/** An ALT (which can be child of ALT_REWRITE node) */
 public class AltAST extends GrammarAST {
 	public Alternative alt;
 
@@ -47,8 +47,11 @@ public class AltAST extends GrammarAST {
 	public AltAST(int type, Token t) { super(type, t); }
 
 	public GrammarAST getRewrite() {
-		if ( getType() == ANTLRParser.ALT ) return null;
-		return (GrammarAST)getChild(1); // ^(ALT_REWRITE ^(ALT ...) ^(-> ...))
+		// ^(ALT_REWRITE ^(ALT ...) ^(-> ...)) ??
+		if ( getParent().getType() == ANTLRParser.ALT_REWRITE ) {
+			return (GrammarAST)getParent().getChild(1);
+		}
+		return null;
 	}
 
 	@Override
