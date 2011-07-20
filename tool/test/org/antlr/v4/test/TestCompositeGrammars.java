@@ -67,6 +67,22 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
+	@Test public void testBringInLiteralsFromDelegate() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : '=' 'a' {System.out.println(\"S.a\");} ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n" ;
+		String found = execParser("M.g", master, "MParser", "MLexer",
+								  "s", "=a", debug);
+		assertEquals("S.a\n", found);
+	}
+
 	@Test public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		// must generate something like:
 		// public int a(int x) throws RecognitionException { return gS.a(x); }
@@ -254,58 +270,8 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.x\n", found);
 	}
 
-	@Test public void testSameStringTwoNames() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		String slave =
-			"parser grammar S;\n" +
-			"tokens { A='a'; }\n" +
-			"x : A {System.out.println(\"S.x\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-		String slave2 =
-			"parser grammar T;\n" +
-			"tokens { X='a'; }\n" +
-			"y : X {System.out.println(\"T.y\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "T.g", slave2);
-
-		String master =
-			"grammar M;\n" +
-			"import S,T;\n" +
-			"s : x y ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
-		writeFile(tmpdir, "M.g", master);
-
-		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
-
-		String expectedTokenIDToTypeMap = "{EOF=-1, T__0=3, WS=4, A=5, X=6}";
-		String expectedStringLiteralToTypeMap = "{'a'=6}";
-		String expectedTypeToTokenList = "[T__0, WS, A, X]";
-
-		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
-		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
-
-		Object expectedArg = "X='a'";
-		Object expectedArg2 = "A";
-		ErrorType expectedMsgID = ErrorType.TOKEN_STRING_REASSIGNMENT;
-		GrammarSemanticsMessage expectedMessage =
-			new GrammarSemanticsMessage(expectedMsgID, g.fileName, null, expectedArg, expectedArg2);
-		checkGrammarSemanticsError(equeue, expectedMessage);
-
-		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
-
-		String expectedError =
-			"error(73): T.g:2:9: cannot alias X='a'; string already assigned to A";
-//		ST msgST = antlr.errMgr.getMessageTemplate(equeue.errors.get(0));
-//		String foundError = msgST.render();
-//		assertEquals(expectedError, foundError);
-	}
-
-	/*
 	@Test public void testImportedTokenVocabIgnoredWithWarning() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
 			"options {tokenVocab=whatever;}\n" +
@@ -320,71 +286,20 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : x ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
+		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
 		Object expectedArg = "S";
-		int expectedMsgID = ErrorManager.MSG_TOKEN_VOCAB_IN_DELEGATE;
+		ErrorType expectedMsgID = ErrorType.OPTIONS_IN_DELEGATE;
 		GrammarSemanticsMessage expectedMessage =
-			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+			new GrammarSemanticsMessage(expectedMsgID, g.fileName, null, expectedArg);
 		checkGrammarSemanticsWarning(equeue, expectedMessage);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-		assertEquals("unexpected errors: "+equeue, 1, equeue.warnings.size());
-
-		String expectedError =
-			"warning(160): S.g:2:10: tokenVocab option ignored in imported grammar S";
-		assertEquals(expectedError, equeue.warnings.get(0).toString());
-	}
-
-	@Test public void testImportedTokenVocabWorksInRoot() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		String slave =
-			"parser grammar S;\n" +
-			"tokens { A='a'; }\n" +
-			"x : A {System.out.println(\"S.x\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-
-		String tokens =
-			"A=99\n";
-		writeFile(tmpdir, "Test.tokens", tokens);
-
-		String master =
-			"grammar M;\n" +
-			"options {tokenVocab=Test;}\n" +
-			"import S;\n" +
-			"s : x ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
-		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
-
-		String expectedTokenIDToTypeMap = "[A=99, WS=101]";
-		String expectedStringLiteralToTypeMap = "{'a'=100}";
-		String expectedTypeToTokenList = "[A, 'a', WS]";
-
-		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
-		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
-
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertEquals("unexpected warnings: "+equeue, 1, equeue.warnings.size());
 	}
 
 	@Test public void testSyntaxErrorsInImportsNotThrownOut() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar S;\n" +
 			"options {toke\n";
@@ -397,41 +312,9 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : x ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
+		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
-		// whole bunch of errors from bad S.g file
-		assertEquals("unexpected errors: "+equeue, 5, equeue.errors.size());
-	}
-
-	@Test public void testSyntaxErrorsInImportsNotThrownOut2() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		String slave =
-			"parser grammar S;\n" +
-			": A {System.out.println(\"S.x\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-
-		String master =
-			"grammar M;\n" +
-			"import S;\n" +
-			"s : x ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
-		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
-
-		// whole bunch of errors from bad S.g file
-		assertEquals("unexpected errors: "+equeue, 3, equeue.errors.size());
+		assertEquals(ErrorType.SYNTAX_ERROR, equeue.errors.get(0).errorType);
 	}
 
 	@Test public void testDelegatorRuleOverridesDelegate() throws Exception {
@@ -456,9 +339,9 @@ public class TestCompositeGrammars extends BaseTest {
 			"parser grammar JavaDecl;\n" +
 			"type : 'int' ;\n" +
 			"decl : type ID ';'\n" +
-			"     | type ID init ';' {System.out.println(\"JavaDecl: \"+$decl.text);}\n" +
+			"     | type ID init ';' {System.out.println(\"JavaDecl: \"+$text);}\n" +
 			"     ;\n" +
-			"init : '=' INT ;\n" ;
+			"init : '=' INT ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "JavaDecl.g", slave);
 		String master =
@@ -476,6 +359,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("JavaDecl: floatx=3;\n", found);
 	}
 
+	/*
     @Test public void testDelegatorRuleOverridesDelegates() throws Exception {
         String slave =
             "parser grammar S;\n" +

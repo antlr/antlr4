@@ -156,12 +156,8 @@ public class ErrorManager {
 								   org.antlr.runtime.RecognitionException antlrException,
 								   Object... args)
 	{
-		switch ( etype.severity ) {
-			case WARNING: warnings++; break;
-			case ERROR: errors++; break;
-		}
 		ANTLRMessage msg = new GrammarSyntaxMessage(etype,fileName,token,antlrException,args);
-		tool.error(msg);
+		emit(etype, msg);
 	}
 
 	public static void fatalInternalError(String error, Throwable e) {
@@ -188,19 +184,14 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public void toolError(ErrorType errorType, Object... args) {
-		switch ( errorType.severity ) {
-			case WARNING: warnings++; break;
-			case ERROR: errors++; break;
-		}
-        tool.error(new ToolMessage(errorType, args));
+		ToolMessage msg = new ToolMessage(errorType, args);
+		emit(errorType, msg);
+		tool.error(msg);
 	}
 
 	public void toolError(ErrorType errorType, Throwable e, Object... args) {
-		switch ( errorType.severity ) {
-			case WARNING: warnings++; break;
-			case ERROR: errors++; break;
-		}
-        tool.error(new ToolMessage(errorType, e, args));
+		ToolMessage msg = new ToolMessage(errorType, e, args);
+		emit(errorType, msg);
 	}
 
     public void grammarError(ErrorType etype,
@@ -208,13 +199,10 @@ public class ErrorManager {
 							 org.antlr.runtime.Token token,
 							 Object... args)
 	{
-		switch ( etype.severity ) {
-			case WARNING: warnings++; break;
-			case ERROR: errors++; break;
-		}
         ANTLRMessage msg = new GrammarSemanticsMessage(etype,fileName,token,args);
-        tool.error(msg);
-    }
+		emit(etype, msg);
+
+	}
 
 	public void leftRecursionCycles(String fileName, Collection cycles) {
 		errors++;
@@ -241,6 +229,13 @@ public class ErrorManager {
     }
 
     // S U P P O R T  C O D E
+
+	public void emit(ErrorType etype, ANTLRMessage msg) {
+		switch ( etype.severity ) {
+			case WARNING: warnings++; tool.warning(msg); break;
+			case ERROR: errors++; tool.error(msg); break;
+		}
+	}
 
     /** The format gets reset either from the Tool if the user supplied a command line option to that effect
      *  Otherwise we just use the default "antlr".

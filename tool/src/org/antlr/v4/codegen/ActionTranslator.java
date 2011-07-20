@@ -40,6 +40,14 @@ import java.util.*;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
+	public static final Map<String, Class> thisRulePropToModelMap = new HashMap<String, Class>() {{
+		put("start", ThisRulePropertyRef_start.class);
+		put("stop", ThisRulePropertyRef_stop.class);
+		put("tree", ThisRulePropertyRef_tree.class);
+		put("text", ThisRulePropertyRef_text.class);
+		put("st", ThisRulePropertyRef_st.class);
+	}};
+
 	public static final Map<String, Class> rulePropToModelMap = new HashMap<String, Class>() {{
 		put("start", RulePropertyRef_start.class);
 		put("stop", RulePropertyRef_stop.class);
@@ -123,7 +131,7 @@ public class ActionTranslator implements ActionSplitterListener {
 			switch ( a.dict.type ) {
 				case ARG: chunks.add(new ArgRef(x.getText())); break;
 				case RET: chunks.add(new RetValueRef(x.getText())); break;
-//			case PREDEFINED_RULE: chunks.add(new RetValueRef(x.getText())); break;
+				case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x));	break;
 //			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
 			}
 		}
@@ -175,7 +183,14 @@ public class ActionTranslator implements ActionSplitterListener {
 				else {
 					chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
 				}
-			case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x, y));	break;
+			case PREDEFINED_RULE:
+				if ( a.dict == Rule.predefinedRulePropertiesDict ) {
+					chunks.add(getRulePropertyRef(y));
+				}
+				else {
+					chunks.add(getRulePropertyRef(x, y));
+				}
+				break;
 			case TOKEN: chunks.add(getTokenPropertyRef(x, y));	break;
 //			case PREDEFINED_LEXER_RULE: chunks.add(new RetValueRef(x.getText())); break;
 //			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
@@ -259,9 +274,24 @@ public class ActionTranslator implements ActionSplitterListener {
 		return null;
 	}
 
-	RulePropertyRef getRulePropertyRef(Token x, Token y) {
+	// $text
+	RulePropertyRef getRulePropertyRef(Token prop) {
 		try {
-			Class c = rulePropToModelMap.get(y.getText());
+			Class c = thisRulePropToModelMap.get(prop.getText());
+			Constructor ctor = c.getConstructor(new Class[] {String.class});
+			RulePropertyRef ref =
+				(RulePropertyRef)ctor.newInstance(getRuleLabel(prop.getText()));
+			return ref;
+		}
+		catch (Exception e) {
+			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+		}
+		return null;
+	}
+
+	RulePropertyRef getRulePropertyRef(Token x, Token prop) {
+		try {
+			Class c = rulePropToModelMap.get(prop.getText());
 			Constructor ctor = c.getConstructor(new Class[] {String.class});
 			RulePropertyRef ref =
 				(RulePropertyRef)ctor.newInstance(getRuleLabel(x.getText()));

@@ -341,6 +341,12 @@ RulePropertyRef_tree(r)  ::= "(_localctx.<r.label>!=null?((<file.ASTLabelType>)_
 RulePropertyRef_text(r)  ::= "(_localctx.<r.label>!=null?((TokenStream)input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
 RulePropertyRef_st(r)    ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 
+ThisRulePropertyRef_start(r) ::= "_localctx.start"
+ThisRulePropertyRef_stop(r)  ::= "_localctx.stop"
+ThisRulePropertyRef_tree(r)  ::= "_localctx.tree"
+ThisRulePropertyRef_text(r)  ::= "((TokenStream)input).toString(_localctx.start, input.LT(-1))"
+ThisRulePropertyRef_st(r)    ::= "_localctx.st"
+
 DynScopeRef(s)           ::= "<s.scope>"
 DynScopeAttrRef(s)       ::= "<s.scope>.peek().<s.attr>"
 DynScopeAttrRef_negIndex(s, indexChunks) ::=

@@ -711,7 +711,6 @@ public class Grammar implements AttributeResolver {
 
 	public Set<String> getStringLiterals() {
 		// TODO: super inefficient way to get these.
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		SymbolCollector collector = new SymbolCollector(this);
 		collector.process(ast); // no side-effects; find strings
 		return collector.strings;

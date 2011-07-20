@@ -235,7 +235,15 @@ public class TestActionTranslation extends BaseTest {
 		testActions(scopeTemplate, "inline", action, expected);
 	}
 
-
+	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
+        String action = "$a.text; $text";
+		String expected =
+			"((TokenStream)input).toString(_localctx.start, _localctx.stop); " +
+			"((TokenStream)input).toString(_localctx.start, _localctx.stop)";
+		testActions(attributeTemplate, "init", action, expected);
+		testActions(attributeTemplate, "inline", action, expected);
+		testActions(attributeTemplate, "finally", action, expected);
+    }
 
     @Test public void testDynamicRuleScopeRefInSubrule() throws Exception {
         String action = "$a::n;";
@@ -276,9 +284,7 @@ public class TestActionTranslation extends BaseTest {
     @Test public void testRefToTemplateAttributeForCurrentRule() throws Exception {
         String action = "$st=null;";
     }
-    @Test public void testRefToTextAttributeForCurrentRule() throws Exception {
-        String action = "$text";
-    }
+
     @Test public void testRefToStartAttributeForCurrentRule() throws Exception {
         String action = "$start;";
     }

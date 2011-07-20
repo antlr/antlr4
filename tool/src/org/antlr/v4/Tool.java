@@ -225,7 +225,7 @@ public class Tool {
 	public void process(Grammar g) {
 		g.loadImportedGrammars();
 
-		mergeImportedGrammars(g);
+		integrateImportedGrammars(g);
 
 		GrammarTransformPipeline transform = new GrammarTransformPipeline();
 		transform.process(g.ast);
@@ -374,7 +374,7 @@ public class Tool {
 	 	The goal is a complete combined grammar so we can ignore subordinate
 	 	grammars.
 	 */
-	public void mergeImportedGrammars(Grammar rootGrammar) {
+	public void integrateImportedGrammars(Grammar rootGrammar) {
 		List<Grammar> imports = rootGrammar.getAllImportedGrammars();
 		if ( imports==null ) return;
 
@@ -401,6 +401,7 @@ public class Tool {
 		}
 
 		for (Grammar imp : imports) {
+			// COPY TOKENS
 			GrammarAST imp_tokensRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.TOKENS);
 			if ( imp_tokensRoot!=null ) {
 				System.out.println("imported tokens: "+imp_tokensRoot.getChildren());
@@ -417,6 +418,7 @@ public class Tool {
 			if ( actionRoots!=null ) all_actionRoots.addAll(actionRoots);
 			all_actionRoots.addAll(imp_actionRoots);
 
+			// COPY ACTIONS
 			if ( imp_actionRoots!=null ) {
 				DoubleKeyMap<String, String, GrammarAST> namedActions =
 					new DoubleKeyMap<String, String, GrammarAST>();
@@ -468,6 +470,7 @@ public class Tool {
 				}
 			}
 
+			// COPY RULES
 			List<GrammarAST> rules = imp.ast.getNodesWithType(ANTLRParser.RULE);
 			if ( rules!=null ) {
 				for (GrammarAST r : rules) {
@@ -479,6 +482,12 @@ public class Tool {
 						rootRuleNames.add(name);
 					}
 				}
+			}
+
+			GrammarAST optionsRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.OPTIONS);
+			if ( optionsRoot!=null ) {
+				errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
+									optionsRoot.g.fileName, optionsRoot.token, imp.name);
 			}
 		}
 		System.out.println("Grammar: "+rootGrammar.ast.toStringTree());
@@ -560,7 +569,9 @@ public class Tool {
 			}
 		}
 		int nLexicalRules = rulesWeMoved.size();
-		rules.removeAll(rulesWeMoved);
+		for (GrammarAST r : rulesWeMoved) {
+			combinedRulesRoot.deleteChild( r );
+		}
 
 		// Will track 'if' from IF : 'if' ; rules to avoid defining new token for 'if'
 		Map<String,String> litAliases =
@@ -576,6 +587,7 @@ public class Tool {
 		Set<String> stringLiterals = combinedGrammar.getStringLiterals();
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
+//		System.out.println("strings from parser: "+stringLiterals);
 		for (String lit : stringLiterals) {
 			if ( litAliases!=null && litAliases.containsKey(lit) ) continue; // already has rule
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
@@ -591,10 +603,15 @@ public class Tool {
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
 			lexerRulesRoot.getChildren().add(0, litRule); // add first
+			lexerRulesRoot.freshenParentAndChildIndexes(); // reset indexes and set litRule parent
 		}
 
-		lexerAST.freshenParentAndChildIndexesDeeply();
-		combinedAST.freshenParentAndChildIndexesDeeply();
+		lexerAST.sanityCheckParentAndChildIndexes();
+		combinedAST.sanityCheckParentAndChildIndexes();
+//		System.out.println(combinedAST.toTokenString());
+
+//		lexerAST.freshenParentAndChildIndexesDeeply();
+//		combinedAST.freshenParentAndChildIndexesDeeply();
 
 		System.out.println("after extract implicit lexer ="+combinedAST.toStringTree());
 		System.out.println("lexer ="+lexerAST.toStringTree());

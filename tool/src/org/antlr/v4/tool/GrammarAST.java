@@ -31,7 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
-import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
@@ -89,6 +89,14 @@ public class GrammarAST extends CommonTree {
 		return null;
 	}
 
+	public void deleteChild(GrammarAST t) {
+		List<GrammarAST> dup = new ArrayList<GrammarAST>();
+		dup.addAll(children);
+		for (Object c : dup) {
+			if ( c == t ) deleteChild(t.getChildIndex());
+		}
+	}
+
     // TODO: move to basetree when i settle on how runtime works
     // TODO: don't include this node!!
 	// TODO: reuse other method
@@ -131,4 +139,23 @@ public class GrammarAST extends CommonTree {
     public String toString() {
         return super.toString();
     }
+
+	public String toTokenString() {
+		CharStream input = this.token.getInputStream();
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(input);
+		CommonTreeNodeStream nodes =
+			new CommonTreeNodeStream(adaptor, this);
+		StringBuffer buf = new StringBuffer();
+		GrammarAST o = (GrammarAST)nodes.LT(1);
+		int type = adaptor.getType(o);
+		while ( type!=Token.EOF ) {
+			buf.append(" ");
+			buf.append(o.token.getText());
+			nodes.consume();
+			o = (GrammarAST)nodes.LT(1);
+			type = adaptor.getType(o);
+		}
+		return buf.toString();
+	}
+
 }

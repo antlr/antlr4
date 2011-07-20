@@ -85,7 +85,7 @@ public String grammarName;
 public GrammarAST currentRuleAST;
 public String currentModeName = LexerGrammar.DEFAULT_MODE_NAME;
 public String currentRuleName;
-public GrammarAST currentRuleBlock;
+//public GrammarAST currentRuleBlock;
 public GrammarAST currentOuterAltRoot;
 public int currentOuterAltNumber = 1; // 1..n
 public int rewriteEBNFLevel = 0;
@@ -136,12 +136,11 @@ public void discoverRules(GrammarAST rules) { }
 public void finishRules(GrammarAST rule) { }
 public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
 						 ActionAST arg, ActionAST returns, GrammarAST thrws,
-						 GrammarAST options, List<ActionAST> actions,
+						 GrammarAST options, List<GrammarAST> actions,
 						 GrammarAST block) { }
 public void finishRule(GrammarAST rule, GrammarAST ID, GrammarAST block) { }
 public void ruleCatch(GrammarAST arg, ActionAST action) { }
 public void finallyAction(ActionAST action) { }
-public void ruleNamedAction(GrammarAST ID, ActionAST action) { }
 /** outermost alt */
 public void discoverAlt(AltAST alt) { }
 /** outermost alt */
@@ -253,7 +252,7 @@ mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} rule+ ) ;
 rule
 @init {
 List<GrammarAST> mods = new ArrayList<GrammarAST>();
-List<ActionAST> actions = new ArrayList<ActionAST>();
+List<GrammarAST> actions = new ArrayList<GrammarAST>(); // track roots
 }
 	:   ^(	RULE ID {currentRuleName=$ID.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
@@ -262,7 +261,7 @@ List<ActionAST> actions = new ArrayList<ActionAST>();
       		thr=throwsSpec?
       		(	ruleScopeSpec
 		    |   opts=optionsSpec
-		    |   a=ruleAction {actions.add((ActionAST)$a.start);}
+		    |   a=ruleAction {actions.add($a.start);}
 		    )* 
       		{discoverRule((RuleAST)$RULE, $ID, mods, (ActionAST)$ARG_ACTION,
       					  $ret.start!=null?(ActionAST)$ret.start.getChild(0):null,
@@ -298,7 +297,7 @@ ruleScopeSpec
 	;
 
 ruleAction
-	:	^(AT ID ACTION)	{ruleNamedAction($ID, (ActionAST)$ACTION);}
+	:	^(AT ID ACTION)
 	;
 
 ruleModifier

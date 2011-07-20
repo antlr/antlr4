@@ -105,7 +105,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void discoverRule(RuleAST rule, GrammarAST ID,
 							 List<GrammarAST> modifiers, ActionAST arg,
 							 ActionAST returns, GrammarAST thrws,
-							 GrammarAST options, List<ActionAST> actions,
+							 GrammarAST options, List<GrammarAST> actions,
 							 GrammarAST block)
 	{
 		int numAlts = block.getChildCount();
@@ -127,6 +127,13 @@ public class SymbolCollector extends GrammarTreeVisitor {
 			r.retvals.type = AttributeDict.DictType.RET;
 			r.retvals.ast = returns;
 		}
+
+		for (GrammarAST a : actions) {
+			// a = ^(AT ID ACTION)
+			ActionAST action = (ActionAST) a.getChild(1);
+			currentRule.namedActions.put(a.getChild(0).getText(), action);
+			action.resolver = currentRule;
+		}
 	}
 
 	@Override
@@ -135,12 +142,6 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	@Override
 	public void discoverAlt(AltAST alt) {
 		currentRule.alt[currentOuterAltNumber].ast = alt;
-	}
-
-	@Override
-	public void ruleNamedAction(GrammarAST ID, ActionAST action) {
-		currentRule.namedActions.put(ID.getText(), action);
-		action.resolver = currentRule;
 	}
 
 	@Override

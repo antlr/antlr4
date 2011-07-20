@@ -207,7 +207,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 							 List<GrammarAST> modifiers,
 							 ActionAST arg, ActionAST returns,
 							 GrammarAST thrws, GrammarAST options,
-							 List<ActionAST> actions, GrammarAST block)
+							 List<GrammarAST> actions, GrammarAST block)
 	{
 		checkInvalidRuleDef(ID.token);
 	}
@@ -363,16 +363,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 						 Token optionID, String value)
 	{
 		boolean ok = true;
-		if ( optionID.getText().equals("tokenVocab") &&
-			 g.parent!=null ) // only allow tokenVocab option in root grammar
-		{
-			g.tool.errMgr.grammarError(ErrorType.TOKEN_VOCAB_IN_DELEGATE,
-									   g.fileName,
-									   optionID,
-									   g.name);
-			ok = false;
-		}
-
 		if ( parent.getType()==ANTLRParser.BLOCK ) {
 			if ( !legalBlockOptions.contains(optionID.getText()) ) { // block
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,

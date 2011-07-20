@@ -774,15 +774,29 @@ public abstract class BaseTest {
 											  GrammarSemanticsMessage expectedMessage)
 		throws Exception
 	{
-		/*
-				System.out.println(equeue.infos);
-				System.out.println(equeue.warnings);
-				System.out.println(equeue.errors);
-				assertTrue("number of errors mismatch", n, equeue.errors.size());
-						   */
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			ANTLRMessage m = (ANTLRMessage)equeue.errors.get(i);
+			if (m.errorType==expectedMessage.errorType ) {
+				foundMsg = m;
+			}
+		}
+		assertNotNull("no error; "+expectedMessage.errorType+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(Arrays.toString(expectedMessage.args), Arrays.toString(foundMsg.args));
+		if ( equeue.size()!=1 ) {
+			System.err.println(equeue);
+		}
+	}
+
+	protected void checkGrammarSemanticsWarning(ErrorQueue equeue,
+											    GrammarSemanticsMessage expectedMessage)
+		throws Exception
+	{
+		ANTLRMessage foundMsg = null;
+		for (int i = 0; i < equeue.warnings.size(); i++) {
+			ANTLRMessage m = equeue.warnings.get(i);
 			if (m.errorType==expectedMessage.errorType ) {
 				foundMsg = m;
 			}
