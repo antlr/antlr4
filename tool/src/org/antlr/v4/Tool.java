@@ -318,18 +318,10 @@ public class Tool {
 	/** Try current dir then dir of g then lib dir */
 	public GrammarRootAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
 		System.out.println("loadImportedGrammar "+fileName+" from "+g.fileName);
-		File importedFile = new File(fileName);
-		if ( !importedFile.exists() ) {
-			File gfile = new File(g.fileName);
-			String parentDir = gfile.getParent();
-			importedFile = new File(parentDir, fileName);
-			if ( !importedFile.exists() ) { // try in lib dir
-				importedFile = new File(libDirectory, fileName);
-				if ( !importedFile.exists() ) {
-					errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, g.fileName, fileName);
-					return null;
-				}
-			}
+		File importedFile = getImportedGrammarFile(g, fileName);
+		if ( importedFile==null ) {
+			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, fileName, g.fileName);
+			return null;
 		}
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
 		return load(in);
@@ -549,7 +541,11 @@ public class Tool {
 				}
 			}
 		}
-		elements.removeAll(actionsWeMoved);
+
+		for (GrammarAST r : actionsWeMoved) {
+			combinedAST.deleteChild( r );
+		}
+
 		GrammarAST combinedRulesRoot =
 			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.RULES);
 		if ( combinedRulesRoot==null ) return lexerAST;
@@ -606,6 +602,7 @@ public class Tool {
 			lexerRulesRoot.freshenParentAndChildIndexes(); // reset indexes and set litRule parent
 		}
 
+		// TODO: take out after stable if slow
 		lexerAST.sanityCheckParentAndChildIndexes();
 		combinedAST.sanityCheckParentAndChildIndexes();
 //		System.out.println(combinedAST.toTokenString());
@@ -655,7 +652,7 @@ public class Tool {
 	 *
 	 *  If outputDirectory==null then write a String.
 	 */
-	public Writer getOutputFile(Grammar g, String fileName) throws IOException {
+	public Writer getOutputFileWriter(Grammar g, String fileName) throws IOException {
 		if (outputDirectory == null) {
 			return new StringWriter();
 		}
@@ -678,6 +675,22 @@ public class Tool {
 		}
 		FileWriter fw = new FileWriter(outputFile);
 		return new BufferedWriter(fw);
+	}
+
+	public File getImportedGrammarFile(Grammar g, String fileName) {
+		File importedFile = new File(fileName);
+		if ( !importedFile.exists() ) {
+			File gfile = new File(g.fileName);
+			String parentDir = gfile.getParent();
+			importedFile = new File(parentDir, fileName);
+			if ( !importedFile.exists() ) { // try in lib dir
+				importedFile = new File(libDirectory, fileName);
+				if ( !importedFile.exists() ) {
+					return null;
+				}
+			}
+		}
+		return importedFile;
 	}
 
 	/**
@@ -744,7 +757,7 @@ public class Tool {
 	}
 
 	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {
-		Writer fw = getOutputFile(g, name + ".dot");
+		Writer fw = getOutputFileWriter(g, name + ".dot");
 		fw.write(dot);
 		fw.close();
 	}

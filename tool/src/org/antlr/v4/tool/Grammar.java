@@ -39,7 +39,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.semantics.SymbolCollector;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
@@ -232,15 +232,18 @@ public class Grammar implements AttributeResolver {
 				grammarAST = tool.loadImportedGrammar(this, importedGrammarName + ".g");
 			}
 			catch (IOException ioe) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, ioe, fileName);
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, ioe, importedGrammarName+".g");
+				continue;
 			}
 			// did it come back as error node or missing?
 			if ( grammarAST==null || grammarAST instanceof GrammarASTErrorNode ) return;
 			GrammarRootAST ast = (GrammarRootAST)grammarAST;
 			Grammar g = tool.createGrammar(ast);
-			g.fileName = importedGrammarName+".g";
+			File f = tool.getImportedGrammarFile(this, importedGrammarName+".g");
+			g.fileName = f.getAbsolutePath();
 			g.parent = this;
 			importedGrammars.add(g);
+			g.loadImportedGrammars(); // recursively pursue any imports in this import
         }
     }
 

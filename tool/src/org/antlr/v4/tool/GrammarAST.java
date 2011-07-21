@@ -89,12 +89,15 @@ public class GrammarAST extends CommonTree {
 		return null;
 	}
 
-	public void deleteChild(GrammarAST t) {
-		List<GrammarAST> dup = new ArrayList<GrammarAST>();
-		dup.addAll(children);
-		for (Object c : dup) {
-			if ( c == t ) deleteChild(t.getChildIndex());
+	public boolean deleteChild(org.antlr.runtime.tree.Tree t) {
+		for (int i=0; i<children.size(); i++) {
+			Object c = children.get(i);
+			if ( c == t ) {
+				deleteChild(t.getChildIndex());
+				return true;
+			}
 		}
+		return false;
 	}
 
     // TODO: move to basetree when i settle on how runtime works

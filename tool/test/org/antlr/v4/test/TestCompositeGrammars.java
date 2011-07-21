@@ -359,7 +359,6 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("JavaDecl: floatx=3;\n", found);
 	}
 
-	/*
     @Test public void testDelegatorRuleOverridesDelegates() throws Exception {
         String slave =
             "parser grammar S;\n" +
@@ -384,7 +383,6 @@ public class TestCompositeGrammars extends BaseTest {
         assertEquals("M.b\n" +
                      "S.a\n", found);
     }
-
 	// LEXER INHERITANCE
 
 	@Test public void testLexerDelegatorInvokesDelegateRule() throws Exception {
@@ -399,8 +397,14 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"B : 'b' ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
+		String expecting =
+			"S.A\n" +
+			"[@0,0:0='a',<5>,1:0]\n" +
+			"[@1,1:1='b',<3>,1:1]\n" +
+			"[@2,2:2='c',<6>,1:2]\n" +
+			"[@3,3:3='<EOF>',<-1>,1:3]\n";
 		String found = execLexer("M.g", master, "M", "abc", debug);
-		assertEquals("S.A\nabc\n", found);
+		assertEquals(expecting, found);
 	}
 
 	@Test public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
@@ -416,119 +420,26 @@ public class TestCompositeGrammars extends BaseTest {
 			"A : 'a' B {System.out.println(\"M.A\");} ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execLexer("M.g", master, "M", "ab", debug);
-		assertEquals("S.B\n" +
-					 "M.A\n" +
-					 "ab\n", found);
+		assertEquals("M.A\n" +
+					 "[@0,0:1='ab',<3>,1:0]\n" +
+					 "[@1,2:2='<EOF>',<-1>,1:2]\n", found);
 	}
 
-	@Test public void testLexerDelegatorRuleOverridesDelegateLeavingNoRules() throws Exception {
-		// M.Tokens has nothing to predict tokens from S.  Should
-		// not include S.Tokens alt in this case?
+	@Test public void testKeywordVSIDOrder() throws Exception {
+		// rules in lexer are imported at END so rules in master override
+		// *and* get priority over imported rules. So importing ID doesn't
+		// mess up keywords in master grammar
+		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"lexer grammar S;\n" +
-			"A : 'a' {System.out.println(\"S.A\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-		String master =
-			"lexer grammar M;\n" +
-			"import S;\n" +
-			"A : 'a' {System.out.println(\"M.A\");} ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
-		writeFile(tmpdir, "/M.g", master);
-
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		composite.assignTokenTypes();
-		composite.defineGrammarSymbols();
-		composite.createNFAs();
-		g.createLookaheadDFAs(false);
-
-		// predict only alts from M not S
-		String expectingDFA =
-			".s0-'a'->.s1\n" +
-			".s0-{'\\n', ' '}->:s3=>2\n" +
-			".s1-<EOT>->:s2=>1\n";
-		org.antlr.analysis.DFA dfa = g.getLookaheadDFA(1);
-		FASerializer serializer = new FASerializer(g);
-		String result = serializer.serialize(dfa.startState);
-		assertEquals(expectingDFA, result);
-
-		// must not be a "unreachable alt: Tokens" error
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-	}
-
-	@Test public void testInvalidImportMechanism() throws Exception {
-		// M.Tokens has nothing to predict tokens from S.  Should
-		// not include S.Tokens alt in this case?
-		String slave =
-			"lexer grammar S;\n" +
-			"A : 'a' {System.out.println(\"S.A\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-		String master =
-			"tree grammar M;\n" +
-			"import S;\n" +
-			"a : A ;";
-		writeFile(tmpdir, "/M.g", master);
-
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-
-		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
-		assertEquals("unexpected errors: "+equeue, 0, equeue.warnings.size());
-
-		String expectedError =
-			"error(161): "+tmpdir.toString().replaceFirst("\\-[0-9]+","")+"/M.g:2:8: tree grammar M cannot import lexer grammar S";
-		assertEquals(expectedError, equeue.errors.get(0).toString().replaceFirst("\\-[0-9]+",""));
-	}
-
-	@Test public void testSyntacticPredicateRulesAreNotInherited() throws Exception {
-		// if this compiles, it means that synpred1_S is defined in S.java
-		// but not MParser.java.  MParser has its own synpred1_M which must
-		// be separate to compile.
-		String slave =
-			"parser grammar S;\n" +
-			"a : 'a' {System.out.println(\"S.a1\");}\n" +
-			"  | 'a' {System.out.println(\"S.a2\");}\n" +
-			"  ;\n" +
-			"b : 'x' | 'y' {;} ;\n"; // preds generated but not need in DFA here
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-		String master =
-			"grammar M;\n" +
-			"options {backtrack=true;}\n" +
-			"import S;\n" +
-			"start : a b ;\n" +
-			"nonsense : 'q' | 'q' {;} ;" + // forces def of preds here in M
-			"WS : (' '|'\\n') {skip();} ;\n" ;
-		String found = execParser("M.g", master, "MParser", "MLexer",
-								  "start", "ax", debug);
-		assertEquals("S.a1\n", found);
-	}
-
-	@Test public void testKeywordVSIDGivesNoWarning() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		String slave =
-			"lexer grammar S;\n" +
-			"A : 'abc' {System.out.println(\"S.A\");} ;\n" +
 			"ID : 'a'..'z'+ ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g", slave);
 		String master =
 			"grammar M;\n" +
 			"import S;\n" +
-			"a : A {System.out.println(\"M.a\");} ;\n" +
+			"a : A {System.out.println(\"M.a: \"+$A);} ;\n" +
+			"A : 'abc' {System.out.println(\"M.A\");} ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
 								  "a", "abc", debug);
@@ -536,46 +447,20 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 		assertEquals("unexpected warnings: "+equeue, 0, equeue.warnings.size());
 
-		assertEquals("S.A\nM.a\n", found);
-	}
-
-	@Test public void testWarningForUndefinedToken() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		String slave =
-			"lexer grammar S;\n" +
-			"A : 'abc' {System.out.println(\"S.A\");} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g", slave);
-		String master =
-			"grammar M;\n" +
-			"import S;\n" +
-			"a : ABC A {System.out.println(\"M.a\");} ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
-		// A is defined in S but M should still see it and not give warning.
-		// only problem is ABC.
-
-		rawGenerateAndBuildRecognizer("M.g", master, "MParser", "MLexer", debug);
-
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-		assertEquals("unexpected warnings: "+equeue, 1, equeue.warnings.size());
-
-		String expectedError =
-			"warning(105): "+tmpdir.toString().replaceFirst("\\-[0-9]+","")+ File.separator+"M.g:3:5: no lexer rule corresponding to token: ABC";
-		assertEquals(expectedError, equeue.warnings.get(0).toString().replaceFirst("\\-[0-9]+",""));
+		assertEquals("M.A\n" +
+					 "M.a: [@0,0:2='abc',<3>,1:0]\n", found);
 	}
 
 	// Make sure that M can import S that imports T.
 	@Test public void test3LevelImport() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar T;\n" +
 			"a : T ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g", slave);
 		String slave2 =
-			"parser grammar S;\n" + // A, B, C token type order
+			"parser grammar S;\n" +
 			"import T;\n" +
 			"a : S ;\n" ;
 		mkdir(tmpdir);
@@ -586,23 +471,17 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"a : M ;\n" ;
 		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
-		g.composite.defineGrammarSymbols();
+		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
-		String expectedTokenIDToTypeMap = "[M=4, S=5, T=6]";
+		String expectedTokenIDToTypeMap = "{EOF=-1, M=3}"; // S and T aren't imported; overridden
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[M, S, T]";
+		String expectedTypeToTokenList = "[M]";
 
 		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+					 g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
+					 realElements(g.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
@@ -614,7 +493,6 @@ public class TestCompositeGrammars extends BaseTest {
 
 	@Test public void testBigTreeOfImports() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar T;\n" +
 			"x : T ;\n" ;
@@ -649,25 +527,19 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S,A;\n" +
 			"a : M ;\n" ;
 		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
-		g.composite.defineGrammarSymbols();
+		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
-		String expectedTokenIDToTypeMap = "[A=4, B=5, C=6, M=7, S=8, T=9]";
+		assertEquals(equeue.errors.toString(), "[]");
+		assertEquals(equeue.warnings.toString(), "[]");
+		String expectedTokenIDToTypeMap = "{EOF=-1, M=3, S=4, T=5, A=6, B=7, C=8}";
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[A, B, C, M, S, T]";
+		String expectedTypeToTokenList = "[M, S, T, A, B, C]";
 
 		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+					 g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
-
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+					 realElements(g.typeToTokenList).toString());
 
 		boolean ok =
 			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null, false);
@@ -677,7 +549,6 @@ public class TestCompositeGrammars extends BaseTest {
 
 	@Test public void testRulesVisibleThroughMultilevelImport() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"parser grammar T;\n" +
 			"x : T ;\n" ;
@@ -695,23 +566,17 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"a : M x ;\n" ; // x MUST BE VISIBLE TO M
 		writeFile(tmpdir, "M.g", master);
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
-		g.composite.defineGrammarSymbols();
+		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
-		String expectedTokenIDToTypeMap = "[M=4, S=5, T=6]";
+		String expectedTokenIDToTypeMap = "{EOF=-1, M=3, T=4}";
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[M, S, T]";
+		String expectedTypeToTokenList = "[M, T]";
 
 		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+					 g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
+					 realElements(g.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
@@ -719,7 +584,6 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testNestedComposite() throws Exception {
 		// Wasn't compiling. http://www.antlr.org/jira/browse/ANTLR-438
 		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
 		String gstr =
 			"lexer grammar L;\n" +
 			"T1: '1';\n" +
@@ -749,23 +613,17 @@ public class TestCompositeGrammars extends BaseTest {
 		mkdir(tmpdir);
 		writeFile(tmpdir, "G3.g", G3str);
 
-		Tool antlr = newTool(new String[] {"-lib", tmpdir});
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar g = new Grammar(antlr,tmpdir+"/G3.g",composite);
-		composite.setDelegationRoot(g);
-		g.parseAndBuildAST();
-		g.composite.assignTokenTypes();
-		g.composite.defineGrammarSymbols();
+		Grammar g = new Grammar(tmpdir+"/G3.g", G3str, equeue);
 
-		String expectedTokenIDToTypeMap = "[T1=4, T2=5, T3=6, T4=7]";
+		String expectedTokenIDToTypeMap = "{EOF=-1, T4=3, T3=4}";
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[T1, T2, T3, T4]";
+		String expectedTypeToTokenList = "[T4, T3]";
 
 		assertEquals(expectedTokenIDToTypeMap,
-					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+					 g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList,
-					 realElements(g.composite.typeToTokenList).toString());
+					 realElements(g.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
@@ -774,7 +632,7 @@ public class TestCompositeGrammars extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
-*/
+
 	@Test public void testHeadersPropogatedCorrectlyToImportedGrammars() throws Exception {
 		String slave =
 			"parser grammar S;\n" +

@@ -193,7 +193,7 @@ public class CodeGenerator {
 
 	public void write(ST code, String fileName) throws IOException {
 		long start = System.currentTimeMillis();
-		Writer w = g.tool.getOutputFile(g, fileName);
+		Writer w = g.tool.getOutputFileWriter(g, fileName);
 		STWriter wr = new AutoIndentWriter(w);
 		wr.setLineWidth(lineWidth);
 		code.write(wr);

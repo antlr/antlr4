@@ -163,6 +163,17 @@ public abstract class BaseTree implements Tree {
 		return killed;
 	}
 
+	public boolean deleteChild(Tree t) {
+		for (int i=0; i<children.size(); i++) {
+			Object c = children.get(i);
+			if ( c == t ) {
+				deleteChild(t.getChildIndex());
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/** Delete children from start to stop and replace with t even if t is
 	 *  a list (nil-root tree).  num of children can increase or decrease.
 	 *  For huge child lists, inserting children can force walking rest of
