@@ -62,16 +62,5 @@ public class Parser extends OutputModelObject {
 		tokenNames = g.getTokenDisplayNames();
 		ruleNames = g.rules.keySet();
 		atn = new SerializedATN(factory, g.atn);
-
-		/*
-		sempreds = new LinkedHashMap<Integer, Action>();
-		for (PredAST p : g.sempreds.keySet()) {
-			sempreds.put(g.sempreds.get(p), new Action(factory, p));
-		}
-		actions = new LinkedHashMap<Integer, ForcedAction>();
-		for (ActionAST a : g.actions.keySet()) {
-			actions.put(g.actions.get(a), new ForcedAction(factory, a));
-		}
-		*/
 	}
 }

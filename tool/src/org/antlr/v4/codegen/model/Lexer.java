@@ -43,8 +43,10 @@ public class Lexer extends OutputModelObject {
 	public Collection<String> modes;
 
 	@ModelElement public SerializedATN atn;
-	@ModelElement public LinkedHashMap<Integer, Action> actions;
-	@ModelElement public LinkedHashMap<Integer, Action> sempreds;
+	@ModelElement public List<RuleActionFunction> actionFuncs =
+		new ArrayList<RuleActionFunction>();
+	@ModelElement public List<RuleSempredFunction> sempredFuncs =
+		new ArrayList<RuleSempredFunction>();
 
 	public Lexer(OutputModelFactory factory, LexerFile file) {
 		this.factory = factory;
@@ -63,15 +65,6 @@ public class Lexer extends OutputModelObject {
 
 		tokenNames = g.getTokenDisplayNames();
 		ruleNames = g.rules.keySet();
-
-		sempreds = new LinkedHashMap<Integer, Action>();
-		for (PredAST p : g.sempreds.keySet()) {
-			sempreds.put(g.sempreds.get(p), new Action(factory, p));
-		}
-		actions = new LinkedHashMap<Integer, Action>();
-		for (ActionAST a : g.actions.keySet()) {
-			actions.put(g.actions.get(a), new Action(factory, a));
-		}
 	}
 
 }

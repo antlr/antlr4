@@ -93,6 +93,28 @@ public class OutputModelController {
 		LexerFile file = lexerFile(gen.getRecognizerFileName());
 		setRoot(file);
 		file.lexer = lexer(file);
+
+		Grammar g = delegate.getGrammar();
+		for (Rule r : g.rules.values()) {
+			String ctxType = gen.target.getRuleFunctionContextStructName(r);
+			for (ActionAST a : r.actions) {
+				if ( a instanceof PredAST ) {
+					PredAST p = (PredAST)a;
+					RuleSempredFunction rsf = new RuleSempredFunction(delegate, r, ctxType);
+					file.lexer.sempredFuncs.add(rsf);
+					rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+				}
+				else if ( a.getType()==ANTLRParser.ACTION ||
+						  a.getType()==ANTLRParser.FORCED_ACTION )
+				{
+					// lexer sees {{...}} and {..} as same; neither are done until accept
+					RuleActionFunction raf = new RuleActionFunction(delegate, r, ctxType);
+					file.lexer.actionFuncs.add(raf);
+					raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+				}
+			}
+		}
+
 		return file;
 	}
 
