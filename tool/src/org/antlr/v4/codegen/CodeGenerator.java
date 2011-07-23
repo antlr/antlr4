@@ -29,6 +29,7 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
@@ -48,14 +49,19 @@ public class CodeGenerator {
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
 	public Grammar g;
+	public Tool tool;
 	public Target target;
 	public STGroup templates;
 
 	public int lineWidth = 72;
 
 	public CodeGenerator(Grammar g) {
+		this(g.tool, g, g.getOption("language", "Java"));
+	}
+
+	public CodeGenerator(Tool tool, Grammar g, String language) {
 		this.g = g;
-		String language = g.getOption("language", "Java");
+		this.tool = tool;
 		loadLanguageTarget(language);
 		loadTemplates(language);
 	}
@@ -74,17 +80,17 @@ public class CodeGenerator {
 			target = new Target(this); // use default
 		}
 		catch (InvocationTargetException ite) {
-			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
 						 ite,
 						 targetName);
 		}
 		catch (InstantiationException ie) {
-			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
 						 ie,
 						 targetName);
 		}
 		catch (IllegalAccessException cnfe) {
-			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
 						 cnfe,
 						 targetName);
 		}
@@ -96,7 +102,7 @@ public class CodeGenerator {
 			templates.registerRenderer(Integer.class, new NumberRenderer());
 		}
 		catch (IllegalArgumentException iae) {
-			g.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
 									iae,
 						 			language);
 		}
@@ -121,10 +127,10 @@ public class CodeGenerator {
 		else outputModel = controller.buildParserOutputModel();
 
 		// CREATE TEMPLATES BY WALKING MODEL
-		OutputModelWalker walker = new OutputModelWalker(g.tool, templates);
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		ST st = walker.walk(outputModel);
 
-		if ( g.tool.launch_ST_inspector ) {
+		if ( tool.launch_ST_inspector ) {
 			st.inspect();
 			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
 		}
@@ -185,7 +191,7 @@ public class CodeGenerator {
 			}
 		}
 		catch (IOException ioe) {
-			g.tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
+			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
 									ioe,
 									fileName);
 		}
@@ -193,7 +199,7 @@ public class CodeGenerator {
 
 	public void write(ST code, String fileName) throws IOException {
 		long start = System.currentTimeMillis();
-		Writer w = g.tool.getOutputFileWriter(g, fileName);
+		Writer w = tool.getOutputFileWriter(g, fileName);
 		STWriter wr = new AutoIndentWriter(w);
 		wr.setLineWidth(lineWidth);
 		code.write(wr);

@@ -29,7 +29,7 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.Tree;
 
 import java.util.*;
@@ -43,6 +43,8 @@ public class GrammarRootAST extends GrammarASTWithOptions {
             };
     public int grammarType; // LEXER, PARSER, TREE, GRAMMAR (combined)
 	public boolean hasErrors;
+	/** Track stream used to create this tree */
+	public TokenStream tokens;
 
 	public GrammarRootAST(GrammarAST node) {
 		super(node);

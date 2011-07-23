@@ -1,32 +1,18 @@
 grammar T;
-options {output=AST;}
-tokens {DUH;}
-a : (A|B) ;
-b : (A|B) -> A ;
+//options {output=AST;}
+
+a : a PLUS a
+  | INT
+  ;
+
 /*
-type returns [int i] : ID;
-ID : 'a'..'z'+ ;
-INT : '0'..'9'+;
-PLUS : '+';
-WS : (' '|'\n') {$channel=HIDDEN;} ;
+a : a_[0] ;
+a_[int _p] : a_primary ( {$_p <= 2}? PLUS a{} )*
+    ;
+a_primary : INT ;
 */
-
 /*
-c : A B C -> A ( D A B C*)* (B A*)? ;
-
-A : 'a';
-B : 'b';
-C : 'c';
-D : 'd';
-SEMI : ';';
-WS : ' '|'\t'|'\n' {skip();} ;
-*/
-
-/*
-r[int a] returns [int b]
-scope {int qq;}
-	:	x=ID y=r[34] z+=b {$b = 99;}
-	;
-
-b	: r[34] {$r::qq = 3;} ;
+a : a_[0] ;
+a_[int _p] : a_primary ( {_p <= 2}? B )* ;
+a_primary : A ;
 */

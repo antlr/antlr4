@@ -30,48 +30,22 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
-import java.util.*;
+import java.util.LinkedHashMap;
 
-/** */
-public class Parser extends OutputModelObject {
+public class RuleActionFunction extends OutputModelObject {
 	public String name;
-	public Map<String,Integer> tokens;
-	public String[] tokenNames;
-	public Set<String> ruleNames;
-	public ParserFile file;
+	public String ctxType;
+	public int ruleIndex;
 
-	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
-	@ModelElement public SerializedATN atn;
-	@ModelElement public List<RuleActionFunction> actionFuncs =
-		new ArrayList<RuleActionFunction>();
-	@ModelElement public List<RuleSempredFunction> sempredFuncs =
-		new ArrayList<RuleSempredFunction>();
+	@ModelElement public LinkedHashMap<Integer, Action> actions =
+		new LinkedHashMap<Integer, Action>();
 
-	public Parser(OutputModelFactory factory, ParserFile file) {
-		this.factory = factory;
-		this.file = file; // who contains us?
-		Grammar g = factory.getGrammar();
-		name = g.getRecognizerName();
-		tokens = new LinkedHashMap<String,Integer>();
-		for (String t : g.tokenNameToTypeMap.keySet()) {
-			Integer ttype = g.tokenNameToTypeMap.get(t);
-			if ( ttype>0 ) tokens.put(t, ttype);
-		}
-		tokenNames = g.getTokenDisplayNames();
-		ruleNames = g.rules.keySet();
-		atn = new SerializedATN(factory, g.atn);
-
-		/*
-		sempreds = new LinkedHashMap<Integer, Action>();
-		for (PredAST p : g.sempreds.keySet()) {
-			sempreds.put(g.sempreds.get(p), new Action(factory, p));
-		}
-		actions = new LinkedHashMap<Integer, ForcedAction>();
-		for (ActionAST a : g.actions.keySet()) {
-			actions.put(g.actions.get(a), new ForcedAction(factory, a));
-		}
-		*/
+	public RuleActionFunction(OutputModelFactory factory, Rule r, String ctxType) {
+		super(factory);
+		name = r.name;
+		ruleIndex = r.index;
+		this.ctxType = ctxType;
 	}
 }

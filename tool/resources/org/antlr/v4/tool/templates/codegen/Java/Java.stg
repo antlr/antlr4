@@ -35,7 +35,7 @@ import java.util.ArrayList;
 <parser>
 >>
 
-Parser(parser, scopes, funcs, atn, actions, sempreds) ::= <<
+Parser(parser, scopes, funcs, atn, actionFuncs, sempredFuncs) ::= <<
 public class <parser.name> extends Parser {
     public static final int
         <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -44,7 +44,6 @@ public class <parser.name> extends Parser {
         <parser.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>
     };
     public static final String[] ruleNames = {
-        "\<INVALID>",
         <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
     };
     <scopes>
@@ -59,21 +58,32 @@ public class <parser.name> extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-    <dumpActions(actions,sempreds)>
+<if(actionFuncs)>
+	public void _action(RuleContext _localctx, int ruleIndex, int predIndex) {
+		switch ( predIndex ) {
+		    <parser.actionFuncs:{f|
+case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+    	}
+	}
+    <actionFuncs; separator="\n">
+<endif>
+<if(sempredFuncs)>
+	public boolean _sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+		switch ( predIndex ) {
+		    <parser.sempredFuncs:{f|
+case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+    	}
+		return true;
+	}
+    <sempredFuncs; separator="\n">
+<endif>
+
     <atn>
 }
 >>
 
-dumpActions(actions,sempreds) ::= <<
-<if(sempreds)>
-	public boolean sempred(int ruleIndex, int predIndex) {
-		switch ( predIndex ) {
-		    <sempreds:{index|
-case <index> : return <sempreds.(index)>;}; separator="\n">
-    	}
-		return true;
-	}
-<endif>
+/*
+dumpActions(actions) ::= <<
 <if(actions)>
 	public void action(int ruleIndex, int actionIndex) {
 		switch ( actionIndex ) {
@@ -83,11 +93,31 @@ case <index> : <actions.(index)> break;}; separator="\n">
 	}
 <endif>
 >>
+*/
 
 ctor(p) ::= <<
 public <p.name>(TokenStream input) {
     super(input);
     _interp = new ParserATNSimulator(this,_ATN);
+}
+>>
+
+RuleActionFunction(r, actions) ::= <<
+public void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
+	switch ( actionIndex ) {
+		<actions:{index|
+case <index> : <actions.(index)> break;}; separator="\n">
+	}
+}
+>>
+
+RuleSempredFunction(r, actions) ::= <<
+public boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
+	switch ( predIndex ) {
+		<actions:{index|
+case <index> : return <actions.(index)>;}; separator="\n">
+	}
+	return true;
 }
 >>
 
@@ -395,6 +425,13 @@ AttributeDecl(d) ::= "<d.decl>"
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 
+// used for left-recursive rules
+recRuleDefArg()                       ::= "int _p"
+recRuleArg()                          ::= "$_p"
+recRuleAltPredicate(ruleName,opPrec)  ::= "<recRuleArg()> \<= <opPrec>"
+recRuleSetResultAction()              ::= "root_0=$<ruleName>_primary.tree;"
+recRuleSetReturnAction(src,name)      ::= "$<name>=$<src>.<name>;"
+
 // AST stuff (TODO: separate?)
 
 RootDecl(d)     ::= "Object <d.name> = _adaptor.nil();"
@@ -548,7 +585,7 @@ public class <lexer.name> extends Lexer {
 
     <lexer.namedActions.members>
 
-    <dumpActions(actions,sempreds)>
+<!    <dumpActions(actions)> !>
     <atn>
 }
 >>
@@ -565,6 +602,7 @@ static {
 }
 >>
 
+/*
 actionMethod(name, ruleIndex, actions) ::= <<
 public void <name>_actions(int action) {
     System.out.println("exec action "+action);
@@ -589,6 +627,7 @@ public boolean <name>_sempreds(int pred) {
     }
 }<\n>
 >>
+*/
 
 /** Using a type to init value map, try to init a type; if not in table
  *  must be an object, default value is "null".

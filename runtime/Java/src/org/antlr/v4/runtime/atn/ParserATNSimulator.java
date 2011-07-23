@@ -52,6 +52,14 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	protected Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 
+	/** Upon entry for prediction, we might need to execute actions and
+	 *  we need to know original context passed to us from parser or
+	 *  lexer.  This is the stack and any args, locals, labels, etc...
+	 *  Meaningless across adaptivePredict() calls but easier as field
+	 *  than passing down many function calls.
+	protected RuleContext _ctx;
+	 */
+
 	public ParserATNSimulator(ATN atn) {
 		super(atn);
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
@@ -68,20 +76,21 @@ public class ParserATNSimulator extends ATNSimulator {
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(TokenStream input, int decision, RuleContext ctx) {
+	public int adaptivePredict(TokenStream input, int decision, RuleContext originalContext) {
 		predict_calls++;
+//		this._ctx = originalContext;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
 			ATNState startState = atn.decisionToState.get(decision);
 			decisionToDFA[decision] = dfa = new DFA(startState);
 			dfa.decision = decision;
-			return predictATN(dfa, input, decision, ctx, false);
+			return predictATN(dfa, input, decision, originalContext, false);
 		}
 		else {
 			//dump(dfa);
 			// start with the DFA
 			int m = input.mark();
-			int alt = execDFA(input, dfa, dfa.s0, ctx);
+			int alt = execDFA(input, dfa, dfa.s0, originalContext);
 			input.seek(m);
 			return alt;
 		}
@@ -95,7 +104,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
 		RuleContext ctx = RuleContext.EMPTY;
 		if ( useContext  ) ctx = originalContext;
-		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.atnStartState, ctx);
+		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.atnStartState, ctx, originalContext);
 		dfa.s0 = addDFAState(dfa, s0_closure);
 		if ( prevAccept!=null ) {
 			dfa.s0.isAcceptState = true;
@@ -119,7 +128,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int matchATN(TokenStream input, ATNState startState) {
 		DFA dfa = new DFA(startState);
 		RuleContext ctx = new ParserRuleContext();
-		OrderedHashSet<ATNConfig> s0_closure = computeStartState(startState, ctx);
+		OrderedHashSet<ATNConfig> s0_closure = computeStartState(startState, ctx, RuleContext.EMPTY);
 		return execATN(input, dfa, input.index(), s0_closure, ctx, false);
 	}
 
@@ -243,7 +252,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					Transition trans = c.state.transition(ti);
 					ATNState target = getReachableTarget(trans, t);
 					if ( target!=null ) {
-						closure(new ATNConfig(c, target), reach);
+						closure(new ATNConfig(c, target), reach, originalContext);
 					}
 				}
 			}
@@ -367,9 +376,10 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictedAlt;
 	}
 
-	public OrderedHashSet<ATNConfig> computeStartState(ATNState p, RuleContext ctx) {
-		RuleContext initialContext = null;
-		initialContext = ctx; // always at least the implicit call to start rule
+	public OrderedHashSet<ATNConfig> computeStartState(ATNState p, RuleContext ctx,
+													   RuleContext originalContext)
+	{
+		RuleContext initialContext = ctx; // always at least the implicit call to start rule
 		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 		prevAccept = null; // might reach end rule; track
 		prevAcceptIndex = -1;
@@ -377,7 +387,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
-			closure(c, configs);
+			closure(c, configs, originalContext);
 		}
 
 		return configs;
@@ -405,13 +415,15 @@ public class ParserATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	protected void closure(ATNConfig config, OrderedHashSet<ATNConfig> configs) {
+	protected void closure(ATNConfig config, OrderedHashSet<ATNConfig> configs,
+						   RuleContext originalContext) {
 		closureBusy.clear();
-		closure(config, configs, closureBusy);
+		closure(config, configs, originalContext, closureBusy);
 	}
 
 	protected void closure(ATNConfig config,
 						   OrderedHashSet<ATNConfig> configs,
+						   RuleContext originalContext,
 						   Set<ATNConfig> closureBusy)
 	{
 		if ( debug ) System.out.println("closure("+config+")");
@@ -427,7 +439,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
 				ATNConfig c = new ATNConfig(retState, config.alt, newContext);
-				closure(c, configs, closureBusy);
+				closure(c, configs, originalContext, closureBusy);
 				return;
 			}
 			// else if we have no context info, just chase follow links
@@ -440,12 +452,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
 			boolean evalPreds = !config.traversedAction;
-			ATNConfig c = getEpsilonTarget(config, t, evalPreds);
-			if ( c!=null ) closure(c, configs, closureBusy);
+			ATNConfig c = getEpsilonTarget(config, t, originalContext, evalPreds);
+			if ( c!=null ) closure(c, configs, originalContext, closureBusy);
 		}
 	}
 
-	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t, boolean evalPreds) {
+	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t,
+									  RuleContext originalContext, boolean evalPreds)
+	{
 		ATNConfig c = null;
 		if ( t instanceof RuleTransition ) {
 			ATNState p = config.state;
@@ -459,7 +473,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// preds are epsilon if we're not doing preds.
 			// if we are doing preds, pred must eval to true
 			if ( !evalPreds ||
-			     (evalPreds && parser.sempred(pt.ruleIndex, pt.predIndex)) ) {
+			     (evalPreds && parser._sempred(originalContext, pt.ruleIndex, pt.predIndex)) ) {
 				c = new ATNConfig(config, t.target);
 				c.traversedPredicate = true;
 			}
@@ -470,7 +484,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
 			if ( at.actionIndex>=0 ) {
 				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
-				parser.action(at.ruleIndex, at.actionIndex);
+				parser._action(originalContext, at.ruleIndex, at.actionIndex);
 			}
 			else {
 				// non-forced action traversed to get to t.target

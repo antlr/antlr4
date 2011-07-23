@@ -644,6 +644,11 @@ public class Grammar implements AttributeResolver {
         return 0;
     }
 
+	public org.antlr.runtime.TokenStream getTokenStream() {
+		if ( ast!=null ) return ast.tokens;
+		return null;
+	}
+
 	public boolean isLexer() { return getType()==ANTLRParser.LEXER; }
 	public boolean isParser() { return getType()==ANTLRParser.PARSER; }
 	public boolean isTreeGrammar() { return getType()==ANTLRParser.TREE; }
@@ -682,6 +687,24 @@ public class Grammar implements AttributeResolver {
 	public boolean hasASTOption() {
 		String outputOption = getOption("output");
 		return outputOption!=null && outputOption.equals("AST");
+	}
+
+	/** Manually get language option from tree */
+	// TODO: move to general tree visitor/parser class?
+	public static String getLanguageOption(GrammarRootAST ast) {
+		GrammarAST options = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.OPTIONS);
+		String language = "Java";
+		if ( options!=null ) {
+			for (Object o : options.getChildren()) {
+				GrammarAST c = (GrammarAST)o;
+				if ( c.getType() == ANTLRParser.ASSIGN &&
+				c.getChild(0).getText().equals("language") )
+				{
+					language = c.getChild(1).getText();
+				}
+			}
+		}
+		return language;
 	}
 
 	public static Map<String,String> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {

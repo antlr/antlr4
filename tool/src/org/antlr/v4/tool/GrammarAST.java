@@ -45,6 +45,8 @@ public class GrammarAST extends CommonTree {
 	/** If we build an ATN, we make AST node point at left edge of ATN construct */
 	public ATNState atnState;
 
+	public String textOverride;
+
     public GrammarAST() {;}
     public GrammarAST(Token t) { super(t); }
     public GrammarAST(GrammarAST node) { super(node); }
@@ -128,6 +130,14 @@ public class GrammarAST extends CommonTree {
 		return null;
 	}
 
+	public void setType(int type) {
+		token.setType(type);
+	}
+
+	public void setText(String text) {
+		textOverride = text; // don't alt tokens as others might see
+	}
+
 //	@Override
 //	public boolean equals(Object obj) {
 //		return super.equals(obj);
@@ -137,6 +147,13 @@ public class GrammarAST extends CommonTree {
     public Tree dupNode() {
         return new GrammarAST(this);
     }
+
+	public GrammarAST dupTree() {
+		GrammarAST t = this;
+		CharStream input = this.token.getInputStream();
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(input);
+		return (GrammarAST)adaptor.dupTree(t);
+	}
 
     @Override
     public String toString() {

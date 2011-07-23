@@ -100,6 +100,7 @@ public enum ErrorType {
 	ARGS_ON_TOKEN_REF("token reference <arg> may not have parameters", ErrorSeverity.ERROR),
 	RULE_REF_AMBIG_WITH_RULE_IN_ALT("", ErrorSeverity.ERROR),
 	ILLEGAL_OPTION("illegal option <arg>", ErrorSeverity.WARNING),
+	ILLEGAL_OPTION_VALUE("illegal option value <arg>=<arg2>", ErrorSeverity.WARNING),
 	LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT("", ErrorSeverity.ERROR),
 	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS("reference to rewrite element <arg> not found to left of ->", ErrorSeverity.ERROR),
     UNDEFINED_TOKEN_REF_IN_REWRITE("token <arg> in rewrite is undefined", ErrorSeverity.ERROR),
@@ -136,9 +137,7 @@ public enum ErrorType {
 	AST_OP_IN_ALT_WITH_REWRITE("rule <arg> alt <arg2> uses rewrite syntax and also an AST operator", ErrorSeverity.ERROR),
     WILDCARD_AS_ROOT("Wildcard invalid as root; wildcard can itself be a tree", ErrorSeverity.ERROR),
     CONFLICTING_OPTION_IN_TREE_FILTER("option <arg>=<arg2> conflicts with tree grammar filter mode", ErrorSeverity.ERROR),
-
-	AMBIGUITY("", ErrorSeverity.ERROR),
-	UNREACHABLE_ALTS("", ErrorSeverity.ERROR),
+	ALL_OPS_NEED_SAME_ASSOC("all operators of alt <alt> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 
 	// these next 3 can happen in recursion-limited LL("", *)
 	//RECURSION_OVERFLOW("", ErrorSeverity.ERROR),

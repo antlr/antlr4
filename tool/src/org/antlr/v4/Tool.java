@@ -227,7 +227,7 @@ public class Tool {
 
 		integrateImportedGrammars(g);
 
-		GrammarTransformPipeline transform = new GrammarTransformPipeline();
+		GrammarTransformPipeline transform = new GrammarTransformPipeline(this);
 		transform.process(g.ast);
 
 		LexerGrammar lexerg = null;
@@ -341,7 +341,8 @@ public class Tool {
 			ParserRuleReturnScope r = p.grammarSpec();
 			GrammarRootAST root = (GrammarRootAST)r.getTree();
 			if ( root instanceof GrammarRootAST ) {
-				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
+				root.hasErrors = p.getNumberOfSyntaxErrors()>0;
+				root.tokens = tokens;
 			}
 			return root;
 		}

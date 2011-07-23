@@ -1,0 +1,79 @@
+/*
+ [The "BSD license"]
+ Copyright (c) 2010 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/** How to generate rules derived from left-recursive rules.
+ *  These rely on recRuleDefArg(), recRuleAltPredicate(),
+ *  recRuleArg(), recRuleSetResultAction(), recRuleSetReturnAction()
+ *  templates in main language.stg
+ */
+group LeftRecursiveRules;
+
+recRuleName(ruleName) ::= "<ruleName>_"
+recPrimaryName(ruleName) ::= "<ruleName>_primary"
+
+recRuleStart(ruleName, minPrec, userRetvals, userRetvalAssignments) ::= <<
+<ruleName><if(userRetvals)> returns [<userRetvals>]<endif>
+  : <recRuleName(...)>[<minPrec>]
+    <if(userRetvals)>
+    {
+        <userRetvalAssignments; separator="\n">
+    }
+    <endif>
+  ;
+>>
+
+recRule(ruleName, precArgDef, argName, alts, setResultAction, buildAST,
+        userRetvals, userRetvalAssignments) ::= <<
+<recRuleName(...)>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
+    :   <recPrimaryName(...)>
+        <if(buildAST)>
+        {
+            <setResultAction>
+        }
+        <endif>
+        <if(userRetvals)>
+        {
+            <userRetvalAssignments; separator="\n">
+        }
+        <endif>
+        (
+        	<alts; separator="\n          | ">
+        )*
+    ;
+>>
+
+recPrimaryRule(ruleName, alts, userRetvals) ::= <<
+<recPrimaryName(...)><if(userRetvals)> returns [<userRetvals>]<endif>
+    : <alts; separator="\n    | ">
+    ;
+>>
+
+recRuleAlt(alt, pred) ::= "{<pred>}? <alt>"
+
+recRuleRef(ruleName, arg) ::= "<recRuleName(...)>[<arg>]"
+

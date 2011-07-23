@@ -82,29 +82,7 @@ public class OutputModelController {
 		file.parser = parser;
 
 		for (Rule r : g.rules.values()) {
-			RuleFunction function = rule(r);
-			parser.funcs.add(function);
-
-			// TRIGGER factory functions for rule alts, elements
-			pushCurrentRule(function);
-			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
-			GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
-			CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
-			walker = new SourceGenTriggers(nodes, this);
-			try {
-				function.code = DefaultOutputModelFactory.list(walker.block(null, null, null)); // walk AST of rule alts/elements
-			}
-			catch (Exception e){
-				e.printStackTrace(System.err);
-			}
-
-			function.ctxType = gen.target.getRuleFunctionContextStructName(function);
-			function.ruleCtx.name = function.ctxType;
-
-			function.postamble = rulePostamble(function, r);
-
-			if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
-			popCurrentRule();
+			buildRuleFunction(parser, r);
 		}
 
 		return file;
@@ -136,6 +114,51 @@ public class OutputModelController {
 
 	public Lexer lexer(LexerFile file) {
 		return new Lexer(delegate, file);
+	}
+
+	/** Create RuleFunction per rule and update sempreds,actions of parser
+	 *  output object with stuff found in r.
+	 */
+	public void buildRuleFunction(Parser parser, Rule r) {
+		CodeGenerator gen = delegate.getGenerator();
+		RuleFunction function = rule(r);
+		parser.funcs.add(function);
+
+		// TRIGGER factory functions for rule alts, elements
+		pushCurrentRule(function);
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
+		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
+		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
+		walker = new SourceGenTriggers(nodes, this);
+		try {
+			function.code = DefaultOutputModelFactory.list(walker.block(null, null, null)); // walk AST of rule alts/elements
+		}
+		catch (Exception e){
+			e.printStackTrace(System.err);
+		}
+
+		function.ctxType = gen.target.getRuleFunctionContextStructName(function);
+		function.ruleCtx.name = function.ctxType;
+
+		function.postamble = rulePostamble(function, r);
+
+		Grammar g = getGrammar();
+		for (ActionAST a : r.actions) {
+			if ( a instanceof PredAST ) {
+				PredAST p = (PredAST)a;
+				RuleSempredFunction rsf = new RuleSempredFunction(delegate, r, function.ctxType);
+				parser.sempredFuncs.add(rsf);
+				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+			}
+			else if ( a.getType()==ANTLRParser.FORCED_ACTION ) {
+				RuleActionFunction raf = new RuleActionFunction(delegate, r, function.ctxType);
+				parser.actionFuncs.add(raf);
+				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+			}
+		}
+
+		if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
+		popCurrentRule();
 	}
 
 	public RuleFunction rule(Rule r) {

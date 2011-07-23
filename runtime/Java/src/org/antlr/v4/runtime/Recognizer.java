@@ -218,11 +218,11 @@ public class Recognizer<ATNInterpreter> {
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
-	public boolean sempred(int ruleIndex, int actionIndex) {
+	public boolean _sempred(RuleContext _localctx, int ruleIndex, int actionIndex) {
 		return true;
 	}
 
 	/** In lexer, both indexes are same; one action per rule. */
-	public void action(int ruleIndex, int actionIndex) {
+	public void _action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 }

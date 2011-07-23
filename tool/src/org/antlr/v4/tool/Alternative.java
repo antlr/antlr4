@@ -65,6 +65,8 @@ public class Alternative implements AttributeResolver {
      *  and catch/finally (not in an alt). Also tracks predicates, rewrite actions.
      *  We need to examine these actions before code generation so
      *  that we can detect refs to $rule.attr etc...
+	 *
+	 *  This tracks per alt
      */
     public List<ActionAST> actions = new ArrayList<ActionAST>();
 

@@ -67,6 +67,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		put("int", TokenPropertyRef_int.class);
 	}};
 
+	CodeGenerator gen;
 	ActionAST node;
 	RuleFunction rf;
 	List<ActionChunk> chunks = new ArrayList<ActionChunk>();
@@ -75,6 +76,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	public ActionTranslator(OutputModelFactory factory, ActionAST node) {
 		this.factory = factory;
 		this.node = node;
+		this.gen = factory.getGenerator();
 	}
 
 	public static String toString(List<ActionChunk> chunks) {

@@ -99,6 +99,15 @@ public class Rule implements AttributeResolver {
 	 */
     public List<ActionAST> exceptionActions = new ArrayList<ActionAST>();
 
+	/** Track all executable actions other than named actions like @init
+	 *  and catch/finally (not in an alt). Also tracks predicates, rewrite actions.
+	 *  We need to examine these actions before code generation so
+	 *  that we can detect refs to $rule.attr etc...
+	 *
+	 *  This tracks per rule; Alternative objs also track per alt.
+	 */
+	public List<ActionAST> actions = new ArrayList<ActionAST>();
+
 	public ActionAST finallyAction;
 
 	public int numberOfAlts;
@@ -122,14 +131,16 @@ public class Rule implements AttributeResolver {
 	}
 
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {
+		actions.add(actionAST);
 		alt[currentAlt].actions.add(actionAST);
-		if ( g.isLexer() || actionAST.getType()== ANTLRParser.FORCED_ACTION ) {
+		if ( g.isLexer() || actionAST.getType()==ANTLRParser.FORCED_ACTION ) {
 			actionIndex = g.actions.size();
 			g.actions.put(actionAST, actionIndex);
 		}
 	}
 
 	public void definePredicateInAlt(int currentAlt, PredAST predAST) {
+		actions.add(predAST);
 		alt[currentAlt].actions.add(predAST);
 		g.sempreds.put(predAST, g.sempreds.size());
 	}

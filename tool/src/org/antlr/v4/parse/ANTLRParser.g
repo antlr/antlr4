@@ -59,6 +59,7 @@ options {
 tokens {
     LEXER;
     RULE;
+	PREC_RULE; // flip to this if we find that it's left-recursive
     RULES;
     RULEMODIFIERS;
     RULEACTIONS;
