@@ -414,7 +414,9 @@ public class IntervalSet implements IntSet {
 		return this.intervals.equals(other.intervals);
 	}
 
-	public String toString() {
+	public String toString() { return toString(false); }
+
+	public String toString(boolean elemAreChar) {
 		StringBuffer buf = new StringBuffer();
 		if ( this.intervals==null || this.intervals.size()==0 ) {
 			return "{}";
@@ -428,10 +430,43 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				buf.append(a);
+				if ( a==-1 ) buf.append("<EOF>");
+				else if ( elemAreChar ) buf.append("'"+(char)a+"'");
+				else buf.append(a);
 			}
 			else {
-				buf.append(a+".."+b);
+				if ( elemAreChar ) buf.append("'"+(char)a+"'..'"+(char)b+"'");
+				else buf.append(a+".."+b);
+			}
+			if ( iter.hasNext() ) {
+				buf.append(", ");
+			}
+		}
+		if ( this.size()>1 ) {
+			buf.append("}");
+		}
+		return buf.toString();
+	}
+
+	public String toString(String[] tokenNames) {
+		StringBuffer buf = new StringBuffer();
+		if ( this.intervals==null || this.intervals.size()==0 ) {
+			return "{}";
+		}
+		if ( this.size()>1 ) {
+			buf.append("{");
+		}
+		Iterator iter = this.intervals.iterator();
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			if ( a==b ) {
+				if ( a==-1 ) buf.append("<EOF>");
+				else buf.append(tokenNames[a]);
+			}
+			else {
+				buf.append(tokenNames[a]+".."+tokenNames[b]);
 			}
 			if ( iter.hasNext() ) {
 				buf.append(", ");

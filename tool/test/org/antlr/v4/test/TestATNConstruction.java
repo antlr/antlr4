@@ -150,7 +150,7 @@ public class TestATNConstruction extends BaseTest {
 			"b : B ;");
 		String expecting =
 			"RuleStart_a_0->s4\n" +
-			"s4->RuleStart_b_2\n" +
+			"s4-b->RuleStart_b_2\n" +
 			"s5->s6\n" +
 			"s6-A->s7\n" +
 			"s7->RuleStop_a_1\n" +
@@ -239,7 +239,7 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_8\n" +
 			"BlockStart_8->s6\n" +
 			"BlockStart_8->BlockEnd_9\n" +
-			"s6-{3..4}->s7\n" +
+			"s6-{A..B}->s7\n" +
 			"BlockEnd_9->RuleStop_a_1\n" +
 			"s7->BlockEnd_9\n" +
 			"RuleStop_a_1-EOF->s10\n";
@@ -252,7 +252,7 @@ public class TestATNConstruction extends BaseTest {
 			"a : (A | B) C;");
 		String expecting =
 			"RuleStart_a_0->s6\n" +
-			"s6-{3..4}->s7\n" +
+			"s6-{A..B}->s7\n" +
 			"s7->s8\n" +
 			"s8-C->s9\n" +
 			"s9->RuleStop_a_1\n" +
@@ -284,7 +284,7 @@ public class TestATNConstruction extends BaseTest {
 		String expecting =
 			"RuleStart_a_0->PlusBlockStart_8\n" +
 			"PlusBlockStart_8->s6\n" +
-			"s6-{3..4}->s7\n" +
+			"s6-{A..B}->s7\n" +
 			"s7->BlockEnd_9\n" +
 			"BlockEnd_9->PlusLoopBack_10\n" +
 			"PlusLoopBack_10->s6\n" +
@@ -363,17 +363,22 @@ public class TestATNConstruction extends BaseTest {
 	@Test public void testAorBstar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
-			"a : (A | B)* ;");
+			"a : (A | B{;})* ;");
 		String expecting =
 			"RuleStart_a_0->StarBlockStart_8\n" +
-			"StarBlockStart_8->s6\n" +
+			"StarBlockStart_8->s2\n" +
+			"StarBlockStart_8->s4\n" +
 			"StarBlockStart_8->s11\n" +
-			"s6-{3..4}->s7\n" +
+			"s2-A->s3\n" +
+			"s4-B->s5\n" +
 			"s11->RuleStop_a_1\n" +
-			"s7->BlockEnd_9\n" +
+			"s3->BlockEnd_9\n" +
+			"s5->s6\n" +
 			"RuleStop_a_1-EOF->s12\n" +
 			"BlockEnd_9->StarLoopBack_10\n" +
-			"StarLoopBack_10->StarBlockStart_8\n";
+			"s6-action_0:-1->s7\n" +
+			"StarLoopBack_10->StarBlockStart_8\n" +
+			"s7->BlockEnd_9\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -385,8 +390,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_10\n" +
 			"BlockStart_10->s2\n" +
 			"BlockStart_10->s6\n" +
-			"s2-pred-0:0->s3\n" +
-			"s6-pred-0:1->s7\n" +
+			"s2-pred_0:0->s3\n" +
+			"s6-pred_0:1->s7\n" +
 			"s3->s4\n" +
 			"s7->s8\n" +
 			"s4-A->s5\n" +
@@ -940,7 +945,7 @@ public class TestATNConstruction extends BaseTest {
 		ATN nfa = f.createATN();
 		ATNState startState = nfa.modeNameToStartState.get(modeName);
 		ATNPrinter serializer = new ATNPrinter(g, startState);
-		String result = serializer.toString();
+		String result = serializer.asString();
 
 		//System.out.print(result);
 		assertEquals(expecting, result);
@@ -968,7 +973,7 @@ public class TestATNConstruction extends BaseTest {
 		Rule r = g.getRule(ruleName);
 		ATNState startState = atn.ruleToStartState[r.index];
 		ATNPrinter serializer = new ATNPrinter(g, startState);
-		String result = serializer.toString();
+		String result = serializer.asString();
 
 		//System.out.print(result);
 		assertEquals(expecting, result);

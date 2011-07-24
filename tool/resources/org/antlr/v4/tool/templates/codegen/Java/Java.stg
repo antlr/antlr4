@@ -611,8 +611,8 @@ public static final ATN _ATN =
     ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
     org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
-	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames));
-	//System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames));
+	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));
+	//System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));
 }
 >>
 

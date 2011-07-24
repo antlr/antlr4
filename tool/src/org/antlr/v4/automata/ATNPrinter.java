@@ -46,7 +46,7 @@ public class ATNPrinter {
 		this.start = start;
 	}
 
-	public String toString() {
+	public String asString() {
 		if ( start==null ) return null;
 		marked = new HashSet<ATNState>();
 
@@ -60,7 +60,7 @@ public class ATNPrinter {
 			s = work.remove(0);
 			if ( marked.contains(s) ) continue;
 			int n = s.getNumberOfTransitions();
-			//System.out.println("visit "+getATNStateString(s)+"; edges="+n);
+//			System.out.println("visit "+s+"; edges="+n);
 			marked.add(s);
 			for (int i=0; i<n; i++) {
 				Transition t = s.transition(i);
@@ -73,7 +73,7 @@ public class ATNPrinter {
 					buf.append("->"+ getStateString(t.target)+'\n');
 				}
 				else if ( t instanceof RuleTransition ) {
-					buf.append("->"+ getStateString(t.target)+'\n');
+					buf.append("-"+g.getRule(((RuleTransition)t).ruleIndex).name+"->"+ getStateString(t.target)+'\n');
 				}
 				else if ( t instanceof ActionTransition ) {
 					ActionTransition a = (ActionTransition)t;
@@ -82,7 +82,12 @@ public class ATNPrinter {
 				else if ( t instanceof SetTransition ) {
 					SetTransition st = (SetTransition)t;
 					boolean not = st instanceof NotSetTransition;
-					buf.append("-"+(not?"~":"")+st.toString()+"->"+ getStateString(t.target)+'\n');
+					if ( g.isLexer() ) {
+						buf.append("-"+(not?"~":"")+st.toString()+"->"+ getStateString(t.target)+'\n');
+					}
+					else {
+						buf.append("-"+(not?"~":"")+st.label().toString(g.getTokenNames())+"->"+ getStateString(t.target)+'\n');
+					}
 				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
@@ -106,7 +111,6 @@ public class ATNPrinter {
 		String stateStr = "s"+n;
 		if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
 		else if ( s instanceof PlusBlockStartState ) stateStr = "PlusBlockStart_"+n;
-		else if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
 		else if ( s instanceof BlockStartState) stateStr = "BlockStart_"+n;
 		else if ( s instanceof BlockEndState ) stateStr = "BlockEnd_"+n;
 		else if ( s instanceof RuleStartState) stateStr = "RuleStart_"+g.getRule(s.ruleIndex).name+"_"+n;

@@ -62,13 +62,17 @@ ebnfSuffix
 	
 blockSet
 @init {
+boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
 }
-	:	{Character.isLowerCase(currentRuleName.charAt(0)) &&
-		 !inContext("RULE")}? // if non-lexer rule and not rule block
-		^(BLOCK ( ^(ALT setElement) )+) -> ^(SET[$BLOCK.token, "SET"] setElement+)
+	:	{!inContext("RULE")}? // if not rule block and > 1 alt
+		^(BLOCK ^(ALT setElement[inLexer]) ( ^(ALT setElement[inLexer]) )+)
+		-> ^(SET[$BLOCK.token, "SET"] setElement+)
 	;
 	
-setElement
+setElement[boolean inLexer]
 @after {$tree = new TerminalAST($start);} // elem can't be to right of ->
-	:	{!rewriteElems.contains($start.getText())}? (STRING_LITERAL|TOKEN_REF)
+	:	{!rewriteElems.contains($start.getText())}?
+		(	STRING_LITERAL
+		|	{!inLexer}? TOKEN_REF
+		)
 	;

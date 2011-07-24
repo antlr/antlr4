@@ -128,7 +128,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 		CharStream input = new ANTLRStringStream(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);
-		System.out.println(dot.getDOT(startState));
+		System.out.println(dot.getDOT(startState, true));
 
 		List<String> tokenTypes = getTokenTypes(lg, atn, input, false);
 		String result = Utils.join(tokenTypes.iterator(), ", ");

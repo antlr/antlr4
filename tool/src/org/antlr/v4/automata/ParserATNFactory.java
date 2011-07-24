@@ -91,8 +91,8 @@ public class ParserATNFactory implements ATNFactory {
 		RuleStopState stop = atn.ruleToStopState[r.index];
 		epsilon(blk.right, stop);
 		Handle h = new Handle(start, stop);
-//		FASerializer ser = new FASerializer(g, h.left);
-//		System.out.println(ruleAST.toStringTree()+":\n"+ser);
+		ATNPrinter ser = new ATNPrinter(g, h.left);
+		System.out.println(ruleAST.toStringTree()+":\n"+ser.asString());
 		ruleAST.atnState = start;
 		return h;
 	}

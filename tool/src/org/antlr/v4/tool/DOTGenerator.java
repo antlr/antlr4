@@ -53,9 +53,7 @@ public class DOTGenerator {
 		this.grammar = grammar;
 	}
 
-	public String getDOT(DFA dfa,
-						 boolean isLexer)
-	{
+	public String getDOT(DFA dfa, boolean isLexer) {
 		if ( dfa.s0==null )	return null;
 
 		ST dot = stlib.getInstanceOf("dfa");
@@ -162,18 +160,22 @@ public class DOTGenerator {
     }
 
 	public String getDOT(ATNState startState) {
+		return getDOT(startState, false);
+	}
+
+	public String getDOT(ATNState startState, boolean isLexer) {
 		Set<String> ruleNames = grammar.rules.keySet();
 		String[] names = new String[ruleNames.size()+1];
 		int i = 0;
 		for (String s : ruleNames) names[i++] = s;
-		return getDOT(startState, names);
+		return getDOT(startState, names, isLexer);
 	}
 
     /** Return a String containing a DOT description that, when displayed,
      *  will show the incoming state machine visually.  All nodes reachable
      *  from startState will be included.
      */
-	public String getDOT(ATNState startState, String[] ruleNames) {
+	public String getDOT(ATNState startState, String[] ruleNames, boolean isLexer) {
 		if ( startState==null )	return null;
 
 		// The output DOT graph for visualization
@@ -212,6 +214,7 @@ public class DOTGenerator {
 			ST edgeST = null;
 			for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 				Transition edge = s.transition(i);
+				System.out.println("dump s"+s.stateNumber+"->"+edge);
 				if ( edge instanceof RuleTransition ) {
 					RuleTransition rr = ((RuleTransition)edge);
 					// don't jump to other rules, but display edge to follow node
@@ -226,17 +229,46 @@ public class DOTGenerator {
 				}
 				if ( edge instanceof ActionTransition) {
 					edgeST = stlib.getInstanceOf("action-edge");
+					edgeST.add("label", getEdgeLabel(edge.toString()));
 				}
 				else if ( edge instanceof PredicateTransition ) {
 					edgeST = stlib.getInstanceOf("edge");
+					edgeST.add("label", getEdgeLabel(edge.toString()));
 				}
 				else if ( edge.isEpsilon() ) {
 					edgeST = stlib.getInstanceOf("epsilon-edge");
+					edgeST.add("label", getEdgeLabel(edge.toString()));
+				}
+				else if ( edge instanceof AtomTransition ) {
+					edgeST = stlib.getInstanceOf("edge");
+					AtomTransition atom = (AtomTransition)edge;
+					String label = String.valueOf(atom.label);
+					if ( isLexer ) label = "'"+getEdgeLabel(String.valueOf((char)atom.label))+"'";
+					else if ( grammar!=null ) label = grammar.getTokenDisplayName(atom.label);
+					if ( edge instanceof NotAtomTransition ) label = "~"+label;
+					edgeST.add("label", getEdgeLabel(label));
+				}
+				else if ( edge instanceof SetTransition ) {
+					edgeST = stlib.getInstanceOf("edge");
+					SetTransition set = (SetTransition)edge;
+					String label = set.label().toString();
+					if ( isLexer ) label = set.label().toString(true);
+					else if ( grammar!=null ) label = set.label().toString(grammar.getTokenNames());
+					if ( edge instanceof NotSetTransition ) label = "~"+label;
+					edgeST.add("label", getEdgeLabel(label));
+				}
+				else if ( edge instanceof RangeTransition ) {
+					edgeST = stlib.getInstanceOf("edge");
+					RangeTransition range = (RangeTransition)edge;
+					String label = range.label().toString();
+					if ( isLexer ) label = range.toString();
+					else if ( grammar!=null ) label = range.label().toString(grammar.getTokenNames());
+					edgeST.add("label", getEdgeLabel(label));
 				}
 				else {
 					edgeST = stlib.getInstanceOf("edge");
+					edgeST.add("label", getEdgeLabel(edge.toString()));
 				}
-				edgeST.add("label", getEdgeLabel(edge.toString()));
 				edgeST.add("src", "s"+s.stateNumber);
 				edgeST.add("target", "s"+edge.target.stateNumber);
 				edgeST.add("arrowhead", arrowhead);
