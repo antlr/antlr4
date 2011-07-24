@@ -80,6 +80,18 @@ rec_rule returns [boolean isLeftRec]
 //		{if ($ruleBlock.isLeftRec) $r.setType(PREC_RULE);}
 	;
 
+exceptionGroup
+    :	exceptionHandler* finallyClause?
+    ;
+
+exceptionHandler
+	: ^(CATCH ARG_ACTION ACTION)
+	;
+
+finallyClause
+	: ^(FINALLY ACTION)			
+	;
+
 ruleModifier
     : PUBLIC
     | PRIVATE
@@ -150,21 +162,21 @@ token returns [GrammarAST t=null]
 	|	^(PLUS_ASSIGN ID s=token {$t = $s.t;})
 	|	^(ROOT s=token {$t = $s.t;})
 	|	^(BANG s=token {$t = $s.t;})
-	|	b=STRING_LITERAL    {$t = $b;}
-	|	c=TOKEN_REF         {$t = $c;}
+	|	b=STRING_LITERAL    					{$t = $b;}
+    |	^(b=STRING_LITERAL elementOptions)		{$t = $b;}
+    |	^(c=TOKEN_REF elementOptions)			{$t = $c;}
+	|	c=TOKEN_REF        						{$t = $c;}
 	;
 
-exceptionGroup
-    :	exceptionHandler* finallyClause?
+elementOptions
+    :	^(ELEMENT_OPTIONS elementOption+)
     ;
 
-exceptionHandler
-	: ^(CATCH ARG_ACTION ACTION)
-	;
-
-finallyClause
-	: ^(FINALLY ACTION)			
-	;
+elementOption
+    :	ID
+    |   ^(ASSIGN ID ID)
+    |   ^(ASSIGN ID STRING_LITERAL)
+    ;
 
 element
 	:	^(ROOT element)
@@ -210,8 +222,11 @@ tree_
 
 atom
 	:	^(RULE_REF ARG_ACTION?)
-	|	^(TOKEN_REF ARG_ACTION?)
+    |  ^(STRING_LITERAL elementOptions)
 	|	STRING_LITERAL
+    |	^(TOKEN_REF elementOptions)
+	|	TOKEN_REF
+    |	^(WILDCARD elementOptions)
 	|	WILDCARD
 	|	^(DOT ID element) 
 	;

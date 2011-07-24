@@ -90,14 +90,16 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	@Override
 	public void setTokenPrec(GrammarAST t, int alt) {
 		ASSOC assoc = ASSOC.left;
-		if ( ((TerminalAST)t).getOptions()!=null ) {
-			String a = ((TerminalAST)t).getOption("assoc");
-			if ( a!=null ) {
-				if ( a.equals(ASSOC.right.toString()) ) {
-					assoc = ASSOC.right;
-				}
-				else {
-					tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, "assoc", assoc);
+		if ( t instanceof GrammarASTWithOptions ) {
+			if ( ((GrammarASTWithOptions)t).getOptions()!=null ) {
+				String a = ((GrammarASTWithOptions)t).getOption("assoc");
+				if ( a!=null ) {
+					if ( a.equals(ASSOC.right.toString()) ) {
+						assoc = ASSOC.right;
+					}
+					else {
+						tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, "assoc", assoc);
+					}
 				}
 			}
 		}

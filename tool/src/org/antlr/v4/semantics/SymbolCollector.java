@@ -35,7 +35,10 @@ import org.antlr.v4.tool.*;
 import java.util.*;
 
 /** Collects (create) rules, terminals, strings, actions, scopes etc... from AST
- *  side-effects: sets resolver field of asts for actions.
+ *  side-effects: sets resolver field of asts for actions and
+ *  defines predicates via definePredicateInAlt(), collects actions and stores
+ *  in alts.
+ *  TODO: remove side-effects!
  */
 public class SymbolCollector extends GrammarTreeVisitor {
 	/** which grammar are we checking */

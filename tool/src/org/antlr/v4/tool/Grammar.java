@@ -37,7 +37,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.semantics.SymbolCollector;
 
 import java.io.*;
 import java.util.*;
@@ -545,7 +544,9 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public int defineTokenName(String name) {
-		return defineTokenName(name, getNewTokenType());
+		Integer prev = tokenNameToTypeMap.get(name);
+		if ( prev==null ) return defineTokenName(name, getNewTokenType());
+		return prev;
 	}
 
 	public int defineTokenName(String name, int ttype) {
@@ -691,6 +692,7 @@ public class Grammar implements AttributeResolver {
 
 	/** Manually get language option from tree */
 	// TODO: move to general tree visitor/parser class?
+	// TODO: don't need anymore as i set optins in parser?
 	public static String getLanguageOption(GrammarRootAST ast) {
 		GrammarAST options = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.OPTIONS);
 		String language = "Java";
@@ -705,6 +707,23 @@ public class Grammar implements AttributeResolver {
 			}
 		}
 		return language;
+	}
+
+	/** Given ^(TOKEN_REF ^(OPTIONS ^(ELEMENT_OPTIONS (= assoc right))))
+	 *  set option assoc=right in TOKEN_REF.
+	 */
+	public static void setNodeOptions(GrammarAST node, GrammarAST options) {
+		GrammarASTWithOptions t = (GrammarASTWithOptions)node;
+		if ( t.getChildCount()==0 ) return;
+		for (Object o : options.getChildren()) {
+			GrammarAST c = (GrammarAST)o;
+			if ( c.getType()==ANTLRParser.ASSIGN ) {
+				t.setOption(c.getChild(0).getText(), c.getChild(1).getText());
+			}
+			else {
+				t.setOption(c.getText(), null); // no arg such as ID<VarNodeType>
+			}
+		}
 	}
 
 	public static Map<String,String> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
@@ -736,10 +755,15 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public Set<String> getStringLiterals() {
-		// TODO: super inefficient way to get these.
-		SymbolCollector collector = new SymbolCollector(this);
-		collector.process(ast); // no side-effects; find strings
-		return collector.strings;
+		final Set<String> strings = new HashSet<String>();
+		GrammarTreeVisitor collector = new GrammarTreeVisitor() {
+			@Override
+			public void stringRef(TerminalAST ref, GrammarAST options) {
+				strings.add(ref.getText());
+			}
+		};
+		collector.visitGrammar(ast);
+		return strings;
 	}
 
 

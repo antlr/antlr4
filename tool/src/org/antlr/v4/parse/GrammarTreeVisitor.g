@@ -413,7 +413,11 @@ block
     ;
 
 ruleref
-    :	^(RULE_REF ARG_ACTION?) {ruleRef($RULE_REF, $ARG_ACTION);}
+    :	^(RULE_REF arg=ARG_ACTION?)
+    	{
+    	ruleRef($RULE_REF, $ARG_ACTION);
+    	if ( $arg!=null ) actionInAlt((ActionAST)$arg);
+    	}
     ;
 
 range

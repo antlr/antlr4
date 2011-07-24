@@ -133,16 +133,22 @@ public class Rule implements AttributeResolver {
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {
 		actions.add(actionAST);
 		alt[currentAlt].actions.add(actionAST);
-		if ( g.isLexer() || actionAST.getType()==ANTLRParser.FORCED_ACTION ) {
+		if ( g.isLexer() || actionAST.getType()==ANTLRParser.FORCED_ACTION ||
+		     actionAST.getType()==ANTLRParser.ARG_ACTION )
+		{
 			actionIndex = g.actions.size();
-			g.actions.put(actionAST, actionIndex);
+			if ( g.actions.get(actionAST)==null ) {
+				g.actions.put(actionAST, actionIndex);
+			}
 		}
 	}
 
 	public void definePredicateInAlt(int currentAlt, PredAST predAST) {
 		actions.add(predAST);
 		alt[currentAlt].actions.add(predAST);
-		g.sempreds.put(predAST, g.sempreds.size());
+		if ( g.sempreds.get(predAST)==null ) {
+			g.sempreds.put(predAST, g.sempreds.size());
+		}
 	}
 
 	public Attribute resolveRetvalOrProperty(String y) {

@@ -43,10 +43,10 @@ public class Lexer extends OutputModelObject {
 	public Collection<String> modes;
 
 	@ModelElement public SerializedATN atn;
-	@ModelElement public List<RuleActionFunction> actionFuncs =
-		new ArrayList<RuleActionFunction>();
-	@ModelElement public List<RuleSempredFunction> sempredFuncs =
-		new ArrayList<RuleSempredFunction>();
+	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
+		new LinkedHashMap<Rule, RuleActionFunction>();
+	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
+		new LinkedHashMap<Rule, RuleSempredFunction>();
 
 	public Lexer(OutputModelFactory factory, LexerFile file) {
 		this.factory = factory;

@@ -133,9 +133,19 @@ public class GrammarAST extends CommonTree {
 	public void setType(int type) {
 		token.setType(type);
 	}
+//
+//	@Override
+//	public String getText() {
+//		if ( textOverride!=null ) return textOverride;
+//        if ( token!=null ) {
+//            return token.getText();
+//        }
+//        return "";
+//	}
 
 	public void setText(String text) {
-		textOverride = text; // don't alt tokens as others might see
+//		textOverride = text; // don't alt tokens as others might see
+		token.setText(text); // we delete surrounding tree, so ok to alter
 	}
 
 //	@Override
@@ -170,7 +180,7 @@ public class GrammarAST extends CommonTree {
 		int type = adaptor.getType(o);
 		while ( type!=Token.EOF ) {
 			buf.append(" ");
-			buf.append(o.token.getText());
+			buf.append(o.getText());
 			nodes.consume();
 			o = (GrammarAST)nodes.LT(1);
 			type = adaptor.getType(o);

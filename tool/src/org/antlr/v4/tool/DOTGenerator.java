@@ -164,7 +164,7 @@ public class DOTGenerator {
 	public String getDOT(ATNState startState) {
 		Set<String> ruleNames = grammar.rules.keySet();
 		String[] names = new String[ruleNames.size()+1];
-		int i = 1;
+		int i = 0;
 		for (String s : ruleNames) names[i++] = s;
 		return getDOT(startState, names);
 	}
@@ -196,17 +196,17 @@ public class DOTGenerator {
 
 			// special case: if decision point, then line up the alt start states
 			// unless it's an end of block
-			if ( s instanceof BlockStartState ) {
-				ST rankST = stlib.getInstanceOf("decision-rank");
-				DecisionState alt = (DecisionState)s;
-				for (int i=0; i<alt.getNumberOfTransitions(); i++) {
-					ATNState target = alt.transition(i).target;
-					if ( target!=null ) {
-						rankST.add("states", target.stateNumber);
-					}
-				}
-				dot.add("decisionRanks", rankST);
-			}
+//			if ( s instanceof BlockStartState ) {
+//				ST rankST = stlib.getInstanceOf("decision-rank");
+//				DecisionState alt = (DecisionState)s;
+//				for (int i=0; i<alt.getNumberOfTransitions(); i++) {
+//					ATNState target = alt.transition(i).target;
+//					if ( target!=null ) {
+//						rankST.add("states", target.stateNumber);
+//					}
+//				}
+//				dot.add("decisionRanks", rankST);
+//			}
 
 			// make a DOT edge for each transition
 			ST edgeST = null;

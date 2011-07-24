@@ -41,7 +41,7 @@ public class LexerGrammar extends Grammar {
     public Grammar implicitLexerOwner;
 
 	/** DEFAULT_MODE rules are added first due to grammar syntax order */
-	public MultiMap<String, Rule> modes = new MultiMap<String, Rule>();
+	public MultiMap<String, Rule> modes;
 
 	public LexerGrammar(Tool tool, GrammarRootAST ast) {
 		super(tool, ast);
@@ -62,6 +62,7 @@ public class LexerGrammar extends Grammar {
 	@Override
 	public void defineRule(Rule r) {
 		super.defineRule(r);
+		if ( modes==null ) modes = new MultiMap<String, Rule>();
 		modes.map(r.mode, r);
 	}
 }

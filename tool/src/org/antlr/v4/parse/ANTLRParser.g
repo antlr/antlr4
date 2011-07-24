@@ -146,6 +146,12 @@ boolean buildAST;
 // the method call from whence to obtain the AST for the parse.
 //
 grammarSpec
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
     :
       // The grammar itself can have a documenation comment, which is the
       // first terminal in the file.
@@ -375,7 +381,13 @@ sync
 // grammar type, such as using returns in lexer rules and so on.
 rule
 @init { paraphrases.push("matching a rule"); }
-@after { paraphrases.pop(); }
+@after {
+	paraphrases.pop();
+	GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+	if ( options!=null ) {
+		Grammar.setNodeOptions($tree, options);
+	}
+}
     : // A rule may start with an optional documentation comment
       DOC_COMMENT?
 
@@ -690,7 +702,16 @@ ebnfSuffix
    	|	PLUS	 	-> POSITIVE_CLOSURE[$start]
 	;
 
-atom:	// Qualified reference delegate.rule. This must be
+atom
+@after {
+	if ( $tree.getType()==DOT ) {
+		GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+		if ( options!=null ) {
+			Grammar.setNodeOptions($tree, options);
+		}
+	}
+}
+	:	// Qualified reference delegate.rule. This must be
 	    // lexically contiguous (no spaces either side of the DOT)
 	    // otherwise it is two references with a wildcard in between
 	    // and not a qualified reference.
@@ -756,6 +777,12 @@ setElement
 // of options, which apply only to that block.
 //
 block
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
  	:	LPAREN
         ( optionsSpec? ra+=ruleAction* COLON )?
         altList
@@ -791,6 +818,12 @@ range
     ;
 
 terminal
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.ELEMENT_OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
     :   TOKEN_REF elementOptions?		-> ^(TOKEN_REF<TerminalAST> elementOptions?)
 	|   STRING_LITERAL elementOptions?	-> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	;
@@ -798,7 +831,7 @@ terminal
 // Terminals may be adorned with certain options when
 // reference in the grammar: TOK<,,,>
 elementOptions
-    : LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS elementOption+)
+    : LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption+)
     ;
 
 // WHen used with elements we can specify what the tree node type can
@@ -860,6 +893,12 @@ rewriteTreeElement
 	;
 
 rewriteTreeAtom
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
     :   TOKEN_REF elementOptions? ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> elementOptions? ARG_ACTION<ActionAST>?) // for imaginary nodes
     |   RULE_REF
 	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)

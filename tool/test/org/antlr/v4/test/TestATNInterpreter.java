@@ -8,7 +8,11 @@ import org.junit.Test;
 
 import java.util.List;
 
-/** */
+
+	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
+	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
+	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
+
 public class TestATNInterpreter extends BaseTest {
 	@Test public void testSimpleNoBlock() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
@@ -157,10 +161,10 @@ public class TestATNInterpreter extends BaseTest {
 			"D : 'd' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"a : (A B | A B | D) C ;");
-		checkMatchedAlt(lg, g, "abc", 1);
-		checkMatchedAlt(lg, g, "abcd", 1);
-		checkMatchedAlt(lg, g, "dc", 3);
+			"a : (A B | A B | C) D ;");
+		checkMatchedAlt(lg, g, "abd", 1);
+		checkMatchedAlt(lg, g, "abdc", 1);
+		checkMatchedAlt(lg, g, "cd", 3);
 	}
 
 	@Test public void testAmbigAltChooseFirst2() throws Exception {
@@ -244,6 +248,7 @@ public class TestATNInterpreter extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
+			"tokens {A;B;C;LP;RP;INT;}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +

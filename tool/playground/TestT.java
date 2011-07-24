@@ -13,7 +13,7 @@ public class TestT {
 		TLexer t = new TLexer(new ANTLRFileStream(args[0]));
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		TParser p = new TParser(tokens);
-		ParserRuleContext ret = p.a();
+		ParserRuleContext ret = p.s();
 		System.out.println(((Tree)ret.tree).toStringTree());
 	}
 
@@ -47,7 +47,7 @@ public class TestT {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("d").index]));
+		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("e_").index]));
 	}
 
 	public static class IntTokenStream implements TokenStream {

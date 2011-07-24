@@ -61,12 +61,8 @@ public class ParserRuleContext extends RuleContext {
 		super(parent, parent!=null ? parent.s : -1, stateNumber);
 	}
 
-	@Override
 	public Object getTree() { return tree; }
-	@Override
 	public ST getTemplate() { return st; }
-	@Override
 	public Token getStart() { return start; }
-	@Override
 	public Token getStop() { return stop; }
 }

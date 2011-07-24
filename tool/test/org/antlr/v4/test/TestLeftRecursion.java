@@ -40,6 +40,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
 			"e : e '*'^ e" +
 			"  | e '+'^ e" +
 			"  | e '?'<assoc=right>^ e ':'! e" +
@@ -66,6 +67,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
 			"        : declarator '['^ e ']'!\n" +
 			"        | declarator '['^ ']'!\n" +
@@ -97,6 +99,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
 			"        : declarator '[' e ']' -> ^('[' declarator e)\n" +
 			"        | declarator '[' ']' -> ^('[' declarator)\n" +
@@ -128,6 +131,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : e EOF ;\n" + // must indicate EOF can follow
 			"e : e '.'^ ID\n" +
 			"  | e '.'^ 'this'\n" +
 			"  | '-'^ e\n" +
@@ -160,6 +164,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : e EOF ;\n" + // must indicate EOF can follow
 			"e : e '.' ID 				-> ^('.' e ID)\n" +
 			"  | e '.' 'this' 			-> ^('.' e 'this')\n" +
 			"  | '-' e 					-> ^('-' e)\n" +
@@ -191,6 +196,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : e EOF ;\n" + // must indicate EOF can follow
 			"e\n" +
 			"  : e '.'^ ID\n" +
 			"  | '-'^ e\n" +
@@ -232,6 +238,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : e EOF ;\n" + // must indicate EOF can follow
 			"expressionList\n" +
 			"    :   e (','! e)*\n" +
 			"    ;\n" +
@@ -245,7 +252,7 @@ public class TestLeftRecursion extends BaseTest {
 			"    |   e '.'^ 'this'\n" +
 			"    |   e '.'^ 'super' '('^ expressionList? ')'!\n" +
 			"    |   e '.'^ 'new'^ ID '('! expressionList? ')'!\n" +
-			"	 |	 'new'^ type ( '(' expressionList? ')'! | (options {k=1;}:'[' e ']'!)+)\n" + // ugly; simplified
+			"	 |	 'new'^ type ( '(' expressionList? ')'! | ('[' e ']'!)+)\n" +
 			"    |   e '['^ e ']'!\n" +
 			"    |   '('^ type ')'! e\n" +
 			"    |   e ('++'^ | '--'^)\n" +

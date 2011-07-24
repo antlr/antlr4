@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
@@ -44,10 +44,12 @@ public class Parser extends OutputModelObject {
 
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 	@ModelElement public SerializedATN atn;
-	@ModelElement public List<RuleActionFunction> actionFuncs =
-		new ArrayList<RuleActionFunction>();
-	@ModelElement public List<RuleSempredFunction> sempredFuncs =
-		new ArrayList<RuleSempredFunction>();
+	@ModelElement public LinkedHashMap<Rule, RuleArgFunction> argFuncs =
+		new LinkedHashMap<Rule, RuleArgFunction>();
+	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
+		new LinkedHashMap<Rule, RuleActionFunction>();
+	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
+		new LinkedHashMap<Rule, RuleSempredFunction>();
 
 	public Parser(OutputModelFactory factory, ParserFile file) {
 		this.factory = factory;

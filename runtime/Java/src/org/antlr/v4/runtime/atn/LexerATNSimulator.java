@@ -148,7 +148,7 @@ public class LexerATNSimulator extends ATNSimulator {
 								   recog.getRuleNames()[prevAcceptState.ruleIndex]+
 								   ":"+ actionIndex);
 			}
-			if ( actionIndex>=0 ) recog._action(null, prevAcceptState.ruleIndex, actionIndex);
+			if ( actionIndex>=0 ) recog.action(null, prevAcceptState.ruleIndex, actionIndex);
 		}
 		input.seek(prevAcceptMarker);
 		return prevAcceptState.prediction;
@@ -237,7 +237,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			else System.out.println("ACTION "+ruleIndex+":"+ruleIndex);
 		}
 		int actionIndex = atn.ruleToActionIndex[ruleIndex];
-		if ( actionIndex>=0 ) recog._action(null, ruleIndex, actionIndex);
+		if ( actionIndex>=0 ) recog.action(null, ruleIndex, actionIndex);
 		return ttype;
 	}
 
@@ -338,7 +338,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 			else if ( t.getClass() == PredicateTransition.class ) {
 				PredicateTransition pt = (PredicateTransition)t;
-				if ( recog._sempred(null, pt.ruleIndex, pt.predIndex) ) {
+				if ( recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 					c = new ATNConfig(config, t.target);
 					c.traversedPredicate = true;
 				}

@@ -197,12 +197,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void grammarOption(GrammarAST ID, String value) {
-		boolean ok = checkOptions(g.ast, ID.token, value);
-		if ( ok ) g.ast.setOption(ID.getText(), value);
-	}
-
-	@Override
 	public void discoverRule(RuleAST rule, GrammarAST ID,
 							 List<GrammarAST> modifiers,
 							 ActionAST arg, ActionAST returns,
@@ -218,18 +212,24 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void grammarOption(GrammarAST ID, String value) {
+		boolean ok = checkOptions(g.ast, ID.token, value);
+		//if ( ok ) g.ast.setOption(ID.getText(), value);
+	}
+
+	@Override
 	public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) {
 		String v = null;
 		if ( value!=null ) v = value.getText();
 		boolean ok = checkTokenOptions(ID, v);
-		if ( ok ) {
-			if ( v!=null ) {
-				t.setOption(ID.getText(), v);
-			}
-			else {
-				t.setOption(TerminalAST.defaultTokenOption, v);
-			}
-		}
+//		if ( ok ) {
+//			if ( v!=null ) {
+//				t.setOption(ID.getText(), v);
+//			}
+//			else {
+//				t.setOption(TerminalAST.defaultTokenOption, v);
+//			}
+//		}
 	}
 
 	@Override

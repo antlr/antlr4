@@ -96,23 +96,7 @@ public class OutputModelController {
 
 		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
-			String ctxType = gen.target.getRuleFunctionContextStructName(r);
-			for (ActionAST a : r.actions) {
-				if ( a instanceof PredAST ) {
-					PredAST p = (PredAST)a;
-					RuleSempredFunction rsf = new RuleSempredFunction(delegate, r, ctxType);
-					file.lexer.sempredFuncs.add(rsf);
-					rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
-				}
-				else if ( a.getType()==ANTLRParser.ACTION ||
-						  a.getType()==ANTLRParser.FORCED_ACTION )
-				{
-					// lexer sees {{...}} and {..} as same; neither are done until accept
-					RuleActionFunction raf = new RuleActionFunction(delegate, r, ctxType);
-					file.lexer.actionFuncs.add(raf);
-					raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
-				}
-			}
+			buildLexerRuleActions(file.lexer, r);
 		}
 
 		return file;
@@ -168,19 +152,79 @@ public class OutputModelController {
 		for (ActionAST a : r.actions) {
 			if ( a instanceof PredAST ) {
 				PredAST p = (PredAST)a;
-				RuleSempredFunction rsf = new RuleSempredFunction(delegate, r, function.ctxType);
-				parser.sempredFuncs.add(rsf);
+				RuleSempredFunction rsf = parser.sempredFuncs.get(r);
+				if ( rsf==null ) {
+					rsf = new RuleSempredFunction(delegate, r, function.ctxType);
+					parser.sempredFuncs.put(r, rsf);
+				}
 				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
 			}
 			else if ( a.getType()==ANTLRParser.FORCED_ACTION ) {
-				RuleActionFunction raf = new RuleActionFunction(delegate, r, function.ctxType);
-				parser.actionFuncs.add(raf);
+				RuleActionFunction raf = parser.actionFuncs.get(r);
+				if ( raf==null ) {
+					raf = new RuleActionFunction(delegate, r, function.ctxType);
+					parser.actionFuncs.put(r, raf);
+				}
 				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+			}
+			else if ( a.getType()==ANTLRParser.ARG_ACTION )	{
+				RuleArgFunction raf = parser.argFuncs.get(r);
+				if ( raf==null ) {
+					raf = new RuleArgFunction(delegate, r, function.ctxType);
+					parser.argFuncs.put(r, raf);
+				}
+				GrammarAST callNode = (GrammarAST)a.getParent();
+				String invokedRuleName = callNode.getText();
+				Rule invokedRule = g.getRule(invokedRuleName);
+				String invokedCtxType = gen.target.getRuleFunctionContextStructName(invokedRule);
+				raf.actions.put(g.actions.get(a), new ArgAction(delegate, a, invokedCtxType));
 			}
 		}
 
 		if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
 		popCurrentRule();
+	}
+
+	public void buildLexerRuleActions(Lexer lexer, Rule r) {
+		CodeGenerator gen = delegate.getGenerator();
+		Grammar g = delegate.getGrammar();
+		String ctxType = gen.target.getRuleFunctionContextStructName(r);
+		for (ActionAST a : r.actions) {
+			if ( a instanceof PredAST ) {
+				PredAST p = (PredAST)a;
+				RuleSempredFunction rsf = lexer.sempredFuncs.get(r);
+				if ( rsf==null ) {
+					rsf = new RuleSempredFunction(delegate, r, ctxType);
+					lexer.sempredFuncs.put(r, rsf);
+				}
+				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+			}
+			else if ( a.getType()== ANTLRParser.ACTION ||
+					  a.getType()==ANTLRParser.FORCED_ACTION )
+			{
+				RuleActionFunction raf = lexer.sempredFuncs.get(r);
+				if ( raf==null ) {
+					raf = new RuleActionFunction(delegate, r, ctxType);
+					lexer.actionFuncs.put(r, raf);
+				}
+				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+			}
+
+			if ( a instanceof PredAST ) {
+				PredAST p = (PredAST)a;
+				RuleSempredFunction rsf = new RuleSempredFunction(delegate, r, ctxType);
+				lexer.sempredFuncs.put(r, rsf);
+				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+			}
+			else if ( a.getType()==ANTLRParser.ACTION ||
+					  a.getType()==ANTLRParser.FORCED_ACTION )
+			{
+				// lexer sees {{...}} and {..} as same; neither are done until accept
+				RuleActionFunction raf = new RuleActionFunction(delegate, r, ctxType);
+				lexer.actionFuncs.put(r, raf);
+				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+			}
+		}
 	}
 
 	public RuleFunction rule(Rule r) {

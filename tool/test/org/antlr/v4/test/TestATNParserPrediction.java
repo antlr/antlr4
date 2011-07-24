@@ -10,6 +10,10 @@ import org.junit.Test;
 
 import java.util.List;
 
+	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
+	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
+	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
+
 public class TestATNParserPrediction extends BaseTest {
 	@Test public void testAorB() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
@@ -143,6 +147,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
+			"tokens {A;B;C;}\n" +
 			"a : x B ;\n" +
 			"b : x C ;\n" +
 			"x : A | ;\n");
@@ -255,6 +260,7 @@ public class TestATNParserPrediction extends BaseTest {
 		// AB predicted in both alts of e but in diff contexts.
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
+			"tokens {A;B;C;}\n" +
 			"a : e B ;\n" +
 			"b : e A B ;\n" +
 			"e : A | ;\n"); // TODO: try with three alts
@@ -363,6 +369,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
+			"tokens {A;B;C;LP;RP;INT;}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -421,6 +428,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
+			"tokens {A;B;C;LP;RP;INT;}\n" +
 			"a : e A | e A B ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +

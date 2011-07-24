@@ -160,14 +160,14 @@ public class SemanticPipeline {
 	void assignTokenTypes(Grammar g, List<GrammarAST> tokensDefs,
 						  List<GrammarAST> tokenIDs, Set<String> strings)
 	{
-		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
+		//Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
 		// DEFINE tokens { X='x'; } ALIASES
 		for (GrammarAST alias : tokensDefs) {
 			if ( alias.getType()== ANTLRParser.ASSIGN ) {
 				String name = alias.getChild(0).getText();
 				String lit = alias.getChild(1).getText();
-				G.defineTokenAlias(name, lit);
+				g.defineTokenAlias(name, lit);
 			}
 		}
 
@@ -182,11 +182,11 @@ public class SemanticPipeline {
 		   */
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
-		for (GrammarAST idAST : tokenIDs) { G.defineTokenName(idAST.getText()); }
+		for (GrammarAST idAST : tokenIDs) { g.defineTokenName(idAST.getText()); }
 
 		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
-		for (String s : strings) { G.defineStringLiteral(s); }
-		System.out.println("tokens="+G.tokenNameToTypeMap);
-		System.out.println("strings="+G.stringLiteralToTypeMap);
+		for (String s : strings) { g.defineStringLiteral(s); }
+		System.out.println("tokens="+g.tokenNameToTypeMap);
+		System.out.println("strings="+g.stringLiteralToTypeMap);
 	}
 }

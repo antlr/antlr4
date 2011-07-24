@@ -37,7 +37,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator extends ATNSimulator {
-	public static boolean debug = false;
+	public static boolean debug = true;
 	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
@@ -465,7 +465,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			ATNState p = config.state;
 			RuleContext newContext =
 				new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
+//			RuleContext xx = parser.args(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
+//			xx.invokingState = p.stateNumber;
 			c = new ATNConfig(config, t.target, newContext);
+//			c = new ATNConfig(config, t.target, xx);
 		}
 		else if ( t instanceof PredicateTransition ) {
 			PredicateTransition pt = (PredicateTransition)t;
@@ -473,7 +476,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// preds are epsilon if we're not doing preds.
 			// if we are doing preds, pred must eval to true
 			if ( !evalPreds ||
-			     (evalPreds && parser._sempred(originalContext, pt.ruleIndex, pt.predIndex)) ) {
+			     (evalPreds && parser.sempred(originalContext, pt.ruleIndex, pt.predIndex)) ) {
 				c = new ATNConfig(config, t.target);
 				c.traversedPredicate = true;
 			}
@@ -484,7 +487,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
 			if ( at.actionIndex>=0 ) {
 				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
-				parser._action(originalContext, at.ruleIndex, at.actionIndex);
+				parser.action(originalContext, at.ruleIndex, at.actionIndex);
 			}
 			else {
 				// non-forced action traversed to get to t.target

@@ -62,7 +62,7 @@ recRule(ruleName, precArgDef, argName, alts, setResultAction, buildAST,
         }
         <endif>
         (
-        	<alts; separator="\n          | ">
+        	(<alts; separator="\n          | ">)
         )*
     ;
 >>

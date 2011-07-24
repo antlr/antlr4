@@ -129,10 +129,10 @@ public class ATNConfig {
 
 	public String toString(Recognizer<?> recog, boolean showAlt) {
 		StringBuffer buf = new StringBuffer();
-		if ( state.ruleIndex>0 ) {
-			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
-			else buf.append(state.ruleIndex+":");
-		}
+//		if ( state.ruleIndex>=0 ) {
+//			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
+//			else buf.append(state.ruleIndex+":");
+//		}
 		buf.append(state);
 		if ( showAlt ) {
 			buf.append("|");
