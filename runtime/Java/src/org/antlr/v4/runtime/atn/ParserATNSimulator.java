@@ -463,16 +463,23 @@ public class ParserATNSimulator extends ATNSimulator {
 		ATNConfig c = null;
 		if ( t instanceof RuleTransition ) {
 			ATNState p = config.state;
-			RuleContext newContext =
-				new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
-//			RuleContext xx = parser.args(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
-//			xx.invokingState = p.stateNumber;
+			RuleContext newContext;
+			if ( parser != null ) {
+				System.out.println("rule trans to rule "+parser.getRuleNames()[t.target.ruleIndex]);
+				newContext = parser.args(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
+				newContext.invokingState = p.stateNumber;
+				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
+			}
+			else {
+				newContext = new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
+			}
 			c = new ATNConfig(config, t.target, newContext);
-//			c = new ATNConfig(config, t.target, xx);
 		}
 		else if ( t instanceof PredicateTransition ) {
 			PredicateTransition pt = (PredicateTransition)t;
 			if ( debug ) System.out.println("PRED (eval="+evalPreds+") "+pt.ruleIndex+":"+pt.predIndex);
+			if ( parser != null ) System.out.println("rule surrounding pred is "+
+													 parser.getRuleNames()[pt.ruleIndex]);
 			// preds are epsilon if we're not doing preds.
 			// if we are doing preds, pred must eval to true
 			if ( !evalPreds ||

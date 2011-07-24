@@ -114,7 +114,7 @@ case <index> : return new <r.actions.(index).ctxType>(_localctx, s, <actions.(in
 >>
 
 RuleActionFunction(r, actions) ::= <<
-public void <r.name>_action(<r.ctxType> _localctx, int s, int actionIndex) {
+public void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
 	switch ( actionIndex ) {
 		<actions:{index|
 case <index> : <actions.(index)> break;}; separator="\n">
@@ -141,7 +141,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     _ctx = _localctx;
     <currentRule.name>_stk.push(_localctx);
     _localctx.start = input.LT(1);
-    //System.out.println("enter "+ruleNames[<currentRule.index>]);
+    System.out.println("enter "+ruleNames[<currentRule.index>]);
     <namedActions.init>
     <locals; separator="\n">
 	try {
@@ -158,7 +158,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
         <currentRule.name>_stk.pop();
         _ctx = (ParserRuleContext)_ctx.parent;
         <finallyAction>
-    	//System.out.println("exit "+ruleNames[<currentRule.index>]);
+    	System.out.println("exit "+ruleNames[<currentRule.index>]);
 	}
     return _localctx;
 }
@@ -611,7 +611,8 @@ public static final ATN _ATN =
     ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
     org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
-	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), rulesNames));
+	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames));
+	//System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames));
 }
 >>
 
