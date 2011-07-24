@@ -52,14 +52,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	protected Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 
-	/** Upon entry for prediction, we might need to execute actions and
-	 *  we need to know original context passed to us from parser or
-	 *  lexer.  This is the stack and any args, locals, labels, etc...
-	 *  Meaningless across adaptivePredict() calls but easier as field
-	 *  than passing down many function calls.
-	protected RuleContext _ctx;
-	 */
-
 	public ParserATNSimulator(ATN atn) {
 		super(atn);
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
@@ -78,7 +70,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public int adaptivePredict(TokenStream input, int decision, RuleContext originalContext) {
 		predict_calls++;
-//		this._ctx = originalContext;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
 			ATNState startState = atn.decisionToState.get(decision);
