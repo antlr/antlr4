@@ -226,7 +226,7 @@ public class Recognizer<ATNInterpreter> {
 	public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 
-	public ParserRuleContext args(RuleContext _localctx, int s, int ruleIndex, int actionIndex) {
+	public ParserRuleContext newContext(RuleContext _localctx, int s, int ruleIndex, int actionIndex) {
 		return new ParserRuleContext(_localctx, s);
 	}
 }

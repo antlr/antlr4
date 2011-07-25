@@ -253,6 +253,7 @@ rule
 @init {
 List<GrammarAST> mods = new ArrayList<GrammarAST>();
 List<GrammarAST> actions = new ArrayList<GrammarAST>(); // track roots
+currentOuterAltNumber=0;
 }
 	:   ^(	RULE ID {currentRuleName=$ID.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
@@ -308,8 +309,7 @@ ruleModifier
     ;
 
 ruleBlock
-    :	{currentOuterAltNumber=0;}
-    	^(	BLOCK
+    :	^(	BLOCK
     		(	{
     			currentOuterAltRoot = (GrammarAST)input.LT(1);
 				currentOuterAltNumber++;

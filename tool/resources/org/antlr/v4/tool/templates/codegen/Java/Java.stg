@@ -65,10 +65,10 @@ public class <parser.name> extends Parser {
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(argFuncs)>
-	public ParserRuleContext args(RuleContext _localctx, int s, int ruleIndex, int actionIndex) {
+	public ParserRuleContext newContext(RuleContext _localctx, int s, int ruleIndex, int actionIndex) {
 		switch ( ruleIndex ) {
 		    <recog.argFuncs.values:{f|
-case <f.ruleIndex> : return <f.name>_arg((<f.ctxType>)_localctx, s, actionIndex);}; separator="\n">
+case <f.ruleIndex> : return <f.name>_argEval((<f.ctxType>)_localctx, s, actionIndex);}; separator="\n">
     	}
 		return new ParserRuleContext(_localctx, s);
 	}
@@ -104,7 +104,7 @@ public <p.name>(TokenStream input) {
 
 RuleArgFunction(r, actions) ::= <<
 /** arg computations for rules called FROM and evaluated in context of <r.name> */
-public ParserRuleContext <r.name>_arg(ParserRuleContext _localctx, int s, int actionIndex) {
+public ParserRuleContext <r.name>_argEval(ParserRuleContext _localctx, int s, int actionIndex) {
 	switch ( actionIndex ) {
 		<actions:{index|
 case <index> : return new <r.actions.(index).ctxType>(_localctx, s, <actions.(index)>);}; separator="\n">

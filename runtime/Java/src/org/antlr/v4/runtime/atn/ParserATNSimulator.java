@@ -94,8 +94,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
 		RuleContext ctx = RuleContext.EMPTY;
-		if ( useContext  ) ctx = originalContext;
-		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.atnStartState, ctx, originalContext);
+		if ( useContext ) ctx = originalContext;
+		OrderedHashSet<ATNConfig> s0_closure =
+			computeStartState(dfa.atnStartState, ctx, originalContext);
 		dfa.s0 = addDFAState(dfa, s0_closure);
 		if ( prevAccept!=null ) {
 			dfa.s0.isAcceptState = true;
@@ -300,7 +301,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			OrderedHashSet<ATNConfig> tmp = reach;
 			reach = closure;
 			closure = tmp;
-			reach.clear();
+			reach.clear(); // THIS MIGHT BE SLOW! kills each element; realloc might be faster
 		} while ( true );
 
 		if ( prevAccept==null ) {
@@ -457,7 +458,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			RuleContext newContext;
 			if ( parser != null ) {
 				System.out.println("rule trans to rule "+parser.getRuleNames()[t.target.ruleIndex]);
-				newContext = parser.args(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
+				newContext = parser.newContext(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
 				newContext.invokingState = p.stateNumber;
 				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
 			}
