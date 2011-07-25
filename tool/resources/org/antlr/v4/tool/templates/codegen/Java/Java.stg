@@ -65,33 +65,33 @@ public class <parser.name> extends Parser {
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(argFuncs)>
-	public ParserRuleContext newContext(RuleContext _localctx, int s, int ruleIndex, int actionIndex) {
-		switch ( ruleIndex ) {
-		    <recog.argFuncs.values:{f|
+public ParserRuleContext newContext(RuleContext _localctx, int s, int ruleIndex, int actionIndex) {
+	switch ( ruleIndex ) {
+		<recog.argFuncs.values:{f|
 case <f.ruleIndex> : return <f.name>_argEval((<f.ctxType>)_localctx, s, actionIndex);}; separator="\n">
-    	}
-		return new ParserRuleContext(_localctx, s);
 	}
-    <argFuncs.values; separator="\n">
+	return new ParserRuleContext(_localctx, s);
+}
+<argFuncs.values; separator="\n">
 <endif>
 <if(actionFuncs)>
-	public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
-		switch ( ruleIndex ) {
-		    <recog.actionFuncs.values:{f|
+public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+	switch ( ruleIndex ) {
+		<recog.actionFuncs.values:{f|
 case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex);}; separator="\n">
-    	}
 	}
-    <actionFuncs.values; separator="\n">
+}
+<actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
-	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
-		switch ( ruleIndex ) {
-		    <recog.sempredFuncs.values:{f|
+public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+	switch ( ruleIndex ) {
+		<recog.sempredFuncs.values:{f|
 case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
-    	}
-		return true;
 	}
-    <sempredFuncs.values; separator="\n">
+	return true;
+}
+<sempredFuncs.values; separator="\n">
 <endif>
 >>
 

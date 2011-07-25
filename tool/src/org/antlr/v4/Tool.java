@@ -625,7 +625,7 @@ public class Tool {
 		for (Grammar ig : grammars) {
 			for (Rule r : ig.rules.values()) {
 				try {
-					String dot = dotGenerator.getDOT(g.atn.ruleToStartState[r.index]);
+					String dot = dotGenerator.getDOT(g.atn.ruleToStartState[r.index], g.isLexer());
 					if (dot != null) {
 						writeDOTFile(g, r, dot);
 					}
