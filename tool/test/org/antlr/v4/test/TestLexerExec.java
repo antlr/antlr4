@@ -67,4 +67,34 @@ public class TestLexerExec extends BaseTest {
 			"[@7,17:17='<EOF>',<-1>,1:17]\n";
 		assertEquals(expecting, found);
 	}
+
+	@Test public void testHexVsID() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"HexLiteral : '0' ('x'|'X') HexDigit+ ;\n"+
+			"DecimalLiteral : ('0' | '1'..'9' '0'..'9'*) ;\n" +
+			"FloatingPointLiteral : ('0x' | '0X') HexDigit* ('.' HexDigit*)? ;\n" +
+			"DOT : '.' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;\n" +
+			"WS : (' '|'\n')+ ;";
+		String found = execLexer("L.g", grammar, "L", "x 0 1 a.b a.l");
+		String expecting =
+			"[@0,0:0='x',<7>,1:0]\n" +
+			"[@1,1:1=' ',<8>,1:1]\n" +
+			"[@2,2:2='0',<4>,1:2]\n" +
+			"[@3,3:3=' ',<8>,1:3]\n" +
+			"[@4,4:4='1',<4>,1:4]\n" +
+			"[@5,5:5=' ',<8>,1:5]\n" +
+			"[@6,6:6='a',<7>,1:6]\n" +
+			"[@7,7:7='.',<6>,1:7]\n" +
+			"[@8,8:8='b',<7>,1:8]\n" +
+			"[@9,9:9=' ',<8>,1:9]\n" +
+			"[@10,10:10='a',<7>,1:10]\n" +
+			"[@11,11:11='.',<6>,1:11]\n" +
+			"[@12,12:12='l',<7>,1:12]\n" +
+			"[@13,13:13='<EOF>',<-1>,1:13]\n";
+		assertEquals(expecting, found);
+	}
+
 }

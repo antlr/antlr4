@@ -71,16 +71,36 @@ public class TestATNConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 
+	@Test public void testLexerIsntSetMultiCharString() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : ('0x' | '0X') ;");
+		String expecting =
+			"BlockStart_0->RuleStart_A_1\n" +
+			"RuleStart_A_1->BlockStart_9\n" +
+			"BlockStart_9->s3\n" +
+			"BlockStart_9->s6\n" +
+			"s3-'0'->s4\n" +
+			"s6-'0'->s7\n" +
+			"s4-'x'->s5\n" +
+			"s7-'X'->s8\n" +
+			"s5->BlockEnd_10\n" +
+			"s8->BlockEnd_10\n" +
+			"BlockEnd_10->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+
 	@Test public void testRange() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+
 			"A : 'a'..'c' ;"
 		);
 		String expecting =
+			"BlockStart_0->RuleStart_A_1\n" +
 			"RuleStart_A_1->s3\n" +
 			"s3-'a'..'c'->s4\n" +
 			"s4->RuleStop_A_2\n";
-		checkTokensRule(g, "A", expecting);
+		checkTokensRule(g, null, expecting);
 	}
 
 	@Test public void testRangeOrRange() throws Exception {
@@ -89,6 +109,7 @@ public class TestATNConstruction extends BaseTest {
 			"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
 		);
 		String expecting =
+			"BlockStart_0->RuleStart_A_1\n" +
 			"RuleStart_A_1->BlockStart_11\n" +
 			"BlockStart_11->s3\n" +
 			"BlockStart_11->s7\n" +
@@ -101,7 +122,7 @@ public class TestATNConstruction extends BaseTest {
 			"s6->BlockEnd_12\n" +
 			"s10->BlockEnd_12\n" +
 			"BlockEnd_12->RuleStop_A_2\n";
-		checkTokensRule(g, "A", expecting);
+		checkTokensRule(g, null, expecting);
 	}
 
 	@Test public void testStringLiteralInParser() throws Exception {
@@ -236,13 +257,13 @@ public class TestATNConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : (A|B)?;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_8\n" +
-			"BlockStart_8->s6\n" +
-			"BlockStart_8->BlockEnd_9\n" +
-			"s6-{A..B}->s7\n" +
-			"BlockEnd_9->RuleStop_a_1\n" +
-			"s7->BlockEnd_9\n" +
-			"RuleStop_a_1-EOF->s10\n";
+			"RuleStart_a_0->BlockStart_4\n" +
+			"BlockStart_4->s2\n" +
+			"BlockStart_4->BlockEnd_5\n" +
+			"s2-{A..B}->s3\n" +
+			"BlockEnd_5->RuleStop_a_1\n" +
+			"s3->BlockEnd_5\n" +
+			"RuleStop_a_1-EOF->s6\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -251,12 +272,12 @@ public class TestATNConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : (A | B) C;");
 		String expecting =
-			"RuleStart_a_0->s6\n" +
-			"s6-{A..B}->s7\n" +
-			"s7->s8\n" +
-			"s8-C->s9\n" +
-			"s9->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s10\n";
+			"RuleStart_a_0->s2\n" +
+			"s2-{A..B}->s3\n" +
+			"s3->s4\n" +
+			"s4-C->s5\n" +
+			"s5->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s6\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -282,15 +303,15 @@ public class TestATNConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : (A|B)+;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_8\n" +
-			"PlusBlockStart_8->s6\n" +
-			"s6-{A..B}->s7\n" +
-			"s7->BlockEnd_9\n" +
-			"BlockEnd_9->PlusLoopBack_10\n" +
-			"PlusLoopBack_10->s6\n" +
-			"PlusLoopBack_10->s11\n" +
-			"s11->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s12\n";
+			"RuleStart_a_0->PlusBlockStart_4\n" +
+			"PlusBlockStart_4->s2\n" +
+			"s2-{A..B}->s3\n" +
+			"s3->BlockEnd_5\n" +
+			"BlockEnd_5->PlusLoopBack_6\n" +
+			"PlusLoopBack_6->s2\n" +
+			"PlusLoopBack_6->s7\n" +
+			"s7->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s8\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -924,18 +945,19 @@ public class TestATNConstruction extends BaseTest {
 	}
 
 	void checkTokensRule(LexerGrammar g, String modeName, String expecting) {
-		if ( g.ast!=null && !g.ast.hasErrors ) {
-			System.out.println(g.ast.toStringTree());
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.processNonCombinedGrammar(imp);
-				}
-			}
-		}
+//		if ( g.ast!=null && !g.ast.hasErrors ) {
+//			System.out.println(g.ast.toStringTree());
+//			Tool antlr = new Tool();
+//			SemanticPipeline sem = new SemanticPipeline(g);
+//			sem.process();
+//			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+//				for (Grammar imp : g.getImportedGrammars()) {
+//					antlr.processNonCombinedGrammar(imp);
+//				}
+//			}
+//		}
 
+		if ( modeName==null ) modeName = "DEFAULT_MODE";
 		if ( g.modes.get(modeName)==null ) {
 			System.err.println("no such mode "+modeName);
 			return;

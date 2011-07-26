@@ -78,7 +78,7 @@ case <f.ruleIndex> : return <f.name>_argEval((<f.ctxType>)_localctx, s, actionIn
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch ( ruleIndex ) {
 		<recog.actionFuncs.values:{f|
-case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex);}; separator="\n">
+case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
 	}
 }
 <actionFuncs.values; separator="\n">
@@ -141,7 +141,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     _ctx = _localctx;
     <currentRule.name>_stk.push(_localctx);
     _localctx.start = input.LT(1);
-    System.out.println("enter "+ruleNames[<currentRule.index>]);
+    //System.out.println("enter "+ruleNames[<currentRule.index>]);
     <namedActions.init>
     <locals; separator="\n">
 	try {
@@ -158,7 +158,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
         <currentRule.name>_stk.pop();
         _ctx = (ParserRuleContext)_ctx.parent;
         <finallyAction>
-    	System.out.println("exit "+ruleNames[<currentRule.index>]);
+    	//System.out.println("exit "+ruleNames[<currentRule.index>]);
 	}
     return _localctx;
 }

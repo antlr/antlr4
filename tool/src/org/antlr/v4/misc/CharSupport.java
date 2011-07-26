@@ -92,6 +92,7 @@ public class CharSupport {
 
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
 	 *  return the int value of 'a'. Convert escape sequences here also.
+	 *  Return -1 if not single char.
 	 */
 	public static int getCharValueFromGrammarCharLiteral(String literal) {
 		switch ( literal.length() ) {
@@ -99,6 +100,7 @@ public class CharSupport {
 				// 'x'
 				return literal.charAt(1); // no escape char
 			case 4 :
+				if ( literal.charAt(1)!='\\' ) return -1;
 				// '\x'  (antlr lexer will catch invalid char)
 				if ( Character.isDigit(literal.charAt(2)) ) {
 //					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,

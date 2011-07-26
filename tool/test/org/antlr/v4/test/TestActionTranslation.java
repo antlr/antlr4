@@ -123,7 +123,7 @@ public class TestActionTranslation extends BaseTest {
 
 	@Test public void testReturnValues() throws Exception {
 		String action = "$lab.e; $b.e;";
-		String expected = "lab.e; _rb.e;";
+		String expected = "_localctx.lab.e; _localctx._rb.e;";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
@@ -238,8 +238,8 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
-			"((TokenStream)input).toString(_localctx.start, _localctx.stop); " +
-			"((TokenStream)input).toString(_localctx.start, _localctx.stop)";
+			"((TokenStream)input).toString(_localctx.start, input.LT(-1)); " +
+			"((TokenStream)input).toString(_localctx.start, input.LT(-1))";
 		testActions(attributeTemplate, "init", action, expected);
 		testActions(attributeTemplate, "inline", action, expected);
 		testActions(attributeTemplate, "finally", action, expected);

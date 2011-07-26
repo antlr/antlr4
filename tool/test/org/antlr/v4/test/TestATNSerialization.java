@@ -439,6 +439,71 @@ public class TestATNSerialization extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
+	@Test public void testLexerWildcardWithMode() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : 'a'..'z'+ ;\n"+
+			"mode CMT;" +
+			"COMMENT : '*/' {skip(); popMode();} ;\n" +
+			"JUNK : . {more();} ;\n");
+		String expecting =
+			"max type 5\n" +
+			"0:TOKEN_START -1\n" +
+			"1:TOKEN_START -1\n" +
+			"2:RULE_START 0\n" +
+			"3:RULE_STOP 0\n" +
+			"4:RULE_START 1\n" +
+			"5:RULE_STOP 1\n" +
+			"6:RULE_START 2\n" +
+			"7:RULE_STOP 2\n" +
+			"8:BASIC 0\n" +
+			"9:BASIC 0\n" +
+			"10:PLUS_BLOCK_START 0\n" +
+			"11:BLOCK_END 0\n" +
+			"12:PLUS_LOOP_BACK 0\n" +
+			"13:BASIC 0\n" +
+			"14:BASIC 1\n" +
+			"15:BASIC 1\n" +
+			"16:BASIC 1\n" +
+			"17:BASIC 1\n" +
+			"18:BASIC 2\n" +
+			"19:BASIC 2\n" +
+			"20:BASIC 2\n" +
+			"rule 0:2 3,-1\n" +
+			"rule 1:4 4,0\n" +
+			"rule 2:6 5,1\n" +
+			"mode 0:0\n" +
+			"mode 1:1\n" +
+			"0->2 EPSILON 0,0\n" +
+			"1->4 EPSILON 0,0\n" +
+			"1->6 EPSILON 0,0\n" +
+			"2->10 EPSILON 0,0\n" +
+			"4->14 EPSILON 0,0\n" +
+			"6->18 EPSILON 0,0\n" +
+			"8->9 RANGE 97,122\n" +
+			"9->11 EPSILON 0,0\n" +
+			"10->8 EPSILON 0,0\n" +
+			"11->12 EPSILON 0,0\n" +
+			"12->8 EPSILON 0,0\n" +
+			"12->13 EPSILON 0,0\n" +
+			"13->3 EPSILON 0,0\n" +
+			"14->15 ATOM 42,0\n" +
+			"15->16 ATOM 47,0\n" +
+			"16->17 EPSILON 0,0\n" +
+			"17->5 EPSILON 0,0\n" +
+			"18->19 WILDCARD 0,0\n" +
+			"19->20 EPSILON 0,0\n" +
+			"20->7 EPSILON 0,0\n" +
+			"0:0\n" +
+			"1:1\n" +
+			"2:10\n" +
+			"3:10\n" +
+			"4:12\n";
+		ATN atn = createATN(lg);
+		String result = ATNSerializer.getDecoded(lg, atn);
+		assertEquals(expecting, result);
+	}
+
 	@Test public void testLexerNotSetWithRange2() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+

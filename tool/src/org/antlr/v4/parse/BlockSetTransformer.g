@@ -10,6 +10,7 @@ options {
 @header {
 package org.antlr.v4.parse;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.misc.*;
 import org.antlr.v4.tool.*;
 import java.util.List;
 import java.util.Set;
@@ -71,8 +72,10 @@ boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
 	
 setElement[boolean inLexer]
 	:	{!rewriteElems.contains($start.getText())}?
-		(	STRING_LITERAL
+		(	a=STRING_LITERAL {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
 		|	{!inLexer}?=> TOKEN_REF
-		|	{inLexer}?=>  ^(RANGE STRING_LITERAL STRING_LITERAL)
+		|	{inLexer}?=>  ^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
+			{CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1 &&
+			 CharSupport.getCharValueFromGrammarCharLiteral($b.getText())!=-1}?
 		)
 	;

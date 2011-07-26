@@ -37,7 +37,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator extends ATNSimulator {
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
@@ -462,10 +462,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			ATNState p = config.state;
 			RuleContext newContext;
 			if ( parser != null ) {
-				System.out.println("rule trans to rule "+parser.getRuleNames()[t.target.ruleIndex]);
+//				System.out.println("rule trans to rule "+parser.getRuleNames()[t.target.ruleIndex]);
 				newContext = parser.newContext(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
 				newContext.invokingState = p.stateNumber;
-				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
+//				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
 			}
 			else {
 				newContext = new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);

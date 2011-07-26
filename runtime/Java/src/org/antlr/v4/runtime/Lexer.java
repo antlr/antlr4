@@ -128,7 +128,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 					eof.setCharPositionInLine(getCharPositionInLine());
 					return eof;
 				}
-//				System.out.println("nextToken at "+((char)input.LA(1))+
+//				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
 //								   " in mode "+mode+
 //								   " at index "+input.index());
 				int ttype = _interp.match(input, mode);

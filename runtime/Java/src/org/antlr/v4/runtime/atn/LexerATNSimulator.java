@@ -35,8 +35,8 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static boolean debug = true;
-	public static boolean dfa_debug = true;
+	public static boolean debug = false;
+	public static boolean dfa_debug = false;
 	public static final int NUM_EDGES = 255;
 
 	protected Lexer recog;
@@ -266,7 +266,7 @@ public class LexerATNSimulator extends ATNSimulator {
 //				if ( st.set.toString().equals("0") ) {
 //					System.out.println("eh?");
 //				}
-				if ( debug ) System.out.println("match set "+st.set.toString());
+				if ( debug ) System.out.println("match set "+st.set.toString(true));
 				return st.target;
 			}
 		}
@@ -311,7 +311,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		// TODO? if ( closure.contains(t) ) return;
 
 		if ( config.state instanceof RuleStopState ) {
-			if ( debug ) System.out.println("closure at rule stop "+config);
+			if ( debug ) {
+				if ( recog!=null ) System.out.println("closure at "+
+													  recog.getRuleNames()[config.state.ruleIndex]+
+													  " rule stop "+config);
+				else System.out.println("closure at rule stop "+config);
+			}
 			if ( config.context == null || config.context.isEmpty() ) {
 				configs.add(config);
 				return;
