@@ -67,7 +67,7 @@ public interface ATNFactory {
 
 	Handle tokenRef(TerminalAST node);
 
-	Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert);
+	Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert);
 
 	Handle tree(List<Handle> els);
 

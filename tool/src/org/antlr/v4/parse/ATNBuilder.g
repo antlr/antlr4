@@ -128,9 +128,16 @@ subrule returns [ATNFactory.Handle p]
 
 blockSet[boolean invert] returns [ATNFactory.Handle p]
 @init {List<GrammarAST> alts = new ArrayList<GrammarAST>();}
-	:	^(SET (atom {alts.add($atom.start);})+) {$p = factory.set($start, alts, $invert);}
+	:	^(SET (setElement {alts.add($setElement.start);})+) {$p = factory.set($start, alts, $invert);}
 	;
 
+/** Don't combine with atom otherwise it will build spurious ATN nodes */
+setElement
+	:	STRING_LITERAL
+	|	TOKEN_REF
+	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
+	;
+	
 astBlockSuffix
     : ROOT
     | IMPLIES

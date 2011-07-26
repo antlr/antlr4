@@ -159,9 +159,9 @@ public class ATNSerializer {
 					case Transition.SET :
 						arg1 = setIndex++;
 						break;
-					case Transition.NOT_ATOM :
-						arg1 = ((NotAtomTransition)t).label;
-						break;
+//					case Transition.NOT_ATOM :
+//						arg1 = ((NotAtomTransition)t).label;
+//						break;
 					case Transition.NOT_SET :
 						arg1 = setIndex++;
 						break;
@@ -199,7 +199,7 @@ public class ATNSerializer {
 					   ruleIndex + "\n");
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);
-		for (int i=1; i<=nrules; i++) {
+		for (int i=0; i<nrules; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
 			int arg1 = ATNSimulator.toInt(data[p++]);
 			int arg2 = ATNSimulator.toInt(data[p++]);

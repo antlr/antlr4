@@ -46,9 +46,6 @@ public class NotSetTransition extends SetTransition {
 	}
 
 	@Override
-	public IntervalSet label() { return notSet; }
-
-	@Override
 	public String toString() {
 		return '~'+super.toString();
 	}

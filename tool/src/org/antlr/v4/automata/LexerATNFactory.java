@@ -31,6 +31,7 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
@@ -101,13 +102,20 @@ public class LexerATNFactory extends ParserATNFactory {
 	}
 
 	@Override
-	public Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert) {
+	public Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert) {
 		ATNState left = newState(associatedAST);
 		ATNState right = newState(associatedAST);
 		IntervalSet set = new IntervalSet();
-		for (GrammarAST t : terminals) {
-			int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
-			set.add(c);
+		for (GrammarAST t : alts) {
+			if ( t.getType()== ANTLRParser.RANGE ) {
+				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
+				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
+				set.add(a, b);
+			}
+			else {
+				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
+				set.add(c);
+			}
 		}
 		if ( invert ) {
 			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());

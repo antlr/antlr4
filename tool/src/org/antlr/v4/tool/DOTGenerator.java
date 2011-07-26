@@ -214,7 +214,6 @@ public class DOTGenerator {
 			ST edgeST = null;
 			for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 				Transition edge = s.transition(i);
-				System.out.println("dump s"+s.stateNumber+"->"+edge);
 				if ( edge instanceof RuleTransition ) {
 					RuleTransition rr = ((RuleTransition)edge);
 					// don't jump to other rules, but display edge to follow node

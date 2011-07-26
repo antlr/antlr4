@@ -19,7 +19,7 @@ public class TestATNSerialization extends BaseTest {
 			"4:BASIC 0\n" +
 			"5:BASIC 0\n" +
 			"6:BASIC 0\n" +
-			"rule 1:0 0,0\n" +
+			"rule 0:0 0,0\n" +
 			"0->2 EPSILON 0,0\n" +
 			"1->6 ATOM -1,0\n" +
 			"2->3 ATOM 3,0\n" +
@@ -43,12 +43,15 @@ public class TestATNSerialization extends BaseTest {
 			"2:BASIC 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:0 0,0\n" +
+			"rule 0:0 0,0\n" +
+			"0:A..A\n" +
 			"0->2 EPSILON 0,0\n" +
 			"1->4 ATOM -1,0\n" +
-			"2->3 NOT_ATOM 3,0\n" +
+			"2->3 NOT_SET 0,0\n" +
 			"3->1 EPSILON 0,0\n";
 		ATN atn = createATN(g);
+		DOTGenerator gen = new DOTGenerator(g);
+		System.out.println(gen.getDOT(atn.ruleToStartState[0]));
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
 	}
@@ -65,7 +68,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:BASIC 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:0 0,0\n" +
+			"rule 0:0 0,0\n" +
 			"0->2 EPSILON 0,0\n" +
 			"1->4 ATOM -1,0\n" +
 			"2->3 WILDCARD 0,0\n" +
@@ -92,7 +95,7 @@ public class TestATNSerialization extends BaseTest {
 			"8:BLOCK_START 0\n" +
 			"9:BLOCK_END 0\n" +
 			"10:BASIC 0\n" +
-			"rule 1:0 0,0\n" +
+			"rule 0:0 0,0\n" +
 			"0->8 EPSILON 0,0\n" +
 			"1->10 ATOM -1,0\n" +
 			"2->3 ATOM 3,0\n" +
@@ -133,7 +136,7 @@ public class TestATNSerialization extends BaseTest {
 			"14:BLOCK_START 0\n" +
 			"15:BLOCK_END 0\n" +
 			"16:BASIC 0\n" +
-			"rule 1:0 0,0\n" +
+			"rule 0:0 0,0\n" +
 			"0->14 EPSILON 0,0\n" +
 			"1->16 ATOM -1,0\n" +
 			"2->3 ATOM 3,0\n" +
@@ -175,7 +178,7 @@ public class TestATNSerialization extends BaseTest {
 			"8:BASIC 0\n" +
 			"9:BASIC 0\n" +
 			"10:BASIC 0\n" +
-			"rule 1:0 0,0\n" +
+			"rule 0:0 0,0\n" +
 			"0->4 EPSILON 0,0\n" +
 			"1->10 ATOM -1,0\n" +
 			"2->3 ATOM 3,0\n" +
@@ -211,8 +214,8 @@ public class TestATNSerialization extends BaseTest {
 			"6:BASIC 1\n" +
 			"7:BASIC 1\n" +
 			"8:BASIC 1\n" +
-			"rule 1:0 0,0\n" +
-			"rule 2:2 0,0\n" +
+			"rule 0:0 0,0\n" +
+			"rule 1:2 0,0\n" +
 			"0->4 EPSILON 0,0\n" +
 			"1->8 ATOM -1,0\n" +
 			"2->6 EPSILON 0,0\n" +
@@ -242,8 +245,8 @@ public class TestATNSerialization extends BaseTest {
 			"6:BASIC 0\n" +
 			"7:BASIC 1\n" +
 			"8:BASIC 1\n" +
-			"rule 1:1 3,-1\n" +
-			"rule 2:3 4,-1\n" +
+			"rule 0:1 3,-1\n" +
+			"rule 1:3 4,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"0->3 EPSILON 0,0\n" +
@@ -270,7 +273,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:1 3,-1\n" +
+			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"1->3 EPSILON 0,0\n" +
@@ -297,7 +300,7 @@ public class TestATNSerialization extends BaseTest {
 			"6:BLOCK_END 0\n" +
 			"7:PLUS_LOOP_BACK 0\n" +
 			"8:BASIC 0\n" +
-			"rule 1:1 3,-1\n" +
+			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"1->5 EPSILON 0,0\n" +
@@ -340,9 +343,9 @@ public class TestATNSerialization extends BaseTest {
 			"12:BASIC 2\n" +
 			"13:BASIC 2\n" +
 			"14:BASIC 2\n" +
-			"rule 1:1 3,0\n" +
-			"rule 2:3 4,-1\n" +
-			"rule 3:5 5,1\n" +
+			"rule 0:1 3,0\n" +
+			"rule 1:3 4,-1\n" +
+			"rule 2:5 5,1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0\n" +
 			"0->3 EPSILON 0,0\n" +
@@ -375,12 +378,36 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:1 3,-1\n" +
+			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
 			"0->1 EPSILON 0,0\n" +
 			"1->3 EPSILON 0,0\n" +
 			"3->4 NOT_SET 0,0\n" +
+			"4->2 EPSILON 0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg);
+		String result = ATNSerializer.getDecoded(lg, atn);
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ('a'|'b'|'e'|'p'..'t')\n ;");
+		String expecting =
+			"max type 3\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 3,-1\n" +
+			"mode 0:0\n" +
+			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
+			"0->1 EPSILON 0,0\n" +
+			"1->3 EPSILON 0,0\n" +
+			"3->4 SET 0,0\n" +
 			"4->2 EPSILON 0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg);
@@ -399,7 +426,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 1:1 3,-1\n" +
+			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
 			"0->1 EPSILON 0,0\n" +
@@ -425,7 +452,7 @@ public class TestATNSerialization extends BaseTest {
 			"4:BASIC 0\n" +
 			"5:BASIC 0\n" +
 			"6:BASIC 0\n" +
-			"rule 1:1 3,-1\n" +
+			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
 			"1:'e'..'e', 'p'..'t'\n" +
@@ -466,9 +493,9 @@ public class TestATNSerialization extends BaseTest {
 			"12:BASIC 1\n" +
 			"13:BASIC 2\n" +
 			"14:BASIC 2\n" +
-			"rule 1:3 3,-1\n" +
-			"rule 2:5 4,-1\n" +
-			"rule 3:7 5,-1\n" +
+			"rule 0:3 3,-1\n" +
+			"rule 1:5 4,-1\n" +
+			"rule 2:7 5,-1\n" +
 			"mode 0:0\n" +
 			"mode 1:1\n" +
 			"mode 2:2\n" +

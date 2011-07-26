@@ -70,9 +70,9 @@ boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
 	;
 	
 setElement[boolean inLexer]
-@after {$tree = new TerminalAST($start);} // elem can't be to right of ->
 	:	{!rewriteElems.contains($start.getText())}?
 		(	STRING_LITERAL
-		|	{!inLexer}? TOKEN_REF
+		|	{!inLexer}?=> TOKEN_REF
+		|	{inLexer}?=>  ^(RANGE STRING_LITERAL STRING_LITERAL)
 		)
 	;

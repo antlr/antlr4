@@ -767,6 +767,7 @@ blockSet
 setElement
 	:	TOKEN_REF<TerminalAST>
 	|	STRING_LITERAL<TerminalAST>
+	|	range
 	;
 
 // -------------

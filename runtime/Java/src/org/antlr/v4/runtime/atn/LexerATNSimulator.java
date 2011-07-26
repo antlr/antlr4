@@ -35,8 +35,8 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static boolean debug = false;
-	public static boolean dfa_debug = false;
+	public static boolean debug = true;
+	public static boolean dfa_debug = true;
 	public static final int NUM_EDGES = 255;
 
 	protected Lexer recog;
@@ -263,6 +263,9 @@ public class LexerATNSimulator extends ATNSimulator {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
 			if ( !not && st.set.member(t) || not && !st.set.member(t) ) {
+//				if ( st.set.toString().equals("0") ) {
+//					System.out.println("eh?");
+//				}
 				if ( debug ) System.out.println("match set "+st.set.toString());
 				return st.target;
 			}
@@ -368,8 +371,13 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected void addDFAEdge(DFAState p, int t, DFAState q) {
 		if ( p==null ) return;
 		if ( p.edges==null ) {
+			//  make room for tokens 1..n and -1 masquerading as index 0
 			p.edges = new DFAState[NUM_EDGES+1]; // TODO: make adaptive
 		}
+//		if ( t==Token.EOF ) {
+//			System.out.println("state "+p+" has EOF edge");
+//			t = 0;
+//		}
 		p.edges[t] = q; // connect
 	}
 

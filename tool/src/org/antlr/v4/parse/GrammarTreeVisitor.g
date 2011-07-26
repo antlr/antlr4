@@ -406,6 +406,11 @@ blockSet
 setElement
 	:	STRING_LITERAL	{stringRef((TerminalAST)$STRING_LITERAL, null);}
 	|	TOKEN_REF		{tokenRef((TerminalAST)$TOKEN_REF, null);}
+	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
+		{
+		stringRef((TerminalAST)$a, null);
+		stringRef((TerminalAST)$b, null);
+		}
 	;
 
 block
