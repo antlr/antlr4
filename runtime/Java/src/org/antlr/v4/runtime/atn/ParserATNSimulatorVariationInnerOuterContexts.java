@@ -27,6 +27,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**********************************
+ * This version I was trying to keep an outer context as well as the
+ * context used during prediction, but it started getting complicated.
+ * For example, s0.configs start state configurations were computed based
+ * upon no an initial context. Later, if I need context I can't start
+ * from these computations. It has to be started over completely.
+ *
+ **********************************/
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.*;
@@ -36,9 +44,9 @@ import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
-public class ParserATNSimulator extends ATNSimulator {
+public class ParserATNSimulatorVariationInnerOuterContexts extends ATNSimulator {
 	public static boolean debug = true;
-	public static boolean dfa_debug = false;
+	public static boolean dfa_debug = true;
 
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
@@ -63,13 +71,13 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	protected Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 
-	public ParserATNSimulator(ATN atn) {
+	public ParserATNSimulatorVariationInnerOuterContexts(ATN atn) {
 		super(atn);
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
 		decisionToDFA = new DFA[atn.getNumberOfDecisions()];
 	}
 
-	public ParserATNSimulator(BaseRecognizer parser, ATN atn) {
+	public ParserATNSimulatorVariationInnerOuterContexts(BaseRecognizer parser, ATN atn) {
 		super(atn);
 		this.parser = parser;
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
@@ -104,10 +112,11 @@ public class ParserATNSimulator extends ATNSimulator {
 						  boolean useContext)
 	{
 		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
+		this.originalContext = originalContext;
 		RuleContext ctx = RuleContext.EMPTY;
 		if ( useContext ) ctx = originalContext;
 		OrderedHashSet<ATNConfig> s0_closure =
-			computeStartState(dfa.atnStartState, ctx);
+			computeStartState(dfa.atnStartState, ctx, originalContext);
 		dfa.s0 = addDFAState(dfa, s0_closure);
 		if ( prevAccept!=null ) {
 			dfa.s0.isAcceptState = true;
@@ -131,13 +140,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int matchATN(TokenStream input, ATNState startState) {
 		DFA dfa = new DFA(startState);
 		RuleContext ctx = new ParserRuleContext();
-		OrderedHashSet<ATNConfig> s0_closure = computeStartState(startState, ctx);
+		OrderedHashSet<ATNConfig> s0_closure = computeStartState(startState, ctx, RuleContext.EMPTY);
 		return execATN(input, dfa, input.index(), s0_closure, ctx, false);
 	}
 
 	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext originalContext) {
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+" exec LA(1)=="+input.LT(1));
 //		dump(dfa);
+		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
+		this.originalContext = originalContext;
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int t = input.LA(1);
@@ -155,15 +166,31 @@ public class ParserATNSimulator extends ATNSimulator {
 				// start all over with ATN; can't use DFA
 				input.seek(start);
 				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-				int alt = execATN(input, throwAwayDFA, start, s0.configs, originalContext, false);
+				int alt = predictATN(throwAwayDFA, input, dfa.decision, originalContext, false);
+//				int alt = execATN(input, throwAwayDFA, start, s0.configs, originalContext, false);
+				// we might get to a different input sequence by retrying with this new context
+				// so don't set the prediction for this accept state.
+				// wait: we are talking about the same input here. it can match more
+				// or less but not different input.Oh, that updates a throwaway DFA.
+				// It will not update our DFA
 				s.ctxToPrediction.put(originalContext, alt);
+				if ( dfa_debug ) System.out.println("after retry, ctx sensitive state mapping "+originalContext+"->"+alt);
 				return alt;
 			}
 			if ( s.isAcceptState ) {
 				if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
 				prevAcceptState = s;
+				if ( s.ctxToPrediction!=null ) {
+					Integer predI = s.ctxToPrediction.get(originalContext);
+					System.out.println("ctx based prediction: "+predI);
+				}
+
 				// keep going unless we're at EOF or state only has one alt number
 				// mentioned in configs; check if something else could match
+				// TODO: for prediction, we must stop here I believe; there's no way to get
+				// past the stop state since we will never look for the longest match.
+				// during prediction, we always look for enough input to get a unique prediction.
+				// nothing beyond that will help
 				if ( s.complete || t==CharStream.EOF ) break;
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
@@ -379,7 +406,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictedAlt;
 	}
 
-	public OrderedHashSet<ATNConfig> computeStartState(ATNState p, RuleContext ctx)	{
+	public OrderedHashSet<ATNConfig> computeStartState(ATNState p, RuleContext ctx,
+													   RuleContext originalContext)
+	{
 		RuleContext initialContext = ctx; // always at least the implicit call to start rule
 		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 		prevAccept = null; // might reach end rule; track
@@ -388,6 +417,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
+//			c.outerContext = originalContext; COMMENTED OUT TO COMPILE
 			closure(c, configs);
 		}
 
@@ -431,17 +461,35 @@ public class ParserATNSimulator extends ATNSimulator {
 		closureBusy.add(config);
 
 		if ( config.state instanceof RuleStopState ) {
+//			if ( debug ) System.out.println("RuleStopState "+config+", originalContext: "+config.outerContext);
 			// We hit rule end. If we have context info, use it
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				RuleContext newContext = config.context.parent; // "pop" invoking state
 				ATNState invokingState = atn.states.get(config.context.invokingState);
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
-				ATNConfig c = new ATNConfig(retState, config.alt, newContext);
+				//ATNConfig c = new ATNConfig(retState, config.alt, newContext);
+				ATNConfig c = new ATNConfig(config, retState, newContext);
 				closure(c, configs, closureBusy);
 				return;
 			}
+			// else use original context info
+			/* COMMENTED OUT TO COMPILE
+			if ( !config.outerContext.isEmpty() ) {
+				System.out.println("context stack empty, using originalContext");
+				RuleContext newContext = config.outerContext.parent; // "pop" invoking state
+				ATNState invokingState = atn.states.get(config.outerContext.invokingState);
+				RuleTransition rt = (RuleTransition)invokingState.transition(0);
+				ATNState retState = rt.followState;
+				ATNConfig c = new ATNConfig(config, retState, newContext);
+				// pop one from originalContext too for this thread of computation
+				c.outerContext = newContext;
+				closure(c, configs, closureBusy);
+				return;
+			}
+			*/
 			// else if we have no context info, just chase follow links
+			// TODO: should be EOF now that we're using originalContext right?
 		}
 
 		ATNState p = config.state;
@@ -479,11 +527,13 @@ public class ParserATNSimulator extends ATNSimulator {
 													 parser.getRuleNames()[pt.ruleIndex]);
 			// preds are epsilon if we're not doing preds.
 			// if we are doing preds, pred must eval to true
+			/* COMMENTED OUT TO COMPILE
 			if ( !evalPreds ||
-			     (evalPreds && parser.sempred(originalContext, pt.ruleIndex, pt.predIndex)) ) {
+			     (evalPreds && parser.sempred(config.outerContext, pt.ruleIndex, pt.predIndex)) ) {
 				c = new ATNConfig(config, t.target);
 				c.traversedPredicate = true;
 			}
+			*/
 		}
 		else if ( t instanceof ActionTransition ) {
 			c = new ATNConfig(config, t.target);
@@ -491,7 +541,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
 			if ( at.actionIndex>=0 ) {
 				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
-				parser.action(originalContext, at.ruleIndex, at.actionIndex);
+				// COMMENTED OUT TO COMPILE parser.action(config.outerContext, at.ruleIndex, at.actionIndex);
 			}
 			else {
 				// non-forced action traversed to get to t.target
@@ -603,7 +653,7 @@ public class ParserATNSimulator extends ATNSimulator {
 								  int t,
 								  OrderedHashSet<ATNConfig> q)
 	{
-//		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
+		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
 		DFAState from = addDFAState(dfa, p);
 		DFAState to = addDFAState(dfa, q);
 		addDFAEdge(from, t, to);
@@ -643,9 +693,32 @@ public class ParserATNSimulator extends ATNSimulator {
 	public void makeAcceptState(DFA dfa, OrderedHashSet<ATNConfig> reach, int uniqueAlt) {
 		DFAState accept = dfa.states.get(new DFAState(reach));
 		if ( accept==null ) return;
-		accept.isAcceptState = true;
-		accept.prediction = uniqueAlt;
-		accept.complete = true;
+
+		boolean usesOuterContext;
+		RuleContext outerContext = null;
+		for (ATNConfig c : accept.configs) {
+			/* COMMENTED OUT TO COMPILE
+			if ( c.outerContext!=originalContext ) {
+				System.out.println("### we used context "+
+								   originalContext.toString(parser, c.outerContext)+" from "+
+								   originalContext.toString(parser));
+				// TODO:Will they ever be different context sizes for the same except state?
+				// seems like they can only one context depth otherwise we'd
+				// be a different except states for different input
+				usesOuterContext = true;
+				outerContext = c.outerContext;
+				break;
+			}
+			*/
+		}
+		if ( outerContext!=null ) {
+			// accept.setContextSensitivePrediction(originalContext, uniqueAlt);
+		}
+		else {
+			accept.isAcceptState = true;
+			accept.prediction = uniqueAlt;
+			accept.complete = true;
+		}
 	}
 
 	public String getTokenName(int t) {

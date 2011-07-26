@@ -211,10 +211,14 @@ public class RuleContext {
 	}
 
 	public String toString(BaseRecognizer recog) {
+		return toString(recog, null);
+	}
+
+	public String toString(BaseRecognizer recog, RuleContext stop) {
 		StringBuffer buf = new StringBuffer();
 		RuleContext p = this;
 		buf.append("[");
-		while ( p != null ) {
+		while ( p != null && p != stop ) {
 			if ( recog!=null ) {
 				ATN atn = recog.getATN();
 				ATNState s = atn.states.get(p.s);

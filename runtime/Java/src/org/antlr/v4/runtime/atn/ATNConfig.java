@@ -45,9 +45,28 @@ public class ATNConfig {
 	public int alt;
 
 	/** The stack of invoking states leading to the rule/states associated
-	 *  wit this config.
+	 *  with this config.  We track only those contexts pushed during
+	 *  execution of the ATN simulator.
 	 */
 	public RuleContext context;
+
+	/** The stack acquired from parser invoking the ATN interpreter.
+	 *  Initially it's the rule stack upon entry into interp.adaptivePredict().
+	 *
+	 *  We only pop from outerContext if we hit rule stop state
+	 *  of rule that initiates the adaptivePredict(). outerContext
+	 *  tracks as we go back up the entry context. If we do a call,
+	 *  we again push onto the regular context, rather than pushing onto
+	 *  outerContext.
+	 *
+	 *  At an accept state, we ignore outerContext unless we had to use it
+	 *  during prediction. If outerContext != originalContext
+	 *  (stored in the ATN interpreter), then this config needed context
+	 *  to find another symbol.
+	 *
+	 *  Lexer matches with ATN so there is no external context; this is null.
+	 */
+	//public RuleContext outerContext;
 
 	/**
 	 Indicates that we have reached this ATN configuration after
@@ -60,7 +79,7 @@ public class ATNConfig {
 
 	/**
 	 Indicates that we have reached this ATN configuration after
-	 traversing a non-force action transition. We do not execute
+	 traversing a non-forced action transition. We do not execute
 	 predicates after such actions because the predicates could be
 	 functions of the side effects. Force actions must be either side
 	 effect free or automatically undone as the parse continues.
@@ -80,6 +99,7 @@ public class ATNConfig {
 		this.state = c.state;
 		this.alt = c.alt;
 		this.context = c.context;
+//		this.outerContext = c.outerContext;
 		this.traversedPredicate = c.traversedPredicate;
 		this.traversedAction = c.traversedAction;
 	}

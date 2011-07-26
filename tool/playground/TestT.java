@@ -2,7 +2,6 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 
@@ -14,7 +13,7 @@ public class TestT {
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		TParser p = new TParser(tokens);
 		ParserRuleContext ret = p.s();
-		System.out.println(((Tree)ret.tree).toStringTree());
+//		System.out.println(((Tree)ret.tree).toStringTree());
 	}
 
 	public static void dump() throws Exception {

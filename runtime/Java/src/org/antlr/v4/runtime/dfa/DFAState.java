@@ -100,6 +100,16 @@ public class DFAState {
 		return alts;
 	}
 
+	/*
+	public void setContextSensitivePrediction(RuleContext ctx, int predictedAlt) {
+		isCtxSensitive = true;
+		if ( ctxToPrediction==null ) {
+			ctxToPrediction = new LinkedHashMap<RuleContext, Integer>();
+		}
+		ctxToPrediction.put(ctx, predictedAlt);
+	}
+	*/
+
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	public int hashCode() {
 		int h = 0;
