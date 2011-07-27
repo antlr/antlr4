@@ -34,6 +34,8 @@ class TestJava {
 			System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
 			System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
 			System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
+			System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
+			System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
 			if ( profile ) {
 				System.out.println("num decisions "+profiler.numDecisions);
 			}
@@ -61,7 +63,7 @@ class TestJava {
 				f.getName().substring(f.getName().length()-5).equals(".java"))
 			|| f.getName().equals("input") )
 		{
-		    System.err.println("parsing "+f.getAbsolutePath());
+			System.err.println("parsing "+f.getAbsolutePath());
 			parseFile(f.getAbsolutePath());
 		}
 	}
@@ -98,6 +100,7 @@ class TestJava {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
 					parser = new JavaParser(tokens);
+//					parser.getInterpreter().setContextSensitive(true);
 				}
 				parser.setTokenStream(tokens);
 				// start parsing at the compilationUnit rule

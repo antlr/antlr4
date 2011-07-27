@@ -36,6 +36,7 @@ import java.util.ArrayList;
 >>
 
 Parser(parser, scopes, funcs, atn, argFuncs, actionFuncs, sempredFuncs) ::= <<
+@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class <parser.name> extends Parser {
     public static final int
         <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -567,6 +568,7 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
+@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class <lexer.name> extends Lexer {
     public static final int
         <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;

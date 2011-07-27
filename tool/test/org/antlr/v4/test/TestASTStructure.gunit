@@ -124,16 +124,16 @@ block:
 	"( ^(A B) | ^(b C) )"	-> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
 
 ebnf:
-	"(A|B)"					-> (SET A B)
-	"(A|B)?"				-> ("?" (BLOCK (ALT (SET A B))))
-	"(A|B)*"				-> ("*" (BLOCK (ALT (SET A B))))
-	"(A|B)+"				-> ("+" (BLOCK (ALT (SET A B))))
+	"(A|B)"					-> (BLOCK (ALT A) (ALT B))
+	"(A|B)?"				-> (? (BLOCK (ALT A) (ALT B)))
+	"(A|B)*"				-> (* (BLOCK (ALT A) (ALT B)))
+	"(A|B)+"				-> (+ (BLOCK (ALT A) (ALT B)))
 
 alternative:
 	"x+=ID* -> $x*" ->
 	    (ALT_REWRITE
 		    (ALT (* (BLOCK (ALT (+= x ID)))))
-            (-> (ALT (* (REWRITE_BLOCK (ALT x))))))
+            (-> (REWRITE_SEQ (* (REWRITE_BLOCK (REWRITE_SEQ x))))))
 
 	"A -> ..." -> (ALT_REWRITE (ALT A) (-> ...))
 	"A -> "	   -> (ALT_REWRITE (ALT A) (-> EPSILON))
@@ -150,7 +150,7 @@ alternative:
 
 	"A -> ({name})()" -> (ALT_REWRITE (ALT A) (-> (TEMPLATE {name})))
 
-	"A -> {expr}" -> (ALT_REWRITE (ALT A) (-> (ALT {expr})))
+	"A -> {expr}" -> (ALT_REWRITE (ALT A) (-> (REWRITE_SEQ {expr})))
 
     <<
     A -> {p1}? {e1}
@@ -160,28 +160,28 @@ alternative:
     ->
     ( ALT_REWRITE
       (ALT A)
-      (-> {p1}? (ALT {e1}))
-      (-> (ALT {e2}))
+      (-> {p1}? (REWRITE_SEQ {e1}))
+      (-> (REWRITE_SEQ {e2}))
     )
 
-	"A -> A" -> (ALT_REWRITE (ALT A) (-> (ALT A)))
+	"A -> A" -> (ALT_REWRITE (ALT A) (-> (REWRITE_SEQ A)))
 
-	"a -> a" -> (ALT_REWRITE (ALT a) (-> (ALT a)))
+	"a -> a" -> (ALT_REWRITE (ALT a) (-> (REWRITE_SEQ a)))
 
 	"a A X? Y* -> A a ^(TOP X)? Y*" ->
         (ALT_REWRITE
             (ALT a A (? (BLOCK (ALT X))) (* (BLOCK (ALT Y))))
-            (-> (ALT
+            (-> (REWRITE_SEQ
                 A a
-                (? (REWRITE_BLOCK (ALT ("^(" TOP X))))
-                (* (REWRITE_BLOCK (ALT Y))))))
+                (? (REWRITE_BLOCK (REWRITE_SEQ ("^(" TOP X))))
+                (* (REWRITE_BLOCK (REWRITE_SEQ Y))))))
 
-	"A -> A[33]" -> (ALT_REWRITE (ALT A) (-> (ALT (A 33))))
+	"A -> A[33]" -> (ALT_REWRITE (ALT A) (-> (REWRITE_SEQ (A 33))))
 
 	"A -> 'int' ^(A A)*" ->
         (ALT_REWRITE
             (ALT A)
-            (-> (ALT 'int' (* (REWRITE_BLOCK (ALT ("^(" A A)))))))
+            (-> (REWRITE_SEQ 'int' (* (REWRITE_BLOCK (REWRITE_SEQ ("^(" A A)))))))
 
     <<
     A -> {p1}? A
@@ -190,8 +190,8 @@ alternative:
     >>
     ->
     (ALT_REWRITE (ALT A)
-    (-> {p1}? (ALT A))
-    (-> {p2}? (ALT B))
+    (-> {p1}? (REWRITE_SEQ A))
+    (-> {p2}? (REWRITE_SEQ B))
     (-> EPSILON))
 
 element:
@@ -210,11 +210,11 @@ element:
 	"x=ID?"		-> (? (BLOCK (ALT (= x ID))))
 	"x=ID*"		-> (* (BLOCK (ALT (= x ID))))
 	"x=b"		-> (= x b)
-	"x=(A|B)"	-> (= x (SET A B))
-	"x=(A|B)^"	-> (= x (^ (SET A B)))
-	"x=~(A|B)"	-> (= x (~ (SET A B)))
-	"x+=~(A|B)"	-> (+= x (~ (SET A B)))
-	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK (ALT (SET A B))))))))
+	"x=(A|B)"	-> (= x (BLOCK (ALT A) (ALT B)))
+	"x=(A|B)^"	-> (= x (^ (BLOCK (ALT A) (ALT B))))
+	"x=~(A|B)"	-> (= x (~ (BLOCK (ALT A) (ALT B))))
+	"x+=~(A|B)"	-> (+= x (~ (BLOCK (ALT A) (ALT B))))
+	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (BLOCK (ALT A) (ALT B)))))))
 	"x=b+"		-> (+ (BLOCK (ALT (= x b))))
 	"x+=ID*"	-> (* (BLOCK (ALT (+= x ID))))
 	"x+='int'*"	-> (* (BLOCK (ALT (+= x 'int'))))

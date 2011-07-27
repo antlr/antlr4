@@ -103,7 +103,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 127
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("ebnf", "(A|B)", 127);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(SET A B)";
+		Object expecting = "(BLOCK (ALT A) (ALT B))";
 		assertEquals("testing rule ebnf", expecting, actual);
 	}
 
@@ -111,7 +111,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 128
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("ebnf", "(A|B)?", 128);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(? (BLOCK (ALT (SET A B))))";
+		Object expecting = "(? (BLOCK (ALT A) (ALT B)))";
 		assertEquals("testing rule ebnf", expecting, actual);
 	}
 
@@ -119,7 +119,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 129
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("ebnf", "(A|B)*", 129);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(* (BLOCK (ALT (SET A B))))";
+		Object expecting = "(* (BLOCK (ALT A) (ALT B)))";
 		assertEquals("testing rule ebnf", expecting, actual);
 	}
 
@@ -127,13 +127,13 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 130
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("ebnf", "(A|B)+", 130);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(+ (BLOCK (ALT (SET A B))))";
+		Object expecting = "(+ (BLOCK (ALT A) (ALT B)))";
 		assertEquals("testing rule ebnf", expecting, actual);
 	} @Test public void test_alternative1() throws Exception {
 		// gunit test on line 133
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "x+=ID* -> $x*", 133);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT (* (BLOCK (ALT (+= x ID))))) (-> (ALT (* (REWRITE_BLOCK (ALT x))))))";
+		Object expecting = "(ALT_REWRITE (ALT (* (BLOCK (ALT (+= x ID))))) (-> (REWRITE_SEQ (* (REWRITE_BLOCK (REWRITE_SEQ x))))))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -181,7 +181,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 153
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "A -> {expr}", 153);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT A) (-> (ALT {expr})))";
+		Object expecting = "(ALT_REWRITE (ALT A) (-> (REWRITE_SEQ {expr})))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -189,7 +189,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 155
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "\n    A -> {p1}? {e1}\n    -> {e2}\n    ->\n    ", 155);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT A) (-> {p1}? (ALT {e1})) (-> (ALT {e2})))";
+		Object expecting = "(ALT_REWRITE (ALT A) (-> {p1}? (REWRITE_SEQ {e1})) (-> (REWRITE_SEQ {e2})))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -197,7 +197,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 167
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "A -> A", 167);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT A) (-> (ALT A)))";
+		Object expecting = "(ALT_REWRITE (ALT A) (-> (REWRITE_SEQ A)))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -205,7 +205,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 169
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "a -> a", 169);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT a) (-> (ALT a)))";
+		Object expecting = "(ALT_REWRITE (ALT a) (-> (REWRITE_SEQ a)))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -213,7 +213,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 171
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "a A X? Y* -> A a ^(TOP X)? Y*", 171);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT a A (? (BLOCK (ALT X))) (* (BLOCK (ALT Y)))) (-> (ALT A a (? (REWRITE_BLOCK (ALT (^( TOP X)))) (* (REWRITE_BLOCK (ALT Y))))))";
+		Object expecting = "(ALT_REWRITE (ALT a A (? (BLOCK (ALT X))) (* (BLOCK (ALT Y)))) (-> (REWRITE_SEQ A a (? (REWRITE_BLOCK (REWRITE_SEQ (^( TOP X)))) (* (REWRITE_BLOCK (REWRITE_SEQ Y))))))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -221,7 +221,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 179
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "A -> A[33]", 179);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT A) (-> (ALT (A 33))))";
+		Object expecting = "(ALT_REWRITE (ALT A) (-> (REWRITE_SEQ (A 33))))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -229,7 +229,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 181
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "A -> 'int' ^(A A)*", 181);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT A) (-> (ALT 'int' (* (REWRITE_BLOCK (ALT (^( A A)))))))";
+		Object expecting = "(ALT_REWRITE (ALT A) (-> (REWRITE_SEQ 'int' (* (REWRITE_BLOCK (REWRITE_SEQ (^( A A)))))))";
 		assertEquals("testing rule alternative", expecting, actual);
 	}
 
@@ -237,7 +237,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 186
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("alternative", "\n    A -> {p1}? A\n      -> {p2}? B\n      ->\n    ", 186);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(ALT_REWRITE (ALT A) (-> {p1}? (ALT A)) (-> {p2}? (ALT B)) (-> EPSILON))";
+		Object expecting = "(ALT_REWRITE (ALT A) (-> {p1}? (REWRITE_SEQ A)) (-> {p2}? (REWRITE_SEQ B)) (-> EPSILON))";
 		assertEquals("testing rule alternative", expecting, actual);
 	} @Test public void test_element1() throws Exception {
 		// gunit test on line 198
@@ -363,7 +363,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 213
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x=(A|B)", 213);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(= x (SET A B))";
+		Object expecting = "(= x (BLOCK (ALT A) (ALT B)))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 
@@ -371,7 +371,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 214
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x=(A|B)^", 214);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(= x (^ (SET A B)))";
+		Object expecting = "(= x (^ (BLOCK (ALT A) (ALT B))))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 
@@ -379,7 +379,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 215
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x=~(A|B)", 215);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(= x (~ (SET A B)))";
+		Object expecting = "(= x (~ (BLOCK (ALT A) (ALT B))))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 
@@ -387,7 +387,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 216
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x+=~(A|B)", 216);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(+= x (~ (SET A B)))";
+		Object expecting = "(+= x (~ (BLOCK (ALT A) (ALT B))))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 
@@ -395,7 +395,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 217
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("element", "x+=~(A|B)+", 217);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(+ (BLOCK (ALT (+= x (~ (BLOCK (ALT (SET A B))))))))";
+		Object expecting = "(+ (BLOCK (ALT (+= x (~ (BLOCK (ALT A) (ALT B)))))))";
 		assertEquals("testing rule element", expecting, actual);
 	}
 

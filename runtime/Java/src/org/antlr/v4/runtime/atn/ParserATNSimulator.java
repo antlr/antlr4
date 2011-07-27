@@ -42,6 +42,9 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
+	public static int retry_with_context = 0;
+	public static int retry_with_context_indicates_no_conflict = 0;
+
 
 	protected BaseRecognizer parser;
 
@@ -346,8 +349,11 @@ public class ParserATNSimulator extends ATNSimulator {
 								Set<Integer> ambigAlts)
 	{
 		// ASSUMES PREDICT ONLY
+		retry_with_context++;
+		int old_k = input.index();
 		// retry using context, if any; if none, kill all but min as before
-		if ( debug ) System.out.println("RETRY with ctx="+ originalContext);
+		if ( debug ) System.out.println("RETRY "+input.toString(startIndex, input.index())+
+										" with ctx="+ originalContext);
 		int min = getMinAlt(ambigAlts);
 		if ( originalContext==RuleContext.EMPTY ) {
 			// no point in retrying with ctx since it's same.
@@ -363,9 +369,24 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( debug ) System.out.println("retry predicts "+ctx_alt+" vs "+getMinAlt(ambigAlts)+
 										" with conflict="+ctx_dfa.conflict+
 										" dfa="+ctx_dfa);
-		if ( ctx_dfa.conflict ) reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
-		else reportContextSensitivity(startIndex, input.index(), ambigAlts, reach);
+
+
+		if ( ctx_dfa.conflict ) {
+//			System.out.println("retry gives ambig for "+input.toString(startIndex, input.index()));
+			reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
+		}
+		else {
+//			System.out.println("NO ambig for "+input.toString(startIndex, input.index()));
+//			System.out.println(ctx_dfa.toString(parser.getTokenNames()));
+			if ( old_k != input.index() ) {
+				System.out.println("ACK!!!!!!!! diff k; old="+(old_k-startIndex+1)+", new="+(input.index()-startIndex+1));
+			}
+			retry_with_context_indicates_no_conflict++;
+			reportContextSensitivity(startIndex, input.index(), ambigAlts, reach);
+		}
 		// it's not context-sensitive; true ambig. fall thru to strip dead alts
+
+		// TODO: if ambig, why turn on ctx sensitive?
 
 		int predictedAlt = ctx_alt;
 		DFAState reachTarget = addDFAEdge(dfa, closure, t, reach);
