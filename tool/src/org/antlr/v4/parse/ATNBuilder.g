@@ -96,13 +96,12 @@ element returns [ATNFactory.Handle p]
 	|   ACTION						{$p = factory.action((ActionAST)$ACTION);}
 	|   FORCED_ACTION				{$p = factory.action((ActionAST)$FORCED_ACTION);}
 	|   SEMPRED						{$p = factory.sempred((PredAST)$SEMPRED);}
-	|	GATED_SEMPRED				{$p = factory.gated_sempred($GATED_SEMPRED);}
 	|	treeSpec					{$p = $treeSpec.p;}
 	|	^(ROOT a=astOperand)		{$p = $a.p;}
 	|	^(BANG a=astOperand)		{$p = $a.p;}
     |	^(NOT b=blockSet[true])		{$p = $b.p;}
 	;
-	
+
 astOperand returns [ATNFactory.Handle p]
 	:	atom						{$p = $atom.p;}
 	|	^(NOT blockSet[true])		{$p = $blockSet.p;}
@@ -137,7 +136,7 @@ setElement
 	|	TOKEN_REF
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
 	;
-	
+
 astBlockSuffix
     : ROOT
     | IMPLIES

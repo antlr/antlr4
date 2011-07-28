@@ -69,7 +69,6 @@ tokens {
     OPTIONAL;
     CLOSURE;
     POSITIVE_CLOSURE;
-    SYNPRED;
     RANGE;
     SET;
     CHAR_RANGE;
@@ -84,9 +83,6 @@ tokens {
     INITACTION;
     LABEL;                // $x used in rewrite rules
     TEMPLATE;
-    GATED_SEMPRED;        // {p}? =>
-    SYN_SEMPRED;          // (...) =>   it's a manually-specified synpred converted to sempred
-    BACKTRACK_SEMPRED;    // auto backtracking mode syn pred converted to sempred
     WILDCARD;
     // A generic node indicating a list of something when we don't
     // really need to distinguish what we have a list of as the AST
@@ -400,9 +396,9 @@ rule
 	  ARG_ACTION?
 
 	  ruleReturns?
-	  
+
 	  throwsSpec?
-	  
+
 	  locals?
 
 	  // Now, before the rule specification itself, which is introduced
@@ -587,10 +583,7 @@ element
 	|	ebnf
 	|   ACTION<ActionAST>
 	|   FORCED_ACTION<ActionAST>
-	|   SEMPRED
-		(	IMPLIES		-> GATED_SEMPRED[$SEMPRED]
-		|				-> SEMPRED<PredAST>
-		)
+	|   SEMPRED -> SEMPRED<PredAST>
 	|   treeSpec
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT<AltAST> treeSpec ) ) )
 		|				-> treeSpec
@@ -855,7 +848,7 @@ options {backtrack=true;}
 
 	| // try to parse a template rewrite
       rewriteTemplate {$isTemplate=true;} // must be 2nd so "ACTION ..." matches as tree rewrite
-      
+
     | ETC
 
     | /* empty rewrite */ -> EPSILON

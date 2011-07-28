@@ -109,7 +109,6 @@ public interface ATNFactory {
 	 *  the SEMPRED token.
 	 */
 	Handle sempred(PredAST pred);
-	Handle gated_sempred(GrammarAST pred);
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during analysis.

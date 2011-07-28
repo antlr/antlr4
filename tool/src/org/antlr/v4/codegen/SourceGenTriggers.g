@@ -109,7 +109,6 @@ element returns [List<? extends SrcOp> omos]
 	|   ACTION							{$omos = controller.action($ACTION);}
 	|   FORCED_ACTION					{$omos = controller.forcedAction($FORCED_ACTION);}
 	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
-	|	GATED_SEMPRED
 	|	treeSpec
 	;
 
@@ -165,7 +164,7 @@ atom[GrammarAST label, GrammarAST astOp, boolean invert] returns [List<SrcOp> om
     |   ruleref[label, $astOp]					{$omos = $ruleref.omos;}
 	|	blockSet[$label, $astOp, invert]		{$omos = $blockSet.omos;}
 	;
-	
+
 ruleref[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
     :	^(RULE_REF ARG_ACTION?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION, $astOp);}
     ;
@@ -213,7 +212,7 @@ rewrite returns [Rewrite code]
 	;
 
 predicatedRewrite returns [RewriteChoice alt]
-	:	^(ST_RESULT SEMPRED rewriteSTAlt)	
+	:	^(ST_RESULT SEMPRED rewriteSTAlt)
 	|	^(RESULT SEMPRED rewriteTreeAlt)	{$alt = controller.rewrite_choice((PredAST)$SEMPRED, $rewriteTreeAlt.omos);}
 	;
 
@@ -269,7 +268,7 @@ rewriteTreeEbnf returns [CodeBlock op]
 		controller.codeBlockLevel--;
 		}
 	;
-	
+
 rewriteTree returns [List<SrcOp> omos]
 	:	{
 		controller.treeLevel++;

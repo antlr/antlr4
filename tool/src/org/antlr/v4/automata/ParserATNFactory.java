@@ -227,14 +227,6 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	public Handle gated_sempred(GrammarAST pred) {
-		ATNState left = newState(pred);
-		ATNState right = newState(pred);
-		left.transition = new PredicateTransition(right);
-		pred.atnState = left;
-		return new Handle(left, right);
-	}
-
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during prediction
 	 *  if actionIndex < 0.  Only forced are executed during prediction.
