@@ -510,13 +510,15 @@ public class ParserATNSimulator extends ATNSimulator {
 								  ", reachesIntoOuterContext="+config.reachesIntoOuterContext);
 				if ( parser != null ) System.out.println("rule surrounding pred is "+
 														 parser.getRuleNames()[pt.ruleIndex]);
-				System.out.println();
 			}
 			// preds are epsilon if we're not doing preds (we saw an action).
 			// if we are doing preds, pred must eval to true
 			// Cannot exec preds out of context if they are context dependent
-			RuleContext ctx = config.context;
-			if ( ctx == RuleContext.EMPTY ) ctx = originalContext;
+			RuleContext ctx = config.context; // use context created after entry into interp
+			if ( ctx == RuleContext.EMPTY ) {
+				if ( config.reachesIntoOuterContext==0 ) ctx = originalContext;
+				else ctx = null; // no context if we in outer context
+			}
 			boolean ctxIssue = pt.isCtxDependent && config.reachesIntoOuterContext>0;
 			boolean seeThroughPred =
 				ignorePreds || ctxIssue ||
@@ -533,8 +535,16 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( at.actionIndex>=0 ) {
 				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
 				RuleContext ctx = config.context;
-				if ( ctx == RuleContext.EMPTY ) ctx = originalContext;
-				parser.action(ctx, at.ruleIndex, at.actionIndex);
+				if ( ctx == RuleContext.EMPTY ) {
+					if ( config.reachesIntoOuterContext==0 ) ctx = originalContext;
+					else ctx = null; // no context if we in outer context
+				}
+				boolean ctxIssue = at.isCtxDependent && config.reachesIntoOuterContext>0;
+				// Only exec forced action that isCtxDependent if we are not
+				// doing global FOLLOW; we don't know context
+				if ( !ctxIssue ) {
+					parser.action(ctx, at.ruleIndex, at.actionIndex);
+				}
 			}
 			else {
 				// non-forced action traversed to get to t.target

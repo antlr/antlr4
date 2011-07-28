@@ -75,10 +75,10 @@ public class UseDefAnalyzer {
 		}
 	}
 
-	public static boolean actionIsContextDependent(PredAST predAST) {
-		ANTLRStringStream in = new ANTLRStringStream(predAST.token.getText());
-		in.setLine(predAST.token.getLine());
-		in.setCharPositionInLine(predAST.token.getCharPositionInLine());
+	public static boolean actionIsContextDependent(ActionAST actionAST) {
+		ANTLRStringStream in = new ANTLRStringStream(actionAST.token.getText());
+		in.setLine(actionAST.token.getLine());
+		in.setCharPositionInLine(actionAST.token.getCharPositionInLine());
 		final boolean[] dependent = new boolean[] {false}; // can't be simple bool with anon class
 		ActionSplitterListener listener = new BlankActionSplitterListener() {
 			@Override
@@ -99,7 +99,7 @@ public class UseDefAnalyzer {
 		ActionSplitter splitter = new ActionSplitter(in, listener);
 		// forces eval, triggers listener methods
 		splitter.getActionTokens();
-		System.out.println("action "+predAST.getText()+" ctx depends="+dependent[0]);
+		System.out.println("action "+actionAST.getText()+" ctx depends="+dependent[0]);
 		return dependent[0];
 	}
 

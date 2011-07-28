@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 public class ActionTransition extends Transition {
 	public int ruleIndex;
 	public int actionIndex = -1;
+	public boolean isCtxDependent; // e.g., $i ref in action
 
 	public ActionTransition(ATNState target) {
 		super(target);

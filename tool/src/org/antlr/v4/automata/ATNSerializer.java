@@ -156,6 +156,7 @@ public class ATNSerializer {
 						ActionTransition at = (ActionTransition)t;
 						arg1 = at.ruleIndex;
 						arg2 = at.actionIndex;
+						if ( at.isCtxDependent ) edgeType = Transition.FORCED_DEPENDENT_ACTION;
 						break;
 					case Transition.SET :
 						arg1 = setIndex++;

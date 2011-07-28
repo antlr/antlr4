@@ -55,9 +55,10 @@ public abstract class Transition {
 	public static final int ATOM			= 6;
 	public static final int ACTION			= 7;
 	public static final int FORCED_ACTION	= 8;
-	public static final int SET				= 9; // ~(A|B) or ~atom, wildcard, which convert to next 2
-	public static final int NOT_SET			= 10;
-	public static final int WILDCARD		= 11;
+	public static final int FORCED_DEPENDENT_ACTION	= 9;
+	public static final int SET				= 10; // ~(A|B) or ~atom, wildcard, which convert to next 2
+	public static final int NOT_SET			= 11;
+	public static final int WILDCARD		= 12;
 
 
 	public static String[] serializationNames = {
@@ -70,6 +71,7 @@ public abstract class Transition {
 		"ATOM",
 		"ACTION",
 		"FORCED_ACTION",
+		"FORCED_DEPENDENT_ACTION",
 		"SET",
 		"NOT_SET",
 		"WILDCARD",

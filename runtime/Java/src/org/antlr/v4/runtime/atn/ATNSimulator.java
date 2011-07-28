@@ -145,6 +145,10 @@ public abstract class ATNSimulator {
 				return p;
 			case Transition.ATOM : return new AtomTransition(arg1, target);
 			case Transition.ACTION : return new ActionTransition(target, arg1, arg2);
+			case Transition.FORCED_DEPENDENT_ACTION :
+				ActionTransition a = new ActionTransition(target, arg1, arg2);
+				a.isCtxDependent = true;
+				return a;
 			case Transition.FORCED_ACTION : return new ActionTransition(target, arg1, arg2);
 			case Transition.SET : return new SetTransition(sets.get(arg1), target);
 			case Transition.NOT_SET : return new NotSetTransition(sets.get(arg1), null, target);

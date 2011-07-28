@@ -241,6 +241,7 @@ public class ParserATNFactory implements ATNFactory {
 		a.ruleIndex = currentRule.index;
 		if ( action.getType()==ANTLRParser.FORCED_ACTION ) {
 			a.actionIndex = g.actions.get(action);
+			a.isCtxDependent = UseDefAnalyzer.actionIsContextDependent(action);
 		}
 		left.transition = a;
 		action.atnState = left;

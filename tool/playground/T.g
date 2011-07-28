@@ -1,6 +1,6 @@
 grammar T;
 
-s : e[9] {true}? ';' ;
+s returns [int j=9999] : e[9] {{System.out.println("after-e "+$j);}} {true}? ';' ;
 
 e[int i]
   : {$i>=0}? {{System.out.println("i=="+$i);}} ID

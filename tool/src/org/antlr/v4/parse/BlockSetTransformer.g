@@ -23,6 +23,11 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 public String currentRuleName;
 public GrammarAST currentAlt;
 public Set<String> rewriteElems = new HashSet<String>();
+public Grammar g;
+public BlockSetTransformer(TreeNodeStream input, Grammar g) {
+    this(input, new RecognizerSharedState());
+    this.g = g;
+}
 }
 
 topdown

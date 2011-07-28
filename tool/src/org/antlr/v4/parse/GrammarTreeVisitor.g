@@ -279,11 +279,7 @@ finallyClause
 	;
 
 locals
-	:	^(LOCAlS ARG_ACTION)
-	;
-	
-r[int a, int b] returns [int j, float k]
-	:
+	:	^(LOCALS ARG_ACTION)
 	;
 	
 ruleReturns
