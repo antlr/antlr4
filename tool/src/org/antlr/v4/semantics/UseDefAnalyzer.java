@@ -29,8 +29,8 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.runtime.Token;
-import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.runtime.*;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -73,6 +73,34 @@ public class UseDefAnalyzer {
 				}
 			}
 		}
+	}
+
+	public static boolean actionIsContextDependent(PredAST predAST) {
+		ANTLRStringStream in = new ANTLRStringStream(predAST.token.getText());
+		in.setLine(predAST.token.getLine());
+		in.setCharPositionInLine(predAST.token.getCharPositionInLine());
+		final boolean[] dependent = new boolean[] {false}; // can't be simple bool with anon class
+		ActionSplitterListener listener = new BlankActionSplitterListener() {
+			@Override
+			public void nonLocalAttr(String expr, Token x, Token y) { dependent[0] = true; }
+			@Override
+			public void qualifiedAttr(String expr, Token x, Token y) { dependent[0] = true; }
+			@Override
+			public void setAttr(String expr, Token x, Token rhs) { dependent[0] = true; }
+			@Override
+			public void setExprAttribute(String expr) { dependent[0] = true; }
+			@Override
+			public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) { dependent[0] = true; }
+			@Override
+			public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) { dependent[0] = true; }
+			@Override
+			public void attr(String expr, Token x) {  dependent[0] = true; }
+		};
+		ActionSplitter splitter = new ActionSplitter(in, listener);
+		// forces eval, triggers listener methods
+		splitter.getActionTokens();
+		System.out.println("action "+predAST.getText()+" ctx depends="+dependent[0]);
+		return dependent[0];
 	}
 
 	/** Given -> (ALT ...),  return list of element refs at

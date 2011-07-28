@@ -36,6 +36,7 @@ import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.*;
 
 import java.lang.reflect.Constructor;
@@ -222,6 +223,7 @@ public class ParserATNFactory implements ATNFactory {
 		PredicateTransition p = new PredicateTransition(right);
 		p.ruleIndex = currentRule.index;
 		p.predIndex = g.sempreds.get(pred);
+		p.isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
 		left.transition = p;
 		pred.atnState = left;
 		return new Handle(left, right);

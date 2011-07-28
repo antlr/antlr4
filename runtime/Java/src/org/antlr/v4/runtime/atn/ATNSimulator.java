@@ -139,11 +139,14 @@ public abstract class ATNSimulator {
 			case Transition.RANGE : return new RangeTransition(arg1, arg2, target);
 			case Transition.RULE : return new RuleTransition(arg2, atn.states.get(arg1), target);
 			case Transition.PREDICATE : return new PredicateTransition(target, arg1, arg2);
+			case Transition.DEPENDENT_PREDICATE :
+				PredicateTransition p = new PredicateTransition(target, arg1, arg2);
+				p.isCtxDependent = true;
+				return p;
 			case Transition.ATOM : return new AtomTransition(arg1, target);
 			case Transition.ACTION : return new ActionTransition(target, arg1, arg2);
 			case Transition.FORCED_ACTION : return new ActionTransition(target, arg1, arg2);
 			case Transition.SET : return new SetTransition(sets.get(arg1), target);
-//			case Transition.NOT_ATOM : return new NotAtomTransition(arg1, target);
 			case Transition.NOT_SET : return new NotSetTransition(sets.get(arg1), null, target);
 			case Transition.WILDCARD : return new WildcardTransition(target);
 		}

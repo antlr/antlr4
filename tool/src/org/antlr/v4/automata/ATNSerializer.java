@@ -143,6 +143,7 @@ public class ATNSerializer {
 						PredicateTransition pt = (PredicateTransition)t;
 						arg1 = pt.ruleIndex;
 						arg2 = pt.predIndex;
+						if ( pt.isCtxDependent ) edgeType = Transition.DEPENDENT_PREDICATE;
 						break;
 					case Transition.RANGE :
 						arg1 = ((RangeTransition)t).from;

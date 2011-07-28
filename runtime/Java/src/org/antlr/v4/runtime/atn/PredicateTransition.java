@@ -38,6 +38,7 @@ package org.antlr.v4.runtime.atn;
 public class PredicateTransition extends Transition {
 	public int ruleIndex;
 	public int predIndex;
+	public boolean isCtxDependent;
 
 	public PredicateTransition(ATNState target) {
 		super(target);

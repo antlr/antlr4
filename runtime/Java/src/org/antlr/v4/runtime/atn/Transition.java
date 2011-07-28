@@ -50,14 +50,14 @@ public abstract class Transition {
 	public static final int EPSILON			= 1;
 	public static final int RANGE			= 2;
 	public static final int RULE			= 3;
-	public static final int PREDICATE		= 4;
-	public static final int ATOM			= 5;
-	public static final int ACTION			= 6;
-	public static final int FORCED_ACTION	= 7;
-	public static final int SET				= 8; // ~(A|B) or ~atom, wildcard, which convert to next 2
-//	public static final int NOT_ATOM		= 9;
-	public static final int NOT_SET			= 9;
-	public static final int WILDCARD		= 10;
+	public static final int PREDICATE		= 4;	 // e.g., {isType(input.LT(1))}?
+	public static final int DEPENDENT_PREDICATE	= 5; // e.g., {$p>3}?
+	public static final int ATOM			= 6;
+	public static final int ACTION			= 7;
+	public static final int FORCED_ACTION	= 8;
+	public static final int SET				= 9; // ~(A|B) or ~atom, wildcard, which convert to next 2
+	public static final int NOT_SET			= 10;
+	public static final int WILDCARD		= 11;
 
 
 	public static String[] serializationNames = {
@@ -66,11 +66,11 @@ public abstract class Transition {
 		"RANGE",
 		"RULE",
 		"PREDICATE",
+		"DEPENDENT_PREDICATE",
 		"ATOM",
 		"ACTION",
 		"FORCED_ACTION",
 		"SET",
-//		"NOT_ATOM",
 		"NOT_SET",
 		"WILDCARD",
 	};
@@ -82,9 +82,8 @@ public abstract class Transition {
 			put(RuleTransition.class, RULE);
 			put(PredicateTransition.class, PREDICATE);
 			put(AtomTransition.class, ATOM);
-			put(ActionTransition.class, ACTION); // TODO: FORCED?
+			put(ActionTransition.class, ACTION);
 			put(SetTransition.class, SET);
-//			put(NotAtomTransition.class, NOT_ATOM);
 			put(NotSetTransition.class, NOT_SET);
 			put(WildcardTransition.class, WILDCARD);
 		}};

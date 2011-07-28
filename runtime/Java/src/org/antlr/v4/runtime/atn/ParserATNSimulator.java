@@ -37,7 +37,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator extends ATNSimulator {
-	public static boolean debug = false;
+	public static boolean debug = true;
 	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
@@ -107,6 +107,7 @@ public class ParserATNSimulator extends ATNSimulator {
 						  boolean useContext)
 	{
 		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
+		this.originalContext = originalContext;
 		RuleContext ctx = RuleContext.EMPTY;
 		if ( useContext ) ctx = originalContext;
 		OrderedHashSet<ATNConfig> s0_closure =
@@ -141,6 +142,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext originalContext) {
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+" exec LA(1)=="+input.LT(1));
 //		dump(dfa);
+		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
+		this.originalContext = originalContext;
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int t = input.LA(1);
@@ -462,7 +465,13 @@ public class ParserATNSimulator extends ATNSimulator {
 				closure(c, configs, closureBusy);
 				return;
 			}
-			// else if we have no context info, just chase follow links
+			else {
+				// else if we have no context info, just chase follow links
+				// but track how far we dip into outer context.  Might
+				// come in handy and we avoid evaluating context dependent
+				// preds if this is > 0.
+				config.reachesIntoOuterContext++;
+			}
 		}
 
 		ATNState p = config.state;
@@ -471,13 +480,13 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
-			boolean evalPreds = !config.traversedAction;
-			ATNConfig c = getEpsilonTarget(config, t, evalPreds);
+			boolean ignorePreds = config.traversedAction;
+			ATNConfig c = getEpsilonTarget(config, t, ignorePreds);
 			if ( c!=null ) closure(c, configs, closureBusy);
 		}
 	}
 
-	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t, boolean evalPreds) {
+	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t, boolean ignorePreds) {
 		ATNConfig c = null;
 		if ( t instanceof RuleTransition ) {
 			ATNState p = config.state;
@@ -495,13 +504,24 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		else if ( t instanceof PredicateTransition ) {
 			PredicateTransition pt = (PredicateTransition)t;
-			if ( debug ) System.out.println("PRED (eval="+evalPreds+") "+pt.ruleIndex+":"+pt.predIndex);
-			if ( parser != null ) System.out.println("rule surrounding pred is "+
-													 parser.getRuleNames()[pt.ruleIndex]);
-			// preds are epsilon if we're not doing preds.
+			if ( debug ) {
+				System.out.println("PRED (ignore="+ignorePreds+") "+pt.ruleIndex+":"+pt.predIndex+
+								  ", ctx dependent="+pt.isCtxDependent+
+								  ", reachesIntoOuterContext="+config.reachesIntoOuterContext);
+				if ( parser != null ) System.out.println("rule surrounding pred is "+
+														 parser.getRuleNames()[pt.ruleIndex]);
+				System.out.println();
+			}
+			// preds are epsilon if we're not doing preds (we saw an action).
 			// if we are doing preds, pred must eval to true
-			if ( !evalPreds ||
-			     (evalPreds && parser.sempred(originalContext, pt.ruleIndex, pt.predIndex)) ) {
+			// Cannot exec preds out of context if they are context dependent
+			RuleContext ctx = config.context;
+			if ( ctx == RuleContext.EMPTY ) ctx = originalContext;
+			boolean ctxIssue = pt.isCtxDependent && config.reachesIntoOuterContext>0;
+			boolean seeThroughPred =
+				ignorePreds || ctxIssue ||
+				(!ctxIssue && parser.sempred(ctx, pt.ruleIndex, pt.predIndex));
+			if ( seeThroughPred ) {
 				c = new ATNConfig(config, t.target);
 				c.traversedPredicate = true;
 			}
@@ -512,7 +532,9 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
 			if ( at.actionIndex>=0 ) {
 				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
-				parser.action(originalContext, at.ruleIndex, at.actionIndex);
+				RuleContext ctx = config.context;
+				if ( ctx == RuleContext.EMPTY ) ctx = originalContext;
+				parser.action(ctx, at.ruleIndex, at.actionIndex);
 			}
 			else {
 				// non-forced action traversed to get to t.target
