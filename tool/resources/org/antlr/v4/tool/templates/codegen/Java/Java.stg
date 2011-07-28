@@ -391,19 +391,6 @@ ThisRulePropertyRef_tree(r)  ::= "_localctx.tree"
 ThisRulePropertyRef_text(r)  ::= "((TokenStream)input).toString(_localctx.start, input.LT(-1))"
 ThisRulePropertyRef_st(r)    ::= "_localctx.st"
 
-DynScopeRef(s)           ::= "<s.scope>"
-DynScopeAttrRef(s)       ::= "<s.scope>.peek().<s.attr>"
-DynScopeAttrRef_negIndex(s, indexChunks) ::=
-    "<s.scope>.get(<s.scope>.size()-<indexChunks>-1).<s.attr>"
-DynScopeAttrRef_index(s, indexChunks)    ::=
-    "<s.scope>.get(<indexChunks>).<s.attr>"
-SetDynScopeAttr(s, rhsChunks)            ::=
-    "<s.scope>.peek().<s.attr> =<rhsChunks>;"
-SetDynScopeAttr_negIndex(s, indexChunks, rhsChunks) ::=
-    "<s.scope>.get(<s.scope>.size()-<indexChunks>-1).<s.attr> =<rhsChunks>;"
-SetDynScopeAttr_index(s, indexChunks, rhsChunks)    ::=
-    "<s.scope>.get(<indexChunks>).<s.attr> =<rhsChunks>;"
-
 AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
 
 TokenDecl(t) ::= "Token <t.name>;"
@@ -415,7 +402,6 @@ RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayL
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
 
-RuleDynamicScopeStructName(ruleName) ::= "<ruleName>_stk"
 ImplicitTokenLabel(tokenName) ::= "_t<tokenName>"
 ImplicitRuleLabel(ruleName)   ::= "_r<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"

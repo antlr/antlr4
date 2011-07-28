@@ -149,10 +149,6 @@ public class ActionTranslator implements ActionSplitterListener {
 			chunks.add(new ListLabelRef(x.getText())); // $ids for ids+=ID etc...
 			return;
 		}
-		if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
-			chunks.add(new DynScopeRef(getDynamicScopeName(x.getText()))); // $S for scope S is ok
-			return;
-		}
 //		switch ( a.dict.type ) {
 //			case ARG: chunks.add(new ArgRef(x.getText())); break;
 //			case RET: chunks.add(new RetValueRef(x.getText())); break;
@@ -205,39 +201,6 @@ public class ActionTranslator implements ActionSplitterListener {
 		SetAttr s = new SetAttr(x.getText(), rhsChunks);
 		if ( factory.getGrammar().isLexer() ) s = new LexerSetAttr(x.getText(), rhsChunks);
 		chunks.add(s);
-	}
-
-	public void dynamicScopeAttr(String expr, Token x, Token y) {
-		System.out.println("scoped "+x+"."+y);
-		// we assume valid, just gen code
-		chunks.add(new DynScopeAttrRef(getDynamicScopeName(x.getText()), y.getText()));
-	}
-
-	public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
-		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetDynScopeAttr(getDynamicScopeName(x.getText()), y.getText(), rhsChunks));
-	}
-
-	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index) {
-		List<ActionChunk> indexChunks = translateActionChunk(factory,rf,index.getText(),node);
-		chunks.add(new DynScopeAttrRef_negIndex(getDynamicScopeName(x.getText()), y.getText(), indexChunks));
-	}
-
-	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
-		List<ActionChunk> indexChunks = translateActionChunk(factory,rf,index.getText(),node);
-		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetDynScopeAttr_negIndex(getDynamicScopeName(x.getText()), y.getText(), indexChunks, rhsChunks));
-	}
-
-	public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index) {
-		List<ActionChunk> indexChunks = translateActionChunk(factory,rf,index.getText(),node);
-		chunks.add(new DynScopeAttrRef_index(getDynamicScopeName(x.getText()), y.getText(), indexChunks));
-	}
-
-	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
-		List<ActionChunk> indexChunks = translateActionChunk(factory,rf,index.getText(),node);
-		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetDynScopeAttr_index(getDynamicScopeName(x.getText()), y.getText(), indexChunks, rhsChunks));
 	}
 
 	public void templateInstance(String expr) {
@@ -313,17 +276,6 @@ public class ActionTranslator implements ActionSplitterListener {
 	public String getRuleLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
 		return factory.getGenerator().target.getImplicitRuleLabel(x);
-	}
-
-	public String getDynamicScopeName(String x) {
-		String scope;
-		if ( factory.getGrammar().getRule(x)==null ) {
-			scope = factory.getGenerator().target.getGlobalDynamicScopeStructName(x);
-		}
-		else {
-			scope = factory.getGenerator().target.getRuleDynamicScopeStructName(x);
-		}
-		return scope;
 	}
 
 //	public String getTokenLabel(String x, ActionAST node) {

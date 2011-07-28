@@ -126,7 +126,6 @@ public void grammarOption(GrammarAST ID, String value) { }
 public void ruleOption(GrammarAST ID, String value) { }
 public void blockOption(GrammarAST ID, String value) { }
 public void tokenAlias(GrammarAST ID, GrammarAST literal) { }
-public void globalScopeDef(GrammarAST ID, ActionAST elems) { }
 public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) { }
 public void importGrammar(GrammarAST label, GrammarAST ID) { }
 
@@ -192,7 +191,6 @@ prequelConstruct
 	:   optionsSpec
     |   delegateGrammars
     |   tokensSpec
-    |   attrScope
     |   action
     ;
 
@@ -235,10 +233,6 @@ tokenSpec
 	|	ID							{tokenAlias($ID, null);}
 	;
 
-attrScope
-	:	^(SCOPE ID ACTION)	{if ( inContext("GRAMMAR") ) globalScopeDef($ID, (ActionAST)$ACTION);}
-	;
-
 action
 	:	^(AT sc=ID? name=ID ACTION) {globalNamedAction($sc, $name, (ActionAST)$ACTION);}
 	;
@@ -260,8 +254,8 @@ currentOuterAltNumber=0;
 			ARG_ACTION?
       		ret=ruleReturns?
       		thr=throwsSpec?
-      		(	ruleScopeSpec
-		    |   opts=optionsSpec
+      		loc=locals?
+      		(	opts=optionsSpec
 		    |   a=ruleAction {actions.add($a.start);}
 		    )* 
       		{discoverRule((RuleAST)$RULE, $ID, mods, (ActionAST)$ARG_ACTION,
@@ -284,18 +278,20 @@ finallyClause
 	: ^(FINALLY ACTION)				{finallyAction((ActionAST)$ACTION);}
 	;
 
-
+locals
+	:	^(LOCAlS ARG_ACTION)
+	;
+	
+r[int a, int b] returns [int j, float k]
+	:
+	;
+	
 ruleReturns
 	: ^(RETURNS ARG_ACTION)
 	;
 throwsSpec
     : ^(THROWS ID+)
     ;
-
-ruleScopeSpec
-	:	^(SCOPE ACTION)
-	|	^(SCOPE ID+)
-	;
 
 ruleAction
 	:	^(AT ID ACTION)

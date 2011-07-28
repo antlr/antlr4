@@ -38,13 +38,6 @@ public interface ActionSplitterListener {
     void setAttr(String expr, Token x, Token rhs);
     void attr(String expr, Token x);
 
-    void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs);
-    void dynamicScopeAttr(String expr, Token x, Token y);
-    void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs);
-    void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index);
-    void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs);
-    void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index);
-
     void templateInstance(String expr);
     void indirectTemplateInstance(String expr);
     void setExprAttribute(String expr); // TODO: rename

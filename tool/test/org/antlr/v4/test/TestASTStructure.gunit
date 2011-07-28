@@ -18,7 +18,6 @@ grammarSpec:
     <<
     parser grammar P;
     options {k=2; output=AST;}
-    scope S {int x}
     tokens { A; B='33'; }
     @header {foo}
     a : A;
@@ -26,7 +25,6 @@ grammarSpec:
     ->
     (PARSER_GRAMMAR P
     (OPTIONS (= k 2) (= output AST))
-    (scope S {int x})
     (tokens { A (= B '33'))
     (@ header {foo})
     (RULES (RULE a (BLOCK (ALT A)))))
@@ -36,7 +34,6 @@ grammarSpec:
     @header {foo}
     tokens { A; B='33'; }
     options {k=2; ASTLabel=a.b.c; output=AST;}
-    scope S {int x}
     a : A;
     >>
     ->
@@ -44,7 +41,6 @@ grammarSpec:
     (@ header {foo})
     (tokens { A (= B '33'))
     (OPTIONS (= k 2) (= ASTLabel a.b.c) (= output AST))
-    (scope S {int x})
     (RULES (RULE a (BLOCK (ALT A)))))
 
     <<
@@ -68,8 +64,6 @@ rule:
     <<
     public a[int i] returns [int y]
     options {backtrack=true;}
-    scope {int ss;}
-    scope S,T;
     @init {blort}
       : ID ;
     >>
@@ -79,26 +73,20 @@ rule:
     int i
     (returns int y)
     (OPTIONS (= backtrack true))
-    (scope {int ss;})
-    (scope S T)
     (@ init {blort})
     (BLOCK (ALT ID)))
 
     <<
     a[int i] returns [int y]
     @init {blort}
-    scope {int ss;}
     options {backtrack=true;}
-    scope S,T;
       : ID;
     >>
     ->
     (RULE a int i
     (returns int y)
     (@ init {blort})
-    (scope {int ss;})
     (OPTIONS (= backtrack true))
-    (scope S T)
     (BLOCK (ALT ID)))
 
     <<
@@ -119,6 +107,21 @@ rule:
     ->
     (RULE a (BLOCK (ALT ID))
     (catch A a {foo}) (catch B b {fu}) (finally {bar}))
+
+	<<
+	a[int i]
+	locals [int a, float b]
+		:	A
+		;
+	>>
+	-> (RULE a int i (locals int a, float b) (BLOCK (ALT A)))
+
+	<<
+	a[int i] throws a.b.c
+		:	A
+		;
+	>>
+	-> (RULE a int i (throws a.b.c) (BLOCK (ALT A)))
 
 block:
 	"( ^(A B) | ^(b C) )"	-> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))

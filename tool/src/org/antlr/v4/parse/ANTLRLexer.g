@@ -424,6 +424,7 @@ PROTECTED    : 'protected'            ;
 PUBLIC       : 'public'               ;
 PRIVATE      : 'private'              ;
 RETURNS      : 'returns'              ;
+LOCALS       : 'locals'               ;
 THROWS       : 'throws'               ;
 CATCH        : 'catch'                ;
 FINALLY      : 'finally'              ;

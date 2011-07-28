@@ -26,6 +26,8 @@
 
 /** The definitive ANTLR v3 tree grammar to parse ANTLR v4 grammars.
  *  Parses trees created in ANTLRParser.g.
+ 
+ OBSOLETE; See tree visitor grammar.
  */
 tree grammar ASTVerifier;
 options {

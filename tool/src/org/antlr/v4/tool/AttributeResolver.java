@@ -65,5 +65,4 @@ public interface AttributeResolver {
 	public boolean resolvesToToken(String x, ActionAST node);
 	public Attribute resolveToAttribute(String x, ActionAST node);
 	public Attribute resolveToAttribute(String x, String y, ActionAST node);
-	public AttributeDict resolveToDynamicScope(String x, ActionAST node);
 }

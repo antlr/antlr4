@@ -223,13 +223,6 @@ public class Target {
 		return r.name+"_ctx";
 	}
 
-	public String getRuleDynamicScopeStructName(String ruleName) {
-		ST st = gen.templates.getInstanceOf("RuleDynamicScopeStructName");
-		st.add("ruleName", ruleName);
-		return st.render();
-	}
-	public String getGlobalDynamicScopeStructName(String scopeName) { return scopeName; }
-
 	// should be same for all refs to same token like $ID within single rule function
 	public String getImplicitTokenLabel(String tokenName) {
 		ST st = gen.templates.getInstanceOf("ImplicitTokenLabel");

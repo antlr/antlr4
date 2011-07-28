@@ -145,7 +145,6 @@ public class Grammar implements AttributeResolver {
 	 *  sempred index is 0..n-1 */
 	public LinkedHashMap<PredAST, Integer> sempreds = new LinkedHashMap<PredAST, Integer>();
 
-    public Map<String, AttributeDict> scopes = new LinkedHashMap<String, AttributeDict>();
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
 	public Grammar(Tool tool, GrammarRootAST ast) {
@@ -303,8 +302,6 @@ public class Grammar implements AttributeResolver {
 		}
 		return getRule(ruleName);
 	}
-
-    public void defineScope(AttributeDict s) { scopes.put(s.getName(), s); }
 
     /** Get list of all imports from all grammars in the delegate subtree of g.
      *  The grammars are in import tree preorder.  Don't include ourselves
@@ -609,10 +606,6 @@ public class Grammar implements AttributeResolver {
 		return null;
 	}
 
-	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
-		return scopes.get(x);
-	}
-
 	public boolean resolvesToLabel(String x, ActionAST node) { return false; }
 
 	public boolean resolvesToListLabel(String x, ActionAST node) { return false; }
@@ -620,7 +613,7 @@ public class Grammar implements AttributeResolver {
 	public boolean resolvesToToken(String x, ActionAST node) { return false; }
 
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
-		return scopes.get(x)!=null;
+		return false;
 	}
 
 	/** Given a grammar type, what should be the default action scope?

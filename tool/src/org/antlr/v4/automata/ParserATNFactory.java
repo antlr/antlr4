@@ -510,12 +510,13 @@ public class ParserATNFactory implements ATNFactory {
 	public ATNState newState() { return newState(null); }
 
 	public boolean isGreedy(BlockAST blkAST) {
-		boolean greedy = true;
-		String greedyOption = blkAST.getOption("greedy");
-		if ( blockHasWildcardAlt(blkAST) || greedyOption!=null&&greedyOption.equals("false") ) {
-			greedy = false;
-		}
-		return greedy;
+		return true;
+//		boolean greedy = true;
+//		String greedyOption = blkAST.getOption("greedy");
+//		if ( blockHasWildcardAlt(blkAST) || greedyOption!=null&&greedyOption.equals("false") ) {
+//			greedy = false;
+//		}
+//		return greedy;
 	}
 
 	// (BLOCK (ALT .)) or (BLOCK (ALT 'a') (ALT .))

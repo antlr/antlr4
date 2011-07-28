@@ -51,45 +51,6 @@ QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {delegate.qualifiedAttr($text, $x, $y);}
 	;
 
-SET_DYNAMIC_SCOPE_ATTR
-	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setDynamicScopeAttr($text, $x, $y, $expr);}
-	;
-
-DYNAMIC_SCOPE_ATTR
-	:	'$' x=ID '::' y=ID {delegate.dynamicScopeAttr($text, $x, $y);}
-	;
-
-/**		To access deeper (than top of stack) scopes, use the notation:
- *
- * 		$x[-1]::y previous (just under top of stack)
- * 		$x[-i]::y top of stack - i where the '-' MUST BE PRESENT;
- * 				  i.e., i cannot simply be negative without the '-' sign!
- * 		$x[i]::y  absolute index i (0..size-1)
- * 		$x[0]::y  is the absolute 0 indexed element (bottom of the stack)
- */
-SET_DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setDynamicNegativeIndexedScopeAttr($text, $x, $y, $index, $expr);}
-	;
-
-DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' '-' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		{delegate.dynamicNegativeIndexedScopeAttr($text, $x, $y, $index);}
-	;
-
-SET_DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setDynamicAbsoluteIndexedScopeAttr($text, $x, $y, $index, $expr);}
-	;
-
-DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-	:	'$' x=ID '[' index=SCOPE_INDEX_EXPR ']' '::' y=ID
-		{delegate.dynamicAbsoluteIndexedScopeAttr($text, $x, $y, $index);}
-	;
-
 SET_ATTR
 	:	'$' x=ID WS? '=' expr=ATTR_VALUE_EXPR ';' {delegate.setAttr($text, $x, $expr);}
 	;

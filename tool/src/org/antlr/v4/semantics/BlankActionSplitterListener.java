@@ -45,26 +45,9 @@ public class BlankActionSplitterListener implements ActionSplitterListener {
 	public void attr(String expr, Token x) {
 	}
 
-	public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
-	}
-
-	public void dynamicScopeAttr(String expr, Token x, Token y) {
-	}
-
-	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
-	}
-
-	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y, Token index) {
-	}
-
-	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index, Token rhs) {
-	}
-
-	public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y, Token index) {
-	}
-
 	public void templateInstance(String expr) {
 	}
+
 
 	public void indirectTemplateInstance(String expr) {
 	}

@@ -43,7 +43,6 @@ public class RuleFunction extends OutputModelObject {
 	public String name;
 	public List<String> modifiers;
 	public String ctxType;
-	public List<String> globalScopesUsed;
 	public Collection<String> ruleLabels;
 	public Collection<String> tokenLabels;
 	public List<String> elementsReferencedInRewrite;
@@ -86,8 +85,6 @@ public class RuleFunction extends OutputModelObject {
 		if ( r.scope!=null ) {
 			ruleCtx.addDecls(r.scope.attributes.values());
 		}
-
-		globalScopesUsed = Utils.apply(r.useScopes, "getText");
 
 		ruleLabels = r.getLabelNames();
 		tokenLabels = r.getTokenRefs();

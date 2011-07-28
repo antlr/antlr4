@@ -102,7 +102,6 @@ public class Alternative implements AttributeResolver {
 		if ( resolvesToToken(x, node) ) return true;
 		if ( x.equals(rule.name) ) return true; // $r for action in rule r, $r is a dict
 		if ( rule!=null && rule.scope!=null ) return true;
-		if ( rule.g.scopes.get(x)!=null ) return true;
 		return false;
 	}
 
@@ -134,12 +133,6 @@ public class Alternative implements AttributeResolver {
 			return rule.getPredefinedScope(anyLabelDef.type).get(y);
 		}
 		return null;
-	}
-
-	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
-		Rule r = resolveToRule(x);
-		if ( r!=null && r.scope !=null ) return r.scope;
-		return rule.resolveToDynamicScope(x, node);
 	}
 
 	public boolean resolvesToLabel(String x, ActionAST node) {

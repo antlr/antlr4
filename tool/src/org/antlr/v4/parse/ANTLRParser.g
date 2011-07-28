@@ -239,11 +239,6 @@ prequelConstruct
       // {tree} parser.
       tokensSpec
 
-    | // A declaration of a scope that may be used in multiple rules within
-      // the grammar spec, rather than being delcared and therefore associated
-      // with, a specific rule.
-      attrScope
-
     | // A declaration of language target implemented constructs. All such
       // action sections start with '@' and are given to the language target's
       // StringTemplate group. For instance @parser::header and @lexer::header
@@ -322,13 +317,6 @@ tokenSpec
 		)
 		SEMI
 	|	RULE_REF // INVALID! (an error alt)
-	;
-
-// A declaration of a scope that may be used in multiple rules within
-// the grammar spec, rather than being declared within and therefore associated
-// with, a specific rule.
-attrScope
-	:	SCOPE id ACTION -> ^(SCOPE id ACTION<ActionAST>)
 	;
 
 // A declaration of a language target specifc section,
@@ -414,6 +402,8 @@ rule
 	  ruleReturns?
 	  
 	  throwsSpec?
+	  
+	  locals?
 
 	  // Now, before the rule specification itself, which is introduced
 	  // with a COLON, we may have zero or more configuration sections.
@@ -441,7 +431,7 @@ rule
       exceptionGroup
 
       -> ^( RULE<RuleAST> id DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
-      		ruleReturns? rulePrequels? ruleBlock exceptionGroup*
+      		ruleReturns? throwsSpec? locals? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
 
@@ -473,12 +463,11 @@ rulePrequels
 	:	sync (rulePrequel sync)* -> rulePrequel*
 	;
 
-	// An individual rule level configuration as referenced by the ruleActions
+// An individual rule level configuration as referenced by the ruleActions
 // rule above.
 //
 rulePrequel
-    : ruleScopeSpec
-    | optionsSpec
+    : optionsSpec
     | ruleAction
     ;
 
@@ -507,14 +496,8 @@ throwsSpec
     : THROWS qid (COMMA qid)* -> ^(THROWS qid+)
     ;
 
-// As well as supporting globally specifed scopes, ANTLR supports rule
-// level scopes, which are tracked in a rule specific stack. Rule specific
-// scopes are specified at this level, and globally specified scopes
-// are merely referenced here.
-ruleScopeSpec
-	:	SCOPE ACTION -> ^(SCOPE ACTION)
-	|	SCOPE id (COMMA id)* SEMI -> ^(SCOPE id+)
-	;
+// locals [Cat x, float g]
+locals : LOCALS^ ARG_ACTION<ActionAST> ;
 
 // @ Sections are generally target language specific things
 // such as local variable declarations, code to run before the

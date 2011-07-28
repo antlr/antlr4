@@ -70,6 +70,7 @@ rec_rule returns [boolean isLeftRec]
 			(^(ARG ARG_ACTION))?
 			(^(RET ARG_ACTION))?
       		( ^(THROWS .+) )?
+      		( ^(LOCALS ARG_ACTION) )?
       		(	^(OPTIONS .*)
 		    |   ^(AT ID ACTION)
 		    )* 

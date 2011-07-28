@@ -75,15 +75,6 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void process(GrammarAST ast) { visitGrammar(ast); }
 
 	@Override
-	public void globalScopeDef(GrammarAST ID, ActionAST elems) {
-		AttributeDict s = ScopeParser.parseDynamicScope(elems.getText());
-		s.type = AttributeDict.DictType.GLOBAL_SCOPE;
-		s.name = ID.getText();
-		s.ast = elems;
-		scopes.add(s);
-	}
-
-	@Override
 	public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) {
 		namedActions.add((GrammarAST)ID.getParent());
 		action.resolver = g;

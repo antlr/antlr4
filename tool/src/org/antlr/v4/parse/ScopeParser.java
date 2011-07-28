@@ -58,16 +58,6 @@ public class ScopeParser {
      */
     public static AttributeDict parseTypeList(String s) { return parse(s, ','); }
 
-    public static AttributeDict parseDynamicScope(String s) {
-        // ignore outer {..} if present
-        s = s.trim();
-        if ( s.startsWith("{") ) {
-            int lastCurly = s.lastIndexOf('}');
-            s = s.substring(1, lastCurly);
-        }
-        return parse(s, ';');
-    }
-
     public static AttributeDict parse(String s, char separator) {
         int i = 0;
         int n = s.length();

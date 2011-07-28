@@ -46,7 +46,6 @@ public class SymbolChecks {
     SymbolCollector collector;
     Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
 	Set<String> tokenIDs = new HashSet<String>();
-    Set<String> globalScopeNames = new HashSet<String>();
     Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 //	DoubleKeyMap<String, String, GrammarAST> namedActions =
 //		new DoubleKeyMap<String, String, GrammarAST>();
@@ -72,7 +71,6 @@ public class SymbolChecks {
     public void process() {
         // methods affect fields, but no side-effects outside this object
         // So, call order sensitive
-        checkScopeRedefinitions(collector.scopes);      // sets globalScopeNames
 		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
 		// done in sem pipe for now
         checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
@@ -94,11 +92,6 @@ public class SymbolChecks {
             else {
                 GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
                 errMgr.grammarError(ErrorType.RULE_REDEFINITION,
-                                          r.g.fileName, idNode.token, r.name);
-            }
-            if ( globalScopeNames.contains(r.name) ) {
-                GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
-                errMgr.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
                                           r.g.fileName, idNode.token, r.name);
             }
         }
@@ -129,22 +122,6 @@ public class SymbolChecks {
             else {
                 errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
                                           g.fileName, nameNode.token, name);
-            }
-        }
-    }
-
-    public void checkScopeRedefinitions(List<AttributeDict> dicts) {
-        if ( dicts ==null ) return;
-        for (int i=0; i< dicts.size(); i++) {
-            AttributeDict s = dicts.get(i);
-            //GrammarAST idNode = (GrammarAST)s.getChild(0);
-            if ( !globalScopeNames.contains(s.getName()) ) {
-                globalScopeNames.add(s.getName());
-            }
-            else {
-                GrammarAST idNode = (GrammarAST) s.ast.getParent().getChild(0);
-                errMgr.grammarError(ErrorType.SCOPE_REDEFINITION,
-                                          idNode.g.fileName, idNode.token, s.getName());
             }
         }
     }
@@ -201,15 +178,11 @@ public class SymbolChecks {
 	}
 
     public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
-        for (GrammarAST a : tokenIDRefs) {
-            Token t = a.token;
-            String ID = t.getText();
-            tokenIDs.add(ID);
-            if ( globalScopeNames.contains(t.getText()) ) {
-                errMgr.grammarError(ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
-                                          g.fileName, t, ID);
-            }
-        }
+//        for (GrammarAST a : tokenIDRefs) {
+//            Token t = a.token;
+//            String ID = t.getText();
+//            tokenIDs.add(ID);
+//        }
     }
 
 	public void checkForUndefinedTokensInRewrite() {
@@ -234,7 +207,6 @@ public class SymbolChecks {
     public void checkForLabelConflicts(List<Rule> rules) {
         for (Rule r : rules) {
             checkForRuleArgumentAndReturnValueConflicts(r);
-            checkForRuleScopeAttributeConflict(r);
             Map<String, LabelElementPair> labelNameSpace =
                 new HashMap<String, LabelElementPair>();
             for (int i=1; i<=r.numberOfAlts; i++) {
@@ -271,10 +243,7 @@ public class SymbolChecks {
         ErrorType etype = ErrorType.INVALID;
         Object arg2 = null;
         String name = labelID.getText();
-        if ( globalScopeNames.contains(name) ) {
-            etype = ErrorType.SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
-        }
-        else if ( nameToRuleMap.containsKey(name) ) {
+        if ( nameToRuleMap.containsKey(name) ) {
             etype = ErrorType.LABEL_CONFLICTS_WITH_RULE;
         }
         else if ( tokenIDs.contains(name) ) {
@@ -308,33 +277,6 @@ public class SymbolChecks {
                         key,
                         r.name);
                 }
-            }
-        }
-    }
-
-    /** Check for collision of a rule-scope dynamic attribute with:
-     *  arg, return value, rule name itself.  Labels are checked elsewhere.
-     */
-    public void checkForRuleScopeAttributeConflict(Rule r) {
-        if ( r.scope ==null ) return;
-        for (Attribute a : r.scope.attributes.values()) {
-            ErrorType msgID = ErrorType.INVALID;
-            Object arg2 = null;
-            String attrName = a.name;
-            if ( r.name.equals(attrName) ) {
-                msgID = ErrorType.ATTRIBUTE_CONFLICTS_WITH_RULE;
-                arg2 = r.name;
-            }
-            else if ( (r.retvals!=null&&r.retvals.get(attrName)!=null) ||
-                      (r.args!=null&&r.args.get(attrName)!=null) )
-            {
-                msgID = ErrorType.ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL;
-                arg2 = r.name;
-            }
-            if ( msgID!=ErrorType.INVALID ) {
-                errMgr.grammarError(msgID,g.fileName,
-                                          r.scope.ast.token,
-                                          attrName,arg2);
             }
         }
     }

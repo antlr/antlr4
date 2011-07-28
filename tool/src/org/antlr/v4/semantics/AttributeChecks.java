@@ -140,9 +140,6 @@ public class AttributeChecks implements ActionSplitterListener {
 
     public void attr(String expr, Token x) {
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-			if ( node.resolver.resolveToDynamicScope(x.getText(), node)!=null ) {
-				return; // $S for scope S is ok
-			}
 			if ( node.resolver.resolvesToToken(x.getText(), node) ) {
 				return; // $ID for token ref or label of token
 			}
@@ -158,51 +155,6 @@ public class AttributeChecks implements ActionSplitterListener {
 									  g.fileName, x, x.getText(), expr);
 		}
     }
-
-    public void setDynamicScopeAttr(String expr, Token x, Token y, Token rhs) {
-		//System.out.println("SET "+x+" :: "+y);
-		dynamicScopeAttr(expr, x, y);
-		new AttributeChecks(g, r, alt, node, rhs).examineAction();
-	}
-
-    public void dynamicScopeAttr(String expr, Token x, Token y) {
-		//System.out.println(x+" :: "+y);
-		AttributeDict s = node.resolver.resolveToDynamicScope(x.getText(), node);
-		if ( s==null ) {
-			errMgr.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE,
-									  g.fileName, x, x.getText(), expr);
-			return;
-		}
-		Attribute a = s.get(y.getText());
-		if ( a==null ) {
-			errMgr.grammarError(ErrorType.UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
-									  g.fileName, y, x.getText(), y.getText(), expr);
-		}
-	}
-
-	public void setDynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
-												   Token index, Token rhs) {
-		setDynamicScopeAttr(expr, x, y, rhs);
-		new AttributeChecks(g, r, alt, node, index).examineAction();
-	}
-
-	public void dynamicNegativeIndexedScopeAttr(String expr, Token x, Token y,
-												Token index) {
-		dynamicScopeAttr(expr, x, y);
-		new AttributeChecks(g, r, alt, node, index).examineAction();
-	}
-
-	public void setDynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
-												   Token index, Token rhs) {
-		setDynamicScopeAttr(expr, x, y, rhs);
-		new AttributeChecks(g, r, alt, node, index).examineAction();
-	}
-
-    public void dynamicAbsoluteIndexedScopeAttr(String expr, Token x, Token y,
-												Token index) {
-		dynamicScopeAttr(expr, x, y);
-		new AttributeChecks(g, r, alt, node, index).examineAction();
-	}
 
     public void unknownSyntax(Token t) {
 		errMgr.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,

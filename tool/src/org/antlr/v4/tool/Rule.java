@@ -29,7 +29,6 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.misc.MultiMap;
 
@@ -76,9 +75,6 @@ public class Rule implements AttributeResolver {
     public AttributeDict args;
     public AttributeDict retvals;
     public AttributeDict scope; // scope { int i; } // TODO: remove
-
-	/** A list of scope names used by this rule */
-    public List<Token> useScopes;
 
 	/** In which grammar does this rule live? */
 	public Grammar g;
@@ -221,12 +217,6 @@ public class Rule implements AttributeResolver {
 
 	}
 
-	public AttributeDict resolveToDynamicScope(String x, ActionAST node) {
-		Rule r = resolveToRule(x);
-		if ( r!=null && r.scope!=null ) return r.scope;
-		return g.scopes.get(x);
-	}
-
 	public boolean resolvesToLabel(String x, ActionAST node) {
 		return false;
 	}
@@ -248,7 +238,6 @@ public class Rule implements AttributeResolver {
 		if ( resolvesToToken(x, node) ) return true;
 		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict
 		if ( scope!=null ) return true;
-		if ( g.scopes.get(x)!=null ) return true;
 		return false;
 	}
 
