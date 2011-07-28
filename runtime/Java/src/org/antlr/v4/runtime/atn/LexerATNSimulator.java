@@ -244,8 +244,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	public ATNState getReachableTarget(Transition trans, int t) {
 		if ( trans instanceof AtomTransition ) {
 			AtomTransition at = (AtomTransition)trans;
-			boolean not = trans instanceof NotAtomTransition;
-			if ( !not && at.label == t || not && at.label!=t ) {
+			if ( at.label == t ) {
 				if ( debug ) {
 					System.out.println("match "+getTokenName(at.label));
 				}

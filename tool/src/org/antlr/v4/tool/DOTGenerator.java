@@ -244,7 +244,6 @@ public class DOTGenerator {
 					String label = String.valueOf(atom.label);
 					if ( isLexer ) label = "'"+getEdgeLabel(String.valueOf((char)atom.label))+"'";
 					else if ( grammar!=null ) label = grammar.getTokenDisplayName(atom.label);
-					if ( edge instanceof NotAtomTransition ) label = "~"+label;
 					edgeST.add("label", getEdgeLabel(label));
 				}
 				else if ( edge instanceof SetTransition ) {
