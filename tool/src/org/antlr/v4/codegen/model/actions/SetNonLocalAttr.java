@@ -29,9 +29,12 @@
 
 package org.antlr.v4.codegen.model.actions;
 
-/** */
-public class ArgRef extends LocalRef {
-	public ArgRef(String name) {
-		super(name);
+import java.util.List;
+
+public class SetNonLocalAttr extends SetAttr {
+	public String context;
+	public SetNonLocalAttr(String context, String name, List<ActionChunk> rhsChunks) {
+		super(name, rhsChunks);
+		this.context = context;
 	}
 }

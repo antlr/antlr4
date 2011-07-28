@@ -148,27 +148,53 @@ public class AttributeChecks implements ActionSplitterListener {
 			}
 			if ( isolatedRuleRef(x.getText())!=null ) {
 				errMgr.grammarError(ErrorType.ISOLATED_RULE_REF,
-										  g.fileName, x, x.getText(), expr);
+									g.fileName, x, x.getText(), expr);
 				return;
 			}
 			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-									  g.fileName, x, x.getText(), expr);
+								g.fileName, x, x.getText(), expr);
 		}
-    }
+	}
 
-    public void unknownSyntax(Token t) {
+	public void nonLocalAttr(String expr, Token x, Token y) {
+		Rule r = g.getRule(x.getText());
+		if ( r==null ) {
+			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
+							 x.getText(), y.getText());
+		}
+		if ( r.resolveToAttribute(y.getText(), null)==null ) {
+			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
+								g.fileName, y, y.getText(), x.getText(), expr);
+
+		}
+	}
+
+	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
+		Rule r = g.getRule(x.getText());
+		if ( r==null ) {
+			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
+							 x.getText(), y.getText());
+		}
+		if ( r.resolveToAttribute(y.getText(), null)==null ) {
+			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
+								g.fileName, y, y.getText(), x.getText(), expr);
+
+		}
+	}
+
+	public void unknownSyntax(Token t) {
 		errMgr.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,
-								  g.fileName, t, t.getText());
-    }
+							g.fileName, t, t.getText());
+	}
 
-    public void text(String text) { }
+	public void text(String text) { }
 
-    // don't care
-    public void templateInstance(String expr) {   }
-    public void indirectTemplateInstance(String expr) {   }
-    public void setExprAttribute(String expr) {   }
-    public void setSTAttribute(String expr) {  }
-    public void templateExpr(String expr) {  }
+	// don't care
+	public void templateInstance(String expr) {   }
+	public void indirectTemplateInstance(String expr) {   }
+	public void setExprAttribute(String expr) {   }
+	public void setSTAttribute(String expr) {  }
+	public void templateExpr(String expr) {  }
 
 	// SUPPORT
 

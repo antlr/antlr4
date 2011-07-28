@@ -29,9 +29,10 @@
 
 package org.antlr.v4.codegen.model.actions;
 
-/** */
-public class ArgRef extends LocalRef {
-	public ArgRef(String name) {
-		super(name);
+public class LocalRef extends ActionChunk {
+	public String name;
+
+	public LocalRef(String name) {
+		this.name = name;
 	}
 }

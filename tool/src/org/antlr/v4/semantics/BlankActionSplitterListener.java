@@ -48,6 +48,11 @@ public class BlankActionSplitterListener implements ActionSplitterListener {
 	public void templateInstance(String expr) {
 	}
 
+	public void nonLocalAttr(String expr, Token x, Token y) {
+	}
+
+	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
+	}
 
 	public void indirectTemplateInstance(String expr) {
 	}

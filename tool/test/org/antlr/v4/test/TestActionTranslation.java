@@ -145,96 +145,6 @@ public class TestActionTranslation extends BaseTest {
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
-    @Test public void testBasicGlobalScope() throws Exception {
-		String action = "$S::i";
-		String expected = "S_stack.peek().i";
-		testActions(scopeTemplate, "members", action, expected);
-    }
-
-    @Test public void test0IndexedGlobalScope() throws Exception {
-        String action = "$S[0]::i";
-		String expected = "S_stack.get(0).i";
-		testActions(scopeTemplate, "members", action, expected);
-    }
-
-    @Test public void testAbsoluteIndexedGlobalScope() throws Exception {
-        String action = "$S[3]::i";
-		String expected = "S_stack.get(3).i";
-		testActions(scopeTemplate, "members", action, expected);
-    }
-
-	@Test public void testNegIndexedGlobalScope() throws Exception {
-		String action = "$S[-1]::i";
-		String expected = "S_stack.get(S_stack.size()-1-1).i";
-		testActions(scopeTemplate, "members", action, expected);
-	}
-
-	@Test public void testNegIndexedGlobalScope2() throws Exception {
-		String action = "$S[-$S::i]::i";
-		String expected = "S_stack.get(S_stack.size()-S_stack.peek().i-1).i";
-		testActions(scopeTemplate, "members", action, expected);
-	}
-
-	@Test public void testBasicRuleScope() throws Exception {
-		String action = "$a::z";
-		String expected = "a_scope_stack.peek().z";
-		testActions(scopeTemplate, "inline", action, expected);
-	}
-
-	@Test public void testBasicGlobalScopeInRule() throws Exception {
-		String action = "$S::i";
-		String expected = "S_stack.peek().i";
-		testActions(scopeTemplate, "inline", action, expected);
-	}
-
-	@Test public void testSetBasicRuleScope() throws Exception {
-		String action = "$a::z = 3;";
-		String expected = "a_scope_stack.peek().z = 3;";
-		testActions(scopeTemplate, "inline", action, expected);
-	}
-
-	@Test public void testSetBasicGlobalScopeInRule() throws Exception {
-		String action = "$S::i = 3;";
-		String expected = "S_stack.peek().i = 3;";
-		testActions(scopeTemplate, "inline", action, expected);
-	}
-
-	@Test public void testSet0IndexedGlobalScope() throws Exception {
-		String action = "$S[0]::i = $S::i;";
-		String expected = "S_stack.get(0).i = S_stack.peek().i;";
-		testActions(scopeTemplate, "members", action, expected);
-	}
-
-	@Test public void testSetAbsoluteIndexedGlobalScope() throws Exception {
-		String action = "$S[3]::i = $S::i;";
-		String expected = "S_stack.get(3).i = S_stack.peek().i;";
-		testActions(scopeTemplate, "members", action, expected);
-	}
-
-	@Test public void testSetNegIndexedGlobalScope() throws Exception {
-		String action = "$S[-1]::i = $S::i;";
-		String expected = "S_stack.get(S_stack.size()-1-1).i = S_stack.peek().i;";
-		testActions(scopeTemplate, "members", action, expected);
-	}
-
-	@Test public void testSetNegIndexedGlobalScope2() throws Exception {
-		String action = "$S[-$S::i]::i = $S::i;";
-		String expected = "S_stack.get(S_stack.size()-S_stack.peek().i-1).i = S_stack.peek().i;";
-		testActions(scopeTemplate, "members", action, expected);
-	}
-
-    @Test public void testIsolatedDynamicRuleScopeRef() throws Exception {
-        String action = "$a;"; // refers to stack not top of stack
-		String expected = "a_scope_stack;";
-		testActions(scopeTemplate, "inline", action, expected);
-    }
-
-	@Test public void testIsolatedGlobalScopeRef() throws Exception {
-		String action = "$S;";
-		String expected = "S_stack;";
-		testActions(scopeTemplate, "inline", action, expected);
-	}
-
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
@@ -491,6 +401,7 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testGenericsAsReturnValue() throws Exception {
 	}
 
+	// TODO: nonlocal $rule::x
 
 
 	public void testActions(String templates, String actionName, String action, String expected) {

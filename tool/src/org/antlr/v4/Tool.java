@@ -225,8 +225,8 @@ public class Tool {
 
 		GrammarTransformPipeline.integrateImportedGrammars(g);
 
-		GrammarTransformPipeline transform = new GrammarTransformPipeline(this);
-		transform.process(g.ast);
+		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
+		transform.process();
 
 		LexerGrammar lexerg = null;
 		GrammarRootAST lexerAST = null;

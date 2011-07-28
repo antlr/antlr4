@@ -360,6 +360,7 @@ if (!(<chunks>)) throw new FailedPredicateException(this, input, "<currentRule.n
 
 ActionText(t) ::= "<t.text>"
 ArgRef(a) ::= "_localctx.<a.name>"
+LocalRef(a) ::= "_localctx.<a.name>"
 RetValueRef(a) ::= "_localctx.<a.name>"
 QRetValueRef(a) ::= "_localctx.<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
@@ -390,6 +391,11 @@ ThisRulePropertyRef_stop(r)  ::= "_localctx.stop"
 ThisRulePropertyRef_tree(r)  ::= "_localctx.tree"
 ThisRulePropertyRef_text(r)  ::= "((TokenStream)input).toString(_localctx.start, input.LT(-1))"
 ThisRulePropertyRef_st(r)    ::= "_localctx.st"
+
+//NonLocalContextRef(s)           ::= "<s.scope>"
+NonLocalAttrRef(s)       ::= "<s.scope>.peek().<s.attr>"
+SetNonLocalAttr(s, rhsChunks)            ::=
+    "<s.scope>.peek().<s.attr> =<rhsChunks>;"
 
 AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
 

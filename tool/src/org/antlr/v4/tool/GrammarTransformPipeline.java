@@ -39,13 +39,16 @@ import java.util.*;
 
 /** Handle left-recursion and block-set transforms */
 public class GrammarTransformPipeline {
+	public Grammar g;
 	public Tool tool;
 
-	public GrammarTransformPipeline(Tool tool) {
+	public GrammarTransformPipeline(Grammar g, Tool tool) {
+		this.g = g;
 		this.tool = tool;
 	}
 
-	public void process(GrammarRootAST ast) {
+	public void process() {
+		GrammarRootAST ast = g.ast;
 		if ( ast==null ) return;
 		System.out.println("before: "+ast.toStringTree());
 
@@ -61,7 +64,7 @@ public class GrammarTransformPipeline {
 		org.antlr.runtime.tree.CommonTreeNodeStream nodes =
 			new org.antlr.runtime.tree.CommonTreeNodeStream(ast);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		BlockSetTransformer transformer = new BlockSetTransformer(nodes);
+		BlockSetTransformer transformer = new BlockSetTransformer(nodes, g);
 		transformer.setTreeAdaptor(adaptor);
 		transformer.downup(ast);
 	}

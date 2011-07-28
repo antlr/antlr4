@@ -74,6 +74,7 @@ public enum ErrorType {
     REPEATED_PREQUEL("repeated grammar prequel spec (option, token, or import); please merge", ErrorSeverity.ERROR),
 	NO_TOKEN_DEFINITION("no lexer rule corresponding to token: <arg>", ErrorSeverity.ERROR),
 	UNDEFINED_RULE_REF("reference to undefined rule: <arg>", ErrorSeverity.ERROR),
+	UNDEFINED_RULE_IN_NONLOCAL_REF("reference to undefined rule in nonlocal ref: <arg>::<arg2>", ErrorSeverity.ERROR),
 	LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE("", ErrorSeverity.ERROR),
 	CANNOT_ALIAS_TOKENS("can't assign string value to token name <arg> in non-combined grammar", ErrorSeverity.ERROR),
     TOKEN_NAMES_MUST_START_UPPER("token names must start with an uppercase letter: <arg>", ErrorSeverity.ERROR),

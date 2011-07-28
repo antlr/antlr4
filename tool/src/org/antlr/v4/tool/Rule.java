@@ -74,6 +74,7 @@ public class Rule implements AttributeResolver {
     public RuleAST ast;
     public AttributeDict args;
     public AttributeDict retvals;
+	public AttributeDict locals;
     public AttributeDict scope; // scope { int i; } // TODO: remove
 
 	/** In which grammar does this rule live? */
@@ -194,6 +195,9 @@ public class Rule implements AttributeResolver {
 		}
 		if ( retvals!=null ) {
 			Attribute a = retvals.get(x);	if ( a!=null ) return a;
+		}
+		if ( locals!=null ) {
+			Attribute a = locals.get(x);	if ( a!=null ) return a;
 		}
 		AttributeDict properties = getPredefinedScope(LabelType.RULE_LABEL);
 		return properties.get(x);

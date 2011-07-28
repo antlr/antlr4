@@ -116,7 +116,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		Token tokenWithinAction = node.token;
 		ActionTranslator translator = new ActionTranslator(factory, node);
 		translator.rf = rf;
-		System.out.println("translate "+action);
+		System.out.println("translate " + action);
 		ANTLRStringStream in = new ANTLRStringStream(action);
 		in.setLine(tokenWithinAction.getLine());
 		in.setCharPositionInLine(tokenWithinAction.getCharPositionInLine());
@@ -133,6 +133,7 @@ public class ActionTranslator implements ActionSplitterListener {
 			switch ( a.dict.type ) {
 				case ARG: chunks.add(new ArgRef(x.getText())); break;
 				case RET: chunks.add(new RetValueRef(x.getText())); break;
+				case LOCAL: chunks.add(new LocalRef(x.getText())); break;
 				case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x));	break;
 //			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
 			}
@@ -200,6 +201,18 @@ public class ActionTranslator implements ActionSplitterListener {
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		SetAttr s = new SetAttr(x.getText(), rhsChunks);
 		if ( factory.getGrammar().isLexer() ) s = new LexerSetAttr(x.getText(), rhsChunks);
+		chunks.add(s);
+	}
+
+	public void nonLocalAttr(String expr, Token x, Token y) {
+		System.out.println("nonLocalAttr "+x+"."+y);
+		chunks.add(new NonLocalAttrRef(x.getText(), y.getText()));
+	}
+
+	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
+		System.out.println("setNonLocalAttr "+x+"::"+y+"="+rhs);
+		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
+		SetNonLocalAttr s = new SetNonLocalAttr(x.getText(), y.getText(), rhsChunks);
 		chunks.add(s);
 	}
 

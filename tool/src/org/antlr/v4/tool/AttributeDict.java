@@ -59,10 +59,8 @@ public class AttributeDict {
     }};
 
     public static enum DictType {
-        ARG, RET, TOKEN,
+        ARG, RET, LOCAL, TOKEN,
 		PREDEFINED_RULE, PREDEFINED_TREE_RULE, PREDEFINED_LEXER_RULE,
-        GLOBAL_SCOPE,   // scope symbols { ...}
-        RULE_SCOPE;     // scope { int i; int j; }
     }
 
     /** The list of Attribute objects */
