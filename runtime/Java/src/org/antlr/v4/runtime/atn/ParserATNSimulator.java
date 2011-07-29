@@ -494,6 +494,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( parser != null ) {
 				RuleContext ctx = getCurrentExecContext(config);
 				int argIndex = ((RuleTransition) t).argIndex;
+				int targetRuleIndex = t.target.ruleIndex;
 				if ( debug ) {
 					System.out.println("CALL rule "+parser.getRuleNames()[t.target.ruleIndex]+
 									   ", arg="+ argIndex +
@@ -501,12 +502,18 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 				int fromRuleIndex = config.state.ruleIndex;
 				if ( argIndex>=0 ) {
+					// we're forced to exec args, even if dependent on _localctx.
+					// If no actual context to use, create dummy context to use
+					// for arg eval only.
+					if ( ctx == null ) {
+						// get dummy context for fromRuleIndex
+						ctx = parser.newContext(null, config.state.stateNumber, fromRuleIndex);
+					}
 					newContext = parser.newContext(ctx, t.target.stateNumber,
 												   fromRuleIndex,
 												   argIndex);
 				}
 				else {
-					int targetRuleIndex = t.target.ruleIndex;
 					newContext = parser.newContext(ctx, t.target.stateNumber, targetRuleIndex);
 				}
 

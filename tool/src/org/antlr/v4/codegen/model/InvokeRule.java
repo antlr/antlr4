@@ -30,6 +30,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.model.actions.ActionChunk;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.RuleTransition;
@@ -42,8 +43,9 @@ import java.util.List;
 public class InvokeRule extends RuleElement implements LabeledOp {
 	public String name;
 	public OrderedHashSet<Decl> labels = new OrderedHashSet<Decl>(); // TODO: should need just 1
-	public String argExprs;
 	public String ctxName;
+
+	@ModelElement public List<ActionChunk> argExprsChunks;
 
 	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
 		super(factory, ast);
@@ -58,20 +60,22 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		ctxName = gen.target.getRuleFunctionContextStructName(r);
 
 		// TODO: move to factory
+		RuleFunction rf = factory.getCurrentRuleFunction();
 		if ( labelAST!=null ) {
 			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			factory.getCurrentRuleFunction().addContextDecl(d);
+			rf.addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				String listLabel = gen.target.getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, ctxName);
-				factory.getCurrentRuleFunction().addContextDecl(l);
+				rf.addContextDecl(l);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {
-			argExprs = ast.getChild(0).getText();
+			ActionAST arg = (ActionAST)ast.getChild(0);
+			argExprsChunks = ActionTranslator.translateAction(factory, rf, arg.token, arg);
 		}
 
 		// If action refs rule as rulename not label, we need to define implicit label
@@ -79,7 +83,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			String label = gen.target.getImplicitRuleLabel(ast.getText());
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			factory.getCurrentRuleFunction().addContextDecl(d);
+			rf.addContextDecl(d);
 		}
 
 //		LinearApproximator approx = new LinearApproximator(factory.g, ATN.INVALID_DECISION_NUMBER);

@@ -80,7 +80,7 @@ dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 public RuleContext newContext(RuleContext _localctx, int s, int fromRuleIndex, int actionIndex) {
 	switch ( fromRuleIndex ) {
 		<recog.argFuncs.values:{f|
-case <f.ruleIndex> : return <f.name>_argEval(_localctx, s, actionIndex);}; separator="\n">
+case <f.ruleIndex> : return <f.name>_argEval((<f.ctxType>)_localctx, s, actionIndex);}; separator="\n">
 	}
 	return new RuleContext(_localctx, s);
 }
@@ -116,7 +116,7 @@ public <p.name>(TokenStream input) {
 
 RuleArgFunction(r, actions) ::= <<
 /** arg computations for rules called FROM and evaluated in context of <r.name> */
-public RuleContext <r.name>_argEval(RuleContext _localctx, int s, int actionIndex) {
+public RuleContext <r.name>_argEval(<r.ctxType> _localctx, int s, int actionIndex) {
 	switch ( actionIndex ) {
 		<actions:{index|
 case <index> : return new <r.actions.(index).ctxType>(_localctx, s, <actions.(index)>);}; separator="\n">
@@ -330,9 +330,9 @@ cases(ttypes) ::= <<
 <ttypes:{t | case <t>:}; separator="\n">
 >>
 
-InvokeRule(r) ::= <<
+InvokeRule(r, argExprsChunks) ::= <<
 _localctx.s = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<r.argExprs:{e| <e>}; separator=",">);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks:{e| <e>}>);
 >>
 
 MatchToken(m) ::= <<
