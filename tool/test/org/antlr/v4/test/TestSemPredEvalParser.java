@@ -432,4 +432,16 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/** if you call a rule as part of FOLLOW with $i, can't execute, but
+	 *  what if there is a forced action in that called rule?  We should
+	 *  NOT execute any actions after
+	 *
+	 *  a[int i] : e x[$i] ;
+	 *  b[int i] : e x[$i] ;
+	 *  e : ID | ;
+	 *  x[int i] : {{$i=3;}} ID ;
+	 *
+	 *  use global context?
+	 */
+
 }
