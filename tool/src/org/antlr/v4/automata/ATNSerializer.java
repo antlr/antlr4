@@ -133,17 +133,20 @@ public class ATNSerializer {
 				int edgeType = Transition.serializationTypes.get(t.getClass());
 				int arg1 = 0;
 				int arg2 = 0;
+				int arg3 = 0;
 				switch ( edgeType ) {
 					case Transition.RULE :
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
 						arg2 = ((RuleTransition)t).ruleIndex;
+						arg3 = ((RuleTransition)t).argIndex;
 						break;
 					case Transition.PREDICATE :
 						PredicateTransition pt = (PredicateTransition)t;
 						arg1 = pt.ruleIndex;
 						arg2 = pt.predIndex;
-						if ( pt.isCtxDependent ) edgeType = Transition.DEPENDENT_PREDICATE;
+//						if ( pt.isCtxDependent ) edgeType = Transition.DEPENDENT_PREDICATE;
+						arg3 = pt.isCtxDependent ? 1 : 0 ;
 						break;
 					case Transition.RANGE :
 						arg1 = ((RangeTransition)t).from;
@@ -156,14 +159,12 @@ public class ATNSerializer {
 						ActionTransition at = (ActionTransition)t;
 						arg1 = at.ruleIndex;
 						arg2 = at.actionIndex;
-						if ( at.isCtxDependent ) edgeType = Transition.FORCED_DEPENDENT_ACTION;
+						arg3 = at.isCtxDependent ? 1 : 0 ;
+//						if ( at.isCtxDependent ) edgeType = Transition.FORCED_DEPENDENT_ACTION;
 						break;
 					case Transition.SET :
 						arg1 = setIndex++;
 						break;
-//					case Transition.NOT_ATOM :
-//						arg1 = ((NotAtomTransition)t).label;
-//						break;
 					case Transition.NOT_SET :
 						arg1 = setIndex++;
 						break;
@@ -175,6 +176,7 @@ public class ATNSerializer {
 				data.add(edgeType);
 				data.add(arg1);
 				data.add(arg2);
+				data.add(arg3);
 			}
 		}
 		int ndecisions = atn.decisionToState.size();
@@ -230,11 +232,12 @@ public class ATNSerializer {
 			int ttype = ATNSimulator.toInt(data[p + 2]);
 			int arg1 = ATNSimulator.toInt(data[p + 3]);
 			int arg2 = ATNSimulator.toInt(data[p + 4]);
+			int arg3 = ATNSimulator.toInt(data[p + 5]);
 			buf.append(src+"->"+trg+
 					   " "+Transition.serializationNames[ttype]+
-					   " "+arg1+","+arg2+
+					   " "+arg1+","+arg2+","+arg3+
 					   "\n");
-			p += 5;
+			p += 6;
 		}
 		int ndecisions = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {

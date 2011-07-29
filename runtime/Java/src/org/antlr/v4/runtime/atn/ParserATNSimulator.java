@@ -37,7 +37,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator extends ATNSimulator {
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
@@ -492,8 +492,24 @@ public class ParserATNSimulator extends ATNSimulator {
 			ATNState p = config.state;
 			RuleContext newContext;
 			if ( parser != null ) {
-//				System.out.println("rule trans to rule "+parser.getRuleNames()[t.target.ruleIndex]);
-				newContext = parser.newContext(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
+				RuleContext ctx = getCurrentExecContext(config);
+				int argIndex = ((RuleTransition) t).argIndex;
+				if ( debug ) {
+					System.out.println("CALL rule "+parser.getRuleNames()[t.target.ruleIndex]+
+									   ", arg="+ argIndex +
+									   ", using context="+ctx);
+				}
+				int fromRuleIndex = config.state.ruleIndex;
+				if ( argIndex>=0 ) {
+					newContext = parser.newContext(ctx, t.target.stateNumber,
+												   fromRuleIndex,
+												   argIndex);
+				}
+				else {
+					int targetRuleIndex = t.target.ruleIndex;
+					newContext = parser.newContext(ctx, t.target.stateNumber, targetRuleIndex);
+				}
+
 				newContext.invokingState = p.stateNumber;
 //				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
 			}
@@ -514,11 +530,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// preds are epsilon if we're not doing preds (we saw an action).
 			// if we are doing preds, pred must eval to true
 			// Cannot exec preds out of context if they are context dependent
-			RuleContext ctx = config.context; // use context created after entry into interp
-			if ( ctx == RuleContext.EMPTY ) {
-				if ( config.reachesIntoOuterContext==0 ) ctx = originalContext;
-				else ctx = null; // no context if we in outer context
-			}
+			RuleContext ctx = getCurrentExecContext(config);
 			boolean ctxIssue = pt.isCtxDependent && config.reachesIntoOuterContext>0;
 			boolean seeThroughPred =
 				ignorePreds || ctxIssue ||
@@ -534,11 +546,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
 			if ( at.actionIndex>=0 ) {
 				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
-				RuleContext ctx = config.context;
-				if ( ctx == RuleContext.EMPTY ) {
-					if ( config.reachesIntoOuterContext==0 ) ctx = originalContext;
-					else ctx = null; // no context if we in outer context
-				}
+				RuleContext ctx = getCurrentExecContext(config);
 				boolean ctxIssue = at.isCtxDependent && config.reachesIntoOuterContext>0;
 				// Only exec forced action that isCtxDependent if we are not
 				// doing global FOLLOW; we don't know context
@@ -585,6 +593,15 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 		return alt;
+	}
+
+	public RuleContext getCurrentExecContext(ATNConfig config) {
+		RuleContext ctx = config.context; // use context created after entry into interp
+		if ( ctx == RuleContext.EMPTY ) {
+			if ( config.reachesIntoOuterContext==0 ) ctx = originalContext;
+			else ctx = null; // no context if we in outer context
+		}
+		return ctx;
 	}
 
 	public Set<Integer> getAmbiguousAlts(OrderedHashSet<ATNConfig> configs) {

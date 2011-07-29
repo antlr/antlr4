@@ -69,13 +69,11 @@ public class RuleContext {
 
 	public RuleContext() {}
 
-//	public RuleContext(RuleContext parent) {
-//		this.parent = parent;
-////		while ( p!=null ) {
-////			System.out.println();
-////			p = p.parent;
-////		}
-//	}
+	public RuleContext(RuleContext parent, int stateNumber) {
+		// capture state that called us as we create this context; use later for
+		// return state in closure
+		this(parent, parent!=null ? parent.s : -1, stateNumber);
+	}
 
 	public RuleContext(RuleContext parent, int invokingState, int stateNumber) {
 		this.parent = parent;

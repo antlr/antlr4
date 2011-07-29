@@ -188,7 +188,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void ruleRef(GrammarAST ref, GrammarAST arg) {
+	public void ruleRef(GrammarAST ref, ActionAST arg) {
 		if ( inContext("DOT ...") ) qualifiedRulerefs.add((GrammarAST)ref.getParent());
 		rulerefs.add(ref);
     	if ( currentRule!=null ) {

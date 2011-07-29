@@ -108,10 +108,11 @@ public abstract class ATNSimulator {
 			int ttype = toInt(data[p+2]);
 			int arg1 = toInt(data[p+3]);
 			int arg2 = toInt(data[p+4]);
-			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, sets);
+			int arg3 = toInt(data[p+5]);
+			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
 			ATNState srcState = atn.states.get(src);
 			srcState.addTransition(trans);
-			p += 5;
+			p += 6;
 		}
 		int ndecisions = toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {
@@ -130,24 +131,25 @@ public abstract class ATNSimulator {
 
 	public static Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
-										 int arg1, int arg2,
+										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)
 	{
 		ATNState target = atn.states.get(trg);
 		switch (type) {
 			case Transition.EPSILON : return new EpsilonTransition(target);
 			case Transition.RANGE : return new RangeTransition(arg1, arg2, target);
-			case Transition.RULE : return new RuleTransition(arg2, atn.states.get(arg1), target);
-			case Transition.PREDICATE : return new PredicateTransition(target, arg1, arg2);
-			case Transition.DEPENDENT_PREDICATE :
-				PredicateTransition p = new PredicateTransition(target, arg1, arg2);
-				p.isCtxDependent = true;
-				return p;
+			case Transition.RULE :
+				RuleTransition rt = new RuleTransition(arg2, atn.states.get(arg1), target);
+				rt.argIndex = arg3;
+				return rt;
+			case Transition.PREDICATE :
+				PredicateTransition pt = new PredicateTransition(target, arg1, arg2);
+				pt.isCtxDependent = arg3==1;
+				return pt;
 			case Transition.ATOM : return new AtomTransition(arg1, target);
-			case Transition.ACTION : return new ActionTransition(target, arg1, arg2);
-			case Transition.FORCED_DEPENDENT_ACTION :
+			case Transition.ACTION :
 				ActionTransition a = new ActionTransition(target, arg1, arg2);
-				a.isCtxDependent = true;
+				a.isCtxDependent = arg3==1;
 				return a;
 			case Transition.FORCED_ACTION : return new ActionTransition(target, arg1, arg2);
 			case Transition.SET : return new SetTransition(sets.get(arg1), target);

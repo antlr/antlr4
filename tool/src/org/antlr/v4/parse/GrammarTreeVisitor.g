@@ -151,7 +151,7 @@ public void finishAltWithRewrite(AltAST alt) { }
 public void discoverSTRewrite(GrammarAST rew) { }
 public void discoverTreeRewrite(GrammarAST rew) { }
 
-public void ruleRef(GrammarAST ref, GrammarAST arg) { }
+public void ruleRef(GrammarAST ref, ActionAST arg) { }
 public void tokenRef(TerminalAST ref, GrammarAST options) { }
 public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
 public void stringRef(TerminalAST ref, GrammarAST options) { }
@@ -412,7 +412,7 @@ block
 ruleref
     :	^(RULE_REF arg=ARG_ACTION?)
     	{
-    	ruleRef($RULE_REF, $ARG_ACTION);
+    	ruleRef($RULE_REF, (ActionAST)$ARG_ACTION);
     	if ( $arg!=null ) actionInAlt((ActionAST)$arg);
     	}
     ;

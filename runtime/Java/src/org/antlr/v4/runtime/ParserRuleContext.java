@@ -56,9 +56,7 @@ public class ParserRuleContext extends RuleContext {
 	public ParserRuleContext() { super(); }
 
 	public ParserRuleContext(RuleContext parent, int stateNumber) {
-		// capture state that called us as we create this context; use later for
-		// return state in closure
-		super(parent, parent!=null ? parent.s : -1, stateNumber);
+		super(parent, stateNumber);
 	}
 
 	public Object getTree() { return tree; }

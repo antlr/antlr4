@@ -1,13 +1,22 @@
 grammar T;
+options {output=AST;}
 
-s returns [int j=9999] : e[9] {{System.out.println("after-e "+$j);}} {true}? ';' ;
+s : e EOF ;
 
-e[int i]
-  : {$i>=0}? {{System.out.println("i=="+$i);}} ID
-  | ID '!'
-  ;
+e : e_[0] ;
 
-foo[int j] : e[8] {$j==2}? '$' ; // not called but in FOLLOW(e)
+e_[int _p]
+    :   e_primary
+        ( {$_p <= 5}? '*'^ e_[6]{} 
+        | {$_p <= 4}? '+'^ e_[5]{} 
+        | {$_p <= 2}? '='<assoc=right>^ e_[2]{} 
+        | {$_p <= 3}? '?'<assoc=right>^ e ':'! e_[3]{} 
+        )*
+    ;
+
+e_primary
+    : ID 
+    ;
 
 ID : 'a'..'z'+;
 

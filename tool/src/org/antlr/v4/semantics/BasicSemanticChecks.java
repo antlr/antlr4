@@ -207,7 +207,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void ruleRef(GrammarAST ref, GrammarAST arg) {
+	public void ruleRef(GrammarAST ref, ActionAST arg) {
 		checkInvalidRuleRef(ref.token);
 	}
 
