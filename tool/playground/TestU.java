@@ -34,7 +34,7 @@ public class TestU {
 		ULexer t = new ULexer(new ANTLRFileStream(args[0]));
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		UParser p = new UParser(tokens);
-		ParserRuleContext ret = p.a(33);
+		ParserRuleContext ret = p.s();
 //		System.out.println(((Tree)ret.tree).toStringTree());
 	}
 }

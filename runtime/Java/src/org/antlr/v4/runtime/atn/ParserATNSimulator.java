@@ -501,7 +501,9 @@ public class ParserATNSimulator extends ATNSimulator {
 									   ", using context="+ctx);
 				}
 				int fromRuleIndex = config.state.ruleIndex;
-				if ( argIndex>=0 ) {
+				if ( argIndex>=0 && ctx!=null ) {
+					// we have an argument and we know its context or it's not depedent
+					/*
 					// we're forced to exec args, even if dependent on _localctx.
 					// If no actual context to use, create dummy context to use
 					// for arg eval only.
@@ -509,11 +511,14 @@ public class ParserATNSimulator extends ATNSimulator {
 						// get dummy context for fromRuleIndex
 						ctx = parser.newContext(null, config.state.stateNumber, fromRuleIndex);
 					}
+					 */
 					newContext = parser.newContext(ctx, t.target.stateNumber,
 												   fromRuleIndex,
 												   argIndex);
 				}
 				else {
+					// there is no argument or there is a dependent arg but
+					// we are unable to identify the proper context
 					newContext = parser.newContext(ctx, t.target.stateNumber, targetRuleIndex);
 				}
 
