@@ -324,6 +324,9 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/** Same as the previous test except that we have dependent forced
+	 *  actions in the global fall not dependent rule arguments.
+	 */
 	@Test public void testForcedDepedentActionInGlobalFOLLOW() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -346,14 +349,18 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/** During a global follow operation, we still execute semantic
+	 *  predicates as long as they are not dependent on local context
+	 */
 	@Test public void testPredsInGlobalFOLLOW() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"@members {" +
 			"void f(Object s) {System.out.println(s);}\n" +
+			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
 			"}\n" +
-			"s : e {{f(\"s1\");}} {f(\"alt 1\");} '!' ;\n" +
-			"t : e {{f(\"t1\");}} ID ;\n" +
+			"s : e {p(true)}? {f(\"parse\");} '!' ;\n" +
+			"t : e {p(false)}? ID ;\n" +
 			"e : ID | ;\n" + // non-LL(1) so we use ATN
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -362,38 +369,67 @@ public class TestSemPredEvalParser extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "a!", false);
 		String expecting =
-			"s1\n" +	// do s1, t1 once during s0 computation from epsilon edge in e
-			"t1\n" +
-			"s1\n" +	// do them again during closure after passing ID in e
-			"t1\n" +
-			"s1\n" +	// now we are parsing
-			"alt 1\n";
+			"eval=true\n" +	// do p(true), p(false) once during s0 computation from epsilon edge in e
+			"eval=false\n" +
+			"eval=true\n" +	// do them again during closure after passing ID in e
+			"eval=false\n" +
+			"eval=true\n" + // now we are parsing
+			"parse\n";
 		assertEquals(expecting, found);
 	}
 
-
+	/** We cannot execute predicates that are dependent on local context if
+	 *  we are doing a global follow. They appear as if they were true
+	 *  predicates or not there at all.
+	 */
 	@Test public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"@members {" +
-			"int f(int s) {System.out.println(s); return s;}\n" +
+			"void f(Object s) {System.out.println(s);}\n" +
+			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
 			"}\n" +
-			"s : a[1] ;\n" +
-			"a[int i] : e {{f($i);}} ID '!' ;\n" +
-			"b[int i] : e {{f($i+1);}} ID '?' ;\n" +
-			"e        : ID | ;\n" +
-			"foo[int k] : ID ';' ;\n" +
+			"s : a[99] ;\n" +
+			"a[int i] : e {p($i==99)}? {f(\"parse\");} '!' ;\n" +
+			"b[int i] : e {p($i==99)}? ID ;\n" +
+			"e : ID | ;\n" + // non-LL(1) so we use ATN
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "x y !", false);
+								  "a!", false);
 		String expecting =
-			"1\n";
+			"eval=true\n" +
+			"parse\n";
 		assertEquals(expecting, found);
 	}
 
+	/** Regular non-forced actions can create side effects used by semantic
+	 *  predicates and so we cannot evaluate any semantic predicate
+	 *  encountered after having seen a regular action. This includes
+	 *  during global follow operations.
+	 */
+	@Test public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"@members {" +
+			"void f(Object s) {System.out.println(s);}\n" +
+			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
+			"}\n" +
+			"s : e {} {p(true)}? {f(\"parse\");} '!' ;\n" +
+			"t : e {} {p(false)}? ID ;\n" +
+			"e : ID | ;\n" + // non-LL(1) so we use ATN
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
 
-	// 			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "a!", false);
+		String expecting =
+			"eval=true\n" +
+			"parse\n";
+		assertEquals(expecting, found);
+	}
+
 }
