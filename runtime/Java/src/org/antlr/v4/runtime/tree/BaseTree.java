@@ -174,6 +174,21 @@ public abstract class BaseTree implements Tree {
 		return false;
 	}
 
+	/** Insert child t at child position i (0..n-1) by shifting children
+		i+1..n-1 to the right one position. Set parent / indexes properly
+	 	but does NOT collapse nil-rooted t's that come in here like addChild.
+	 */
+	public void insertChild(int i, Object t) {
+		if (i < 0 || i >= getChildCount()) {
+			throw new IndexOutOfBoundsException(i+" out or range");
+		}
+
+		children.add(i, t);
+		// walk others to increment their child indexes
+		// set index, parent of this one too
+		this.freshenParentAndChildIndexes(i);
+	}
+
 	/** Delete children from start to stop and replace with t even if t is
 	 *  a list (nil-root tree).  num of children can increase or decrease.
 	 *  For huge child lists, inserting children can force walking rest of
