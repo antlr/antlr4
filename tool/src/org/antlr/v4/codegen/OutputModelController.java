@@ -159,26 +159,6 @@ public class OutputModelController {
 				}
 				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
 			}
-			else if ( a.getType()==ANTLRParser.FORCED_ACTION ) {
-				RuleActionFunction raf = parser.actionFuncs.get(r);
-				if ( raf==null ) {
-					raf = new RuleActionFunction(delegate, r, function.ctxType);
-					parser.actionFuncs.put(r, raf);
-				}
-				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
-			}
-			else if ( a.getType()==ANTLRParser.ARG_ACTION )	{
-				RuleArgFunction raf = parser.argFuncs.get(r);
-				if ( raf==null ) {
-					raf = new RuleArgFunction(delegate, r, function.ctxType);
-					parser.argFuncs.put(r, raf);
-				}
-				GrammarAST callNode = (GrammarAST)a.getParent();
-				String invokedRuleName = callNode.getText();
-				Rule invokedRule = g.getRule(invokedRuleName);
-				String invokedCtxType = gen.target.getRuleFunctionContextStructName(invokedRule);
-				raf.actions.put(g.actions.get(a), new ArgAction(delegate, a, invokedCtxType));
-			}
 		}
 
 		if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;

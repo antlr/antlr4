@@ -229,15 +229,15 @@ public class Recognizer<ATNInterpreter> {
 	/** Create context for a rule reference IN fromRuleIndex using parent _localctx.
 	 *  Used only when there are arguments to the rule function. _localctx
 	 *  must be correct context for fromRuleIndex.
-	 */
 	public RuleContext newContext(RuleContext _localctx, int s, int fromRuleIndex, int actionIndex) {
 		return new ParserRuleContext(_localctx, s);
 	}
+	 */
 
 	/** Map a rule index to appropriate RuleContext subclass. Used when rule
 	 *  has no arguments.
-	 */
 	public RuleContext newContext(RuleContext _localctx, int s, int targetRuleIndex) {
 		return new ParserRuleContext(_localctx, s);
 	}
+	 */
 }

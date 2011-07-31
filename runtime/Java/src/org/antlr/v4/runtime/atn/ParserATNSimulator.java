@@ -62,7 +62,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *
 	 *  The full stack at any moment is [config.outerContext + config.context].
 	 */
-	protected RuleContext originalContext;
+	protected RuleContext outerContext;
 
 	protected Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 
@@ -82,20 +82,20 @@ public class ParserATNSimulator extends ATNSimulator {
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(TokenStream input, int decision, RuleContext originalContext) {
+	public int adaptivePredict(TokenStream input, int decision, RuleContext outerContext) {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
 			ATNState startState = atn.decisionToState.get(decision);
 			decisionToDFA[decision] = dfa = new DFA(startState);
 			dfa.decision = decision;
-			return predictATN(dfa, input, decision, originalContext, false);
+			return predictATN(dfa, input, decision, outerContext, false);
 		}
 		else {
 			//dump(dfa);
 			// start with the DFA
 			int m = input.mark();
-			int alt = execDFA(input, dfa, dfa.s0, originalContext);
+			int alt = execDFA(input, dfa, dfa.s0, outerContext);
 			input.seek(m);
 			return alt;
 		}
@@ -103,13 +103,13 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public int predictATN(DFA dfa, TokenStream input,
 						  int decision,
-						  RuleContext originalContext,
+						  RuleContext outerContext,
 						  boolean useContext)
 	{
-		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
-		this.originalContext = originalContext;
+		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
+		this.outerContext = outerContext;
 		RuleContext ctx = RuleContext.EMPTY;
-		if ( useContext ) ctx = originalContext;
+		if ( useContext ) ctx = outerContext;
 		OrderedHashSet<ATNConfig> s0_closure =
 			computeStartState(dfa.atnStartState, ctx);
 		dfa.s0 = addDFAState(dfa, s0_closure);
@@ -121,7 +121,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		int alt = 0;
 		int m = input.mark();
 		try {
-			alt = execATN(input, dfa, m, s0_closure, originalContext, useContext);
+			alt = execATN(input, dfa, m, s0_closure, useContext);
 		}
 		catch (NoViableAltException nvae) {	dumpDeadEndConfigs(nvae); throw nvae; }
 		finally {
@@ -136,14 +136,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFA dfa = new DFA(startState);
 		RuleContext ctx = new ParserRuleContext();
 		OrderedHashSet<ATNConfig> s0_closure = computeStartState(startState, ctx);
-		return execATN(input, dfa, input.index(), s0_closure, ctx, false);
+		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
-	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext originalContext) {
+	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext outerContext) {
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+" exec LA(1)=="+input.LT(1));
 //		dump(dfa);
-		if ( originalContext==null ) originalContext = RuleContext.EMPTY;
-		this.originalContext = originalContext;
+		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
+		this.outerContext = outerContext;
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int t = input.LA(1);
@@ -153,16 +153,16 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+t);
 			// TODO: ctxSensitive
 			if ( s.isCtxSensitive ) {
-				Integer predI = s.ctxToPrediction.get(originalContext);
-				if ( dfa_debug ) System.out.println("ctx sensitive state "+originalContext+"->"+predI+
+				Integer predI = s.ctxToPrediction.get(outerContext);
+				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+"->"+predI+
 								 				    " in "+s);
 				if ( predI!=null ) return predI;
 //				System.out.println("start all over with ATN; can't use DFA");
 				// start all over with ATN; can't use DFA
 				input.seek(start);
 				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-				int alt = execATN(input, throwAwayDFA, start, s0.configs, originalContext, false);
-				s.ctxToPrediction.put(originalContext, alt);
+				int alt = execATN(input, throwAwayDFA, start, s0.configs, false);
+				s.ctxToPrediction.put(outerContext, alt);
 				return alt;
 			}
 			if ( s.isAcceptState ) {
@@ -182,7 +182,7 @@ public class ParserATNSimulator extends ATNSimulator {
 									   " at DFA state "+s.stateNumber);
 				}
 				try {
-					alt = execATN(input, dfa, start, s.configs, originalContext, false);
+					alt = execATN(input, dfa, start, s.configs, false);
 					// this adds edge even if next state is accept for
 					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 					// TODO: This next stuff kills edge, but extra states remain. :(
@@ -229,7 +229,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					   DFA dfa,
 					   int startIndex,
 					   OrderedHashSet<ATNConfig> s0,
-					   RuleContext originalContext,
 					   boolean useContext)
 	{
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+" exec LA(1)=="+input.LT(1));
@@ -270,7 +269,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			Set<Integer> ambigAlts = getAmbiguousAlts(reach);
 			if ( ambigAlts!=null ) {
 				if ( debug ) {
-					ATNState loc = atn.states.get(originalContext.s);
+					ATNState loc = atn.states.get(outerContext.s);
 					String rname = "n/a";
 					if ( parser !=null ) rname = parser.getRuleNames()[loc.ruleIndex];
 					System.out.println("AMBIG in "+rname+" for alt "+ambigAlts+" upon "+
@@ -280,15 +279,15 @@ public class ParserATNSimulator extends ATNSimulator {
 				dfa.conflict = true; // at least one DFA state is ambiguous
 				if ( !userWantsCtxSensitive ) reportConflict(startIndex, input.index(), ambigAlts, reach);
 
-//				ATNState loc = atn.states.get(originalContext.s);
+//				ATNState loc = atn.states.get(outerContext.s);
 //				String rname = recog.getRuleNames()[loc.ruleIndex];
-//				System.out.println("AMBIG orig="+originalContext.toString((BaseRecognizer)recog)+" for alt "+ambigAlts+" upon "+
+//				System.out.println("AMBIG orig="+outerContext.toString((BaseRecognizer)recog)+" for alt "+ambigAlts+" upon "+
 //								   input.toString(startIndex, input.index()));
 				if ( !userWantsCtxSensitive || useContext ) {
 					resolveToMinAlt(reach, ambigAlts);
 				}
 				else {
-					return retryWithContext(input, dfa, startIndex, originalContext,
+					return retryWithContext(input, dfa, startIndex, outerContext,
 											closure, t, reach, ambigAlts);
 				}
 			}
@@ -324,7 +323,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		if ( prevAccept==null ) {
 			System.out.println("no viable token at input "+input.LT(1)+", index "+input.index());
-			NoViableAltException nvae = new NoViableAltException(parser, input, closure, originalContext);
+			NoViableAltException nvae = new NoViableAltException(parser, input, closure, outerContext);
 			nvae.startIndex = startIndex;
 			throw nvae;
 		}
@@ -446,6 +445,13 @@ public class ParserATNSimulator extends ATNSimulator {
 		closure(config, configs, closureBusy);
 	}
 
+	/* TODO: If we are doing predicates, there is no point in pursuing
+	 closure operations if we reach a DFA state that uniquely predicts
+	 alternative. We will not be caching that DFA state and it is a
+	 waste to pursue the closure. Might have to advance when we do
+	 ambig detection thought :(
+	  */
+
 	protected void closure(ATNConfig config,
 						   OrderedHashSet<ATNConfig> configs,
 						   Set<ATNConfig> closureBusy)
@@ -488,98 +494,75 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t, boolean ignorePreds) {
-		ATNConfig c = null;
 		if ( t instanceof RuleTransition ) {
-			ATNState p = config.state;
-			RuleContext newContext;
-			if ( parser != null ) {
-				RuleContext ctx = getCurrentExecContext(config);
-				int argIndex = ((RuleTransition) t).argIndex;
-				int targetRuleIndex = t.target.ruleIndex;
-				if ( debug ) {
-					System.out.println("CALL rule "+parser.getRuleNames()[t.target.ruleIndex]+
-									   ", arg="+ argIndex +
-									   ", using context="+ctx);
-				}
-				int fromRuleIndex = config.state.ruleIndex;
-				if ( argIndex>=0 && ctx!=null ) {
-					// we have an argument and we know its context or it's not depedent
-					/*
-					// we're forced to exec args, even if dependent on _localctx.
-					// If no actual context to use, create dummy context to use
-					// for arg eval only.
-					if ( ctx == null ) {
-						// get dummy context for fromRuleIndex
-						ctx = parser.newContext(null, config.state.stateNumber, fromRuleIndex);
-					}
-					 */
-					newContext = parser.newContext(ctx, t.target.stateNumber,
-												   fromRuleIndex,
-												   argIndex);
-				}
-				else {
-					// there is no argument or there is a dependent arg but
-					// we are unable to identify the proper context
-					newContext = parser.newContext(ctx, t.target.stateNumber, targetRuleIndex);
-				}
-
-				newContext.invokingState = p.stateNumber;
-//				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
-			}
-			else {
-				newContext = new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
-			}
-			c = new ATNConfig(config, t.target, newContext);
+			return ruleTransition(config, t);
 		}
 		else if ( t instanceof PredicateTransition ) {
-			PredicateTransition pt = (PredicateTransition)t;
-			if ( debug ) {
-				System.out.println("PRED (ignore="+ignorePreds+") "+pt.ruleIndex+":"+pt.predIndex+
-								  ", ctx dependent="+pt.isCtxDependent+
-								  ", reachesIntoOuterContext="+config.reachesIntoOuterContext);
-				if ( parser != null ) System.out.println("rule surrounding pred is "+
-														 parser.getRuleNames()[pt.ruleIndex]);
-			}
-			// preds are epsilon if we're not doing preds (we saw an action).
-			// if we are doing preds, pred must eval to true
-			// Cannot exec preds out of context if they are context dependent
-			RuleContext ctx = getCurrentExecContext(config);
-			boolean ctxIssue = pt.isCtxDependent && config.reachesIntoOuterContext>0;
-			boolean seeThroughPred =
-				ignorePreds || ctxIssue ||
-				(!ctxIssue && parser.sempred(ctx, pt.ruleIndex, pt.predIndex));
-			if ( seeThroughPred ) {
-				c = new ATNConfig(config, t.target);
-				c.traversedPredicate = true;
-			}
+			return predTransition(config, (PredicateTransition)t, ignorePreds);
 		}
 		else if ( t instanceof ActionTransition ) {
-			c = new ATNConfig(config, t.target);
-			ActionTransition at = (ActionTransition)t;
-			if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
-			if ( at.actionIndex>=0 ) {
-				if ( debug ) System.out.println("DO ACTION "+at.ruleIndex+":"+at.actionIndex);
-				RuleContext ctx = getCurrentExecContext(config);
-				boolean ctxIssue = at.isCtxDependent && config.reachesIntoOuterContext>0;
-				// Only exec forced action that isCtxDependent if we are not
-				// doing global FOLLOW; we don't know context
-				if ( !ctxIssue ) {
-					parser.action(ctx, at.ruleIndex, at.actionIndex);
-				}
-			}
-			else {
-				// non-forced action traversed to get to t.target
-				if ( debug && !config.traversedAction ) {
-					System.out.println("NONFORCED; pruning future pred eval derived from s"+
-									   config.state.stateNumber);
-				}
-				c.traversedAction = true;
-			}
+			return actionTransition(config, t);
 		}
 		else if ( t.isEpsilon() ) {
-			c = new ATNConfig(config, t.target);
+			return new ATNConfig(config, t.target);
+		}
+		return null;
+	}
+
+	public ATNConfig actionTransition(ATNConfig config, Transition t) {
+		ActionTransition at = (ActionTransition)t;
+		if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
+		if ( debug && !config.traversedAction ) {
+			System.out.println("NONFORCED; pruning future pred eval derived from s"+
+							   config.state.stateNumber);
+		}
+
+		ATNConfig c = new ATNConfig(config, t.target);
+		c.traversedAction = true;
+		return c;
+	}
+
+	public ATNConfig predTransition(ATNConfig config, PredicateTransition pt,
+									boolean ignorePreds)
+	{
+		if ( debug ) {
+			System.out.println("PRED (ignore="+ignorePreds+") "+pt.ruleIndex+":"+pt.predIndex+
+							  ", ctx dependent="+pt.isCtxDependent);
+			if ( parser != null ) System.out.println("rule surrounding pred is "+
+													 parser.getRuleNames()[pt.ruleIndex]);
+		}
+		// We know the correct context and exactly one spot: in the original
+		// rule that invokes the ATN simulation. We know we are in this rule
+		// when the context stack is empty and we've not dipped into
+		// the outer context.
+		boolean inContext =
+			config.context==RuleContext.EMPTY && config.reachesIntoOuterContext==0;
+		RuleContext ctx = null;
+		if ( inContext ) ctx = outerContext;
+
+		// We see through the predicate if:
+		//	1) we are ignoring them
+		//	2) we aren't ignoring them but it is not context dependent and
+		//	   pred is true
+		//	3) we aren't ignoring them, it is context dependent, but
+		//     we know the context and pred is true
+		ATNConfig c = null;
+		boolean seeThroughPred =
+			ignorePreds ||
+			(!ignorePreds&&!pt.isCtxDependent&&parser.sempred(ctx, pt.ruleIndex, pt.predIndex))||
+			(!ignorePreds&&pt.isCtxDependent&&inContext&&parser.sempred(ctx, pt.ruleIndex, pt.predIndex));
+		if ( seeThroughPred ) {
+			c = new ATNConfig(config, pt.target);
+			c.traversedPredicate = true;
 		}
 		return c;
+	}
+
+	public ATNConfig ruleTransition(ATNConfig config, Transition t) {
+		ATNState p = config.state;
+		RuleContext newContext =
+			new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
+		return new ATNConfig(config, t.target, newContext);
 	}
 
 	public void reportConflict(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {
@@ -611,7 +594,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	public RuleContext getCurrentExecContext(ATNConfig config) {
 		RuleContext ctx = config.context; // use context created after entry into interp
 		if ( ctx == RuleContext.EMPTY ) {
-			if ( config.reachesIntoOuterContext==0 ) ctx = originalContext;
+			if ( config.reachesIntoOuterContext==0 ) ctx = outerContext;
 			else ctx = null; // no context if we in outer context
 		}
 		return ctx;

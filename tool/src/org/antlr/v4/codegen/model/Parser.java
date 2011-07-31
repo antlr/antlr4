@@ -44,10 +44,6 @@ public class Parser extends OutputModelObject {
 
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 	@ModelElement public SerializedATN atn;
-	@ModelElement public LinkedHashMap<Rule, RuleArgFunction> argFuncs =
-		new LinkedHashMap<Rule, RuleArgFunction>();
-	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
-		new LinkedHashMap<Rule, RuleActionFunction>();
 	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
 		new LinkedHashMap<Rule, RuleSempredFunction>();
 
