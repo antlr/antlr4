@@ -19,7 +19,7 @@
 // 3) All errors are pushed as far down the parsing chain as possible, which means
 //    that the lexer tries to defer error reporting to the parser, and the parser
 //    tries to defer error reporting to a semantic phase consisting of a single
-//    walk of the AST. The reason for this is that the error messages produced 
+//    walk of the AST. The reason for this is that the error messages produced
 //    from later phases of the parse will generally have better context and so
 //    be more useful to the end user. Consider the message: "Syntax error at 'options'"
 //    vs: "You cannot specify two options{} sections in a single grammar file".
@@ -53,7 +53,7 @@ lexer grammar ANTLRLexer;
 // ==============================================================================
 // Note that while this grammar does not care about order of constructs
 // that don't really matter, such as options before @header etc, it must first
-// be parsed by the original v2 parser, before it replaces it. That parser does 
+// be parsed by the original v2 parser, before it replaces it. That parser does
 // care about order of structures. Hence we are constrained by the v2 parser
 // for at least the first bootstrap release that causes this parser to replace
 // the v2 version.
@@ -72,7 +72,7 @@ options {
 	// for users.
 	//
 	language      = Java;
-	
+
 	// The super class that this lexer should expect to inherit from, and
 	// which contains any and all support routines for the lexer. This is
 	// commented out in this baseline (definitive or normative grammar)
@@ -82,7 +82,7 @@ options {
 	//superclass    = AbstractA3Lexer;
 }
 
-tokens { SEMPRED; FORCED_ACTION; }
+tokens { SEMPRED; }
 
 // Include the copyright in this source and also the generated source
 //
@@ -139,7 +139,7 @@ COMMENT
 	// Record the start line and offsets as if we need to report an
 	// unterminated comment, then we want to show the start of the comment
 	// we think is broken, not the end, where people will have to try and work
-	// it out themselves. 
+	// it out themselves.
 	//
 	int startLine = $line;
 	int offset    = getCharPositionInLine();
@@ -148,7 +148,7 @@ COMMENT
       // or something silly.
       //
       '/'  // Comment introducer
-            
+
       (
           // Single line comment, possibly with embedded src/line directives
           // in a similar style to the C pre-processor, allowing generated
@@ -158,9 +158,9 @@ COMMENT
           '/'
             (
                 (' $ANTLR')=> ' $ANTLR' SRC
-              | ~(NLCHARS)* 
+              | ~(NLCHARS)*
             )
-        
+
          | // Multi-line comment, which may be a documentation comment
            // if it starts /** (note that we protect against accidentaly
            // recognizing a comment /**/ as a documentation comment
@@ -171,17 +171,17 @@ COMMENT
            	   )
 
                // Should we support embedded multiline comments here?
-               //           
+               //
                (
                    // Pick out end of multiline comment and exit the loop
                    // if we find it.
                    //
                	   {    !(input.LA(1) == '*' && input.LA(2) == '/') }?
-                    
+
               	      // Anything else other than the non-greedy match of
               	      // the comment close sequence
               	      //
-              	      .                 
+              	      .
                )*
             (
                  // Look for the comment terminator, but if it is accidentally
@@ -190,14 +190,14 @@ COMMENT
                  // to the start of the unterminated multi-line comment
                  //
                  '*/'
-         
+
                | // Unterminated comment!
                  //
                  {
                    // ErrorManager.msg(Msg.UNTERMINATED_DOC_COMMENT, startLine, offset, $pos, startLine, offset, $pos, (Object)null);
                  }
              )
-             
+
          | // There was nothing that made sense following the opening '/' and so
            // we issue an error regarding the malformed comment
            //
@@ -213,7 +213,7 @@ COMMENT
          // just skip and save token space if not.
          //
          if ($type != DOC_COMMENT) {
-          
+
              $channel=2;  // Comments are on channel 2
          }
        }
@@ -227,7 +227,7 @@ DOUBLE_QUOTE_STRING_LITERAL
 DOUBLE_ANGLE_STRING_LITERAL
 	:	'<<' (options {greedy=false;} : . )* '>>'
 	;
-	
+
 // --------------
 // Argument specs
 //
@@ -241,17 +241,17 @@ ARG_ACTION
 {
 	StringBuffer theText = new StringBuffer();
 }
-	: '[' 
+	: '['
          (
              ('\\')=>'\\'
                  (
-                     (']')=>']' 
+                     (']')=>']'
                        {
-                           // We do not include the \ character itself when picking up an escaped ] 
+                           // We do not include the \ character itself when picking up an escaped ]
                            //
-                           theText.append(']'); 
+                           theText.append(']');
                        }
-                   | c=.   
+                   | c=.
                        {
                            // We DO include the \ character when finding any other escape
                            //
@@ -266,14 +266,14 @@ ARG_ACTION
                     //
                     theText.append($as.text);
                 }
-           
+
            | ('\'')=>ac=ACTION_CHAR_LITERAL
                 {
                     // Append the embedded chracter literal text
                     //
                     theText.append($ac.text);
-                } 
-                
+                }
+
            | c=~']'
                 {
                     // Whatever else we found in the scan
@@ -281,7 +281,7 @@ ARG_ACTION
                     theText.append((char)$c);
                 }
 	     )*
-	     
+
        ']'
        {
            // Set the token text to our gathered string
@@ -289,7 +289,7 @@ ARG_ACTION
            setText(theText.toString());
        }
 	;
-	
+
 // -------
 // Actions
 //
@@ -297,24 +297,12 @@ ARG_ACTION
 // within what we have assumed to be literals in the action code, the
 // job of the lexer is merely to gather the code within the action
 // (delimited by {}) and pass it to the parser as a single token.
-// Note the special case of the {{ }} action, which is a forced
-// action, that the generated code will execute regardless of
-// backtracking (predicate) level.
 // We know that this token will be asked for its text somewhere
 // in the upcoming parse, so setting the text here to exclude
 // the delimiting {} is no additional overhead.
 //
 ACTION
 	:	NESTED_ACTION ('?' {$type = SEMPRED;} )?
-		{
-            // Note that because of the sempred detection above, we
-            // will not see {{ action }}? as a forced action, but as a semantic
-            // predicate.
-            if ( $text.startsWith("{{") && $text.endsWith("}}") ) {            
-                // Switch types to a forced action
-                $type = FORCED_ACTION;
-            }          
-		}
 	;
 
 // ----------------
@@ -335,7 +323,7 @@ NESTED_ACTION
 	// Record the start line and offsets as if we need to report an
 	// unterminated block, then we want to show the start of the comment
 	// we think is broken, not the end, where people will have to try and work
-	// it out themselves. 
+	// it out themselves.
 	//
 	int startLine = getLine();
 	int offset    = getCharPositionInLine();
@@ -346,7 +334,7 @@ NESTED_ACTION
 	  '{'
       (
 	    // And now we can match one of a number of embedded
-	    // elements within the action until we find a 
+	    // elements within the action until we find a
 	    // } that balances the opening {. If we do not find
 	    // the balanced } then we will hit EOF and can issue
 	    // an error message about the brace that we belive to
@@ -355,41 +343,41 @@ NESTED_ACTION
 	    // opening brace that we feel is in error and this will
 	    // guide the user to the correction as best we can.
 	    //
-         
-         
+
+
           // An embedded {} block
 	      //
 	      NESTED_ACTION
-	
+
         | // What appears to be a literal
           //
           ACTION_CHAR_LITERAL
-          
+
         | // We have assumed that the target language has C/Java
           // type comments.
           //
           COMMENT
-          
+
         | // What appears to be a literal
           //
           ACTION_STRING_LITERAL
-	
+
 	    | // What appears to be an escape sequence
-	      // 
+	      //
 	      ACTION_ESC
-	
+
 	    | // Some other single character that is not
 	      // handled above
 	      //
 	      ~('\\'|'"'|'\''|'/'|'{'|'}')
-	      
+
       )*
-     
+
 	(
 	    // Correctly balanced closing brace
 	    //
 	    '}'
-	    
+
 	  | // Looks like have an imblanced {} block, report
 	    // with respect to the opening brace.
 	    //
@@ -399,8 +387,8 @@ NESTED_ACTION
 	    }
 	)
    ;
-	
-    
+
+
 // Keywords
 // --------
 // keywords used to specify ANTLR v3 grammars. Keywords may not be used as
@@ -483,15 +471,15 @@ TOKEN_REF
 RULE_REF
     : ('a'..'z') ('A'..'Z' | 'a'..'z' | '0'..'9' | '_')*
     ;
-    
-	 	
+
+
 // ----------------------------
 // Literals embedded in actions
 //
 // Note that we have made the assumption that the language used within
 // actions uses the fairly standard " and ' delimiters for literals and
 // that within these literals, characters are escaped using the \ character.
-// There are some languages which do not conform to this in all cases, such 
+// There are some languages which do not conform to this in all cases, such
 // as by using /string/ and so on. We will have to deal with such cases if
 // if they come up in targets.
 //
@@ -535,7 +523,7 @@ ACTION_ESC
 INT : ('0'..'9')+
     ;
 
-// -----------    
+// -----------
 // Source spec
 //
 // A fragment rule for picking up information about an origrinating
@@ -547,8 +535,8 @@ fragment
 SRC : 'src' WSCHARS+ file=ACTION_STRING_LITERAL WSCHARS+ line=INT
       {
          // TODO: Add target specific code to change the source file name and current line number
-         //     
-      } 
+         //
+      }
     ;
 
 // --------------
@@ -575,17 +563,17 @@ HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
 //
 fragment
 ESC_SEQ
-    : '\\' 
+    : '\\'
         (
               // The standard escaped character set such as tab, newline,
               // etc.
               //
     		  'b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\'
-    		  
+
     	    | // A Java style Unicode escape sequence
     	      //
     	      UNICODE_ESC
-    	      
+
     	    | // An illegal escape seqeunce
     	      //
     	      {
@@ -606,43 +594,43 @@ UNICODE_ESC
 	int	hCount = 0;
 }
     :   'u' // Leadin for unicode escape sequence
-    
+
         // We now require 4 hex digits. Note though
         // that we accept any number of characters
         // and issue an error if we do not get 4. We cannot
         // use an inifinite count such as + because this
         // might consume too many, so we lay out the lexical
         // options and issue an error at the invalid paths.
-        // 
+        //
     	(
-    	   ( 
+    	   (
     	      HEX_DIGIT  { hCount++; }
     	        (
     	             HEX_DIGIT  { hCount++; }
     		         (
     		              HEX_DIGIT  { hCount++; }
-    		              (   
+    		              (
     		                  // Four valid hex digits, we are good
     		                  //
     		                  HEX_DIGIT { hCount++; }
-    		                  
+
     		                | // Three valid digits
     		              )
-    		              
+
     		            | // Two valid digits
     		          )
-    		          
+
     		        | // One valid digit
     		    )
             )
           | // No valid hex digits at all
     	)
-    	
+
     	// Now check the digit count and issue an error if we need to
     	//
     	{
     		if	(hCount != 4) {
-    		
+
     			// TODO: Issue error message
     		}
     	}
@@ -655,31 +643,31 @@ UNICODE_ESC
 // to the parser and are used to make the grammar easier to read
 // for humans.
 //
-WS  
-    : ( 
+WS
+    : (
     	  ' '
         | '\t'
         | '\r'
         | '\n'
         | '\f'
-      )+ 
+      )+
       {
-      
+
 	$channel=2;
       }
     ;
 
-// A fragment rule for use in recognizing end of line in 
+// A fragment rule for use in recognizing end of line in
 // rules like COMMENT.
-// 
+//
 fragment
 NLCHARS
     : '\n' | '\r'
     ;
-  
+
 // A fragment rule for recognizing traditional whitespace
 // characters within lexer rules.
-//  
+//
 fragment
 WSCHARS
     : ' ' | '\t' | '\f'
@@ -688,13 +676,13 @@ WSCHARS
 // A fragment rule for recognizing both traditional whitespace and
 // end of line markers, when we don't care to distinguish but don't
 // want any action code going on.
-// 
+//
 fragment
 WSNLCHARS
     : ' ' | '\t' | '\f' | '\n' | '\r'
     ;
-      
-// -----------------  
+
+// -----------------
 // Illegal Character
 //
 // This is an illegal character trap which is always the last rule in the
@@ -702,7 +690,7 @@ WSNLCHARS
 // the last rule in the file will match when no other rule knows what to do
 // about the character. It is reported as an error but is not passed on to the
 // parser. This means that the parser to deal with the gramamr file anyway
-// but we will not try to analyse or code generate from a file with lexical 
+// but we will not try to analyse or code generate from a file with lexical
 // errors.
 //
 ERRCHAR

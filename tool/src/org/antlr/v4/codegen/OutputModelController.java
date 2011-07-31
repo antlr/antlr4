@@ -179,15 +179,13 @@ public class OutputModelController {
 				}
 				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
 			}
-			else if ( a.getType()== ANTLRParser.ACTION ||
-					  a.getType()==ANTLRParser.FORCED_ACTION )
-			{
+			else if ( a.getType()== ANTLRParser.ACTION ) {
 				RuleActionFunction raf = lexer.sempredFuncs.get(r);
 				if ( raf==null ) {
 					raf = new RuleActionFunction(delegate, r, ctxType);
 					lexer.actionFuncs.put(r, raf);
 				}
-				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+				raf.actions.put(g.lexerActions.get(a), new ForcedAction(delegate, a));
 			}
 
 			if ( a instanceof PredAST ) {
@@ -196,13 +194,11 @@ public class OutputModelController {
 				lexer.sempredFuncs.put(r, rsf);
 				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
 			}
-			else if ( a.getType()==ANTLRParser.ACTION ||
-					  a.getType()==ANTLRParser.FORCED_ACTION )
-			{
+			else if ( a.getType()==ANTLRParser.ACTION ) {
 				// lexer sees {{...}} and {..} as same; neither are done until accept
 				RuleActionFunction raf = new RuleActionFunction(delegate, r, ctxType);
 				lexer.actionFuncs.put(r, raf);
-				raf.actions.put(g.actions.get(a), new ForcedAction(delegate, a));
+				raf.actions.put(g.lexerActions.get(a), new ForcedAction(delegate, a));
 			}
 		}
 	}
@@ -309,12 +305,6 @@ public class OutputModelController {
 	public List<SrcOp> action(GrammarAST ast) {
 		List<SrcOp> ops = delegate.action(ast);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.action(ops);
-		return ops;
-	}
-
-	public List<SrcOp> forcedAction(GrammarAST ast) {
-		List<SrcOp> ops = delegate.forcedAction(ast);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.forcedAction(ops);
 		return ops;
 	}
 

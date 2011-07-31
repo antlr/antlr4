@@ -107,7 +107,6 @@ element returns [List<? extends SrcOp> omos]
 	|	atom[null,null,false]			{$omos = $atom.omos;}
 	|	subrule							{$omos = $subrule.omos;}
 	|   ACTION							{$omos = controller.action($ACTION);}
-	|   FORCED_ACTION					{$omos = controller.forcedAction($FORCED_ACTION);}
 	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
 	|	treeSpec
 	;

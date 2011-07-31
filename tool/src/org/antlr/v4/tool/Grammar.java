@@ -134,12 +134,10 @@ public class Grammar implements AttributeResolver {
      */
 	public Map<String,ActionAST> namedActions = new HashMap<String,ActionAST>();
 
-	/** Tracks all forced actions in all alternatives of all rules.
-	 *  This is includes rule arguments.
-	 *  Or if lexer all actions period. Doesn't track sempreds.
-	 *  maps tree node to action index.
+	/** Tracks all lexer actions in all alternatives of all rules.
+	 *  Doesn't track sempreds.  maps tree node to action index.
  	 */
-	public LinkedHashMap<ActionAST, Integer> actions = new LinkedHashMap<ActionAST, Integer>();
+	public LinkedHashMap<ActionAST, Integer> lexerActions = new LinkedHashMap<ActionAST, Integer>();
 
 	/** All sempreds found in grammar; maps tree node to sempred index;
 	 *  sempred index is 0..n-1

@@ -191,11 +191,6 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		RuleTransition call = new RuleTransition(r.index, start, right);
-		ActionAST arg = (ActionAST)node.getFirstChildWithType(ANTLRParser.ARG_ACTION);
-		if ( arg!=null ) {
-			call.argIndex = g.actions.get(arg);
-		}
-
 		left.addTransition(call);
 
 		node.atnState = left;
@@ -244,10 +239,6 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(action);
 		ActionTransition a = new ActionTransition(right);
 		a.ruleIndex = currentRule.index;
-		if ( action.getType()==ANTLRParser.FORCED_ACTION ) {
-			a.actionIndex = g.actions.get(action);
-			a.isCtxDependent = UseDefAnalyzer.actionIsContextDependent(action);
-		}
 		left.transition = a;
 		action.atnState = left;
 		return new Handle(left, right);

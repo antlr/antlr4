@@ -26,7 +26,7 @@
 
 /** The definitive ANTLR v3 tree grammar to parse ANTLR v4 grammars.
  *  Parses trees created in ANTLRParser.g.
- 
+
  OBSOLETE; See tree visitor grammar.
  */
 tree grammar ASTVerifier;
@@ -260,7 +260,6 @@ element
 	|	atom
 	|	subrule
 	|   ACTION
-    |   FORCED_ACTION
 	|   SEMPRED
 	|	GATED_SEMPRED
 	|	treeSpec
@@ -315,7 +314,7 @@ atom:	range
 blockSet
 	:	^(SET setElement+)
 	;
-	
+
 setElement
 	:	STRING_LITERAL
 	|	TOKEN_REF

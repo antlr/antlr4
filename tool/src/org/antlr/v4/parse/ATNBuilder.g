@@ -94,7 +94,6 @@ element returns [ATNFactory.Handle p]
 	|	atom						{$p = $atom.p;}
 	|	subrule						{$p = $subrule.p;}
 	|   ACTION						{$p = factory.action((ActionAST)$ACTION);}
-	|   FORCED_ACTION				{$p = factory.action((ActionAST)$FORCED_ACTION);}
 	|   SEMPRED						{$p = factory.sempred((PredAST)$SEMPRED);}
 	|	treeSpec					{$p = $treeSpec.p;}
 	|	^(ROOT a=astOperand)		{$p = $a.p;}

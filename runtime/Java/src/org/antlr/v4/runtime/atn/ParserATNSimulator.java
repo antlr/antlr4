@@ -513,7 +513,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		ActionTransition at = (ActionTransition)t;
 		if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
 		if ( debug && !config.traversedAction ) {
-			System.out.println("NONFORCED; pruning future pred eval derived from s"+
+			System.out.println("pruning future pred eval derived from s"+
 							   config.state.stateNumber);
 		}
 

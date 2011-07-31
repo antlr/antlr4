@@ -53,10 +53,9 @@ public abstract class Transition {
 	public static final int PREDICATE		= 4; // e.g., {isType(input.LT(1))}?
 	public static final int ATOM			= 5;
 	public static final int ACTION			= 6;
-	public static final int FORCED_ACTION	= 7;
-	public static final int SET				= 8; // ~(A|B) or ~atom, wildcard, which convert to next 2
-	public static final int NOT_SET			= 9;
-	public static final int WILDCARD		= 10;
+	public static final int SET				= 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
+	public static final int NOT_SET			= 8;
+	public static final int WILDCARD		= 9;
 
 
 	public static String[] serializationNames = {
@@ -67,7 +66,6 @@ public abstract class Transition {
 		"PREDICATE",
 		"ATOM",
 		"ACTION",
-		"FORCED_ACTION",
 		"SET",
 		"NOT_SET",
 		"WILDCARD",

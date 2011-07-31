@@ -76,8 +76,6 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> action(List<SrcOp> ops) { return ops; }
 
-	public List<SrcOp> forcedAction(List<SrcOp> ops) { return ops; }
-
 	public List<SrcOp> sempred(List<SrcOp> ops) { return ops; }
 
 	// AST OPS

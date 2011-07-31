@@ -139,13 +139,11 @@ public class ATNSerializer {
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
 						arg2 = ((RuleTransition)t).ruleIndex;
-						arg3 = ((RuleTransition)t).argIndex;
 						break;
 					case Transition.PREDICATE :
 						PredicateTransition pt = (PredicateTransition)t;
 						arg1 = pt.ruleIndex;
 						arg2 = pt.predIndex;
-//						if ( pt.isCtxDependent ) edgeType = Transition.DEPENDENT_PREDICATE;
 						arg3 = pt.isCtxDependent ? 1 : 0 ;
 						break;
 					case Transition.RANGE :
@@ -160,7 +158,6 @@ public class ATNSerializer {
 						arg1 = at.ruleIndex;
 						arg2 = at.actionIndex;
 						arg3 = at.isCtxDependent ? 1 : 0 ;
-//						if ( at.isCtxDependent ) edgeType = Transition.FORCED_DEPENDENT_ACTION;
 						break;
 					case Transition.SET :
 						arg1 = setIndex++;

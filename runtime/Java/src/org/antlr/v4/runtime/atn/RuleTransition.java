@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.atn;
 public class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */
 	public int ruleIndex;     // no Rule object at runtime
-	public int argIndex = -1; // args are forced actions
 
 	/** What node to begin computations following ref to rule */
     public ATNState followState;

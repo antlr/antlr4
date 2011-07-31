@@ -73,7 +73,7 @@ rec_rule returns [boolean isLeftRec]
       		( ^(LOCALS ARG_ACTION) )?
       		(	^(OPTIONS .*)
 		    |   ^(AT ID ACTION)
-		    )* 
+		    )*
 			ruleBlock {$isLeftRec = $ruleBlock.isLeftRec;}
 			exceptionGroup
 		)
@@ -90,7 +90,7 @@ exceptionHandler
 	;
 
 finallyClause
-	: ^(FINALLY ACTION)			
+	: ^(FINALLY ACTION)
 	;
 
 ruleModifier
@@ -117,7 +117,7 @@ ruleBlock returns [boolean isLeftRec]
 outerAlternative[GrammarAST rew] returns [boolean isLeftRec]
     :   (binaryMultipleOp)=> binaryMultipleOp
                              {binaryAlt($start, $rew, currentOuterAltNumber); $isLeftRec=true;}
-    |   (binary)=>           binary       
+    |   (binary)=>           binary
                              {binaryAlt($start, $rew, currentOuterAltNumber); $isLeftRec=true;}
     |   (ternary)=>          ternary
                              {ternaryAlt($start, $rew, currentOuterAltNumber); $isLeftRec=true;}
@@ -191,27 +191,26 @@ element
     |   RULE_REF
 	|	ebnf
 	|	tree_
-	|	FORCED_ACTION
 	|	ACTION
 	|	SEMPRED
-	|	EPSILON 
+	|	EPSILON
 	;
 
 setElement
-	:	STRING_LITERAL	
-	|	TOKEN_REF		
+	:	STRING_LITERAL
+	|	TOKEN_REF
 	;
 
 ebnf:   block
-    |   ^( OPTIONAL block ) 
-    |   ^( CLOSURE block )  
-    |   ^( POSITIVE_CLOSURE block ) 
+    |   ^( OPTIONAL block )
+    |   ^( CLOSURE block )
+    |   ^( POSITIVE_CLOSURE block )
     ;
 
 block
     :	^(BLOCK ACTION? alternative+)
     ;
-  
+
 alternative
 	:	^(ALT_REWRITE alternative rewrite)
 	|	^(ALT element+)
@@ -229,14 +228,14 @@ atom
 	|	TOKEN_REF
     |	^(WILDCARD elementOptions)
 	|	WILDCARD
-	|	^(DOT ID element) 
+	|	^(DOT ID element)
 	;
 
 ast_suffix
 	:	ROOT
 	|	BANG
 	;
-	
+
 rewrite
 	:	rewrite_result*
 	;

@@ -186,7 +186,7 @@ grammarSpec
 prequelConstructs
 	:	prequelConstruct*
 	;
-	
+
 prequelConstruct
 	:   optionsSpec
     |   delegateGrammars
@@ -257,7 +257,7 @@ currentOuterAltNumber=0;
       		loc=locals?
       		(	opts=optionsSpec
 		    |   a=ruleAction {actions.add($a.start);}
-		    )* 
+		    )*
       		{discoverRule((RuleAST)$RULE, $ID, mods, (ActionAST)$ARG_ACTION,
       					  $ret.start!=null?(ActionAST)$ret.start.getChild(0):null,
       					  $thr.start, $opts.start, actions, (GrammarAST)input.LT(1));}
@@ -281,7 +281,7 @@ finallyClause
 locals
 	:	^(LOCALS ARG_ACTION)
 	;
-	
+
 ruleReturns
 	: ^(RETURNS ARG_ACTION)
 	;
@@ -328,7 +328,7 @@ outerAlternative
 }
 	:	alternative
 	;
-	
+
 alternative
 	:	^(ALT_REWRITE alternative {inRewrite=true;} rewrite {inRewrite=false;})
 	|	^(ALT element+)
@@ -340,7 +340,6 @@ element
 	|	atom
 	|	subrule
 	|   ACTION				{actionInAlt((ActionAST)$ACTION);}
-    |   FORCED_ACTION		{actionInAlt((ActionAST)$FORCED_ACTION);}
 	|   SEMPRED				{sempredInAlt((PredAST)$SEMPRED);}
 	|	treeSpec
 	|	^(ROOT astOperand)	{rootOp($ROOT, $astOperand.start);}
@@ -394,7 +393,7 @@ atom:	range
 blockSet
 	:	^(SET setElement+)
 	;
-	
+
 setElement
 	:	STRING_LITERAL	{stringRef((TerminalAST)$STRING_LITERAL, null);}
 	|	TOKEN_REF		{tokenRef((TerminalAST)$TOKEN_REF, null);}
@@ -440,7 +439,7 @@ elementOption[TerminalAST t]
     ;
 
 rewrite
-	:	{discoverRewrites($start);} predicatedRewrite* nakedRewrite {finishRewrites($start);} 
+	:	{discoverRewrites($start);} predicatedRewrite* nakedRewrite {finishRewrites($start);}
 	;
 
 predicatedRewrite
@@ -490,7 +489,7 @@ rewriteTreeAtom
 rewriteElementOptions
     :	^(ELEMENT_OPTIONS rewriteElementOption[(TerminalAST)$start.getParent()]+)
     ;
-   
+
 rewriteElementOption[TerminalAST t]
     :	ID								{rewriteTerminalOption(t, $ID, null);}
     |   ^(ASSIGN id=ID v=ID)			{rewriteTerminalOption(t, $id, $v);}
@@ -500,7 +499,7 @@ rewriteElementOption[TerminalAST t]
 rewriteTreeEbnf
 	:	^(ebnfSuffix ^(REWRITE_BLOCK {rewriteEBNFLevel++;} rewriteTreeAlt {rewriteEBNFLevel--;}))
 	;
-	
+
 rewriteTree
 	:	^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )
 	;

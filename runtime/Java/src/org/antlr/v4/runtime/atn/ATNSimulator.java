@@ -143,7 +143,6 @@ public abstract class ATNSimulator {
 			case Transition.RANGE : return new RangeTransition(arg1, arg2, target);
 			case Transition.RULE :
 				RuleTransition rt = new RuleTransition(arg2, atn.states.get(arg1), target);
-				rt.argIndex = arg3;
 				return rt;
 			case Transition.PREDICATE :
 				PredicateTransition pt = new PredicateTransition(target, arg1, arg2);
@@ -154,7 +153,6 @@ public abstract class ATNSimulator {
 				ActionTransition a = new ActionTransition(target, arg1, arg2);
 				a.isCtxDependent = arg3==1;
 				return a;
-			case Transition.FORCED_ACTION : return new ActionTransition(target, arg1, arg2);
 			case Transition.SET : return new SetTransition(sets.get(arg1), target);
 			case Transition.NOT_SET : return new NotSetTransition(sets.get(arg1), null, target);
 			case Transition.WILDCARD : return new WildcardTransition(target);

@@ -29,7 +29,6 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -130,12 +129,10 @@ public class Rule implements AttributeResolver {
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {
 		actions.add(actionAST);
 		alt[currentAlt].actions.add(actionAST);
-		if ( g.isLexer() || actionAST.getType()==ANTLRParser.FORCED_ACTION ||
-		     actionAST.getType()==ANTLRParser.ARG_ACTION )
-		{
-			actionIndex = g.actions.size();
-			if ( g.actions.get(actionAST)==null ) {
-				g.actions.put(actionAST, actionIndex);
+		if ( g.isLexer() ) {
+			actionIndex = g.lexerActions.size();
+			if ( g.lexerActions.get(actionAST)==null ) {
+				g.lexerActions.put(actionAST, actionIndex);
 			}
 		}
 	}

@@ -582,7 +582,6 @@ element
 		)
 	|	ebnf
 	|   ACTION<ActionAST>
-	|   FORCED_ACTION<ActionAST>
 	|   SEMPRED -> SEMPRED<PredAST>
 	|   treeSpec
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT<AltAST> treeSpec ) ) )
