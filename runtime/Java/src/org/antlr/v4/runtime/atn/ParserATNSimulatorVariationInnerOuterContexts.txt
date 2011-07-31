@@ -511,7 +511,7 @@ public class ParserATNSimulatorVariationInnerOuterContexts extends ATNSimulator 
 			RuleContext newContext;
 			if ( parser != null ) {
 				System.out.println("rule trans to rule "+parser.getRuleNames()[t.target.ruleIndex]);
-				newContext = parser.newContext(config.context, t.target.stateNumber, t.target.ruleIndex, -999);
+				newContext = parser.newContext(null, config.context, t.target.stateNumber, t.target.ruleIndex, -999);
 				newContext.invokingState = p.stateNumber;
 				System.out.println("new ctx type is "+newContext.getClass().getSimpleName());
 			}
