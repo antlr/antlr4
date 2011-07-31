@@ -46,6 +46,6 @@ public class SerializedATN extends OutputModelObject {
 			String encoded = factory.getGenerator().target.encodeIntAsCharEscape(c);
 			serialized.add(encoded);
 		}
-		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));
+//		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));
 	}
 }
