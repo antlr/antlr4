@@ -42,7 +42,8 @@ public class ATNState {
 	public static final int RULE_STOP = 7;
 	public static final int BLOCK_END = 8;
 	public static final int STAR_LOOP_BACK = 9;
-	public static final int PLUS_LOOP_BACK = 10;
+	public static final int STAR_LOOP_ENTRY = 10;
+	public static final int PLUS_LOOP_BACK = 11;
 
 	public static String[] serializationNames = {
 		"INVALID",
@@ -55,6 +56,7 @@ public class ATNState {
 		"RULE_STOP",
 		"BLOCK_END",
 		"STAR_LOOP_BACK",
+		"STAR_LOOP_ENTRY",
 		"PLUS_LOOP_BACK",
 	};
 
@@ -70,6 +72,7 @@ public class ATNState {
 			put(BlockEndState.class, BLOCK_END);
 			put(PlusLoopbackState.class, PLUS_LOOP_BACK);
 			put(StarLoopbackState.class, STAR_LOOP_BACK);
+			put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
 		}};
 
 	public static final int INVALID_STATE_NUMBER = -1;
@@ -112,12 +115,14 @@ public class ATNState {
 	}
 
 	public void addTransition(Transition e) {
-		if ( transition!=null ) throw new IllegalArgumentException("only one transition");
+		if ( transition!=null ) throw new IllegalArgumentException("only one transition in state type "+
+																   getClass().getSimpleName());
 		transition = e;
 	}
 
 	public Transition transition(int i) {
-		if ( i>0 ) throw new IllegalArgumentException("only one transition");
+		if ( i>0 ) throw new IllegalArgumentException("only one transition"+
+													  getClass().getSimpleName());
 		return transition;
 	}
 
@@ -126,7 +131,8 @@ public class ATNState {
 	}
 
 	public void setTransition(int i, Transition e) {
-		if ( i>0 ) throw new IllegalArgumentException("only one transition");
+		if ( i>0 ) throw new IllegalArgumentException("only one transition"+
+													  getClass().getSimpleName());
 		transition = e;
 	}
 

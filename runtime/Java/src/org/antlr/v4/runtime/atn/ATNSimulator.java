@@ -110,6 +110,10 @@ public abstract class ATNSimulator {
 			int arg2 = toInt(data[p+4]);
 			int arg3 = toInt(data[p+5]);
 			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
+//			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
+//							   src+"->"+trg+
+//					   " "+Transition.serializationNames[ttype]+
+//					   " "+arg1+","+arg2+","+arg3);
 			ATNState srcState = atn.states.get(src);
 			srcState.addTransition(trans);
 			p += 6;
@@ -121,7 +125,6 @@ public abstract class ATNSimulator {
 			atn.decisionToState.add((DecisionState) decState);
 			decState.decision = i-1;
 		}
-//		System.out.println(atn.getDecoded());
 		return atn;
 	}
 
@@ -171,6 +174,7 @@ public abstract class ATNSimulator {
 			case ATNState.RULE_STOP : s = new RuleStopState(); break;
 			case ATNState.BLOCK_END : s = new BlockEndState(); break;
 			case ATNState.STAR_LOOP_BACK : s = new StarLoopbackState(); break;
+			case ATNState.STAR_LOOP_ENTRY : s = new StarLoopEntryState(); break;
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 		}
 		s.stateNumber = stateNumber;

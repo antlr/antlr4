@@ -37,7 +37,7 @@ public class DecisionState extends ATNState {
 	/** Track the transitions emanating from this ATN state. */
 	public List<Transition> transitions = new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 
-	public int decision;
+	public int decision = -1;
 
 	@Override
 	public int getNumberOfTransitions() { return transitions.size(); }

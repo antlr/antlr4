@@ -1,9 +1,7 @@
 package org.antlr.v4.test;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.automata.*;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 import org.junit.Test;
 
@@ -291,7 +289,7 @@ public class TestATNConstruction extends BaseTest {
 			"s2-A->s3\n" +
 			"s3->BlockEnd_5\n" +
 			"BlockEnd_5->PlusLoopBack_6\n" +
-			"PlusLoopBack_6->s2\n" +
+			"PlusLoopBack_6->PlusBlockStart_4\n" +
 			"PlusLoopBack_6->s7\n" +
 			"s7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
@@ -301,17 +299,22 @@ public class TestATNConstruction extends BaseTest {
 	@Test public void testAorBplus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
-			"a : (A|B)+;");
+			"a : (A|B{;})+;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_4\n" +
-			"PlusBlockStart_4->s2\n" +
-			"s2-{A..B}->s3\n" +
-			"s3->BlockEnd_5\n" +
-			"BlockEnd_5->PlusLoopBack_6\n" +
-			"PlusLoopBack_6->s2\n" +
-			"PlusLoopBack_6->s7\n" +
-			"s7->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s8\n";
+			"RuleStart_a_0->PlusBlockStart_8\n" +
+			"PlusBlockStart_8->s2\n" +
+			"PlusBlockStart_8->s4\n" +
+			"s2-A->s3\n" +
+			"s4-B->s5\n" +
+			"s3->BlockEnd_9\n" +
+			"s5->s6\n" +
+			"BlockEnd_9->PlusLoopBack_10\n" +
+			"s6-action_0:-1->s7\n" +
+			"PlusLoopBack_10->PlusBlockStart_8\n" +
+			"PlusLoopBack_10->s11\n" +
+			"s7->BlockEnd_9\n" +
+			"s11->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s12\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -331,9 +334,7 @@ public class TestATNConstruction extends BaseTest {
 			"s5->BlockEnd_9\n" +
 			"s7->BlockEnd_9\n" +
 			"BlockEnd_9->PlusLoopBack_10\n" +
-			"PlusLoopBack_10->s2\n" +
-			"PlusLoopBack_10->s4\n" +
-			"PlusLoopBack_10->s6\n" +
+			"PlusLoopBack_10->PlusBlockStart_8\n" +
 			"PlusLoopBack_10->s11\n" +
 			"s11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
@@ -345,15 +346,16 @@ public class TestATNConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : A*;");
 		String expecting =
-			"RuleStart_a_0->StarBlockStart_4\n" +
+			"RuleStart_a_0->StarLoopEntry_6\n" +
+			"StarLoopEntry_6->StarBlockStart_4\n" +
+			"StarLoopEntry_6->s7\n" +
 			"StarBlockStart_4->s2\n" +
-			"StarBlockStart_4->s7\n" +
-			"s2-A->s3\n" +
 			"s7->RuleStop_a_1\n" +
+			"s2-A->s3\n" +
+			"RuleStop_a_1-EOF->s9\n" +
 			"s3->BlockEnd_5\n" +
-			"RuleStop_a_1-EOF->s8\n" +
-			"BlockEnd_5->StarLoopBack_6\n" +
-			"StarLoopBack_6->StarBlockStart_4\n";
+			"BlockEnd_5->StarLoopBack_8\n" +
+			"StarLoopBack_8->StarLoopEntry_6\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -362,22 +364,24 @@ public class TestATNConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : (',' ID*)*;");
 		String expecting =
-			"RuleStart_a_0->StarBlockStart_10\n" +
-			"StarBlockStart_10->s2\n" +
-			"StarBlockStart_10->s13\n" +
+			"RuleStart_a_0->StarLoopEntry_13\n" +
+			"StarLoopEntry_13->StarBlockStart_11\n" +
+			"StarLoopEntry_13->s14\n" +
+			"StarBlockStart_11->s2\n" +
+			"s14->RuleStop_a_1\n" +
 			"s2-','->s3\n" +
-			"s13->RuleStop_a_1\n" +
-			"s3->StarBlockStart_6\n" +
-			"RuleStop_a_1-EOF->s14\n" +
+			"RuleStop_a_1-EOF->s16\n" +
+			"s3->StarLoopEntry_8\n" +
+			"StarLoopEntry_8->StarBlockStart_6\n" +
+			"StarLoopEntry_8->s9\n" +
 			"StarBlockStart_6->s4\n" +
-			"StarBlockStart_6->s9\n" +
+			"s9->BlockEnd_12\n" +
 			"s4-ID->s5\n" +
-			"s9->BlockEnd_11\n" +
+			"BlockEnd_12->StarLoopBack_15\n" +
 			"s5->BlockEnd_7\n" +
-			"BlockEnd_11->StarLoopBack_12\n" +
-			"BlockEnd_7->StarLoopBack_8\n" +
-			"StarLoopBack_12->StarBlockStart_10\n" +
-			"StarLoopBack_8->StarBlockStart_6\n";
+			"StarLoopBack_15->StarLoopEntry_13\n" +
+			"BlockEnd_7->StarLoopBack_10\n" +
+			"StarLoopBack_10->StarLoopEntry_8\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -386,19 +390,20 @@ public class TestATNConstruction extends BaseTest {
 			"parser grammar P;\n"+
 			"a : (A | B{;})* ;");
 		String expecting =
-			"RuleStart_a_0->StarBlockStart_8\n" +
+			"RuleStart_a_0->StarLoopEntry_10\n" +
+			"StarLoopEntry_10->StarBlockStart_8\n" +
+			"StarLoopEntry_10->s11\n" +
 			"StarBlockStart_8->s2\n" +
 			"StarBlockStart_8->s4\n" +
-			"StarBlockStart_8->s11\n" +
+			"s11->RuleStop_a_1\n" +
 			"s2-A->s3\n" +
 			"s4-B->s5\n" +
-			"s11->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s13\n" +
 			"s3->BlockEnd_9\n" +
 			"s5->s6\n" +
-			"RuleStop_a_1-EOF->s12\n" +
-			"BlockEnd_9->StarLoopBack_10\n" +
+			"BlockEnd_9->StarLoopBack_12\n" +
 			"s6-action_0:-1->s7\n" +
-			"StarLoopBack_10->StarBlockStart_8\n" +
+			"StarLoopBack_12->StarLoopEntry_10\n" +
 			"s7->BlockEnd_9\n";
 		checkRule(g, "a", expecting);
 	}
@@ -974,18 +979,6 @@ public class TestATNConstruction extends BaseTest {
 	}
 
 	void checkRule(Grammar g, String ruleName, String expecting) {
-		if ( g.ast!=null && !g.ast.hasErrors ) {
-			System.out.println(g.ast.toStringTree());
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
-				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.processNonCombinedGrammar(imp);
-				}
-			}
-		}
-
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 

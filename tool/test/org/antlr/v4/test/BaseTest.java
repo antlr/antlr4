@@ -108,7 +108,7 @@ public abstract class BaseTest {
 			sem.process();
 			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
 				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.processNonCombinedGrammar(imp);
+					antlr.processNonCombinedGrammar(imp, false);
 				}
 			}
 		}

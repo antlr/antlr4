@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.atn.StarBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.GrammarAST;
 
@@ -46,8 +46,9 @@ public class LL1StarBlock extends LL1Loop {
 	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 
-		StarBlockStartState blkStart = (StarBlockStartState)blkAST.atnState;
-		this.decision = blkStart.decision;
+//		StarBlockStartState blkStart = (StarBlockStartState)blkAST.atnState;
+		StarLoopEntryState star = (StarLoopEntryState)blkAST.atnState;
+		this.decision = star.decision;
 
 		/** Lookahead for each alt 1..n */
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);

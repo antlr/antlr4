@@ -126,7 +126,16 @@ treeSpec returns [SrcOp omo]
 subrule returns [List<? extends SrcOp> omos]
 	:	^(astBlockSuffix block[null,null,$astBlockSuffix.start]) {$omos = $block.omos;}
 	|	^(OPTIONAL block[null,$OPTIONAL,null])	{$omos = $block.omos;}
-	|	^(CLOSURE block[null,$CLOSURE,null])	{$omos = $block.omos;}
+	|	^(CLOSURE block[null,null,null])
+		{
+		List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();
+		SrcOp blk = $block.omos.get(0);
+		CodeBlockForAlt alt = new CodeBlockForAlt(controller.delegate);
+		alt.addOp(blk);
+		alts.add(alt);
+		SrcOp loop = controller.getEBNFBlock($CLOSURE, alts); // "star it"
+   	    $omos = DefaultOutputModelFactory.list(loop);
+		}
 	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE,null])
 										    	{$omos = $block.omos;}
 	| 	block[null, null,null]					{$omos = $block.omos;}

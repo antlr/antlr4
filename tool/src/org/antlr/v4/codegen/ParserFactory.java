@@ -175,7 +175,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			decision = ((PlusBlockStartState)ebnfRoot.atnState).loopBackState.decision;
 		}
 		else if ( ebnfRoot.getType()==ANTLRParser.CLOSURE ) {
-			decision = ((BlockStartState)ebnfRoot.atnState).decision;
+			decision = ((StarLoopEntryState)ebnfRoot.atnState).decision;
 		}
 		else {
 			decision = ((DecisionState)ebnfRoot.atnState).decision;

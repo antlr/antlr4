@@ -45,7 +45,7 @@ public class TestCompositeGrammars extends BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		Tool antlr = new Tool();
 		antlr.addListener(equeue);
-		antlr.process(g);
+		antlr.process(g,true);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}

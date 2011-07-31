@@ -210,7 +210,7 @@ public class Tool {
 
 			final Grammar g = createGrammar(ast);
 			g.fileName = fileName;
-			process(g);
+			process(g, true);
 		}
 	}
 
@@ -220,7 +220,7 @@ public class Tool {
 		we have to extract the implicit lexer. Once all this is done, we
 		process the lexer first, if present, and then the parser grammar
 	 */
-	public void process(Grammar g) {
+	public void process(Grammar g, boolean gencode) {
 		g.loadImportedGrammars();
 
 		GrammarTransformPipeline.integrateImportedGrammars(g);
@@ -239,7 +239,7 @@ public class Tool {
 				lexerg.fileName = g.fileName;
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
-				processNonCombinedGrammar(lexerg);
+				processNonCombinedGrammar(lexerg, gencode);
 				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
 				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
 			}
@@ -247,10 +247,10 @@ public class Tool {
 		if ( g.implicitLexer!=null ) g.importVocab(g.implicitLexer);
 		System.out.println("tokens="+g.tokenNameToTypeMap);
 		System.out.println("strings="+g.stringLiteralToTypeMap);
-		processNonCombinedGrammar(g);
+		processNonCombinedGrammar(g, gencode);
 	}
 
-	public void processNonCombinedGrammar(Grammar g) {
+	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
 		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 		//g.ast.inspect();
 
@@ -277,8 +277,10 @@ public class Tool {
 		if ( g.tool.getNumErrors()>0 ) return;
 
 		// GENERATE CODE
-		CodeGenPipeline gen = new CodeGenPipeline(g);
-		gen.process();
+		if ( gencode ) {
+			CodeGenPipeline gen = new CodeGenPipeline(g);
+			gen.process();
+		}
 	}
 
 	/** Given the raw AST of a grammar, create a grammar object

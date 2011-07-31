@@ -117,6 +117,7 @@ public class ATNPrinter {
 		else if ( s instanceof RuleStopState ) stateStr = "RuleStop_"+g.getRule(s.ruleIndex).name+"_"+n;
 		else if ( s instanceof PlusLoopbackState) stateStr = "PlusLoopBack_"+n;
 		else if ( s instanceof StarLoopbackState) stateStr = "StarLoopBack_"+n;
+		else if ( s instanceof StarLoopEntryState) stateStr = "StarLoopEntry_"+n;
 		return stateStr;
 	}
 }

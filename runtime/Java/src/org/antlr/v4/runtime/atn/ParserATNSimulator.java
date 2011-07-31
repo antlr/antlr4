@@ -275,6 +275,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					if ( parser !=null ) rname = parser.getRuleNames()[loc.ruleIndex];
 					System.out.println("AMBIG in "+rname+" for alt "+ambigAlts+" upon "+
 									   input.toString(startIndex, input.index()));
+					System.out.println("REACH="+reach);
 				}
 				dfa.conflict = true; // at least one DFA state is ambiguous
 				if ( !userWantsCtxSensitive ) reportConflict(startIndex, input.index(), ambigAlts, reach);
@@ -642,11 +643,10 @@ public class ParserATNSimulator extends ATNSimulator {
 					if ( sameCtx ) {
 						if ( debug ) {
 							System.out.println("we reach state "+c.state.stateNumber+
-											   " in rule "+
-											   (parser !=null ? parser.getRuleNames()[c.state.ruleIndex]:"n/a")+
-											   " alts "+goal.alt+","+c.alt+" from ctx "+goal.context.toString((BaseRecognizer) parser)
-											   +" and "+
-											   c.context.toString((BaseRecognizer) parser));
+							   " in rule "+
+							   (parser !=null ? parser.getRuleNames()[c.state.ruleIndex]:"n/a")+
+							   " alts "+goal.alt+","+c.alt+" from ctx "+goal.context.toString(parser)
+							   +" and "+ c.context.toString(parser));
 						}
 						if ( ambigAlts==null ) ambigAlts = new HashSet<Integer>();
 						ambigAlts.add(goal.alt);

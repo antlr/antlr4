@@ -196,7 +196,7 @@ public class Grammar implements AttributeResolver {
 		});
 		initTokenSymbolTables();
 
-		tool.process(this);
+		tool.process(this, false);
     }
 
 	protected void initTokenSymbolTables() {

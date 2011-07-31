@@ -29,9 +29,8 @@
 
 package org.antlr.v4.runtime.atn;
 
-/** Decision state for A+ and (A|B)+. The first
- *  transition points at the start of the first alternative.
- *  The last transition is the exit transition.
+/** Decision state for A+ and (A|B)+.  It has two transitions:
+ *  one to the loop back to start of the block and one to exit.
  */
 public class PlusLoopbackState extends DecisionState {
 	@Override

@@ -411,7 +411,7 @@ public class DOTGenerator {
 	protected String getStateLabel(ATNState s) {
 		if ( s==null ) return "null";
 		String stateLabel = String.valueOf(s.stateNumber);
-		if ( s instanceof DecisionState ) {
+		if ( s instanceof DecisionState && ((DecisionState)s).decision>=0 ) {
 			stateLabel = stateLabel+"\\nd="+((DecisionState)s).decision;
 		}
 		return stateLabel;

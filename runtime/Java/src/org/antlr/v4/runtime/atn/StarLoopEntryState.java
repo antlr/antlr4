@@ -27,26 +27,9 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.atn.StarLoopEntryState;
-import org.antlr.v4.tool.GrammarAST;
-
-import java.util.List;
-
-public class StarBlock extends Loop {
-	public String loopLabel;
-
-	public StarBlock(OutputModelFactory factory,
-					 GrammarAST blkOrEbnfRootAST,
-					 List<CodeBlockForAlt> alts)
-	{
-		super(factory, blkOrEbnfRootAST, alts);
-		loopLabel = factory.getGenerator().target.getLoopLabel(blkOrEbnfRootAST);
-//		BlockStartState star = (BlockStartState)blkOrEbnfRootAST.atnState;
-		StarLoopEntryState star = (StarLoopEntryState)blkOrEbnfRootAST.atnState;
-		decision = star.decision;
-		exitAlt = alts.size()+1;
-	}
+public class StarLoopEntryState extends DecisionState {
+	@Override
+	public boolean onlyHasEpsilonTransitions() { return true; }
 }

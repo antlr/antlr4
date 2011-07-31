@@ -11,7 +11,7 @@ class TestJava {
 	public static long lexerTime = 0;
 	public static boolean profile = false;
 	public static JavaLexer lexer;
-	public static JavaParser parser = null;
+//	public static JavaParser parser = null;
 
 	public static void main(String[] args) {
 		try {
@@ -98,13 +98,13 @@ class TestJava {
 
 			if ( true ) {
 				// Create a parser that reads from the scanner
-				if ( parser==null ) {
-					parser = new JavaParser(tokens);
-//					parser.getInterpreter().setContextSensitive(true);
-				}
-				parser.setTokenStream(tokens);
+//				if ( parser==null ) {
+//					//parser = new JavaParser(tokens);
+////					parser.getInterpreter().setContextSensitive(true);
+//				}
+				//parser.setTokenStream(tokens);
 				// start parsing at the compilationUnit rule
-				parser.compilationUnit();
+			//	parser.compilationUnit();
 				//System.err.println("finished "+f);
 			}
 		}

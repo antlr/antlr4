@@ -282,19 +282,23 @@ public class ParserATNFactory implements ATNFactory {
 				return h;
 			}
 			BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
+			if ( alts.size()>1 ) atn.defineDecisionState(start);
 			return makeBlock(start, blkAST, alts);
 		}
 		switch ( ebnfRoot.getType() ) {
 			case ANTLRParser.OPTIONAL :
 				BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
+				atn.defineDecisionState(start);
 				Handle h = makeBlock(start, blkAST, alts);
 				return optional(ebnfRoot, h);
 			case ANTLRParser.CLOSURE :
 				BlockStartState star = (StarBlockStartState)newState(StarBlockStartState.class, ebnfRoot);
+				if ( alts.size()>1 ) atn.defineDecisionState(star);
 				h = makeBlock(star, blkAST, alts);
 				return star(ebnfRoot, h);
 			case ANTLRParser.POSITIVE_CLOSURE :
 				PlusBlockStartState plus = (PlusBlockStartState)newState(PlusBlockStartState.class, ebnfRoot);
+				if ( alts.size()>1 ) atn.defineDecisionState(plus);
 				h = makeBlock(plus, blkAST, alts);
 				return plus(ebnfRoot, h);
 		}
@@ -308,7 +312,7 @@ public class ParserATNFactory implements ATNFactory {
 			epsilon(start, alt.left);
 			epsilon(alt.right, end);
 		}
-		atn.defineDecisionState(start);
+//		if ( alts.size()>1 ) atn.defineDecisionState(start);
 		Handle h = new Handle(start, end);
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(blkAST.toStringTree()+":\n"+ser);
@@ -355,69 +359,58 @@ public class ParserATNFactory implements ATNFactory {
 
 	/** From (blk)+ build
 	 *
-	 *     |---------|
-	 *     v         |
-	 *  o->o-A-o->o->o->o     loop back points at start of all alts
-	 *  |         ^
-	 *  |->o-B-o--|
+	 *   |---------|
+	 *   v         |
+	 *  [o-blk-o]->o->o
 	 *
-	 *  Meaning that the last ATNState in A blk points to loop back node,
-	 *  which points back to block start.  We add start/end nodes to
-	 *  outside.
+	 *  We add a decision for loop back node to the existing one at
+	 *  blk start.
 	 */
 	public Handle plus(GrammarAST plusAST, Handle blk) {
-		PlusBlockStartState start = (PlusBlockStartState)blk.left;
-		atn.defineDecisionState(start); // we don't use in code gen though
-		plusAST.atnState = start;
+		PlusBlockStartState blkStart = (PlusBlockStartState)blk.left;
+		BlockEndState blkEnd = (BlockEndState)blk.right;
+
 		PlusLoopbackState loop = (PlusLoopbackState)newState(PlusLoopbackState.class, plusAST);
-		ATNState end = (ATNState)newState(ATNState.class, plusAST);
-		start.loopBackState = loop;
-		epsilon(blk.right, loop);
-		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
-		// if not greedy, priority to exit branch; make it first
-		if ( !isGreedy(blkAST) ) epsilon(loop, end);
-		// connect loop back to all alt left edges
-		for (Transition trans : start.transitions) {
-			epsilon(loop, trans.target);
-		}
-		// if greedy, last alt of decisions is exit branch
-		if ( isGreedy(blkAST) ) epsilon(loop, end);
 		atn.defineDecisionState(loop);
-		return new Handle(start, end);
+		ATNState end = newState(ATNState.class, plusAST);
+
+		plusAST.atnState = blkStart;
+		blkStart.loopBackState = loop;
+		epsilon(blkEnd, loop);		// blk can see loop back
+		epsilon(loop, blkStart);	// loop back to start
+		epsilon(loop, end);			// or exit
+
+		return new Handle(blkStart, end);
 	}
 
-	/** From (blk)* build
+	/** From (blk)* build ( blk+ )? with *two* decisions, one for entry
+	 *  and one for choosing alts of blk.
 	 *
-	 *     |----------|
-	 *     v          |
-	 *     o-[blk]-o->o  o
-	 *     |             ^
-	 *     o-------------| (optional branch is nth alt of StarBlockStartState)
-	 *
-	 *  There 1 decision point in a A*.
+	 *   |-------------|
+	 *   v             |
+	 *   o--[o-blk-o]->o->o
+	 *   |                ^
+	 *   o----------------|
 	 *
 	 *  Note that the optional bypass must jump outside the loop as (A|B)* is
 	 *  not the same thing as (A|B|)+.
 	 */
 	public Handle star(GrammarAST starAST, Handle elem) {
-		BlockAST blkAST = (BlockAST)starAST.getChild(0);
-
 		StarBlockStartState blkStart = (StarBlockStartState)elem.left;
 		BlockEndState blkEnd = (BlockEndState)elem.right;
 
+		StarLoopEntryState entry = (StarLoopEntryState)newState(StarLoopEntryState.class, starAST);
+		atn.defineDecisionState(entry);
+		ATNState end = newState(ATNState.class, starAST);
 		StarLoopbackState loop = (StarLoopbackState)newState(StarLoopbackState.class, starAST);
-		ATNState end = (ATNState)newState(ATNState.class, starAST);
-		// If greedy, exit alt is last, else exit is first
-		if ( isGreedy(blkAST) ) {
-			epsilon(blkStart, end); // bypass edge
-		}
-		else {
-			blkStart.addTransitionFirst(new EpsilonTransition(end));
-		}
-		epsilon(loop, blkStart);
-		epsilon(blkEnd, loop);
-		starAST.atnState = blkStart;
-		return new Handle(blkStart, end);
+
+		epsilon(entry, blkStart);	// loop enter edge (alt 1)
+		epsilon(entry, end);		// bypass loop edge (alt 2)
+		epsilon(blkEnd, loop);		// block end hits loop back
+		epsilon(loop, entry);		// loop back to entry/exit decision
+
+		starAST.atnState = entry;	// decision is to enter/exit; blk is its own decision
+		return new Handle(entry, end);
 	}
 
 	/** Build an atom with all possible values in its label */

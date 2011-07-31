@@ -15,7 +15,7 @@ public class TestLexerAttributes extends BaseTest {
 			"A : 'a' {#$type=101;#} ;\n"
 		);
 		Tool antlr = new Tool();
-		antlr.process(g);
+		antlr.process(g,false);
 		CodeGenerator gen = new CodeGenerator(g);
 		ST outputFileST = gen.generate();
 		String output = outputFileST.render();

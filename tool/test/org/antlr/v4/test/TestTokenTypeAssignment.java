@@ -1,6 +1,5 @@
 package org.antlr.v4.test;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
 import org.junit.Test;
@@ -82,9 +81,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 				"a : 'x' E ; \n" +
 				"E: 'x' '0' ;\n");
 
-		Tool antlr = new Tool();
-		antlr.process(g);
-
 		String literals = "['x']";
 		String foundLiterals = g.stringLiteralToTypeMap.keySet().toString();
 		assertEquals(literals, foundLiterals);
@@ -125,8 +121,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : '\\n';\n");
-		Tool antlr = new Tool();
-		antlr.process(g);
 		Set literals = g.stringLiteralToTypeMap.keySet();
 		// must store literals how they appear in the antlr grammar
 		assertEquals("'\\n'", literals.toArray()[0]);
@@ -167,9 +161,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 								String allValidTokensStr)
 		throws Exception
 	{
-		Tool antlr = new Tool();
-		antlr.process(g);
-
 		String[] typeToTokenName = g.getTokenNames();
 		Set<String> tokens = new HashSet<String>();
 		for (String t : typeToTokenName) if ( t!=null ) tokens.add(t);

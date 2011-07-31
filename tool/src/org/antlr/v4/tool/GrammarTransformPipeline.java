@@ -353,11 +353,13 @@ public class GrammarTransformPipeline {
 		lexerAST.addChild(lexerRulesRoot);
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
 		List<GrammarASTWithOptions> rules = combinedRulesRoot.getChildren();
-		for (GrammarASTWithOptions r : rules) {
-			String ruleName = r.getChild(0).getText();
-			if ( Character.isUpperCase(ruleName.charAt(0)) ) {
-				lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
-				rulesWeMoved.add(r);
+		if ( rules!=null ) {
+			for (GrammarASTWithOptions r : rules) {
+				String ruleName = r.getChild(0).getText();
+				if ( Character.isUpperCase(ruleName.charAt(0)) ) {
+					lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
+					rulesWeMoved.add(r);
+				}
 			}
 		}
 		int nLexicalRules = rulesWeMoved.size();
