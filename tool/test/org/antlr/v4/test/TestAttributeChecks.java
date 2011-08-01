@@ -23,27 +23,6 @@ public class TestAttributeChecks extends BaseTest {
         "c   :   ;\n" +
 		"d	 :   ;\n";
 
-    String scopeTemplate =
-        "parser grammar A;\n"+
-        "@members {\n" +
-		"<members>\n" +
-        "}\n" +
-        "scope S { int i; }\n" +
-        "a[int x] returns [int y]\n" +
-        "scope { int z; }\n" +
-        "scope S;\n" +
-        "@init {<init>}\n" +
-        "    :   lab=b[34] {\n" +
-		"		 <inline>" +
-		"		 }\n" +
-        "    ;\n" +
-        "    finally {<finally>}\n" +
-        "b[int d] returns [int e]\n" +
-        "scope { int f; }\n" +
-        "    :   {<inline2>}\n" +
-        "    ;\n" +
-        "c   :   ;";
-
     String[] membersChecks = {
 		"$a",			"error(29): A.g:2:11: unknown attribute reference a in $a\n",
         "$a.y",			"error(29): A.g:2:11: unknown attribute reference a in $a.y\n",
@@ -56,7 +35,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$y = $x",		"",
 		"$lab.e",		"",
 		"$ids",			"",
-		
+
        	"$a",			"error(33): A.g:4:8: missing attribute access on rule reference a in $a\n",
 		"$c",			"error(29): A.g:4:8: unknown attribute reference c in $c\n",
 		"$a.q",			"error(31): A.g:4:10: unknown attribute q for rule a in $a.q\n",
@@ -210,7 +189,7 @@ public class TestAttributeChecks extends BaseTest {
 
     @Test public void testInitActions() throws RecognitionException {
         testActions("init", initChecks, attributeTemplate);
-    }    
+    }
 
 	@Test public void testInlineActions() throws RecognitionException {
 		testActions("inline", inlineChecks, attributeTemplate);
@@ -222,22 +201,6 @@ public class TestAttributeChecks extends BaseTest {
 
 	@Test public void testFinallyActions() throws RecognitionException {
 		testActions("finally", finallyChecks, attributeTemplate);
-	}
-
-	@Test public void testDynMembersActions() throws RecognitionException {
-		testActions("members", dynMembersChecks, scopeTemplate);
-	}
-
-	@Test public void testDynInitActions() throws RecognitionException {
-		testActions("init", dynInitChecks, scopeTemplate);
-	}
-
-	@Test public void testDynInlineActions() throws RecognitionException {
-		testActions("inline", dynInlineChecks, scopeTemplate);
-	}
-
-	@Test public void testDynFinallyActions() throws RecognitionException {
-		testActions("finally", dynFinallyChecks, scopeTemplate);
 	}
 
 	@Test public void testTokenRef() throws RecognitionException {
@@ -266,7 +229,7 @@ public class TestAttributeChecks extends BaseTest {
 		String action = "$Symbols::x";
 	}
 
-	
+
     public void testActions(String location, String[] pairs, String template) {
         for (int i = 0; i < pairs.length; i+=2) {
             String action = pairs[i];

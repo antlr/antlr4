@@ -108,6 +108,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
+		if ( debug ) System.out.println("ATN decision "+dfa.decision+
+										" exec LA(1)=="+input.LT(1)+
+										", outerContext="+outerContext.toString(parser));
 		RuleContext ctx = RuleContext.EMPTY;
 		if ( useContext ) ctx = outerContext;
 		OrderedHashSet<ATNConfig> s0_closure =
@@ -134,16 +137,18 @@ public class ParserATNSimulator extends ATNSimulator {
 	// doesn't create DFA when matching
 	public int matchATN(TokenStream input, ATNState startState) {
 		DFA dfa = new DFA(startState);
-		RuleContext ctx = new ParserRuleContext();
+		RuleContext ctx = RuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure = computeStartState(startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
 	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext outerContext) {
-		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+" exec LA(1)=="+input.LT(1));
 //		dump(dfa);
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
+		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+											" exec LA(1)=="+input.LT(1)+
+											", outerContext="+outerContext.toString(parser));
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int t = input.LA(1);
@@ -469,15 +474,17 @@ public class ParserATNSimulator extends ATNSimulator {
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
 				ATNConfig c = new ATNConfig(retState, config.alt, newContext);
+				// While we have context to pop back from, we may have
+				// gotten that context AFTER having fallen off a rule.
+				// Make sure we track that we are now out of context.
+				c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 				closure(c, configs, closureBusy);
 				return;
 			}
 			else {
 				// else if we have no context info, just chase follow links
-				// but track how far we dip into outer context.  Might
-				// come in handy and we avoid evaluating context dependent
-				// preds if this is > 0.
-				config.reachesIntoOuterContext++;
+				if ( debug ) System.out.println("FALLING off rule "+
+												parser.getRuleNames()[config.state.ruleIndex]);
 			}
 		}
 
@@ -489,7 +496,16 @@ public class ParserATNSimulator extends ATNSimulator {
 			Transition t = p.transition(i);
 			boolean ignorePreds = config.traversedAction;
 			ATNConfig c = getEpsilonTarget(config, t, ignorePreds);
-			if ( c!=null ) closure(c, configs, closureBusy);
+			if ( c!=null ) {
+				if ( config.state instanceof RuleStopState ) {
+					// fell off end of rule.
+					// track how far we dip into outer context.  Might
+					// come in handy and we avoid evaluating context dependent
+					// preds if this is > 0.
+					c.reachesIntoOuterContext++;
+				}
+				closure(c, configs, closureBusy);
+			}
 		}
 	}
 
@@ -559,6 +575,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public ATNConfig ruleTransition(ATNConfig config, Transition t) {
+		if ( debug ) {
+			System.out.println("CALL rule "+parser.getRuleNames()[t.target.ruleIndex]+
+							   ", ctx="+config.context);
+		}
 		ATNState p = config.state;
 		RuleContext newContext =
 			new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);

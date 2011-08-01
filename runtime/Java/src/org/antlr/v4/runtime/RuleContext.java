@@ -48,7 +48,7 @@ public class RuleContext {
 	 *  Not used during ATN simulation; only used during parse that updates
 	 *  current location in ATN.
 	 */
-	public int s;
+	public int s = -1;
 
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
@@ -209,7 +209,7 @@ public class RuleContext {
 	}
 
 	public String toString(BaseRecognizer recog) {
-		return toString(recog, null);
+		return toString(recog, RuleContext.EMPTY);
 	}
 
 	public String toString(BaseRecognizer recog, RuleContext stop) {

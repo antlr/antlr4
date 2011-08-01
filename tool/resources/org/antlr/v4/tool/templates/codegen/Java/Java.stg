@@ -131,7 +131,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     _ctx = _localctx;
     <currentRule.name>_stk.push(_localctx);
     _localctx.start = input.LT(1);
-    //System.out.println("enter "+ruleNames[<currentRule.index>]);
+    //System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+input.LT(1).getText());
     <namedActions.init>
     <locals; separator="\n">
 	try {
@@ -148,7 +148,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
         <currentRule.name>_stk.pop();
         _ctx = (ParserRuleContext)_ctx.parent;
         <finallyAction>
-    	//System.out.println("exit "+ruleNames[<currentRule.index>]);
+    	// System.out.println("exit "+ruleNames[<currentRule.index>]);
 	}
     return _localctx;
 }
@@ -424,8 +424,8 @@ labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 // used for left-recursive rules
 recRuleDefArg()                       ::= "int _p"
 recRuleArg()                          ::= "$_p"
-recRuleAltPredicate(ruleName,opPrec)  ::= "<recRuleArg()> \<= <opPrec>"
-recRuleSetResultAction()              ::= "root_0=$<ruleName>_primary.tree;"
+recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
+recRuleSetResultAction()              ::= "$tree=$<ruleName>_primary.tree;"
 recRuleSetReturnAction(src,name)      ::= "$<name>=$<src>.<name>;"
 
 // AST stuff (TODO: separate?)

@@ -1,23 +1,17 @@
 grammar T;
 options {output=AST;}
 
-s : e EOF ;
-
-e : e_[0] ;
+s : e_[0] EOF ;
 
 e_[int _p]
-    :   e_primary
-        ( {$_p <= 5}? '*'^ e_[6]{} 
-        | {$_p <= 4}? '+'^ e_[5]{} 
-        | {$_p <= 2}? '='<assoc=right>^ e_[2]{} 
-        | {$_p <= 3}? '?'<assoc=right>^ e ':'! e_[3]{} 
-        )*
+    :   e_primary {  }
+        ( {19 >= $_p}? '['^ e_[0] ']'! )*
     ;
-
 e_primary
-    : ID 
+    : INT
+	| 'new'^ ID ('[' INT ']')+ 
     ;
 
-ID : 'a'..'z'+;
-
-WS : (' '|'\n')+ {skip();} ;
+ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') {skip();} ;

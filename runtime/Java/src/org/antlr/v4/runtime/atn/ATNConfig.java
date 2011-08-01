@@ -72,10 +72,12 @@ public class ATNConfig {
 	 * We cannot execute predicates dependent upon local context unless
 	 * we know for sure we are in the correct context. Because there is
 	 * no way to do this efficiently, we simply cannot evaluate
-	 * dependent predicates if we are pursuing a global FOLLOW
-	 * operation.  closure() tracks the depth of how far we dip into the
-	 * outer context. We then avoid executing predicates that are
-	 * dependent on local context if this depth is > 0.
+	 * dependent predicates unless we are in the rule that initially
+	 * invokes the ATN simulator.
+	 *
+	 * closure() tracks the depth of how far we dip into the
+	 * outer context: depth > 0.  Note that it may not be totally
+	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
 	 */
 	public int reachesIntoOuterContext;
 
@@ -155,6 +157,9 @@ public class ATNConfig {
             buf.append("|");
             buf.append(context);
         }
+		if ( reachesIntoOuterContext>0 ) {
+			buf.append("|up="+reachesIntoOuterContext);
+		}
 //		if (isAccept) {
 //			buf.append("|=>"+alt);
 //		}

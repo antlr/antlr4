@@ -59,6 +59,7 @@ public void otherAlt(GrammarAST altTree, GrammarAST rewriteTree, int alt) {}
 public void setReturnValues(GrammarAST t) {}
 }
 
+// TODO: can get parser errors for not matching pattern; make them go away
 public
 rec_rule returns [boolean isLeftRec]
 @init
@@ -67,12 +68,12 @@ rec_rule returns [boolean isLeftRec]
 }
 	:	^(	r=RULE id=ID {ruleName=$id.getText();}
 			ruleModifier?
-			(^(ARG ARG_ACTION))?
-			(^(RET ARG_ACTION))?
-      		( ^(THROWS .+) )?
-      		( ^(LOCALS ARG_ACTION) )?
+//			(ARG_ACTION)? shouldn't allow args, right?
+			(^(RETURNS a=ARG_ACTION {setReturnValues($a);}))?
+//      		( ^(THROWS .+) )? don't allow
+      		( ^(LOCALS ARG_ACTION) )? // TODO: copy these to gen'd code
       		(	^(OPTIONS .*)
-		    |   ^(AT ID ACTION)
+		    |   ^(AT ID ACTION) // TODO: copy
 		    )*
 			ruleBlock {$isLeftRec = $ruleBlock.isLeftRec;}
 			exceptionGroup

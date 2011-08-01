@@ -110,6 +110,7 @@ public class Rule implements AttributeResolver {
 
 	public boolean isStartRule = true; // nobody calls us
 
+	/** 1..n alts */
 	public Alternative[] alt;
 
 	/** All rules have unique index 0..n-1 */

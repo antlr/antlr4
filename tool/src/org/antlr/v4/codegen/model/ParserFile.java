@@ -48,7 +48,7 @@ public class ParserFile extends OutputModelObject {
 		this.fileName = fileName;
 		Grammar g = factory.getGrammar();
 		TokenLabelType = g.getOption("TokenLabelType");
-		ASTLabelType = g.getOption("ASTLabelType");
+		ASTLabelType = g.getOption("ASTLabelType", "CommonTree");
 		namedActions = new HashMap<String, Action>();
 		for (String name : g.namedActions.keySet()) {
 			GrammarAST ast = g.namedActions.get(name);

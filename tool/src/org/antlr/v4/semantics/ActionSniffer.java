@@ -35,7 +35,9 @@ import org.antlr.v4.tool.*;
 
 import java.util.List;
 
-/** Find token and rule refs, side-effect: update Alternatives */
+/** Find token and rule refs plus refs to them in actions;
+ *  side-effect: update Alternatives
+ */
 public class ActionSniffer extends BlankActionSplitterListener {
 	public Grammar g;
 	public Rule r;          // null if action outside of rule
@@ -64,7 +66,40 @@ public class ActionSniffer extends BlankActionSplitterListener {
 		System.out.println(node.chunks);
 	}
 
-	public void attr(String expr, Token x) {
+	public void processNested(Token actionToken) {
+		ANTLRStringStream in = new ANTLRStringStream(actionToken.getText());
+		in.setLine(actionToken.getLine());
+		in.setCharPositionInLine(actionToken.getCharPositionInLine());
+		ActionSplitter splitter = new ActionSplitter(in, this);
+		// forces eval, triggers listener methods
+		splitter.getActionTokens();
+	}
+
+
+	@Override
+	public void attr(String expr, Token x) { trackRef(x); }
+
+	@Override
+	public void qualifiedAttr(String expr, Token x, Token y) { trackRef(x); }
+
+	@Override
+	public void setAttr(String expr, Token x, Token rhs) {
+		trackRef(x);
+		processNested(rhs);
+	}
+
+	@Override
+	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
+		trackRef(x);
+		processNested(rhs);
+	}
+
+	@Override
+	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
+		processNested(rhs);
+	}
+
+	public void trackRef(Token x) {
 		List<TerminalAST> xRefs = alt.tokenRefs.get(x.getText());
 		if ( alt!=null && xRefs!=null ) {
 			alt.tokenRefsInActions.map(x.getText(), node);
@@ -73,9 +108,5 @@ public class ActionSniffer extends BlankActionSplitterListener {
 		if ( alt!=null && rRefs!=null ) {
 			alt.ruleRefsInActions.map(x.getText(), node);
 		}
-	}
-
-	public void qualifiedAttr(String expr, Token x, Token y) {
-		attr(expr, x);
 	}
 }

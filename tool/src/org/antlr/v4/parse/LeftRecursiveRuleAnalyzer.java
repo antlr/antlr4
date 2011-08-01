@@ -83,7 +83,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	@Override
 	public void setReturnValues(GrammarAST t) {
-		System.out.println(t);
 		retvals = t;
 	}
 
@@ -96,6 +95,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 				if ( a!=null ) {
 					if ( a.equals(ASSOC.right.toString()) ) {
 						assoc = ASSOC.right;
+					}
+					else if ( a.equals(ASSOC.left.toString()) ) {
+						assoc = ASSOC.left;
 					}
 					else {
 						tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, "assoc", assoc);
@@ -234,10 +236,10 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		return ruleST.render();
 	}
 
-	public String getArtificialOpPrecRule() {
+	public String getArtificialOpPrecRule(boolean buildAST) {
 		ST ruleST = recRuleTemplates.getInstanceOf("recRule");
 		ruleST.add("ruleName", ruleName);
-		// TODO: ruleST.add("buildAST", grammar.hasASTOption());
+		ruleST.add("buildAST", buildAST);
 		ST argDefST =
 			codegenTemplates.getInstanceOf("recRuleDefArg");
 		ruleST.add("precArgDef", argDefST);

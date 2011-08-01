@@ -240,9 +240,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) {
-		return	op.getLabels().size()==0 &&
-				(getCurrentOuterMostAlt().tokenRefsInActions.containsKey(ID.getText()) ||
-				getCurrentOuterMostAlt().ruleRefsInActions.containsKey(ID.getText()));
+		Alternative currentOuterMostAlt = getCurrentOuterMostAlt();
+		boolean actionRefsAsToken = currentOuterMostAlt.tokenRefsInActions.containsKey(ID.getText());
+		boolean actionRefsAsRule = currentOuterMostAlt.ruleRefsInActions.containsKey(ID.getText());
+		return	op.getLabels().size()==0 &&	(actionRefsAsToken || actionRefsAsRule);
 	}
 
 	// AST REWRITE

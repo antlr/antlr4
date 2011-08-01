@@ -42,18 +42,22 @@ LINE_COMMENT
     : '//' ~('\n'|'\r')* '\r'? '\n' {delegate.text($text);}
     ;
 
-SET_DYNAMIC_SCOPE_ATTR
+SET_NONLOCAL_ATTR
 	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setNonLocalAttr($text, $x, $y, $expr);}
+		{
+		delegate.setNonLocalAttr($text, $x, $y, $expr);
+		}
 	;
 
-DYNAMIC_SCOPE_ATTR
+NONLOCAL_ATTR
 	:	'$' x=ID '::' y=ID {delegate.nonLocalAttr($text, $x, $y);}
 	;
 
 SET_QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{delegate.setQualifiedAttr($text, $x, $y, $expr);}
+		{
+		delegate.setQualifiedAttr($text, $x, $y, $expr);
+		}
 	;
 
 QUALIFIED_ATTR
@@ -61,7 +65,10 @@ QUALIFIED_ATTR
 	;
 
 SET_ATTR
-	:	'$' x=ID WS? '=' expr=ATTR_VALUE_EXPR ';' {delegate.setAttr($text, $x, $expr);}
+	:	'$' x=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
+		{
+		delegate.setAttr($text, $x, $expr);
+		}
 	;
 
 ATTR

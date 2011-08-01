@@ -108,7 +108,11 @@ public class GrammarTransformPipeline {
 
 		List<String> rules = new ArrayList<String>();
 		rules.add( leftRecursiveRuleWalker.getArtificialPrecStartRule() ) ;
-		rules.add( leftRecursiveRuleWalker.getArtificialOpPrecRule() );
+
+		String outputOption = ast.getOption("output");
+		boolean buildAST = outputOption!=null && outputOption.equals("AST");
+
+		rules.add( leftRecursiveRuleWalker.getArtificialOpPrecRule(buildAST) );
 		rules.add( leftRecursiveRuleWalker.getArtificialPrimaryRule() );
 		for (String ruleText : rules) {
 //			System.out.println("created: "+ruleText);
