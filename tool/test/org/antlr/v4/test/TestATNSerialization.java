@@ -218,7 +218,7 @@ public class TestATNSerialization extends BaseTest {
 			"1->8 ATOM -1,0,0\n" +
 			"2->6 EPSILON 0,0,0\n" +
 			"3->5 EPSILON 0,0,0\n" +
-			"4->5 RULE 2,1,-1\n" +
+			"4->5 RULE 2,1,0\n" +
 			"5->1 EPSILON 0,0,0\n" +
 			"6->7 ATOM 3,0,0\n" +
 			"7->3 EPSILON 0,0,0\n";

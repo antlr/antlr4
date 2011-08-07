@@ -50,6 +50,6 @@ public class LexerNoViableAltException extends LexerRecognitionExeption {
 	}
 
 	public String toString() {
-		return "NoViableAltException('"+(char)c+"'";
+		return "NoViableAltException('"+(char)c+"')";
 	}
 }

@@ -199,10 +199,14 @@ optionsSpec
     ;
 
 option
-    :   ^(ASSIGN ID optionValue)
+@init {
+boolean rule = inContext("RULE ...");
+boolean block = inContext("BLOCK ...");
+}
+    :   ^(a=ASSIGN ID optionValue)
     	{
-    	if ( inContext("RULE") ) ruleOption($ID, $optionValue.v);
-    	else if ( inContext("BLOCK") ) blockOption($ID, $optionValue.v);
+    	if ( rule ) ruleOption($ID, $optionValue.v);
+    	else if ( block ) blockOption($ID, $optionValue.v);
     	else grammarOption($ID, $optionValue.v);
     	}
     ;

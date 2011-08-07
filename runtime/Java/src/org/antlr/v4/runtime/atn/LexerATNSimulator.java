@@ -184,6 +184,21 @@ public class LexerATNSimulator extends ATNSimulator {
 						prevAccept = c;
 						prevAcceptIndex = input.index();
 					}
+
+					// if we reach lexer accept state, toss out any configs in rest
+					// of configs work list associated with this rule (config.alt);
+					// that rule is done. this is how we cut off nongreedy .+ loops.
+					deleteConfigsForAlt(closure, ci, c.alt);
+//					int j=ci+1;
+//					while ( j<closure.size() ) {
+//						ATNConfig c2 = closure.get(j);
+//						if ( c2.alt == c.alt ) {
+//							System.out.println("kill "+c2);
+//							closure.remove(j);
+//						}
+//						else j++;
+//					}
+
  					// move to next char, looking for longer match
 					// (we continue processing if there are states in reach)
 				}
@@ -275,19 +290,19 @@ public class LexerATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	/* TODO: use if we need nongreedy
 	public void deleteConfigsForAlt(OrderedHashSet<ATNConfig> closure, int ci, int alt) {
 		int j=ci+1;
 		while ( j<closure.size() ) {
 			ATNConfig c = closure.get(j);
-			if ( c.alt == alt ) {
+			boolean isWildcard = c.state.getClass() == ATNState.class &&
+				c.state.transition(0).getClass() == WildcardTransition.class;
+			if ( c.alt == alt && isWildcard ) {
 				System.out.println("kill "+c);
 				closure.remove(j);
 			}
 			else j++;
 		}
 	}
-	*/
 
 	protected OrderedHashSet<ATNConfig> computeStartState(IntStream input,
 														  ATNState p)
@@ -337,29 +352,34 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
-			ATNConfig c = null;
-			if ( t.getClass() == RuleTransition.class ) {
-				RuleContext newContext =
-					new RuleContext(config.context, p.stateNumber, t.target.stateNumber);
-				c = new ATNConfig(config, t.target, newContext);
-			}
-			else if ( t.getClass() == PredicateTransition.class ) {
-				PredicateTransition pt = (PredicateTransition)t;
-				if ( recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
-					c = new ATNConfig(config, t.target);
-					c.traversedPredicate = true;
-				}
-			}
-			// ignore actions; just exec one per rule upon accept
-			else if ( t.getClass() == ActionTransition.class ) {
-				c = new ATNConfig(config, t.target);
-			}
-			// TODO: forced actions?
-			else if ( t.isEpsilon() ) {
-				c = new ATNConfig(config, t.target);
-			}
+			ATNConfig c = getEpsilonTarget(config, t);
 			if ( c!=null ) closure(c, configs);
 		}
+	}
+
+	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t) {
+		ATNState p = config.state;
+		ATNConfig c = null;
+		if ( t.getClass() == RuleTransition.class ) {
+			RuleContext newContext =
+				new RuleContext(config.context, p.stateNumber, t.target.stateNumber);
+			c = new ATNConfig(config, t.target, newContext);
+		}
+		else if ( t.getClass() == PredicateTransition.class ) {
+			PredicateTransition pt = (PredicateTransition)t;
+			if ( recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
+				c = new ATNConfig(config, t.target);
+				c.traversedPredicate = true;
+			}
+		}
+		// ignore actions; just exec one per rule upon accept
+		else if ( t.getClass() == ActionTransition.class ) {
+			c = new ATNConfig(config, t.target);
+		}
+		else if ( t.isEpsilon() ) {
+			c = new ATNConfig(config, t.target);
+		}
+		return c;
 	}
 
 	protected void addDFAEdge(OrderedHashSet<ATNConfig> p,
