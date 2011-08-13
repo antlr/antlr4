@@ -57,8 +57,8 @@ public class NoViableAltException extends RecognitionException {
 		if ( recognizer!=null ) {
 			TokenStream tokens = recognizer.input;
 			String bad = tokens.toString(startIndex, index);
-			return "NoViableAltException(input=\""+bad+"\" last token type is "+getUnexpectedType();
+			return "NoViableAltException(input=\""+bad+"\" last token type is "+getUnexpectedType()+")";
 		}
-		return "NoViableAltException(last token type is "+getUnexpectedType();
+		return "NoViableAltException(last token type is "+getUnexpectedType()+")";
 	}
 }

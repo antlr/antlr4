@@ -107,7 +107,7 @@ public class TestATNSerialization extends BaseTest {
 			"8->2 EPSILON 0,0,0\n" +
 			"8->4 EPSILON 0,0,0\n" +
 			"9->1 EPSILON 0,0,0\n" +
-			"0:8\n";
+			"0:8 1\n";
 		ATN atn = createATN(g);
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
@@ -155,7 +155,7 @@ public class TestATNSerialization extends BaseTest {
 			"14->4 EPSILON 0,0,0\n" +
 			"14->8 EPSILON 0,0,0\n" +
 			"15->1 EPSILON 0,0,0\n" +
-			"0:14\n";
+			"0:14 1\n";
 		ATN atn = createATN(g);
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
@@ -190,7 +190,7 @@ public class TestATNSerialization extends BaseTest {
 			"7->8 EPSILON 0,0,0\n" +
 			"8->9 ATOM 4,0,0\n" +
 			"9->1 EPSILON 0,0,0\n" +
-			"0:6\n";
+			"0:6 1\n";
 		ATN atn = createATN(g);
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
@@ -254,7 +254,7 @@ public class TestATNSerialization extends BaseTest {
 			"6->2 EPSILON 0,0,0\n" +
 			"7->8 ATOM 98,0,0\n" +
 			"8->4 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -277,7 +277,7 @@ public class TestATNSerialization extends BaseTest {
 			"1->3 EPSILON 0,0,0\n" +
 			"3->4 RANGE 48,57,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -309,8 +309,8 @@ public class TestATNSerialization extends BaseTest {
 			"7->5 EPSILON 0,0,0\n" +
 			"7->8 EPSILON 0,0,0\n" +
 			"8->2 EPSILON 0,0,0\n" +
-			"0:0\n" +
-			"1:7\n";
+			"0:0 1\n" +
+			"1:7 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -357,7 +357,7 @@ public class TestATNSerialization extends BaseTest {
 			"12->13 ATOM 99,0,0\n" +
 			"13->14 EPSILON 0,0,0\n" +
 			"14->6 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -381,7 +381,7 @@ public class TestATNSerialization extends BaseTest {
 			"1->3 EPSILON 0,0,0\n" +
 			"3->4 NOT_SET 0,0,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -405,7 +405,7 @@ public class TestATNSerialization extends BaseTest {
 			"1->3 EPSILON 0,0,0\n" +
 			"3->4 SET 0,0,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -429,7 +429,7 @@ public class TestATNSerialization extends BaseTest {
 			"1->3 EPSILON 0,0,0\n" +
 			"3->4 NOT_SET 0,0,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -490,9 +490,9 @@ public class TestATNSerialization extends BaseTest {
 			"18->19 WILDCARD 0,0,0\n" +
 			"19->20 EPSILON 0,0,0\n" +
 			"20->7 EPSILON 0,0,0\n" +
-			"0:0\n" +
-			"1:1\n" +
-			"2:12\n";
+			"0:0 1\n" +
+			"1:1 1\n" +
+			"2:12 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -521,7 +521,7 @@ public class TestATNSerialization extends BaseTest {
 			"4->5 EPSILON 0,0,0\n" +
 			"5->6 NOT_SET 1,0,0\n" +
 			"6->2 EPSILON 0,0,0\n" +
-			"0:0\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -570,9 +570,9 @@ public class TestATNSerialization extends BaseTest {
 			"12->6 EPSILON 0,0,0\n" +
 			"13->14 ATOM 99,0,0\n" +
 			"14->8 EPSILON 0,0,0\n" +
-			"0:0\n" +
-			"1:1\n" +
-			"2:2\n";
+			"0:0 1\n" +
+			"1:1 1\n" +
+			"2:2 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);

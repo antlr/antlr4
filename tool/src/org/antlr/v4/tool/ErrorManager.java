@@ -103,6 +103,10 @@ public class ErrorManager {
 			messageST.add("exception", msg.e);
 			messageST.add("stackTrace", msg.e.getStackTrace());
 		}
+		else {
+			messageST.add("exception", null); // avoid ST error msg
+			messageST.add("stackTrace", null);
+		}
 
 		boolean locationValid = false;
 		if (msg.line != -1) {

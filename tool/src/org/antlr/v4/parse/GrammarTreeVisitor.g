@@ -177,14 +177,15 @@ grammarSpec
     :   ^(	GRAMMAR ID {grammarName=$ID.text;} DOC_COMMENT?
     		{discoverGrammar((GrammarRootAST)$GRAMMAR, $ID);}
  		   	prequelConstructs
-    		{finishPrequels($prequelConstructs.start);}
+    		{finishPrequels($prequelConstructs.firstOne);}
  		   	rules mode*
     		{finishGrammar((GrammarRootAST)$GRAMMAR, $ID);}
  		 )
 	;
 
-prequelConstructs
-	:	prequelConstruct*
+prequelConstructs returns [GrammarAST firstOne=null]
+	:	{$firstOne=$start;} prequelConstruct+
+	|
 	;
 
 prequelConstruct
@@ -205,8 +206,8 @@ boolean block = inContext("BLOCK ...");
 }
     :   ^(a=ASSIGN ID optionValue)
     	{
-    	if ( rule ) ruleOption($ID, $optionValue.v);
-    	else if ( block ) blockOption($ID, $optionValue.v);
+    	if ( block ) blockOption($ID, $optionValue.v); // most specific first
+    	else if ( rule ) ruleOption($ID, $optionValue.v);
     	else grammarOption($ID, $optionValue.v);
     	}
     ;

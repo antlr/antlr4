@@ -170,9 +170,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void finishPrequels(GrammarAST firstPrequel) {
-		List<GrammarAST> options = firstPrequel.getNodesWithType(OPTIONS);
-		List<GrammarAST> imports = firstPrequel.getNodesWithType(IMPORT);
-		List<GrammarAST> tokens = firstPrequel.getNodesWithType(TOKENS);
+		if ( firstPrequel==null ) return;
+		GrammarAST parent = (GrammarAST)firstPrequel.parent;
+		List<GrammarAST> options = parent.getAllChildrenWithType(OPTIONS);
+		List<GrammarAST> imports = parent.getAllChildrenWithType(IMPORT);
+		List<GrammarAST> tokens = parent.getAllChildrenWithType(TOKENS);
 		checkNumPrequels(options, imports, tokens);
 	}
 

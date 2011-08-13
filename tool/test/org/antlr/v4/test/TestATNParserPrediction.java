@@ -499,10 +499,16 @@ public class TestATNParserPrediction extends BaseTest {
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("a").index]));
-		Rule r = g.getRule("b");
+
+		Rule r = g.getRule("a");
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+		r = g.getRule("b");
 		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 		r = g.getRule("e");
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+		r = g.getRule("ifstat");
+		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+		r = g.getRule("block");
 		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
@@ -510,7 +516,7 @@ public class TestATNParserPrediction extends BaseTest {
 		TokenStream input = new IntTokenStream(types);
 		ATNState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
-		int alt = interp.predictATN(dfa, input, decision, RuleContext.EMPTY, false);
+		int alt = interp.predictATN(dfa, input, RuleContext.EMPTY, false);
 
 		System.out.println(dot.getDOT(dfa, false));
 
@@ -554,7 +560,7 @@ public class TestATNParserPrediction extends BaseTest {
 			DFA dfa = new DFA(startState);
 //			Rule r = g.getRule(ruleName);
 			//ATNState startState = atn.ruleToStartState.get(r);
-			interp.predictATN(dfa, input, 0, ctx, false);
+			interp.predictATN(dfa, input, ctx, false);
 		}
 		catch (NoViableAltException nvae) {
 			nvae.printStackTrace(System.err);

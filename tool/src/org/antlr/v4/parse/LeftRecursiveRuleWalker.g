@@ -59,6 +59,8 @@ public void otherAlt(GrammarAST altTree, GrammarAST rewriteTree, int alt) {}
 public void setReturnValues(GrammarAST t) {}
 }
 
+@rulecatch { }
+
 // TODO: can get parser errors for not matching pattern; make them go away
 public
 rec_rule returns [boolean isLeftRec]

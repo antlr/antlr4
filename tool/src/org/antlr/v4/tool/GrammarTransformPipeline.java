@@ -98,7 +98,7 @@ public class GrammarTransformPipeline {
 			isLeftRec = leftRecursiveRuleWalker.rec_rule();
 		}
 		catch (RecognitionException re) {
-			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "bad ast structure", re);
+			isLeftRec = false; // didn't match; oh well
 		}
 		if ( !isLeftRec ) return;
 

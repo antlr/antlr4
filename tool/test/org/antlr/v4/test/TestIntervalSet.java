@@ -69,7 +69,7 @@ public class TestIntervalSet extends BaseTest {
     @Test public void testSimpleAnd() throws Exception {
         IntervalSet s = IntervalSet.of(10,20);
         IntervalSet s2 = IntervalSet.of(13,15);
-        String expecting = "13..15";
+        String expecting = "{13..15}";
         String result = (s.and(s2)).toString();
         assertEquals(result, expecting);
     }
@@ -157,12 +157,12 @@ public class TestIntervalSet extends BaseTest {
     @Test public void testSubtractOfOverlappingRangeFromLeft() throws Exception {
         IntervalSet s = IntervalSet.of(10,20);
         IntervalSet s2 = IntervalSet.of(5,11);
-        String expecting = "12..20";
+        String expecting = "{12..20}";
         String result = (s.subtract(s2)).toString();
         assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(5,10);
-        expecting = "11..20";
+        expecting = "{11..20}";
         result = (s.subtract(s3)).toString();
         assertEquals(result, expecting);
     }
@@ -170,12 +170,12 @@ public class TestIntervalSet extends BaseTest {
     @Test public void testSubtractOfOverlappingRangeFromRight() throws Exception {
         IntervalSet s = IntervalSet.of(10,20);
         IntervalSet s2 = IntervalSet.of(15,25);
-        String expecting = "10..14";
+        String expecting = "{10..14}";
         String result = (s.subtract(s2)).toString();
         assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(20,25);
-        expecting = "10..19";
+        expecting = "{10..19}";
         result = (s.subtract(s3)).toString();
         assertEquals(result, expecting);
     }
@@ -193,7 +193,7 @@ public class TestIntervalSet extends BaseTest {
         s.add(30,40);
         s.add(50,60); // s has 3 ranges now: 10..20, 30..40, 50..60
         IntervalSet s2 = IntervalSet.of(5,55); // covers one and touches 2nd range
-        String expecting = "56..60";
+        String expecting = "{56..60}";
         String result = (s.subtract(s2)).toString();
         assertEquals(result, expecting);
 
@@ -309,7 +309,7 @@ public class TestIntervalSet extends BaseTest {
 	@Test public void testComplement3() throws Exception {
 		IntervalSet s = IntervalSet.of(1,96);
 		s.add(99, Lexer.MAX_CHAR_VALUE);
-		String expecting = "97..98";
+		String expecting = "{97..98}";
 		String result = (s.complement(1, Lexer.MAX_CHAR_VALUE)).toString();
 		assertEquals(result, expecting);
 	}
@@ -319,7 +319,7 @@ public class TestIntervalSet extends BaseTest {
         IntervalSet s = IntervalSet.of(0,41);
         s.add(42);
         s.add(43,65534);
-        String expecting = "0..65534";
+        String expecting = "{0..65534}";
         String result = s.toString();
         assertEquals(result, expecting);
     }
@@ -328,7 +328,7 @@ public class TestIntervalSet extends BaseTest {
         IntervalSet s = IntervalSet.of(43,65534);
         s.add(42);
         s.add(0,41);
-        String expecting = "0..65534";
+        String expecting = "{0..65534}";
         String result = s.toString();
         assertEquals(result, expecting);
     }
@@ -340,7 +340,7 @@ public class TestIntervalSet extends BaseTest {
         s.add(0,9);
         s.add(43,65534);
         s.add(11,41);
-        String expecting = "0..65534";
+        String expecting = "{0..65534}";
         String result = s.toString();
         assertEquals(result, expecting);
     }
@@ -349,7 +349,7 @@ public class TestIntervalSet extends BaseTest {
 		IntervalSet s = IntervalSet.of(1,10);
 		s.add(20,30);
 		s.add(5,25); // overlaps two!
-		String expecting = "1..30";
+		String expecting = "{1..30}";
 		String result = s.toString();
 		assertEquals(result, expecting);
 	}

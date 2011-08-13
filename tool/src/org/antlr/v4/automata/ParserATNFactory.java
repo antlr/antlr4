@@ -93,7 +93,7 @@ public class ParserATNFactory implements ATNFactory {
 		epsilon(blk.right, stop);
 		Handle h = new Handle(start, stop);
 		ATNPrinter ser = new ATNPrinter(g, h.left);
-		System.out.println(ruleAST.toStringTree()+":\n"+ser.asString());
+//		System.out.println(ruleAST.toStringTree()+":\n"+ser.asString());
 		ruleAST.atnState = start;
 		return h;
 	}
@@ -370,7 +370,8 @@ public class ParserATNFactory implements ATNFactory {
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
-		if ( !g.isLexer() || isGreedy(blkAST) ) {
+		loop.isGreedy = isGreedy(blkAST);
+		if ( !g.isLexer() || loop.isGreedy ) {
 			epsilon(loop, blkStart);	// loop back to start
 			epsilon(loop, end);			// or exit
 		}
@@ -405,7 +406,8 @@ public class ParserATNFactory implements ATNFactory {
 		StarLoopbackState loop = (StarLoopbackState)newState(StarLoopbackState.class, starAST);
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
-		if ( !g.isLexer() || isGreedy(blkAST) ) {
+		entry.isGreedy = isGreedy(blkAST);
+		if ( !g.isLexer() || entry.isGreedy ) {
 			epsilon(entry, blkStart);	// loop enter edge (alt 1)
 			epsilon(entry, end);		// bypass loop edge (alt 2)
 		}

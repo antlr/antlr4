@@ -235,7 +235,7 @@ public class BufferedTokenStream implements TokenStream {
     }
 
     public String toString(int start, int stop) {
-        if ( start<0 || stop<0 ) return null;
+        if ( start<0 || stop<0 ) return "";
         if ( p == -1 ) setup();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
         StringBuffer buf = new StringBuffer();

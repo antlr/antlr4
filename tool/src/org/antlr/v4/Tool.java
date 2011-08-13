@@ -240,13 +240,13 @@ public class Tool {
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
 				processNonCombinedGrammar(lexerg, gencode);
-				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
-				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
+//				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
+//				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
 			}
 		}
 		if ( g.implicitLexer!=null ) g.importVocab(g.implicitLexer);
-		System.out.println("tokens="+g.tokenNameToTypeMap);
-		System.out.println("strings="+g.stringLiteralToTypeMap);
+//		System.out.println("tokens="+g.tokenNameToTypeMap);
+//		System.out.println("strings="+g.stringLiteralToTypeMap);
 		processNonCombinedGrammar(g, gencode);
 	}
 

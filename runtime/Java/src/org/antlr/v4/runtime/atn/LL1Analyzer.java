@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
@@ -51,10 +51,9 @@ public class LL1Analyzer {
 //		System.out.println("LOOK("+s.stateNumber+")");
 		if ( s==null ) return null;
 		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()+1];
-		Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 		for (int alt=1; alt<=s.getNumberOfTransitions(); alt++) {
 			look[alt] = new IntervalSet();
-			lookBusy.clear();
+			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			_LOOK(s.transition(alt - 1).target, RuleContext.EMPTY, look[alt], lookBusy);
 		}
 		return look;
@@ -85,13 +84,16 @@ public class LL1Analyzer {
 		int n = s.getNumberOfTransitions();
 		for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
-			if ( t instanceof RuleTransition ) {
+			if ( t.getClass() == RuleTransition.class ) {
 				RuleContext newContext =
 					new RuleContext(ctx, s.stateNumber,  t.target.stateNumber);
 				_LOOK(t.target, newContext, look, lookBusy);
 			}
 			else if ( t.isEpsilon() ) {
 				_LOOK(t.target, ctx, look, lookBusy);
+			}
+			else if ( t.getClass() == WildcardTransition.class ) {
+				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
 			}
 			else {
 //				System.out.println("adding "+ t);

@@ -39,6 +39,8 @@ public class DecisionState extends ATNState {
 
 	public int decision = -1;
 
+	public boolean isGreedy = true;
+
 	@Override
 	public int getNumberOfTransitions() { return transitions.size(); }
 

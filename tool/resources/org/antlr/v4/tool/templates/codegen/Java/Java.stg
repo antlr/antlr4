@@ -270,7 +270,7 @@ case <i>:
 
 StarBlock(choice, alts, sync) ::= <<
 int _alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
-while ( _alt<choice.uniqueID>!=<choice.exitAlt> ) {
+while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
 case <i>:
@@ -293,7 +293,7 @@ case <i>:
 		    <error>
 	}
 	_alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
-} while ( _alt<choice.uniqueID>!=<choice.exitAlt> );
+} while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );
 >>
 
 Sync(s) ::= "sync(<s.expecting.name>);"

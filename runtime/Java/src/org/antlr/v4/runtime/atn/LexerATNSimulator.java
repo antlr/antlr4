@@ -138,7 +138,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 		if ( prevAcceptState==null ) {
-			System.out.println("!!! no viable alt in dfa");
+			if ( debug ) System.out.println("!!! no viable alt in dfa");
 			return -1;
 		}
 		if ( recog!=null ) {
@@ -188,7 +188,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					// if we reach lexer accept state, toss out any configs in rest
 					// of configs work list associated with this rule (config.alt);
 					// that rule is done. this is how we cut off nongreedy .+ loops.
-					deleteConfigsForAlt(closure, ci, c.alt);
+					deleteWildcardConfigsForAlt(closure, ci, c.alt);
 //					int j=ci+1;
 //					while ( j<closure.size() ) {
 //						ATNConfig c2 = closure.get(j);
@@ -252,7 +252,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			else System.out.println("ACTION "+ruleIndex+":"+ruleIndex);
 		}
 		int actionIndex = atn.ruleToActionIndex[ruleIndex];
-		if ( actionIndex>=0 ) recog.action(null, ruleIndex, actionIndex);
+		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 		return ttype;
 	}
 
@@ -290,14 +290,14 @@ public class LexerATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	public void deleteConfigsForAlt(OrderedHashSet<ATNConfig> closure, int ci, int alt) {
+	public void deleteWildcardConfigsForAlt(OrderedHashSet<ATNConfig> closure, int ci, int alt) {
 		int j=ci+1;
 		while ( j<closure.size() ) {
 			ATNConfig c = closure.get(j);
 			boolean isWildcard = c.state.getClass() == ATNState.class &&
 				c.state.transition(0).getClass() == WildcardTransition.class;
 			if ( c.alt == alt && isWildcard ) {
-				System.out.println("kill "+c);
+//				System.out.println("kill "+c);
 				closure.remove(j);
 			}
 			else j++;
