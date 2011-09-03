@@ -46,13 +46,13 @@ public interface IntStream {
 	int LA(int i);
 
 	/** Tell the stream to start buffering if it hasn't already.  Return
-     *  current input position, index(), or some other marker so that
-	 *  when passed to rewind() you get back to the same spot.
-	 *  rewind(mark()) should not affect the input cursor.  The Lexer
-	 *  track line/col info as well as input index so its markers are
-	 *  not pure input indexes.  Same for tree node streams.
+     *  current input position, index(). seek(mark()) should not
+	 *  affect the input cursor.
      */
 	int mark();
+
+	/** Reset the stream so that next call to index() would return index arg. */
+	void rewind(int index);
 
 	/** Return the current input symbol index 0..n where n indicates the
      *  last symbol has been read.  The index is the symbol about to be

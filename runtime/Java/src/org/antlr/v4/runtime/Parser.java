@@ -29,7 +29,8 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.CommonTreeAdaptor;
+import org.antlr.v4.runtime.tree.TreeAdaptor;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
@@ -86,11 +87,11 @@ public class Parser extends BaseRecognizer {
 		return input.getSourceName();
 	}
 
-	public void traceIn(String ruleName, int ruleIndex)  {
-		super.traceIn(ruleName, ruleIndex, input.LT(1));
+	public void traceIn(int ruleIndex, ParserRuleContext ctx)  {
+		super.traceIn(getRuleNames()[ruleIndex], ruleIndex, input.LT(1));
 	}
 
-	public void traceOut(String ruleName, int ruleIndex)  {
-		super.traceOut(ruleName, ruleIndex, input.LT(1));
+	public void traceOut(int ruleIndex, ParserRuleContext ctx)  {
+		super.traceOut(getRuleNames()[ruleIndex], ruleIndex, input.LT(1));
 	}
 }

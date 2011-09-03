@@ -31,7 +31,8 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
@@ -53,11 +54,6 @@ public class TreeParser extends BaseRecognizer {
 		super((TokenStream)input); // highlight that we go to super to set state object
 		setTreeNodeStream(input);
 	}
-
-	public TreeParser(TreeNodeStream input, RecognizerSharedState<?> state) {
-		super((TokenStream)input); // share the state object with another parser
-		setTreeNodeStream(input);
-    }
 
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
