@@ -1,18 +1,19 @@
 /*
  [The "BSD license"]
- Copyright (c) 2005-2009 Terence Parr
+ Copyright (c) 2011 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
+
  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
+    notice, this list of conditions and the following disclaimer.
  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
+    derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -25,24 +26,44 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/** A record of the rules used to match a token sequence.  The tokens
- *  end up as the leaves of this tree and rule nodes are the interior nodes.
+/** An interface to access the tree of RuleContext objects created
+ *  during a parse that makes the data structure look like a simple parse tree.
+ *  This note represents both internal nodes, rule invocations,
+ *  and leaf nodes, token matches.
+ *
+ *  Unlike the common AST stuff in the runtime library, there is no such thing
+ *  as a nil node. The payload is either a token or a context object.
  */
-public abstract class ParseTree {
-
-	public static class TokenNode extends ParseTree {
+public interface ParseTree {
+	public interface RuleNode extends ParseTree {
+		RuleContext getRuleContext();
+	}
+	public interface TokenNode extends ParseTree {
+		Token getToken();
+	}
+	public static class TokenNodeImpl implements TokenNode {
 		public Token token;
-		public TokenNode(Token token) {
+		public ParseTree parent;
+		/** Which ATN node matched this token? */
+		public int s;
+		public TokenNodeImpl(Token token) {
 			this.token = token;
 		}
+
+		public ParseTree getChild(int i) {return null;}
+
+		public Token getToken() {return token;}
+
+		public ParseTree getParent() { return parent; }
+
+		public Object getPayload() { return token; }
+
+		public int getChildCount() { return 0; }
 
 		@Override
 		public String toString() {
@@ -51,67 +72,21 @@ public abstract class ParseTree {
 		}
 	}
 
-	public static class RuleNode extends ParseTree {
-		public RuleContext ctx;
-		public String ruleName;
-		public RuleNode(String ruleName, RuleContext ctx) {
-			this.ruleName = ruleName;
-			this.ctx = ctx;
-		}
-		public String toString() { return ruleName; }
-	}
-
-	protected ParseTree parent;
-	protected List<ParseTree> children;
-	protected List hiddenTokens;
-
-	/** Add t as child of this node.  t must not be nil node. */
-	public void addChild(ParseTree t) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
-		children.add(t);
-	}
-
-	public ParseTree getChild(int i) {
-		if ( children==null || i>=children.size() ) {
-			return null;
-		}
-		return children.get(i);
-	}
-
-	public ParseTree getParent() { return parent; }
-
-	public void setParent(ParseTree t) { parent = t; }
-
-	public String toStringWithHiddenTokens() {
-		StringBuffer buf = new StringBuffer();
-		if ( hiddenTokens!=null ) {
-			for (int i = 0; i < hiddenTokens.size(); i++) {
-				Token hidden = (Token) hiddenTokens.get(i);
-				buf.append(hidden.getText());
-			}
-		}
-		String nodeText = this.toString();
-		if ( !nodeText.equals("<EOF>") ) buf.append(nodeText);
-		return buf.toString();
-	}
-
-	/** Print out the leaves of this tree, which means printing original
-	 *  input back out.
+	/** The parent of this node. If the return value is null, then this
+	 *  node is the root of the parse tree.
 	 */
-	public String toInputString() {
-		StringBuffer buf = new StringBuffer();
-		_toStringLeaves(buf);
-		return buf.toString();
-	}
+	ParseTree getParent();
 
-	protected void _toStringLeaves(StringBuffer buf) {
-		if ( children==null ) { // leaf node token?
-			buf.append(this.toStringWithHiddenTokens());
-			return;
-		}
-		for (int i = 0; children!=null && i < children.size(); i++) {
-			ParseTree t = children.get(i);
-			t._toStringLeaves(buf);
-		}
-	}
+	/** This can be a Token representing a leaf node or a RuleContext
+	 *  object representing a rule invocation.
+	 */
+	Object getPayload();
+
+	/** If there are children, get the ith value indexed from 0. */
+	ParseTree getChild(int i);
+
+	/** How many children are there? If there is none, then this
+	 *  node represents a token match leaf node.
+	 */
+	int getChildCount();
 }

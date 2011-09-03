@@ -624,6 +624,15 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		System.out.println();
 	}
 
+	/** Indicate that the recognizer has changed internal state that is
+	 *  consistent with the ATN state passed in.  This way we always know
+	 *  where we are in the ATN as the parser goes along. The rule
+	 *  context objects form a stack that lets us see the stack of
+	 *  invoking rules. Combine this and we have complete ATN
+	 *  configuration information.
+	 */
+	public void move(int atnState) { _ctx.s = atnState; }
+
 	/* In v3, programmers altered error messages by overriding
 	   displayRecognitionError() and possibly getTokenErrorDisplay().
 	   They overrode emitErrorMessage(String) to change where the output goes.

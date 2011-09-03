@@ -29,6 +29,9 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+
+import java.util.List;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -37,11 +40,36 @@ import org.antlr.v4.runtime.atn.*;
  *  Used during parse to record stack of rule invocations and during
  *  ATN simulation to record invoking states.
  */
-public class RuleContext {
+public class RuleContext implements ParseTree.RuleNode {
 	public static final RuleContext EMPTY = new RuleContext();
 
 	/** What context invoked this rule? */
 	public RuleContext parent;
+
+	/** If we are debugging or building a parse tree for a visitor,
+	 *  we need to track all of the tokens and rule invocations associated
+	 *  with this rule's context. This is empty for normal parsing
+	 *  operation because we don't the need to track the details about
+	 *  how we parse this rule.
+	 */
+	public List<ParseTree> children;
+
+	/** For debugging/tracing purposes, we want to track all of the nodes in
+	 *  the ATN traversed by the parser for a particular rule.
+	 *  This list indicates the sequence of ATN nodes used to match
+	 *  the elements of the children list. This list does not include
+	 *  ATN nodes and other rules used to match rule invocations. It
+	 *  tracks the rule invocation node itself but nothing inside that
+	 *  other rule.
+	 *
+	 *  There is a one-to-one correspondence between the children and
+	 *  states list. children[i] is an element matched at node states[i]
+	 *  in the ATN.
+	 *
+	 *  The parser move method updates field s and adds it to this list
+	 *  if we are debugging/tracing.
+	 */
+	public List<Integer> states;
 
 	/** Current ATN state number we are executing.
 	 *
@@ -107,6 +135,7 @@ public class RuleContext {
 		}
 		return n;
 	}
+
 	/** Two contexts are equals() if both have
 	 *  same call stack; walk upwards to the root.
 	 *  Note that you may be comparing contexts in different alt trees.
@@ -203,6 +232,18 @@ public class RuleContext {
 	public boolean isEmpty() {
 		return invokingState == -1;
 	}
+
+	public ParseTree getChild(int i) {
+		return children!=null ? children.get(i) : null;
+	}
+
+	public RuleContext getRuleContext() { return this; }
+
+	public ParseTree getParent() { return parent; }
+
+	public Object getPayload() { return this; }
+
+	public int getChildCount() { return children!=null ? children.size() : 0; }
 
 	public String toString() {
 		return toString(null);

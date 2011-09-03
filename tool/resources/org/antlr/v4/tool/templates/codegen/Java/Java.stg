@@ -311,13 +311,11 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-_localctx.s = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks:{e| <e>}>);
+move(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks:{e| <e>}>);
 >>
 
 MatchToken(m) ::= <<
-_localctx.s = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
+move(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -325,7 +323,7 @@ MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
-_localctx.s = <m.stateNumber>;
+move(<m.stateNumber>);
 <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>input.LT(1);
 <capture>
 if ( <if(!invert)>!<endif>(<expr>) ) throw new MismatchedSetException(this, input);
@@ -333,7 +331,7 @@ input.consume();
 >>
 
 Wildcard(w) ::= <<
-_localctx.s = <w.stateNumber>;
+move(<w.stateNumber>);
 <if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>input.LT(1); input.consume();
 >>
 
