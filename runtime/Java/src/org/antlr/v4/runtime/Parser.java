@@ -80,18 +80,26 @@ public class Parser extends BaseRecognizer {
 	}
 
     public TokenStream getTokenStream() {
-		return (TokenStream)input;
+		return input;
 	}
 
 	public String getSourceName() {
 		return input.getSourceName();
 	}
 
-	public void traceIn(int ruleIndex, ParserRuleContext ctx)  {
-		super.traceIn(getRuleNames()[ruleIndex], ruleIndex, input.LT(1));
-	}
+	/** Always called by generated parsers upon entry to a rule.
+	 *  This occurs after the new context has been pushed. Access field
+	 *  _ctx get the current context.
+	 *
+	 *  The HotSpot compiler should optimize/inline these empty methods
+	 *  so there is no overhead to always having the parser call them.
+	 *  It is also much more flexible because users do not have to
+	 *  regenerate parsers to get trace facilities.
+	 *
+	 *  These methods along with an override of match() are used to build
+	 *  parse trees as well.
+	 */
+	public void enterRule(int ruleIndex) { }
 
-	public void traceOut(int ruleIndex, ParserRuleContext ctx)  {
-		super.traceOut(getRuleNames()[ruleIndex], ruleIndex, input.LT(1));
-	}
+	public void exitRule(int ruleIndex) { }
 }

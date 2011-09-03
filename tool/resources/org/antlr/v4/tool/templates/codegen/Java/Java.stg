@@ -128,8 +128,9 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
     <currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
-    _ctx = _localctx;
     <currentRule.name>_stk.push(_localctx);
+    _ctx = _localctx;
+    enterRule(<currentRule.index>);
     _localctx.start = input.LT(1);
     //System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+input.LT(1).getText());
     <namedActions.init>
@@ -148,6 +149,7 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
         <currentRule.name>_stk.pop();
         _ctx = (ParserRuleContext)_ctx.parent;
         <finallyAction>
+        exitRule(<currentRule.index>);
     	// System.out.println("exit "+ruleNames[<currentRule.index>]);
 	}
     return _localctx;

@@ -27,63 +27,61 @@
  */
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** A record of the rules used to match a token sequence.  The tokens
  *  end up as the leaves of this tree and rule nodes are the interior nodes.
- *  This really adds no functionality, it is just an alias for CommonTree
- *  that is more meaningful (specific) and holds a String to display for a node.
  */
-public class ParseTree extends BaseTree {
-	public Object payload;
-	public List hiddenTokens;
+public abstract class ParseTree {
 
-	public ParseTree(Object label) {
-		this.payload = label;
-	}
-
-	public Tree dupNode() {
-		return null;
-	}
-
-	public int getType() {
-		return 0;
-	}
-
-	public String getText() {
-		return toString();
-	}
-
-	public int getTokenStartIndex() {
-		return 0;
-	}
-
-	public void setTokenStartIndex(int index) {
-	}
-
-	public int getTokenStopIndex() {
-		return 0;
-	}
-
-	public void setTokenStopIndex(int index) {
-	}
-
-	public String toString() {
-		if ( payload instanceof Token ) {
-			Token t = (Token)payload;
-			if ( t.getType() == Token.EOF ) {
-				return "<EOF>";
-			}
-			return t.getText();
+	public static class TokenNode extends ParseTree {
+		public Token token;
+		public TokenNode(Token token) {
+			this.token = token;
 		}
-		return payload.toString();
+
+		@Override
+		public String toString() {
+			if ( token.getType() == Token.EOF ) return "<EOF>";
+			return token.getText();
+		}
 	}
 
-	/** Emit a token and all hidden nodes before.  EOF node holds all
-	 *  hidden tokens after last real token.
-	 */
+	public static class RuleNode extends ParseTree {
+		public RuleContext ctx;
+		public String ruleName;
+		public RuleNode(String ruleName, RuleContext ctx) {
+			this.ruleName = ruleName;
+			this.ctx = ctx;
+		}
+		public String toString() { return ruleName; }
+	}
+
+	protected ParseTree parent;
+	protected List<ParseTree> children;
+	protected List hiddenTokens;
+
+	/** Add t as child of this node.  t must not be nil node. */
+	public void addChild(ParseTree t) {
+		if ( children==null ) children = new ArrayList<ParseTree>();
+		children.add(t);
+	}
+
+	public ParseTree getChild(int i) {
+		if ( children==null || i>=children.size() ) {
+			return null;
+		}
+		return children.get(i);
+	}
+
+	public ParseTree getParent() { return parent; }
+
+	public void setParent(ParseTree t) { parent = t; }
+
 	public String toStringWithHiddenTokens() {
 		StringBuffer buf = new StringBuffer();
 		if ( hiddenTokens!=null ) {
@@ -106,13 +104,13 @@ public class ParseTree extends BaseTree {
 		return buf.toString();
 	}
 
-	public void _toStringLeaves(StringBuffer buf) {
-		if ( payload instanceof Token ) { // leaf node token?
+	protected void _toStringLeaves(StringBuffer buf) {
+		if ( children==null ) { // leaf node token?
 			buf.append(this.toStringWithHiddenTokens());
 			return;
 		}
 		for (int i = 0; children!=null && i < children.size(); i++) {
-			ParseTree t = (ParseTree)children.get(i);
+			ParseTree t = children.get(i);
 			t._toStringLeaves(buf);
 		}
 	}

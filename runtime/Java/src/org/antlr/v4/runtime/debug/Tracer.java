@@ -42,19 +42,21 @@ public class Tracer extends BlankDebugEventListener {
 		this.input = input;
 	}
 
-	public void enterRule(String ruleName) {
+	@Override
+	public void enterRule(String grammarFileName, String ruleName) {
 		for (int i=1; i<=level; i++) {System.out.print(" ");}
 		System.out.println("> "+ruleName+" lookahead(1)="+getInputSymbol(1));
 		level++;
 	}
 
-	public void exitRule(String ruleName) {
+	@Override
+	public void exitRule(String grammarFileName, String ruleName) {
 		level--;
 		for (int i=1; i<=level; i++) {System.out.print(" ");}
 		System.out.println("< "+ruleName+" lookahead(1)="+getInputSymbol(1));
 	}
 
-	public Object getInputSymbol(int k) {
+	protected Object getInputSymbol(int k) {
 		if ( input instanceof TokenStream) {
 			return ((TokenStream)input).LT(k);
 		}
