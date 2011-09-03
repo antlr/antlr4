@@ -187,11 +187,11 @@ public class RecognitionException extends RuntimeException {
 	/** Return the token type or char of the unexpected input element */
 	public int getUnexpectedType() {
 		if ( recognizer==null ) return token.getType();
-		if ( recognizer.input instanceof TokenStream) {
+		if ( recognizer._input instanceof TokenStream) {
 			return token.getType();
 		}
-		else if ( recognizer.input instanceof TreeNodeStream) {
-			TreeNodeStream nodes = (TreeNodeStream)recognizer.input;
+		else if ( recognizer._input instanceof TreeNodeStream) {
+			TreeNodeStream nodes = (TreeNodeStream)recognizer._input;
 			TreeAdaptor adaptor = nodes.getTreeAdaptor();
 			return adaptor.getType(node);
 		}

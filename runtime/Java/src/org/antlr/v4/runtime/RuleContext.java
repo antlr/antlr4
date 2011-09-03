@@ -31,7 +31,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.List;
+import java.util.*;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -59,14 +59,15 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  This list indicates the sequence of ATN nodes used to match
 	 *  the elements of the children list. This list does not include
 	 *  ATN nodes and other rules used to match rule invocations. It
-	 *  tracks the rule invocation node itself but nothing inside that
-	 *  other rule.
+	 *  traces the rule invocation node itself but nothing inside that
+	 *  other rule's ATN submachine.
 	 *
-	 *  There is a one-to-one correspondence between the children and
-	 *  states list. children[i] is an element matched at node states[i]
-	 *  in the ATN.
+	 *  There is NOT a one-to-one correspondence between the children and
+	 *  states list. There are typically many nodes in the ATN traversed
+	 *  for each element in the children list. For example, for a rule
+	 *  invocation there is the invoking state and the following state.
 	 *
-	 *  The parser move method updates field s and adds it to this list
+	 *  The parser move() method updates field s and adds it to this list
 	 *  if we are debugging/tracing.
 	 */
 	public List<Integer> states;
@@ -134,6 +135,24 @@ public class RuleContext implements ParseTree.RuleNode {
 			n++;
 		}
 		return n;
+	}
+
+	public void addChild(Token matchedToken) {
+		if ( children==null ) children = new ArrayList<ParseTree>();
+		TokenNodeImpl t = new TokenNodeImpl(matchedToken);
+		t.parent = this;
+		t.s = this.s;
+		children.add(t);
+	}
+
+	public void addChild(RuleContext ruleInvocation) {
+		if ( children==null ) children = new ArrayList<ParseTree>();
+		children.add(ruleInvocation);
+	}
+
+	public void trace(int s) {
+		if ( states==null ) states = new ArrayList<Integer>();
+		states.add(s);
 	}
 
 	/** Two contexts are equals() if both have
@@ -232,6 +251,8 @@ public class RuleContext implements ParseTree.RuleNode {
 	public boolean isEmpty() {
 		return invokingState == -1;
 	}
+
+	// satisfy the ParseTree interface
 
 	public ParseTree getChild(int i) {
 		return children!=null ? children.get(i) : null;

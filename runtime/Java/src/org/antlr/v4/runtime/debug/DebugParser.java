@@ -27,9 +27,7 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 
 import java.io.IOException;
 
@@ -53,8 +51,8 @@ public class DebugParser extends Parser {
 	 *  input stream too that it should send events to this listener.
 	 */
 	public void setDebugListener(DebugEventListener dbg) {
-		if ( input instanceof DebugTokenStream ) {
-			((DebugTokenStream)input).setDebugListener(dbg);
+		if ( _input instanceof DebugTokenStream ) {
+			((DebugTokenStream) _input).setDebugListener(dbg);
 		}
 		this.dbg = dbg;
 	}

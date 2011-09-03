@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.*;
 
 /** An interface to access the tree of RuleContext objects created
  *  during a parse that makes the data structure look like a simple parse tree.
- *  This note represents both internal nodes, rule invocations,
+ *  This node represents both internal nodes, rule invocations,
  *  and leaf nodes, token matches.
  *
  *  Unlike the common AST stuff in the runtime library, there is no such thing
@@ -51,9 +51,7 @@ public interface ParseTree {
 		public ParseTree parent;
 		/** Which ATN node matched this token? */
 		public int s;
-		public TokenNodeImpl(Token token) {
-			this.token = token;
-		}
+		public TokenNodeImpl(Token token) {	this.token = token;	}
 
 		public ParseTree getChild(int i) {return null;}
 

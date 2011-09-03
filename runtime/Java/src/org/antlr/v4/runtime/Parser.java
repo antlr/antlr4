@@ -29,8 +29,7 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.CommonTreeAdaptor;
-import org.antlr.v4.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.tree.*;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
@@ -45,13 +44,13 @@ public class Parser extends BaseRecognizer {
 
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
-		if ( input!=null ) {
-			input.seek(0); // rewind the input
+		if ( _input !=null ) {
+			_input.seek(0); // rewind the input
 		}
 	}
 
 	protected Object getCurrentInputSymbol() {
-		return input.LT(1);
+		return _input.LT(1);
 	}
 
 	protected Object getMissingSymbol(RecognitionException e,
@@ -61,9 +60,9 @@ public class Parser extends BaseRecognizer {
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+getTokenNames()[expectedTokenType]+">";
 		CommonToken t = new CommonToken(expectedTokenType, tokenText);
-		Token current = input.LT(1);
+		Token current = _input.LT(1);
 		if ( current.getType() == Token.EOF ) {
-			current = input.LT(-1);
+			current = _input.LT(-1);
 		}
 		t.line = current.getLine();
 		t.charPositionInLine = current.getCharPositionInLine();
@@ -74,32 +73,16 @@ public class Parser extends BaseRecognizer {
 
 	/** Set the token stream and reset the parser */
 	public void setTokenStream(TokenStream input) {
-		this.input = null;
+		this._input = null;
 		reset();
-		this.input = input;
+		this._input = input;
 	}
 
     public TokenStream getTokenStream() {
-		return input;
+		return _input;
 	}
 
 	public String getSourceName() {
-		return input.getSourceName();
+		return _input.getSourceName();
 	}
-
-	/** Always called by generated parsers upon entry to a rule.
-	 *  This occurs after the new context has been pushed. Access field
-	 *  _ctx get the current context.
-	 *
-	 *  The HotSpot compiler should optimize/inline these empty methods
-	 *  so there is no overhead to always having the parser call them.
-	 *  It is also much more flexible because users do not have to
-	 *  regenerate parsers to get trace facilities.
-	 *
-	 *  These methods along with an override of match() are used to build
-	 *  parse trees as well.
-	 */
-	public void enterRule(int ruleIndex) { }
-
-	public void exitRule(int ruleIndex) { }
 }

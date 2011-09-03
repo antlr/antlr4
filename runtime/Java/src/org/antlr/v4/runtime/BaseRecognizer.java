@@ -41,21 +41,25 @@ import java.util.*;
  *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
 public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
-
-	public static final int MEMO_RULE_FAILED = -2;
-	public static final int MEMO_RULE_UNKNOWN = -1;
-
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
-	public TokenStream input;
+	protected TokenStream _input;
 
-	public ParserRuleContext _ctx; // current _ctx of executing rule
+	/** The RuleContext object for the currently executing rule. This
+	 *  must be non-null during parsing, but is initially null.
+	 *  When somebody calls the start rule, this gets set to the
+	 *  root context.
+	 */
+	protected ParserRuleContext _ctx;
+
+	protected boolean buildParseTrees;
+	protected boolean traceATNStates;
 
 	/** This is true when we see an error and before having successfully
 	 *  matched a token.  Prevents generation of more than one error message
 	 *  per error.
 	 */
-	public boolean errorRecovery = false;
+	protected boolean errorRecovery = false;
 
 	/** The index into the input stream where the last error occurred.
 	 * 	This is used to prevent infinite loops where an error is found
@@ -63,27 +67,27 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
 	 *  one token/tree node is consumed for two errors.
 	 */
-	public int lastErrorIndex = -1;
+	protected int lastErrorIndex = -1;
 
 	/** In lieu of a return value, this indicates that a rule or token
 	 *  has failed to match.  Reset to false upon valid token match.
 	 */
-	public boolean failed = false;
+//	protected boolean failed = false;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	public int syntaxErrors = 0;
 
 	public BaseRecognizer(TokenStream input) {
-		this.input = input;
+		this._input = input;
 	}
 
 	/** reset the parser's state */
 	public void reset() {
-		if ( input!=null ) input.seek(0);
+		if ( _input !=null ) _input.seek(0);
 		errorRecovery = false;
 		_ctx = null;
 		lastErrorIndex = -1;
-		failed = false;
+//		failed = false;
 	}
 
 	/** Match current input symbol against ttype.  Attempt
@@ -100,10 +104,11 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	public Object match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
 		Object matchedSymbol = getCurrentInputSymbol();
-		if ( input.LA(1)==ttype ) {
-			input.consume();
+		if ( _input.LA(1)==ttype ) {
+			_input.consume();
 			errorRecovery = false;
-			failed = false;
+//			failed = false;
+			if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
 			return matchedSymbol;
 		}
 //		System.out.println("MATCH failure at state "+_ctx.s+
@@ -118,7 +123,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	// like matchSet but w/o consume; error checking routine.
 	public void sync(IntervalSet expecting) {
-		if ( expecting.member(input.LA(1)) ) return;
+		if ( expecting.member(_input.LA(1)) ) return;
 //		System.out.println("failed sync to "+expecting);
 		IntervalSet followSet = computeErrorRecoverySet();
 		followSet.addAll(expecting);
@@ -129,12 +134,12 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	/** Match the wildcard: in a symbol */
 	public void matchAny() {
 		errorRecovery = false;
-		failed = false;
-		input.consume();
+//		failed = false;
+		_input.consume();
 	}
 
 	public boolean mismatchIsUnwantedToken(int ttype) {
-		return input.LA(2)==ttype;
+		return _input.LA(2)==ttype;
 	}
 
 	public boolean mismatchIsMissingToken(IntervalSet follow) {
@@ -169,6 +174,42 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		}
 		return false;
 		*/
+	}
+
+	/** Track the RuleContext objects during the parse and hook them up
+	 *  using the children list so that it forms a parse tree.
+	 *  The RuleContext returned from the start rule represents the root
+	 *  of the parse tree.
+	 *
+	 *  To built parse trees, all we have to do is put a hook in move()
+	 *  and enterRule(). In move(), we had tokens to the current context
+	 *  as children. By the time we get to enterRule(), we are already
+	 *  in in invoke rule so we add this context As a child of the parent
+	 *  (invoking) context. Simple and effective.
+	 *
+	 *  Note that if we are not building parse trees, rule contexts
+	 *  only point upwards. When a rule exits, it returns the context
+	 *  but that gets garbage collected if nobody holds a reference.
+	 *  It points upwards but nobody points at it.
+	 *
+	 *  When we build parse trees, we are adding all of these contexts to
+	 *  somebody's children list. Contexts are then not candidates
+	 *  for garbage collection.
+	 */
+	public void setBuildParseTrees(boolean buildParseTrees) {
+		this.buildParseTrees = buildParseTrees;
+	}
+
+	public boolean getBuildParseTrees() {
+		return buildParseTrees;
+	}
+
+	public void setTraceATNStates(boolean traceATNStates) {
+		this.traceATNStates = traceATNStates;
+	}
+
+	public boolean getTraceATNStates() {
+		return traceATNStates;
 	}
 
 	/** Report a recognition problem.
@@ -217,7 +258,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  token that the match() routine could not recover from.
 	 */
 	public void recover() {
-		input.consume();
+		_input.consume();
 		/*
 		if ( lastErrorIndex==input.index() ) {
 			// uh oh, another error at same token index; must be a case
@@ -449,30 +490,30 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		RecognitionException e = null;
 		// if next token is what we are looking for then "delete" this token
 		if ( mismatchIsUnwantedToken(ttype) ) {
-			e = new UnwantedTokenException(this, input, ttype);
+			e = new UnwantedTokenException(this, _input, ttype);
 			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
 							   ((TokenStream)input).LT(1)+
 							   " since "+((TokenStream)input).LT(2)+" is what we want");
 							   */
 			beginResync();
-			input.consume(); // simply delete extra token
+			_input.consume(); // simply delete extra token
 			endResync();
 			reportError(e);  // report after consuming so AW sees the token in the exception
 			// we want to return the token we're actually matching
 			Object matchedSymbol = getCurrentInputSymbol();
-			input.consume(); // move past ttype token as if all were ok
+			_input.consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
 		// can't recover with single token deletion, try insertion
 		if ( mismatchIsMissingToken(follow) ) {
 			Object inserted = getMissingSymbol(e, ttype, follow);
-			e = new MissingTokenException(this, input, ttype, inserted);
+			e = new MissingTokenException(this, _input, ttype, inserted);
 			reportError(e);  // report after inserting so AW sees the token in the exception
 			return inserted;
 		}
 		// even that didn't work; must throw the exception
-		e = new MismatchedTokenException(this, input, ttype);
+		e = new MismatchedTokenException(this, _input, ttype);
 		throw e;
 	}
 
@@ -527,21 +568,21 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	public void consumeUntil(int tokenType) {
 		//System.out.println("consumeUntil "+tokenType);
-		int ttype = input.LA(1);
+		int ttype = _input.LA(1);
 		while (ttype != Token.EOF && ttype != tokenType) {
-			input.consume();
-			ttype = input.LA(1);
+			_input.consume();
+			ttype = _input.LA(1);
 		}
 	}
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(IntervalSet set) {
 		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
-		int ttype = input.LA(1);
+		int ttype = _input.LA(1);
 		while (ttype != Token.EOF && !set.member(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
-			input.consume();
-			ttype = input.LA(1);
+			_input.consume();
+			ttype = _input.LA(1);
 		}
 	}
 
@@ -588,7 +629,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	}
 
     /** Return whether or not a backtracking attempt failed. */
-    public boolean failed() { return failed; }
+//    public boolean failed() { return failed; }
 
 	/** For debugging and other purposes, might want the grammar name.
 	 *  Have ANTLR generate an implementation for this method.
@@ -611,18 +652,18 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		return strings;
 	}
 
-	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
-		System.out.print("enter "+ruleName+" "+inputSymbol);
-		System.out.println();
-	}
-
-	public void traceOut(String ruleName,
-						 int ruleIndex,
-						 Object inputSymbol)
-	{
-		System.out.print("exit "+ruleName+" "+inputSymbol);
-		System.out.println();
-	}
+//	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
+//		System.out.print("enter "+ruleName+" "+inputSymbol);
+//		System.out.println();
+//	}
+//
+//	public void traceOut(String ruleName,
+//						 int ruleIndex,
+//						 Object inputSymbol)
+//	{
+//		System.out.print("exit "+ruleName+" "+inputSymbol);
+//		System.out.println();
+//	}
 
 	/** Indicate that the recognizer has changed internal state that is
 	 *  consistent with the ATN state passed in.  This way we always know
@@ -631,7 +672,28 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  invoking rules. Combine this and we have complete ATN
 	 *  configuration information.
 	 */
-	public void move(int atnState) { _ctx.s = atnState; }
+	public void move(int atnState) {
+		_ctx.s = atnState;
+		if ( traceATNStates ) _ctx.trace(atnState);
+	}
+
+	/** Always called by generated parsers upon entry to a rule.
+	 *  This occurs after the new context has been pushed. Access field
+	 *  _ctx get the current context.
+	 *
+	 *  This is flexible because users do not have to regenerate parsers
+	 *  to get trace facilities.
+	 *
+	 *  These methods along with an override of match() are used to build
+	 *  parse trees as well.
+	 */
+	public void enterRule(int ruleIndex) {
+		if ( buildParseTrees ) {
+			if ( _ctx.parent!=null ) _ctx.parent.addChild(_ctx);
+		}
+	}
+
+	public void exitRule(int ruleIndex) { }
 
 	/* In v3, programmers altered error messages by overriding
 	   displayRecognitionError() and possibly getTokenErrorDisplay().
@@ -651,11 +713,14 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	   messing up the programmers' error handling.
 	 */
 
-	public void reportConflict(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {}
+	public void reportConflict(int startIndex, int stopIndex, Set<Integer> alts,
+							   OrderedHashSet<ATNConfig> configs) {}
 
-	public void reportContextSensitivity(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {}
+	public void reportContextSensitivity(int startIndex, int stopIndex,
+										 Set<Integer> alts,
+										 OrderedHashSet<ATNConfig> configs) {}
 
 	/** If context sensitive parsing, we know it's ambiguity not conflict */
-	public void reportAmbiguity(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {}
-
+	public void reportAmbiguity(int startIndex, int stopIndex, Set<Integer> alts,
+								OrderedHashSet<ATNConfig> configs) {}
 }

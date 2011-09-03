@@ -131,13 +131,13 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
     <currentRule.name>_stk.push(_localctx);
     _ctx = _localctx;
     enterRule(<currentRule.index>);
-    _localctx.start = input.LT(1);
-    //System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+input.LT(1).getText());
+    _localctx.start = _input.LT(1);
+    //System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+_input.LT(1).getText());
     <namedActions.init>
     <locals; separator="\n">
 	try {
 	    <code>
-        _localctx.stop = input.LT(-1);
+        _localctx.stop = _input.LT(-1);
 	    <postamble; separator="\n">
         <namedActions.after>
 	}
@@ -165,9 +165,9 @@ CodeBlockForAlt(c, locals, preamble, ops) ::= <<
 >>
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
-<if(choice.label)><labelref(choice.label)> = input.LT(1);<endif>
+<if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
-switch ( input.LA(1) ) {
+switch ( _input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -177,7 +177,7 @@ switch ( input.LA(1) ) {
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
-switch ( input.LA(1) ) {
+switch ( _input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -197,7 +197,7 @@ if ( <expr> ) {
 LL1StarBlock(choice, alts, sync) ::= <<
 <choice.loopLabel>:
 while (true) {
-	switch ( input.LA(1) ) {
+	switch ( _input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(look)>
 	<alt>
 		break;}; separator="\n">
@@ -220,7 +220,7 @@ while ( <loopExpr> ) {
 LL1PlusBlock(choice, alts, iteration, loopExpr, sync, error, iterationSync) ::= <<
 //<sync>
 do {
-	switch ( input.LA(1) ) {
+	switch ( _input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(look)>
 	<alt>
 	break;}; separator="\n">
@@ -247,9 +247,9 @@ do {
 // LL(*) stuff
 
 AltBlock(choice, preamble, alts, error) ::= <<
-<if(choice.label)><labelref(choice.label)> = input.LT(1);<endif>
+<if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
-switch ( _interp.adaptivePredict(input,<choice.decision>,_ctx) ) {
+switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
 	<alt>
@@ -260,7 +260,7 @@ case <i>:
 >>
 
 OptionalBlock(choice, alts, error) ::= <<
-switch ( _interp.adaptivePredict(input,<choice.decision>,_ctx) ) {
+switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
 	<alt>
@@ -271,7 +271,7 @@ case <i>:
 // TODO: we we need uniqueID? a single _alt might work
 
 StarBlock(choice, alts, sync) ::= <<
-int _alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
+int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
@@ -279,12 +279,12 @@ case <i>:
 	<alt>
 	break;}; separator="\n">
 	}
-	_alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
+	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
-int _alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
+int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 do {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
@@ -294,7 +294,7 @@ case <i>:
 	    default :
 		    <error>
 	}
-	_alt<choice.uniqueID> = _interp.adaptivePredict(input,<choice.decision>,_ctx);
+	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 } while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );
 >>
 
@@ -324,15 +324,15 @@ MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
 move(<m.stateNumber>);
-<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>input.LT(1);
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_input.LT(1);
 <capture>
-if ( <if(!invert)>!<endif>(<expr>) ) throw new MismatchedSetException(this, input);
-input.consume();
+if ( <if(!invert)>!<endif>(<expr>) ) throw new MismatchedSetException(this, _input);
+_input.consume();
 >>
 
 Wildcard(w) ::= <<
 move(<w.stateNumber>);
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>input.LT(1); input.consume();
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>_input.LT(1); _input.consume();
 >>
 
 // ACTION STUFF
@@ -344,7 +344,7 @@ ForcedAction(a, chunks) ::= "<chunks>"
 ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks) ::= <<
-if (!(<chunks>)) throw new FailedPredicateException(this, input, "<currentRule.name>", ""<!"<chunks>"!>);
+if (!(<chunks>)) throw new FailedPredicateException(this, _input, "<currentRule.name>", ""<!"<chunks>"!>);
 >>
 
 ActionText(t) ::= "<t.text>"
@@ -372,13 +372,13 @@ TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localct
 RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.start):null)"
 RulePropertyRef_stop(r)  ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.stop):null)"
 RulePropertyRef_tree(r)  ::= "(_localctx.<r.label>!=null?((<file.ASTLabelType>)_localctx.<r.label>.tree):null)"
-RulePropertyRef_text(r)  ::= "(_localctx.<r.label>!=null?((TokenStream)input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
+RulePropertyRef_text(r)  ::= "(_localctx.<r.label>!=null?((TokenStream)_input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
 RulePropertyRef_st(r)    ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)  ::= "_localctx.stop"
 ThisRulePropertyRef_tree(r)  ::= "_localctx.tree"
-ThisRulePropertyRef_text(r)  ::= "((TokenStream)input).toString(_localctx.start, input.LT(-1))"
+ThisRulePropertyRef_text(r)  ::= "((TokenStream)_input).toString(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_st(r)    ::= "_localctx.st"
 
 //NonLocalContextRef(s)           ::= "<s.scope>"
@@ -402,8 +402,8 @@ ImplicitRuleLabel(ruleName)   ::= "_r<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
 ListLabelName(label)		  ::= "<label>_list"
 
-CaptureNextToken(d) ::= "<d.varName> = input.LT(1);"
-CaptureNextTokenType(d) ::= "<d.varName> = input.LA(1);"
+CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
 StructDecl(s,attrs) ::= <<
 public static class <s.name> extends ParserRuleContext {
