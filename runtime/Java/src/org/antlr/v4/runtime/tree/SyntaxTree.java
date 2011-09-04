@@ -32,12 +32,13 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** A tree that knows about an interval in a token stream
- *  is some kind of syntax tree.
+ *  is some kind of syntax tree. Subinterfaces distinguish
+ *  between parse trees and ASTs.
  */
 public interface SyntaxTree extends Tree {
 	/** Return an interval indicating the index in the TokenStream of
 	 *  the 1st and last token associated with this subtree. If this
-	 *  note choose to use a leaf, then the interval represents a single token.
+	 *  node is a leaf, then the interval represents a single token.
 	 *
 	 *  If source interval is unknown, this does not return null.
 	 *  It returns an interval of length 0.
