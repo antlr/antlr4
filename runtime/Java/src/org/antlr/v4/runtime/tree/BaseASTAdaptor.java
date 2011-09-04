@@ -33,24 +33,15 @@ import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-/** A TreeAdaptor that works with any Tree implementation. */
-public abstract class BaseTreeAdaptor implements TreeAdaptor {
+/** An ASTAdaptor that works with any BaseAST implementation. */
+public abstract class BaseASTAdaptor implements ASTAdaptor {
 	/** System.identityHashCode() is not always unique; we have to
 	 *  track ourselves.  That's ok, it's only for debugging, though it's
 	 *  expensive: we have to create a hashtable with all tree nodes in it.
+	 *  TODO: rm?
 	 */
-	protected Map treeToUniqueIDMap;
+	protected Map<BaseAST, Integer> treeToUniqueIDMap;
 	protected int uniqueNodeID = 1;
-
-	// BEGIN v4 stuff
-
-	/* not needed
-	public void addChildren(Object root, List kids) {
-		if ( root!=null ) ((Tree)root).addChildren(kids);
-	}
-
-	public List getChildren(Object root) { return ((Tree)root).getChildren(); }
-	 */
 
 	public List<Object> createElementList() {
 		return new ElementList<Object>(this);
@@ -66,7 +57,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  with an error.
 	 *
 	 *  If you specify your own kind of tree nodes, you will likely have to
-	 *  override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
+	 *  override this method. CommonAST returns Token.INVALID_TOKEN_TYPE
 	 *  if no token payload but you might have to set token type for diff
 	 *  node type.
      *
@@ -82,7 +73,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public boolean isNil(Object tree) {
-		return ((Tree)tree).isNil();
+		return ((AST)tree).isNil();
 	}
 
 	public Object dupTree(Object tree) {
@@ -90,7 +81,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	/** This is generic in the sense that it will work with any kind of
-	 *  tree (not just Tree interface).  It invokes the adaptor routines
+	 *  tree (not just AST interface).  It invokes the adaptor routines
 	 *  not the tree node routines to do the construction.
 	 */
 	public Object dupTree(Object t, Object parent) {
@@ -119,7 +110,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 */
 	public void addChild(Object t, Object child) {
 		if ( t!=null && child!=null ) {
-			((Tree)t).addChild((Tree)child);
+			((BaseAST)t).addChild((BaseAST) child);
 		}
 	}
 
@@ -151,15 +142,15 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 */
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
         //System.out.println("becomeroot new "+newRoot.toString()+" old "+oldRoot);
-        Tree newRootTree = (Tree)newRoot;
-		Tree oldRootTree = (Tree)oldRoot;
+        BaseAST newRootTree = (BaseAST)newRoot;
+		BaseAST oldRootTree = (BaseAST)oldRoot;
 		if ( oldRoot==null ) {
 			return newRoot;
 		}
 		// handle ^(nil real-node)
 		if ( newRootTree.isNil() ) {
             int nc = newRootTree.getChildCount();
-            if ( nc==1 ) newRootTree = (Tree)newRootTree.getChild(0);
+            if ( nc==1 ) newRootTree = newRootTree.getChild(0);
             else if ( nc >1 ) {
 				// TODO: make tree run time exceptions hierarchy
 				throw new RuntimeException("more than one node as root (TODO: make exception hierarchy)");
@@ -174,14 +165,14 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	/** Transform ^(nil x) to x and nil to null */
 	public Object rulePostProcessing(Object root) {
-		//System.out.println("rulePostProcessing: "+((Tree)root).toStringTree());
-		Tree r = (Tree)root;
+		//System.out.println("rulePostProcessing: "+((AST)root).toStringTree());
+		BaseAST r = (BaseAST)root;
 		if ( r!=null && r.isNil() ) {
 			if ( r.getChildCount()==0 ) {
 				r = null;
 			}
 			else if ( r.getChildCount()==1 ) {
-				r = (Tree)r.getChild(0);
+				r = r.getChild(0);
 				// whoever invokes rule will set parent and child index
 				r.setParent(null);
 				r.setChildIndex(-1);
@@ -198,7 +189,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		WritableToken tok = createToken(fromToken);
 		//((ClassicToken)fromToken).setType(tokenType);
 		tok.setType(tokenType);
-		Tree t = (Tree)create(tok);
+		AST t = (AST)create(tok);
 		return t;
 	}
 
@@ -207,46 +198,46 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		WritableToken tok = createToken(fromToken);
 		tok.setType(tokenType);
 		tok.setText(text);
-		Tree t = (Tree)create(tok);
+		AST t = (AST)create(tok);
 		return t;
 	}
 
 	public Object create(int tokenType, String text) {
 		Token fromToken = createToken(tokenType, text);
-		Tree t = (Tree)create(fromToken);
+		AST t = (AST)create(fromToken);
 		return t;
 	}
 
 	public int getType(Object t) {
-		return ((Tree)t).getType();
+		return ((AST)t).getType();
 	}
 
 	public void setType(Object t, int type) {
-		throw new NoSuchMethodError("don't know enough about Tree node");
+		throw new NoSuchMethodError("don't know enough about AST node");
 	}
 
 	public String getText(Object t) {
-		return ((Tree)t).getText();
+		return ((AST)t).getText();
 	}
 
 	public void setText(Object t, String text) {
-		throw new NoSuchMethodError("don't know enough about Tree node");
+		throw new NoSuchMethodError("don't know enough about AST node");
 	}
 
 	public Object getChild(Object t, int i) {
-		return ((Tree)t).getChild(i);
+		return ((AST)t).getChild(i);
 	}
 
 	public void setChild(Object t, int i, Object child) {
-		((Tree)t).setChild(i, (Tree)child);
+		((BaseAST)t).setChild(i, (BaseAST)child);
 	}
 
 	public Object deleteChild(Object t, int i) {
-		return ((Tree)t).deleteChild(i);
+		return ((BaseAST)t).deleteChild(i);
 	}
 
 	public int getChildCount(Object t) {
-		return ((Tree)t).getChildCount();
+		return ((BaseAST)t).getChildCount();
 	}
 
 	public int getUniqueID(Object node) {
@@ -255,10 +246,10 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		}
 		Integer prevID = (Integer)treeToUniqueIDMap.get(node);
 		if ( prevID!=null ) {
-			return prevID.intValue();
+			return prevID;
 		}
 		int ID = uniqueNodeID;
-		treeToUniqueIDMap.put(node, new Integer(ID));
+		treeToUniqueIDMap.put((BaseAST)node, ID);
 		uniqueNodeID++;
 		return ID;
 		// GC makes these nonunique:

@@ -32,6 +32,8 @@ package org.antlr.v4.runtime.misc;
 public class Interval {
 	public static final int INTERVAL_POOL_MAX_VALUE = 1000;
 
+	public static final Interval ZeroLength = new Interval(0,-1);
+
 	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
 	public int a;

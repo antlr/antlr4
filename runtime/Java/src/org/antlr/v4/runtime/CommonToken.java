@@ -100,10 +100,10 @@ public class CommonToken implements WritableToken, Serializable {
 		if ( text!=null ) {
 			return text;
 		}
-		CharStream input = getTokenSource().getInputStream();
-		if ( input==null ) {
-			return null;
-		}
+		TokenSource tokens = getTokenSource();
+		if ( tokens==null ) return null;
+		CharStream input = tokens.getInputStream();
+		if ( input==null ) return null;
 		int n = input.size();
 		if ( start<n && stop<n) {
 			return input.substring(start,stop);

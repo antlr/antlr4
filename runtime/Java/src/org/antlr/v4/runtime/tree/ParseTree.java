@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
  *  during a parse that makes the data structure look like a simple parse tree.
@@ -39,7 +40,7 @@ import org.antlr.v4.runtime.*;
  *  Unlike the common AST stuff in the runtime library, there is no such thing
  *  as a nil node. The payload is either a token or a context object.
  */
-public interface ParseTree {
+public interface ParseTree extends SyntaxTree {
 	public interface RuleNode extends ParseTree {
 		RuleContext getRuleContext();
 	}
@@ -59,7 +60,12 @@ public interface ParseTree {
 
 		public ParseTree getParent() { return parent; }
 
-		public Object getPayload() { return token; }
+		public Token getPayload() { return token; }
+
+		public Interval getSourceInterval() {
+			if ( token==null ) return Interval.ZeroLength;
+			return new Interval(token.getTokenIndex(), token.getTokenIndex());
+		}
 
 		public int getChildCount() { return 0; }
 
@@ -68,23 +74,9 @@ public interface ParseTree {
 			if ( token.getType() == Token.EOF ) return "<EOF>";
 			return token.getText();
 		}
+
+		public String toStringTree() {
+			return toString();
+		}
 	}
-
-	/** The parent of this node. If the return value is null, then this
-	 *  node is the root of the parse tree.
-	 */
-	ParseTree getParent();
-
-	/** This can be a Token representing a leaf node or a RuleContext
-	 *  object representing a rule invocation.
-	 */
-	Object getPayload();
-
-	/** If there are children, get the ith value indexed from 0. */
-	ParseTree getChild(int i);
-
-	/** How many children are there? If there is none, then this
-	 *  node represents a token match leaf node.
-	 */
-	int getChildCount();
 }

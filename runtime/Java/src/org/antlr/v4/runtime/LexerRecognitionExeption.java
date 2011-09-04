@@ -55,8 +55,10 @@ public class LexerRecognitionExeption extends RuntimeException {
 		this.lexer = lexer;
 		this.index = input.index();
 		this.c = input.LA(1);
-		this.line = lexer.getLine();
-		this.charPositionInLine = lexer.getCharPositionInLine();
+		if ( lexer!=null ) {
+			this.line = lexer.getLine();
+			this.charPositionInLine = lexer.getCharPositionInLine();
+		}
 	}
 
 }

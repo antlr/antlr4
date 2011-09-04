@@ -277,9 +277,9 @@ public interface DebugEventListener {
 	/** Make a node the new root of an existing root.  See
 	 *
 	 *  Note: the newRootID parameter is possibly different
-	 *  than the TreeAdaptor.becomeRoot() newRoot parameter.
+	 *  than the ASTAdaptor.becomeRoot() newRoot parameter.
 	 *  In our case, it will always be the result of calling
-	 *  TreeAdaptor.becomeRoot() and not root_n or whatever.
+	 *  ASTAdaptor.becomeRoot() and not root_n or whatever.
 	 *
 	 *  The listener should assume that this event occurs
 	 *  only when the current subrule (or rule) subtree is
@@ -288,7 +288,7 @@ public interface DebugEventListener {
 	 *  If you are receiving this event over a socket via
 	 *  RemoteDebugEventSocketListener then only IDs are set.
 	 *
-	 *  @see org.antlr.v4.runtime.tree.TreeAdaptor becomeRoot()
+	 *  @see org.antlr.v4.runtime.tree.ASTAdaptor becomeRoot()
 	 */
 	public void becomeRoot(Object newRoot, Object oldRoot);
 
@@ -297,7 +297,7 @@ public interface DebugEventListener {
 	 *  If you are receiving this event over a socket via
 	 *  RemoteDebugEventSocketListener then only IDs are set.
 	 *
-	 *  @see org.antlr.v4.runtime.tree.TreeAdaptor addChild()
+	 *  @see org.antlr.v4.runtime.tree.ASTAdaptor addChild()
 	 */
 	public void addChild(Object root, Object child);
 

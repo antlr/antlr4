@@ -29,32 +29,49 @@
 
 package org.antlr.v4.runtime.tree;
 
-/** The basic notion of a tree has a parent, a payload, and a list of children.
- *  It is the most abstract interface for all the trees used by ANTLR.
- */
-public interface Tree {
-	/** The parent of this node. If the return value is null, then this
-	 *  node is the root of the tree.
-	 */
-	Tree getParent();
+import org.antlr.v4.runtime.Token;
 
-	/** This method returns whatever object represents the data at this note.
-	 *  For example, for parse trees, the payload can be a Token representing
-	 *  a leaf node or a RuleContext object representing a rule invocation.
-	 *  For abstract syntax trees (ASTs), this is a Token object.
-	 */
-	Object getPayload();
+import java.util.List;
 
-	/** If there are children, get the ith value indexed from 0. */
-	Tree getChild(int i);
+/** An abstract syntax tree built by ANTLR during a parcel or tree parse. */
+public interface AST extends SyntaxTree {
+    /** Is there is a node above with token type ttype? */
+    public boolean hasAncestor(int ttype);
 
-	/** How many children are there? If there is none, then this
-	 *  node represents a leaf node.
-	 */
-	int getChildCount();
+    /** Walk upwards and get first ancestor with this token type. */
+    public AST getAncestor(int ttype);
 
-	/** Print out a whole tree, not just a node, in LISP format
-	 *  (root child1 .. childN). Print just a node if this is a leaf.
+    /** Return a list of all ancestors of this node.  The first node of
+     *  list is the root and the last is the parent of this node.
+     */
+    public List getAncestors();
+
+    /** This node is what child index? 0..n-1 */
+	public int getChildIndex();
+
+	/** Set the parent and child index values for all children */
+	public void freshenParentAndChildIndexes();
+
+	/** Indicates the node is a nil node but may still have children, meaning
+	 *  the tree is a flat list.
 	 */
-	String toStringTree();
+	boolean isNil();
+
+	/** Return a token type; needed for tree parsing */
+	int getType();
+
+	/** Text for this node alone, not the subtree */
+	String getText();
+
+	// TODO: do we need line/charpos????
+	/** In case we don't have a token payload, what is the line for errors? */
+	int getLine();
+
+	int getCharPositionInLine();
+
+	/** Redefined from Tree interface so we can narrow the return type */
+	AST getParent();
+
+	/** Redefined from Tree interface so we can narrow the return type */
+	Token getPayload();
 }

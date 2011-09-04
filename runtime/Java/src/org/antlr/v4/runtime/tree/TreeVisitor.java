@@ -33,12 +33,12 @@ package org.antlr.v4.runtime.tree;
  *  as we discover and finish nodes.
  */
 public class TreeVisitor {
-    protected TreeAdaptor adaptor;
+    protected ASTAdaptor adaptor;
 
-    public TreeVisitor(TreeAdaptor adaptor) {
+    public TreeVisitor(ASTAdaptor adaptor) {
         this.adaptor = adaptor;
     }
-    public TreeVisitor() { this(new CommonTreeAdaptor()); }
+    public TreeVisitor() { this(new CommonASTAdaptor()); }
 
     /** Visit every node in tree t and trigger an action for each node
      *  before/after having visited all of its children.

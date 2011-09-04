@@ -28,13 +28,13 @@
 package org.antlr.v4.runtime.debug;
 
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.tree.ASTAdaptor;
 
 /** Print out (most of) the events... Useful for debugging, testing... */
 public class TraceDebugEventListener extends BlankDebugEventListener {
-	TreeAdaptor adaptor;
+	ASTAdaptor adaptor;
 
-	public TraceDebugEventListener(TreeAdaptor adaptor) {
+	public TraceDebugEventListener(ASTAdaptor adaptor) {
 		this.adaptor = adaptor;
 	}
 

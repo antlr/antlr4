@@ -84,7 +84,7 @@ public class TreeParser extends BaseRecognizer {
 	{
 		String tokenText =
 			"<missing "+getTokenNames()[expectedTokenType]+">";
-        TreeAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
+        ASTAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
         return adaptor.create(new CommonToken(expectedTokenType, tokenText));
 	}
 
@@ -144,7 +144,7 @@ public class TreeParser extends BaseRecognizer {
 	 */
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
 		if ( this instanceof TreeParser ) {
-			TreeAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
+			ASTAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
 			e.token = adaptor.getToken(e.node);
 			if ( e.token==null ) { // could be an UP/DOWN node
 				e.token = new CommonToken(adaptor.getType(e.node),
@@ -171,7 +171,7 @@ public class TreeParser extends BaseRecognizer {
     /** The worker for inContext.  It's static and full of parameters for
      *  testing purposes.
      */
-    public static boolean inContext(TreeAdaptor adaptor,
+    public static boolean inContext(ASTAdaptor adaptor,
                                     String[] tokenNames,
                                     Object t,
                                     String context)
@@ -214,7 +214,7 @@ public class TreeParser extends BaseRecognizer {
     }
 
     /** Helper for static inContext */
-    protected static Object getAncestor(TreeAdaptor adaptor, String[] tokenNames, Object t, String goal) {
+    protected static Object getAncestor(ASTAdaptor adaptor, String[] tokenNames, Object t, String goal) {
         while ( t!=null ) {
             String name = tokenNames[adaptor.getType(t)];
             if ( name.equals(goal) ) return t;

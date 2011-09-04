@@ -187,7 +187,7 @@ public class RecognitionException extends RuntimeException {
 		}
 		else if ( recognizer._input instanceof TreeNodeStream) {
 			TreeNodeStream nodes = (TreeNodeStream)recognizer._input;
-			TreeAdaptor adaptor = nodes.getTreeAdaptor();
+			ASTAdaptor adaptor = nodes.getTreeAdaptor();
 			return adaptor.getType(node);
 		}
 		else {

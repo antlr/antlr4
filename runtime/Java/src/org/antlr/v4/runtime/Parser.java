@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.tree.*;
  */
 public class Parser extends BaseRecognizer {
 
-	public TreeAdaptor _adaptor = new CommonTreeAdaptor();
+	public ASTAdaptor _adaptor = new CommonASTAdaptor();
 
 	public Parser(TokenStream input) {
 		super(input);

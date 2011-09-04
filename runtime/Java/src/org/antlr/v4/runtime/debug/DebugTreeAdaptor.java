@@ -27,15 +27,13 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ASTAdaptor;
 
 import java.util.List;
 
-/** A TreeAdaptor proxy that fires debugging events to a DebugEventListener
- *  delegate and uses the TreeAdaptor delegate to do the actual work.  All
+/** An ASTAdaptor proxy that fires debugging events to a DebugEventListener
+ *  delegate and uses the ASTAdaptor delegate to do the actual work.  All
  *  AST events are triggered by this adaptor; no code gen changes are needed
  *  in generated rules.  Debugging events are triggered *after* invoking
  *  tree adaptor routines.
@@ -46,11 +44,11 @@ import java.util.List;
  *  not see a createNode event.  A single <unknown> node is sufficient even
  *  if it represents a whole tree.
  */
-public class DebugTreeAdaptor implements TreeAdaptor {
+public class DebugTreeAdaptor implements ASTAdaptor {
 	protected DebugEventListener dbg;
-	protected TreeAdaptor adaptor;
+	protected ASTAdaptor adaptor;
 
-	public DebugTreeAdaptor(DebugEventListener dbg, TreeAdaptor adaptor) {
+	public DebugTreeAdaptor(DebugEventListener dbg, ASTAdaptor adaptor) {
 		this.dbg = dbg;
 		this.adaptor = adaptor;
 	}
@@ -250,7 +248,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		this.dbg = dbg;
 	}
 
-	public TreeAdaptor getTreeAdaptor() {
+	public ASTAdaptor getTreeAdaptor() {
 		return adaptor;
 	}
 }

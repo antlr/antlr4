@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.tree.*;
  */
 public class DebugTreeNodeStream implements TreeNodeStream {
 	protected DebugEventListener dbg;
-	protected TreeAdaptor adaptor;
+	protected ASTAdaptor adaptor;
 	protected TreeNodeStream input;
 	protected boolean initialStreamState = true;
 
@@ -56,7 +56,7 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		this.dbg = dbg;
 	}
 
-	public TreeAdaptor getTreeAdaptor() {
+	public ASTAdaptor getTreeAdaptor() {
 		return adaptor;
 	}
 

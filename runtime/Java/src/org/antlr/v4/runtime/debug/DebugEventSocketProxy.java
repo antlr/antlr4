@@ -28,7 +28,7 @@
 package org.antlr.v4.runtime.debug;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.tree.ASTAdaptor;
 
 import java.io.*;
 import java.net.*;
@@ -55,13 +55,13 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 	 *  we don't know how to cast it (Parser or TreeParser) to get
 	 *  the adaptor field.  Must be set with a constructor. :(
 	 */
-	protected TreeAdaptor adaptor;
+	protected ASTAdaptor adaptor;
 
-	public DebugEventSocketProxy(BaseRecognizer recognizer, TreeAdaptor adaptor) {
+	public DebugEventSocketProxy(BaseRecognizer recognizer, ASTAdaptor adaptor) {
 		this(recognizer, DEFAULT_DEBUGGER_PORT, adaptor);
 	}
 
-	public DebugEventSocketProxy(BaseRecognizer recognizer, int port, TreeAdaptor adaptor) {
+	public DebugEventSocketProxy(BaseRecognizer recognizer, int port, ASTAdaptor adaptor) {
 		this.grammarFileName = recognizer.getGrammarFileName();
 		this.adaptor = adaptor;
 		this.port = port;
@@ -316,8 +316,8 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 
     // support
 
-    public void setTreeAdaptor(TreeAdaptor adaptor) { this.adaptor = adaptor; }
-    public TreeAdaptor getTreeAdaptor() { return adaptor; }
+    public void setTreeAdaptor(ASTAdaptor adaptor) { this.adaptor = adaptor; }
+    public ASTAdaptor getTreeAdaptor() { return adaptor; }
 
     protected String serializeToken(Token t) {
         StringBuffer buf = new StringBuffer(50);

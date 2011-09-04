@@ -37,24 +37,30 @@ import java.util.*;
  *  an empty node whose children represent the list.  An empty, but
  *  non-null node is called "nil".
  */
-public abstract class BaseTree implements Tree {
-	protected List children;
+public abstract class BaseAST implements AST {
+	/** Who is the parent node of this node; if null, implies node is root */
+	public BaseAST parent;
 
-	public BaseTree() {
+	protected List<BaseAST> children;
+
+	/** What index is this node in the child list? Range: 0..n-1 */
+	public int childIndex = -1;
+
+	public BaseAST() {
 	}
 
 	/** Create a new node from an existing node does nothing for BaseTree
 	 *  as there are no fields other than the children list, which cannot
 	 *  be copied as the children are not considered part of this node.
 	 */
-	public BaseTree(Tree node) {
+	public BaseAST(AST node) {
 	}
 
-	public Tree getChild(int i) {
+	public BaseAST getChild(int i) {
 		if ( children==null || i>=children.size() ) {
 			return null;
 		}
-		return (Tree)children.get(i);
+		return children.get(i);
 	}
 
 	/** Get the children internal List; note that if you directly mess with
@@ -64,9 +70,9 @@ public abstract class BaseTree implements Tree {
 		return children;
 	}
 
-	public Tree getFirstChildWithType(int type) {
+	public AST getFirstChildWithType(int type) {
 		for (int i = 0; children!=null && i < children.size(); i++) {
-			Tree t = (Tree) children.get(i);
+			AST t = (AST) children.get(i);
 			if ( t.getType()==type ) {
 				return t;
 			}
@@ -87,13 +93,13 @@ public abstract class BaseTree implements Tree {
 	 *  and child isNil then this routine moves children to t via
 	 *  t.children = child.children; i.e., without copying the array.
 	 */
-	public void addChild(Tree t) {
+	public void addChild(BaseAST t) {
 		//System.out.println("add child "+t.toStringTree()+" "+this.toStringTree());
 		//System.out.println("existing children: "+children);
 		if ( t==null ) {
 			return; // do nothing upon addChild(null)
 		}
-		BaseTree childTree = (BaseTree)t;
+		BaseAST childTree = (BaseAST)t;
 		if ( childTree.isNil() ) { // t is an empty node possibly with children
 			if ( this.children!=null && this.children == childTree.children ) {
 				throw new RuntimeException("attempt to add child list to itself");
@@ -103,7 +109,7 @@ public abstract class BaseTree implements Tree {
 				if ( this.children!=null ) { // must copy, this has children already
 					int n = childTree.children.size();
 					for (int i = 0; i < n; i++) {
-						Tree c = (Tree)childTree.children.get(i);
+						BaseAST c = childTree.children.get(i);
 						this.children.add(c);
 						// handle double-link stuff for each child of nil root
 						c.setParent(this);
@@ -130,19 +136,19 @@ public abstract class BaseTree implements Tree {
 	}
 
 	/** Add all elements of kids list as children of this node */
-	public void addChildren(List kids) {
+	public void addChildren(List<BaseAST> kids) {
 		if ( kids==null ) return;
 		for (int i = 0; i < kids.size(); i++) {
-			Tree t = (Tree) kids.get(i);
+			BaseAST t = kids.get(i);
 			addChild(t);
 		}
 	}
 
-	public void setChild(int i, Tree t) {
+	public void setChild(int i, BaseAST t) {
 		if ( t==null ) {
 			return;
 		}
-		if ( t.isNil() ) {
+		if ( ((AST)t).isNil() ) {
 			throw new IllegalArgumentException("Can't set single child to a list");
 		}
 		if ( children==null ) {
@@ -153,17 +159,33 @@ public abstract class BaseTree implements Tree {
 		t.setChildIndex(i);
 	}
 
+	public int getChildIndex() {
+		return childIndex;
+	}
+
+	public AST getParent() {
+		return parent;
+	}
+
+	public void setParent(BaseAST t) {
+		this.parent = t;
+	}
+
+	public void setChildIndex(int index) {
+		this.childIndex = index;
+	}
+
 	public Object deleteChild(int i) {
 		if ( children==null ) {
 			return null;
 		}
-		Tree killed = (Tree)children.remove(i);
+		AST killed = (AST)children.remove(i);
 		// walk rest and decrement their child indexes
 		this.freshenParentAndChildIndexes(i);
 		return killed;
 	}
 
-	public boolean deleteChild(Tree t) {
+	public boolean deleteChild(AST t) {
 		for (int i=0; i<children.size(); i++) {
 			Object c = children.get(i);
 			if ( c == t ) {
@@ -178,7 +200,7 @@ public abstract class BaseTree implements Tree {
 		i+1..n-1 to the right one position. Set parent / indexes properly
 	 	but does NOT collapse nil-rooted t's that come in here like addChild.
 	 */
-	public void insertChild(int i, Object t) {
+	public void insertChild(int i, BaseAST t) {
 		if (i < 0 || i >= getChildCount()) {
 			throw new IndexOutOfBoundsException(i+" out or range");
 		}
@@ -205,8 +227,8 @@ public abstract class BaseTree implements Tree {
 		}
 		int replacingHowMany = stopChildIndex - startChildIndex + 1;
 		int replacingWithHowMany;
-		BaseTree newTree = (BaseTree)t;
-		List newChildren = null;
+		BaseAST newTree = (BaseAST)t;
+		List<BaseAST> newChildren = null;
 		// normalize to a list of children to add: newChildren
 		if ( newTree.isNil() ) {
 			newChildren = newTree.children;
@@ -222,7 +244,7 @@ public abstract class BaseTree implements Tree {
 		if ( delta == 0 ) {
 			int j = 0; // index into new children
 			for (int i=startChildIndex; i<=stopChildIndex; i++) {
-				BaseTree child = (BaseTree)newChildren.get(j);
+				BaseAST child = (BaseAST)newChildren.get(j);
 				children.set(i, child);
 				child.setParent(this);
 				child.setChildIndex(i);
@@ -272,7 +294,7 @@ public abstract class BaseTree implements Tree {
 	public void freshenParentAndChildIndexes(int offset) {
 		int n = getChildCount();
 		for (int c = offset; c < n; c++) {
-			Tree child = (Tree)getChild(c);
+			BaseAST child = getChild(c);
 			child.setChildIndex(c);
 			child.setParent(this);
 		}
@@ -285,7 +307,7 @@ public abstract class BaseTree implements Tree {
 	public void freshenParentAndChildIndexesDeeply(int offset) {
 		int n = getChildCount();
 		for (int c = offset; c < n; c++) {
-			BaseTree child = (BaseTree)getChild(c);
+			BaseAST child = (BaseAST)getChild(c);
 			child.setChildIndex(c);
 			child.setParent(this);
 			child.freshenParentAndChildIndexesDeeply();
@@ -296,7 +318,7 @@ public abstract class BaseTree implements Tree {
 		sanityCheckParentAndChildIndexes(null, -1);
 	}
 
-	public void sanityCheckParentAndChildIndexes(Tree parent, int i) {
+	public void sanityCheckParentAndChildIndexes(AST parent, int i) {
 		if ( parent!=this.getParent() ) {
 			throw new IllegalStateException("parents don't match; expected "+parent+" found "+this.getParent());
 		}
@@ -305,32 +327,17 @@ public abstract class BaseTree implements Tree {
 		}
 		int n = this.getChildCount();
 		for (int c = 0; c < n; c++) {
-			CommonTree child = (CommonTree)this.getChild(c);
+			CommonAST child = (CommonAST)this.getChild(c);
 			child.sanityCheckParentAndChildIndexes(this, c);
 		}
-	}
-
-	/** BaseTree doesn't track child indexes. */
-	public int getChildIndex() {
-		return 0;
-	}
-	public void setChildIndex(int index) {
-	}
-
-	/** BaseTree doesn't track parent pointers. */
-	public Tree getParent() {
-		return null;
-	}
-
-    public void setParent(Tree t) {
 	}
 
     /** Walk upwards looking for ancestor with this token type. */
     public boolean hasAncestor(int ttype) { return getAncestor(ttype)!=null; }
 
     /** Walk upwards and get first ancestor with this token type. */
-    public Tree getAncestor(int ttype) {
-        Tree t = this;
+    public AST getAncestor(int ttype) {
+        AST t = this;
         t = t.getParent();
         while ( t!=null ) {
             if ( t.getType()==ttype ) return t;
@@ -344,8 +351,8 @@ public abstract class BaseTree implements Tree {
      */
     public List getAncestors() {
         if ( getParent()==null ) return null;
-        List ancestors = new ArrayList();
-        Tree t = this;
+        List<AST> ancestors = new ArrayList();
+        AST t = this;
         t = t.getParent();
         while ( t!=null ) {
             ancestors.add(0, t); // insert at start
@@ -354,7 +361,9 @@ public abstract class BaseTree implements Tree {
         return ancestors;
     }
 
-    /** Print out a whole tree not just a node */
+	/** Don't use standard tree printing mechanism since ASTs can have nil
+	 *  root nodes.
+	 */
     public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
 			return this.toString();
@@ -366,7 +375,7 @@ public abstract class BaseTree implements Tree {
 			buf.append(' ');
 		}
 		for (int i = 0; children!=null && i < children.size(); i++) {
-			Tree t = (Tree)children.get(i);
+			AST t = children.get(i);
 			if ( i>0 ) {
 				buf.append(' ');
 			}
@@ -377,15 +386,4 @@ public abstract class BaseTree implements Tree {
 		}
 		return buf.toString();
 	}
-
-    public int getLine() {
-		return 0;
-	}
-
-	public int getCharPositionInLine() {
-		return 0;
-	}
-
-	/** Override to say how a node (not a tree) should look as text */
-	public abstract String toString();
 }

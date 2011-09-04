@@ -607,7 +607,7 @@ public class TestASTOps extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( x+=b^ )+ {" +
-			"System.out.print(\"x=\"+((CommonTree)$x.get(1).tree).toStringTree()+';');} ;\n" +
+			"System.out.print(\"x=\"+((CommonAST)$x.get(1).tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -622,7 +622,7 @@ public class TestASTOps extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : x+=b! x+=b {" +
-			"System.out.print(\"1st x=\"+((CommonTree)$x.get(0).tree).toStringTree()+';');} ;\n" +
+			"System.out.print(\"1st x=\"+((CommonAST)$x.get(0).tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +

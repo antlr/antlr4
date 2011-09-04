@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.*;
 
 /** A node representing erroneous token range in token stream */
-public class CommonErrorNode extends CommonTree {
+public class CommonErrorNode extends CommonAST {
 	public IntStream input;
 	public Token start;
 	public Token stop;

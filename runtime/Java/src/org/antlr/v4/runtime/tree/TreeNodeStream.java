@@ -67,7 +67,7 @@ public interface TreeNodeStream extends IntStream {
 	/** What adaptor can tell me how to interpret/navigate nodes and
 	 *  trees.  E.g., get text of a node.
 	 */
-	public TreeAdaptor getTreeAdaptor();
+	public ASTAdaptor getTreeAdaptor();
 
 	/** As we flatten the tree, we use UP, DOWN nodes to represent
 	 *  the tree structure.  When debugging we need unique nodes

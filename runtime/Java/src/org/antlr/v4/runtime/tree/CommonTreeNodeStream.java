@@ -45,7 +45,7 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
 	protected TokenStream tokens;
 
 	/** What tree adaptor was used to build these trees */
-	TreeAdaptor adaptor;
+	ASTAdaptor adaptor;
 
     /** The tree iterator we using */
     protected TreeIterator it;
@@ -60,10 +60,10 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
     protected int level = 0;
 
 	public CommonTreeNodeStream(Object tree) {
-		this(new CommonTreeAdaptor(), tree);
+		this(new CommonASTAdaptor(), tree);
 	}
 
-	public CommonTreeNodeStream(TreeAdaptor adaptor, Object tree) {
+	public CommonTreeNodeStream(ASTAdaptor adaptor, Object tree) {
 		this.root = tree;
 		this.adaptor = adaptor;
         it = new TreeIterator(adaptor,root);
@@ -109,9 +109,9 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
 
 	public void setTokenStream(TokenStream tokens) { this.tokens = tokens; }
 
-	public TreeAdaptor getTreeAdaptor() { return adaptor; }
+	public ASTAdaptor getTreeAdaptor() { return adaptor; }
 
-	public void setTreeAdaptor(TreeAdaptor adaptor) { this.adaptor = adaptor; }
+	public void setTreeAdaptor(ASTAdaptor adaptor) { this.adaptor = adaptor; }
 
     public Object get(int i) {
         throw new UnsupportedOperationException("Absolute node indexes are meaningless in an unbuffered stream");

@@ -30,17 +30,13 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.gui.ASTViewer;
 
 import java.util.Set;
 
-/** A tree node that is wrapper for a Token object.  After 3.0 release
- *  while building tree rewrite stuff, it became clear that computing
- *  parent and child index is very difficult and cumbersome.  Better to
- *  spend the space in every tree node.  If you don't want these extra
- *  fields, it's easy to cut them out in your own BaseTree subclass.
- */
-public class CommonTree extends BaseTree {
+/** A tree node that is wrapper for a Token object. */
+public class CommonAST extends BaseAST {
 	/** A single token is the payload */
 	public Token token;
 
@@ -49,22 +45,16 @@ public class CommonTree extends BaseTree {
 	 */
 	protected int startIndex=-1, stopIndex=-1;
 
-	/** Who is the parent node of this node; if null, implies node is root */
-	public CommonTree parent;
+	public CommonAST() { }
 
-	/** What index is this node in the child list? Range: 0..n-1 */
-	public int childIndex = -1;
-
-	public CommonTree() { }
-
-	public CommonTree(CommonTree node) {
+	public CommonAST(CommonAST node) {
 		super(node);
 		this.token = node.token;
 		this.startIndex = node.startIndex;
 		this.stopIndex = node.stopIndex;
 	}
 
-	public CommonTree(Token t) {
+	public CommonAST(Token t) {
 		this.token = t;
 	}
 
@@ -72,8 +62,12 @@ public class CommonTree extends BaseTree {
 		return token;
 	}
 
-	public Tree dupNode() {
-		return new CommonTree(this);
+	public Token getPayload() {
+		return getToken();
+	}
+
+	public Interval getSourceInterval() {
+		return new Interval(getTokenStartIndex(), getTokenStopIndex());
 	}
 
 	public boolean isNil() {
@@ -148,32 +142,16 @@ public class CommonTree extends BaseTree {
             return;
         }
         for (int i=0; i<children.size(); i++) {
-            ((CommonTree)children.get(i)).setUnknownTokenBoundaries();
+            ((CommonAST)children.get(i)).setUnknownTokenBoundaries();
         }
         if ( startIndex>=0 && stopIndex>=0 ) return; // already set
         if ( children.size() > 0 ) {
-            CommonTree firstChild = (CommonTree)children.get(0);
-            CommonTree lastChild = (CommonTree)children.get(children.size()-1);
+            CommonAST firstChild = (CommonAST)children.get(0);
+            CommonAST lastChild = (CommonAST)children.get(children.size()-1);
             startIndex = firstChild.getTokenStartIndex();
             stopIndex = lastChild.getTokenStopIndex();
         }
     }
-
-	public int getChildIndex() {
-		return childIndex;
-	}
-
-	public Tree getParent() {
-		return parent;
-	}
-
-	public void setParent(Tree t) {
-		this.parent = (CommonTree)t;
-	}
-
-	public void setChildIndex(int index) {
-		this.childIndex = index;
-	}
 
     // TODO: move to basetree when i settle on how runtime works
     public void inspect() {
@@ -184,26 +162,26 @@ public class CommonTree extends BaseTree {
     // TODO: move to basetree when i settle on how runtime works
     // TODO: don't include this node!!
 	// TODO: reuse other method
-    public CommonTree getFirstDescendantWithType(int type) {
+    public CommonAST getFirstDescendantWithType(int type) {
         if ( getType()==type ) return this;
         if ( children==null ) return null;
         for (Object c : children) {
-            CommonTree t = (CommonTree)c;
+            CommonAST t = (CommonAST)c;
             if ( t.getType()==type ) return t;
-            CommonTree d = t.getFirstDescendantWithType(type);
+            CommonAST d = t.getFirstDescendantWithType(type);
             if ( d!=null ) return d;
         }
         return null;
     }
 
 	// TODO: don't include this node!!
-	public CommonTree getFirstDescendantWithType(Set<Integer> types) {
+	public CommonAST getFirstDescendantWithType(Set<Integer> types) {
 		if ( types.contains(getType()) ) return this;
 		if ( children==null ) return null;
 		for (Object c : children) {
-			CommonTree t = (CommonTree)c;
+			CommonAST t = (CommonAST)c;
 			if ( types.contains(t.getType()) ) return t;
-			CommonTree d = t.getFirstDescendantWithType(types);
+			CommonAST d = t.getFirstDescendantWithType(types);
 			if ( d!=null ) return d;
 		}
 		return null;

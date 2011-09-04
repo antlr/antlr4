@@ -36,13 +36,10 @@ import java.util.List;
 /** How to create and navigate trees.  Rather than have a separate factory
  *  and adaptor, I've merged them.  Makes sense to encapsulate.
  *
- *  This takes the place of the tree construction code generated in the
- *  generated code in 2.x and the ASTFactory.
- *
  *  I do not need to know the type of a tree at all so they are all
- *  generic Objects.  This may increase the amount of typecasting needed. :(
+ *  generic Objects.
  */
-public interface TreeAdaptor {
+public interface ASTAdaptor {
 	// BEGIN new v4 stuff
 
 	// If not null root, add kids to it
@@ -57,7 +54,7 @@ public interface TreeAdaptor {
 
 	// C o n s t r u c t i o n
 
-	/** Create a tree node from Token object; for CommonTree type trees,
+	/** Create a tree node from Token object; for CommonAST type trees,
 	 *  then the token just becomes the payload.  This is the most
 	 *  common create call.
 	 *
@@ -170,7 +167,7 @@ public interface TreeAdaptor {
 	 *  Be advised: when debugging ASTs, the DebugTreeAdaptor manually
 	 *  calls create(Token child) and then plain becomeRoot(node, node)
 	 *  because it needs to trap calls to create, but it can't since it delegates
-	 *  to not inherits from the TreeAdaptor.
+	 *  to not inherits from the ASTAdaptor.
 	 */
 	public Object becomeRoot(Token newRoot, Object oldRoot);
 

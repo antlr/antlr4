@@ -29,7 +29,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.*;
 
 import java.util.*;
 
@@ -262,9 +263,20 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	public ParseTree getParent() { return parent; }
 
-	public Object getPayload() { return this; }
+	public RuleContext getPayload() { return this; }
 
 	public int getChildCount() { return children!=null ? children.size() : 0; }
+
+	public Interval getSourceInterval() {
+		if ( getChildCount()==0 ) return Interval.ZeroLength;
+		int start = getChild(0).getSourceInterval().a;
+		int stop = getChild(getChildCount()-1).getSourceInterval().b;
+		return new Interval(start, stop);
+	}
+
+	public String toStringTree() {
+		return Trees.toStringTree(this);
+	}
 
 	public String toString() {
 		return toString(null);

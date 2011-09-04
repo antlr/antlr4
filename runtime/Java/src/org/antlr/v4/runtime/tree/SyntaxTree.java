@@ -29,32 +29,18 @@
 
 package org.antlr.v4.runtime.tree;
 
-/** The basic notion of a tree has a parent, a payload, and a list of children.
- *  It is the most abstract interface for all the trees used by ANTLR.
+import org.antlr.v4.runtime.misc.Interval;
+
+/** A tree that knows about an interval in a token stream
+ *  is some kind of syntax tree.
  */
-public interface Tree {
-	/** The parent of this node. If the return value is null, then this
-	 *  node is the root of the tree.
+public interface SyntaxTree extends Tree {
+	/** Return an interval indicating the index in the TokenStream of
+	 *  the 1st and last token associated with this subtree. If this
+	 *  note choose to use a leaf, then the interval represents a single token.
+	 *
+	 *  If source interval is unknown, this does not return null.
+	 *  It returns an interval of length 0.
 	 */
-	Tree getParent();
-
-	/** This method returns whatever object represents the data at this note.
-	 *  For example, for parse trees, the payload can be a Token representing
-	 *  a leaf node or a RuleContext object representing a rule invocation.
-	 *  For abstract syntax trees (ASTs), this is a Token object.
-	 */
-	Object getPayload();
-
-	/** If there are children, get the ith value indexed from 0. */
-	Tree getChild(int i);
-
-	/** How many children are there? If there is none, then this
-	 *  node represents a leaf node.
-	 */
-	int getChildCount();
-
-	/** Print out a whole tree, not just a node, in LISP format
-	 *  (root child1 .. childN). Print just a node if this is a leaf.
-	 */
-	String toStringTree();
+	Interval getSourceInterval();
 }

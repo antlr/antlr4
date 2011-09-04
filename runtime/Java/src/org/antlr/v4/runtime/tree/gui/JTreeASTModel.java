@@ -35,16 +35,16 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.*;
 
 public class JTreeASTModel implements TreeModel {
-    TreeAdaptor adaptor;
+    ASTAdaptor adaptor;
     Object root;
 
-    public JTreeASTModel(TreeAdaptor adaptor, Object root) {
+    public JTreeASTModel(ASTAdaptor adaptor, Object root) {
         this.adaptor = adaptor;
         this.root = root;
     }
 
     public JTreeASTModel(Object root) {
-        this.adaptor = new CommonTreeAdaptor();
+        this.adaptor = new CommonASTAdaptor();
         this.root = root;
     }
 

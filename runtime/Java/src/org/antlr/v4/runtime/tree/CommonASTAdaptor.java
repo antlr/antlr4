@@ -31,17 +31,16 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
 
-/** A TreeAdaptor that works with any Tree implementation.  It provides
+/** An ASTAdaptor that works with CommonAST.  It provides
  *  really just factory methods; all the work is done by BaseTreeAdaptor.
- *  If you would like to have different tokens created than ClassicToken
+ *  If you would like to have different tokens created than CommonToken
  *  objects, you need to override this and then set the parser tree adaptor to
  *  use your subclass.
  *
  *  To get your parser to build nodes of a different type, override
- *  create(Token), errorNode(), and to be safe, YourTreeClass.dupNode().
- *  dupNode is called to duplicate nodes during rewrite operations.
+ *  create(Token), errorNode().
  */
-public class CommonTreeAdaptor extends BaseTreeAdaptor {
+public class CommonASTAdaptor extends BaseASTAdaptor {
 	/** Duplicate a node.  This is part of the factory;
 	 *	override if you want another kind of node to be built.
 	 *
@@ -50,11 +49,12 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	 */
 	public Object dupNode(Object t) {
 		if ( t==null ) return null;
-		return ((Tree)t).dupNode();
+		return new CommonAST((CommonAST)t);
+//		return ((Tree)t).dupNode();
 	}
 
 	public Object create(Token payload) {
-		return new CommonTree(payload);
+		return new CommonAST(payload);
 	}
 
 	/** Tell me how to create a token for use with imaginary token nodes.
@@ -90,7 +90,7 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
 	/** Track start/stop token for subtree root created for a rule.
-	 *  Only works with Tree nodes.  For rules that match nothing,
+	 *  Only works with CommonAST nodes.  For rules that match nothing,
 	 *  seems like this will yield start=i and stop=i-1 in a nil node.
 	 *  Might be useful info so I'll not force to be i..i.
 	 */
@@ -100,72 +100,72 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		int stop = 0;
 		if ( startToken!=null ) start = startToken.getTokenIndex();
 		if ( stopToken!=null ) stop = stopToken.getTokenIndex();
-		((Tree)t).setTokenStartIndex(start);
-		((Tree)t).setTokenStopIndex(stop);
+		((CommonAST)t).setTokenStartIndex(start);
+		((CommonAST)t).setTokenStopIndex(stop);
 	}
 
 	public int getTokenStartIndex(Object t) {
 		if ( t==null ) return -1;
-		return ((Tree)t).getTokenStartIndex();
+		return ((CommonAST)t).getTokenStartIndex();
 	}
 
 	public int getTokenStopIndex(Object t) {
 		if ( t==null ) return -1;
-		return ((Tree)t).getTokenStopIndex();
+		return ((CommonAST)t).getTokenStopIndex();
 	}
 
 	public String getText(Object t) {
 		if ( t==null ) return null;
-		return ((Tree)t).getText();
+		return ((CommonAST)t).getText();
 	}
 
     public int getType(Object t) {
 		if ( t==null ) return Token.INVALID_TYPE;
-		return ((Tree)t).getType();
+		return ((CommonAST)t).getType();
 	}
 
 	/** What is the Token associated with this node?  If
-	 *  you are not using CommonTree, then you must
+	 *  you are not using CommonAST, then you must
 	 *  override this in your own adaptor.
 	 */
 	public Token getToken(Object t) {
-		if ( t instanceof CommonTree ) {
-			return ((CommonTree)t).getToken();
+		if ( t instanceof CommonAST) {
+			return ((CommonAST)t).getToken();
 		}
 		return null; // no idea what to do
 	}
 
 	public Object getChild(Object t, int i) {
 		if ( t==null ) return null;
-        return ((Tree)t).getChild(i);
+        return ((CommonAST)t).getChild(i);
     }
 
     public int getChildCount(Object t) {
 		if ( t==null ) return 0;
-        return ((Tree)t).getChildCount();
+        return ((CommonAST)t).getChildCount();
     }
 
 	public Object getParent(Object t) {
 		if ( t==null ) return null;
-        return ((Tree)t).getParent();
+        return ((CommonAST)t).getParent();
 	}
 
 	public void setParent(Object t, Object parent) {
-        if ( t!=null ) ((Tree)t).setParent((Tree)parent);
+        if ( t!=null ) ((CommonAST)t).setParent((CommonAST)parent);
 	}
 
 	public int getChildIndex(Object t) {
         if ( t==null ) return 0;
-		return ((Tree)t).getChildIndex();
+		return ((CommonAST)t).getChildIndex();
 	}
 
 	public void setChildIndex(Object t, int index) {
-        if ( t!=null ) ((Tree)t).setChildIndex(index);
+        if ( t!=null ) ((CommonAST)t).setChildIndex(index);
 	}
 
 	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
 		if ( parent!=null ) {
-			((Tree)parent).replaceChildren(startChildIndex, stopChildIndex, t);
+			((CommonAST)parent).replaceChildren(startChildIndex, stopChildIndex, t);
 		}
 	}
 }

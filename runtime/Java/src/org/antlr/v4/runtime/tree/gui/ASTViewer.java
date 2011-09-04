@@ -33,16 +33,16 @@ import org.antlr.v4.runtime.tree.*;
 
 /** */
 public class ASTViewer {
-    TreeAdaptor adaptor;
+    ASTAdaptor adaptor;
     Object root;
 
-    public ASTViewer(TreeAdaptor adaptor, Object root) {
+    public ASTViewer(ASTAdaptor adaptor, Object root) {
         this.adaptor = adaptor;
         this.root = root;
     }
 
     public ASTViewer(Object root) {
-        this.adaptor = new CommonTreeAdaptor();
+        this.adaptor = new CommonASTAdaptor();
         this.root = root;
     }
 

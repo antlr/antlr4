@@ -28,7 +28,8 @@
 package org.antlr.v4.runtime.debug;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.BaseAST;
 
 import java.io.*;
 import java.net.*;
@@ -118,7 +119,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 	}
 
-	public static class ProxyTree extends BaseTree {
+	public static class ProxyTree extends BaseAST {
 		public int ID;
 		public int type;
 		public int line = 0;
@@ -137,11 +138,21 @@ public class RemoteDebugEventSocketListener implements Runnable {
 
 		public ProxyTree(int ID) { this.ID = ID; }
 
-		public int getTokenStartIndex() { return tokenIndex; }
-		public void setTokenStartIndex(int index) {	}
-		public int getTokenStopIndex() { return 0; }
-		public void setTokenStopIndex(int index) { }
-		public Tree dupNode() {	return null; }
+		public int getCharPositionInLine() {
+			return charPos;
+		}
+
+		public Token getPayload() {
+			return null;
+		}
+
+		public int getLine() {
+			return line;
+		}
+
+		public Interval getSourceInterval() {
+			return new Interval(tokenIndex, tokenIndex);
+		}
 		public int getType() { return type; }
 		public String getText() { return text; }
 		public String toString() {
