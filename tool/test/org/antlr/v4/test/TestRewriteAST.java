@@ -1006,7 +1006,7 @@ public class TestRewriteAST extends BaseTest {
 			"options { output = AST; }\n" +
 			"tokens { FLOAT; }\n" +
 			"a\n" +
-			"    : INT -> {new CommonTree(new CommonAST(FLOAT,$INT.text+\".0\"))} \n" +
+			"    : INT -> {new CommonAST(new CommonAST(FLOAT,$INT.text+\".0\"))} \n" +
 			"    ; \n" +
 			"INT : '0'..'9'+; \n" +
 			"WS: (' ' | '\\n' | '\\t')+ {$channel = HIDDEN;}; \n";

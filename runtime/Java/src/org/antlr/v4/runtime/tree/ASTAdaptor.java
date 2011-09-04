@@ -47,7 +47,10 @@ public interface ASTAdaptor {
 
 	//public List getChildren(Object root);
 
-	/** Used to track elements to left of -> for use in rewrite */
+	/** Used to track elements to left of -> for use in rewrite. These
+	 *  are some kind of trees, but we generically use Object
+	 *  for tree types in ANTLR.
+	 */
 	public List<Object> createElementList();
 
 	// END new v4 stuff

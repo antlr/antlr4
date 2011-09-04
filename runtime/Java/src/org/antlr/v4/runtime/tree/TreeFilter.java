@@ -93,8 +93,8 @@ public class TreeFilter extends TreeParser {
         if ( t==null ) return;
         try {
             // share TreeParser object but not parsing-related state
-            input = new CommonTreeNodeStream(originalAdaptor, t);
-            ((CommonTreeNodeStream)input).setTokenStream(originalTokenStream);
+            input = new CommonASTNodeStream(originalAdaptor, t);
+            ((CommonASTNodeStream)input).setTokenStream(originalTokenStream);
             whichRule.rule();
         }
         catch (RecognitionException e) { ; }

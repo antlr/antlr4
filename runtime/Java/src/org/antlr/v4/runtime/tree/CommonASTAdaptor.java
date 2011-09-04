@@ -165,7 +165,7 @@ public class CommonASTAdaptor extends BaseASTAdaptor {
 
 	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
 		if ( parent!=null ) {
-			((CommonAST)parent).replaceChildren(startChildIndex, stopChildIndex, t);
+			Trees.replaceChildren((CommonAST)parent, startChildIndex, stopChildIndex, t);
 		}
 	}
 }

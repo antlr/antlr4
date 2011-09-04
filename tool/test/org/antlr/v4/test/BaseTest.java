@@ -949,7 +949,7 @@ public abstract class BaseTest {
 			"        <if(!treeParserStartRuleName)>\n" +
 			"        if ( r.tree!=null ) {\n" +
 			"            System.out.println(((Tree)r.tree).toStringTree());\n" +
-			"            ((CommonAST)r.tree).sanityCheckParentAndChildIndexes();\n" +
+			"            Trees.sanityCheckParentAndChildIndexes((CommonAST)r.tree);\n" +
 			"		 }\n" +
 			"        <else>\n" +
 			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
@@ -1002,7 +1002,7 @@ public abstract class BaseTest {
 			"        TokenRewriteStream tokens = new TokenRewriteStream(lex);\n" +
 			"        <createParser>\n"+
 			"        ParserRuleContext r = parser.<parserStartRuleName>();\n" +
-			"        ((CommonAST)r.tree).sanityCheckParentAndChildIndexes();\n" +
+			"        Trees.sanityCheckParentAndChildIndexes((CommonAST)r.tree);\n" +
 			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
 			"        nodes.setTokenStream(tokens);\n" +
 			"        <treeParserName> walker = new <treeParserName>(nodes);\n" +

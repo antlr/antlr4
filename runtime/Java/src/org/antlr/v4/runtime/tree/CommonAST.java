@@ -33,8 +33,6 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.gui.ASTViewer;
 
-import java.util.Set;
-
 /** A tree node that is wrapper for a Token object. */
 public class CommonAST extends BaseAST {
 	/** A single token is the payload */
@@ -130,62 +128,11 @@ public class CommonAST extends BaseAST {
 		stopIndex = index;
 	}
 
-    /** For every node in this subtree, make sure it's start/stop token's
-     *  are set.  Walk depth first, visit bottom up.  Only updates nodes
-     *  with at least one token index < 0.
-     */
-    public void setUnknownTokenBoundaries() {
-        if ( children==null ) {
-            if ( startIndex<0 || stopIndex<0 ) {
-                startIndex = stopIndex = token.getTokenIndex();
-            }
-            return;
-        }
-        for (int i=0; i<children.size(); i++) {
-            ((CommonAST)children.get(i)).setUnknownTokenBoundaries();
-        }
-        if ( startIndex>=0 && stopIndex>=0 ) return; // already set
-        if ( children.size() > 0 ) {
-            CommonAST firstChild = (CommonAST)children.get(0);
-            CommonAST lastChild = (CommonAST)children.get(children.size()-1);
-            startIndex = firstChild.getTokenStartIndex();
-            stopIndex = lastChild.getTokenStopIndex();
-        }
-    }
-
     // TODO: move to basetree when i settle on how runtime works
     public void inspect() {
         ASTViewer viewer = new ASTViewer(this);
         viewer.open();
     }
-
-    // TODO: move to basetree when i settle on how runtime works
-    // TODO: don't include this node!!
-	// TODO: reuse other method
-    public CommonAST getFirstDescendantWithType(int type) {
-        if ( getType()==type ) return this;
-        if ( children==null ) return null;
-        for (Object c : children) {
-            CommonAST t = (CommonAST)c;
-            if ( t.getType()==type ) return t;
-            CommonAST d = t.getFirstDescendantWithType(type);
-            if ( d!=null ) return d;
-        }
-        return null;
-    }
-
-	// TODO: don't include this node!!
-	public CommonAST getFirstDescendantWithType(Set<Integer> types) {
-		if ( types.contains(getType()) ) return this;
-		if ( children==null ) return null;
-		for (Object c : children) {
-			CommonAST t = (CommonAST)c;
-			if ( types.contains(t.getType()) ) return t;
-			CommonAST d = t.getFirstDescendantWithType(types);
-			if ( d!=null ) return d;
-		}
-		return null;
-	}
 
     public String toString() {
         if ( isNil() ) {

@@ -31,27 +31,8 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Token;
 
-import java.util.List;
-
-/** An abstract syntax tree built by ANTLR during a parcel or tree parse. */
+/** An abstract syntax tree built by ANTLR during a parse or tree parse. */
 public interface AST extends SyntaxTree {
-    /** Is there is a node above with token type ttype? */
-    public boolean hasAncestor(int ttype);
-
-    /** Walk upwards and get first ancestor with this token type. */
-    public AST getAncestor(int ttype);
-
-    /** Return a list of all ancestors of this node.  The first node of
-     *  list is the root and the last is the parent of this node.
-     */
-    public List getAncestors();
-
-    /** This node is what child index? 0..n-1 */
-	public int getChildIndex();
-
-	/** Set the parent and child index values for all children */
-	public void freshenParentAndChildIndexes();
-
 	/** Indicates the node is a nil node but may still have children, meaning
 	 *  the tree is a flat list.
 	 */

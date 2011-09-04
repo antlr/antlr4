@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.misc.LookaheadStream;
 
 import java.util.Stack;
 
-public class CommonTreeNodeStream extends LookaheadStream<Object> implements TreeNodeStream {
+public class CommonASTNodeStream extends LookaheadStream<Object> implements TreeNodeStream {
 	public static final int DEFAULT_INITIAL_BUFFER_SIZE = 100;
 	public static final int INITIAL_CALL_STACK_SIZE = 10;
 
@@ -59,11 +59,11 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
     /** Tracks tree depth.  Level=0 means we're at root node level. */
     protected int level = 0;
 
-	public CommonTreeNodeStream(Object tree) {
+	public CommonASTNodeStream(Object tree) {
 		this(new CommonASTAdaptor(), tree);
 	}
 
-	public CommonTreeNodeStream(ASTAdaptor adaptor, Object tree) {
+	public CommonASTNodeStream(ASTAdaptor adaptor, Object tree) {
 		this.root = tree;
 		this.adaptor = adaptor;
         it = new TreeIterator(adaptor,root);

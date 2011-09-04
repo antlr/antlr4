@@ -66,24 +66,14 @@ public abstract class BaseAST implements AST {
 	/** Get the children internal List; note that if you directly mess with
 	 *  the list, do so at your own risk.
 	 */
-	public List getChildren() {
-		return children;
-	}
+	public List<BaseAST> getChildren() { return children; }
 
 	public AST getFirstChildWithType(int type) {
-		for (int i = 0; children!=null && i < children.size(); i++) {
-			AST t = (AST) children.get(i);
-			if ( t.getType()==type ) {
-				return t;
-			}
-		}
-		return null;
+		return Trees.getFirstChildWithType(this, type);
 	}
 
 	public int getChildCount() {
-		if ( children==null ) {
-			return 0;
-		}
+		if ( children==null ) return 0;
 		return children.size();
 	}
 
@@ -136,7 +126,7 @@ public abstract class BaseAST implements AST {
 	}
 
 	/** Add all elements of kids list as children of this node */
-	public void addChildren(List<BaseAST> kids) {
+	public void addChildren(List<? extends BaseAST> kids) {
 		if ( kids==null ) return;
 		for (int i = 0; i < kids.size(); i++) {
 			BaseAST t = kids.get(i);
@@ -148,7 +138,7 @@ public abstract class BaseAST implements AST {
 		if ( t==null ) {
 			return;
 		}
-		if ( ((AST)t).isNil() ) {
+		if ( t.isNil() ) {
 			throw new IllegalArgumentException("Can't set single child to a list");
 		}
 		if ( children==null ) {
@@ -185,7 +175,7 @@ public abstract class BaseAST implements AST {
 		return killed;
 	}
 
-	public boolean deleteChild(AST t) {
+	public boolean deleteChild(BaseAST t) {
 		for (int i=0; i<children.size(); i++) {
 			Object c = children.get(i);
 			if ( c == t ) {
@@ -211,75 +201,9 @@ public abstract class BaseAST implements AST {
 		this.freshenParentAndChildIndexes(i);
 	}
 
-	/** Delete children from start to stop and replace with t even if t is
-	 *  a list (nil-root tree).  num of children can increase or decrease.
-	 *  For huge child lists, inserting children can force walking rest of
-	 *  children to set their childindex; could be slow.
-	 */
-	public void replaceChildren(int startChildIndex, int stopChildIndex, Object t) {
-		/*
-		System.out.println("replaceChildren "+startChildIndex+", "+stopChildIndex+
-						   " with "+((BaseTree)t).toStringTree());
-		System.out.println("in="+toStringTree());
-		*/
-		if ( children==null ) {
-			throw new IllegalArgumentException("indexes invalid; no children in list");
-		}
-		int replacingHowMany = stopChildIndex - startChildIndex + 1;
-		int replacingWithHowMany;
-		BaseAST newTree = (BaseAST)t;
-		List<BaseAST> newChildren = null;
-		// normalize to a list of children to add: newChildren
-		if ( newTree.isNil() ) {
-			newChildren = newTree.children;
-		}
-		else {
-			newChildren = new ArrayList(1);
-			newChildren.add(newTree);
-		}
-		replacingWithHowMany = newChildren.size();
-		int numNewChildren = newChildren.size();
-		int delta = replacingHowMany - replacingWithHowMany;
-		// if same number of nodes, do direct replace
-		if ( delta == 0 ) {
-			int j = 0; // index into new children
-			for (int i=startChildIndex; i<=stopChildIndex; i++) {
-				BaseAST child = (BaseAST)newChildren.get(j);
-				children.set(i, child);
-				child.setParent(this);
-				child.setChildIndex(i);
-                j++;
-            }
-		}
-		else if ( delta > 0 ) { // fewer new nodes than there were
-			// set children and then delete extra
-			for (int j=0; j<numNewChildren; j++) {
-				children.set(startChildIndex+j, newChildren.get(j));
-			}
-			int indexToDelete = startChildIndex+numNewChildren;
-			for (int c=indexToDelete; c<=stopChildIndex; c++) {
-				// delete same index, shifting everybody down each time
-				children.remove(indexToDelete);
-			}
-			freshenParentAndChildIndexes(startChildIndex);
-		}
-		else { // more new nodes than were there before
-			// fill in as many children as we can (replacingHowMany) w/o moving data
-			for (int j=0; j<replacingHowMany; j++) {
-				children.set(startChildIndex+j, newChildren.get(j));
-			}
-			int numToInsert = replacingWithHowMany-replacingHowMany;
-			for (int j=replacingHowMany; j<replacingWithHowMany; j++) {
-				children.add(startChildIndex+j, newChildren.get(j));
-			}
-			freshenParentAndChildIndexes(startChildIndex);
-		}
-		//System.out.println("out="+toStringTree());
-	}
-
 	/** Override in a subclass to change the impl of children list */
-	protected List createChildrenList() {
-		return new ArrayList();
+	protected List<BaseAST> createChildrenList() {
+		return new ArrayList<BaseAST>();
 	}
 
 	public boolean isNil() {
@@ -314,52 +238,16 @@ public abstract class BaseAST implements AST {
 		}
 	}
 
-	public void sanityCheckParentAndChildIndexes() {
-		sanityCheckParentAndChildIndexes(null, -1);
-	}
-
-	public void sanityCheckParentAndChildIndexes(AST parent, int i) {
-		if ( parent!=this.getParent() ) {
-			throw new IllegalStateException("parents don't match; expected "+parent+" found "+this.getParent());
-		}
-		if ( i!=this.getChildIndex() ) {
-			throw new IllegalStateException("child index of "+this.toStringTree()+" doesn't match in "+parent.toStringTree()+"; expected "+i+" found "+this.getChildIndex());
-		}
-		int n = this.getChildCount();
-		for (int c = 0; c < n; c++) {
-			CommonAST child = (CommonAST)this.getChild(c);
-			child.sanityCheckParentAndChildIndexes(this, c);
-		}
-	}
-
     /** Walk upwards looking for ancestor with this token type. */
     public boolean hasAncestor(int ttype) { return getAncestor(ttype)!=null; }
 
     /** Walk upwards and get first ancestor with this token type. */
-    public AST getAncestor(int ttype) {
-        AST t = this;
-        t = t.getParent();
-        while ( t!=null ) {
-            if ( t.getType()==ttype ) return t;
-            t = t.getParent();
-        }
-        return null;
-    }
+	public Tree getAncestor(int ttype) { return Trees.getAncestor(this, ttype); }
 
     /** Return a list of all ancestors of this node.  The first node of
      *  list is the root and the last is the parent of this node.
      */
-    public List getAncestors() {
-        if ( getParent()==null ) return null;
-        List<AST> ancestors = new ArrayList();
-        AST t = this;
-        t = t.getParent();
-        while ( t!=null ) {
-            ancestors.add(0, t); // insert at start
-            t = t.getParent();
-        }
-        return ancestors;
-    }
+    public List<? extends Tree> getAncestors() { return Trees.getAncestors(this); }
 
 	/** Don't use standard tree printing mechanism since ASTs can have nil
 	 *  root nodes.
