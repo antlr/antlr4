@@ -29,6 +29,10 @@
 
 package org.antlr.v4.runtime;
 
+/** A token has properties: text, type, line, character position in the line
+ *  (so we can ignore tabs), token channel, index, and source from which
+ *  we obtained this token.
+ */
 public interface Token {
 	public static final int INVALID_TYPE = 0;
 	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
@@ -36,6 +40,7 @@ public interface Token {
 
 	/** imaginary tree navigation type; traverse "get child" link */
 	public static final int DOWN = 1;
+
 	/** imaginary tree navigation type; finish with a child list */
 	public static final int UP = 2;
 
@@ -55,32 +60,34 @@ public interface Token {
 	public static final int HIDDEN_CHANNEL = 99;
 
 	/** Get the text of the token */
-	public String getText();
-	public void setText(String text);
+	String getText();
 
-	public int getType();
-	public void setType(int ttype);
-	/**  The line number on which this token was matched; line=1..n */
-	public int getLine();
-    public void setLine(int line);
+	/** Get the token type of the token */
+	int getType();
 
-	/** The index of the first character relative to the beginning of the line 0..n-1 */
-	public int getCharPositionInLine();
-	public void setCharPositionInLine(int pos);
+	/** The line number on which the 1st character of this token was matched,
+	 *  line=1..n
+	 */
+	int getLine();
 
-	public int getChannel();
-	public void setChannel(int channel);
+	/** The index of the first character of this token relative to the
+	 *  beginning of the line at which it occurs, 0..n-1
+	 */
+	int getCharPositionInLine();
+
+	/** Return the channel this token. Each token can arrive at the parser
+	 *  on a different channel, but the parser only "tunes" to a single channel.
+	 *  The parser ignores everything not on DEFAULT_CHANNEL.
+	 */
+	int getChannel();
 
 	/** An index from 0..n-1 of the token object in the input stream.
 	 *  This must be valid in order to use the ANTLRWorks debugger.
 	 */
-	public int getTokenIndex();
-	public void setTokenIndex(int index);
+	int getTokenIndex();
 
-	/** From what character stream was this token created?  You don't have to
-	 *  implement but it's nice to know where a Token comes from if you have
-	 *  include files etc... on the input.
+	/** Where does this token come from? You can get the
+	 *  character input stream from the token source.
 	 */
-	public CharStream getInputStream();
-	public void setInputStream(CharStream input);
+	TokenSource getTokenSource();
 }

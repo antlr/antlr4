@@ -28,8 +28,7 @@
 package org.antlr.v4.runtime.debug;
 
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
 /** A blank listener that does nothing; useful for real classes so
  *  they don't have to have lots of blank methods and are less
@@ -48,7 +47,7 @@ public class BlankDebugEventListener implements DebugEventListener {
 	public void consumeHiddenToken(Token token) {}
 	public void LT(int i, Token t) {}
 	public void mark(int i) {}
-	public void rewind(int i) {}
+	public void release(int i) {}
 	public void seek(int i) {}
 	public void recognitionException(RecognitionException e) {}
 	public void beginResync() {}

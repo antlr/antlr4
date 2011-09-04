@@ -115,13 +115,13 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 			token = null;
 			channel = Token.DEFAULT_CHANNEL;
 			tokenStartCharIndex = input.index();
-			tokenStartCharPositionInLine = input.getCharPositionInLine();
-			tokenStartLine = input.getLine();
+			tokenStartCharPositionInLine = _interp.getCharPositionInLine();
+			tokenStartLine = _interp.getLine();
 			text = null;
 			do {
 				type = Token.INVALID_TYPE;
 				if ( input.LA(1)==CharStream.EOF ) {
-					Token eof = new CommonToken(input,Token.EOF,
+					WritableToken eof = new CommonToken(this,Token.EOF,
 												Token.DEFAULT_CHANNEL,
 												input.index(),input.index());
 					eof.setLine(getLine());
@@ -182,12 +182,12 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		this.input = input;
 	}
 
-	public CharStream getCharStream() {
-		return ((CharStream)input);
-	}
-
 	public String getSourceName() {
 		return input.getSourceName();
+	}
+
+	public CharStream getInputStream() {
+		return input;
 	}
 
 	/** Currently does not support multiple emits per nextToken invocation
@@ -210,9 +210,9 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	 *  Parser or TreeParser.getMissingSymbol().
 	 */
 	public Token emit() {
-		Token t = new CommonToken(((CharStream)input), type,
-								  channel, tokenStartCharIndex,
-								  getCharIndex()-1);
+		WritableToken t = new CommonToken(this, type,
+										  channel, tokenStartCharIndex,
+										  getCharIndex()-1);
 		t.setLine(tokenStartLine);
 		t.setText(text);
 		t.setCharPositionInLine(tokenStartCharPositionInLine);
@@ -221,11 +221,11 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	}
 
 	public int getLine() {
-		return ((CharStream)input).getLine();
+		return _interp.getLine();
 	}
 
 	public int getCharPositionInLine() {
-		return ((CharStream)input).getCharPositionInLine();
+		return _interp.getCharPositionInLine();
 	}
 
 	/** What is the index of the current character of lookahead? */
@@ -338,6 +338,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	public void recover(RecognitionException re) {
 		//System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
 		//re.printStackTrace();
+		// TODO: Do we lose character or line position information?
 		input.consume();
 	}
 }

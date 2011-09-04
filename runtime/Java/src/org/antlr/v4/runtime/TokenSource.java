@@ -48,6 +48,16 @@ public interface TokenSource {
 	 */
 	public Token nextToken();
 
+	public int getLine();
+
+	public int getCharPositionInLine();
+
+	/** From what character stream was this token created?  You don't have to
+	 *  implement but it's nice to know where a Token comes from if you have
+	 *  include files etc... on the input.
+	 */
+	public CharStream getInputStream();
+
 	/** Where are you getting tokens from? normally the implication will simply
 	 *  ask lexers input stream.
 	 */

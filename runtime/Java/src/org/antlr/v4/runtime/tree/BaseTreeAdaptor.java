@@ -195,19 +195,19 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object create(int tokenType, Token fromToken) {
-		fromToken = createToken(fromToken);
+		WritableToken tok = createToken(fromToken);
 		//((ClassicToken)fromToken).setType(tokenType);
-		fromToken.setType(tokenType);
-		Tree t = (Tree)create(fromToken);
+		tok.setType(tokenType);
+		Tree t = (Tree)create(tok);
 		return t;
 	}
 
 	public Object create(int tokenType, Token fromToken, String text) {
         if (fromToken == null) return create(tokenType, text);
-		fromToken = createToken(fromToken);
-		fromToken.setType(tokenType);
-		fromToken.setText(text);
-		Tree t = (Tree)create(fromToken);
+		WritableToken tok = createToken(fromToken);
+		tok.setType(tokenType);
+		tok.setText(text);
+		Tree t = (Tree)create(tok);
 		return t;
 	}
 
@@ -273,7 +273,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  If you care what the token payload objects' type is, you should
 	 *  override this method and any other createToken variant.
 	 */
-	public abstract Token createToken(int tokenType, String text);
+	public abstract WritableToken createToken(int tokenType, String text);
 
 	/** Tell me how to create a token for use with imaginary token nodes.
 	 *  For example, there is probably no input symbol associated with imaginary
@@ -289,6 +289,6 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  If you care what the token payload objects' type is, you should
 	 *  override this method and any other createToken variant.
 	 */
-	public abstract Token createToken(Token fromToken);
+	public abstract WritableToken createToken(Token fromToken);
 }
 

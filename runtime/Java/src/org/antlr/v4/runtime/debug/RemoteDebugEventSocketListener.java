@@ -27,15 +27,11 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.BaseTree;
-import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 
 import java.io.*;
-import java.net.ConnectException;
-import java.net.Socket;
+import java.net.*;
 import java.util.StringTokenizer;
 
 public class RemoteDebugEventSocketListener implements Runnable {
@@ -110,10 +106,8 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		public void setTokenIndex(int index) {
 			this.index = index;
 		}
-		public CharStream getInputStream() {
+		public TokenSource getTokenSource() {
 			return null;
-		}
-		public void setInputStream(CharStream input) {
 		}
 		public String toString() {
 			String channelStr = "";

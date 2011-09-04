@@ -27,14 +27,11 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TreeAdaptor;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
 /** A proxy debug event listener that forwards events over a socket to
  *  a debugger (or any other listener) using a simple text-based protocol;
@@ -165,7 +162,7 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		transmit("mark\t"+i);
 	}
 
-	public void rewind(int i) {
+	public void release(int i) {
 		transmit("rewind\t"+i);
 	}
 

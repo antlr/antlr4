@@ -177,7 +177,7 @@ public class TestCommonTokenStream extends BaseTest {
         TokenSource lexer = // simulate input " x =34  ;\n"
             new TokenSource() {
                 int i = 0;
-                Token[] tokens = {
+                WritableToken[] tokens = {
                     new CommonToken(1," "),
                     new CommonToken(1,"x"),
                     new CommonToken(1," "),
@@ -200,7 +200,16 @@ public class TestCommonTokenStream extends BaseTest {
                     return tokens[i++];
                 }
                 public String getSourceName() { return "test"; }
-            };
+				public int getCharPositionInLine() {
+					return 0;
+				}
+				public int getLine() {
+					return 0;
+				}
+				public CharStream getInputStream() {
+					return null;
+				}
+			};
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 

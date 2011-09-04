@@ -27,11 +27,9 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Broadcast debug events to multiple listeners.  Lets you debug and still
  *  use the event mechanism to build parse trees etc...  Not thread-safe.
@@ -158,10 +156,10 @@ public class DebugEventHub implements DebugEventListener {
 		}
 	}
 
-	public void rewind(int index) {
+	public void release(int marker) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.rewind(index);
+			listener.release(marker);
 		}
 	}
 

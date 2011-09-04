@@ -27,9 +27,7 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 
 public class DebugTokenStream implements TokenStream {
 	protected DebugEventListener dbg;
@@ -111,9 +109,9 @@ public class DebugTokenStream implements TokenStream {
 		return input.range();
 	}
 
-	public void rewind(int index) {
-		dbg.rewind(index);
-		input.seek(index);
+	public void release(int index) {
+		dbg.release(index);
+		input.release(index);
 	}
 
 	public void seek(int index) {

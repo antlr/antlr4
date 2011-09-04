@@ -28,8 +28,7 @@
 package org.antlr.v4.runtime.debug;
 
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
 /** All debugging events that a recognizer can trigger.
  *
@@ -91,7 +90,7 @@ public interface DebugEventListener {
 	/** After an arbitrarily long lookahead, this informs the
 	 *  debugger that stream should be rewound to the position index.
 	 */
-	public void rewind(int index);
+	public void release(int marker);
 
 	/** Set the input cursor to the position indicated by index. */
 	public void seek(int index);

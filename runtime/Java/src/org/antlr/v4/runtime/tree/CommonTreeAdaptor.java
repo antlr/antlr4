@@ -66,7 +66,7 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	 *  override this method and any other createToken variant.
 	 */
 	@Override
-	public Token createToken(int tokenType, String text) {
+	public WritableToken createToken(int tokenType, String text) {
 		return new CommonToken(tokenType, text);
 	}
 
@@ -85,7 +85,7 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	 *  override this method and any other createToken variant.
 	 */
 	@Override
-	public Token createToken(Token fromToken) {
+	public WritableToken createToken(Token fromToken) {
 		return new CommonToken(fromToken);
 	}
 

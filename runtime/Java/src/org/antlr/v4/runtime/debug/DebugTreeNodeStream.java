@@ -28,8 +28,7 @@
 package org.antlr.v4.runtime.debug;
 
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.tree.TreeAdaptor;
-import org.antlr.v4.runtime.tree.TreeNodeStream;
+import org.antlr.v4.runtime.tree.*;
 
 /** Debug any tree node stream.  The constructor accepts the stream
  *  and a debug listener.  As node stream calls come in, debug events
@@ -95,9 +94,9 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		return lastMarker;
 	}
 
-	public void rewind(int marker) {
-		dbg.rewind(marker);
-		input.rewind(marker);
+	public void release(int marker) {
+		dbg.release(marker);
+		input.release(marker);
 	}
 
 	public int index() {

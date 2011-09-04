@@ -30,17 +30,19 @@ package org.antlr.v4.runtime;
 
 import java.io.Serializable;
 
-public class CommonToken implements Token, Serializable {
+public class CommonToken implements WritableToken, Serializable {
 	protected int type;
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
-	protected transient CharStream input;
+	protected TokenSource source;
+	// TODO: rm protected transient CharStream input;
 
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
 	 *  start/stop are not affected by changing this.
 	  */
+	// TODO: can store these in map in token stream rather than as field here
 	protected String text;
 
 	/** What token number is this from 0..n-1 tokens; < 0 implies invalid index */
@@ -56,14 +58,14 @@ public class CommonToken implements Token, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(CharStream input, int type, int channel, int start, int stop) {
-		this.input = input;
+	public CommonToken(TokenSource source, int type, int channel, int start, int stop) {
+		this.source = source;
 		this.type = type;
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
-        this.line = input.getLine();
-        this.charPositionInLine = input.getCharPositionInLine();
+        this.line = source.getLine();
+        this.charPositionInLine = source.getCharPositionInLine();
 	}
 
 	public CommonToken(int type, String text) {
@@ -79,7 +81,7 @@ public class CommonToken implements Token, Serializable {
 		index = oldToken.getTokenIndex();
 		charPositionInLine = oldToken.getCharPositionInLine();
 		channel = oldToken.getChannel();
-        input = oldToken.getInputStream();
+        source = oldToken.getTokenSource();
 		if ( oldToken instanceof CommonToken ) {
 			start = ((CommonToken)oldToken).start;
 			stop = ((CommonToken)oldToken).stop;
@@ -98,6 +100,7 @@ public class CommonToken implements Token, Serializable {
 		if ( text!=null ) {
 			return text;
 		}
+		CharStream input = getTokenSource().getInputStream();
 		if ( input==null ) {
 			return null;
 		}
@@ -167,12 +170,12 @@ public class CommonToken implements Token, Serializable {
 		this.index = index;
 	}
 
-	public CharStream getInputStream() {
-		return input;
+	public TokenSource getTokenSource() {
+		return source;
 	}
 
-	public void setInputStream(CharStream input) {
-		this.input = input;
+	public CharStream getInputStream() {
+		return source.getInputStream();
 	}
 
 	public String toString() {

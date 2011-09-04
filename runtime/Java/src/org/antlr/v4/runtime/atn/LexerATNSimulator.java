@@ -41,6 +41,12 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	protected Lexer recog;
 
+	/** line number 1..n within the input */
+	protected int line = 1;
+
+	/** The index of the character relative to the beginning of the line 0..n-1 */
+	protected int charPositionInLine = 0;
+
 	protected DFA[] dfa;
 	protected int mode = Lexer.DEFAULT_MODE;
 
@@ -87,6 +93,9 @@ public class LexerATNSimulator extends ATNSimulator {
 											(char)input.LA(1));
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
 		int prevAcceptMarker = -1;
+		int prevAcceptIndex = -1;
+		int prevAcceptLine = 0;
+		int prevAcceptCharPos = -1;
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int startIndex = input.index();
@@ -99,7 +108,10 @@ public class LexerATNSimulator extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("accept; predict "+s.prediction+
 													" in state "+s.stateNumber);
 				prevAcceptState = s;
-				prevAcceptMarker = input.index();
+				prevAcceptMarker = input.mark();
+				prevAcceptIndex = input.index();
+				prevAcceptLine = line;
+				prevAcceptCharPos = charPositionInLine;
 				// keep going unless we're at EOF; check if something else could match
 				if ( t==CharStream.EOF ) break;
 			}
@@ -134,7 +146,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			DFAState target = s.edges[t];
 			if ( target == ERROR ) break;
 			s = target;
-			input.consume();
+			consume(input, t);
 			t = input.LA(1);
 		}
 		if ( prevAcceptState==null ) {
@@ -150,7 +162,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 			if ( actionIndex>=0 ) recog.action(null, prevAcceptState.ruleIndex, actionIndex);
 		}
-		input.seek(prevAcceptMarker);
+		input.release(prevAcceptMarker);
+		input.seek(prevAcceptIndex);
+		line = prevAcceptLine;
+		charPositionInLine = prevAcceptCharPos;
 		return prevAcceptState.prediction;
 	}
 
@@ -223,7 +238,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 			}
 
-			input.consume();
+			consume(input, t);
 			addDFAEdge(closure, t, reach);
 			t = input.LA(1);
 
@@ -462,6 +477,28 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public DFA getDFA(int mode) {
 		return dfa[mode];
+	}
+
+	public int getLine() {
+		return line;
+	}
+
+	public int getCharPositionInLine() {
+		return charPositionInLine;
+	}
+
+	public void consume(CharStream input, int curChar) {
+		//System.out.println("prev p="+p+", c="+(char)data[p]);
+		charPositionInLine++;
+		if ( curChar=='\n' ) {
+			/*
+			   System.out.println("newline char found on line: "+line+
+								  "@ pos="+charPositionInLine);
+			   */
+			line++;
+			charPositionInLine=0;
+		}
+		input.consume();
 	}
 
 	public String getTokenName(int t) {

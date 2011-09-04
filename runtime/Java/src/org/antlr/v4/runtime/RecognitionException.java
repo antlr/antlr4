@@ -121,18 +121,13 @@ public class RecognitionException extends RuntimeException {
 		if ( recognizer!=null ) expecting = recognizer._interp.atn.nextTokens(ctx);
 
 		this.index = input.index();
-		if ( input instanceof TokenStream) {
+		if ( input instanceof TokenStream ) {
 			this.token = ((TokenStream)input).LT(1);
 			this.line = token.getLine();
 			this.charPositionInLine = token.getCharPositionInLine();
 		}
 		if ( input instanceof TreeNodeStream) {
 			//extractInformationFromTreeNodeStream(input);
-		}
-		else if ( input instanceof CharStream) {
-			this.c = input.LA(1);
-			this.line = ((CharStream)input).getLine();
-			this.charPositionInLine = ((CharStream)input).getCharPositionInLine();
 		}
 		else {
 			this.c = input.LA(1);

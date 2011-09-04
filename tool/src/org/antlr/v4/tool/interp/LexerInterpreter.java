@@ -55,13 +55,26 @@ public class LexerInterpreter implements TokenSource {
 
 	public String getSourceName() {	return g.name; }
 
+	public int getCharPositionInLine() {
+		return 0;
+	}
+
+	public int getLine() {
+		return 0;
+	}
+
+	public CharStream getInputStream() {
+		return null;
+	}
+
 	public Token nextToken() {
+		// TODO: Deal with off channel tokens
 		int start = input.index();
+		int tokenStartCharPositionInLine = interp.getCharPositionInLine();
+		int tokenStartLine = interp.getLine();
 		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
 		int stop = input.index()-1;
-		int tokenStartCharPositionInLine = input.getCharPositionInLine();
-		int tokenStartLine = input.getLine();
-		Token t = new CommonToken(input, ttype, Token.DEFAULT_CHANNEL, start, stop);
+		WritableToken t = new CommonToken(this, ttype, Token.DEFAULT_CHANNEL, start, stop);
 		t.setLine(tokenStartLine);
 		t.setCharPositionInLine(tokenStartCharPositionInLine);
 		return t;

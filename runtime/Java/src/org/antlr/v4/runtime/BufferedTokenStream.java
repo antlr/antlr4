@@ -129,7 +129,7 @@ public class BufferedTokenStream implements TokenStream {
     /** add n elements to buffer */
     protected void fetch(int n) {
         for (int i=1; i<=n; i++) {
-            Token t = tokenSource.nextToken();
+            WritableToken t = (WritableToken)tokenSource.nextToken();
 //            System.out.println("adding "+t+" at index "+tokens.size());
             t.setTokenIndex(tokens.size());
             tokens.add(t);

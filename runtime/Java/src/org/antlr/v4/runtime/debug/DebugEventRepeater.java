@@ -27,8 +27,7 @@
  */
 package org.antlr.v4.runtime.debug;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
 /** A simple event repeater (proxy) that delegates all functionality to the
  *  listener sent into the ctor.  Useful if you want to listen in on a few
@@ -58,7 +57,7 @@ public class DebugEventRepeater implements DebugEventListener {
 	public void consumeHiddenToken(Token token) { listener.consumeHiddenToken(token); }
 	public void LT(int i, Token t) { listener.LT(i, t); }
 	public void mark(int i) { listener.mark(i); }
-	public void rewind(int i) { listener.rewind(i); }
+	public void release(int i) { listener.release(i); }
 	public void seek(int i) { listener.seek(i); }
 	public void recognitionException(RecognitionException e) { listener.recognitionException(e); }
 	public void beginResync() { listener.beginResync(); }
