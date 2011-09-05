@@ -49,6 +49,9 @@ import org.stringtemplate.v4.ST;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext extends RuleContext {
+	/** Set during parsing to identify which rule parser is in. */
+	public int ruleIndex;
+
 	public Token start, stop;
 	public Object tree;
 	public ST st;

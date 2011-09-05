@@ -688,6 +688,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  parse trees as well.
 	 */
 	public void enterRule(int ruleIndex) {
+		_ctx.ruleIndex = ruleIndex;
 		if ( buildParseTrees ) {
 			if ( _ctx.parent!=null ) _ctx.parent.addChild(_ctx);
 		}

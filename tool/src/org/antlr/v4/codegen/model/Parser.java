@@ -40,6 +40,7 @@ public class Parser extends OutputModelObject {
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
+	public Collection<Rule> rules;
 	public ParserFile file;
 
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
@@ -59,6 +60,7 @@ public class Parser extends OutputModelObject {
 		}
 		tokenNames = g.getTokenDisplayNames();
 		ruleNames = g.rules.keySet();
+		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
 	}
 }

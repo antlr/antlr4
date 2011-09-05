@@ -44,6 +44,8 @@ public class <parser.name> extends Parser {
         "\<INVALID>", "\<INVALID>", "\<INVALID>",
         <parser.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>
     };
+    public static final int
+        <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
     public static final String[] ruleNames = {
         <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
     };
