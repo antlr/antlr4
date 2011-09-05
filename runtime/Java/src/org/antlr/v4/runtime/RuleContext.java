@@ -80,6 +80,9 @@ public class RuleContext implements ParseTree.RuleNode {
 	 */
 	public int s = -1;
 
+	/** Set during parsing to identify which rule parser is in. */
+	public int ruleIndex;
+
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
 	 *  If parent is null, this should be -1.
