@@ -1,0 +1,46 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="260" height="176" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<line x1="177" y1="10" x2="110" y2="80" style="stroke:black; stroke-width:2px;" />
+<line x1="110" y1="80" x2="40" y2="158" style="stroke:black; stroke-width:2px;" />
+<line x1="110" y1="80" x2="110" y2="158" style="stroke:black; stroke-width:2px;" />
+<line x1="110" y1="80" x2="180" y2="158" style="stroke:black; stroke-width:2px;" />
+<line x1="177" y1="10" x2="245" y2="80" style="stroke:black; stroke-width:2px;" />
+<line x1="245" y1="80" x2="245" y2="158" style="stroke:black; stroke-width:2px;" />
+<rect x="91" y="149" width="38" height="18" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="98" y="161" style="font-family:sans-serif;font-size:12px;">
+n1.2
+</text>
+<rect x="1" y="141" width="78" height="34" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="8" y="153" style="font-family:sans-serif;font-size:12px;">
+n1.1
+</text>
+<text x="8" y="165" style="font-family:sans-serif;font-size:12px;">
+(first node)
+</text>
+<rect x="231" y="71" width="28" height="18" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="238" y="83" style="font-family:sans-serif;font-size:12px;">
+n2
+</text>
+<rect x="158" y="1" width="38" height="18" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="165" y="13" style="font-family:sans-serif;font-size:12px;">
+root
+</text>
+<rect x="231" y="149" width="28" height="18" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="238" y="161" style="font-family:sans-serif;font-size:12px;">
+n2
+</text>
+<rect x="96" y="71" width="28" height="18" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="103" y="83" style="font-family:sans-serif;font-size:12px;">
+n1
+</text>
+<rect x="141" y="141" width="78" height="34" style="fill:orange; stroke:rgb(0,0,0);" rx="10"/>
+<text x="148" y="153" style="font-family:sans-serif;font-size:12px;">
+n1.3
+</text>
+<text x="148" y="165" style="font-family:sans-serif;font-size:12px;">
+(last node)
+</text>
+</svg>
+
+
