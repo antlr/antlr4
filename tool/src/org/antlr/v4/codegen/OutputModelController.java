@@ -161,7 +161,12 @@ public class OutputModelController {
 			}
 		}
 
-		if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
+		// we will usually have to build one of these because of labels
+		// and it will come in very handy for visitors on the parse tree.
+		// I think I will just always generate this structure now.
+		// It makes it easier for code generation as well because every
+		// rule context has a real name.
+		//if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
 		popCurrentRule();
 	}
 

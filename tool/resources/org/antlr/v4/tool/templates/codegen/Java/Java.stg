@@ -415,6 +415,10 @@ public static class <s.name> extends ParserRuleContext {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
+    /*
+	public void discover(TListener listener) { listener.discover_<s.name>(this); }
+	public void finish(TListener listener) { listener.finish_<s.name>(this); }
+	*/
 }
 >>
 

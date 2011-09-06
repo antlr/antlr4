@@ -79,4 +79,8 @@ public interface ParseTree extends SyntaxTree {
 			return toString();
 		}
 	}
+
+	// the following methods narrow the return type; they are not additional methods
+	ParseTree getParent();
+	ParseTree getChild(int i);
 }

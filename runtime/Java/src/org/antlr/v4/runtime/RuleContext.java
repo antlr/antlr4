@@ -281,6 +281,9 @@ public class RuleContext implements ParseTree.RuleNode {
 		return Trees.toStringTree(this);
 	}
 
+	public void discover(ParseTreeListener listener) { }
+	public void finish(ParseTreeListener listener) { }
+
 	public String toString() {
 		return toString(null);
 	}
