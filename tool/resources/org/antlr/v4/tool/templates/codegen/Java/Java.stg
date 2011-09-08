@@ -37,10 +37,10 @@ import java.util.ArrayList;
 
 ListenerFile(listener) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
-public interface <listener.grammarName> {
+public interface <listener.grammarName>Listener {
     <listener.rules:{r |
-void enterRule(<r.name>_ctx ctx);
-void exitRule(<r.name>_ctx ctx);}; separator="\n">
+void enterRule(<listener.grammarName>.<r.name>_ctx ctx);
+void exitRule(<listener.grammarName>.<r.name>_ctx ctx);}; separator="\n">
 }
 >>
 
@@ -424,8 +424,8 @@ public static class <s.name> extends ParserRuleContext {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-	public void enterRule(TListener listener) { listener.enterRule(this); }
-	public void exitRule(TListener listener) { listener.exitRule(this); }
+	public void enterRule(<parser.name>Listener listener) { listener.enterRule(this); }
+	public void exitRule(<parser.name>Listener listener) { listener.exitRule(this); }
 }
 >>
 
