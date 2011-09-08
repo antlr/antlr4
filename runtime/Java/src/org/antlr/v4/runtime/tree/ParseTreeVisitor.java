@@ -57,55 +57,13 @@ public class ParseTreeVisitor {
 	 */
     protected void enterRule(ParseTreeListener listener, ParseTree.RuleNode r) {
 		ParserRuleContext ctx = (ParserRuleContext)r.getRuleContext();
-		listener.discoverRule((ParserRuleContext)r.getRuleContext());
+		listener.enterEveryRule((ParserRuleContext) r.getRuleContext());
 		ctx.enterRule(listener);
     }
 
     protected void exitRule(ParseTreeListener listener, ParseTree.RuleNode r) {
 		ParserRuleContext ctx = (ParserRuleContext)r.getRuleContext();
 		ctx.exitRule(listener);
-		listener.finishRule(ctx);
+		listener.exitEveryRule(ctx);
     }
-
-	/*
-	public static void main(String[] args) {
-		TListener listener = new TListener() {
-			public void discover_s(s_ctx ctx) {
-			}
-			public void finish_s(s_ctx ctx) {
-			}
-			public void discover_ifstat(ParserRuleContext ctx) {
-			}
-			public void finish_ifstat(ParserRuleContext ctx) {
-			}
-			public void visitToken(Token token) {
-			}
-			public void discoverRule(ParserRuleContext ctx) {
-			}
-			public void finishRule(ParserRuleContext ctx) {
-			}
-		};
-		ParserRuleContext ctx = new ParserRuleContext();
-		ParseTreeVisitor visitor = new ParseTreeVisitor();
-		visitor.visit(listener, ctx);
-	}
-	*/
 }
-
-/*
-interface TListener extends ParseTreeListener {
-	void discover_s(s_ctx ctx);
-	void finish_s(s_ctx ctx);
-	void discover_ifstat(ParserRuleContext ctx); // no labels
-	void finish_ifstat(ParserRuleContext ctx); // no labels
-}
-
-class s_ctx extends ParserRuleContext {
-    public ParserRuleContext i;
-    public s_ctx(RuleContext parent, int state) {
-            super(parent, state);
-    }
-	public void discover(TListener listener) { listener.discover_s(this); }
-	public void finish(TListener listener) { listener.discover_s(this); }
-}
-*/

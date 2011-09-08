@@ -1,6 +1,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.ActionAST;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -15,6 +16,8 @@ public class ListenerFile extends OutputModelObject {
 	public String parserName;
 	public Collection<Rule> rules;
 
+	@ModelElement public Action header;
+
 	public ListenerFile(OutputModelFactory factory, String fileName) {
 		super(factory);
 		this.fileName = fileName;
@@ -22,5 +25,7 @@ public class ListenerFile extends OutputModelObject {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		rules = g.rules.values();
+		ActionAST ast = g.namedActions.get("header");
+		if ( ast!=null ) header = new Action(factory, ast);
 	}
 }

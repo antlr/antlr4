@@ -29,10 +29,11 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 public interface ParseTreeListener {
     void visitToken(Token token);
-    void discoverRule(ParserRuleContext ctx);
-    void finishRule(ParserRuleContext ctx);
+    void enterEveryRule(ParserRuleContext ctx);
+    void exitEveryRule(ParserRuleContext ctx);
 }

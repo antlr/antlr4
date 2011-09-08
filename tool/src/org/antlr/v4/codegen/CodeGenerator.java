@@ -52,8 +52,6 @@ public class CodeGenerator {
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
-	public OutputModelObject outputModel;
-
 	public Grammar g;
 	public Tool tool;
 	public Target target;
@@ -118,9 +116,6 @@ public class CodeGenerator {
 //		OutputModelFactory factory;
 //		if ( g.isLexer() ) factory = new LexerFactory(this);
 //		else factory = new ParserFactory(this);
-//
-//		// TODO: let someone add their own factory?
-//
 //		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 //		OutputModelController controller = new OutputModelController(factory);
 //		if ( g.hasASTOption() ) {
@@ -140,7 +135,7 @@ public class CodeGenerator {
 		OutputModelController controller = new OutputModelController(factory);
 		factory.setController(controller);
 
-		outputModel = controller.buildLexerOutputModel();
+		OutputModelObject outputModel = controller.buildLexerOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		ST st = walker.walk(outputModel);
@@ -156,8 +151,6 @@ public class CodeGenerator {
 	public ST generateParser() {
 		OutputModelFactory factory = new ParserFactory(this);
 
-		// TODO: let someone add their own factory?
-
 		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 		OutputModelController controller = new OutputModelController(factory);
 		if ( g.hasASTOption() ) {
@@ -165,7 +158,7 @@ public class CodeGenerator {
 		}
 		factory.setController(controller);
 
-		outputModel = controller.buildParserOutputModel();
+		OutputModelObject outputModel = controller.buildParserOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		ST st = walker.walk(outputModel);
@@ -181,25 +174,26 @@ public class CodeGenerator {
 	public ST generateListener() {
 		OutputModelFactory factory = new ParserFactory(this);
 
-		// TODO: let someone add their own factory?
-
-		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 		OutputModelController controller = new OutputModelController(factory);
-		if ( g.hasASTOption() ) {
-			controller.addExtension( new ParserASTExtension(factory) );
-		}
 		factory.setController(controller);
 
-		outputModel = controller.buildListenerOutputModel();
+		OutputModelObject listenerModel = controller.buildListenerOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(outputModel);
+		ST st = walker.walk(listenerModel);
+		return st;
+	}
 
-		if ( tool.launch_ST_inspector ) {
-			st.inspect();
-			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
-		}
+	public ST generateBlankListener() {
+		OutputModelFactory factory = new ParserFactory(this);
 
+		OutputModelController controller = new OutputModelController(factory);
+		factory.setController(controller);
+
+		OutputModelObject blankModel = controller.buildBlankListenerOutputModel();
+
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		ST st = walker.walk(blankModel);
 		return st;
 	}
 
@@ -240,7 +234,11 @@ public class CodeGenerator {
 	}
 
 	public void writeListener(ST outputFileST) {
-		target.genFile(g,outputFileST,getListenerFileName());
+		target.genFile(g,outputFileST, getListenerFileName());
+	}
+
+	public void writeBlankListener(ST outputFileST) {
+		target.genFile(g,outputFileST, getBlankListenerFileName());
 	}
 
 	public void writeHeaderFile() {
@@ -319,6 +317,15 @@ public class CodeGenerator {
 	public String getListenerFileName() {
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Listener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as BlankTListener.java, if we're using the Java target.
+ 	 */
+	public String getBlankListenerFileName() {
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = "Blank" + g.name + "Listener";
 		return listenerName+extST.render();
 	}
 

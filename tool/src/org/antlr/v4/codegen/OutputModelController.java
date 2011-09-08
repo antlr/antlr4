@@ -110,6 +110,11 @@ public class OutputModelController {
 		return new ListenerFile(delegate, gen.getListenerFileName());
 	}
 
+	public OutputModelObject buildBlankListenerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BlankListenerFile(delegate, gen.getBlankListenerFileName());
+	}
+
 	public ParserFile parserFile(String fileName) {
 		ParserFile f = delegate.parserFile(fileName);
 		for (CodeGeneratorExtension ext : extensions) f = ext.parserFile(f);

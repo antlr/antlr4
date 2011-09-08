@@ -35,12 +35,33 @@ import java.util.ArrayList;
 <parser>
 >>
 
-ListenerFile(listener) ::= <<
+ListenerFile(listener, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
-public interface <listener.grammarName>Listener {
+public interface <listener.grammarName>Listener extends ParseTreeListener {
     <listener.rules:{r |
 void enterRule(<listener.parserName>.<r.name>Context ctx);
 void exitRule(<listener.parserName>.<r.name>Context ctx);}; separator="\n">
+}
+>>
+
+BlankListenerFile(listener, header) ::= <<
+<header>
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+
+@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
+public class Blank<listener.grammarName>Listener implements <listener.grammarName>Listener {
+    <listener.rules:{r |
+public void enterRule(<listener.parserName>.<r.name>Context ctx) { \}
+public void exitRule(<listener.parserName>.<r.name>Context ctx) { \}}; separator="\n">
+
+	public void enterEveryRule(ParserRuleContext ctx) { }
+	public void exitEveryRule(ParserRuleContext ctx) { }
+	public void visitToken(Token token) { }
 }
 >>
 
@@ -429,8 +450,8 @@ public static class <s.name> extends ParserRuleContext {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-	public void enterRule(<parser.grammarName>Listener listener) { listener.enterRule(this); }
-	public void exitRule(<parser.grammarName>Listener listener) { listener.exitRule(this); }
+	public void enterRule(ParseTreeListener listener) { ((<parser.grammarName>Listener)listener).enterRule(this); }
+	public void exitRule(ParseTreeListener listener) { ((<parser.grammarName>Listener)listener).exitRule(this); }
 }
 >>
 
