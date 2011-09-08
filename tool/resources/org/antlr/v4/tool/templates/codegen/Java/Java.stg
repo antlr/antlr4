@@ -39,8 +39,8 @@ ListenerFile(listener) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public interface <listener.grammarName>Listener {
     <listener.rules:{r |
-void enterRule(<listener.grammarName>.<r.name>_ctx ctx);
-void exitRule(<listener.grammarName>.<r.name>_ctx ctx);}; separator="\n">
+void enterRule(<listener.parserName>.<r.name>_ctx ctx);
+void exitRule(<listener.parserName>.<r.name>_ctx ctx);}; separator="\n">
 }
 >>
 

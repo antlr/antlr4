@@ -12,12 +12,14 @@ import java.util.Collection;
 public class ListenerFile extends OutputModelObject {
 	public String fileName;
 	public String grammarName;
+	public String parserName;
 	public Collection<Rule> rules;
 
 	public ListenerFile(OutputModelFactory factory, String fileName) {
 		super(factory);
 		this.fileName = fileName;
 		Grammar g = factory.getGrammar();
+		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		rules = g.rules.values();
 	}
