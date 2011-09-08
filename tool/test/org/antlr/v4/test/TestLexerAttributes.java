@@ -17,7 +17,7 @@ public class TestLexerAttributes extends BaseTest {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
 		CodeGenerator gen = new CodeGenerator(g);
-		ST outputFileST = gen.generate();
+		ST outputFileST = gen.generateRecognizer();
 		String output = outputFileST.render();
 		int start = output.indexOf('#');
 		int end = output.lastIndexOf('#');

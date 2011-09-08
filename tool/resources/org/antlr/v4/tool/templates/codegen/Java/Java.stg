@@ -35,6 +35,15 @@ import java.util.ArrayList;
 <parser>
 >>
 
+ListenerFile(listener) ::= <<
+@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
+public interface <listener.grammarName> {
+    <listener.rules:{r |
+void enterRule(<r.name>_ctx ctx);
+void exitRule(<r.name>_ctx ctx);}; separator="\n">
+}
+>>
+
 Parser(parser, scopes, funcs, atn, sempredFuncs) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class <parser.name> extends Parser {
@@ -415,10 +424,8 @@ public static class <s.name> extends ParserRuleContext {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-    /*
 	public void enterRule(TListener listener) { listener.enterRule(this); }
 	public void exitRule(TListener listener) { listener.exitRule(this); }
-	*/
 }
 >>
 

@@ -32,12 +32,16 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.*;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -47,6 +51,8 @@ public class CodeGenerator {
 	public final static String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
+
+	public OutputModelObject outputModel;
 
 	public Grammar g;
 	public Tool tool;
@@ -108,10 +114,47 @@ public class CodeGenerator {
 		}
 	}
 
-	public ST generate() {
-		OutputModelFactory factory;
-		if ( g.isLexer() ) factory = new LexerFactory(this);
-		else factory = new ParserFactory(this);
+//	public void buildOutputModel() {
+//		OutputModelFactory factory;
+//		if ( g.isLexer() ) factory = new LexerFactory(this);
+//		else factory = new ParserFactory(this);
+//
+//		// TODO: let someone add their own factory?
+//
+//		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
+//		OutputModelController controller = new OutputModelController(factory);
+//		if ( g.hasASTOption() ) {
+//			controller.addExtension( new ParserASTExtension(factory) );
+//		}
+//		factory.setController(controller);
+//
+//		if ( g.isLexer() ) outputModel = controller.buildLexerOutputModel();
+//		else outputModel = controller.buildParserOutputModel();
+//	}
+
+	// CREATE TEMPLATES BY WALKING MODEL
+	public ST generateLexer() {
+		OutputModelFactory factory = new LexerFactory(this);
+
+		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
+		OutputModelController controller = new OutputModelController(factory);
+		factory.setController(controller);
+
+		outputModel = controller.buildLexerOutputModel();
+
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		ST st = walker.walk(outputModel);
+
+		if ( tool.launch_ST_inspector ) {
+			st.inspect();
+			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
+		}
+
+		return st;
+	}
+
+	public ST generateParser() {
+		OutputModelFactory factory = new ParserFactory(this);
 
 		// TODO: let someone add their own factory?
 
@@ -122,11 +165,33 @@ public class CodeGenerator {
 		}
 		factory.setController(controller);
 
-		OutputModelObject outputModel;
-		if ( g.isLexer() ) outputModel = controller.buildLexerOutputModel();
-		else outputModel = controller.buildParserOutputModel();
+		outputModel = controller.buildParserOutputModel();
 
-		// CREATE TEMPLATES BY WALKING MODEL
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		ST st = walker.walk(outputModel);
+
+		if ( tool.launch_ST_inspector ) {
+			st.inspect();
+			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
+		}
+
+		return st;
+	}
+
+	public ST generateListener() {
+		OutputModelFactory factory = new ParserFactory(this);
+
+		// TODO: let someone add their own factory?
+
+		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
+		OutputModelController controller = new OutputModelController(factory);
+		if ( g.hasASTOption() ) {
+			controller.addExtension( new ParserASTExtension(factory) );
+		}
+		factory.setController(controller);
+
+		outputModel = controller.buildListenerOutputModel();
+
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		ST st = walker.walk(outputModel);
 
@@ -170,42 +235,73 @@ public class CodeGenerator {
 		return vocabFileST;
 	}
 
-	public void write(ST outputFileST) {
-		// WRITE FILES
-		String fileName = "unknown";
-		try {
-			fileName = getRecognizerFileName();
-			target.genRecognizerFile(g,outputFileST);
-			if ( templates.isDefined("headerFile") ) {
-				fileName = getHeaderFileName();
-				ST extST = templates.getInstanceOf("headerFileExtension");
-				ST headerFileST = null;
-				target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
-			}
-			// write out the vocab interchange file; used by antlr,
-			// does not change per target
-			ST tokenVocabSerialization = getTokenVocabOutput();
-			fileName = getVocabFileName();
-			if ( fileName!=null ) {
-				write(tokenVocabSerialization, fileName);
-			}
-		}
-		catch (IOException ioe) {
-			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
-									ioe,
-									fileName);
+	public void writeRecognizer(ST outputFileST) {
+		target.genFile(g, outputFileST, getRecognizerFileName());
+	}
+
+	public void writeListener(ST outputFileST) {
+		target.genFile(g,outputFileST,getListenerFileName());
+	}
+
+	public void writeHeaderFile() {
+		String fileName = getHeaderFileName();
+		if ( fileName==null ) return;
+		if ( templates.isDefined("headerFile") ) {
+			ST extST = templates.getInstanceOf("headerFileExtension");
+			ST headerFileST = null;
+			// TODO:  don't hide this header file generation here!
+			target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
 		}
 	}
 
-	public void write(ST code, String fileName) throws IOException {
-		long start = System.currentTimeMillis();
-		Writer w = tool.getOutputFileWriter(g, fileName);
-		STWriter wr = new AutoIndentWriter(w);
-		wr.setLineWidth(lineWidth);
-		code.write(wr);
-		w.close();
-		long stop = System.currentTimeMillis();
-		System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
+	public void writeVocabFile() {
+		// write out the vocab interchange file; used by antlr,
+		// does not change per target
+		ST tokenVocabSerialization = getTokenVocabOutput();
+		String fileName = getVocabFileName();
+		if ( fileName!=null ) {
+			write(tokenVocabSerialization, fileName);
+		}
+	}
+
+//	public void write(ST outputFileST) {
+//		// WRITE FILES
+//		String fileName = "unknown";
+//		try {
+//			fileName = getRecognizerFileName();
+//			target.genRecognizerFile(g,outputFileST);
+//			writeHeaderFile();
+//			// write out the vocab interchange file; used by antlr,
+//			// does not change per target
+//			ST tokenVocabSerialization = getTokenVocabOutput();
+//			fileName = getVocabFileName();
+//			if ( fileName!=null ) {
+//				write(tokenVocabSerialization, fileName);
+//			}
+//		}
+//		catch (IOException ioe) {
+//			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
+//									ioe,
+//									fileName);
+//		}
+//	}
+
+	public void write(ST code, String fileName) {
+		try {
+			long start = System.currentTimeMillis();
+			Writer w = tool.getOutputFileWriter(g, fileName);
+			STWriter wr = new AutoIndentWriter(w);
+			wr.setLineWidth(lineWidth);
+			code.write(wr);
+			w.close();
+			long stop = System.currentTimeMillis();
+			System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
+		}
+		catch (IOException ioe) {
+			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
+								  ioe,
+								  fileName);
+		}
 	}
 
 	/** Generate TParser.java and TLexer.java from T.g if combined, else
@@ -217,6 +313,15 @@ public class CodeGenerator {
 		return recognizerName+extST.render();
 	}
 
+	/** A given grammar T, return the listener name such as
+	 *  TListener.java, if we're using the Java target.
+ 	 */
+	public String getListenerFileName() {
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "Listener";
+		return listenerName+extST.render();
+	}
+
 	/** What is the name of the vocab file generated for this grammar?
 	 *  Returns null if no .tokens file should be generated.
 	 */
@@ -226,6 +331,7 @@ public class CodeGenerator {
 
 	public String getHeaderFileName() {
 		ST extST = templates.getInstanceOf("headerFileExtension");
+		if ( extST==null ) return null;
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}

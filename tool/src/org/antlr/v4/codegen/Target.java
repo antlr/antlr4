@@ -31,11 +31,12 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
-
-import java.io.IOException;
 
 /** */
 public class Target {
@@ -66,18 +67,23 @@ public class Target {
 		this.gen = gen;
 	}
 
-	protected void genRecognizerFile(Grammar g,
-									 ST outputFileST)
-		throws IOException
+	protected void genFile(Grammar g,
+						   ST outputFileST,
+						   String fileName)
 	{
-		String fileName = gen.getRecognizerFileName();
+		gen.write(outputFileST, fileName);
+	}
+
+	protected void genListenerFile(Grammar g,
+								   ST outputFileST)
+	{
+		String fileName = gen.getListenerFileName();
 		gen.write(outputFileST, fileName);
 	}
 
 	protected void genRecognizerHeaderFile(Grammar g,
 										   ST headerFileST,
 										   String extName) // e.g., ".h"
-		throws IOException
 	{
 		// no header file by default
 	}

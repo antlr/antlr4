@@ -33,10 +33,13 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -102,6 +105,11 @@ public class OutputModelController {
 		return file;
 	}
 
+	public OutputModelObject buildListenerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new ListenerFile(delegate, gen.getListenerFileName());
+	}
+
 	public ParserFile parserFile(String fileName) {
 		ParserFile f = delegate.parserFile(fileName);
 		for (CodeGeneratorExtension ext : extensions) f = ext.parserFile(f);
@@ -115,7 +123,7 @@ public class OutputModelController {
 	}
 
 	public LexerFile lexerFile(String fileName) {
-		return new LexerFile(delegate, getGenerator().getRecognizerFileName());
+		return new LexerFile(delegate, fileName);
 	}
 
 	public Lexer lexer(LexerFile file) {
