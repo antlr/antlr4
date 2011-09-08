@@ -22,6 +22,9 @@ import org.abego.treelayout.util.FixedNodeExtentProvider;
 import org.antlr.v4.runtime.tree.Tree;
 
 public class TreeViewer {
+
+	// ----------------------------------------------------------------------
+
 	private static class AntlrTreeLayout extends TreeLayout<Tree> {
 		public AntlrTreeLayout(TreeForTreeLayout<Tree> tree,
 				NodeExtentProvider<Tree> nodeExtentProvider,
@@ -29,6 +32,8 @@ public class TreeViewer {
 			super(tree, nodeExtentProvider, configuration);
 		}
 	}
+
+	// ----------------------------------------------------------------------
 
 	private static class AntlrTreeLayouter {
 		// TODO: provide public interface to the configuration/nodeExtent
@@ -158,7 +163,9 @@ public class TreeViewer {
 		}
 	}
 
-	private static class AntlrTreePane extends JComponent {
+	// ----------------------------------------------------------------------
+
+	private class AntlrTreePane extends JComponent {
 		private final AntlrTreeLayout treeLayout;
 
 		private TreeForTreeLayout<Tree> getTree() {
@@ -174,7 +181,7 @@ public class TreeViewer {
 		}
 
 		private String getText(Tree tree) {
-			return String.valueOf(tree.getPayload());
+			return treeTextProvider.getText(tree);
 		}
 
 		/**
@@ -193,11 +200,6 @@ public class TreeViewer {
 		// -------------------------------------------------------------------
 		// painting
 
-		private final static int ARC_SIZE = 10;
-		private final static Color BOX_COLOR = Color.orange;
-		private final static Color BORDER_COLOR = Color.darkGray;
-		private final static Color TEXT_COLOR = Color.black;
-
 		private void paintEdges(Graphics g, Tree parent) {
 			if (!getTree().isLeaf(parent)) {
 				Rectangle2D.Double b1 = getBoundsOfNode(parent);
@@ -215,20 +217,20 @@ public class TreeViewer {
 
 		private void paintBox(Graphics g, Tree tree) {
 			// draw the box in the background
-			g.setColor(BOX_COLOR);
+			g.setColor(boxColor);
 			Rectangle2D.Double box = getBoundsOfNode(tree);
 			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
-					(int) box.height - 1, ARC_SIZE, ARC_SIZE);
-			g.setColor(BORDER_COLOR);
+					(int) box.height - 1, arcSize, arcSize);
+			g.setColor(borderColor);
 			g.drawRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
-					(int) box.height - 1, ARC_SIZE, ARC_SIZE);
+					(int) box.height - 1, arcSize, arcSize);
 
 			// draw the text on top of the box (possibly multiple lines)
-			g.setColor(TEXT_COLOR);
+			g.setColor(textColor);
 			String s = getText(tree);
 			String[] lines = s.split("\n");
 			FontMetrics m = getFontMetrics(getFont());
-			int x = (int) box.x + ARC_SIZE / 2;
+			int x = (int) box.x + arcSize / 2;
 			int y = (int) box.y + m.getAscent() + m.getLeading() + 1;
 			for (int i = 0; i < lines.length; i++) {
 				g.drawString(lines[i], x, y);
@@ -249,7 +251,71 @@ public class TreeViewer {
 		}
 	}
 
+	// ----------------------------------------------------------------------
+
+	private int arcSize = 10;
+
+	public int getArcSize() {
+		return arcSize;
+	}
+
+	public void setArcSize(int arcSize) {
+		this.arcSize = arcSize;
+	}
+
+	// ----------------------------------------------------------------------
+
+	private Color boxColor = Color.orange;
+
+	public Color getBoxColor() {
+		return boxColor;
+	}
+
+	public void setBoxColor(Color boxColor) {
+		this.boxColor = boxColor;
+	}
+
+	// ----------------------------------------------------------------------
+
+	private Color borderColor = Color.darkGray;
+
+	public Color getBorderColor() {
+		return borderColor;
+	}
+
+	public void setBorderColor(Color borderColor) {
+		this.borderColor = borderColor;
+	}
+
+	// ----------------------------------------------------------------------
+
+	private Color textColor = Color.black;
+
+	public Color getTextColor() {
+		return textColor;
+	}
+
+	public void setTextColor(Color textColor) {
+		this.textColor = textColor;
+	}
+
+	// ----------------------------------------------------------------------
+
+	private TreeTextProvider treeTextProvider = new DefaultTreeTextProvider();
+
+	public TreeTextProvider getTreeTextProvider() {
+		return treeTextProvider;
+	}
+
+	public void setTreeTextProvider(TreeTextProvider treeTextProvider) {
+		this.treeTextProvider = treeTextProvider;
+	}
+
+	// ----------------------------------------------------------------------
+
 	private AntlrTreeLayouter layouter = new AntlrTreeLayouter();
+
+	// ----------------------------------------------------------------------
 
 	private static void showInDialog(JComponent panel) {
 		JDialog dialog = new JDialog();
@@ -267,4 +333,5 @@ public class TreeViewer {
 		AntlrTreePane panel = new AntlrTreePane(layout);
 		showInDialog(panel);
 	}
+
 }
