@@ -29,25 +29,47 @@
 
 package org.antlr.v4.runtime.tree;
 
-import java.util.*;
+import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.Token;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
 	/** Print out a whole tree in LISP form. toString is used on the
-	 *  node payloads to get the text for the nodes.
+	 *  node payloads to get the text for the nodes.  Detect
+	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(Tree t) {
-		if ( t.getChildCount()==0 ) return t.getPayload().toString();
+	public static String toStringTree(Tree t, BaseRecognizer recog) {
+		if ( t.getChildCount()==0 ) return getNodeText(t, recog);
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
-		buf.append(t.getPayload().toString());
+		buf.append(getNodeText(t, recog));
 		buf.append(' ');
 		for (int i = 0; i<t.getChildCount(); i++) {
 			if ( i>0 ) buf.append(' ');
-			buf.append(t.getChild(i).toStringTree());
+			buf.append(toStringTree(t.getChild(i), recog));
 		}
 		buf.append(")");
 		return buf.toString();
+	}
+
+	public static String getNodeText(Tree t, BaseRecognizer recog) {
+		if ( recog!=null ) {
+			if ( t instanceof ParseTree.RuleNode ) {
+				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().ruleIndex;
+				String ruleName = recog.getRuleNames()[ruleIndex];
+				return ruleName;
+			}
+			else if ( t instanceof ParseTree.TokenNode ) {
+				Token tok = ((ParseTree.TokenNode) t).getToken();
+				return tok.getText();
+			}
+		}
+		return t.getPayload().toString();
 	}
 
 	/** Walk upwards and get first ancestor with this token type. */

@@ -28,11 +28,15 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.Trees;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -277,12 +281,18 @@ public class RuleContext implements ParseTree.RuleNode {
 		return new Interval(start, stop);
 	}
 
-	public String toStringTree() {
-		return Trees.toStringTree(this);
+	/** Print out a whole tree, not just a node, in LISP format
+	 *  (root child1 .. childN). Print just a node if this is a leaf.
+	 *  We have to know the recognizer so we can get rule names.
+	 */
+	public String toStringTree(BaseRecognizer recog) {
+		return Trees.toStringTree(this, recog);
 	}
 
-	public void discover(ParseTreeListener listener) { }
-	public void finish(ParseTreeListener listener) { }
+	public String toStringTree() { return toStringTree(null); }
+
+	public void enterRule(ParseTreeListener listener) { }
+	public void exitRule(ParseTreeListener listener) { }
 
 	public String toString() {
 		return toString(null);

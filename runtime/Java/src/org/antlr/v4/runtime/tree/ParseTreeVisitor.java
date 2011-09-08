@@ -38,12 +38,12 @@ public class ParseTreeVisitor {
 			return;
 		}
 		ParseTree.RuleNode r = (ParseTree.RuleNode)t;
-        discoverRule(listener, r);
+        enterRule(listener, r);
         int n = r.getChildCount();
         for (int i = 0; i<n; i++) {
             visit(listener, r.getChild(i));
         }
-		finishRule(listener, r);
+		exitRule(listener, r);
     }
 
     protected void visitToken(ParseTreeListener listener, ParseTree.TokenNode t) {
@@ -55,15 +55,15 @@ public class ParseTreeVisitor {
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected void discoverRule(ParseTreeListener listener, ParseTree.RuleNode r) {
+    protected void enterRule(ParseTreeListener listener, ParseTree.RuleNode r) {
 		ParserRuleContext ctx = (ParserRuleContext)r.getRuleContext();
 		listener.discoverRule((ParserRuleContext)r.getRuleContext());
-		ctx.discover(listener);
+		ctx.enterRule(listener);
     }
 
-    protected void finishRule(ParseTreeListener listener, ParseTree.RuleNode r) {
+    protected void exitRule(ParseTreeListener listener, ParseTree.RuleNode r) {
 		ParserRuleContext ctx = (ParserRuleContext)r.getRuleContext();
-		ctx.finish(listener);
+		ctx.exitRule(listener);
 		listener.finishRule(ctx);
     }
 

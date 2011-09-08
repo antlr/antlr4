@@ -208,7 +208,7 @@ public class Target {
 		if ( r.g.isLexer() ) {
 			return gen.templates.getInstanceOf("ParserRuleContext").render();
 		}
-		return r.name+"_ctx";
+		return r.name+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 //		boolean hasNoExternallyVisibleElements =
 //			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
 //		if ( hasNoExternallyVisibleElements ) {
@@ -227,7 +227,7 @@ public class Target {
 		if ( r.g.isLexer() ) {
 			return gen.templates.getInstanceOf("ParserRuleContext").render();
 		}
-		return r.name+"_ctx";
+		return r.name+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 //		boolean hasNoExternallyVisibleElements =
 //			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
 //

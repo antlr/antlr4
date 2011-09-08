@@ -1,4 +1,5 @@
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public class TestT {
 	public static void main(String[] args) throws Exception {
@@ -10,7 +11,7 @@ public class TestT {
 //		}
 		TParser p = new TParser(tokens);
 		p.setBuildParseTrees(true);
-		ParserRuleContext ret = p.s();
-//		System.out.println(((Tree)ret.tree).toStringTree());
+		TParser.sContext ret = p.s();
+		System.out.println(ret.toStringTree(p));
 	}
 }

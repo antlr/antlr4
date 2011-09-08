@@ -30,13 +30,15 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 import java.util.*;
 
 /** */
 public class Parser extends OutputModelObject {
 	public String name;
+	public String grammarName;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -52,6 +54,7 @@ public class Parser extends OutputModelObject {
 		this.factory = factory;
 		this.file = file; // who contains us?
 		Grammar g = factory.getGrammar();
+		grammarName = g.name;
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
 		for (String t : g.tokenNameToTypeMap.keySet()) {

@@ -39,8 +39,8 @@ ListenerFile(listener) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public interface <listener.grammarName>Listener {
     <listener.rules:{r |
-void enterRule(<listener.parserName>.<r.name>_ctx ctx);
-void exitRule(<listener.parserName>.<r.name>_ctx ctx);}; separator="\n">
+void enterRule(<listener.parserName>.<r.name>Context ctx);
+void exitRule(<listener.parserName>.<r.name>Context ctx);}; separator="\n">
 }
 >>
 
@@ -408,6 +408,11 @@ RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayL
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
 
+/** The rule context name is the rule followed by a suffix; e.g.,
+ *  r becomes rContext.
+ */
+RuleContextNameSuffix() ::= "Context"
+
 ImplicitTokenLabel(tokenName) ::= "_t<tokenName>"
 ImplicitRuleLabel(ruleName)   ::= "_r<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
@@ -424,8 +429,8 @@ public static class <s.name> extends ParserRuleContext {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
-	public void enterRule(<parser.name>Listener listener) { listener.enterRule(this); }
-	public void exitRule(<parser.name>Listener listener) { listener.exitRule(this); }
+	public void enterRule(<parser.grammarName>Listener listener) { listener.enterRule(this); }
+	public void exitRule(<parser.grammarName>Listener listener) { listener.exitRule(this); }
 }
 >>
 
