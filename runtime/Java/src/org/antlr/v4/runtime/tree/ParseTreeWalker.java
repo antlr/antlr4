@@ -31,8 +31,8 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class ParseTreeVisitor {
-    public void visit(ParseTreeListener listener, ParseTree t) {
+public class ParseTreeWalker {
+    public void walk(ParseTreeListener listener, ParseTree t) {
 		if ( t instanceof ParseTree.TokenNode) {
 			visitToken(listener, (ParseTree.TokenNode) t);
 			return;
@@ -41,7 +41,7 @@ public class ParseTreeVisitor {
         enterRule(listener, r);
         int n = r.getChildCount();
         for (int i = 0; i<n; i++) {
-            visit(listener, r.getChild(i));
+            walk(listener, r.getChild(i));
         }
 		exitRule(listener, r);
     }

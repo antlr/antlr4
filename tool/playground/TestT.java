@@ -1,7 +1,5 @@
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class TestT {
 	public static void main(String[] args) throws Exception {
@@ -16,7 +14,7 @@ public class TestT {
 		TParser.sContext tree = p.s();
 		System.out.println(tree.toStringTree(p));
 
-		ParseTreeVisitor visitor = new ParseTreeVisitor();
+		ParseTreeWalker walker = new ParseTreeWalker();
 		TListener listener = new BlankTListener() {
 			public void enterEveryRule(ParserRuleContext ctx) {
 				System.out.println("enter rule "+TParser.ruleNames[ctx.ruleIndex]);
@@ -25,6 +23,6 @@ public class TestT {
 				System.out.println("exit rule s");
 			}
 		};
-		visitor.visit(listener, tree);
+		walker.walk(listener, tree);
 	}
 }

@@ -1,9 +1,12 @@
 package org.antlr.v4.test;
 
 import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.tool.*;
 import org.junit.Test;
+import org.stringtemplate.v4.*;
 
 /** */
 public class TestActionTranslation extends BaseTest {
@@ -420,7 +423,7 @@ public class TestActionTranslation extends BaseTest {
 				g.atn = factory.createATN();
 
 				CodeGenerator gen = new CodeGenerator(g);
-				ST outputFileST = gen.generateRecognizer();
+				ST outputFileST = gen.generateParser();
 				String output = outputFileST.render();
 				//System.out.println(output);
 				String b = "#" + actionName + "#";
