@@ -53,11 +53,20 @@ public class ParserRuleContext extends RuleContext {
 	public Object tree;
 	public ST st;
 
+	/** Set during parsing to identify which rule parser is in. */
+	public int ruleIndex;
+
+	/** Set during parsing to identify which alt of rule parser is in. */
+	public int alt;
+
 	public ParserRuleContext() { super(); }
 
 	public ParserRuleContext(RuleContext parent, int stateNumber) {
 		super(parent, stateNumber);
 	}
+
+	@Override
+	public int getRuleIndex() { return ruleIndex; }
 
 	public Object getTree() { return tree; }
 	public ST getTemplate() { return st; }

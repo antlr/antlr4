@@ -84,9 +84,6 @@ public class RuleContext implements ParseTree.RuleNode {
 	 */
 	public int s = -1;
 
-	/** Set during parsing to identify which rule parser is in. */
-	public int ruleIndex;
-
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
 	 *  If parent is null, this should be -1.
@@ -273,6 +270,8 @@ public class RuleContext implements ParseTree.RuleNode {
 	public RuleContext getPayload() { return this; }
 
 	public int getChildCount() { return children!=null ? children.size() : 0; }
+
+	public int getRuleIndex() { return -1; }
 
 	public Interval getSourceInterval() {
 		if ( getChildCount()==0 ) return Interval.ZeroLength;

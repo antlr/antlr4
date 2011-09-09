@@ -60,7 +60,7 @@ public class Trees {
 	public static String getNodeText(Tree t, BaseRecognizer recog) {
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
-				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().ruleIndex;
+				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
 				String ruleName = recog.getRuleNames()[ruleIndex];
 				return ruleName;
 			}
