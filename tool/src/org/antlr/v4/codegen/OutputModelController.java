@@ -238,7 +238,7 @@ public class OutputModelController {
 	public CodeGenerator getGenerator() { return delegate.getGenerator(); }
 
 	public CodeBlockForAlt alternative(Alternative alt, boolean outerMost) {
-		CodeBlockForAlt blk = delegate.alternative(alt);
+		CodeBlockForAlt blk = delegate.alternative(alt, outerMost);
 		if ( outerMost ) currentOuterMostAlternativeBlock = blk;
 		for (CodeGeneratorExtension ext : extensions) blk = ext.alternative(blk, outerMost);
 		return blk;

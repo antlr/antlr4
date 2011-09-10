@@ -448,6 +448,7 @@ ETC          : '...'                  ;
 RARROW       : '->'                   ;
 TREE_BEGIN   : '^('                   ;
 AT           : '@'                    ;
+POUND        : '#'                    ;
 NOT          : '~'                    ;
 RBRACE       : '}'                    ;
 

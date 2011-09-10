@@ -51,7 +51,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	// ALTERNATIVES / ELEMENTS
 
-	public CodeBlockForAlt alternative(Alternative alt) { return null; }
+	public CodeBlockForAlt alternative(Alternative alt, boolean outerMost) { return null; }
 
 	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops) { return blk; }
 

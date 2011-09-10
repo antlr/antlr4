@@ -57,7 +57,7 @@ public class ParserRuleContext extends RuleContext {
 	public int ruleIndex;
 
 	/** Set during parsing to identify which alt of rule parser is in. */
-	public int alt;
+	public int altNum;
 
 	public ParserRuleContext() { super(); }
 

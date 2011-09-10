@@ -530,10 +530,6 @@ ruleModifier
     | FRAGMENT
     ;
 
-altList
-    : alternative (OR alternative)* -> alternative+
-    ;
-
 // A set of alts, rewritten as a BLOCK for generic processing
 // in tree walkers. Used by the rule 'rule' so that the list of
 // alts for a rule appears as a BLOCK containing the alts and
@@ -542,12 +538,25 @@ altList
 // boundaries set correctly by rule post processing of rewrites.
 ruleBlock
 @init {Token colon = input.LT(-1);}
-    : altList -> ^(BLOCK<BlockAST>[colon,"BLOCK"] altList)
+    :	ruleAltList -> ^(BLOCK<BlockAST>[colon,"BLOCK"] ruleAltList)
     ;
     catch [ResyncToEndOfRuleBlock e] {
     	// just resyncing; ignore error
 		retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), null);
     }
+
+ruleAltList
+	:	labeledAlt (OR labeledAlt)* -> labeledAlt+
+	;
+	
+labeledAlt
+	:	alternative (POUND id {((AltAST)$alternative.tree).altLabel=$id.tree;})?
+		-> alternative
+	;
+	
+altList
+    :	alternative (OR alternative)* -> alternative+
+    ;
 
 // An individual alt with an optional rewrite clause for the
 // elements of the alt.

@@ -33,15 +33,17 @@ package org.antlr.v4.tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/** Record use/def information about an outermost alternative in a subrule
- *  or rule of a grammar.
- */
+/** An outermost alternative for a rule.  We don't track inner alternatives. */
 public class Alternative implements AttributeResolver {
     public Rule rule;
 
 	public AltAST ast;
+
+	/** What alternative number is this outermost alt? 1..n */
+	public int altNum;
 
     // token IDs, string literals in this alt
     public MultiMap<String, TerminalAST> tokenRefs = new MultiMap<String, TerminalAST>();
@@ -70,7 +72,7 @@ public class Alternative implements AttributeResolver {
      */
     public List<ActionAST> actions = new ArrayList<ActionAST>();
 
-    public Alternative(Rule r) { this.rule = r; }
+    public Alternative(Rule r, int altNum) { this.rule = r; this.altNum = altNum; }
 
 	/** (ALT_REWRITE (ALT ...) (-> (ALT ...))); rewrite might nested in subrule */
 	public boolean hasRewrite() {

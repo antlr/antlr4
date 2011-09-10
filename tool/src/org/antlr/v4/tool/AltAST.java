@@ -33,9 +33,14 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.ANTLRParser;
 
-/** An ALT (which can be child of ALT_REWRITE node) */
+/** Any ALT (which can be child of ALT_REWRITE node) */
 public class AltAST extends GrammarAST {
 	public Alternative alt;
+
+	/** If someone specified an outermost alternative label with #foo.
+	 *  Token type will be ID.
+	 */
+	public GrammarAST altLabel;
 
 	public AltAST(GrammarAST node) {
 		super(node);

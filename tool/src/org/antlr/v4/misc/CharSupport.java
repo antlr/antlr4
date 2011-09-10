@@ -157,4 +157,7 @@ public class CharSupport {
 		return buf.toString();
 	}
 
+	public static final String capitalize(String s) {
+		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
 }

@@ -124,7 +124,7 @@ public class Rule implements AttributeResolver {
 		this.ast = ast;
 		this.numberOfAlts = numberOfAlts;
 		alt = new Alternative[numberOfAlts+1]; // 1..n
-		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this);
+		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
 	}
 
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {
@@ -163,7 +163,7 @@ public class Rule implements AttributeResolver {
 		return refs;
     }
 
-    public Set<String> getLabelNames() {
+    public Set<String> getElementLabelNames() {
         Set<String> refs = new HashSet<String>();
         for (int i=1; i<=numberOfAlts; i++) {
             refs.addAll(alt[i].labelDefs.keySet());
@@ -172,7 +172,7 @@ public class Rule implements AttributeResolver {
         return refs;
     }
 
-    public MultiMap<String, LabelElementPair> getLabelDefs() {
+    public MultiMap<String, LabelElementPair> getElementLabelDefs() {
         MultiMap<String, LabelElementPair> defs =
             new MultiMap<String, LabelElementPair>();
         for (int i=1; i<=numberOfAlts; i++) {
@@ -185,7 +185,18 @@ public class Rule implements AttributeResolver {
         return defs;
     }
 
-		/**  $x		Attribute: rule arguments, return values, predefined rule prop.
+	public List<String> getAltLabels() {
+		List<String> labels = new ArrayList<String>();
+		for (int i=1; i<=numberOfAlts; i++) {
+			GrammarAST altLabel = alt[i].ast.altLabel;
+			if ( altLabel==null ) break; // all or none
+			labels.add(altLabel.getText());
+		}
+		if ( labels.size()==0 ) return null;
+		return labels;
+	}
+
+	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		if ( args!=null ) {
@@ -253,7 +264,7 @@ public class Rule implements AttributeResolver {
 	}
 
 	public LabelElementPair getAnyLabelDef(String x) {
-		List<LabelElementPair> labels = getLabelDefs().get(x);
+		List<LabelElementPair> labels = getElementLabelDefs().get(x);
 		if ( labels!=null ) return labels.get(0);
 		return null;
 	}

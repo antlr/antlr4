@@ -31,7 +31,8 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
@@ -205,6 +206,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 							 GrammarAST thrws, GrammarAST options,
 							 List<GrammarAST> actions, GrammarAST block)
 	{
+		// TODO: chk that all or no alts have "# label"
 		checkInvalidRuleDef(ID.token);
 	}
 

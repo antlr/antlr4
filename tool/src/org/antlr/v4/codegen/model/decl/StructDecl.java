@@ -31,22 +31,35 @@ package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.SwitchedVisitorDispatchMethod;
+import org.antlr.v4.codegen.model.VisitorDispatchMethod;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.Rule;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /** */
 public class StructDecl extends Decl {
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
+	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
 
-	public StructDecl(OutputModelFactory factory) {
+	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, null);
-	}
-
-	public StructDecl(OutputModelFactory factory, String name) {
-		super(factory, name);
+		List<String> labels = r.getAltLabels();
+		boolean multiAlts = labels!=null && labels.size()>1;
+		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
+		VisitorDispatchMethod enter = multiAlts ?
+			new SwitchedVisitorDispatchMethod(factory, r, true) :
+			new VisitorDispatchMethod(factory, r, true);
+		visitorDispatchMethods.add(enter);
+		VisitorDispatchMethod exit = multiAlts ?
+			new SwitchedVisitorDispatchMethod(factory, r, false) :
+			new VisitorDispatchMethod(factory, r, false);
+		visitorDispatchMethods.add(exit);
 	}
 
 	public void addDecl(Decl d) { attrs.add(d); }

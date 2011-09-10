@@ -58,7 +58,7 @@ public interface OutputModelFactory {
 
 	// ELEMENT TRIGGERS
 
-	CodeBlockForAlt alternative(Alternative alt);
+	CodeBlockForAlt alternative(Alternative alt, boolean outerMost);
 
 	CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops);
 
