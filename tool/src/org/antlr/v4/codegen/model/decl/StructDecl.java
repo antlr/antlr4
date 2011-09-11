@@ -30,36 +30,43 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ModelElement;
-import org.antlr.v4.codegen.model.SwitchedVisitorDispatchMethod;
-import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-/** */
+/** This object models the structure holding all of the parameters,
+ *  return values, local variables, and labels associated with a rule.
+ */
 public class StructDecl extends Decl {
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
-		super(factory, null);
+		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
+		addVisitorDispatchMethods(r);
+
+//		boolean multiAlts = labels!=null && labels.size()>1;
+//		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
+//		VisitorDispatchMethod enter = multiAlts ?
+//			new SwitchedVisitorDispatchMethod(factory, r, true) :
+//			new VisitorDispatchMethod(factory, r, true);
+//		visitorDispatchMethods.add(enter);
+//		VisitorDispatchMethod exit = multiAlts ?
+//			new SwitchedVisitorDispatchMethod(factory, r, false) :
+//			new VisitorDispatchMethod(factory, r, false);
+//		visitorDispatchMethods.add(exit);
+	}
+
+	public void addVisitorDispatchMethods(Rule r) {
 		List<String> labels = r.getAltLabels();
-		boolean multiAlts = labels!=null && labels.size()>1;
-		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
-		VisitorDispatchMethod enter = multiAlts ?
-			new SwitchedVisitorDispatchMethod(factory, r, true) :
-			new VisitorDispatchMethod(factory, r, true);
-		visitorDispatchMethods.add(enter);
-		VisitorDispatchMethod exit = multiAlts ?
-			new SwitchedVisitorDispatchMethod(factory, r, false) :
-			new VisitorDispatchMethod(factory, r, false);
-		visitorDispatchMethods.add(exit);
+		if ( labels==null ) {
+			visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
+			visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, true));
+			visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
+		}
 	}
 
 	public void addDecl(Decl d) { attrs.add(d); }

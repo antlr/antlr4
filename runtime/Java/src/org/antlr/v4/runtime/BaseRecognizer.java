@@ -677,24 +677,32 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 
+	public void enterRule(int ruleIndex) { }
+
 	/** Always called by generated parsers upon entry to a rule.
 	 *  This occurs after the new context has been pushed. Access field
 	 *  _ctx get the current context.
 	 *
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
-	 *
-	 *  These methods along with an override of match() are used to build
-	 *  parse trees as well.
 	 */
-	public void enterRule(int ruleIndex) {
+	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
+		_ctx = localctx;
+		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
+	}
+
+	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
+		_ctx = localctx;
+		_ctx.altNum = altNum;
 		if ( buildParseTrees ) {
 			if ( _ctx.parent!=null ) _ctx.parent.addChild(_ctx);
 		}
 	}
 
-	public void exitRule(int ruleIndex) { }
+	public void exitRule(int ruleIndex) {
+		_ctx = (ParserRuleContext)_ctx.parent;
+	}
 
 	/* In v3, programmers altered error messages by overriding
 	   displayRecognitionError() and possibly getTokenErrorDisplay().

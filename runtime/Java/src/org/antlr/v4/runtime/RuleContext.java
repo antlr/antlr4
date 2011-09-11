@@ -28,15 +28,11 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.tree.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -102,6 +98,10 @@ public class RuleContext implements ParseTree.RuleNode {
 	protected int cachedHashCode;
 
 	public RuleContext() {}
+
+	public RuleContext(RuleContext parent) {
+		this(parent, -1);
+	}
 
 	public RuleContext(RuleContext parent, int stateNumber) {
 		// capture state that called us as we create this context; use later for

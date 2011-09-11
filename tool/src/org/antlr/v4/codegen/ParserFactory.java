@@ -34,9 +34,7 @@ import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.PlusBlockStartState;
-import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.*;
@@ -62,7 +60,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public CodeBlockForAlt epsilon() { return new CodeBlockForAlt(this); }
 
 	public CodeBlockForAlt alternative(Alternative alt, boolean outerMost) {
-		if ( outerMost ) return new CodeBlockForOuterMostAlt(this, alt.altNum);
+		if ( outerMost ) return new CodeBlockForOuterMostAlt(this, alt);
 		return new CodeBlockForAlt(this);
 	}
 

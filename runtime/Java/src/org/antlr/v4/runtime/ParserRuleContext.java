@@ -59,7 +59,22 @@ public class ParserRuleContext extends RuleContext {
 	/** Set during parsing to identify which alt of rule parser is in. */
 	public int altNum;
 
-	public ParserRuleContext() { super(); }
+	public ParserRuleContext() { }
+
+	/** COPY a ctx
+	 */
+	public void copyFrom(ParserRuleContext ctx) {
+		// from RuleContext
+		this.parent = ctx.parent;
+		this.s = ctx.s;
+		this.invokingState = ctx.invokingState;
+
+		this.start = ctx.start;
+		this.stop = ctx.stop;
+		this.tree = ctx.tree;
+		this.st = ctx.st;
+		this.ruleIndex = ctx.ruleIndex;
+	}
 
 	public ParserRuleContext(RuleContext parent, int stateNumber) {
 		super(parent, stateNumber);

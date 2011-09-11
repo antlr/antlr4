@@ -30,14 +30,11 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.codegen.model.decl.StructDecl;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
@@ -57,7 +54,8 @@ public class RuleFunction extends OutputModelObject {
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
-	@ModelElement public StructDecl ruleCtx;	//@ModelElement public DynamicScopeStruct scope;
+	@ModelElement public StructDecl ruleCtx;
+	@ModelElement public List<AltLabelStructDecl> altLabelCtxs;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public Action finallyAction;
 	@ModelElement public List<SrcOp> postamble;
@@ -74,8 +72,15 @@ public class RuleFunction extends OutputModelObject {
 
 		index = r.index;
 
-		// might need struct; build but drop later if no elements
 		ruleCtx = new StructDecl(factory, r);
+
+		List<String> labels = r.getAltLabels();
+		if ( labels!=null ) {
+			altLabelCtxs = new ArrayList<AltLabelStructDecl>();
+			for (String label : labels) {
+				altLabelCtxs.add(new AltLabelStructDecl(factory, r, label));
+			}
+		}
 
 		if ( r.args!=null ) {
 			ruleCtx.addDecls(r.args.attributes.values());

@@ -33,13 +33,10 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -157,7 +154,6 @@ public class OutputModelController {
 		}
 
 		function.ctxType = gen.target.getRuleFunctionContextStructName(function);
-		function.ruleCtx.name = function.ctxType;
 
 		function.postamble = rulePostamble(function, r);
 

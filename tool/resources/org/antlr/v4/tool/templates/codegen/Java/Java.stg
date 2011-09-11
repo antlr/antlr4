@@ -41,9 +41,9 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public interface <listener.grammarName>Listener extends ParseTreeListener {
-    <listener.listenerNames,listener.ruleNames:{lname,rname |
-void enter<lname>(<listener.parserName>.<rname>Context ctx);
-void exit<lname>(<listener.parserName>.<rname>Context ctx);}; separator="\n">
+    <listener.listenerNames:{lname |
+void enterRule(<listener.parserName>.<lname>Context ctx);
+void exitRule(<listener.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
@@ -55,9 +55,9 @@ import org.antlr.v4.runtime.Token;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class Blank<listener.grammarName>Listener implements <listener.grammarName>Listener {
-    <listener.listenerNames,listener.ruleNames:{lname,rname |
-public void enter<lname>(<listener.parserName>.<rname>Context ctx) { \}
-public void exit<lname>(<listener.parserName>.<rname>Context ctx) { \}}; separator="\n">
+    <listener.listenerNames:{lname |
+public void enterRule(<listener.parserName>.<lname>Context ctx) { \}
+public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
 	public void enterEveryRule(ParserRuleContext ctx) { }
 	public void exitEveryRule(ParserRuleContext ctx) { }
@@ -154,16 +154,17 @@ case <index> : return <actions.(index)>;}; separator="\n">
 }
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,namedActions,finallyAction,postamble) ::= <<
+RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
+
 <ruleCtx>
+<altLabelCtxs; separator="\n">
+
 public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<currentRule.ctxType>\>();
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
     <currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
     <currentRule.name>_stk.push(_localctx);
-    _ctx = _localctx;
-    enterRule(<currentRule.index>);
-    _localctx.start = _input.LT(1);
+    enterRule(_localctx, <currentRule.index>);
     //System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+_input.LT(1).getText());
     <namedActions.init>
     <locals; separator="\n">
@@ -179,7 +180,6 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 	}
 	finally {
         <currentRule.name>_stk.pop();
-        _ctx = (ParserRuleContext)_ctx.parent;
         <finallyAction>
         exitRule(<currentRule.index>);
     	// System.out.println("exit "+ruleNames[<currentRule.index>]);
@@ -189,7 +189,8 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 >>
 
 CodeBlockForOuterMostAlt(c, locals, preamble, ops) ::= <<
-_ctx.altNum = <c.altNum>;
+<if(c.altLabel)>_localctx = new <c.altLabel>Context(_localctx);<endif>
+enterOuterAlt(_localctx, <c.alt.altNum>);
 <CodeBlockForAlt(...)>
 >>
 
@@ -455,16 +456,31 @@ public static class <s.name> extends ParserRuleContext {
     	super(parent, state);
         <s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
     }
+<if(!visitorDispatchMethods)> <! don't need copy if no subclasses !>
+	public <s.name>() { }
+	public void copyFrom(<s.name> ctx) {
+   		super.copyFrom(ctx);
+		<s.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+	}
+<endif>
+    <visitorDispatchMethods; separator="\n">
+}
+>>
+
+AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
+public static class <s.label>Context extends <currentRule.name>Context {
+	public <s.label>Context(<currentRule.name>Context ctx) { copyFrom(ctx); }
     <visitorDispatchMethods; separator="\n">
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
-    ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><method.listenerName>(this);
+    ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
 }
 >>
 
+/*
 SwitchedVisitorDispatchMethod(method) ::= <<
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
     switch ( altNum ) {
@@ -473,6 +489,7 @@ case <i> : ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<el
     }
 }
 >>
+*/
 
 AttributeDecl(d) ::= "<d.decl>"
 
