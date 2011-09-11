@@ -92,32 +92,32 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testComplicatedArgParsingWithTranslation() throws Exception {
 		String action = "x, $ID.text+\"3242\", (*$ID).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
-		String expected = "x, (_rID!=null?_rID.getText():null)+\"3242\"," +
-						  " (*_tID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expected = "x, (_localctx._tID!=null?_localctx._tID.getText():null)+\"3242\"," +
+						  " (*_localctx._tID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testArguments() throws Exception {
 		String action = "$x; $a.x";
-		String expected = "_ctx.x; _ctx.x";
+		String expected = "_localctx.x; _localctx.x";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testReturnValue() throws Exception {
 		String action = "$x; $a.x";
-		String expected = "_ctx.x; _ctx.x";
+		String expected = "_localctx.x; _localctx.x";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testReturnValueWithNumber() throws Exception {
 		String action = "$a.x1";
-		String expected = "_ctx.x1";
+		String expected = "_localctx.x1";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testReturnValuesCurrentRule() throws Exception {
 		String action = "$y; $a.y;";
-		String expected = "_ctx.y; _ctx.y;";
+		String expected = "_localctx.y; _localctx.y;";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
@@ -129,29 +129,34 @@ public class TestActionTranslation extends BaseTest {
 
     @Test public void testReturnWithMultipleRuleRefs() throws Exception {
 		String action = "$c.x; $c.y;";
-		String expected = "_rc.x; _rc.y;";
+		String expected = "_localctx._rc.x; _localctx._rc.y;";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testTokenRefs() throws Exception {
 		String action = "$id; $ID; $id.text; $id.getText(); $id.line;";
-		String expected = "id; _tID; (id!=null?id.getText():null); id.getText(); (id!=null?id.getLine():0);";
+		String expected = "_localctx.id; _localctx._tID; (_localctx.id!=null?_localctx.id.getText():null); _localctx.id.getText(); (_localctx.id!=null?_localctx.id.getLine():0);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testRuleRefs() throws Exception {
         String action = "$lab.start; $c.tree;";
-		String expected = "(lab!=null?(()lab.start):null); (_rc!=null?(()_rc.tree):null);";
+		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx._rc!=null?((CommonAST)_localctx._rc.tree):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
-			"((TokenStream)input).toString(_localctx.start, input.LT(-1)); " +
-			"((TokenStream)input).toString(_localctx.start, input.LT(-1))";
+			"(_localctx._ra!=null?((TokenStream)_input).toString(_localctx._ra.start,_localctx._ra.stop):" +
+			"null); ((TokenStream)_input).toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "init", action, expected);
+		expected =
+			"((TokenStream)_input).toString(_localctx.start, _input.LT(-1)); ((TokenStream)_input).toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "inline", action, expected);
+		expected =
+			"(_localctx._ra!=null?((TokenStream)_input).toString(_localctx._ra.start,_localctx._ra.stop):null);" +
+			" ((TokenStream)_input).toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "finally", action, expected);
     }
 
