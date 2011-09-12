@@ -32,9 +32,14 @@ package org.antlr.v4.codegen.model.actions;
 import java.util.List;
 
 public class SetNonLocalAttr extends SetAttr {
-	public String context;
-	public SetNonLocalAttr(String context, String name, List<ActionChunk> rhsChunks) {
+	public String ruleName;
+	public int ruleIndex;
+
+	public SetNonLocalAttr(String ruleName, String name, int ruleIndex,
+						   List<ActionChunk> rhsChunks)
+	{
 		super(name, rhsChunks);
-		this.context = context;
+		this.ruleName = ruleName;
+		this.ruleIndex = ruleIndex;
 	}
 }

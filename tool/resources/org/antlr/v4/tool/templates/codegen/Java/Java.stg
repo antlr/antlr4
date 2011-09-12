@@ -159,11 +159,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <ruleCtx>
 <altLabelCtxs; separator="\n">
 
-public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<currentRule.ctxType>\>();
-
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
     <currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
-    <currentRule.name>_stk.push(_localctx);
     enterRule(_localctx, <currentRule.index>);
     //System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+_input.LT(1).getText());
     <namedActions.init>
@@ -179,7 +176,6 @@ public QStack\<<currentRule.ctxType>\> <currentRule.name>_stk = new QStack\<<cur
 		recover();
 	}
 	finally {
-        <currentRule.name>_stk.pop();
         <finallyAction>
         exitRule(<currentRule.index>);
     	// System.out.println("exit "+ruleNames[<currentRule.index>]);
@@ -419,10 +415,9 @@ ThisRulePropertyRef_tree(r)  ::= "_localctx.tree"
 ThisRulePropertyRef_text(r)  ::= "((TokenStream)_input).toString(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_st(r)    ::= "_localctx.st"
 
-//NonLocalContextRef(s)           ::= "<s.scope>"
-NonLocalAttrRef(s)       ::= "<s.scope>.peek().<s.attr>"
-SetNonLocalAttr(s, rhsChunks)            ::=
-    "<s.scope>.peek().<s.attr> =<rhsChunks>;"
+NonLocalAttrRef(s)       ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
+SetNonLocalAttr(s, rhsChunks)     ::=
+	"((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
 
 AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
 

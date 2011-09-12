@@ -586,6 +586,20 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		}
 	}
 
+	public ParserRuleContext getInvokingContext(int ruleIndex) {
+		ParserRuleContext p = _ctx;
+		while ( p!=null ) {
+			if ( p.getRuleIndex() == ruleIndex ) return p;
+			p = (ParserRuleContext)p.parent;
+		}
+		return null;
+	}
+
+	public boolean inContext(String context) {
+		// TODO: useful in parser?
+		return false;
+	}
+
 	/** Return List<String> of the rules in your parser instance
 	 *  leading up to a call to this method.  You could override if
 	 *  you want more details such as the file/line info of where
@@ -595,6 +609,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  error recovery.
 	 */
 	public List getRuleInvocationStack() {
+		// TODO: walk ctx chain now; this is legacy
 		String parserClassName = getClass().getName();
 		return getRuleInvocationStack(new Throwable(), parserClassName);
 	}
@@ -609,6 +624,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	public static List getRuleInvocationStack(Throwable e,
 											  String recognizerClassName)
 	{
+		// TODO: walk ctx chain now; this is legacy
 		List rules = new ArrayList();
 		StackTraceElement[] stack = e.getStackTrace();
 		int i = 0;

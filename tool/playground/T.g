@@ -1,7 +1,7 @@
 grammar T;
 s : i=ifstat  {System.out.println(_input.toString(0,_input.index()-1));} ;
 
-ifstat : 'if' '(' INT ')' ID '=' ID ';' # DoIf;
+ifstat : 'if' {$s::start = null;} '(' INT ')' ID '=' ID ';' # DoIf;
 
 r[int x] returns [int y]
 locals [int z]

@@ -30,11 +30,14 @@
 package org.antlr.v4.codegen.model.actions;
 
 public class NonLocalAttrRef extends ActionChunk {
-	public String context;
+	public String ruleName;
 	public String name;
-	public NonLocalAttrRef(String context, String name) {
-		this.context = context;
+	public int ruleIndex;
+
+	public NonLocalAttrRef(String ruleName, String name, int ruleIndex) {
 		this.name = name;
+		this.ruleName = ruleName;
+		this.ruleIndex = ruleIndex;
 	}
 
 }

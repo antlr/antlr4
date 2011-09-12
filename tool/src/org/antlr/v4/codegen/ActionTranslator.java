@@ -207,14 +207,16 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	public void nonLocalAttr(String expr, Token x, Token y) {
-		System.out.println("nonLocalAttr "+x+"."+y);
-		chunks.add(new NonLocalAttrRef(x.getText(), y.getText()));
+		System.out.println("nonLocalAttr "+x+"::"+y);
+		Rule r = factory.getGrammar().getRule(x.getText());
+		chunks.add(new NonLocalAttrRef(x.getText(), y.getText(), r.index));
 	}
 
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
 		System.out.println("setNonLocalAttr "+x+"::"+y+"="+rhs);
+		Rule r = factory.getGrammar().getRule(x.getText());
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		SetNonLocalAttr s = new SetNonLocalAttr(x.getText(), y.getText(), rhsChunks);
+		SetNonLocalAttr s = new SetNonLocalAttr(x.getText(), y.getText(), r.index, rhsChunks);
 		chunks.add(s);
 	}
 
