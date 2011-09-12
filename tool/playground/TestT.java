@@ -12,6 +12,7 @@ public class TestT {
 		TParser p = new TParser(tokens);
 		p.setBuildParseTrees(true);
 		TParser.sContext tree = p.s();
+
 		System.out.println(tree.toStringTree(p));
 
 		ParseTreeWalker walker = new ParseTreeWalker();
@@ -19,8 +20,8 @@ public class TestT {
 			public void enterEveryRule(ParserRuleContext ctx) {
 				System.out.println("enter rule "+TParser.ruleNames[ctx.ruleIndex]);
 			}
-			public void exitRule(TParser.sContext ctx) { // specific to rule s
-				System.out.println("exit rule s");
+			public void exitRule(TParser.DoIfContext ctx) { // specific to rule ifstat
+				System.out.println("exit rule ifstat");
 			}
 		};
 		walker.walk(listener, tree);
