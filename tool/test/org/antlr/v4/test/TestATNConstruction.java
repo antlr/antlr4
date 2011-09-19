@@ -16,7 +16,7 @@ public class TestATNConstruction extends BaseTest {
 			"s2-A->s3\n" +
 			"s3->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s4\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAB() throws Exception {
@@ -30,7 +30,7 @@ public class TestATNConstruction extends BaseTest {
 			"s4-B->s5\n" +
 			"s5->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s6\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAorB() throws Exception {
@@ -49,7 +49,7 @@ public class TestATNConstruction extends BaseTest {
 			"s6-action_0:-1->s7\n" + // actionIndex -1 since not forced action
 			"RuleStop_a_1-EOF->s10\n" +
 			"s7->BlockEnd_9\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testSetAorB() throws Exception {
@@ -66,7 +66,7 @@ public class TestATNConstruction extends BaseTest {
 			"s5->BlockEnd_7\n" +
 			"BlockEnd_7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testLexerIsntSetMultiCharString() throws Exception {
@@ -138,7 +138,7 @@ public class TestATNConstruction extends BaseTest {
 			"s5->BlockEnd_7\n" +
 			"BlockEnd_7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testABorCD() throws Exception {
@@ -159,7 +159,7 @@ public class TestATNConstruction extends BaseTest {
 			"s9->BlockEnd_11\n" +
 			"BlockEnd_11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testbA() throws Exception {
@@ -174,13 +174,13 @@ public class TestATNConstruction extends BaseTest {
 			"s6-A->s7\n" +
 			"s7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s10\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 		expecting =
 			"RuleStart_b_2->s8\n" +
 			"s8-B->s9\n" +
 			"s9->RuleStop_b_3\n" +
 			"RuleStop_b_3->s5\n";
-		checkRule(g, "b", expecting);
+		checkRuleATN(g, "b", expecting);
 	}
 
 	@Test public void testFollow() throws Exception {
@@ -195,7 +195,7 @@ public class TestATNConstruction extends BaseTest {
 			"s11->RuleStop_b_3\n" +
 			"RuleStop_b_3->s7\n" +
 			"RuleStop_b_3->s13\n";
-		checkRule(g, "b", expecting);
+		checkRuleATN(g, "b", expecting);
 	}
 
 	@Test public void testAorEpsilon() throws Exception {
@@ -212,7 +212,7 @@ public class TestATNConstruction extends BaseTest {
 			"s5->BlockEnd_7\n" +
 			"BlockEnd_7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAOptional() throws Exception {
@@ -227,7 +227,7 @@ public class TestATNConstruction extends BaseTest {
 			"BlockEnd_5->RuleStop_a_1\n" +
 			"s3->BlockEnd_5\n" +
 			"RuleStop_a_1-EOF->s6\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAorBoptional() throws Exception {
@@ -247,7 +247,7 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStop_a_1-EOF->s10\n" +
 			"s4-action_0:-1->s5\n" +
 			"s5->BlockEnd_9\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testSetAorBoptional() throws Exception {
@@ -262,7 +262,7 @@ public class TestATNConstruction extends BaseTest {
 			"BlockEnd_5->RuleStop_a_1\n" +
 			"s3->BlockEnd_5\n" +
 			"RuleStop_a_1-EOF->s6\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAorBthenC() throws Exception {
@@ -276,7 +276,7 @@ public class TestATNConstruction extends BaseTest {
 			"s4-C->s5\n" +
 			"s5->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s6\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAplus() throws Exception {
@@ -293,7 +293,7 @@ public class TestATNConstruction extends BaseTest {
 			"PlusLoopBack_6->s7\n" +
 			"s7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAorBplus() throws Exception {
@@ -315,7 +315,7 @@ public class TestATNConstruction extends BaseTest {
 			"s7->BlockEnd_9\n" +
 			"s11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAorBorEmptyPlus() throws Exception {
@@ -338,7 +338,7 @@ public class TestATNConstruction extends BaseTest {
 			"PlusLoopBack_10->s11\n" +
 			"s11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAStar() throws Exception {
@@ -356,7 +356,7 @@ public class TestATNConstruction extends BaseTest {
 			"s3->BlockEnd_5\n" +
 			"BlockEnd_5->StarLoopBack_8\n" +
 			"StarLoopBack_8->StarLoopEntry_6\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testNestedAstar() throws Exception {
@@ -382,7 +382,7 @@ public class TestATNConstruction extends BaseTest {
 			"StarLoopBack_15->StarLoopEntry_13\n" +
 			"BlockEnd_7->StarLoopBack_10\n" +
 			"StarLoopBack_10->StarLoopEntry_8\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testAorBstar() throws Exception {
@@ -405,7 +405,7 @@ public class TestATNConstruction extends BaseTest {
 			"s6-action_0:-1->s7\n" +
 			"StarLoopBack_12->StarLoopEntry_10\n" +
 			"s7->BlockEnd_9\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 	@Test public void testPredicatedAorB() throws Exception {
@@ -426,7 +426,7 @@ public class TestATNConstruction extends BaseTest {
 			"s9->BlockEnd_11\n" +
 			"BlockEnd_11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
-		checkRule(g, "a", expecting);
+		checkRuleATN(g, "a", expecting);
 	}
 
 /*
@@ -978,19 +978,4 @@ public class TestATNConstruction extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	void checkRule(Grammar g, String ruleName, String expecting) {
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
-
-		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule(ruleName).index]));
-
-		Rule r = g.getRule(ruleName);
-		ATNState startState = atn.ruleToStartState[r.index];
-		ATNPrinter serializer = new ATNPrinter(g, startState);
-		String result = serializer.asString();
-
-		//System.out.print(result);
-		assertEquals(expecting, result);
-	}
 }

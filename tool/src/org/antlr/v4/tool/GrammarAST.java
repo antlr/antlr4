@@ -176,11 +176,6 @@ public class GrammarAST extends CommonTree {
 		return (GrammarAST)adaptor.dupTree(t);
 	}
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
 	public String toTokenString() {
 		CharStream input = this.token.getInputStream();
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(input);

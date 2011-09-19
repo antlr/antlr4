@@ -75,6 +75,21 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	public int getTreeLevel() { return controller.treeLevel; }
 
+	@Override
+	public TreeParserFile treeParserFile(String fileName) {
+		return null;
+	}
+
+	@Override
+	public TreeParserModel treeParser(TreeParserFile file) {
+		return null;
+	}
+
+	@Override
+	public MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos) {
+		throw new UnsupportedOperationException("^(...) in non-tree grammar");
+	}
+
 	// MISC
 
 	public static List<SrcOp> list(Object... values) {

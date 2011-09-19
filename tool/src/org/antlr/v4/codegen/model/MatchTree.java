@@ -27,32 +27,19 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.GrammarAST;
 
-public class CodeGenPipeline {
-	Grammar g;
+import java.util.List;
 
-	public CodeGenPipeline(Grammar g) {
-		this.g = g;
+public class MatchTree extends RuleElement {
+	@ModelElement public List<? extends SrcOp> elems;
+
+	public MatchTree(OutputModelFactory factory, GrammarAST ast, List<? extends SrcOp> elems) {
+		super(factory, ast);
+		this.elems = elems;
 	}
 
-	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
-
-		if ( g.isLexer() ) {
-			gen.writeRecognizer(gen.generateLexer());
-		}
-		else if ( g.isTreeGrammar() ) {
-			gen.writeRecognizer(gen.generateTreeParser());
-		}
-		else {
-			gen.writeRecognizer(gen.generateParser());
-			gen.writeListener(gen.generateListener());
-			gen.writeBlankListener(gen.generateBlankListener());
-			gen.writeHeaderFile();
-		}
-		gen.writeVocabFile();
-	}
 }

@@ -52,6 +52,10 @@ public interface OutputModelFactory {
 
 	Lexer lexer(LexerFile file);
 
+	TreeParserFile treeParserFile(String fileName);
+
+	TreeParserModel treeParser(TreeParserFile file);
+
 	RuleFunction rule(Rule r);
 
 	List<SrcOp> rulePostamble(RuleFunction function, Rule r);
@@ -83,6 +87,8 @@ public interface OutputModelFactory {
 	List<SrcOp> rootRule(List<SrcOp> ops);
 
 	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp);
+
+	MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos);
 
 	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label);
 

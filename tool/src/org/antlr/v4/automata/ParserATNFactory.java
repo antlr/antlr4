@@ -49,7 +49,7 @@ import java.util.*;
 public class ParserATNFactory implements ATNFactory {
 	public Grammar g;
 	public Rule currentRule;
-	ATN atn;
+	public ATN atn;
 
 	public ParserATNFactory(Grammar g) { this.g = g; atn = new ATN(); }
 
@@ -133,27 +133,14 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	public Handle tree(List<Handle> els) {
-		return null;
+	public Handle tree(GrammarAST node, List<Handle> els) {
+		throw new UnsupportedOperationException("^(...) not allowed in non-tree grammar");
 	}
 
 	/** Not valid for non-lexers */
 	public Handle range(GrammarAST a, GrammarAST b) {
 		throw new UnsupportedOperationException();
 	}
-
-	/** ~atom only */
-	/*
-	public Handle not(GrammarAST node) {
-		ATNState left = newState(node);
-		ATNState right = newState(node);
-		int ttype = getTokenType((GrammarAST) node.getChild(0));
-		left.transition = new NotAtomTransition(ttype, right);
-		right.incidentTransition = left.transition;
-		node.atnState = left;
-		return new Handle(left, right);
-	}
-	*/
 
 	protected int getTokenType(GrammarAST atom) {
 		int ttype;
@@ -319,6 +306,10 @@ public class ParserATNFactory implements ATNFactory {
 //	}
 
 	public Handle alt(List<Handle> els) {
+		return elemList(els);
+	}
+
+	public Handle elemList(List<Handle> els) {
 		Handle prev = null;
 		for (Handle el : els) { // hook up elements
 			if ( prev!=null ) epsilon(prev.right, el.left);
@@ -327,7 +318,7 @@ public class ParserATNFactory implements ATNFactory {
 		Handle first = els.get(0);
 		Handle last = els.get(els.size()-1);
 		if ( first==null || last==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "alt Handle has first|last == null");
+			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "element list has first|last == null");
 		}
 		return new Handle(first.left, last.right);
 	}

@@ -52,6 +52,10 @@ public class CodeGeneratorExtension {
 
 	public Lexer lexer(Lexer l) { return l; }
 
+	public TreeParserFile treeParserFile(TreeParserFile f) { return f; }
+
+	public TreeParserModel treeParser(TreeParserModel p) { return p; }
+
 	public RuleFunction rule(RuleFunction rf) { return rf; }
 
 	public List<SrcOp> rulePostamble(List<SrcOp> ops) { return ops; }
@@ -71,6 +75,8 @@ public class CodeGeneratorExtension {
 	public List<SrcOp> stringRef(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> wildcard(List<SrcOp> ops) { return ops; }
+
+	public MatchTree tree(MatchTree matchTree) { return matchTree; }
 
 	// ACTIONS
 

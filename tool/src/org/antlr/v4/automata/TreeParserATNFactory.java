@@ -27,32 +27,50 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.automata;
 
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 
-public class CodeGenPipeline {
-	Grammar g;
+import java.util.List;
 
-	public CodeGenPipeline(Grammar g) {
-		this.g = g;
+/** Build ATNs for tree grammars */
+public class TreeParserATNFactory extends ParserATNFactory {
+	public TreeParserATNFactory(Grammar g) {
+		super(g);
 	}
 
-	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
+	/** x y z from ^(x y z) becomes o-x->o-DOWN->o-y->o-z->o-UP->o */
+	public Handle tree(GrammarAST node, List<Handle> els) {
+		Handle h = elemList(els);
+		return h;
 
-		if ( g.isLexer() ) {
-			gen.writeRecognizer(gen.generateLexer());
-		}
-		else if ( g.isTreeGrammar() ) {
-			gen.writeRecognizer(gen.generateTreeParser());
-		}
-		else {
-			gen.writeRecognizer(gen.generateParser());
-			gen.writeListener(gen.generateListener());
-			gen.writeBlankListener(gen.generateBlankListener());
-			gen.writeHeaderFile();
-		}
-		gen.writeVocabFile();
+//		ATNState first = h.left;
+//		ATNState last = h.right;
+//		node.atnState = first;
+//
+//		// find root transition first side node
+//		ATNState p = first;
+//		while ( p.transition(0) instanceof EpsilonTransition ||
+//				p.transition(0) instanceof PredicateTransition ||
+//				p.transition(0) instanceof RangeTransition ||
+//				p.transition(0) instanceof ActionTransition )
+//		{
+//			p = p.transition(0).target;
+//		}
+//		ATNState rootLeftNode = p;
+//		ATNState rootRightNode = rootLeftNode.transition(0).target;
+//		ATNState downLeftNode = newState(node);
+//		downLeftNode.transition = new AtomTransition(Token.DOWN, rootRightNode);
+//		rootRightNode.incidentTransition = downLeftNode.transition;
+//		rootLeftNode.transition.target = downLeftNode;
+//		downLeftNode.incidentTransition = rootLeftNode.transition;
+//
+//		ATNState upRightNode = newState(node);
+//		last.transition = new AtomTransition(Token.UP, upRightNode);
+//		upRightNode.incidentTransition = last.transition;
+//		last = upRightNode;
+//
+//		return new Handle(first, last);
 	}
+
 }

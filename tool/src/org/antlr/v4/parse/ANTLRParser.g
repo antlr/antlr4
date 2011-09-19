@@ -93,6 +93,9 @@ tokens {
     ST_RESULT;			  // distinguish between ST and tree rewrites
     RESULT;
     ALT_REWRITE;		  // indicate ALT is rewritten
+    
+    DOWN_TOKEN;			  // AST node representing DOWN node in tree parser code gen
+    UP_TOKEN;
 }
 
 // Include the copyright in this source and also the generated source
@@ -650,12 +653,17 @@ treeSpec
          // Only a subset of elements are allowed to be a root node. However
          // we allow any element to appear here and reject silly ones later
          // when we walk the AST.
-         element
+         root=element
          // After the tree root we get the usual suspects,
          // all members of the element set
-         element+
+         (kids+=element)+
       RPAREN
-      -> ^(TREE_BEGIN element+)
+      -> ^(TREE_BEGIN
+      		$root
+      		DOWN_TOKEN<DownAST>[$TREE_BEGIN]
+      		$kids+
+     		UP_TOKEN<UpAST>[$TREE_BEGIN]
+   		)
     ;
 
 // A block of gramamr structure optionally followed by standard EBNF

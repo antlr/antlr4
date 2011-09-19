@@ -108,7 +108,7 @@ element returns [List<? extends SrcOp> omos]
 	|	subrule							{$omos = $subrule.omos;}
 	|   ACTION							{$omos = controller.action($ACTION);}
 	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
-	|	treeSpec
+	|	treeSpec						{$omos = DefaultOutputModelFactory.list($treeSpec.treeMatch);}
 	;
 
 labeledElement returns [List<? extends SrcOp> omos]
@@ -118,8 +118,14 @@ labeledElement returns [List<? extends SrcOp> omos]
 	|	^(PLUS_ASSIGN ID block[$ID,null,null])		{$omos = $block.omos;}
 	;
 
-treeSpec returns [SrcOp omo]
-    : ^(TREE_BEGIN  (e=element )+)
+treeSpec returns [MatchTree treeMatch]
+@init {
+   	List<SrcOp> elems = new ArrayList<SrcOp>();
+}
+    :	^(TREE_BEGIN
+       		(e=element {if ($e.omos!=null) elems.addAll($e.omos);})+
+    	 )
+    	{$treeMatch = controller.tree($TREE_BEGIN, elems);}
     ;
 
 subrule returns [List<? extends SrcOp> omos]
@@ -187,6 +193,8 @@ terminal[GrammarAST label, GrammarAST astOp] returns [List<SrcOp> omos]
     |	^(TOKEN_REF ARG_ACTION .)	{$omos = controller.tokenRef($TOKEN_REF, $label, $ARG_ACTION, $astOp);}
     |	^(TOKEN_REF .)				{$omos = controller.tokenRef($TOKEN_REF, $label, null, $astOp);}
     |	TOKEN_REF					{$omos = controller.tokenRef($TOKEN_REF, $label, null, $astOp);}
+    |	DOWN_TOKEN					{$omos = controller.tokenRef($DOWN_TOKEN, null, null, null);}
+    |	UP_TOKEN					{$omos = controller.tokenRef($UP_TOKEN, null, null, null);}
     ;
 
 elementOptions

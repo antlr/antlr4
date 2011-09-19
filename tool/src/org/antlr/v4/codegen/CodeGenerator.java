@@ -32,16 +32,12 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.*;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -159,6 +155,29 @@ public class CodeGenerator {
 		factory.setController(controller);
 
 		OutputModelObject outputModel = controller.buildParserOutputModel();
+
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		ST st = walker.walk(outputModel);
+
+		if ( tool.launch_ST_inspector ) {
+			st.inspect();
+			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
+		}
+
+		return st;
+	}
+
+	public ST generateTreeParser() {
+		OutputModelFactory factory = new TreeParserFactory(this);
+
+		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
+		OutputModelController controller = new OutputModelController(factory);
+		if ( g.hasASTOption() ) {
+			controller.addExtension( new ParserASTExtension(factory) );
+		}
+		factory.setController(controller);
+
+		OutputModelObject outputModel = controller.buildTreeParserOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		ST st = walker.walk(outputModel);

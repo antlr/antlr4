@@ -170,6 +170,14 @@ public void rewriteStringRef(TerminalAST ast, GrammarAST options) { }
 public void rewriteRuleRef(GrammarAST ast) { }
 public void rewriteLabelRef(GrammarAST ast) { }
 public void rewriteAction(ActionAST ast) { }
+
+	public void traceIn(String ruleName, int ruleIndex)  {
+		System.err.println("enter "+ruleName+": "+input.LT(1));
+	}
+
+	public void traceOut(String ruleName, int ruleIndex)  {
+		System.err.println("exit "+ruleName+": "+input.LT(1));
+	}
 }
 
 grammarSpec
@@ -363,7 +371,7 @@ labeledElement
 	;
 
 treeSpec
-    : ^(TREE_BEGIN element+)
+    : ^(TREE_BEGIN element DOWN_TOKEN element+ UP_TOKEN )
     ;
 
 subrule

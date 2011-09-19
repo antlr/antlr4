@@ -102,6 +102,21 @@ public class OutputModelController {
 		return file;
 	}
 
+	public OutputModelObject buildTreeParserOutputModel() {
+		Grammar g = delegate.getGrammar();
+		CodeGenerator gen = delegate.getGenerator();
+		TreeParserFile file = treeParserFile(gen.getRecognizerFileName());
+		setRoot(file);
+		Parser parser = treeParser(file);
+		file.parser = parser;
+
+		for (Rule r : g.rules.values()) {
+			buildRuleFunction(parser, r);
+		}
+
+		return file;
+	}
+
 	public OutputModelObject buildListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
 		return new ListenerFile(delegate, gen.getListenerFileName());
@@ -130,6 +145,18 @@ public class OutputModelController {
 
 	public Lexer lexer(LexerFile file) {
 		return new Lexer(delegate, file);
+	}
+
+	public TreeParserFile treeParserFile(String fileName) {
+		TreeParserFile f = delegate.treeParserFile(fileName);
+		for (CodeGeneratorExtension ext : extensions) f = ext.treeParserFile(f);
+		return f;
+	}
+
+	public TreeParserModel treeParser(TreeParserFile file) {
+		TreeParserModel p = delegate.treeParser(file);
+		for (CodeGeneratorExtension ext : extensions) p = ext.treeParser(p);
+		return p;
 	}
 
 	/** Create RuleFunction per rule and update sempreds,actions of parser
@@ -340,6 +367,12 @@ public class OutputModelController {
 			}
 		}
 		return ops;
+	}
+
+	public MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos) {
+		MatchTree matchTree = delegate.tree(treeBeginAST, omos);
+		for (CodeGeneratorExtension ext : extensions) matchTree = ext.tree(matchTree);
+		return matchTree;
 	}
 
 	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label) {

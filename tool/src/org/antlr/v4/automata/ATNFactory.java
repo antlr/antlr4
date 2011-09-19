@@ -69,7 +69,7 @@ public interface ATNFactory {
 
 	Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert);
 
-	Handle tree(List<Handle> els);
+	Handle tree(GrammarAST node, List<Handle> els);
 
 	Handle range(GrammarAST a, GrammarAST b);
 

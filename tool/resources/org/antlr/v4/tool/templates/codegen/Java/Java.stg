@@ -35,6 +35,10 @@ import java.util.ArrayList;
 <parser>
 >>
 
+TreeParserFile(file, parser, namedActions) ::= <<
+<ParserFile(...)>
+>>
+
 ListenerFile(listener, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -104,6 +108,10 @@ public class <parser.name> extends Parser {
 
     <atn>
 }
+>>
+
+TreeParserModel(parser, scopes, funcs, atn, sempredFuncs) ::= <<
+<Parser(...)>
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
@@ -342,6 +350,19 @@ TestSetInline(s) ::= <<
 
 cases(ttypes) ::= <<
 <ttypes:{t | case <t>:}; separator="\n">
+>>
+
+MatchTree(t, elems) ::= <<
+// match tree
+<elems; separator="\n">
+>>
+
+MatchDOWN(m) ::= <<
+move(<m.stateNumber>); match(Token.DOWN);
+>>
+
+MatchUP(m) ::= <<
+move(<m.stateNumber>); match(Token.UP);
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<

@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Rule;
 import org.junit.*;
 import org.stringtemplate.v4.ST;
 
@@ -735,6 +736,23 @@ public abstract class BaseTest {
 			if ( m.getClass() == c ) filtered.add(m);
 		}
 		return filtered;
+	}
+
+	void checkRuleATN(Grammar g, String ruleName, String expecting) {
+		ParserATNFactory f = new ParserATNFactory(g);
+		if ( g.isTreeGrammar() ) f = new TreeParserATNFactory(g);
+		ATN atn = f.createATN();
+
+		DOTGenerator dot = new DOTGenerator(g);
+		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule(ruleName).index]));
+
+		Rule r = g.getRule(ruleName);
+		ATNState startState = atn.ruleToStartState[r.index];
+		ATNPrinter serializer = new ATNPrinter(g, startState);
+		String result = serializer.asString();
+
+		//System.out.print(result);
+		assertEquals(expecting, result);
 	}
 
 	public static class StreamVacuum implements Runnable {

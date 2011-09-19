@@ -27,32 +27,42 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.test;
 
 import org.antlr.v4.tool.Grammar;
+import org.junit.Test;
 
-public class CodeGenPipeline {
-	Grammar g;
-
-	public CodeGenPipeline(Grammar g) {
-		this.g = g;
+public class TestATNTreeGrammarConstruction extends BaseTest {
+	@Test public void testAB() throws Exception {
+		Grammar g = new Grammar(
+			"tree grammar P;\n"+
+			"a : A B ;");
+		String expecting =
+			"RuleStart_a_0->s2\n" +
+			"s2-A->s3\n" +
+			"s3->s4\n" +
+			"s4-B->s5\n" +
+			"s5->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s6\n";
+		checkRuleATN(g, "a", expecting);
 	}
 
-	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
-
-		if ( g.isLexer() ) {
-			gen.writeRecognizer(gen.generateLexer());
-		}
-		else if ( g.isTreeGrammar() ) {
-			gen.writeRecognizer(gen.generateTreeParser());
-		}
-		else {
-			gen.writeRecognizer(gen.generateParser());
-			gen.writeListener(gen.generateListener());
-			gen.writeBlankListener(gen.generateBlankListener());
-			gen.writeHeaderFile();
-		}
-		gen.writeVocabFile();
+	@Test public void testTreeAB() throws Exception {
+		Grammar g = new Grammar(
+			"tree grammar P;\n"+
+			"a : ^(A B) ;");
+		String expecting =
+			"RuleStart_a_0->s2\n" +
+			"s2-A->s3\n" +
+			"s3->s4\n" +
+			"s4-DOWN->s5\n" +
+			"s5->s6\n" +
+			"s6-B->s7\n" +
+			"s7->s8\n" +
+			"s8-UP->s9\n" +
+			"s9->RuleStop_a_1\n" +
+			"RuleStop_a_1-EOF->s10\n";
+		checkRuleATN(g, "a", expecting);
 	}
+
 }

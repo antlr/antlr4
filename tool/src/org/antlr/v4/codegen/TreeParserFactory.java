@@ -29,30 +29,29 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.tool.GrammarAST;
 
-public class CodeGenPipeline {
-	Grammar g;
+import java.util.List;
 
-	public CodeGenPipeline(Grammar g) {
-		this.g = g;
+public class TreeParserFactory extends ParserFactory {
+	public TreeParserFactory(CodeGenerator gen) {
+		super(gen);
 	}
 
-	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
-
-		if ( g.isLexer() ) {
-			gen.writeRecognizer(gen.generateLexer());
-		}
-		else if ( g.isTreeGrammar() ) {
-			gen.writeRecognizer(gen.generateTreeParser());
-		}
-		else {
-			gen.writeRecognizer(gen.generateParser());
-			gen.writeListener(gen.generateListener());
-			gen.writeBlankListener(gen.generateBlankListener());
-			gen.writeHeaderFile();
-		}
-		gen.writeVocabFile();
+	@Override
+	public TreeParserFile treeParserFile(String fileName) {
+		return new TreeParserFile(this, fileName);
 	}
+
+	@Override
+	public TreeParserModel treeParser(TreeParserFile file) {
+		return new TreeParserModel(this, file);
+	}
+
+	@Override
+	public MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos) {
+		return new MatchTree(this, treeBeginAST, omos);
+	}
+
 }

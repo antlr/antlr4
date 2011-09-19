@@ -98,6 +98,8 @@ element returns [ATNFactory.Handle p]
 	|	^(ROOT a=astOperand)		{$p = $a.p;}
 	|	^(BANG a=astOperand)		{$p = $a.p;}
     |	^(NOT b=blockSet[true])		{$p = $b.p;}
+    |	DOWN_TOKEN					{$p = factory.tokenRef((DownAST)$start);}
+    |	UP_TOKEN					{$p = factory.tokenRef((UpAST)$start);}
 	;
 
 astOperand returns [ATNFactory.Handle p]
@@ -112,7 +114,8 @@ labeledElement returns [ATNFactory.Handle p]
 
 treeSpec returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> els = new ArrayList<ATNFactory.Handle>();}
-    : ^(TREE_BEGIN  (e=element {els.add($e.p);})+)	{$p = factory.tree(els);}
+    :	^(TREE_BEGIN (e=element {els.add($e.p);})+ )
+    	{$p = factory.tree($TREE_BEGIN, els);}
     ;
 
 subrule returns [ATNFactory.Handle p]

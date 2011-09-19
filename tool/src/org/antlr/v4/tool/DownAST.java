@@ -27,32 +27,23 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.tool;
 
-import org.antlr.v4.tool.Grammar;
+import org.antlr.runtime.Token;
 
-public class CodeGenPipeline {
-	Grammar g;
-
-	public CodeGenPipeline(Grammar g) {
-		this.g = g;
+public class DownAST extends TerminalAST {
+	public DownAST(int type, Token t) {
+		super(type, t);
 	}
 
-	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
 
-		if ( g.isLexer() ) {
-			gen.writeRecognizer(gen.generateLexer());
-		}
-		else if ( g.isTreeGrammar() ) {
-			gen.writeRecognizer(gen.generateTreeParser());
-		}
-		else {
-			gen.writeRecognizer(gen.generateParser());
-			gen.writeListener(gen.generateListener());
-			gen.writeBlankListener(gen.generateBlankListener());
-			gen.writeHeaderFile();
-		}
-		gen.writeVocabFile();
+	@Override
+	public String getText() {
+		return "DOWN";
+	}
+
+	@Override
+	public String toString() {
+		return getText();
 	}
 }
