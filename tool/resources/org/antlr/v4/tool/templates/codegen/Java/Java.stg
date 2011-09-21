@@ -70,8 +70,16 @@ public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator=
 >>
 
 Parser(parser, scopes, funcs, atn, sempredFuncs) ::= <<
+<Parser_(ctor="parser_ctor", ...)>
+>>
+
+TreeParserModel(parser, scopes, funcs, atn, sempredFuncs) ::= <<
+<Parser_(ctor="treeparser_ctor", ...)>
+>>
+
+Parser_(parser, scopes, funcs, atn, sempredFuncs, ctor) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
-public class <parser.name> extends Parser {
+public class <parser.name> extends <parser.superclass> {
     public static final int
         <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
     public static final String[] tokenNames = {
@@ -85,7 +93,7 @@ public class <parser.name> extends Parser {
     };
     <scopes>
     <namedActions.members>
-    <parser:ctor()>
+    <parser:(ctor)()>
     <funcs; separator="\n">
 
     @Override
@@ -110,10 +118,6 @@ public class <parser.name> extends Parser {
 }
 >>
 
-TreeParserModel(parser, scopes, funcs, atn, sempredFuncs) ::= <<
-<Parser(...)>
->>
-
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
@@ -136,8 +140,15 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 <endif>
 >>
 
-ctor(p) ::= <<
+parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
+    super(input);
+    _interp = new ParserATNSimulator(this,_ATN);
+}
+>>
+
+treeparser_ctor(p) ::= <<
+public <p.name>(TreeNodeStream input) {
     super(input);
     _interp = new ParserATNSimulator(this,_ATN);
 }

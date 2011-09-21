@@ -30,8 +30,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
 import java.util.*;
 
@@ -39,6 +38,7 @@ import java.util.*;
 public class Parser extends OutputModelObject {
 	public String name;
 	public String grammarName;
+	public String superclass;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -65,5 +65,6 @@ public class Parser extends OutputModelObject {
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
+		superclass = g.getOption("superClass", "Parser");
 	}
 }

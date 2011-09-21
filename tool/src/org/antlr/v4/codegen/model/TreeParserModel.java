@@ -30,9 +30,12 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.Grammar;
 
 public class TreeParserModel extends Parser {
 	public TreeParserModel(OutputModelFactory factory, ParserFile file) {
 		super(factory, file);
+		Grammar g = factory.getGrammar();
+		superclass = g.getOption("superClass", "TreeParser");
 	}
 }
