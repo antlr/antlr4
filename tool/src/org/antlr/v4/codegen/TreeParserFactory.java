@@ -34,6 +34,8 @@ import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.TreeParserModel;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.NodeDecl;
+import org.antlr.v4.codegen.model.decl.NodeListDecl;
+import org.antlr.v4.codegen.model.decl.TokenListDecl;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
@@ -61,5 +63,10 @@ public class TreeParserFactory extends ParserFactory {
 	@Override
 	public Decl getTokenLabelDecl(String label) {
 		return new NodeDecl(this, label);
+	}
+
+	@Override
+	public TokenListDecl getTokenListLabelDecl(String label) {
+		return new NodeListDecl(this, gen.target.getListLabel(label));
 	}
 }

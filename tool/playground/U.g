@@ -1,7 +1,7 @@
 grammar U;
 options {output=AST;}
-
-a : INT ID -> ID INT ;
+tokens {DECL;}
+a : ID '=' INT -> ^(DECL ID INT) ;
 
 INT : '0'..'9'+ ;
 ID : 'a'..'z'+ ;

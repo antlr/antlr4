@@ -99,7 +99,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			((MatchToken)matchOp).labels.add(d);
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
-				TokenListDecl l = new TokenListDecl(this, gen.target.getListLabel(label));
+				TokenListDecl l = getTokenListLabelDecl(label);
 				getCurrentRuleFunction().addContextDecl(l);
 			}
 		}
@@ -110,6 +110,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public Decl getTokenLabelDecl(String label) {
 		return new TokenDecl(this, label);
+	}
+
+	public TokenListDecl getTokenListLabelDecl(String label) {
+		return new TokenListDecl(this, gen.target.getListLabel(label));
 	}
 
 	@Override
@@ -125,7 +129,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			((MatchSet)matchOp).labels.add(d);
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
-				TokenListDecl l = new TokenListDecl(this, gen.target.getListLabel(label));
+				TokenListDecl l = getTokenListLabelDecl(label);
 				getCurrentRuleFunction().addContextDecl(l);
 			}
 		}
@@ -144,7 +148,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			wild.labels.add(d);
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
-				TokenListDecl l = new TokenListDecl(this, gen.target.getListLabel(label));
+				TokenListDecl l = getTokenListLabelDecl(label);
 				getCurrentRuleFunction().addContextDecl(l);
 			}
 		}

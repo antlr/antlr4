@@ -69,15 +69,21 @@ public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator=
 }
 >>
 
-Parser(parser, scopes, funcs, atn, sempredFuncs) ::= <<
+Parser(parser, funcs, atn, sempredFuncs) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-TreeParserModel(parser, scopes, funcs, atn, sempredFuncs) ::= <<
-<Parser_(ctor="treeparser_ctor", ...)>
+TreeParserModel(parser, funcs, atn, sempredFuncs) ::= <<
+<Parser_(ctor="treeparser_ctor",
+         extras={
+@Override
+public <file.ASTLabelType> match(int ttype) throws RecognitionException {
+    return (<file.ASTLabelType>)super.match(ttype);
+\}
+}, ...)>
 >>
 
-Parser_(parser, scopes, funcs, atn, sempredFuncs, ctor) ::= <<
+Parser_(parser, funcs, atn, sempredFuncs, ctor, extras) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class <parser.name> extends <parser.superclass> {
     public static final int
@@ -91,8 +97,8 @@ public class <parser.name> extends <parser.superclass> {
     public static final String[] ruleNames = {
         <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
     };
-    <scopes>
     <namedActions.members>
+    <extras>
     <parser:(ctor)()>
     <funcs; separator="\n">
 
@@ -459,8 +465,8 @@ TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
-NodeDecl(t) ::= "Object <t.name>;"
-
+NodeDecl(t) ::= "<file.ASTLabelType> <t.name>;"
+NodeListDecl(t) ::= "List\<<file.ASTLabelType>> <t.name> = new ArrayList\<<file.ASTLabelType>>();"
 
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
