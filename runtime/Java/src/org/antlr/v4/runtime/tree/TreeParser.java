@@ -31,7 +31,8 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
@@ -47,31 +48,42 @@ public class TreeParser extends BaseRecognizer {
     static Pattern dotdotPattern = Pattern.compile(dotdot);
     static Pattern doubleEtcPattern = Pattern.compile(doubleEtc);
 
-	protected TreeNodeStream input;
+	protected TreeNodeStream _input;
 
 	public TreeParser(TreeNodeStream input) {
-		super((TokenStream)input); // highlight that we go to super to set state object
-		setTreeNodeStream(input);
+		super(input);
 	}
 
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
-		if ( input!=null ) {
-			input.seek(0); // rewind the input
+		if ( _input !=null ) {
+			_input.seek(0); // rewind the input
 		}
 	}
 
-	/** Set the input stream */
-	public void setTreeNodeStream(TreeNodeStream input) {
-		this.input = input;
-	}
+	protected Object getCurrentInputSymbol() { return _input.LT(1); }
 
-	public TreeNodeStream getTreeNodeStream() {
-		return input;
+	@Override
+	public TreeNodeStream getInputStream() { return _input; }
+
+	@Override
+	public void setInputStream(IntStream input) { _input = (TreeNodeStream)input; }
+
+	/** Always called by generated parsers upon entry to a rule.
+	 *  This occurs after the new context has been pushed. Access field
+	 *  _ctx get the current context.
+	 *
+	 *  This is flexible because users do not have to regenerate parsers
+	 *  to get trace facilities.
+	 */
+	public void enterRule(TreeParserRuleContext localctx, int ruleIndex) {
+		_ctx = localctx;
+		localctx.start = _input.LT(1);
+		localctx.ruleIndex = ruleIndex;
 	}
 
 	public String getSourceName() {
-		return input.getSourceName();
+		return _input.getSourceName();
 	}
 
 	protected Object getCurrentInputSymbol(IntStream input) {
@@ -95,19 +107,19 @@ public class TreeParser extends BaseRecognizer {
 	public void matchAny(IntStream ignore) { // ignore stream, copy of input
 		errorRecovery = false;
 //		failed = false;
-		Object look = input.LT(1);
-		if ( input.getTreeAdaptor().getChildCount(look)==0 ) {
-			input.consume(); // not subtree, consume 1 node and return
+		Object look = _input.LT(1);
+		if ( _input.getTreeAdaptor().getChildCount(look)==0 ) {
+			_input.consume(); // not subtree, consume 1 node and return
 			return;
 		}
 		// current node is a subtree, skip to corresponding UP.
 		// must count nesting level to get right UP
 		int level=0;
-		int tokenType = input.getTreeAdaptor().getType(look);
+		int tokenType = _input.getTreeAdaptor().getType(look);
 		while ( tokenType!=Token.EOF && !(tokenType==UP && level==0) ) {
-			input.consume();
-			look = input.LT(1);
-			tokenType = input.getTreeAdaptor().getType(look);
+			_input.consume();
+			look = _input.LT(1);
+			tokenType = _input.getTreeAdaptor().getType(look);
 			if ( tokenType == DOWN ) {
 				level++;
 			}
@@ -115,7 +127,7 @@ public class TreeParser extends BaseRecognizer {
 				level--;
 			}
 		}
-		input.consume(); // consume UP
+		_input.consume(); // consume UP
 	}
 
     /** We have DOWN/UP nodes in the stream that have no line info; override.
@@ -165,7 +177,7 @@ public class TreeParser extends BaseRecognizer {
      *  There is no way to force the first node to be the root.
      */
     public boolean inContext(String context) {
-        return inContext(input.getTreeAdaptor(), getTokenNames(), input.LT(1), context);
+        return inContext(_input.getTreeAdaptor(), getTokenNames(), _input.LT(1), context);
     }
 
     /** The worker for inContext.  It's static and full of parameters for

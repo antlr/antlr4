@@ -31,7 +31,7 @@ package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 
-/** */
+/** x=ID or implicit _tID label */
 public class TokenDecl extends Decl {
 	public boolean isImplicit;
 

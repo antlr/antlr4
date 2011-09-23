@@ -369,19 +369,19 @@ MatchTree(t, elems) ::= <<
 >>
 
 MatchDOWN(m) ::= <<
-move(<m.stateNumber>); match(Token.DOWN);
+setState(<m.stateNumber>); match(Token.DOWN);
 >>
 
 MatchUP(m) ::= <<
-move(<m.stateNumber>); match(Token.UP);
+setState(<m.stateNumber>); match(Token.UP);
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-move(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks:{e| <e>}>);
+setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks:{e| <e>}>);
 >>
 
 MatchToken(m) ::= <<
-move(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }>(Token)<endif>match(<m.name>);
+setState(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>match(<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -389,7 +389,7 @@ MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
-move(<m.stateNumber>);
+setState(<m.stateNumber>);
 <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_input.LT(1);
 <capture>
 if ( <if(!invert)>!<endif>(<expr>) ) throw new MismatchedSetException(this, _input);
@@ -397,7 +397,7 @@ _input.consume();
 >>
 
 Wildcard(w) ::= <<
-move(<w.stateNumber>);
+setState(<w.stateNumber>);
 <if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>_input.LT(1); _input.consume();
 >>
 
@@ -459,6 +459,9 @@ TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
+NodeDecl(t) ::= "Object <t.name>;"
+
+
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
 
@@ -475,8 +478,8 @@ ListLabelName(label)		  ::= "<label>_list"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods) ::= <<
-public static class <s.name> extends ParserRuleContext {
+StructDecl(s,attrs,visitorDispatchMethods,superClass="ParserRuleContext") ::= <<
+public static class <s.name> extends <superClass> {
     <attrs:{a | public <a>;}; separator="\n">
     <if(s.ctorAttrs)>public <s.name>(RuleContext parent, int state) { super(parent, state); }<endif>
     public <s.name>(RuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
@@ -492,6 +495,10 @@ public static class <s.name> extends ParserRuleContext {
 <endif>
     <visitorDispatchMethods; separator="\n">
 }
+>>
+
+TreeParserStructDecl(s,attrs,visitorDispatchMethods) ::= <<
+<StructDecl(superClass="TreeParserRuleContext", ...)>
 >>
 
 AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
@@ -684,7 +691,7 @@ public class <lexer.name> extends Lexer {
 
     <lexer.namedActions.members>
 
-	<dumpActions(lexer, {}, actionFuncs, sempredFuncs)>
+	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
     <atn>
 }
 >>

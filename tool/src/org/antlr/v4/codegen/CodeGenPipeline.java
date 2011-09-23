@@ -49,8 +49,10 @@ public class CodeGenPipeline {
 		}
 		else {
 			gen.writeRecognizer(gen.generateParser());
-			gen.writeListener(gen.generateListener());
-			gen.writeBlankListener(gen.generateBlankListener());
+			if ( g.tool.genListener) {
+				gen.writeListener(gen.generateListener());
+				gen.writeBlankListener(gen.generateBlankListener());
+			}
 			gen.writeHeaderFile();
 		}
 		gen.writeVocabFile();

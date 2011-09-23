@@ -42,7 +42,7 @@ public class NoViableAltException extends RecognitionException {
 	public NoViableAltException() {;}
 
 	public NoViableAltException(BaseRecognizer recognizer, RuleContext ctx) { // LL(1) error
-		super(recognizer, recognizer._input, ctx);
+		super(recognizer, recognizer.getInputStream(), ctx);
 	}
 
 	public NoViableAltException(BaseRecognizer recognizer, IntStream input,
@@ -55,7 +55,7 @@ public class NoViableAltException extends RecognitionException {
 
 	public String toString() {
 		if ( recognizer!=null ) {
-			TokenStream tokens = recognizer._input;
+			TokenStream tokens = ((Parser)recognizer).getTokenStream();
 			String bad = tokens.toString(startIndex, index);
 			return "NoViableAltException(input=\""+bad+"\" last token type is "+getUnexpectedType()+")";
 		}

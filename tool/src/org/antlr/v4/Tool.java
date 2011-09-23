@@ -31,16 +31,25 @@ package org.antlr.v4;
 
 import org.antlr.runtime.*;
 import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.automata.*;
+import org.antlr.v4.automata.ATNFactory;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.automata.TreeParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRLexer;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.STGroup;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
@@ -76,20 +85,22 @@ public class Tool {
 	public boolean generate_ATN_dot = false;
 	public String msgFormat = "antlr";
 	public boolean saveLexer = false;
+	public boolean genListener = true;
 	public boolean launch_ST_inspector = false;
 
 	public static Option[] optionDefs = {
-	new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-	new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
-	new Option("report",			"-report", "print out a report about the grammar(s) processed"),
-	new Option("printGrammar",		"-print", "print out the grammar without actions"),
-	new Option("debug",				"-debug", "generate a parser that emits debugging events"),
-	new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-	new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
-	new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
-	new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
-	new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
-	new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+		new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
+		new Option("report",			"-report", "print out a report about the grammar(s) processed"),
+		new Option("printGrammar",		"-print", "print out the grammar without actions"),
+		new Option("debug",				"-debug", "generate a parser that emits debugging events"),
+		new Option("profile",			"-profile", "generate a parser that computes profiling information"),
+		new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
+		new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
+		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+		new Option("genListener",		"-walker", "generate parse tree walker and listener"),
+		new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
+		new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
 	};
 
 	// helper vars for option management

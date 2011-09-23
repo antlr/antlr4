@@ -29,7 +29,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ASTAdaptor;
+import org.antlr.v4.runtime.tree.TreeNodeStream;
 
 /** The root of the ANTLR exception hierarchy.
  *
@@ -182,11 +183,11 @@ public class RecognitionException extends RuntimeException {
 	/** Return the token type or char of the unexpected input element */
 	public int getUnexpectedType() {
 		if ( recognizer==null ) return token.getType();
-		if ( recognizer._input instanceof TokenStream) {
+		if ( recognizer.getInputStream() instanceof TokenStream) {
 			return token.getType();
 		}
-		else if ( recognizer._input instanceof TreeNodeStream) {
-			TreeNodeStream nodes = (TreeNodeStream)recognizer._input;
+		else if ( recognizer.getInputStream() instanceof TreeNodeStream) {
+			TreeNodeStream nodes = (TreeNodeStream)recognizer.getInputStream();
 			ASTAdaptor adaptor = nodes.getTreeAdaptor();
 			return adaptor.getType(node);
 		}

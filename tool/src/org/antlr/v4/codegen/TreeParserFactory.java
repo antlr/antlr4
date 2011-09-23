@@ -29,7 +29,11 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.MatchTree;
+import org.antlr.v4.codegen.model.SrcOp;
+import org.antlr.v4.codegen.model.TreeParserModel;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.codegen.model.decl.NodeDecl;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
@@ -54,4 +58,8 @@ public class TreeParserFactory extends ParserFactory {
 		return new MatchTree(this, treeBeginAST, omos);
 	}
 
+	@Override
+	public Decl getTokenLabelDecl(String label) {
+		return new NodeDecl(this, label);
+	}
 }

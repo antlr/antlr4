@@ -29,7 +29,8 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ASTAdaptor;
+import org.antlr.v4.runtime.tree.CommonASTAdaptor;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
@@ -37,6 +38,8 @@ import org.antlr.v4.runtime.tree.*;
 public class Parser extends BaseRecognizer {
 
 	public ASTAdaptor _adaptor = new CommonASTAdaptor();
+
+	protected TokenStream _input;
 
 	public Parser(TokenStream input) {
 		super(input);
@@ -49,9 +52,33 @@ public class Parser extends BaseRecognizer {
 		}
 	}
 
-	protected Object getCurrentInputSymbol() {
-		return _input.LT(1);
+	/** Always called by generated parsers upon entry to a rule.
+	 *  This occurs after the new context has been pushed. Access field
+	 *  _ctx get the current context.
+	 *
+	 *  This is flexible because users do not have to regenerate parsers
+	 *  to get trace facilities.
+	 */
+	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
+		_ctx = localctx;
+		_ctx.start = _input.LT(1);
+		_ctx.ruleIndex = ruleIndex;
 	}
+
+	@Override
+	public Token match(int ttype) throws RecognitionException {
+		return (Token)super.match(ttype);
+	}
+
+	protected Object getCurrentInputSymbol() {
+		return ((TokenStream)_input).LT(1);
+	}
+
+	@Override
+	public TokenStream getInputStream() { return _input; }
+
+	@Override
+	public void setInputStream(IntStream input) { _input = (TokenStream)input; }
 
 	protected Object getMissingSymbol(RecognitionException e,
 									  int expectedTokenType)
@@ -60,9 +87,9 @@ public class Parser extends BaseRecognizer {
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+getTokenNames()[expectedTokenType]+">";
 		CommonToken t = new CommonToken(expectedTokenType, tokenText);
-		Token current = _input.LT(1);
+		Token current = ((TokenStream)_input).LT(1);
 		if ( current.getType() == Token.EOF ) {
-			current = _input.LT(-1);
+			current = ((TokenStream)_input).LT(-1);
 		}
 		t.line = current.getLine();
 		t.charPositionInLine = current.getCharPositionInLine();
@@ -79,7 +106,7 @@ public class Parser extends BaseRecognizer {
 	}
 
     public TokenStream getTokenStream() {
-		return _input;
+		return ((TokenStream)_input);
 	}
 
 	public String getSourceName() {

@@ -29,7 +29,8 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.TokenStream;
 
 /**
  Cut-n-paste from material I'm not using in the book anymore (edit later
@@ -93,8 +94,8 @@ public class TreeFilter extends TreeParser {
         if ( t==null ) return;
         try {
             // share TreeParser object but not parsing-related state
-            input = new CommonASTNodeStream(originalAdaptor, t);
-            ((CommonASTNodeStream)input).setTokenStream(originalTokenStream);
+            _input = new CommonASTNodeStream(originalAdaptor, t);
+            ((CommonASTNodeStream) _input).setTokenStream(originalTokenStream);
             whichRule.rule();
         }
         catch (RecognitionException e) { ; }

@@ -34,7 +34,9 @@ import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.*;
@@ -93,7 +95,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
-			TokenDecl d = new TokenDecl(this, label);
+			Decl d = getTokenLabelDecl(label);
 			((MatchToken)matchOp).labels.add(d);
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
@@ -106,6 +108,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return list(matchOp, listLabelOp);
 	}
 
+	public Decl getTokenLabelDecl(String label) {
+		return new TokenDecl(this, label);
+	}
+
 	@Override
 	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST,
 						   GrammarAST astOp, boolean invert)
@@ -115,7 +121,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		else matchOp = new MatchSet(this, setAST);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
-			TokenDecl d = new TokenDecl(this, label);
+			Decl d = getTokenLabelDecl(label);
 			((MatchSet)matchOp).labels.add(d);
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
@@ -134,7 +140,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		// TODO: dup with tokenRef
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
-			TokenDecl d = new TokenDecl(this, label);
+			Decl d = getTokenLabelDecl(label);
 			wild.labels.add(d);
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
@@ -159,7 +165,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 		if ( labelAST!=null ) { // for x=(...), define x or x_list
 			String label = labelAST.getText();
-			TokenDecl d = new TokenDecl(this,label);
+			Decl d = getTokenLabelDecl(label);
 			c.label = d;
 			getCurrentRuleFunction().addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
@@ -377,7 +383,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		if ( ast.getType()==ANTLRParser.SET || ast.getType()==ANTLRParser.WILDCARD ) {
 			String implLabel =
 				gen.target.getImplicitSetLabel(String.valueOf(ast.token.getTokenIndex()));
-			d = new TokenDecl(this, implLabel);
+			d = getTokenLabelDecl(implLabel);
 			((TokenDecl)d).isImplicit = true;
 		}
 		else if ( r!=null ) {
@@ -389,7 +395,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		}
 		else {
 			String implLabel = gen.target.getImplicitTokenLabel(ast.getText());
-			d = new TokenDecl(this, implLabel);
+			d = getTokenLabelDecl(implLabel);
 			((TokenDecl)d).isImplicit = true;
 		}
 		op.getLabels().add(d);

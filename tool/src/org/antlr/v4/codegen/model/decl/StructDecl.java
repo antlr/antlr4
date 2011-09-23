@@ -30,34 +30,30 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.VisitorDispatchMethod;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.Rule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /** This object models the structure holding all of the parameters,
  *  return values, local variables, and labels associated with a rule.
  */
 public class StructDecl extends Decl {
+	public String superClass;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
-		addVisitorDispatchMethods(r);
-
-//		boolean multiAlts = labels!=null && labels.size()>1;
-//		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
-//		VisitorDispatchMethod enter = multiAlts ?
-//			new SwitchedVisitorDispatchMethod(factory, r, true) :
-//			new VisitorDispatchMethod(factory, r, true);
-//		visitorDispatchMethods.add(enter);
-//		VisitorDispatchMethod exit = multiAlts ?
-//			new SwitchedVisitorDispatchMethod(factory, r, false) :
-//			new VisitorDispatchMethod(factory, r, false);
-//		visitorDispatchMethods.add(exit);
+		if ( !factory.getGrammar().isTreeGrammar() ) {
+			addVisitorDispatchMethods(r);
+		}
 	}
 
 	public void addVisitorDispatchMethods(Rule r) {
