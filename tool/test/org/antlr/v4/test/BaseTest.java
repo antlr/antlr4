@@ -970,7 +970,7 @@ public abstract class BaseTest {
 			"            Trees.sanityCheckParentAndChildIndexes((CommonAST)r.tree);\n" +
 			"		 }\n" +
 			"        <else>\n" +
-			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
+			"        CommonASTNodeStream nodes = new CommonASTNodeStream((Tree)r.tree);\n" +
 			"        nodes.setTokenStream(tokens);\n" +
 			"        <treeParserName> walker = new <treeParserName>(nodes);\n" +
 			"        walker.<treeParserStartRuleName>();\n" +
@@ -1021,7 +1021,7 @@ public abstract class BaseTest {
 			"        <createParser>\n"+
 			"        ParserRuleContext r = parser.<parserStartRuleName>();\n" +
 			"        Trees.sanityCheckParentAndChildIndexes((CommonAST)r.tree);\n" +
-			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
+			"        CommonASTNodeStream nodes = new CommonASTNodeStream((Tree)r.tree);\n" +
 			"        nodes.setTokenStream(tokens);\n" +
 			"        <treeParserName> walker = new <treeParserName>(nodes);\n" +
 			"        ParserRuleContext r2 = walker.<treeParserStartRuleName>();\n" +

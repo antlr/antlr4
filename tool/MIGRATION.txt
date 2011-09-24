@@ -1,0 +1,9 @@
+Actions/scopes
+
+* no global scopes. no scope[n].
+
+Trees
+
+* moved methods to Trees
+* Tree->AST
+* added parse trees

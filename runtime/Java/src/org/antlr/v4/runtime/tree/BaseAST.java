@@ -31,7 +31,7 @@ package org.antlr.v4.runtime.tree;
 
 import java.util.*;
 
-/** A generic tree implementation with no payload.  You must subclass to
+/** A generic AST implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
  *  instead of the child-sibling approach in v2.  A flat tree (a list) is
  *  an empty node whose children represent the list.  An empty, but

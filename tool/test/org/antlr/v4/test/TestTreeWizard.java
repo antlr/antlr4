@@ -1,52 +1,47 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2010 Terence Parr
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *  1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-package org.antlr.test;
+ [The "BSD license"]
+ Copyright (c) 2011 Terence Parr
+ All rights reserved.
 
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.antlr.runtime.tree.TreeAdaptor;
-import org.antlr.runtime.tree.TreeWizard;
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.antlr.v4.test;
+
+import org.antlr.v4.runtime.tree.*;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class TestTreeWizard extends BaseTest {
 	protected static final String[] tokens =
 		new String[] {"", "", "", "", "", "A", "B", "C", "D", "E", "ID", "VAR"};
-	protected static final TreeAdaptor adaptor = new CommonTreeAdaptor();
+	protected static final ASTAdaptor adaptor = new CommonASTAdaptor();
 
 	@Test public void testSingleNode() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("ID");
+		CommonAST t = (CommonAST)wiz.create("ID");
 		String found = t.toStringTree();
 		String expecting = "ID";
 		assertEquals(expecting, found);
@@ -54,7 +49,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testSingleNodeWithArg() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("ID[foo]");
+		CommonAST t = (CommonAST)wiz.create("ID[foo]");
 		String found = t.toStringTree();
 		String expecting = "foo";
 		assertEquals(expecting, found);
@@ -62,7 +57,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testSingleNodeTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A)");
+		CommonAST t = (CommonAST)wiz.create("(A)");
 		String found = t.toStringTree();
 		String expecting = "A";
 		assertEquals(expecting, found);
@@ -70,7 +65,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testSingleLevelTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C D)");
+		CommonAST t = (CommonAST)wiz.create("(A B C D)");
 		String found = t.toStringTree();
 		String expecting = "(A B C D)";
 		assertEquals(expecting, found);
@@ -78,7 +73,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testListTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(nil A B C)");
+		CommonAST t = (CommonAST)wiz.create("(nil A B C)");
 		String found = t.toStringTree();
 		String expecting = "A B C";
 		assertEquals(expecting, found);
@@ -86,13 +81,13 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testInvalidListTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("A B C");
+		CommonAST t = (CommonAST)wiz.create("A B C");
 		assertTrue(t==null);
 	}
 
 	@Test public void testDoubleLevelTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A (B C) (B D) E)");
+		CommonAST t = (CommonAST)wiz.create("(A (B C) (B D) E)");
 		String found = t.toStringTree();
 		String expecting = "(A (B C) (B D) E)";
 		assertEquals(expecting, found);
@@ -100,7 +95,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testSingleNodeIndex() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("ID");
+		CommonAST t = (CommonAST)wiz.create("ID");
 		Map m = wiz.index(t);
 		String found = m.toString();
 		String expecting = "{10=[ID]}";
@@ -109,7 +104,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testNoRepeatsIndex() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C D)");
+		CommonAST t = (CommonAST)wiz.create("(A B C D)");
 		Map m = wiz.index(t);
 		String found = sortMapToString(m);
         String expecting = "{5=[A], 6=[B], 7=[C], 8=[D]}";
@@ -118,7 +113,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testRepeatsIndex() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
+		CommonAST t = (CommonAST)wiz.create("(A B (A C B) B D D)");
 		Map m = wiz.index(t);
 		String found =  sortMapToString(m);
         String expecting = "{5=[A, A], 6=[B, B, B], 7=[C], 8=[D, D]}";
@@ -127,7 +122,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testNoRepeatsVisit() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C D)");
+		CommonAST t = (CommonAST)wiz.create("(A B C D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, wiz.getTokenType("B"), new TreeWizard.Visitor() {
 			public void visit(Object t) {
@@ -141,7 +136,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testNoRepeatsVisit2() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
+		CommonAST t = (CommonAST)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, wiz.getTokenType("C"),
 					   new TreeWizard.Visitor() {
@@ -156,7 +151,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testRepeatsVisit() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
+		CommonAST t = (CommonAST)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, wiz.getTokenType("B"),
 					   new TreeWizard.Visitor() {
@@ -171,7 +166,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testRepeatsVisit2() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
+		CommonAST t = (CommonAST)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, wiz.getTokenType("A"),
 					   new TreeWizard.Visitor() {
@@ -186,7 +181,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testRepeatsVisitWithContext() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
+		CommonAST t = (CommonAST)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, wiz.getTokenType("B"),
 		   new TreeWizard.ContextVisitor() {
@@ -203,7 +198,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testRepeatsVisitWithNullParentAndContext() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
+		CommonAST t = (CommonAST)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, wiz.getTokenType("A"),
 		   new TreeWizard.ContextVisitor() {
@@ -220,7 +215,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testVisitPattern() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C (A B) D)");
+		CommonAST t = (CommonAST)wiz.create("(A B C (A B) D)");
 		final List elements = new ArrayList();
 		wiz.visit(t, "(A B)",
 					   new TreeWizard.Visitor() {
@@ -235,7 +230,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testVisitPatternMultiple() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C (A B) (D (A B)))");
+		CommonAST t = (CommonAST)wiz.create("(A B C (A B) (D (A B)))");
 		final List elements = new ArrayList();
 		wiz.visit(t, "(A B)",
 					   new TreeWizard.ContextVisitor() {
@@ -252,7 +247,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testVisitPatternMultipleWithLabels() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
+		CommonAST t = (CommonAST)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
 		final List elements = new ArrayList();
 		wiz.visit(t, "(%a:A %b:B)",
 					   new TreeWizard.ContextVisitor() {
@@ -269,35 +264,35 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testParse() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C)");
+		CommonAST t = (CommonAST)wiz.create("(A B C)");
 		boolean valid = wiz.parse(t, "(A B C)");
 		assertTrue(valid);
 	}
 
 	@Test public void testParseSingleNode() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("A");
+		CommonAST t = (CommonAST)wiz.create("A");
 		boolean valid = wiz.parse(t, "A");
 		assertTrue(valid);
 	}
 
 	@Test public void testParseFlatTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(nil A B C)");
+		CommonAST t = (CommonAST)wiz.create("(nil A B C)");
 		boolean valid = wiz.parse(t, "(nil A B C)");
 		assertTrue(valid);
 	}
 
 	@Test public void testWildcard() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C)");
+		CommonAST t = (CommonAST)wiz.create("(A B C)");
 		boolean valid = wiz.parse(t, "(A . .)");
 		assertTrue(valid);
 	}
 
 	@Test public void testParseWithText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B[foo] C[bar])");
+		CommonAST t = (CommonAST)wiz.create("(A B[foo] C[bar])");
 		// C pattern has no text arg so despite [bar] in t, no need
 		// to match text--check structure only.
 		boolean valid = wiz.parse(t, "(A B[foo] C)");
@@ -306,7 +301,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testParseWithText2() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B[T__32] (C (D E[a])))");
+		CommonAST t = (CommonAST)wiz.create("(A B[T__32] (C (D E[a])))");
 		// C pattern has no text arg so despite [bar] in t, no need
 		// to match text--check structure only.
 		boolean valid = wiz.parse(t, "(A B[foo] C)");
@@ -315,14 +310,14 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testParseWithTextFails() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C)");
+		CommonAST t = (CommonAST)wiz.create("(A B C)");
 		boolean valid = wiz.parse(t, "(A[foo] B C)");
 		assertTrue(!valid); // fails
 	}
 
 	@Test public void testParseLabels() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C)");
+		CommonAST t = (CommonAST)wiz.create("(A B C)");
 		Map labels = new HashMap();
 		boolean valid = wiz.parse(t, "(%a:A %b:B %c:C)", labels);
 		assertTrue(valid);
@@ -333,7 +328,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testParseWithWildcardLabels() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C)");
+		CommonAST t = (CommonAST)wiz.create("(A B C)");
 		Map labels = new HashMap();
 		boolean valid = wiz.parse(t, "(A %b:. %c:.)", labels);
 		assertTrue(valid);
@@ -343,7 +338,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testParseLabelsAndTestText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B[foo] C)");
+		CommonAST t = (CommonAST)wiz.create("(A B[foo] C)");
 		Map labels = new HashMap();
 		boolean valid = wiz.parse(t, "(%a:A %b:B[foo] %c:C)", labels);
 		assertTrue(valid);
@@ -354,7 +349,7 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testParseLabelsInNestedTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A (B C) (D E))");
+		CommonAST t = (CommonAST)wiz.create("(A (B C) (D E))");
 		Map labels = new HashMap();
 		boolean valid = wiz.parse(t, "(%a:A (%b:B %c:C) (%d:D %e:E) )", labels);
 		assertTrue(valid);
@@ -367,36 +362,36 @@ public class TestTreeWizard extends BaseTest {
 
 	@Test public void testEquals() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t1 = (CommonTree)wiz.create("(A B C)");
-		CommonTree t2 = (CommonTree)wiz.create("(A B C)");
+		CommonAST t1 = (CommonAST)wiz.create("(A B C)");
+		CommonAST t2 = (CommonAST)wiz.create("(A B C)");
 		boolean same = TreeWizard.equals(t1, t2, adaptor);
 		assertTrue(same);
 	}
 
 	@Test public void testEqualsWithText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t1 = (CommonTree)wiz.create("(A B[foo] C)");
-		CommonTree t2 = (CommonTree)wiz.create("(A B[foo] C)");
+		CommonAST t1 = (CommonAST)wiz.create("(A B[foo] C)");
+		CommonAST t2 = (CommonAST)wiz.create("(A B[foo] C)");
 		boolean same = TreeWizard.equals(t1, t2, adaptor);
 		assertTrue(same);
 	}
-	
+
 	@Test public void testEqualsWithMismatchedText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t1 = (CommonTree)wiz.create("(A B[foo] C)");
-		CommonTree t2 = (CommonTree)wiz.create("(A B C)");
+		CommonAST t1 = (CommonAST)wiz.create("(A B[foo] C)");
+		CommonAST t2 = (CommonAST)wiz.create("(A B C)");
 		boolean same = TreeWizard.equals(t1, t2, adaptor);
 		assertTrue(!same);
 	}
 
 	@Test public void testFindPattern() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
-		CommonTree t = (CommonTree)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
+		CommonAST t = (CommonAST)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
 		final List subtrees = wiz.find(t, "(A B)");
 		List elements = subtrees;
 		String found = elements.toString();
 		String expecting = "[foo, big]";
 		assertEquals(expecting, found);
 	}
-	
+
 }
