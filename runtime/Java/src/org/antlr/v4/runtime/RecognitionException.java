@@ -29,8 +29,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.tree.ASTAdaptor;
-import org.antlr.v4.runtime.tree.TreeNodeStream;
+import org.antlr.v4.runtime.tree.*;
 
 /** The root of the ANTLR exception hierarchy.
  *
@@ -127,7 +126,7 @@ public class RecognitionException extends RuntimeException {
 			this.line = token.getLine();
 			this.charPositionInLine = token.getCharPositionInLine();
 		}
-		if ( input instanceof TreeNodeStream) {
+		if ( input instanceof ASTNodeStream) {
 			//extractInformationFromTreeNodeStream(input);
 		}
 		else {
@@ -186,8 +185,8 @@ public class RecognitionException extends RuntimeException {
 		if ( recognizer.getInputStream() instanceof TokenStream) {
 			return token.getType();
 		}
-		else if ( recognizer.getInputStream() instanceof TreeNodeStream) {
-			TreeNodeStream nodes = (TreeNodeStream)recognizer.getInputStream();
+		else if ( recognizer.getInputStream() instanceof ASTNodeStream) {
+			ASTNodeStream nodes = (ASTNodeStream)recognizer.getInputStream();
 			ASTAdaptor adaptor = nodes.getTreeAdaptor();
 			return adaptor.getType(node);
 		}

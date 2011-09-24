@@ -28,8 +28,7 @@
 package org.antlr.v4.runtime.debug;
 
 import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.tree.TreeNodeStream;
-import org.antlr.v4.runtime.tree.TreeParser;
+import org.antlr.v4.runtime.tree.*;
 
 import java.io.IOException;
 
@@ -45,12 +44,12 @@ public class DebugTreeParser extends TreeParser {
 	/** Create a normal parser except wrap the token stream in a debug
 	 *  proxy that fires consume events.
 	 */
-	public DebugTreeParser(TreeNodeStream input, DebugEventListener dbg) {
+	public DebugTreeParser(ASTNodeStream input, DebugEventListener dbg) {
 		super(input instanceof DebugTreeNodeStream?input:new DebugTreeNodeStream(input,dbg));
 		setDebugListener(dbg);
 	}
 
-	public DebugTreeParser(TreeNodeStream input) {
+	public DebugTreeParser(ASTNodeStream input) {
 		super(input instanceof DebugTreeNodeStream?input:new DebugTreeNodeStream(input,null));
 	}
 

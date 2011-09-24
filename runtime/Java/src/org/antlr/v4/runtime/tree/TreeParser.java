@@ -31,8 +31,7 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
@@ -48,9 +47,9 @@ public class TreeParser extends BaseRecognizer {
     static Pattern dotdotPattern = Pattern.compile(dotdot);
     static Pattern doubleEtcPattern = Pattern.compile(doubleEtc);
 
-	protected TreeNodeStream _input;
+	protected ASTNodeStream _input;
 
-	public TreeParser(TreeNodeStream input) {
+	public TreeParser(ASTNodeStream input) {
 		super(input);
 	}
 
@@ -64,10 +63,10 @@ public class TreeParser extends BaseRecognizer {
 	protected Object getCurrentInputSymbol() { return _input.LT(1); }
 
 	@Override
-	public TreeNodeStream getInputStream() { return _input; }
+	public ASTNodeStream getInputStream() { return _input; }
 
 	@Override
-	public void setInputStream(IntStream input) { _input = (TreeNodeStream)input; }
+	public void setInputStream(IntStream input) { _input = (ASTNodeStream)input; }
 
 	/** Always called by generated parsers upon entry to a rule.
 	 *  This occurs after the new context has been pushed. Access field
@@ -87,7 +86,7 @@ public class TreeParser extends BaseRecognizer {
 	}
 
 	protected Object getCurrentInputSymbol(IntStream input) {
-		return ((TreeNodeStream)input).LT(1);
+		return ((ASTNodeStream)input).LT(1);
 	}
 
 	protected Object getMissingSymbol(IntStream input,
@@ -96,7 +95,7 @@ public class TreeParser extends BaseRecognizer {
 	{
 		String tokenText =
 			"<missing "+getTokenNames()[expectedTokenType]+">";
-        ASTAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
+        ASTAdaptor adaptor = ((ASTNodeStream)e.input).getTreeAdaptor();
         return adaptor.create(new CommonToken(expectedTokenType, tokenText));
 	}
 
@@ -156,7 +155,7 @@ public class TreeParser extends BaseRecognizer {
 	 */
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
 		if ( this instanceof TreeParser ) {
-			ASTAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
+			ASTAdaptor adaptor = ((ASTNodeStream)e.input).getTreeAdaptor();
 			e.token = adaptor.getToken(e.node);
 			if ( e.token==null ) { // could be an UP/DOWN node
 				e.token = new CommonToken(adaptor.getType(e.node),

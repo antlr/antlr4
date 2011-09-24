@@ -34,16 +34,16 @@ import org.antlr.v4.runtime.tree.*;
  *  and a debug listener.  As node stream calls come in, debug events
  *  are triggered.
  */
-public class DebugTreeNodeStream implements TreeNodeStream {
+public class DebugTreeNodeStream implements ASTNodeStream {
 	protected DebugEventListener dbg;
 	protected ASTAdaptor adaptor;
-	protected TreeNodeStream input;
+	protected ASTNodeStream input;
 	protected boolean initialStreamState = true;
 
 	/** Track the last mark() call result value for use in rewind(). */
 	protected int lastMarker;
 
-	public DebugTreeNodeStream(TreeNodeStream input,
+	public DebugTreeNodeStream(ASTNodeStream input,
 							   DebugEventListener dbg)
 	{
 		this.input = input;

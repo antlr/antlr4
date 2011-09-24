@@ -77,7 +77,7 @@ public class CommonErrorNode extends CommonAST {
 			badText = ((TokenStream)input).toString(i, j);
 		}
 		else if ( start instanceof Tree ) {
-			badText = ((TreeNodeStream)input).toString(start, stop);
+			badText = ((ASTNodeStream)input).toString(start, stop);
 		}
 		else {
 			// people should subclass if they alter the tree type so this

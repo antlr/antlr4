@@ -132,7 +132,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		String grammar =
 			"grammar P;\n" +
 			"tokens { B='}'; }\n"+
-			"a : A B {System.out.println(input);} ;\n"+
+			"a : A B {System.out.println(_input);} ;\n"+
 			"A : 'a' ;\n" +
 			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
@@ -147,7 +147,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		String grammar =
 			"grammar P;\n" +
 			"tokens { B='}'; }\n"+
-			"a : A '}' {System.out.println(input);} ;\n"+
+			"a : A '}' {System.out.println(_input);} ;\n"+
 			"A : 'a' ;\n" +
 			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";

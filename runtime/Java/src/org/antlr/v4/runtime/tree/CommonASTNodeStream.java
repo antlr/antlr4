@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.misc.LookaheadStream;
 
 import java.util.Stack;
 
-public class CommonASTNodeStream extends LookaheadStream<Object> implements TreeNodeStream {
+public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTNodeStream {
 	public static final int DEFAULT_INITIAL_BUFFER_SIZE = 100;
 	public static final int INITIAL_CALL_STACK_SIZE = 10;
 

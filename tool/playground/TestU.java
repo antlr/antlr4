@@ -1,8 +1,5 @@
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.CommonASTNodeStream;
-import org.antlr.v4.runtime.tree.Tree;
-import org.antlr.v4.runtime.tree.TreeNodeStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 
 public class TestU {
 	public static void main(String[] args) throws Exception {
@@ -14,7 +11,7 @@ public class TestU {
 
 		System.out.println(((Tree) ctx.tree).toStringTree());
 
-		TreeNodeStream nodes = new CommonASTNodeStream(ctx.tree);
+		ASTNodeStream nodes = new CommonASTNodeStream(ctx.tree);
 		UWalker walker = new UWalker(nodes);
 		walker.a();
 	}

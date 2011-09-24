@@ -154,7 +154,7 @@ public <p.name>(TokenStream input) {
 >>
 
 treeparser_ctor(p) ::= <<
-public <p.name>(TreeNodeStream input) {
+public <p.name>(ASTNodeStream input) {
     super(input);
     _interp = new ParserATNSimulator(this,_ATN);
 }

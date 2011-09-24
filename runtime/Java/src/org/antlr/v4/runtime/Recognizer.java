@@ -122,8 +122,8 @@ public class Recognizer<ATNInterpreter> {
 			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
 				" expecting "+tokenName;
 		}
-		else if ( e instanceof MismatchedTreeNodeException ) {
-			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
+		else if ( e instanceof MismatchedASTNodeException) {
+			MismatchedASTNodeException mtne = (MismatchedASTNodeException)e;
 			String tokenName="<unknown>";
 			if ( mtne.expecting.member(Token.EOF) ) {
 				tokenName = "EOF";
