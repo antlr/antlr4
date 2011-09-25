@@ -124,7 +124,7 @@ public class ATNState {
 	}
 
 	public boolean onlyHasEpsilonTransitions() {
-		if ( transitions==null ) return false;
+		if ( transitions.size()==0 ) return false;
 		for (Transition t : transitions) {
 			if ( !t.isEpsilon() ) return false;
 		}

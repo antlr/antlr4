@@ -288,9 +288,11 @@ public class ParserATNSimulator extends ATNSimulator {
 			Set<Integer> ambigAlts = getAmbiguousAlts(reach);
 			if ( ambigAlts!=null ) {
 				if ( debug ) {
-					ATNState loc = atn.states.get(outerContext.s);
-					String rname = "n/a";
-					if ( parser !=null ) rname = parser.getRuleNames()[loc.ruleIndex];
+					int i = -1;
+					if ( outerContext!=null && outerContext.s>=0 ) {
+						i = atn.states.get(outerContext.s).ruleIndex;
+					}
+					String rname = getRuleName(i);
 					System.out.println("AMBIG dec "+dfa.decision+" in "+rname+" for alt "+ambigAlts+" upon "+
 									   getInputString(input, startIndex));
 					System.out.println("REACH="+reach);
@@ -534,13 +536,13 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( decState!=null && !decState.isGreedy ) {
 					if ( debug ) System.out.println("nongreedy decision state = "+decState);
 					if ( debug ) System.out.println("NONGREEDY at stop state of "+
-												   parser.getRuleNames()[config.state.ruleIndex]);
+													getRuleName(config.state.ruleIndex));
 					// don't purse past end of a rule for any nongreedy decision
 					configs.add(config);
 					return;
 				}
 				if ( debug ) System.out.println("FALLING off rule "+
-												parser.getRuleNames()[config.state.ruleIndex]);
+												getRuleName(config.state.ruleIndex));
 			}
 		}
 
@@ -563,6 +565,11 @@ public class ParserATNSimulator extends ATNSimulator {
 				closure(c, configs, decState, closureBusy);
 			}
 		}
+	}
+
+	private String getRuleName(int index) {
+		if ( parser!=null && index>=0 ) return parser.getRuleNames()[index];
+		return "<rule "+index+">";
 	}
 
 	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t, boolean ignorePreds) {
@@ -632,7 +639,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public ATNConfig ruleTransition(ATNConfig config, Transition t) {
 		if ( debug ) {
-			System.out.println("CALL rule "+parser.getRuleNames()[t.target.ruleIndex]+
+			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
 		}
 		ATNState p = config.state;
@@ -705,7 +712,7 @@ public class ParserATNSimulator extends ATNSimulator {
 						if ( debug ) {
 							System.out.println("we reach state "+c.state.stateNumber+
 							   " in rule "+
-							   (parser !=null ? parser.getRuleNames()[c.state.ruleIndex]:"n/a")+
+							   (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
 							   " alts "+goal.alt+","+c.alt+" from ctx "+goal.context.toString(parser)
 							   +" and "+ c.context.toString(parser));
 						}
@@ -798,8 +805,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public String getLookaheadName(IntStream input) {
-		if ( input.LA(1)==Token.EOF ) return "EOF";
-		return parser.getTokenNames()[input.LA(1)];
+		return getTokenName(input.LA(1));
 	}
 
 	public void setContextSensitive(boolean ctxSensitive) {
