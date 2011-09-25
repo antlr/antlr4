@@ -41,6 +41,8 @@ public class TreeParser extends BaseRecognizer {
 	public static final int DOWN = Token.DOWN;
 	public static final int UP = Token.UP;
 
+	public ASTAdaptor _adaptor = new CommonASTAdaptor();
+
     // precompiled regex used by inContext
     static String dotdot = ".*[^.]\\.\\.[^.].*";
     static String doubleEtc = ".*\\.\\.\\.\\s+\\.\\.\\..*";

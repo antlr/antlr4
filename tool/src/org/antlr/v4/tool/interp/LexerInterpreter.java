@@ -39,6 +39,11 @@ public class LexerInterpreter implements TokenSource {
 	protected LexerATNSimulator interp;
 	protected CharStream input;
 
+	public LexerInterpreter(LexerGrammar g, String inputString) {
+		this(g);
+		setInput(inputString);
+	}
+
 	public LexerInterpreter(LexerGrammar g) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
@@ -64,7 +69,7 @@ public class LexerInterpreter implements TokenSource {
 	}
 
 	public CharStream getInputStream() {
-		return null;
+		return input;
 	}
 
 	public Token nextToken() {

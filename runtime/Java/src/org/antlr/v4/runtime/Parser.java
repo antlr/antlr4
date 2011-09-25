@@ -29,14 +29,12 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.ASTAdaptor;
-import org.antlr.v4.runtime.tree.CommonASTAdaptor;
+import org.antlr.v4.runtime.tree.*;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */
 public class Parser extends BaseRecognizer {
-
 	public ASTAdaptor _adaptor = new CommonASTAdaptor();
 
 	protected TokenStream _input;
