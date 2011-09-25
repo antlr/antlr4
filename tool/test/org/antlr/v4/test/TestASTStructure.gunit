@@ -124,7 +124,7 @@ rule:
 	-> (RULE a int i (throws a.b.c) (BLOCK (ALT A)))
 
 block:
-	"( ^(A B) | ^(b C) )"	-> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
+	"( ^(A B) | ^(b C) )"	-> (BLOCK (ALT ("^(" A DOWN B UP)) (ALT ("^(" b DOWN C UP)))
 
 ebnf:
 	"(A|B)"					-> (BLOCK (ALT A) (ALT B))

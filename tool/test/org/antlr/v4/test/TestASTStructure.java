@@ -113,7 +113,7 @@ public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
 		// gunit test on line 127
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("block", "( ^(A B) | ^(b C) )", 127);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(BLOCK (ALT (^( A B)) (ALT (^( b C)))";
+		Object expecting = "(BLOCK (ALT (^( A DOWN B UP)) (ALT (^( b DOWN C UP)))";
 		assertEquals("testing rule block", expecting, actual);
 	} @Test public void test_ebnf1() throws Exception {
 		// gunit test on line 130

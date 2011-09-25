@@ -130,9 +130,12 @@ treeSpec returns [MatchTree treeMatch]
 
 subrule returns [List<? extends SrcOp> omos]
 	:	^(astBlockSuffix block[null,null,$astBlockSuffix.start]) {$omos = $block.omos;}
-	|	^(OPTIONAL block[null,$OPTIONAL,null])	{$omos = $block.omos;}
-	|	(	^(op=CLOSURE b=block[null,$CLOSURE,null])
-		|	^(op=POSITIVE_CLOSURE b=block[null,$POSITIVE_CLOSURE,null])
+	|	^(OPTIONAL b=block[null,$OPTIONAL,null])
+		{
+		$omos = $block.omos;
+		}
+	|	(	^(op=CLOSURE b=block[null,null,null])
+		|	^(op=POSITIVE_CLOSURE b=block[null,null,null])
 		)
 		{
 		List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();
