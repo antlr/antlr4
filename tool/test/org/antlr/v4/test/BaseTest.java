@@ -325,6 +325,7 @@ public abstract class BaseTest {
 	/** Return true if all is ok, no errors */
 	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean debug) {
 		boolean allIsWell = true;
+		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		try {

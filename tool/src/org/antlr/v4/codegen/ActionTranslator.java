@@ -56,6 +56,8 @@ public class ActionTranslator implements ActionSplitterListener {
 		put("st", RulePropertyRef_st.class);
 	}};
 
+	public static final Map<String, Class> treeRulePropToModelMap = rulePropToModelMap;
+
 	public static final Map<String, Class> tokenPropToModelMap = new HashMap<String, Class>() {{
 		put("text", TokenPropertyRef_text.class);
 		put("type", TokenPropertyRef_type.class);
@@ -135,7 +137,7 @@ public class ActionTranslator implements ActionSplitterListener {
 				case RET: chunks.add(new RetValueRef(x.getText())); break;
 				case LOCAL: chunks.add(new LocalRef(x.getText())); break;
 				case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x));	break;
-//			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
+				case PREDEFINED_TREE_RULE: chunks.add(getRulePropertyRef(x)); break;
 			}
 		}
 		if ( node.resolver.resolvesToToken(x.getText(), node) ) {
@@ -150,16 +152,6 @@ public class ActionTranslator implements ActionSplitterListener {
 			chunks.add(new ListLabelRef(x.getText())); // $ids for ids+=ID etc...
 			return;
 		}
-//		switch ( a.dict.type ) {
-//			case ARG: chunks.add(new ArgRef(x.getText())); break;
-//			case RET: chunks.add(new RetValueRef(x.getText())); break;
-//			case PREDEFINED_RULE: chunks.add(new RetValueRef(x.getText())); break;
-//			case PREDEFINED_LEXER_RULE: chunks.add(new RetValueRef(x.getText())); break;
-//			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
-//			case GLOBAL_SCOPE: chunks.add(new RetValueRef(x.getText())); break;
-//			case RULE_SCOPE: chunks.add(new RetValueRef(x.getText())); break;
-//			case TOKEN: chunks.add(new TokenRef(x.getText())); break;
-//		}
 	}
 
 	/** $x.y = expr; */
@@ -176,13 +168,16 @@ public class ActionTranslator implements ActionSplitterListener {
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(y.getText())); break; // has to be current rule
 			case RET:
-				if ( factory.getCurrentRuleFunction()!=null && factory.getCurrentRuleFunction().name.equals(x.getText()) ) {
+				if ( factory.getCurrentRuleFunction()!=null &&
+					 factory.getCurrentRuleFunction().name.equals(x.getText()) )
+				{
 					chunks.add(new RetValueRef(y.getText())); break;
 				}
 				else {
 					chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
 				}
 			case PREDEFINED_RULE:
+			case PREDEFINED_TREE_RULE:
 				if ( factory.getCurrentRuleFunction()!=null &&
 					 factory.getCurrentRuleFunction().name.equals(x.getText()) )
 				{
@@ -192,9 +187,13 @@ public class ActionTranslator implements ActionSplitterListener {
 					chunks.add(getRulePropertyRef(x, y));
 				}
 				break;
-			case TOKEN: chunks.add(getTokenPropertyRef(x, y));	break;
+			case TOKEN:
+				chunks.add(getTokenPropertyRef(x, y));
+				break;
+//			case PREDEFINED_TREE_RULE:
+//				chunks.add(new RetValueRef(x.getText()));
+//				break;
 //			case PREDEFINED_LEXER_RULE: chunks.add(new RetValueRef(x.getText())); break;
-//			case PREDEFINED_TREE_RULE: chunks.add(new RetValueRef(x.getText())); break;
 		}
 	}
 
@@ -272,15 +271,18 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	RulePropertyRef getRulePropertyRef(Token x, Token prop) {
+		Grammar g = factory.getGrammar();
 		try {
-			Class c = rulePropToModelMap.get(prop.getText());
+			Class c = g.isTreeGrammar() ?
+				treeRulePropToModelMap.get(prop.getText()) :
+				rulePropToModelMap.get(prop.getText());
 			Constructor ctor = c.getConstructor(new Class[] {String.class});
 			RulePropertyRef ref =
 				(RulePropertyRef)ctor.newInstance(getRuleLabel(x.getText()));
 			return ref;
 		}
 		catch (Exception e) {
-			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
 		}
 		return null;
 	}

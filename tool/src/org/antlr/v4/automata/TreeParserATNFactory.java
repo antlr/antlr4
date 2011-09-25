@@ -29,48 +29,75 @@
 
 package org.antlr.v4.automata;
 
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.*;
 
-import java.util.List;
+import java.util.*;
 
 /** Build ATNs for tree grammars */
 public class TreeParserATNFactory extends ParserATNFactory {
+	// track stuff for ^(...) patterns in grammar to fix up nullable after ATN build
+	List<TreePatternAST> treePatternRootNodes = new ArrayList<TreePatternAST>();
+	List<ATNState> firstChildStates = new ArrayList<ATNState>();
+	List<ATNState> downStates = new ArrayList<ATNState>();
+	List<ATNState> upTargetStates = new ArrayList<ATNState>();
+
 	public TreeParserATNFactory(Grammar g) {
 		super(g);
 	}
 
-	/** x y z from ^(x y z) becomes o-x->o-DOWN->o-y->o-z->o-UP->o */
-	public Handle tree(GrammarAST node, List<Handle> els) {
-		Handle h = elemList(els);
-		return h;
+	public ATN createATN() {
+		super.createATN();
 
-//		ATNState first = h.left;
-//		ATNState last = h.right;
-//		node.atnState = first;
-//
-//		// find root transition first side node
-//		ATNState p = first;
-//		while ( p.transition(0) instanceof EpsilonTransition ||
-//				p.transition(0) instanceof PredicateTransition ||
-//				p.transition(0) instanceof RangeTransition ||
-//				p.transition(0) instanceof ActionTransition )
-//		{
-//			p = p.transition(0).target;
-//		}
-//		ATNState rootLeftNode = p;
-//		ATNState rootRightNode = rootLeftNode.transition(0).target;
-//		ATNState downLeftNode = newState(node);
-//		downLeftNode.transition = new AtomTransition(Token.DOWN, rootRightNode);
-//		rootRightNode.incidentTransition = downLeftNode.transition;
-//		rootLeftNode.transition.target = downLeftNode;
-//		downLeftNode.incidentTransition = rootLeftNode.transition;
-//
-//		ATNState upRightNode = newState(node);
-//		last.transition = new AtomTransition(Token.UP, upRightNode);
-//		upRightNode.incidentTransition = last.transition;
-//		last = upRightNode;
-//
-//		return new Handle(first, last);
+		for (int i=0; i<firstChildStates.size(); i++) {
+			ATNState firstChild = firstChildStates.get(i);
+			LL1Analyzer analyzer = new LL1Analyzer(atn);
+			IntervalSet look = analyzer.LOOK(firstChild, RuleContext.EMPTY);
+			TreePatternAST root = treePatternRootNodes.get(i);
+			System.out.println(root.toStringTree()+"==nullable? "+look.member(Token.UP));
+
+			if ( look.member(Token.UP) ) {
+				// nullable child list if we can see the UP as the next token.
+				// convert r DN kids UP to r (DN kids UP)?; leave AST
+				// that drives code gen. This just affects analysis
+				root.isNullable = true;
+				epsilon(downStates.get(i), upTargetStates.get(i));
+			}
+		}
+
+		return atn;
 	}
 
+	/** x y z from ^(x y z) becomes o-x->o-DOWN->o-y->o-z->o-UP->o
+	 *  ANTLRParser.g has added DOWN_TOKEN, UP_TOKEN into AST.
+	 *  Elems are [root, DOWN_TOKEN, x, y, UP_TOKEN]
+	 */
+	public Handle tree(GrammarAST node, List<Handle> els) {
+		Handle h = elemList(els);
+
+		treePatternRootNodes.add((TreePatternAST)node);
+		// find DOWN node then first child
+		for (Handle elh : els) {
+			Transition trans = elh.left.transition(0);
+			if ( !trans.isEpsilon() && trans.label().member(Token.DOWN) ) {
+				ATNState downState = elh.left;
+				downStates.add(downState);
+				firstChildStates.add(downState.transition(0).target);
+				break;
+			}
+		}
+		// find UP node
+		for (Handle elh : els) {
+			Transition trans = elh.left.transition(0);
+			if ( trans instanceof AtomTransition && trans.label().member(Token.UP) ) {
+				ATNState upTargetState = elh.right;
+				upTargetStates.add(upTargetState);
+				break;
+			}
+		}
+
+		return h;
+	}
 }

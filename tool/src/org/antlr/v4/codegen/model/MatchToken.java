@@ -38,13 +38,14 @@ import java.util.*;
 /** */
 public class MatchToken extends RuleElement implements LabeledOp {
 	public String name;
+	public int ttype;
 	public List<Decl> labels = new ArrayList<Decl>();
 
 	public MatchToken(OutputModelFactory factory, TerminalAST ast) {
 		super(factory, ast);
 		Grammar g = factory.getGrammar();
 		CodeGenerator gen = factory.getGenerator();
-		int ttype = g.getTokenType(ast.getText());
+		ttype = g.getTokenType(ast.getText());
 		name = gen.target.getTokenTypeAsTargetLabel(g, ttype);
 	}
 

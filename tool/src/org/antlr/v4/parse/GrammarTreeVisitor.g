@@ -358,6 +358,8 @@ element
 	|	^(BANG astOperand)	{bangOp($BANG, $astOperand.start);}
 	|	^(NOT blockSet)
 	|	^(NOT block)
+	|	DOWN_TOKEN
+	|	UP_TOKEN
 	;
 
 astOperand
@@ -371,7 +373,7 @@ labeledElement
 	;
 
 treeSpec
-    : ^(TREE_BEGIN element DOWN_TOKEN element+ UP_TOKEN )
+    : ^(TREE_BEGIN element element+ ) // UP_TOKEN and DOWN_TOKEN in there somewhere
     ;
 
 subrule

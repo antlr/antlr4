@@ -26,21 +26,15 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.runtime;
 
-/**
- */
-public class MismatchedTreeNodeException extends RecognitionException {
-	public MismatchedTreeNodeException() {
-	}
+package org.antlr.v4.tool;
 
-	public MismatchedTreeNodeException(BaseRecognizer  recognizer,
-									   IntStream input, int firstSet)
-	{
-		super(recognizer, input, recognizer._ctx);
-	}
+import org.antlr.runtime.Token;
 
-	public String toString() {
-		return "MismatchedTreeNodeException("+getUnexpectedType()+"!="+expecting+")";
+public class TreePatternAST extends GrammarAST {
+	public boolean isNullable;
+
+	public TreePatternAST(Token t) {
+		super(t);
 	}
 }

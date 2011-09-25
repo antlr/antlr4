@@ -30,16 +30,46 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.misc.Utils;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.tool.*;
 
 import java.util.List;
 
 public class MatchTree extends RuleElement {
-	@ModelElement public List<? extends SrcOp> elems;
+	public boolean isNullable;
+
+	@ModelElement public SrcOp root;
+	@ModelElement public List<? extends SrcOp> leftActions;
+	@ModelElement public SrcOp down;
+	@ModelElement public List<? extends SrcOp> kids;
+	@ModelElement public SrcOp up;
+	@ModelElement public List<? extends SrcOp> rightActions;
 
 	public MatchTree(OutputModelFactory factory, GrammarAST ast, List<? extends SrcOp> elems) {
 		super(factory, ast);
-		this.elems = elems;
+		TreePatternAST rootNode = (TreePatternAST)ast;
+		this.isNullable = rootNode.isNullable;
+		List<? extends SrcOp> afterRoot = elems.subList(1, elems.size());
+		int downIndex =
+			Utils.indexOf(afterRoot, new Utils.Filter<SrcOp>() {
+				public boolean select(SrcOp op) {
+					return op instanceof MatchToken && ((MatchToken)op).ttype==Token.DOWN;
+				}
+			});
+		downIndex++; // we skipped root
+		down = elems.get(downIndex);
+		int upIndex =
+			Utils.lastIndexOf(elems, new Utils.Filter<SrcOp>() {
+				public boolean select(SrcOp op) {
+					return op instanceof MatchToken && ((MatchToken) op).ttype == Token.UP;
+				}
+			});
+		up = elems.get(upIndex);
+		root = elems.get(0);
+		leftActions = elems.subList(1, downIndex);
+		rightActions = elems.subList(upIndex+1, elems.size());
+		this.kids = elems.subList(downIndex+1, upIndex);
 	}
 
 }

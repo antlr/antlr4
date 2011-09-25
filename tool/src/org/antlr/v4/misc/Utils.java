@@ -37,6 +37,11 @@ import java.util.*;
 /** */
 public class Utils {
 	public static final int INTEGER_POOL_MAX_VALUE = 1000;
+
+	public interface Filter<T> {
+		boolean select(T t);
+	}
+
 	static Integer[] ints = new Integer[INTEGER_POOL_MAX_VALUE+1];
 
 	/** Integer objects are immutable so share all Integers with the
@@ -179,4 +184,19 @@ public class Utils {
 		}
 		return null;
 	}
+
+	public static <T> int indexOf(List<? extends T> elems, Filter<T> filter) {
+		for (int i=0; i<elems.size(); i++) {
+			if ( filter.select(elems.get(i)) ) return i;
+		}
+		return -1;
+	}
+
+	public static <T> int lastIndexOf(List<? extends T> elems, Filter<T> filter) {
+		for (int i=elems.size()-1; i>=0; i--) {
+			if ( filter.select(elems.get(i)) ) return i;
+		}
+		return -1;
+	}
+
 }

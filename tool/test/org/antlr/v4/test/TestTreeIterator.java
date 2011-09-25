@@ -42,7 +42,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("A");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "A EOF";
         String found = buf.toString();
@@ -53,7 +53,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("(nil A B)");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "nil DOWN A B UP EOF";
         String found = buf.toString();
@@ -64,7 +64,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("(A B)");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "A DOWN B UP EOF";
         String found = buf.toString();
@@ -75,7 +75,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("(A B C)");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "A DOWN B C UP EOF";
         String found = buf.toString();
@@ -86,7 +86,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("(A (B C))");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "A DOWN B DOWN C UP UP EOF";
         String found = buf.toString();
@@ -97,7 +97,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("(A (B (C D E) F) G)");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "A DOWN B DOWN C DOWN D E UP F UP G UP EOF";
         String found = buf.toString();
@@ -108,7 +108,7 @@ public class TestTreeIterator {
         ASTAdaptor adaptor = new CommonASTAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonAST t = (CommonAST)wiz.create("(A (B (C D E) F) G)");
-        TreeIterator it = new TreeIterator(t);
+        ASTIterator it = new ASTIterator(t);
         StringBuffer buf = toString(it);
         String expecting = "A DOWN B DOWN C DOWN D E UP F UP G UP EOF";
         String found = buf.toString();
@@ -121,7 +121,7 @@ public class TestTreeIterator {
         assertEquals(expecting, found);
     }
 
-    protected static StringBuffer toString(TreeIterator it) {
+    protected static StringBuffer toString(ASTIterator it) {
         StringBuffer buf = new StringBuffer();
         while ( it.hasNext() ) {
             CommonAST n = (CommonAST)it.next();

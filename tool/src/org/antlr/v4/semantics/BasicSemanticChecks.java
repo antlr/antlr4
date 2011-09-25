@@ -31,8 +31,7 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
@@ -534,7 +533,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	void checkWildcardRoot(GrammarAST wild) {
-		if ( wild.getParent().getType()==ANTLRParser.TREE_BEGIN ) {
+		if ( wild.getChildIndex()==0 && wild.getParent().getType()==ANTLRParser.TREE_BEGIN ) {
 			String fileName = wild.token.getInputStream().getSourceName();
 			g.tool.errMgr.grammarError(ErrorType.WILDCARD_AS_ROOT,
 									   fileName,

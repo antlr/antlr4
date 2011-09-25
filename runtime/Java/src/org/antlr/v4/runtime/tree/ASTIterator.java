@@ -39,7 +39,7 @@ import java.util.Iterator;
  *
  *  Emit navigation nodes (DOWN, UP, and EOF) to let show tree structure.
  */
-public class TreeIterator implements Iterator {
+public class ASTIterator implements Iterator {
     protected ASTAdaptor adaptor;
     protected Object root;
     protected Object tree;
@@ -55,11 +55,11 @@ public class TreeIterator implements Iterator {
      */
     protected FastQueue nodes;
 
-    public TreeIterator(Object tree) {
+    public ASTIterator(Object tree) {
         this(new CommonASTAdaptor(),tree);
     }
 
-    public TreeIterator(ASTAdaptor adaptor, Object tree) {
+    public ASTIterator(ASTAdaptor adaptor, Object tree) {
         this.adaptor = adaptor;
         this.tree = tree;
         this.root = tree;

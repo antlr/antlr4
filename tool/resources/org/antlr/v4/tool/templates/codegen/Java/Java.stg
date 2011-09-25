@@ -369,9 +369,22 @@ cases(ttypes) ::= <<
 <ttypes:{t | case <t>:}; separator="\n">
 >>
 
-MatchTree(t, elems) ::= <<
+MatchTree(t, root, down, leftActions, kids, rightActions, up) ::= <<
 // match tree
-<elems; separator="\n">
+<root>
+<leftActions>
+<if(t.isNullable)>
+if ( _input.LA(1)==Token.DOWN ) {
+    <down>
+    <kids; separator="\n">
+    <up>
+}
+<else>
+<down>
+<kids; separator="\n">
+<up>
+<endif>
+<rightActions>
 >>
 
 MatchDOWN(m) ::= <<
@@ -444,7 +457,7 @@ TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localct
 RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.start):null)"
 RulePropertyRef_stop(r)  ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.stop):null)"
 RulePropertyRef_tree(r)  ::= "(_localctx.<r.label>!=null?((<file.ASTLabelType>)_localctx.<r.label>.tree):null)"
-RulePropertyRef_text(r)  ::= "(_localctx.<r.label>!=null?((TokenStream)_input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
+RulePropertyRef_text(r)  ::= "(_localctx.<r.label>!=null?_input.toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
 RulePropertyRef_st(r)    ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
@@ -452,6 +465,15 @@ ThisRulePropertyRef_stop(r)  ::= "_localctx.stop"
 ThisRulePropertyRef_tree(r)  ::= "_localctx.tree"
 ThisRulePropertyRef_text(r)  ::= "((TokenStream)_input).toString(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_st(r)    ::= "_localctx.st"
+
+/*
+TreeRulePropertyRef_text(r)  ::= <%
+(_localctx.<r.label>!=null?
+    ((ASTNodeStream)_input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop)
+    :null
+)
+%>
+*/
 
 NonLocalAttrRef(s)       ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks)     ::=

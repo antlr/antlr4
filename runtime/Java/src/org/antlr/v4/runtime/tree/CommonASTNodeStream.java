@@ -48,7 +48,7 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
 	ASTAdaptor adaptor;
 
     /** The tree iterator we using */
-    protected TreeIterator it;
+    protected ASTIterator it;
 
     /** Stack of indexes used for push/pop calls */
     protected Stack<Integer> calls;
@@ -66,7 +66,7 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
 	public CommonASTNodeStream(ASTAdaptor adaptor, Object tree) {
 		this.root = tree;
 		this.adaptor = adaptor;
-        it = new TreeIterator(adaptor,root);
+        it = new ASTIterator(adaptor,root);
 	}
 
     public void reset() {
@@ -147,10 +147,19 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
 		}
 	}
 
+	/** Print the token text between start and stop nodes. If stop is an UP
+	 *  node, then we have to walk it back until we see the first non-UP node.
+	 *  Then, just get the token indexes and look into the token stream.
+	 */
 	public String toString(Object start, Object stop) {
-        // we'll have to walk from start to stop in tree; we're not keeping
-        // a complete node stream buffer
-        return "n/a";
+		if ( tokens==null ) throw new UnsupportedOperationException("can't print from null token stream in node stream");
+		if ( start==null || stop==null ) return "";
+		Token startToken = adaptor.getToken(start);
+		Token stopToken = adaptor.getToken(stop);
+		while ( stopToken.getType()==Token.UP ) {
+			stopToken = adaptor.getToken(stop);
+		}
+		return tokens.toString(startToken.getTokenIndex(), stopToken.getTokenIndex());
 	}
 
     /** For debugging; destructive: moves tree iterator to end. */

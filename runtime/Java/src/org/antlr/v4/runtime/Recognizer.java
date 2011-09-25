@@ -173,6 +173,7 @@ public class Recognizer<ATNInterpreter> {
 	 *  so that it creates a new Java type.
 	 */
 	public String getTokenErrorDisplay(Token t) {
+		if ( t==null ) return "<no token>";
 		String s = t.getText();
 		if ( s==null ) {
 			if ( t.getType()==Token.EOF ) {

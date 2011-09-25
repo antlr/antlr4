@@ -131,18 +131,18 @@ treeSpec returns [MatchTree treeMatch]
 subrule returns [List<? extends SrcOp> omos]
 	:	^(astBlockSuffix block[null,null,$astBlockSuffix.start]) {$omos = $block.omos;}
 	|	^(OPTIONAL block[null,$OPTIONAL,null])	{$omos = $block.omos;}
-	|	^(CLOSURE block[null,null,null])
+	|	(	^(op=CLOSURE b=block[null,$CLOSURE,null])
+		|	^(op=POSITIVE_CLOSURE b=block[null,$POSITIVE_CLOSURE,null])
+		)
 		{
 		List<CodeBlockForAlt> alts = new ArrayList<CodeBlockForAlt>();
-		SrcOp blk = $block.omos.get(0);
+		SrcOp blk = $b.omos.get(0);
 		CodeBlockForAlt alt = new CodeBlockForAlt(controller.delegate);
 		alt.addOp(blk);
 		alts.add(alt);
-		SrcOp loop = controller.getEBNFBlock($CLOSURE, alts); // "star it"
+		SrcOp loop = controller.getEBNFBlock($op, alts); // "star it"
    	    $omos = DefaultOutputModelFactory.list(loop);
 		}
-	|	^(POSITIVE_CLOSURE block[null,$POSITIVE_CLOSURE,null])
-										    	{$omos = $block.omos;}
 	| 	block[null, null,null]					{$omos = $block.omos;}
     ;
 
@@ -266,7 +266,7 @@ rewriteTreeAtom[boolean isRoot] returns [List<SrcOp> omos]
 	;
 
 rewriteTreeEbnf returns [CodeBlock op]
-	:	^(	(a=OPTIONAL|a=CLOSURE)
+	:	^(	(a=OPTIONAL|a=CLOSURE|a=POSITIVE_CLOSURE)
 			^(	REWRITE_BLOCK
 				{
 				controller.codeBlockLevel++;

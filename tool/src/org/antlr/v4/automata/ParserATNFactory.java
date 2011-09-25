@@ -103,8 +103,8 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
-		left.transition = new AtomTransition(ttype, right);
-		right.incidentTransition = left.transition;
+		left.addTransition(new AtomTransition(ttype, right));
+		right.incidentTransition = left.transition(0);
 		node.atnState = left;
 		return new Handle(left, right);
 	}
@@ -123,12 +123,12 @@ public class ParserATNFactory implements ATNFactory {
 		}
 		if ( invert ) {
 			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
-			left.transition = new NotSetTransition(set, notSet, right);
+			left.addTransition(new NotSetTransition(set, notSet, right));
 		}
 		else {
-			left.transition = new SetTransition(set, right);
+			left.addTransition(new SetTransition(set, right));
 		}
-		right.incidentTransition = left.transition;
+		right.incidentTransition = left.transition(0);
 		associatedAST.atnState = left;
 		return new Handle(left, right);
 	}
@@ -211,7 +211,7 @@ public class ParserATNFactory implements ATNFactory {
 		p.ruleIndex = currentRule.index;
 		p.predIndex = g.sempreds.get(pred);
 		p.isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
-		left.transition = p;
+		left.addTransition(p);
 		pred.atnState = left;
 		return new Handle(left, right);
 	}
@@ -226,7 +226,7 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(action);
 		ActionTransition a = new ActionTransition(right);
 		a.ruleIndex = currentRule.index;
-		left.transition = a;
+		left.addTransition(a);
 		action.atnState = left;
 		return new Handle(left, right);
 	}
@@ -300,7 +300,7 @@ public class ParserATNFactory implements ATNFactory {
 
 //	public Handle notBlock(GrammarAST notAST, Handle set) {
 //		SetTransition st = (SetTransition)set.left.transition;
-//		set.left.transition = new NotSetTransition(st.label, set.right);
+//		set.left.addTransition(new NotSetTransition(st.label, set.right);
 //		notAST.atnState = set.left;
 //		return set;
 //	}
@@ -418,8 +418,8 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle wildcard(GrammarAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		left.transition = new WildcardTransition(right);
-		right.incidentTransition = left.transition;
+		left.addTransition(new WildcardTransition(right));
+		right.incidentTransition = left.transition(0);
 		node.atnState = left;
 		return new Handle(left, right);
 	}

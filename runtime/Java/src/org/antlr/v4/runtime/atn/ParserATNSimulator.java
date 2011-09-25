@@ -30,9 +30,9 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.dfa.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.tree.ASTNodeStream;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -81,7 +81,7 @@ public class ParserATNSimulator extends ATNSimulator {
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(TokenStream input, int decision, RuleContext outerContext) {
+	public int adaptivePredict(IntStream input, int decision, RuleContext outerContext) {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
@@ -100,14 +100,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(DFA dfa, TokenStream input,
+	public int predictATN(DFA dfa, IntStream input,
 						  RuleContext outerContext,
 						  boolean useContext)
 	{
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+
-										" exec LA(1)=="+input.LT(1)+
+										" exec LA(1)=="+ getLookaheadName(input) +
 										", outerContext="+outerContext.toString(parser));
 		RuleContext ctx = RuleContext.EMPTY;
 		if ( useContext ) ctx = outerContext;
@@ -133,19 +133,19 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	// doesn't create DFA when matching
-	public int matchATN(TokenStream input, ATNState startState) {
+	public int matchATN(IntStream input, ATNState startState) {
 		DFA dfa = new DFA(startState);
 		RuleContext ctx = RuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
-	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext outerContext) {
+	public int execDFA(IntStream input, DFA dfa, DFAState s0, RuleContext outerContext) {
 //		dump(dfa);
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" exec LA(1)=="+input.LT(1)+
+											" exec LA(1)=="+ getLookaheadName(input) +
 											", outerContext="+outerContext.toString(parser));
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
@@ -180,8 +180,9 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("no edge for "+t);
 				int alt = -1;
 				if ( dfa_debug ) {
+
 					System.out.println("ATN exec upon "+
-									   input.toString(start,input.index())+
+									   getInputString(input, start) +
 									   " at DFA state "+s.stateNumber);
 				}
 				try {
@@ -228,13 +229,23 @@ public class ParserATNSimulator extends ATNSimulator {
 		return prevAcceptState.prediction;
 	}
 
-	public int execATN(TokenStream input,
+	public String getInputString(IntStream input, int start) {
+		if ( input instanceof TokenStream ) {
+			return ((TokenStream)input).toString(start,input.index());
+		}
+		else if ( input instanceof ASTNodeStream) {
+			return ((ASTNodeStream)input).toString(start,input.index());
+		}
+		return "n/a";
+	}
+
+	public int execATN(IntStream input,
 					   DFA dfa,
 					   int startIndex,
 					   OrderedHashSet<ATNConfig> s0,
 					   boolean useContext)
 	{
-		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+input.LT(1));
+		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
 		ATN_failover++;
 		OrderedHashSet<ATNConfig> closure = new OrderedHashSet<ATNConfig>();
 
@@ -281,7 +292,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					String rname = "n/a";
 					if ( parser !=null ) rname = parser.getRuleNames()[loc.ruleIndex];
 					System.out.println("AMBIG dec "+dfa.decision+" in "+rname+" for alt "+ambigAlts+" upon "+
-									   input.toString(startIndex, input.index()));
+									   getInputString(input, startIndex));
 					System.out.println("REACH="+reach);
 				}
 				dfa.conflict = true; // at least one DFA state is ambiguous
@@ -351,7 +362,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		} while ( true );
 
 		if ( prevAccept==null ) {
-			System.out.println("no viable token at input "+input.LT(1)+", index "+input.index());
+			System.out.println("no viable token at input "+ getLookaheadName(input) +", index "+input.index());
 			NoViableAltException nvae = new NoViableAltException(parser, input, closure, outerContext);
 			nvae.startIndex = startIndex;
 			throw nvae;
@@ -382,7 +393,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return exitAlt;
 	}
 
-	public int retryWithContext(TokenStream input,
+	public int retryWithContext(IntStream input,
 								DFA dfa,
 								int startIndex,
 								RuleContext originalContext,
@@ -395,7 +406,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		retry_with_context++;
 		int old_k = input.index();
 		// retry using context, if any; if none, kill all but min as before
-		if ( debug ) System.out.println("RETRY "+input.toString(startIndex, input.index())+
+		if ( debug ) System.out.println("RETRY "+ getInputString(input, startIndex) +
 										" with ctx="+ originalContext);
 		int min = getMinAlt(ambigAlts);
 		if ( originalContext==RuleContext.EMPTY ) {
@@ -784,6 +795,11 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( t==-1 ) return "EOF";
 		if ( parser!=null && parser.getTokenNames()!=null ) return parser.getTokenNames()[t]+"<"+t+">";
 		return String.valueOf(t);
+	}
+
+	public String getLookaheadName(IntStream input) {
+		if ( input.LA(1)==Token.EOF ) return "EOF";
+		return parser.getTokenNames()[input.LA(1)];
 	}
 
 	public void setContextSensitive(boolean ctxSensitive) {

@@ -233,6 +233,19 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("a b\n", found);
 	}
 
+	@Test public void testPositiveClosureSingleToken() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID ID -> ID+ ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a b", debug);
+		assertEquals("a b\n", found);
+	}
+
 	@Test public void testOptionalSingleRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +

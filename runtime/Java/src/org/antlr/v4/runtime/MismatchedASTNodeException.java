@@ -26,14 +26,21 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.antlr.v4.runtime;
 
-package org.antlr.v4.runtime.atn;
-
-/** Start of (A|B|...)+ loop. Technically a decision state, but
- *  we don't use for code generation; somebody might need it, so I'm defining
- *  it for completeness. In reality, the PlusLoopbackState node is the
- *  real decision-making note for A+
+/**
  */
-public class PlusBlockStartState extends BlockStartState {
-	public PlusLoopbackState loopBackState;
+public class MismatchedASTNodeException extends RecognitionException {
+	public MismatchedASTNodeException() {
+	}
+
+	public MismatchedASTNodeException(BaseRecognizer recognizer,
+									  IntStream input, int firstSet)
+	{
+		super(recognizer, input, recognizer._ctx);
+	}
+
+	public String toString() {
+		return "MismatchedTreeNodeException("+getUnexpectedType()+"!="+expecting+")";
+	}
 }

@@ -649,21 +649,34 @@ labeledElement
 // will walk of course. Alts for trees therefore start with ^( XXX, which
 // says we will see a root node of XXX then DOWN etc
 treeSpec
-    : TREE_BEGIN
+@after {
+	GrammarAST down = new DownAST(DOWN_TOKEN, $begin);
+	GrammarAST up = new UpAST(UP_TOKEN, $begin);
+	int i = 1; // skip root element
+	GrammarAST p = (GrammarAST)$tree.getChild(i);
+	while ( p.getType()==ACTION || p.getType()==SEMPRED ) {
+		i++;
+		p = (GrammarAST)$tree.getChild(i);
+	}
+	$tree.insertChild(i, down); // ADD DOWN
+	i = $tree.getChildCount()-1;
+	p = (GrammarAST)$tree.getChild(i);
+	while ( p.getType()==ACTION || p.getType()==SEMPRED ) {
+		i--;
+		p = (GrammarAST)$tree.getChild(i);
+	}
+	$tree.insertChild(i+1, up); // ADD UP
+}
+    : begin=TREE_BEGIN
          // Only a subset of elements are allowed to be a root node. However
          // we allow any element to appear here and reject silly ones later
          // when we walk the AST.
          root=element
          // After the tree root we get the usual suspects,
-         // all members of the element set
+         // all members of the element set.
          (kids+=element)+
       RPAREN
-      -> ^(TREE_BEGIN
-      		$root
-      		DOWN_TOKEN<DownAST>[$TREE_BEGIN]
-      		$kids+
-     		UP_TOKEN<UpAST>[$TREE_BEGIN]
-   		)
+      -> ^( TREE_BEGIN<TreePatternAST> $root $kids+ )
     ;
 
 // A block of gramamr structure optionally followed by standard EBNF

@@ -32,6 +32,8 @@ package org.antlr.v4.runtime.atn;
 import java.util.*;
 
 public class ATNState {
+	public static final int INITIAL_NUM_TRANSITIONS = 4;
+
 	// constants for serialization
 	public static final int BASIC = 1;
 	public static final int RULE_START = 2;
@@ -79,15 +81,17 @@ public class ATNState {
 
 	public int stateNumber = INVALID_STATE_NUMBER;
 
-//	public Rule rule;
 	public int ruleIndex; // at runtime, we don't have Rule objects
 
 	/** Which ATN are we in? */
 	public ATN atn = null;
 
-	/** ATN state is associated with which node in AST? */
-//	public GrammarAST ast;
-	public Transition transition;
+	//public Transition transition;
+
+	/** Track the transitions emanating from this ATN state. */
+	protected List<Transition> transitions =
+		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
+
 	/** For o-A->o type ATN tranitions, record the label that leads to this
 	 *  state.  Useful for creating rich error messages when we find
 	 *  insufficiently (with preds) covered states.
@@ -109,31 +113,22 @@ public class ATNState {
 		return String.valueOf(stateNumber);
 	}
 
-	public int getNumberOfTransitions() {
-		if ( transition!=null ) return 1;
-		return  0;
-	}
+	public int getNumberOfTransitions() { return transitions.size(); }
 
-	public void addTransition(Transition e) {
-		if ( transition!=null ) throw new IllegalArgumentException("only one transition in state type "+
-																   getClass().getSimpleName());
-		transition = e;
-	}
+	public void addTransition(Transition e) { transitions.add(e); }
 
-	public Transition transition(int i) {
-		if ( i>0 ) throw new IllegalArgumentException("only one transition"+
-													  getClass().getSimpleName());
-		return transition;
+	public Transition transition(int i) { return transitions.get(i); }
+
+	public void setTransition(int i, Transition e) {
+		transitions.set(i, e);
 	}
 
 	public boolean onlyHasEpsilonTransitions() {
-		return transition!=null && transition.isEpsilon();
-	}
-
-	public void setTransition(int i, Transition e) {
-		if ( i>0 ) throw new IllegalArgumentException("only one transition"+
-													  getClass().getSimpleName());
-		transition = e;
+		if ( transitions==null ) return false;
+		for (Transition t : transitions) {
+			if ( !t.isEpsilon() ) return false;
+		}
+		return true;
 	}
 
 	public void setRuleIndex(int ruleIndex) { this.ruleIndex = ruleIndex; }

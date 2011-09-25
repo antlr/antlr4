@@ -38,9 +38,6 @@ public class ActionAST extends GrammarAST {
     // Alt, rule, grammar space
     public AttributeResolver resolver;
 	public List<Token> chunks; // useful for ANTLR IDE developers
-	/** In which alt does this node live? */
-//	public Alternative alt;
-
 
 	public ActionAST(GrammarAST node) {
 		super(node);
