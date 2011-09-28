@@ -29,12 +29,16 @@
 
 package org.antlr.v4.automata;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.TreePatternAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Build ATNs for tree grammars */
 public class TreeParserATNFactory extends ParserATNFactory {
@@ -60,9 +64,8 @@ public class TreeParserATNFactory extends ParserATNFactory {
 
 			if ( look.member(Token.UP) ) {
 				// nullable child list if we can see the UP as the next token.
-				// convert r DN kids UP to r (DN kids UP)?; leave AST
+				// convert r DN kids UP to r (DN kids UP)?; leave AST alone--
 				// that drives code gen. This just affects analysis
-				root.isNullable = true;
 				epsilon(downStates.get(i), upTargetStates.get(i));
 			}
 		}
@@ -75,15 +78,17 @@ public class TreeParserATNFactory extends ParserATNFactory {
 	 *  Elems are [root, DOWN_TOKEN, x, y, UP_TOKEN]
 	 */
 	public Handle tree(GrammarAST node, List<Handle> els) {
-		Handle h = elemList(els);
+		TreePatternAST root = (TreePatternAST) node;
 
-		treePatternRootNodes.add((TreePatternAST)node);
+		Handle h = elemList(els);
+		treePatternRootNodes.add(root);
 		// find DOWN node then first child
 		for (Handle elh : els) {
 			Transition trans = elh.left.transition(0);
 			if ( !trans.isEpsilon() && trans.label().member(Token.DOWN) ) {
 				ATNState downState = elh.left;
 				downStates.add(downState);
+				root.downState = downState;
 				firstChildStates.add(downState.transition(0).target);
 				break;
 			}
@@ -93,6 +98,7 @@ public class TreeParserATNFactory extends ParserATNFactory {
 			Transition trans = elh.left.transition(0);
 			if ( trans instanceof AtomTransition && trans.label().member(Token.UP) ) {
 				ATNState upTargetState = elh.right;
+				root.upState = elh.left;
 				upTargetStates.add(upTargetState);
 				break;
 			}

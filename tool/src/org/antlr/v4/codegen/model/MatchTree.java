@@ -31,8 +31,13 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.LL1Analyzer;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.TreePatternAST;
 
 import java.util.List;
 
@@ -49,7 +54,7 @@ public class MatchTree extends RuleElement {
 	public MatchTree(OutputModelFactory factory, GrammarAST ast, List<? extends SrcOp> elems) {
 		super(factory, ast);
 		TreePatternAST rootNode = (TreePatternAST)ast;
-		this.isNullable = rootNode.isNullable;
+		this.isNullable = isNullable(rootNode);
 		List<? extends SrcOp> afterRoot = elems.subList(1, elems.size());
 		int downIndex =
 			Utils.indexOf(afterRoot, new Utils.Filter<SrcOp>() {
@@ -70,6 +75,14 @@ public class MatchTree extends RuleElement {
 		leftActions = elems.subList(1, downIndex);
 		rightActions = elems.subList(upIndex+1, elems.size());
 		this.kids = elems.subList(downIndex+1, upIndex);
+	}
+
+	boolean isNullable(TreePatternAST rootNode) {
+		ATNState firstChildState = rootNode.downState.transition(0).target;
+		LL1Analyzer analyzer = new LL1Analyzer(firstChildState.atn);
+		IntervalSet look = analyzer.LOOK(firstChildState, RuleContext.EMPTY);
+		System.out.println(rootNode.toStringTree()+"==nullable? "+look.member(Token.UP));
+		return look.member(Token.UP);
 	}
 
 }

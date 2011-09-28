@@ -30,9 +30,12 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.atn.ATNState;
 
 public class TreePatternAST extends GrammarAST {
-	public boolean isNullable;
+	/** Record ATN DN, UP nodes so we can find easily later */
+	public ATNState downState;
+	public ATNState upState;
 
 	public TreePatternAST(Token t) {
 		super(t);

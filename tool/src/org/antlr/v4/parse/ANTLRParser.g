@@ -665,7 +665,8 @@ treeSpec
 		i--;
 		p = (GrammarAST)$tree.getChild(i);
 	}
-	$tree.insertChild(i+1, up); // ADD UP
+	if ( i+1 >= $tree.getChildCount() ) $tree.addChild(up);
+   	else $tree.insertChild(i+1, up); // ADD UP
 }
     : begin=TREE_BEGIN
          // Only a subset of elements are allowed to be a root node. However
