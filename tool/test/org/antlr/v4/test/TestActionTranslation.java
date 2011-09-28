@@ -1,12 +1,6 @@
 package org.antlr.v4.test;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.automata.*;
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.*;
 import org.junit.Test;
-import org.stringtemplate.v4.*;
 
 /** */
 public class TestActionTranslation extends BaseTest {
@@ -407,43 +401,4 @@ public class TestActionTranslation extends BaseTest {
 	}
 
 	// TODO: nonlocal $rule::x
-
-
-	public void testActions(String templates, String actionName, String action, String expected) {
-		int lp = templates.indexOf('(');
-		String name = templates.substring(0, lp);
-		STGroup group = new STGroupString(templates);
-		ST st = group.getInstanceOf(name);
-		st.add(actionName, action);
-		String grammar = st.render();
-		try {
-			ErrorQueue equeue = new ErrorQueue();
-			Grammar g = new Grammar(grammar);
-			if ( g.ast!=null && !g.ast.hasErrors ) {
-				SemanticPipeline sem = new SemanticPipeline(g);
-				sem.process();
-
-				ATNFactory factory = new ParserATNFactory(g);
-				if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
-				g.atn = factory.createATN();
-
-				CodeGenerator gen = new CodeGenerator(g);
-				ST outputFileST = gen.generateParser();
-				String output = outputFileST.render();
-				//System.out.println(output);
-				String b = "#" + actionName + "#";
-				int start = output.indexOf(b);
-				String e = "#end-" + actionName + "#";
-				int end = output.indexOf(e);
-				String snippet = output.substring(start+b.length(),end);
-				assertEquals(expected, snippet);
-			}
-			if ( equeue.size()>0 ) {
-				System.err.println(equeue.toString(g.tool));
-			}
-		}
-		catch (RecognitionException re) {
-			re.printStackTrace(System.err);
-		}
-	}
 }

@@ -30,17 +30,27 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.*;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.Rule;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupString;
 
-import javax.tools.*;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import java.io.*;
 import java.util.*;
 
@@ -662,7 +672,7 @@ public abstract class BaseTest {
 			msg = msg.replaceAll("\t","\\\\t");
 
 			// ignore error number
-			expect = stripErrorNum(expect);
+			if ( expect!=null ) expect = stripErrorNum(expect);
 			actual = stripErrorNum(actual);
             assertEquals("error in: "+msg,expect,actual);
         }
@@ -754,6 +764,44 @@ public abstract class BaseTest {
 
 		//System.out.print(result);
 		assertEquals(expecting, result);
+	}
+
+	public void testActions(String templates, String actionName, String action, String expected) {
+		int lp = templates.indexOf('(');
+		String name = templates.substring(0, lp);
+		STGroup group = new STGroupString(templates);
+		ST st = group.getInstanceOf(name);
+		st.add(actionName, action);
+		String grammar = st.render();
+		try {
+			ErrorQueue equeue = new ErrorQueue();
+			Grammar g = new Grammar(grammar);
+			if ( g.ast!=null && !g.ast.hasErrors ) {
+				SemanticPipeline sem = new SemanticPipeline(g);
+				sem.process();
+
+				ATNFactory factory = new ParserATNFactory(g);
+				if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+				g.atn = factory.createATN();
+
+				CodeGenerator gen = new CodeGenerator(g);
+				ST outputFileST = gen.generateParser();
+				String output = outputFileST.render();
+				//System.out.println(output);
+				String b = "#" + actionName + "#";
+				int start = output.indexOf(b);
+				String e = "#end-" + actionName + "#";
+				int end = output.indexOf(e);
+				String snippet = output.substring(start+b.length(),end);
+				assertEquals(expected, snippet);
+			}
+			if ( equeue.size()>0 ) {
+				System.err.println(equeue.toString(g.tool));
+			}
+		}
+		catch (org.antlr.runtime.RecognitionException re) {
+			re.printStackTrace(System.err);
+		}
 	}
 
 	public static class StreamVacuum implements Runnable {

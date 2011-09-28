@@ -27,12 +27,13 @@
  */
 package org.antlr.v4.test;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.*;
 import org.junit.Test;
 
 /** Test the tree node stream. */
-public class TestTreeNodeStream extends BaseTest {
+public class TestASTNodeStream extends BaseTest {
 	public static final String DN = " "+Token.DOWN+" ";
 	public static final String UP = " "+Token.UP;
 
