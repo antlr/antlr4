@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
@@ -59,13 +60,13 @@ public class LL1Analyzer {
 		return look;
 	}
 
-	public IntervalSet LOOK(ATNState s, RuleContext ctx) {
+	public IntervalSet LOOK(ATNState s, @Nullable RuleContext ctx) {
 		IntervalSet r = new IntervalSet();
 		_LOOK(s, ctx, r, new HashSet<ATNConfig>());
 		return r;
 	}
 
-	protected void _LOOK(ATNState s, RuleContext ctx, IntervalSet look,
+	protected void _LOOK(ATNState s, @Nullable RuleContext ctx, IntervalSet look,
 						 Set<ATNConfig> lookBusy) {
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
 		ATNConfig c = new ATNConfig(s, 0, ctx);

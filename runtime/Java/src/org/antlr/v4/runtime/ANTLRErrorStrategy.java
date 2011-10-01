@@ -17,6 +17,8 @@ package org.antlr.v4.runtime;
  *  can be shared between multiple parsers running at the same time.
  *  This is just for flexibility, not that we need it for the default system.
  *
+ *  TODO: To bail out upon first error, simply rethrow e?
+ *
  *  TODO: what to do about lexers
  */
 public interface ANTLRErrorStrategy {
@@ -40,8 +42,6 @@ public interface ANTLRErrorStrategy {
 	 *  Because we can recover from a single token deletions by
 	 *  "inserting" tokens, we need to specify what that implicitly created
 	 *  token is. We use object, because it could be a tree node.
-	 *
-	 *  To bail out upon first error, simply rethrow e.
 	 */
 	Object recoverInline(BaseRecognizer recognizer)
 		throws RecognitionException;
@@ -49,13 +49,36 @@ public interface ANTLRErrorStrategy {
 	/** Resynchronize the parser by consuming tokens until we find one
 	 *  in the resynchronization set--loosely the set of tokens that can follow
 	 *  the current rule.
-	 *
-	 *  To bail out upon first error, simply rethrow e.
 	 */
 	void recover(BaseRecognizer recognizer);
 
+	/** Implement Jim Idle's magic sync mechanism in closures and optional
+	 *  subrules. E.g.,
+	 *
+	 * 		a : sync ( stuff sync )* ;
+	 * 		sync : {consume to what can follow sync} ;
+	 *
+	 *  Previous versions of ANTLR did a poor job of their recovery within
+	 *  loops. A single mismatch token or missing token would force the parser
+	 *  to bail out of the entire rules surrounding the loop. So, for rule
+	 *
+	 *  classDef : 'class' ID '{' member* '}'
+	 *
+	 *  input with an extra token between members would force the parser to
+	 *  consume until it found the next class definition rather than the
+	 *  next member definition of the current class.
+	 *
+	 *  This functionality cost a little bit of effort because the parser
+	 *  has to compare token set at the start of the loop and add each
+	 *  iteration. If for some reason speed is suffering for you, you can
+	 *  turn off this functionality by simply overriding this method as
+	 *  a blank { }.
+	 */
+	void sync(BaseRecognizer recognizer);
+
 	/** Reset the error handler. The parser invokes this
-	 *  from its own reset method.
+	 *  when it matches a valid token (indicating no longer in recovery mode)
+	 *  and from its own reset method.
 	 */
 	void reset();
 }

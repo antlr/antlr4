@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.*;
 
@@ -69,6 +70,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	/** reset the parser's state */
 	public void reset() {
 		if ( getInputStream()!=null ) getInputStream().seek(0);
+		_errHandler.reset();
 		errorRecovery = false;
 		_ctx = null;
 	}
@@ -91,6 +93,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		if ( getInputStream().LA(1)==ttype ) {
 			getInputStream().consume();
 			errorRecovery = false;
+			_errHandler.reset();
 			if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
 			return matchedSymbol;
 		}
@@ -219,7 +222,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		syntaxErrors++; // don't count spurious
 		errorRecovery = true;
 
-		notifyListeners(e.line, e.charPositionInLine, e.getMessage());
+		notifyListeners(e.line, e.charPositionInLine, e.getMessage(), e);
 	}
 
 
@@ -516,13 +519,15 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 */
 	protected Object getCurrentInputSymbol() { return null; }
 
-	public void notifyListeners(int line, int charPositionInLine, String msg) {
+	public void notifyListeners(int line, int charPositionInLine, String msg,
+							   @Nullable RecognitionException e)
+	{
 		if ( _listeners==null || _listeners.size()==0 ) {
 			emitErrorMessage("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
 		for (ANTLRParserListener pl : _listeners) {
-			pl.error(line, charPositionInLine, msg);
+			pl.error(this, line, charPositionInLine, msg, e);
 		}
 	}
 

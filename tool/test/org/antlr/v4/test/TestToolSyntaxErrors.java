@@ -2,7 +2,7 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
-public class TestSyntaxErrors extends BaseTest {
+public class TestToolSyntaxErrors extends BaseTest {
     static String[] A = {
         // INPUT
         "grammar A;\n" +

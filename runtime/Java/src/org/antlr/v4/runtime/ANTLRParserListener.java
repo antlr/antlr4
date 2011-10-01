@@ -29,7 +29,13 @@
 
 package org.antlr.v4.runtime;
 
+import com.sun.istack.internal.Nullable;
+
 /** */
 public interface ANTLRParserListener {
-	public void error(int line, int charPositionInLine, String msg);
+	public void error(BaseRecognizer recognizer,
+					  int line,
+					  int charPositionInLine,
+					  String msg,
+					  @Nullable RecognitionException e);
 }
