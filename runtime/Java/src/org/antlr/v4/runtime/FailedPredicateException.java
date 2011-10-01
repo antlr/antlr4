@@ -40,6 +40,11 @@ public class FailedPredicateException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public FailedPredicateException() {;}
 
+	public FailedPredicateException(BaseRecognizer recognizer, String predText) {
+		super(recognizer);
+		this.predicateText = predText;
+	}
+
 	public FailedPredicateException(BaseRecognizer  recognizer,
 									IntStream input,
 									String ruleName,

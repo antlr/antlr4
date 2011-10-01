@@ -63,21 +63,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 */
 	protected boolean errorRecovery = false;
 
-	/** The index into the input stream where the last error occurred.
-	 * 	This is used to prevent infinite loops where an error is found
-	 *  but no token is consumed during recovery...another error is found,
-	 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
-	 *  one token/tree node is consumed for two errors.
-	 */
-	protected int lastErrorIndex = -1;
-
-	/** In lieu of a return value, this indicates that a rule or token
-	 *  has failed to match.  Reset to false upon valid token match.
-	 */
-//	protected boolean failed = false;
-
 	/** Did the recognizer encounter a syntax error?  Track how many. */
-	public int syntaxErrors = 0;
+	protected int syntaxErrors = 0;
 
 	public BaseRecognizer(IntStream input) {
 		setInputStream(input);
@@ -88,8 +75,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		if ( getInputStream()!=null ) getInputStream().seek(0);
 		errorRecovery = false;
 		_ctx = null;
-		lastErrorIndex = -1;
-//		failed = false;
 	}
 
 	/** Match current input symbol against ttype.  Attempt
@@ -102,6 +87,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
      *  This way any error in a rule will cause an exception and
      *  immediate exit from rule.  Rule would recover by resynchronizing
      *  to the set of symbols that can follow rule ref.
+	 *  TODO: mv into Parser etc... to get more precise return value/efficiency
 	 */
 	public Object match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
@@ -109,18 +95,18 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		if ( getInputStream().LA(1)==ttype ) {
 			getInputStream().consume();
 			errorRecovery = false;
-//			failed = false;
 			if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
 			return matchedSymbol;
 		}
+		return _errHandler.recoverInline(this);
 //		System.out.println("MATCH failure at state "+_ctx.s+
 //			", ctx="+_ctx.toString(this));
-		IntervalSet expecting = _interp.atn.nextTokens(_ctx);
+//		IntervalSet expecting = _interp.atn.nextTokens(_ctx);
 //		System.out.println("could match "+expecting);
 
-		matchedSymbol = recoverFromMismatchedToken(ttype, expecting);
+//		matchedSymbol = recoverFromMismatchedToken(ttype, expecting);
 //		System.out.println("rsync'd to "+matchedSymbol);
-		return matchedSymbol;
+//		return matchedSymbol;
 	}
 
 	// like matchSet but w/o consume; error checking routine.
@@ -129,7 +115,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 //		System.out.println("failed sync to "+expecting);
 		IntervalSet followSet = computeErrorRecoverySet();
 		followSet.addAll(expecting);
-		NoViableAltException e = new NoViableAltException(this, _ctx);
+		NoViableAltException e = new NoViableAltException(this);
 		recoverFromMismatchedSet(e, followSet);
 	}
 
@@ -237,7 +223,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		syntaxErrors++; // don't count spurious
 		errorRecovery = true;
 
-		notifyListeners(e);
+		notifyListeners(e.line, e.charPositionInLine, e.getMessage());
 	}
 
 
@@ -275,15 +261,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		consumeUntil(followSet);
 		endResync();
 		*/
-	}
-
-	/** A hook to listen in on the token consumption during error recovery.
-	 *  The DebugParser subclasses this to fire events to the listenter.
-	 */
-	public void beginResync() {
-	}
-
-	public void endResync() {
 	}
 
 	/*  Compute the error recovery set for the current rule.  During
@@ -498,9 +475,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 							   ((TokenStream)input).LT(1)+
 							   " since "+((TokenStream)input).LT(2)+" is what we want");
 							   */
-			beginResync();
 			getInputStream().consume(); // simply delete extra token
-			endResync();
 			reportError(e);  // report after consuming so AW sees the token in the exception
 			// we want to return the token we're actually matching
 			Object matchedSymbol = getCurrentInputSymbol();
@@ -545,6 +520,15 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 */
 	protected Object getCurrentInputSymbol() { return null; }
 
+	public void notifyListeners(int line, int charPositionInLine, String msg) {
+		if ( _listeners==null || _listeners.size()==0 ) {
+			emitErrorMessage("line "+line+":"+charPositionInLine+" "+msg);
+			return;
+		}
+		for (ANTLRParserListener pl : _listeners) {
+			pl.error(line, charPositionInLine, msg);
+		}
+	}
 
 	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
 		_ctx = localctx;

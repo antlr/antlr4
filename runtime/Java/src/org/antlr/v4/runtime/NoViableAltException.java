@@ -41,8 +41,8 @@ public class NoViableAltException extends RecognitionException {
 	/** Used for remote debugger deserialization */
 	public NoViableAltException() {;}
 
-	public NoViableAltException(BaseRecognizer recognizer, RuleContext ctx) { // LL(1) error
-		super(recognizer, recognizer.getInputStream(), ctx);
+	public NoViableAltException(BaseRecognizer recognizer) { // LL(1) error
+		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
 	}
 
 	public NoViableAltException(BaseRecognizer recognizer, IntStream input,

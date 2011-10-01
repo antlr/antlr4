@@ -312,6 +312,11 @@ public class ErrorManager {
         e.printStackTrace(System.err);
     }
 
+	public static void panic(String msg) {
+		rawError(msg);
+		panic();
+	}
+
     public static void panic() {
         // can't call tool.panic since there may be multiple tools; just
         // one error manager

@@ -36,7 +36,8 @@ import java.util.*;
 public class Recognizer<ATNInterpreter> {
 	public static final int EOF=-1;
 
-	protected List<ANTLRParserListener> listeners;
+	protected ANTLRErrorStrategy _errHandler = new DefaultANTLRErrorStrategy();
+	protected List<ANTLRParserListener> _listeners;
 
 	protected ATNInterpreter _interp;
 
@@ -195,27 +196,22 @@ public class Recognizer<ATNInterpreter> {
 	}
 
 	public void addListener(ANTLRParserListener pl) {
-		if ( listeners==null ) {
-			listeners =
+		if ( _listeners ==null ) {
+			_listeners =
 				Collections.synchronizedList(new ArrayList<ANTLRParserListener>(2));
 		}
-		if ( pl!=null ) listeners.add(pl);
+		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeListener(ANTLRParserListener pl) { listeners.remove(pl); }
+	public void removeListener(ANTLRParserListener pl) { _listeners.remove(pl); }
 
-	public void removeListeners() { listeners.clear(); }
+	public void removeListeners() { _listeners.clear(); }
 
-	public List<ANTLRParserListener> getListeners() { return listeners; }
+	public List<ANTLRParserListener> getListeners() { return _listeners; }
 
-	public void notifyListeners(RecognitionException re) {
-		if ( listeners==null || listeners.size()==0 ) {
-			// call legacy v3 func; this calls emitErrorMessage(String msg)
-			displayRecognitionError(re);
-			return;
-		}
-		for (ANTLRParserListener pl : listeners) pl.error(re);
-	}
+	public ANTLRErrorStrategy getErrHandler() { return _errHandler; }
+
+	public void setErrHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute

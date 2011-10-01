@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
+import com.sun.org.apache.regexp.internal.RE;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.*;
 
@@ -108,6 +109,10 @@ public class RecognitionException extends RuntimeException {
 	public RecognitionException() {
 	}
 
+	public RecognitionException(BaseRecognizer recognizer) {
+		this(recognizer, recognizer.getInputStream(), recognizer._ctx);
+	}
+
 	public RecognitionException(BaseRecognizer recognizer, IntStream input,
 								RuleContext ctx)
 	{
@@ -126,7 +131,7 @@ public class RecognitionException extends RuntimeException {
 			this.line = token.getLine();
 			this.charPositionInLine = token.getCharPositionInLine();
 		}
-		if ( input instanceof ASTNodeStream) {
+		else if ( input instanceof ASTNodeStream) {
 			//extractInformationFromTreeNodeStream(input);
 		}
 		else {

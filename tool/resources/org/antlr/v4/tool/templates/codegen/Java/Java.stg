@@ -197,8 +197,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
         <namedActions.after>
 	}
 	catch (RecognitionException re) {
-		reportError(re);
-		recover();
+		_errHandler.reportError(this, re);
+		_errHandler.recover(this);
 	}
 	finally {
         <finallyAction>
@@ -313,8 +313,6 @@ switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
 case <i>:
 	<alt>
 	break;}; separator="\n">
-	default :
-		<error>
 }
 >>
 
@@ -359,7 +357,7 @@ case <i>:
 
 Sync(s) ::= "sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this,_ctx);"
+ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
 <s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
@@ -411,7 +409,7 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
 <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_input.LT(1);
 <capture>
-if ( <if(!invert)>!<endif>(<expr>) ) throw new MismatchedSetException(this, _input);
+if ( <if(!invert)>!<endif>(<expr>) ) throw new InputMismatchedException(this);
 _input.consume();
 >>
 
@@ -429,7 +427,7 @@ ForcedAction(a, chunks) ::= "<chunks>"
 ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks) ::= <<
-if (!(<chunks>)) throw new FailedPredicateException(this, _input, "<currentRule.name>", ""<!"<chunks>"!>);
+if (!(<chunks>)) throw new FailedPredicateException(this, "");
 >>
 
 ActionText(t) ::= "<t.text>"

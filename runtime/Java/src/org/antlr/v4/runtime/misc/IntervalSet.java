@@ -466,7 +466,10 @@ public class IntervalSet implements IntSet {
 				else buf.append(tokenNames[a]);
 			}
 			else {
-				buf.append(tokenNames[a]+".."+tokenNames[b]);
+				for (int i=a; i<=b; i++) {
+					if ( i>a ) buf.append(", ");
+					buf.append(tokenNames[i]);
+				}
 			}
 			if ( iter.hasNext() ) {
 				buf.append(", ");
@@ -477,55 +480,6 @@ public class IntervalSet implements IntSet {
 		}
 		return buf.toString();
 	}
-
-	/*
-    public String toString(Grammar g) {
-        StringBuffer buf = new StringBuffer();
-		if ( this.intervals==null || this.intervals.size()==0 ) {
-			return "{}";
-		}
-        if ( this.size()>1 ) {
-            buf.append("{");
-        }
-        Iterator iter = this.intervals.iterator();
-        while (iter.hasNext()) {
-            Interval I = (Interval) iter.next();
-            int a = I.a;
-            int b = I.b;
-            if ( a==b ) {
-                if ( g!=null ) {
-                    buf.append(g.getTokenDisplayName(a));
-                }
-                else {
-                    buf.append(a);
-                }
-            }
-            else {
-				if ( g!=null ) {
-					if ( !g.isLexer() ) {
-						for (int i=a; i<=b; i++) {
-							if ( i>a ) buf.append(", ");
-							buf.append(g.getTokenDisplayName(i));
-						}
-					}
-					else {
-						buf.append(g.getTokenDisplayName(a)+".."+g.getTokenDisplayName(b));
-					}
-				}
-				else {
-					buf.append(a+".."+b);
-				}
-            }
-            if ( iter.hasNext() ) {
-                buf.append(", ");
-            }
-        }
-        if ( this.size()>1 ) {
-            buf.append("}");
-        }
-        return buf.toString();
-    }
-    */
 
     public int size() {
 		int n = 0;

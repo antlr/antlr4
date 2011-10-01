@@ -36,7 +36,7 @@ import org.antlr.v4.tool.GrammarAST;
 import java.util.List;
 
 public class AltBlock extends Choice {
-	@ModelElement public ThrowNoViableAlt error;
+//	@ModelElement public ThrowNoViableAlt error;
 
 	public AltBlock(OutputModelFactory factory,
 					GrammarAST blkOrEbnfRootAST,
@@ -44,6 +44,7 @@ public class AltBlock extends Choice {
 	{
 		super(factory, blkOrEbnfRootAST, alts);
 		decision = ((BlockStartState)blkOrEbnfRootAST.atnState).decision;
-		this.error = new ThrowNoViableAlt(factory, blkOrEbnfRootAST, null);
+		// interp.predict() throws exception
+//		this.error = new ThrowNoViableAlt(factory, blkOrEbnfRootAST, null);
 	}
 }
