@@ -88,7 +88,7 @@ public class GrammarAST extends CommonTree {
 		GrammarAST t = null;
 		while ( work.size()>0 ) {
 			t = work.remove(0);
-			if ( types.member(t.getType()) ) nodes.add(t);
+			if ( types.contains(t.getType()) ) nodes.add(t);
 			if ( t.children!=null ) work.addAll(t.children);
 		}
 		return nodes;

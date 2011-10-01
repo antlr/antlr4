@@ -28,14 +28,10 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** A generic recognizer that can handle recognizers generated from
  *  parser and tree grammars.  This is all the parsing
@@ -111,7 +107,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	// like matchSet but w/o consume; error checking routine.
 	public void sync(IntervalSet expecting) {
-		if ( expecting.member(getInputStream().LA(1)) ) return;
+		if ( expecting.contains(getInputStream().LA(1)) ) return;
 //		System.out.println("failed sync to "+expecting);
 		IntervalSet followSet = computeErrorRecoverySet();
 		followSet.addAll(expecting);
@@ -582,7 +578,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	public void consumeUntil(IntervalSet set) {
 		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		int ttype = getInputStream().LA(1);
-		while (ttype != Token.EOF && !set.member(ttype) ) {
+		while (ttype != Token.EOF && !set.contains(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
 			getInputStream().consume();
 			ttype = getInputStream().LA(1);

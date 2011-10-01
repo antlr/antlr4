@@ -318,7 +318,7 @@ public class IntervalSet implements IntSet {
 	}
 
     /** Is el in any range of this set? */
-    public boolean member(int el) {
+    public boolean contains(int el) {
 		int n = intervals.size();
 		for (int i = 0; i < n; i++) {
 			Interval I = (Interval) intervals.get(i);

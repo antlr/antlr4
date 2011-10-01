@@ -91,7 +91,7 @@ public class Recognizer<ATNInterpreter> {
 		if ( e instanceof UnwantedTokenException ) {
 			UnwantedTokenException ute = (UnwantedTokenException)e;
 			String tokenName="<unknown>";
-			if ( ute.expecting.member(Token.EOF) ) {
+			if ( ute.expecting.contains(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {
@@ -103,7 +103,7 @@ public class Recognizer<ATNInterpreter> {
 		else if ( e instanceof MissingTokenException ) {
 			MissingTokenException mte = (MissingTokenException)e;
 			String tokenName="<unknown>";
-			if ( mte.expecting.member(Token.EOF) ) {
+			if ( mte.expecting.contains(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {
@@ -126,7 +126,7 @@ public class Recognizer<ATNInterpreter> {
 		else if ( e instanceof MismatchedASTNodeException) {
 			MismatchedASTNodeException mtne = (MismatchedASTNodeException)e;
 			String tokenName="<unknown>";
-			if ( mtne.expecting.member(Token.EOF) ) {
+			if ( mtne.expecting.contains(Token.EOF) ) {
 				tokenName = "EOF";
 			}
 			else {

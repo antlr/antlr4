@@ -31,13 +31,10 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.LL1Analyzer;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.GrammarAST;
-import org.antlr.v4.tool.TreePatternAST;
+import org.antlr.v4.tool.*;
 
 import java.util.List;
 
@@ -81,8 +78,8 @@ public class MatchTree extends RuleElement {
 		ATNState firstChildState = rootNode.downState.transition(0).target;
 		LL1Analyzer analyzer = new LL1Analyzer(firstChildState.atn);
 		IntervalSet look = analyzer.LOOK(firstChildState, RuleContext.EMPTY);
-		System.out.println(rootNode.toStringTree()+"==nullable? "+look.member(Token.UP));
-		return look.member(Token.UP);
+		System.out.println(rootNode.toStringTree()+"==nullable? "+look.contains(Token.UP));
+		return look.contains(Token.UP);
 	}
 
 }

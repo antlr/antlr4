@@ -259,13 +259,13 @@ public class TestIntervalSet extends BaseTest {
     @Test public void testMembership() throws Exception {
         IntervalSet s = IntervalSet.of(15,15);
         s.add(50,60);
-        assertTrue(!s.member(0));
-        assertTrue(!s.member(20));
-        assertTrue(!s.member(100));
-        assertTrue(s.member(15));
-        assertTrue(s.member(55));
-        assertTrue(s.member(50));
-        assertTrue(s.member(60));
+        assertTrue(!s.contains(0));
+        assertTrue(!s.contains(20));
+        assertTrue(!s.contains(100));
+        assertTrue(s.contains(15));
+        assertTrue(s.contains(55));
+        assertTrue(s.contains(50));
+        assertTrue(s.contains(60));
     }
 
     // {2,15,18} & 10..20

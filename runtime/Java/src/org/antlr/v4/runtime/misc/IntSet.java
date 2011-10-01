@@ -70,7 +70,7 @@ public interface IntSet {
 
     int getSingleElement();
 
-    boolean member(int el);
+    boolean contains(int el);
 
     /** remove this element from this set */
     void remove(int el);

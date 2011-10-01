@@ -485,7 +485,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		else if ( trans instanceof SetTransition ) {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
-			if ( !not && st.set.member(ttype) || not && !st.set.member(ttype) ) {
+			if ( !not && st.set.contains(ttype) || not && !st.set.contains(ttype) ) {
 				return st.target;
 			}
 		}

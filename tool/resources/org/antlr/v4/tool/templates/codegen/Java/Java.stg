@@ -409,7 +409,7 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
 <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_input.LT(1);
 <capture>
-if ( <if(!invert)>!<endif>(<expr>) ) throw new InputMismatchedException(this);
+if ( <if(!invert)>!<endif>(<expr>) ) throw new InputMismatchException(this);
 _input.consume();
 >>
 

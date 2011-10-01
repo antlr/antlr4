@@ -1,8 +1,6 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -23,9 +21,12 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	 */
 	protected int lastErrorIndex = -1;
 
+	protected IntervalSet lastErrorStates;
+
 	@Override
 	public void reset() {
 		errorRecovery = false;
+		lastErrorStates = null;
 		lastErrorIndex = -1;
 	}
 
@@ -56,14 +57,18 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	 */
 	@Override
 	public void recover(BaseRecognizer recognizer) {
-		if ( lastErrorIndex==recognizer.getInputStream().index() ) {
-			// uh oh, another error at same token index; must be a case
-			// where LT(1) is in the recovery token set so nothing is
-			// consumed; consume a single token at least to prevent
-			// an infinite loop; this is a failsafe.
+		if ( lastErrorIndex==recognizer.getInputStream().index() &&
+		     lastErrorStates.contains(recognizer._ctx.s) )
+		{
+			// uh oh, another error at same token index and previously-visited
+			// state in ATN; must be a case where LT(1) is in the recovery
+			// token set so nothing got consumed. Consume a single token
+			// at least to prevent an infinite loop; this is a failsafe.
 			recognizer.getInputStream().consume();
 		}
 		lastErrorIndex = recognizer.getInputStream().index();
+		if ( lastErrorStates==null ) lastErrorStates = new IntervalSet();
+		lastErrorStates.add(recognizer._ctx.s);
 		IntervalSet followSet = computeErrorRecoverySet(recognizer);
 		consumeUntil(recognizer, followSet);
 	}
@@ -168,7 +173,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		RecognitionException e = null;
 		// if next token is what we are looking for then "delete" this token
 		int nextTokenType = recognizer.getInputStream().LA(2);
-		if ( expecting.member(nextTokenType) ) {
+		if ( expecting.contains(nextTokenType) ) {
 			reportUnwantedToken(recognizer);
 			System.err.println("recoverFromMismatchedToken deleting "+
 							   ((TokenStream)recognizer.getInputStream()).LT(1)+
@@ -433,7 +438,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	public void consumeUntil(BaseRecognizer recognizer, IntervalSet set) {
 		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
-		while (ttype != Token.EOF && !set.member(ttype) ) {
+		while (ttype != Token.EOF && !set.contains(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
 			recognizer.getInputStream().consume();
 			ttype = recognizer.getInputStream().LA(1);

@@ -27,13 +27,9 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.runtime.misc.IntArray;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /** A buffered stream of tree nodes.  Nodes can be from a tree of ANY kind.
  *
@@ -120,7 +116,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	protected int lastMarker;
 
 	/** Stack of indexes used for push/pop calls */
-	protected IntArray calls;
+	protected List<Integer> calls;
 
 	public BufferedASTNodeStream(Object tree) {
 		this(new CommonASTAdaptor(), tree);
@@ -350,9 +346,9 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	 */
 	public void push(int index) {
 		if ( calls==null ) {
-			calls = new IntArray();
+			calls = new ArrayList<Integer>();
 		}
-		calls.push(p); // save current index
+		calls.add(p); // save current index
 		seek(index);
 	}
 
@@ -360,7 +356,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	 *  Return top of stack (return index).
 	 */
 	public int pop() {
-		int ret = calls.pop();
+		int ret = calls.remove(calls.size() - 1);
 		seek(ret);
 		return ret;
 	}

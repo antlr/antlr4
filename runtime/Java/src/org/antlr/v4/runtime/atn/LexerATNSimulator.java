@@ -291,7 +291,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		else if ( trans instanceof SetTransition ) {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
-			if ( !not && st.set.member(t) || not && !st.set.member(t) ) {
+			if ( !not && st.set.contains(t) || not && !st.set.contains(t) ) {
 //				if ( st.set.toString().equals("0") ) {
 //					System.out.println("eh?");
 //				}
