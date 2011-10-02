@@ -318,24 +318,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 
-	/* In v3, programmers altered error messages by overriding
-	   displayRecognitionError() and possibly getTokenErrorDisplay().
-	   They overrode emitErrorMessage(String) to change where the output goes.
-
-	   Now, in v4, we're going to use a listener mechanism. This makes it
-	   easier for language applications to have parsers notify them
-	   upon error without having to override the parsers. If you don't specify
-	   a listener, ANTLR calls the v3 legacy displayRecognitionError()
-	   method. All that does is format a message and call emitErrorMessage().
-	   Otherwise, your listener will receive RecognitionException
-	   exceptions and you can do what ever you want with them including
-	   reproducing the same behavior by calling the legacy methods.
-	   (In v4, RecognitionException includes the recognizer object).
-
-	   Grammar tools can have a listeners without having to worry about
-	   messing up the programmers' error handling.
-	 */
-
 	public void reportConflict(int startIndex, int stopIndex, Set<Integer> alts,
 							   OrderedHashSet<ATNConfig> configs) {}
 
