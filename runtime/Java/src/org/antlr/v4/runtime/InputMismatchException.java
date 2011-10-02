@@ -6,5 +6,6 @@ package org.antlr.v4.runtime;
 public class InputMismatchException extends RecognitionException {
 	public InputMismatchException(BaseRecognizer recognizer) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
+		this.offendingToken = (Token)recognizer.getCurrentInputSymbol();
 	}
 }

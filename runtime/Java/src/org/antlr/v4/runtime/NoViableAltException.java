@@ -47,8 +47,8 @@ public class NoViableAltException extends RecognitionException {
 
 	public NoViableAltException(BaseRecognizer recognizer) { // LL(1) error
 		this(recognizer,recognizer.getInputStream(),
-			 ((TokenStream)recognizer.getInputStream()).LT(1),
-			 ((TokenStream)recognizer.getInputStream()).LT(1),
+			 (Token)recognizer.getCurrentInputSymbol(),
+			 (Token)recognizer.getCurrentInputSymbol(),
 			 null,
 			 recognizer._ctx);
 	}
