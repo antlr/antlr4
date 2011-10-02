@@ -48,14 +48,10 @@ public interface ANTLRParserListener {
 	 * @param recognizer
 	 * 		  What parser got the error. From this object, you
 	 * 		  can access the context as well as the input stream.
-	 * @param startTokenIndex
-	 * 		  The offending token index in the input token stream.
-	 * 		  If no viable alternative error, it's the token index
+	 * @param offendingToken
+	 * 		  The offending token in the input token stream.
+	 * 		  If no viable alternative error, e has token
 	 * 		  at which we started production for the decision.
-	 * @param stopTokenIndex
-	 * 		  Normally a copy of the offending token index unless we
-	 * 		  found a no viable alternative error. In that case,
-	 * 		  this is the offending token index.
 	 * @param line
 	 * 		  At what line in input to the error occur? This always refers to
 	 * 		  stopTokenIndex
@@ -70,8 +66,7 @@ public interface ANTLRParserListener {
 	 *        surrounding rule.
 	 */
 	public void error(BaseRecognizer recognizer,
-					  int startTokenIndex,
-					  int stopTokenIndex,
+					  Token offendingToken,
 					  int line,
 					  int charPositionInLine,
 					  String msg,

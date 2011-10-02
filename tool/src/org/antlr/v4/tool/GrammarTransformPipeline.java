@@ -375,13 +375,6 @@ public class GrammarTransformPipeline {
 		Map<String,String> litAliases =
 			Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
 
-		if ( nLexicalRules==0 && (litAliases==null||litAliases.size()==0) &&
-			 combinedGrammar.stringLiteralToTypeMap.size()==0 )
-		{
-			// no rules, tokens{}, or 'literals' in grammar
-			return null;
-		}
-
 		Set<String> stringLiterals = combinedGrammar.getStringLiterals();
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
@@ -400,7 +393,8 @@ public class GrammarTransformPipeline {
 			CommonToken idToken = new CommonToken(ANTLRParser.ID, rname);
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
-			lexerRulesRoot.getChildren().add(0, litRule); // add first
+			lexerRulesRoot.insertChild(0, litRule);        // add first
+//			lexerRulesRoot.getChildren().add(0, litRule);
 			lexerRulesRoot.freshenParentAndChildIndexes(); // reset indexes and set litRule parent
 		}
 
@@ -409,11 +403,10 @@ public class GrammarTransformPipeline {
 		combinedAST.sanityCheckParentAndChildIndexes();
 //		System.out.println(combinedAST.toTokenString());
 
-//		lexerAST.freshenParentAndChildIndexesDeeply();
-//		combinedAST.freshenParentAndChildIndexesDeeply();
-
 		System.out.println("after extract implicit lexer ="+combinedAST.toStringTree());
 		System.out.println("lexer ="+lexerAST.toStringTree());
+
+		if ( lexerRulesRoot.getChildCount()==0 )	return null;
 		return lexerAST;
 	}
 }

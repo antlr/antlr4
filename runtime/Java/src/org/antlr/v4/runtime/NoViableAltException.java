@@ -66,14 +66,14 @@ public class NoViableAltException extends RecognitionException {
 		this.offendingToken = offendingToken;
 	}
 
-	public String toString() {
-		if ( recognizer!=null ) {
-			TokenStream tokens = ((Parser)recognizer).getTokenStream();
-			String bad = tokens.toString(startToken.getTokenIndex(),
-										 offendingToken.getTokenIndex());
-			return "NoViableAltException(input=\""+bad+"\" last token type is "+
-					getUnexpectedType()+")";
-		}
-		return "NoViableAltException(last token type is "+getUnexpectedType()+")";
-	}
+//	public String toString() {
+//		if ( recognizer!=null ) {
+//			TokenStream tokens = ((Parser)recognizer).getTokenStream();
+//			String bad = tokens.toString(startToken.getTokenIndex(),
+//										 offendingToken.getTokenIndex());
+//			return "NoViableAltException(input=\""+bad+"\" last token type is "+
+//					getUnexpectedType()+")";
+//		}
+//		return "NoViableAltException(last token type is "+getUnexpectedType()+")";
+//	}
 }

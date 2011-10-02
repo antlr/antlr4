@@ -29,8 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** A generic AST implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
@@ -190,13 +189,13 @@ public abstract class BaseAST implements AST {
 	/** Insert child t at child position i (0..n) by shifting children
 		i+1..n-1 to the right one position. Set parent / indexes properly
 	 	but does NOT collapse nil-rooted t's that come in here like addChild.
-	    Set position i==n to add to end.
+	    Set position i==n to add to end. Add @ 0 in empty list, adds 1st child.
 	 */
 	public void insertChild(int i, BaseAST t) {
 		if (i < 0 || i > getChildCount()) {
 			throw new IndexOutOfBoundsException(i+" out or range");
 		}
-
+		if ( children==null ) children = createChildrenList();
 		children.add(i, t);
 		// walk others to increment their child indexes
 		// set index, parent of this one too

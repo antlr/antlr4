@@ -97,7 +97,7 @@ public class TreeParser extends BaseRecognizer {
 	{
 		String tokenText =
 			"<missing "+getTokenNames()[expectedTokenType]+">";
-        ASTAdaptor adaptor = ((ASTNodeStream)e.input).getTreeAdaptor();
+        ASTAdaptor adaptor = ((ASTNodeStream)e.getInputStream()).getTreeAdaptor();
         return adaptor.create(new CommonToken(expectedTokenType, tokenText));
 	}
 

@@ -124,7 +124,10 @@ public class ParserATNSimulator extends ATNSimulator {
 		try {
 			alt = execATN(input, dfa, m, s0_closure, useContext);
 		}
-		catch (NoViableAltException nvae) {	dumpDeadEndConfigs(nvae); throw nvae; }
+		catch (NoViableAltException nvae) {
+			if ( debug ) dumpDeadEndConfigs(nvae);
+			throw nvae;
+		}
 		finally {
 			input.seek(m);
 		}

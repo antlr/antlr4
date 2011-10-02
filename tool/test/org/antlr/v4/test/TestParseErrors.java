@@ -38,8 +38,7 @@ public class TestParseErrors extends BaseTest {
 			"a : 'a' 'b'" +
 			"  | 'a' 'c'" +
 			";\n" +
-			"q : 'e' ;\n" +
-			"WS : ' ' ;\n";
+			"q : 'e' ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "ae", false);
 		String expecting = "line 1:1 no viable alternative at input 'e'\n";
 		String result = stderrDuringParse;

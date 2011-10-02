@@ -197,17 +197,12 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	{
 		int line = offendingToken.getLine();
 		int charPositionInLine = offendingToken.getCharPositionInLine();
-		int start = offendingToken.getTokenIndex();
-		int stop = start;
-		if ( e instanceof NoViableAltException ) {
-			start = ((NoViableAltException)e).startToken.getTokenIndex();
-		}
 		if ( _listeners==null || _listeners.size()==0 ) {
 			emitErrorMessage("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
 		for (ANTLRParserListener pl : _listeners) {
-			pl.error(this, start, stop, line, charPositionInLine, msg, e);
+			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
