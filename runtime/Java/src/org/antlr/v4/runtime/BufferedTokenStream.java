@@ -65,7 +65,7 @@ public class BufferedTokenStream implements TokenStream {
      */
     protected int p = -1;
 
-	protected int range = -1; // how deep have we gone?
+//	protected int range = -1; // how deep have we gone?
 
     public BufferedTokenStream() {;}
 
@@ -77,7 +77,7 @@ public class BufferedTokenStream implements TokenStream {
 
 	public int index() { return p; }
 
-	public int range() { return range; }
+//	public int range() { return range; }
 
     public int mark() {
         if ( p == -1 ) setup();
@@ -176,7 +176,7 @@ public class BufferedTokenStream implements TokenStream {
             // EOF must be last token
             return tokens.get(tokens.size()-1);
         }
-		if ( i>range ) range = i;
+//		if ( i>range ) range = i;
         return tokens.get(i);
     }
 

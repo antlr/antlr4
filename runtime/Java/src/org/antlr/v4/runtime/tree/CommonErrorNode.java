@@ -99,10 +99,10 @@ public class CommonErrorNode extends CommonAST {
 				   ", resync="+getText()+">";
 		}
 		else if ( trappedException instanceof MismatchedTokenException ) {
-			return "<mismatched token: "+trappedException.token+", resync="+getText()+">";
+			return "<mismatched token: "+trappedException.offendingToken +", resync="+getText()+">";
 		}
 		else if ( trappedException instanceof NoViableAltException ) {
-			return "<unexpected: "+trappedException.token+
+			return "<unexpected: "+trappedException.offendingToken +
 				   ", resync="+getText()+">";
 		}
 		return "<error: "+getText()+">";

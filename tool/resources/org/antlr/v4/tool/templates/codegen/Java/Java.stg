@@ -86,8 +86,10 @@ public <file.ASTLabelType> match(int ttype) throws RecognitionException {
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class <parser.name> extends <parser.superclass> {
+    <if(parser.tokens)>
     public static final int
         <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
+    <endif>
     public static final String[] tokenNames = {
         "\<INVALID>", "\<INVALID>", "\<INVALID>",
         <parser.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>

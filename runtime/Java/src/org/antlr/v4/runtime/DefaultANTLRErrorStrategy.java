@@ -47,7 +47,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		else {
 			System.err.println("unknown recognition error type: "+e.getClass().getName());
 			if ( recognizer!=null ) {
-				recognizer.notifyListeners(e.line, e.charPositionInLine, e.getMessage(), e);
+				recognizer.notifyListeners(e.offendingToken, e.getMessage(), e);
 			}
 		}
 	}
@@ -84,8 +84,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		if ( recognizer.errorRecovery ) return;
 		trackError(recognizer);
 
-		String msg = "no viable alternative at input "+getTokenErrorDisplay(e.token);
-		recognizer.notifyListeners(e.line, e.charPositionInLine, msg, e);
+		String msg = "no viable alternative at input "+getTokenErrorDisplay(e.offendingToken);
+		recognizer.notifyListeners(e.offendingToken, msg, e);
 	}
 
 	public void reportInputMismatch(BaseRecognizer recognizer,
@@ -95,9 +95,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		if ( recognizer.errorRecovery ) return;
 		trackError(recognizer);
 
-		String msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+		String msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
 		" expecting "+e.expecting.toString(recognizer.getTokenNames());
-		recognizer.notifyListeners(e.line, e.charPositionInLine, msg, e);
+		recognizer.notifyListeners(e.offendingToken, msg, e);
 	}
 
 	public void reportFailedPredicate(BaseRecognizer recognizer,
@@ -110,7 +110,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" failed predicate: {"+
 		e.predicateText+"}?";
-		recognizer.notifyListeners(e.line, e.charPositionInLine, msg, e);
+		recognizer.notifyListeners(e.offendingToken, msg, e);
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {
@@ -123,7 +123,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
 			expecting.toString(recognizer.getTokenNames());
-		recognizer.notifyListeners(t.getLine(), t.getCharPositionInLine(), msg, null);
+		recognizer.notifyListeners(t, msg, null);
 	}
 
 	public void reportMissingToken(BaseRecognizer recognizer) {
@@ -135,7 +135,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		String msg = "missing "+expecting.toString(recognizer.getTokenNames())+
 			" at "+getTokenErrorDisplay(t);
 
-		recognizer.notifyListeners(t.getLine(), t.getCharPositionInLine(), msg, null);
+		recognizer.notifyListeners(t, msg, null);
 	}
 
 	/** Attempt to recover from a single missing or extra token.
@@ -318,7 +318,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 //		if ( recognizer.errorRecovery ) return;
 //		trackError(recognizer);
 //
-//		recognizer.notifyListeners(e.line, e.charPositionInLine, "dsfdkjasdf");
+//		recognizer.notifyListeners(e.offendingToken, "dsfdkjasdf");
 //	}
 
 	/*  Compute the error recovery set for the current rule.  During

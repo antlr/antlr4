@@ -42,7 +42,7 @@ public interface TokenStream extends IntStream {
 	/** How far ahead has the stream been asked to look?  The return
 	 *  value is a valid index from 0..n-1.
 	 */
-	int range();
+//	int range();
 
 	/** Get a token at an absolute index i; 0..n-1.  This is really only
 	 *  needed for profiling and debugging and token stream rewriting.

@@ -28,7 +28,6 @@
  */
 package org.antlr.v4.runtime;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.*;
 
@@ -74,29 +73,21 @@ public class RecognitionException extends RuntimeException {
 	public IntStream input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
-	public int index;
+	public int offendingTokenIndex;
 
 	/** The current Token when an error occurred.  Since not all streams
 	 *  can retrieve the ith Token, we have to track the Token object.
 	 *  For parsers.  Even when it's a tree parser, token might be set.
 	 */
-	public Token token;
+	public Token offendingToken;
 
 	/** If this is a tree parser exception, node is set to the node with
 	 *  the problem.
 	 */
-	public Object node;
+	public Object offendingNode;
 
 	/** The current char when an error occurred. For lexers. */
 	public int c;
-
-	/** Track the line at which the error occurred in case this is
-	 *  generated from a lexer.  We need to track this since the
-	 *  unexpected char doesn't carry the line info.
-	 */
-	public int line;
-
-	public int charPositionInLine;
 
 	/** If you are parsing a tree node stream, you will encounter som
 	 *  imaginary nodes w/o line/col info.  We now search backwards looking
@@ -125,11 +116,9 @@ public class RecognitionException extends RuntimeException {
 //		this.expecting = viableTokensFollowingThisRule.or(firstSet);
 		if ( recognizer!=null ) expecting = recognizer._interp.atn.nextTokens(ctx);
 
-		this.index = input.index();
+		this.offendingTokenIndex = input.index();
 		if ( input instanceof TokenStream ) {
-			this.token = ((TokenStream)input).LT(1);
-			this.line = token.getLine();
-			this.charPositionInLine = token.getCharPositionInLine();
+			this.offendingToken = ((TokenStream)input).LT(1);
 		}
 		else if ( input instanceof ASTNodeStream) {
 			//extractInformationFromTreeNodeStream(input);
@@ -186,14 +175,14 @@ public class RecognitionException extends RuntimeException {
 
 	/** Return the token type or char of the unexpected input element */
 	public int getUnexpectedType() {
-		if ( recognizer==null ) return token.getType();
+		if ( recognizer==null ) return offendingToken.getType();
 		if ( recognizer.getInputStream() instanceof TokenStream) {
-			return token.getType();
+			return offendingToken.getType();
 		}
 		else if ( recognizer.getInputStream() instanceof ASTNodeStream) {
 			ASTNodeStream nodes = (ASTNodeStream)recognizer.getInputStream();
 			ASTAdaptor adaptor = nodes.getTreeAdaptor();
-			return adaptor.getType(node);
+			return adaptor.getType(offendingNode);
 		}
 		else {
 			return c;

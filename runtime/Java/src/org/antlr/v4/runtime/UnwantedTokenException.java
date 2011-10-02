@@ -38,14 +38,14 @@ public class UnwantedTokenException extends MismatchedTokenException {
 	}
 
 	public Token getUnexpectedToken() {
-		return token;
+		return offendingToken;
 	}
 
 	public String toString() {
 		String exp = ", expected "+expecting;
-		if ( token==null ) {
+		if ( offendingToken ==null ) {
 			return "UnwantedTokenException(found="+null+exp+")";
 		}
-		return "UnwantedTokenException(found="+token.getText()+exp+")";
+		return "UnwantedTokenException(found="+ offendingToken.getText()+exp+")";
 	}
 }

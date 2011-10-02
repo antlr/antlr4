@@ -148,8 +148,11 @@ public class TreeParser extends BaseRecognizer {
 	 *  the input tree not the user.
 	 */
 	public String getErrorHeader(RecognitionException e) {
+		// todo: might not have token; use node?
+		int line = e.offendingToken.getLine();
+		int charPositionInLine = e.offendingToken.getCharPositionInLine();
 		return getGrammarFileName()+": node from "+
-			   (e.approximateLineInfo?"after ":"")+"line "+e.line+":"+e.charPositionInLine;
+			   (e.approximateLineInfo?"after ":"")+"line "+line+":"+charPositionInLine;
 	}
 
 	/** Tree parsers parse nodes they usually have a token object as
@@ -158,10 +161,10 @@ public class TreeParser extends BaseRecognizer {
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
 		if ( this instanceof TreeParser ) {
 			ASTAdaptor adaptor = ((ASTNodeStream)e.input).getTreeAdaptor();
-			e.token = adaptor.getToken(e.node);
-			if ( e.token==null ) { // could be an UP/DOWN node
-				e.token = new CommonToken(adaptor.getType(e.node),
-										  adaptor.getText(e.node));
+			e.offendingToken = adaptor.getToken(e.offendingNode);
+			if ( e.offendingToken ==null ) { // could be an UP/DOWN node
+				e.offendingToken = new CommonToken(adaptor.getType(e.offendingNode),
+										  adaptor.getText(e.offendingNode));
 			}
 		}
 		return super.getErrorMessage(e);

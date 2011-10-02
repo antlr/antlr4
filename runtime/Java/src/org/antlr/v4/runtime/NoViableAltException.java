@@ -34,6 +34,12 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 public class NoViableAltException extends RecognitionException {
 	/** Prediction began at what input index? */
 	public int startIndex;
+	/** The token object at the start index; the input stream might
+	 * 	not be buffering tokens so get a reference to it. (At the
+	 *  time the error occurred, of course the stream needs to keep a
+	 *  buffer all of the tokens but later we might not have access to those.)
+ 	 */
+	public Token startToken;
 
 	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
 	public OrderedHashSet<ATNConfig> deadEndConfigs;
@@ -46,17 +52,20 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	public NoViableAltException(BaseRecognizer recognizer, IntStream input,
+								Token startToken,
 								OrderedHashSet<ATNConfig> deadEndConfigs,
 								RuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
+		this.startToken = startToken;
+		this.startIndex = startToken.getTokenIndex();
 	}
 
 	public String toString() {
 		if ( recognizer!=null ) {
 			TokenStream tokens = ((Parser)recognizer).getTokenStream();
-			String bad = tokens.toString(startIndex, index);
+			String bad = tokens.toString(startIndex, offendingTokenIndex);
 			return "NoViableAltException(input=\""+bad+"\" last token type is "+getUnexpectedType()+")";
 		}
 		return "NoViableAltException(last token type is "+getUnexpectedType()+")";

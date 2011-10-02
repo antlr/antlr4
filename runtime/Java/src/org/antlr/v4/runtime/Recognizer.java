@@ -109,7 +109,7 @@ public class Recognizer<ATNInterpreter> {
 			else {
 				tokenName = tokenNames[mte.expecting.getSingleElement()];
 			}
-			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.token);
+			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.offendingToken);
 		}
 		else if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
@@ -120,7 +120,7 @@ public class Recognizer<ATNInterpreter> {
 //			else {
 //				tokenName = tokenNames[mte.expecting.getSingleElement()];
 //			}
-			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+			msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
 				" expecting "+tokenName;
 		}
 		else if ( e instanceof MismatchedASTNodeException) {
@@ -132,7 +132,7 @@ public class Recognizer<ATNInterpreter> {
 			else {
 				tokenName = tokenNames[mtne.expecting.getSingleElement()];
 			}
-			msg = "mismatched tree node: "+mtne.node+
+			msg = "mismatched tree node: "+mtne.offendingNode +
 				" expecting "+tokenName;
 		}
 		else if ( e instanceof NoViableAltException ) {
@@ -140,16 +140,16 @@ public class Recognizer<ATNInterpreter> {
 			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 			// and "(decision="+nvae.decisionNumber+") and
 			// "state "+nvae.stateNumber
-			msg = "no viable alternative at input "+getTokenErrorDisplay(e.token);
+			msg = "no viable alternative at input "+getTokenErrorDisplay(e.offendingToken);
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
-			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+			msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
 				" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
-			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+			msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
 				" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof FailedPredicateException ) {
@@ -162,7 +162,9 @@ public class Recognizer<ATNInterpreter> {
 
 	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {
-		return "line "+e.line+":"+e.charPositionInLine;
+		int line = e.offendingToken.getLine();
+		int charPositionInLine = e.offendingToken.getCharPositionInLine();
+		return "line "+line+":"+charPositionInLine;
 	}
 
 	/** How should a token be displayed in an error message? The default

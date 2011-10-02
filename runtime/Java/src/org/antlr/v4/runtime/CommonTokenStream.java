@@ -100,7 +100,7 @@ public class CommonTokenStream extends BufferedTokenStream {
             i = skipOffTokenChannels(i+1);
             n++;
         }
-		if ( i>range ) range = i;
+//		if ( i>range ) range = i;
         return tokens.get(i);
     }
 

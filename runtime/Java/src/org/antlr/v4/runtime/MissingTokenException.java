@@ -46,11 +46,11 @@ public class MissingTokenException extends MismatchedTokenException {
 	}
 
 	public String toString() {
-		if ( inserted!=null && token!=null ) {
-			return "MissingTokenException(inserted "+inserted+" at "+token.getText()+")";
+		if ( inserted!=null && offendingToken !=null ) {
+			return "MissingTokenException(inserted "+inserted+" at "+ offendingToken.getText()+")";
 		}
-		if ( token!=null ) {
-			return "MissingTokenException(at "+token.getText()+")";
+		if ( offendingToken !=null ) {
+			return "MissingTokenException(at "+ offendingToken.getText()+")";
 		}
 		return "MissingTokenException";
 	}

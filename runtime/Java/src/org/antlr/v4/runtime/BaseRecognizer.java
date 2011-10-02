@@ -222,7 +222,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		syntaxErrors++; // don't count spurious
 		errorRecovery = true;
 
-		notifyListeners(e.line, e.charPositionInLine, e.getMessage(), e);
+		notifyListeners(e.offendingToken, e.getMessage(), e);
 	}
 
 
@@ -519,15 +519,23 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 */
 	protected Object getCurrentInputSymbol() { return null; }
 
-	public void notifyListeners(int line, int charPositionInLine, String msg,
+	public void notifyListeners(Token offendingToken, String msg,
 							   @Nullable RecognitionException e)
 	{
+		int line = offendingToken.getLine();
+		int charPositionInLine = offendingToken.getCharPositionInLine();
+		int start = getInputStream().index();
+		int stop = start;
+		if ( e instanceof NoViableAltException ) {
+			start = ((NoViableAltException) e).startIndex;
+			stop = e.offendingTokenIndex;
+		}
 		if ( _listeners==null || _listeners.size()==0 ) {
 			emitErrorMessage("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
 		for (ANTLRParserListener pl : _listeners) {
-			pl.error(this, line, charPositionInLine, msg, e);
+			pl.error(this, start, stop, line, charPositionInLine, msg, e);
 		}
 	}
 
