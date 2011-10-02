@@ -37,23 +37,20 @@ public class FailedPredicateException extends RecognitionException {
 	public String ruleName;
 	public String predicateText;
 
-	/** Used for remote debugger deserialization */
-	public FailedPredicateException() {;}
-
 	public FailedPredicateException(BaseRecognizer recognizer, String predText) {
 		super(recognizer);
 		this.predicateText = predText;
 	}
 
-	public FailedPredicateException(BaseRecognizer  recognizer,
-									IntStream input,
-									String ruleName,
-									String predicateText)
-	{
-		super(recognizer, input, recognizer._ctx);
-		this.ruleName = ruleName;
-		this.predicateText = predicateText;
-	}
+//	public FailedPredicateException(BaseRecognizer  recognizer,
+//									IntStream input,
+//									String ruleName,
+//									String predicateText)
+//	{
+//		super(recognizer, input, recognizer._ctx);
+//		this.ruleName = ruleName;
+//		this.predicateText = predicateText;
+//	}
 
 	public String toString() {
 		return "FailedPredicateException("+ruleName+",{"+predicateText+"}?)";

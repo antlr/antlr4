@@ -109,14 +109,14 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	}
 
 	// like matchSet but w/o consume; error checking routine.
-	public void sync(IntervalSet expecting) {
-		if ( expecting.contains(getInputStream().LA(1)) ) return;
-//		System.out.println("failed sync to "+expecting);
-		IntervalSet followSet = computeErrorRecoverySet();
-		followSet.addAll(expecting);
-		NoViableAltException e = new NoViableAltException(this);
-		recoverFromMismatchedSet(e, followSet);
-	}
+//	public void sync(IntervalSet expecting) {
+//		if ( expecting.contains(getInputStream().LA(1)) ) return;
+////		System.out.println("failed sync to "+expecting);
+//		IntervalSet followSet = computeErrorRecoverySet();
+//		followSet.addAll(expecting);
+//		NoViableAltException e = new NoViableAltException(this);
+//		recoverFromMismatchedSet(e, followSet);
+//	}
 
 	/** Match the wildcard: in a symbol */
 	public void matchAny() {
@@ -461,7 +461,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  mismatched token error.  To recover, it sees that LA(1)==';'
 	 *  is in the set of tokens that can follow the ')' token
 	 *  reference in rule atom.  It can assume that you forgot the ')'.
-	 */
 	protected Object recoverFromMismatchedToken(int ttype, IntervalSet follow)
 		throws RecognitionException
 	{
@@ -469,11 +468,9 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		// if next token is what we are looking for then "delete" this token
 		if ( mismatchIsUnwantedToken(ttype) ) {
 			e = new UnwantedTokenException(this, getInputStream(), ttype);
-			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
 							   ((TokenStream)input).LT(1)+
 							   " since "+((TokenStream)input).LT(2)+" is what we want");
-							   */
 			getInputStream().consume(); // simply delete extra token
 			reportError(e);  // report after consuming so AW sees the token in the exception
 			// we want to return the token we're actually matching
@@ -492,7 +489,9 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		e = new MismatchedTokenException(this, getInputStream(), ttype);
 		throw e;
 	}
+	*/
 
+/*
 	public Object recoverFromMismatchedSet(RecognitionException e,
 										   IntervalSet follow)
 		throws RecognitionException
@@ -506,7 +505,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		// TODO do single token deletion like above for Token mismatch
 		throw e;
 	}
-
+*/
 	public abstract IntStream getInputStream();
 	public abstract void setInputStream(IntStream input);
 
@@ -524,11 +523,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	{
 		int line = offendingToken.getLine();
 		int charPositionInLine = offendingToken.getCharPositionInLine();
-		int start = getInputStream().index();
+		int start = offendingToken.getTokenIndex();
 		int stop = start;
 		if ( e instanceof NoViableAltException ) {
-			start = ((NoViableAltException) e).startIndex;
-			stop = e.offendingTokenIndex;
+			start = ((NoViableAltException)e).startToken.getTokenIndex();
 		}
 		if ( _listeners==null || _listeners.size()==0 ) {
 			emitErrorMessage("line "+line+":"+charPositionInLine+" "+msg);

@@ -366,7 +366,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( prevAccept==null ) {
 			System.out.println("no viable token at input "+ getLookaheadName(input) +", index "+input.index());
 			NoViableAltException nvae =
-				new NoViableAltException(parser, input, input.get(startIndex),
+				new NoViableAltException(parser, input,
+										 input.get(startIndex),
+										 input.LT(1),
 										 closure, outerContext);
 			throw nvae;
 		}
@@ -801,8 +803,8 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public String getTokenName(int t) {
 		if ( t==-1 ) return "EOF";
-		String[] tokensNames = parser.getTokenNames();
-		if ( parser!=null && tokensNames !=null ) {
+		if ( parser!=null && parser.getTokenNames()!=null ) {
+			String[] tokensNames = parser.getTokenNames();
 			if ( t>=tokensNames.length ) {
 				System.err.println(t+" ttype out of range: "+Arrays.toString(tokensNames));
 				System.err.println(((CommonTokenStream)parser.getInputStream()).getTokens());

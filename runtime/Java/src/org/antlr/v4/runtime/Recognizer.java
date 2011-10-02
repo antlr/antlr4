@@ -57,11 +57,13 @@ public class Recognizer<ATNInterpreter> {
 
 	public ATNInterpreter getInterpreter() { return _interp; }
 
+	/*
 	public void displayRecognitionError(RecognitionException e) {
 		String hdr = getErrorHeader(e);
 		String msg = getErrorMessage(e);
 		emitErrorMessage(hdr+" "+msg);
 	}
+	*/
 
 	/** What error message should be generated for the various
 	 *  exception types?
@@ -84,7 +86,6 @@ public class Recognizer<ATNInterpreter> {
 	 *
 	 *  Override this to change the message generated for one or more
 	 *  exception types.
-	 */
 	public String getErrorMessage(RecognitionException e) {
 		String[] tokenNames = getTokenNames();
 		String msg = e.getMessage();
@@ -159,6 +160,7 @@ public class Recognizer<ATNInterpreter> {
 		}
 		return msg;
 	}
+	 */
 
 	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {

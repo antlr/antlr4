@@ -146,7 +146,6 @@ public class TreeParser extends BaseRecognizer {
     /** Prefix error message with the grammar name because message is
 	 *  always intended for the programmer because the parser built
 	 *  the input tree not the user.
-	 */
 	public String getErrorHeader(RecognitionException e) {
 		// todo: might not have token; use node?
 		int line = e.offendingToken.getLine();
@@ -154,10 +153,10 @@ public class TreeParser extends BaseRecognizer {
 		return getGrammarFileName()+": node from "+
 			   (e.approximateLineInfo?"after ":"")+"line "+line+":"+charPositionInLine;
 	}
+	 */
 
 	/** Tree parsers parse nodes they usually have a token object as
 	 *  payload. Set the exception token and do the default behavior.
-	 */
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
 		if ( this instanceof TreeParser ) {
 			ASTAdaptor adaptor = ((ASTNodeStream)e.input).getTreeAdaptor();
@@ -169,6 +168,7 @@ public class TreeParser extends BaseRecognizer {
 		}
 		return super.getErrorMessage(e);
 	}
+	 */
 
     /** Check if current node in input has a context.  Context means sequence
      *  of nodes towards root of tree.  For example, you might say context

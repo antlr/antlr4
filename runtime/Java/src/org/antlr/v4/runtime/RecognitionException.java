@@ -31,49 +31,26 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.*;
 
-/** The root of the ANTLR exception hierarchy.
- *
- *  To avoid English-only error messages and to generally make things
- *  as flexible as possible, these exceptions are not created with strings,
- *  but rather the information necessary to generate an error.  Then
- *  the various reporting methods in Parser and Lexer can be overridden
- *  to generate a localized error message.  For example, MismatchedToken
- *  exceptions are built with the expected token type.
- *  So, don't expect getMessage() to return anything.
- *
- *  Note that as of Java 1.4, you can access the stack trace, which means
- *  that you can compute the complete trace of rules from the start symbol.
- *  This gives you considerable context information with which to generate
- *  useful error messages.
- *
- *  ANTLR generates code that throws exceptions upon recognition error and
- *  also generates code to catch these exceptions in each rule.  If you
- *  want to quit upon first error, you can turn off the automatic error
- *  handling mechanism using rulecatch action, but you still need to
- *  override methods mismatch and recoverFromMismatchSet.
- *
- *  In general, the recognition exceptions can track where in a grammar a
- *  problem occurred and/or what was the expected input.  While the parser
- *  knows its state (such as current input symbol and line info) that
- *  state can change before the exception is reported so current token index
- *  is computed and stored at exception time.  From this info, you can
- *  perhaps print an entire line of input not just a single token, for example.
- *  Better to just say the recognizer had a problem and then let the parser
- *  figure out a fancy report.
+/** The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
+ *  3 kinds of errors: prediction errors, failed predicate errors, and
+ *  mismatched input errors. In each case, the parser knows where it is
+ *  in the input, where it is in the ATN, the rule invocation stack,
+ *  and what kind of problem occurred.
  */
-// TODO: split out lexer one
 public class RecognitionException extends RuntimeException {
 	/** Who threw the exception? */
 	public BaseRecognizer recognizer;
 
-	public RuleContext ctx; // should be what is in recognizer, but won't work when interpreting
+	// TODO: make a dummy recognizer for the interpreter to use?
+	// Next two (ctx,input) should be what is in recognizer, but
+	// won't work when interpreting
 
-	public IntervalSet expecting;
+	public RuleContext ctx;
 
 	public IntStream input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
-	public int offendingTokenIndex;
+//	public int offendingTokenIndex;
 
 	/** The current Token when an error occurred.  Since not all streams
 	 *  can retrieve the ith Token, we have to track the Token object.
@@ -86,19 +63,12 @@ public class RecognitionException extends RuntimeException {
 	 */
 	public Object offendingNode;
 
-	/** The current char when an error occurred. For lexers. */
-	public int c;
-
 	/** If you are parsing a tree node stream, you will encounter som
 	 *  imaginary nodes w/o line/col info.  We now search backwards looking
 	 *  for most recent token with line/col info, but notify getErrorHeader()
 	 *  that info is approximate.
-	 */
 	public boolean approximateLineInfo;
-
-	/** Used for remote debugger deserialization */
-	public RecognitionException() {
-	}
+	 */
 
 	public RecognitionException(BaseRecognizer recognizer) {
 		this(recognizer, recognizer.getInputStream(), recognizer._ctx);
@@ -110,68 +80,21 @@ public class RecognitionException extends RuntimeException {
 		this.recognizer = recognizer;
 		this.input = input;
 		this.ctx = ctx;
-		// firstSet is what can we're expecting within rule that calls this ctor.
-		// must combine with context-sensitive FOLLOW of that rule.
-//		LABitSet viableTokensFollowingThisRule = recognizer.computeNextViableTokenSet();
-//		this.expecting = viableTokensFollowingThisRule.or(firstSet);
-		if ( recognizer!=null ) expecting = recognizer._interp.atn.nextTokens(ctx);
 
-		this.offendingTokenIndex = input.index();
-		if ( input instanceof TokenStream ) {
-			this.offendingToken = ((TokenStream)input).LT(1);
-		}
-		else if ( input instanceof ASTNodeStream) {
-			//extractInformationFromTreeNodeStream(input);
-		}
-		else {
-			this.c = input.LA(1);
-		}
+		//this.offendingTokenIndex = input.index();
+//		if ( input instanceof TokenStream ) {
+//			this.offendingToken = ((TokenStream)input).LT(1);
+//		}
+//		else if ( input instanceof ASTNodeStream) {
+//			//extractInformationFromTreeNodeStream(input);
+//		}
 	}
 
-	/*
-	protected void extractInformationFromTreeNodeStream(IntStream input) {
-		TreeNodeStream nodes = (TreeNodeStream)input;
-		this.node = nodes.LT(1);
-		TreeAdaptor adaptor = nodes.getTreeAdaptor();
-		Token payload = adaptor.getToken(node);
-		if ( payload!=null ) {
-			this.token = payload;
-			if ( payload.getLine()<= 0 ) {
-				// imaginary node; no line/pos info; scan backwards
-				int i = -1;
-				Object priorNode = nodes.LT(i);
-				while ( priorNode!=null ) {
-					Token priorPayload = adaptor.getToken(priorNode);
-					if ( priorPayload!=null && priorPayload.getLine()>0 ) {
-						// we found the most recent real line / pos info
-						this.line = priorPayload.getLine();
-						this.charPositionInLine = priorPayload.getCharPositionInLine();
-						this.approximateLineInfo = true;
-						break;
-					}
-					--i;
-					priorNode = nodes.LT(i);
-				}
-			}
-			else { // node created from real token
-				this.line = payload.getLine();
-				this.charPositionInLine = payload.getCharPositionInLine();
-			}
-		}
-		else if ( this.node instanceof Tree) {
-			this.line = ((Tree)this.node).getLine();
-			this.charPositionInLine = ((Tree)this.node).getCharPositionInLine();
-			if ( this.node instanceof CommonTree) {
-				this.token = ((CommonTree)this.node).token;
-			}
-		}
-		else {
-			int type = adaptor.getType(this.node);
-			String text = adaptor.getText(this.node);
-			this.token = new CommonToken(type, text);
-		}
+	public IntervalSet getExpectedTokens() {
+		if ( recognizer!=null ) return recognizer._interp.atn.nextTokens(ctx);
+		return null;
 	}
-	*/
+
 
 	/** Return the token type or char of the unexpected input element */
 	public int getUnexpectedType() {
@@ -184,8 +107,6 @@ public class RecognitionException extends RuntimeException {
 			ASTAdaptor adaptor = nodes.getTreeAdaptor();
 			return adaptor.getType(offendingNode);
 		}
-		else {
-			return c;
-		}
+		return Token.INVALID_TYPE;
 	}
 }

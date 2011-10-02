@@ -31,9 +31,13 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
+/** The parser could not decide which path in the decision to take based
+ *  upon the remaining input.
+ */
 public class NoViableAltException extends RecognitionException {
-	/** Prediction began at what input index? */
-	public int startIndex;
+	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
+	public OrderedHashSet<ATNConfig> deadEndConfigs;
+
 	/** The token object at the start index; the input stream might
 	 * 	not be buffering tokens so get a reference to it. (At the
 	 *  time the error occurred, of course the stream needs to keep a
@@ -41,32 +45,34 @@ public class NoViableAltException extends RecognitionException {
  	 */
 	public Token startToken;
 
-	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
-	public OrderedHashSet<ATNConfig> deadEndConfigs;
-
-	/** Used for remote debugger deserialization */
-	public NoViableAltException() {;}
-
 	public NoViableAltException(BaseRecognizer recognizer) { // LL(1) error
-		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
+		this(recognizer,recognizer.getInputStream(),
+			 ((TokenStream)recognizer.getInputStream()).LT(1),
+			 ((TokenStream)recognizer.getInputStream()).LT(1),
+			 null,
+			 recognizer._ctx);
 	}
 
-	public NoViableAltException(BaseRecognizer recognizer, IntStream input,
+	public NoViableAltException(BaseRecognizer recognizer,
+								IntStream input,
 								Token startToken,
+								Token offendingToken,
 								OrderedHashSet<ATNConfig> deadEndConfigs,
 								RuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
 		this.startToken = startToken;
-		this.startIndex = startToken.getTokenIndex();
+		this.offendingToken = offendingToken;
 	}
 
 	public String toString() {
 		if ( recognizer!=null ) {
 			TokenStream tokens = ((Parser)recognizer).getTokenStream();
-			String bad = tokens.toString(startIndex, offendingTokenIndex);
-			return "NoViableAltException(input=\""+bad+"\" last token type is "+getUnexpectedType()+")";
+			String bad = tokens.toString(startToken.getTokenIndex(),
+										 offendingToken.getTokenIndex());
+			return "NoViableAltException(input=\""+bad+"\" last token type is "+
+					getUnexpectedType()+")";
 		}
 		return "NoViableAltException(last token type is "+getUnexpectedType()+")";
 	}

@@ -96,7 +96,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		trackError(recognizer);
 
 		String msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
-		" expecting "+e.expecting.toString(recognizer.getTokenNames());
+		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
 		recognizer.notifyListeners(e.offendingToken, msg, e);
 	}
 

@@ -273,6 +273,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		return null;
 	}
 
+	/*
 	public String getErrorMessage(RecognitionException e) {
 		String msg = null;
 		if ( e instanceof MismatchedTokenException ) {
@@ -310,6 +311,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		}
 		return msg;
 	}
+	*/
 
 	public String getCharErrorDisplay(int c) {
 		String s = String.valueOf((char)c);

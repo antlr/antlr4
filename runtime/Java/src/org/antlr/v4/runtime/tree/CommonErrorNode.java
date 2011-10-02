@@ -88,6 +88,7 @@ public class CommonErrorNode extends CommonAST {
 	}
 
 	public String toString() {
+		/*
 		if ( trappedException instanceof MissingTokenException ) {
 			return "<missing type: "+
 				   ((MissingTokenException)trappedException).getMissingType()+
@@ -105,6 +106,7 @@ public class CommonErrorNode extends CommonAST {
 			return "<unexpected: "+trappedException.offendingToken +
 				   ", resync="+getText()+">";
 		}
+		*/
 		return "<error: "+getText()+">";
 	}
 }

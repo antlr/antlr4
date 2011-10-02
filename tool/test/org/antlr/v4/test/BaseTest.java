@@ -33,24 +33,15 @@ import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
+import org.antlr.v4.tool.Rule;
+import org.junit.*;
+import org.stringtemplate.v4.*;
 
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+import javax.tools.*;
 import java.io.*;
 import java.util.*;
 
@@ -1316,12 +1307,11 @@ public abstract class BaseTest {
 		}
 
 		public Token LT(int i) {
-			if ( (p+i-1)>=types.size() ) return new CommonToken(-1);
-			return new CommonToken(types.get(p+i-1));
-		}
-
-		public int range() {
-			return 0;
+			CommonToken t;
+			if ( (p+i-1)>=types.size() ) t = new CommonToken(-1);
+			t = new CommonToken(types.get(p+i-1));
+			t.setTokenIndex(p+i-1);
+			return t;
 		}
 
 		public Token get(int i) {
