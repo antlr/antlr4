@@ -87,10 +87,10 @@ public class TestParseErrors extends BaseTest {
 			"WS : ' ' {skip();} ;" +
 			"acClass\n" +
 			"@init\n" +
-			"{ System.out.println(computeContextSensitiveRuleFOLLOW().toString(tokenNames)); }\n" +
+			"{ System.out.println(getExpectedTokens().toString(tokenNames)); }\n" +
 			"  : ;\n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "start", "dog and software", false);
-		String expecting = "{HARDWARE,SOFTWARE}\n";
+		String expecting = "{'hardware', 'software'}\n";
 		assertEquals(expecting, result);
 	}
 }

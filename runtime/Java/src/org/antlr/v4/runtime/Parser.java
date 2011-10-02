@@ -78,24 +78,6 @@ public class Parser extends BaseRecognizer {
 	@Override
 	public void setInputStream(IntStream input) { _input = (TokenStream)input; }
 
-	protected Object getMissingSymbol(RecognitionException e,
-									  int expectedTokenType)
-	{
-		String tokenText = null;
-		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
-		else tokenText = "<missing "+getTokenNames()[expectedTokenType]+">";
-		CommonToken t = new CommonToken(expectedTokenType, tokenText);
-		Token current = ((TokenStream)_input).LT(1);
-		if ( current.getType() == Token.EOF ) {
-			current = ((TokenStream)_input).LT(-1);
-		}
-		t.line = current.getLine();
-		t.charPositionInLine = current.getCharPositionInLine();
-		t.channel = Token.DEFAULT_CHANNEL;
-		t.source = current.getTokenSource();
-		return t;
-	}
-
 	/** Set the token stream and reset the parser */
 	public void setTokenStream(TokenStream input) {
 		this._input = null;

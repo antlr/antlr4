@@ -198,8 +198,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		throw new InputMismatchException(recognizer);
 	}
 
-	protected IntervalSet getExpectedTokens(BaseRecognizer recognizer) {
-		return recognizer._interp.atn.nextTokens(recognizer._ctx);
+	public IntervalSet getExpectedTokens(BaseRecognizer recognizer) {
+		return recognizer.getExpectedTokens();
 	}
 
 	public boolean mismatchIsMissingToken() {

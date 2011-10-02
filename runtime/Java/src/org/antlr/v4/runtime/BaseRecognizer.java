@@ -98,69 +98,13 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 			return matchedSymbol;
 		}
 		return _errHandler.recoverInline(this);
-//		System.out.println("MATCH failure at state "+_ctx.s+
-//			", ctx="+_ctx.toString(this));
-//		IntervalSet expecting = _interp.atn.nextTokens(_ctx);
-//		System.out.println("could match "+expecting);
-
-//		matchedSymbol = recoverFromMismatchedToken(ttype, expecting);
-//		System.out.println("rsync'd to "+matchedSymbol);
-//		return matchedSymbol;
 	}
-
-	// like matchSet but w/o consume; error checking routine.
-//	public void sync(IntervalSet expecting) {
-//		if ( expecting.contains(getInputStream().LA(1)) ) return;
-////		System.out.println("failed sync to "+expecting);
-//		IntervalSet followSet = computeErrorRecoverySet();
-//		followSet.addAll(expecting);
-//		NoViableAltException e = new NoViableAltException(this);
-//		recoverFromMismatchedSet(e, followSet);
-//	}
 
 	/** Match the wildcard: in a symbol */
 	public void matchAny() {
 		errorRecovery = false;
-//		failed = false;
+		_errHandler.reset();
 		getInputStream().consume();
-	}
-
-	public boolean mismatchIsUnwantedToken(int ttype) {
-		return getInputStream().LA(2)==ttype;
-	}
-
-	public boolean mismatchIsMissingToken(IntervalSet follow) {
-		return false;
-		/*
-		if ( follow==null ) {
-			// we have no information about the follow; we can only consume
-			// a single token and hope for the best
-			return false;
-		}
-		// compute what can follow this grammar element reference
-		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
-			IntervalSet viableTokensFollowingThisRule = computeNextViableTokenSet();
-			follow = follow.or(viableTokensFollowingThisRule);
-            if ( ctx.sp>=0 ) { // remove EOR if we're not the start symbol
-                follow.remove(Token.EOR_TOKEN_TYPE);
-            }
-		}
-		// if current token is consistent with what could come after set
-		// then we know we're missing a token; error recovery is free to
-		// "insert" the missing token
-
-		//System.out.println("viable tokens="+follow.toString(getTokenNames()));
-		//System.out.println("LT(1)="+((TokenStream)input).LT(1));
-
-		// IntervalSet cannot handle negative numbers like -1 (EOF) so I leave EOR
-		// in follow set to indicate that the fall of the start symbol is
-		// in the set (EOF can follow).
-		if ( follow.member(input.LA(1)) || follow.member(Token.EOR_TOKEN_TYPE) ) {
-			//System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
-			return true;
-		}
-		return false;
-		*/
 	}
 
 	/** Track the RuleContext objects during the parse and hook them up
@@ -225,7 +169,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		notifyListeners(e.offendingToken, e.getMessage(), e);
 	}
 
-
 	/** Get number of recognition errors (lexer, parser, tree parser).  Each
 	 *  recognizer tracks its own number.  So parser and lexer each have
 	 *  separate count.  Does not count the spurious errors found between
@@ -237,275 +180,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		return syntaxErrors;
 	}
 
-
-	/** Recover from an error found on the input stream.  This is
-	 *  for NoViableAlt and mismatched symbol exceptions.  If you enable
-	 *  single token insertion and deletion, this will usually not
-	 *  handle mismatched symbol exceptions but there could be a mismatched
-	 *  token that the match() routine could not recover from.
-	 */
-	public void recover() {
-		getInputStream().consume();
-		/*
-		if ( lastErrorIndex==input.index() ) {
-			// uh oh, another error at same token index; must be a case
-			// where LT(1) is in the recovery token set so nothing is
-			// consumed; consume a single token so at least to prevent
-			// an infinite loop; this is a failsafe.
-			input.consume();
-		}
-		lastErrorIndex = input.index();
-		IntervalSet followSet = computeErrorRecoverySet();
-		beginResync();
-		consumeUntil(followSet);
-		endResync();
-		*/
-	}
-
-	/*  Compute the error recovery set for the current rule.  During
-	 *  rule invocation, the parser pushes the set of tokens that can
-	 *  follow that rule reference on the stack; this amounts to
-	 *  computing FIRST of what follows the rule reference in the
-	 *  enclosing rule. See LinearApproximator.FIRST().
-	 *  This local follow set only includes tokens
-	 *  from within the rule; i.e., the FIRST computation done by
-	 *  ANTLR stops at the end of a rule.
-	 *
-	 *  EXAMPLE
-	 *
-	 *  When you find a "no viable alt exception", the input is not
-	 *  consistent with any of the alternatives for rule r.  The best
-	 *  thing to do is to consume tokens until you see something that
-	 *  can legally follow a call to r *or* any rule that called r.
-	 *  You don't want the exact set of viable next tokens because the
-	 *  input might just be missing a token--you might consume the
-	 *  rest of the input looking for one of the missing tokens.
-	 *
-	 *  Consider grammar:
-	 *
-	 *  a : '[' b ']'
-	 *    | '(' b ')'
-	 *    ;
-	 *  b : c '^' INT ;
-	 *  c : ID
-	 *    | INT
-	 *    ;
-	 *
-	 *  At each rule invocation, the set of tokens that could follow
-	 *  that rule is pushed on a stack.  Here are the various
-	 *  context-sensitive follow sets:
-	 *
-	 *  FOLLOW(b1_in_a) = FIRST(']') = ']'
-	 *  FOLLOW(b2_in_a) = FIRST(')') = ')'
-	 *  FOLLOW(c_in_b) = FIRST('^') = '^'
-	 *
-	 *  Upon erroneous input "[]", the call chain is
-	 *
-	 *  a -> b -> c
-	 *
-	 *  and, hence, the follow context stack is:
-	 *
-	 *  depth     follow set       start of rule execution
-	 *    0         <EOF>                    a (from main())
-	 *    1          ']'                     b
-	 *    2          '^'                     c
-	 *
-	 *  Notice that ')' is not included, because b would have to have
-	 *  been called from a different context in rule a for ')' to be
-	 *  included.
-	 *
-	 *  For error recovery, we cannot consider FOLLOW(c)
-	 *  (context-sensitive or otherwise).  We need the combined set of
-	 *  all context-sensitive FOLLOW sets--the set of all tokens that
-	 *  could follow any reference in the call chain.  We need to
-	 *  resync to one of those tokens.  Note that FOLLOW(c)='^' and if
-	 *  we resync'd to that token, we'd consume until EOF.  We need to
-	 *  sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
-	 *  In this case, for input "[]", LA(1) is ']' and in the set, so we would
-	 *  not consume anything. After printing an error, rule c would
-	 *  return normally.  Rule b would not find the required '^' though.
-	 *  At this point, it gets a mismatched token error and throws an
-	 *  exception (since LA(1) is not in the viable following token
-	 *  set).  The rule exception handler tries to recover, but finds
-	 *  the same recovery set and doesn't consume anything.  Rule b
-	 *  exits normally returning to rule a.  Now it finds the ']' (and
-	 *  with the successful match exits errorRecovery mode).
-	 *
-	 *  So, you can see that the parser walks up the call chain looking
-	 *  for the token that was a member of the recovery set.
-	 *
-	 *  Errors are not generated in errorRecovery mode.
-	 *
-	 *  ANTLR's error recovery mechanism is based upon original ideas:
-	 *
-	 *  "Algorithms + Data Structures = Programs" by Niklaus Wirth
-	 *
-	 *  and
-	 *
-	 *  "A note on error recovery in recursive descent parsers":
-	 *  http://portal.acm.org/citation.cfm?id=947902.947905
-	 *
-	 *  Later, Josef Grosch had some good ideas:
-	 *
-	 *  "Efficient and Comfortable Error Recovery in Recursive Descent
-	 *  Parsers":
-	 *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
-	 *
-	 *  Like Grosch I implement context-sensitive FOLLOW sets that are combined
-	 *  at run-time upon error to avoid overhead during parsing.
-	 */
-	protected IntervalSet computeErrorRecoverySet() {
-		return null;
-//		int top = ctx.sp;
-//		IntervalSet followSet = new IntervalSet();
-//		for (int i=top; i>=0; i--) { // i==0 is EOF context for start rule invocation
-//			IntervalSet f = (IntervalSet)ctx.get(i).follow;
-//			followSet.orInPlace(f);
-//		}
-//		return followSet;
-	}
-
-	/** Compute the context-sensitive FOLLOW set for current rule.
-	 *  This is set of token types that can follow a specific rule
-	 *  reference given a specific call chain.  You get the set of
-	 *  viable tokens that can possibly come next (lookahead depth 1)
-	 *  given the current call chain.  Contrast this with the
-	 *  definition of plain FOLLOW for rule r:
-	 *
-	 *   FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}
-	 *
-	 *  where x in T* and alpha, beta in V*; T is set of terminals and
-	 *  V is the set of terminals and nonterminals.  In other words,
-	 *  FOLLOW(r) is the set of all tokens that can possibly follow
-	 *  references to r in *any* sentential form (context).  At
-	 *  runtime, however, we know precisely which context applies as
-	 *  we have the call chain.  We may compute the exact (rather
-	 *  than covering superset) set of following tokens.
-	 *
-	 *  For example, consider grammar:
-	 *
-	 *  stat : ID '=' expr ';'      // FOLLOW(stat)=={EOF}
-	 *       | "return" expr '.'
-	 *       ;
-	 *  expr : atom ('+' atom)* ;   // FOLLOW(expr)=={';','.',')'}
-	 *  atom : INT                  // FOLLOW(atom)=={'+',')',';','.'}
-	 *       | '(' expr ')'
-	 *       ;
-	 *
-	 *  The FOLLOW sets are all inclusive whereas context-sensitive
-	 *  FOLLOW sets are precisely what could follow a rule reference.
-	 *  For input input "i=(3);", here is the derivation:
-	 *
-	 *  stat => ID '=' expr ';'
-	 *       => ID '=' atom ('+' atom)* ';'
-	 *       => ID '=' '(' expr ')' ('+' atom)* ';'
-	 *       => ID '=' '(' atom ')' ('+' atom)* ';'
-	 *       => ID '=' '(' INT ')' ('+' atom)* ';'
-	 *       => ID '=' '(' INT ')' ';'
-	 *
-	 *  At the "3" token, you'd have a call chain of
-	 *
-	 *    stat -> expr -> atom -> expr -> atom
-	 *
-	 *  What can follow that specific nested ref to atom?  Exactly ')'
-	 *  as you can see by looking at the derivation of this specific
-	 *  input.  Contrast this with the FOLLOW(atom)={'+',')',';','.'}.
-	 *
-	 *  You want the exact viable token set when recovering from a
-	 *  token mismatch.  Upon token mismatch, if LA(1) is member of
-	 *  the viable next token set, then you know there is most likely
-	 *  a missing token in the input stream.  "Insert" one by just not
-	 *  throwing an exception.
-	 */
-	public IntervalSet computeNextViableTokenSet() {
-		return null;
-//		int top = ctx.sp;
-//		IntervalSet followSet = new IntervalSet();
-//		for (int i=top; i>=0; i--) { // i==0 is EOF context for start rule invocation
-//			IntervalSet f = (IntervalSet)ctx.get(i).follow;
-//			followSet.orInPlace(f);
-//			// can we see end of rule? if not, don't include follow of this rule
-//			if ( !f.member(Token.EOR_TOKEN_TYPE) ) break;
-//			// else combine with tokens that can follow this rule (rm EOR also)
-//			// EOR indicates we have to include follow(start rule); i.e., EOF
-//			followSet.remove(Token.EOR_TOKEN_TYPE);
-//		}
-//		return followSet;
-	}
-
-	/** Attempt to recover from a single missing or extra token.
-	 *
-	 *  EXTRA TOKEN
-	 *
-	 *  LA(1) is not what we are looking for.  If LA(2) has the right token,
-	 *  however, then assume LA(1) is some extra spurious token.  Delete it
-	 *  and LA(2) as if we were doing a normal match(), which advances the
-	 *  input.
-	 *
-	 *  MISSING TOKEN
-	 *
-	 *  If current token is consistent with what could come after
-	 *  ttype then it is ok to "insert" the missing token, else throw
-	 *  exception For example, Input "i=(3;" is clearly missing the
-	 *  ')'.  When the parser returns from the nested call to expr, it
-	 *  will have call chain:
-	 *
-	 *    stat -> expr -> atom
-	 *
-	 *  and it will be trying to match the ')' at this point in the
-	 *  derivation:
-	 *
-	 *       => ID '=' '(' INT ')' ('+' atom)* ';'
-	 *                          ^
-	 *  match() will see that ';' doesn't match ')' and report a
-	 *  mismatched token error.  To recover, it sees that LA(1)==';'
-	 *  is in the set of tokens that can follow the ')' token
-	 *  reference in rule atom.  It can assume that you forgot the ')'.
-	protected Object recoverFromMismatchedToken(int ttype, IntervalSet follow)
-		throws RecognitionException
-	{
-		RecognitionException e = null;
-		// if next token is what we are looking for then "delete" this token
-		if ( mismatchIsUnwantedToken(ttype) ) {
-			e = new UnwantedTokenException(this, getInputStream(), ttype);
-			System.err.println("recoverFromMismatchedToken deleting "+
-							   ((TokenStream)input).LT(1)+
-							   " since "+((TokenStream)input).LT(2)+" is what we want");
-			getInputStream().consume(); // simply delete extra token
-			reportError(e);  // report after consuming so AW sees the token in the exception
-			// we want to return the token we're actually matching
-			Object matchedSymbol = getCurrentInputSymbol();
-			getInputStream().consume(); // move past ttype token as if all were ok
-			return matchedSymbol;
-		}
-		// can't recover with single token deletion, try insertion
-		if ( mismatchIsMissingToken(follow) ) {
-			Object inserted = getMissingSymbol(e, ttype, follow);
-			e = new MissingTokenException(this, getInputStream(), ttype, inserted);
-			reportError(e);  // report after inserting so AW sees the token in the exception
-			return inserted;
-		}
-		// even that didn't work; must throw the exception
-		e = new MismatchedTokenException(this, getInputStream(), ttype);
-		throw e;
-	}
-	*/
-
-/*
-	public Object recoverFromMismatchedSet(RecognitionException e,
-										   IntervalSet follow)
-		throws RecognitionException
-	{
-		if ( mismatchIsMissingToken(follow) ) {
-			// System.out.println("missing token");
-			reportError(e);
-			// we don't know how to conjure up a token for sets yet
-			return getMissingSymbol(e, Token.INVALID_TYPE, follow);
-		}
-		// TODO do single token deletion like above for Token mismatch
-		throw e;
-	}
-*/
 	public abstract IntStream getInputStream();
 	public abstract void setInputStream(IntStream input);
 
@@ -549,51 +223,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		_ctx = (ParserRuleContext)_ctx.parent;
 	}
 
-
-	/** Conjure up a missing token during error recovery.
-	 *
-	 *  The recognizer attempts to recover from single missing
-	 *  symbols. But, actions might refer to that missing symbol.
-	 *  For example, x=ID {f($x);}. The action clearly assumes
-	 *  that there has been an identifier matched previously and that
-	 *  $x points at that token. If that token is missing, but
-	 *  the next token in the stream is what we want we assume that
-	 *  this token is missing and we keep going. Because we
-	 *  have to return some token to replace the missing token,
-	 *  we have to conjure one up. This method gives the user control
-	 *  over the tokens returned for missing tokens. Mostly,
-	 *  you will want to create something special for identifier
-	 *  tokens. For literals such as '{' and ',', the default
-	 *  action in the parser or tree parser works. It simply creates
-	 *  a CommonToken of the appropriate type. The text will be the token.
-	 *  If you change what tokens must be created by the lexer,
-	 *  override this method to create the appropriate tokens.
-	 */
-	protected Object getMissingSymbol(RecognitionException e,
-									  int expectedTokenType,
-									  IntervalSet follow)
-	{
-		return null;
-	}
-
-	public void consumeUntil(int tokenType) {
-		//System.out.println("consumeUntil "+tokenType);
-		int ttype = getInputStream().LA(1);
-		while (ttype != Token.EOF && ttype != tokenType) {
-			getInputStream().consume();
-			ttype = getInputStream().LA(1);
-		}
-	}
-
-	/** Consume tokens until one matches the given token set */
-	public void consumeUntil(IntervalSet set) {
-		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
-		int ttype = getInputStream().LA(1);
-		while (ttype != Token.EOF && !set.contains(ttype) ) {
-			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
-			getInputStream().consume();
-			ttype = getInputStream().LA(1);
-		}
+	public IntervalSet getExpectedTokens() {
+		return _interp.atn.nextTokens(_ctx);
 	}
 
 	public ParserRuleContext getInvokingContext(int ruleIndex) {
@@ -654,9 +285,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		return rules;
 	}
 
-    /** Return whether or not a backtracking attempt failed. */
-//    public boolean failed() { return failed; }
-
 	/** For debugging and other purposes, might want the grammar name.
 	 *  Have ANTLR generate an implementation for this method.
 	 */
@@ -677,19 +305,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		}
 		return strings;
 	}
-
-//	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
-//		System.out.print("enter "+ruleName+" "+inputSymbol);
-//		System.out.println();
-//	}
-//
-//	public void traceOut(String ruleName,
-//						 int ruleIndex,
-//						 Object inputSymbol)
-//	{
-//		System.out.print("exit "+ruleName+" "+inputSymbol);
-//		System.out.println();
-//	}
 
 	/** Indicate that the recognizer has changed internal state that is
 	 *  consistent with the ATN state passed in.  This way we always know
