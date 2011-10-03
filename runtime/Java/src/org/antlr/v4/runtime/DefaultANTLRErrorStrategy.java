@@ -199,7 +199,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		ATNState currentState = recognizer._interp.atn.states.get(recognizer._ctx.s);
 		ATNState next = currentState.transition(0).target;
 		IntervalSet expectingAtLL2 = recognizer._interp.atn.nextTokens(next, recognizer._ctx);
-		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
+//		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
 		if ( expectingAtLL2.contains(((Token)currentSymbol).getType()) ) {
 			reportMissingToken(recognizer);
 			return getMissingSymbol(recognizer);
