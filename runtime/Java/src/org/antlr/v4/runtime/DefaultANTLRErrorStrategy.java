@@ -36,7 +36,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		throws RecognitionException
 	{
 		if ( e instanceof NoViableAltException ) {
-			reportNoViableAlternative(recognizer, (NoViableAltException)e);
+			reportNoViableAlternative(recognizer, (NoViableAltException) e);
 		}
 		else if ( e instanceof InputMismatchException ) {
 			reportInputMismatch(recognizer, (InputMismatchException)e);
@@ -172,68 +172,40 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		throws RecognitionException
 	{
 		IntervalSet expecting = getExpectedTokens(recognizer);
-		IntervalSet follow = null;
+		Object currentSymbol = recognizer.getCurrentInputSymbol();
 
-		RecognitionException e = null;
 		// if next token is what we are looking for then "delete" this token
 		int nextTokenType = recognizer.getInputStream().LA(2);
 		if ( expecting.contains(nextTokenType) ) {
 			reportUnwantedToken(recognizer);
+			/*
 			System.err.println("recoverFromMismatchedToken deleting "+
 							   ((TokenStream)recognizer.getInputStream()).LT(1)+
 							   " since "+((TokenStream)recognizer.getInputStream()).LT(2)+
 							   " is what we want");
+			*/
 			recognizer.getInputStream().consume(); // simply delete extra token
 			// we want to return the token we're actually matching
 			Object matchedSymbol = recognizer.getCurrentInputSymbol();
 			recognizer.getInputStream().consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
+
 		// can't recover with single token deletion, try insertion
-		if ( mismatchIsMissingToken() ) {
+		// if current token is consistent with what could come after current
+		// ATN state, then we know we're missing a token; error recovery
+		// is free to conjure up and insert the missing token
+
+		ATNState currentState = recognizer._interp.atn.states.get(recognizer._ctx.s);
+		ATNState next = currentState.transition(0).target;
+		IntervalSet expectingAtLL2 = recognizer._interp.atn.nextTokens(next, recognizer._ctx);
+		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
+		if ( expectingAtLL2.contains(((Token)currentSymbol).getType()) ) {
 			reportMissingToken(recognizer);
 			return getMissingSymbol(recognizer);
 		}
 		// even that didn't work; must throw the exception
 		throw new InputMismatchException(recognizer);
-	}
-
-	public IntervalSet getExpectedTokens(BaseRecognizer recognizer) {
-		return recognizer.getExpectedTokens();
-	}
-
-	public boolean mismatchIsMissingToken() {
-		return false;
-		/*
-		if ( follow==null ) {
-			// we have no information about the follow; we can only consume
-			// a single token and hope for the best
-			return false;
-		}
-		// compute what can follow this grammar element reference
-		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
-			IntervalSet viableTokensFollowingThisRule = computeNextViableTokenSet();
-			follow = follow.or(viableTokensFollowingThisRule);
-            if ( ctx.sp>=0 ) { // remove EOR if we're not the start symbol
-                follow.remove(Token.EOR_TOKEN_TYPE);
-            }
-		}
-		// if current token is consistent with what could come after set
-		// then we know we're missing a token; error recovery is free to
-		// "insert" the missing token
-
-		//System.out.println("viable tokens="+follow.toString(getTokenNames()));
-		//System.out.println("LT(1)="+((TokenStream)input).LT(1));
-
-		// IntervalSet cannot handle negative numbers like -1 (EOF) so I leave EOR
-		// in follow set to indicate that the fall of the start symbol is
-		// in the set (EOF can follow).
-		if ( follow.member(input.LA(1)) || follow.member(Token.EOR_TOKEN_TYPE) ) {
-			//System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
-			return true;
-		}
-		return false;
-		*/
 	}
 
 	/** Conjure up a missing token during error recovery.
@@ -273,6 +245,10 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		return t;
 	}
 
+	public IntervalSet getExpectedTokens(BaseRecognizer recognizer) {
+		return recognizer.getExpectedTokens();
+	}
+
 	/** How should a token be displayed in an error message? The default
 	 *  is to display just the text, but during development you might
 	 *  want to have a lot of information spit out.  Override in that case
@@ -297,29 +273,6 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		s = s.replaceAll("\t","\\\\t");
 		return "'"+s+"'";
 	}
-
-	/** Report a recognition problem.
-	 *
-	 *  This method sets errorRecovery to indicate the parser is recovering
-	 *  not parsing.  Once in recovery mode, no errors are generated.
-	 *  To get out of recovery mode, the parser must successfully match
-	 *  a token (after a resync).  So it will go:
-	 *
-	 * 		1. error occurs
-	 * 		2. enter recovery mode, report error
-	 * 		3. consume until token found in resynch set
-	 * 		4. try to resume parsing
-	 * 		5. next match() will reset errorRecovery mode
-	 */
-//	public void _reportError(BaseRecognizer recognizer,
-//							RecognitionException e) {
-//		// if we've already reported an error and have not matched a token
-//		// yet successfully, don't report any errors.
-//		if ( recognizer.errorRecovery ) return;
-//		trackError(recognizer);
-//
-//		recognizer.notifyListeners(e.offendingToken, "dsfdkjasdf");
-//	}
 
 	/*  Compute the error recovery set for the current rule.  During
 	 *  rule invocation, the parser pushes the set of tokens that can
@@ -428,15 +381,6 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
 		return recoverSet;
 	}
-
-//	public void consumeUntil(BaseRecognizer recognizer, int tokenType) {
-//		//System.out.println("consumeUntil "+tokenType);
-//		int ttype = recognizer.getInputStream().LA(1);
-//		while (ttype != Token.EOF && ttype != tokenType) {
-//			recognizer.getInputStream().consume();
-//			ttype = recognizer.getInputStream().LA(1);
-//		}
-//	}
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BaseRecognizer recognizer, IntervalSet set) {

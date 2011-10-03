@@ -32,6 +32,56 @@ import org.junit.Test;
 
 /** test runtime parse errors */
 public class TestParseErrors extends BaseTest {
+	@Test public void testTokenMismatch() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' 'b' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aa", false);
+		String expecting = "line 1:1 mismatched input 'a' expecting 'b'\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testSingleTokenDeletion() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' 'b' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aab", false);
+		String expecting = "line 1:1 extraneous input 'a' expecting 'b'\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testSingleTokenDeletionExpectingSet() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' ('b'|'c') ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aab", false);
+		String expecting = "line 1:1 extraneous input 'a' expecting {'b', 'c'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testSingleTokenInsertion() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' 'b' 'c' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "ac", false);
+		String expecting = "line 1:1 missing 'b' at 'c'\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testSingleSetInsertion() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' ('b'|'c') 'd' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "ad", false);
+		String expecting = "line 1:1 missing {'b', 'c'} at 'd'\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
 	@Test public void testLL2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
