@@ -1,6 +1,8 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -97,7 +99,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 			endErrorCondition();
 			return;
 		}
-		recoverInline(recognizer);
+		reportUnwantedToken(recognizer);
+		consumeUntil(recognizer, expecting);
 	}
 
 	public void reportNoViableAlternative(BaseRecognizer recognizer,

@@ -150,12 +150,34 @@ public class TestParseErrors extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
+	@Test public void testMultiTokenDeletionBeforeLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' 'b'* 'c';";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aacabc", false);
+		String expecting = "line 1:1 extraneous input 'a' expecting {'b', 'c'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
 	@Test public void testSingleTokenDeletionDuringLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : 'a' 'b'* 'c' ;";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "ababbc", false);
 		String expecting = "line 1:2 extraneous input 'a' expecting {'b', 'c'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testMultiTokenDeletionDuringLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' 'b'* 'c' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "abaaababc", false);
+		String expecting =
+				"line 1:2 extraneous input 'a' expecting {'b', 'c'}\n" +
+				"line 1:6 extraneous input 'a' expecting {'b', 'c'}\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
