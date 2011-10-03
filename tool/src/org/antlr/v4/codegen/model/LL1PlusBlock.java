@@ -41,7 +41,6 @@ public class LL1PlusBlock extends LL1Loop {
 	/** Token names for each alt 0..n-1 */
 	public List<String[]> altLook;
 
-	@ModelElement public Sync iterationSync;
 	public String loopLabel;
 	public String loopCounterVar;
 	public String[] exitLook;
@@ -73,10 +72,5 @@ public class LL1PlusBlock extends LL1Loop {
 		IntervalSet exitLookSet = altLookSets[altLookSets.length-1];
 		this.exitLook = gen.target.getTokenTypesAsTargetLabels(g,
 															   exitLookSet.toArray());
-
-		//IntervalSet iterationExpected = (IntervalSet)loopBackLook.or(exitLookSet);
-//		this.sync = new Sync(factory, plusRoot, loopBackLook, decision, "enter");
-//		this.iterationSync = new Sync(factory, plusRoot, iterationExpected, decision, "iter");
-//		this.earlyExitError = new ThrowEarlyExitException(factory, plusRoot, null);
 	}
 }

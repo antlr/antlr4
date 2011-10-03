@@ -44,7 +44,6 @@ public class StarBlock extends Loop {
 	{
 		super(factory, blkOrEbnfRootAST, alts);
 		loopLabel = factory.getGenerator().target.getLoopLabel(blkOrEbnfRootAST);
-//		BlockStartState star = (BlockStartState)blkOrEbnfRootAST.atnState;
 		StarLoopEntryState star = (StarLoopEntryState)blkOrEbnfRootAST.atnState;
 		decision = star.decision;
 		exitAlt = alts.size()+1;

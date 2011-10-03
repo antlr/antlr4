@@ -218,6 +218,7 @@ CodeBlockForAlt(c, locals, preamble, ops) ::= <<
 >>
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
+setState(<choice.stateNumber>);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( _input.LA(1) ) {
@@ -230,6 +231,7 @@ switch ( _input.LA(1) ) {
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
+setState(<choice.stateNumber>);
 switch ( _input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
@@ -240,6 +242,7 @@ switch ( _input.LA(1) ) {
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
+setState(<choice.stateNumber>);
 <preamble; separator="\n">
 if ( <expr> ) {
     <alts; separator="\n">
@@ -247,7 +250,9 @@ if ( <expr> ) {
 <!else if ( !(<followExpr>) ) <error>!>
 >>
 
-LL1StarBlock(choice, alts, sync) ::= <<
+LL1StarBlock(choice, alts) ::= <<
+setState(<choice.stateNumber>);
+_errHandler.sync(this);
 <choice.loopLabel>:
 while (true) {
 	switch ( _input.LA(1) ) {
@@ -257,21 +262,26 @@ while (true) {
 		<cases(choice.exitLook)>
 		    break <choice.loopLabel>;
 	}
-    //<sync>
+	setState(<choice.stateNumber>);
+    _errHandler.sync(this);
 }
 >>
 
-LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration, sync) ::= <<
+LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
+setState(<choice.stateNumber>);
+_errHandler.sync(this);
 <preamble; separator="\n">
 while ( <loopExpr> ) {
     <alts; separator="\n">
+	setState(<choice.stateNumber>);
+	_errHandler.sync(this);
     <iteration>
-    //<sync>
 }
 >>
 
-LL1PlusBlock(choice, alts, iteration, loopExpr, sync, error, iterationSync) ::= <<
-//<sync>
+LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
+setState(<choice.stateNumber>);
+_errHandler.sync(this);
 do {
 	switch ( _input.LA(1) ) {
 		<choice.altLook,alts:{look,alt| <cases(look)>
@@ -280,26 +290,28 @@ do {
         default :
             <error>
 	}
+	setState(<choice.stateNumber>);
+	_errHandler.sync(this);
     <iteration>
-    //<iterationSync>
 } while ( <loopExpr> );
 >>
 
-LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration,
-                      sync, iterationSync) ::=
-<<
-//<sync>
+LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
+setState(<choice.stateNumber>);
+_errHandler.sync(this);
 <preamble; separator="\n">
 do {
     <alts; separator="\n">
+	setState(<choice.stateNumber>);
+	_errHandler.sync(this);
     <iteration>
-//    <iterationSync>
 } while ( <loopExpr> );
 >>
 
 // LL(*) stuff
 
 AltBlock(choice, preamble, alts, error) ::= <<
+setState(<choice.stateNumber>);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
@@ -311,6 +323,7 @@ case <i>:
 >>
 
 OptionalBlock(choice, alts, error) ::= <<
+setState(<choice.stateNumber>);
 switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
@@ -322,6 +335,8 @@ case <i>:
 // TODO: we we need uniqueID? a single _alt might work
 
 StarBlock(choice, alts, sync) ::= <<
+setState(<choice.stateNumber>);
+_errHandler.sync(this);
 int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
 	switch ( _alt<choice.uniqueID> ) {
@@ -330,11 +345,15 @@ case <i>:
 	<alt>
 	break;}; separator="\n">
 	}
+	setState(<choice.stateNumber>);
+	_errHandler.sync(this);
 	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
+setState(<choice.stateNumber>);
+_errHandler.sync(this);
 int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 do {
 	switch ( _alt<choice.uniqueID> ) {
@@ -345,6 +364,8 @@ case <i>:
 	    default :
 		    <error>
 	}
+	setState(<choice.stateNumber>);
+	_errHandler.sync(this);
 	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 } while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );
 >>

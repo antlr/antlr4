@@ -58,7 +58,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  matched a token.  Prevents generation of more than one error message
 	 *  per error.
 	 */
-	protected boolean errorRecovery = false;
+//	protected boolean errorRecovery = false;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int syntaxErrors = 0;
@@ -70,8 +70,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	/** reset the parser's state */
 	public void reset() {
 		if ( getInputStream()!=null ) getInputStream().seek(0);
-		_errHandler.reset();
-		errorRecovery = false;
+		_errHandler.endErrorCondition();
+//		errorRecovery = false;
 		_ctx = null;
 	}
 
@@ -92,8 +92,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		Object matchedSymbol = getCurrentInputSymbol();
 		if ( getInputStream().LA(1)==ttype ) {
 			getInputStream().consume();
-			errorRecovery = false;
-			_errHandler.reset();
+//			errorRecovery = false;
+			_errHandler.endErrorCondition();
 			if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
 			return matchedSymbol;
 		}
@@ -102,8 +102,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	/** Match the wildcard: in a symbol */
 	public void matchAny() {
-		errorRecovery = false;
-		_errHandler.reset();
+//		errorRecovery = false;
+		_errHandler.endErrorCondition();
 		getInputStream().consume();
 	}
 
@@ -141,32 +141,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	public boolean getTraceATNStates() {
 		return traceATNStates;
-	}
-
-	/** Report a recognition problem.
-	 *
-	 *  This method sets errorRecovery to indicate the parser is recovering
-	 *  not parsing.  Once in recovery mode, no errors are generated.
-	 *  To get out of recovery mode, the parser must successfully match
-	 *  a token (after a resync).  So it will go:
-	 *
-	 * 		1. error occurs
-	 * 		2. enter recovery mode, report error
-	 * 		3. consume until token found in resynch set
-	 * 		4. try to resume parsing
-	 * 		5. next match() will reset errorRecovery mode
-	 */
-	public void reportError(RecognitionException e) {
-		// if we've already reported an error and have not matched a token
-		// yet successfully, don't report any errors.
-		if ( errorRecovery ) {
-			//System.err.print("[SPURIOUS] ");
-			return;
-		}
-		syntaxErrors++; // don't count spurious
-		errorRecovery = true;
-
-		notifyListeners(e.offendingToken, e.getMessage(), e);
 	}
 
 	/** Get number of recognition errors (lexer, parser, tree parser).  Each

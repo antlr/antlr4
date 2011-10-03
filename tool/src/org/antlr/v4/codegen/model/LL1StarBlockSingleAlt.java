@@ -48,8 +48,5 @@ public class LL1StarBlockSingleAlt extends LL1Loop {
 		IntervalSet enterLook = altLookSets[1];
 		IntervalSet exitLook = altLookSets[2];
 		loopExpr = addCodeForLoopLookaheadTempVar(enterLook);
-
-		IntervalSet enterExpecting = (IntervalSet)exitLook.or(enterLook);
-		this.sync = new Sync(factory, starRoot, enterExpecting, decision, "iter");
 	}
 }

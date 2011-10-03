@@ -108,7 +108,7 @@ public class TestParseErrors extends BaseTest {
 			";\n" +
 			"q : 'e' ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "ae", false);
-		String expecting = "line 1:1 no viable alternative at input 'e'\n";
+		String expecting = "line 1:1 no viable alternative at input 'ae'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
@@ -122,7 +122,7 @@ public class TestParseErrors extends BaseTest {
 			"q : 'e' ;\n";
 		System.out.println(grammar);
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "abe", false);
-		String expecting = "line 1:2 no viable alternative at input 'e'\n";
+		String expecting = "line 1:2 no viable alternative at input 'abe'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
@@ -135,10 +135,21 @@ public class TestParseErrors extends BaseTest {
 			";\n" +
 			"q : 'e' ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aaae", false);
-		String expecting = "line 1:3 no viable alternative at input 'e'\n";
+		String expecting = "line 1:3 no viable alternative at input 'aaae'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
+
+	@Test public void testSingleTokenDeletionBeforeLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' 'b'*;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aabc", false);
+		String expecting = "line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
 
 	@Test public void testLL1ErrorInfo() throws Exception {
 		String grammar =

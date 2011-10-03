@@ -23,8 +23,12 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	protected IntervalSet lastErrorStates;
 
+	protected void beginErrorCondition() {
+		errorRecovery = true;
+	}
+
 	@Override
-	public void reset() {
+	public void endErrorCondition() {
 		errorRecovery = false;
 		lastErrorStates = null;
 		lastErrorIndex = -1;
@@ -35,6 +39,11 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 							RecognitionException e)
 		throws RecognitionException
 	{
+		// if we've already reported an error and have not matched a token
+		// yet successfully, don't report any errors.
+		if ( errorRecovery ) return; // don't count spurious errors
+		recognizer.syntaxErrors++;
+		beginErrorCondition();
 		if ( e instanceof NoViableAltException ) {
 			reportNoViableAlternative(recognizer, (NoViableAltException) e);
 		}
@@ -69,22 +78,36 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		lastErrorIndex = recognizer.getInputStream().index();
 		if ( lastErrorStates==null ) lastErrorStates = new IntervalSet();
 		lastErrorStates.add(recognizer._ctx.s);
-		IntervalSet followSet = computeErrorRecoverySet(recognizer);
+		IntervalSet followSet = getErrorRecoverySet(recognizer);
 		consumeUntil(recognizer, followSet);
 	}
 
+	/** Make sure that the current lookahead symbol is consistent with
+	 *  what were expecting at this point in the ATN.
+ 	 */
 	@Override
 	public void sync(BaseRecognizer recognizer) {
+		System.out.println("sync");
+		// TODO: CACHE THESE RESULTS!!
+		IntervalSet expecting = getExpectedTokens(recognizer);
+		// TODO: subclass this class for treeparsers
+		TokenStream tokens = (TokenStream)recognizer.getInputStream();
+		Token la = tokens.LT(1);
+		if ( expecting.contains(la.getType()) ) {
+			endErrorCondition();
+			return;
+		}
+		recoverInline(recognizer);
 	}
 
 	public void reportNoViableAlternative(BaseRecognizer recognizer,
 										  NoViableAltException e)
 		throws RecognitionException
 	{
-		if ( recognizer.errorRecovery ) return;
-		trackError(recognizer);
-
-		String msg = "no viable alternative at input "+getTokenErrorDisplay(e.offendingToken);
+		// TODO: subclass this class for treeparsers
+		TokenStream tokens = (TokenStream)recognizer.getInputStream();
+		String input = tokens.toString(e.startToken, e.offendingToken);
+		String msg = "no viable alternative at input "+escapeWSAndQuote(input);
 		recognizer.notifyListeners(e.offendingToken, msg, e);
 	}
 
@@ -92,9 +115,6 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 									InputMismatchException e)
 		throws RecognitionException
 	{
-		if ( recognizer.errorRecovery ) return;
-		trackError(recognizer);
-
 		String msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
 		recognizer.notifyListeners(e.offendingToken, msg, e);
@@ -102,11 +122,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportFailedPredicate(BaseRecognizer recognizer,
 									  FailedPredicateException e)
-	throws RecognitionException
+		throws RecognitionException
 	{
-		if ( recognizer.errorRecovery ) return;
-		trackError(recognizer);
-
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" failed predicate: {"+
 		e.predicateText+"}?";
@@ -114,11 +131,11 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {
-		if ( recognizer.errorRecovery ) return;
-		trackError(recognizer);
+		if ( errorRecovery ) return;
+		recognizer.syntaxErrors++;
+		beginErrorCondition();
 
 		Token t = (Token)recognizer.getCurrentInputSymbol();
-
 		String tokenName = getTokenErrorDisplay(t);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
@@ -127,8 +144,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	public void reportMissingToken(BaseRecognizer recognizer) {
-		if ( recognizer.errorRecovery ) return;
-		trackError(recognizer);
+		if ( errorRecovery ) return;
+		recognizer.syntaxErrors++;
+		beginErrorCondition();
 
 		Token t = (Token)recognizer.getCurrentInputSymbol();
 		IntervalSet expecting = getExpectedTokens(recognizer);
@@ -268,6 +286,10 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 				s = "<"+t.getType()+">";
 			}
 		}
+		return escapeWSAndQuote(s);
+	}
+
+	protected String escapeWSAndQuote(String s) {
 		s = s.replaceAll("\n","\\\\n");
 		s = s.replaceAll("\r","\\\\r");
 		s = s.replaceAll("\t","\\\\t");
@@ -366,7 +388,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	 *  Like Grosch I implement context-sensitive FOLLOW sets that are combined
 	 *  at run-time upon error to avoid overhead during parsing.
 	 */
-	protected IntervalSet computeErrorRecoverySet(BaseRecognizer recognizer) {
+	protected IntervalSet getErrorRecoverySet(BaseRecognizer recognizer) {
 		ATN atn = recognizer._interp.atn;
 		RuleContext ctx = recognizer._ctx;
 		IntervalSet recoverSet = new IntervalSet();
@@ -393,9 +415,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		}
 	}
 
-	protected void trackError(BaseRecognizer recognizer) {
-		recognizer.syntaxErrors++;
-		recognizer.errorRecovery = true;
-	}
+//	protected void trackError(BaseRecognizer recognizer) {
+//		recognizer.syntaxErrors++;
+//		recognizer.errorRecovery = true;
+//	}
 
 }

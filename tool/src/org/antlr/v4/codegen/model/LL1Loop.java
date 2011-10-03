@@ -39,7 +39,6 @@ import java.util.*;
 public abstract class LL1Loop extends Choice {
 	@ModelElement public OutputModelObject loopExpr;
 	@ModelElement public List<SrcOp> iteration;
-	@ModelElement public Sync sync;
 
 	public LL1Loop(OutputModelFactory factory,
 				   GrammarAST blkAST,

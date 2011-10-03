@@ -106,8 +106,7 @@ public class TreeParser extends BaseRecognizer {
 	 *  corresponding UP node.
 	 */
 	public void matchAny(IntStream ignore) { // ignore stream, copy of input
-		errorRecovery = false;
-//		failed = false;
+		_errHandler.endErrorCondition();
 		Object look = _input.LT(1);
 		if ( _input.getTreeAdaptor().getChildCount(look)==0 ) {
 			_input.consume(); // not subtree, consume 1 node and return

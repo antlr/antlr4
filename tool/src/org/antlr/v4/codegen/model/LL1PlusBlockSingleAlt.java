@@ -38,21 +38,14 @@ import java.util.List;
 
 /** */
 public class LL1PlusBlockSingleAlt extends LL1Loop {
-	@ModelElement public Sync iterationSync;
-
 	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 
 		PlusBlockStartState plus = (PlusBlockStartState)blkAST.atnState;
 		this.decision = plus.loopBackState.decision;
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
-		IntervalSet exitLook = altLookSets[altLookSets.length-1];
 
 		IntervalSet loopBackLook = altLookSets[1];
 		loopExpr = addCodeForLoopLookaheadTempVar(loopBackLook);
-
-		this.sync = new Sync(factory, blkAST, loopBackLook, decision, "enter");
-		IntervalSet iterationExpected = (IntervalSet) loopBackLook.or(exitLook);
-		iterationSync = new Sync(factory, blkAST, iterationExpected, decision, "iter");
 	}
 }

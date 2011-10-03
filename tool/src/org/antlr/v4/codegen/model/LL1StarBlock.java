@@ -46,7 +46,6 @@ public class LL1StarBlock extends LL1Loop {
 	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 
-//		StarBlockStartState blkStart = (StarBlockStartState)blkAST.atnState;
 		StarLoopEntryState star = (StarLoopEntryState)blkAST.atnState;
 		this.decision = star.decision;
 
@@ -61,7 +60,5 @@ public class LL1StarBlock extends LL1Loop {
 
 		this.exitLook =
 			factory.getGenerator().target.getTokenTypesAsTargetLabels(factory.getGrammar(), lastLook.toArray());
-
-//		this.sync = new Sync(factory, blkAST, expecting, decision, "iter");
 	}
 }

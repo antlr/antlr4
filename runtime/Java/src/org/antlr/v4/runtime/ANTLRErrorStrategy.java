@@ -52,7 +52,12 @@ public interface ANTLRErrorStrategy {
 	 */
 	void recover(BaseRecognizer recognizer);
 
-	/** Implement Jim Idle's magic sync mechanism in closures and optional
+	/** Make sure that the current lookahead symbol is consistent with
+	 *  what were expecting at this point in the ATN. You can call this
+	 *  anytime but ANTLR only generates code to check before loops
+	 *  and each iteration.
+	 *
+	 *  Implements Jim Idle's magic sync mechanism in closures and optional
 	 *  subrules. E.g.,
 	 *
 	 * 		a : sync ( stuff sync )* ;
@@ -80,5 +85,5 @@ public interface ANTLRErrorStrategy {
 	 *  when it matches a valid token (indicating no longer in recovery mode)
 	 *  and from its own reset method.
 	 */
-	void reset();
+	void endErrorCondition();
 }
