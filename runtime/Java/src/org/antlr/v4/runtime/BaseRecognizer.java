@@ -29,10 +29,14 @@
 package org.antlr.v4.runtime;
 
 import com.sun.istack.internal.Nullable;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /** A generic recognizer that can handle recognizers generated from
  *  parser and tree grammars.  This is all the parsing
@@ -54,11 +58,11 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	protected boolean buildParseTrees;
 	protected boolean traceATNStates;
 
-	/** This is true when we see an error and before having successfully
-	 *  matched a token.  Prevents generation of more than one error message
+	/** This is true after we see an error and before having successfully
+	 *  matched a token. Prevents generation of more than one error message
 	 *  per error.
 	 */
-//	protected boolean errorRecovery = false;
+	protected boolean errorRecoveryMode = false;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int syntaxErrors = 0;
@@ -70,8 +74,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	/** reset the parser's state */
 	public void reset() {
 		if ( getInputStream()!=null ) getInputStream().seek(0);
-		_errHandler.endErrorCondition();
-//		errorRecovery = false;
+		_errHandler.endErrorCondition(this);
 		_ctx = null;
 	}
 
@@ -91,20 +94,14 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
 		Object matchedSymbol = getCurrentInputSymbol();
 		if ( getInputStream().LA(1)==ttype ) {
-			getInputStream().consume();
-//			errorRecovery = false;
-			_errHandler.endErrorCondition();
-			if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
-			return matchedSymbol;
+			_errHandler.endErrorCondition(this);
+			consume();
 		}
-		return _errHandler.recoverInline(this);
-	}
-
-	/** Match the wildcard: in a symbol */
-	public void matchAny() {
-//		errorRecovery = false;
-		_errHandler.endErrorCondition();
-		getInputStream().consume();
+		else {
+			matchedSymbol = _errHandler.recoverInline(this);
+		}
+//		if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
+		return matchedSymbol;
 	}
 
 	/** Track the RuleContext objects during the parse and hook them up
@@ -112,10 +109,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  The RuleContext returned from the start rule represents the root
 	 *  of the parse tree.
 	 *
-	 *  To built parse trees, all we have to do is put a hook in move()
-	 *  and enterRule(). In move(), we had tokens to the current context
+	 *  To built parse trees, all we have to do is put a hook in setState()
+	 *  and enterRule(). In setState(), we add tokens to the current context
 	 *  as children. By the time we get to enterRule(), we are already
-	 *  in in invoke rule so we add this context As a child of the parent
+	 *  in an invoked rule so we add this context as a child of the parent
 	 *  (invoking) context. Simple and effective.
 	 *
 	 *  Note that if we are not building parse trees, rule contexts
@@ -183,6 +180,32 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
 		_ctx = localctx;
 		_ctx.altNum = altNum;
+		addContextToParseTree();
+	}
+
+	/** Consume the current symbol and return it. E.g., given the following
+	 *  input with A being the current lookahead symbol:
+	 *
+	 *  	A B
+	 *  	^
+	 *
+	 *  this function moves the cursor to B and returns A.
+	 *
+	 *  If the parser is creating parse trees, the current symbol
+	 *  would also be added as a child to the current context (node).
+	 */
+	protected Object consume() {
+		Object o = getCurrentInputSymbol();
+		getInputStream().consume();
+		if ( buildParseTrees ) {
+			// TODO: tree parsers?
+			if ( errorRecoveryMode ) _ctx.addErrorNode((Token) o);
+			else _ctx.addChild((Token)o);
+		}
+		return o;
+	}
+
+	protected void addContextToParseTree() {
 		if ( buildParseTrees ) {
 			if ( _ctx.parent!=null ) _ctx.parent.addChild(_ctx);
 		}
@@ -190,10 +213,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	public void exitRule(int ruleIndex) {
 		_ctx = (ParserRuleContext)_ctx.parent;
-	}
-
-	public IntervalSet getExpectedTokens() {
-		return _interp.atn.nextTokens(_ctx);
 	}
 
 	public ParserRuleContext getInvokingContext(int ruleIndex) {
@@ -208,6 +227,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	public boolean inContext(String context) {
 		// TODO: useful in parser?
 		return false;
+	}
+
+	public IntervalSet getExpectedTokens() {
+		return _interp.atn.nextTokens(_ctx);
 	}
 
 	/** Return List<String> of the rules in your parser instance

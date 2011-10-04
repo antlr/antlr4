@@ -29,7 +29,8 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
@@ -44,9 +45,11 @@ public interface ParseTree extends SyntaxTree {
 	public interface RuleNode extends ParseTree {
 		RuleContext getRuleContext();
 	}
+
 	public interface TokenNode extends ParseTree {
 		Token getToken();
 	}
+
 	public static class TokenNodeImpl implements TokenNode {
 		public Token token;
 		public ParseTree parent;
@@ -78,6 +81,20 @@ public interface ParseTree extends SyntaxTree {
 		public String toStringTree() {
 			return toString();
 		}
+	}
+
+	/** Represents a token that was consumed during resynchronization
+	 *  rather than during a valid match operation. For example,
+	 *  we will create this kind of a node during single token insertion
+	 *  and deletion as well as during "consume until error recovery set"
+	 *  upon no viable alternative exceptions.
+	 */
+	public static class ErrorNodeImpl extends TokenNodeImpl {
+		public ErrorNodeImpl(Token token) {
+			super(token);
+		}
+		@Override
+		public String toString() { return "<ERROR: "+super.toString()+">"; }
 	}
 
 	// the following methods narrow the return type; they are not additional methods

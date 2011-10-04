@@ -9,12 +9,6 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  *  and tree parsers.
  */
 public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
-	/** This is true when we see an error and before having successfully
-	 *  matched a token.  Prevents generation of more than one error message
-	 *  per error.
-	 */
-	protected boolean errorRecovery = false;
-
 	/** The index into the input stream where the last error occurred.
 	 * 	This is used to prevent infinite loops where an error is found
 	 *  but no token is consumed during recovery...another error is found,
@@ -25,13 +19,13 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	protected IntervalSet lastErrorStates;
 
-	protected void beginErrorCondition() {
-		errorRecovery = true;
+	protected void beginErrorCondition(BaseRecognizer recognizer) {
+		recognizer.errorRecoveryMode = true;
 	}
 
 	@Override
-	public void endErrorCondition() {
-		errorRecovery = false;
+	public void endErrorCondition(BaseRecognizer recognizer) {
+		recognizer.errorRecoveryMode = false;
 		lastErrorStates = null;
 		lastErrorIndex = -1;
 	}
@@ -43,9 +37,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	{
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if ( errorRecovery ) return; // don't count spurious errors
+		if (recognizer.errorRecoveryMode) return; // don't count spurious errors
 		recognizer.syntaxErrors++;
-		beginErrorCondition();
+		beginErrorCondition(recognizer);
 		if ( e instanceof NoViableAltException ) {
 			reportNoViableAlternative(recognizer, (NoViableAltException) e);
 		}
@@ -75,7 +69,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token
 			// at least to prevent an infinite loop; this is a failsafe.
-			recognizer.getInputStream().consume();
+//			recognizer.getInputStream().consume();
+			recognizer.consume();
 		}
 		lastErrorIndex = recognizer.getInputStream().index();
 		if ( lastErrorStates==null ) lastErrorStates = new IntervalSet();
@@ -89,14 +84,13 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
  	 */
 	@Override
 	public void sync(BaseRecognizer recognizer) {
-		System.out.println("sync");
 		// TODO: CACHE THESE RESULTS!!
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		// TODO: subclass this class for treeparsers
 		TokenStream tokens = (TokenStream)recognizer.getInputStream();
 		Token la = tokens.LT(1);
 		if ( expecting.contains(la.getType()) ) {
-			endErrorCondition();
+			endErrorCondition(recognizer);
 			return;
 		}
 		reportUnwantedToken(recognizer);
@@ -134,9 +128,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {
-		if ( errorRecovery ) return;
+		if (recognizer.errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
-		beginErrorCondition();
+		beginErrorCondition(recognizer);
 
 		Token t = (Token)recognizer.getCurrentInputSymbol();
 		String tokenName = getTokenErrorDisplay(t);
@@ -147,9 +141,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	public void reportMissingToken(BaseRecognizer recognizer) {
-		if ( errorRecovery ) return;
+		if (recognizer.errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
-		beginErrorCondition();
+		beginErrorCondition(recognizer);
 
 		Token t = (Token)recognizer.getCurrentInputSymbol();
 		IntervalSet expecting = getExpectedTokens(recognizer);
@@ -192,11 +186,12 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	public Object recoverInline(BaseRecognizer recognizer)
 		throws RecognitionException
 	{
-		IntervalSet expecting = getExpectedTokens(recognizer);
 		Object currentSymbol = recognizer.getCurrentInputSymbol();
 
+		// SINGLE TOKEN DELETION
 		// if next token is what we are looking for then "delete" this token
 		int nextTokenType = recognizer.getInputStream().LA(2);
+		IntervalSet expecting = getExpectedTokens(recognizer);
 		if ( expecting.contains(nextTokenType) ) {
 			reportUnwantedToken(recognizer);
 			/*
@@ -205,18 +200,20 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 							   " since "+((TokenStream)recognizer.getInputStream()).LT(2)+
 							   " is what we want");
 			*/
-			recognizer.getInputStream().consume(); // simply delete extra token
+			recognizer.consume(); // simply delete extra token
+//			recognizer.getInputStream().consume(); // simply delete extra token
 			// we want to return the token we're actually matching
 			Object matchedSymbol = recognizer.getCurrentInputSymbol();
-			recognizer.getInputStream().consume(); // move past ttype token as if all were ok
+			endErrorCondition(recognizer);  // we know next token is correct
+			recognizer.consume(); // move past ttype token as if all were ok
+//			recognizer.getInputStream().consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
 
-		// can't recover with single token deletion, try insertion
+		// SINGLE TOKEN INSERTION
 		// if current token is consistent with what could come after current
 		// ATN state, then we know we're missing a token; error recovery
 		// is free to conjure up and insert the missing token
-
 		ATNState currentState = recognizer._interp.atn.states.get(recognizer._ctx.s);
 		ATNState next = currentState.transition(0).target;
 		IntervalSet expectingAtLL2 = recognizer._interp.atn.nextTokens(next, recognizer._ctx);
@@ -403,7 +400,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 			recoverSet.addAll(follow);
 			ctx = ctx.parent;
 		}
-		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
+//		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
 		return recoverSet;
 	}
 
@@ -413,7 +410,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
-			recognizer.getInputStream().consume();
+//			recognizer.getInputStream().consume();
+			recognizer.consume();
 			ttype = recognizer.getInputStream().LA(1);
 		}
 	}

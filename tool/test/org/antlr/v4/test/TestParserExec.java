@@ -38,7 +38,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID INT {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : ID INT {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
@@ -51,7 +51,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID+ {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : ID+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -64,7 +64,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)+ {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : (ID|ID)+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -76,7 +76,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID* {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : ID* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -92,7 +92,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)* {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : (ID|ID)* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -107,7 +107,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})+ {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : (ID|INT{;})+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
@@ -120,7 +120,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})* {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : (ID|INT{;})* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
@@ -136,7 +136,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testNongreedyLoopCantSeeEOF() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : block EOF {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"s : block EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"block : '{' .* '}' ;\n"+
 			"EQ : '=' ;\n" +
 			"INT : '0'..'9'+ ;\n" +
@@ -162,7 +162,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testNongreedyLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : ifstat ';' EOF {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"s : ifstat ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ifstat : 'if' '(' .* ')' block ;\n" +
 			"block : '{' '}' ;\n"+
 			"EQ : '=' ;\n" +
@@ -189,7 +189,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testNongreedyLoopPassingThroughAnotherNongreedy() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : ifstat ';' EOF {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"s : ifstat ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ifstat : 'if' '(' .* ')' block ;\n" +
 			"block : '{' (block|.)* '}' ;\n"+
 			"EQ : '=' ;\n" +
@@ -207,7 +207,7 @@ public class TestParserExec extends BaseTest {
 		// EOF on end means LL(*) can identify when to stop the loop.
 		String grammar =
 			"grammar T;\n" +
-			"s : stat* ID '=' ID ';' EOF {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"s : stat* ID '=' ID ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"stat : 'if' '(' INT ')' stat\n" +
 			"     | 'return' INT ';'\n" +
 			"     | ID '=' (INT|ID) ';'\n" +
@@ -234,12 +234,12 @@ public class TestParserExec extends BaseTest {
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		// can't match EOF to ID '=' '0' ';'
-		assertEquals("no viable token at input [@8,9:9='<EOF>',<-1>,1:9], index 8\n", found);
+		assertEquals("no viable token at input EOF, index 8\n", found);
 		input =
 			"x=1; a=b; z=3;"; // FAILS to match since it can't match last element
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
-		assertEquals("no viable token at input [@12,14:14='<EOF>',<-1>,1:14], index 12\n", found); // should not finish to print output
+		assertEquals("no viable token at input EOF, index 12\n", found); // should not finish to print output
 	}
 
 	@Test public void testStatLoopNongreedyNecessary() throws Exception {
@@ -250,7 +250,7 @@ public class TestParserExec extends BaseTest {
 			"grammar T;\n" +
 			"random : s ;" + // call s so s isn't followed by EOF directly
 			"s : (options {greedy=false;} : stat)* ID '=' ID ';'\n" +
-			"    {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"    {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"stat : 'if' '(' INT ')' stat\n" +
 			"     | 'return' INT ';'\n" +
 			"     | ID '=' (INT|ID) ';'\n" +
@@ -277,7 +277,7 @@ public class TestParserExec extends BaseTest {
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		// can't match EOF to ID '=' '0' ';'
-		assertEquals("no viable token at input [@8,9:9='<EOF>',<-1>,1:9], index 8\n", found);
+		assertEquals("no viable token at input EOF, index 8\n", found);
 		input =
 			"x=1; a=b; z=3;"; // stops at a=b; ignores z=3;
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -288,7 +288,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testHTMLTags() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : tag+ {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"a : tag+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"tag : '<' '/'? .* '>'  ;\n" +
 			"EQ : '=' ;\n" +
 			"COMMA : ',' ;\n" +
@@ -300,7 +300,7 @@ public class TestParserExec extends BaseTest {
 		String found = null;
 		found = execParser("T.g", grammar, "TParser", "TLexer", "a",
 								  "<a>foo</a>", false);
-		assertEquals("<a>\n", found);
+		assertEquals("<a>foo</a>\n", found);
 		found = execParser("T.g", grammar, "TParser", "TLexer", "a",
 								  "<a></a>", false);
 		assertEquals("<a></a>\n", found);
@@ -347,7 +347,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testNongreedyLoopEndOfRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : ifstat EOF {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+			"s : ifstat EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 			"ifstat : 'if' '(' INT ')' .* ;\n" +
 			"EQ : '=' ;\n" +
 			"INT : '0'..'9'+ ;\n" +
@@ -375,7 +375,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testNongreedyLoopEndOfRuleStuffFollowing() throws Exception {
 		String grammar =
 		"grammar T;\n" +
-		"s : ifstat '.' {System.out.println(input.toString(0,input.index()-1));} ;\n" +
+		"s : ifstat '.' {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
 		"ifstat : 'if' '(' INT ')' .* ;\n" +
 		"EQ : '=' ;\n" +
 		"INT : '0'..'9'+ ;\n" +
@@ -385,6 +385,6 @@ public class TestParserExec extends BaseTest {
 		"if ( 34 ) a b .";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
-		assertEquals("no viable token at input [@7,15:15='<EOF>',<-1>,1:15], index 7\n", found);
+		assertEquals("no viable token at input EOF, index 7\nif(34)ab.\n", found);
 	}
 }

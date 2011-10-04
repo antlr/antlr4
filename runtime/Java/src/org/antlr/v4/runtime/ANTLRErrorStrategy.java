@@ -81,9 +81,9 @@ public interface ANTLRErrorStrategy {
 	 */
 	void sync(BaseRecognizer recognizer);
 
-	/** Reset the error handler. The parser invokes this
-	 *  when it matches a valid token (indicating no longer in recovery mode)
+	/** Reset the error handler. Call this when the parser
+	 *  matches a valid token (indicating no longer in recovery mode)
 	 *  and from its own reset method.
 	 */
-	void endErrorCondition();
+	void endErrorCondition(BaseRecognizer recognizer);
 }

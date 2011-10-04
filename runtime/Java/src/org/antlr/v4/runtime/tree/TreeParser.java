@@ -31,9 +31,10 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
+/** A parser for a stream of tree nodes. "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
  *  the BaseRecognizer superclass.
 */
@@ -106,7 +107,7 @@ public class TreeParser extends BaseRecognizer {
 	 *  corresponding UP node.
 	 */
 	public void matchAny(IntStream ignore) { // ignore stream, copy of input
-		_errHandler.endErrorCondition();
+		_errHandler.endErrorCondition(this);
 		Object look = _input.LT(1);
 		if ( _input.getTreeAdaptor().getChildCount(look)==0 ) {
 			_input.consume(); // not subtree, consume 1 node and return

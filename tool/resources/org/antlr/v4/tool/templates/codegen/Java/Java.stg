@@ -427,12 +427,12 @@ setState(<m.stateNumber>);
 if ( <if(!invert)>!<endif>(<expr>) ) {
     <if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler.recoverInline(this);
 }
-_input.consume();
+consume();
 >>
 
 Wildcard(w) ::= <<
 setState(<w.stateNumber>);
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>_input.LT(1); _input.consume();
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>_input.LT(1); consume();
 >>
 
 // ACTION STUFF
