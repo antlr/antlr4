@@ -29,9 +29,14 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.WritableToken;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** An ASTAdaptor that works with any BaseAST implementation. */
 public abstract class BaseASTAdaptor implements ASTAdaptor {
@@ -213,7 +218,7 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 	}
 
 	public void setType(Object t, int type) {
-		throw new NoSuchMethodError("don't know enough about AST node");
+		throw new UnsupportedOperationException("don't know enough about AST node");
 	}
 
 	public String getText(Object t) {
@@ -221,7 +226,7 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 	}
 
 	public void setText(Object t, String text) {
-		throw new NoSuchMethodError("don't know enough about AST node");
+		throw new UnsupportedOperationException("don't know enough about AST node");
 	}
 
 	public Object getChild(Object t, int i) {
