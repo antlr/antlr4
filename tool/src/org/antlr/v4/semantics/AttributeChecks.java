@@ -149,8 +149,8 @@ public class AttributeChecks implements ActionSplitterListener {
 				return; // $ids for ids+=ID etc...
 			}
 			if ( isolatedRuleRef(x.getText())!=null ) {
-				errMgr.grammarError(ErrorType.ISOLATED_RULE_REF,
-									g.fileName, x, x.getText(), expr);
+//				errMgr.grammarError(ErrorType.ISOLATED_RULE_REF,
+//									g.fileName, x, x.getText(), expr);
 				return;
 			}
 			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,

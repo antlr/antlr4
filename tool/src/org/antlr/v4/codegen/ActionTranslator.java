@@ -29,14 +29,19 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.actions.*;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ActionSplitter;
+import org.antlr.v4.parse.ActionSplitterListener;
 import org.antlr.v4.tool.*;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
@@ -151,6 +156,10 @@ public class ActionTranslator implements ActionSplitterListener {
 		if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
 			chunks.add(new ListLabelRef(x.getText())); // $ids for ids+=ID etc...
 			return;
+		}
+		Rule r = factory.getGrammar().getRule(x.getText());
+		if ( r!=null ) {
+			chunks.add(new LabelRef(getRuleLabel(x.getText()))); // $r for r rule ref
 		}
 	}
 

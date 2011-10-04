@@ -64,6 +64,9 @@ public class Trees {
 				String ruleName = recog.getRuleNames()[ruleIndex];
 				return ruleName;
 			}
+			else if ( t instanceof ParseTree.ErrorNodeImpl ) {
+				return t.toString();
+			}
 			else if ( t instanceof ParseTree.TokenNode ) {
 				Token tok = ((ParseTree.TokenNode) t).getToken();
 				return tok.getText();

@@ -1,16 +1,14 @@
 grammar W;
 
-s : a ';' {System.out.println("done");} ;
-
-a : '[' b ']'
-  | '(' b ')'
+s
+@init {setBuildParseTrees(true);}
+@after {System.out.println(_localctx.toStringTree(this));}
+  : a
   ;
-
-b : c '^' INT ;
-
-c : ID
-  | INT
+ 
+a : 'x' | 'y'
   ;
+Z : 'z'; 
 
 EQ : '=' ;
 INT : '0'..'9'+ ;

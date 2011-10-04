@@ -94,7 +94,7 @@ public interface ParseTree extends SyntaxTree {
 			super(token);
 		}
 		@Override
-		public String toString() { return "<ERROR: "+super.toString()+">"; }
+		public String toString() { return "<ERROR:"+super.toString()+">"; }
 	}
 
 	// the following methods narrow the return type; they are not additional methods

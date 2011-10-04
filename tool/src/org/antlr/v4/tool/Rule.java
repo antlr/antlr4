@@ -231,7 +231,10 @@ public class Rule implements AttributeResolver {
 	}
 
 	public boolean resolvesToLabel(String x, ActionAST node) {
-		return false;
+		LabelElementPair anyLabelDef = getAnyLabelDef(x);
+		return anyLabelDef!=null &&
+			   (anyLabelDef.type==LabelType.RULE_LABEL ||
+				anyLabelDef.type==LabelType.TOKEN_LABEL);
 	}
 
 	public boolean resolvesToListLabel(String x, ActionAST node) {
