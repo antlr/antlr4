@@ -104,4 +104,19 @@ public class TestParseTrees extends BaseTest {
 		String expecting = "(a <ERROR:z>)\n";
 		assertEquals(expecting, result);
 	}
+
+	@Test public void testSync() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s\n" +
+			"@init {setBuildParseTrees(true);}\n" +
+			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"  : r=a ;\n" +
+			"a : 'x' 'y'* '!'\n" +
+			"  ;\n" +
+			"Z : 'z'; \n";
+		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xzyy!", false);
+		String expecting = "(a x <ERROR:z> y y !)\n";
+		assertEquals(expecting, result);
+	}
 }
