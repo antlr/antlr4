@@ -78,10 +78,12 @@ public class TreeParser extends BaseRecognizer {
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
 	 */
-	public void enterRule(TreeParserRuleContext localctx, int ruleIndex) {
-		_ctx = localctx;
-		localctx.start = _input.LT(1);
-		localctx.ruleIndex = ruleIndex;
+	@Override
+	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
+		TreeParserRuleContext tctx = (TreeParserRuleContext)localctx;
+		_ctx = tctx;
+		tctx.start = _input.LT(1);
+		tctx.ruleIndex = ruleIndex;
 	}
 
 	public String getSourceName() {

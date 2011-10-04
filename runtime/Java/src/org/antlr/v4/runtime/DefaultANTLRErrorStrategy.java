@@ -9,6 +9,12 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  *  and tree parsers.
  */
 public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
+	/** This is true after we see an error and before having successfully
+	 *  matched a token. Prevents generation of more than one error message
+	 *  per error.
+	 */
+	protected boolean errorRecoveryMode = false;
+
 	/** The index into the input stream where the last error occurred.
 	 * 	This is used to prevent infinite loops where an error is found
 	 *  but no token is consumed during recovery...another error is found,
@@ -19,13 +25,19 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	protected IntervalSet lastErrorStates;
 
-	protected void beginErrorCondition(BaseRecognizer recognizer) {
-		recognizer.errorRecoveryMode = true;
+	@Override
+	public void beginErrorCondition(BaseRecognizer recognizer) {
+		errorRecoveryMode = true;
+	}
+
+	@Override
+	public boolean inErrorRecoveryMode(BaseRecognizer recognizer) {
+		return errorRecoveryMode;
 	}
 
 	@Override
 	public void endErrorCondition(BaseRecognizer recognizer) {
-		recognizer.errorRecoveryMode = false;
+		errorRecoveryMode = false;
 		lastErrorStates = null;
 		lastErrorIndex = -1;
 	}
@@ -37,7 +49,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	{
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if (recognizer.errorRecoveryMode) return; // don't count spurious errors
+		if (errorRecoveryMode) return; // don't count spurious errors
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
 		if ( e instanceof NoViableAltException ) {
@@ -128,7 +140,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {
-		if (recognizer.errorRecoveryMode) return;
+		if (errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
 
@@ -141,7 +153,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	public void reportMissingToken(BaseRecognizer recognizer) {
-		if (recognizer.errorRecoveryMode) return;
+		if (errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
 
@@ -415,10 +427,4 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 			ttype = recognizer.getInputStream().LA(1);
 		}
 	}
-
-//	protected void trackError(BaseRecognizer recognizer) {
-//		recognizer.syntaxErrors++;
-//		recognizer.errorRecovery = true;
-//	}
-
 }

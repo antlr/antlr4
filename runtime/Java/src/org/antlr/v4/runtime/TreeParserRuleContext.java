@@ -3,6 +3,7 @@ package org.antlr.v4.runtime;
 import org.stringtemplate.v4.ST;
 
 public class TreeParserRuleContext extends ParserRuleContext {
+	// TODO: heh, these are duplicates of the fields above!
 	public Object start, stop;
 	public Object tree;
 	public ST st;

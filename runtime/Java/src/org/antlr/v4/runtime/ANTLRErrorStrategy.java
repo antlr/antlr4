@@ -81,6 +81,21 @@ public interface ANTLRErrorStrategy {
 	 */
 	void sync(BaseRecognizer recognizer);
 
+	/** Notify handler that parser has entered an error state.  The
+	 *  parser currently doesn't call this--the handler itself calls this
+	 *  in report error methods.  But, for symmetry with endErrorCondition,
+	 *  this method is in the interface.
+	 */
+	void beginErrorCondition(BaseRecognizer recognizer);
+
+	/** Is the parser in the process of recovering from an error? Upon
+	 *  a syntax error, the parser enters recovery mode and stays there until
+	 *  the next successful match of a token. In this way, we can
+	 *  avoid sending out spurious error messages. We only want one error
+	 *  message per syntax error
+	 */
+	boolean inErrorRecoveryMode(BaseRecognizer recognizer);
+
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
 	 *  and from its own reset method.

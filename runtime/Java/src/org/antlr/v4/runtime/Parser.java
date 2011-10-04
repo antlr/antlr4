@@ -29,7 +29,8 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ASTAdaptor;
+import org.antlr.v4.runtime.tree.CommonASTAdaptor;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
@@ -57,6 +58,7 @@ public class Parser extends BaseRecognizer {
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
 	 */
+	@Override
 	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);

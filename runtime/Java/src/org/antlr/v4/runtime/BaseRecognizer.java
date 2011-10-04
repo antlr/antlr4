@@ -30,7 +30,9 @@ package org.antlr.v4.runtime;
 
 import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
@@ -57,12 +59,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 
 	protected boolean buildParseTrees;
 	protected boolean traceATNStates;
-
-	/** This is true after we see an error and before having successfully
-	 *  matched a token. Prevents generation of more than one error message
-	 *  per error.
-	 */
-	protected boolean errorRecoveryMode = false;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int syntaxErrors = 0;
@@ -199,7 +195,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		getInputStream().consume();
 		if ( buildParseTrees ) {
 			// TODO: tree parsers?
-			if ( errorRecoveryMode ) _ctx.addErrorNode((Token) o);
+			if ( _errHandler.inErrorRecoveryMode(this) ) _ctx.addErrorNode((Token) o);
 			else _ctx.addChild((Token)o);
 		}
 		return o;
@@ -210,6 +206,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 			if ( _ctx.parent!=null ) _ctx.parent.addChild(_ctx);
 		}
 	}
+
+	public abstract void enterRule(ParserRuleContext localctx, int ruleIndex);
 
 	public void exitRule(int ruleIndex) {
 		_ctx = (ParserRuleContext)_ctx.parent;
@@ -233,48 +231,25 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		return _interp.atn.nextTokens(_ctx);
 	}
 
-	/** Return List<String> of the rules in your parser instance
-	 *  leading up to a call to this method.  You could override if
+	/** Return List<String> of the rule names in your parser instance
+	 *  leading up to a call to the current rule.  You could override if
 	 *  you want more details such as the file/line info of where
-	 *  in the parser java code a rule is invoked.
+	 *  in the ATN a rule is invoked.
 	 *
-	 *  This is very useful for error messages and for context-sensitive
-	 *  error recovery.
+	 *  This is very useful for error messages.
 	 */
-	public List getRuleInvocationStack() {
-		// TODO: walk ctx chain now; this is legacy
-		String parserClassName = getClass().getName();
-		return getRuleInvocationStack(new Throwable(), parserClassName);
-	}
-
-	/** A more general version of getRuleInvocationStack where you can
-	 *  pass in, for example, a RecognitionException to get it's rule
-	 *  stack trace.  This routine is shared with all recognizers, hence,
-	 *  static.
-	 *
-	 *  TODO: move to a utility class or something; weird having lexer call this
-	 */
-	public static List getRuleInvocationStack(Throwable e,
-											  String recognizerClassName)
-	{
-		// TODO: walk ctx chain now; this is legacy
-		List rules = new ArrayList();
-		StackTraceElement[] stack = e.getStackTrace();
-		int i = 0;
-		for (i=stack.length-1; i>=0; i--) {
-			StackTraceElement t = stack[i];
-			if ( t.getClassName().startsWith("org.antlr.v4.runtime.") ) {
-				continue; // skip support code such as this method
-			}
-			if ( t.getMethodName().equals(NEXT_TOKEN_RULE_NAME) ) {
-				continue;
-			}
-			if ( !t.getClassName().equals(recognizerClassName) ) {
-				continue; // must not be part of this parser
-			}
-            rules.add(t.getMethodName());
+	public List<String> getRuleInvocationStack() {
+		String[] ruleNames = getRuleNames();
+		List<String> stack = new ArrayList<String>();
+		RuleContext p = _ctx;
+		while ( p!=null && p.invokingState>=0 ) {
+			// compute what follows who invoked us
+			ATNState invokingState = _interp.atn.states.get(p.invokingState);
+			RuleTransition rt = (RuleTransition)invokingState.transition(0);
+			stack.add(ruleNames[rt.ruleIndex]);
+			p = p.parent;
 		}
-		return rules;
+		return stack;
 	}
 
 	/** For debugging and other purposes, might want the grammar name.
