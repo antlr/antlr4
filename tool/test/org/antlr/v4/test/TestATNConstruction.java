@@ -1,8 +1,12 @@
 package org.antlr.v4.test;
 
-import org.antlr.v4.automata.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.automata.ATNPrinter;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 public class TestATNConstruction extends BaseTest {
@@ -258,7 +262,7 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_4\n" +
 			"BlockStart_4->s2\n" +
 			"BlockStart_4->BlockEnd_5\n" +
-			"s2-{A..B}->s3\n" +
+			"s2-{A, B}->s3\n" +
 			"BlockEnd_5->RuleStop_a_1\n" +
 			"s3->BlockEnd_5\n" +
 			"RuleStop_a_1-EOF->s6\n";
@@ -271,7 +275,7 @@ public class TestATNConstruction extends BaseTest {
 			"a : (A | B) C;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-{A..B}->s3\n" +
+			"s2-{A, B}->s3\n" +
 			"s3->s4\n" +
 			"s4-C->s5\n" +
 			"s5->RuleStop_a_1\n" +
