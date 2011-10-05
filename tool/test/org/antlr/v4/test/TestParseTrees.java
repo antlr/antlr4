@@ -3,16 +3,16 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 public class TestParseTrees extends BaseTest {
-	@Test public void testToken() throws Exception {
+	@Test public void testTokenAndRuleContextString() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTrees(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
-			"a : 'x' ;\n";
+			"a : 'x' {System.out.println(getRuleInvocationStack());} ;\n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "x", false);
-		String expecting = "(a x)\n";
+		String expecting = "[a, s]\n(a x)\n";
 		assertEquals(expecting, result);
 	}
 

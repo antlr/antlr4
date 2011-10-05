@@ -30,9 +30,7 @@ package org.antlr.v4.runtime;
 
 import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
@@ -242,11 +240,9 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		String[] ruleNames = getRuleNames();
 		List<String> stack = new ArrayList<String>();
 		RuleContext p = _ctx;
-		while ( p!=null && p.invokingState>=0 ) {
+		while ( p!=null ) {
 			// compute what follows who invoked us
-			ATNState invokingState = _interp.atn.states.get(p.invokingState);
-			RuleTransition rt = (RuleTransition)invokingState.transition(0);
-			stack.add(ruleNames[rt.ruleIndex]);
+			stack.add(ruleNames[p.getRuleIndex()]);
 			p = p.parent;
 		}
 		return stack;
