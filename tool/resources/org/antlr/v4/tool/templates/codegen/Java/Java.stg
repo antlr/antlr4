@@ -280,7 +280,7 @@ while ( <loopExpr> ) {
 >>
 
 LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-setState(<choice.stateNumber>);
+setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
 do {
 	switch ( _input.LA(1) ) {
@@ -290,19 +290,19 @@ do {
         default :
             <error>
 	}
-	setState(<choice.stateNumber>);
+    setState(<choice.stateNumber>);
 	_errHandler.sync(this);
     <iteration>
 } while ( <loopExpr> );
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
-setState(<choice.stateNumber>);
+setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
 <preamble; separator="\n">
 do {
     <alts; separator="\n">
-	setState(<choice.stateNumber>);
+	setState(<choice.stateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
     <iteration>
 } while ( <loopExpr> );
@@ -352,7 +352,7 @@ case <i>:
 >>
 
 PlusBlock(choice, alts, error) ::= <<
-setState(<choice.stateNumber>);
+setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
 int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 do {
@@ -364,7 +364,7 @@ case <i>:
 	    default :
 		    <error>
 	}
-	setState(<choice.stateNumber>);
+	setState(<choice.stateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 } while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );

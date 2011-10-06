@@ -277,6 +277,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  configuration information.
 	 */
 	public void setState(int atnState) {
+//		System.err.println("setState "+atnState);
 		_ctx.s = atnState;
 		if ( traceATNStates ) _ctx.trace(atnState);
 	}

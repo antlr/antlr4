@@ -56,6 +56,7 @@ public class LL1PlusBlock extends LL1Loop {
 		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
 
 		stateNumber = blkStart.loopBackState.stateNumber;
+		blockStartStateNumber = blkStart.stateNumber;
 
 		this.decision = blkStart.decision;
 		Grammar g = factory.getGrammar();

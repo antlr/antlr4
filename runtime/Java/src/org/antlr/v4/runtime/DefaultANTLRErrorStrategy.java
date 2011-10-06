@@ -74,14 +74,20 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	 */
 	@Override
 	public void recover(BaseRecognizer recognizer) {
+//		System.out.println("recover in "+recognizer.getRuleInvocationStack()+
+//						   " index="+recognizer.getInputStream().index()+
+//						   ", lastErrorIndex="+
+//						   lastErrorIndex+
+//						   ", states="+lastErrorStates);
 		if ( lastErrorIndex==recognizer.getInputStream().index() &&
-		     lastErrorStates.contains(recognizer._ctx.s) )
+		lastErrorStates.contains(recognizer._ctx.s) )
 		{
 			// uh oh, another error at same token index and previously-visited
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token
 			// at least to prevent an infinite loop; this is a failsafe.
-//			recognizer.getInputStream().consume();
+//			System.err.println("seen error condition before index="+
+//							   lastErrorIndex+", states="+lastErrorStates);
 			recognizer.consume();
 		}
 		lastErrorIndex = recognizer.getInputStream().index();
@@ -96,6 +102,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
  	 */
 	@Override
 	public void sync(BaseRecognizer recognizer) {
+		// If already recovering, don't try to sync
+		if ( errorRecoveryMode ) return;
 		// TODO: CACHE THESE RESULTS!!
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		// TODO: subclass this class for treeparsers

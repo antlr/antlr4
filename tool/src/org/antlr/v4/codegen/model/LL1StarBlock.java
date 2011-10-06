@@ -43,10 +43,13 @@ public class LL1StarBlock extends LL1Loop {
 	public String loopLabel;
 	public String[] exitLook;
 
-	public LL1StarBlock(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
-		super(factory, blkAST, alts);
+	public LL1StarBlock(OutputModelFactory factory, GrammarAST starRootAST, List<CodeBlockForAlt> alts) {
+		super(factory, starRootAST, alts);
 
-		StarLoopEntryState star = (StarLoopEntryState)blkAST.atnState;
+		StarLoopEntryState star = (StarLoopEntryState)starRootAST.atnState;
+		blockStartStateNumber =
+			starRootAST.atnState.transition(0).target.stateNumber;
+
 		this.decision = star.decision;
 
 		/** Lookahead for each alt 1..n */
@@ -56,7 +59,7 @@ public class LL1StarBlock extends LL1Loop {
 		System.arraycopy(altLookSets, 0, copy, 0, altLookSets.length-1); // remove last (exit) alt
 		altLookSets = copy;
 		altLook = getAltLookaheadAsStringLists(altLookSets);
-		loopLabel = factory.getGenerator().target.getLoopLabel(blkAST);
+		loopLabel = factory.getGenerator().target.getLoopLabel(starRootAST);
 
 		this.exitLook =
 			factory.getGenerator().target.getTokenTypesAsTargetLabels(factory.getGrammar(), lastLook.toArray());

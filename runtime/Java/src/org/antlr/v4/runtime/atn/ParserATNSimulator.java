@@ -95,9 +95,13 @@ public class ParserATNSimulator extends ATNSimulator {
 			//dump(dfa);
 			// start with the DFA
 			int m = input.mark();
-			int alt = execDFA(input, dfa, dfa.s0, outerContext);
-			input.seek(m);
-			return alt;
+			try {
+				int alt = execDFA(input, dfa, dfa.s0, outerContext);
+				return alt;
+			}
+			finally {
+				input.seek(m);
+			}
 		}
 	}
 
@@ -155,7 +159,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int t = input.LA(1);
-		int start = input.index();
+		int startIndex = input.index();
 	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+t);
@@ -167,9 +171,9 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( predI!=null ) return predI;
 //				System.out.println("start all over with ATN; can't use DFA");
 				// start all over with ATN; can't use DFA
-				input.seek(start);
+				input.seek(startIndex);
 				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-				int alt = execATN(input, throwAwayDFA, start, s0.configs, false);
+				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, false);
 				s.ctxToPrediction.put(outerContext, alt);
 				return alt;
 			}
@@ -187,11 +191,11 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( dfa_debug ) {
 
 					System.out.println("ATN exec upon "+
-									   getInputString(input, start) +
+									   getInputString(input, startIndex) +
 									   " at DFA state "+s.stateNumber);
 				}
 				try {
-					alt = execATN(input, dfa, start, s.configs, false);
+					alt = execATN(input, dfa, startIndex, s.configs, false);
 					// this adds edge even if next state is accept for
 					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 					// TODO: This next stuff kills edge, but extra states remain. :(
@@ -217,7 +221,14 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 			}
 			DFAState target = s.edges[t+1];
-			if ( target == ERROR ) break;
+			if ( target == ERROR ) {
+				NoViableAltException nvae =
+					new NoViableAltException(parser, input,
+											 input.get(startIndex),
+											 input.LT(1),
+											 s.configs, outerContext);
+				throw nvae;
+			}
 			s = target;
 			input.consume();
 			t = input.LA(1);
@@ -366,7 +377,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		} while ( true );
 
 		if ( prevAccept==null ) {
-			System.out.println("no viable token at input "+ getLookaheadName(input) +", index "+input.index());
+//			System.out.println("no viable token at input "+ getLookaheadName(input) +", index "+input.index());
 			NoViableAltException nvae =
 				new NoViableAltException(parser, input,
 										 input.get(startIndex),
