@@ -29,10 +29,12 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class LL1PlusBlock extends LL1Loop {
 		super(factory, plusRoot, alts);
 
 		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
+
+		stateNumber = blkStart.loopBackState.stateNumber;
 
 		this.decision = blkStart.decision;
 		Grammar g = factory.getGrammar();

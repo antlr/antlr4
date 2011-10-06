@@ -30,7 +30,8 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.tool.GrammarAST;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class PlusBlock extends Loop {
 	{
 		super(factory, ebnfRootAST, alts);
 		PlusLoopbackState loop = ((PlusBlockStartState)ebnfRootAST.atnState).loopBackState;
+		stateNumber = loop.stateNumber;
 		this.error = new ThrowNoViableAlt(factory, ebnfRootAST, null);
 		decision = loop.decision;
 		exitAlt = alts.size()+1;

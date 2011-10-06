@@ -41,6 +41,8 @@ public class LL1PlusBlockSingleAlt extends LL1Loop {
 	public LL1PlusBlockSingleAlt(OutputModelFactory factory, GrammarAST blkAST, List<CodeBlockForAlt> alts) {
 		super(factory, blkAST, alts);
 
+		PlusBlockStartState blkStart = (PlusBlockStartState)blkAST.atnState;
+		stateNumber = blkStart.loopBackState.stateNumber;
 		PlusBlockStartState plus = (PlusBlockStartState)blkAST.atnState;
 		this.decision = plus.loopBackState.decision;
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);

@@ -30,7 +30,8 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.runtime.tree.ASTNodeStream;
 import org.stringtemplate.v4.misc.MultiMap;
@@ -138,6 +139,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	// doesn't create DFA when matching
 	public int matchATN(TokenStream input, ATNState startState) {
 		DFA dfa = new DFA(startState);
+		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		RuleContext ctx = RuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
@@ -200,22 +202,19 @@ public class ParserATNSimulator extends ATNSimulator {
 							s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
 						}
 					}
+					if ( dfa_debug ) {
+						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa);
+						//dump(dfa);
+					}
+					// action already executed
+					if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+														" predicts "+alt);
+					return alt; // we've updated DFA, exec'd action, and have our deepest answer
 				}
 				catch (NoViableAltException nvae) {
-					alt = -1;
-				}
-				if ( dfa_debug ) {
-					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa);
-					//dump(dfa);
-				}
-				if ( alt==-1 ) {
 					addDFAEdge(s, t, ERROR);
-					break loop; // dead end; no where to go, fall back on prev if any
+					throw nvae;
 				}
-				// action already executed
-				if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-													" predicts "+alt);
-				return alt; // we've updated DFA, exec'd action, and have our deepest answer
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) break;

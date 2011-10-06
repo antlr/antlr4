@@ -30,17 +30,22 @@
 package org.antlr.v4.automata;
 
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.ATNBuilder;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.*;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 /** ATN construction routines triggered by ATNBuilder.g.
  *

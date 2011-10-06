@@ -101,10 +101,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		// TODO: subclass this class for treeparsers
 		TokenStream tokens = (TokenStream)recognizer.getInputStream();
 		Token la = tokens.LT(1);
-		if ( expecting.contains(la.getType()) ) {
-			endErrorCondition(recognizer);
-			return;
-		}
+		// Return but don't end recovery. only do that upon valid token match
+		if ( expecting.contains(la.getType()) ) return;
 		reportUnwantedToken(recognizer);
 		consumeUntil(recognizer, expecting);
 	}
