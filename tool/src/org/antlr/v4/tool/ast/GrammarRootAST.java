@@ -63,4 +63,7 @@ public class GrammarRootAST extends GrammarASTWithOptions {
     public GrammarRootAST(int type, Token t, String text) {
         super(type,t,text);
     }
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

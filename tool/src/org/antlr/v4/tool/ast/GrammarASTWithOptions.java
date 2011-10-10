@@ -34,7 +34,7 @@ import org.antlr.runtime.Token;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GrammarASTWithOptions extends GrammarAST {
+public abstract class GrammarASTWithOptions extends GrammarAST {
     protected Map<String, String> options;
 
 	public GrammarASTWithOptions(GrammarAST node) {

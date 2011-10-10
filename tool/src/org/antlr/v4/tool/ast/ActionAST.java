@@ -35,7 +35,7 @@ import org.antlr.v4.tool.AttributeResolver;
 
 import java.util.List;
 
-public class ActionAST extends GrammarAST {
+public class ActionAST extends GrammarAST implements RuleElementAST {
     // Alt, rule, grammar space
     public AttributeResolver resolver;
 	public List<Token> chunks; // useful for ANTLR IDE developers
@@ -53,4 +53,6 @@ public class ActionAST extends GrammarAST {
 	@Override
 	public Tree dupNode() { return new ActionAST(this); }
 
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

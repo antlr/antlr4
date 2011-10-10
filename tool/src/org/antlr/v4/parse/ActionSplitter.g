@@ -5,6 +5,7 @@ options { filter=true; }
 @header {
 package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 }
 
 @members {

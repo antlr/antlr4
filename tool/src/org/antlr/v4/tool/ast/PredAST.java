@@ -41,4 +41,7 @@ public class PredAST extends ActionAST {
 	public PredAST(Token t) { super(t); }
     public PredAST(int type) { super(type); }
     public PredAST(int type, Token t) { super(type, t); }
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

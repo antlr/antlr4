@@ -35,7 +35,7 @@ import org.antlr.runtime.tree.Tree;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockAST extends GrammarASTWithOptions {
+public class BlockAST extends GrammarASTWithOptions implements RuleElementAST {
     // TODO: maybe I need a Subrule object like Rule so these options mov to that?
     /** What are the default options for a subrule? */
     public static final Map defaultBlockOptions =
@@ -55,4 +55,7 @@ public class BlockAST extends GrammarASTWithOptions {
 
 	@Override
 	public Tree dupNode() { return new BlockAST(this); }
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

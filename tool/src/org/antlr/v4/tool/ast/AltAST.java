@@ -62,4 +62,7 @@ public class AltAST extends GrammarAST {
 
 	@Override
 	public Tree dupNode() { return new AltAST(this); }
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

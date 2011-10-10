@@ -76,6 +76,7 @@ options {
  */
 package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 import java.lang.reflect.Method;
 }
 

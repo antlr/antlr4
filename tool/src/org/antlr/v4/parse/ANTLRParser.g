@@ -704,9 +704,9 @@ blockSuffix
     ;
 
 ebnfSuffix
-	:	QUESTION	-> OPTIONAL[$start]
-  	|	STAR 		-> CLOSURE[$start]
-   	|	PLUS	 	-> POSITIVE_CLOSURE[$start]
+	:	QUESTION	-> OPTIONAL<OptionalBlockAST>[$start]
+  	|	STAR 		-> CLOSURE<StarBlockAST>[$start]
+   	|	PLUS	 	-> POSITIVE_CLOSURE<PlusBlockAST>[$start]
 	;
 
 atom
@@ -722,13 +722,17 @@ atom
 	    // lexically contiguous (no spaces either side of the DOT)
 	    // otherwise it is two references with a wildcard in between
 	    // and not a qualified reference.
+	    /*
 	    {
 	    	input.LT(1).getCharPositionInLine()+input.LT(1).getText().length()==
 	        input.LT(2).getCharPositionInLine() &&
 	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
 	    }?
 	    id DOT ruleref -> ^(DOT id ruleref)
-    |   range    (ROOT^ | BANG^)? // Range x..y - only valid in lexers
+	    
+    |
+    	*/
+        range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
 	|	terminal (ROOT^ | BANG^)?
     |   ruleref
     |	notSet   (ROOT^|BANG^)?
@@ -749,8 +753,8 @@ atom
 // A set of characters (in a lexer) or terminal tokens, if a parser,
 // that are then used to create the inverse set of them.
 notSet
-    : NOT setElement	-> ^(NOT ^(SET[$setElement.start,"SET"] setElement))
-    | NOT blockSet		-> ^(NOT blockSet)
+    : NOT setElement	-> ^(NOT<NotAST>[$NOT] ^(SET<SetAST>[$setElement.start,"SET"] setElement))
+    | NOT blockSet		-> ^(NOT<NotAST>[$NOT] blockSet)
     ;
 
 blockSet
@@ -822,7 +826,7 @@ ruleref
 // error about any abuse of the .. operator.
 //
 range
-    : STRING_LITERAL<TerminalAST> RANGE^ STRING_LITERAL<TerminalAST>
+    : STRING_LITERAL<TerminalAST> RANGE<RangeAST>^ STRING_LITERAL<TerminalAST>
     ;
 
 terminal

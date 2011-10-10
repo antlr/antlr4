@@ -32,7 +32,7 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNState;
 
-public class TreePatternAST extends GrammarAST {
+public class TreePatternAST extends GrammarAST implements RuleElementAST {
 	/** Record ATN DN, UP nodes so we can find easily later */
 	public ATNState downState;
 	public ATNState upState;
@@ -40,4 +40,7 @@ public class TreePatternAST extends GrammarAST {
 	public TreePatternAST(Token t) {
 		super(t);
 	}
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

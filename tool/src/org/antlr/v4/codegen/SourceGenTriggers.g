@@ -40,6 +40,7 @@ import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;

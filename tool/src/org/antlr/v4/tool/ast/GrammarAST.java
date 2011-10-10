@@ -215,4 +215,5 @@ public class GrammarAST extends CommonTree {
 		return buf.toString();
 	}
 
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

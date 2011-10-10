@@ -32,7 +32,7 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
-public class TerminalAST extends GrammarASTWithOptions {
+public class TerminalAST extends GrammarASTWithOptions implements RuleElementAST {
     public static final String defaultTokenOption = "node";
 
 	public TerminalAST(GrammarAST node) {
@@ -45,4 +45,7 @@ public class TerminalAST extends GrammarASTWithOptions {
 
 	@Override
 	public Tree dupNode() { return new TerminalAST(this); }
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

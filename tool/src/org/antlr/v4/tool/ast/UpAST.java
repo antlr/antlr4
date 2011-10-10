@@ -45,4 +45,7 @@ public class UpAST extends TerminalAST {
 	public String toString() {
 		return getText();
 	}
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

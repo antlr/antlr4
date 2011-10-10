@@ -58,5 +58,6 @@ public class RuleAST extends GrammarASTWithOptions {
 		return null;
 	}
 
+	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

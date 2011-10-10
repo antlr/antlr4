@@ -34,7 +34,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTErrorNode;
-import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
 public class GrammarASTAdaptor extends CommonTreeAdaptor {
@@ -52,7 +52,7 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
 		GrammarAST t = null;
 		if ( tokenType==ANTLRParser.RULE ) {
 			// needed by TreeWizard to make RULE tree
-        	t = new GrammarASTWithOptions(new CommonToken(tokenType, text));
+        	t = new RuleAST(new CommonToken(tokenType, text));
 		}
 		else if ( tokenType==ANTLRParser.STRING_LITERAL ) {
 			// implicit lexer construction done with wizard; needs this node type
