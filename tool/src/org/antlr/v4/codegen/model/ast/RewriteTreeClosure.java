@@ -30,10 +30,12 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.*;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RewriteTreeClosure extends CodeBlock {
 	public List<Decl> iteratorDecls = new ArrayList<Decl>();

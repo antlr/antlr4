@@ -29,6 +29,8 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.tool.ast.ActionAST;
+
 /** Grammars, rules, and alternatives all have symbols visible to
  *  actions.  To evaluate attr exprs, ask action for its resolver
  *  then ask resolver to look up various symbols. Depending on the context,

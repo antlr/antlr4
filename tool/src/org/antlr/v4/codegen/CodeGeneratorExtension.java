@@ -32,7 +32,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.ast.*;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 

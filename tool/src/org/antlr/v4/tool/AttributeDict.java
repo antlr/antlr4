@@ -29,7 +29,12 @@
 
 package org.antlr.v4.tool;
 
-import java.util.*;
+import org.antlr.v4.tool.ast.GrammarAST;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 /** Track the attributes within retval, arg lists etc...
  *

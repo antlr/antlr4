@@ -31,10 +31,13 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.TreePatternAST;
 
 import java.util.List;
 

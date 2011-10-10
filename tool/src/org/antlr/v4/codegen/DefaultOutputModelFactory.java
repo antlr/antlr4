@@ -30,10 +30,14 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.decl.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Create output objects for elements *within* rule functions except
  *  buildOutputModel() which builds outer/root model object and any

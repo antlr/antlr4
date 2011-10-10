@@ -31,9 +31,12 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.misc.DoubleKeyMap;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeVisitor;
+import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.*;
 

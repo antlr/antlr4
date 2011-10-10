@@ -27,24 +27,22 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.CommonErrorNode;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.Tree;
 
-/** A node representing erroneous token range in token stream */
-public class GrammarASTErrorNode extends GrammarAST {
-    CommonErrorNode delegate;
-    public GrammarASTErrorNode(TokenStream input, Token start, Token stop,
-                               org.antlr.runtime.RecognitionException e)
-    {
-        delegate = new CommonErrorNode(input,start,stop,e);
-    }
+public class TerminalAST extends GrammarASTWithOptions {
+    public static final String defaultTokenOption = "node";
 
-    public boolean isNil() { return delegate.isNil(); }
+	public TerminalAST(GrammarAST node) {
+		super(node);
+	}
 
-    public int getType() { return delegate.getType(); }
+	public TerminalAST(Token t) { super(t); }
+    public TerminalAST(int type) { super(type); }
+    public TerminalAST(int type, Token t) { super(type, t); }
 
-    public String getText() { return delegate.getText(); }
-    public String toString() { return delegate.toString(); }
+	@Override
+	public Tree dupNode() { return new TerminalAST(this); }
 }

@@ -29,12 +29,16 @@
 
 package org.antlr.v4.automata;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.TreePatternAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Build ATNs for tree grammars */
 public class TreeParserATNFactory extends ParserATNFactory {

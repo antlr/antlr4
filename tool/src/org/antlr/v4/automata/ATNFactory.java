@@ -29,8 +29,9 @@
 
 package org.antlr.v4.automata;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 

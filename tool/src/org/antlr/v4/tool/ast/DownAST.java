@@ -27,18 +27,19 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 
-public class UpAST extends TerminalAST {
-	public UpAST(int type, Token t) {
+public class DownAST extends TerminalAST {
+	public DownAST(int type, Token t) {
 		super(type, t);
 	}
 
+
 	@Override
 	public String getText() {
-		return "UP";
+		return "DOWN";
 	}
 
 	@Override

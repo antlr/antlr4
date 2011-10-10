@@ -30,12 +30,14 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.codegen.model.decl.TokenTypeDecl;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** The class hierarchy underneath SrcOp is pretty deep but makes sense that,
  *  for example LL1StarBlock is a kind of LL1Loop which is a kind of Choice.

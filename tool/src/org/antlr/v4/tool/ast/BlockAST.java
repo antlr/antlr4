@@ -27,38 +27,32 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class GrammarRootAST extends GrammarASTWithOptions {
-    public static final Map defaultOptions =
-            new HashMap() {
-                {
-                    put("language","Java");
-                }
-            };
-    public int grammarType; // LEXER, PARSER, TREE, GRAMMAR (combined)
-	public boolean hasErrors;
-	/** Track stream used to create this tree */
-	public TokenStream tokens;
+public class BlockAST extends GrammarASTWithOptions {
+    // TODO: maybe I need a Subrule object like Rule so these options mov to that?
+    /** What are the default options for a subrule? */
+    public static final Map defaultBlockOptions =
+            new HashMap() {{put("greedy","true");}};
 
-	public GrammarRootAST(GrammarAST node) {
+    public static final Map defaultLexerBlockOptions =
+            new HashMap() {{put("greedy","true");}};
+
+	public BlockAST(GrammarAST node) {
 		super(node);
-		this.grammarType = ((GrammarRootAST)node).grammarType;
-		this.hasErrors = ((GrammarRootAST)node).hasErrors;
 	}
 
-	@Override
-	public Tree dupNode() { return new GrammarRootAST(this); }
+	public BlockAST(Token t) { super(t); }
+    public BlockAST(int type) { super(type); }
+    public BlockAST(int type, Token t) { super(type, t); }
+	public BlockAST(int type, Token t, String text) { super(type,t,text); }
 
-	public GrammarRootAST(int type) { super(type); }
-    public GrammarRootAST(Token t) { super(t); }
-    public GrammarRootAST(int type, Token t) { super(type, t); }
-    public GrammarRootAST(int type, Token t, String text) {
-        super(type,t,text);
-    }
+	@Override
+	public Tree dupNode() { return new BlockAST(this); }
 }

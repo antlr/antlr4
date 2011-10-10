@@ -42,6 +42,9 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTErrorNode;
+import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.stringtemplate.v4.STGroup;
 
 import java.io.*;
@@ -215,7 +218,7 @@ public class Tool {
 	public void processGrammarsOnCommandLine() {
 		for (String fileName : grammarFiles) {
 			GrammarAST t = loadGrammar(fileName);
-			if ( t==null || t instanceof GrammarASTErrorNode ) return; // came back as error node
+			if ( t==null || t instanceof GrammarASTErrorNode) return; // came back as error node
 			if ( ((GrammarRootAST)t).hasErrors ) return;
 			GrammarRootAST ast = (GrammarRootAST)t;
 
@@ -348,7 +351,7 @@ public class Tool {
 			p.setTreeAdaptor(adaptor);
 			ParserRuleReturnScope r = p.grammarSpec();
 			GrammarRootAST root = (GrammarRootAST)r.getTree();
-			if ( root instanceof GrammarRootAST ) {
+			if ( root instanceof GrammarRootAST) {
 				root.hasErrors = p.getNumberOfSyntaxErrors()>0;
 				root.tokens = tokens;
 			}

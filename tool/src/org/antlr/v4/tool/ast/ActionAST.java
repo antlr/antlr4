@@ -27,38 +27,30 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.tool.AttributeResolver;
 
-/** Any ALT (which can be child of ALT_REWRITE node) */
-public class AltAST extends GrammarAST {
-	public Alternative alt;
+import java.util.List;
 
-	/** If someone specified an outermost alternative label with #foo.
-	 *  Token type will be ID.
-	 */
-	public GrammarAST altLabel;
+public class ActionAST extends GrammarAST {
+    // Alt, rule, grammar space
+    public AttributeResolver resolver;
+	public List<Token> chunks; // useful for ANTLR IDE developers
 
-	public AltAST(GrammarAST node) {
+	public ActionAST(GrammarAST node) {
 		super(node);
-		this.alt = ((AltAST)node).alt;
+		this.resolver = ((ActionAST)node).resolver;
+		this.chunks = ((ActionAST)node).chunks;
 	}
 
-	public AltAST(Token t) { super(t); }
-	public AltAST(int type) { super(type); }
-	public AltAST(int type, Token t) { super(type, t); }
-
-	public GrammarAST getRewrite() {
-		// ^(ALT_REWRITE ^(ALT ...) ^(-> ...)) ??
-		if ( getParent().getType() == ANTLRParser.ALT_REWRITE ) {
-			return (GrammarAST)getParent().getChild(1);
-		}
-		return null;
-	}
+	public ActionAST(Token t) { super(t); }
+    public ActionAST(int type) { super(type); }
+    public ActionAST(int type, Token t) { super(type, t); }
 
 	@Override
-	public Tree dupNode() { return new AltAST(this); }
+	public Tree dupNode() { return new ActionAST(this); }
+
 }

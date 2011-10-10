@@ -27,34 +27,25 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonErrorNode;
 
-import java.util.*;
-
-public class GrammarASTWithOptions extends GrammarAST {
-    protected Map<String, String> options;
-
-	public GrammarASTWithOptions(GrammarAST node) {
-		super(node);
-		this.options = ((GrammarASTWithOptions)node).options;
-	}
-
-	public GrammarASTWithOptions(Token t) { super(t); }
-    public GrammarASTWithOptions(int type) { super(type); }
-    public GrammarASTWithOptions(int type, Token t) { super(type, t); }
-    public GrammarASTWithOptions(int type, Token t, String text) { super(type,t,text); }
-
-    public void setOption(String key, String value) {
-        if ( options==null ) options = new HashMap<String, String>();
-        options.put(key, value);
+/** A node representing erroneous token range in token stream */
+public class GrammarASTErrorNode extends GrammarAST {
+    CommonErrorNode delegate;
+    public GrammarASTErrorNode(TokenStream input, Token start, Token stop,
+                               org.antlr.runtime.RecognitionException e)
+    {
+        delegate = new CommonErrorNode(input,start,stop,e);
     }
 
-    public String getOption(String key) {
-        if ( options==null ) return null;
-        return options.get(key);
-    }
+    public boolean isNil() { return delegate.isNil(); }
 
-    public Map<String, String> getOptions() { return options; }
+    public int getType() { return delegate.getType(); }
+
+    public String getText() { return delegate.getText(); }
+    public String toString() { return delegate.toString(); }
 }

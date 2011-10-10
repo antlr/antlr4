@@ -27,17 +27,40 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.Tree;
 
-public class TreePatternAST extends GrammarAST {
-	/** Record ATN DN, UP nodes so we can find easily later */
-	public ATNState downState;
-	public ATNState upState;
+import java.util.HashMap;
+import java.util.Map;
 
-	public TreePatternAST(Token t) {
-		super(t);
+public class GrammarRootAST extends GrammarASTWithOptions {
+    public static final Map defaultOptions =
+            new HashMap() {
+                {
+                    put("language","Java");
+                }
+            };
+    public int grammarType; // LEXER, PARSER, TREE, GRAMMAR (combined)
+	public boolean hasErrors;
+	/** Track stream used to create this tree */
+	public TokenStream tokens;
+
+	public GrammarRootAST(GrammarAST node) {
+		super(node);
+		this.grammarType = ((GrammarRootAST)node).grammarType;
+		this.hasErrors = ((GrammarRootAST)node).hasErrors;
 	}
+
+	@Override
+	public Tree dupNode() { return new GrammarRootAST(this); }
+
+	public GrammarRootAST(int type) { super(type); }
+    public GrammarRootAST(Token t) { super(t); }
+    public GrammarRootAST(int type, Token t) { super(type, t); }
+    public GrammarRootAST(int type, Token t, String text) {
+        super(type,t,text);
+    }
 }

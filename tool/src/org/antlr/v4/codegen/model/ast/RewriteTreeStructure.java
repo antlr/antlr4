@@ -30,10 +30,11 @@
 package org.antlr.v4.codegen.model.ast;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 

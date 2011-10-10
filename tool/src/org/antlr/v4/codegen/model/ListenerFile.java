@@ -1,9 +1,12 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** A model object representing a parse tree listener file.
  *  These are the rules specific events triggered by a parse tree visitor.

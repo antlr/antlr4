@@ -38,8 +38,8 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.*;
 

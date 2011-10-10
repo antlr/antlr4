@@ -34,8 +34,8 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarAST;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 
 /** */

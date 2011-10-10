@@ -41,7 +41,11 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.semantics.UseDefAnalyzer;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.*;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;

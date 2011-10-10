@@ -27,29 +27,36 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.parse.ANTLRParser;
 
-import java.util.List;
+public class RuleAST extends GrammarASTWithOptions {
 
-public class ActionAST extends GrammarAST {
-    // Alt, rule, grammar space
-    public AttributeResolver resolver;
-	public List<Token> chunks; // useful for ANTLR IDE developers
 
-	public ActionAST(GrammarAST node) {
+	public RuleAST(GrammarAST node) {
 		super(node);
-		this.resolver = ((ActionAST)node).resolver;
-		this.chunks = ((ActionAST)node).chunks;
 	}
 
-	public ActionAST(Token t) { super(t); }
-    public ActionAST(int type) { super(type); }
-    public ActionAST(int type, Token t) { super(type, t); }
+	public RuleAST(Token t) { super(t); }
+    public RuleAST(int type) { super(type); }
 
 	@Override
-	public Tree dupNode() { return new ActionAST(this); }
+	public Tree dupNode() { return new RuleAST(this); }
 
+	public ActionAST getLexerAction() {
+		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);
+		if ( blk.getChildCount()==1 ) {
+			Tree onlyAlt = blk.getChild(0);
+			Tree lastChild = onlyAlt.getChild(onlyAlt.getChildCount()-1);
+			if ( lastChild.getType()==ANTLRParser.ACTION ) {
+				return (ActionAST)lastChild;
+			}
+		}
+		return null;
+	}
+
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

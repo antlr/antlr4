@@ -27,22 +27,17 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.runtime.atn.ATNState;
 
-public class TerminalAST extends GrammarASTWithOptions {
-    public static final String defaultTokenOption = "node";
+public class TreePatternAST extends GrammarAST {
+	/** Record ATN DN, UP nodes so we can find easily later */
+	public ATNState downState;
+	public ATNState upState;
 
-	public TerminalAST(GrammarAST node) {
-		super(node);
+	public TreePatternAST(Token t) {
+		super(t);
 	}
-
-	public TerminalAST(Token t) { super(t); }
-    public TerminalAST(int type) { super(type); }
-    public TerminalAST(int type, Token t) { super(type, t); }
-
-	@Override
-	public Tree dupNode() { return new TerminalAST(this); }
 }

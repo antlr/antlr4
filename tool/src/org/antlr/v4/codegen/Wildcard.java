@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.MatchToken;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 public class Wildcard extends MatchToken {
 	public Wildcard(OutputModelFactory factory, GrammarAST ast) {

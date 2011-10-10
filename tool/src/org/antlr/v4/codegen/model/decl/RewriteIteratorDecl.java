@@ -30,7 +30,7 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 public class RewriteIteratorDecl extends Decl {
 	public String listName;

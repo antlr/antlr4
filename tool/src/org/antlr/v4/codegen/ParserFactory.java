@@ -39,7 +39,9 @@ import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.semantics.UseDefAnalyzer;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 

@@ -32,6 +32,7 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.*;
 

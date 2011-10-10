@@ -27,32 +27,39 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.tool.Alternative;
 
-public class RuleAST extends GrammarASTWithOptions {
-	public RuleAST(GrammarAST node) {
+/** Any ALT (which can be child of ALT_REWRITE node) */
+public class AltAST extends GrammarAST {
+	public Alternative alt;
+
+	/** If someone specified an outermost alternative label with #foo.
+	 *  Token type will be ID.
+	 */
+	public GrammarAST altLabel;
+
+	public AltAST(GrammarAST node) {
 		super(node);
+		this.alt = ((AltAST)node).alt;
 	}
 
-	public RuleAST(Token t) { super(t); }
-    public RuleAST(int type) { super(type); }
+	public AltAST(Token t) { super(t); }
+	public AltAST(int type) { super(type); }
+	public AltAST(int type, Token t) { super(type, t); }
 
-	@Override
-	public Tree dupNode() { return new RuleAST(this); }
-
-	public ActionAST getLexerAction() {
-		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);
-		if ( blk.getChildCount()==1 ) {
-			Tree onlyAlt = blk.getChild(0);
-			Tree lastChild = onlyAlt.getChild(onlyAlt.getChildCount()-1);
-			if ( lastChild.getType()==ANTLRParser.ACTION ) {
-				return (ActionAST)lastChild;
-			}
+	public GrammarAST getRewrite() {
+		// ^(ALT_REWRITE ^(ALT ...) ^(-> ...)) ??
+		if ( getParent().getType() == ANTLRParser.ALT_REWRITE ) {
+			return (GrammarAST)getParent().getChild(1);
 		}
 		return null;
 	}
+
+	@Override
+	public Tree dupNode() { return new AltAST(this); }
 }

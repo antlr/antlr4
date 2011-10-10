@@ -29,16 +29,26 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.TreeVisitor;
+import org.antlr.runtime.tree.TreeVisitorAction;
+import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.*;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.parse.TokenVocabParser;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntSet;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.ast.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
@@ -233,7 +243,7 @@ public class Grammar implements AttributeResolver {
 				continue;
 			}
 			// did it come back as error node or missing?
-			if ( grammarAST==null || grammarAST instanceof GrammarASTErrorNode ) return;
+			if ( grammarAST==null || grammarAST instanceof GrammarASTErrorNode) return;
 			GrammarRootAST ast = (GrammarRootAST)grammarAST;
 			Grammar g = tool.createGrammar(ast);
 			File f = tool.getImportedGrammarFile(this, importedGrammarName+".g");
@@ -665,14 +675,10 @@ public class Grammar implements AttributeResolver {
         }
 	}
 
-	public String getOption(String key) {
-		if ( ast.options==null ) return null;
-		return ast.options.get(key);
-	}
+	public String getOption(String key) { return ast.getOption(key); }
 
 	public String getOption(String key, String defaultValue) {
-		if ( ast.options==null ) return defaultValue;
-		String v = ast.options.get(key);
+		String v = ast.getOption(key);
 		if ( v!=null ) return v;
 		return defaultValue;
 	}

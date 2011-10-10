@@ -30,9 +30,12 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RewriteRefs extends GrammarTreeVisitor {
 	List<GrammarAST> shallow = new ArrayList<GrammarAST>();

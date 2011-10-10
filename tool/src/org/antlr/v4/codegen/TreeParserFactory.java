@@ -36,7 +36,7 @@ import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.NodeDecl;
 import org.antlr.v4.codegen.model.decl.NodeListDecl;
 import org.antlr.v4.codegen.model.decl.TokenListDecl;
-import org.antlr.v4.tool.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 

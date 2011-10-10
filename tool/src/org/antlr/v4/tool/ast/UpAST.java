@@ -27,31 +27,22 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 
-import java.util.*;
-
-public class BlockAST extends GrammarASTWithOptions {
-    // TODO: maybe I need a Subrule object like Rule so these options mov to that?
-    /** What are the default options for a subrule? */
-    public static final Map defaultBlockOptions =
-            new HashMap() {{put("greedy","true");}};
-
-    public static final Map defaultLexerBlockOptions =
-            new HashMap() {{put("greedy","true");}};
-
-	public BlockAST(GrammarAST node) {
-		super(node);
+public class UpAST extends TerminalAST {
+	public UpAST(int type, Token t) {
+		super(type, t);
 	}
 
-	public BlockAST(Token t) { super(t); }
-    public BlockAST(int type) { super(type); }
-    public BlockAST(int type, Token t) { super(type, t); }
-	public BlockAST(int type, Token t, String text) { super(type,t,text); }
+	@Override
+	public String getText() {
+		return "UP";
+	}
 
 	@Override
-	public Tree dupNode() { return new BlockAST(this); }
+	public String toString() {
+		return getText();
+	}
 }

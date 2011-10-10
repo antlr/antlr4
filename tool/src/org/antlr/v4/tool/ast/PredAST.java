@@ -27,23 +27,18 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 
-public class DownAST extends TerminalAST {
-	public DownAST(int type, Token t) {
-		super(type, t);
+public class PredAST extends ActionAST {
+	public PredAST(GrammarAST node) {
+		super(node);
+		this.resolver = ((ActionAST)node).resolver;
+		this.chunks = ((ActionAST)node).chunks;
 	}
 
-
-	@Override
-	public String getText() {
-		return "DOWN";
-	}
-
-	@Override
-	public String toString() {
-		return getText();
-	}
+	public PredAST(Token t) { super(t); }
+    public PredAST(int type) { super(type); }
+    public PredAST(int type, Token t) { super(type, t); }
 }

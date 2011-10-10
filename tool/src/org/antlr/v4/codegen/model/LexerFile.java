@@ -30,9 +30,11 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LexerFile extends OutputModelObject {
 	public String fileName;

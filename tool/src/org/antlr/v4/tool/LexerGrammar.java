@@ -31,6 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.Tool;
+import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.stringtemplate.v4.misc.MultiMap;
 
 /** */

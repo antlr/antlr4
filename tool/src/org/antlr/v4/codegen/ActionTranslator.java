@@ -35,7 +35,11 @@ import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.actions.*;
 import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.parse.ActionSplitterListener;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

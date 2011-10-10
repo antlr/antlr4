@@ -29,9 +29,13 @@
 
 package org.antlr.v4.parse;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTErrorNode;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 public class GrammarASTAdaptor extends CommonTreeAdaptor {
     org.antlr.runtime.CharStream input; // where we can find chars ref'd by tokens in tree
