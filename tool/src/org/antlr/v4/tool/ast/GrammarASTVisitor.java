@@ -1,14 +1,26 @@
 package org.antlr.v4.tool.ast;
 
-/*
-GrammarAST t = ...;
-SynDiagVisitor v = new ...;
-t.visit(v);
-*/
+/** A simple visitor, based upon the classic double dispatch method,
+ *  for walking GrammarAST trees resulting from parsing ANTLR grammars.
+ *  There is also the GrammarTreeVisitor.g tree grammar that looks for
+ *  subtree patterns and fires off high-level events as opposed to
+ *  "found node" events like this visitor does. Also, like all
+ *  visitors, the users of this interface are required to implement
+ *  the node visitation of the children. The GrammarTreeVisitor mechanism
+ *  fires events and the user is not required to do any walking code.
+ *
+ *  GrammarAST t = ...;
+ *  GrammarASTVisitor v = new ...;
+ *  t.visit(v);
+ */
 public interface GrammarASTVisitor {
 	Object visit(RuleAST node);
 	Object visit(AltAST node);
 	Object visit(DownAST node);
+
+	/** This is the generic visitor method that will be invoked
+	 *  for any other kind of AST node not covered by the other visit methods.
+	 */
 	Object visit(GrammarAST node);
 	Object visit(GrammarRootAST node);
 	Object visit(NotAST node);
