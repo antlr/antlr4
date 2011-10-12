@@ -82,9 +82,20 @@ public interface Token {
 	int getChannel();
 
 	/** An index from 0..n-1 of the token object in the input stream.
-	 *  This must be valid in order to use the ANTLRWorks debugger.
+	 *  This must be valid in order to print token streams,
+	 *  use TokenRewriteStream, and generally deal with ASTs.
 	 */
 	int getTokenIndex();
+
+	/** The starting character index of the token
+	 *  This method is optional; return -1 if not implemented.
+	 */
+	int getStartIndex();
+
+	/** The last character index of the token.
+	 *  This method is optional; return -1 if not implemented.
+	 */
+	int getStopIndex();
 
 	/** Where does this token come from? You can get the
 	 *  character input stream from the token source.
