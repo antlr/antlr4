@@ -7,7 +7,7 @@ public class TestW {
 		WLexer t = new WLexer(new ANTLRFileStream(args[0]));
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		WParser p = new WParser(tokens);
-		p.setBuildParseTrees(true);
+		p.setBuildParseTree(true);
 		RuleContext ctx = p.s();
 		//System.out.println("ctx="+ctx.toStringTree(p));
 	}

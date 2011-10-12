@@ -110,7 +110,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		TokenStream tokens = (TokenStream)recognizer.getInputStream();
 		Token la = tokens.LT(1);
 		// Return but don't end recovery. only do that upon valid token match
-		if ( expecting.contains(la.getType()) ) return;
+		if ( la.getType()==Token.EOF || expecting.contains(la.getType()) ) return;
 		reportUnwantedToken(recognizer);
 		consumeUntil(recognizer, expecting);
 	}

@@ -118,7 +118,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  somebody's children list. Contexts are then not candidates
 	 *  for garbage collection.
 	 */
-	public void setBuildParseTrees(boolean buildParseTrees) {
+	public void setBuildParseTree(boolean buildParseTrees) {
 		this.buildParseTrees = buildParseTrees;
 	}
 

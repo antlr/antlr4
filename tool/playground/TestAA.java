@@ -7,7 +7,7 @@ public class TestAA {
 		AALexer t = new AALexer(new ANTLRFileStream(args[0]));
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		AAParser p = new AAParser(tokens);
-		p.setBuildParseTrees(true);
+		p.setBuildParseTree(true);
 		RuleContext ctx = p.prog();
 		//System.out.println("ctx="+ctx.toStringTree(p));
 	}

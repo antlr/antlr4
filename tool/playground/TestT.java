@@ -1,4 +1,6 @@
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class TestT {
@@ -10,7 +12,7 @@ public class TestT {
 //			System.out.println(tok);
 //		}
 		TParser p = new TParser(tokens);
-		p.setBuildParseTrees(true);
+		p.setBuildParseTree(true);
 		TParser.sContext tree = p.s();
 
 		System.out.println(tree.toStringTree(p));
