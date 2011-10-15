@@ -63,6 +63,7 @@ public class Parser extends BaseRecognizer {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
+		if ( buildParseTrees ) addContextToParseTree();
 	}
 
 	@Override

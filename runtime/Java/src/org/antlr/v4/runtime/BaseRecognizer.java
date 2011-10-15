@@ -172,9 +172,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	}
 
 	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
+		// if we have new localctx, make sure we add to parse tree
+		if ( buildParseTrees && _ctx != localctx ) addContextToParseTree();
 		_ctx = localctx;
 		_ctx.altNum = altNum;
-		addContextToParseTree();
 	}
 
 	/** Consume the current symbol and return it. E.g., given the following
@@ -193,15 +194,20 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		getInputStream().consume();
 		if ( buildParseTrees ) {
 			// TODO: tree parsers?
-			if ( _errHandler.inErrorRecoveryMode(this) ) _ctx.addErrorNode((Token) o);
+			if ( _errHandler.inErrorRecoveryMode(this) ) {
+				System.out.println("consume in error recovery mode for "+o);
+				_ctx.addErrorNode((Token) o);
+			}
 			else _ctx.addChild((Token)o);
 		}
 		return o;
 	}
 
 	protected void addContextToParseTree() {
-		if ( buildParseTrees ) {
-			if ( _ctx.parent!=null ) _ctx.parent.addChild(_ctx);
+		RuleContext parent = _ctx.parent;
+		// add current context to parent if we have a parent
+		if ( parent!=null )	{
+			parent.addChild(_ctx);
 		}
 	}
 

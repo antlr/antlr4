@@ -49,7 +49,10 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	{
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if (errorRecoveryMode) return; // don't count spurious errors
+		if (errorRecoveryMode) {
+			System.err.print("[SPURIOUS] ");
+			//return; // don't count spurious errors
+		}
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
 		if ( e instanceof NoViableAltException ) {
@@ -80,8 +83,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 //						   lastErrorIndex+
 //						   ", states="+lastErrorStates);
 		if ( lastErrorIndex==recognizer.getInputStream().index() &&
-		lastErrorStates.contains(recognizer._ctx.s) )
-		{
+		lastErrorStates.contains(recognizer._ctx.s) ) {
 			// uh oh, another error at same token index and previously-visited
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token
@@ -424,7 +426,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BaseRecognizer recognizer, IntervalSet set) {
-		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
+		System.out.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
