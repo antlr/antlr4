@@ -28,15 +28,11 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.tree.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -164,6 +160,16 @@ public class RuleContext implements ParseTree.RuleNode {
 	public void addChild(RuleContext ruleInvocation) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(ruleInvocation);
+	}
+
+	/** Used by enterOuterAlt to toss out a RuleContext previously added as
+	 *  we entered a rule. If we have # label, we will need to remove
+	 *  generic ruleContext object.
+ 	 */
+	public void removeLastChild() {
+		if ( children!=null ) {
+			children.remove(children.size()-1);
+		}
 	}
 
 	public void trace(int s) {

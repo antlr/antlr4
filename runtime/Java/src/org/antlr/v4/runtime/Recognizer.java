@@ -37,7 +37,7 @@ public class Recognizer<ATNInterpreter> {
 	public static final int EOF=-1;
 
 	protected ANTLRErrorStrategy _errHandler = new DefaultANTLRErrorStrategy();
-	protected List<ANTLRParserListener> _listeners;
+	protected List<ANTLRErrorListener> _listeners;
 
 	protected ATNInterpreter _interp;
 
@@ -194,24 +194,19 @@ public class Recognizer<ATNInterpreter> {
 		return "'"+s+"'";
 	}
 
-	/** Override this method to change where error messages go */
-	public void emitErrorMessage(String msg) {
-		System.err.println(msg);
-	}
-
-	public void addListener(ANTLRParserListener pl) {
+	public void addListener(ANTLRErrorListener pl) {
 		if ( _listeners ==null ) {
 			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRParserListener>(2));
+				Collections.synchronizedList(new ArrayList<ANTLRErrorListener>(2));
 		}
 		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeListener(ANTLRParserListener pl) { _listeners.remove(pl); }
+	public void removeListener(ANTLRErrorListener pl) { _listeners.remove(pl); }
 
 	public void removeListeners() { _listeners.clear(); }
 
-	public List<ANTLRParserListener> getListeners() { return _listeners; }
+	public List<ANTLRErrorListener> getListeners() { return _listeners; }
 
 	public ANTLRErrorStrategy getErrHandler() { return _errHandler; }
 

@@ -123,7 +123,12 @@ public class ATNState {
 		transitions.set(i, e);
 	}
 
-	public boolean onlyHasEpsilonTransitions() {
+	protected int epsilonOnlyTransitions = -1;
+
+	//lexer atn sim: getEpTar: 13.2%
+	// ruleCtx.equals 10%
+	public boolean onlyHasEpsilonTransitions() { // 22% time
+		if ( epsilonOnlyTransitions>=0 ) return epsilonOnlyTransitions==1;
 		if ( transitions.size()==0 ) return false;
 		for (Transition t : transitions) {
 			if ( !t.isEpsilon() ) return false;

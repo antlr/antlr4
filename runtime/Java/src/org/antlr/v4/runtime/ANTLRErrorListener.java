@@ -32,7 +32,7 @@ package org.antlr.v4.runtime;
 import com.sun.istack.internal.Nullable;
 
 /** How to emit recognition errors */
-public interface ANTLRParserListener {
+public interface ANTLRErrorListener {
 	/** Upon syntax error, notify any interested parties. This is not how to
 	 *  recover from errors or compute error messages. The parser
 	 *  ANTLRErrorStrategy specifies how to recover from syntax errors

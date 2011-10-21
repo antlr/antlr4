@@ -29,17 +29,13 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
-	/** Print out a whole tree in LISP form. toString is used on the
+	/** Print out a whole tree in LISP form. getNodeText is used on the
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */

@@ -29,14 +29,10 @@
 package org.antlr.v4.runtime;
 
 import com.sun.istack.internal.Nullable;
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** A generic recognizer that can handle recognizers generated from
  *  parser and tree grammars.  This is all the parsing
@@ -163,17 +159,22 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		int line = offendingToken.getLine();
 		int charPositionInLine = offendingToken.getCharPositionInLine();
 		if ( _listeners==null || _listeners.size()==0 ) {
-			emitErrorMessage("line "+line+":"+charPositionInLine+" "+msg);
+			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
-		for (ANTLRParserListener pl : _listeners) {
+		for (ANTLRErrorListener pl : _listeners) {
 			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
 	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
-		// if we have new localctx, make sure we add to parse tree
-		if ( buildParseTrees && _ctx != localctx ) addContextToParseTree();
+		// if we have new localctx, make sure we replace existing ctx
+		// that is previous child of parse tree
+		if ( buildParseTrees && _ctx != localctx ) {
+			RuleContext parent = _ctx.parent;
+			parent.removeLastChild();
+			if ( parent!=null )	parent.addChild(localctx);
+		}
 		_ctx = localctx;
 		_ctx.altNum = altNum;
 	}
@@ -195,7 +196,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		if ( buildParseTrees ) {
 			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				System.out.println("consume in error recovery mode for "+o);
+//				System.out.println("consume in error recovery mode for "+o);
 				_ctx.addErrorNode((Token) o);
 			}
 			else _ctx.addChild((Token)o);

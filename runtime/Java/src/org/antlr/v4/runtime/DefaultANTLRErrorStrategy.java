@@ -1,8 +1,6 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -50,8 +48,8 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
 		if (errorRecoveryMode) {
-			System.err.print("[SPURIOUS] ");
-			//return; // don't count spurious errors
+//			System.err.print("[SPURIOUS] ");
+			return; // don't count spurious errors
 		}
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
@@ -90,6 +88,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 			// at least to prevent an infinite loop; this is a failsafe.
 //			System.err.println("seen error condition before index="+
 //							   lastErrorIndex+", states="+lastErrorStates);
+//			System.err.println("FAILSAFE consumes "+recognizer.getTokenNames()[recognizer.getInputStream().LA(1)]);
 			recognizer.consume();
 		}
 		lastErrorIndex = recognizer.getInputStream().index();
@@ -426,7 +425,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BaseRecognizer recognizer, IntervalSet set) {
-		System.out.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
+//		System.out.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
