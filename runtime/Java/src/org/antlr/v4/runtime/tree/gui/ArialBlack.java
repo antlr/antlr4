@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-public class ArialBlack extends FontMetrics {
+public class ArialBlack extends BasicFontMetrics {
     {
 		maxCharHeight = 770;
         widths[32] = 333; // space

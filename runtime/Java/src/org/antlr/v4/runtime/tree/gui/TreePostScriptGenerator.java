@@ -163,7 +163,7 @@ public class TreePostScriptGenerator {
 		t.addChild(b);
 		b.addChild(c);
 		b.addChild(d);
-		TreePostScriptGenerator psgen = new TreePostScriptGenerator(null, t, "TimesNewRoman", 11);
+		TreePostScriptGenerator psgen = new TreePostScriptGenerator(null, t, "CourierNew", 11);
 		System.out.println(psgen.getPS());
 	}
 }

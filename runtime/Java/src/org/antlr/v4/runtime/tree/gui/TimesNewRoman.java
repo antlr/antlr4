@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-public class TimesNewRoman extends FontMetrics {
+public class TimesNewRoman extends BasicFontMetrics {
     {
 		maxCharHeight = 717;
         widths[32] = 250; // space

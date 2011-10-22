@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-public class CourierNew extends FontMetrics {
+public class CourierNew extends BasicFontMetrics {
 	{
 		maxCharHeight = 678;
 		for (int i=0; i<128; i++) widths[i] = 600;

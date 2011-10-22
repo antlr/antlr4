@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-public class Arial extends FontMetrics {
+public class Arial extends BasicFontMetrics {
 	{
 		maxCharHeight = 781;
         widths[32] = 277; // space

@@ -67,7 +67,7 @@ package org.antlr.v4.runtime.tree.gui;
 
  	Units are 1000th of an 'em'.
  */
-public abstract class FontMetrics {
+public abstract class BasicFontMetrics {
 	protected int maxCharHeight;
 	protected int[] widths = new int[128];
 
