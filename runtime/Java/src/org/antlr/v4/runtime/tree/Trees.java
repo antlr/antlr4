@@ -30,11 +30,44 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
 
+import java.io.*;
 import java.util.*;
 
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
+
+	public static String getPS(Tree t, BaseRecognizer recog,
+							   String fontName, int fontSize)
+	{
+		TreePostScriptGenerator psgen =
+			new TreePostScriptGenerator(null, t, fontName, fontSize);
+		return psgen.getPS();
+	}
+
+	public static String getPS(Tree t, BaseRecognizer recog) {
+		return getPS(t, recog, "Arial", 11);
+	}
+
+	public static void writePS(Tree t, BaseRecognizer recog,
+							   String fileName,
+							   String fontName, int fontSize)
+		throws IOException
+	{
+		String ps = getPS(t, recog, fontName, fontSize);
+		FileWriter f = new FileWriter(fileName);
+		BufferedWriter bw = new BufferedWriter(f);
+		bw.write(ps);
+		bw.close();
+	}
+
+	public static void writePS(Tree t, BaseRecognizer recog, String fileName)
+		throws IOException
+	{
+		writePS(t, recog, fileName, "Arial", 11);
+	}
+
 	/** Print out a whole tree in LISP form. getNodeText is used on the
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
