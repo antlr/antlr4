@@ -68,6 +68,10 @@ public class Trees {
 				return tok.getText();
 			}
 		}
+		Object payload = t.getPayload();
+		if ( payload instanceof Token ) {
+			return ((Token)payload).getText();
+		}
 		return t.getPayload().toString();
 	}
 

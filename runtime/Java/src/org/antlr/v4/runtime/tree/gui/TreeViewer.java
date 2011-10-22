@@ -29,20 +29,17 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.NodeExtentProvider;
-import org.abego.treelayout.TreeForTreeLayout;
-import org.abego.treelayout.TreeLayout;
+import org.abego.treelayout.*;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.tree.Tree;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.tree.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 public class TreeViewer extends JComponent {
-	public class DefaultTreeTextProvider implements TreeTextProvider {
+	public static class DefaultTreeTextProvider implements TreeTextProvider {
 		BaseRecognizer parser;
 		public DefaultTreeTextProvider(BaseRecognizer parser) {
 			this.parser = parser;
