@@ -29,9 +29,7 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -131,9 +129,13 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN.
-	 *
-	 *  TODO: see if we can merge sync() and recoverInline(). are they same?
-	 *  does one call the other?
+	 *  sync() differs fundamentally from the recoverInline() method.
+	 *  In this case, we throw out a token that's not in the set of what
+	 *  were expecting at this point. recoverInline() only deletes this
+	 *  token if LT(2) (token after the current token) is what were expecting;
+	 *  i.e., we have an extra token sitting on the input stream.  sync()
+	 *  simply consumes until it finds something that can start whatever
+	 *  follows the call to sync().
  	 */
 	@Override
 	public void sync(BaseRecognizer recognizer) {

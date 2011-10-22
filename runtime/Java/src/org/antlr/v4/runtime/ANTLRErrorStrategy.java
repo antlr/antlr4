@@ -54,7 +54,7 @@ public interface ANTLRErrorStrategy {
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN. You can call this
-	 *  anytime but ANTLR only generates code to check before loops
+	 *  anytime but ANTLR only generates code to check before subrules/loops
 	 *  and each iteration.
 	 *
 	 *  Implements Jim Idle's magic sync mechanism in closures and optional
@@ -74,7 +74,7 @@ public interface ANTLRErrorStrategy {
 	 *  next member definition of the current class.
 	 *
 	 *  This functionality cost a little bit of effort because the parser
-	 *  has to compare token set at the start of the loop and add each
+	 *  has to compare token set at the start of the loop and at each
 	 *  iteration. If for some reason speed is suffering for you, you can
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
