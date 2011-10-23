@@ -36,7 +36,6 @@ public class TestAttributeChecks extends BaseTest {
 		"$lab.e",		"",
 		"$ids",			"",
 
-       	"$a",			"error(33): A.g:4:8: missing attribute access on rule reference a in $a\n",
 		"$c",			"error(29): A.g:4:8: unknown attribute reference c in $c\n",
 		"$a.q",			"error(31): A.g:4:10: unknown attribute q for rule a in $a.q\n",
     };
@@ -59,10 +58,7 @@ public class TestAttributeChecks extends BaseTest {
 	};
 
 	String[] bad_inlineChecks = {
-		"$a",			"error(33): A.g:6:4: missing attribute access on rule reference a in $a\n",
-		"$b",           "error(33): A.g:6:4: missing attribute access on rule reference b in $b\n",
 		"$lab",			"error(33): A.g:6:4: missing attribute access on rule reference lab in $lab\n",
-		"$c",			"error(33): A.g:6:4: missing attribute access on rule reference c in $c\n", // no scope
 		"$q",           "error(29): A.g:6:4: unknown attribute reference q in $q\n",
 		"$q.y",         "error(29): A.g:6:4: unknown attribute reference q in $q.y\n",
 		"$q = 3",       "error(29): A.g:6:4: unknown attribute reference q in $q\n",
@@ -89,7 +85,6 @@ public class TestAttributeChecks extends BaseTest {
 		"$ids",			"",
 
 		"$lab",			"error(33): A.g:9:14: missing attribute access on rule reference lab in $lab\n",
-		"$a",           "error(33): A.g:9:14: missing attribute access on rule reference a in $a\n",
 		"$q",           "error(29): A.g:9:14: unknown attribute reference q in $q\n",
 		"$q.y",         "error(29): A.g:9:14: unknown attribute reference q in $q.y\n",
 		"$q = 3",       "error(29): A.g:9:14: unknown attribute reference q in $q\n",
@@ -99,7 +94,6 @@ public class TestAttributeChecks extends BaseTest {
 						"error(29): A.g:9:19: unknown attribute reference blort in $blort\n",
 		"$a.ick",       "error(31): A.g:9:16: unknown attribute ick for rule a in $a.ick\n",
 		"$a.ick = 3;",  "error(31): A.g:9:16: unknown attribute ick for rule a in $a.ick = 3;\n",
-		"$b",           "error(29): A.g:9:14: unknown attribute reference b in $b\n",
 		"$b.e",			"error(29): A.g:9:14: unknown attribute reference b in $b.e\n", // can't see rule refs outside alts
 		"$b.d",         "error(29): A.g:9:14: unknown attribute reference b in $b.d\n",
 		"$c.text",      "error(29): A.g:9:14: unknown attribute reference c in $c.text\n",

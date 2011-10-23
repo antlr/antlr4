@@ -75,18 +75,26 @@ public class Trees {
 	public static String toStringTree(Tree t, BaseRecognizer recog) {
 		if ( t.getChildCount()==0 ) return getNodeText(t, recog);
 		StringBuilder buf = new StringBuilder();
-		buf.append("(");
-		buf.append(getNodeText(t, recog));
-		buf.append(' ');
+		boolean nilRoot = t instanceof AST && ((AST)t).isNil();
+		if ( !nilRoot ) {
+			buf.append("(");
+			buf.append(getNodeText(t, recog));
+			buf.append(' ');
+		}
 		for (int i = 0; i<t.getChildCount(); i++) {
 			if ( i>0 ) buf.append(' ');
 			buf.append(toStringTree(t.getChild(i), recog));
 		}
-		buf.append(")");
+		if ( !nilRoot ) {
+			buf.append(")");
+		}
 		return buf.toString();
 	}
 
 	public static String getNodeText(Tree t, BaseRecognizer recog) {
+		if ( t instanceof AST ) {
+			return t.toString();
+		}
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
 				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
@@ -101,6 +109,7 @@ public class Trees {
 				return tok.getText();
 			}
 		}
+		// not AST and no recog for rule names
 		Object payload = t.getPayload();
 		if ( payload instanceof Token ) {
 			return ((Token)payload).getText();

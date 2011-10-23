@@ -32,12 +32,12 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.*;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
-public interface ASTNodeStream extends IntStream {
+public interface ASTNodeStream extends ObjectStream {
 	/** Get a tree node at an absolute index i; 0..n-1.
 	 *  If you don't want to buffer up nodes, then this method makes no
 	 *  sense for you.
 	 */
-	public Object get(int i);
+	Object get(int i);
 
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
 	 *  i<0 indicates nodes in the past.  So LT(-1) is previous node, but
@@ -50,7 +50,7 @@ public interface ASTNodeStream extends IntStream {
 	 *  returns a tree node instead of a token.  Makes code gen identical
 	 *  for both parser and tree grammars. :)
 	 */
-	public Object LT(int k);
+	Object LT(int k);
 
 	/** Where is this stream pulling nodes from?  This is not the name, but
 	 *  the object that provides node objects.

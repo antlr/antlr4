@@ -39,14 +39,17 @@ public class PlusBlock extends Loop {
 	@ModelElement public ThrowNoViableAlt error;
 
 	public PlusBlock(OutputModelFactory factory,
-					 GrammarAST ebnfRootAST,
+					 GrammarAST plusRoot,
 					 List<CodeBlockForAlt> alts)
 	{
-		super(factory, ebnfRootAST, alts);
-		PlusLoopbackState loop = ((PlusBlockStartState)ebnfRootAST.atnState).loopBackState;
+		super(factory, plusRoot, alts);
+
+		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
+		PlusLoopbackState loop = ((PlusBlockStartState)plusRoot.atnState).loopBackState;
+		stateNumber = blkStart.loopBackState.stateNumber;
+		blockStartStateNumber = blkStart.stateNumber;
 		loopBackStateNumber = loop.stateNumber;
-		stateNumber = loop.stateNumber;
-		this.error = new ThrowNoViableAlt(factory, ebnfRootAST, null);
+		this.error = new ThrowNoViableAlt(factory, plusRoot, null);
 		decision = loop.decision;
 		exitAlt = alts.size()+1;
 	}

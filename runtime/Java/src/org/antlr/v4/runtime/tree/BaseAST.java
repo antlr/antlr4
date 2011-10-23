@@ -32,8 +32,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.BaseRecognizer;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** A generic AST implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
@@ -263,25 +262,26 @@ public abstract class BaseAST implements AST {
 	 *  root nodes.
 	 */
     public String toStringTree() {
-		if ( children==null || children.size()==0 ) {
-			return this.toString();
-		}
-		StringBuffer buf = new StringBuffer();
-		if ( !isNil() ) {
-			buf.append("(");
-			buf.append(this.toString());
-			buf.append(' ');
-		}
-		for (int i = 0; children!=null && i < children.size(); i++) {
-			AST t = children.get(i);
-			if ( i>0 ) {
-				buf.append(' ');
-			}
-			buf.append(t.toStringTree());
-		}
-		if ( !isNil() ) {
-			buf.append(")");
-		}
-		return buf.toString();
+		return Trees.toStringTree(this, null);
+//		if ( children==null || children.size()==0 ) {
+//			return this.toString();
+//		}
+//		StringBuffer buf = new StringBuffer();
+//		if ( !isNil() ) {
+//			buf.append("(");
+//			buf.append(this.toString());
+//			buf.append(' ');
+//		}
+//		for (int i = 0; children!=null && i < children.size(); i++) {
+//			AST t = children.get(i);
+//			if ( i>0 ) {
+//				buf.append(' ');
+//			}
+//			buf.append(t.toStringTree());
+//		}
+//		if ( !isNil() ) {
+//			buf.append(")");
+//		}
+//		return buf.toString();
 	}
 }

@@ -369,7 +369,7 @@ case <i>:
 		default :
 			<error>
 	}
-	setState(<choice.stateNumber>); <! loopback/exit decision !>
+	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 } while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );
@@ -483,7 +483,7 @@ RulePropertyRef_st(r)	 ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:nu
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
 ThisRulePropertyRef_tree(r)	 ::= "_localctx.tree"
-ThisRulePropertyRef_text(r)	 ::= "((TokenStream)_input).toString(_localctx.start, _input.LT(-1))"
+ThisRulePropertyRef_text(r)	 ::= "_input.toString(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_st(r)	 ::= "_localctx.st"
 
 /*

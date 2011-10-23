@@ -27,8 +27,9 @@
  */
 package org.antlr.v4.test;
 
-import org.junit.Test;
+import org.junit.*;
 
+@Ignore
 public class TestRewriteTemplates extends BaseTest {
 	protected boolean debug = false;
 

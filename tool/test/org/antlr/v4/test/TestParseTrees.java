@@ -7,7 +7,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' {System.out.println(getRuleInvocationStack());} ;\n";
@@ -20,7 +20,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' 'y'\n" +
@@ -34,7 +34,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' | 'y'\n" +
@@ -48,7 +48,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : ('x' | 'y')* 'z'\n" +
@@ -62,7 +62,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : b 'x'\n" +
@@ -79,7 +79,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' 'y'\n" +
@@ -94,7 +94,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' | 'y'\n" +
@@ -109,7 +109,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {setBuildParseTrees(true);}\n" +
+			"@init {setBuildParseTree(true);}\n" +
 			"@after {System.out.println($r.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' 'y'* '!'\n" +

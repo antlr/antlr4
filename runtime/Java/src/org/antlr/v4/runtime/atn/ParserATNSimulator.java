@@ -30,10 +30,9 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.dfa.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.tree.ASTNodeStream;
+import org.antlr.v4.runtime.tree.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -82,7 +81,7 @@ public class ParserATNSimulator extends ATNSimulator {
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(TokenStream input, int decision, RuleContext outerContext) {
+	public int adaptivePredict(ObjectStream input, int decision, RuleContext outerContext) {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
@@ -105,7 +104,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(DFA dfa, TokenStream input,
+	public int predictATN(DFA dfa, ObjectStream input,
 						  RuleContext outerContext,
 						  boolean useContext)
 	{
@@ -141,7 +140,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	// doesn't create DFA when matching
-	public int matchATN(TokenStream input, ATNState startState) {
+	public int matchATN(ObjectStream input, ATNState startState) {
 		DFA dfa = new DFA(startState);
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		RuleContext ctx = RuleContext.EMPTY;
@@ -149,7 +148,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
-	public int execDFA(TokenStream input, DFA dfa, DFAState s0, RuleContext outerContext) {
+	public int execDFA(ObjectStream input, DFA dfa, DFAState s0, RuleContext outerContext) {
 //		dump(dfa);
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
@@ -222,12 +221,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) {
-				NoViableAltException nvae =
-					new NoViableAltException(parser, input,
-											 input.get(startIndex),
-											 input.LT(1),
-											 s.configs, outerContext);
-				throw nvae;
+				return throwNoViableAlt(input, outerContext, s.configs, startIndex);
 			}
 			s = target;
 			input.consume();
@@ -242,7 +236,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return prevAcceptState.prediction;
 	}
 
-	public String getInputString(TokenStream input, int start) {
+	public String getInputString(ObjectStream input, int start) {
 		if ( input instanceof TokenStream ) {
 			return ((TokenStream)input).toString(start,input.index());
 		}
@@ -252,7 +246,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return "n/a";
 	}
 
-	public int execATN(TokenStream input,
+	public int execATN(ObjectStream input,
 					   DFA dfa,
 					   int startIndex,
 					   OrderedHashSet<ATNConfig> s0,
@@ -378,12 +372,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		if ( prevAccept==null ) {
 //			System.out.println("no viable token at input "+ getLookaheadName(input) +", index "+input.index());
-			NoViableAltException nvae =
-				new NoViableAltException(parser, input,
-										 input.get(startIndex),
-										 input.LT(1),
-										 closure, outerContext);
-			throw nvae;
+			throwNoViableAlt(input, outerContext, closure, startIndex);
 		}
 
 		if ( debug ) System.out.println("PREDICT " + prevAccept + " index " + prevAccept.alt);
@@ -411,7 +400,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return exitAlt;
 	}
 
-	public int retryWithContext(TokenStream input,
+	public int retryWithContext(ObjectStream input,
 								DFA dfa,
 								int startIndex,
 								RuleContext originalContext,
@@ -829,7 +818,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return String.valueOf(t);
 	}
 
-	public String getLookaheadName(TokenStream input) {
+	public String getLookaheadName(ObjectStream input) {
 		return getTokenName(input.LA(1));
 	}
 
@@ -852,6 +841,23 @@ public class ParserATNSimulator extends ATNSimulator {
 				trans = (not?"~":"")+"Set "+st.set.toString();
 			}
 			System.err.println(c.toString(parser, true)+":"+trans);
+		}
+	}
+
+	public int throwNoViableAlt(ObjectStream input, RuleContext outerContext,
+								OrderedHashSet<ATNConfig> configs, int startIndex)
+	{
+		if ( parser instanceof TreeParser) {
+			throw new NoViableTreeGrammarAltException(parser, (ASTNodeStream)input,
+													  input.get(startIndex),
+													  input.LT(1),
+													  configs, outerContext);
+		}
+		else {
+			throw new NoViableAltException(parser, input,
+										   (Token)input.get(startIndex),
+										   (Token)input.LT(1),
+										   configs, outerContext);
 		}
 	}
 }

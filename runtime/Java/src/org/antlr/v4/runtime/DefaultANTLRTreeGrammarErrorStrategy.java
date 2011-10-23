@@ -27,21 +27,51 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.runtime;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import java.util.List;
+public class DefaultANTLRTreeGrammarErrorStrategy implements ANTLRErrorStrategy {
+	@Override
+	public void beginErrorCondition(BaseRecognizer recognizer) {
+	}
 
-public class Loop extends Choice {
-	public int blockStartStateNumber;
-	public int loopBackStateNumber;
-	public int exitAlt;
-	public Loop(OutputModelFactory factory,
-				GrammarAST blkOrEbnfRootAST,
-				List<CodeBlockForAlt> alts)
+	@Override
+	public void reportError(BaseRecognizer recognizer, RecognitionException e)
+		throws RecognitionException
 	{
-		super(factory, blkOrEbnfRootAST, alts);
+		Object root = ((TreeParser)recognizer).getInputStream().getTreeSource();
+		if ( root instanceof Tree ) {
+			TreeViewer viewer = new TreeViewer(recognizer, (Tree)root);
+			viewer.open();
+			// TODO: highlight error node
+		}
+		recognizer.notifyListeners(e.offendingToken, e.getMessage(), e);
+	}
+
+	@Override
+	public Object recoverInline(BaseRecognizer recognizer) throws RecognitionException {
+		throw new InputMismatchException(recognizer);
+	}
+
+	@Override
+	public void recover(BaseRecognizer recognizer) {
+		throw new RecognitionException(recognizer,
+									   recognizer.getInputStream(),
+									   recognizer._ctx);
+	}
+
+	@Override
+	public void sync(BaseRecognizer recognizer) {
+	}
+
+	@Override
+	public boolean inErrorRecoveryMode(BaseRecognizer recognizer) {
+		return false;
+	}
+
+	@Override
+	public void endErrorCondition(BaseRecognizer recognizer) {
 	}
 }

@@ -142,15 +142,15 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
-			"(_localctx._ra!=null?((TokenStream)_input).toString(_localctx._ra.start,_localctx._ra.stop):" +
-			"null); ((TokenStream)_input).toString(_localctx.start, _input.LT(-1))";
+			"(_localctx._ra!=null?_input.toString(_localctx._ra.start,_localctx._ra.stop):" +
+			"null); _input.toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "init", action, expected);
 		expected =
-			"((TokenStream)_input).toString(_localctx.start, _input.LT(-1)); ((TokenStream)_input).toString(_localctx.start, _input.LT(-1))";
+			"_input.toString(_localctx.start, _input.LT(-1)); _input.toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "inline", action, expected);
 		expected =
-			"(_localctx._ra!=null?((TokenStream)_input).toString(_localctx._ra.start,_localctx._ra.stop):null);" +
-			" ((TokenStream)_input).toString(_localctx.start, _input.LT(-1))";
+			"(_localctx._ra!=null?_input.toString(_localctx._ra.start,_localctx._ra.stop):null);" +
+			" _input.toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "finally", action, expected);
     }
 

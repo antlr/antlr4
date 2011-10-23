@@ -27,21 +27,21 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.runtime;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.ast.GrammarAST;
+/**  A stream of either tokens or tree nodes */
+public interface ObjectStream extends IntStream {
+	/** Get an object at absolute index i; 0..n-1.
+	 *  This is only valid if the underlying stream implementation buffers
+	 *  all of the incoming objects.
+	 */
+	public Object get(int i);
 
-import java.util.List;
-
-public class Loop extends Choice {
-	public int blockStartStateNumber;
-	public int loopBackStateNumber;
-	public int exitAlt;
-	public Loop(OutputModelFactory factory,
-				GrammarAST blkOrEbnfRootAST,
-				List<CodeBlockForAlt> alts)
-	{
-		super(factory, blkOrEbnfRootAST, alts);
-	}
+	/** Get Object at current input pointer + i ahead where i=1 is next Object.
+	 *  i<0 indicates Objects in the past.  So -1 is previous Object and -2 is
+	 *  two Objects ago. LT(0) is undefined.  For i>=n, return an
+	 *  object representing EOF. Return null for LT(0) and any index that
+	 *  results in an absolute index that is negative.
+	 */
+	Object LT(int k);
 }

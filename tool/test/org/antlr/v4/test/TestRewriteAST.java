@@ -1335,7 +1335,7 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "decl", "x=1;", debug);
-		assertEquals("line 1:0 mismatched input 'x' expecting set null\n", this.stderrDuringParse);
+		assertEquals("line 1:0 mismatched input 'x' expecting set {'int', 'float'}\n", this.stderrDuringParse);
 		assertEquals("(EXPR <error: x> x 1)\n", found); // tree gets invented ID token
 	}
 
@@ -1401,27 +1401,6 @@ public class TestRewriteAST extends BaseTest {
 		// ref to rule b (start of c). It then matches 34 in c.
 		assertEquals("line 1:0 missing ID at '34'\n", this.stderrDuringParse);
 		assertEquals("<missing ID> 34\n", found);
-	}
-
-	@Test
-	public void testNoViableAltGivesErrorNode() throws Exception {
-		String grammar =
-			"grammar foo;\n" +
-			"options {output=AST;}\n" +
-			"a : b -> b | c -> c;\n" +
-			"b : ID -> ID ;\n" +
-			"c : INT -> INT ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"S : '*' ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
-								  "a", "*", debug);
-		// finds an error at the first token, 34, and re-syncs.
-		// re-synchronizing does not consume a token because 34 follows
-		// ref to rule b (start of c). It then matches 34 in c.
-		assertEquals("line 1:0 no viable alternative at input '*'\n", this.stderrDuringParse);
-		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
 
 }

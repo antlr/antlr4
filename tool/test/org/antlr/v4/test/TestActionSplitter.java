@@ -19,8 +19,8 @@ public class TestActionSplitter extends BaseTest {
         "$ID.text = \"test\";",		"['$ID.text = \"test\";'<19>]",
         "$a.line == $b.line",		"['$a.line'<13>, ' == '<22>, '$b.line'<13>]",
         "$r.tree",		"['$r.tree'<13>]",
-        "foo $a::n bar",		"['foo '<22>, '$a::n'<9>, ' bar'<22>]",
-        "$rule::x;",		"['$rule::x'<9>, ';'<22>]",
+        "foo $a::n bar",		"['foo '<22>, '$a::n'<12>, ' bar'<22>]",
+        "$rule::x;",		"['$rule::x'<12>, ';'<22>]",
         "$field::x = $field.st;",		"['$field::x = $field.st;'<17>]",
         "$foo.get(\"ick\");",		"['$foo'<6>, '.get(\"ick\");'<22>]",
     };

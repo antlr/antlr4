@@ -27,21 +27,28 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.runtime;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.tree.ASTNodeStream;
 
-import java.util.List;
+public class NoViableTreeGrammarAltException extends NoViableAltException {
+	protected Object startNode;
+	protected Object offendingNode;
 
-public class Loop extends Choice {
-	public int blockStartStateNumber;
-	public int loopBackStateNumber;
-	public int exitAlt;
-	public Loop(OutputModelFactory factory,
-				GrammarAST blkOrEbnfRootAST,
-				List<CodeBlockForAlt> alts)
-	{
-		super(factory, blkOrEbnfRootAST, alts);
+	public NoViableTreeGrammarAltException(BaseRecognizer recognizer) {
+		super(recognizer);
+	}
+
+	public NoViableTreeGrammarAltException(BaseRecognizer recognizer,
+										   ASTNodeStream input,
+										   Object startNode,
+										   Object offendingNode,
+										   OrderedHashSet<ATNConfig> deadEndConfigs,
+										   RuleContext ctx) {
+		super(recognizer, input, null, null, deadEndConfigs, ctx);
+		this.startNode = startNode;
+		this.offendingNode = offendingNode;
 	}
 }

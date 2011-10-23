@@ -31,8 +31,7 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 /** A parser for a stream of tree nodes. "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
@@ -54,6 +53,7 @@ public class TreeParser extends BaseRecognizer {
 
 	public TreeParser(ASTNodeStream input) {
 		super(input);
+		_errHandler = new DefaultANTLRTreeGrammarErrorStrategy();
 	}
 
 	public void reset() {
