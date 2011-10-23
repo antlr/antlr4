@@ -41,8 +41,8 @@ public class LL1StarBlockSingleAlt extends LL1Loop {
 	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST starRoot, List<CodeBlockForAlt> alts) {
 		super(factory, starRoot, alts);
 
-//		StarBlockStartState star = (StarBlockStartState)starRoot.atnState;
 		StarLoopEntryState star = (StarLoopEntryState)starRoot.atnState;
+		loopBackStateNumber = star.loopBackState.stateNumber;
 		this.decision = star.decision;
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
 		IntervalSet enterLook = altLookSets[1];

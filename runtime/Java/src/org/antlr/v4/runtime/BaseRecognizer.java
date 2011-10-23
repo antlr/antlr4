@@ -190,7 +190,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  If the parser is creating parse trees, the current symbol
 	 *  would also be added as a child to the current context (node).
 	 */
-	protected Object consume() {
+	public Object consume() {
 		Object o = getCurrentInputSymbol();
 		getInputStream().consume();
 		if ( buildParseTrees ) {
@@ -225,6 +225,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 			p = (ParserRuleContext)p.parent;
 		}
 		return null;
+	}
+
+	public ParserRuleContext getContext() {
+		return _ctx;
 	}
 
 	public boolean inContext(String context) {

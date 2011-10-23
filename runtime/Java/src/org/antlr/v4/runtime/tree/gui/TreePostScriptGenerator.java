@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2011 T2rence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.tree.*;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 
 public class TreePostScriptGenerator {
 	public class VariableExtentProvide implements NodeExtentProvider<Tree> {
@@ -48,16 +49,18 @@ public class TreePostScriptGenerator {
 		@Override
 		public double getHeight(Tree tree) {
 			String s = getText(tree);
-			double h = doc.getLineHeight() + nodeHeightPadding*2;
+			double h =
+				doc.getLineHeight() + nodeHeightPaddingAbove + nodeHeightPaddingBelow;
 			String[] lines = s.split("\n");
 			return h * lines.length;
 		}
 	}
 
-	protected double gapBetweenLevels = 30;
-	protected double gapBetweenNodes = 10;
+	protected double gapBetweenLevels = 10;
+	protected double gapBetweenNodes = 7;
 	protected int nodeWidthPadding = 1;  // added to left/right
-	protected int nodeHeightPadding = 1; // added above/below
+	protected int nodeHeightPaddingAbove = 2;
+	protected int nodeHeightPaddingBelow = 5;
 
 	protected Tree root;
 	protected TreeTextProvider treeTextProvider;
@@ -99,12 +102,12 @@ public class TreePostScriptGenerator {
 	protected void generateEdges(Tree parent) {
 		if (!getTree().isLeaf(parent)) {
 			Rectangle2D.Double parentBounds = getBoundsOfNode(parent);
-			System.out.println("%% parent("+getText(parent)+")="+parentBounds);
+//			System.out.println("%% parent("+getText(parent)+")="+parentBounds);
 			double x1 = parentBounds.getCenterX();
 			double y1 = parentBounds.y;
 			for (Tree child : getChildren(parent)) {
 				Rectangle2D.Double childBounds = getBoundsOfNode(child);
-				System.out.println("%% child("+getText(child)+")="+childBounds);
+//				System.out.println("%% child("+getText(child)+")="+childBounds);
 				double x2 = childBounds.getCenterX();
 				double y2 = childBounds.getMaxY();
 				doc.line(x1, y1, x2, y2);
@@ -120,7 +123,7 @@ public class TreePostScriptGenerator {
 		// for debugging, turn this on to see boundingbox of nodes
 		// doc.rect(box.x, box.y, box.width, box.height);
 		double x = box.x+nodeWidthPadding;
-		double y = box.y+nodeHeightPadding;
+		double y = box.y+nodeHeightPaddingBelow;
 		for (int i = 0; i < lines.length; i++) {
 			doc.text(lines[i], x, y);
 			y += doc.getFontSize();
@@ -151,19 +154,36 @@ public class TreePostScriptGenerator {
 		this.treeTextProvider = treeTextProvider;
 	}
 
-	public static void main(String[] args) {
-		CommonAST t = new CommonAST(new CommonToken(1, "+"));
-		CommonAST a = new CommonAST(new CommonToken(1, "expression"));
-		CommonAST f = new CommonAST(new CommonToken(1, "3000"));
-		CommonAST b = new CommonAST(new CommonToken(1, "*"));
-		CommonAST c = new CommonAST(new CommonToken(1, "42"));
-		CommonAST d = new CommonAST(new CommonToken(1, "105"));
-		t.addChild(a);
-		a.addChild(f);
-		t.addChild(b);
-		b.addChild(c);
-		b.addChild(d);
-		TreePostScriptGenerator psgen = new TreePostScriptGenerator(null, t, "CourierNew", 11);
-		System.out.println(psgen.getPS());
+	public static void main(String[] args) throws IOException {
+		CommonAST t = new CommonAST(new CommonToken(1, "s"));
+		CommonAST ifstat = new CommonAST(new CommonToken(1, "ifstat"));
+		CommonAST iff = new CommonAST(new CommonToken(1, "if"));
+		CommonAST b = new CommonAST(new CommonToken(1, "("));
+		CommonAST c = new CommonAST(new CommonToken(1, "expr"));
+		CommonAST d = new CommonAST(new CommonToken(1, ")"));
+		CommonAST e = new CommonAST(new CommonToken(1, "assign"));
+		CommonAST f = new CommonAST(new CommonToken(1, "34"));
+		CommonAST g = new CommonAST(new CommonToken(1, "a"));
+		CommonAST h = new CommonAST(new CommonToken(1, "="));
+		CommonAST i = new CommonAST(new CommonToken(1, "expr"));
+		CommonAST j = new CommonAST(new CommonToken(1, ";"));
+		CommonAST k = new CommonAST(new CommonToken(1, "b"));
+		t.addChild(ifstat);
+		ifstat.addChild(iff);
+		ifstat.addChild(b);
+		ifstat.addChild(c);
+		ifstat.addChild(d);
+		ifstat.addChild(e);
+		c.addChild(f);
+		e.addChild(g);
+		e.addChild(h);
+		e.addChild(i);
+		e.addChild(j);
+		i.addChild(k);
+		Trees.writePS(t, null,
+					  "/Users/parrt/antlr/code/antlr4/main/tool/playground/t.eps",
+					  "Arial", 11);
+//		TreePostScriptGenerator psgen = new TreePostScriptGenerator(null, t, "CourierNew", 11);
+//		System.out.println(psgen.getPS());
 	}
 }

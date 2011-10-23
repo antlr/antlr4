@@ -35,6 +35,7 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.List;
 
 public class Loop extends Choice {
+	public int loopBackStateNumber;
 	public int exitAlt;
 	public Loop(OutputModelFactory factory,
 				GrammarAST blkOrEbnfRootAST,

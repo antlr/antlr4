@@ -50,6 +50,8 @@ public class LL1StarBlock extends LL1Loop {
 		blockStartStateNumber =
 			starRootAST.atnState.transition(0).target.stateNumber;
 
+		loopBackStateNumber = star.loopBackState.stateNumber;
+
 		this.decision = star.decision;
 
 		/** Lookahead for each alt 1..n */

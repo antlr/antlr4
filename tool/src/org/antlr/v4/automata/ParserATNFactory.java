@@ -30,26 +30,18 @@
 package org.antlr.v4.automata;
 
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.*;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.ATNBuilder;
-import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.semantics.UseDefAnalyzer;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /** ATN construction routines triggered by ATNBuilder.g.
  *
@@ -364,9 +356,9 @@ public class ParserATNFactory implements ATNFactory {
 		PlusLoopbackState loop = (PlusLoopbackState)newState(PlusLoopbackState.class, plusAST);
 		atn.defineDecisionState(loop);
 		ATNState end = newState(ATNState.class, plusAST);
+		blkStart.loopBackState = loop;
 
 		plusAST.atnState = blkStart;
-		blkStart.loopBackState = loop;
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
@@ -404,6 +396,7 @@ public class ParserATNFactory implements ATNFactory {
 		atn.defineDecisionState(entry);
 		ATNState end = newState(ATNState.class, starAST);
 		StarLoopbackState loop = (StarLoopbackState)newState(StarLoopbackState.class, starAST);
+		entry.loopBackState = loop;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
 		entry.isGreedy = isGreedy(blkAST);

@@ -129,27 +129,52 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN.
-	 *  sync() differs fundamentally from the recoverInline() method.
-	 *  In this case, we throw out a token that's not in the set of what
-	 *  were expecting at this point. recoverInline() only deletes this
-	 *  token if LT(2) (token after the current token) is what were expecting;
-	 *  i.e., we have an extra token sitting on the input stream.  sync()
-	 *  simply consumes until it finds something that can start whatever
-	 *  follows the call to sync().
+	 *
+	 *  At the start of a sub rule upon error, sync() performs single
+	 *  token deletion, if possible. If it can't do that, it bails
+	 *  on the current rule and uses the default error recovery,
+	 *  which consumes until the resynchronization set of the current rule.
+	 *
+	 *  If the sub rule is optional, ()? or ()* or optional alternative,
+	 *  then the expected set includes what follows the subrule.
+	 *
+	 *  During loop iteration, it consumes until it sees a token that can
+	 *  start a sub rule or what follows loop. Yes, that is pretty aggressive.
+	 *  We opt to stay in the loop as long as possible.
  	 */
 	@Override
 	public void sync(BaseRecognizer recognizer) {
+		ATNState s = recognizer._interp.atn.states.get(recognizer._ctx.s);
+//		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
 		if ( errorRecoveryMode ) return;
+
 		// TODO: CACHE THESE RESULTS!!
 		IntervalSet expecting = getExpectedTokens(recognizer);
+//		System.err.println("sync expecting: "+expecting);
+
 		// TODO: subclass this class for treeparsers
 		TokenStream tokens = (TokenStream)recognizer.getInputStream();
 		Token la = tokens.LT(1);
 		// Return but don't end recovery. only do that upon valid token match
 		if ( la.getType()==Token.EOF || expecting.contains(la.getType()) ) return;
-		reportUnwantedToken(recognizer);
-		consumeUntil(recognizer, expecting);
+
+		if ( s instanceof PlusBlockStartState ||
+			 s instanceof StarLoopEntryState ||
+			 s instanceof BlockStartState )
+		{
+			// report error and recover if possible
+			if ( singleTokenDeletion(recognizer)!=null ) return;
+			throw new InputMismatchException(recognizer);
+		}
+		if ( s instanceof PlusLoopbackState ||
+			 s instanceof StarLoopbackState )
+		{
+//			System.err.println("at loop back: "+s.getClass().getSimpleName());
+			reportUnwantedToken(recognizer);
+			consumeUntil(recognizer, expecting);
+		}
+		// do nothing if we can identify the exact kind of ATN state
 	}
 
 	public void reportNoViableAlternative(BaseRecognizer recognizer,
@@ -241,10 +266,55 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	public Object recoverInline(BaseRecognizer recognizer)
 		throws RecognitionException
 	{
-		Object currentSymbol = recognizer.getCurrentInputSymbol();
-
-		// SINGLE TOKEN DELETION
 		// if next token is what we are looking for then "delete" this token
+//		int nextTokenType = recognizer.getInputStream().LA(2);
+//		IntervalSet expecting = getExpectedTokens(recognizer);
+//		if ( expecting.contains(nextTokenType) ) {
+//			reportUnwantedToken(recognizer);
+//			/*
+//			System.err.println("recoverFromMismatchedToken deleting "+
+//							   ((TokenStream)recognizer.getInputStream()).LT(1)+
+//							   " since "+((TokenStream)recognizer.getInputStream()).LT(2)+
+//							   " is what we want");
+//			*/
+//			recognizer.consume(); // simply delete extra token
+//			// we want to return the token we're actually matching
+//			Object matchedSymbol = recognizer.getCurrentInputSymbol();
+//			endErrorCondition(recognizer);  // we know next token is correct
+//			recognizer.consume(); // move past ttype token as if all were ok
+//			return matchedSymbol;
+//		}
+		// SINGLE TOKEN DELETION
+		Object matchedSymbol = singleTokenDeletion(recognizer);
+		if ( matchedSymbol!=null ) return matchedSymbol;
+
+		// SINGLE TOKEN INSERTION
+		if ( singleTokenInsertion(recognizer) ) {
+			return getMissingSymbol(recognizer);
+		}
+
+		// even that didn't work; must throw the exception
+		throw new InputMismatchException(recognizer);
+	}
+
+	// if next token is what we are looking for then "delete" this token
+	public boolean singleTokenInsertion(BaseRecognizer recognizer) {
+		Object currentSymbol = recognizer.getCurrentInputSymbol();
+		// if current token is consistent with what could come after current
+		// ATN state, then we know we're missing a token; error recovery
+		// is free to conjure up and insert the missing token
+		ATNState currentState = recognizer._interp.atn.states.get(recognizer._ctx.s);
+		ATNState next = currentState.transition(0).target;
+		IntervalSet expectingAtLL2 = recognizer._interp.atn.nextTokens(next, recognizer._ctx);
+//		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
+		if ( expectingAtLL2.contains(((Token)currentSymbol).getType()) ) {
+			reportMissingToken(recognizer);
+			return true;
+		}
+		return false;
+	}
+
+	public Object singleTokenDeletion(BaseRecognizer recognizer) {
 		int nextTokenType = recognizer.getInputStream().LA(2);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		if ( expecting.contains(nextTokenType) ) {
@@ -256,29 +326,13 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 							   " is what we want");
 			*/
 			recognizer.consume(); // simply delete extra token
-//			recognizer.getInputStream().consume(); // simply delete extra token
 			// we want to return the token we're actually matching
 			Object matchedSymbol = recognizer.getCurrentInputSymbol();
 			endErrorCondition(recognizer);  // we know next token is correct
 			recognizer.consume(); // move past ttype token as if all were ok
-//			recognizer.getInputStream().consume(); // move past ttype token as if all were ok
 			return matchedSymbol;
 		}
-
-		// SINGLE TOKEN INSERTION
-		// if current token is consistent with what could come after current
-		// ATN state, then we know we're missing a token; error recovery
-		// is free to conjure up and insert the missing token
-		ATNState currentState = recognizer._interp.atn.states.get(recognizer._ctx.s);
-		ATNState next = currentState.transition(0).target;
-		IntervalSet expectingAtLL2 = recognizer._interp.atn.nextTokens(next, recognizer._ctx);
-//		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
-		if ( expectingAtLL2.contains(((Token)currentSymbol).getType()) ) {
-			reportMissingToken(recognizer);
-			return getMissingSymbol(recognizer);
-		}
-		// even that didn't work; must throw the exception
-		throw new InputMismatchException(recognizer);
+		return null;
 	}
 
 	/** Conjure up a missing token during error recovery.
@@ -461,7 +515,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BaseRecognizer recognizer, IntervalSet set) {
-//		System.out.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
+//		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);

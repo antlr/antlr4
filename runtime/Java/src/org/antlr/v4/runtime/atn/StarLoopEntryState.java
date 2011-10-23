@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 public class StarLoopEntryState extends DecisionState {
+	public StarLoopbackState loopBackState;
 	@Override
 	public boolean onlyHasEpsilonTransitions() { return true; }
 }

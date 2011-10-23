@@ -79,7 +79,7 @@ public class ATNSerializer {
 		int nedges = 0;
 		// dump states, count edges and collect sets while doing so
 		for (ATNState s : atn.states) {
-			data.add(ATNState.serializationTypes.get(s.getClass()));
+			data.add(s.getStateType());
 			data.add(s.ruleIndex);
 			nedges += s.getNumberOfTransitions();
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {

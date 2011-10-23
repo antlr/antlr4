@@ -265,7 +265,7 @@ while (true) {
 		<cases(choice.exitLook)>
 			break <choice.loopLabel>;
 	}
-	setState(<choice.stateNumber>);
+	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 }
 >>
@@ -276,7 +276,7 @@ _errHandler.sync(this);
 <preamble; separator="\n">
 while ( <loopExpr> ) {
 	<alts; separator="\n">
-	setState(<choice.stateNumber>);
+	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 	<iteration>
 }
@@ -350,7 +350,7 @@ case <i>:
 	<alt>
 	break;}; separator="\n">
 	}
-	setState(<choice.stateNumber>);
+	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
 }

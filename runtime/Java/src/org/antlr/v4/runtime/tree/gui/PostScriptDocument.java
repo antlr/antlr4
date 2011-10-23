@@ -70,26 +70,26 @@ public class PostScriptDocument {
 		ps.append("%!PS-Adobe-3.0 EPSF-3.0\n");
 		ps.append("%%BoundingBox: (atend)\n");
 		lineWidth(0.3);
-		ps.append("%\n");
-		ps.append("% x y rarrow\n");
-		ps.append("%\n");
-		ps.append("/rarrow {\n");
-		ps.append("  moveto\n");
-		ps.append("  -3 +2 rlineto\n");
-		ps.append("  0 -4 rlineto\n");
-		ps.append("  3 +2 rlineto\n");
-		ps.append("  fill\n");
-		ps.append("} def\n");
-		ps.append("%\n");
-		ps.append("% x y darrow\n");
-		ps.append("%\n");
-		ps.append("/darrow {\n");
-		ps.append("  moveto\n");
-		ps.append("  -2 +3 rlineto\n");
-		ps.append("  4 0 rlineto\n");
-		ps.append("  -2 -3 rlineto\n");
-		ps.append("  fill\n");
-		ps.append("} def\n");
+//		ps.append("%\n");
+//		ps.append("% x y rarrow\n");
+//		ps.append("%\n");
+//		ps.append("/rarrow {\n");
+//		ps.append("  moveto\n");
+//		ps.append("  -3 +2 rlineto\n");
+//		ps.append("  0 -4 rlineto\n");
+//		ps.append("  3 +2 rlineto\n");
+//		ps.append("  fill\n");
+//		ps.append("} def\n");
+//		ps.append("%\n");
+//		ps.append("% x y darrow\n");
+//		ps.append("%\n");
+//		ps.append("/darrow {\n");
+//		ps.append("  moveto\n");
+//		ps.append("  -2 +3 rlineto\n");
+//		ps.append("  4 0 rlineto\n");
+//		ps.append("  -2 -3 rlineto\n");
+//		ps.append("  fill\n");
+//		ps.append("} def\n");
 	}
 
 	// Courier, Helvetica, Times, ... should be available
@@ -144,6 +144,22 @@ public class PostScriptDocument {
 	}
 
 	public void text(String s, double x, double y) {
+		StringBuilder buf = new StringBuilder();
+		// escape \, (, ): \\,  \(,  \)
+		for (char c : s.toCharArray()) {
+			switch ( c ) {
+				case '\\' :
+				case '(' :
+				case ')' :
+					buf.append('\\');
+					buf.append(c);
+					break;
+				default :
+					buf.append(c);
+					break;
+			}
+		}
+		s = buf.toString();
 		move(x,y);
 		ps.append(String.format("(%s) show\n", s));
 		stroke();

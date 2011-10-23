@@ -35,6 +35,14 @@ public class ATNState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 
 	// constants for serialization
+//	public static enum ATNStateType {
+//		BASIC(1), RULE_START(2), BLOCK_START(3), PLUS_BLOCK_START(4),
+//		STAR_BLOCK_START(5), TOKEN_START(6), RULE_STOP(7), BLOCK_END(8),
+//		STAR_LOOP_BACK(9), STAR_LOOP_ENTRY(10), PLUS_LOOP_BACK(11);
+//		public int type;
+//		ATNStateType(int type) { this.type = type; }
+//		public int intValue() { return type; }
+//	}
 	public static final int BASIC = 1;
 	public static final int RULE_START = 2;
 	public static final int BLOCK_START = 3;
@@ -83,6 +91,8 @@ public class ATNState {
 
 	public int ruleIndex; // at runtime, we don't have Rule objects
 
+	public int epsilonOnlyTransitions = -1;
+
 	/** Which ATN are we in? */
 	public ATN atn = null;
 
@@ -123,7 +133,9 @@ public class ATNState {
 		transitions.set(i, e);
 	}
 
-	protected int epsilonOnlyTransitions = -1;
+	public int getStateType() {
+		return serializationTypes.get(this.getClass());
+	}
 
 	//lexer atn sim: getEpTar: 13.2%
 	// ruleCtx.equals 10%

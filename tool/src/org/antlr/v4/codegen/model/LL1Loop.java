@@ -33,8 +33,7 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** */
 public abstract class LL1Loop extends Choice {
@@ -42,6 +41,7 @@ public abstract class LL1Loop extends Choice {
 	 *  is super.stateNumber
 	 */
 	public int blockStartStateNumber;
+	public int loopBackStateNumber;
 
 	@ModelElement public OutputModelObject loopExpr;
 	@ModelElement public List<SrcOp> iteration;

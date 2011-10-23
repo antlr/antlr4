@@ -151,11 +151,14 @@ public class TestParseErrors extends BaseTest {
 	}
 
 	@Test public void testMultiTokenDeletionBeforeLoop() throws Exception {
+		// can only delete 1 before loop
 		String grammar =
 			"grammar T;\n" +
 			"a : 'a' 'b'* 'c';";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aacabc", false);
-		String expecting = "line 1:1 extraneous input 'a' expecting {'b', 'c'}\n";
+		String expecting =
+			"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n" +
+			"line 1:3 mismatched input 'a' expecting 'c'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
@@ -178,6 +181,53 @@ public class TestParseErrors extends BaseTest {
 		String expecting =
 				"line 1:2 extraneous input 'a' expecting {'b', 'c'}\n" +
 				"line 1:6 extraneous input 'a' expecting {'b', 'c'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	// ------
+
+	@Test public void testSingleTokenDeletionBeforeLoop2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' ('b'|'z'{;})*;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aabc", false);
+		String expecting = "line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testMultiTokenDeletionBeforeLoop2() throws Exception {
+		// can only delete 1 before loop
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' ('b'|'z'{;})* 'c';";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aacabc", false);
+		String expecting =
+			"line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n" +
+			"line 1:3 mismatched input 'a' expecting 'c'\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testSingleTokenDeletionDuringLoop2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' ('b'|'z'{;})* 'c' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "ababbc", false);
+		String expecting = "line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testMultiTokenDeletionDuringLoop2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'a' ('b'|'z'{;})* 'c' ;";
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "abaaababc", false);
+		String expecting =
+				"line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n" +
+				"line 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}

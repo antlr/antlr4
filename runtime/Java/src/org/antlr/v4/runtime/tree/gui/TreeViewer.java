@@ -82,10 +82,10 @@ public class TreeViewer extends JComponent {
 	protected int fontSize = 12;
 	protected Font font = new Font(fontName, fontStyle, fontSize);
 
-	protected double gapBetweenLevels = 30;
-	protected double gapBetweenNodes = 10;
+	protected double gapBetweenLevels = 12;
+	protected double gapBetweenNodes = 7;
 	protected int nodeWidthPadding = 2;  // added to left/right
-	protected int nodeHeightPadding = 1; // added above/below
+	protected int nodeHeightPadding = 4; // added above/below
 	protected int arcSize = 0;           // make an arc in node outline?
 
 	protected Color boxColor = Color.white;
