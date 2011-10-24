@@ -35,7 +35,6 @@ ListenerFile(listener, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public interface <listener.grammarName>Listener extends ParseTreeListener {
 	<listener.listenerNames:{lname |
 void enterRule(<listener.parserName>.<lname>Context ctx);
@@ -49,15 +48,14 @@ BlankListenerFile(listener, header) ::= <<
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
 public class Blank<listener.grammarName>Listener implements <listener.grammarName>Listener {
 	<listener.listenerNames:{lname |
-public void enterRule(<listener.parserName>.<lname>Context ctx) { \}
-public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator="\n">
+@Override public void enterRule(<listener.parserName>.<lname>Context ctx) { \}
+@Override public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
-	public void enterEveryRule(ParserRuleContext ctx) { }
-	public void exitEveryRule(ParserRuleContext ctx) { }
-	public void visitToken(Token token) { }
+	@Override public void enterEveryRule(ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	@Override public void visitToken(Token token) { }
 }
 >>
 
@@ -180,8 +178,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
-	enterRule(_localctx, <currentRule.index>);
-	//System.out.println("enter "+ruleNames[<currentRule.index>]+", LT(1)="+_input.LT(1).getText());
+	enterRule(_localctx, RULE_<currentRule.name>);
+	//System.out.println("enter "+ruleNames[RULE_<currentRule.name>]+", LT(1)="+_input.LT(1).getText());
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -196,8 +194,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 	}
 	finally {
 		<finallyAction>
-		exitRule(<currentRule.index>);
-		// System.out.println("exit "+ruleNames[<currentRule.index>]);
+		exitRule(RULE_<currentRule.name>);
+		// System.out.println("exit "+ruleNames[RULE_<currentRule.name>]);
 	}
 	return _localctx;
 }
@@ -557,8 +555,9 @@ public static class <s.label>Context extends <currentRule.name>Context {
 >>
 
 VisitorDispatchMethod(method) ::= <<
+@Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
-	((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
+	if ( listener!=null ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
 }
 >>
 
