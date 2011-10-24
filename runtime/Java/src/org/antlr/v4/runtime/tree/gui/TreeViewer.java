@@ -29,10 +29,13 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.*;
+import org.abego.treelayout.NodeExtentProvider;
+import org.abego.treelayout.TreeForTreeLayout;
+import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.tree.Trees;
 
 import javax.swing.*;
 import java.awt.*;
@@ -150,6 +153,10 @@ public class TreeViewer extends JComponent {
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
+
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+      						RenderingHints.VALUE_ANTIALIAS_ON);
 
 		paintEdges(g, getTree().getRoot());
 
