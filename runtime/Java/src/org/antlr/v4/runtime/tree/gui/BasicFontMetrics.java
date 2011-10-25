@@ -49,10 +49,9 @@ package org.antlr.v4.runtime.tree.gui;
      #
 	 lines = open("metrics").read().split('\n')
 	 print "public class FontName {"
-	 print "    public static int[] widths = new int[128];"
-	 print "    static {"
+	 print "    {"
 	 maxh = 0;
-	 for line in lines:
+	 for line in lines[4:]: # skip header 0..3
 			 all = line.split(' ')
 			 words = [x for x in all if len(x)>0]
 			 ascii = int(words[1], 16)
@@ -61,15 +60,16 @@ package org.antlr.v4.runtime.tree.gui;
 			 if ascii>=128: break
 			 print "        widths[%d] = %s; // %s" % (ascii, words[3], words[2])
 
+	 print "        maxCharHeight = "+str(maxh)+";"
 	 print "    }"
-	 print "    public static int MAX_CHAR_HEIGHT = "+str(maxh)+";"
 	 print "}"
 
  	Units are 1000th of an 'em'.
  */
 public abstract class BasicFontMetrics {
+	public static final int MAX_CHAR = '\u00FF';
 	protected int maxCharHeight;
-	protected int[] widths = new int[128];
+	protected int[] widths = new int[MAX_CHAR+1];
 
 	public double getWidth(String s, int fontSize) {
 		double w = 0;
@@ -80,6 +80,7 @@ public abstract class BasicFontMetrics {
 	}
 
 	public double getWidth(char c, int fontSize) {
+		if ( c > MAX_CHAR || widths[c]==0 ) return widths['m']/1000.0; // return width('m')
 		return widths[c]/1000.0 * fontSize;
 	}
 

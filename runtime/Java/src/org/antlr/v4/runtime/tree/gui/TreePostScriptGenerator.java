@@ -182,7 +182,7 @@ public class TreePostScriptGenerator {
 		i.addChild(k);
 		Trees.writePS(t, null,
 					  "/Users/parrt/antlr/code/antlr4/main/tool/playground/t.eps",
-					  "Arial", 11);
+					  "ArialNarrow", 11);
 //		TreePostScriptGenerator psgen = new TreePostScriptGenerator(null, t, "CourierNew", 11);
 //		System.out.println(psgen.getPS());
 	}
