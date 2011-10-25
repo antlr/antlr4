@@ -29,6 +29,12 @@
 
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.tree.gui.TreeViewer;
+
+import java.awt.*;
+import java.util.ArrayList;
 
 public class TestT {
 	public static void main(String[] args) throws Exception {
@@ -40,10 +46,17 @@ public class TestT {
 //		}
 		TParser p = new TParser(tokens);
 		p.setBuildParseTree(true);
-		TParser.sContext tree = p.s();
-
+		final TParser.sContext tree = p.s();
 		System.out.println(tree.toStringTree(p));
-		tree.inspect(p);
+		TreeViewer v = new TreeViewer(p, tree);
+		v.setHighlightedBoxColor(new Color(217, 189, 187));
+		v.addHighlightNodes(new ArrayList<Tree>(){{
+			ParseTree c0 = tree.getChild(0);
+			add(c0);
+			add(c0.getChild(0));
+		}});
+		v.open();
+//		tree.inspect(p);
 //
 //		ParseTreeWalker walker = new ParseTreeWalker();
 //		TListener listener = new BlankTListener() {

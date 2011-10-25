@@ -29,14 +29,19 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.*;
+import org.abego.treelayout.NodeExtentProvider;
+import org.abego.treelayout.TreeForTreeLayout;
+import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.tree.Trees;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class TreeViewer extends JComponent {
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
@@ -76,6 +81,7 @@ public class TreeViewer extends JComponent {
 
 	protected TreeTextProvider treeTextProvider;
 	protected TreeLayout<Tree> treeLayout;
+	protected java.util.List<Tree> highlightedNodes;
 
 	protected String fontName = Font.MONOSPACED;
 	protected int fontStyle = Font.PLAIN;
@@ -89,6 +95,8 @@ public class TreeViewer extends JComponent {
 	protected int arcSize = 0;           // make an arc in node outline?
 
 	protected Color boxColor = Color.white;
+
+	protected Color highlightedBoxColor = Color.lightGray;
 	protected Color borderColor = Color.white;
 	protected Color textColor = Color.black;
 
@@ -126,7 +134,8 @@ public class TreeViewer extends JComponent {
 
 	protected void paintBox(Graphics g, Tree tree) {
 		// draw the box in the background
-		g.setColor(boxColor);
+		if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
+		else g.setColor(boxColor);
 		Rectangle2D.Double box = getBoundsOfNode(tree);
 		g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 						(int) box.height - 1, arcSize, arcSize);
@@ -214,6 +223,35 @@ public class TreeViewer extends JComponent {
 		font = new Font(fontName, fontStyle, fontSize);
 	}
 
+	/** Slow for big lists of highlighted nodes */
+	public void addHighlightNodes(Collection<Tree> nodes) {
+		highlightedNodes = new ArrayList<Tree>();
+		highlightedNodes.addAll(nodes);
+	}
+
+	public void removeHighlightNodes(Collection<Tree> nodes) {
+		if ( highlightedNodes!=null ) {
+			// only remove exact objects defined by ==, not equals()
+			for (Tree t : nodes) {
+				int i = getHighlightedNodeIndex(t);
+				if ( i>=0 ) highlightedNodes.remove(i);
+			}
+		}
+	}
+
+	protected boolean isHighlighted(Tree node) {
+		return getHighlightedNodeIndex(node) >= 0;
+	}
+
+	protected int getHighlightedNodeIndex(Tree node) {
+		if ( highlightedNodes==null ) return -1;
+		for (int i = 0; i < highlightedNodes.size(); i++) {
+			Tree t = highlightedNodes.get(i);
+			if ( t == node ) return i;
+		}
+		return -1;
+	}
+
 	@Override
 	public Font getFont() {
 		return font;
@@ -238,6 +276,14 @@ public class TreeViewer extends JComponent {
 
 	public void setBoxColor(Color boxColor) {
 		this.boxColor = boxColor;
+	}
+
+	public Color getHighlightedBoxColor() {
+		return highlightedBoxColor;
+	}
+
+	public void setHighlightedBoxColor(Color highlightedBoxColor) {
+		this.highlightedBoxColor = highlightedBoxColor;
 	}
 
 	public Color getBorderColor() {
