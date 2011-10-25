@@ -59,7 +59,7 @@ public class TreePostScriptGenerator {
 	protected double gapBetweenLevels = 10;
 	protected double gapBetweenNodes = 7;
 	protected int nodeWidthPadding = 1;  // added to left/right
-	protected int nodeHeightPaddingAbove = 2;
+	protected int nodeHeightPaddingAbove = 0;
 	protected int nodeHeightPaddingBelow = 5;
 
 	protected Tree root;
