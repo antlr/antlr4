@@ -184,7 +184,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( s.complete || t==CharStream.EOF ) break;
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || s.edges[t+1] == null ) {
+			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
 				if ( dfa_debug ) System.out.println("no edge for "+t);
 				int alt = -1;
 				if ( dfa_debug ) {
