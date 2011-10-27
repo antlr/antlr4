@@ -99,9 +99,9 @@ public class ErrorManager {
 			}
 			if ( msg.args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
 		}
-		if ( msg.e!=null ) {
-			messageST.add("exception", msg.e);
-			messageST.add("stackTrace", msg.e.getStackTrace());
+		if ( msg.getCause()!=null ) {
+			messageST.add("exception", msg.getCause());
+			messageST.add("stackTrace", msg.getCause().getStackTrace());
 		}
 		else {
 			messageST.add("exception", null); // avoid ST error msg
