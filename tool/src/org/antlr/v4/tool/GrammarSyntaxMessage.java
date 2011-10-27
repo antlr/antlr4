@@ -38,7 +38,6 @@ public class GrammarSyntaxMessage extends ANTLRMessage {
 	public Grammar g;
 	/** Most of the time, we'll have a token and so this will be set. */
 	public Token offendingToken;
-	public RecognitionException antlrException;
 
 	public GrammarSyntaxMessage(ErrorType etype,
 								String fileName,
@@ -46,13 +45,18 @@ public class GrammarSyntaxMessage extends ANTLRMessage {
 								RecognitionException antlrException,
 								Object... args)
 	{
-		super(etype,args);
+		super(etype, antlrException, args);
 		this.fileName = fileName;
 		this.offendingToken = offendingToken;
-		this.antlrException = antlrException;
 		if ( offendingToken!=null ) {
 			line = offendingToken.getLine();
 			charPosition = offendingToken.getCharPositionInLine();
 		}
 	}
+
+    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
+    @Override
+    public RecognitionException getCause() {
+        return (RecognitionException)super.getCause();
+    }
 }

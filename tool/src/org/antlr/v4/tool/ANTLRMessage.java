@@ -34,7 +34,7 @@ import java.util.Arrays;
 public class ANTLRMessage {
     public ErrorType errorType;
     public Object[] args;
-    public Throwable e;
+    private final Throwable e;
 
     // used for location template
     public String fileName;
@@ -42,20 +42,33 @@ public class ANTLRMessage {
     public int charPosition = -1;
 
     public ANTLRMessage() {
+        this(ErrorType.INVALID, (Throwable)null);
     }
 
     public ANTLRMessage(ErrorType errorType) {
-        this.errorType = errorType;
+        this(errorType, (Throwable)null);
     }
 
     public ANTLRMessage(ErrorType errorType, Object... args) {
-        this(errorType);
+        this(errorType, null, args);
+    }
+
+    public ANTLRMessage(ErrorType errorType, /*@Nullable*/ Throwable e, Object... args) {
+        this.errorType = errorType;
+        this.e = e;
         this.args = args;
     }
 
-    public ANTLRMessage(ErrorType errorType, Throwable e, Object... args) {
-        this(errorType, args);
-        this.e = e;
+    public ErrorType getErrorType() {
+        return errorType;
+    }
+
+    public Object[] getArgs() {
+        return args;
+    }
+
+    public Throwable getCause() {
+        return e;
     }
 
 	@Override
