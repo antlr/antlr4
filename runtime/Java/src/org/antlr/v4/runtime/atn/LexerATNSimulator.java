@@ -35,7 +35,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static boolean debug = false;
+	public static boolean debug = true;
 	public static boolean dfa_debug = false;
 	public static final int NUM_EDGES = 255;
 
@@ -49,6 +49,9 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	protected DFA[] dfa;
 	protected int mode = Lexer.DEFAULT_MODE;
+
+	protected ATNConfig prevAccept = null;
+	protected int prevAcceptIndex = -1;
 
 	public static int ATN_failover = 0;
 	public static int match_calls = 0;
@@ -176,8 +179,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( debug ) System.out.println("start state closure="+closure);
 
 		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
-		ATNConfig prevAccept = null;
-		int prevAcceptIndex = -1;
 
 		int t = input.LA(1);
 		if ( t==Token.EOF ) return Token.EOF;
@@ -188,35 +189,26 @@ public class LexerATNSimulator extends ATNSimulator {
 				ATNConfig c = closure.get(ci);
 				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString(recog, true));
 
-				if ( c.state instanceof RuleStopState ) {
-					if ( debug ) {
-						System.out.println("in reach we hit accept state "+c+" index "+
-										   input.index()+", reach="+reach+
-										   ", prevAccept="+prevAccept+", prevIndex="+prevAcceptIndex);
-					}
-					if ( input.index() > prevAcceptIndex ) {
-						// will favor prev accept at same index so "int" is keyword not ID
-						prevAccept = c;
-						prevAcceptIndex = input.index();
-					}
-
-					// if we reach lexer accept state, toss out any configs in rest
-					// of configs work list associated with this rule (config.alt);
-					// that rule is done. this is how we cut off nongreedy .+ loops.
-					deleteWildcardConfigsForAlt(closure, ci, c.alt);
-//					int j=ci+1;
-//					while ( j<closure.size() ) {
-//						ATNConfig c2 = closure.get(j);
-//						if ( c2.alt == c.alt ) {
-//							System.out.println("kill "+c2);
-//							closure.remove(j);
-//						}
-//						else j++;
+//				if ( c.state instanceof RuleStopState ) {
+//					if ( debug ) {
+//						System.out.println("in reach we hit accept state "+c+" index "+
+//										   input.index()+", reach="+reach+
+//										   ", prevAccept="+prevAccept+", prevIndex="+prevAcceptIndex);
 //					}
-
- 					// move to next char, looking for longer match
-					// (we continue processing if there are states in reach)
-				}
+//					if ( input.index() > prevAcceptIndex ) {
+//						// will favor prev accept at same index so "int" is keyword not ID
+//						prevAccept = c;
+//						prevAcceptIndex = input.index();
+//					}
+//
+//					// if we reach lexer accept state, toss out any configs in rest
+//					// of configs work list associated with this rule (config.alt);
+//					// that rule is done. this is how we cut off nongreedy .+ loops.
+//					deleteWildcardConfigsForAlt(closure, ci, c.alt);
+//
+// 					// move to next char, looking for longer match
+//					// (we continue processing if there are states in reach)
+//				}
 
 				int n = c.state.getNumberOfTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each transition
@@ -236,6 +228,34 @@ public class LexerATNSimulator extends ATNSimulator {
 				// cause a failover from DFA later.
 				if ( t!=Token.EOF ) addDFAEdge(from, t, ERROR);
 				break;
+			}
+
+			for (int ci=0; ci<reach.size(); ci++) { // TODO: foreach
+				ATNConfig c = reach.get(ci);
+				if ( c.state instanceof RuleStopState ) {
+					System.out.println("found stop in reach: "+c.state);
+					if ( debug ) {
+						System.out.println("in reach we hit accept state "+c+" index "+
+										   input.index()+", reach="+reach+
+										   ", prevAccept="+prevAccept+", prevIndex="+prevAcceptIndex);
+					}
+					if ( input.index() > prevAcceptIndex ) {
+						// will favor prev accept at same index so "int" is keyword not ID
+						prevAccept = c;
+						prevAcceptIndex = input.index();
+						if ( debug ) {
+							System.out.println("mark "+c+" @ index="+input.index());
+						}
+					}
+
+					// if we reach lexer accept state, toss out any configs in rest
+					// of configs work list associated with this rule (config.alt);
+					// that rule is done. this is how we cut off nongreedy .+ loops.
+					deleteWildcardConfigsForAlt(reach, ci, c.alt); // CAUSES INF LOOP if reach not closure
+
+ 					// move to next char, looking for longer match
+					// (we continue processing if there are states in reach)
+				}
 			}
 
 			consume(input, t);
@@ -260,6 +280,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( debug ) System.out.println("ACCEPT " + prevAccept.toString(recog, true) + " index " + prevAcceptIndex);
 
+		input.seek(prevAcceptIndex+1); // seek to after last char in token
 		int ruleIndex = prevAccept.state.ruleIndex;
 		int ttype = atn.ruleToTokenType[ruleIndex];
 		if ( debug ) {
@@ -312,7 +333,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			boolean isWildcard = c.state.getClass() == ATNState.class &&
 				c.state.transition(0).getClass() == WildcardTransition.class;
 			if ( c.alt == alt && isWildcard ) {
-//				System.out.println("kill "+c);
+				if ( debug ) System.out.println("deleteWildcardConfigsForAlt "+c);
 				closure.remove(j);
 			}
 			else j++;

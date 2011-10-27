@@ -1,8 +1,5 @@
 lexer grammar L;
-HexLiteral : '0' ('x'|'X') HexDigit+ ;
+HexLiteral : '0' 'x' HexDigit+ ;
 DecimalLiteral : ('0' | '1'..'9' '0'..'9'*) ;
-FloatingPointLiteral : ('0x' | '0X') HexDigit* ('.' HexDigit*)? ;
-DOT : '.' ;
-ID : 'a'..'z'+ ;
-fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
+fragment HexDigit : ('0'..'9'|'a'..'f');
 WS : (' '|'\n')+ ;
