@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
 	public static boolean debug = true;
-	public static boolean dfa_debug = false;
+	public static boolean dfa_debug = true;
 	public static final int NUM_EDGES = 255;
 
 	protected Lexer recog;
@@ -178,6 +178,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		closure.addAll(s0);
 		if ( debug ) System.out.println("start state closure="+closure);
 
+		prevAccept = null;
+		prevAcceptIndex = -1;
+
 		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
 
 		int t = input.LA(1);
@@ -188,27 +191,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			for (int ci=0; ci<closure.size(); ci++) { // TODO: foreach
 				ATNConfig c = closure.get(ci);
 				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString(recog, true));
-
-//				if ( c.state instanceof RuleStopState ) {
-//					if ( debug ) {
-//						System.out.println("in reach we hit accept state "+c+" index "+
-//										   input.index()+", reach="+reach+
-//										   ", prevAccept="+prevAccept+", prevIndex="+prevAcceptIndex);
-//					}
-//					if ( input.index() > prevAcceptIndex ) {
-//						// will favor prev accept at same index so "int" is keyword not ID
-//						prevAccept = c;
-//						prevAcceptIndex = input.index();
-//					}
-//
-//					// if we reach lexer accept state, toss out any configs in rest
-//					// of configs work list associated with this rule (config.alt);
-//					// that rule is done. this is how we cut off nongreedy .+ loops.
-//					deleteWildcardConfigsForAlt(closure, ci, c.alt);
-//
-// 					// move to next char, looking for longer match
-//					// (we continue processing if there are states in reach)
-//				}
 
 				int n = c.state.getNumberOfTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each transition
@@ -221,11 +203,13 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			if ( reach.size()==0 ) {
-				// we reached closure state for sure, make sure it's defined.
-				// worst case, we define s0 from start state configs.
+				// we reached state associated with closure for sure, so
+				// make sure it's defined. worst case, we define s0 from
+				// start state configs.
 				DFAState from = addDFAState(closure);
 				// we got nowhere on t, don't throw out this knowledge; it'd
-				// cause a failover from DFA later.
+				// cause a failover from DFA later.  Don't track EOF edges
+				// from stop states, though.
 				if ( t!=Token.EOF ) addDFAEdge(from, t, ERROR);
 				break;
 			}
