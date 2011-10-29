@@ -74,6 +74,11 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	/** The character position of first character within the line */
 	public int tokenStartCharPositionInLine;
 
+	/** Once we see EOF on char stream, next token will be EOF.
+	 *  If you have DONE : EOF ; then you see DONE EOF.
+	 */
+	public boolean hitEOF;
+
 	/** The channel number for the current token */
 	public int channel;
 
@@ -110,6 +115,8 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	 *  stream.
 	 */
 	public Token nextToken() {
+		if ( hitEOF ) return emitEOF();
+
 		outer:
 		while (true) {
 			token = null;
@@ -126,14 +133,9 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 				int ttype = _interp.match(input, mode);
 //				System.out.println("accepted ttype "+ttype);
 
-//				if ( input.LA(1)==CharStream.EOF ) {
-//					WritableToken eof = new CommonToken(this,Token.EOF,
-//												Token.DEFAULT_CHANNEL,
-//												input.index(),input.index());
-//					eof.setLine(getLine());
-//					eof.setCharPositionInLine(getCharPositionInLine());
-//					return eof;
-//				}
+				if ( input.LA(1)==CharStream.EOF ) {
+					hitEOF = true;
+				}
 
 				if ( type == Token.INVALID_TYPE ) type = ttype;
 				if ( type==SKIP ) {
@@ -216,10 +218,26 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 										  channel, tokenStartCharIndex,
 										  getCharIndex()-1);
 		t.setLine(tokenStartLine);
-		t.setText(text);
+		if ( text!=null ) t.setText(text);
 		t.setCharPositionInLine(tokenStartCharPositionInLine);
 		emit(t);
 		return t;
+	}
+
+	public Token emitEOF() {
+		WritableToken eof = new CommonToken(this,Token.EOF,
+											Token.DEFAULT_CHANNEL,
+											input.index(),input.index()-1);
+		eof.setLine(getLine());
+		// The character position for EOF is one beyond the position of
+		// the previous token's last character
+		int cpos = getCharPositionInLine();
+		if ( token!=null ) {
+			int n = token.getStopIndex() - token.getStartIndex() + 1;
+			cpos = token.getCharPositionInLine()+n;
+		}
+		eof.setCharPositionInLine(cpos);
+		return eof;
 	}
 
 	public int getLine() {

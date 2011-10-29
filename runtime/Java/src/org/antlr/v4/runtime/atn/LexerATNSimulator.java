@@ -103,7 +103,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		DFAState s = s0;
 		int startIndex = input.index();
 		int t = input.LA(1);
-//		if ( t==CharStream.EOF ) return -1; // TODO: how to match EOF in lexer rule?
 	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("state "+s.stateNumber+" LA(1)=="+(char)t);
@@ -123,7 +122,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				 s.edges[t] == null )
 			{
 				if ( dfa_debug ) System.out.println("no edge for "+(char)t);
-				int ttype = -1;
+				int ttype = CharStream.INVALID_CHAR;
 				try {
 					if ( dfa_debug ) {
 						System.out.println("ATN exec upon "+
@@ -141,7 +140,7 @@ public class LexerATNSimulator extends ATNSimulator {
 									   ", dfa[mode "+mode+"]=\n"+dfa[mode].toLexerString());
 				}
 
-				if ( ttype==-1 ) {
+				if ( ttype==CharStream.INVALID_CHAR ) {
 					if ( t != CharStream.EOF ) addDFAEdge(s, t, ERROR);
 					break loop; // dead end; no where to go, fall back on prev if any
 				}
@@ -151,7 +150,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			DFAState target = s.edges[t];
 			if ( target == ERROR ) break;
 			s = target;
-			consume(input, t);
+			consume(input);
 			t = input.LA(1);
 		}
 		if ( prevAcceptState==null ) {
@@ -219,7 +218,8 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 			}
 
-			for (int ci=0; ci<reach.size(); ci++) { // TODO: foreach
+			// Did we hit a stop state during reach op?
+			for (int ci=0; ci<reach.size(); ci++) {
 				ATNConfig c = reach.get(ci);
 				if ( c.state instanceof RuleStopState ) {
 					if ( debug ) {
@@ -231,10 +231,10 @@ public class LexerATNSimulator extends ATNSimulator {
 					if ( index > prevAcceptIndex ) {
 						// will favor prev accept at same index so "int" is keyword not ID
 						prevAccept = c;
-						if ( t == CharStream.EOF ) {
-							// later we seek to prevAcceptIndex+1, undo that effect for EOF
-							index--;
-						}
+//						if ( t == CharStream.EOF ) {
+//							// later we seek to prevAcceptIndex+1, undo that effect for EOF
+//							index--;
+//						}
 						prevAcceptIndex = index;
 						if ( debug ) {
 							System.out.println("mark "+c+" @ index="+index);
@@ -251,7 +251,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			consume(input, t);
+			consume(input);
 			if ( t!=CharStream.EOF ) addDFAEdge(closure, t, reach);
 			t = input.LA(1);
 
@@ -500,7 +500,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		return charPositionInLine;
 	}
 
-	public void consume(CharStream input, int curChar) {
+	public void consume(CharStream input) {
+		int curChar = input.LA(1);
 		//System.out.println("prev p="+p+", c="+(char)data[p]);
 		charPositionInLine++;
 		if ( curChar=='\n' ) {

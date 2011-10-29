@@ -30,7 +30,8 @@ package org.antlr.v4.runtime;
 
 /** A source of characters for an ANTLR lexer */
 public interface CharStream extends IntStream {
-    public static final int EOF = -1;
+	public static final int EOF = -1;
+	public static final int INVALID_CHAR = -2;
 
 	/** For infinite streams, you don't need this; primarily I'm providing
 	 *  a useful interface for action code.  Just make sure actions don't

@@ -189,7 +189,7 @@ public class ANTLRStringStream implements CharStream {
 	}
 
 	/** consume() ahead until p==index; can't just set p=index as we must
-	 *  update line and charPositionInLine.
+	 *  update line and charPositionInLine. If we seek backwards, just set p
 	 */
 	public void seek(int index) {
 		if ( index<=p ) {
@@ -197,16 +197,16 @@ public class ANTLRStringStream implements CharStream {
 			return;
 		}
 		// seek forward, consume until p hits index
-		while ( p<index ) {
+		while ( p<index && index<n ) {
 			consume();
 		}
 	}
 
 	public String substring(int start, int stop) {
-		int last = stop - start + 1;
-		if ( last >= data.length ) last = data.length-1;
-		if ( start >= data.length ) return "";
-		return new String(data, start, last);
+		int count = stop - start + 1;
+		if ( count > n ) count = n;
+		if ( start >= n ) return "";
+		return new String(data, start, count);
 	}
 
 	public int getLine() {

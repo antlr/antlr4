@@ -160,9 +160,13 @@ public abstract class BaseTest {
 		LexerATNSimulator interp = new LexerATNSimulator(atn);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
-		int t;
+		boolean hitEOF = false;
 		do {
-			t = input.LA(1);
+			if ( hitEOF ) {
+				tokenTypes.add("EOF");
+				break;
+			}
+			int t = input.LA(1);
 			if ( adaptive ) ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			else ttype = interp.matchATN(input);
 			if ( ttype == Token.EOF ) {
@@ -171,9 +175,11 @@ public abstract class BaseTest {
 			else {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
-			// stop upon EOF token or when we see EOF on input since we might
-			// match DONE : EOF ; in lexer and need to know when to stop.
-		} while ( ttype!=Token.EOF && t!=CharStream.EOF );
+
+			if ( t==CharStream.EOF ) {
+				hitEOF = true;
+			}
+		} while ( ttype!=Token.EOF );
 		return tokenTypes;
 	}
 
