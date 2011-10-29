@@ -31,6 +31,53 @@ public class TestATNSerialization extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
+	@Test public void testEOF() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : A EOF ;");
+		String expecting =
+			"max type 3\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"rule 0:0 0,0\n" +
+			"0->2 EPSILON 0,0,0\n" +
+			"1->6 ATOM -1,0,0\n" +
+			"2->3 ATOM 3,0,0\n" +
+			"3->4 EPSILON 0,0,0\n" +
+			"4->5 ATOM -1,0,0\n" +
+			"5->1 EPSILON 0,0,0\n";
+		ATN atn = createATN(g);
+		String result = ATNSerializer.getDecoded(g, atn);
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testEOFInSet() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : (A|EOF) ;");
+		String expecting =
+			"max type 3\n" +
+			"0:RULE_START 0\n" +
+			"1:RULE_STOP 0\n" +
+			"2:BASIC 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:0 0,0\n" +
+			"0:EOF..EOF, A..A\n" +
+			"0->2 EPSILON 0,0,0\n" +
+			"1->4 ATOM -1,0,0\n" +
+			"2->3 SET 0,0,0\n" +
+			"3->1 EPSILON 0,0,0\n";
+		ATN atn = createATN(g);
+		String result = ATNSerializer.getDecoded(g, atn);
+		assertEquals(expecting, result);
+	}
+
 	@Test public void testNot() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
@@ -278,6 +325,70 @@ public class TestATNSerialization extends BaseTest {
 			"3->4 RANGE 48,57,0\n" +
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0 1\n";
+		ATN atn = createATN(lg);
+		String result = ATNSerializer.getDecoded(lg, atn);
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"INT : 'a' EOF ;\n");
+		String expecting =
+			"max type 3\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"rule 0:1 3,-1\n" +
+			"mode 0:0\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 ATOM 97,0,0\n" +
+			"4->5 EPSILON 0,0,0\n" +
+			"5->6 ATOM -1,0,0\n" +
+			"6->2 EPSILON 0,0,0\n" +
+			"0:0 1\n";
+		ATN atn = createATN(lg);
+		String result = ATNSerializer.getDecoded(lg, atn);
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerEOFInSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"INT : 'a' (EOF|'\n') ;\n");
+		String expecting =
+			"max type 3\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"7:BASIC 0\n" +
+			"8:BASIC 0\n" +
+			"9:BLOCK_START 0\n" +
+			"10:BLOCK_END 0\n" +
+			"rule 0:1 3,-1\n" +
+			"mode 0:0\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 ATOM 97,0,0\n" +
+			"4->9 EPSILON 0,0,0\n" +
+			"5->6 ATOM -1,0,0\n" +
+			"6->10 EPSILON 0,0,0\n" +
+			"7->8 ATOM 10,0,0\n" +
+			"8->10 EPSILON 0,0,0\n" +
+			"9->5 EPSILON 0,0,0\n" +
+			"9->7 EPSILON 0,0,0\n" +
+			"10->2 EPSILON 0,0,0\n" +
+			"0:0 1\n" +
+			"1:9 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);

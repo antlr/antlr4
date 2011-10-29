@@ -763,16 +763,7 @@ blockSet
 	boolean ebnf = false;
 }
     :	LPAREN setElement (OR setElement)* RPAREN
-/*		{
-		t = input.LT(1);
-		ebnf = t!=null && (t.getType()==QUESTION || t.getType()==STAR || t.getType()==PLUS);
-	    }
-	    */
-		-> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] ^(ALT setElement)+ )
-/*
-		-> {ebnf}?	^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] ^(ALT ^(SET[$LPAREN,"SET"] setElement+ )))
-		-> 			^(SET[$LPAREN,"SET"] setElement+ )
-*/
+		-> ^(SET<SetAST>[$LPAREN,"SET"] setElement+ )
     ;
 
 setElement

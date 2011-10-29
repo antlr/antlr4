@@ -210,7 +210,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				// we got nowhere on t, don't throw out this knowledge; it'd
 				// cause a failover from DFA later.  Don't track EOF edges
 				// from stop states, though.
-				if ( t!=Token.EOF ) addDFAEdge(from, t, ERROR);
+				if ( t!=CharStream.EOF ) addDFAEdge(from, t, ERROR);
 				break;
 			}
 
@@ -223,12 +223,17 @@ public class LexerATNSimulator extends ATNSimulator {
 										   input.index()+", reach="+reach+
 										   ", prevAccept="+prevAccept+", prevIndex="+prevAcceptIndex);
 					}
-					if ( input.index() > prevAcceptIndex ) {
+					int index = input.index();
+					if ( index > prevAcceptIndex ) {
 						// will favor prev accept at same index so "int" is keyword not ID
 						prevAccept = c;
-						prevAcceptIndex = input.index();
+						if ( t == CharStream.EOF ) {
+							// later we seek to prevAcceptIndex+1, undo that effect for EOF
+							index--;
+						}
+						prevAcceptIndex = index;
 						if ( debug ) {
-							System.out.println("mark "+c+" @ index="+input.index());
+							System.out.println("mark "+c+" @ index="+index);
 						}
 					}
 
@@ -243,10 +248,11 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			consume(input, t);
-			addDFAEdge(closure, t, reach);
+			if ( t!=CharStream.EOF ) addDFAEdge(closure, t, reach);
 			t = input.LA(1);
 
 			// swap to avoid reallocating space
+			// TODO: faster to reallocate?
 			OrderedHashSet<ATNConfig> tmp = reach;
 			reach = closure;
 			closure = tmp;
@@ -256,7 +262,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( prevAccept==null ) {
 			if ( t==Token.EOF ) {
 				System.out.println("EOF in token at input index "+input.index());
-				return Token.EOF;
+				//return Token.EOF;
 			}
 //					System.out.println("no viable token at input "+getTokenName(input.LA(1))+", index "+input.index());
 			throw new LexerNoViableAltException(recog, input, closure); // TODO: closure is empty
@@ -296,11 +302,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		else if ( trans instanceof SetTransition ) {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
-			if ( !not && st.set.contains(t) || not && !st.set.contains(t) ) {
-//				if ( st.set.toString().equals("0") ) {
-//					System.out.println("eh?");
-//				}
-				if ( debug ) System.out.println("match set "+st.set.toString(true));
+			if ( (!not && st.set.contains(t)) ||
+				 (not && !st.set.contains(t) && t!=Token.EOF) ) // ~set doesn't not match EOF
+			{
+				if ( debug ) System.out.println("match "+(not?"~":"")+"set "+st.set.toString(true));
 				return st.target;
 			}
 		}

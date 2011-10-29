@@ -14,6 +14,20 @@ public class TestATNDeserialization extends BaseTest {
 		checkDeserializationIsStable(g);
 	}
 
+	@Test public void testEOF() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : EOF ;");
+		checkDeserializationIsStable(g);
+	}
+
+	@Test public void testEOFInSet() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : (EOF|A) ;");
+		checkDeserializationIsStable(g);
+	}
+
 	@Test public void testNot() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
@@ -64,6 +78,20 @@ public class TestATNDeserialization extends BaseTest {
 			"lexer grammar L;\n"+
 			"A : 'a' ;\n" +
 			"B : 'b' ;\n");
+		checkDeserializationIsStable(lg);
+	}
+
+	@Test public void testLexerEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a' EOF ;\n");
+		checkDeserializationIsStable(lg);
+	}
+
+	@Test public void testLexerEOFInSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a' (EOF|'\n') ;\n");
 		checkDeserializationIsStable(lg);
 	}
 

@@ -32,13 +32,11 @@ package org.antlr.v4.automata;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.TerminalAST;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 
@@ -122,6 +120,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			}
 		}
 		if ( invert ) {
+			// TODO: what? should be chars not token types
 			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
 			left.addTransition(new NotSetTransition(set, notSet, right));
 		}
@@ -157,6 +156,13 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public Handle tokenRef(TerminalAST node) {
+		// Ref to EOF in lexer yields char transition on -1
+		if ( node.getText().equals("EOF") ) {
+			ATNState left = newState(node);
+			ATNState right = newState(node);
+			left.addTransition(new AtomTransition(CharStream.EOF, right));
+			return new Handle(left, right);
+		}
 		return _ruleRef(node);
 	}
 }

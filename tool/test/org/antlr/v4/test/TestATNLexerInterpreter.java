@@ -4,7 +4,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.tool.*;
-import org.junit.*;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * several rules and even within a rule. However, that conflicts
  * with the notion of non-greedy, which by definition tries to match
  * the fewest possible. During ATN construction, non-greedy loops
- * have their entry and exit branches reversed so that the ATM
+ * have their entry and exit branches reversed so that the ATN
  * simulator will see the exit branch 1st, giving it a priority. The
  * 1st path to the stop state kills any other paths for that rule
  * that begin with the wildcard. In general, this does everything we
@@ -51,17 +51,17 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "xyz", "A, EOF");
 	}
 
-	@Test public void testWildOnEnd() throws Exception {
+	@Test public void testWildOnEndFirstAlt() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"A : 'xy' .\n" + // should not pursue '.' since xy already hit stop
+			"A : 'xy' .\n" + // should pursue '.' since xyz hits stop first, before 2nd alt
 			"  | 'xy'\n" +
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
 		checkLexerMatches(lg, "xyz", "A, EOF");
 	}
 
-	@Test public void testWildOnEndLast() throws Exception {
+	@Test public void testWildOnEndLastAlt() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
@@ -81,6 +81,15 @@ public class TestATNLexerInterpreter extends BaseTest {
 //		checkLexerMatches(lg, "xy", "A, EOF");
 		LexerRecognitionExeption e = checkLexerMatches(lg, "xyqz", "A, EOF");
 		assertEquals("NoViableAltException('q')", e.toString());
+	}
+
+	@Test public void testWildcardNonQuirkWhenSplitBetweenTwoRules() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'xy' ;\n" +
+			"B : 'xy' . 'z' ;\n");
+		checkLexerMatches(lg, "xy", "A, EOF");
+		checkLexerMatches(lg, "xyz", "B, EOF");
 	}
 
 	@Test public void testLexerLoops() throws Exception {
@@ -135,7 +144,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "/* ick */\n/* /*nested*/ */", expecting);
 	}
 
-	@Ignore public void testLexerWildcardNonGreedyLoopByDefault() throws Exception {
+	@Test public void testLexerWildcardNonGreedyLoopByDefault() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"CMT : '//' .* '\\n' ;\n");
@@ -143,25 +152,23 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "//x\n//y\n", expecting);
 	}
 
-	// should not work. no priority within a single rule. the subrule won't work. need modes
-	@Ignore
-	public void testLexerEscapeInString() throws Exception {
+	@Test public void testLexerEscapeInString() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"STR : '\"' ('\\\\' '\"' | .)* '\"' ;\n"); // STR : '"' ('\\' '"' | .)* '"'
-		checkLexerMatches(lg, "\"a\\\"b\"", "STR, EOF");
-		checkLexerMatches(lg, "\"a\"", "STR, EOF");
+			"STR : '[' ('~' ']' | .)* ']' ;\n");
+		checkLexerMatches(lg, "[a~]b]", "STR, EOF");
+		checkLexerMatches(lg, "[a]", "STR, EOF");
 	}
 
 	@Test public void testLexerWildcardNonGreedyPlusLoopByDefault() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"CMT : '//' (options {greedy=false;}:.)+ '\\n' ;\n");
+			"CMT : '//' .+ '\\n' ;\n");
 		String expecting = "CMT, CMT, EOF";
 		checkLexerMatches(lg, "//x\n//y\n", expecting);
 	}
 
-	// does not fail since ('*/')? cant match and have rule succeed
+	// does not fail since ('*/')? can't match and have rule succeed
 	@Test public void testLexerGreedyOptionalShouldWorkAsWeExpect() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -177,6 +184,60 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"B : '<' .+ '>' ;\n");
 		String expecting = "A, B, EOF";
 		checkLexerMatches(lg, "<a><x>", expecting);
+	}
+
+	@Test public void testEOFAtEndOfLineComment() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"CMT : '//' ~('\n')* ;\n");
+		String expecting = "CMT, EOF";
+		checkLexerMatches(lg, "//x", expecting);
+	}
+
+	@Test public void testEOFAtEndOfLineComment2() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"CMT : '//' ~('\n'|'\r')* ;\n");
+		String expecting = "CMT, EOF";
+		checkLexerMatches(lg, "//x", expecting);
+	}
+
+	/** only positive sets like (EOF|'\n') can match EOF and not in wildcard or ~foo sets
+	 *  EOF matches but does not advance cursor.
+	 */
+	@Test public void testEOFInSetAtEndOfLineComment() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"CMT : '//' .* (EOF|'\n') ;\n");
+		String expecting = "CMT, EOF";
+		checkLexerMatches(lg, "//", expecting);
+	}
+
+	@Test public void testEOFSuffixInSecondRule() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a' ;\n"+ // shorter than 'a' EOF, despite EOF being 0 width
+			"B : 'a' EOF ;\n");
+		String expecting = "B, EOF";
+		checkLexerMatches(lg, "a", expecting);
+	}
+
+	@Test public void testEOFSuffixInFirstRule() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a' EOF ;\n"+
+			"B : 'a';\n");
+		String expecting = "A, EOF";
+		checkLexerMatches(lg, "a", expecting);
+	}
+
+	@Test public void testEOFByItself() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"DONE : EOF ;\n"+
+			"A : 'a';\n");
+		String expecting = "A, DONE, EOF";
+		checkLexerMatches(lg, "a", expecting);
 	}
 
 	protected LexerRecognitionExeption checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
