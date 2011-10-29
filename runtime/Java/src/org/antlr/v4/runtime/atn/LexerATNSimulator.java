@@ -35,8 +35,8 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static boolean debug = true;
-	public static boolean dfa_debug = true;
+	public static boolean debug = false;
+	public static boolean dfa_debug = false;
 	public static final int NUM_EDGES = 255;
 
 	protected Lexer recog;
@@ -103,7 +103,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		DFAState s = s0;
 		int startIndex = input.index();
 		int t = input.LA(1);
-		if ( t==CharStream.EOF ) return -1; // TODO: how to match EOF in lexer rule?
+//		if ( t==CharStream.EOF ) return -1; // TODO: how to match EOF in lexer rule?
 	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("state "+s.stateNumber+" LA(1)=="+(char)t);
@@ -119,14 +119,16 @@ public class LexerATNSimulator extends ATNSimulator {
 				if ( t==CharStream.EOF ) break;
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || s.edges[t] == null ) {
+			if ( s.edges == null || t >= s.edges.length || t <= CharStream.EOF ||
+				 s.edges[t] == null )
+			{
 				if ( dfa_debug ) System.out.println("no edge for "+(char)t);
 				int ttype = -1;
 				try {
 					if ( dfa_debug ) {
-					System.out.println("ATN exec upon "+
-									   input.substring(startIndex,input.index())+
-									   " at DFA state "+s.stateNumber+" = "+s.configs);
+						System.out.println("ATN exec upon "+
+										   input.substring(startIndex,input.index())+
+										   " at DFA state "+s.stateNumber+" = "+s.configs);
 					}
 					ATN_failover++;
 					ttype = exec(input, s.configs);
@@ -140,7 +142,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 
 				if ( ttype==-1 ) {
-					addDFAEdge(s, t, ERROR);
+					if ( t != CharStream.EOF ) addDFAEdge(s, t, ERROR);
 					break loop; // dead end; no where to go, fall back on prev if any
 				}
 				// action already executed
@@ -153,8 +155,11 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 		if ( prevAcceptState==null ) {
+			if ( t==CharStream.EOF ) {
+				return Token.EOF;
+			}
 			if ( debug ) System.out.println("!!! no viable alt in dfa");
-			return -1;
+			throw new LexerNoViableAltException(recog, input, s.configs); // TODO: closure is empty
 		}
 		if ( recog!=null ) {
 			int actionIndex = atn.ruleToActionIndex[prevAcceptState.ruleIndex];
@@ -184,7 +189,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
 
 		int t = input.LA(1);
-		if ( t==Token.EOF ) return Token.EOF;
+//		if ( t==Token.EOF ) return Token.EOF;
 
 		do { // while more work
 			if ( debug ) System.out.println("in reach starting closure: " + closure);
@@ -217,7 +222,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			for (int ci=0; ci<reach.size(); ci++) { // TODO: foreach
 				ATNConfig c = reach.get(ci);
 				if ( c.state instanceof RuleStopState ) {
-					System.out.println("found stop in reach: "+c.state);
 					if ( debug ) {
 						System.out.println("in reach we hit accept state "+c+" index "+
 										   input.index()+", reach="+reach+
@@ -260,9 +264,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		} while ( true );
 
 		if ( prevAccept==null ) {
-			if ( t==Token.EOF ) {
-				System.out.println("EOF in token at input index "+input.index());
-				//return Token.EOF;
+			if ( t==CharStream.EOF ) {
+				return Token.EOF;
 			}
 //					System.out.println("no viable token at input "+getTokenName(input.LA(1))+", index "+input.index());
 			throw new LexerNoViableAltException(recog, input, closure); // TODO: closure is empty

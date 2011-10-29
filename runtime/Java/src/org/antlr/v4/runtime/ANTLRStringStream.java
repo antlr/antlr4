@@ -203,7 +203,10 @@ public class ANTLRStringStream implements CharStream {
 	}
 
 	public String substring(int start, int stop) {
-		return new String(data,start,stop-start+1);
+		int last = stop - start + 1;
+		if ( last >= data.length ) last = data.length-1;
+		if ( start >= data.length ) return "";
+		return new String(data, start, last);
 	}
 
 	public int getLine() {

@@ -148,12 +148,12 @@ public class TestParserExec extends BaseTest {
 								  input, false);
 		assertEquals("{}\n", found);
 		input =
-			"{a b { } ;";
+			"{a b { }";
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		assertEquals("{ab{}\n", found);
 		input =
-			"{ } a 2) { } ;"; // FAILS to match since it terminates loop at first { }
+			"{ } a 2) { }"; // FAILS to match since it terminates loop at first { }
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		assertEquals("", found); // should not print output; resync kills rest of input
@@ -227,19 +227,23 @@ public class TestParserExec extends BaseTest {
 		input =
 			"if ( 1 ) { x=3; { return 4; } } return 99; abc=def;";
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  input, false);
+						   input, false);
 		assertEquals("if(1){x=3;{return4;}}return99;abc=def;\n", found);
 		input =
-			"x=1; a=3;"; // FAILS to match since it can't match last element
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  input, false);
-		// can't match EOF to ID '=' '0' ';'
-		assertEquals("no viable token at input EOF, index 8\n", found);
+		"x=1; a=3;"; // FAILS to match since it can't match last element
+		execParser("T.g", grammar, "TParser", "TLexer", "s",
+				   input, false);
+		// can't match EOF to ID '=' '3' ';'
+		assertEquals("line 1:9 no viable alternative at input ''\n",
+					 this.stderrDuringParse);
+
 		input =
-			"x=1; a=b; z=3;"; // FAILS to match since it can't match last element
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  input, false);
-		assertEquals("no viable token at input EOF, index 12\n", found); // should not finish to print output
+		"x=1; a=b; z=3;"; // FAILS to match since it can't match last element
+		execParser("T.g", grammar, "TParser", "TLexer", "s",
+				   input, false);
+		assertEquals("line 1:14 no viable alternative at input ''\n",
+					 this.stderrDuringParse);
+		// should not finish to print output
 	}
 
 	@Test public void testStatLoopNongreedyNecessary() throws Exception {
@@ -274,10 +278,11 @@ public class TestParserExec extends BaseTest {
 		assertEquals("if(1){x=3;{return4;}}return99;abc=def;\n", found);
 		input =
 			"x=1; a=3;"; // FAILS to match since it can't match either stat
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		// can't match EOF to ID '=' '0' ';'
-		assertEquals("no viable token at input EOF, index 8\n", found);
+		assertEquals("line 1:9 no viable alternative at input ''\n",
+					 this.stderrDuringParse);
 		input =
 			"x=1; a=b; z=3;"; // stops at a=b; ignores z=3;
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -359,7 +364,7 @@ public class TestParserExec extends BaseTest {
 								  input, false);
 		assertEquals("if(34)ab\n", found);
 		input =
-		"if ( 34 ))) ) ( a = = b( ;";
+		"if ( 34 ))) ) ( a = = b(";
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 						   input, false);
 		assertEquals("if(34))))(a==b(\n", found);
@@ -367,7 +372,7 @@ public class TestParserExec extends BaseTest {
 
 	/** When .* is on the end of a rule, no tokens predict the exit branch of the loop
 	 *  since it immediately hits the end of the rule.  Non-greedy loops
-	 *  never consume more tokens than exist following the .* end that
+	 *  never consume more tokens than exist following the .* in that
 	 *  same rule. So, in this case, the greedy loop always wins and it will
 	 *  suck tokens until end of file. Unfortunately, the '.' in rule s
 	 *  will not match, leading to a syntax error.
@@ -385,6 +390,8 @@ public class TestParserExec extends BaseTest {
 		"if ( 34 ) a b .";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
-		assertEquals("no viable token at input EOF, index 7\nif(34)ab.\n", found);
+		assertEquals("if(34)ab.\n", found);
+		assertEquals("line 1:15 no viable alternative at input ''\n",
+					 this.stderrDuringParse);
 	}
 }

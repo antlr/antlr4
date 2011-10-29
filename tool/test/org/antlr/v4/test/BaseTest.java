@@ -33,24 +33,15 @@ import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
+import org.antlr.v4.tool.Rule;
+import org.junit.*;
+import org.stringtemplate.v4.*;
 
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+import javax.tools.*;
 import java.io.*;
 import java.util.*;
 
@@ -169,14 +160,20 @@ public abstract class BaseTest {
 		LexerATNSimulator interp = new LexerATNSimulator(atn);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
+		int t;
 		do {
+			t = input.LA(1);
 			if ( adaptive ) ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			else ttype = interp.matchATN(input);
-			if ( ttype == Token.EOF ) tokenTypes.add("EOF");
+			if ( ttype == Token.EOF ) {
+				tokenTypes.add("EOF");
+			}
 			else {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
-		} while ( ttype!=Token.EOF );
+			// stop upon EOF token or when we see EOF on input since we might
+			// match DONE : EOF ; in lexer and need to know when to stop.
+		} while ( ttype!=Token.EOF && t!=CharStream.EOF );
 		return tokenTypes;
 	}
 

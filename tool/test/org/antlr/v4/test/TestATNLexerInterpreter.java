@@ -236,7 +236,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"lexer grammar L;\n"+
 			"DONE : EOF ;\n"+
 			"A : 'a';\n");
-		String expecting = "A, DONE, EOF";
+		String expecting = "A, DONE";
 		checkLexerMatches(lg, "a", expecting);
 	}
 

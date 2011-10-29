@@ -120,20 +120,22 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 			text = null;
 			do {
 				type = Token.INVALID_TYPE;
-				if ( input.LA(1)==CharStream.EOF ) {
-					WritableToken eof = new CommonToken(this,Token.EOF,
-												Token.DEFAULT_CHANNEL,
-												input.index(),input.index());
-					eof.setLine(getLine());
-					eof.setCharPositionInLine(getCharPositionInLine());
-					return eof;
-				}
 //				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
 //								   " in mode "+mode+
 //								   " at index "+input.index());
 				int ttype = _interp.match(input, mode);
 //				System.out.println("accepted ttype "+ttype);
-				if ( type == Token.INVALID_TYPE) type = ttype;
+
+//				if ( input.LA(1)==CharStream.EOF ) {
+//					WritableToken eof = new CommonToken(this,Token.EOF,
+//												Token.DEFAULT_CHANNEL,
+//												input.index(),input.index());
+//					eof.setLine(getLine());
+//					eof.setCharPositionInLine(getCharPositionInLine());
+//					return eof;
+//				}
+
+				if ( type == Token.INVALID_TYPE ) type = ttype;
 				if ( type==SKIP ) {
 					continue outer;
 				}

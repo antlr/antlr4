@@ -188,7 +188,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("no edge for "+t);
 				int alt = -1;
 				if ( dfa_debug ) {
-
 					System.out.println("ATN exec upon "+
 									   getInputString(input, startIndex) +
 									   " at DFA state "+s.stateNumber);
