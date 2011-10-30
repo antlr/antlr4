@@ -26,33 +26,24 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.runtime;
 
-/** A semantic predicate failed during validation.  Validation of predicates
- *  occurs when normally parsing the alternative just like matching a token.
- *  Disambiguating predicate evaluation occurs when we hoist a predicate into
- *  a prediction decision.
- */
-public class FailedPredicateException extends RecognitionException {
-	public String ruleName;
-	public String predicateText;
+package org.antlr.v4.tool.ast;
 
-	public FailedPredicateException(BaseRecognizer recognizer, String predText) {
-		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		this.predicateText = predText;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.Tree;
+
+public class RuleRefAST extends GrammarASTWithOptions implements RuleElementAST {
+	public RuleRefAST(GrammarAST node) {
+		super(node);
 	}
 
-//	public FailedPredicateException(BaseRecognizer  recognizer,
-//									IntStream input,
-//									String ruleName,
-//									String predicateText)
-//	{
-//		super(recognizer, input, recognizer._ctx);
-//		this.ruleName = ruleName;
-//		this.predicateText = predicateText;
-//	}
+	public RuleRefAST(Token t) { super(t); }
+    public RuleRefAST(int type) { super(type); }
+    public RuleRefAST(int type, Token t) { super(type, t); }
 
-	public String toString() {
-		return "FailedPredicateException("+ruleName+",{"+predicateText+"}?)";
-	}
+	@Override
+	public Tree dupNode() { return new TerminalAST(this); }
+
+	@Override
+	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

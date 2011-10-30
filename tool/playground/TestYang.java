@@ -82,7 +82,7 @@ class TestYang {
 			if ( lexer==null ) {
 				lexer = new YangJavaLexer(null);
 			}
-			lexer.setCharStream(new ANTLRFileStream(f));
+			lexer.setInputStream(new ANTLRFileStream(f));
 
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			long start = System.currentTimeMillis();

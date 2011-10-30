@@ -267,7 +267,7 @@ public class TestATNInterpreter extends BaseTest {
 	{
 		ATN lexatn = createATN(lg);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
-		List<Integer> types = getTokenTypes(inputString, lexInterp);
+		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
 		semanticProcess(lg);

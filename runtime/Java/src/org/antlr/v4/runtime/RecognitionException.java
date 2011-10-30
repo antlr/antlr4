@@ -38,7 +38,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  */
 public class RecognitionException extends RuntimeException {
 	/** Who threw the exception? */
-	protected BaseRecognizer recognizer;
+	protected Recognizer recognizer;
 
 	// TODO: make a dummy recognizer for the interpreter to use?
 	// Next two (ctx,input) should be what is in recognizer, but
@@ -71,17 +71,17 @@ public class RecognitionException extends RuntimeException {
 	public boolean approximateLineInfo;
 	 */
 
-	public RecognitionException(BaseRecognizer recognizer) {
-		this(recognizer, recognizer.getInputStream(), recognizer._ctx);
-	}
+//	public RecognitionException(Recognizer recognizer) {
+//		this(recognizer, recognizer.getInputStream(), null);
+//	}
 
-	public RecognitionException(BaseRecognizer recognizer, IntStream input,
+	public RecognitionException(Recognizer recognizer, IntStream input,
 								RuleContext ctx)
 	{
 		this.recognizer = recognizer;
 		this.input = input;
 		this.ctx = ctx;
-		this.offendingState = ctx.s;
+		if ( ctx!=null ) this.offendingState = ctx.s;
 	}
 
 	/** Where was the parser in the ATN when the error occurred?
@@ -93,7 +93,9 @@ public class RecognitionException extends RuntimeException {
 	public int getOffendingState() { return offendingState; }
 
 	public IntervalSet getExpectedTokens() {
-		if ( recognizer!=null ) return recognizer._interp.atn.nextTokens(ctx);
+		if ( recognizer!=null && recognizer instanceof BaseRecognizer) {
+			return ((BaseRecognizer)recognizer)._interp.atn.nextTokens(ctx);
+		}
 		return null;
 	}
 
@@ -109,7 +111,7 @@ public class RecognitionException extends RuntimeException {
 		return offendingToken;
 	}
 
-	public BaseRecognizer getRecognizer() {
+	public Recognizer getRecognizer() {
 		return recognizer;
 	}
 

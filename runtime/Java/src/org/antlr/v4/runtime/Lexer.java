@@ -130,13 +130,18 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 //				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
 //								   " in mode "+mode+
 //								   " at index "+input.index());
-				int ttype = _interp.match(input, mode);
-//				System.out.println("accepted ttype "+ttype);
-
+				int ttype;
+				try {
+					ttype = _interp.match(input, mode);
+				}
+				catch (LexerNoViableAltException e) {
+					notifyListeners(e);		// report error
+					recover();
+					ttype = SKIP;
+				}
 				if ( input.LA(1)==CharStream.EOF ) {
 					hitEOF = true;
 				}
-
 				if ( type == Token.INVALID_TYPE ) type = ttype;
 				if ( type==SKIP ) {
 					continue outer;
@@ -180,16 +185,18 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	}
 
 	/** Set the char stream and reset the lexer */
-	public void setCharStream(CharStream input) {
+	@Override
+	public void setInputStream(IntStream input) {
 		this.input = null;
 		reset();
-		this.input = input;
+		this.input = (CharStream)input;
 	}
 
 	public String getSourceName() {
 		return input.getSourceName();
 	}
 
+	@Override
 	public CharStream getInputStream() {
 		return input;
 	}
@@ -260,14 +267,15 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		if ( text!=null ) {
 			return text;
 		}
-		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
+		return _interp.getText();
+//		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 
 	/** Set the complete text of this token; it wipes any previous
 	 *  changes to the text.
 	 */
 	public void setText(String text) {
-		text = text;
+		this.text = text;
 	}
 
 	public void reportError(RecognitionException e) {
@@ -293,45 +301,23 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		return null;
 	}
 
-	/*
-	public String getErrorMessage(RecognitionException e) {
-		String msg = null;
-		if ( e instanceof MismatchedTokenException ) {
-			MismatchedTokenException mte = (MismatchedTokenException)e;
-			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting "+
-				  getCharErrorDisplay(mte.expecting.getSingleElement());
-		}
-		else if ( e instanceof NoViableAltException ) {
-			NoViableAltException nvae = (NoViableAltException)e;
-			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
-			// and "(decision="+nvae.decisionNumber+") and
-			// "state "+nvae.stateNumber
-			msg = "no viable alternative at character "+getCharErrorDisplay(e.c);
-		}
-		else if ( e instanceof EarlyExitException ) {
-			EarlyExitException eee = (EarlyExitException)e;
-			// for development, can add "(decision="+eee.decisionNumber+")"
-			msg = "required (...)+ loop did not match anything at character "+getCharErrorDisplay(e.c);
-		}
-		else if ( e instanceof MismatchedNotSetException ) {
-			MismatchedNotSetException mse = (MismatchedNotSetException)e;
-			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
-		}
-		else if ( e instanceof MismatchedSetException ) {
-			MismatchedSetException mse = (MismatchedSetException)e;
-			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
-		}
-		else if ( e instanceof MismatchedRangeException ) {
-			MismatchedRangeException mre = (MismatchedRangeException)e;
-			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+
-				  getCharErrorDisplay(mre.a)+".."+getCharErrorDisplay(mre.b);
-		}
-		else {
-			//msg = super.getErrorMessage(e, tokenNames);
-		}
-		return msg;
+	public void recover() {
+		_interp.consume(input); // skip a char and try again
 	}
-	*/
+
+	public void notifyListeners(LexerNoViableAltException e) {
+		String msg = "token recognition error at: '"+
+			input.substring(tokenStartCharIndex,input.index())+"'";
+		if ( _listeners==null || _listeners.size()==0 ) {
+			System.err.println("line "+tokenStartLine+":"+
+							   tokenStartCharPositionInLine+" "+
+							   msg);
+			return;
+		}
+		for (ANTLRErrorListener pl : _listeners) {
+			pl.error(this, null, tokenStartLine, tokenStartCharPositionInLine, msg, e);
+		}
+	}
 
 	public String getCharErrorDisplay(int c) {
 		String s = String.valueOf((char)c);

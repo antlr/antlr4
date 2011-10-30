@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.atn.ATN;
 
 import java.util.*;
 
-public class Recognizer<ATNInterpreter> {
+public abstract class Recognizer<ATNInterpreter> {
 	public static final int EOF=-1;
 
 	protected ANTLRErrorStrategy _errHandler = new DefaultANTLRErrorStrategy();
@@ -236,4 +236,7 @@ public class Recognizer<ATNInterpreter> {
 		return new ParserRuleContext(_localctx, s);
 	}
 	 */
+	public abstract IntStream getInputStream();
+
+	public abstract void setInputStream(IntStream input);
 }

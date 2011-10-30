@@ -287,7 +287,7 @@ public class TestATNParserPrediction extends BaseTest {
 
 		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		interp.setContextSensitive(true);
-		List<Integer> types = getTokenTypes("ab", lexInterp);
+		List<Integer> types = getTokenTypesViaATN("ab", lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
 		int alt = interp.adaptivePredict(input, 0, b_e_ctx);
@@ -331,7 +331,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 
-		types = getTokenTypes("b", lexInterp);
+		types = getTokenTypesViaATN("b", lexInterp);
 		System.out.println(types);
 		input = new IntTokenStream(types);
 		alt = interp.adaptivePredict(input, 0, null); // ctx irrelevant
@@ -343,7 +343,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 
-		types = getTokenTypes("aab", lexInterp);
+		types = getTokenTypesViaATN("aab", lexInterp);
 		System.out.println(types);
 		input = new IntTokenStream(types);
 		alt = interp.adaptivePredict(input, 0, null);
@@ -488,7 +488,7 @@ public class TestATNParserPrediction extends BaseTest {
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
-		List<Integer> types = getTokenTypes(inputString, lexInterp);
+		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
 		semanticProcess(lg);
@@ -552,7 +552,7 @@ public class TestATNParserPrediction extends BaseTest {
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
 
 		ParserATNSimulator interp = new ParserATNSimulator(atn);
-		List<Integer> types = getTokenTypes(inputString, lexInterp);
+		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
 		try {
@@ -585,7 +585,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
-			List<Integer> types = getTokenTypes(inputString[i], lexInterp);
+			List<Integer> types = getTokenTypesViaATN(inputString[i], lexInterp);
 			System.out.println(types);
 			TokenStream input = new IntTokenStream(types);
 			try {

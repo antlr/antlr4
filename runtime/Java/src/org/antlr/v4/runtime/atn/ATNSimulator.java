@@ -39,9 +39,6 @@ public abstract class ATNSimulator {
 	public static DFAState ERROR;
 	public ATN atn;
 
-	protected ATNConfig prevAccept; // TODO Move down? used to avoid passing int down and back up in method calls
-	protected int prevAcceptIndex = -1;
-
 	static {
 		ERROR = new DFAState(new OrderedHashSet<ATNConfig>());
 		ERROR.stateNumber = Integer.MAX_VALUE;

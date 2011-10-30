@@ -1,3 +1,3 @@
 lexer grammar L;
-DONE : EOF ;
-A : 'a';
+I : '0'..'9'+ {System.out.println("I");} ;
+WS : (' '|'\n') {skip();} ;

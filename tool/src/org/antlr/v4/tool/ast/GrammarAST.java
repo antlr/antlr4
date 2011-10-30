@@ -29,21 +29,14 @@
 
 package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.runtime.*;
+import org.antlr.runtime.tree.*;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class GrammarAST extends CommonTree {
 	/** For error msgs, nice to know which grammar this AST lives in */
@@ -57,7 +50,12 @@ public class GrammarAST extends CommonTree {
 
     public GrammarAST() {;}
     public GrammarAST(Token t) { super(t); }
-    public GrammarAST(GrammarAST node) { super(node); }
+    public GrammarAST(GrammarAST node) {
+		super(node);
+		this.g = node.g;
+		this.atnState = node.atnState;
+		this.textOverride = node.textOverride;
+	}
     public GrammarAST(int type) { super(new CommonToken(type, ANTLRParser.tokenNames[type])); }
     public GrammarAST(int type, Token t) {
 		this(new CommonToken(type, t.getText()));

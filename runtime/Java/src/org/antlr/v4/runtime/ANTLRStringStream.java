@@ -150,7 +150,7 @@ public class ANTLRStringStream implements CharStream {
 	public int mark() {
         if ( markers==null ) {
             markers = new ArrayList();
-            markers.add(null); // depth 0 means no backtracking, leave blank
+            markers.add(null); // depth 0
         }
         markDepth++;
 		CharStreamState state = null;
@@ -203,9 +203,12 @@ public class ANTLRStringStream implements CharStream {
 	}
 
 	public String substring(int start, int stop) {
+		if ( stop >= n ) stop = n-1;
 		int count = stop - start + 1;
-		if ( count > n ) count = n;
 		if ( start >= n ) return "";
+//		System.err.println("data: "+Arrays.toString(data)+", n="+n+
+//						   ", start="+start+
+//						   ", stop="+stop);
 		return new String(data, start, count);
 	}
 

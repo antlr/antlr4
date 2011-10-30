@@ -141,9 +141,6 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		return syntaxErrors;
 	}
 
-	public abstract IntStream getInputStream();
-	public abstract void setInputStream(IntStream input);
-
 	/** Match needs to return the current input symbol, which gets put
 	 *  into the label for the associated token ref; e.g., x=ID.  Token
 	 *  and tree parsers need to return different objects. Rather than test

@@ -801,8 +801,8 @@ if ( options!=null ) {
 //
 ruleref
     :	RULE_REF ARG_ACTION?
-		(	(op=ROOT|op=BANG)	-> ^($op ^(RULE_REF ARG_ACTION<ActionAST>?))
-		|						-> ^(RULE_REF ARG_ACTION<ActionAST>?)
+		(	(op=ROOT|op=BANG)	-> ^($op ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>?))
+		|						-> ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>?)
 		)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element

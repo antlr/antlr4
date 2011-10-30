@@ -49,7 +49,8 @@ public interface ANTLRErrorListener {
 	 * 		  What parser got the error. From this object, you
 	 * 		  can access the context as well as the input stream.
 	 * @param offendingToken
-	 * 		  The offending token in the input token stream.
+	 * 		  The offending token in the input token stream, unless recognizer
+	 * 		  is a lexer (then it's null)
 	 * 		  If no viable alternative error, e has token
 	 * 		  at which we started production for the decision.
 	 * @param line
@@ -65,8 +66,8 @@ public interface ANTLRErrorListener {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void error(BaseRecognizer recognizer,
-					  Token offendingToken,
+	public void error(Recognizer recognizer,
+					  @Nullable Token offendingToken,
 					  int line,
 					  int charPositionInLine,
 					  String msg,

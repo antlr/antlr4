@@ -64,6 +64,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  The full stack at any moment is [config.outerContext + config.context].
 	 */
 	protected RuleContext outerContext;
+	protected ATNConfig prevAccept; // TODO Move down? used to avoid passing int down and back up in method calls
+	protected int prevAcceptIndex = -1;
 
 	public ParserATNSimulator(ATN atn) {
 		super(atn);
