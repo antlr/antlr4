@@ -127,6 +127,19 @@ public class TestLexerErrors extends BaseTest {
 		assertEquals(expectingError, error);
 	}
 
+	@Test public void testErrorInMiddle() throws Exception {
+		String grammar =
+			"lexer grammar L;\n" +
+			"A : 'abc' ;\n";
+		String tokens = execLexer("L.g", grammar, "L", "abx");
+		String expectingTokens =
+			"[@0,3:2='<EOF>',<-1>,1:3]\n";
+		assertEquals(expectingTokens, tokens);
+		String expectingError = "line 1:0 token recognition error at: 'abx'\n";
+		String error = stderrDuringParse;
+		assertEquals(expectingError, error);
+	}
+
 	// TEST RECOVERY
 
 }
