@@ -156,8 +156,8 @@ public class LexerATNSimulator extends ATNSimulator {
 				 s.edges[t] == null )
 			{
 				try {
-					int ttype = failOverToATN(input, s);
-					return ttype;
+					ATN_failover++;
+					return failOverToATN(input, s);
 				}
 				catch (LexerNoViableAltException nvae) {
 					atnException = nvae;
@@ -194,42 +194,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		int ruleIndex = dfaPrevAccept.state.ruleIndex;
 		accept(input, ruleIndex, dfaPrevAccept);
 		return dfaPrevAccept.state.prediction;
-	}
-
-	int failOverToATN(CharStream input, DFAState s) {
-		LexerNoViableAltException atnException = null;
-		if ( dfa_debug ) System.out.println("no edge for "+(char)input.LA(1));
-		if ( dfa_debug ) {
-			System.out.println("ATN exec upon "+
-							   input.substring(startIndex,input.index())+
-							   " at DFA state "+s.stateNumber+" = "+s.configs);
-		}
-//		try {
-			ATN_failover++;
-			int ttype = exec(input, s.configs);
-			if ( dfa_debug ) {
-				System.out.println("back from DFA update, ttype="+ttype+
-								   ", dfa[mode "+mode+"]=\n"+
-								   dfa[mode].toLexerString());
-			}
-			// action already executed by ATN
-			// we've updated DFA, exec'd action, and have our deepest answer
-			return ttype;
-//		}
-//		catch (LexerNoViableAltException nvae) {
-//			// The ATN could not match anything starting from s.configs
-//			// so we had an error edge. Re-throw the exception
-//			// if there was no previous accept state here in DFA.
-//			throw nvae;
-//			// dead end; no where to go, fall back on prev
-//		}
-	}
-
-	protected void markAcceptState(ExecState state, CharStream input) {
-		state.marker = input.mark();
-		state.index = input.index();
-		state.line = line;
-		state.charPos = charPositionInLine;
 	}
 
 	protected int exec(CharStream input, OrderedHashSet<ATNConfig> s0) {
@@ -275,7 +239,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			processAcceptStates(input, reach);
 
 			consume(input);
-			if ( t!=CharStream.EOF ) addDFAEdge(closure, t, reach);
+			addDFAEdge(closure, t, reach);
 			t = input.LA(1);
 
 			// swap to avoid reallocating space
@@ -293,11 +257,6 @@ public class LexerATNSimulator extends ATNSimulator {
 				return Token.EOF;
 			}
 			throw new LexerNoViableAltException(recog, input, startIndex, reach);
-		}
-
-		if ( debug ) {
-			System.out.println("ACCEPT " +atnPrevAccept.config.toString(recog, true) +
-							   " index " +atnPrevAccept.index);
 		}
 
 		int ruleIndex = atnPrevAccept.config.state.ruleIndex;
@@ -478,6 +437,31 @@ public class LexerATNSimulator extends ATNSimulator {
 			c = new ATNConfig(config, t.target);
 		}
 		return c;
+	}
+
+	int failOverToATN(CharStream input, DFAState s) {
+		if ( dfa_debug ) System.out.println("no edge for "+(char)input.LA(1));
+		if ( dfa_debug ) {
+			System.out.println("ATN exec upon "+
+							   input.substring(startIndex,input.index())+
+							   " at DFA state "+s.stateNumber+" = "+s.configs);
+		}
+		int ttype = exec(input, s.configs);
+		if ( dfa_debug ) {
+			System.out.println("back from DFA update, ttype="+ttype+
+							   ", dfa[mode "+mode+"]=\n"+
+							   dfa[mode].toLexerString());
+		}
+		// action already executed by ATN
+		// we've updated DFA, exec'd action, and have our deepest answer
+		return ttype;
+	}
+
+	protected void markAcceptState(ExecState state, CharStream input) {
+		state.marker = input.mark();
+		state.index = input.index();
+		state.line = line;
+		state.charPos = charPositionInLine;
 	}
 
 	protected void resetPrevAccept(ExecState prevAccept) {
