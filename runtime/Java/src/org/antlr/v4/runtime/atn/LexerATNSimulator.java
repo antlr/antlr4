@@ -143,10 +143,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
 		textIndex = -1;
 		startIndex = input.index();
-		dfaPrevAccept.marker = -1;
-		dfaPrevAccept.index = -1;
-		dfaPrevAccept.line = 0;
-		dfaPrevAccept.charPos = -1;
+		resetPrevAccept(dfaPrevAccept);
 		dfaPrevAccept.state = null;
 		LexerNoViableAltException atnException = null;
 		DFAState s = s0;
@@ -158,42 +155,16 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( s.edges == null || t >= s.edges.length || t <= CharStream.EOF ||
 				 s.edges[t] == null )
 			{
-				if ( dfa_debug ) System.out.println("no edge for "+(char)t);
-				if ( dfa_debug ) {
-					System.out.println("ATN exec upon "+
-									   input.substring(startIndex,input.index())+
-									   " at DFA state "+s.stateNumber+" = "+s.configs);
-				}
-				int ttype = Token.INVALID_TYPE;
 				try {
-					ATN_failover++;
-					ttype = exec(input, s.configs);
-					if ( dfa_debug ) {
-						System.out.println("back from DFA update, ttype="+ttype+
-										   ", dfa[mode "+mode+"]=\n"+
-										   dfa[mode].toLexerString());
-					}
+					int ttype = failOverToATN(input, s);
+					return ttype;
 				}
 				catch (LexerNoViableAltException nvae) {
-					// The ATN could not match anything starting from s.configs
-					// so we had an error edge. Re-throw the exception
-					// if there was no previous accept state here in DFA.
 					atnException = nvae;
-					//if ( t!=CharStream.EOF ) addDFAEdge(s, t, ERROR); TODO added by ATN already?
-//					if ( dfaPrevAccept.state==null ) {
-//						throw nvae;
-//					}
 					break loop; // dead end; no where to go, fall back on prev
 				}
-
-//				if ( ttype==Token.INVALID_TYPE ) {
-//					//if ( t != CharStream.EOF ) addDFAEdge(s, t, ERROR);
-//					break loop; // dead end; no where to go, fall back on prev if any
-//				}
-				// action already executed by ATN
-				// we've updated DFA, exec'd action, and have our deepest answer
-				return ttype;
 			}
+
 			DFAState target = s.edges[t];
 			if ( target == ERROR ) break;
 			s = target;
@@ -201,11 +172,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( s.isAcceptState ) {
 				if ( dfa_debug ) System.out.println("accept; predict "+s.prediction+
 													" in state "+s.stateNumber);
+				markAcceptState(dfaPrevAccept, input);
 				dfaPrevAccept.state = s;
-				dfaPrevAccept.marker = input.mark();
-				dfaPrevAccept.index = input.index();
-				dfaPrevAccept.line = line;
-				dfaPrevAccept.charPos = charPositionInLine;
 				// keep going unless we're at EOF; check if something else could match
 				// EOF never in DFA
 				if ( t==CharStream.EOF ) break;
@@ -215,29 +183,53 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 		if ( dfaPrevAccept.state==null ) {
-			if ( t==CharStream.EOF ) {
+			// if no accept and EOF is first char, return EOF
+			if ( t==CharStream.EOF && input.index()==startIndex ) {
 				return Token.EOF;
 			}
 			if ( atnException!=null ) throw atnException;
 			throw new LexerNoViableAltException(recog, input, startIndex, s.configs);
 		}
-		if ( recog!=null ) {
-			int actionIndex = atn.ruleToActionIndex[dfaPrevAccept.state.ruleIndex];
-			if ( dfa_debug ) {
-				System.out.println("ACTION "+
-								   recog.getRuleNames()[dfaPrevAccept.state.ruleIndex]+
-								   ":"+ actionIndex);
-			}
-			if ( actionIndex>=0 ) recog.action(null, dfaPrevAccept.state.ruleIndex, actionIndex);
-		}
 
-		// seek to after last char in token
-		input.release(dfaPrevAccept.marker);
-		input.seek(dfaPrevAccept.index);
-		line = dfaPrevAccept.line;
-		charPositionInLine = dfaPrevAccept.charPos;
-		consume(input);
+		int ruleIndex = dfaPrevAccept.state.ruleIndex;
+		accept(input, ruleIndex, dfaPrevAccept);
 		return dfaPrevAccept.state.prediction;
+	}
+
+	int failOverToATN(CharStream input, DFAState s) {
+		LexerNoViableAltException atnException = null;
+		if ( dfa_debug ) System.out.println("no edge for "+(char)input.LA(1));
+		if ( dfa_debug ) {
+			System.out.println("ATN exec upon "+
+							   input.substring(startIndex,input.index())+
+							   " at DFA state "+s.stateNumber+" = "+s.configs);
+		}
+//		try {
+			ATN_failover++;
+			int ttype = exec(input, s.configs);
+			if ( dfa_debug ) {
+				System.out.println("back from DFA update, ttype="+ttype+
+								   ", dfa[mode "+mode+"]=\n"+
+								   dfa[mode].toLexerString());
+			}
+			// action already executed by ATN
+			// we've updated DFA, exec'd action, and have our deepest answer
+			return ttype;
+//		}
+//		catch (LexerNoViableAltException nvae) {
+//			// The ATN could not match anything starting from s.configs
+//			// so we had an error edge. Re-throw the exception
+//			// if there was no previous accept state here in DFA.
+//			throw nvae;
+//			// dead end; no where to go, fall back on prev
+//		}
+	}
+
+	protected void markAcceptState(ExecState state, CharStream input) {
+		state.marker = input.mark();
+		state.index = input.index();
+		state.line = line;
+		state.charPos = charPositionInLine;
 	}
 
 	protected int exec(CharStream input, OrderedHashSet<ATNConfig> s0) {
@@ -247,10 +239,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( debug ) System.out.println("start state closure="+closure);
 
 		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
-		atnPrevAccept.marker = -1;
-		atnPrevAccept.index = -1;
-		atnPrevAccept.line = 0;
-		atnPrevAccept.charPos = -1;
+		resetPrevAccept(atnPrevAccept);
 		atnPrevAccept.config = null;
 
 		int t = input.LA(1);
@@ -277,45 +266,13 @@ public class LexerATNSimulator extends ATNSimulator {
 				// start state configs.
 				DFAState from = addDFAState(closure);
 				// we got nowhere on t, don't throw out this knowledge; it'd
-				// cause a failover from DFA later.  Don't track EOF edges
-				// from stop states, though.
-				if ( t!=CharStream.EOF ) addDFAEdge(from, t, ERROR);
+				// cause a failover from DFA later.
+				addDFAEdge(from, t, ERROR);
 				break;
 			}
 
 			// Did we hit a stop state during reach op?
-			for (int ci=0; ci<reach.size(); ci++) {
-				ATNConfig c = reach.get(ci);
-				if ( c.state instanceof RuleStopState ) {
-					if ( debug ) {
-						System.out.println("in reach we hit accept state "+c+" index "+
-										   input.index()+", reach="+reach+
-										   ", prevAccept="+atnPrevAccept.config+
-										   ", prevIndex="+atnPrevAccept.index);
-					}
-					int index = input.index();
-					if ( index > atnPrevAccept.index ) {
-						// will favor prev accept at same index so "int" is keyword not ID
-						atnPrevAccept.config = c;
-						atnPrevAccept.index = index;
-						atnPrevAccept.marker = input.mark();
-						atnPrevAccept.line = line;
-						atnPrevAccept.charPos = charPositionInLine;
-						if ( debug ) {
-							System.out.println("mark "+c+" @ index="+index+", "+
-											  atnPrevAccept.line+":"+atnPrevAccept.charPos);
-						}
-					}
-
-					// if we reach lexer accept state, toss out any configs in rest
-					// of configs work list associated with this rule (config.alt);
-					// that rule is done. this is how we cut off nongreedy .+ loops.
-					deleteWildcardConfigsForAlt(reach, ci, c.alt); // CAUSES INF LOOP if reach not closure
-
- 					// move to next char, looking for longer match
-					// (we continue processing if there are states in reach)
-				}
-			}
+			processAcceptStates(input, reach);
 
 			consume(input);
 			if ( t!=CharStream.EOF ) addDFAEdge(closure, t, reach);
@@ -335,8 +292,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( t==CharStream.EOF && input.index()==startIndex ) {
 				return Token.EOF;
 			}
-			// TODO: closure is empty?
-			throw new LexerNoViableAltException(recog, input, startIndex, closure);
+			throw new LexerNoViableAltException(recog, input, startIndex, reach);
 		}
 
 		if ( debug ) {
@@ -345,24 +301,58 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		int ruleIndex = atnPrevAccept.config.state.ruleIndex;
-		if ( recog!=null ) {
-			if ( debug ) {
-				if ( recog!=null ) System.out.println("ACTION "+
-													  recog.getRuleNames()[ruleIndex]+
-													  ":"+ruleIndex);
-				else System.out.println("ACTION "+ruleIndex+":"+ruleIndex);
+		accept(input, ruleIndex, atnPrevAccept);
+		return atn.ruleToTokenType[ruleIndex];
+	}
+
+	protected void processAcceptStates(CharStream input, OrderedHashSet<ATNConfig> reach) {
+		for (int ci=0; ci<reach.size(); ci++) {
+			ATNConfig c = reach.get(ci);
+			if ( c.state instanceof RuleStopState) {
+				if ( debug ) {
+					System.out.println("in reach we hit accept state "+c+" index "+
+									   input.index()+", reach="+reach+
+									   ", prevAccept="+atnPrevAccept.config+
+									   ", prevIndex="+atnPrevAccept.index);
+				}
+				int index = input.index();
+				if ( index > atnPrevAccept.index ) {
+					// will favor prev accept at same index so "int" is keyword not ID
+					markAcceptState(atnPrevAccept, input);
+					atnPrevAccept.config = c;
+					if ( debug ) {
+						System.out.println("mark "+c+" @ index="+index+", "+
+										  atnPrevAccept.line+":"+atnPrevAccept.charPos);
+					}
+				}
+
+				// if we reach lexer accept state, toss out any configs in rest
+				// of configs work list associated with this rule (config.alt);
+				// that rule is done. this is how we cut off nongreedy .+ loops.
+				deleteWildcardConfigsForAlt(reach, ci, c.alt); // CAUSES INF LOOP if reach not closure
+
+				 // move to next char, looking for longer match
+				// (we continue processing if there are states in reach)
 			}
-			int actionIndex = atn.ruleToActionIndex[ruleIndex];
-			if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 		}
+	}
+
+	protected void accept(CharStream input, int ruleIndex, ExecState prevAccept) {
+		if ( debug ) {
+			if ( recog!=null ) System.out.println("ACTION "+
+												  recog.getRuleNames()[ruleIndex]+
+												  ":"+ruleIndex);
+			else System.out.println("ACTION "+ruleIndex+":"+ruleIndex);
+		}
+		int actionIndex = atn.ruleToActionIndex[ruleIndex];
+		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
-		input.release(atnPrevAccept.marker);
-		input.seek(atnPrevAccept.index);
-		line = atnPrevAccept.line;
-		charPositionInLine = atnPrevAccept.charPos;
+		input.release(prevAccept.marker);
+		input.seek(prevAccept.index);
+		line = prevAccept.line;
+		charPositionInLine = prevAccept.charPos;
 		consume(input);
-		return atn.ruleToTokenType[ruleIndex];
 	}
 
 	public ATNState getReachableTarget(Transition trans, int t) {
@@ -490,6 +480,13 @@ public class LexerATNSimulator extends ATNSimulator {
 		return c;
 	}
 
+	protected void resetPrevAccept(ExecState prevAccept) {
+		prevAccept.marker = -1;
+		prevAccept.index = -1;
+		prevAccept.line = 0;
+		prevAccept.charPos = -1;
+	}
+
 	protected void addDFAEdge(OrderedHashSet<ATNConfig> p,
 							  int t,
 							  OrderedHashSet<ATNConfig> q)
@@ -501,7 +498,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	protected void addDFAEdge(DFAState p, int t, DFAState q) {
-		if ( p==null ) return;
+		if ( p==null || t==CharStream.EOF ) return; // Don't track EOF edges from stop states
 		if ( p.edges==null ) {
 			//  make room for tokens 1..n and -1 masquerading as index 0
 			p.edges = new DFAState[NUM_EDGES+1]; // TODO: make adaptive
