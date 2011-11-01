@@ -1,30 +1,30 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
- All rights reserved.
+  Copyright (c) 2011 Udo Borkowski and Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
 
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.tree.gui;
@@ -37,6 +37,7 @@ public class PostScriptDocument {
 	protected String fontName;
 	protected int fontSize = 12;
 	protected double lineWidth = 0.3;
+	protected String boundingBox;
 
 	protected StringBuilder ps = new StringBuilder();
 	protected boolean closed = false;
@@ -50,13 +51,16 @@ public class PostScriptDocument {
 		setFont(fontName, fontSize);
 	}
 
-	public String getPS() { close(); return ps.toString(); }
+	public String getPS() {
+		close();
+		return header()+ps.toString();
+	}
 
 	public void boundingBox(int w, int h) {
 		boundingBoxWidth = w;
 		boundingBoxHeight = h;
-		ps.append(String.format("%%%%BoundingBox: %d %d %d %d\n", 0,0,
-								boundingBoxWidth,boundingBoxHeight));
+		boundingBox = String.format("%%%%BoundingBox: %d %d %d %d\n", 0,0,
+									boundingBoxWidth,boundingBoxHeight);
 	}
 
 	public void close() {
@@ -66,30 +70,13 @@ public class PostScriptDocument {
 		closed = true;
 	}
 
-	protected void header() {
-		ps.append("%!PS-Adobe-3.0 EPSF-3.0\n");
-		ps.append("%%BoundingBox: (atend)\n");
-		lineWidth(0.3);
-//		ps.append("%\n");
-//		ps.append("% x y rarrow\n");
-//		ps.append("%\n");
-//		ps.append("/rarrow {\n");
-//		ps.append("  moveto\n");
-//		ps.append("  -3 +2 rlineto\n");
-//		ps.append("  0 -4 rlineto\n");
-//		ps.append("  3 +2 rlineto\n");
-//		ps.append("  fill\n");
-//		ps.append("} def\n");
-//		ps.append("%\n");
-//		ps.append("% x y darrow\n");
-//		ps.append("%\n");
-//		ps.append("/darrow {\n");
-//		ps.append("  moveto\n");
-//		ps.append("  -2 +3 rlineto\n");
-//		ps.append("  4 0 rlineto\n");
-//		ps.append("  -2 -3 rlineto\n");
-//		ps.append("  fill\n");
-//		ps.append("} def\n");
+	/** Compute the header separately because we need to wait for the bounding box */
+	protected StringBuilder header() {
+		StringBuilder b = new StringBuilder();
+		b.append("%!PS-Adobe-3.0 EPSF-3.0\n");
+		b.append(boundingBox+"\n");
+		b.append("0.3 setlinewidth\n");
+		return b;
 	}
 
 	// Courier, Helvetica, Times, ... should be available
