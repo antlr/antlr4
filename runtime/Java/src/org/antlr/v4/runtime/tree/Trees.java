@@ -53,7 +53,7 @@ public class Trees {
 	}
 
 	public static String getPS(Tree t, BaseRecognizer recog) {
-		return getPS(t, recog, "Arial", 11);
+		return getPS(t, recog, "Helvetica", 11);
 	}
 
 	public static void writePS(Tree t, BaseRecognizer recog,
@@ -71,7 +71,7 @@ public class Trees {
 	public static void writePS(Tree t, BaseRecognizer recog, String fileName)
 		throws IOException
 	{
-		writePS(t, recog, fileName, "Arial", 11);
+		writePS(t, recog, fileName, "Helvetica", 11);
 	}
 
 	/** Print out a whole tree in LISP form. getNodeText is used on the
