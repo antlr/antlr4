@@ -1,8 +1,39 @@
+/*
+ [The "BSD license"]
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 public class TestATNSerialization extends BaseTest {
@@ -633,6 +664,63 @@ public class TestATNSerialization extends BaseTest {
 			"5->6 NOT_SET 1,0,0\n" +
 			"6->2 EPSILON 0,0,0\n" +
 			"0:0 1\n";
+		ATN atn = createATN(lg);
+		String result = ATNSerializer.getDecoded(lg, atn);
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testModeInLexer() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : 'a'\n ;\n" +
+			"B : 'b';\n" +
+			"mode A;\n" +
+			"C : 'c';\n"+
+			"D : 'd';\n");
+		String expecting =
+			"max type 6\n" +
+			"0:TOKEN_START -1\n" +
+			"1:TOKEN_START -1\n" +
+			"2:RULE_START 0\n" +
+			"3:RULE_STOP 0\n" +
+			"4:RULE_START 1\n" +
+			"5:RULE_STOP 1\n" +
+			"6:RULE_START 2\n" +
+			"7:RULE_STOP 2\n" +
+			"8:RULE_START 3\n" +
+			"9:RULE_STOP 3\n" +
+			"10:BASIC 0\n" +
+			"11:BASIC 0\n" +
+			"12:BASIC 1\n" +
+			"13:BASIC 1\n" +
+			"14:BASIC 2\n" +
+			"15:BASIC 2\n" +
+			"16:BASIC 3\n" +
+			"17:BASIC 3\n" +
+			"rule 0:2 3,-1\n" +
+			"rule 1:4 4,-1\n" +
+			"rule 2:6 5,-1\n" +
+			"rule 3:8 6,-1\n" +
+			"mode 0:0\n" +
+			"mode 1:1\n" +
+			"0->2 EPSILON 0,0,0\n" +
+			"0->4 EPSILON 0,0,0\n" +
+			"1->6 EPSILON 0,0,0\n" +
+			"1->8 EPSILON 0,0,0\n" +
+			"2->10 EPSILON 0,0,0\n" +
+			"4->12 EPSILON 0,0,0\n" +
+			"6->14 EPSILON 0,0,0\n" +
+			"8->16 EPSILON 0,0,0\n" +
+			"10->11 ATOM 97,0,0\n" +
+			"11->3 EPSILON 0,0,0\n" +
+			"12->13 ATOM 98,0,0\n" +
+			"13->5 EPSILON 0,0,0\n" +
+			"14->15 ATOM 99,0,0\n" +
+			"15->7 EPSILON 0,0,0\n" +
+			"16->17 ATOM 100,0,0\n" +
+			"17->9 EPSILON 0,0,0\n" +
+			"0:0 1\n" +
+			"1:1 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);

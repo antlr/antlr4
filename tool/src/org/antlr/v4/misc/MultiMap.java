@@ -27,18 +27,19 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
+package org.antlr.v4.misc;
 
-public class TestL {
-	public static void main(String[] args) throws Exception {
-		CharStream input = new ANTLRFileStream(args[0]);
-//		input = new ANTLRStringStream("3 3");
-		L lexer = new L(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		tokens.fill();
-//		System.out.println(tokens.getTokens());
-		for (Object t : tokens.getTokens()) System.out.println(t);
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
+	public void map(K key, V value) {
+		List<V> elementsForKey = get(key);
+		if ( elementsForKey==null ) {
+			elementsForKey = new ArrayList<V>();
+			super.put(key, elementsForKey);
+		}
+		elementsForKey.add(value);
 	}
 }
