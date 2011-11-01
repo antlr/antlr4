@@ -24,6 +24,7 @@ build.sysclasspath=ignore
 	<path id="classpath">
         <pathelement location="${antlr3.jar}"/> <!-- general setup -->
 		<pathelement location="${ant-antlr3.jar}"/>
+		<pathelement location="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
 	</path>
 
     <target name="clean">
