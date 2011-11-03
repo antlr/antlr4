@@ -62,7 +62,7 @@ public class TreePostScriptGenerator {
 		}
 	}
 
-	protected double gapBetweenLevels = 10;
+	protected double gapBetweenLevels = 17;
 	protected double gapBetweenNodes = 7;
 	protected int nodeWidthPadding = 1;  // added to left/right
 	protected int nodeHeightPaddingAbove = 0;

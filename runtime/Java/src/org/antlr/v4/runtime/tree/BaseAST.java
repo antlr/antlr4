@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.BaseRecognizer;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import javax.print.PrintException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -262,10 +261,16 @@ public abstract class BaseAST implements AST {
 	}
 
 	public void save(BaseRecognizer parser, String fileName)
-		throws IOException, PrintException
+		throws IOException
 	{
-		TreeViewer viewer = new TreeViewer(parser, this);
-		viewer.save(fileName);
+		Trees.writePS(this, parser, fileName);
+	}
+
+	public void save(BaseRecognizer parser, String fileName,
+					 String fontName, int fontSize)
+		throws IOException
+	{
+		Trees.writePS(this, parser, fileName, fontName, fontSize);
 	}
 
 	/** Don't use standard tree printing mechanism since ASTs can have nil

@@ -34,15 +34,12 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.misc.GraphicsSupport;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
-import javax.print.PrintException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -86,7 +83,7 @@ public class TreeViewer extends JComponent {
 	protected TreeLayout<Tree> treeLayout;
 	protected java.util.List<Tree> highlightedNodes;
 
-	protected String fontName = Font.SANS_SERIF;
+	protected String fontName = "Helvetica"; //Font.SANS_SERIF;
 	protected int fontStyle = Font.PLAIN;
 	protected int fontSize = 11;
 	protected Font font = new Font(fontName, fontStyle, fontSize);
@@ -164,6 +161,7 @@ public class TreeViewer extends JComponent {
 	}
 
 	public void text(Graphics g, String s, int x, int y) {
+		System.out.println("drawing '"+s+"' @ "+x+","+y);
 		g.drawString(s, x, y);
 	}
 
@@ -172,8 +170,13 @@ public class TreeViewer extends JComponent {
 		super.paint(g);
 
 		Graphics2D g2 = (Graphics2D)g;
+		// anti-alias the lines
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       						RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// Anti-alias the text
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                         	RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		paintEdges(g, getTree().getRoot());
 
@@ -217,6 +220,7 @@ public class TreeViewer extends JComponent {
 		showInDialog(this);
 	}
 
+	/** This does not always seem to render the postscript properly
 	public void save(String fileName) throws IOException, PrintException {
 		JDialog dialog = new JDialog();
 		Container contentPane = dialog.getContentPane();
@@ -230,6 +234,7 @@ public class TreeViewer extends JComponent {
 //		dialog.setVisible(true);
 		GraphicsSupport.saveImage(this, fileName);
 	}
+	 */
 
 	// ---------------------------------------------------
 

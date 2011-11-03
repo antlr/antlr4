@@ -312,8 +312,14 @@ public class RuleContext implements ParseTree.RuleNode {
 	public void save(BaseRecognizer parser, String fileName)
 		throws IOException, PrintException
 	{
-		TreeViewer viewer = new TreeViewer(parser, this);
-		viewer.save(fileName);
+		Trees.writePS(this, parser, fileName);
+	}
+
+	public void save(BaseRecognizer parser, String fileName,
+					 String fontName, int fontSize)
+		throws IOException
+	{
+		Trees.writePS(this, parser, fileName, fontName, fontSize);
 	}
 
 	/** Print out a whole tree, not just a node, in LISP format
