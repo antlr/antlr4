@@ -32,7 +32,10 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.BaseRecognizer;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import java.util.*;
+import javax.print.PrintException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** A generic AST implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
@@ -256,6 +259,13 @@ public abstract class BaseAST implements AST {
 	public void inspect(BaseRecognizer parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
+	}
+
+	public void save(BaseRecognizer parser, String fileName)
+		throws IOException, PrintException
+	{
+		TreeViewer viewer = new TreeViewer(parser, this);
+		viewer.save(fileName);
 	}
 
 	/** Don't use standard tree printing mechanism since ASTs can have nil

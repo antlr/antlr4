@@ -34,12 +34,15 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.misc.GraphicsSupport;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
+import javax.print.PrintException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -209,6 +212,10 @@ public class TreeViewer extends JComponent {
 
 	public void open() {
 		showInDialog(this);
+	}
+
+	public void save(String fileName) throws IOException, PrintException {
+		GraphicsSupport.saveImage(this, fileName);
 	}
 
 	// ---------------------------------------------------

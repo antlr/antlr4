@@ -36,6 +36,8 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
+import javax.print.PrintException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -305,6 +307,13 @@ public class RuleContext implements ParseTree.RuleNode {
 	public void inspect(BaseRecognizer parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
+	}
+
+	public void save(BaseRecognizer parser, String fileName)
+		throws IOException, PrintException
+	{
+		TreeViewer viewer = new TreeViewer(parser, this);
+		viewer.save(fileName);
 	}
 
 	/** Print out a whole tree, not just a node, in LISP format
