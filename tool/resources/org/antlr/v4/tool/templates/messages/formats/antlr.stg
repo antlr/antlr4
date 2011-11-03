@@ -27,7 +27,6 @@
 */
 /*
  This file contains the actual layout of the messages emitted by ANTLR.
- The text itself is coming out of the languages/*stg files, according to the chosen locale.
  This file contains the default format ANTLR uses.
 */
 
