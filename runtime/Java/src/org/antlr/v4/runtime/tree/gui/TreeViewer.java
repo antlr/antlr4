@@ -86,18 +86,18 @@ public class TreeViewer extends JComponent {
 	protected TreeLayout<Tree> treeLayout;
 	protected java.util.List<Tree> highlightedNodes;
 
-	protected String fontName = Font.MONOSPACED;
+	protected String fontName = Font.SANS_SERIF;
 	protected int fontStyle = Font.PLAIN;
-	protected int fontSize = 12;
+	protected int fontSize = 11;
 	protected Font font = new Font(fontName, fontStyle, fontSize);
 
-	protected double gapBetweenLevels = 12;
+	protected double gapBetweenLevels = 17;
 	protected double gapBetweenNodes = 7;
 	protected int nodeWidthPadding = 2;  // added to left/right
-	protected int nodeHeightPadding = 4; // added above/below
+	protected int nodeHeightPadding = 0; // added above/below
 	protected int arcSize = 0;           // make an arc in node outline?
 
-	protected Color boxColor = Color.white;
+	protected Color boxColor = null;     // set to a color to make it draw background
 
 	protected Color highlightedBoxColor = Color.lightGray;
 	protected Color borderColor = Color.white;
@@ -122,13 +122,15 @@ public class TreeViewer extends JComponent {
 
 	protected void paintEdges(Graphics g, Tree parent) {
 		if (!getTree().isLeaf(parent)) {
-			Rectangle2D.Double b1 = getBoundsOfNode(parent);
-			double x1 = b1.getCenterX();
-			double y1 = b1.getCenterY();
+			Rectangle2D.Double parentBounds = getBoundsOfNode(parent);
+			double x1 = parentBounds.getCenterX();
+			double y1 = parentBounds.getMaxY();
 			for (Tree child : getTree().getChildren(parent)) {
-				Rectangle2D.Double b2 = getBoundsOfNode(child);
-				g.drawLine((int) x1, (int) y1, (int) b2.getCenterX(),
-						   (int) b2.getCenterY());
+				Rectangle2D.Double childBounds = getBoundsOfNode(child);
+				double x2 = childBounds.getCenterX();
+				double y2 = childBounds.getMinY();
+				g.drawLine((int) x1, (int) y1,
+						   (int) x2, (int) y2);
 
 				paintEdges(g, child);
 			}
@@ -136,12 +138,14 @@ public class TreeViewer extends JComponent {
 	}
 
 	protected void paintBox(Graphics g, Tree tree) {
-		// draw the box in the background
-		if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
-		else g.setColor(boxColor);
 		Rectangle2D.Double box = getBoundsOfNode(tree);
-		g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
-						(int) box.height - 1, arcSize, arcSize);
+		// draw the box in the background
+		if ( isHighlighted(tree) || boxColor!=null ) {
+			if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
+			else g.setColor(boxColor);
+			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
+							(int) box.height - 1, arcSize, arcSize);
+		}
 		g.setColor(borderColor);
 		g.drawRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 						(int) box.height - 1, arcSize, arcSize);
@@ -154,7 +158,6 @@ public class TreeViewer extends JComponent {
 		int x = (int) box.x + arcSize / 2 + nodeWidthPadding;
 		int y = (int) box.y + m.getAscent() + m.getLeading() + 1 + nodeHeightPadding;
 		for (int i = 0; i < lines.length; i++) {
-//			g.drawString(lines[i], x, y);
 			text(g, lines[i], x, y);
 			y += m.getHeight();
 		}
@@ -215,6 +218,16 @@ public class TreeViewer extends JComponent {
 	}
 
 	public void save(String fileName) throws IOException, PrintException {
+		JDialog dialog = new JDialog();
+		Container contentPane = dialog.getContentPane();
+		((JComponent) contentPane).setBorder(BorderFactory.createEmptyBorder(
+				10, 10, 10, 10));
+		contentPane.add(this);
+		contentPane.setBackground(Color.white);
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.dispose();
+//		dialog.setVisible(true);
 		GraphicsSupport.saveImage(this, fileName);
 	}
 
