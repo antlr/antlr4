@@ -29,8 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
@@ -93,8 +92,8 @@ public interface ParseTree extends SyntaxTree {
 		public ErrorNodeImpl(Token token) {
 			super(token);
 		}
-		@Override
-		public String toString() { return "<ERROR:"+super.toString()+">"; }
+//		@Override
+//		public String toString() { return "<ERROR:"+super.toString()+">"; }
 	}
 
 	// the following methods narrow the return type; they are not additional methods

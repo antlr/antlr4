@@ -29,21 +29,19 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.NodeExtentProvider;
-import org.abego.treelayout.TreeForTreeLayout;
-import org.abego.treelayout.TreeLayout;
+import org.abego.treelayout.*;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.tree.Tree;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.tree.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 public class TreeViewer extends JComponent {
+	public static final Color LIGHT_RED = new Color(244, 213, 211);
+
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
 		BaseRecognizer parser;
 		public DefaultTreeTextProvider(BaseRecognizer parser) {
@@ -137,8 +135,11 @@ public class TreeViewer extends JComponent {
 	protected void paintBox(Graphics g, Tree tree) {
 		Rectangle2D.Double box = getBoundsOfNode(tree);
 		// draw the box in the background
-		if ( isHighlighted(tree) || boxColor!=null ) {
+		if ( isHighlighted(tree) || boxColor!=null ||
+			 tree instanceof ParseTree.ErrorNodeImpl )
+		{
 			if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
+			else if ( tree instanceof ParseTree.ErrorNodeImpl ) g.setColor(LIGHT_RED);
 			else g.setColor(boxColor);
 			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 							(int) box.height - 1, arcSize, arcSize);
@@ -161,7 +162,7 @@ public class TreeViewer extends JComponent {
 	}
 
 	public void text(Graphics g, String s, int x, int y) {
-		System.out.println("drawing '"+s+"' @ "+x+","+y);
+//		System.out.println("drawing '"+s+"' @ "+x+","+y);
 		g.drawString(s, x, y);
 	}
 

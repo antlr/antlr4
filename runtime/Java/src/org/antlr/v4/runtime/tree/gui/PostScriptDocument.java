@@ -65,7 +65,7 @@ public class PostScriptDocument {
 
 	public void close() {
 		if ( closed ) return;
-		ps.append("showpage\n");
+//		ps.append("showpage\n");
 		ps.append("%%Trailer\n");
 		closed = true;
 	}
@@ -76,6 +76,27 @@ public class PostScriptDocument {
 		b.append("%!PS-Adobe-3.0 EPSF-3.0\n");
 		b.append(boundingBox+"\n");
 		b.append("0.3 setlinewidth\n");
+		b.append("%% x y w h highlight\n" +
+				 "/highlight {\n" +
+				 "        4 dict begin\n" +
+				 "        /h exch def\n" +
+				 "        /w exch def\n" +
+				 "        /y exch def\n" +
+				 "        /x exch def\n" +
+				 "        newpath\n" +
+				 "        x y moveto\n" +
+				 "        0 h rlineto     % up to left corner\n" +
+				 "        w 0 rlineto     % to upper right corner\n" +
+				 "        0 h neg rlineto % to lower right corner\n" +
+				 "        w neg 0 rlineto % back home to lower left corner\n" +
+				 "        closepath\n" +
+				 "        gsave\n" +
+				 "        .95 .83 .82 setrgbcolor\n" +
+				 "        fill\n" +
+				 "        grestore\n" +
+				 "        end\n" +
+				 "} def");
+
 		return b;
 	}
 
@@ -118,17 +139,22 @@ public class PostScriptDocument {
 		line(x + width, y, x, y);
 	}
 
+	/** Make red box */
+	public void highlight(double x, double y, double width, double height) {
+		ps.append(String.format("%1.3f %1.3f %1.3f %1.3f highlight\n", x, y, width, height));
+	}
+
 	public void stroke() {
 		ps.append("stroke\n");
 	}
 
-	public void rarrow(double x, double y) {
-		ps.append(String.format("%1.3f %1.3f rarrow\n", x,y));
-	}
-
-	public void darrow(double x, double y) {
-		ps.append(String.format("%1.3f %1.3f darrow\n", x,y));
-	}
+//	public void rarrow(double x, double y) {
+//		ps.append(String.format("%1.3f %1.3f rarrow\n", x,y));
+//	}
+//
+//	public void darrow(double x, double y) {
+//		ps.append(String.format("%1.3f %1.3f darrow\n", x,y));
+//	}
 
 	public void text(String s, double x, double y) {
 		StringBuilder buf = new StringBuilder();

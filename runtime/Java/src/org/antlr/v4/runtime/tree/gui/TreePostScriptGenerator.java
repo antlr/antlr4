@@ -29,16 +29,10 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.Configuration;
-import org.abego.treelayout.NodeExtentProvider;
-import org.abego.treelayout.TreeForTreeLayout;
-import org.abego.treelayout.TreeLayout;
+import org.abego.treelayout.*;
 import org.abego.treelayout.util.DefaultConfiguration;
-import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.tree.CommonAST;
-import org.antlr.v4.runtime.tree.Tree;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -128,6 +122,10 @@ public class TreePostScriptGenerator {
 		Rectangle2D.Double box = getBoundsOfNode(t);
 		// for debugging, turn this on to see boundingbox of nodes
 		//doc.rect(box.x, box.y, box.width, box.height);
+		// make error nodes from parse tree red by default
+		if ( t instanceof ParseTree.ErrorNodeImpl ) {
+			doc.highlight(box.x, box.y, box.width, box.height);
+		}
 		double x = box.x+nodeWidthPadding;
 		double y = box.y+nodeHeightPaddingBelow;
 		for (int i = 0; i < lines.length; i++) {

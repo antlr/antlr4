@@ -27,13 +27,10 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class TestT {
@@ -49,7 +46,7 @@ public class TestT {
 		final TParser.sContext tree = p.s();
 		System.out.println(tree.toStringTree(p));
 		TreeViewer v = new TreeViewer(p, tree);
-		v.setHighlightedBoxColor(new Color(217, 189, 187));
+		v.setHighlightedBoxColor(TreeViewer.LIGHT_RED);
 		v.addHighlightNodes(new ArrayList<Tree>() {{
 			ParseTree c0 = tree.getChild(0);
 			add(c0);
