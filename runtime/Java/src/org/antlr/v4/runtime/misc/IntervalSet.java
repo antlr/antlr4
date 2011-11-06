@@ -153,7 +153,7 @@ public class IntervalSet implements IntSet {
 		return r;
 	}
 
-	public IntSet addAll(IntSet set) {
+	public IntervalSet addAll(IntSet set) {
 		if ( set==null ) {
 			return this;
 		}
@@ -172,7 +172,7 @@ public class IntervalSet implements IntSet {
 		return this;
     }
 
-    public IntSet complement(int minElement, int maxElement) {
+    public IntervalSet complement(int minElement, int maxElement) {
         return this.complement(IntervalSet.of(minElement,maxElement));
     }
 
@@ -182,7 +182,7 @@ public class IntervalSet implements IntSet {
      *
      *  'this' is assumed to be either a subset or equal to vocabulary.
      */
-    public IntSet complement(IntSet vocabulary) {
+    public IntervalSet complement(IntSet vocabulary) {
         if ( vocabulary==null ) {
             return null; // nothing in common with null set
         }
@@ -227,7 +227,7 @@ public class IntervalSet implements IntSet {
 	 *  other is assumed to be a subset of this;
      *  anything that is in other but not in this will be ignored.
 	 */
-	public IntSet subtract(IntSet other) {
+	public IntervalSet subtract(IntSet other) {
 		// assume the whole unicode range here for the complement
 		// because it doesn't matter.  Anything beyond the max of this' set
 		// will be ignored since we are doing this & ~other.  The intersection
@@ -237,7 +237,7 @@ public class IntervalSet implements IntSet {
 		return this.and(((IntervalSet)other).complement(COMPLETE_SET));
 	}
 
-	public IntSet or(IntSet a) {
+	public IntervalSet or(IntSet a) {
 		IntervalSet o = new IntervalSet();
 		o.addAll(this);
 		o.addAll(a);
@@ -249,7 +249,7 @@ public class IntervalSet implements IntSet {
      *  just walk them together.  This is roughly O(min(n,m)) for interval
      *  list lengths n and m.
      */
-	public IntSet and(IntSet other) {
+	public IntervalSet and(IntSet other) {
 		if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
 			return null; // nothing in common with null set
 		}

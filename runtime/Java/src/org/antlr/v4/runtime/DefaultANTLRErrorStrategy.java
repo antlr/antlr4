@@ -172,7 +172,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		{
 //			System.err.println("at loop back: "+s.getClass().getSimpleName());
 			reportUnwantedToken(recognizer);
-			consumeUntil(recognizer, getErrorRecoverySet(recognizer));
+			IntervalSet whatFollowLoopOrRule =
+				expecting.or(getErrorRecoverySet(recognizer));
+			consumeUntil(recognizer, whatFollowLoopOrRule);
 		}
 		// do nothing if we can't identify the exact kind of ATN state
 	}
@@ -268,7 +270,12 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	{
 		// SINGLE TOKEN DELETION
 		Object matchedSymbol = singleTokenDeletion(recognizer);
-		if ( matchedSymbol!=null ) return matchedSymbol;
+		if ( matchedSymbol!=null ) {
+			// we have deleted the extra token.
+			// now, move past ttype token as if all were ok
+			recognizer.consume();
+			return matchedSymbol;
+		}
 
 		// SINGLE TOKEN INSERTION
 		if ( singleTokenInsertion(recognizer) ) {
@@ -310,8 +317,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 			recognizer.consume(); // simply delete extra token
 			// we want to return the token we're actually matching
 			Object matchedSymbol = recognizer.getCurrentInputSymbol();
-			endErrorCondition(recognizer);  // we know next token is correct
-			recognizer.consume(); // move past ttype token as if all were ok
+			endErrorCondition(recognizer);  // we know current token is correct
 			return matchedSymbol;
 		}
 		return null;
