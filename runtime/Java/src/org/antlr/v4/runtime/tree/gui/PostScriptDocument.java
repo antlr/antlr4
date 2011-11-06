@@ -83,6 +83,7 @@ public class PostScriptDocument {
 				 "        /w exch def\n" +
 				 "        /y exch def\n" +
 				 "        /x exch def\n" +
+				 "        gsave\n" +
 				 "        newpath\n" +
 				 "        x y moveto\n" +
 				 "        0 h rlineto     % up to left corner\n" +
@@ -90,7 +91,6 @@ public class PostScriptDocument {
 				 "        0 h neg rlineto % to lower right corner\n" +
 				 "        w neg 0 rlineto % back home to lower left corner\n" +
 				 "        closepath\n" +
-				 "        gsave\n" +
 				 "        .95 .83 .82 setrgbcolor\n" +
 				 "        fill\n" +
 				 "        grestore\n" +
