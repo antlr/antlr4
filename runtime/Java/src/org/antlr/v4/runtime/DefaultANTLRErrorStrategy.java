@@ -172,9 +172,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		{
 //			System.err.println("at loop back: "+s.getClass().getSimpleName());
 			reportUnwantedToken(recognizer);
-			IntervalSet whatFollowLoopOrRule =
+			IntervalSet whatFollowsLoopIterationOrRule =
 				expecting.or(getErrorRecoverySet(recognizer));
-			consumeUntil(recognizer, whatFollowLoopOrRule);
+			consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
 		}
 		// do nothing if we can't identify the exact kind of ATN state
 	}
