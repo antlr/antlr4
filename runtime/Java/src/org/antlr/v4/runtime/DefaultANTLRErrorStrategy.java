@@ -173,8 +173,9 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 //			System.err.println("at loop back: "+s.getClass().getSimpleName());
 			reportUnwantedToken(recognizer);
 			consumeUntil(recognizer, expecting);
+//			consumeUntil(recognizer, getErrorRecoverySet(recognizer));
 		}
-		// do nothing if we can identify the exact kind of ATN state
+		// do nothing if we can't identify the exact kind of ATN state
 	}
 
 	public void reportNoViableAlternative(BaseRecognizer recognizer,
@@ -266,24 +267,6 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	public Object recoverInline(BaseRecognizer recognizer)
 		throws RecognitionException
 	{
-		// if next token is what we are looking for then "delete" this token
-//		int nextTokenType = recognizer.getInputStream().LA(2);
-//		IntervalSet expecting = getExpectedTokens(recognizer);
-//		if ( expecting.contains(nextTokenType) ) {
-//			reportUnwantedToken(recognizer);
-//			/*
-//			System.err.println("recoverFromMismatchedToken deleting "+
-//							   ((TokenStream)recognizer.getInputStream()).LT(1)+
-//							   " since "+((TokenStream)recognizer.getInputStream()).LT(2)+
-//							   " is what we want");
-//			*/
-//			recognizer.consume(); // simply delete extra token
-//			// we want to return the token we're actually matching
-//			Object matchedSymbol = recognizer.getCurrentInputSymbol();
-//			endErrorCondition(recognizer);  // we know next token is correct
-//			recognizer.consume(); // move past ttype token as if all were ok
-//			return matchedSymbol;
-//		}
 		// SINGLE TOKEN DELETION
 		Object matchedSymbol = singleTokenDeletion(recognizer);
 		if ( matchedSymbol!=null ) return matchedSymbol;
@@ -369,6 +352,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		t.charPositionInLine = current.getCharPositionInLine();
 		t.channel = Token.DEFAULT_CHANNEL;
 		t.source = current.getTokenSource();
+		t.index = -1; // indicate we conjured this up because it has no index
 		return t;
 	}
 

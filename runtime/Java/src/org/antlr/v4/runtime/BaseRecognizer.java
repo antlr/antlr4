@@ -82,16 +82,22 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 */
 	public Object match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
-		Object matchedSymbol = getCurrentInputSymbol();
+		Object currentSymbol = getCurrentInputSymbol();
 		if ( getInputStream().LA(1)==ttype ) {
 			_errHandler.endErrorCondition(this);
 			consume();
 		}
 		else {
-			matchedSymbol = _errHandler.recoverInline(this);
+			currentSymbol = _errHandler.recoverInline(this);
+			if ( buildParseTrees && currentSymbol instanceof Token &&
+			     ((Token)currentSymbol).getTokenIndex()==-1 )
+			{
+				// we must have conjured up a new token during single token insertion
+				// if it's not the current symbol
+				_ctx.addErrorNode((Token)currentSymbol);
+			}
 		}
-//		if ( buildParseTrees ) _ctx.addChild((Token)matchedSymbol);
-		return matchedSymbol;
+		return currentSymbol;
 	}
 
 	/** Track the RuleContext objects during the parse and hook them up
