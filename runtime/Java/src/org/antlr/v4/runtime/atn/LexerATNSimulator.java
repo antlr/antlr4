@@ -308,8 +308,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
-		input.release(prevAccept.marker);
 		input.seek(prevAccept.index);
+		input.release(prevAccept.marker);
 		line = prevAccept.line;
 		charPositionInLine = prevAccept.charPos;
 		consume(input);

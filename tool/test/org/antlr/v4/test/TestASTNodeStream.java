@@ -182,13 +182,14 @@ public class TestASTNodeStream extends BaseTest {
 
 		ASTNodeStream stream = newStream(r0);
 		int m = stream.mark(); // MARK
+		int index = stream.index();
 		for (int k=1; k<=13; k++) { // consume til end
 			stream.LT(1);
 			stream.consume();
 		}
 		assertEquals(Token.EOF, ((AST)stream.LT(1)).getType());
+		stream.seek(index);
 		stream.release(m);
-		stream.seek(m); // i know it's an index
 
 		// consume til end again :)
 		for (int k=1; k<=13; k++) { // consume til end
@@ -219,12 +220,13 @@ public class TestASTNodeStream extends BaseTest {
 		}
 		assertEquals(107, ((AST)stream.LT(1)).getType());
 		int m = stream.mark(); // MARK
+		int index = stream.index();
 		stream.consume(); // consume 107
 		stream.consume(); // consume UP
 		stream.consume(); // consume UP
 		stream.consume(); // consume 104
+		stream.seek(index);
 		stream.release(m); // REWIND
-		stream.seek(m);
         stream.mark();   // keep saving nodes though
 
 		assertEquals(107, ((AST)stream.LT(1)).getType());
@@ -260,22 +262,24 @@ public class TestASTNodeStream extends BaseTest {
 
 		ASTNodeStream stream = newStream(r0);
 		int m = stream.mark(); // MARK at start
+		int index = stream.index();
 		stream.consume(); // consume 101
 		stream.consume(); // consume DN
 		int m2 = stream.mark(); // MARK on 102
+		int index2 = stream.index();
 		stream.consume(); // consume 102
 		stream.consume(); // consume DN
 		stream.consume(); // consume 103
 		stream.consume(); // consume 106
-		stream.release(m2);      // REWIND to 102
-		stream.seek(m2);
+		stream.seek(index2); // REWIND to 102
+		stream.release(m2);
 		assertEquals(102, ((AST)stream.LT(1)).getType());
 		stream.consume();
 		assertEquals(Token.DOWN, ((AST)stream.LT(1)).getType());
 		stream.consume();
 		// stop at 103 and rewind to start
-		stream.release(m); // REWIND to 101
-		stream.seek(m);
+		stream.seek(index); // REWIND to 101
+		stream.release(m);
 		assertEquals(101, ((AST)stream.LT(1)).getType());
 		stream.consume();
 		assertEquals(Token.DOWN, ((AST)stream.LT(1)).getType());

@@ -96,12 +96,14 @@ public class ParserATNSimulator extends ATNSimulator {
 			//dump(dfa);
 			// start with the DFA
 			int m = input.mark();
+			int index = input.index();
 			try {
 				int alt = execDFA(input, dfa, dfa.s0, outerContext);
 				return alt;
 			}
 			finally {
-				input.seek(m);
+				input.seek(index);
+				input.release(m);
 			}
 		}
 	}
@@ -127,6 +129,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		int alt = 0;
 		int m = input.mark();
+		int index = input.index();
 		try {
 			alt = execATN(input, dfa, m, s0_closure, useContext);
 		}
@@ -135,7 +138,8 @@ public class ParserATNSimulator extends ATNSimulator {
 			throw nvae;
 		}
 		finally {
-			input.seek(m);
+			input.seek(index);
+			input.release(m);
 		}
 		if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString());
 		return alt;
