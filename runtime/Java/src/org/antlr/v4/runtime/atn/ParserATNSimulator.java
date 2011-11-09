@@ -771,7 +771,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	protected void addDFAEdge(DFAState p, int t, DFAState q) {
-		if ( p==null ) return;
+		if ( p==null || t < -1 ) return;
 		if ( p.edges==null ) {
 			p.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
 		}
