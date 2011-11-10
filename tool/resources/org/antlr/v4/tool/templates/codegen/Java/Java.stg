@@ -190,7 +190,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 	}
 	catch (RecognitionException re) {
 		_errHandler.reportError(this, re);
-		_errHandler.recover(this);
+		_errHandler.recover(this, re);
 	}
 	finally {
 		<finallyAction>

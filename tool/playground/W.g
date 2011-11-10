@@ -1,7 +1,7 @@
 grammar W;
 
 s
-@init {setBuildParseTrees(true);}
+@init {setBuildParseTree(true);}
 @after {System.out.println(_localctx.toStringTree(this));}
   : a
   ;
