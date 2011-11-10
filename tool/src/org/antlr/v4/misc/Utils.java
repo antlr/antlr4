@@ -31,11 +31,7 @@ package org.antlr.v4.misc;
 
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /** */
 public class Utils {
@@ -176,7 +172,7 @@ public class Utils {
 		if ( list==null ) return null;
 		List<To> b = new ArrayList<To>();
 		for (From f : list) {
-			b.add(method.exec(f));
+			b.add(selector.exec(f));
 		}
 		return b;
 	}
