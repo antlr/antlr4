@@ -56,7 +56,7 @@ public class DefaultANTLRTreeGrammarErrorStrategy implements ANTLRErrorStrategy 
 	}
 
 	@Override
-	public void recover(BaseRecognizer recognizer) {
+	public void recover(BaseRecognizer recognizer, RecognitionException e) {
 		throw new RecognitionException(recognizer,
 									   recognizer.getInputStream(),
 									   recognizer._ctx);
