@@ -38,7 +38,7 @@ public class SemPred extends Action {
 
 	public SemPred(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		this.msg = ((PredAST)ast).getOption("msg");
+		this.msg = ((PredAST)ast).getOption("fail");
 		if ( msg==null ) {
 			msg = "failed predicate: "+ast.getText();
 		}
