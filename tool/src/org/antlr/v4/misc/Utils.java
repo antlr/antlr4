@@ -45,6 +45,14 @@ public class Utils {
 		boolean select(T t);
 	}
 
+	public interface Func0<TResult> {
+		TResult exec();
+	}
+
+	public interface Func1<T1, TResult> {
+		TResult exec(T1 arg1);
+	}
+
 	static Integer[] ints = new Integer[INTEGER_POOL_MAX_VALUE+1];
 
 	/** Integer objects are immutable so share all Integers with the
@@ -103,7 +111,7 @@ public class Utils {
 		uses regex (I only want to play with strings anyway).
 	*/
 	public static String replace(String src, String replacee, String replacer) {
-		StringBuffer result = new StringBuffer(src.length() + 50);
+		StringBuilder result = new StringBuilder(src.length() + 50);
 		int startIndex = 0;
 		int endIndex = src.indexOf(replacee);
 		while(endIndex != -1) {
@@ -122,7 +130,7 @@ public class Utils {
 		String lines[] = s.split("\n");
 		Arrays.sort(lines);
 		List<String> linesL = Arrays.asList(lines);
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (String l : linesL) {
 			buf.append(l);
 			buf.append('\n');
@@ -164,17 +172,11 @@ public class Utils {
 	/** apply methodName to list and return list of results. method has
 	 *  no args.  This pulls data out of a list essentially.
 	 */
-	public static <From,To> List<To> apply(List<From> list, String methodName) {
+	public static <From,To> List<To> select(List<From> list, Func1<From, To> selector) {
 		if ( list==null ) return null;
 		List<To> b = new ArrayList<To>();
 		for (From f : list) {
-			try {
-				Method m = f.getClass().getMethod(methodName, (Class[])null);
-				b.add( (To)m.invoke(f, (Object[])null) );
-			}
-			catch (Exception e) {
-				e.printStackTrace(System.err);
-			}
+			b.add(method.exec(f));
 		}
 		return b;
 	}
@@ -200,6 +202,16 @@ public class Utils {
 			if ( filter.select(elems.get(i)) ) return i;
 		}
 		return -1;
+	}
+
+	public static void setSize(List<?> list, int size) {
+		if (size < list.size()) {
+			list.subList(size, list.size()).clear();
+		} else {
+			while (size > list.size()) {
+				list.add(null);
+			}
+		}
 	}
 
 }
