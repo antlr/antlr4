@@ -130,7 +130,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalSemPredOptions =
 		new HashSet<String>() {
 			{
-				add("msg");
+				add("fail");
 			}
 		};
 
