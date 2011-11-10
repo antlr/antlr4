@@ -204,9 +204,12 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 		throws RecognitionException
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
-		String msg = "rule "+ruleName+" failed predicate: {"+
-		e.predicateText+"}?";
-		recognizer.notifyListeners(e.offendingToken, msg, e);
+		String msg = "rule "+ruleName+" "+e.msg;
+		recognizer.notifyListeners(curToken(recognizer), msg, e);
+	}
+
+	private Token curToken(BaseRecognizer recognizer) {
+		return ((TokenStream)recognizer.getInputStream()).LT(1);
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {

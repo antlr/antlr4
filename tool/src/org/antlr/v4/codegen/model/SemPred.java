@@ -30,9 +30,17 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.*;
 
 /** */
 public class SemPred extends Action {
-	public SemPred(OutputModelFactory factory, GrammarAST ast) { super(factory,ast); }
+	public String msg; // user-specified in grammar option
+
+	public SemPred(OutputModelFactory factory, GrammarAST ast) {
+		super(factory,ast);
+		this.msg = ((PredAST)ast).getOption("msg");
+		if ( msg==null ) {
+			msg = "failed predicate: "+ast.getText();
+		}
+	}
 }

@@ -152,10 +152,10 @@ public void discoverSTRewrite(GrammarAST rew) { }
 public void discoverTreeRewrite(GrammarAST rew) { }
 
 public void ruleRef(GrammarAST ref, ActionAST arg) { }
-public void tokenRef(TerminalAST ref, GrammarAST options) { }
-public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
-public void stringRef(TerminalAST ref, GrammarAST options) { }
-public void wildcardRef(GrammarAST ref, GrammarAST options) { }
+public void tokenRef(TerminalAST ref) { }
+public void elementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST value) { }
+public void stringRef(TerminalAST ref) { }
+public void wildcardRef(GrammarAST ref) { }
 public void actionInAlt(ActionAST action) { }
 public void sempredInAlt(PredAST pred) { }
 public void label(GrammarAST op, GrammarAST ID, GrammarAST element) { }
@@ -165,9 +165,9 @@ public void bangOp(GrammarAST op, GrammarAST opnd) { }
 
 public void discoverRewrites(GrammarAST result) { }
 public void finishRewrites(GrammarAST result) { }
-public void rewriteTokenRef(TerminalAST ast, GrammarAST options, ActionAST arg) { }
+public void rewriteTokenRef(TerminalAST ast, ActionAST arg) { }
 public void rewriteTerminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
-public void rewriteStringRef(TerminalAST ast, GrammarAST options) { }
+public void rewriteStringRef(TerminalAST ast) { }
 public void rewriteRuleRef(GrammarAST ast) { }
 public void rewriteLabelRef(GrammarAST ast) { }
 public void rewriteAction(ActionAST ast) { }
@@ -224,6 +224,7 @@ optionValue returns [String v]
 @init {$v = $start.token.getText();}
     :   ID
     |   STRING_LITERAL
+    |	DOUBLE_QUOTE_STRING_LITERAL
     |   INT
     |   STAR
     ;
@@ -352,11 +353,14 @@ element
 	:	labeledElement
 	|	atom
 	|	subrule
-	|   ACTION				{actionInAlt((ActionAST)$ACTION);}
-	|   SEMPRED				{sempredInAlt((PredAST)$SEMPRED);}
+	|   ACTION						{actionInAlt((ActionAST)$ACTION);}
+	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
+	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
+	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
+	
 	|	treeSpec
-	|	^(ROOT astOperand)	{rootOp($ROOT, $astOperand.start);}
-	|	^(BANG astOperand)	{bangOp($BANG, $astOperand.start);}
+	|	^(ROOT astOperand)			{rootOp($ROOT, $astOperand.start);}
+	|	^(BANG astOperand)			{bangOp($BANG, $astOperand.start);}
 	|	^(NOT blockSet)
 	|	^(NOT block)
 	|	DOWN_TOKEN
@@ -398,8 +402,8 @@ ebnfSuffix
 atom:	range
 	|	^(DOT ID terminal)
 	|	^(DOT ID ruleref)
-    |	^(WILDCARD elementOptions)	{wildcardRef($WILDCARD, $elementOptions.start);}
-    |	WILDCARD					{wildcardRef($WILDCARD, null);}
+    |	^(WILDCARD elementOptions)	{wildcardRef($WILDCARD);}
+    |	WILDCARD					{wildcardRef($WILDCARD);}
     |   terminal
     |	blockSet
     |   ruleref
@@ -410,12 +414,12 @@ blockSet
 	;
 
 setElement
-	:	STRING_LITERAL	{stringRef((TerminalAST)$STRING_LITERAL, null);}
-	|	TOKEN_REF		{tokenRef((TerminalAST)$TOKEN_REF, null);}
+	:	STRING_LITERAL	{stringRef((TerminalAST)$STRING_LITERAL);}
+	|	TOKEN_REF		{tokenRef((TerminalAST)$TOKEN_REF);}
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
 		{
-		stringRef((TerminalAST)$a, null);
-		stringRef((TerminalAST)$b, null);
+		stringRef((TerminalAST)$a);
+		stringRef((TerminalAST)$b);
 		}
 	;
 
@@ -437,20 +441,21 @@ range
 
 terminal
     :  ^(STRING_LITERAL elementOptions)
-    								{stringRef((TerminalAST)$STRING_LITERAL, $elementOptions.start);}
-    |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL, null);}
-    |	^(TOKEN_REF elementOptions)	{tokenRef((TerminalAST)$TOKEN_REF, $elementOptions.start);}
-    |	TOKEN_REF	    			{tokenRef((TerminalAST)$TOKEN_REF, null);}
+    								{stringRef((TerminalAST)$STRING_LITERAL);}
+    |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL);}
+    |	^(TOKEN_REF elementOptions)	{tokenRef((TerminalAST)$TOKEN_REF);}
+    |	TOKEN_REF	    			{tokenRef((TerminalAST)$TOKEN_REF);}
     ;
 
 elementOptions
-    :	^(ELEMENT_OPTIONS elementOption[(TerminalAST)$start.getParent()]+)
+    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]+)
     ;
 
-elementOption[TerminalAST t]
-    :	ID								{terminalOption(t, $ID, null);}
-    |   ^(ASSIGN id=ID v=ID)			{terminalOption(t, $id, $v);}
-    |   ^(ASSIGN ID v=STRING_LITERAL)	{terminalOption(t, $ID, $v);}
+elementOption[GrammarASTWithOptions t]
+    :	ID								{elementOption(t, $ID, null);}
+    |   ^(ASSIGN id=ID v=ID)			{elementOption(t, $id, $v);}
+    |   ^(ASSIGN ID v=STRING_LITERAL)	{elementOption(t, $ID, $v);}
+    |   ^(ASSIGN ID v=DOUBLE_QUOTE_STRING_LITERAL)	{elementOption(t, $ID, $v);}
     ;
 
 rewrite
@@ -487,16 +492,16 @@ rewriteTreeElement
 
 rewriteTreeAtom
     :   ^(TOKEN_REF rewriteElementOptions ARG_ACTION)
-    	{rewriteTokenRef((TerminalAST)$start,$rewriteElementOptions.start,(ActionAST)$ARG_ACTION);}
+    	{rewriteTokenRef((TerminalAST)$start,(ActionAST)$ARG_ACTION);}
     |   ^(TOKEN_REF rewriteElementOptions)
-    	{rewriteTokenRef((TerminalAST)$start,$rewriteElementOptions.start,null);}
+    	{rewriteTokenRef((TerminalAST)$start,null);}
     |   ^(TOKEN_REF ARG_ACTION)
-    	{rewriteTokenRef((TerminalAST)$start,null,(ActionAST)$ARG_ACTION);}
-	|   TOKEN_REF							{rewriteTokenRef((TerminalAST)$start,null,null);}
+    	{rewriteTokenRef((TerminalAST)$start,(ActionAST)$ARG_ACTION);}
+	|   TOKEN_REF							{rewriteTokenRef((TerminalAST)$start,null);}
     |   RULE_REF							{rewriteRuleRef($start);}
 	|   ^(STRING_LITERAL rewriteElementOptions)
-		{rewriteStringRef((TerminalAST)$start,$rewriteElementOptions.start);}
-	|   STRING_LITERAL						{rewriteStringRef((TerminalAST)$start,null);}
+		{rewriteStringRef((TerminalAST)$start);}
+	|   STRING_LITERAL						{rewriteStringRef((TerminalAST)$start);}
 	|   LABEL								{rewriteLabelRef($start);}
 	|	ACTION								{rewriteAction((ActionAST)$start);}
 	;

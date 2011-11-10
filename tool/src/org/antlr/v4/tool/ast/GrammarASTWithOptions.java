@@ -30,9 +30,9 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.misc.CharSupport;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class GrammarASTWithOptions extends GrammarAST {
     protected Map<String, String> options;
@@ -49,6 +49,9 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 
     public void setOption(String key, String value) {
         if ( options==null ) options = new HashMap<String, String>();
+		if ( value.startsWith("'") || value.startsWith("\"") ) {
+			value = CharSupport.getStringFromGrammarStringLiteral(value);
+		}
         options.put(key, value);
     }
 

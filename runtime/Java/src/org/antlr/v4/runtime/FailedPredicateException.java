@@ -28,31 +28,29 @@
  */
 package org.antlr.v4.runtime;
 
+import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.atn.*;
+
 /** A semantic predicate failed during validation.  Validation of predicates
  *  occurs when normally parsing the alternative just like matching a token.
- *  Disambiguating predicate evaluation occurs when we hoist a predicate into
- *  a prediction decision.
+ *  Disambiguating predicate evaluation occurs when we test a predicate during
+ *  prediction.
  */
 public class FailedPredicateException extends RecognitionException {
-	public String ruleName;
-	public String predicateText;
+	public int ruleIndex;
+	public int predIndex;
+	public String msg;
 
-	public FailedPredicateException(BaseRecognizer recognizer, String predText) {
-		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		this.predicateText = predText;
+	public FailedPredicateException(BaseRecognizer recognizer) {
+		this(recognizer, null);
 	}
 
-//	public FailedPredicateException(BaseRecognizer  recognizer,
-//									IntStream input,
-//									String ruleName,
-//									String predicateText)
-//	{
-//		super(recognizer, input, recognizer._ctx);
-//		this.ruleName = ruleName;
-//		this.predicateText = predicateText;
-//	}
-
-	public String toString() {
-		return "FailedPredicateException("+ruleName+",{"+predicateText+"}?)";
+	public FailedPredicateException(BaseRecognizer recognizer, @Nullable String msg) {
+		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
+		ATNState s = recognizer._interp.atn.states.get(recognizer._ctx.s);
+		PredicateTransition trans = (PredicateTransition)s.transition(0);
+		ruleIndex = trans.ruleIndex;
+		predIndex = trans.predIndex;
+		this.msg = msg;
 	}
 }

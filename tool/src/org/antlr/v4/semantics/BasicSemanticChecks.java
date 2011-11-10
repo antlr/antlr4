@@ -31,11 +31,8 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
@@ -127,6 +124,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			{
 				add(TerminalAST.defaultTokenOption);
 				add("associativity");
+			}
+		};
+
+	public static final Set<String> legalSemPredOptions =
+		new HashSet<String>() {
+			{
+				add("msg");
 			}
 		};
 
@@ -225,10 +229,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void terminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) {
+	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST value) {
 		String v = null;
 		if ( value!=null ) v = value.getText();
-		boolean ok = checkTokenOptions(ID, v);
+		boolean ok = checkElementOptions(elem, ID, v);
 //		if ( ok ) {
 //			if ( v!=null ) {
 //				t.setOption(ID.getText(), v);
@@ -268,7 +272,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void wildcardRef(GrammarAST ref, GrammarAST options) {
+	public void wildcardRef(GrammarAST ref) {
 		checkWildcardRoot(ref);
 	}
 
@@ -400,8 +404,30 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		return ok;
 	}
 
-	/** Check option is appropriate for token; parent is ELEMENT_OPTIONS */
-	boolean checkTokenOptions(GrammarAST ID, String value)	{
+	/** Check option is appropriate for elem; parent of ID is ELEMENT_OPTIONS */
+	boolean checkElementOptions(GrammarASTWithOptions elem, GrammarAST ID, String value) {
+		if ( elem instanceof TerminalAST ) {
+			return checkTokenOptions((TerminalAST)elem, ID, value);
+		}
+		if ( elem.getType()==ANTLRParser.ACTION ) {
+			return false;
+		}
+		if ( elem.getType()==ANTLRParser.SEMPRED ) {
+			Token optionID = ID.token;
+			String fileName = optionID.getInputStream().getSourceName();
+			if ( value!=null && !legalSemPredOptions.contains(optionID.getText()) ) {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+										   fileName,
+										   optionID,
+										   optionID.getText());
+				return false;
+			}
+		}
+		return false;
+	}
+
+
+	boolean checkTokenOptions(TerminalAST elem, GrammarAST ID, String value) {
 		Token optionID = ID.token;
 		String fileName = optionID.getInputStream().getSourceName();
 		// don't care about ID<ASTNodeName> options

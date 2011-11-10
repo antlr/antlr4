@@ -95,6 +95,8 @@ element returns [ATNFactory.Handle p]
 	|	subrule						{$p = $subrule.p;}
 	|   ACTION						{$p = factory.action((ActionAST)$ACTION);}
 	|   SEMPRED						{$p = factory.sempred((PredAST)$SEMPRED);}
+	|   ^(ACTION .)					{$p = factory.action((ActionAST)$ACTION);}
+	|   ^(SEMPRED .)				{$p = factory.sempred((PredAST)$SEMPRED);}
 	|	treeSpec					{$p = $treeSpec.p;}
 	|	^(ROOT a=astOperand)		{$p = $a.p;}
 	|	^(BANG a=astOperand)		{$p = $a.p;}

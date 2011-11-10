@@ -447,7 +447,8 @@ ForcedAction(a, chunks) ::= "<chunks>"
 ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks) ::= <<
-if (!(<chunks>)) throw new FailedPredicateException(this, "");
+setState(<p.stateNumber>);
+if (!(<chunks>)) throw new FailedPredicateException(this, "<p.msg>");
 >>
 
 ActionText(t) ::= "<t.text>"

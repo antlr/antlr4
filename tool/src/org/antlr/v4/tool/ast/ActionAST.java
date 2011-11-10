@@ -35,7 +35,7 @@ import org.antlr.v4.tool.AttributeResolver;
 
 import java.util.List;
 
-public class ActionAST extends GrammarAST implements RuleElementAST {
+public class ActionAST extends GrammarASTWithOptions implements RuleElementAST {
     // Alt, rule, grammar space
     public AttributeResolver resolver;
 	public List<Token> chunks; // useful for ANTLR IDE developers

@@ -29,26 +29,17 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.tree.TreeVisitor;
-import org.antlr.runtime.tree.TreeVisitorAction;
-import org.antlr.runtime.tree.TreeWizard;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.parse.TokenVocabParser;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.misc.*;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntSet;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.tool.ast.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
@@ -756,7 +747,7 @@ public class Grammar implements AttributeResolver {
 		final Set<String> strings = new HashSet<String>();
 		GrammarTreeVisitor collector = new GrammarTreeVisitor() {
 			@Override
-			public void stringRef(TerminalAST ref, GrammarAST options) {
+			public void stringRef(TerminalAST ref) {
 				strings.add(ref.getText());
 			}
 		};

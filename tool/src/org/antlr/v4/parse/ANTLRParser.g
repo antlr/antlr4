@@ -276,8 +276,10 @@ optionValue
 
     | // The value is a long string
       //
-      STRING_LITERAL<TerminalAST>
+      STRING_LITERAL
 
+	| DOUBLE_QUOTE_STRING_LITERAL
+	
     | // The value was an integer number
       //
       INT
@@ -594,8 +596,7 @@ element
 		|				-> atom
 		)
 	|	ebnf
-	|   ACTION<ActionAST>
-	|   SEMPRED -> SEMPRED<PredAST>
+	|	actionElement
 	|   treeSpec
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT<AltAST> treeSpec ) ) )
 		|				-> treeSpec
@@ -628,20 +629,24 @@ element
         recover(input,re);
 	}
 
+actionElement
+@after {
+	GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.ELEMENT_OPTIONS);
+	if ( options!=null ) {
+		Grammar.setNodeOptions($tree, options);
+	}
+}
+	:	ACTION<ActionAST>
+	|   ACTION elementOptions	-> ^(ACTION<ActionAST> elementOptions)
+	|   SEMPRED<PredAST>
+	|   SEMPRED elementOptions	-> ^(SEMPRED<PredAST> elementOptions)
+	;
+
 labeledElement
 	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
 		(	atom						-> ^($ass id atom)
 		|	block (op=ROOT|op=BANG)?	-> {$op!=null}? ^($ass id ^($op block))
 										->				^($ass id block)
-/*
-		|	{buildAST}? blockSet
-			{
-			RecognitionException e =
-				new v4ParserException("can't  '"+
-									  input.LT(1).getText()+" "+input.LT(2).getText()+"'", input);
-			reportError(missingSemi);
-			}
-*/
 		)
 	;
 
@@ -710,14 +715,6 @@ ebnfSuffix
 	;
 
 atom
-@after {
-	if ( $tree.getType()==DOT ) {
-		GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
-		if ( options!=null ) {
-			Grammar.setNodeOptions($tree, options);
-		}
-	}
-}
 	:	// Qualified reference delegate.rule. This must be
 	    // lexically contiguous (no spaces either side of the DOT)
 	    // otherwise it is two references with a wildcard in between
@@ -736,7 +733,18 @@ atom
 	|	terminal (ROOT^ | BANG^)?
     |   ruleref
     |	notSet   (ROOT^|BANG^)?
-	|   // Wildcard '.' means any character in a lexer, any
+    |	wildcard
+    ;
+    catch [RecognitionException re] { throw re; } // pass upwards to element
+
+wildcard
+@after {
+	GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.ELEMENT_OPTIONS);
+	if ( options!=null ) {
+		Grammar.setNodeOptions($tree, options);
+	}
+}
+	:	// Wildcard '.' means any character in a lexer, any
 		// token in parser and any node or subtree in a tree parser
 		// Because the terminal rule is allowed to be the node
 		// specification for the start of a tree rule, we must
@@ -744,9 +752,8 @@ atom
 	    DOT elementOptions?	(astop=ROOT|astop=BANG)?
 	    -> {astop!=null}?	^($astop ^(WILDCARD<TerminalAST>[$DOT] elementOptions?))
 	    -> 					^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
-    ;
-    catch [RecognitionException re] { throw re; } // pass upwards to element
-
+	;
+	
 // --------------------
 // Inverted element set
 //
@@ -827,7 +834,7 @@ if ( options!=null ) {
 	Grammar.setNodeOptions($tree, options);
 }
 }
-    :   TOKEN_REF elementOptions?		-> ^(TOKEN_REF<TerminalAST> elementOptions?)
+	:   TOKEN_REF elementOptions?		-> ^(TOKEN_REF<TerminalAST> elementOptions?)
 	|   STRING_LITERAL elementOptions?	-> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	;
 
@@ -837,14 +844,14 @@ elementOptions
     : LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption+)
     ;
 
-// WHen used with elements we can specify what the tree node type can
+// When used with elements we can specify what the tree node type can
 // be and also assign settings of various options  (which we do not check here)
 elementOption
-    : // This format indicates the default node option
+    : // This format indicates the default element option
       qid
 
     | // This format indicates option assignment
-      id ASSIGN^ (qid | STRING_LITERAL<TerminalAST>)
+      id ASSIGN^ (qid | STRING_LITERAL | DOUBLE_QUOTE_STRING_LITERAL)
     ;
 
 rewrite
@@ -897,7 +904,7 @@ rewriteTreeElement
 
 rewriteTreeAtom
 @after {
-GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.ELEMENT_OPTIONS);
 if ( options!=null ) {
 	Grammar.setNodeOptions($tree, options);
 }

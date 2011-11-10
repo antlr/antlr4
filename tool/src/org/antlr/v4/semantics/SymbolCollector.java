@@ -29,18 +29,11 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.AttributeDict;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LabelElementPair;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** Collects (create) rules, terminals, strings, actions, scopes etc... from AST
  *  side-effects: sets resolver field of asts for actions and
@@ -178,7 +171,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void stringRef(TerminalAST ref, GrammarAST options) {
+	public void stringRef(TerminalAST ref) {
 		terminals.add(ref);
 		strings.add(ref.getText());
 		if ( currentRule!=null ) {
@@ -187,7 +180,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void tokenRef(TerminalAST ref, GrammarAST options) {
+	public void tokenRef(TerminalAST ref) {
 		terminals.add(ref);
 		tokenIDRefs.add(ref);
 		if ( currentRule!=null ) {
@@ -211,12 +204,12 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void rewriteRuleRef(GrammarAST ast) { rewriteElements.add(ast);	}
 
 	@Override
-	public void rewriteStringRef(TerminalAST ast, GrammarAST options) {
+	public void rewriteStringRef(TerminalAST ast) {
 		 rewriteElements.add(ast);
 	}
 
 	@Override
-	public void rewriteTokenRef(TerminalAST ast, GrammarAST options, ActionAST arg) {
+	public void rewriteTokenRef(TerminalAST ast, ActionAST arg) {
 		rewriteElements.add(ast);
 		if ( arg!=null ) arg.resolver = currentRule.alt[currentOuterAltNumber];
 	}

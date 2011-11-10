@@ -109,6 +109,8 @@ element returns [List<? extends SrcOp> omos]
 	|	subrule							{$omos = $subrule.omos;}
 	|   ACTION							{$omos = controller.action($ACTION);}
 	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
+	|	^(ACTION elementOptions)		{$omos = controller.action($ACTION);}
+	|   ^(SEMPRED elementOptions)		{$omos = controller.sempred($SEMPRED);}
 	|	treeSpec						{$omos = DefaultOutputModelFactory.list($treeSpec.treeMatch);}
 	;
 
@@ -209,6 +211,7 @@ elementOption
     :	ID
     |   ^(ASSIGN ID ID)
     |   ^(ASSIGN ID STRING_LITERAL)
+    |   ^(ASSIGN ID DOUBLE_QUOTE_STRING_LITERAL)
     ;
 
 // R E W R I T E  S T U F F
