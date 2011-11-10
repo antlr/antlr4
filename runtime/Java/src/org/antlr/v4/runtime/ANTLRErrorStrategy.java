@@ -48,9 +48,11 @@ public interface ANTLRErrorStrategy {
 
 	/** Resynchronize the parser by consuming tokens until we find one
 	 *  in the resynchronization set--loosely the set of tokens that can follow
-	 *  the current rule.
+	 *  the current rule. The exception contains info you might want to
+	 *  use to recover better.
 	 */
-	void recover(BaseRecognizer recognizer);
+	void recover(BaseRecognizer recognizer,
+				 RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN. You can call this

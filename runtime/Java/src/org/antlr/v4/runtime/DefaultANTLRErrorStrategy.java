@@ -103,7 +103,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	 *  token that the match() routine could not recover from.
 	 */
 	@Override
-	public void recover(BaseRecognizer recognizer) {
+	public void recover(BaseRecognizer recognizer, RecognitionException e) {
 //		System.out.println("recover in "+recognizer.getRuleInvocationStack()+
 //						   " index="+recognizer.getInputStream().index()+
 //						   ", lastErrorIndex="+
