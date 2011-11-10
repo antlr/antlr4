@@ -70,8 +70,8 @@ import java.util.*;
  * TODO: 1 action per lex rule
  */
 public class BasicSemanticChecks extends GrammarTreeVisitor {
-	public static final Set legalLexerOptions =
-		new HashSet() {
+	public static final Set<String> legalLexerOptions =
+		new HashSet<String>() {
 			{
 				add("language"); add("tokenVocab");
 				add("TokenLabelType");
@@ -83,8 +83,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
-	public static final Set legalParserOptions =
-		new HashSet() {
+	public static final Set<String> legalParserOptions =
+		new HashSet<String>() {
 			{
 				add("language"); add("tokenVocab");
 				add("output"); add("rewrite"); add("ASTLabelType");
@@ -96,8 +96,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
-	public static final Set legalTreeParserOptions =
-		new HashSet() {
+	public static final Set<String> legalTreeParserOptions =
+		new HashSet<String>() {
 			{
 				add("language"); add("tokenVocab");
 				add("output"); add("rewrite"); add("ASTLabelType");
@@ -110,20 +110,20 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
-	public static final Set legalRuleOptions =
-		new HashSet() {
+	public static final Set<String> legalRuleOptions =
+		new HashSet<String>() {
 			{
 				add("k"); add("greedy"); add("memoize");
 				add("backtrack"); add("strategy");
 			}
 		};
 
-	public static final Set legalBlockOptions =
-		new HashSet() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
+	public static final Set<String> legalBlockOptions =
+		new HashSet<String>() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
 
 	/** Legal options for terminal refs like ID<node=MyVarNode> */
-	public static final Set legalTokenOptions =
-		new HashSet() {
+	public static final Set<String> legalTokenOptions =
+		new HashSet<String>() {
 			{
 				add(TerminalAST.defaultTokenOption);
 				add("associativity");

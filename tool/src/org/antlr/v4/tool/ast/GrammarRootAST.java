@@ -37,8 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GrammarRootAST extends GrammarASTWithOptions {
-    public static final Map defaultOptions =
-            new HashMap() {
+    public static final Map<String, String> defaultOptions =
+            new HashMap<String, String>() {
                 {
                     put("language","Java");
                 }
