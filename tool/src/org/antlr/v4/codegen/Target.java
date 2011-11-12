@@ -224,7 +224,7 @@ public class Target {
 	}
 
 	public String getTargetStringLiteralFromString(String s) {
-		return getTargetStringLiteralFromString(s, false);
+		return getTargetStringLiteralFromString(s, true);
 	}
 
 	/** Convert from an ANTLR string literal found in a grammar file to
