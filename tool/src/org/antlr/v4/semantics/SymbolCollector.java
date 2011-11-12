@@ -100,7 +100,8 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void discoverRule(RuleAST rule, GrammarAST ID,
 							 List<GrammarAST> modifiers, ActionAST arg,
 							 ActionAST returns, GrammarAST thrws,
-							 GrammarAST options, List<GrammarAST> actions,
+							 GrammarAST options, GrammarAST locals,
+							 List<GrammarAST> actions,
 							 GrammarAST block)
 	{
 		int numAlts = block.getChildCount();
@@ -111,16 +112,22 @@ public class SymbolCollector extends GrammarTreeVisitor {
 		currentRule = r;
 
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypeList(arg.getText());
+			r.args = ScopeParser.parseTypedArgList(arg.getText());
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[currentOuterAltNumber];
 		}
 
 		if ( returns!=null ) {
-			r.retvals = ScopeParser.parseTypeList(returns.getText());
+			r.retvals = ScopeParser.parseTypedArgList(returns.getText());
 			r.retvals.type = AttributeDict.DictType.RET;
 			r.retvals.ast = returns;
+		}
+
+		if ( locals!=null ) {
+			r.locals = ScopeParser.parseTypedArgList(locals.getText());
+			r.locals.type = AttributeDict.DictType.LOCAL;
+			r.locals.ast = returns;
 		}
 
 		for (GrammarAST a : actions) {
@@ -217,5 +224,32 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	@Override
 	public void rewriteAction(ActionAST ast) {
 		ast.resolver = currentRule.alt[currentOuterAltNumber];
+	}
+
+	@Override
+	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
+		setActionResolver(valueAST);
+	}
+
+	@Override
+	public void ruleOption(GrammarAST ID, GrammarAST valueAST) {
+		setActionResolver(valueAST);
+	}
+
+	@Override
+	public void blockOption(GrammarAST ID, GrammarAST valueAST) {
+		setActionResolver(valueAST);
+	}
+
+	@Override
+	public void elementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST valueAST) {
+		setActionResolver(valueAST);
+	}
+
+	/** In case of option id={...}, set resolve in case they use $foo */
+	private void setActionResolver(GrammarAST valueAST) {
+		if ( valueAST instanceof ActionAST) {
+			((ActionAST)valueAST).resolver = currentRule.alt[currentOuterAltNumber];
+		}
 	}
 }

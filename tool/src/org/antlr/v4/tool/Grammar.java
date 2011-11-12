@@ -511,7 +511,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public void importTokensFromTokensFile() {
-		String vocab = getOption("tokenVocab");
+		String vocab = getOptionString("tokenVocab");
 		if ( vocab!=null ) {
 			TokenVocabParser vparser = new TokenVocabParser(tool, vocab);
 			Map<String,Integer> tokens = vparser.load();
@@ -666,16 +666,17 @@ public class Grammar implements AttributeResolver {
         }
 	}
 
-	public String getOption(String key) { return ast.getOption(key); }
+	public String getOptionString(String key) { return ast.getOptionString(key); }
+	public GrammarAST getOption(String key) { return ast.getOption(key); }
 
-	public String getOption(String key, String defaultValue) {
-		String v = ast.getOption(key);
+	public String getOptionString(String key, String defaultValue) {
+		String v = ast.getOptionString(key);
 		if ( v!=null ) return v;
 		return defaultValue;
 	}
 
 	public boolean hasASTOption() {
-		String outputOption = getOption("output");
+		String outputOption = getOptionString("output");
 		return outputOption!=null && outputOption.equals("AST");
 	}
 
@@ -707,7 +708,7 @@ public class Grammar implements AttributeResolver {
 		for (Object o : options.getChildren()) {
 			GrammarAST c = (GrammarAST)o;
 			if ( c.getType()==ANTLRParser.ASSIGN ) {
-				t.setOption(c.getChild(0).getText(), c.getChild(1).getText());
+				t.setOption(c.getChild(0).getText(), (GrammarAST)c.getChild(1));
 			}
 			else {
 				t.setOption(c.getText(), null); // no arg such as ID<VarNodeType>

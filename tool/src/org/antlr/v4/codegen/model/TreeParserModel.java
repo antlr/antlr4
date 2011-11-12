@@ -36,6 +36,6 @@ public class TreeParserModel extends Parser {
 	public TreeParserModel(OutputModelFactory factory, ParserFile file) {
 		super(factory, file);
 		Grammar g = factory.getGrammar();
-		superclass = g.getOption("superClass", "TreeParser");
+		superclass = g.getOptionString("superClass", "TreeParser");
 	}
 }

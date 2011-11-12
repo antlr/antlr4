@@ -33,8 +33,7 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /** */
 public class ParserFile extends OutputModelObject {
@@ -49,8 +48,8 @@ public class ParserFile extends OutputModelObject {
 		super(factory);
 		this.fileName = fileName;
 		Grammar g = factory.getGrammar();
-		TokenLabelType = g.getOption("TokenLabelType");
-		ASTLabelType = g.getOption("ASTLabelType", "CommonAST");
+		TokenLabelType = g.getOptionString("TokenLabelType");
+		ASTLabelType = g.getOptionString("ASTLabelType", "CommonAST");
 		namedActions = new HashMap<String, Action>();
 		for (String name : g.namedActions.keySet()) {
 			GrammarAST ast = g.namedActions.get(name);

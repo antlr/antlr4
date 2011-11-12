@@ -173,7 +173,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
-		checkTreeFilterOptions(root, g.ast.getOptions());
+		checkTreeFilterOptions(root);
 	}
 
 	@Override
@@ -211,6 +211,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 							 List<GrammarAST> modifiers,
 							 ActionAST arg, ActionAST returns,
 							 GrammarAST thrws, GrammarAST options,
+							 GrammarAST locals,
 							 List<GrammarAST> actions, GrammarAST block)
 	{
 		// TODO: chk that all or no alts have "# label"
@@ -223,16 +224,15 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void grammarOption(GrammarAST ID, String value) {
-		boolean ok = checkOptions(g.ast, ID.token, value);
+	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
+		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
 	}
 
 	@Override
-	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST value) {
+	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
 		String v = null;
-		if ( value!=null ) v = value.getText();
-		boolean ok = checkElementOptions(elem, ID, v);
+		boolean ok = checkElementOptions(elem, ID, valueAST);
 //		if ( ok ) {
 //			if ( v!=null ) {
 //				t.setOption(ID.getText(), v);
@@ -246,29 +246,29 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	public void discoverAltWithRewrite(AltAST alt) {
 		GrammarAST firstNode = (GrammarAST)alt.getChild(0);
-		checkRewriteForMultiRootAltInTreeGrammar(g.ast.getOptions(),
+		checkRewriteForMultiRootAltInTreeGrammar(g.ast,
 												 firstNode.token,
 												 currentOuterAltNumber);
 	}
 
 	@Override
 	public void rootOp(GrammarAST op, GrammarAST opnd) {
-		checkASTOps(g.ast.getOptions(), op, opnd);
+		checkASTOps(g.ast, op, opnd);
 	}
 
 	@Override
 	public void bangOp(GrammarAST op, GrammarAST opnd) {
-		checkASTOps(g.ast.getOptions(), op, opnd);
+		checkASTOps(g.ast, op, opnd);
 	}
 
 	@Override
 	public void discoverTreeRewrite(GrammarAST rew) {
-		checkRewriteOk(g.ast.getOptions(), rew);
+		checkRewriteOk(g.ast, rew);
 	}
 
 	@Override
 	public void discoverSTRewrite(GrammarAST rew) {
-		checkRewriteOk(g.ast.getOptions(), rew);
+		checkRewriteOk(g.ast, rew);
 	}
 
 	@Override
@@ -371,7 +371,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	/** Check option is appropriate for grammar, rule, subrule */
 	boolean checkOptions(GrammarAST parent,
-						 Token optionID, String value)
+						 Token optionID, GrammarAST valueAST)
 	{
 		boolean ok = true;
 		if ( parent.getType()==ANTLRParser.BLOCK ) {
@@ -405,9 +405,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	/** Check option is appropriate for elem; parent of ID is ELEMENT_OPTIONS */
-	boolean checkElementOptions(GrammarASTWithOptions elem, GrammarAST ID, String value) {
+	boolean checkElementOptions(GrammarASTWithOptions elem, GrammarAST ID,
+								GrammarAST valueAST)
+	{
 		if ( elem instanceof TerminalAST ) {
-			return checkTokenOptions((TerminalAST)elem, ID, value);
+			return checkTokenOptions((TerminalAST)elem, ID, valueAST);
 		}
 		if ( elem.getType()==ANTLRParser.ACTION ) {
 			return false;
@@ -415,7 +417,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		if ( elem.getType()==ANTLRParser.SEMPRED ) {
 			Token optionID = ID.token;
 			String fileName = optionID.getInputStream().getSourceName();
-			if ( value!=null && !legalSemPredOptions.contains(optionID.getText()) ) {
+			if ( valueAST!=null && !legalSemPredOptions.contains(optionID.getText()) ) {
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 										   fileName,
 										   optionID,
@@ -427,11 +429,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 
-	boolean checkTokenOptions(TerminalAST elem, GrammarAST ID, String value) {
+	boolean checkTokenOptions(TerminalAST elem, GrammarAST ID, GrammarAST valueAST) {
 		Token optionID = ID.token;
 		String fileName = optionID.getInputStream().getSourceName();
 		// don't care about ID<ASTNodeName> options
-		if ( value!=null && !legalTokenOptions.contains(optionID.getText()) ) {
+		if ( valueAST!=null && !legalTokenOptions.contains(optionID.getText()) ) {
 			g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 									   fileName,
 									   optionID,
@@ -467,15 +469,15 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 *  that match either nodes or trees.
 	 */
 	void checkRewriteForMultiRootAltInTreeGrammar(
-		Map<String, String> options,
+		GrammarRootAST root,
 		Token altStart,
 		int alt)
 	{
 		if ( g.isTreeGrammar() &&
-			 options!=null && options.get("output")!=null &&
-			 options.get("output").equals("template") &&
-			 options.get("rewrite")!=null &&
-			 options.get("rewrite").equals("true") )
+			 root.getOptions()!=null && root.getOptionString("output")!=null &&
+			 root.getOptionString("output").equals("template") &&
+			 root.getOptionString("rewrite")!=null &&
+			 root.getOptionString("rewrite").equals("true") )
 		{
 			String fileName = altStart.getInputStream().getSourceName();
 			g.tool.errMgr.grammarError(ErrorType.REWRITE_FOR_MULTI_ELEMENT_ALT,
@@ -485,20 +487,20 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkASTOps(Map<String, String> options,
+	void checkASTOps(GrammarRootAST root,
 					 GrammarAST op,
 					 GrammarAST elementRoot)
 	{
 		RuleAST rule = (RuleAST)op.getAncestor(ANTLRParser.RULE);
 		String ruleName = rule.getChild(0).getText();
 		String fileName = elementRoot.token.getInputStream().getSourceName();
-		if ( options==null || !options.get("output").equals("AST") ) {
+		if ( root.getOptions()==null || !root.getOptionString("output").equals("AST") ) {
 			g.tool.errMgr.grammarError(ErrorType.AST_OP_WITH_NON_AST_OUTPUT_OPTION,
 									   fileName,
 									   elementRoot.token,
 									   op.getText());
 		}
-		if ( options!=null && options.get("output")==null ) {
+		if ( root.getOptions()!=null && root.getOptionString("output")==null ) {
 			g.tool.errMgr.grammarError(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
 									   fileName,
 									   elementRoot.token,
@@ -515,10 +517,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkRewriteOk(Map<String, String> options, GrammarAST elementRoot) {
+	void checkRewriteOk(GrammarRootAST root, GrammarAST elementRoot) {
 		String ruleName = currentRuleAST.getChild(0).getText();
 		String fileName = elementRoot.token.getInputStream().getSourceName();
-		if ( options!=null && options.get("output")==null ) {
+		if ( root.getOptions()!=null && root.getOptionString("output")==null ) {
 			g.tool.errMgr.grammarError(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
 									   fileName,
 									   elementRoot.token,
@@ -526,21 +528,19 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkTreeFilterOptions(GrammarRootAST root,
-								Map<String, String> options)
-	{
-		if ( options==null ) return;
+	void checkTreeFilterOptions(GrammarRootAST root) {
+		if ( root.getOptions()==null ) return;
 		String fileName = root.token.getInputStream().getSourceName();
-		String filter = options.get("filter");
+		String filter = root.getOptionString("filter");
 		if ( g.isTreeGrammar() && filter!=null && filter.equals("true") ) {
 			// check for conflicting options
 			// filter => backtrack=true (can't be false)
 			// filter&&output!=AST => error
 			// filter&&output=AST => rewrite=true
 			// any deviation from valid option set is an error
-			String backtrack = options.get("backtrack");
-			String output = options.get("output");
-			String rewrite = options.get("rewrite");
+			String backtrack = root.getOptionString("backtrack");
+			String output = root.getOptionString("output");
+			String rewrite = root.getOptionString("rewrite");
 			if ( backtrack!=null && !backtrack.toString().equals("true") ) {
 				g.tool.errMgr.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
 										   fileName,

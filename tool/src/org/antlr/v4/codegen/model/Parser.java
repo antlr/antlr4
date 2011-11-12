@@ -65,6 +65,6 @@ public class Parser extends OutputModelObject {
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
-		superclass = g.getOption("superClass", "Parser");
+		superclass = g.getOptionString("superClass", "Parser");
 	}
 }

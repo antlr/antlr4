@@ -271,22 +271,11 @@ optionValue
     : // If the option value is a single word that conforms to the
       // lexical rules of token or rule names, then the user may skip quotes
       // and so on. Many option values meet this description
-      //
       qid
-
-    | // The value is a long string
-      //
-      STRING_LITERAL
-
+    | STRING_LITERAL
 	| DOUBLE_QUOTE_STRING_LITERAL
-	
-    | // The value was an integer number
-      //
-      INT
-
-    | // Asterisk, used for things like k=*
-      //
-      STAR
+	| ACTION<ActionAST>
+    | INT
     ;
 
 // A list of grammars to which this grammar will delegate certain
@@ -849,9 +838,7 @@ elementOptions
 elementOption
     : // This format indicates the default element option
       qid
-
-    | // This format indicates option assignment
-      id ASSIGN^ (qid | STRING_LITERAL | DOUBLE_QUOTE_STRING_LITERAL)
+    | id ASSIGN^ optionValue
     ;
 
 rewrite

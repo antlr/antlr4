@@ -31,9 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.misc.DoubleKeyMap;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.runtime.tree.TreeVisitor;
-import org.antlr.runtime.tree.TreeVisitorAction;
+import org.antlr.runtime.tree.*;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.ast.*;
@@ -112,7 +110,7 @@ public class GrammarTransformPipeline {
 		List<String> rules = new ArrayList<String>();
 		rules.add( leftRecursiveRuleWalker.getArtificialPrecStartRule() ) ;
 
-		String outputOption = ast.getOption("output");
+		String outputOption = ast.getOptionString("output");
 		boolean buildAST = outputOption!=null && outputOption.equals("AST");
 
 		rules.add( leftRecursiveRuleWalker.getArtificialOpPrecRule(buildAST) );

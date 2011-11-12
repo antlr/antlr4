@@ -212,6 +212,7 @@ elementOption
     |   ^(ASSIGN ID ID)
     |   ^(ASSIGN ID STRING_LITERAL)
     |   ^(ASSIGN ID DOUBLE_QUOTE_STRING_LITERAL)
+    |   ^(ASSIGN ID ACTION)
     ;
 
 // R E W R I T E  S T U F F

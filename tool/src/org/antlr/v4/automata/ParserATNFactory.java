@@ -507,7 +507,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	public boolean isGreedy(BlockAST blkAST) {
 		boolean greedy = true;
-		String greedyOption = blkAST.getOption("greedy");
+		String greedyOption = blkAST.getOptionString("greedy");
 		if ( blockHasWildcardAlt(blkAST) || greedyOption!=null&&greedyOption.equals("false") ) {
 			greedy = false;
 		}

@@ -31,10 +31,8 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 
@@ -177,6 +175,130 @@ public class Target {
 		}
 		buf.append(digits);
 		return buf.toString();
+	}
+
+	/** Given a random string of Java unicode chars, return a new string with
+	 *  optionally appropriate quote characters for target language and possibly
+	 *  with some escaped characters.  For example, if the incoming string has
+	 *  actual newline characters, the output of this method would convert them
+	 *  to the two char sequence \n for Java, C, C++, ...  The new string has
+	 *  double-quotes around it as well.  Example String in memory:
+	 *
+	 *     a"[newlinechar]b'c[carriagereturnchar]d[tab]e\f
+	 *
+	 *  would be converted to the valid Java s:
+	 *
+	 *     "a\"\nb'c\rd\te\\f"
+	 *
+	 *  or
+	 *
+	 *     a\"\nb'c\rd\te\\f
+	 *
+	 *  depending on the quoted arg.
+	 */
+	public String getTargetStringLiteralFromString(String s, boolean quoted) {
+		if ( s==null ) {
+			return null;
+		}
+
+		StringBuffer buf = new StringBuffer();
+		if ( quoted ) {
+			buf.append('"');
+		}
+		for (int i=0; i<s.length(); i++) {
+			int c = s.charAt(i);
+			if ( c!='\'' && // don't escape single quotes in strings for java
+				 c<targetCharValueEscape.length &&
+				 targetCharValueEscape[c]!=null )
+			{
+				buf.append(targetCharValueEscape[c]);
+			}
+			else {
+				buf.append((char)c);
+			}
+		}
+		if ( quoted ) {
+			buf.append('"');
+		}
+		return buf.toString();
+	}
+
+	public String getTargetStringLiteralFromString(String s) {
+		return getTargetStringLiteralFromString(s, false);
+	}
+
+	/** Convert from an ANTLR string literal found in a grammar file to
+	 *  an equivalent string literal in the target language.  For Java, this
+	 *  is the translation 'a\n"' -> "a\n\"".  Expect single quotes
+	 *  around the incoming literal.  Just flip the quotes and replace
+	 *  double quotes with \"
+     *
+     *  Note that we have decided to allow poeple to use '\"' without
+     *  penalty, so we must build the target string in a loop as Utils.replae
+     *  cannot handle both \" and " without a lot of messing around.
+     *
+	 */
+	public String getTargetStringLiteralFromANTLRStringLiteral(
+		CodeGenerator generator,
+		String literal)
+	{
+        StringBuilder sb = new StringBuilder();
+        StringBuffer is = new StringBuffer(literal);
+
+        // Opening quote
+        //
+        sb.append('"');
+
+        for (int i = 1; i < is.length() -1; i++) {
+            if  (is.charAt(i) == '\\') {
+                // Anything escaped is what it is! We assume that
+                // people know how to escape characters correctly. However
+                // we catch anything that does not need an escape in Java (which
+                // is what the default implementation is dealing with and remove
+                // the escape. The C target does this for instance.
+                //
+                switch (is.charAt(i+1)) {
+                    // Pass through any escapes that Java also needs
+                    //
+                    case    '"':
+                    case    'n':
+                    case    'r':
+                    case    't':
+                    case    'b':
+                    case    'f':
+                    case    '\\':
+                    case    'u':    // Assume unnnn
+                        sb.append('\\');    // Pass the escape through
+                        break;
+                    default:
+                        // Remove the escape by virtue of not adding it here
+                        // Thus \' becomes ' and so on
+                        //
+                        break;
+                }
+
+                // Go past the \ character
+                //
+                i++;
+            } else {
+                // Chracters that don't need \ in ANTLR 'strings' but do in Java
+                //
+                if (is.charAt(i) == '"') {
+                    // We need to escape " in Java
+                    //
+                    sb.append('\\');
+                }
+            }
+            // Add in the next character, which may have been escaped
+            //
+            sb.append(is.charAt(i));
+        }
+
+        // Append closing " and return
+        //
+        sb.append('"');
+
+		return sb.toString();
 	}
 
 	/** Assume 16-bit char */

@@ -122,9 +122,9 @@ public void discoverGrammar(GrammarRootAST root, GrammarAST ID) { }
 public void finishPrequels(GrammarAST firstPrequel) { }
 public void finishGrammar(GrammarRootAST root, GrammarAST ID) { }
 
-public void grammarOption(GrammarAST ID, String value) { }
-public void ruleOption(GrammarAST ID, String value) { }
-public void blockOption(GrammarAST ID, String value) { }
+public void grammarOption(GrammarAST ID, GrammarAST valueAST) { }
+public void ruleOption(GrammarAST ID, GrammarAST valueAST) { }
+public void blockOption(GrammarAST ID, GrammarAST valueAST) { }
 public void tokenAlias(GrammarAST ID, GrammarAST literal) { }
 public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) { }
 public void importGrammar(GrammarAST label, GrammarAST ID) { }
@@ -135,7 +135,8 @@ public void discoverRules(GrammarAST rules) { }
 public void finishRules(GrammarAST rule) { }
 public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
 						 ActionAST arg, ActionAST returns, GrammarAST thrws,
-						 GrammarAST options, List<GrammarAST> actions,
+						 GrammarAST options, GrammarAST locals,
+						 List<GrammarAST> actions,
 						 GrammarAST block) { }
 public void finishRule(GrammarAST rule, GrammarAST ID, GrammarAST block) { }
 public void ruleCatch(GrammarAST arg, ActionAST action) { }
@@ -153,7 +154,7 @@ public void discoverTreeRewrite(GrammarAST rew) { }
 
 public void ruleRef(GrammarAST ref, ActionAST arg) { }
 public void tokenRef(TerminalAST ref) { }
-public void elementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST value) { }
+public void elementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST valueAST) { }
 public void stringRef(TerminalAST ref) { }
 public void wildcardRef(GrammarAST ref) { }
 public void actionInAlt(ActionAST action) { }
@@ -212,11 +213,11 @@ option
 boolean rule = inContext("RULE ...");
 boolean block = inContext("BLOCK ...");
 }
-    :   ^(a=ASSIGN ID optionValue)
+    :   ^(a=ASSIGN ID v=optionValue)
     	{
-    	if ( block ) blockOption($ID, $optionValue.v); // most specific first
-    	else if ( rule ) ruleOption($ID, $optionValue.v);
-    	else grammarOption($ID, $optionValue.v);
+    	if ( block ) blockOption($ID, $v.start); // most specific first
+    	else if ( rule ) ruleOption($ID, $v.start);
+    	else grammarOption($ID, $v.start);
     	}
     ;
 
@@ -226,7 +227,6 @@ optionValue returns [String v]
     |   STRING_LITERAL
     |	DOUBLE_QUOTE_STRING_LITERAL
     |   INT
-    |   STAR
     ;
 
 delegateGrammars
@@ -274,7 +274,9 @@ currentOuterAltNumber=0;
 		    )*
       		{discoverRule((RuleAST)$RULE, $ID, mods, (ActionAST)$ARG_ACTION,
       					  $ret.start!=null?(ActionAST)$ret.start.getChild(0):null,
-      					  $thr.start, $opts.start, actions, (GrammarAST)input.LT(1));}
+      					  $thr.start, $opts.start,
+      					  $loc.start!=null?(ActionAST)$loc.start.getChild(0):null,
+      					  actions, (GrammarAST)input.LT(1));}
       		ruleBlock exceptionGroup
       		{finishRule($RULE, $ID, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
       	 )
@@ -456,6 +458,7 @@ elementOption[GrammarASTWithOptions t]
     |   ^(ASSIGN id=ID v=ID)			{elementOption(t, $id, $v);}
     |   ^(ASSIGN ID v=STRING_LITERAL)	{elementOption(t, $ID, $v);}
     |   ^(ASSIGN ID v=DOUBLE_QUOTE_STRING_LITERAL)	{elementOption(t, $ID, $v);}
+    |   ^(ASSIGN ID v=ACTION)			{elementOption(t, $ID, $v);}
     ;
 
 rewrite

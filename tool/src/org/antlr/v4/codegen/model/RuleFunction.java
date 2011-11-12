@@ -30,15 +30,11 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.codegen.model.decl.StructDecl;
-import org.antlr.v4.codegen.model.decl.TreeParserStructDecl;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.*;
@@ -97,8 +93,8 @@ public class RuleFunction extends OutputModelObject {
 		if ( r.retvals!=null ) {
 			ruleCtx.addDecls(r.retvals.attributes.values());
 		}
-		if ( r.scope!=null ) {
-			ruleCtx.addDecls(r.scope.attributes.values());
+		if ( r.locals!=null ) {
+			ruleCtx.addDecls(r.locals.attributes.values());
 		}
 
 		ruleLabels = r.getElementLabelNames();

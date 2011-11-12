@@ -56,7 +56,7 @@ public class ScopeParser {
      *
      *  convert to an attribute scope.
      */
-    public static AttributeDict parseTypeList(String s) { return parse(s, ','); }
+    public static AttributeDict parseTypedArgList(String s) { return parse(s, ','); }
 
     public static AttributeDict parse(String s, char separator) {
         int i = 0;

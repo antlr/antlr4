@@ -30,12 +30,11 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.misc.CharSupport;
 
 import java.util.*;
 
 public abstract class GrammarASTWithOptions extends GrammarAST {
-    protected Map<String, String> options;
+    protected Map<String, GrammarAST> options;
 
 	public GrammarASTWithOptions(GrammarAST node) {
 		super(node);
@@ -47,15 +46,19 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
     public GrammarASTWithOptions(int type, Token t) { super(type, t); }
     public GrammarASTWithOptions(int type, Token t, String text) { super(type,t,text); }
 
-    public void setOption(String key, String value) {
-        if ( options==null ) options = new HashMap<String, String>();
-		if ( value.startsWith("'") || value.startsWith("\"") ) {
-			value = CharSupport.getStringFromGrammarStringLiteral(value);
-		}
-        options.put(key, value);
+    public void setOption(String key, GrammarAST node) {
+        if ( options==null ) options = new HashMap<String, GrammarAST>();
+//		if ( value.startsWith("'") || value.startsWith("\"") ) {
+//			value = CharSupport.getStringFromGrammarStringLiteral(value);
+//		}
+        options.put(key, node);
     }
 
-    public String getOption(String key) {
+	public String getOptionString(String key) {
+		return null;
+	}
+
+    public GrammarAST getOption(String key) {
         if ( options==null ) return null;
         return options.get(key);
     }
@@ -64,5 +67,5 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 		return options==null ? 0 : options.size();
 	}
 
-    public Map<String, String> getOptions() { return options; }
+    public Map<String, GrammarAST> getOptions() { return options; }
 }

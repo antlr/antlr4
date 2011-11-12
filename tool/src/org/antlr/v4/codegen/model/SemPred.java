@@ -29,18 +29,38 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.model.actions.ActionChunk;
 import org.antlr.v4.tool.ast.*;
+
+import java.util.List;
 
 /** */
 public class SemPred extends Action {
 	public String msg; // user-specified in grammar option
 
+	@ModelElement public List<ActionChunk> failChunks;
+
 	public SemPred(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		this.msg = ((PredAST)ast).getOption("fail");
-		if ( msg==null ) {
+		GrammarAST failNode = ((PredAST)ast).getOption("fail");
+		CodeGenerator gen = factory.getGenerator();
+		if ( failNode==null ) {
 			msg = "failed predicate: "+ast.getText();
+			msg = gen.target.getTargetStringLiteralFromString(msg);
+			return;
+		}
+
+		if ( failNode instanceof ActionAST ) {
+			ActionAST failActionNode = (ActionAST)failNode;
+			RuleFunction rf = factory.getCurrentRuleFunction();
+			failChunks = ActionTranslator.translateAction(factory, rf,
+														  failActionNode.token,
+														  failActionNode);
+		}
+		else {
+			msg = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
+																		  failNode.getText());
 		}
 	}
 }

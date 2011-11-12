@@ -412,7 +412,7 @@ setState(<m.stateNumber>); match(Token.UP);
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks:{e| <e>}>);
+setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -446,9 +446,9 @@ ForcedAction(a, chunks) ::= "<chunks>"
 
 ArgAction(a, chunks) ::= "<chunks>"
 
-SemPred(p, chunks) ::= <<
+SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
-if (!(<chunks>)) throw new FailedPredicateException(this, "<p.msg>");
+if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
 >>
 
 ActionText(t) ::= "<t.text>"
