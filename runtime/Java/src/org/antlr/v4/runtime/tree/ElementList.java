@@ -33,7 +33,7 @@ import java.util.*;
 
 /** This list tracks elements to left of -> for use on right of -> */
 public class ElementList<E> extends ArrayList<E> {
-	protected ASTAdaptor adaptor;
+	protected ASTAdaptor<E> adaptor;
 
 	/** Once a node / subtree has been used in a stream, it must be dup'd
 	 *  from then on.

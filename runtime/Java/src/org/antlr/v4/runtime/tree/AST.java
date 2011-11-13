@@ -31,7 +31,7 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Token;
 
-/** An abstract syntax tree built by ANTLR during a parse or tree parse. */
+/** An abstract syntax tree built by ANTLR during a parse. */
 public interface AST extends SyntaxTree {
 	/** Indicates the node is a nil node but may still have children, meaning
 	 *  the tree is a flat list.

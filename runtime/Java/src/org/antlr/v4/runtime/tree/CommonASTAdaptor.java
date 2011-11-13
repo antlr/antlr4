@@ -38,24 +38,25 @@ import org.antlr.v4.runtime.*;
  *  use your subclass.
  *
  *  To get your parser to build nodes of a different type, override
- *  create(Token), errorNode().
+ *  create(Token).
  */
-public class CommonASTAdaptor extends BaseASTAdaptor {
+public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 	/** Duplicate a node.  This is part of the factory;
 	 *	override if you want another kind of node to be built.
 	 *
 	 *  I could use reflection to prevent having to override this
 	 *  but reflection is slow.
 	 */
-	public Object dupNode(Object t) {
+	public CommonAST dupNode(CommonAST t) {
 		if ( t==null ) return null;
-		return new CommonAST((CommonAST)t);
-//		return ((Tree)t).dupNode();
+		return new CommonAST(t);
 	}
 
-	public Object create(Token payload) {
+	public CommonAST create(Token payload) {
 		return new CommonAST(payload);
 	}
+
+
 
 	/** Tell me how to create a token for use with imaginary token nodes.
 	 *  For example, there is probably no input symbol associated with imaginary
@@ -94,76 +95,73 @@ public class CommonASTAdaptor extends BaseASTAdaptor {
 	 *  seems like this will yield start=i and stop=i-1 in a nil node.
 	 *  Might be useful info so I'll not force to be i..i.
 	 */
-	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
+	public void setTokenBoundaries(CommonAST t, Token startToken, Token stopToken) {
 		if ( t==null ) return;
 		int start = 0;
 		int stop = 0;
 		if ( startToken!=null ) start = startToken.getTokenIndex();
 		if ( stopToken!=null ) stop = stopToken.getTokenIndex();
-		((CommonAST)t).setTokenStartIndex(start);
-		((CommonAST)t).setTokenStopIndex(stop);
+		t.setTokenStartIndex(start);
+		t.setTokenStopIndex(stop);
 	}
 
-	public int getTokenStartIndex(Object t) {
+	public int getTokenStartIndex(CommonAST t) {
 		if ( t==null ) return -1;
-		return ((CommonAST)t).getTokenStartIndex();
+		return t.getTokenStartIndex();
 	}
 
-	public int getTokenStopIndex(Object t) {
+	public int getTokenStopIndex(CommonAST t) {
 		if ( t==null ) return -1;
-		return ((CommonAST)t).getTokenStopIndex();
+		return t.getTokenStopIndex();
 	}
 
-	public String getText(Object t) {
+	public String getText(CommonAST t) {
 		if ( t==null ) return null;
-		return ((CommonAST)t).getText();
+		return t.getText();
 	}
 
-    public int getType(Object t) {
+    public int getType(CommonAST t) {
 		if ( t==null ) return Token.INVALID_TYPE;
-		return ((CommonAST)t).getType();
+		return t.getType();
 	}
 
 	/** What is the Token associated with this node?  If
 	 *  you are not using CommonAST, then you must
 	 *  override this in your own adaptor.
 	 */
-	public Token getToken(Object t) {
-		if ( t instanceof CommonAST) {
-			return ((CommonAST)t).getToken();
-		}
-		return null; // no idea what to do
+	public Token getToken(CommonAST t) {
+		return t.getToken();
 	}
 
-	public Object getChild(Object t, int i) {
+	public CommonAST getChild(CommonAST t, int i) {
 		if ( t==null ) return null;
-        return ((CommonAST)t).getChild(i);
+        return t.getChild(i);
     }
 
-    public int getChildCount(Object t) {
+    public int getChildCount(CommonAST t) {
 		if ( t==null ) return 0;
-        return ((CommonAST)t).getChildCount();
+        return t.getChildCount();
     }
 
-	public Object getParent(Object t) {
+	public CommonAST getParent(CommonAST t) {
 		if ( t==null ) return null;
-        return ((CommonAST)t).getParent();
+        return t.getParent();
 	}
 
-	public void setParent(Object t, Object parent) {
-        if ( t!=null ) ((CommonAST)t).setParent((CommonAST)parent);
+	public void setParent(CommonAST t, CommonAST parent) {
+        if ( t!=null ) t.setParent((CommonAST)parent);
 	}
 
-	public int getChildIndex(Object t) {
+	public int getChildIndex(CommonAST t) {
         if ( t==null ) return 0;
-		return ((CommonAST)t).getChildIndex();
+		return t.getChildIndex();
 	}
 
-	public void setChildIndex(Object t, int index) {
-        if ( t!=null ) ((CommonAST)t).setChildIndex(index);
+	public void setChildIndex(CommonAST t, int index) {
+        if ( t!=null ) t.setChildIndex(index);
 	}
 
-	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+	public void replaceChildren(CommonAST parent, int startChildIndex, int stopChildIndex, CommonAST t) {
 		if ( parent!=null ) {
 			Trees.replaceChildren((CommonAST)parent, startChildIndex, stopChildIndex, t);
 		}

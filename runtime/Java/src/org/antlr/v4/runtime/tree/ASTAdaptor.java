@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ import java.util.List;
  *  I do not need to know the type of a tree at all so they are all
  *  generic Objects.
  */
-public interface ASTAdaptor {
+public interface ASTAdaptor<T> {
 	// BEGIN new v4 stuff
 
 	// If not null root, add kids to it
@@ -51,7 +51,7 @@ public interface ASTAdaptor {
 	 *  are some kind of trees, but we generically use Object
 	 *  for tree types in ANTLR.
 	 */
-	public List<Object> createElementList();
+	public List<T> createElementList();
 
 	// END new v4 stuff
 
@@ -63,40 +63,24 @@ public interface ASTAdaptor {
 	 *
 	 *  Override if you want another kind of node to be built.
 	 */
-	public Object create(Token payload);
+	public T create(Token payload);
 
 	/** Duplicate a single tree node.
 	 *  Override if you want another kind of node to be built.
 	 */
-	public Object dupNode(Object treeNode);
+	public T dupNode(T treeNode);
 
 	/** Duplicate tree recursively, using dupNode() for each node */
-	public Object dupTree(Object tree);
+	public T dupTree(T tree);
 
 	/** Return a nil node (an empty but non-null node) that can hold
 	 *  a list of element as the children.  If you want a flat tree (a list)
 	 *  use "t=adaptor.nil(); t.addChild(x); t.addChild(y);"
 	 */
-	public Object nil();
-
-	/** Return a tree node representing an error.  This node records the
-	 *  tokens consumed during error recovery.  The start token indicates the
-	 *  input symbol at which the error was detected.  The stop token indicates
-	 *  the last symbol consumed during recovery.
-	 *
-	 *  You must specify the input stream so that the erroneous text can
-	 *  be packaged up in the error node.  The exception could be useful
-	 *  to some applications; default implementation stores ptr to it in
-	 *  the CommonErrorNode.
-	 *
-	 *  This only makes sense during token parsing, not tree parsing.
-	 *  Tree parsing should happen only when parsing and tree construction
-	 *  succeed.
-	 */
-	public Object errorNode(TokenStream input, Token start, Token stop, RecognitionException e);
+	public T nil();
 
 	/** Is tree considered a nil node used to make lists of child nodes? */
-	public boolean isNil(Object tree);
+	public boolean isNil(T tree);
 
 	/** Add a child to the tree t.  If child is a flat tree (a list), make all
 	 *  in list children of t.  Warning: if t has no children, but child does
@@ -105,7 +89,7 @@ public interface ASTAdaptor {
 	 *  make sure that this is consistent with have the user will build
 	 *  ASTs.  Do nothing if t or child is null.
 	 */
-	public void addChild(Object t, Object child);
+	public void addChild(T t, T child);
 
 	/** If oldRoot is a nil root, just copy or move the children to newRoot.
 	 *  If not a nil root, make oldRoot a child of newRoot.
@@ -133,7 +117,7 @@ public interface ASTAdaptor {
 	 *  constructing these nodes so we should have this control for
 	 *  efficiency.
 	 */
-	public Object becomeRoot(Object newRoot, Object oldRoot);
+	public T becomeRoot(T newRoot, T oldRoot);
 
 	/** Given the root of the subtree created for this rule, post process
 	 *  it to do any simplifications or whatever you want.  A required
@@ -148,7 +132,7 @@ public interface ASTAdaptor {
 	 *  This method is executed after all rule tree construction and right
 	 *  before setTokenBoundaries().
 	 */
-	public Object rulePostProcessing(Object root);
+	public T rulePostProcessing(T root);
 
 	/** For identifying trees.
 	 *
@@ -156,7 +140,7 @@ public interface ASTAdaptor {
 	 *  Even becomeRoot is an issue.  Use System.identityHashCode(node)
 	 *  usually.
 	 */
-	public int getUniqueID(Object node);
+	public int getUniqueID(T node);
 
 
 	// R e w r i t e  R u l e s
@@ -172,7 +156,7 @@ public interface ASTAdaptor {
 	 *  because it needs to trap calls to create, but it can't since it delegates
 	 *  to not inherits from the ASTAdaptor.
 	 */
-	public Object becomeRoot(Token newRoot, Object oldRoot);
+	public T becomeRoot(Token newRoot, T oldRoot);
 
 	/** Create a new node derived from a token, with a new token type.
 	 *  This is invoked from an imaginary node ref on right side of a
@@ -180,7 +164,7 @@ public interface ASTAdaptor {
 	 *
 	 *  This should invoke createToken(Token).
 	 */
-	public Object create(int tokenType, Token fromToken);
+	public T create(int tokenType, Token fromToken);
 
 	/** Same as create(tokenType,fromToken) except set the text too.
 	 *  This is invoked from an imaginary node ref on right side of a
@@ -188,7 +172,7 @@ public interface ASTAdaptor {
 	 *
 	 *  This should invoke createToken(Token).
 	 */
-	public Object create(int tokenType, Token fromToken, String text);
+	public T create(int tokenType, Token fromToken, String text);
 
 	/** Create a new node derived from a token, with a new token type.
 	 *  This is invoked from an imaginary node ref on right side of a
@@ -196,21 +180,21 @@ public interface ASTAdaptor {
 	 *
 	 *  This should invoke createToken(int,String).
 	 */
-	public Object create(int tokenType, String text);
+	public T create(int tokenType, String text);
 
 
 	// C o n t e n t
 
 	/** For tree parsing, I need to know the token type of a node */
-	public int getType(Object t);
+	public int getType(T t);
 
 	/** Node constructors can set the type of a node */
-	public void setType(Object t, int type);
+	public void setType(T t, int type);
 
-	public String getText(Object t);
+	public String getText(T t);
 
 	/** Node constructors can set the text of a node */
-	public void setText(Object t, String text);
+	public void setText(T t, String text);
 
 	/** Return the token object from which this node was created.
 	 *  Currently used only for printing an error message.
@@ -221,7 +205,7 @@ public interface ASTAdaptor {
 	 *  the appropriate information and pass that back.  See
 	 *  BaseRecognizer.getErrorMessage().
 	 */
-	public Token getToken(Object t);
+	public Token getToken(T t);
 
 	/** Where are the bounds in the input token stream for this node and
 	 *  all children?  Each rule that creates AST nodes will call this
@@ -229,42 +213,42 @@ public interface ASTAdaptor {
 	 *  still usually have a nil root node just to hold the children list.
 	 *  That node would contain the start/stop indexes then.
 	 */
-	public void setTokenBoundaries(Object t, Token startToken, Token stopToken);
+	public void setTokenBoundaries(T t, Token startToken, Token stopToken);
 
 	/** Get the token start index for this subtree; return -1 if no such index */
-	public int getTokenStartIndex(Object t);
+	public int getTokenStartIndex(T t);
 
 	/** Get the token stop index for this subtree; return -1 if no such index */
-	public int getTokenStopIndex(Object t);
+	public int getTokenStopIndex(T t);
 
 
 	// N a v i g a t i o n  /  T r e e  P a r s i n g
 
 	/** Get a child 0..n-1 node */
-	public Object getChild(Object t, int i);
+	public T getChild(T t, int i);
 
 	/** Set ith child (0..n-1) to t; t must be non-null and non-nil node */
-	public void setChild(Object t, int i, Object child);
+	public void setChild(T t, int i, T child);
 
 	/** Remove ith child and shift children down from right. */
-	public Object deleteChild(Object t, int i);
+	public T deleteChild(T t, int i);
 
 	/** How many children?  If 0, then this is a leaf node */
-	public int getChildCount(Object t);
+	public int getChildCount(T t);
 
 	/** Who is the parent node of this node; if null, implies node is root.
 	 *  If your node type doesn't handle this, it's ok but the tree rewrites
 	 *  in tree parsers need this functionality.
 	 */
-	public Object getParent(Object t);
-	public void setParent(Object t, Object parent);
+	public T getParent(T t);
+	public void setParent(T t, T parent);
 
 	/** What index is this node in the child list? Range: 0..n-1
 	 *  If your node type doesn't handle this, it's ok but the tree rewrites
 	 *  in tree parsers need this functionality.
 	 */
-	public int getChildIndex(Object t);
-	public void setChildIndex(Object t, int index);
+	public int getChildIndex(T t);
+	public void setChildIndex(T t, int index);
 
 	/** Replace from start to stop child index of parent with t, which might
 	 *  be a list.  Number of children may be different
@@ -273,5 +257,5 @@ public interface ASTAdaptor {
 	 *  If parent is null, don't do anything; must be at root of overall tree.
 	 *  Can't replace whatever points to the parent externally.  Do nothing.
 	 */
-	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t);
+	public void replaceChildren(T parent, int startChildIndex, int stopChildIndex, T t);
 }

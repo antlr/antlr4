@@ -30,6 +30,7 @@ package org.antlr.v4.runtime;
 
 import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.tree.AST;
 
 /** A semantic predicate failed during validation.  Validation of predicates
  *  occurs when normally parsing the alternative just like matching a token.
@@ -52,5 +53,13 @@ public class FailedPredicateException extends RecognitionException {
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;
 		this.msg = msg;
+		Object la = recognizer.getCurrentInputSymbol();
+		if ( la instanceof AST) {
+			this.offendingNode = la;
+			this.offendingToken = ((AST)la).getPayload();
+		}
+		else {
+			this.offendingToken = (Token)la;
+		}
 	}
 }

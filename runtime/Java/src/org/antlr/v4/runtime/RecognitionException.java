@@ -64,17 +64,6 @@ public class RecognitionException extends RuntimeException {
 
 	protected int offendingState;
 
-	/** If you are parsing a tree node stream, you will encounter som
-	 *  imaginary nodes w/o line/col info.  We now search backwards looking
-	 *  for most recent token with line/col info, but notify getErrorHeader()
-	 *  that info is approximate.
-	public boolean approximateLineInfo;
-	 */
-
-//	public RecognitionException(Recognizer recognizer) {
-//		this(recognizer, recognizer.getInputStream(), null);
-//	}
-
 	public RecognitionException(Recognizer recognizer, IntStream input,
 								RuleContext ctx)
 	{

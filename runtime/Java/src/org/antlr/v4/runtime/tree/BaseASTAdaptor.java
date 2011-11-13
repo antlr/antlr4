@@ -29,17 +29,12 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.WritableToken;
+import org.antlr.v4.runtime.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** An ASTAdaptor that works with any BaseAST implementation. */
-public abstract class BaseASTAdaptor implements ASTAdaptor {
+public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T> {
 	/** System.identityHashCode() is not always unique; we have to
 	 *  track ourselves.  That's ok, it's only for debugging, though it's
 	 *  expensive: we have to create a hashtable with all tree nodes in it.
@@ -48,40 +43,21 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 	protected Map<BaseAST, Integer> treeToUniqueIDMap;
 	protected int uniqueNodeID = 1;
 
-	public List<Object> createElementList() {
-		return new ElementList<Object>(this);
+	public List<T> createElementList() {
+		return new ElementList<T>(this);
 	}
 
 	// END v4 stuff
 
-	public Object nil() {
+	public T nil() {
 		return create(null);
 	}
 
-	/** create tree node that holds the start and stop tokens associated
-	 *  with an error.
-	 *
-	 *  If you specify your own kind of tree nodes, you will likely have to
-	 *  override this method. CommonAST returns Token.INVALID_TOKEN_TYPE
-	 *  if no token payload but you might have to set token type for diff
-	 *  node type.
-     *
-     *  You don't have to subclass CommonErrorNode; you will likely need to
-     *  subclass your own tree node class to avoid class cast exception.
-	 */
-	public Object errorNode(TokenStream input, Token start, Token stop,
-							RecognitionException e)
-	{
-		CommonErrorNode t = new CommonErrorNode(input, start, stop, e);
-		//System.out.println("returning error node '"+t+"' @index="+input.index());
-		return t;
-	}
-
-	public boolean isNil(Object tree) {
+	public boolean isNil(T tree) {
 		return ((AST)tree).isNil();
 	}
 
-	public Object dupTree(Object tree) {
+	public T dupTree(T tree) {
 		return dupTree(tree, null);
 	}
 
@@ -89,18 +65,18 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 	 *  tree (not just AST interface).  It invokes the adaptor routines
 	 *  not the tree node routines to do the construction.
 	 */
-	public Object dupTree(Object t, Object parent) {
+	public T dupTree(T t, T parent) {
 		if ( t==null ) {
 			return null;
 		}
-		Object newTree = dupNode(t);
+		T newTree = dupNode(t);
 		// ensure new subtree root has parent/child index set
 		setChildIndex(newTree, getChildIndex(t)); // same index in new tree
 		setParent(newTree, parent);
 		int n = getChildCount(t);
 		for (int i = 0; i < n; i++) {
-			Object child = getChild(t, i);
-			Object newSubTree = dupTree(child, t);
+			T child = getChild(t, i);
+			T newSubTree = dupTree(child, t);
 			addChild(newTree, newSubTree);
 		}
 		return newTree;
@@ -113,7 +89,7 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 	 *  make sure that this is consistent with have the user will build
 	 *  ASTs.
 	 */
-	public void addChild(Object t, Object child) {
+	public void addChild(T t, T child) {
 		if ( t!=null && child!=null ) {
 			((BaseAST)t).addChild((BaseAST) child);
 		}
@@ -145,17 +121,15 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 	 *  constructing these nodes so we should have this control for
 	 *  efficiency.
 	 */
-	public Object becomeRoot(Object newRoot, Object oldRoot) {
+	public T becomeRoot(T newRoot, T oldRoot) {
         //System.out.println("becomeroot new "+newRoot.toString()+" old "+oldRoot);
-        BaseAST newRootTree = (BaseAST)newRoot;
-		BaseAST oldRootTree = (BaseAST)oldRoot;
 		if ( oldRoot==null ) {
 			return newRoot;
 		}
 		// handle ^(nil real-node)
-		if ( newRootTree.isNil() ) {
-            int nc = newRootTree.getChildCount();
-            if ( nc==1 ) newRootTree = newRootTree.getChild(0);
+		if ( newRoot.isNil() ) {
+            int nc = newRoot.getChildCount();
+            if ( nc==1 ) newRoot = (T)newRoot.getChild(0);
             else if ( nc >1 ) {
 				// TODO: make tree run time exceptions hierarchy
 				throw new RuntimeException("more than one node as root (TODO: make exception hierarchy)");
@@ -164,88 +138,84 @@ public abstract class BaseASTAdaptor implements ASTAdaptor {
 		// add oldRoot to newRoot; addChild takes care of case where oldRoot
 		// is a flat list (i.e., nil-rooted tree).  All children of oldRoot
 		// are added to newRoot.
-		newRootTree.addChild(oldRootTree);
-		return newRootTree;
+		newRoot.addChild(oldRoot);
+		return newRoot;
 	}
 
 	/** Transform ^(nil x) to x and nil to null */
-	public Object rulePostProcessing(Object root) {
+	public T rulePostProcessing(T root) {
 		//System.out.println("rulePostProcessing: "+((AST)root).toStringTree());
-		BaseAST r = (BaseAST)root;
-		if ( r!=null && r.isNil() ) {
-			if ( r.getChildCount()==0 ) {
-				r = null;
+		if ( root!=null && root.isNil() ) {
+			if ( root.getChildCount()==0 ) {
+				root = null;
 			}
-			else if ( r.getChildCount()==1 ) {
-				r = r.getChild(0);
+			else if ( root.getChildCount()==1 ) {
+				root = (T)root.getChild(0);
 				// whoever invokes rule will set parent and child index
-				r.setParent(null);
-				r.setChildIndex(-1);
+				root.setParent(null);
+				root.setChildIndex(-1);
 			}
 		}
-		return r;
+		return root;
 	}
 
-	public Object becomeRoot(Token newRoot, Object oldRoot) {
+	public T becomeRoot(Token newRoot, T oldRoot) {
 		return becomeRoot(create(newRoot), oldRoot);
 	}
 
-	public Object create(int tokenType, Token fromToken) {
+	public T create(int tokenType, Token fromToken) {
 		WritableToken tok = createToken(fromToken);
 		//((ClassicToken)fromToken).setType(tokenType);
 		tok.setType(tokenType);
-		AST t = (AST)create(tok);
-		return t;
+		return create(tok);
 	}
 
-	public Object create(int tokenType, Token fromToken, String text) {
+	public T create(int tokenType, Token fromToken, String text) {
         if (fromToken == null) return create(tokenType, text);
 		WritableToken tok = createToken(fromToken);
 		tok.setType(tokenType);
 		tok.setText(text);
-		AST t = (AST)create(tok);
-		return t;
+		return create(tok);
 	}
 
-	public Object create(int tokenType, String text) {
+	public T create(int tokenType, String text) {
 		Token fromToken = createToken(tokenType, text);
-		AST t = (AST)create(fromToken);
-		return t;
+		return create(fromToken);
 	}
 
-	public int getType(Object t) {
-		return ((AST)t).getType();
+	public int getType(T t) {
+		return t.getType();
 	}
 
-	public void setType(Object t, int type) {
+	public void setType(T t, int type) {
 		throw new UnsupportedOperationException("don't know enough about AST node");
 	}
 
-	public String getText(Object t) {
-		return ((AST)t).getText();
+	public String getText(T t) {
+		return t.getText();
 	}
 
-	public void setText(Object t, String text) {
+	public void setText(T t, String text) {
 		throw new UnsupportedOperationException("don't know enough about AST node");
 	}
 
-	public Object getChild(Object t, int i) {
-		return ((AST)t).getChild(i);
+	public T getChild(T t, int i) {
+		return (T)t.getChild(i);
 	}
 
-	public void setChild(Object t, int i, Object child) {
-		((BaseAST)t).setChild(i, (BaseAST)child);
+	public void setChild(T t, int i, T child) {
+		t.setChild(i, child);
 	}
 
-	public Object deleteChild(Object t, int i) {
-		return ((BaseAST)t).deleteChild(i);
+	public T deleteChild(T t, int i) {
+		return (T)t.deleteChild(i);
 	}
 
-	public int getChildCount(Object t) {
+	public int getChildCount(T t) {
 		return ((BaseAST)t).getChildCount();
 	}
 
-	public int getUniqueID(Object node) {
+	public int getUniqueID(T node) {
 		if ( treeToUniqueIDMap==null ) {
 			 treeToUniqueIDMap = new HashMap();
 		}

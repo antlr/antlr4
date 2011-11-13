@@ -32,12 +32,12 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.*;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
-public interface ASTNodeStream extends ObjectStream {
+public interface ASTNodeStream<T> extends ObjectStream<T> {
 	/** Get a tree node at an absolute index i; 0..n-1.
 	 *  If you don't want to buffer up nodes, then this method makes no
 	 *  sense for you.
 	 */
-	Object get(int i);
+	T get(int i);
 
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
 	 *  i<0 indicates nodes in the past.  So LT(-1) is previous node, but
@@ -50,12 +50,12 @@ public interface ASTNodeStream extends ObjectStream {
 	 *  returns a tree node instead of a token.  Makes code gen identical
 	 *  for both parser and tree grammars. :)
 	 */
-	Object LT(int k);
+	T LT(int k);
 
 	/** Where is this stream pulling nodes from?  This is not the name, but
 	 *  the object that provides node objects.
 	 */
-	public Object getTreeSource();
+	public T getTreeSource();
 
 	/** If the tree associated with this stream was created from a TokenStream,
 	 *  you can specify it here.  Used to do rule $text attribute in tree
@@ -67,7 +67,7 @@ public interface ASTNodeStream extends ObjectStream {
 	/** What adaptor can tell me how to interpret/navigate nodes and
 	 *  trees.  E.g., get text of a node.
 	 */
-	public ASTAdaptor getTreeAdaptor();
+	public ASTAdaptor<T> getTreeAdaptor();
 
 	/** As we flatten the tree, we use UP, DOWN nodes to represent
 	 *  the tree structure.  When debugging we need unique nodes
@@ -88,7 +88,7 @@ public interface ASTNodeStream extends ObjectStream {
 	 *  null or "" too, but users should not access $ruleLabel.text in
 	 *  an action of course in that case.
 	 */
-	public String toString(Object start, Object stop);
+	public String toString(T start, T stop);
 
 
 	// REWRITING TREES (used by tree parser)
@@ -103,5 +103,5 @@ public interface ASTNodeStream extends ObjectStream {
 	 *  If parent is null, don't do anything; must be at root of overall tree.
 	 *  Can't replace whatever points to the parent externally.  Do nothing.
 	 */
-	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t);
+	public void replaceChildren(T parent, int startChildIndex, int stopChildIndex, T t);
 }

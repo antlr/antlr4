@@ -92,7 +92,7 @@ public class TreeWizard {
 
 	/** This adaptor creates TreePattern objects for use during scan() */
 	public static class TreePatternASTAdaptor extends CommonASTAdaptor {
-		public Object create(Token payload) {
+		public CommonAST create(Token payload) {
 			return new TreePattern(payload);
 		}
 	}

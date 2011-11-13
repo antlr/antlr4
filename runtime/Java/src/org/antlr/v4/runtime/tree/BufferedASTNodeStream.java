@@ -53,17 +53,17 @@ import java.util.*;
  *
  *  @see CommonASTNodeStream
  */
-public class BufferedASTNodeStream implements ASTNodeStream {
+public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 	public static final int DEFAULT_INITIAL_BUFFER_SIZE = 100;
 	public static final int INITIAL_CALL_STACK_SIZE = 10;
 
-    protected class StreamIterator implements Iterator {
+    protected class StreamIterator implements Iterator<T> {
 		int i = 0;
 		public boolean hasNext() {
 			return i<nodes.size();
 		}
 
-		public Object next() {
+		public T next() {
 			int current = i;
 			i++;
 			if ( current < nodes.size() ) {
@@ -80,9 +80,9 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	// all these navigation nodes are shared and hence they
 	// cannot contain any line/column info
 
-	protected Object down;
-	protected Object up;
-	protected Object eof;
+	protected T down;
+	protected T up;
+	protected T eof;
 
 	/** The complete mapping from stream index to tree node.
 	 *  This buffer includes pointers to DOWN, UP, and EOF nodes.
@@ -93,16 +93,16 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	 *  of interest for reverseIndexing.  Slows us down a wee bit to
 	 *  do all of the if p==-1 testing everywhere though.
 	 */
-	protected List nodes;
+	protected List<T> nodes;
 
 	/** Pull nodes from which tree? */
-	protected Object root;
+	protected T root;
 
 	/** IF this tree (root) was created from a token stream, track it. */
 	protected TokenStream tokens;
 
 	/** What tree adaptor was used to build these trees */
-	ASTAdaptor adaptor;
+	ASTAdaptor<T> adaptor;
 
 	/** Reuse same DOWN, UP navigation nodes unless this is true */
 	protected boolean uniqueNavigationNodes = false;
@@ -118,18 +118,18 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	/** Stack of indexes used for push/pop calls */
 	protected List<Integer> calls;
 
-	public BufferedASTNodeStream(Object tree) {
+	public BufferedASTNodeStream(T tree) {
 		this(new CommonASTAdaptor(), tree);
 	}
 
-	public BufferedASTNodeStream(ASTAdaptor adaptor, Object tree) {
+	public BufferedASTNodeStream(ASTAdaptor adaptor, T tree) {
 		this(adaptor, tree, DEFAULT_INITIAL_BUFFER_SIZE);
 	}
 
-	public BufferedASTNodeStream(ASTAdaptor adaptor, Object tree, int initialBufferSize) {
+	public BufferedASTNodeStream(ASTAdaptor<T> adaptor, T tree, int initialBufferSize) {
 		this.root = tree;
 		this.adaptor = adaptor;
-		nodes = new ArrayList(initialBufferSize);
+		nodes = new ArrayList<T>(initialBufferSize);
 		down = adaptor.create(Token.DOWN, "DOWN");
 		up = adaptor.create(Token.UP, "UP");
 		eof = adaptor.create(Token.EOF, "EOF");
@@ -144,7 +144,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 		p = 0; // buffer of nodes intialized now
 	}
 
-	public void fillBuffer(Object t) {
+	public void fillBuffer(T t) {
 		boolean nil = adaptor.isNil(t);
 		if ( !nil ) {
 			nodes.add(t); // add this node
@@ -156,7 +156,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 		}
 		// and now add all its children
 		for (int c=0; c<n; c++) {
-			Object child = adaptor.getChild(t,c);
+			T child = (T)adaptor.getChild(t,c);
 			fillBuffer(child);
 		}
 		// add UP node if t has children
@@ -168,12 +168,12 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	/** What is the stream index for node? 0..n-1
 	 *  Return -1 if node not found.
 	 */
-	protected int getNodeIndex(Object node) {
+	protected int getNodeIndex(T node) {
 		if ( p==-1 ) {
 			fillBuffer();
 		}
 		for (int i = 0; i < nodes.size(); i++) {
-			Object t = (Object) nodes.get(i);
+			T t = (T) nodes.get(i);
 			if ( t==node ) {
 				return i;
 			}
@@ -186,7 +186,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 	 *  so instantiate new ones when uniqueNavigationNodes is true.
 	 */
 	protected void addNavigationNode(final int ttype) {
-		Object navNode = null;
+		T navNode = null;
 		if ( ttype==Token.DOWN ) {
 			if ( hasUniqueNavigationNodes() ) {
 				navNode = adaptor.create(Token.DOWN, "DOWN");
@@ -203,17 +203,17 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 				navNode = up;
 			}
 		}
-		nodes.add(navNode);
+		nodes.add((T)navNode);
 	}
 
-	public Object get(int i) {
+	public T get(int i) {
 		if ( p==-1 ) {
 			fillBuffer();
 		}
 		return nodes.get(i);
 	}
 
-	public Object LT(int k) {
+	public T LT(int k) {
 		if ( p==-1 ) {
 			fillBuffer();
 		}
@@ -230,10 +230,10 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 		return nodes.get(p+k-1);
 	}
 
-	public Object getCurrentSymbol() { return LT(1); }
+	public T getCurrentSymbol() { return LT(1); }
 
 /*
-	public Object getLastTreeNode() {
+	public T getLastTreeNode() {
 		int i = index();
 		if ( i>=size() ) {
 			i--; // if at EOF, have to start one back
@@ -252,7 +252,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 */
 
 	/** Look backwards k nodes */
-	protected Object LB(int k) {
+	protected T LB(int k) {
 		if ( k==0 ) {
 			return null;
 		}
@@ -262,7 +262,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 		return nodes.get(p-k);
 	}
 
-	public Object getTreeSource() {
+	public T getTreeSource() {
 		return root;
 	}
 
@@ -385,7 +385,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 
 	// TREE REWRITE INTERFACE
 
-	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+	public void replaceChildren(T parent, int startChildIndex, int stopChildIndex, T t) {
 		if ( parent!=null ) {
 			adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
 		}
@@ -398,7 +398,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 		}
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < nodes.size(); i++) {
-			Object t = (Object) nodes.get(i);
+			T t = (T) nodes.get(i);
 			buf.append(" ");
 			buf.append(adaptor.getType(t));
 		}
@@ -412,14 +412,14 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 		}
 		StringBuffer buf = new StringBuffer();
 		for (int i = start; i < nodes.size() && i <= stop; i++) {
-			Object t = (Object) nodes.get(i);
+			T t = (T) nodes.get(i);
 			buf.append(" ");
 			buf.append(adaptor.getToken(t));
 		}
 		return buf.toString();
 	}
 
-	public String toString(Object start, Object stop) {
+	public String toString(T start, T stop) {
 		System.out.println("toString");
 		if ( start==null || stop==null ) {
 			return null;
@@ -451,7 +451,7 @@ public class BufferedASTNodeStream implements ASTNodeStream {
 			return tokens.toString(beginTokenIndex, endTokenIndex);
 		}
 		// walk nodes looking for start
-		Object t = null;
+		T t = null;
 		int i = 0;
 		for (; i < nodes.size(); i++) {
 			t = nodes.get(i);

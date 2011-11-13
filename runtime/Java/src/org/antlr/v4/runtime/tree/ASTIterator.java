@@ -39,34 +39,37 @@ import java.util.Iterator;
  *
  *  Emit navigation nodes (DOWN, UP, and EOF) to let show tree structure.
  */
-public class ASTIterator implements Iterator {
-    protected ASTAdaptor adaptor;
-    protected Object root;
-    protected Object tree;
+public class ASTIterator<T> implements Iterator<T> {
+    protected ASTAdaptor<T> adaptor;
+    protected T root;
+    protected T tree;
     protected boolean firstTime = true;
 
     // navigation nodes to return during walk and at end
-    public Object up;
-    public Object down;
-    public Object eof;
+    public T up;
+    public T down;
+    public T eof;
 
     /** If we emit UP/DOWN nodes, we need to spit out multiple nodes per
      *  next() call.
      */
-    protected FastQueue nodes;
+    protected FastQueue<T> nodes;
 
-    public ASTIterator(Object tree) {
-        this(new CommonASTAdaptor(),tree);
+    public ASTIterator(T tree) {
+        this((tree instanceof CommonAST) ? (ASTAdaptor<T>)new CommonASTAdaptor() : null,
+			 tree);
     }
 
-    public ASTIterator(ASTAdaptor adaptor, Object tree) {
+    public ASTIterator(ASTAdaptor<T> adaptor, T tree) {
         this.adaptor = adaptor;
-        this.tree = tree;
-        this.root = tree;
-        nodes = new FastQueue();
-        down = adaptor.create(Token.DOWN, "DOWN");
-        up = adaptor.create(Token.UP, "UP");
-        eof = adaptor.create(Token.EOF, "EOF");
+		this.tree = tree;
+		this.root = tree;
+		nodes = new FastQueue<T>();
+		if ( adaptor!=null ) {
+			down = adaptor.create(Token.DOWN, "DOWN");
+			up = adaptor.create(Token.UP, "UP");
+			eof = adaptor.create(Token.EOF, "EOF");
+		}
     }
 
     public void reset() {
@@ -83,7 +86,7 @@ public class ASTIterator implements Iterator {
         return adaptor.getParent(tree)!=null; // back at root?
     }
 
-    public Object next() {
+    public T next() {
         if ( firstTime ) { // initial condition
             firstTime = false;
             if ( adaptor.getChildCount(tree)==0 ) { // single node tree (special)
@@ -105,7 +108,7 @@ public class ASTIterator implements Iterator {
             return down;
         }
         // if no children, look for next sibling of tree or ancestor
-        Object parent = adaptor.getParent(tree);
+        T parent = adaptor.getParent(tree);
         // while we're out of siblings, keep popping back up towards root
         while ( parent!=null &&
                 adaptor.getChildIndex(tree)+1 >= adaptor.getChildCount(parent) )

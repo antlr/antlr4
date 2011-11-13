@@ -71,6 +71,16 @@ public class CommonAST extends BaseAST {
 		return token==null;
 	}
 
+	@Override
+	public CommonAST getChild(int i) {
+		return (CommonAST)super.getChild(i);
+	}
+
+	@Override
+	public CommonAST getParent() {
+		return (CommonAST)super.getParent();
+	}
+
 	public int getType() {
 		if ( token==null ) {
 			return Token.INVALID_TYPE;

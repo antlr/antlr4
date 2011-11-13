@@ -204,7 +204,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" "+e.msg;
-		recognizer.notifyListeners((Token)recognizer.getCurrentInputSymbol(), msg, e);
+		recognizer.notifyListeners(e.offendingToken, msg, e);
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {

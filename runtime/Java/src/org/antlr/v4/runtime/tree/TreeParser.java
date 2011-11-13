@@ -37,7 +37,7 @@ import java.util.regex.*;
  *  of this.  All the error reporting and recovery is shared with Parser via
  *  the BaseRecognizer superclass.
 */
-public class TreeParser extends BaseRecognizer {
+public class TreeParser<T> extends BaseRecognizer {
 	public static final int DOWN = Token.DOWN;
 	public static final int UP = Token.UP;
 
@@ -49,9 +49,9 @@ public class TreeParser extends BaseRecognizer {
     static Pattern dotdotPattern = Pattern.compile(dotdot);
     static Pattern doubleEtcPattern = Pattern.compile(doubleEtc);
 
-	protected ASTNodeStream _input;
+	protected ASTNodeStream<T> _input;
 
-	public TreeParser(ASTNodeStream input) {
+	public TreeParser(ASTNodeStream<T> input) {
 		super(input);
 		_errHandler = new DefaultANTLRTreeGrammarErrorStrategy();
 	}
@@ -63,13 +63,13 @@ public class TreeParser extends BaseRecognizer {
 		}
 	}
 
-	protected Object getCurrentInputSymbol() { return _input.LT(1); }
+	protected T getCurrentInputSymbol() { return _input.LT(1); }
 
 	@Override
-	public ASTNodeStream getInputStream() { return _input; }
+	public ASTNodeStream<T> getInputStream() { return _input; }
 
 	@Override
-	public void setInputStream(IntStream input) { _input = (ASTNodeStream)input; }
+	public void setInputStream(IntStream input) { _input = (ASTNodeStream<T>)input; }
 
 	/** Always called by generated parsers upon entry to a rule.
 	 *  This occurs after the new context has been pushed. Access field
@@ -90,17 +90,17 @@ public class TreeParser extends BaseRecognizer {
 		return _input.getSourceName();
 	}
 
-	protected Object getCurrentInputSymbol(IntStream input) {
-		return ((ASTNodeStream)input).LT(1);
-	}
+//	protected T getCurrentInputSymbol(IntStream input) {
+//		return ((ASTNodeStream)input).LT(1);
+//	}
 
-	protected Object getMissingSymbol(IntStream input,
+	protected T getMissingSymbol(IntStream input,
 									  RecognitionException e,
 									  int expectedTokenType)
 	{
 		String tokenText =
 			"<missing "+getTokenNames()[expectedTokenType]+">";
-        ASTAdaptor adaptor = ((ASTNodeStream)e.getInputStream()).getTreeAdaptor();
+        ASTAdaptor<T> adaptor = ((ASTNodeStream<T>)e.getInputStream()).getTreeAdaptor();
         return adaptor.create(new CommonToken(expectedTokenType, tokenText));
 	}
 
@@ -110,7 +110,7 @@ public class TreeParser extends BaseRecognizer {
 	 */
 	public void matchAny(IntStream ignore) { // ignore stream, copy of input
 		_errHandler.endErrorCondition(this);
-		Object look = _input.LT(1);
+		T look = _input.LT(1);
 		if ( _input.getTreeAdaptor().getChildCount(look)==0 ) {
 			_input.consume(); // not subtree, consume 1 node and return
 			return;
@@ -137,7 +137,7 @@ public class TreeParser extends BaseRecognizer {
 	 *  plus we want to alter the exception type.  Don't try to recover
 	 *  from tree parser errors inline...
      */
-    protected Object recoverFromMismatchedToken(IntStream input,
+    protected T recoverFromMismatchedToken(IntStream input,
                                                 int ttype)
         throws RecognitionException
     {
@@ -189,9 +189,9 @@ public class TreeParser extends BaseRecognizer {
     /** The worker for inContext.  It's static and full of parameters for
      *  testing purposes.
      */
-    public static boolean inContext(ASTAdaptor adaptor,
+    public static <T> boolean inContext(ASTAdaptor<T> adaptor,
                                     String[] tokenNames,
-                                    Object t,
+                                    T t,
                                     String context)
     {
         Matcher dotdotMatcher = dotdotPattern.matcher(context);
@@ -212,7 +212,7 @@ public class TreeParser extends BaseRecognizer {
                 // walk upwards until we see nodes[ni-1] then continue walking
                 if ( ni==0 ) return true; // ... at start is no-op
                 String goal = nodes[ni-1];
-                Object ancestor = getAncestor(adaptor, tokenNames, t, goal);
+                T ancestor = getAncestor(adaptor, tokenNames, t, goal);
                 if ( ancestor==null ) return false;
                 t = ancestor;
                 ni--;
@@ -232,7 +232,7 @@ public class TreeParser extends BaseRecognizer {
     }
 
     /** Helper for static inContext */
-    protected static Object getAncestor(ASTAdaptor adaptor, String[] tokenNames, Object t, String goal) {
+    protected static <T> T getAncestor(ASTAdaptor<T> adaptor, String[] tokenNames, T t, String goal) {
         while ( t!=null ) {
             String name = tokenNames[adaptor.getType(t)];
             if ( name.equals(goal) ) return t;

@@ -34,21 +34,23 @@ import org.antlr.v4.runtime.misc.LookaheadStream;
 
 import java.util.Stack;
 
-public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTNodeStream {
+public class CommonASTNodeStream<T> extends LookaheadStream<T>
+	implements ASTNodeStream<T>
+{
 	public static final int DEFAULT_INITIAL_BUFFER_SIZE = 100;
 	public static final int INITIAL_CALL_STACK_SIZE = 10;
 
 	/** Pull nodes from which tree? */
-	protected Object root;
+	protected T root;
 
 	/** If this tree (root) was created from a token stream, track it. */
 	protected TokenStream tokens;
 
 	/** What tree adaptor was used to build these trees */
-	ASTAdaptor adaptor;
+	ASTAdaptor<T> adaptor;
 
     /** The tree iterator we using */
-    protected ASTIterator it;
+    protected ASTIterator<T> it;
 
     /** Stack of indexes used for push/pop calls */
     protected Stack<Integer> calls;
@@ -59,14 +61,15 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
     /** Tracks tree depth.  Level=0 means we're at root node level. */
     protected int level = 0;
 
-	public CommonASTNodeStream(Object tree) {
-		this(new CommonASTAdaptor(), tree);
+	public CommonASTNodeStream(T tree) {
+		this((tree instanceof CommonAST)?(ASTAdaptor<T>)new CommonASTAdaptor():null,
+			 tree);
 	}
 
-	public CommonASTNodeStream(ASTAdaptor adaptor, Object tree) {
+	public CommonASTNodeStream(ASTAdaptor<T> adaptor, T tree) {
 		this.root = tree;
 		this.adaptor = adaptor;
-        it = new ASTIterator(adaptor,root);
+        it = new ASTIterator<T>(adaptor,root);
 	}
 
     public void reset() {
@@ -80,8 +83,8 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
     /** Pull elements from tree iterator.  Track tree level 0..max_level.
      *  If nil rooted tree, don't give initial nil and DOWN nor final UP.
      */
-    public Object nextElement() {
-        Object t = it.next();
+    public T nextElement() {
+        T t = it.next();
         //System.out.println("pulled "+adaptor.getType(t));
         if ( t == it.up ) {
             level--;
@@ -97,11 +100,11 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
         return t;
     }
 
-    public boolean isEOF(Object o) { return adaptor.getType(o) == Token.EOF; }
+    public boolean isEOF(T o) { return adaptor.getType(o) == Token.EOF; }
 
     public void setUniqueNavigationNodes(boolean uniqueNavigationNodes) { }
 
-	public Object getTreeSource() {	return root; }
+	public T getTreeSource() {	return root; }
 
 	public String getSourceName() { return getTokenStream().getSourceName(); }
 
@@ -113,7 +116,7 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
 
 	public void setTreeAdaptor(ASTAdaptor adaptor) { this.adaptor = adaptor; }
 
-    public Object get(int i) {
+    public T get(int i) {
         throw new UnsupportedOperationException("Absolute node indexes are meaningless in an unbuffered stream");
     }
 
@@ -141,7 +144,7 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
 
 	// TREE REWRITE INTERFACE
 
-	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+	public void replaceChildren(T parent, int startChildIndex, int stopChildIndex, T t) {
 		if ( parent!=null ) {
 			adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
 		}
@@ -151,7 +154,7 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
 	 *  node, then we have to walk it back until we see the first non-UP node.
 	 *  Then, just get the token indexes and look into the token stream.
 	 */
-	public String toString(Object start, Object stop) {
+	public String toString(T start, T stop) {
 		if ( tokens==null ) throw new UnsupportedOperationException("can't print from null token stream in node stream");
 		if ( start==null || stop==null ) return "";
 		Token startToken = adaptor.getToken(start);
@@ -166,7 +169,7 @@ public class CommonASTNodeStream extends LookaheadStream<Object> implements ASTN
     public String toTokenTypeString() {
         reset();
 		StringBuffer buf = new StringBuffer();
-        Object o = LT(1);
+        T o = LT(1);
         int type = adaptor.getType(o);
         while ( type!=Token.EOF ) {
             buf.append(" ");

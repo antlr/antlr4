@@ -33,8 +33,7 @@ import org.antlr.v4.runtime.BaseRecognizer;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** A generic AST implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
@@ -170,11 +169,11 @@ public abstract class BaseAST implements AST {
 		this.childIndex = index;
 	}
 
-	public Object deleteChild(int i) {
+	public BaseAST deleteChild(int i) {
 		if ( children==null ) {
 			return null;
 		}
-		AST killed = (AST)children.remove(i);
+		BaseAST killed = children.remove(i);
 		// walk rest and decrement their child indexes
 		this.freshenParentAndChildIndexes(i);
 		return killed;
@@ -182,7 +181,7 @@ public abstract class BaseAST implements AST {
 
 	public boolean deleteChild(BaseAST t) {
 		for (int i=0; i<children.size(); i++) {
-			Object c = children.get(i);
+			BaseAST c = children.get(i);
 			if ( c == t ) {
 				deleteChild(t.getChildIndex());
 				return true;

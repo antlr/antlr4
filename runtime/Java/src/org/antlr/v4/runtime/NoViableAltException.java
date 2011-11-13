@@ -30,7 +30,6 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.tree.AST;
 
 /** The parser could not decide which path in the decision to take based
  *  upon the remaining input.
@@ -45,7 +44,6 @@ public class NoViableAltException extends RecognitionException {
 	 *  buffer all of the tokens but later we might not have access to those.)
  	 */
 	public Token startToken;
-	public Object startNode;
 
 	public NoViableAltException(BaseRecognizer recognizer) { // LL(1) error
 		this(recognizer,recognizer.getInputStream(),
@@ -65,23 +63,6 @@ public class NoViableAltException extends RecognitionException {
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
 		this.startToken = startToken;
-		Object la = recognizer.getCurrentInputSymbol();
-		if ( la instanceof AST) {
-			this.offendingNode = la;
-			this.offendingToken = ((AST)la).getPayload();
-		}
-
 		this.offendingToken = offendingToken;
 	}
-
-//	public String toString() {
-//		if ( recognizer!=null ) {
-//			TokenStream tokens = ((Parser)recognizer).getTokenStream();
-//			String bad = tokens.toString(startToken.getTokenIndex(),
-//										 offendingToken.getTokenIndex());
-//			return "NoViableAltException(input=\""+bad+"\" last token type is "+
-//					getUnexpectedType()+")";
-//		}
-//		return "NoViableAltException(last token type is "+getUnexpectedType()+")";
-//	}
 }

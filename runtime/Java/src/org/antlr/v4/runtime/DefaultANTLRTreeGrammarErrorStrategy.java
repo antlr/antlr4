@@ -42,14 +42,23 @@ public class DefaultANTLRTreeGrammarErrorStrategy extends DefaultANTLRErrorStrat
 		throws RecognitionException
 	{
 		super.reportError(recognizer, e);
-		Object root = ((TreeParser)recognizer).getInputStream().getTreeSource();
-		if ( root instanceof Tree ) {
+		ASTNodeStream input = ((TreeParser) recognizer).getInputStream();
+		Object root = input.getTreeSource();
+		if ( root instanceof AST ) {
 			TreeViewer viewer = new TreeViewer(recognizer, (Tree)root);
 			viewer.open();
+			if ( e instanceof NoViableTreeGrammarAltException ) {
+				NoViableTreeGrammarAltException nva =
+					(NoViableTreeGrammarAltException)e;
+//				((AST)nva.startNode).get
+			}
+			else {
+
+			}
+//			input.get()
 //			viewer.addHighlightedNodes();
 			// TODO: highlight error node
 		}
-//		recognizer.notifyListeners(e.offendingToken, e.getMessage(), e);
 	}
 
 	@Override

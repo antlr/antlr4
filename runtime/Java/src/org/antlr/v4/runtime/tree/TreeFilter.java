@@ -75,36 +75,36 @@ or both. In our case, we need to call @m applyOnce in both. On the way
 down, we'll look for @r vmult patterns. On the way up,
 we'll look for @r mult0 patterns.
  */
-public class TreeFilter extends TreeParser {
+public class TreeFilter<T> extends TreeParser {
     public interface fptr {
         public void rule() throws RecognitionException;
     }
 
     protected TokenStream originalTokenStream;
-    protected ASTAdaptor originalAdaptor;
+    protected ASTAdaptor<T> originalAdaptor;
 
-    public TreeFilter(ASTNodeStream input) {
+    public TreeFilter(ASTNodeStream<T> input) {
 		super(input);
-        originalAdaptor = (ASTAdaptor) input.getTreeAdaptor();
+        originalAdaptor = input.getTreeAdaptor();
         originalTokenStream = input.getTokenStream();
     }
 
-    public void applyOnce(Object t, fptr whichRule) {
+    public void applyOnce(T t, fptr whichRule) {
         if ( t==null ) return;
         try {
             // share TreeParser object but not parsing-related state
-            _input = new CommonASTNodeStream(originalAdaptor, t);
+            _input = new CommonASTNodeStream<T>(originalAdaptor, t);
             ((CommonASTNodeStream) _input).setTokenStream(originalTokenStream);
             whichRule.rule();
         }
-        catch (RecognitionException e) { ; }
+        catch (RecognitionException e) { }
     }
 
-    public void downup(Object t) {
+    public void downup(T t) {
         TreeVisitor v = new TreeVisitor(new CommonASTAdaptor());
-        TreeVisitorAction actions = new TreeVisitorAction() {
-            public Object pre(Object t)  { applyOnce(t, topdown_fptr); return t; }
-            public Object post(Object t) { applyOnce(t, bottomup_fptr); return t; }
+        TreeVisitorAction actions = new TreeVisitorAction<T>() {
+            public T pre(T t)  { applyOnce(t, topdown_fptr); return t; }
+            public T post(T t) { applyOnce(t, bottomup_fptr); return t; }
         };
         v.visit(t, actions);
     }
