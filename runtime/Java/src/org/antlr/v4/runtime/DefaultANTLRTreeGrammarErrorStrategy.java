@@ -32,7 +32,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-public class DefaultANTLRTreeGrammarErrorStrategy implements ANTLRErrorStrategy {
+public class DefaultANTLRTreeGrammarErrorStrategy extends DefaultANTLRErrorStrategy {
 	@Override
 	public void beginErrorCondition(BaseRecognizer recognizer) {
 	}
@@ -41,18 +41,22 @@ public class DefaultANTLRTreeGrammarErrorStrategy implements ANTLRErrorStrategy 
 	public void reportError(BaseRecognizer recognizer, RecognitionException e)
 		throws RecognitionException
 	{
+		super.reportError(recognizer, e);
 		Object root = ((TreeParser)recognizer).getInputStream().getTreeSource();
 		if ( root instanceof Tree ) {
 			TreeViewer viewer = new TreeViewer(recognizer, (Tree)root);
 			viewer.open();
+//			viewer.addHighlightedNodes();
 			// TODO: highlight error node
 		}
-		recognizer.notifyListeners(e.offendingToken, e.getMessage(), e);
+//		recognizer.notifyListeners(e.offendingToken, e.getMessage(), e);
 	}
 
 	@Override
 	public Object recoverInline(BaseRecognizer recognizer) throws RecognitionException {
-		throw new InputMismatchException(recognizer);
+		InputMismatchException e = new InputMismatchException(recognizer);
+		reportError(recognizer, e);
+		throw e;
 	}
 
 	@Override

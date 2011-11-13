@@ -188,10 +188,12 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
+<if(currentRule.catch_)>
 	catch (RecognitionException re) {
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
 	}
+<endif>
 	finally {
 		<finallyAction>
 		exitRule(RULE_<currentRule.name>);

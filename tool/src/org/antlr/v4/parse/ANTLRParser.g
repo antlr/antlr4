@@ -93,7 +93,7 @@ tokens {
     ST_RESULT;			  // distinguish between ST and tree rewrites
     RESULT;
     ALT_REWRITE;		  // indicate ALT is rewritten
-    
+
     DOWN_TOKEN;			  // AST node representing DOWN node in tree parser code gen
     UP_TOKEN;
 }
@@ -253,13 +253,6 @@ optionsSpec
 
 option
     :   id ASSIGN^ optionValue
-/*
-    	{
-    	if ( $id.text.equals("output") ) {
-    		if ( $optionValue.text.equals("AST") ) buildAST = true;
-    	}
-    	}
-    	*/
     ;
 
 // ------------
@@ -543,12 +536,12 @@ ruleBlock
 ruleAltList
 	:	labeledAlt (OR labeledAlt)* -> labeledAlt+
 	;
-	
+
 labeledAlt
 	:	alternative (POUND id {((AltAST)$alternative.tree).altLabel=$id.tree;})?
 		-> alternative
 	;
-	
+
 altList
     :	alternative (OR alternative)* -> alternative+
     ;
@@ -715,7 +708,7 @@ atom
 	        input.LT(2).getCharPositionInLine()+1==input.LT(3).getCharPositionInLine()
 	    }?
 	    id DOT ruleref -> ^(DOT id ruleref)
-	    
+
     |
     	*/
         range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
@@ -742,7 +735,7 @@ wildcard
 	    -> {astop!=null}?	^($astop ^(WILDCARD<TerminalAST>[$DOT] elementOptions?))
 	    -> 					^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
 	;
-	
+
 // --------------------
 // Inverted element set
 //

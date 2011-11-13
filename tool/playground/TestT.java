@@ -47,7 +47,7 @@ public class TestT {
 		System.out.println(tree.toStringTree(p));
 		TreeViewer v = new TreeViewer(p, tree);
 		v.setHighlightedBoxColor(TreeViewer.LIGHT_RED);
-		v.addHighlightNodes(new ArrayList<Tree>() {{
+		v.addHighlightedNodes(new ArrayList<Tree>() {{
 			ParseTree c0 = tree.getChild(0);
 			add(c0);
 			add(c0.getChild(0));

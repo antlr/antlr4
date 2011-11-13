@@ -59,8 +59,8 @@ public class RecognitionException extends RuntimeException {
 
 	/** If this is a tree parser exception, node is set to the node with
 	 *  the problem.
-	public Object offendingNode;
 	 */
+	protected Object offendingNode;
 
 	protected int offendingState;
 

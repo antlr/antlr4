@@ -156,6 +156,10 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 */
 	protected Object getCurrentInputSymbol() { return null; }
 
+	public void notifyListeners(String msg)	{
+		notifyListeners((Token)getCurrentInputSymbol(), msg, null);
+	}
+
 	public void notifyListeners(Token offendingToken, String msg,
 							   @Nullable RecognitionException e)
 	{

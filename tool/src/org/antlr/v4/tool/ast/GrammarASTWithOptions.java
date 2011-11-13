@@ -30,6 +30,7 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.misc.CharSupport;
 
 import java.util.*;
 
@@ -48,14 +49,22 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 
     public void setOption(String key, GrammarAST node) {
         if ( options==null ) options = new HashMap<String, GrammarAST>();
-//		if ( value.startsWith("'") || value.startsWith("\"") ) {
-//			value = CharSupport.getStringFromGrammarStringLiteral(value);
-//		}
         options.put(key, node);
     }
 
 	public String getOptionString(String key) {
-		return null;
+		GrammarAST value = getOption(key);
+		if ( value == null ) return null;
+		if ( value instanceof ActionAST ) {
+			return value.getText();
+		}
+		else {
+			String v = value.getText();
+			if ( v.startsWith("'") || v.startsWith("\"") ) {
+				v = CharSupport.getStringFromGrammarStringLiteral(v);
+			}
+			return v;
+		}
 	}
 
     public GrammarAST getOption(String key) {

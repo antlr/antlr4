@@ -208,9 +208,9 @@ public abstract class Recognizer<ATNInterpreter> {
 
 	public List<ANTLRErrorListener> getListeners() { return _listeners; }
 
-	public ANTLRErrorStrategy getErrHandler() { return _errHandler; }
+	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }
 
-	public void setErrHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
+	public void setErrorHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute

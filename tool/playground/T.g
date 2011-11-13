@@ -1,4 +1,6 @@
 grammar T;
+options {output=AST;}
+
 s : i=ifstat  {System.out.println(_input.toString(0,_input.index()-1));} ;
 
 ifstat : 'if' '(' expr ')' assign ;

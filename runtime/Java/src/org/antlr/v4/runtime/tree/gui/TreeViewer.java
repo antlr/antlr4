@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.BaseRecognizer;
 import org.antlr.v4.runtime.tree.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -216,37 +217,39 @@ public class TreeViewer extends JComponent {
 		final Container contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout(0,0));
 		contentPane.setBackground(Color.white);
-//		contentPane.setPreferredSize(new Dimension(200, 200));
 		dialog.setContentPane(contentPane);
 
 		// Wrap viewer in scroll pane
 		JScrollPane scrollPane = new JScrollPane(viewer);
 		// Make it tree size up to width/height of viewer
-		Dimension scaledTreeSize =
-			viewer.treeLayout.getBounds().getBounds().getSize();
-		scaledTreeSize = new Dimension((int)(scaledTreeSize.width*viewer.scale),
-									   (int)(scaledTreeSize.height*viewer.scale));
-		if ( scaledTreeSize.width < viewer.width ) {
-			viewer.setWidth(scaledTreeSize.width);
-		}
-		if ( scaledTreeSize.height < viewer.height ) {
-			viewer.setHeight(scaledTreeSize.height);
-		}
-		scrollPane.setPreferredSize(new Dimension(viewer.width,viewer.height));
+		viewer.setPreferredSizeToScaledTree();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
 	  	// Add button to bottom
+		JPanel wrapper = new JPanel(new BorderLayout(0,0));
+		contentPane.add(wrapper, BorderLayout.SOUTH);
 		JButton ok = new JButton("OK");
 		ok.addActionListener(
-			new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					dialog.dispose();
+		new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dialog.dispose();
+			}
+		}
+							);
+		wrapper.add(ok, BorderLayout.SOUTH);
+
+		// Add scale slider
+		final JSlider scaleSlider = new JSlider(JSlider.HORIZONTAL,
+										  0,1000,1);
+		scaleSlider.addChangeListener(
+			new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					int v = scaleSlider.getValue();
+					viewer.setScale(v / 1000.0 + 1.0);
 				}
 			}
 		);
-		JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		wrapper.add(ok);
-		contentPane.add(wrapper, BorderLayout.SOUTH);
+		wrapper.add(scaleSlider, BorderLayout.CENTER);
 
 		// make viz
 		dialog.pack();
@@ -254,9 +257,23 @@ public class TreeViewer extends JComponent {
 		dialog.setVisible(true);
 	}
 
+	protected void setPreferredSizeToScaledTree() {
+		Dimension scaledTreeSize =
+			treeLayout.getBounds().getBounds().getSize();
+		scaledTreeSize = new Dimension((int)(scaledTreeSize.width*scale),
+									   (int)(scaledTreeSize.height*scale));
+		if ( scaledTreeSize.width < width ) {
+			setWidth(scaledTreeSize.width);
+		}
+		if ( scaledTreeSize.height < height ) {
+			setHeight(scaledTreeSize.height);
+		}
+		setPreferredSize(new Dimension(width,height));
+	}
+
 	public void open() {
 		final TreeViewer viewer = this;
-		viewer.setScale(10.5);
+		viewer.setScale(2.0);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 				showInDialog(viewer);
@@ -397,6 +414,7 @@ public class TreeViewer extends JComponent {
 
 	public void setScale(double scale) {
 		this.scale = scale;
+		repaint();
 	}
 
 	public int getHeight() {

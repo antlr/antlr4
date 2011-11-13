@@ -183,7 +183,6 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 										  NoViableAltException e)
 		throws RecognitionException
 	{
-		// TODO: subclass this class for treeparsers
 		TokenStream tokens = (TokenStream)recognizer.getInputStream();
 		String input = tokens.toString(e.startToken, e.offendingToken);
 		String msg = "no viable alternative at input "+escapeWSAndQuote(input);
@@ -205,11 +204,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" "+e.msg;
-		recognizer.notifyListeners(curToken(recognizer), msg, e);
-	}
-
-	private Token curToken(BaseRecognizer recognizer) {
-		return ((TokenStream)recognizer.getInputStream()).LT(1);
+		recognizer.notifyListeners((Token)recognizer.getCurrentInputSymbol(), msg, e);
 	}
 
 	public void reportUnwantedToken(BaseRecognizer recognizer) {
