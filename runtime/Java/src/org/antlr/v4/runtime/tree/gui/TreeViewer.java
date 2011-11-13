@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.tree.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 
@@ -91,6 +92,11 @@ public class TreeViewer extends JComponent {
 	protected int nodeWidthPadding = 2;  // added to left/right
 	protected int nodeHeightPadding = 0; // added above/below
 	protected int arcSize = 0;           // make an arc in node outline?
+
+	protected int width = 800;
+	protected int height = 600;
+
+	protected double scale = 1.0;
 
 	protected Color boxColor = null;     // set to a color to make it draw background
 
@@ -179,6 +185,13 @@ public class TreeViewer extends JComponent {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                          	RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+//		AffineTransform at = g2.getTransform();
+//        g2.scale(
+//            (double) this.getWidth() / 400,
+//            (double) this.getHeight() / 400);
+//
+//		g2.setTransform(at);
+
 		paintEdges(g, getTree().getRoot());
 
 		// paint the boxes
@@ -187,38 +200,68 @@ public class TreeViewer extends JComponent {
 		}
 	}
 
+	@Override
+	protected Graphics getComponentGraphics(Graphics g) {
+		Graphics2D g2d=(Graphics2D)g;
+		g2d.scale(scale, scale);
+		return super.getComponentGraphics(g2d);
+	}
+
 	// ----------------------------------------------------------------------
 
-	protected Rectangle2D.Double getBoundsOfNode(Tree node) {
-		return treeLayout.getNodeBounds().get(node);
-	}
+	protected static void showInDialog(final TreeViewer viewer) {
+		final JDialog dialog = new JDialog();
 
-	protected String getText(Tree tree) {
-		return treeTextProvider.getText(tree);
-	}
-
-	public TreeTextProvider getTreeTextProvider() {
-		return treeTextProvider;
-	}
-
-	public void setTreeTextProvider(TreeTextProvider treeTextProvider) {
-		this.treeTextProvider = treeTextProvider;
-	}
-
-	protected static void showInDialog(TreeViewer viewer) {
-		JDialog dialog = new JDialog();
-		Container contentPane = dialog.getContentPane();
-		((JComponent) contentPane).setBorder(BorderFactory.createEmptyBorder(
-				10, 10, 10, 10));
-		contentPane.add(viewer);
+		// Make new content pane
+		final Container contentPane = new JPanel();
+		contentPane.setLayout(new BorderLayout(0,0));
 		contentPane.setBackground(Color.white);
+//		contentPane.setPreferredSize(new Dimension(200, 200));
+		dialog.setContentPane(contentPane);
+
+		// Wrap viewer in scroll pane
+		JScrollPane scrollPane = new JScrollPane(viewer);
+		// Make it tree size up to width/height of viewer
+		Dimension scaledTreeSize =
+			viewer.treeLayout.getBounds().getBounds().getSize();
+		scaledTreeSize = new Dimension((int)(scaledTreeSize.width*viewer.scale),
+									   (int)(scaledTreeSize.height*viewer.scale));
+		if ( scaledTreeSize.width < viewer.width ) {
+			viewer.setWidth(scaledTreeSize.width);
+		}
+		if ( scaledTreeSize.height < viewer.height ) {
+			viewer.setHeight(scaledTreeSize.height);
+		}
+		scrollPane.setPreferredSize(new Dimension(viewer.width,viewer.height));
+		contentPane.add(scrollPane, BorderLayout.CENTER);
+
+	  	// Add button to bottom
+		JButton ok = new JButton("OK");
+		ok.addActionListener(
+			new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					dialog.dispose();
+				}
+			}
+		);
+		JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		wrapper.add(ok);
+		contentPane.add(wrapper, BorderLayout.SOUTH);
+
+		// make viz
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 	}
 
 	public void open() {
-		showInDialog(this);
+		final TreeViewer viewer = this;
+		viewer.setScale(10.5);
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+				showInDialog(viewer);
+            }
+        });
 	}
 
 	/** This does not always seem to render the postscript properly
@@ -239,6 +282,22 @@ public class TreeViewer extends JComponent {
 
 	// ---------------------------------------------------
 
+	protected Rectangle2D.Double getBoundsOfNode(Tree node) {
+		return treeLayout.getNodeBounds().get(node);
+	}
+
+	protected String getText(Tree tree) {
+		return treeTextProvider.getText(tree);
+	}
+
+	public TreeTextProvider getTreeTextProvider() {
+		return treeTextProvider;
+	}
+
+	public void setTreeTextProvider(TreeTextProvider treeTextProvider) {
+		this.treeTextProvider = treeTextProvider;
+	}
+
 	public void setFontSize(int sz) {
 		fontSize = sz;
 		font = new Font(fontName, fontStyle, fontSize);
@@ -250,12 +309,12 @@ public class TreeViewer extends JComponent {
 	}
 
 	/** Slow for big lists of highlighted nodes */
-	public void addHighlightNodes(Collection<Tree> nodes) {
+	public void addHighlightedNodes(Collection<Tree> nodes) {
 		highlightedNodes = new ArrayList<Tree>();
 		highlightedNodes.addAll(nodes);
 	}
 
-	public void removeHighlightNodes(Collection<Tree> nodes) {
+	public void removeHighlightedNodes(Collection<Tree> nodes) {
 		if ( highlightedNodes!=null ) {
 			// only remove exact objects defined by ==, not equals()
 			for (Tree t : nodes) {
@@ -330,5 +389,29 @@ public class TreeViewer extends JComponent {
 
 	protected TreeForTreeLayout<Tree> getTree() {
 		return treeLayout.getTree();
+	}
+
+	public double getScale() {
+		return scale;
+	}
+
+	public void setScale(double scale) {
+		this.scale = scale;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
 	}
 }
