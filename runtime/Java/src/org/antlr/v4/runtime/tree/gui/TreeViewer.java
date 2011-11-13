@@ -273,7 +273,7 @@ public class TreeViewer extends JComponent {
 
 	public void open() {
 		final TreeViewer viewer = this;
-		viewer.setScale(2.0);
+		viewer.setScale(1.5);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 				showInDialog(viewer);
