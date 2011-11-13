@@ -226,21 +226,23 @@ public class TreeViewer extends JComponent {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
 	  	// Add button to bottom
-		JPanel wrapper = new JPanel(new BorderLayout(0,0));
-		contentPane.add(wrapper, BorderLayout.SOUTH);
+		JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
+		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 		JButton ok = new JButton("OK");
 		ok.addActionListener(
-		new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dialog.dispose();
+			new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					dialog.dispose();
+				}
 			}
-		}
-							);
-		wrapper.add(ok, BorderLayout.SOUTH);
+		);
+		JPanel wrapper = new JPanel(new FlowLayout());
+		wrapper.add(ok);
+		bottomPanel.add(wrapper, BorderLayout.SOUTH);
 
 		// Add scale slider
 		final JSlider scaleSlider = new JSlider(JSlider.HORIZONTAL,
-										  0,1000,1);
+										  -1000,1000,0);
 		scaleSlider.addChangeListener(
 			new ChangeListener() {
 				public void stateChanged(ChangeEvent e) {
@@ -249,7 +251,7 @@ public class TreeViewer extends JComponent {
 				}
 			}
 		);
-		wrapper.add(scaleSlider, BorderLayout.CENTER);
+		bottomPanel.add(scaleSlider, BorderLayout.CENTER);
 
 		// make viz
 		dialog.pack();
@@ -268,7 +270,7 @@ public class TreeViewer extends JComponent {
 		if ( scaledTreeSize.height < height ) {
 			setHeight(scaledTreeSize.height);
 		}
-		setPreferredSize(new Dimension(width,height));
+		setPreferredSize(new Dimension(width, height));
 	}
 
 	public void open() {
