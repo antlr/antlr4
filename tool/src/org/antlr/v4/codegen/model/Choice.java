@@ -30,14 +30,12 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.codegen.model.decl.TokenTypeDecl;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** The class hierarchy underneath SrcOp is pretty deep but makes sense that,
  *  for example LL1StarBlock is a kind of LL1Loop which is a kind of Choice.
@@ -88,5 +86,16 @@ public abstract class Choice extends RuleElement {
 			addPreambleOp(nextType);
 		}
 		return expr;
+	}
+
+	public ThrowNoViableAlt getThrowNoViableAlt(OutputModelFactory factory,
+												GrammarAST blkAST,
+												IntervalSet expecting) {
+		if ( factory.getGrammar().isTreeGrammar() ) {
+			return new ThrowNoViableTreeAlt(factory, blkAST, expecting);
+		}
+		else {
+			return new ThrowNoViableAlt(factory, blkAST, expecting);
+		}
 	}
 }

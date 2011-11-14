@@ -136,7 +136,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 				}
 				catch (LexerNoViableAltException e) {
 					notifyListeners(e);		// report error
-					recover();
+					recover(e);
 					ttype = SKIP;
 				}
 				if ( input.LA(1)==CharStream.EOF ) {
@@ -301,7 +301,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		return null;
 	}
 
-	public void recover() {
+	public void recover(LexerNoViableAltException e) {
 		_interp.consume(input); // skip a char and try again
 	}
 

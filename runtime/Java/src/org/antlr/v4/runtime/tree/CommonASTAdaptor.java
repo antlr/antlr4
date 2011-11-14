@@ -130,6 +130,7 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 	 *  override this in your own adaptor.
 	 */
 	public Token getToken(CommonAST t) {
+		if ( t==null ) return null;
 		return t.getToken();
 	}
 

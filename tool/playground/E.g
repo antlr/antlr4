@@ -1,5 +1,12 @@
 grammar E;
 
+@lexer::members {
+public void recover(LexerNoViableAltException e) {
+	super.recover(e);
+	throw new RuntimeException(e);
+}
+}
+
 prog:   classDef+ ; // match one or more class definitions
 
 classDef

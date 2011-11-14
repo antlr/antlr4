@@ -32,7 +32,9 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-public class DefaultANTLRTreeGrammarErrorStrategy extends DefaultANTLRErrorStrategy {
+import java.util.*;
+
+public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorStrategy {
 	@Override
 	public void beginErrorCondition(BaseRecognizer recognizer) {
 	}
@@ -42,23 +44,72 @@ public class DefaultANTLRTreeGrammarErrorStrategy extends DefaultANTLRErrorStrat
 		throws RecognitionException
 	{
 		super.reportError(recognizer, e);
-		ASTNodeStream input = ((TreeParser) recognizer).getInputStream();
+		TreeParser<T> parser = (TreeParser<T>)recognizer;
+		ASTNodeStream input = parser.getInputStream();
 		Object root = input.getTreeSource();
-		if ( root instanceof AST ) {
+		// If instanceof Tree, we can show in TreeViewer
+		if ( root instanceof Tree ) {
 			TreeViewer viewer = new TreeViewer(recognizer, (Tree)root);
 			viewer.open();
+			List<T> unmatchedNodes = null;
 			if ( e instanceof NoViableTreeGrammarAltException ) {
 				NoViableTreeGrammarAltException nva =
 					(NoViableTreeGrammarAltException)e;
-//				((AST)nva.startNode).get
+				unmatchedNodes = getNodeList(input, nva);
 			}
 			else {
-
+				unmatchedNodes = new ArrayList<T>();
+				unmatchedNodes.add((T)e.offendingNode);
 			}
-//			input.get()
-//			viewer.addHighlightedNodes();
-			// TODO: highlight error node
+			viewer.setHighlightedBoxColor(TreeViewer.LIGHT_RED);
+			viewer.addHighlightedNodes((List<Tree>)unmatchedNodes);
 		}
+	}
+
+	@Override
+	public void reportNoViableAlternative(BaseRecognizer recognizer,
+										  NoViableAltException e)
+		throws RecognitionException
+	{
+		TreeParser<T> parser = (TreeParser<T>)recognizer;
+		ASTNodeStream input = parser.getInputStream();
+		List<T> unmatchedNodes =
+			getNodeList(input, (NoViableTreeGrammarAltException)e);
+		StringBuffer buf = new StringBuffer();
+		ASTAdaptor<T> adap = input.getTreeAdaptor();
+		for (int i = 0; i < unmatchedNodes.size(); i++) {
+			if ( i>0 ) buf.append(" ");
+			T t = unmatchedNodes.get(i);
+			buf.append(adap.getText(t));
+		}
+		String s = buf.toString();
+		String msg = "no viable alternative at node(s) "+escapeWSAndQuote(s);
+		recognizer.notifyListeners(e.offendingToken, msg, e);
+	}
+
+	protected List<T> getNodeList(ASTNodeStream input,
+								  NoViableTreeGrammarAltException nva)
+	{
+		List<T> unmatchedNodes;
+		T start = (T)nva.startNode;
+		T stop = (T)nva.offendingNode;
+		if ( input instanceof BufferedASTNodeStream) {
+			BufferedASTNodeStream<T> b =
+				(BufferedASTNodeStream<T>)input;
+			unmatchedNodes = b.get(start, stop);
+		}
+		else {
+			// if not buffered then we can't get from start to stop;
+			// just highlight the start/stop nodes, but not in between
+			unmatchedNodes = new ArrayList<T>();
+			if ( nva.startNode!=null ) {
+				unmatchedNodes.add((T)nva.startNode);
+			}
+			if ( nva.startNode==null || nva.offendingNode!=nva.startNode ) {
+				unmatchedNodes.add((T)nva.offendingNode);
+			}
+		}
+		return unmatchedNodes;
 	}
 
 	@Override
@@ -70,9 +121,7 @@ public class DefaultANTLRTreeGrammarErrorStrategy extends DefaultANTLRErrorStrat
 
 	@Override
 	public void recover(BaseRecognizer recognizer, RecognitionException e) {
-		throw new RecognitionException(recognizer,
-									   recognizer.getInputStream(),
-									   recognizer._ctx);
+		throw new RuntimeException(e);
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class TreeParser<T> extends BaseRecognizer {
 	public static final int DOWN = Token.DOWN;
 	public static final int UP = Token.UP;
 
-	public ASTAdaptor _adaptor = new CommonASTAdaptor();
+	public ASTAdaptor<T> _adaptor = (ASTAdaptor<T>)new CommonASTAdaptor();
 
     // precompiled regex used by inContext
     static String dotdot = ".*[^.]\\.\\.[^.].*";
@@ -53,7 +53,7 @@ public class TreeParser<T> extends BaseRecognizer {
 
 	public TreeParser(ASTNodeStream<T> input) {
 		super(input);
-		_errHandler = new DefaultANTLRTreeGrammarErrorStrategy();
+		_errHandler = new DefaultANTLRTreeGrammarErrorStrategy<T>();
 	}
 
 	public void reset() {

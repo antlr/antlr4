@@ -52,7 +52,6 @@ public class RuleFunction extends OutputModelObject {
 	public int index;
 	public Collection<Attribute> args = null;
 	public Rule rule;
-	public boolean catch_;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -73,8 +72,6 @@ public class RuleFunction extends OutputModelObject {
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
 		index = r.index;
-
-		catch_ = !r.g.isTreeGrammar();
 
 		ruleCtx = r.g.isTreeGrammar() ?
 					new TreeParserStructDecl(factory, r) :

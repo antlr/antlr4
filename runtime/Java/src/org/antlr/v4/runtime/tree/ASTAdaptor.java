@@ -42,16 +42,17 @@ import java.util.List;
 public interface ASTAdaptor<T> {
 	// BEGIN new v4 stuff
 
-	// If not null root, add kids to it
-	//public void addChildren(Object root, List kids);
-
-	//public List getChildren(Object root);
-
 	/** Used to track elements to left of -> for use in rewrite. These
 	 *  are some kind of trees, but we generically use Object
 	 *  for tree types in ANTLR.
 	 */
 	public List<T> createElementList();
+
+	/** Get the absolute index starting from 0 of this note within
+	 * 	a node stream. This should w
+ork even if the stream is not buffered
+ 	 */
+//	public int getNodeIndex(T t);
 
 	// END new v4 stuff
 

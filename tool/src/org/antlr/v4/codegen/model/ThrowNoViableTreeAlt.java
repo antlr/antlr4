@@ -30,27 +30,14 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.List;
-
-public class PlusBlock extends Loop {
-	@ModelElement public ThrowNoViableAlt error;
-
-	public PlusBlock(OutputModelFactory factory,
-					 GrammarAST plusRoot,
-					 List<CodeBlockForAlt> alts)
+public class ThrowNoViableTreeAlt extends ThrowNoViableAlt {
+	public ThrowNoViableTreeAlt(OutputModelFactory factory,
+								GrammarAST blkOrEbnfRootAST,
+								IntervalSet expecting)
 	{
-		super(factory, plusRoot, alts);
-
-		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
-		PlusLoopbackState loop = ((PlusBlockStartState)plusRoot.atnState).loopBackState;
-		stateNumber = blkStart.loopBackState.stateNumber;
-		blockStartStateNumber = blkStart.stateNumber;
-		loopBackStateNumber = loop.stateNumber;
-		this.error = getThrowNoViableAlt(factory, plusRoot, null);
-		decision = loop.decision;
-		exitAlt = alts.size()+1;
+		super(factory, blkOrEbnfRootAST, expecting);
 	}
 }

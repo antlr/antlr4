@@ -232,6 +232,7 @@ public class TreeViewer extends JComponent {
 		ok.addActionListener(
 			new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					dialog.setVisible(false);
 					dialog.dispose();
 				}
 			}

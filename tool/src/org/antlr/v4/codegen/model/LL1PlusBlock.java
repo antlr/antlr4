@@ -29,8 +29,7 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.*;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
@@ -67,7 +66,7 @@ public class LL1PlusBlock extends LL1Loop {
 		IntervalSet all = new IntervalSet();
 		for (IntervalSet s : altLookSets) all.addAll(s);
 
-		this.error = new ThrowNoViableAlt(factory, plusRoot, all);
+		this.error = getThrowNoViableAlt(factory, plusRoot, all);
 
 		loopExpr = addCodeForLoopLookaheadTempVar(all);
 

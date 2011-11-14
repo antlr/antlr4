@@ -213,6 +213,29 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return nodes.get(i);
 	}
 
+	public List<T> get(int i, int j) {
+		if ( p==-1 ) {
+			fillBuffer();
+		}
+		return nodes.subList(i,j+1);
+	}
+
+	public List<T> get(T start, T stop) {
+		int i=0;
+		for (; i<nodes.size(); i++) {
+			T t = nodes.get(i);
+			if ( t==start ) break;
+		}
+		int j=i;
+		for (; j<nodes.size(); j++) {
+			T t = nodes.get(j);
+			if ( t==stop ) break;
+		}
+		if ( i>=nodes.size() ) return null;
+		if ( j>=nodes.size() ) j = nodes.size()-1;
+		return get(i,j);
+	}
+
 	public T LT(int k) {
 		if ( p==-1 ) {
 			fillBuffer();

@@ -38,16 +38,24 @@ public class NoViableTreeGrammarAltException extends NoViableAltException {
 	protected Object offendingNode;
 
 	public NoViableTreeGrammarAltException(BaseRecognizer recognizer) {
-		super(recognizer);
+		this(recognizer,
+			 (ASTNodeStream<Object>)recognizer.getInputStream(),
+			 recognizer.getCurrentInputSymbol(),
+			 recognizer.getCurrentInputSymbol(),
+			 null,
+			 recognizer._ctx);
 	}
 
 	public NoViableTreeGrammarAltException(BaseRecognizer recognizer,
-										   ASTNodeStream input,
+										   ASTNodeStream<Object> input,
 										   Object startNode,
 										   Object offendingNode,
 										   OrderedHashSet<ATNConfig> deadEndConfigs,
 										   RuleContext ctx) {
-		super(recognizer, input, null, null, deadEndConfigs, ctx);
+		super(recognizer, input,
+			  input.getTreeAdaptor().getToken(startNode),
+			  input.getTreeAdaptor().getToken(offendingNode),
+			  deadEndConfigs, ctx);
 		this.startNode = startNode;
 		this.offendingNode = offendingNode;
 	}

@@ -188,12 +188,10 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
-<if(currentRule.catch_)>
 	catch (RecognitionException re) {
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
 	}
-<endif>
 	finally {
 		<finallyAction>
 		exitRule(RULE_<currentRule.name>);
@@ -378,6 +376,14 @@ case <i>:
 Sync(s) ::= "sync(<s.expecting.name>);"
 
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
+ThrowNoViableTreeAlt(t) ::= <<
+/*
+NoViableTreeGrammarAltException e<choice.uniqueID> = new NoViableTreeGrammarAltException(this);
+_errHandler.reportError(this, e<choice.uniqueID>);
+throw e<choice.uniqueID>;
+*/
+throw new NoViableTreeGrammarAltException(this);
+>>
 
 TestSetInline(s) ::= <<
 <s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">

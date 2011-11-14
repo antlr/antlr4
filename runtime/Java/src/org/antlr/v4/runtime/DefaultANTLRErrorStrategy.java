@@ -181,7 +181,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportNoViableAlternative(BaseRecognizer recognizer,
 										  NoViableAltException e)
-		throws RecognitionException
+	throws RecognitionException
 	{
 		TokenStream tokens = (TokenStream)recognizer.getInputStream();
 		String input = tokens.toString(e.startToken, e.offendingToken);
