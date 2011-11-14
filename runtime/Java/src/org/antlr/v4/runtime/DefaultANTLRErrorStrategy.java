@@ -386,6 +386,7 @@ public class DefaultANTLRErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	protected String escapeWSAndQuote(String s) {
+//		if ( s==null ) return s;
 		s = s.replaceAll("\n","\\\\n");
 		s = s.replaceAll("\r","\\\\r");
 		s = s.replaceAll("\t","\\\\t");

@@ -852,11 +852,11 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int throwNoViableAlt(ObjectStream input, RuleContext outerContext,
 								OrderedHashSet<ATNConfig> configs, int startIndex)
 	{
-		Object startNode = null;
-		if ( input instanceof BufferedASTNodeStream ) {
-			startNode = input.get(startIndex);
-		}
 		if ( parser instanceof TreeParser) {
+			Object startNode = null;
+			if ( input instanceof BufferedASTNodeStream ) {
+				startNode = input.get(startIndex);
+			}
 			throw new NoViableTreeGrammarAltException(parser,
 													  (ASTNodeStream<Object>)input,
 													  startNode,
@@ -865,7 +865,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		else {
 			throw new NoViableAltException(parser, input,
-										   (Token) startNode,
+										   (Token)input.get(startIndex),
 										   (Token)input.LT(1),
 										   configs, outerContext);
 		}
