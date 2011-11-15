@@ -32,6 +32,8 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class ParseTreeWalker {
+    public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
+
     public void walk(ParseTreeListener listener, ParseTree t) {
 		if ( t instanceof ParseTree.TokenNode) {
 			visitToken(listener, (ParseTree.TokenNode) t);
