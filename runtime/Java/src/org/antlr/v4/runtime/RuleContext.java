@@ -298,7 +298,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	public int getRuleIndex() { return -1; }
 
 	public Interval getSourceInterval() {
-		if ( getChildCount()==0 ) return Interval.ZeroLength;
+		if ( getChildCount()==0 ) return Interval.INVALID;
 		int start = getChild(0).getSourceInterval().a;
 		int stop = getChild(getChildCount()-1).getSourceInterval().b;
 		return new Interval(start, stop);
