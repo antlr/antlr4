@@ -30,13 +30,14 @@
 package org.antlr.v4.runtime;
 
 /** A stream of tokens accessing tokens from a TokenSource */
-public interface TokenStream extends ObjectStream {
+public interface TokenStream extends ObjectStream<Token> {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
 	 *  i<0 indicates tokens in the past.  So -1 is previous token and -2 is
 	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
 	 *  Return null for LT(0) and any index that results in an absolute address
 	 *  that is negative.
 	 */
+    @Override
     public Token LT(int k);
 
 	/** How far ahead has the stream been asked to look?  The return
@@ -51,6 +52,7 @@ public interface TokenStream extends ObjectStream {
 	 *  I believe DebugTokenStream can easily be altered to not use
 	 *  this method, removing the dependency.
 	 */
+	@Override
 	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but
