@@ -106,7 +106,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		/** Execute the rewrite operation by possibly adding to the buffer.
 		 *  Return the index of the next token to operate on.
 		 */
-		public int execute(StringBuffer buf) {
+		public int execute(StringBuilder buf) {
 			return index;
 		}
 		public String toString() {
@@ -122,7 +122,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		public InsertBeforeOp(int index, Object text) {
 			super(index,text);
 		}
-		public int execute(StringBuffer buf) {
+		public int execute(StringBuilder buf) {
 			buf.append(text);
 			if ( tokens.get(index).getType()!=Token.EOF ) {
 				buf.append(tokens.get(index).getText());
@@ -140,7 +140,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			super(from,text);
 			lastIndex = to;
 		}
-		public int execute(StringBuffer buf) {
+		public int execute(StringBuilder buf) {
 			if ( text!=null ) {
 				buf.append(text);
 			}
@@ -338,7 +338,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public String toOriginalString(int start, int end) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.size(); i++) {
 			if ( get(i).getType()!=Token.EOF ) buf.append(get(i).getText());
 		}
@@ -369,7 +369,7 @@ public class TokenRewriteStream extends CommonTokenStream {
         if ( rewrites==null || rewrites.size()==0 ) {
 			return toOriginalString(start,end); // no instructions to execute
 		}
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 
 		// First, optimize instruction stream
 		Map indexToOp = reduceToSingleOperationPerIndex(rewrites);
@@ -582,7 +582,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public String toDebugString(int start, int end) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.size(); i++) {
 			buf.append(get(i));
 		}
