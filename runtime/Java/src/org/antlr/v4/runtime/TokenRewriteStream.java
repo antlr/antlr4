@@ -28,6 +28,8 @@
  */
 package org.antlr.v4.runtime;
 
+import com.sun.istack.internal.Nullable;
+
 import java.util.*;
 
 /** Useful for dumping out the input stream after doing some
@@ -109,6 +111,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 		public int execute(StringBuilder buf) {
 			return index;
 		}
+
+		@Override
 		public String toString() {
 			String opName = getClass().getName();
 			int $index = opName.indexOf('$');
@@ -122,6 +126,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 		public InsertBeforeOp(int index, Object text) {
 			super(index,text);
 		}
+
+		@Override
 		public int execute(StringBuilder buf) {
 			buf.append(text);
 			if ( tokens.get(index).getType()!=Token.EOF ) {
@@ -140,12 +146,14 @@ public class TokenRewriteStream extends CommonTokenStream {
 			super(from,text);
 			lastIndex = to;
 		}
+		@Override
 		public int execute(StringBuilder buf) {
 			if ( text!=null ) {
 				buf.append(text);
 			}
 			return lastIndex+1;
 		}
+		@Override
 		public String toString() {
 			if ( text==null ) {
 				return "<DeleteOp@"+tokens.get(index)+
@@ -261,7 +269,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		replace(DEFAULT_PROGRAM_NAME, from, to, text);
 	}
 
-	public void replace(String programName, int from, int to, Object text) {
+	public void replace(String programName, int from, int to, @Nullable Object text) {
 		if ( from > to || from<0 || to<0 || to >= tokens.size() ) {
 			throw new IllegalArgumentException("replace: range invalid: "+from+".."+to+"(size="+tokens.size()+")");
 		}
@@ -271,7 +279,7 @@ public class TokenRewriteStream extends CommonTokenStream {
         rewrites.add(op);
 	}
 
-	public void replace(String programName, Token from, Token to, Object text) {
+	public void replace(String programName, Token from, Token to, @Nullable Object text) {
 		replace(programName,
 				from.getTokenIndex(),
 				to.getTokenIndex(),
@@ -307,15 +315,15 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	protected int getLastRewriteTokenIndex(String programName) {
-		Integer I = (Integer)lastRewriteTokenIndexes.get(programName);
+		Integer I = lastRewriteTokenIndexes.get(programName);
 		if ( I==null ) {
 			return -1;
 		}
-		return I.intValue();
+		return I;
 	}
 
 	protected void setLastRewriteTokenIndex(String programName, int i) {
-		lastRewriteTokenIndexes.put(programName, new Integer(i));
+		lastRewriteTokenIndexes.put(programName, i);
 	}
 
 	protected List<RewriteOperation> getProgram(String name) {
@@ -355,6 +363,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return toString(programName, MIN_TOKEN_INDEX, size()-1);
 	}
 
+	@Override
 	public String toString(int start, int end) {
 		return toString(DEFAULT_PROGRAM_NAME, start, end);
 	}
@@ -377,8 +386,8 @@ public class TokenRewriteStream extends CommonTokenStream {
         // Walk buffer, executing instructions and emitting tokens
         int i = start;
         while ( i <= end && i < tokens.size() ) {
-			RewriteOperation op = indexToOp.get(new Integer(i));
-			indexToOp.remove(new Integer(i)); // remove so any left have index size-1
+			RewriteOperation op = indexToOp.get(i);
+			indexToOp.remove(i); // remove so any left have index size-1
 			Token t = tokens.get(i);
 			if ( op==null ) {
 				// no operation at that index, just dump token
@@ -546,10 +555,10 @@ public class TokenRewriteStream extends CommonTokenStream {
 		for (int i = 0; i < rewrites.size(); i++) {
 			RewriteOperation op = rewrites.get(i);
 			if ( op==null ) continue; // ignore deleted ops
-			if ( m.get(new Integer(op.index))!=null ) {
+			if ( m.get(op.index)!=null ) {
 				throw new Error("should only be one op per index");
 			}
-			m.put(new Integer(op.index), op);
+			m.put(op.index, op);
 		}
 		//System.out.println("index to op: "+m);
 		return m;
