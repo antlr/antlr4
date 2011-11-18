@@ -143,7 +143,7 @@ public class ATNConfig {
 	}
 
 	public String toString(Recognizer<?> recog, boolean showAlt) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 //		if ( state.ruleIndex>=0 ) {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
 //			else buf.append(state.ruleIndex+":");
@@ -158,7 +158,7 @@ public class ATNConfig {
             buf.append(context);
         }
 		if ( reachesIntoOuterContext>0 ) {
-			buf.append("|up="+reachesIntoOuterContext);
+			buf.append("|up=").append(reachesIntoOuterContext);
 		}
 //		if (isAccept) {
 //			buf.append("|=>"+alt);
