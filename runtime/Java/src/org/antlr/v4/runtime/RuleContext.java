@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
+import com.sun.istack.internal.NotNull;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Interval;
@@ -49,6 +50,7 @@ import java.util.List;
  *  ATN simulation to record invoking states.
  */
 public class RuleContext implements ParseTree.RuleNode {
+	@NotNull
 	public static final RuleContext EMPTY = new RuleContext();
 
 	/** What context invoked this rule? */

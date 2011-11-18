@@ -29,19 +29,22 @@
 
 package org.antlr.v4.runtime.atn;
 
-public class ActionTransition extends Transition {
-	public int ruleIndex;
-	public int actionIndex = -1;
-	public boolean isCtxDependent; // e.g., $i ref in action
+import com.sun.istack.internal.NotNull;
 
-	public ActionTransition(ATNState target) {
-		super(target);
+public class ActionTransition extends Transition {
+	public final int ruleIndex;
+	public final int actionIndex;
+	public final boolean isCtxDependent; // e.g., $i ref in action
+
+	public ActionTransition(@NotNull ATNState target, int ruleIndex) {
+		this(target, ruleIndex, -1, false);
 	}
 
-	public ActionTransition(ATNState target, int ruleIndex, int actionIndex) {
+	public ActionTransition(@NotNull ATNState target, int ruleIndex, int actionIndex, boolean isCtxDependent) {
 		super(target);
 		this.ruleIndex = ruleIndex;
 		this.actionIndex = actionIndex;
+		this.isCtxDependent = isCtxDependent;
 	}
 
 	@Override

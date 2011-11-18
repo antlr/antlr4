@@ -29,8 +29,10 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
@@ -41,14 +43,16 @@ public class LL1Analyzer {
 	 *  loop.
 	 */
 
-	public ATN atn;
+	@NotNull
+	public final ATN atn;
 
-	public LL1Analyzer(ATN atn) { this.atn = atn; }
+	public LL1Analyzer(@NotNull ATN atn) { this.atn = atn; }
 
 	/** From an ATN state, s, find the set of all labels reachable from s at
 	 *  depth k.  Only for DecisionStates.
 	 */
-	public IntervalSet[] getDecisionLookahead(ATNState s) {
+	@Nullable
+	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
 		if ( s==null ) return null;
 		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()+1];
@@ -60,14 +64,15 @@ public class LL1Analyzer {
 		return look;
 	}
 
-	public IntervalSet LOOK(ATNState s, @Nullable RuleContext ctx) {
+	@NotNull
+	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
 		IntervalSet r = new IntervalSet();
 		_LOOK(s, ctx, r, new HashSet<ATNConfig>());
 		return r;
 	}
 
-	protected void _LOOK(ATNState s, @Nullable RuleContext ctx, IntervalSet look,
-						 Set<ATNConfig> lookBusy) {
+	protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx, @NotNull IntervalSet look,
+						 @NotNull Set<ATNConfig> lookBusy) {
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
 		ATNConfig c = new ATNConfig(s, 0, ctx);
 		if ( lookBusy.contains(c) ) return;

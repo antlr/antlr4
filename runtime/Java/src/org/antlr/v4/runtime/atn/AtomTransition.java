@@ -29,25 +29,26 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** TODO: make all transitions sets? no, should remove set edges */
 public class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
-	public int label;
+	public final int label;
 
-	public AtomTransition(int label, ATNState target) {
-		this.label = label;
-		this.target = target;
-	}
-
-	public AtomTransition(ATNState target) {
+	public AtomTransition(@NotNull ATNState target, int label) {
 		super(target);
+		this.label = label;
 	}
 
 	@Override
+	@NotNull
 	public IntervalSet label() { return IntervalSet.of(label); }
 
+	@Override
+	@NotNull
 	public String toString() {
 		return String.valueOf(label);
 	}

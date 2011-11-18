@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.*;
@@ -58,21 +60,22 @@ public abstract class Transition {
 	public static final int WILDCARD		= 9;
 
 
-	public static String[] serializationNames = {
-		"INVALID",
-		"EPSILON",
-		"RANGE",
-		"RULE",
-		"PREDICATE",
-		"ATOM",
-		"ACTION",
-		"SET",
-		"NOT_SET",
-		"WILDCARD",
-	};
+	public static final List<String> serializationNames =
+		Collections.unmodifiableList(Arrays.asList(
+			"INVALID",
+			"EPSILON",
+			"RANGE",
+			"RULE",
+			"PREDICATE",
+			"ATOM",
+			"ACTION",
+			"SET",
+			"NOT_SET",
+			"WILDCARD"
+		));
 
-	public static Map<Class<? extends Transition>, Integer> serializationTypes =
-		new HashMap<Class<? extends Transition>, Integer>() {{
+	public static final Map<Class<? extends Transition>, Integer> serializationTypes =
+		Collections.unmodifiableMap(new HashMap<Class<? extends Transition>, Integer>() {{
 			put(EpsilonTransition.class, EPSILON);
 			put(RangeTransition.class, RANGE);
 			put(RuleTransition.class, RULE);
@@ -82,19 +85,19 @@ public abstract class Transition {
 			put(SetTransition.class, SET);
 			put(NotSetTransition.class, NOT_SET);
 			put(WildcardTransition.class, WILDCARD);
-		}};
+		}});
 
 	/** The target of this transition */
-	public ATNState target;
+	@NotNull
+	public final ATNState target;
 
-	public Transition() { }
-
-	public Transition(ATNState target) { this.target = target; }
+	protected Transition(@NotNull ATNState target) { this.target = target; }
 
 	public int getSerializationType() { return 0; }
 
 	/** Are we epsilon, action, sempred? */
 	public boolean isEpsilon() { return false; }
 
+	@Nullable
 	public IntervalSet label() { return null; }
 }

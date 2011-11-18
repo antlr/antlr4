@@ -103,7 +103,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(b);
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
-		left.addTransition(new  RangeTransition(t1, t2, right));
+		left.addTransition(new  RangeTransition(right, t1, t2));
 		a.atnState = left;
 		b.atnState = left;
 		return new Handle(left, right);
@@ -128,10 +128,10 @@ public class LexerATNFactory extends ParserATNFactory {
 		if ( invert ) {
 			// TODO: what? should be chars not token types
 			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
-			left.addTransition(new NotSetTransition(set, notSet, right));
+			left.addTransition(new NotSetTransition(right, set, notSet));
 		}
 		else {
-			left.addTransition(new SetTransition(set, right));
+			left.addTransition(new SetTransition(right, set));
 		}
 		right.incidentTransition = left.transition(0);
 		associatedAST.atnState = left;
@@ -153,7 +153,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = null;
 		for (int i=0; i<n; i++) {
 			right = newState(stringLiteralAST);
-			prev.addTransition(new AtomTransition(chars.charAt(i), right));
+			prev.addTransition(new AtomTransition(right, chars.charAt(i)));
 			prev = right;
 		}
 		stringLiteralAST.atnState = left;
@@ -166,7 +166,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		if ( node.getText().equals("EOF") ) {
 			ATNState left = newState(node);
 			ATNState right = newState(node);
-			left.addTransition(new AtomTransition(CharStream.EOF, right));
+			left.addTransition(new AtomTransition(right, CharStream.EOF));
 			return new Handle(left, right);
 		}
 		return _ruleRef(node);

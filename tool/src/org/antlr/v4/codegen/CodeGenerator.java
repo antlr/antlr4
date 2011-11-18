@@ -29,6 +29,7 @@
 
 package org.antlr.v4.codegen;
 
+import com.sun.istack.internal.NotNull;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
@@ -48,18 +49,21 @@ public class CodeGenerator {
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
-	public Grammar g;
-	public Tool tool;
+	@NotNull
+	public final Grammar g;
+	@NotNull
+	public final Tool tool;
+
 	public Target target;
 	public STGroup templates;
 
 	public int lineWidth = 72;
 
-	public CodeGenerator(Grammar g) {
+	public CodeGenerator(@NotNull Grammar g) {
 		this(g.tool, g, g.getOptionString("language", "Java"));
 	}
 
-	public CodeGenerator(Tool tool, Grammar g, String language) {
+	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
 		loadLanguageTarget(language);

@@ -30,6 +30,8 @@
 package org.antlr.v4.automata;
 
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.misc.CharSupport;
@@ -48,11 +50,15 @@ import java.util.*;
  *  No side-effects. It builds an ATN object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
-	public Grammar g;
-	public Rule currentRule;
-	public ATN atn;
+	@NotNull
+	public final Grammar g;
 
-	public ParserATNFactory(Grammar g) { this.g = g; atn = new ATN(); }
+	@NotNull
+	public final ATN atn;
+
+	public Rule currentRule;
+
+	public ParserATNFactory(@NotNull Grammar g) { this.g = g; atn = new ATN(); }
 
 	public ATN createATN() {
 		_createATN(g.rules.values());
@@ -104,7 +110,7 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
-		left.addTransition(new AtomTransition(ttype, right));
+		left.addTransition(new AtomTransition(right, ttype));
 		right.incidentTransition = left.transition(0);
 		node.atnState = left;
 		return new Handle(left, right);
@@ -124,10 +130,10 @@ public class ParserATNFactory implements ATNFactory {
 		}
 		if ( invert ) {
 			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
-			left.addTransition(new NotSetTransition(set, notSet, right));
+			left.addTransition(new NotSetTransition(right, set, notSet));
 		}
 		else {
-			left.addTransition(new SetTransition(set, right));
+			left.addTransition(new SetTransition(right, set));
 		}
 		right.incidentTransition = left.transition(0);
 		associatedAST.atnState = left;
@@ -178,7 +184,7 @@ public class ParserATNFactory implements ATNFactory {
 		RuleStartState start = atn.ruleToStartState[r.index];
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		RuleTransition call = new RuleTransition(r.index, start, right);
+		RuleTransition call = new RuleTransition(start, r.index, right);
 		left.addTransition(call);
 
 		node.atnState = left;
@@ -208,10 +214,8 @@ public class ParserATNFactory implements ATNFactory {
 		//System.out.println("sempred: "+ pred);
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
-		PredicateTransition p = new PredicateTransition(right);
-		p.ruleIndex = currentRule.index;
-		p.predIndex = g.sempreds.get(pred);
-		p.isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
+		boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
+		PredicateTransition p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
 		left.addTransition(p);
 		pred.atnState = left;
 		return new Handle(left, right);
@@ -225,8 +229,7 @@ public class ParserATNFactory implements ATNFactory {
 		//System.out.println("action: "+action);
 		ATNState left = newState(action);
 		ATNState right = newState(action);
-		ActionTransition a = new ActionTransition(right);
-		a.ruleIndex = currentRule.index;
+		ActionTransition a = new ActionTransition(right, currentRule.index);
 		left.addTransition(a);
 		action.atnState = left;
 		return new Handle(left, right);
@@ -306,11 +309,13 @@ public class ParserATNFactory implements ATNFactory {
 //		return set;
 //	}
 
-	public Handle alt(List<Handle> els) {
+	@NotNull
+	public Handle alt(@NotNull List<Handle> els) {
 		return elemList(els);
 	}
 
-	public Handle elemList(List<Handle> els) {
+	@NotNull
+	public Handle elemList(@NotNull List<Handle> els) {
 		Handle prev = null;
 		for (Handle el : els) { // hook up elements
 			if ( prev!=null ) epsilon(prev.right, el.left);
@@ -332,7 +337,8 @@ public class ParserATNFactory implements ATNFactory {
 	 *
 	 *  or, if A is a block, just add an empty alt to the end of the block
 	 */
-	public Handle optional(GrammarAST optAST, Handle blk) {
+	@NotNull
+	public Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk) {
 		// TODO: no such thing as nongreedy ()? so give error
 		BlockStartState blkStart = (BlockStartState)blk.left;
 		epsilon(blkStart, blk.right);
@@ -349,7 +355,8 @@ public class ParserATNFactory implements ATNFactory {
 	 *  We add a decision for loop back node to the existing one at
 	 *  blk start.
 	 */
-	public Handle plus(GrammarAST plusAST, Handle blk) {
+	@NotNull
+	public Handle plus(@NotNull GrammarAST plusAST, @NotNull Handle blk) {
 		PlusBlockStartState blkStart = (PlusBlockStartState)blk.left;
 		BlockEndState blkEnd = (BlockEndState)blk.right;
 
@@ -388,7 +395,8 @@ public class ParserATNFactory implements ATNFactory {
 	 *  Note that the optional bypass must jump outside the loop as (A|B)* is
 	 *  not the same thing as (A|B|)+.
 	 */
-	public Handle star(GrammarAST starAST, Handle elem) {
+	@NotNull
+	public Handle star(@NotNull GrammarAST starAST, @NotNull Handle elem) {
 		StarBlockStartState blkStart = (StarBlockStartState)elem.left;
 		BlockEndState blkEnd = (BlockEndState)elem.right;
 
@@ -417,6 +425,7 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** Build an atom with all possible values in its label */
+	@NotNull
 	public Handle wildcard(GrammarAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
@@ -431,7 +440,7 @@ public class ParserATNFactory implements ATNFactory {
 	 */
 	public Handle wildcardTree(GrammarAST associatedAST) { throw new UnsupportedOperationException(); }
 
-	void epsilon(ATNState a, ATNState b) {
+	void epsilon(ATNState a, @NotNull ATNState b) {
 		if ( a!=null ) a.addTransition(new EpsilonTransition(b));
 	}
 
@@ -442,8 +451,8 @@ public class ParserATNFactory implements ATNFactory {
 		atn.ruleToStartState = new RuleStartState[g.rules.size()];
 		atn.ruleToStopState = new RuleStopState[g.rules.size()];
 		for (Rule r : g.rules.values()) {
-			RuleStartState start = (RuleStartState)newState(RuleStartState.class, r.ast);
-			RuleStopState stop = (RuleStopState)newState(RuleStopState.class, r.ast);
+			RuleStartState start = newState(RuleStartState.class, r.ast);
+			RuleStopState stop = newState(RuleStopState.class, r.ast);
 			start.stopState = stop;
 			start.setRuleIndex(r.index);
 			stop.setRuleIndex(r.index);
@@ -467,7 +476,7 @@ public class ParserATNFactory implements ATNFactory {
 			ATNState stop = atn.ruleToStopState[r.index];
 			if ( stop.getNumberOfTransitions()>0 ) continue;
 			n++;
-			Transition t = new AtomTransition(Token.EOF, eofTarget);
+			Transition t = new AtomTransition(eofTarget, Token.EOF);
 			stop.addTransition(t);
 		}
 		return n;
@@ -481,10 +490,12 @@ public class ParserATNFactory implements ATNFactory {
 		return t;
 	}
 
-	public ATNState newState(Class nodeType, GrammarAST node) {
+	// TODO (sam): should we allow this to throw an exception instead of returning null?
+	@Nullable
+	public <T extends ATNState> T newState(@NotNull Class<T> nodeType, GrammarAST node) {
 		try {
-			Constructor ctor = nodeType.getConstructor();
-			ATNState s = (ATNState)ctor.newInstance();
+			Constructor<T> ctor = nodeType.getConstructor();
+			T s = ctor.newInstance();
 			if ( currentRule==null ) s.setRuleIndex(-1);
 			else s.setRuleIndex(currentRule.index);
 			atn.addState(s);
@@ -496,16 +507,18 @@ public class ParserATNFactory implements ATNFactory {
 		return null;
 	}
 
-	public ATNState newState(GrammarAST node) {
+	@NotNull
+	public ATNState newState(@Nullable GrammarAST node) {
 		ATNState n = new ATNState();
 		n.setRuleIndex(currentRule.index);
 		atn.addState(n);
 		return n;
 	}
 
+	@NotNull
 	public ATNState newState() { return newState(null); }
 
-	public boolean isGreedy(BlockAST blkAST) {
+	public boolean isGreedy(@NotNull BlockAST blkAST) {
 		boolean greedy = true;
 		String greedyOption = blkAST.getOptionString("greedy");
 		if ( blockHasWildcardAlt(blkAST) || greedyOption!=null&&greedyOption.equals("false") ) {
@@ -515,7 +528,7 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	// (BLOCK (ALT .)) or (BLOCK (ALT 'a') (ALT .))
-	public static boolean blockHasWildcardAlt(GrammarAST block) {
+	public static boolean blockHasWildcardAlt(@NotNull GrammarAST block) {
 		for (Object alt : block.getChildren()) {
 			if ( !(alt instanceof AltAST) ) continue;
 			AltAST altAST = (AltAST)alt;

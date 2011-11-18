@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.ATNState;
 
@@ -37,20 +38,24 @@ public class DFA {
 	/** A set of all DFA states. Use Map so we can get old state back
 	 *  (Set only allows you to see if it's there).
      */
-    public Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
+    @NotNull
+    public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
+	@Nullable
 	public DFAState s0;
 	public int decision;
 
 	/** From which ATN state did we create this DFA? */
-	public ATNState atnStartState;
+	@NotNull
+	public final ATNState atnStartState;
 
 	/** Does at least one state have a conflict? Mainly used as return value
 	 *  from predictATN()
 	 */
 	public boolean conflict;
 
-	public DFA(ATNState atnStartState) { this.atnStartState = atnStartState; }
+	public DFA(@NotNull ATNState atnStartState) { this.atnStartState = atnStartState; }
 
+	@Override
 	public String toString() { return toString(null); }
 
 	public String toString(@Nullable String[] tokenNames) {

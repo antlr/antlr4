@@ -29,26 +29,29 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** A transition containing a set of values */
 public class SetTransition extends Transition {
-	public IntervalSet set;
+	@NotNull
+	public final IntervalSet set;
 
-	public SetTransition(IntervalSet set, ATNState target) {
+	// TODO (sam): should we really allow null here?
+	public SetTransition(@NotNull ATNState target, @Nullable IntervalSet set) {
 		super(target);
 		if ( set == null ) set = IntervalSet.of(Token.INVALID_TYPE);
 		this.set = set;
 	}
 
-	public SetTransition(ATNState target) {
-		super(target);
-	}
-
 	@Override
+	@NotNull
 	public IntervalSet label() { return set; }
 
+	@Override
+	@NotNull
 	public String toString() {
 		return set.toString();
 	}

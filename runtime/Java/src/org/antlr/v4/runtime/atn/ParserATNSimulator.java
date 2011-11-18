@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -46,12 +48,14 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
 
+	@Nullable
+	protected final BaseRecognizer<TSymbol> parser;
 
-	protected BaseRecognizer<TSymbol> parser;
-
-	public Map<RuleContext, DFA[]> ctxToDFAs;
+	@NotNull
+	public final Map<RuleContext, DFA[]> ctxToDFAs;
 	public Map<RuleContext, DFA>[] decisionToDFAPerCtx; // TODO: USE THIS ONE
-	public DFA[] decisionToDFA;
+	@NotNull
+	public final DFA[] decisionToDFA;
 	protected boolean userWantsCtxSensitive = false;
 
 	/** This is the original context upon entry to the ATN simulator.
@@ -63,27 +67,28 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	 *
 	 *  The full stack at any moment is [config.outerContext + config.context].
 	 */
-	protected RuleContext outerContext;
+	@NotNull
+	protected RuleContext outerContext = RuleContext.EMPTY;
+	@Nullable
 	protected ATNConfig prevAccept; // TODO Move down? used to avoid passing int down and back up in method calls
 	protected int prevAcceptIndex = -1;
 
-	public ParserATNSimulator(ATN atn) {
-		super(atn);
-		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
-		decisionToDFA = new DFA[atn.getNumberOfDecisions()];
+	public ParserATNSimulator(@NotNull ATN atn) {
+		this(null, atn);
 	}
 
-	public ParserATNSimulator(BaseRecognizer<TSymbol> parser, ATN atn) {
+	public ParserATNSimulator(@Nullable BaseRecognizer<TSymbol> parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
-		decisionToDFA = new DFA[atn.getNumberOfDecisions()+1];
+		// TODO (sam): why distinguish on parser != null?
+		decisionToDFA = new DFA[atn.getNumberOfDecisions() + (parser != null ? 1 : 0)];
 //		DOTGenerator dot = new DOTGenerator(null);
 //		System.out.println(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(SymbolStream<TSymbol> input, int decision, RuleContext outerContext) {
+	public int adaptivePredict(@NotNull SymbolStream<TSymbol> input, int decision, @Nullable RuleContext outerContext) {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
@@ -108,8 +113,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(DFA dfa, SymbolStream<TSymbol> input,
-						  RuleContext outerContext,
+	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<TSymbol> input,
+						  @Nullable RuleContext outerContext,
 						  boolean useContext)
 	{
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
@@ -146,15 +151,14 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	}
 
 	// doesn't create DFA when matching
-	public int matchATN(SymbolStream<TSymbol> input, ATNState startState) {
+	public int matchATN(@NotNull SymbolStream<TSymbol> input, @NotNull ATNState startState) {
 		DFA dfa = new DFA(startState);
-		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		RuleContext ctx = RuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
-	public int execDFA(SymbolStream<TSymbol> input, DFA dfa, DFAState s0, RuleContext outerContext) {
+	public int execDFA(@NotNull SymbolStream<TSymbol> input, @NotNull DFA dfa, @NotNull DFAState s0, @Nullable RuleContext outerContext) {
 //		dump(dfa);
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
@@ -226,7 +230,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) {
-				return throwNoViableAlt(input, outerContext, s.configs, startIndex);
+				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 			s = target;
 			input.consume();
@@ -241,7 +245,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return prevAcceptState.prediction;
 	}
 
-	public String getInputString(SymbolStream<TSymbol> input, int start) {
+	public String getInputString(@NotNull SymbolStream<TSymbol> input, int start) {
 		if ( input instanceof TokenStream ) {
 			return ((TokenStream)input).toString(start,input.index());
 		}
@@ -251,10 +255,10 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return "n/a";
 	}
 
-	public int execATN(SymbolStream<TSymbol> input,
-					   DFA dfa,
+	public int execATN(@NotNull SymbolStream<TSymbol> input,
+					   @NotNull DFA dfa,
 					   int startIndex,
-					   OrderedHashSet<ATNConfig> s0,
+					   @NotNull OrderedHashSet<ATNConfig> s0,
 					   boolean useContext)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
@@ -377,14 +381,14 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 
 		if ( prevAccept==null ) {
 //			System.out.println("no viable token at input "+ getLookaheadName(input) +", index "+input.index());
-			throwNoViableAlt(input, outerContext, closure, startIndex);
+			throw noViableAlt(input, outerContext, closure, startIndex);
 		}
 
 		if ( debug ) System.out.println("PREDICT " + prevAccept + " index " + prevAccept.alt);
 		return prevAccept.alt;
 	}
 
-	protected int resolveToMinAlt(OrderedHashSet<ATNConfig> reach, Set<Integer> ambigAlts) {
+	protected int resolveToMinAlt(@NotNull OrderedHashSet<ATNConfig> reach, @NotNull Set<Integer> ambigAlts) {
 		int min = getMinAlt(ambigAlts);
 		// create DFA accept state for resolved alt
 		ambigAlts.remove(min);
@@ -394,7 +398,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return min;
 	}
 
-	protected int resolveNongreedyToExitBranch(OrderedHashSet<ATNConfig> reach, Set<Integer> ambigAlts) {
+	protected int resolveNongreedyToExitBranch(@NotNull OrderedHashSet<ATNConfig> reach, @NotNull Set<Integer> ambigAlts) {
 		// exit branch is alt 2 always; alt 1 is entry or loopback branch
 		// since we're predicting, create DFA accept state for exit alt
 		int exitAlt = 2;
@@ -405,14 +409,14 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return exitAlt;
 	}
 
-	public int retryWithContext(SymbolStream<TSymbol> input,
-								DFA dfa,
+	public int retryWithContext(@NotNull SymbolStream<TSymbol> input,
+								@NotNull DFA dfa,
 								int startIndex,
-								RuleContext originalContext,
-								OrderedHashSet<ATNConfig> closure,
+								@NotNull RuleContext originalContext,
+								@NotNull OrderedHashSet<ATNConfig> closure,
 								int t,
-								OrderedHashSet<ATNConfig> reach,
-								Set<Integer> ambigAlts)
+								@NotNull OrderedHashSet<ATNConfig> reach,
+								@NotNull Set<Integer> ambigAlts)
 	{
 		// ASSUMES PREDICT ONLY
 		retry_with_context++;
@@ -466,7 +470,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return predictedAlt;
 	}
 
-	public OrderedHashSet<ATNConfig> computeStartState(int decision, ATNState p, RuleContext ctx)	{
+	@NotNull
+	public OrderedHashSet<ATNConfig> computeStartState(int decision, @NotNull ATNState p, @Nullable RuleContext ctx)	{
 		RuleContext initialContext = ctx; // always at least the implicit call to start rule
 		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 		prevAccept = null; // might reach end rule; track
@@ -485,7 +490,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return configs;
 	}
 
-	public ATNState getReachableTarget(Transition trans, int ttype) {
+	@Nullable
+	public ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
 		if ( trans instanceof AtomTransition ) {
 			AtomTransition at = (AtomTransition)trans;
 			if ( at.label == ttype ) {
@@ -516,10 +522,10 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	 ambig detection thought :(
 	  */
 
-	protected void closure(ATNConfig config,
-						   OrderedHashSet<ATNConfig> configs,
-						   DecisionState decState,
-						   Set<ATNConfig> closureBusy)
+	protected void closure(@NotNull ATNConfig config,
+						   @NotNull OrderedHashSet<ATNConfig> configs,
+						   @Nullable DecisionState decState,
+						   @NotNull Set<ATNConfig> closureBusy)
 	{
 		if ( debug ) System.out.println("closure("+config+")");
 
@@ -577,12 +583,14 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		}
 	}
 
+	@NotNull
 	private String getRuleName(int index) {
 		if ( parser!=null && index>=0 ) return parser.getRuleNames()[index];
 		return "<rule "+index+">";
 	}
 
-	public ATNConfig getEpsilonTarget(ATNConfig config, Transition t, boolean ignorePreds) {
+	@Nullable
+	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean ignorePreds) {
 		if ( t instanceof RuleTransition ) {
 			return ruleTransition(config, t);
 		}
@@ -590,7 +598,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 			return predTransition(config, (PredicateTransition)t, ignorePreds);
 		}
 		else if ( t instanceof ActionTransition ) {
-			return actionTransition(config, t);
+			return actionTransition(config, (ActionTransition)t);
 		}
 		else if ( t.isEpsilon() ) {
 			return new ATNConfig(config, t.target);
@@ -598,9 +606,9 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return null;
 	}
 
-	public ATNConfig actionTransition(ATNConfig config, Transition t) {
-		ActionTransition at = (ActionTransition)t;
-		if ( debug ) System.out.println("ACTION edge "+at.ruleIndex+":"+at.actionIndex);
+	@NotNull
+	public ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
+		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
 		if ( debug && !config.traversedAction ) {
 			System.out.println("pruning future pred eval derived from s"+
 							   config.state.stateNumber);
@@ -611,7 +619,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return c;
 	}
 
-	public ATNConfig predTransition(ATNConfig config, PredicateTransition pt,
+	@Nullable
+	public ATNConfig predTransition(@NotNull ATNConfig config, @NotNull PredicateTransition pt,
 									boolean ignorePreds)
 	{
 		if ( debug ) {
@@ -647,7 +656,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return c;
 	}
 
-	public ATNConfig ruleTransition(ATNConfig config, Transition t) {
+	@NotNull
+	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull Transition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
@@ -658,20 +668,20 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	public void reportConflict(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {
+	public void reportConflict(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
 		if ( parser!=null ) parser.reportConflict(startIndex, stopIndex, alts, configs);
 	}
 
-	public void reportContextSensitivity(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {
+	public void reportContextSensitivity(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
 		if ( parser!=null ) parser.reportContextSensitivity(startIndex, stopIndex, alts, configs);
 	}
 
 	/** If context sensitive parsing, we know it's ambiguity not conflict */
-	public void reportAmbiguity(int startIndex, int stopIndex, Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {
+	public void reportAmbiguity(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
 		if ( parser!=null ) parser.reportAmbiguity(startIndex, stopIndex, alts, configs);
 	}
 
-	public static int getUniqueAlt(Collection<ATNConfig> configs) {
+	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
@@ -684,7 +694,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return alt;
 	}
 
-	public ATNConfig configWithAltAtStopState(Collection<ATNConfig> configs, int alt) {
+	@Nullable
+	public ATNConfig configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
 		for (ATNConfig c : configs) {
 			if ( c.alt == alt ) {
 				if ( c.state.getClass() == RuleStopState.class ) {
@@ -695,7 +706,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return null;
 	}
 
-	public Set<Integer> getAmbiguousAlts(OrderedHashSet<ATNConfig> configs) {
+	@Nullable
+	public Set<Integer> getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
 //		System.err.println("check ambiguous "+configs);
 		Set<Integer> ambigAlts = null;
 		int numConfigs = configs.size();
@@ -739,7 +751,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return ambigAlts;
 	}
 
-	public static int getMinAlt(Set<Integer> ambigAlts) {
+	public static int getMinAlt(@NotNull Set<Integer> ambigAlts) {
 		int min = Integer.MAX_VALUE;
 		for (int alt : ambigAlts) {
 			if ( alt < min ) min = alt;
@@ -747,7 +759,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return min;
 	}
 
-	public static void killAlts(Set<Integer> alts, OrderedHashSet<ATNConfig> configs) {
+	public static void killAlts(@NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
 		int i = 0;
 		while ( i<configs.size() ) {
 			ATNConfig c = configs.get(i);
@@ -758,10 +770,10 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		}
 	}
 
-	protected DFAState addDFAEdge(DFA dfa,
-								  OrderedHashSet<ATNConfig> p,
+	protected DFAState addDFAEdge(@NotNull DFA dfa,
+								  @NotNull OrderedHashSet<ATNConfig> p,
 								  int t,
-								  OrderedHashSet<ATNConfig> q)
+								  @NotNull OrderedHashSet<ATNConfig> q)
 	{
 //		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
 		DFAState from = addDFAState(dfa, p);
@@ -770,8 +782,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return to;
 	}
 
-	protected void addDFAEdge(DFAState p, int t, DFAState q) {
-		if ( p==null || t < -1 ) return;
+	protected void addDFAEdge(@Nullable DFAState p, int t, @Nullable DFAState q) {
+		if ( p==null || t < -1 || q == null ) return;
 		if ( p.edges==null ) {
 			p.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
 		}
@@ -779,7 +791,8 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	}
 
 	/** See comment on LexerInterpreter.addDFAState. */
-	protected DFAState addDFAState(DFA dfa, OrderedHashSet<ATNConfig> configs) {
+	@Nullable
+	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull OrderedHashSet<ATNConfig> configs) {
 		DFAState proposed = new DFAState(configs);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
@@ -800,7 +813,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return newState;
 	}
 
-	public void makeAcceptState(DFA dfa, OrderedHashSet<ATNConfig> reach, int uniqueAlt) {
+	public void makeAcceptState(@NotNull DFA dfa, @NotNull OrderedHashSet<ATNConfig> reach, int uniqueAlt) {
 		DFAState accept = dfa.states.get(new DFAState(reach));
 		if ( accept==null ) return;
 		accept.isAcceptState = true;
@@ -808,6 +821,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		accept.complete = true;
 	}
 
+	@NotNull
 	public String getTokenName(int t) {
 		if ( t==-1 ) return "EOF";
 		if ( parser!=null && parser.getTokenNames()!=null ) {
@@ -831,7 +845,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		this.userWantsCtxSensitive = ctxSensitive;
 	}
 
-	public void dumpDeadEndConfigs(NoViableAltException nvae) {
+	public void dumpDeadEndConfigs(@NotNull NoViableAltException nvae) {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.deadEndConfigs) {
 			Transition t = c.state.transition(0);
@@ -849,22 +863,23 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		}
 	}
 
-	public int throwNoViableAlt(SymbolStream<TSymbol> input, RuleContext outerContext,
-								OrderedHashSet<ATNConfig> configs, int startIndex)
+	@NotNull
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<TSymbol> input, @NotNull RuleContext outerContext,
+								@NotNull OrderedHashSet<ATNConfig> configs, int startIndex)
 	{
 		if ( parser instanceof TreeParser) {
 			TSymbol startNode = null;
 			if ( input instanceof BufferedASTNodeStream ) {
 				startNode = input.get(startIndex);
 			}
-			throw new NoViableTreeGrammarAltException(parser,
+			return new NoViableTreeGrammarAltException(parser,
 													  (ASTNodeStream<TSymbol>)input,
 													  startNode,
 													  input.LT(1),
 													  configs, outerContext);
 		}
 		else {
-			throw new NoViableAltException(parser, input,
+			return new NoViableAltException(parser, input,
 										   (Token)input.get(startIndex),
 										   (Token)input.LT(1),
 										   input.LT(1),

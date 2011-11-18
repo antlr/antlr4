@@ -29,9 +29,13 @@
 
 package org.antlr.v4.runtime.atn;
 
-public class WildcardTransition extends Transition {
-	public WildcardTransition(ATNState target) { super(target); }
+import com.sun.istack.internal.NotNull;
 
+public class WildcardTransition extends Transition {
+	public WildcardTransition(@NotNull ATNState target) { super(target); }
+
+	@Override
+	@NotNull
 	public String toString() {
 		return ".";
 	}

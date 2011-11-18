@@ -197,7 +197,7 @@ public class ATNSerializer {
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
 			if ( stype==0 ) continue; // ignore bad type of states
 			buf.append((i - 1) + ":" +
-					   ATNState.serializationNames[stype] + " "+
+					   ATNState.serializationNames.get(stype) + " "+
 					   ruleIndex + "\n");
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);
@@ -232,7 +232,7 @@ public class ATNSerializer {
 			int arg2 = ATNSimulator.toInt(data[p + 4]);
 			int arg3 = ATNSimulator.toInt(data[p + 5]);
 			buf.append(src+"->"+trg+
-					   " "+Transition.serializationNames[ttype]+
+					   " "+Transition.serializationNames.get(ttype)+
 					   " "+arg1+","+arg2+","+arg3+
 					   "\n");
 			p += 6;

@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.*;
 
@@ -36,19 +37,21 @@ import java.util.*;
 
 public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
-	public static DFAState ERROR;
-	public ATN atn;
+	@NotNull
+	public static final DFAState ERROR;
+	@NotNull
+	public final ATN atn;
 
 	static {
 		ERROR = new DFAState(new OrderedHashSet<ATNConfig>());
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 
-	public ATNSimulator(ATN atn) {
+	public ATNSimulator(@NotNull ATN atn) {
 		this.atn = atn;
 	}
 
-	public static ATN deserialize(char[] data) {
+	public static ATN deserialize(@NotNull char[] data) {
 		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
@@ -131,7 +134,7 @@ public abstract class ATNSimulator {
 		return c==65535 ? -1 : c;
 	}
 
-	public static Transition edgeFactory(ATN atn,
+	public static Transition edgeFactory(@NotNull ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)
@@ -139,21 +142,19 @@ public abstract class ATNSimulator {
 		ATNState target = atn.states.get(trg);
 		switch (type) {
 			case Transition.EPSILON : return new EpsilonTransition(target);
-			case Transition.RANGE : return new RangeTransition(arg1, arg2, target);
+			case Transition.RANGE : return new RangeTransition(target, arg1, arg2);
 			case Transition.RULE :
-				RuleTransition rt = new RuleTransition(arg2, atn.states.get(arg1), target);
+				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, target);
 				return rt;
 			case Transition.PREDICATE :
-				PredicateTransition pt = new PredicateTransition(target, arg1, arg2);
-				pt.isCtxDependent = arg3==1;
+				PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
 				return pt;
-			case Transition.ATOM : return new AtomTransition(arg1, target);
+			case Transition.ATOM : return new AtomTransition(target, arg1);
 			case Transition.ACTION :
-				ActionTransition a = new ActionTransition(target, arg1, arg2);
-				a.isCtxDependent = arg3==1;
+				ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);
 				return a;
-			case Transition.SET : return new SetTransition(sets.get(arg1), target);
-			case Transition.NOT_SET : return new NotSetTransition(sets.get(arg1), null, target);
+			case Transition.SET : return new SetTransition(target, sets.get(arg1));
+			case Transition.NOT_SET : return new NotSetTransition(target, sets.get(arg1), null);
 			case Transition.WILDCARD : return new WildcardTransition(target);
 		}
 		return null;

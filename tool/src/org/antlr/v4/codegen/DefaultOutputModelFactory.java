@@ -29,6 +29,8 @@
 
 package org.antlr.v4.codegen;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.codegen.model.decl.Decl;
@@ -46,37 +48,50 @@ import java.util.List;
  */
 public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory {
 	// Interface to outside world
-	public Grammar g;
-	public CodeGenerator gen;
+	@NotNull
+	public final Grammar g;
+	@NotNull
+	public final CodeGenerator gen;
+
 	public OutputModelController controller;
 
-	protected DefaultOutputModelFactory(CodeGenerator gen) {
+	protected DefaultOutputModelFactory(@NotNull CodeGenerator gen) {
 		this.gen = gen;
 		this.g = gen.g;
 	}
 
+	@Override
 	public void setController(OutputModelController controller) {
 		this.controller = controller;
 	}
 
 	// Convenience methods
 
+	@NotNull
 	public Grammar getGrammar() { return g; }
 
+	@Override
 	public CodeGenerator getGenerator() { return gen; }
 
+	@Override
 	public OutputModelObject getRoot() { return controller.getRoot(); }
 
+	@Override
 	public RuleFunction getCurrentRuleFunction() { return controller.getCurrentRuleFunction(); }
 
+	@Override
 	public Alternative getCurrentOuterMostAlt() { return controller.getCurrentOuterMostAlt(); }
 
+	@Override
 	public CodeBlock getCurrentBlock() { return controller.getCurrentBlock(); }
 
+	@Override
 	public CodeBlock getCurrentOuterMostAlternativeBlock() { return controller.getCurrentOuterMostAlternativeBlock(); }
 
+	@Override
 	public int getCodeBlockLevel() { return controller.codeBlockLevel; }
 
+	@Override
 	public int getTreeLevel() { return controller.treeLevel; }
 
 	@Override
@@ -96,6 +111,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	// MISC
 
+	@NotNull
 	public static List<SrcOp> list(Object... values) {
 		List<SrcOp> x = new ArrayList<SrcOp>(values.length);
 		for (Object v : values) {
@@ -107,6 +123,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 		return x;
 	}
 
+	@Nullable
 	public Decl getCurrentDeclForName(String name) {
 		if ( getCurrentBlock().locals==null ) return null;
 		for (Decl d : getCurrentBlock().locals.elements()) {

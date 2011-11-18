@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -64,9 +65,11 @@ public class DFAState {
 	public int stateNumber = -1;
 
 	/** The set of ATN configurations (state,alt,context) for this DFA state */
+	@Nullable
 	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 
 	/** edges[symbol] points to target of symbol */
+	@Nullable
 	public DFAState[] edges;
 
 //	public IntervalSet viableChars;
@@ -80,6 +83,7 @@ public class DFAState {
 	public boolean complete; // all alts predict "prediction"
 	public boolean isCtxSensitive;
 
+	@Nullable
 	public Map<RuleContext, Integer> ctxToPrediction;
 
 	public DFAState() { }
@@ -92,6 +96,7 @@ public class DFAState {
 	 *  DFA state.
 	 */
 	public Set<Integer> getAltSet() {
+		// TODO (sam): what to do when configs==null?
 		Set<Integer> alts = new HashSet<Integer>();
 		for (ATNConfig c : configs) {
 			alts.add(c.alt);
@@ -111,7 +116,9 @@ public class DFAState {
 	*/
 
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
+	@Override
 	public int hashCode() {
+		// TODO (sam): what to do when configs==null?
 		int h = 0;
 		for (ATNConfig c : configs) {
 			h += c.alt;
@@ -130,16 +137,18 @@ public class DFAState {
 	 *  to know if any other state exists that has this exact set of ATN
 	 *  configurations.  The DFAState state number is irrelevant.
 	 */
+	@Override
 	public boolean equals(Object o) {
 		// compare set of ATN configurations in this set with other
 		if ( this==o ) return true;
 		DFAState other = (DFAState)o;
+		// TODO (sam): what to do when configs==null?
 		boolean sameSet = this.configs.equals(other.configs);
 //		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
 		return sameSet;
 	}
 
-
+	@Override
 	public String toString() {
 		return stateNumber+":"+configs+(isAcceptState?("=>"+prediction):"");
 	}

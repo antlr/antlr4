@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime.misc;
 
+import com.sun.istack.internal.NotNull;
 import org.antlr.v4.runtime.*;
 
 import java.util.*;
@@ -68,6 +69,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	/** Create a set with a single element, el. */
+    @NotNull
     public static IntervalSet of(int a) {
 		IntervalSet s = new IntervalSet();
         s.add(a);

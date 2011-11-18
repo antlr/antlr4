@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+
 /** TODO: this is old comment:
  *  A tree of semantic predicates from the grammar AST if label==SEMPRED.
  *  In the ATN, labels will always be exactly one predicate, but the DFA
@@ -36,23 +38,22 @@ package org.antlr.v4.runtime.atn;
  *  multiple ATN configurations into a single DFA state.
  */
 public class PredicateTransition extends Transition {
-	public int ruleIndex;
-	public int predIndex;
-	public boolean isCtxDependent;  // e.g., $i ref in pred
+	public final int ruleIndex;
+	public final int predIndex;
+	public final boolean isCtxDependent;  // e.g., $i ref in pred
 
-	public PredicateTransition(ATNState target) {
-		super(target);
-	}
-
-	public PredicateTransition(ATNState target, int ruleIndex, int predIndex) {
+	public PredicateTransition(@NotNull ATNState target, int ruleIndex, int predIndex, boolean isCtxDependent) {
 		super(target);
 		this.ruleIndex = ruleIndex;
 		this.predIndex = predIndex;
+		this.isCtxDependent = isCtxDependent;
 	}
 
 	@Override
 	public boolean isEpsilon() { return true; }
 
+	@Override
+	@NotNull
 	public String toString() {
 		return "pred_"+ruleIndex+":"+predIndex;
 	}

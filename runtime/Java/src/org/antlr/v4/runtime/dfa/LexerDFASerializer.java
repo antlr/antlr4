@@ -29,12 +29,15 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import com.sun.istack.internal.NotNull;
+
 public class LexerDFASerializer extends DFASerializer {
-	public LexerDFASerializer(DFA dfa) {
+	public LexerDFASerializer(@NotNull DFA dfa) {
 		super(dfa, null);
 	}
 
 	@Override
+	@NotNull
 	protected String getEdgeLabel(int i) {
 		return "'"+(char)i+"'";
 	}

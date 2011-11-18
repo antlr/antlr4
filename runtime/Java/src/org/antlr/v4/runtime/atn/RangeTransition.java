@@ -29,24 +29,25 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 public class RangeTransition extends Transition {
-	public int from;
-	public int to;
-	public RangeTransition(int from, int to, ATNState target) {
+	public final int from;
+	public final int to;
+
+	public RangeTransition(@NotNull ATNState target, int from, int to) {
 		super(target);
 		this.from = from;
 		this.to = to;
 	}
-	public RangeTransition(ATNState target) {
-		super(target);
-	}
 
 	@Override
+	@NotNull
 	public IntervalSet label() { return IntervalSet.of(from, to); }
 
 	@Override
+	@NotNull
 	public String toString() {
 		return "'"+(char)from+"'..'"+(char)to+"'";
 	}

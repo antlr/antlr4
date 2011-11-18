@@ -29,6 +29,8 @@
 
 package org.antlr.v4.tool;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.*;
@@ -99,7 +101,8 @@ public class Grammar implements AttributeResolver {
 
 	public Vector<IntervalSet[]> decisionLOOK;
 
-	public Tool tool;
+	@NotNull
+	public final Tool tool;
 
 	/** Token names and literal tokens like "void" are uniquely indexed.
 	 *  with -1 implying EOF.  Characters are different; they go from
@@ -175,7 +178,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/** For testing; builds trees, does sem anal */
-	public Grammar(String fileName, String grammarText, ANTLRToolListener listener)
+	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
         this.text = grammarText;

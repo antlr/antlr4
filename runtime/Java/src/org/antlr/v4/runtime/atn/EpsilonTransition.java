@@ -29,12 +29,16 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+
 public class EpsilonTransition extends Transition {
-	public EpsilonTransition(ATNState target) { super(target); }
+	public EpsilonTransition(@NotNull ATNState target) { super(target); }
 
 	@Override
 	public boolean isEpsilon() { return true; }
 
+	@Override
+	@NotNull
 	public String toString() {
 		return "epsilon";
 	}

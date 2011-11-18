@@ -55,23 +55,24 @@ public class ATNState {
 	public static final int STAR_LOOP_ENTRY = 10;
 	public static final int PLUS_LOOP_BACK = 11;
 
-	public static String[] serializationNames = {
-		"INVALID",
-		"BASIC",
-		"RULE_START",
-		"BLOCK_START",
-		"PLUS_BLOCK_START",
-		"STAR_BLOCK_START",
-		"TOKEN_START",
-		"RULE_STOP",
-		"BLOCK_END",
-		"STAR_LOOP_BACK",
-		"STAR_LOOP_ENTRY",
-		"PLUS_LOOP_BACK",
-	};
+	public static final List<String> serializationNames =
+		Collections.unmodifiableList(Arrays.asList(
+			"INVALID",
+			"BASIC",
+			"RULE_START",
+			"BLOCK_START",
+			"PLUS_BLOCK_START",
+			"STAR_BLOCK_START",
+			"TOKEN_START",
+			"RULE_STOP",
+			"BLOCK_END",
+			"STAR_LOOP_BACK",
+			"STAR_LOOP_ENTRY",
+			"PLUS_LOOP_BACK"
+		));
 
-	public static Map<Class<? extends ATNState>, Integer> serializationTypes =
-		new HashMap<Class<? extends ATNState>, Integer>() {{
+	public static final Map<Class<? extends ATNState>, Integer> serializationTypes =
+		Collections.unmodifiableMap(new HashMap<Class<? extends ATNState>, Integer>() {{
 			put(ATNState.class, BASIC);
 			put(RuleStartState.class, RULE_START);
 			put(BlockStartState.class, BLOCK_START);
@@ -83,7 +84,7 @@ public class ATNState {
 			put(PlusLoopbackState.class, PLUS_LOOP_BACK);
 			put(StarLoopbackState.class, STAR_LOOP_BACK);
 			put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
-		}};
+		}});
 
 	public static final int INVALID_STATE_NUMBER = -1;
 
@@ -99,7 +100,7 @@ public class ATNState {
 	//public Transition transition;
 
 	/** Track the transitions emanating from this ATN state. */
-	protected List<Transition> transitions =
+	protected final List<Transition> transitions =
 		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 
 	/** For o-A->o type ATN tranitions, record the label that leads to this

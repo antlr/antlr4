@@ -29,25 +29,24 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+
 /** */
 public class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */
-	public int ruleIndex;     // no Rule object at runtime
+	public final int ruleIndex;     // no Rule object at runtime
 
 	/** What node to begin computations following ref to rule */
-    public ATNState followState;
+	@NotNull
+	public final ATNState followState;
 
-	public RuleTransition(int ruleIndex,
-						  ATNState ruleStart,
-						  ATNState followState)
+	public RuleTransition(@NotNull RuleStartState ruleStart,
+						  int ruleIndex,
+						  @NotNull ATNState followState)
 	{
 		super(ruleStart);
 		this.ruleIndex = ruleIndex;
 		this.followState = followState;
-	}
-
-	public RuleTransition(ATNState ruleStart) {
-		super(ruleStart);
 	}
 
 	@Override

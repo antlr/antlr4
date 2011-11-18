@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
@@ -43,18 +44,21 @@ public class ATN {
 	public static final int LEXER = 2;
 	public static final int TREE_PARSER = 3;
 
-	public List<ATNState> states = new ArrayList<ATNState>();
+	@NotNull
+	public final List<ATNState> states = new ArrayList<ATNState>();
 
 	/** Each subrule/rule is a decision point and we must track them so we
 	 *  can go back later and build DFA predictors for them.  This includes
 	 *  all the rules, subrules, optional blocks, ()+, ()* etc...
 	 */
-	public List<DecisionState> decisionToState = new ArrayList<DecisionState>();
+	@NotNull
+	public final List<DecisionState> decisionToState = new ArrayList<DecisionState>();
 
 	public RuleStartState[] ruleToStartState;
 	public RuleStopState[] ruleToStopState;
 
-	public Map<String, TokensStartState> modeNameToStartState =
+	@NotNull
+	public final Map<String, TokensStartState> modeNameToStartState =
 		new LinkedHashMap<String, TokensStartState>();
 
 	// runtime for parsers, lexers
@@ -64,7 +68,8 @@ public class ATN {
 	// runtime for lexer only
 	public int[] ruleToTokenType;
 	public int[] ruleToActionIndex;
-	public List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
+	@NotNull
+	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
 
 	/** used during construction from grammar AST */
 	int stateNumber = 0;
@@ -92,13 +97,13 @@ public class ATN {
 		return next;
 	}
 
-	public void addState(ATNState state) {
+	public void addState(@NotNull ATNState state) {
 		state.atn = this;
 		states.add(state);
 		state.stateNumber = stateNumber++;
 	}
 
-	public int defineDecisionState(DecisionState s) {
+	public int defineDecisionState(@NotNull DecisionState s) {
 		decisionToState.add(s);
 		s.decision = decisionToState.size()-1;
 		return s.decision;

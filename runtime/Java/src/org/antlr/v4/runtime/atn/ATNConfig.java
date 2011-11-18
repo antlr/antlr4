@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.*;
 
 /** An ATN state, predicted alt, and syntactic/semantic context.
@@ -39,16 +41,18 @@ import org.antlr.v4.runtime.*;
  */
 public class ATNConfig {
 	/** The ATN state associated with this configuration */
-	public ATNState state;
+	@NotNull
+	public final ATNState state;
 
 	/** What alt (or lexer rule) is predicted by this configuration */
-	public int alt;
+	public final int alt;
 
 	/** The stack of invoking states leading to the rule/states associated
 	 *  with this config.  We track only those contexts pushed during
 	 *  execution of the ATN simulator.
 	 */
-	public RuleContext context;
+	@Nullable
+	public final RuleContext context;
 
 	/**
 	 * Indicates that we have reached this ATN configuration after
@@ -81,68 +85,67 @@ public class ATNConfig {
 	 */
 	public int reachesIntoOuterContext;
 
-	public ATNConfig(ATNState state,
+	public ATNConfig(@NotNull ATNState state,
 					 int alt,
-					 RuleContext context)
+					 @Nullable RuleContext context)
 	{
 		this.state = state;
 		this.alt = alt;
 		this.context = context;
 	}
 
-	public ATNConfig(ATNConfig c) {
-		this.state = c.state;
+	public ATNConfig(@NotNull ATNConfig c) {
+		this(c, c.state, c.context);
+	}
+
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
+		this(c, state, c.context);
+	}
+
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context) {
+		this.state = state;
 		this.alt = c.alt;
-		this.context = c.context;
+		this.context = context;
 		this.traversedPredicate = c.traversedPredicate;
 		this.traversedAction = c.traversedAction;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
 	}
 
-	public ATNConfig(ATNConfig c, ATNState state) {
-		this(c);
-		this.state = state;
-	}
-
-	public ATNConfig(ATNConfig c, ATNState state, RuleContext context) {
-		this(c);
-		this.state = state;
-		this.context = context;
-	}
-
-	public ATNConfig(ATNConfig c, RuleContext context) {
-		this(c);
-		this.context = context;
+	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {
+		this(c, c.state, context);
 	}
 
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
      *  syntactic/semantic contexts are the same.
      */
+    @Override
     public boolean equals(Object o) {
 		if ( o==null ) return false;
 		if ( this==o ) return true;
+		if (!(o instanceof ATNConfig)) {
+			return false;
+		}
+
 		ATNConfig other = (ATNConfig)o;
 		return this.state.stateNumber==other.state.stateNumber &&
 		this.alt==other.alt &&
-		(this.context==other.context ||
-		this.context.equals(other.context));
+		(this.context==other.context || (this.context != null && this.context.equals(other.context)));
     }
 
+    @Override
     public int hashCode() {
-		if ( state==null ) {
-			System.out.println("eh?");
-		}
         int h = state.stateNumber + alt;
 		if ( context!=null ) h += context.hashCode();
         return h;
     }
 
+	@Override
 	public String toString() {
 		return toString(null, true);
 	}
 
-	public String toString(Recognizer<?, ?> recog, boolean showAlt) {
+	public String toString(@Nullable Recognizer<?, ?> recog, boolean showAlt) {
 		StringBuilder buf = new StringBuilder();
 //		if ( state.ruleIndex>=0 ) {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
