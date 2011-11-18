@@ -72,6 +72,7 @@ public class CommonASTNodeStream<T> extends LookaheadStream<T>
         it = new ASTIterator<T>(adaptor,root);
 	}
 
+    @Override
     public void reset() {
         super.reset();
         it.reset();
@@ -83,6 +84,7 @@ public class CommonASTNodeStream<T> extends LookaheadStream<T>
     /** Pull elements from tree iterator.  Track tree level 0..max_level.
      *  If nil rooted tree, don't give initial nil and DOWN nor final UP.
      */
+    @Override
     public T nextElement() {
         T t = it.next();
         //System.out.println("pulled "+adaptor.getType(t));
@@ -100,26 +102,34 @@ public class CommonASTNodeStream<T> extends LookaheadStream<T>
         return t;
     }
 
+    @Override
     public boolean isEOF(T o) { return adaptor.getType(o) == Token.EOF; }
 
+    @Override
     public void setUniqueNavigationNodes(boolean uniqueNavigationNodes) { }
 
+	@Override
 	public T getTreeSource() {	return root; }
 
+	@Override
 	public String getSourceName() { return getTokenStream().getSourceName(); }
 
+	@Override
 	public TokenStream getTokenStream() { return tokens; }
 
 	public void setTokenStream(TokenStream tokens) { this.tokens = tokens; }
 
+	@Override
 	public ASTAdaptor getTreeAdaptor() { return adaptor; }
 
 	public void setTreeAdaptor(ASTAdaptor adaptor) { this.adaptor = adaptor; }
 
+    @Override
     public T get(int i) {
         throw new UnsupportedOperationException("Absolute node indexes are meaningless in an unbuffered stream");
     }
 
+    @Override
     public int LA(int i) { return adaptor.getType(LT(i)); }
 
     /** Make stream jump to a new location, saving old location.
@@ -144,6 +154,7 @@ public class CommonASTNodeStream<T> extends LookaheadStream<T>
 
 	// TREE REWRITE INTERFACE
 
+	@Override
 	public void replaceChildren(T parent, int startChildIndex, int stopChildIndex, T t) {
 		if ( parent!=null ) {
 			adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
@@ -154,6 +165,7 @@ public class CommonASTNodeStream<T> extends LookaheadStream<T>
 	 *  node, then we have to walk it back until we see the first non-UP node.
 	 *  Then, just get the token indexes and look into the token stream.
 	 */
+	@Override
 	public String toString(T start, T stop) {
 		if ( tokens==null ) throw new UnsupportedOperationException("can't print from null token stream in node stream");
 		if ( start==null || stop==null ) return "";
