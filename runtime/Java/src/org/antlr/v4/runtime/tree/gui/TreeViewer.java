@@ -231,6 +231,7 @@ public class TreeViewer extends JComponent {
 		JButton ok = new JButton("OK");
 		ok.addActionListener(
 			new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					dialog.setVisible(false);
 					dialog.dispose();
@@ -246,6 +247,7 @@ public class TreeViewer extends JComponent {
 										  -1000,1000,0);
 		scaleSlider.addChangeListener(
 			new ChangeListener() {
+				@Override
 				public void stateChanged(ChangeEvent e) {
 					int v = scaleSlider.getValue();
 					viewer.setScale(v / 1000.0 + 1.0);
@@ -278,6 +280,7 @@ public class TreeViewer extends JComponent {
 		final TreeViewer viewer = this;
 		viewer.setScale(1.5);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
 				showInDialog(viewer);
             }
@@ -420,6 +423,7 @@ public class TreeViewer extends JComponent {
 		repaint();
 	}
 
+	@Override
 	public int getHeight() {
 		return height;
 	}
@@ -428,6 +432,7 @@ public class TreeViewer extends JComponent {
 		this.height = height;
 	}
 
+	@Override
 	public int getWidth() {
 		return width;
 	}
