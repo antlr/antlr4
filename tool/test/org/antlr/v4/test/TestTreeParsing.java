@@ -130,7 +130,7 @@ public class TestTreeParsing extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		String treeGrammar =
-			"tree grammar TP; options {ASTLabelType=CommonAST;}\n" +
+			"tree grammar TP; options {tokenVocab=\"T\"; ASTLabelType=CommonAST;}\n" +
 			"a : ID INT+ PERIOD {System.out.print(\"alt 1\");}"+
 			"  | ID INT+ SEMI   {System.out.print(\"alt 2\");}\n" +
 			"  ;\n";
