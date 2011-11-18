@@ -114,6 +114,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	/** Return a token from this source; i.e., match a token on the char
 	 *  stream.
 	 */
+	@Override
 	public Token nextToken() {
 		if ( hitEOF ) return emitEOF();
 
@@ -192,6 +193,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		this.input = (CharStream)input;
 	}
 
+	@Override
 	public String getSourceName() {
 		return input.getSourceName();
 	}
@@ -247,10 +249,12 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 		return eof;
 	}
 
+	@Override
 	public int getLine() {
 		return _interp.getLine();
 	}
 
+	@Override
 	public int getCharPositionInLine() {
 		return _interp.getCharPositionInLine();
 	}
@@ -297,6 +301,7 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	 *  error reporting.  The generated parsers implement a method
 	 *  that overrides this to point to their String[] tokenNames.
 	 */
+	@Override
 	public String[] getTokenNames() {
 		return null;
 	}
