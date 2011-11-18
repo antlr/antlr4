@@ -105,7 +105,7 @@ public class PostScriptDocument {
 		this.fontName = fontName;
 		this.fontSize = fontSize;
 		try {
-			Class c = Class.forName("org.antlr.v4.runtime.tree.gui." + fontName);
+			Class<?> c = Class.forName("org.antlr.v4.runtime.tree.gui." + fontName);
 			this.fontMetrics = (BasicFontMetrics)c.newInstance();
 		}
 		catch (Exception e) {
