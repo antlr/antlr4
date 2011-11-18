@@ -460,7 +460,7 @@ if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><els
 >>
 
 DefaultParserSuperClass(s) ::= "Parser"
-DefaultTreeParserSuperClass(s) ::= "TreeParser"
+DefaultTreeParserSuperClass(s) ::= "TreeParser\<<ASTLabelType()>>"
 
 ActionText(t) ::= "<t.text>"
 ArgRef(a) ::= "_localctx.<a.name>"
@@ -602,7 +602,7 @@ recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 
 // AST stuff (TODO: separate?)
 
-RootDecl(d)		::= "Object <d.name> = _adaptor.nil();"
+RootDecl(d)		::= "<ASTLabelType()> <d.name> = _adaptor.nil();"
 RootName(level) ::= "_root<level>"
 
 TokenAST(t) ::= "_adaptor.create(<labelref(t.label)>)"
@@ -613,7 +613,7 @@ _localctx.tree = _adaptor.rulePostProcessing(_localctx.tree);
 _adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
 >>
 
-ElementListDecl(d) ::= "List\<Object> <d.name> = _adaptor.createElementList();"
+ElementListDecl(d) ::= "List\<<ASTLabelType()>> <d.name> = _adaptor.createElementList();"
 ElementListName(elemName) ::= "_track_<elemName>"
 ClearElementList(c) ::= "<c.name>.clear();"
 TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>.tree);"
@@ -642,7 +642,7 @@ if ( <predicate> ) {
 <endif>
 >>
 
-RewriteIteratorDecl(d) ::= "Iterator <d.name>;"
+RewriteIteratorDecl(d) ::= "Iterator\<<ASTLabelType()>> <d.name>;"
 RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
 RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
 
