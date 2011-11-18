@@ -162,7 +162,7 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 
 	@Override
 	public void setParent(CommonAST t, CommonAST parent) {
-        if ( t!=null ) t.setParent((CommonAST)parent);
+        if ( t!=null ) t.setParent(parent);
 	}
 
 	@Override
@@ -179,7 +179,7 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 	@Override
 	public void replaceChildren(CommonAST parent, int startChildIndex, int stopChildIndex, CommonAST t) {
 		if ( parent!=null ) {
-			Trees.replaceChildren((CommonAST)parent, startChildIndex, stopChildIndex, t);
+			Trees.replaceChildren(parent, startChildIndex, stopChildIndex, t);
 		}
 	}
 }
