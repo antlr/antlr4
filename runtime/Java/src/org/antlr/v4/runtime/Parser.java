@@ -44,6 +44,7 @@ public class Parser extends BaseRecognizer {
 		super(input);
     }
 
+	@Override
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
 		if ( _input !=null ) {
@@ -71,6 +72,7 @@ public class Parser extends BaseRecognizer {
 		return (Token)super.match(ttype);
 	}
 
+	@Override
 	protected Object getCurrentInputSymbol() {
 		return ((TokenStream)_input).LT(1);
 	}
@@ -92,6 +94,7 @@ public class Parser extends BaseRecognizer {
 		return ((TokenStream)_input);
 	}
 
+	@Override
 	public String getSourceName() {
 		return _input.getSourceName();
 	}
