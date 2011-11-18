@@ -351,7 +351,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	}
 
 	public String toString(BaseRecognizer recog, RuleContext stop) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		RuleContext p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
