@@ -42,6 +42,8 @@ public interface ObjectStream<T> extends IntStream {
 	 *  two Objects ago. LT(0) is undefined.  For i>=n, return an
 	 *  object representing EOF. Return null for LT(0) and any index that
 	 *  results in an absolute index that is negative.
+	 *
+	 *  TODO (Sam): throw exception for invalid k?
 	 */
 	T LT(int k);
 }

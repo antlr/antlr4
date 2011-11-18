@@ -36,6 +36,7 @@ public interface TokenStream extends ObjectStream<Token> {
 	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
 	 *  Return null for LT(0) and any index that results in an absolute address
 	 *  that is negative.
+     *  TODO (Sam): Throw exception for invalid k?
 	 */
     @Override
     public Token LT(int k);
