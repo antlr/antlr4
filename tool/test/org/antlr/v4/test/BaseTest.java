@@ -1015,14 +1015,14 @@ public abstract class BaseTest {
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        TokenRewriteStream tokens = new TokenRewriteStream(lex);\n" +
 			"        <createParser>\n"+
-			"        ParserRuleContext r = parser.<parserStartRuleName>();\n" +
+			"        ASTContext\\<? extends CommonAST> r = parser.<parserStartRuleName>();\n" +
 			"        <if(!treeParserStartRuleName)>\n" +
-			"        if ( r.tree!=null ) {\n" +
-			"            System.out.println(((Tree)r.tree).toStringTree());\n" +
-			"            Trees.sanityCheckParentAndChildIndexes((CommonAST)r.tree);\n" +
+			"        if ( r.getTree()!=null ) {\n" +
+			"            System.out.println(((Tree)r.getTree()).toStringTree());\n" +
+			"            Trees.sanityCheckParentAndChildIndexes((CommonAST)r.getTree());\n" +
 			"		 }\n" +
 			"        <else>\n" +
-			"        CommonASTNodeStream nodes = new CommonASTNodeStream((Tree)r.tree);\n" +
+			"        CommonASTNodeStream nodes = new CommonASTNodeStream((Tree)r.getTree());\n" +
 			"        nodes.setTokenStream(tokens);\n" +
 			"        <treeParserName> walker = new <treeParserName>(nodes);\n" +
 			"        walker.<treeParserStartRuleName>();\n" +
