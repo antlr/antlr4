@@ -50,5 +50,6 @@ public class RuleTransition extends Transition {
 		super(ruleStart);
 	}
 
+	@Override
 	public boolean isEpsilon() { return true; }
 }

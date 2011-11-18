@@ -51,8 +51,10 @@ public interface AST extends SyntaxTree {
 	int getCharPositionInLine();
 
 	/** Redefined from Tree interface so we can narrow the return type */
+	@Override
 	AST getParent();
 
 	/** Redefined from Tree interface so we can narrow the return type */
+	@Override
 	Token getPayload();
 }

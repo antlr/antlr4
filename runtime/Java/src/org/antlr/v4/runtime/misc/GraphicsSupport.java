@@ -83,6 +83,7 @@ public class GraphicsSupport {
 			if (factories.length > 0) {
 				PrintService service = factories[0].getPrintService(out);
 				SimpleDoc doc = new SimpleDoc(new Printable() {
+					@Override
 					public int print(Graphics g, PageFormat pf, int page) {
 						if (page >= 1) return Printable.NO_SUCH_PAGE;
 						else {

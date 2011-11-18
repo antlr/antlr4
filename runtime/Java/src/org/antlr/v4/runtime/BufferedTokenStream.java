@@ -73,18 +73,22 @@ public class BufferedTokenStream implements TokenStream {
         this.tokenSource = tokenSource;
     }
 
+    @Override
     public TokenSource getTokenSource() { return tokenSource; }
 
+	@Override
 	public int index() { return p; }
 
 //	public int range() { return range; }
 
+    @Override
     public int mark() {
         if ( p == -1 ) setup();
 		lastMarker = index();
 		return lastMarker;
 	}
 
+	@Override
 	public void release(int marker) {
 		// no resources to release
 	}
@@ -102,8 +106,10 @@ public class BufferedTokenStream implements TokenStream {
         lastMarker = 0;
     }
 
+    @Override
     public void seek(int index) { p = index; }
 
+    @Override
     public int size() { return tokens.size(); }
 
     /** Move the input pointer to the next incoming token.  The stream
@@ -113,6 +119,7 @@ public class BufferedTokenStream implements TokenStream {
      *
      *  Walk past any token not on the channel the parser is listening to.
      */
+    @Override
     public void consume() {
         if ( p == -1 ) setup();
         p++;
@@ -137,6 +144,7 @@ public class BufferedTokenStream implements TokenStream {
         }
     }
 
+    @Override
     public Token get(int i) {
         if ( i < 0 || i >= tokens.size() ) {
             throw new NoSuchElementException("token index "+i+" out of range 0.."+(tokens.size()-1));
@@ -158,6 +166,7 @@ public class BufferedTokenStream implements TokenStream {
 		return subset;
 	}
 
+	@Override
 	public int LA(int i) { return LT(i).getType(); }
 
     protected Token LB(int k) {
@@ -165,6 +174,7 @@ public class BufferedTokenStream implements TokenStream {
         return tokens.get(p-k);
     }
 
+    @Override
     public Token LT(int k) {
         if ( p == -1 ) setup();
         if ( k==0 ) return null;
@@ -225,6 +235,7 @@ public class BufferedTokenStream implements TokenStream {
 		return getTokens(start,stop, s);
     }
 
+    @Override
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
     /** Grab *all* tokens from stream and return string */
@@ -234,6 +245,7 @@ public class BufferedTokenStream implements TokenStream {
         return toString(0, tokens.size()-1);
     }
 
+    @Override
     public String toString(int start, int stop) {
         if ( start<0 || stop<0 ) return "";
         if ( p == -1 ) setup();
@@ -247,6 +259,7 @@ public class BufferedTokenStream implements TokenStream {
         return buf.toString();
     }
 
+    @Override
     public String toString(Token start, Token stop) {
         if ( start!=null && stop!=null ) {
             return toString(start.getTokenIndex(), stop.getTokenIndex());

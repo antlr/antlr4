@@ -73,6 +73,7 @@ public class ANTLRFileStream extends ANTLRStringStream {
 		}
 	}
 
+	@Override
 	public String getSourceName() {
 		return fileName;
 	}

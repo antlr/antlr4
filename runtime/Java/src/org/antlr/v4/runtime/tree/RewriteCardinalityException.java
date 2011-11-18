@@ -40,6 +40,7 @@ public class RewriteCardinalityException extends RuntimeException {
 		this.elementDescription = elementDescription;
 	}
 
+	@Override
 	public String getMessage() {
 		if ( elementDescription!=null ) {
 			return elementDescription;

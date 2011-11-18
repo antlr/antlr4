@@ -78,6 +78,7 @@ public class ASTIterator<T> implements Iterator<T> {
         nodes.clear();
     }
 
+    @Override
     public boolean hasNext() {
         if ( firstTime ) return root!=null;
         if ( nodes!=null && nodes.size()>0 ) return true;
@@ -86,6 +87,7 @@ public class ASTIterator<T> implements Iterator<T> {
         return adaptor.getParent(tree)!=null; // back at root?
     }
 
+    @Override
     public T next() {
         if ( firstTime ) { // initial condition
             firstTime = false;
@@ -132,5 +134,6 @@ public class ASTIterator<T> implements Iterator<T> {
         return nodes.remove();
     }
 
+    @Override
     public void remove() { throw new UnsupportedOperationException(); }
 }

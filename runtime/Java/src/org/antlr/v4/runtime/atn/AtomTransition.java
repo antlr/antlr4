@@ -45,6 +45,7 @@ public class AtomTransition extends Transition {
 		super(target);
 	}
 
+	@Override
 	public IntervalSet label() { return IntervalSet.of(label); }
 
 	public String toString() {

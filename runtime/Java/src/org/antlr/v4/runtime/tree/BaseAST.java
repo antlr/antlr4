@@ -60,6 +60,7 @@ public abstract class BaseAST implements AST {
 	public BaseAST(AST node) {
 	}
 
+	@Override
 	public BaseAST getChild(int i) {
 		if ( children==null || i>=children.size() ) {
 			return null;
@@ -76,6 +77,7 @@ public abstract class BaseAST implements AST {
 		return Trees.getFirstChildWithType(this, type);
 	}
 
+	@Override
 	public int getChildCount() {
 		if ( children==null ) return 0;
 		return children.size();
@@ -157,6 +159,7 @@ public abstract class BaseAST implements AST {
 		return childIndex;
 	}
 
+	@Override
 	public AST getParent() {
 		return parent;
 	}
@@ -211,6 +214,7 @@ public abstract class BaseAST implements AST {
 		return new ArrayList<BaseAST>();
 	}
 
+	@Override
 	public boolean isNil() {
 		return false;
 	}
@@ -275,6 +279,7 @@ public abstract class BaseAST implements AST {
 	/** Don't use standard tree printing mechanism since ASTs can have nil
 	 *  root nodes.
 	 */
+    @Override
     public String toStringTree() {
 		return Trees.toStringTree(this, null);
 //		if ( children==null || children.size()==0 ) {

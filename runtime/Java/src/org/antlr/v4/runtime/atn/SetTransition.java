@@ -46,6 +46,7 @@ public class SetTransition extends Transition {
 		super(target);
 	}
 
+	@Override
 	public IntervalSet label() { return set; }
 
 	public String toString() {

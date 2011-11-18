@@ -43,20 +43,24 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 	protected Map<BaseAST, Integer> treeToUniqueIDMap;
 	protected int uniqueNodeID = 1;
 
+	@Override
 	public List<T> createElementList() {
 		return new ElementList<T>(this);
 	}
 
 	// END v4 stuff
 
+	@Override
 	public T nil() {
 		return create(null);
 	}
 
+	@Override
 	public boolean isNil(T tree) {
 		return ((AST)tree).isNil();
 	}
 
+	@Override
 	public T dupTree(T tree) {
 		return dupTree(tree, null);
 	}
@@ -89,6 +93,7 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 	 *  make sure that this is consistent with have the user will build
 	 *  ASTs.
 	 */
+	@Override
 	public void addChild(T t, T child) {
 		if ( t!=null && child!=null ) {
 			((BaseAST)t).addChild((BaseAST) child);
@@ -121,6 +126,7 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 	 *  constructing these nodes so we should have this control for
 	 *  efficiency.
 	 */
+	@Override
 	public T becomeRoot(T newRoot, T oldRoot) {
         //System.out.println("becomeroot new "+newRoot.toString()+" old "+oldRoot);
 		if ( oldRoot==null ) {
@@ -143,6 +149,7 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 	}
 
 	/** Transform ^(nil x) to x and nil to null */
+	@Override
 	public T rulePostProcessing(T root) {
 		//System.out.println("rulePostProcessing: "+((AST)root).toStringTree());
 		if ( root!=null && root.isNil() ) {
@@ -159,10 +166,12 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 		return root;
 	}
 
+	@Override
 	public T becomeRoot(Token newRoot, T oldRoot) {
 		return becomeRoot(create(newRoot), oldRoot);
 	}
 
+	@Override
 	public T create(int tokenType, Token fromToken) {
 		WritableToken tok = createToken(fromToken);
 		//((ClassicToken)fromToken).setType(tokenType);
@@ -170,6 +179,7 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 		return create(tok);
 	}
 
+	@Override
 	public T create(int tokenType, Token fromToken, String text) {
         if (fromToken == null) return create(tokenType, text);
 		WritableToken tok = createToken(fromToken);
@@ -178,43 +188,53 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 		return create(tok);
 	}
 
+	@Override
 	public T create(int tokenType, String text) {
 		Token fromToken = createToken(tokenType, text);
 		return create(fromToken);
 	}
 
+	@Override
 	public int getType(T t) {
 		return t.getType();
 	}
 
+	@Override
 	public void setType(T t, int type) {
 		throw new UnsupportedOperationException("don't know enough about AST node");
 	}
 
+	@Override
 	public String getText(T t) {
 		return t.getText();
 	}
 
+	@Override
 	public void setText(T t, String text) {
 		throw new UnsupportedOperationException("don't know enough about AST node");
 	}
 
+	@Override
 	public T getChild(T t, int i) {
 		return (T)t.getChild(i);
 	}
 
+	@Override
 	public void setChild(T t, int i, T child) {
 		t.setChild(i, child);
 	}
 
+	@Override
 	public T deleteChild(T t, int i) {
 		return (T)t.deleteChild(i);
 	}
 
+	@Override
 	public int getChildCount(T t) {
 		return ((BaseAST)t).getChildCount();
 	}
 
+	@Override
 	public int getUniqueID(T node) {
 		if ( treeToUniqueIDMap==null ) {
 			 treeToUniqueIDMap = new HashMap();

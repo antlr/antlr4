@@ -59,14 +59,17 @@ public class CommonAST extends BaseAST {
 		return token;
 	}
 
+	@Override
 	public Token getPayload() {
 		return getToken();
 	}
 
+	@Override
 	public Interval getSourceInterval() {
 		return new Interval(getTokenStartIndex(), getTokenStopIndex());
 	}
 
+	@Override
 	public boolean isNil() {
 		return token==null;
 	}
@@ -81,6 +84,7 @@ public class CommonAST extends BaseAST {
 		return (CommonAST)super.getParent();
 	}
 
+	@Override
 	public int getType() {
 		if ( token==null ) {
 			return Token.INVALID_TYPE;
@@ -88,6 +92,7 @@ public class CommonAST extends BaseAST {
 		return token.getType();
 	}
 
+	@Override
 	public String getText() {
 		if ( token==null ) {
 			return null;
@@ -95,6 +100,7 @@ public class CommonAST extends BaseAST {
 		return token.getText();
 	}
 
+	@Override
 	public int getLine() {
 		if ( token==null || token.getLine()==0 ) {
 			if ( getChildCount()>0 ) {
@@ -105,6 +111,7 @@ public class CommonAST extends BaseAST {
 		return token.getLine();
 	}
 
+	@Override
 	public int getCharPositionInLine() {
 		if ( token==null || token.getCharPositionInLine()==-1 ) {
 			if ( getChildCount()>0 ) {

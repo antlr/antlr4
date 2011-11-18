@@ -88,14 +88,17 @@ public class CommonToken implements WritableToken, Serializable {
 		}
 	}
 
+	@Override
 	public int getType() {
 		return type;
 	}
 
+	@Override
 	public void setLine(int line) {
 		this.line = line;
 	}
 
+	@Override
 	public String getText() {
 		if ( text!=null ) {
 			return text;
@@ -118,34 +121,42 @@ public class CommonToken implements WritableToken, Serializable {
 	 *  that start/stop indexes are not valid.  It means that that input
 	 *  was converted to a new string in the token object.
 	 */
+	@Override
 	public void setText(String text) {
 		this.text = text;
 	}
 
+	@Override
 	public int getLine() {
 		return line;
 	}
 
+	@Override
 	public int getCharPositionInLine() {
 		return charPositionInLine;
 	}
 
+	@Override
 	public void setCharPositionInLine(int charPositionInLine) {
 		this.charPositionInLine = charPositionInLine;
 	}
 
+	@Override
 	public int getChannel() {
 		return channel;
 	}
 
+	@Override
 	public void setChannel(int channel) {
 		this.channel = channel;
 	}
 
+	@Override
 	public void setType(int type) {
 		this.type = type;
 	}
 
+	@Override
 	public int getStartIndex() {
 		return start;
 	}
@@ -154,6 +165,7 @@ public class CommonToken implements WritableToken, Serializable {
 		this.start = start;
 	}
 
+	@Override
 	public int getStopIndex() {
 		return stop;
 	}
@@ -162,14 +174,17 @@ public class CommonToken implements WritableToken, Serializable {
 		this.stop = stop;
 	}
 
+	@Override
 	public int getTokenIndex() {
 		return index;
 	}
 
+	@Override
 	public void setTokenIndex(int index) {
 		this.index = index;
 	}
 
+	@Override
 	public TokenSource getTokenSource() {
 		return source;
 	}

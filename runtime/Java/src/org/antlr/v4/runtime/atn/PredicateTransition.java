@@ -50,6 +50,7 @@ public class PredicateTransition extends Transition {
 		this.predIndex = predIndex;
 	}
 
+	@Override
 	public boolean isEpsilon() { return true; }
 
 	public String toString() {

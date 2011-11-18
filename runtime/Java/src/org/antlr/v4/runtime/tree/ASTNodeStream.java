@@ -37,6 +37,7 @@ public interface ASTNodeStream<T> extends ObjectStream<T> {
 	 *  If you don't want to buffer up nodes, then this method makes no
 	 *  sense for you.
 	 */
+	@Override
 	T get(int i);
 
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
@@ -50,6 +51,7 @@ public interface ASTNodeStream<T> extends ObjectStream<T> {
 	 *  returns a tree node instead of a token.  Makes code gen identical
 	 *  for both parser and tree grammars. :)
 	 */
+	@Override
 	T LT(int k);
 
 	/** Where is this stream pulling nodes from?  This is not the name, but
