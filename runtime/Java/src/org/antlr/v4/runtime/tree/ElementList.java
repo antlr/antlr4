@@ -58,7 +58,7 @@ public class ElementList<E> extends ArrayList<E> {
 			if ( n == 0 ) throw new RewriteEmptyStreamException("n/a");
 			if ( cursor >= n) { // out of elements?
 				if ( n == 1 ) { // if size is 1, it's ok; return and we'll dup
-					return (E)adaptor.dupTree( get(0) );
+					return adaptor.dupTree( get(0) );
 				}
 				// out of elements and size was not 1, so we can't dup
 				throw new RewriteCardinalityException("size=="+n+" and out of elements");
@@ -67,7 +67,7 @@ public class ElementList<E> extends ArrayList<E> {
 			// we have elements
 			if ( n == 1 ) {
 				cursor++; // move cursor even for single element list
-				return (E)adaptor.dupTree( get(0) );
+				return adaptor.dupTree( get(0) );
 			}
 			// must have more than one in list, pull from elements
 			E e = get(cursor);
@@ -79,7 +79,7 @@ public class ElementList<E> extends ArrayList<E> {
 		public void remove() { throw new UnsupportedOperationException(); }
 	}
 
-	public ElementList(ASTAdaptor adaptor) {
+	public ElementList(ASTAdaptor<E> adaptor) {
 		this.adaptor = adaptor;
 	}
 
@@ -87,7 +87,7 @@ public class ElementList<E> extends ArrayList<E> {
 	public E get(int index) {
 		E o = super.get(index);
 		if ( used.contains(index) ) {
-			return (E)adaptor.dupTree( o );
+			return adaptor.dupTree( o );
 		}
 		used.add(index); // any subsequent ref must be dup'd
 		return o;
