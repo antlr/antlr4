@@ -29,12 +29,14 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import com.sun.istack.internal.Nullable;
+
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {
 	String[] tokenNames;
 	DFA dfa;
 
-	public DFASerializer(DFA dfa, String[] tokenNames) {
+	public DFASerializer(DFA dfa, @Nullable String[] tokenNames) {
 		this.dfa = dfa;
 		this.tokenNames = tokenNames;
 	}

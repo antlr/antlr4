@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.ATNState;
 
 import java.util.*;
@@ -52,7 +53,7 @@ public class DFA {
 
 	public String toString() { return toString(null); }
 
-	public String toString(String[] tokenNames) {
+	public String toString(@Nullable String[] tokenNames) {
 		if ( s0==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames);
 		return serializer.toString();

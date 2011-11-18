@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
@@ -104,7 +105,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		this(null, atn);
 	}
 
-	public LexerATNSimulator(Lexer recog, ATN atn) {
+	public LexerATNSimulator(@Nullable Lexer recog, ATN atn) {
 		super(atn);
 		dfa = new DFA[atn.modeToStartState.size()];
 		for (int i=0; i<atn.modeToStartState.size(); i++) {
