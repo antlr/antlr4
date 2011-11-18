@@ -148,7 +148,7 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 	}
 
 	@Override
-	public abstract ObjectStream<TSymbol> getInputStream();
+	public abstract SymbolStream<TSymbol> getInputStream();
 
 	/** Match needs to return the current input symbol, which gets put
 	 *  into the label for the associated token ref; e.g., x=ID.  Token

@@ -55,7 +55,7 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	public <T> NoViableAltException(BaseRecognizer<T> recognizer,
-								ObjectStream<T> input,
+								SymbolStream<T> input,
 								Token startToken,
 								Token offendingToken,
 								T offendingNode,

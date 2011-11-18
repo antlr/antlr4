@@ -30,7 +30,7 @@
 package org.antlr.v4.runtime;
 
 /** A stream of tokens accessing tokens from a TokenSource */
-public interface TokenStream extends ObjectStream<Token> {
+public interface TokenStream extends SymbolStream<Token> {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
 	 *  i<0 indicates tokens in the past.  So -1 is previous token and -2 is
 	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.

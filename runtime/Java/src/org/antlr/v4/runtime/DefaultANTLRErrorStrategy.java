@@ -33,8 +33,6 @@ import com.sun.istack.internal.NotNull;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.AST;
-import org.antlr.v4.runtime.tree.ASTAdaptor;
-import org.antlr.v4.runtime.tree.Tree;
 
 /** This is the default error handling mechanism for ANTLR parsers
  *  and tree parsers.
@@ -158,7 +156,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 //		System.err.println("sync expecting: "+expecting);
 
 		// TODO: subclass this class for treeparsers
-		ObjectStream<TSymbol> tokens = recognizer.getInputStream();
+		SymbolStream<TSymbol> tokens = recognizer.getInputStream();
 		int la = tokens.LA(1);
 		// Return but don't end recovery. only do that upon valid token match
 		if ( la==Token.EOF || expecting.contains(la) ) return;
@@ -187,7 +185,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 										  NoViableAltException e)
 	throws RecognitionException
 	{
-		ObjectStream<TSymbol> tokens = recognizer.getInputStream();
+		SymbolStream<TSymbol> tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream) {
 			input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);

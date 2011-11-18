@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.*;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
-public interface ASTNodeStream<T> extends ObjectStream<T> {
+public interface ASTNodeStream<T> extends SymbolStream<T> {
 	/** Get a tree node at an absolute index i; 0..n-1.
 	 *  If you don't want to buffer up nodes, then this method makes no
 	 *  sense for you.

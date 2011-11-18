@@ -30,7 +30,7 @@
 package org.antlr.v4.runtime;
 
 /**  A stream of either tokens or tree nodes */
-public interface ObjectStream<T> extends IntStream {
+public interface SymbolStream<T> extends IntStream {
 	/** Get an object at absolute index i; 0..n-1.
 	 *  This is only valid if the underlying stream implementation buffers
 	 *  all of the incoming objects.
