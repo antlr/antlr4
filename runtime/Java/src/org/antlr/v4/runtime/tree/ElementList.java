@@ -46,11 +46,13 @@ public class ElementList<E> extends ArrayList<E> {
 		/** If just 1 element, we still track cursor; next() will dup if
 		 *  cursor beyond 1 element.
 		 */
+		@Override
 		public boolean hasNext() {
 			int n = size();
 			return (n==1 && cursor<1) || (n>1 && cursor<n);
 		}
 
+		@Override
 		public E next() {
 			int n = size();
 			if ( n == 0 ) throw new RewriteEmptyStreamException("n/a");
@@ -73,6 +75,7 @@ public class ElementList<E> extends ArrayList<E> {
 			return e;
 		}
 
+		@Override
 		public void remove() { throw new UnsupportedOperationException(); }
 	}
 

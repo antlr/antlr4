@@ -57,19 +57,25 @@ public interface ParseTree extends SyntaxTree {
 		public int s;
 		public TokenNodeImpl(Token token) {	this.token = token;	}
 
+		@Override
 		public ParseTree getChild(int i) {return null;}
 
+		@Override
 		public Token getToken() {return token;}
 
+		@Override
 		public ParseTree getParent() { return parent; }
 
+		@Override
 		public Token getPayload() { return token; }
 
+		@Override
 		public Interval getSourceInterval() {
 			if ( token==null ) return Interval.INVALID;
 			return new Interval(token.getTokenIndex(), token.getTokenIndex());
 		}
 
+		@Override
 		public int getChildCount() { return 0; }
 
 		@Override
@@ -78,6 +84,7 @@ public interface ParseTree extends SyntaxTree {
 			return token.getText();
 		}
 
+		@Override
 		public String toStringTree() {
 			return toString();
 		}
@@ -98,6 +105,8 @@ public interface ParseTree extends SyntaxTree {
 	}
 
 	// the following methods narrow the return type; they are not additional methods
+	@Override
 	ParseTree getParent();
+	@Override
 	ParseTree getChild(int i);
 }
