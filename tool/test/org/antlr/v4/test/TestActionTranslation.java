@@ -135,7 +135,7 @@ public class TestActionTranslation extends BaseTest {
 
     @Test public void testRuleRefs() throws Exception {
         String action = "$lab.start; $c.tree;";
-		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx._rc!=null?((CommonAST)_localctx._rc.tree):null);";
+		String expected = "(_localctx.lab!=null?((Token)_localctx.lab.start):null); (_localctx._rc!=null?((CommonAST)_localctx._rc.tree):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 

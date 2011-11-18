@@ -402,7 +402,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"[@0,0:0='a',<5>,1:0]\n" +
 			"[@1,1:1='b',<3>,1:1]\n" +
 			"[@2,2:2='c',<6>,1:2]\n" +
-			"[@3,3:3='<EOF>',<-1>,1:3]\n";
+			"[@3,3:2='<EOF>',<-1>,1:3]\n";
 		String found = execLexer("M.g", master, "M", "abc", debug);
 		assertEquals(expecting, found);
 	}
@@ -422,7 +422,7 @@ public class TestCompositeGrammars extends BaseTest {
 		String found = execLexer("M.g", master, "M", "ab", debug);
 		assertEquals("M.A\n" +
 					 "[@0,0:1='ab',<3>,1:0]\n" +
-					 "[@1,2:2='<EOF>',<-1>,1:2]\n", found);
+					 "[@1,2:1='<EOF>',<-1>,1:2]\n", found);
 	}
 
 	@Test public void testKeywordVSIDOrder() throws Exception {

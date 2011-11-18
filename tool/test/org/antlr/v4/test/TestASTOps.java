@@ -747,8 +747,8 @@ public class TestASTOps extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc", debug);
-		assertEquals("line 1:3 mismatched input '<EOF>' expecting INT\n", this.stderrDuringParse);
-		assertEquals("<mismatched token: [@1,3:3='<EOF>',<-1>,1:3], resync=abc>\n", found);
+		assertEquals("line 1:3 missing INT at '<EOF>'\n", this.stderrDuringParse);
+		assertEquals("abc <missing INT>\n", found);
 	}
 
 	@Test public void testExtraTokenGivesErrorNode() throws Exception {
@@ -813,7 +813,7 @@ public class TestASTOps extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "*", debug);
-		assertEquals("line 1:0 no viable alternative at input '*'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 mismatched input '*' expecting {ID, INT}\n", this.stderrDuringParse);
 		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
 

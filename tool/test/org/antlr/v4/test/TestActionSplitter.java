@@ -9,20 +9,20 @@ import java.util.*;
 
 public class TestActionSplitter extends BaseTest {
     static String[] exprs = {
-        "foo",		"['foo'<22>]",
-        "$x",		"['$x'<6>]",
-        "\\$x",		"['\\$x'<22>]",
-        "$x.y",		"['$x.y'<13>]",
-        "$ID.text",		"['$ID.text'<13>]",
-        "$ID",		"['$ID'<6>]",
-        "$ID.getText()",		"['$ID'<6>, '.getText()'<22>]",
-        "$ID.text = \"test\";",		"['$ID.text = \"test\";'<19>]",
-        "$a.line == $b.line",		"['$a.line'<13>, ' == '<22>, '$b.line'<13>]",
-        "$r.tree",		"['$r.tree'<13>]",
-        "foo $a::n bar",		"['foo '<22>, '$a::n'<12>, ' bar'<22>]",
-        "$rule::x;",		"['$rule::x'<12>, ';'<22>]",
-        "$field::x = $field.st;",		"['$field::x = $field.st;'<17>]",
-        "$foo.get(\"ick\");",		"['$foo'<6>, '.get(\"ick\");'<22>]",
+        "foo",		"['foo'<" + ActionSplitter.TEXT + ">]",
+        "$x",		"['$x'<" + ActionSplitter.ATTR + ">]",
+        "\\$x",		"['\\$x'<" + ActionSplitter.TEXT + ">]",
+        "$x.y",		"['$x.y'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
+        "$ID.text",		"['$ID.text'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
+        "$ID",		"['$ID'<" + ActionSplitter.ATTR + ">]",
+        "$ID.getText()",		"['$ID'<" + ActionSplitter.ATTR + ">, '.getText()'<" + ActionSplitter.TEXT + ">]",
+        "$ID.text = \"test\";",		"['$ID.text = \"test\";'<" + ActionSplitter.SET_QUALIFIED_ATTR + ">]",
+        "$a.line == $b.line",		"['$a.line'<" + ActionSplitter.QUALIFIED_ATTR + ">, ' == '<" + ActionSplitter.TEXT + ">, '$b.line'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
+        "$r.tree",		"['$r.tree'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
+        "foo $a::n bar",		"['foo '<" + ActionSplitter.TEXT + ">, '$a::n'<" + ActionSplitter.NONLOCAL_ATTR + ">, ' bar'<" + ActionSplitter.TEXT + ">]",
+        "$rule::x;",		"['$rule::x'<" + ActionSplitter.NONLOCAL_ATTR + ">, ';'<" + ActionSplitter.TEXT + ">]",
+        "$field::x = $field.st;",		"['$field::x = $field.st;'<" + ActionSplitter.SET_NONLOCAL_ATTR + ">]",
+        "$foo.get(\"ick\");",		"['$foo'<" + ActionSplitter.ATTR + ">, '.get(\"ick\");'<" + ActionSplitter.TEXT + ">]",
     };
 
     @Test public void testExprs() {

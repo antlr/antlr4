@@ -145,7 +145,8 @@ public class TestParseErrors extends BaseTest {
 			"grammar T;\n" +
 			"a : 'a' 'b'*;";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aabc", false);
-		String expecting = "line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\n";
+		String expecting = "line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\n" +
+			"line 1:3 token recognition error at: 'c'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
@@ -157,8 +158,7 @@ public class TestParseErrors extends BaseTest {
 			"a : 'a' 'b'* 'c';";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aacabc", false);
 		String expecting =
-			"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n" +
-			"line 1:3 mismatched input 'a' expecting 'c'\n";
+			"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
@@ -192,7 +192,8 @@ public class TestParseErrors extends BaseTest {
 			"grammar T;\n" +
 			"a : 'a' ('b'|'z'{;})*;";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aabc", false);
-		String expecting = "line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\n";
+		String expecting = "line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\n" +
+			"line 1:3 token recognition error at: 'c'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}
@@ -204,8 +205,7 @@ public class TestParseErrors extends BaseTest {
 			"a : 'a' ('b'|'z'{;})* 'c';";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "aacabc", false);
 		String expecting =
-			"line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n" +
-			"line 1:3 mismatched input 'a' expecting 'c'\n";
+			"line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}

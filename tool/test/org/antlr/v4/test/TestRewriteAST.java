@@ -1019,7 +1019,7 @@ public class TestRewriteAST extends BaseTest {
 			"options { output = AST; }\n" +
 			"tokens { FLOAT; }\n" +
 			"a\n" +
-			"    : INT -> {new CommonAST(new CommonAST(FLOAT,$INT.text+\".0\"))} \n" +
+			"    : INT -> {new CommonAST(new CommonToken(FLOAT,$INT.text+\".0\"))} \n" +
 			"    ; \n" +
 			"INT : '0'..'9'+; \n" +
 			"WS: (' ' | '\\n' | '\\t')+ {$channel = HIDDEN;}; \n";
@@ -1335,7 +1335,7 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "decl", "x=1;", debug);
-		assertEquals("line 1:0 mismatched input 'x' expecting set {'int', 'float'}\n", this.stderrDuringParse);
+		assertEquals("line 1:0 mismatched input 'x' expecting {'int', 'float'}\n", this.stderrDuringParse);
 		assertEquals("(EXPR <error: x> x 1)\n", found); // tree gets invented ID token
 	}
 

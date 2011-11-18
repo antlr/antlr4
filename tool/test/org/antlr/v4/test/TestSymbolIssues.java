@@ -20,9 +20,9 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
-        "warning(50): A.g:2:10: illegal option opt\n" +
+        "warning(51): A.g:2:10: illegal option opt\n" +
 		"error(60): A.g:7:1: redefinition of header action\n" +
-		"warning(50): A.g:2:10: illegal option opt\n" +
+		"warning(51): A.g:2:10: illegal option opt\n" +
 		"error(19): A.g:11:0: rule a redefinition\n" +
 		"error(60): A.g:5:1: redefinition of members action\n" +
 		"error(47): A.g:9:37: rule b has no defined parameters\n" +
@@ -77,7 +77,7 @@ public class TestSymbolIssues extends BaseTest {
 
         // YIELDS
         "error(39): D.g:3:21: label j conflicts with rule a's return value or parameter with same name\n" +
-		"error(43): D.g:5:0: rule b's argument i conflicts a return value with same nameK\n"
+		"error(43): D.g:5:0: rule b's argument i conflicts a return value with same name\n"
     };
 
 	static String[] E = {

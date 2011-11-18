@@ -40,7 +40,7 @@ public class TestBasicSemanticErrors extends BaseTest {
     static String[] U = {
         // INPUT
         "parser grammar U;\n" +
-        "options { foo=bar; k=*; backtrack=true;}\n" +
+        "options { foo=bar; k=\"*\"; backtrack=true;}\n" +
         "tokens {\n" +
         "        f='fkj';\n" +
         "        S = 'a';\n" +
@@ -55,16 +55,16 @@ public class TestBasicSemanticErrors extends BaseTest {
         "b : ( options { ick=bar; greedy=true; } : ID )+ ;\n" +
         "c : ID<blue> ID<x=y> ;",
         // YIELDS
-        "error(21): U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"error(21): U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"error(49): U.g:2:10: illegal option foo\n" +
+		"warning(51): U.g:2:10: illegal option foo\n" +
 		"error(26): U.g:4:8: token names must start with an uppercase letter: f\n" +
 		"error(25): U.g:4:8: can't assign string value to token name f in non-combined grammar\n" +
 		"error(25): U.g:5:8: can't assign string value to token name S in non-combined grammar\n" +
-		"error(49): U.g:8:10: illegal option x\n" +
-		"error(49): U.g:11:10: illegal option blech\n" +
-		"error(49): U.g:14:16: illegal option ick\n" +
-		"error(49): U.g:15:16: illegal option x\n",
+		"warning(51): U.g:8:10: illegal option x\n" +
+		"error(21): U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
+		"error(21): U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
+		"warning(51): U.g:11:10: illegal option blech\n" +
+		"warning(51): U.g:14:16: illegal option ick\n" +
+		"warning(51): U.g:15:16: illegal option x\n",
 
         // INPUT
         "tree grammar V;\n" +

@@ -225,8 +225,8 @@ public class TestASTNodeStream extends BaseTest {
 		stream.consume(); // consume UP
 		stream.consume(); // consume UP
 		stream.consume(); // consume 104
-		stream.seek(index);
-		stream.release(m); // REWIND
+		stream.seek(index); // REWIND
+		stream.release(m);
         stream.mark();   // keep saving nodes though
 
 		assertEquals(107, ((AST)stream.LT(1)).getType());

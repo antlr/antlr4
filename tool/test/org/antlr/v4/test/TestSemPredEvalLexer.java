@@ -15,7 +15,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		String expecting =
 			"[@0,0:3='enum',<4>,1:0]\n" +
 			"[@1,5:7='abc',<5>,1:5]\n" +
-			"[@2,8:8='<EOF>',<-1>,1:8]\n"; // no dfa since preds on left edge
+			"[@2,8:7='<EOF>',<-1>,1:8]\n"; // no dfa since preds on left edge
 		assertEquals(expecting, found);
 	}
 
@@ -31,7 +31,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@0,0:3='enum',<4>,1:0]\n" +
 			"[@1,5:7='abc',<5>,1:5]\n" +
 			"[@2,9:12='enum',<4>,1:9]\n" +
-			"[@3,13:13='<EOF>',<-1>,1:13]\n" +
+			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
 			"s0-' '->:s4=>6\n" +
 			"s0-'a'->:s5=>5\n" +
 			"s0-'e'->:s1=>5\n" +
