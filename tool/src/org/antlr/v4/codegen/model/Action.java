@@ -35,6 +35,7 @@ import org.antlr.v4.codegen.model.actions.ActionChunk;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** */
@@ -44,7 +45,11 @@ public class Action extends RuleElement {
 	public Action(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
 		RuleFunction rf = factory.getCurrentRuleFunction();
-		chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
+		if (ast != null) {
+			chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
+		} else {
+			chunks = new ArrayList<ActionChunk>();
+		}
 		//System.out.println("actions="+chunks);
 	}
 }
