@@ -533,8 +533,8 @@ ListLabelName(label)		  ::= "<label>_list"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,superClass="ParserRuleContext") ::= <<
-public static class <s.name> extends <superClass> {
+StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass="ParserRuleContext") ::= <<
+public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<if(s.ctorAttrs)>public <s.name>(RuleContext parent, int state) { super(parent, state); }<endif>
 	public <s.name>(RuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
@@ -549,6 +549,7 @@ public static class <s.name> extends <superClass> {
 	}
 <endif>
 	<visitorDispatchMethods; separator="\n">
+	<extensionMembers; separator="\n">
 }
 >>
 

@@ -31,6 +31,7 @@ package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.VisitorDispatchMethod;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
@@ -48,6 +49,8 @@ public class StructDecl extends Decl {
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
+	@ModelElement public List<OutputModelObject> interfaces;
+	@ModelElement public List<OutputModelObject> extensionMembers;
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
@@ -73,6 +76,22 @@ public class StructDecl extends Decl {
 
 	public void addDecls(Collection<Attribute> attrList) {
 		for (Attribute a : attrList) addDecl(a);
+	}
+
+	public void implementInterface(OutputModelObject value) {
+		if (interfaces == null) {
+			interfaces = new ArrayList<OutputModelObject>();
+		}
+
+		interfaces.add(value);
+	}
+
+	public void addExtensionMember(OutputModelObject member) {
+		if (extensionMembers == null) {
+			extensionMembers = new ArrayList<OutputModelObject>();
+		}
+
+		extensionMembers.add(member);
 	}
 
 	public boolean isEmpty() { return attrs.size()==0; }
