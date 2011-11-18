@@ -97,7 +97,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static String getNodeText(Tree t, BaseRecognizer<?> recog) {
+	public static <TSymbol> String getNodeText(Tree t, BaseRecognizer<TSymbol> recog) {
 		if ( t instanceof AST ) {
 			return t.toString();
 		}
@@ -110,9 +110,11 @@ public class Trees {
 			else if ( t instanceof ParseTree.ErrorNodeImpl ) {
 				return t.toString();
 			}
-			else if ( t instanceof ParseTree.TokenNode ) {
-				Token tok = ((ParseTree.TokenNode) t).getToken();
-				return tok.getText();
+			else if ( t instanceof ParseTree.TerminalNode) {
+				Object symbol = ((ParseTree.TerminalNode<?>)t).getSymbol();
+				if (symbol instanceof Token) {
+					return ((Token)symbol).getText();
+				}
 			}
 		}
 		// not AST and no recog for rule names

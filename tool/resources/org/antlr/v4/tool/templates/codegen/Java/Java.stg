@@ -55,7 +55,7 @@ public class Blank<listener.grammarName>Listener implements <listener.grammarNam
 
 	@Override public void enterEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
-	@Override public void visitToken(Token token) { }
+	@Override public void visitTerminal(\<<TokenLabelType()> > symbol) { }
 }
 >>
 

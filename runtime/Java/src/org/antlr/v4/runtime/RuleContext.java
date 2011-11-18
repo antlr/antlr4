@@ -150,16 +150,16 @@ public class RuleContext implements ParseTree.RuleNode {
 	}
 
 	public void addChild(Token matchedToken) {
-		TokenNodeImpl t = new TokenNodeImpl(matchedToken);
+		TerminalNodeImpl<?> t = new TerminalNodeImpl<Token>(matchedToken);
 		addChild(t);
 	}
 
 	public void addErrorNode(Token badToken) {
-		TokenNodeImpl t = new ErrorNodeImpl(badToken);
+		TerminalNodeImpl<?> t = new ErrorNodeImpl<Token>(badToken);
 		addChild(t);
 	}
 
-	public void addChild(TokenNode t) {
+	public void addChild(TerminalNode<?> t) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(t);
 	}

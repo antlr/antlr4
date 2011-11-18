@@ -46,33 +46,40 @@ public interface ParseTree extends SyntaxTree {
 		RuleContext getRuleContext();
 	}
 
-	public interface TokenNode extends ParseTree {
-		Token getToken();
+	public interface TerminalNode<TSymbol> extends ParseTree {
+		TSymbol getSymbol();
 	}
 
-	public static class TokenNodeImpl implements TokenNode {
-		public Token token;
+	public static class TerminalNodeImpl<TSymbol> implements TerminalNode<TSymbol> {
+		public TSymbol symbol;
 		public ParseTree parent;
 		/** Which ATN node matched this token? */
 		public int s;
-		public TokenNodeImpl(Token token) {	this.token = token;	}
+		public TerminalNodeImpl(TSymbol symbol) {	this.symbol = symbol;	}
 
 		@Override
 		public ParseTree getChild(int i) {return null;}
 
 		@Override
-		public Token getToken() {return token;}
+		public TSymbol getSymbol() {return symbol;}
 
 		@Override
 		public ParseTree getParent() { return parent; }
 
 		@Override
-		public Token getPayload() { return token; }
+		public TSymbol getPayload() { return symbol; }
 
 		@Override
 		public Interval getSourceInterval() {
-			if ( token==null ) return Interval.INVALID;
-			return new Interval(token.getTokenIndex(), token.getTokenIndex());
+			if ( symbol ==null ) return Interval.INVALID;
+
+			if (symbol instanceof Token) {
+				return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
+			} else if (symbol instanceof SyntaxTree) {
+				return ((SyntaxTree)symbol).getSourceInterval();
+			} else {
+				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
+			}
 		}
 
 		@Override
@@ -80,8 +87,18 @@ public interface ParseTree extends SyntaxTree {
 
 		@Override
 		public String toString() {
-			if ( token.getType() == Token.EOF ) return "<EOF>";
-			return token.getText();
+			if (symbol instanceof Token) {
+				if ( ((Token)symbol).getType() == Token.EOF ) return "<EOF>";
+				return ((Token)symbol).getText();
+			} else if (symbol instanceof AST) {
+				if (((AST)symbol).getType() == Token.EOF) {
+					return "<EOF>";
+				} else {
+					return ((AST)symbol).getText();
+				}
+			} else {
+				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
+			}
 		}
 
 		@Override
@@ -96,8 +113,8 @@ public interface ParseTree extends SyntaxTree {
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl extends TokenNodeImpl {
-		public ErrorNodeImpl(Token token) {
+	public static class ErrorNodeImpl<TSymbol> extends TerminalNodeImpl<TSymbol> {
+		public ErrorNodeImpl(TSymbol token) {
 			super(token);
 		}
 //		@Override
