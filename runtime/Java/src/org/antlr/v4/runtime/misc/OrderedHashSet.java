@@ -67,6 +67,7 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
      *  Key is object itself.  Good for say asking if a certain string is in
      *  a list of strings.
      */
+    @Override
     public boolean add(T value) {
         boolean result = super.add(value);
 		if ( result ) {  // only track if new element not in set
@@ -75,10 +76,12 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 		return result;
     }
 
+	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
     }
 
+	@Override
 	public void clear() {
         elements.clear();
         super.clear();
@@ -92,7 +95,7 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 	@Override
 	public boolean equals(Object o) {
 //		System.out.print("equals " + this + ", " + o+" = ");
-		boolean same = elements!=null && elements.equals(((OrderedHashSet)o).elements);
+		boolean same = elements!=null && elements.equals(((OrderedHashSet<?>)o).elements);
 //		System.out.println(same);
 		return same;
 	}
