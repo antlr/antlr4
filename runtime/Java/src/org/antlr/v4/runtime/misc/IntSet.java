@@ -75,7 +75,7 @@ public interface IntSet {
     /** remove this element from this set */
     void remove(int el);
 
-    List toList();
+    List<Integer> toList();
 
     String toString();
 }
