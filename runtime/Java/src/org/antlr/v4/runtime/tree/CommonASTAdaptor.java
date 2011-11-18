@@ -47,11 +47,13 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 	 *  I could use reflection to prevent having to override this
 	 *  but reflection is slow.
 	 */
+	@Override
 	public CommonAST dupNode(CommonAST t) {
 		if ( t==null ) return null;
 		return new CommonAST(t);
 	}
 
+	@Override
 	public CommonAST create(Token payload) {
 		return new CommonAST(payload);
 	}
@@ -95,6 +97,7 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 	 *  seems like this will yield start=i and stop=i-1 in a nil node.
 	 *  Might be useful info so I'll not force to be i..i.
 	 */
+	@Override
 	public void setTokenBoundaries(CommonAST t, Token startToken, Token stopToken) {
 		if ( t==null ) return;
 		int start = 0;
@@ -105,21 +108,25 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 		t.setTokenStopIndex(stop);
 	}
 
+	@Override
 	public int getTokenStartIndex(CommonAST t) {
 		if ( t==null ) return -1;
 		return t.getTokenStartIndex();
 	}
 
+	@Override
 	public int getTokenStopIndex(CommonAST t) {
 		if ( t==null ) return -1;
 		return t.getTokenStopIndex();
 	}
 
+	@Override
 	public String getText(CommonAST t) {
 		if ( t==null ) return null;
 		return t.getText();
 	}
 
+    @Override
     public int getType(CommonAST t) {
 		if ( t==null ) return Token.INVALID_TYPE;
 		return t.getType();
@@ -129,39 +136,47 @@ public class CommonASTAdaptor extends BaseASTAdaptor<CommonAST> {
 	 *  you are not using CommonAST, then you must
 	 *  override this in your own adaptor.
 	 */
+	@Override
 	public Token getToken(CommonAST t) {
 		if ( t==null ) return null;
 		return t.getToken();
 	}
 
+	@Override
 	public CommonAST getChild(CommonAST t, int i) {
 		if ( t==null ) return null;
         return t.getChild(i);
     }
 
+    @Override
     public int getChildCount(CommonAST t) {
 		if ( t==null ) return 0;
         return t.getChildCount();
     }
 
+	@Override
 	public CommonAST getParent(CommonAST t) {
 		if ( t==null ) return null;
         return t.getParent();
 	}
 
+	@Override
 	public void setParent(CommonAST t, CommonAST parent) {
         if ( t!=null ) t.setParent((CommonAST)parent);
 	}
 
+	@Override
 	public int getChildIndex(CommonAST t) {
         if ( t==null ) return 0;
 		return t.getChildIndex();
 	}
 
+	@Override
 	public void setChildIndex(CommonAST t, int index) {
         if ( t!=null ) t.setChildIndex(index);
 	}
 
+	@Override
 	public void replaceChildren(CommonAST parent, int startChildIndex, int stopChildIndex, CommonAST t) {
 		if ( parent!=null ) {
 			Trees.replaceChildren((CommonAST)parent, startChildIndex, stopChildIndex, t);
