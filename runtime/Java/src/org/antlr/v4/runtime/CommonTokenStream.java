@@ -117,7 +117,7 @@ public class CommonTokenStream extends BufferedTokenStream {
     }
 
     protected int skipOffTokenChannelsReverse(int i) {
-        while ( i>=0 && ((Token)tokens.get(i)).getChannel()!=channel ) {
+        while ( i>=0 && tokens.get(i).getChannel()!=channel ) {
             i--;
         }
         return i;
