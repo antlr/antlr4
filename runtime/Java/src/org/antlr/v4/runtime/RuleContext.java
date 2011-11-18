@@ -283,20 +283,26 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	// satisfy the ParseTree interface
 
+	@Override
 	public ParseTree getChild(int i) {
 		return children!=null ? children.get(i) : null;
 	}
 
+	@Override
 	public RuleContext getRuleContext() { return this; }
 
+	@Override
 	public ParseTree getParent() { return parent; }
 
+	@Override
 	public RuleContext getPayload() { return this; }
 
+	@Override
 	public int getChildCount() { return children!=null ? children.size() : 0; }
 
 	public int getRuleIndex() { return -1; }
 
+	@Override
 	public Interval getSourceInterval() {
 		if ( getChildCount()==0 ) return Interval.INVALID;
 		int start = getChild(0).getSourceInterval().a;
@@ -330,6 +336,7 @@ public class RuleContext implements ParseTree.RuleNode {
 		return Trees.toStringTree(this, recog);
 	}
 
+	@Override
 	public String toStringTree() { return toStringTree(null); }
 
 	public void enterRule(ParseTreeListener listener) { }
