@@ -90,6 +90,7 @@ public class Tool {
 	public boolean saveLexer = false;
 	public boolean genListener = true;
 	public boolean launch_ST_inspector = false;
+	public boolean force_atn = false;
 
 	public static Option[] optionDefs = {
 		new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -104,6 +105,7 @@ public class Tool {
 		new Option("genListener",		"-walker", "generate parse tree walker and listener"),
 		new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
 		new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("force_atn",			"-Xforceatn", "use the ATN simulator for all predictions"),
 	};
 
 	// helper vars for option management
