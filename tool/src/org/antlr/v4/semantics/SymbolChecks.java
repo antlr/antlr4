@@ -57,6 +57,10 @@ public class SymbolChecks {
         this.g = g;
         this.collector = collector;
 		this.errMgr = g.tool.errMgr;
+
+        for (GrammarAST tokenId : collector.tokenIDRefs) {
+            tokenIDs.add(tokenId.getText());
+        }
         /*
         System.out.println("rules="+collector.rules);
         System.out.println("rulerefs="+collector.rulerefs);
