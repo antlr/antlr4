@@ -128,6 +128,6 @@ public class TreeFilter<T> extends TreeParser {
     // methods the downup strategy uses to do the up and down rules.
     // to override, just define tree grammar rule topdown and turn on
     // filter=true.
-    public void topdown() throws RecognitionException {;}
-    public void bottomup() throws RecognitionException {;}
+    public void topdown() throws RecognitionException {}
+    public void bottomup() throws RecognitionException {}
 }
