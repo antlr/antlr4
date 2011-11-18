@@ -67,8 +67,8 @@ TreeParserModel(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="treeparser_ctor",
 		 extras={
 @Override
-public <file.ASTLabelType> match(int ttype) throws RecognitionException {
-	return (<file.ASTLabelType>)super.match(ttype);
+public <ASTLabelType()> match(int ttype) throws RecognitionException {
+	return (<ASTLabelType()>)super.match(ttype);
 \}
 }, ...)>
 >>
@@ -475,6 +475,9 @@ SetAttr(s,rhsChunks) ::= "_localctx.<s.name> = <rhsChunks>;"
 LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
 //SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
 
+ASTLabelType() ::= "<file.ASTLabelType; null={Object}>"
+TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
+
 TokenPropertyRef_text(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getText():null)"
 TokenPropertyRef_type(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getType():0)"
 TokenPropertyRef_line(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getLine():0)"
@@ -484,9 +487,9 @@ TokenPropertyRef_index(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.ge
 TokenPropertyRef_tree(t) ::= "_localctx.<t.label>_tree"
 TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localctx.<t.label>.getText()):0)"
 
-RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.start):null)"
-RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?((<file.TokenLabelType>)_localctx.<r.label>.stop):null)"
-RulePropertyRef_tree(r)	 ::= "(_localctx.<r.label>!=null?((<file.ASTLabelType>)_localctx.<r.label>.tree):null)"
+RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?((<TokenLabelType()>)_localctx.<r.label>.start):null)"
+RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?((<TokenLabelType()>)_localctx.<r.label>.stop):null)"
+RulePropertyRef_tree(r)	 ::= "(_localctx.<r.label>!=null?((<ASTLabelType()>)_localctx.<r.label>.tree):null)"
 RulePropertyRef_text(r)	 ::= "(_localctx.<r.label>!=null?_input.toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
 RulePropertyRef_st(r)	 ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 
@@ -517,8 +520,8 @@ TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
-NodeDecl(t) ::= "<file.ASTLabelType> <t.name>;"
-NodeListDecl(t) ::= "List\<<file.ASTLabelType>> <t.name> = new ArrayList\<<file.ASTLabelType>>();"
+NodeDecl(t) ::= "<ASTLabelType()> <t.name>;"
+NodeListDecl(t) ::= "List\<<ASTLabelType()>> <t.name> = new ArrayList\<<ASTLabelType()>>();"
 
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext"
