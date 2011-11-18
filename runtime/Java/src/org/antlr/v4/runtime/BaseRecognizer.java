@@ -278,11 +278,11 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	/** A convenience method for use most often with template rewrites.
 	 *  Convert a List<Token> to List<String>
 	 */
-	public List toStrings(List tokens) {
+	public List<String> toStrings(List<? extends Token> tokens) {
 		if ( tokens==null ) return null;
-		List strings = new ArrayList(tokens.size());
+		List<String> strings = new ArrayList<String>(tokens.size());
 		for (int i=0; i<tokens.size(); i++) {
-			strings.add(((Token)tokens.get(i)).getText());
+			strings.add(tokens.get(i).getText());
 		}
 		return strings;
 	}
