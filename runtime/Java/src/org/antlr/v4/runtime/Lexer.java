@@ -38,7 +38,7 @@ import java.util.EmptyStackException;
  *  uses simplified match() and error recovery mechanisms in the interest
  *  of speed.
  */
-public abstract class Lexer extends Recognizer<LexerATNSimulator>
+public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	implements TokenSource
 {
 	public static final int DEFAULT_MODE = 0;
@@ -313,13 +313,14 @@ public abstract class Lexer extends Recognizer<LexerATNSimulator>
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
 			input.substring(tokenStartCharIndex,input.index())+"'";
-		if ( _listeners==null || _listeners.size()==0 ) {
+		ANTLRErrorListener<Integer>[] listeners = getListeners();
+		if ( listeners.length == 0 ) {
 			System.err.println("line "+tokenStartLine+":"+
 							   tokenStartCharPositionInLine+" "+
 							   msg);
 			return;
 		}
-		for (ANTLRErrorListener pl : _listeners) {
+		for (ANTLRErrorListener<Integer> pl : listeners) {
 			pl.error(this, null, tokenStartLine, tokenStartCharPositionInLine, msg, e);
 		}
 	}

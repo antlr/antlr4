@@ -48,9 +48,8 @@ import org.stringtemplate.v4.ST;
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-public class ParserRuleContext extends RuleContext {
-	public Token start, stop;
-	public Object tree;
+public class ParserRuleContext<SymbolType> extends RuleContext {
+	public SymbolType start, stop;
 	public ST st;
 
 	/** Set during parsing to identify which rule parser is in. */
@@ -63,7 +62,7 @@ public class ParserRuleContext extends RuleContext {
 
 	/** COPY a ctx
 	 */
-	public void copyFrom(ParserRuleContext ctx) {
+	public void copyFrom(ParserRuleContext<SymbolType> ctx) {
 		// from RuleContext
 		this.parent = ctx.parent;
 		this.s = ctx.s;
@@ -71,7 +70,6 @@ public class ParserRuleContext extends RuleContext {
 
 		this.start = ctx.start;
 		this.stop = ctx.stop;
-		this.tree = ctx.tree;
 		this.st = ctx.st;
 		this.ruleIndex = ctx.ruleIndex;
 	}
@@ -83,8 +81,7 @@ public class ParserRuleContext extends RuleContext {
 	@Override
 	public int getRuleIndex() { return ruleIndex; }
 
-	public Object getTree() { return tree; }
 	public ST getTemplate() { return st; }
-	public Token getStart() { return start; }
-	public Token getStop() { return stop; }
+	public SymbolType getStart() { return start; }
+	public SymbolType getStop() { return stop; }
 }

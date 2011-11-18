@@ -41,7 +41,7 @@ import java.util.*;
  *
  *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
-public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
+public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, ParserATNSimulator<TSymbol>> {
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
 	/** The RuleContext object for the currently executing rule. This
@@ -49,7 +49,7 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  When somebody calls the start rule, this gets set to the
 	 *  root context.
 	 */
-	protected ParserRuleContext _ctx;
+	protected ParserRuleContext<TSymbol> _ctx;
 
 	protected boolean buildParseTrees;
 	protected boolean traceATNStates;
@@ -80,9 +80,9 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
      *  to the set of symbols that can follow rule ref.
 	 *  TODO: mv into Parser etc... to get more precise return value/efficiency
 	 */
-	public Object match(int ttype) throws RecognitionException {
+	public TSymbol match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
-		Object currentSymbol = getCurrentInputSymbol();
+		TSymbol currentSymbol = getCurrentInputSymbol();
 		if ( getInputStream().LA(1)==ttype ) {
 			_errHandler.endErrorCondition(this);
 			consume();
@@ -147,6 +147,9 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		return syntaxErrors;
 	}
 
+	@Override
+	public abstract ObjectStream<TSymbol> getInputStream();
+
 	/** Match needs to return the current input symbol, which gets put
 	 *  into the label for the associated token ref; e.g., x=ID.  Token
 	 *  and tree parsers need to return different objects. Rather than test
@@ -154,27 +157,32 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  a simple method to ask the recognizer to tell me what the current
 	 *  input symbol is.
 	 */
-	protected Object getCurrentInputSymbol() { return null; }
+	public abstract TSymbol getCurrentInputSymbol();
 
 	public void notifyListeners(String msg)	{
-		notifyListeners((Token)getCurrentInputSymbol(), msg, null);
+		notifyListeners(getCurrentInputSymbol(), msg, null);
 	}
 
-	public void notifyListeners(Token offendingToken, String msg,
+	public void notifyListeners(TSymbol offendingToken, String msg,
 							   @Nullable RecognitionException e)
 	{
-		int line = offendingToken.getLine();
-		int charPositionInLine = offendingToken.getCharPositionInLine();
-		if ( _listeners==null || _listeners.size()==0 ) {
+		int line = -1;
+		int charPositionInLine = -1;
+		if (offendingToken instanceof Token) {
+			line = ((Token) offendingToken).getLine();
+			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
+		}
+		ANTLRErrorListener<TSymbol>[] listeners = getListeners();
+		if ( listeners.length == 0 ) {
 			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
-		for (ANTLRErrorListener pl : _listeners) {
+		for (ANTLRErrorListener<TSymbol> pl : listeners) {
 			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
-	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
+	public void enterOuterAlt(ParserRuleContext<TSymbol> localctx, int altNum) {
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( buildParseTrees && _ctx != localctx ) {
@@ -197,8 +205,8 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 	 *  If the parser is creating parse trees, the current symbol
 	 *  would also be added as a child to the current context (node).
 	 */
-	public Object consume() {
-		Object o = getCurrentInputSymbol();
+	public TSymbol consume() {
+		TSymbol o = getCurrentInputSymbol();
 		getInputStream().consume();
 		if ( buildParseTrees ) {
 			// TODO: tree parsers?
@@ -219,22 +227,22 @@ public abstract class BaseRecognizer extends Recognizer<ParserATNSimulator> {
 		}
 	}
 
-	public abstract void enterRule(ParserRuleContext localctx, int ruleIndex);
+	public abstract void enterRule(ParserRuleContext<TSymbol> localctx, int ruleIndex);
 
 	public void exitRule(int ruleIndex) {
-		_ctx = (ParserRuleContext)_ctx.parent;
+		_ctx = (ParserRuleContext<TSymbol>)_ctx.parent;
 	}
 
-	public ParserRuleContext getInvokingContext(int ruleIndex) {
-		ParserRuleContext p = _ctx;
+	public ParserRuleContext<TSymbol> getInvokingContext(int ruleIndex) {
+		ParserRuleContext<TSymbol> p = _ctx;
 		while ( p!=null ) {
 			if ( p.getRuleIndex() == ruleIndex ) return p;
-			p = (ParserRuleContext)p.parent;
+			p = (ParserRuleContext<TSymbol>)p.parent;
 		}
 		return null;
 	}
 
-	public ParserRuleContext getContext() {
+	public ParserRuleContext<TSymbol> getContext() {
 		return _ctx;
 	}
 

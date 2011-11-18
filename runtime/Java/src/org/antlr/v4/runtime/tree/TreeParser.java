@@ -37,7 +37,7 @@ import java.util.regex.*;
  *  of this.  All the error reporting and recovery is shared with Parser via
  *  the BaseRecognizer superclass.
 */
-public class TreeParser<T> extends BaseRecognizer {
+public class TreeParser<T> extends BaseRecognizer<T> {
 	public static final int DOWN = Token.DOWN;
 	public static final int UP = Token.UP;
 
@@ -65,7 +65,7 @@ public class TreeParser<T> extends BaseRecognizer {
 	}
 
 	@Override
-	protected T getCurrentInputSymbol() { return _input.LT(1); }
+	public T getCurrentInputSymbol() { return _input.LT(1); }
 
 	@Override
 	public ASTNodeStream<T> getInputStream() { return _input; }
@@ -79,13 +79,14 @@ public class TreeParser<T> extends BaseRecognizer {
 	 *
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
+	 *
+	 *  TODO: this shouldn't be needed now that ParserRuleContext is generic.
 	 */
 	@Override
-	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
-		TreeParserRuleContext tctx = (TreeParserRuleContext)localctx;
-		_ctx = tctx;
-		tctx.start = _input.LT(1);
-		tctx.ruleIndex = ruleIndex;
+	public void enterRule(ParserRuleContext<T> localctx, int ruleIndex) {
+		_ctx = localctx;
+		_ctx.start = _input.LT(1);
+		_ctx.ruleIndex = ruleIndex;
 	}
 
 	@Override

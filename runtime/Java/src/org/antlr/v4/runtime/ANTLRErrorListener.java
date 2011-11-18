@@ -32,7 +32,7 @@ package org.antlr.v4.runtime;
 import com.sun.istack.internal.Nullable;
 
 /** How to emit recognition errors */
-public interface ANTLRErrorListener {
+public interface ANTLRErrorListener<TSymbol> {
 	/** Upon syntax error, notify any interested parties. This is not how to
 	 *  recover from errors or compute error messages. The parser
 	 *  ANTLRErrorStrategy specifies how to recover from syntax errors
@@ -48,7 +48,7 @@ public interface ANTLRErrorListener {
 	 * @param recognizer
 	 * 		  What parser got the error. From this object, you
 	 * 		  can access the context as well as the input stream.
-	 * @param offendingToken
+	 * @param offendingSymbol
 	 * 		  The offending token in the input token stream, unless recognizer
 	 * 		  is a lexer (then it's null)
 	 * 		  If no viable alternative error, e has token
@@ -66,8 +66,8 @@ public interface ANTLRErrorListener {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void error(Recognizer recognizer,
-					  @Nullable Token offendingToken,
+	public void error(Recognizer<TSymbol, ?> recognizer,
+					  @Nullable TSymbol offendingSymbol,
 					  int line,
 					  int charPositionInLine,
 					  String msg,

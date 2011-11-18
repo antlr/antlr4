@@ -75,7 +75,7 @@ or both. In our case, we need to call @m applyOnce in both. On the way
 down, we'll look for @r vmult patterns. On the way up,
 we'll look for @r mult0 patterns.
  */
-public class TreeFilter<T> extends TreeParser {
+public class TreeFilter<T> extends TreeParser<T> {
     public interface fptr {
         public void rule() throws RecognitionException;
     }
@@ -94,15 +94,15 @@ public class TreeFilter<T> extends TreeParser {
         try {
             // share TreeParser object but not parsing-related state
             _input = new CommonASTNodeStream<T>(originalAdaptor, t);
-            ((CommonASTNodeStream) _input).setTokenStream(originalTokenStream);
+            ((CommonASTNodeStream<T>) _input).setTokenStream(originalTokenStream);
             whichRule.rule();
         }
         catch (RecognitionException e) { }
     }
 
     public void downup(T t) {
-        TreeVisitor v = new TreeVisitor(new CommonASTAdaptor());
-        TreeVisitorAction actions = new TreeVisitorAction<T>() {
+        TreeVisitor<T> v = new TreeVisitor<T>((ASTAdaptor<T>)new CommonASTAdaptor());
+        TreeVisitorAction<T> actions = new TreeVisitorAction<T>() {
             @Override
             public T pre(T t)  { applyOnce(t, topdown_fptr); return t; }
             @Override

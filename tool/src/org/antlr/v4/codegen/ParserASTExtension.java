@@ -30,11 +30,13 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.actions.ParserASTExtensionMembers;
 import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
@@ -42,6 +44,26 @@ import java.util.List;
 public class ParserASTExtension extends CodeGeneratorExtension {
 	public ParserASTExtension(OutputModelFactory factory) {
 		super(factory);
+	}
+
+	@Override
+	public ParserFile parserFile(ParserFile file) {
+		Action members = file.namedActions.get("members");
+		if (members == null) {
+			members = new Action(factory, null);
+			file.namedActions.put("members", members);
+		}
+
+		members.chunks.add(new ParserASTExtensionMembers());
+		return super.parserFile(file);
+	}
+
+	@Override
+	public RuleFunction rule(RuleFunction rf) {
+		rf.ruleCtx.addDecl(new ParserASTTreeFieldDecl(factory));
+		rf.ruleCtx.addExtensionMember(new ParserASTContextMembers());
+		rf.ruleCtx.implementInterface(new ParserASTContextInterface());
+		return super.rule(rf);
 	}
 
 	@Override

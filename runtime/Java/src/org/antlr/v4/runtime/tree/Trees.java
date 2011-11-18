@@ -44,7 +44,7 @@ import java.util.TreeSet;
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
 
-	public static String getPS(Tree t, BaseRecognizer recog,
+	public static String getPS(Tree t, BaseRecognizer<?> recog,
 							   String fontName, int fontSize)
 	{
 		TreePostScriptGenerator psgen =
@@ -52,11 +52,11 @@ public class Trees {
 		return psgen.getPS();
 	}
 
-	public static String getPS(Tree t, BaseRecognizer recog) {
+	public static String getPS(Tree t, BaseRecognizer<?> recog) {
 		return getPS(t, recog, "Helvetica", 11);
 	}
 
-	public static void writePS(Tree t, BaseRecognizer recog,
+	public static void writePS(Tree t, BaseRecognizer<?> recog,
 							   String fileName,
 							   String fontName, int fontSize)
 		throws IOException
@@ -68,7 +68,7 @@ public class Trees {
 		bw.close();
 	}
 
-	public static void writePS(Tree t, BaseRecognizer recog, String fileName)
+	public static void writePS(Tree t, BaseRecognizer<?> recog, String fileName)
 		throws IOException
 	{
 		writePS(t, recog, fileName, "Helvetica", 11);
@@ -78,7 +78,7 @@ public class Trees {
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(Tree t, BaseRecognizer recog) {
+	public static String toStringTree(Tree t, BaseRecognizer<?> recog) {
 		if ( t.getChildCount()==0 ) return getNodeText(t, recog);
 		StringBuilder buf = new StringBuilder();
 		boolean nilRoot = t instanceof AST && ((AST)t).isNil();
@@ -97,7 +97,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static String getNodeText(Tree t, BaseRecognizer recog) {
+	public static String getNodeText(Tree t, BaseRecognizer<?> recog) {
 		if ( t instanceof AST ) {
 			return t.toString();
 		}
@@ -174,7 +174,7 @@ public class Trees {
 		int replacingHowMany = stopChildIndex - startChildIndex + 1;
 		int replacingWithHowMany;
 		BaseAST newTree = (BaseAST)t;
-		List<BaseAST> newChildren = null;
+		List<BaseAST> newChildren;
 		// normalize to a list of children to add: newChildren
 		if ( newTree.isNil() ) {
 			newChildren = newTree.children;
@@ -190,7 +190,7 @@ public class Trees {
 		if ( delta == 0 ) {
 			int j = 0; // index into new children
 			for (int i=startChildIndex; i<=stopChildIndex; i++) {
-				BaseAST child = (BaseAST)newChildren.get(j);
+				BaseAST child = newChildren.get(j);
 				tree.setChild(i, child);
 				child.setParent(tree);
 				child.setChildIndex(i);
@@ -223,18 +223,18 @@ public class Trees {
 		//System.out.println("out="+toStringTree());
 	}
 
-	public static AST dupTree(ASTAdaptor adaptor, AST t, AST parent) {
+	public static <T> T dupTree(ASTAdaptor<T> adaptor, T t, T parent) {
 		if ( t==null ) {
 			return null;
 		}
-		AST newTree = (AST)adaptor.dupNode(t);
+		T newTree = adaptor.dupNode(t);
 		// ensure new subtree root has parent/child index set
 		adaptor.setChildIndex(newTree, adaptor.getChildIndex(t)); // same index in new tree
 		adaptor.setParent(newTree, parent);
 		int n = adaptor.getChildCount(t);
 		for (int i = 0; i < n; i++) {
-			AST child = (AST)adaptor.getChild(t, i);
-			Object newSubTree = dupTree(adaptor, child, t);
+			T child = adaptor.getChild(t, i);
+			T newSubTree = dupTree(adaptor, child, t);
 			adaptor.addChild(newTree, newSubTree);
 		}
 		return newTree;
@@ -253,12 +253,12 @@ public class Trees {
 		}
 		int n = t.getChildCount();
 		for (int i = 0; i < n; i++) {
-			setUnknownTokenBoundaries((CommonAST) t.getChild(i));
+			setUnknownTokenBoundaries(t.getChild(i));
 		}
 		if ( t.startIndex>=0 && t.stopIndex>=0 ) return; // already set
 		if ( t.getChildCount() > 0 ) {
-			CommonAST firstChild = (CommonAST)t.getChild(0);
-			CommonAST lastChild = (CommonAST)t.getChild(t.getChildCount()-1);
+			CommonAST firstChild = t.getChild(0);
+			CommonAST lastChild = t.getChild(t.getChildCount()-1);
 			t.startIndex = firstChild.getTokenStartIndex();
 			t.stopIndex = lastChild.getTokenStopIndex();
 		}

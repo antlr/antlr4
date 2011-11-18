@@ -34,18 +34,18 @@ import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import java.util.*;
 
-public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorStrategy {
+public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorStrategy<T> {
 	@Override
-	public void beginErrorCondition(BaseRecognizer recognizer) {
+	public void beginErrorCondition(BaseRecognizer<T> recognizer) {
 	}
 
 	@Override
-	public void reportError(BaseRecognizer recognizer, RecognitionException e)
+	public void reportError(BaseRecognizer<T> recognizer, RecognitionException e)
 		throws RecognitionException
 	{
 		super.reportError(recognizer, e);
 		TreeParser<T> parser = (TreeParser<T>)recognizer;
-		ASTNodeStream input = parser.getInputStream();
+		ASTNodeStream<T> input = parser.getInputStream();
 		Object root = input.getTreeSource();
 		// If instanceof Tree, we can show in TreeViewer
 		if ( root instanceof Tree ) {
@@ -67,15 +67,15 @@ public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorSt
 	}
 
 	@Override
-	public void reportNoViableAlternative(BaseRecognizer recognizer,
+	public void reportNoViableAlternative(BaseRecognizer<T> recognizer,
 										  NoViableAltException e)
 		throws RecognitionException
 	{
 		TreeParser<T> parser = (TreeParser<T>)recognizer;
-		ASTNodeStream input = parser.getInputStream();
+		ASTNodeStream<T> input = parser.getInputStream();
 		List<T> unmatchedNodes =
 			getNodeList(input, (NoViableTreeGrammarAltException)e);
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		ASTAdaptor<T> adap = input.getTreeAdaptor();
 		for (int i = 0; i < unmatchedNodes.size(); i++) {
 			if ( i>0 ) buf.append(" ");
@@ -84,10 +84,10 @@ public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorSt
 		}
 		String s = buf.toString();
 		String msg = "no viable alternative at node(s) "+escapeWSAndQuote(s);
-		recognizer.notifyListeners(e.offendingToken, msg, e);
+		recognizer.notifyListeners((T)e.offendingNode, msg, e);
 	}
 
-	protected List<T> getNodeList(ASTNodeStream input,
+	protected List<T> getNodeList(ASTNodeStream<T> input,
 								  NoViableTreeGrammarAltException nva)
 	{
 		List<T> unmatchedNodes;
@@ -113,27 +113,27 @@ public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorSt
 	}
 
 	@Override
-	public Object recoverInline(BaseRecognizer recognizer) throws RecognitionException {
+	public T recoverInline(BaseRecognizer<T> recognizer) throws RecognitionException {
 		InputMismatchException e = new InputMismatchException(recognizer);
 		reportError(recognizer, e);
 		throw e;
 	}
 
 	@Override
-	public void recover(BaseRecognizer recognizer, RecognitionException e) {
+	public void recover(BaseRecognizer<T> recognizer, RecognitionException e) {
 		throw new RuntimeException(e);
 	}
 
 	@Override
-	public void sync(BaseRecognizer recognizer) {
+	public void sync(BaseRecognizer<T> recognizer) {
 	}
 
 	@Override
-	public boolean inErrorRecoveryMode(BaseRecognizer recognizer) {
+	public boolean inErrorRecoveryMode(BaseRecognizer<T> recognizer) {
 		return false;
 	}
 
 	@Override
-	public void endErrorCondition(BaseRecognizer recognizer) {
+	public void endErrorCondition(BaseRecognizer<T> recognizer) {
 	}
 }

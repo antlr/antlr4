@@ -45,8 +45,9 @@ public class TreeViewer extends JComponent {
 	public static final Color LIGHT_RED = new Color(244, 213, 211);
 
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
-		BaseRecognizer parser;
-		public DefaultTreeTextProvider(BaseRecognizer parser) {
+		BaseRecognizer<?> parser;
+
+		public DefaultTreeTextProvider(BaseRecognizer<?> parser) {
 			this.parser = parser;
 		}
 
@@ -105,9 +106,9 @@ public class TreeViewer extends JComponent {
 	protected Color borderColor = Color.white;
 	protected Color textColor = Color.black;
 
-	protected BaseRecognizer parser;
+	protected BaseRecognizer<?> parser;
 
-	public TreeViewer(BaseRecognizer parser, Tree tree) {
+	public TreeViewer(BaseRecognizer<?> parser, Tree tree) {
 		this.parser = parser;
 		setTreeTextProvider(new DefaultTreeTextProvider(parser));
 		this.treeLayout =

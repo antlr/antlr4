@@ -42,11 +42,11 @@ public class FailedPredicateException extends RecognitionException {
 	public int predIndex;
 	public String msg;
 
-	public FailedPredicateException(BaseRecognizer recognizer) {
+	public FailedPredicateException(BaseRecognizer<?> recognizer) {
 		this(recognizer, null);
 	}
 
-	public FailedPredicateException(BaseRecognizer recognizer, @Nullable String msg) {
+	public FailedPredicateException(BaseRecognizer<?> recognizer, @Nullable String msg) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
 		ATNState s = recognizer._interp.atn.states.get(recognizer._ctx.s);
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
@@ -54,8 +54,8 @@ public class FailedPredicateException extends RecognitionException {
 		predIndex = trans.predIndex;
 		this.msg = msg;
 		Object la = recognizer.getCurrentInputSymbol();
+		this.offendingNode = la;
 		if ( la instanceof AST) {
-			this.offendingNode = la;
 			this.offendingToken = ((AST)la).getPayload();
 		}
 		else {

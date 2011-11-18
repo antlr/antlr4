@@ -27,36 +27,12 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime;
+package org.antlr.v4.codegen.model.decl;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.tree.ASTNodeStream;
-import org.antlr.v4.runtime.tree.TreeParser;
+import org.antlr.v4.codegen.OutputModelFactory;
 
-public class NoViableTreeGrammarAltException extends NoViableAltException {
-	protected Object startNode;
-
-	public <T> NoViableTreeGrammarAltException(TreeParser<T> recognizer) {
-		this(recognizer,
-			 recognizer.getInputStream(),
-			 recognizer.getCurrentInputSymbol(),
-			 recognizer.getCurrentInputSymbol(),
-			 null,
-			 recognizer._ctx);
-	}
-
-	public <T> NoViableTreeGrammarAltException(BaseRecognizer<T> recognizer,
-										   ASTNodeStream<T> input,
-										   T startNode,
-										   T offendingNode,
-										   OrderedHashSet<ATNConfig> deadEndConfigs,
-										   RuleContext ctx) {
-		super(recognizer, input,
-			  input.getTreeAdaptor().getToken(startNode),
-			  input.getTreeAdaptor().getToken(offendingNode),
-			  offendingNode,
-			  deadEndConfigs, ctx);
-		this.startNode = startNode;
-	}
+public class ParserASTTreeFieldDecl extends AttributeDecl {
+    public ParserASTTreeFieldDecl(OutputModelFactory factory) {
+        super(factory, "tree", "Unknown");
+    }
 }

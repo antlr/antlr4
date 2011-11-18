@@ -29,6 +29,7 @@
 package org.antlr.v4.runtime.tree;
 
 
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.Token;
 
 import java.util.*;
@@ -49,20 +50,21 @@ import java.util.*;
  *  patterns like "(A B C)".  You can create a tree from that pattern or
  *  match subtrees against it.
  */
-public class TreeWizard {
-	protected ASTAdaptor adaptor;
-	protected Map tokenNameToTypeMap;
+public class TreeWizard<T> {
+	protected ASTAdaptor<T> adaptor;
+	protected Map<String, Integer> tokenNameToTypeMap;
 
-	public interface ContextVisitor {
+	public interface ContextVisitor<T> {
 		// TODO: should this be called visit or something else?
-		public void visit(Object t, Object parent, int childIndex, Map labels);
+		public void visit(T t, Object parent, int childIndex, @Nullable Map<String, T> labels);
 	}
 
-	public static abstract class Visitor implements ContextVisitor {
-		public void visit(Object t, Object parent, int childIndex, Map labels) {
+	public static abstract class Visitor<T> implements ContextVisitor<T> {
+		@Override
+		public void visit(T t, Object parent, int childIndex, Map<String, T> labels) {
 			visit(t);
 		}
-		public abstract void visit(Object t);
+		public abstract void visit(T t);
 	}
 
 	/** When using %label:TOKENNAME in a tree for parse(), we must
@@ -118,35 +120,35 @@ public class TreeWizard {
 	protected Set tokenTypesToReverseIndex = null;
 	*/
 
-	public TreeWizard(ASTAdaptor adaptor) {
+	public TreeWizard(ASTAdaptor<T> adaptor) {
 		this.adaptor = adaptor;
 	}
 
-	public TreeWizard(ASTAdaptor adaptor, Map tokenNameToTypeMap) {
+	public TreeWizard(ASTAdaptor<T> adaptor, Map<String, Integer> tokenNameToTypeMap) {
 		this.adaptor = adaptor;
 		this.tokenNameToTypeMap = tokenNameToTypeMap;
 	}
 
-	public TreeWizard(ASTAdaptor adaptor, String[] tokenNames) {
+	public TreeWizard(ASTAdaptor<T> adaptor, String[] tokenNames) {
 		this.adaptor = adaptor;
 		this.tokenNameToTypeMap = computeTokenTypes(tokenNames);
 	}
 
 	public TreeWizard(String[] tokenNames) {
-		this(new CommonASTAdaptor(), tokenNames);
+		this((ASTAdaptor<T>)new TreePatternASTAdaptor(), tokenNames);
 	}
 
 	/** Compute a Map<String, Integer> that is an inverted index of
 	 *  tokenNames (which maps int token types to names).
 	 */
-	public Map computeTokenTypes(String[] tokenNames) {
-		Map m = new HashMap();
+	public Map<String, Integer> computeTokenTypes(String[] tokenNames) {
+		Map<String, Integer> m = new HashMap<String, Integer>();
 		if ( tokenNames==null ) {
 			return m;
 		}
 		for (int ttype = Token.MIN_TOKEN_TYPE; ttype < tokenNames.length; ttype++) {
 			String name = tokenNames[ttype];
-			m.put(name, new Integer(ttype));
+			m.put(name, ttype);
 		}
 		return m;
 	}
@@ -156,9 +158,9 @@ public class TreeWizard {
 	 	if ( tokenNameToTypeMap==null ) {
 			 return Token.INVALID_TYPE;
 		 }
-		Integer ttypeI = (Integer)tokenNameToTypeMap.get(tokenName);
+		Integer ttypeI = tokenNameToTypeMap.get(tokenName);
 		if ( ttypeI!=null ) {
-			return ttypeI.intValue();
+			return ttypeI;
 		}
 		return Token.INVALID_TYPE;
 	}
@@ -170,36 +172,37 @@ public class TreeWizard {
 	 *
 	 *  TODO: save this index so that find and visit are faster
 	 */
-	public Map index(Object t) {
-		Map m = new HashMap();
+	public Map<Integer, List<T>> index(T t) {
+		Map<Integer, List<T>> m = new HashMap<Integer, List<T>>();
 		_index(t, m);
 		return m;
 	}
 
 	/** Do the work for index */
-	protected void _index(Object t, Map m) {
+	protected void _index(T t, Map<Integer, List<T>> m) {
 		if ( t==null ) {
 			return;
 		}
 		int ttype = adaptor.getType(t);
-		List elements = (List)m.get(new Integer(ttype));
+		List<T> elements = m.get(ttype);
 		if ( elements==null ) {
-			elements = new ArrayList();
-			m.put(new Integer(ttype), elements);
+			elements = new ArrayList<T>();
+			m.put(ttype, elements);
 		}
 		elements.add(t);
 		int n = adaptor.getChildCount(t);
 		for (int i=0; i<n; i++) {
-			Object child = adaptor.getChild(t, i);
+			T child = adaptor.getChild(t, i);
 			_index(child, m);
 		}
 	}
 
 	/** Return a List of tree nodes with token type ttype */
-	public List find(Object t, int ttype) {
-		final List nodes = new ArrayList();
-		visit(t, ttype, new TreeWizard.Visitor() {
-			public void visit(Object t) {
+	public List<T> find(T t, int ttype) {
+		final List<T> nodes = new ArrayList<T>();
+		visit(t, ttype, new TreeWizard.Visitor<T>() {
+			@Override
+			public void visit(T t) {
 				nodes.add(t);
 			}
 		});
@@ -207,13 +210,13 @@ public class TreeWizard {
 	}
 
 	/** Return a List of subtrees matching pattern. */
-	public List find(Object t, String pattern) {
-		final List subtrees = new ArrayList();
+	public List<T> find(T t, String pattern) {
+		final List<T> subtrees = new ArrayList<T>();
 		// Create a TreePattern from the pattern
 		TreePatternLexer tokenizer = new TreePatternLexer(pattern);
 		TreePatternParser parser =
 			new TreePatternParser(tokenizer, this, new TreePatternASTAdaptor());
-		final TreePattern tpattern = (TreePattern)parser.pattern();
+		final TreePattern tpattern = parser.pattern();
 		// don't allow invalid patterns
 		if ( tpattern==null ||
 			 tpattern.isNil() ||
@@ -222,8 +225,9 @@ public class TreeWizard {
 			return null;
 		}
 		int rootTokenType = tpattern.getType();
-		visit(t, rootTokenType, new TreeWizard.ContextVisitor() {
-			public void visit(Object t, Object parent, int childIndex, Map labels) {
+		visit(t, rootTokenType, new TreeWizard.ContextVisitor<T>() {
+			@Override
+			public void visit(T t, Object parent, int childIndex, Map<String, T> labels) {
 				if ( _parse(t, tpattern, null) ) {
 					subtrees.add(t);
 				}
@@ -232,11 +236,11 @@ public class TreeWizard {
 		return subtrees;
 	}
 
-	public Object findFirst(Object t, int ttype) {
+	public T findFirst(T t, int ttype) {
 		return null;
 	}
 
-	public Object findFirst(Object t, String pattern) {
+	public T findFirst(T t, String pattern) {
 		return null;
 	}
 
@@ -245,12 +249,12 @@ public class TreeWizard {
 	 *  of the visitor action method is never set (it's null) since using
 	 *  a token type rather than a pattern doesn't let us set a label.
 	 */
-	public void visit(Object t, int ttype, ContextVisitor visitor) {
+	public void visit(T t, int ttype, ContextVisitor<T> visitor) {
 		_visit(t, null, 0, ttype, visitor);
 	}
 
 	/** Do the recursive work for visit */
-	protected void _visit(Object t, Object parent, int childIndex, int ttype, ContextVisitor visitor) {
+	protected void _visit(T t, @Nullable Object parent, int childIndex, int ttype, ContextVisitor<T> visitor) {
 		if ( t==null ) {
 			return;
 		}
@@ -259,7 +263,7 @@ public class TreeWizard {
 		}
 		int n = adaptor.getChildCount(t);
 		for (int i=0; i<n; i++) {
-			Object child = adaptor.getChild(t, i);
+			T child = adaptor.getChild(t, i);
 			_visit(child, t, i, ttype, visitor);
 		}
 	}
@@ -269,12 +273,12 @@ public class TreeWizard {
 	 *  with visit(t, ttype, visitor) so nil-rooted patterns are not allowed.
 	 *  Patterns with wildcard roots are also not allowed.
 	 */
-	public void visit(Object t, final String pattern, final ContextVisitor visitor) {
+	public void visit(T t, final String pattern, final ContextVisitor<T> visitor) {
 		// Create a TreePattern from the pattern
 		TreePatternLexer tokenizer = new TreePatternLexer(pattern);
 		TreePatternParser parser =
 			new TreePatternParser(tokenizer, this, new TreePatternASTAdaptor());
-		final TreePattern tpattern = (TreePattern)parser.pattern();
+		final TreePattern tpattern = parser.pattern();
 		// don't allow invalid patterns
 		if ( tpattern==null ||
 			 tpattern.isNil() ||
@@ -282,10 +286,11 @@ public class TreeWizard {
 		{
 			return;
 		}
-		final Map labels = new HashMap(); // reused for each _parse
+		final Map<String, T> labels = new HashMap<String, T>(); // reused for each _parse
 		int rootTokenType = tpattern.getType();
-		visit(t, rootTokenType, new TreeWizard.ContextVisitor() {
-			public void visit(Object t, Object parent, int childIndex, Map unusedlabels) {
+		visit(t, rootTokenType, new TreeWizard.ContextVisitor<T>() {
+			@Override
+			public void visit(T t, Object parent, int childIndex, Map<String, T> unusedlabels) {
 				// the unusedlabels arg is null as visit on token type doesn't set.
 				labels.clear();
 				if ( _parse(t, tpattern, labels) ) {
@@ -306,11 +311,11 @@ public class TreeWizard {
 	 *
 	 *  TODO: what's a better way to indicate bad pattern? Exceptions are a hassle
 	 */
-	public boolean parse(Object t, String pattern, Map labels) {
+	public boolean parse(T t, String pattern, @Nullable Map<String, T> labels) {
 		TreePatternLexer tokenizer = new TreePatternLexer(pattern);
 		TreePatternParser parser =
 			new TreePatternParser(tokenizer, this, new TreePatternASTAdaptor());
-		TreePattern tpattern = (TreePattern)parser.pattern();
+		TreePattern tpattern = parser.pattern();
 		/*
 		System.out.println("t="+((Tree)t).toStringTree());
 		System.out.println("scant="+tpattern.toStringTree());
@@ -319,7 +324,7 @@ public class TreeWizard {
 		return matched;
 	}
 
-	public boolean parse(Object t, String pattern) {
+	public boolean parse(T t, String pattern) {
 		return parse(t, pattern, null);
 	}
 
@@ -328,7 +333,7 @@ public class TreeWizard {
 	 *  text arguments on nodes.  Fill labels map with pointers to nodes
 	 *  in tree matched against nodes in pattern with labels.
 	 */
-	protected boolean _parse(Object t1, TreePattern tpattern, Map labels) {
+	protected boolean _parse(T t1, TreePattern tpattern, @Nullable Map<String, T> labels) {
 		// make sure both are non-null
 		if ( t1==null || tpattern==null ) {
 			return false;
@@ -352,7 +357,7 @@ public class TreeWizard {
 			return false;
 		}
 		for (int i=0; i<n1; i++) {
-			Object child1 = adaptor.getChild(t1, i);
+			T child1 = adaptor.getChild(t1, i);
 			TreePattern child2 = (TreePattern)tpattern.getChild(i);
 			if ( !_parse(child1, child2, labels) ) {
 				return false;
@@ -374,10 +379,10 @@ public class TreeWizard {
 	 *  nil is a special name meaning "give me a nil node".  Useful for
 	 *  making lists: (nil A B C) is a list of A B C.
  	 */
-	public Object create(String pattern) {
+	public TreePattern create(String pattern) {
 		TreePatternLexer tokenizer = new TreePatternLexer(pattern);
-		TreePatternParser parser = new TreePatternParser(tokenizer, this, adaptor);
-		Object t = parser.pattern();
+		TreePatternParser parser = new TreePatternParser(tokenizer, this, new TreePatternASTAdaptor());
+		TreePattern t = parser.pattern();
 		return t;
 	}
 
@@ -390,18 +395,18 @@ public class TreeWizard {
 	 *  I cannot rely on the tree node's equals() implementation as I make
 	 *  no constraints at all on the node types nor interface etc...
 	 */
-	public static boolean equals(Object t1, Object t2, ASTAdaptor adaptor) {
+	public static <T> boolean equals(T t1, T t2, ASTAdaptor<T> adaptor) {
 		return _equals(t1, t2, adaptor);
 	}
 
 	/** Compare type, structure, and text of two trees, assuming adaptor in
 	 *  this instance of a TreeWizard.
 	 */
-	public boolean equals(Object t1, Object t2) {
+	public boolean equals(T t1, T t2) {
 		return _equals(t1, t2, adaptor);
 	}
 
-	protected static boolean _equals(Object t1, Object t2, ASTAdaptor adaptor) {
+	protected static <T> boolean _equals(T t1, T t2, ASTAdaptor<T> adaptor) {
 		// make sure both are non-null
 		if ( t1==null || t2==null ) {
 			return false;
@@ -420,8 +425,8 @@ public class TreeWizard {
 			return false;
 		}
 		for (int i=0; i<n1; i++) {
-			Object child1 = adaptor.getChild(t1, i);
-			Object child2 = adaptor.getChild(t2, i);
+			T child1 = adaptor.getChild(t1, i);
+			T child2 = adaptor.getChild(t2, i);
 			if ( !_equals(child1, child2, adaptor) ) {
 				return false;
 			}

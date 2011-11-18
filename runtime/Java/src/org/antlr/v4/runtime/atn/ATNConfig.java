@@ -142,7 +142,7 @@ public class ATNConfig {
 		return toString(null, true);
 	}
 
-	public String toString(Recognizer<?> recog, boolean showAlt) {
+	public String toString(Recognizer<?, ?> recog, boolean showAlt) {
 		StringBuilder buf = new StringBuilder();
 //		if ( state.ruleIndex>=0 ) {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");

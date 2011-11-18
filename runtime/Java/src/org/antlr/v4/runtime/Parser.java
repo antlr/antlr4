@@ -29,15 +29,10 @@
 package org.antlr.v4.runtime;
 
 
-import org.antlr.v4.runtime.tree.ASTAdaptor;
-import org.antlr.v4.runtime.tree.CommonASTAdaptor;
-
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */
-public class Parser extends BaseRecognizer {
-	public ASTAdaptor _adaptor = new CommonASTAdaptor();
-
+public class Parser extends BaseRecognizer<Token> {
 	protected TokenStream _input;
 
 	public Parser(TokenStream input) {
@@ -60,7 +55,7 @@ public class Parser extends BaseRecognizer {
 	 *  to get trace facilities.
 	 */
 	@Override
-	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
+	public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
@@ -69,12 +64,12 @@ public class Parser extends BaseRecognizer {
 
 	@Override
 	public Token match(int ttype) throws RecognitionException {
-		return (Token)super.match(ttype);
+		return super.match(ttype);
 	}
 
 	@Override
-	protected Object getCurrentInputSymbol() {
-		return ((TokenStream)_input).LT(1);
+	public Token getCurrentInputSymbol() {
+		return _input.LT(1);
 	}
 
 	@Override
@@ -91,7 +86,7 @@ public class Parser extends BaseRecognizer {
 	}
 
     public TokenStream getTokenStream() {
-		return ((TokenStream)_input);
+		return _input;
 	}
 
 	@Override

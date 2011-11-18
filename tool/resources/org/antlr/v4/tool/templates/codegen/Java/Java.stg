@@ -53,8 +53,8 @@ public class Blank<listener.grammarName>Listener implements <listener.grammarNam
 @Override public void enterRule(<listener.parserName>.<lname>Context ctx) { \}
 @Override public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	@Override public void enterEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
 	@Override public void visitToken(Token token) { }
 }
 >>
@@ -459,6 +459,16 @@ setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
 >>
 
+ParserASTExtensionMembers(s) ::= <<
+public ASTAdaptor\<<ASTLabelType()> > _adaptor = (ASTAdaptor)new CommonASTAdaptor();
+>>
+
+ParserASTContextInterface(s) ::= "ASTContext\<<ASTLabelType()> >"
+ParserASTTreeFieldDecl(s) ::= "<ASTLabelType()> tree"
+ParserASTContextMembers(s) ::= <<
+@Override public <ASTLabelType()> getTree() { return tree; }
+>>
+
 DefaultParserSuperClass(s) ::= "Parser"
 DefaultTreeParserSuperClass(s) ::= "TreeParser\<<ASTLabelType()>>"
 
@@ -539,7 +549,7 @@ ListLabelName(label)		  ::= "<label>_list"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass="ParserRuleContext") ::= <<
+StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass={ParserRuleContext\<<TokenLabelType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<if(s.ctorAttrs)>public <s.name>(RuleContext parent, int state) { super(parent, state); }<endif>
@@ -560,7 +570,7 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 >>
 
 TreeParserStructDecl(s,attrs,visitorDispatchMethods) ::= <<
-<StructDecl(superClass="TreeParserRuleContext", ...)>
+<StructDecl(superClass={TreeParserRuleContext\<<ASTLabelType()> >}, ...)>
 >>
 
 AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<

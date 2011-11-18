@@ -310,18 +310,18 @@ public class RuleContext implements ParseTree.RuleNode {
 		return new Interval(start, stop);
 	}
 
-	public void inspect(BaseRecognizer parser) {
+	public void inspect(BaseRecognizer<?> parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
 	}
 
-	public void save(BaseRecognizer parser, String fileName)
+	public void save(BaseRecognizer<?> parser, String fileName)
 		throws IOException, PrintException
 	{
 		Trees.writePS(this, parser, fileName);
 	}
 
-	public void save(BaseRecognizer parser, String fileName,
+	public void save(BaseRecognizer<?> parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{
@@ -332,25 +332,25 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 *  We have to know the recognizer so we can get rule names.
 	 */
-	public String toStringTree(BaseRecognizer recog) {
+	public String toStringTree(BaseRecognizer<?> recog) {
 		return Trees.toStringTree(this, recog);
 	}
 
 	@Override
 	public String toStringTree() { return toStringTree(null); }
 
-	public void enterRule(ParseTreeListener listener) { }
-	public void exitRule(ParseTreeListener listener) { }
+	public void enterRule(ParseTreeListener<?> listener) { }
+	public void exitRule(ParseTreeListener<?> listener) { }
 
 	public String toString() {
 		return toString(null);
 	}
 
-	public String toString(BaseRecognizer recog) {
+	public String toString(BaseRecognizer<?> recog) {
 		return toString(recog, RuleContext.EMPTY);
 	}
 
-	public String toString(BaseRecognizer recog, RuleContext stop) {
+	public String toString(BaseRecognizer<?> recog, RuleContext stop) {
 		StringBuilder buf = new StringBuilder();
 		RuleContext p = this;
 		buf.append("[");

@@ -29,15 +29,21 @@
 
 package org.antlr.v4.runtime;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 
 import java.util.*;
 
-public abstract class Recognizer<ATNInterpreter> {
+public abstract class Recognizer<TSymbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	protected ANTLRErrorStrategy _errHandler = new DefaultANTLRErrorStrategy();
-	protected List<ANTLRErrorListener> _listeners;
+	protected ANTLRErrorStrategy<TSymbol> _errHandler = new DefaultANTLRErrorStrategy();
+
+	private List<ANTLRErrorListener<TSymbol>> _listeners;
+
+	private static final ANTLRErrorListener[] EMPTY_LISTENERS = new ANTLRErrorListener[0];
 
 	protected ATNInterpreter _interp;
 
@@ -194,32 +200,38 @@ public abstract class Recognizer<ATNInterpreter> {
 		return "'"+s+"'";
 	}
 
-	public void addListener(ANTLRErrorListener pl) {
+	public void addListener(ANTLRErrorListener<TSymbol> pl) {
 		if ( _listeners ==null ) {
 			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRErrorListener>(2));
+				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<TSymbol>>(2));
 		}
 		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeListener(ANTLRErrorListener pl) { _listeners.remove(pl); }
+	public void removeListener(ANTLRErrorListener<TSymbol> pl) { _listeners.remove(pl); }
 
 	public void removeListeners() { _listeners.clear(); }
 
-	public List<ANTLRErrorListener> getListeners() { return _listeners; }
+	public @NotNull ANTLRErrorListener<TSymbol>[] getListeners() {
+		if (_listeners == null) {
+			return EMPTY_LISTENERS;
+		}
 
-	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }
+		return _listeners.toArray(EMPTY_LISTENERS);
+	}
 
-	public void setErrorHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
+	public ANTLRErrorStrategy<TSymbol> getErrorHandler() { return _errHandler; }
+
+	public void setErrorHandler(ANTLRErrorStrategy<TSymbol> h) { this._errHandler = h; }
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
-	public boolean sempred(RuleContext _localctx, int ruleIndex, int actionIndex) {
+	public boolean sempred(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 		return true;
 	}
 
 	/** In lexer, both indexes are same; one action per rule. */
-	public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 
 	/** Create context for a rule reference IN fromRuleIndex using parent _localctx.

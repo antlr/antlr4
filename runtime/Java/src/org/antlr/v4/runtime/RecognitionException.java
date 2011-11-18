@@ -38,7 +38,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  */
 public class RecognitionException extends RuntimeException {
 	/** Who threw the exception? */
-	protected Recognizer recognizer;
+	protected Recognizer<?, ?> recognizer;
 
 	// TODO: make a dummy recognizer for the interpreter to use?
 	// Next two (ctx,input) should be what is in recognizer, but
@@ -64,7 +64,7 @@ public class RecognitionException extends RuntimeException {
 
 	protected int offendingState;
 
-	public RecognitionException(Recognizer recognizer, IntStream input,
+	public RecognitionException(Recognizer<?, ?> recognizer, IntStream input,
 								RuleContext ctx)
 	{
 		this.recognizer = recognizer;
@@ -82,8 +82,9 @@ public class RecognitionException extends RuntimeException {
 	public int getOffendingState() { return offendingState; }
 
 	public IntervalSet getExpectedTokens() {
+        // TODO: do we really need this type check?
 		if ( recognizer!=null && recognizer instanceof BaseRecognizer) {
-			return ((BaseRecognizer)recognizer)._interp.atn.nextTokens(ctx);
+			return recognizer._interp.atn.nextTokens(ctx);
 		}
 		return null;
 	}
@@ -100,7 +101,7 @@ public class RecognitionException extends RuntimeException {
 		return offendingToken;
 	}
 
-	public Recognizer getRecognizer() {
+	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
 	}
 

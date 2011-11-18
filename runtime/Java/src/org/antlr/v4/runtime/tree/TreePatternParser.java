@@ -34,22 +34,23 @@ import org.antlr.v4.runtime.*;
 public class TreePatternParser {
 	protected TreePatternLexer tokenizer;
 	protected int ttype;
-	protected TreeWizard wizard;
-	protected ASTAdaptor adaptor;
+	protected TreeWizard<?> wizard;
+	// TODO: would be nice to use ASTAdaptor<TreeWizard.TreePattern>...
+	protected ASTAdaptor<CommonAST> adaptor;
 
-	public TreePatternParser(TreePatternLexer tokenizer, TreeWizard wizard, ASTAdaptor adaptor) {
+	public TreePatternParser(TreePatternLexer tokenizer, TreeWizard<?> wizard, ASTAdaptor<CommonAST> adaptor) {
 		this.tokenizer = tokenizer;
 		this.wizard = wizard;
 		this.adaptor = adaptor;
 		ttype = tokenizer.nextToken(); // kickstart
 	}
 
-	public Object pattern() {
+	public TreeWizard.TreePattern pattern() {
 		if ( ttype==TreePatternLexer.BEGIN ) {
 			return parseTree();
 		}
 		else if ( ttype==TreePatternLexer.ID ) {
-			Object node = parseNode();
+			TreeWizard.TreePattern node = parseNode();
 			if ( ttype==TreePatternLexer.EOF ) {
 				return node;
 			}
@@ -58,12 +59,12 @@ public class TreePatternParser {
 		return null;
 	}
 
-	public Object parseTree() {
+	public TreeWizard.TreePattern parseTree() {
 		if ( ttype != TreePatternLexer.BEGIN ) {
 			throw new RuntimeException("no BEGIN");
 		}
 		ttype = tokenizer.nextToken();
-		Object root = parseNode();
+		TreeWizard.TreePattern root = parseNode();
 		if ( root==null ) {
 			return null;
 		}
@@ -73,11 +74,11 @@ public class TreePatternParser {
 				ttype==TreePatternLexer.DOT )
 		{
 			if ( ttype==TreePatternLexer.BEGIN ) {
-				Object subtree = parseTree();
+				TreeWizard.TreePattern subtree = parseTree();
 				adaptor.addChild(root, subtree);
 			}
 			else {
-				Object child = parseNode();
+				TreeWizard.TreePattern child = parseNode();
 				if ( child==null ) {
 					return null;
 				}
@@ -91,7 +92,7 @@ public class TreePatternParser {
 		return root;
 	}
 
-	public Object parseNode() {
+	public TreeWizard.TreePattern parseNode() {
 		// "%label:" prefix
 		String label = null;
 		if ( ttype == TreePatternLexer.PERCENT ) {
@@ -126,7 +127,7 @@ public class TreePatternParser {
 		String tokenName = tokenizer.sval.toString();
 		ttype = tokenizer.nextToken();
 		if ( tokenName.equals("nil") ) {
-			return adaptor.nil();
+			return (TreeWizard.TreePattern)adaptor.nil();
 		}
 		String text = tokenName;
 		// check for arg
@@ -142,13 +143,13 @@ public class TreePatternParser {
 		if ( treeNodeType== Token.INVALID_TYPE ) {
 			return null;
 		}
-		Object node;
-		node = adaptor.create(treeNodeType, text);
+		TreeWizard.TreePattern node;
+		node = (TreeWizard.TreePattern)adaptor.create(treeNodeType, text);
 		if ( label!=null && node.getClass()==TreeWizard.TreePattern.class ) {
-			((TreeWizard.TreePattern)node).label = label;
+			node.label = label;
 		}
 		if ( arg!=null && node.getClass()==TreeWizard.TreePattern.class ) {
-			((TreeWizard.TreePattern)node).hasTextArg = true;
+			node.hasTextArg = true;
 		}
 		return node;
 	}

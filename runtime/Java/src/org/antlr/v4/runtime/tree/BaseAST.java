@@ -258,18 +258,18 @@ public abstract class BaseAST implements AST {
      */
     public List<? extends Tree> getAncestors() { return Trees.getAncestors(this); }
 
-	public void inspect(BaseRecognizer parser) {
+	public void inspect(BaseRecognizer<?> parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
 	}
 
-	public void save(BaseRecognizer parser, String fileName)
+	public void save(BaseRecognizer<?> parser, String fileName)
 		throws IOException
 	{
 		Trees.writePS(this, parser, fileName);
 	}
 
-	public void save(BaseRecognizer parser, String fileName,
+	public void save(BaseRecognizer<?> parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{

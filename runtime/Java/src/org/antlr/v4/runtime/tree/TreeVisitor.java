@@ -32,13 +32,14 @@ package org.antlr.v4.runtime.tree;
 /** Do a depth first walk of a tree, applying pre() and post() actions
  *  as we discover and finish nodes.
  */
-public class TreeVisitor {
-    protected ASTAdaptor adaptor;
+public class TreeVisitor<T> {
+    protected ASTAdaptor<T> adaptor;
 
-    public TreeVisitor(ASTAdaptor adaptor) {
+    public TreeVisitor(ASTAdaptor<T> adaptor) {
         this.adaptor = adaptor;
     }
-    public TreeVisitor() { this(new CommonASTAdaptor()); }
+
+    public TreeVisitor() { this((ASTAdaptor<T>)new CommonASTAdaptor()); }
 
     /** Visit every node in tree t and trigger an action for each node
      *  before/after having visited all of its children.
@@ -50,16 +51,16 @@ public class TreeVisitor {
      *
      *  Return result of applying post action to this node.
      */
-    public Object visit(Object t, TreeVisitorAction action) {
+    public T visit(T t, TreeVisitorAction<T> action) {
         // System.out.println("visit "+((Tree)t).toStringTree());
         boolean isNil = adaptor.isNil(t);
         if ( action!=null && !isNil ) {
             t = action.pre(t); // if rewritten, walk children of new t
         }
         for (int i=0; i<adaptor.getChildCount(t); i++) {
-            Object child = adaptor.getChild(t, i);
-            Object visitResult = visit(child, action);
-            Object childAfterVisit = adaptor.getChild(t, i);
+            T child = adaptor.getChild(t, i);
+            T visitResult = visit(child, action);
+            T childAfterVisit = adaptor.getChild(t, i);
             if ( visitResult !=  childAfterVisit ) { // result & child differ?
                 adaptor.setChild(t, i, visitResult);
             }
