@@ -30,6 +30,7 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
@@ -224,6 +225,16 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void ruleOption(GrammarAST ID, GrammarAST valueAST) {
+		checkOptions(ID.getAncestor(RULE), ID.token, valueAST);
+	}
+
+	@Override
+	public void blockOption(GrammarAST ID, GrammarAST valueAST) {
+		checkOptions(ID.getAncestor(BLOCK), ID.token, valueAST);
+	}
+
+	@Override
 	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
 		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
@@ -370,7 +381,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	/** Check option is appropriate for grammar, rule, subrule */
-	boolean checkOptions(GrammarAST parent,
+	boolean checkOptions(Tree parent,
 						 Token optionID, GrammarAST valueAST)
 	{
 		boolean ok = true;
@@ -441,7 +452,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			return false;
 		}
 		// example (ALT_REWRITE (ALT (ID (ELEMENT_OPTIONS Foo))) (-> (ALT ID))
-		if ( inRewrite ) {
+		if ( !inRewrite && this.currentOuterAltHasRewrite ) {
 			g.tool.errMgr.grammarError(ErrorType.HETERO_ILLEGAL_IN_REWRITE_ALT,
 									   fileName,
 									   optionID);
