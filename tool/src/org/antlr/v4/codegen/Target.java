@@ -403,6 +403,10 @@ public class Target {
 	}
 
 	public String getElementName(String name) {
+		if (".".equals(name)) {
+			return "_wild";
+		}
+
 		if ( gen.g.getRule(name)!=null ) return name;
 		int ttype = gen.g.getTokenType(name);
 		if ( ttype==Token.INVALID_TYPE ) return name;
