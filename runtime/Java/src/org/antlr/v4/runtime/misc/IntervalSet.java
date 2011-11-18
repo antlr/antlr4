@@ -88,6 +88,7 @@ public class IntervalSet implements IntSet {
     /** Add a single element to the set.  An isolated element is stored
      *  as a range el..el.
      */
+    @Override
     public void add(int el) {
         add(el,el);
     }
@@ -111,8 +112,8 @@ public class IntervalSet implements IntSet {
 		}
 		// find position in list
 		// Use iterators as we modify list in place
-		for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
-			Interval r = (Interval) iter.next();
+		for (ListIterator<Interval> iter = intervals.listIterator(); iter.hasNext();) {
+			Interval r = iter.next();
 			if ( addition.equals(r) ) {
 				return;
 			}
@@ -123,7 +124,7 @@ public class IntervalSet implements IntSet {
 				// make sure we didn't just create an interval that
 				// should be merged with next interval in list
 				if ( iter.hasNext() ) {
-					Interval next = (Interval) iter.next();
+					Interval next = iter.next();
 					if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
 						// if we bump up against or overlap next, merge
 						iter.remove();   // remove this one
@@ -153,6 +154,7 @@ public class IntervalSet implements IntSet {
 		return r;
 	}
 
+	@Override
 	public IntervalSet addAll(IntSet set) {
 		if ( set==null ) {
 			return this;
@@ -166,7 +168,7 @@ public class IntervalSet implements IntSet {
         // walk set and add each interval
 		int n = other.intervals.size();
 		for (int i = 0; i < n; i++) {
-			Interval I = (Interval) other.intervals.get(i);
+			Interval I = other.intervals.get(i);
 			this.add(I.a,I.b);
 		}
 		return this;
@@ -182,6 +184,7 @@ public class IntervalSet implements IntSet {
      *
      *  'this' is assumed to be either a subset or equal to vocabulary.
      */
+    @Override
     public IntervalSet complement(IntSet vocabulary) {
         if ( vocabulary==null ) {
             return null; // nothing in common with null set
@@ -198,25 +201,25 @@ public class IntervalSet implements IntSet {
 		if ( n ==0 ) {
 			return compl;
 		}
-		Interval first = (Interval)intervals.get(0);
+		Interval first = intervals.get(0);
 		// add a range from 0 to first.a constrained to vocab
 		if ( first.a > 0 ) {
 			IntervalSet s = IntervalSet.of(0, first.a-1);
-			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
+			IntervalSet a = s.and(vocabularyIS);
 			compl.addAll(a);
 		}
 		for (int i=1; i<n; i++) { // from 2nd interval .. nth
-			Interval previous = (Interval)intervals.get(i-1);
-			Interval current = (Interval)intervals.get(i);
+			Interval previous = intervals.get(i-1);
+			Interval current = intervals.get(i);
 			IntervalSet s = IntervalSet.of(previous.b+1, current.a-1);
-			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
+			IntervalSet a = s.and(vocabularyIS);
 			compl.addAll(a);
 		}
-		Interval last = (Interval)intervals.get(n -1);
+		Interval last = intervals.get(n -1);
 		// add a range from last.b to maxElement constrained to vocab
 		if ( last.b < maxElement ) {
 			IntervalSet s = IntervalSet.of(last.b+1, maxElement);
-			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
+			IntervalSet a = s.and(vocabularyIS);
 			compl.addAll(a);
 		}
 		return compl;
@@ -227,6 +230,7 @@ public class IntervalSet implements IntSet {
 	 *  other is assumed to be a subset of this;
      *  anything that is in other but not in this will be ignored.
 	 */
+	@Override
 	public IntervalSet subtract(IntSet other) {
 		// assume the whole unicode range here for the complement
 		// because it doesn't matter.  Anything beyond the max of this' set
@@ -237,6 +241,7 @@ public class IntervalSet implements IntSet {
 		return this.and(((IntervalSet)other).complement(COMPLETE_SET));
 	}
 
+	@Override
 	public IntervalSet or(IntSet a) {
 		IntervalSet o = new IntervalSet();
 		o.addAll(this);
@@ -249,13 +254,14 @@ public class IntervalSet implements IntSet {
      *  just walk them together.  This is roughly O(min(n,m)) for interval
      *  list lengths n and m.
      */
+	@Override
 	public IntervalSet and(IntSet other) {
 		if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
 			return null; // nothing in common with null set
 		}
 
-		ArrayList myIntervals = (ArrayList)this.intervals;
-		ArrayList theirIntervals = (ArrayList)((IntervalSet)other).intervals;
+		List<Interval> myIntervals = this.intervals;
+		List<Interval> theirIntervals = ((IntervalSet)other).intervals;
 		IntervalSet intersection = null;
 		int mySize = myIntervals.size();
 		int theirSize = theirIntervals.size();
@@ -263,8 +269,8 @@ public class IntervalSet implements IntSet {
 		int j = 0;
 		// iterate down both interval lists looking for nondisjoint intervals
 		while ( i<mySize && j<theirSize ) {
-			Interval mine = (Interval)myIntervals.get(i);
-			Interval theirs = (Interval)theirIntervals.get(j);
+			Interval mine = myIntervals.get(i);
+			Interval theirs = theirIntervals.get(j);
 			//System.out.println("mine="+mine+" and theirs="+theirs);
 			if ( mine.startsBeforeDisjoint(theirs) ) {
 				// move this iterator looking for interval that might overlap
@@ -318,10 +324,11 @@ public class IntervalSet implements IntSet {
 	}
 
     /** Is el in any range of this set? */
+    @Override
     public boolean contains(int el) {
 		int n = intervals.size();
 		for (int i = 0; i < n; i++) {
-			Interval I = (Interval) intervals.get(i);
+			Interval I = intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			if ( el<a ) {
@@ -347,14 +354,16 @@ public class IntervalSet implements IntSet {
     }
 
     /** return true if this set has no members */
+    @Override
     public boolean isNil() {
         return intervals==null || intervals.size()==0;
     }
 
     /** If this set is a single integer, return it otherwise Token.INVALID_TYPE */
+    @Override
     public int getSingleElement() {
         if ( intervals!=null && intervals.size()==1 ) {
-            Interval I = (Interval)intervals.get(0);
+            Interval I = intervals.get(0);
             if ( I.a == I.b ) {
                 return I.a;
             }
@@ -366,7 +375,7 @@ public class IntervalSet implements IntSet {
 		if ( isNil() ) {
 			return Token.INVALID_TYPE;
 		}
-		Interval last = (Interval)intervals.get(intervals.size()-1);
+		Interval last = intervals.get(intervals.size()-1);
 		return last.b;
 	}
 
@@ -377,7 +386,7 @@ public class IntervalSet implements IntSet {
 		}
 		int n = intervals.size();
 		for (int i = 0; i < n; i++) {
-			Interval I = (Interval) intervals.get(i);
+			Interval I = intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -424,9 +433,9 @@ public class IntervalSet implements IntSet {
 		if ( this.size()>1 ) {
 			buf.append("{");
 		}
-		Iterator iter = this.intervals.iterator();
+		Iterator<Interval> iter = this.intervals.iterator();
 		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+			Interval I = iter.next();
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
@@ -456,9 +465,9 @@ public class IntervalSet implements IntSet {
 		if ( this.size()>1 ) {
 			buf.append("{");
 		}
-		Iterator iter = this.intervals.iterator();
+		Iterator<Interval> iter = this.intervals.iterator();
 		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+			Interval I = iter.next();
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
@@ -481,6 +490,7 @@ public class IntervalSet implements IntSet {
 		return buf.toString();
 	}
 
+    @Override
     public int size() {
 		int n = 0;
 		int numIntervals = intervals.size();
@@ -489,17 +499,18 @@ public class IntervalSet implements IntSet {
 			return firstInterval.b-firstInterval.a+1;
 		}
 		for (int i = 0; i < numIntervals; i++) {
-			Interval I = (Interval) intervals.get(i);
+			Interval I = intervals.get(i);
 			n += (I.b-I.a+1);
 		}
 		return n;
     }
 
+    @Override
     public List<Integer> toList() {
 		List<Integer> values = new ArrayList<Integer>();
 		int n = intervals.size();
 		for (int i = 0; i < n; i++) {
-			Interval I = (Interval) intervals.get(i);
+			Interval I = intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -517,7 +528,7 @@ public class IntervalSet implements IntSet {
 		int n = intervals.size();
 		int index = 0;
 		for (int j = 0; j < n; j++) {
-			Interval I = (Interval) intervals.get(j);
+			Interval I = intervals.get(j);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -535,7 +546,7 @@ public class IntervalSet implements IntSet {
 		int n = intervals.size();
 		int j = 0;
 		for (int i = 0; i < n; i++) {
-			Interval I = (Interval) intervals.get(i);
+			Interval I = intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -546,6 +557,7 @@ public class IntervalSet implements IntSet {
 		return values;
 	}
 
+	@Override
 	public void remove(int el) {
         throw new NoSuchMethodError("IntervalSet.remove() unimplemented");
     }
