@@ -99,6 +99,9 @@ public class LL1Analyzer {
 			else {
 //				System.out.println("adding "+ t);
 				IntervalSet set = t.label();
+				if (t instanceof NotSetTransition) {
+					set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
+				}
 				look.addAll(set);
 			}
 		}
