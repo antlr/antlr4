@@ -120,9 +120,9 @@ public class CommonASTNodeStream<T> extends LookaheadStream<T>
 	public void setTokenStream(TokenStream tokens) { this.tokens = tokens; }
 
 	@Override
-	public ASTAdaptor getTreeAdaptor() { return adaptor; }
+	public ASTAdaptor<T> getTreeAdaptor() { return adaptor; }
 
-	public void setTreeAdaptor(ASTAdaptor adaptor) { this.adaptor = adaptor; }
+	public void setTreeAdaptor(ASTAdaptor<T> adaptor) { this.adaptor = adaptor; }
 
     @Override
     public T get(int i) {
