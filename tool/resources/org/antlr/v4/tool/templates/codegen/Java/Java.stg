@@ -59,11 +59,11 @@ public class Blank<listener.grammarName>Listener implements <listener.grammarNam
 }
 >>
 
-Parser(parser, funcs, atn, sempredFuncs) ::= <<
+Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-TreeParserModel(parser, funcs, atn, sempredFuncs) ::= <<
+TreeParserModel(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="treeparser_ctor",
 		 extras={
 @Override
@@ -73,9 +73,9 @@ public <file.ASTLabelType> match(int ttype) throws RecognitionException {
 }, ...)>
 >>
 
-Parser_(parser, funcs, atn, sempredFuncs, ctor, extras) ::= <<
+Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused"})
-public class <parser.name> extends <parser.superclass> {
+public class <parser.name> extends <superclass> {
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -458,6 +458,9 @@ SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
 >>
+
+DefaultParserSuperClass(s) ::= "Parser"
+DefaultTreeParserSuperClass(s) ::= "TreeParser"
 
 ActionText(t) ::= "<t.text>"
 ArgRef(a) ::= "_localctx.<a.name>"

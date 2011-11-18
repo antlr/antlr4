@@ -30,6 +30,9 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.actions.ActionChunk;
+import org.antlr.v4.codegen.model.actions.ActionText;
+import org.antlr.v4.codegen.model.actions.DefaultParserSuperClass;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -38,7 +41,7 @@ import java.util.*;
 public class Parser extends OutputModelObject {
 	public String name;
 	public String grammarName;
-	public String superclass;
+	@ModelElement public ActionChunk superclass;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -65,6 +68,10 @@ public class Parser extends OutputModelObject {
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
-		superclass = g.getOptionString("superClass", "Parser");
+		if (g.getOptionString("superClass") != null) {
+			superclass = new ActionText(g.getOptionString("superClass"));
+		} else {
+			superclass = new DefaultParserSuperClass();
+		}
 	}
 }

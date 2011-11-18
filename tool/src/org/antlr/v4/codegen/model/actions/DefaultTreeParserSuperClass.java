@@ -27,21 +27,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.actions;
 
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.actions.ActionText;
-import org.antlr.v4.codegen.model.actions.DefaultTreeParserSuperClass;
-import org.antlr.v4.tool.Grammar;
-
-public class TreeParserModel extends Parser {
-	public TreeParserModel(OutputModelFactory factory, ParserFile file) {
-		super(factory, file);
-		Grammar g = factory.getGrammar();
-		if (g.getOptionString("superClass") != null) {
-			superclass = new ActionText(g.getOptionString("superClass"));
-		} else {
-			superclass = new DefaultTreeParserSuperClass();
-		}
-	}
+public class DefaultTreeParserSuperClass extends ActionChunk {
 }
