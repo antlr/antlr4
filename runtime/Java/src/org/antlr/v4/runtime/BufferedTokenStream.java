@@ -145,10 +145,10 @@ public class BufferedTokenStream implements TokenStream {
     }
 
 	/** Get all tokens from start..stop inclusively */
-	public List get(int start, int stop) {
+	public List<Token> get(int start, int stop) {
 		if ( start<0 || stop<0 ) return null;
 		if ( p == -1 ) setup();
-		List subset = new ArrayList();
+		List<Token> subset = new ArrayList<Token>();
 		if ( stop>=tokens.size() ) stop = tokens.size()-1;
 		for (int i = start; i <= stop; i++) {
 			Token t = tokens.get(i);
@@ -189,17 +189,17 @@ public class BufferedTokenStream implements TokenStream {
         p = -1;
     }
 
-    public List getTokens() { return tokens; }
+    public List<Token> getTokens() { return tokens; }
 
-    public List getTokens(int start, int stop) {
-        return getTokens(start, stop, (Set<Integer>)null);
+    public List<Token> getTokens(int start, int stop) {
+        return getTokens(start, stop, null);
     }
 
     /** Given a start and stop index, return a List of all tokens in
      *  the token type BitSet.  Return null if no tokens were found.  This
      *  method looks at both on and off channel tokens.
      */
-    public List getTokens(int start, int stop, Set<Integer> types) {
+    public List<Token> getTokens(int start, int stop, Set<Integer> types) {
         if ( p == -1 ) setup();
         if ( stop>=tokens.size() ) stop=tokens.size()-1;
         if ( start<0 ) start=0;
@@ -219,7 +219,7 @@ public class BufferedTokenStream implements TokenStream {
         return filteredTokens;
     }
 
-    public List getTokens(int start, int stop, int ttype) {
+    public List<Token> getTokens(int start, int stop, int ttype) {
 		HashSet<Integer> s = new HashSet<Integer>(ttype);
 		s.add(ttype);
 		return getTokens(start,stop, s);
