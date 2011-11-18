@@ -44,6 +44,7 @@ public class ActionTransition extends Transition {
 		this.actionIndex = actionIndex;
 	}
 
+	@Override
 	public boolean isEpsilon() {
 		return true; // we are to be ignored by analysis 'cept for predicates
 	}
