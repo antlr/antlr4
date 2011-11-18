@@ -122,10 +122,10 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 	protected List<Integer> calls;
 
 	public BufferedASTNodeStream(T tree) {
-		this(new CommonASTAdaptor(), tree);
+		this((ASTAdaptor<T>)new CommonASTAdaptor(), tree);
 	}
 
-	public BufferedASTNodeStream(ASTAdaptor adaptor, T tree) {
+	public BufferedASTNodeStream(ASTAdaptor<T> adaptor, T tree) {
 		this(adaptor, tree, DEFAULT_INITIAL_BUFFER_SIZE);
 	}
 
@@ -159,7 +159,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		}
 		// and now add all its children
 		for (int c=0; c<n; c++) {
-			T child = (T)adaptor.getChild(t,c);
+			T child = adaptor.getChild(t,c);
 			fillBuffer(child);
 		}
 		// add UP node if t has children
@@ -176,7 +176,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 			fillBuffer();
 		}
 		for (int i = 0; i < nodes.size(); i++) {
-			T t = (T) nodes.get(i);
+			T t = nodes.get(i);
 			if ( t==node ) {
 				return i;
 			}
@@ -206,7 +206,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 				navNode = up;
 			}
 		}
-		nodes.add((T)navNode);
+		nodes.add(navNode);
 	}
 
 	@Override
@@ -301,7 +301,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 	}
 
 	@Override
-	public ASTAdaptor getTreeAdaptor() {
+	public ASTAdaptor<T> getTreeAdaptor() {
 		return adaptor;
 	}
 
@@ -314,11 +314,11 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		this.tokens = tokens;
 	}
 
-	public ASTAdaptor getASTAdaptor() {
+	public ASTAdaptor<T> getASTAdaptor() {
 		return adaptor;
 	}
 
-	public void setASTAdaptor(ASTAdaptor adaptor) {
+	public void setASTAdaptor(ASTAdaptor<T> adaptor) {
 		this.adaptor = adaptor;
 	}
 
@@ -416,7 +416,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return nodes.size();
 	}
 
-	public Iterator iterator() {
+	public Iterator<T> iterator() {
 		if ( p==-1 ) {
 			fillBuffer();
 		}
@@ -439,7 +439,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		}
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < nodes.size(); i++) {
-			T t = (T) nodes.get(i);
+			T t = nodes.get(i);
 			buf.append(" ");
 			buf.append(adaptor.getType(t));
 		}
@@ -453,7 +453,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		}
 		StringBuffer buf = new StringBuffer();
 		for (int i = start; i < nodes.size() && i <= stop; i++) {
-			T t = (T) nodes.get(i);
+			T t = nodes.get(i);
 			buf.append(" ");
 			buf.append(adaptor.getToken(t));
 		}
