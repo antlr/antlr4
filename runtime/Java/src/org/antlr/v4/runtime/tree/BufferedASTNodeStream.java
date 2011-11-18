@@ -59,10 +59,12 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 
     protected class StreamIterator implements Iterator<T> {
 		int i = 0;
+		@Override
 		public boolean hasNext() {
 			return i<nodes.size();
 		}
 
+		@Override
 		public T next() {
 			int current = i;
 			i++;
@@ -72,6 +74,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 			return eof;
 		}
 
+		@Override
 		public void remove() {
 			throw new RuntimeException("cannot remove nodes from stream");
 		}
@@ -206,6 +209,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		nodes.add((T)navNode);
 	}
 
+	@Override
 	public T get(int i) {
 		if ( p==-1 ) {
 			fillBuffer();
@@ -236,6 +240,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return get(i,j);
 	}
 
+	@Override
 	public T LT(int k) {
 		if ( p==-1 ) {
 			fillBuffer();
@@ -285,10 +290,12 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return nodes.get(p-k);
 	}
 
+	@Override
 	public T getTreeSource() {
 		return root;
 	}
 
+	@Override
 	public String getSourceName() {
 		return getTokenStream().getSourceName();
 	}
@@ -298,6 +305,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return adaptor;
 	}
 
+	@Override
 	public TokenStream getTokenStream() {
 		return tokens;
 	}
@@ -318,10 +326,12 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return uniqueNavigationNodes;
 	}
 
+	@Override
 	public void setUniqueNavigationNodes(boolean uniqueNavigationNodes) {
 		this.uniqueNavigationNodes = uniqueNavigationNodes;
 	}
 
+	@Override
 	public void consume() {
 		if ( p==-1 ) {
 			fillBuffer();
@@ -329,10 +339,12 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		p++;
 	}
 
+	@Override
 	public int LA(int i) {
 		return adaptor.getType(LT(i));
 	}
 
+	@Override
 	public int mark() {
 		if ( p==-1 ) {
 			fillBuffer();
@@ -341,10 +353,12 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return lastMarker;
 	}
 
+	@Override
 	public void release(int marker) {
 		// no resources to release
 	}
 
+	@Override
 	public int index() {
 		return p;
 	}
@@ -357,6 +371,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		seek(lastMarker);
 	}
 
+	@Override
 	public void seek(int index) {
 		if ( p==-1 ) {
 			fillBuffer();
@@ -384,6 +399,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return ret;
 	}
 
+	@Override
 	public void reset() {
 		p = 0;
 		lastMarker = 0;
@@ -392,6 +408,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
         }
     }
 
+	@Override
 	public int size() {
 		if ( p==-1 ) {
 			fillBuffer();
@@ -408,6 +425,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 
 	// TREE REWRITE INTERFACE
 
+	@Override
 	public void replaceChildren(T parent, int startChildIndex, int stopChildIndex, T t) {
 		if ( parent!=null ) {
 			adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
@@ -442,6 +460,7 @@ public class BufferedASTNodeStream<T> implements ASTNodeStream<T> {
 		return buf.toString();
 	}
 
+	@Override
 	public String toString(T start, T stop) {
 		System.out.println("toString");
 		if ( start==null || stop==null ) {
