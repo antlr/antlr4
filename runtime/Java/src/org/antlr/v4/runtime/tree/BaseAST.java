@@ -95,7 +95,7 @@ public abstract class BaseAST implements AST {
 		if ( t==null ) {
 			return; // do nothing upon addChild(null)
 		}
-		BaseAST childTree = (BaseAST)t;
+		BaseAST childTree = t;
 		if ( childTree.isNil() ) { // t is an empty node possibly with children
 			if ( this.children!=null && this.children == childTree.children ) {
 				throw new RuntimeException("attempt to add child list to itself");
@@ -240,7 +240,7 @@ public abstract class BaseAST implements AST {
 	public void freshenParentAndChildIndexesDeeply(int offset) {
 		int n = getChildCount();
 		for (int c = offset; c < n; c++) {
-			BaseAST child = (BaseAST)getChild(c);
+			BaseAST child = getChild(c);
 			child.setChildIndex(c);
 			child.setParent(this);
 			child.freshenParentAndChildIndexesDeeply();

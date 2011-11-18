@@ -57,7 +57,7 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 
 	@Override
 	public boolean isNil(T tree) {
-		return ((AST)tree).isNil();
+		return tree.isNil();
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 	@Override
 	public void addChild(T t, T child) {
 		if ( t!=null && child!=null ) {
-			((BaseAST)t).addChild((BaseAST) child);
+			t.addChild(child);
 		}
 	}
 
@@ -231,20 +231,20 @@ public abstract class BaseASTAdaptor<T extends BaseAST> implements ASTAdaptor<T>
 
 	@Override
 	public int getChildCount(T t) {
-		return ((BaseAST)t).getChildCount();
+		return t.getChildCount();
 	}
 
 	@Override
 	public int getUniqueID(T node) {
 		if ( treeToUniqueIDMap==null ) {
-			 treeToUniqueIDMap = new HashMap();
+			 treeToUniqueIDMap = new HashMap<BaseAST, Integer>();
 		}
-		Integer prevID = (Integer)treeToUniqueIDMap.get(node);
+		Integer prevID = treeToUniqueIDMap.get(node);
 		if ( prevID!=null ) {
 			return prevID;
 		}
 		int ID = uniqueNodeID;
-		treeToUniqueIDMap.put((BaseAST)node, ID);
+		treeToUniqueIDMap.put(node, ID);
 		uniqueNodeID++;
 		return ID;
 		// GC makes these nonunique:
