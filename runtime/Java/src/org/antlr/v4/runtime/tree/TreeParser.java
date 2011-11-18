@@ -56,6 +56,7 @@ public class TreeParser<T> extends BaseRecognizer {
 		_errHandler = new DefaultANTLRTreeGrammarErrorStrategy<T>();
 	}
 
+	@Override
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
 		if ( _input !=null ) {
@@ -63,6 +64,7 @@ public class TreeParser<T> extends BaseRecognizer {
 		}
 	}
 
+	@Override
 	protected T getCurrentInputSymbol() { return _input.LT(1); }
 
 	@Override
@@ -86,6 +88,7 @@ public class TreeParser<T> extends BaseRecognizer {
 		tctx.ruleIndex = ruleIndex;
 	}
 
+	@Override
 	public String getSourceName() {
 		return _input.getSourceName();
 	}
@@ -182,6 +185,7 @@ public class TreeParser<T> extends BaseRecognizer {
      *  matcher stops matching and returns true when it runs out of context.
      *  There is no way to force the first node to be the root.
      */
+    @Override
     public boolean inContext(String context) {
         return inContext(_input.getTreeAdaptor(), getTokenNames(), _input.LT(1), context);
     }
