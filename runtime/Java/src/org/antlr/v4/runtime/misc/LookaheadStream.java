@@ -50,12 +50,10 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
      */
     public T eof = null;
 
-    /** Track the last mark() call result value for use in rewind(). */
-    protected int lastMarker;
-
     /** tracks how deep mark() calls are nested */
     protected int markDepth = 0;
 
+    @Override
     public void reset() {
         super.reset();
         currentElementIndex = 0;
@@ -73,6 +71,7 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     /** Get and remove first element in queue; override FastQueue.remove();
      *  it's the same, just checks for backtracking.
      */
+    @Override
     public T remove() {
         T o = elementAt(0);
         p++;
@@ -87,7 +86,10 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     /** Make sure we have at least one element to remove, even if EOF */
     public void consume() {
         syncAhead(1);
-        prevElement = remove();
+        T element = remove();
+        if (markDepth == 0) {
+            prevElement = element;
+        }
         currentElementIndex++;
     }
 
@@ -110,6 +112,7 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     }
 
     /** Size of entire stream is unknown; we only know buffer size from FastQueue */
+    @Override
     public int size() { throw new UnsupportedOperationException("streams are of unknown size"); }
 
     public T LT(int k) {
@@ -127,23 +130,12 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 
 	public int mark() {
         markDepth++;
-        lastMarker = p; // track where we are in buffer not absolute token index
-        return lastMarker;
+        return markDepth;
 	}
 
 	public void release(int marker) {
 		// no resources to release
 	}
-
-	public void rewind(int marker) {
-        markDepth--;
-        seek(marker); // assume marker is top
-        // release(marker); // waste of call; it does nothing in this class
-    }
-
-	public void rewind() {
-        seek(lastMarker); // rewind but do not release marker
-    }
 
     /** Seek to a 0-indexed position within data buffer.  Can't handle
      *  case where you seek beyond end of existing buffer.  Normally used
@@ -151,10 +143,24 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
      *  Doesn't see to absolute position in input stream since this stream
      *  is unbuffered. Seeks only into our moving window of elements.
      */
-    public void seek(int index) { p = index; }
+    public void seek(int index) {
+        int bufferStartIndex = currentElementIndex - p;
+        if (index < bufferStartIndex || index > currentElementIndex) {
+            throw new UnsupportedOperationException("Cannot seek to the specified index.");
+        }
+
+        currentElementIndex = index;
+        p = index - bufferStartIndex;
+    }
 
     protected T LB(int k) {
-        if ( k==1 ) return prevElement;
+        int bufferIndex = p - k;
+        if (bufferIndex == -1) {
+            return prevElement;
+        } else if (bufferIndex >= 0 && bufferIndex < data.size()) {
+            return data.get(bufferIndex);
+        }
+
         throw new NoSuchElementException("can't look backwards more than one token in this stream");
     }
 }
