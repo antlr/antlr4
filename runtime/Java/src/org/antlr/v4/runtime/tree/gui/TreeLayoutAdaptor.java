@@ -128,13 +128,12 @@ class TreeLayoutAdaptor implements TreeForTreeLayout<Tree> {
 
 	@Override
 	public Tree getLastChild(Tree parentNode) {
-		return (Tree) parentNode
-		.getChild(parentNode.getChildCount() - 1);
+		return parentNode.getChild(parentNode.getChildCount() - 1);
 	}
 
 	@Override
 	public Tree getFirstChild(Tree parentNode) {
-		return (Tree) parentNode.getChild(0);
+		return parentNode.getChild(0);
 	}
 
 	@Override
