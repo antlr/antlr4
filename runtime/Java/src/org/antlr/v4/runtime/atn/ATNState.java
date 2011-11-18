@@ -70,8 +70,8 @@ public class ATNState {
 		"PLUS_LOOP_BACK",
 	};
 
-	public static Map<Class, Integer> serializationTypes =
-		new HashMap<Class, Integer>() {{
+	public static Map<Class<? extends ATNState>, Integer> serializationTypes =
+		new HashMap<Class<? extends ATNState>, Integer>() {{
 			put(ATNState.class, BASIC);
 			put(RuleStartState.class, RULE_START);
 			put(BlockStartState.class, BLOCK_START);

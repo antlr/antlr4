@@ -71,8 +71,8 @@ public abstract class Transition {
 		"WILDCARD",
 	};
 
-	public static Map<Class, Integer> serializationTypes =
-		new HashMap<Class, Integer>() {{
+	public static Map<Class<? extends Transition>, Integer> serializationTypes =
+		new HashMap<Class<? extends Transition>, Integer>() {{
 			put(EpsilonTransition.class, EPSILON);
 			put(RangeTransition.class, RANGE);
 			put(RuleTransition.class, RULE);
