@@ -381,7 +381,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		StringBuilder buf = new StringBuilder();
 
 		// First, optimize instruction stream
-		Map<?, RewriteOperation> indexToOp = reduceToSingleOperationPerIndex(rewrites);
+		Map<Integer, RewriteOperation> indexToOp = reduceToSingleOperationPerIndex(rewrites);
 
         // Walk buffer, executing instructions and emitting tokens
         int i = start;
