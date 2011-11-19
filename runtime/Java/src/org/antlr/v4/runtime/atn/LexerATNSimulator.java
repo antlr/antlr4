@@ -29,12 +29,9 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.misc.*;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -43,7 +40,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static final int NUM_EDGES = 255;
 
 	/** When we hit an accept state in either the DFA or the ATN, we
-	 *  have to notify the character stream to start offering characters
+	 *  have to notify the character stream to start buffering characters
 	 *  via mark() and record the current state. The current state includes
 	 *  the current index into the input, the current line, and current
 	 *  character position in that line. Note that the Lexer is tracking
