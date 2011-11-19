@@ -28,7 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.*;
 

@@ -30,8 +30,8 @@
 package org.antlr.v4.automata;
 
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.misc.CharSupport;

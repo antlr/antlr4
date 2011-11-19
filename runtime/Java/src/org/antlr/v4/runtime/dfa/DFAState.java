@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.dfa;
 
-import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.misc.OrderedHashSet;

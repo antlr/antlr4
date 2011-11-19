@@ -28,7 +28,7 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import com.sun.istack.internal.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.*;
 
 import java.util.*;

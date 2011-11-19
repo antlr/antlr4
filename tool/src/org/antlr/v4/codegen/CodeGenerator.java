@@ -29,7 +29,7 @@
 
 package org.antlr.v4.codegen;
 
-import com.sun.istack.internal.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;

@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.dfa;
 
-import com.sun.istack.internal.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 
 public class LexerDFASerializer extends DFASerializer {
 	public LexerDFASerializer(@NotNull DFA dfa) {

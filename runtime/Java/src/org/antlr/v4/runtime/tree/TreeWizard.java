@@ -29,7 +29,7 @@
 package org.antlr.v4.runtime.tree;
 
 
-import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.Token;
 
 import java.util.*;

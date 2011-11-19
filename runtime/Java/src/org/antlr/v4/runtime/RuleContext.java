@@ -28,7 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import com.sun.istack.internal.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Interval;

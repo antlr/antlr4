@@ -29,8 +29,8 @@
 
 package org.antlr.v4.runtime.dfa;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {

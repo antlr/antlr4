@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime;
 
-import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.misc.Nullable;
 
 /** How to emit recognition errors */
 public interface ANTLRErrorListener<TSymbol> {
