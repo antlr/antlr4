@@ -279,7 +279,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		if ( text!=null ) {
 			return text;
 		}
-		return _interp.getText();
+		return _interp.getText(input);
 //		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 

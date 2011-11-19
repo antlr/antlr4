@@ -89,14 +89,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	@Nullable
 	protected final Lexer recog;
 
-	/** In case the stream is not offering characters, we need to track
-	 * at minimum the text for the current token. This is what
-	 * getText() returns.
-	 */
-	@NotNull
-	protected char[] text = new char[100];
-	protected int textIndex = -1;
-
 	/** The current token's starting index into the character stream.
 	 *  Shared across DFA to ATN simulation in case the ATN fails and the
 	 *  DFA did not have a previous accept state. In this case, we use the
@@ -150,7 +142,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	public void reset() {
 		dfaPrevAccept.reset();
 		atnPrevAccept.reset();
-		textIndex = -1;
 		startIndex = -1;
 		line = 1;
 		charPositionInLine = 0;
@@ -161,7 +152,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	public int matchATN(@NotNull CharStream input) {
 		int mark = input.mark();
 		try {
-			textIndex = -1;
 			startIndex = input.index();
 			ATNState startState = atn.modeToStartState.get(mode);
 			if ( debug ) System.out.println("mode "+ mode +" start: "+startState);
@@ -182,7 +172,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) System.out.println("DFA[mode "+(recog==null?0:recog.mode)+"] exec LA(1)=="+
 											(char)input.LA(1));
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
-		textIndex = -1;
 		startIndex = input.index();
 		dfaPrevAccept.reset();
 		LexerNoViableAltException atnException = null;
@@ -594,9 +583,8 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	/** Get the text of the current token */
 	@NotNull
-	public String getText() {
-		if ( textIndex<0 ) return "";
-		return new String(text, 0, textIndex+1);
+	public String getText(@NotNull CharStream input) {
+		return input.substring(this.startIndex, input.index());
 	}
 
 	public int getLine() {
@@ -609,18 +597,11 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public void consume(@NotNull CharStream input) {
 		int curChar = input.LA(1);
-		if ( curChar!=CharStream.EOF ) {
-			if ( (textIndex+1)>=text.length ) {
-				char[] txt = new char[text.length*2];
-				System.arraycopy(text, 0, txt, 0, text.length);
-				text = txt;
-			}
-			text[++textIndex] = (char)curChar;
-		}
-		charPositionInLine++;
 		if ( curChar=='\n' ) {
 			line++;
 			charPositionInLine=0;
+		} else {
+			charPositionInLine++;
 		}
 		input.consume();
 	}
