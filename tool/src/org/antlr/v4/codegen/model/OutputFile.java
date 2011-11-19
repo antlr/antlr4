@@ -31,22 +31,17 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.HashMap;
-import java.util.Map;
+public abstract class OutputFile extends OutputModelObject {
+    public final String fileName;
+    public final String TokenLabelType;
+    public final String ASTLabelType;
 
-public class LexerFile extends OutputFile {
-	@ModelElement public Lexer lexer;
-	@ModelElement public Map<String, Action> namedActions;
-
-	public LexerFile(OutputModelFactory factory, String fileName) {
-		super(factory, fileName);
-		namedActions = new HashMap<String, Action>();
-		Grammar g = factory.getGrammar();
-		for (String name : g.namedActions.keySet()) {
-			GrammarAST ast = g.namedActions.get(name);
-			namedActions.put(name, new Action(factory, ast));
-		}
-	}
+    public OutputFile(OutputModelFactory factory, String fileName) {
+        super(factory);
+        this.fileName = fileName;
+        Grammar g = factory.getGrammar();
+        TokenLabelType = g.getOptionString("TokenLabelType");
+        ASTLabelType = g.getOptionString("ASTLabelType", "CommonAST");
+    }
 }

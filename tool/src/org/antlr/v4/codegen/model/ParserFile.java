@@ -36,20 +36,13 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.*;
 
 /** */
-public class ParserFile extends OutputModelObject {
-	public String fileName;
-	public String TokenLabelType;
-	public String ASTLabelType;
-
+public class ParserFile extends OutputFile {
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {
-		super(factory);
-		this.fileName = fileName;
+		super(factory, fileName);
 		Grammar g = factory.getGrammar();
-		TokenLabelType = g.getOptionString("TokenLabelType");
-		ASTLabelType = g.getOptionString("ASTLabelType", "CommonAST");
 		namedActions = new HashMap<String, Action>();
 		for (String name : g.namedActions.keySet()) {
 			GrammarAST ast = g.namedActions.get(name);

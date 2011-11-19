@@ -11,8 +11,7 @@ import java.util.List;
 /** A model object representing a parse tree listener file.
  *  These are the rules specific events triggered by a parse tree visitor.
  */
-public class ListenerFile extends OutputModelObject {
-	public String fileName;
+public class ListenerFile extends OutputFile {
 	public String grammarName;
 	public String parserName;
 	public List<String> listenerNames = new ArrayList<String>();
@@ -21,8 +20,7 @@ public class ListenerFile extends OutputModelObject {
 	@ModelElement public Action header;
 
 	public ListenerFile(OutputModelFactory factory, String fileName) {
-		super(factory);
-		this.fileName = fileName;
+		super(factory, fileName);
 		Grammar g = factory.getGrammar();
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
