@@ -145,12 +145,18 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
      */
     public void seek(int index) {
         int bufferStartIndex = currentElementIndex - p;
-        if (index < bufferStartIndex || index > currentElementIndex) {
+        if (index < bufferStartIndex) {
             throw new UnsupportedOperationException("Cannot seek to the specified index.");
         }
 
-        currentElementIndex = index;
-        p = index - bufferStartIndex;
+        if (index > currentElementIndex) {
+            for (int i = 0; i < currentElementIndex - index; i++) {
+                consume();
+            }
+        } else {
+            currentElementIndex = index;
+            p = index - bufferStartIndex;
+        }
     }
 
     protected T LB(int k) {
