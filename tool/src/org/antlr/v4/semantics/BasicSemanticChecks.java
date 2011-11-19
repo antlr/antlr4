@@ -30,7 +30,6 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
@@ -226,12 +225,12 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void ruleOption(GrammarAST ID, GrammarAST valueAST) {
-		checkOptions(ID.getAncestor(RULE), ID.token, valueAST);
+		checkOptions((GrammarAST)ID.getAncestor(RULE), ID.token, valueAST);
 	}
 
 	@Override
 	public void blockOption(GrammarAST ID, GrammarAST valueAST) {
-		checkOptions(ID.getAncestor(BLOCK), ID.token, valueAST);
+		checkOptions((GrammarAST)ID.getAncestor(BLOCK), ID.token, valueAST);
 	}
 
 	@Override
@@ -381,8 +380,9 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	/** Check option is appropriate for grammar, rule, subrule */
-	boolean checkOptions(Tree parent,
-						 Token optionID, GrammarAST valueAST)
+	boolean checkOptions(GrammarAST parent,
+						 Token optionID,
+						 GrammarAST valueAST)
 	{
 		boolean ok = true;
 		if ( parent.getType()==ANTLRParser.BLOCK ) {
@@ -416,7 +416,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	/** Check option is appropriate for elem; parent of ID is ELEMENT_OPTIONS */
-	boolean checkElementOptions(GrammarASTWithOptions elem, GrammarAST ID,
+	boolean checkElementOptions(GrammarASTWithOptions elem,
+								GrammarAST ID,
 								GrammarAST valueAST)
 	{
 		if ( elem instanceof TerminalAST ) {
