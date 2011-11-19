@@ -53,7 +53,7 @@ public class TreeParser<T> extends BaseRecognizer<T> {
 
 	public TreeParser(ASTNodeStream<T> input) {
 		super(input);
-		_errHandler = new DefaultANTLRTreeGrammarErrorStrategy<T>();
+		_errHandler = new DefaultTreeGrammarErrorStrategy<T>();
 	}
 
 	@Override
@@ -191,17 +191,17 @@ public class TreeParser<T> extends BaseRecognizer<T> {
         return inContext(_input.getTreeAdaptor(), getTokenNames(), _input.LT(1), context);
     }
 
-    /** The worker for inContext.  It's static and full of parameters for
-     *  testing purposes.
-     */
-    public static <T> boolean inContext(ASTAdaptor<T> adaptor,
-                                    String[] tokenNames,
-                                    T t,
-                                    String context)
-    {
-        Matcher dotdotMatcher = dotdotPattern.matcher(context);
-        Matcher doubleEtcMatcher = doubleEtcPattern.matcher(context);
-        if ( dotdotMatcher.find() ) { // don't allow "..", must be "..."
+	/** The worker for inContext.  It's static and full of parameters for
+	 *  testing purposes.
+	 */
+	public static <T> boolean inContext(ASTAdaptor<T> adaptor,
+										String[] tokenNames,
+										T t,
+										String context)
+	{
+		Matcher dotdotMatcher = dotdotPattern.matcher(context);
+		Matcher doubleEtcMatcher = doubleEtcPattern.matcher(context);
+		if ( dotdotMatcher.find() ) { // don't allow "..", must be "..."
             throw new IllegalArgumentException("invalid syntax: ..");
         }
         if ( doubleEtcMatcher.find() ) { // don't allow double "..."

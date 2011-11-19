@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import java.util.*;
 
-public class DefaultANTLRTreeGrammarErrorStrategy<T> extends DefaultANTLRErrorStrategy<T> {
+public class DefaultTreeGrammarErrorStrategy<T> extends DefaultErrorStrategy<T> {
 	@Override
 	public void beginErrorCondition(BaseRecognizer<T> recognizer) {
 	}

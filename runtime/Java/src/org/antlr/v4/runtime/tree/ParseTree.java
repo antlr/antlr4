@@ -29,8 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
@@ -46,28 +45,28 @@ public interface ParseTree extends SyntaxTree {
 		RuleContext getRuleContext();
 	}
 
-	public interface TerminalNode<TSymbol> extends ParseTree {
-		TSymbol getSymbol();
+	public interface TerminalNode<Symbol> extends ParseTree {
+		Symbol getSymbol();
 	}
 
-	public static class TerminalNodeImpl<TSymbol> implements TerminalNode<TSymbol> {
-		public TSymbol symbol;
+	public static class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
+		public Symbol symbol;
 		public ParseTree parent;
 		/** Which ATN node matched this token? */
 		public int s;
-		public TerminalNodeImpl(TSymbol symbol) {	this.symbol = symbol;	}
+		public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
 
 		@Override
 		public ParseTree getChild(int i) {return null;}
 
 		@Override
-		public TSymbol getSymbol() {return symbol;}
+		public Symbol getSymbol() {return symbol;}
 
 		@Override
 		public ParseTree getParent() { return parent; }
 
 		@Override
-		public TSymbol getPayload() { return symbol; }
+		public Symbol getPayload() { return symbol; }
 
 		@Override
 		public Interval getSourceInterval() {
@@ -113,8 +112,8 @@ public interface ParseTree extends SyntaxTree {
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<TSymbol> extends TerminalNodeImpl<TSymbol> {
-		public ErrorNodeImpl(TSymbol token) {
+	public static class ErrorNodeImpl<Symbol> extends TerminalNodeImpl<Symbol> {
+		public ErrorNodeImpl(Symbol token) {
 			super(token);
 		}
 //		@Override

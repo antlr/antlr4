@@ -21,9 +21,9 @@ package org.antlr.v4.runtime;
  *
  *  TODO: what to do about lexers
  */
-public interface ANTLRErrorStrategy<TSymbol> {
+public interface ANTLRErrorStrategy<Symbol> {
 	/** Report any kind of RecognitionException. */
-	void reportError(BaseRecognizer<TSymbol> recognizer,
+	void reportError(BaseRecognizer<Symbol> recognizer,
 					 RecognitionException e)
 		throws RecognitionException;
 
@@ -43,7 +43,7 @@ public interface ANTLRErrorStrategy<TSymbol> {
 	 *  "inserting" tokens, we need to specify what that implicitly created
 	 *  token is. We use object, because it could be a tree node.
 	 */
-	TSymbol recoverInline(BaseRecognizer<TSymbol> recognizer)
+	Symbol recoverInline(BaseRecognizer<Symbol> recognizer)
 		throws RecognitionException;
 
 	/** Resynchronize the parser by consuming tokens until we find one
@@ -51,7 +51,7 @@ public interface ANTLRErrorStrategy<TSymbol> {
 	 *  the current rule. The exception contains info you might want to
 	 *  use to recover better.
 	 */
-	void recover(BaseRecognizer<TSymbol> recognizer,
+	void recover(BaseRecognizer<Symbol> recognizer,
 				 RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
@@ -81,14 +81,14 @@ public interface ANTLRErrorStrategy<TSymbol> {
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
 	 */
-	void sync(BaseRecognizer<TSymbol> recognizer);
+	void sync(BaseRecognizer<Symbol> recognizer);
 
 	/** Notify handler that parser has entered an error state.  The
 	 *  parser currently doesn't call this--the handler itself calls this
 	 *  in report error methods.  But, for symmetry with endErrorCondition,
 	 *  this method is in the interface.
 	 */
-	void beginErrorCondition(BaseRecognizer<TSymbol> recognizer);
+	void beginErrorCondition(BaseRecognizer<Symbol> recognizer);
 
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
@@ -96,11 +96,11 @@ public interface ANTLRErrorStrategy<TSymbol> {
 	 *  avoid sending out spurious error messages. We only want one error
 	 *  message per syntax error
 	 */
-	boolean inErrorRecoveryMode(BaseRecognizer<TSymbol> recognizer);
+	boolean inErrorRecoveryMode(BaseRecognizer<Symbol> recognizer);
 
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
 	 *  and from its own reset method.
 	 */
-	void endErrorCondition(BaseRecognizer<TSymbol> recognizer);
+	void endErrorCondition(BaseRecognizer<Symbol> recognizer);
 }

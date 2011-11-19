@@ -31,13 +31,12 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.tree.ASTNodeStream;
-import org.antlr.v4.runtime.tree.TreeParser;
+import org.antlr.v4.runtime.tree.*;
 
 public class NoViableTreeGrammarAltException extends NoViableAltException {
 	protected Object startNode;
 
-	public <T> NoViableTreeGrammarAltException(TreeParser<T> recognizer) {
+	public <Symbol> NoViableTreeGrammarAltException(TreeParser<Symbol> recognizer) {
 		this(recognizer,
 			 recognizer.getInputStream(),
 			 recognizer.getCurrentInputSymbol(),
@@ -46,12 +45,12 @@ public class NoViableTreeGrammarAltException extends NoViableAltException {
 			 recognizer._ctx);
 	}
 
-	public <T> NoViableTreeGrammarAltException(BaseRecognizer<T> recognizer,
-										   ASTNodeStream<T> input,
-										   T startNode,
-										   T offendingNode,
-										   OrderedHashSet<ATNConfig> deadEndConfigs,
-										   RuleContext ctx) {
+	public <Symbol> NoViableTreeGrammarAltException(BaseRecognizer<Symbol> recognizer,
+													ASTNodeStream<Symbol> input,
+													Symbol startNode,
+													Symbol offendingNode,
+													OrderedHashSet<ATNConfig> deadEndConfigs,
+													RuleContext ctx) {
 		super(recognizer, input,
 			  input.getTreeAdaptor().getToken(startNode),
 			  input.getTreeAdaptor().getToken(offendingNode),

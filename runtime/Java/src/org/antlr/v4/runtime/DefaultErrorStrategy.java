@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.tree.AST;
 /** This is the default error handling mechanism for ANTLR parsers
  *  and tree parsers.
  */
-public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TSymbol> {
+public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> {
 	/** This is true after we see an error and before having successfully
 	 *  matched a token. Prevents generation of more than one error message
 	 *  per error.
@@ -54,24 +54,24 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	protected IntervalSet lastErrorStates;
 
 	@Override
-	public void beginErrorCondition(BaseRecognizer<TSymbol> recognizer) {
+	public void beginErrorCondition(BaseRecognizer<Symbol> recognizer) {
 		errorRecoveryMode = true;
 	}
 
 	@Override
-	public boolean inErrorRecoveryMode(BaseRecognizer<TSymbol> recognizer) {
+	public boolean inErrorRecoveryMode(BaseRecognizer<Symbol> recognizer) {
 		return errorRecoveryMode;
 	}
 
 	@Override
-	public void endErrorCondition(BaseRecognizer<TSymbol> recognizer) {
+	public void endErrorCondition(BaseRecognizer<Symbol> recognizer) {
 		errorRecoveryMode = false;
 		lastErrorStates = null;
 		lastErrorIndex = -1;
 	}
 
 	@Override
-	public void reportError(BaseRecognizer<TSymbol> recognizer,
+	public void reportError(BaseRecognizer<Symbol> recognizer,
 							RecognitionException e)
 		throws RecognitionException
 	{
@@ -95,7 +95,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		else {
 			System.err.println("unknown recognition error type: "+e.getClass().getName());
 			if ( recognizer!=null ) {
-				recognizer.notifyListeners((TSymbol)e.offendingNode, e.getMessage(), e);
+				recognizer.notifyListeners((Symbol)e.offendingNode, e.getMessage(), e);
 			}
 		}
 	}
@@ -104,7 +104,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	 *  token that the match() routine could not recover from.
 	 */
 	@Override
-	public void recover(BaseRecognizer<TSymbol> recognizer, RecognitionException e) {
+	public void recover(BaseRecognizer<Symbol> recognizer, RecognitionException e) {
 //		System.out.println("recover in "+recognizer.getRuleInvocationStack()+
 //						   " index="+recognizer.getInputStream().index()+
 //						   ", lastErrorIndex="+
@@ -144,7 +144,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	 *  We opt to stay in the loop as long as possible.
  	 */
 	@Override
-	public void sync(BaseRecognizer<TSymbol> recognizer) {
+	public void sync(BaseRecognizer<Symbol> recognizer) {
 		ATNState s = recognizer._interp.atn.states.get(recognizer._ctx.s);
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
@@ -155,7 +155,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 //		System.err.println("sync expecting: "+expecting);
 
 		// TODO: subclass this class for treeparsers
-		SymbolStream<TSymbol> tokens = recognizer.getInputStream();
+		SymbolStream<Symbol> tokens = recognizer.getInputStream();
 		int la = tokens.LA(1);
 		// Return but don't end recovery. only do that upon valid token match
 		if ( la==Token.EOF || expecting.contains(la) ) return;
@@ -180,11 +180,11 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		// do nothing if we can't identify the exact kind of ATN state
 	}
 
-	public void reportNoViableAlternative(BaseRecognizer<TSymbol> recognizer,
+	public void reportNoViableAlternative(BaseRecognizer<Symbol> recognizer,
 										  NoViableAltException e)
 	throws RecognitionException
 	{
-		SymbolStream<TSymbol> tokens = recognizer.getInputStream();
+		SymbolStream<Symbol> tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream) {
 			input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);
@@ -192,33 +192,33 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 			input = "<unknown input>";
 		}
 		String msg = "no viable alternative at input "+escapeWSAndQuote(input);
-		recognizer.notifyListeners((TSymbol) e.offendingNode, msg, e);
+		recognizer.notifyListeners((Symbol) e.offendingNode, msg, e);
 	}
 
-	public void reportInputMismatch(BaseRecognizer<TSymbol> recognizer,
+	public void reportInputMismatch(BaseRecognizer<Symbol> recognizer,
 									InputMismatchException e)
 		throws RecognitionException
 	{
-		String msg = "mismatched input "+getTokenErrorDisplay((TSymbol)e.offendingNode)+
+		String msg = "mismatched input "+getTokenErrorDisplay((Symbol)e.offendingNode)+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
-		recognizer.notifyListeners((TSymbol)e.offendingNode, msg, e);
+		recognizer.notifyListeners((Symbol)e.offendingNode, msg, e);
 	}
 
-	public void reportFailedPredicate(BaseRecognizer<TSymbol> recognizer,
+	public void reportFailedPredicate(BaseRecognizer<Symbol> recognizer,
 									  FailedPredicateException e)
 		throws RecognitionException
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" "+e.msg;
-		recognizer.notifyListeners((TSymbol)e.offendingNode, msg, e);
+		recognizer.notifyListeners((Symbol)e.offendingNode, msg, e);
 	}
 
-	public void reportUnwantedToken(BaseRecognizer<TSymbol> recognizer) {
+	public void reportUnwantedToken(BaseRecognizer<Symbol> recognizer) {
 		if (errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
 
-		TSymbol t = recognizer.getCurrentInputSymbol();
+		Symbol t = recognizer.getCurrentInputSymbol();
 		String tokenName = getTokenErrorDisplay(t);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
@@ -226,12 +226,12 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		recognizer.notifyListeners(t, msg, null);
 	}
 
-	public void reportMissingToken(BaseRecognizer<TSymbol> recognizer) {
+	public void reportMissingToken(BaseRecognizer<Symbol> recognizer) {
 		if (errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
 
-		TSymbol t = recognizer.getCurrentInputSymbol();
+		Symbol t = recognizer.getCurrentInputSymbol();
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "missing "+expecting.toString(recognizer.getTokenNames())+
 			" at "+getTokenErrorDisplay(t);
@@ -269,11 +269,11 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	 *  reference in rule atom.  It can assume that you forgot the ')'.
 	 */
 	@Override
-	public TSymbol recoverInline(BaseRecognizer<TSymbol> recognizer)
+	public Symbol recoverInline(BaseRecognizer<Symbol> recognizer)
 		throws RecognitionException
 	{
 		// SINGLE TOKEN DELETION
-		TSymbol matchedSymbol = singleTokenDeletion(recognizer);
+		Symbol matchedSymbol = singleTokenDeletion(recognizer);
 		if ( matchedSymbol!=null ) {
 			// we have deleted the extra token.
 			// now, move past ttype token as if all were ok
@@ -291,7 +291,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	}
 
 	// if next token is what we are looking for then "delete" this token
-	public boolean singleTokenInsertion(BaseRecognizer<TSymbol> recognizer) {
+	public boolean singleTokenInsertion(BaseRecognizer<Symbol> recognizer) {
 		int currentSymbolType = recognizer.getInputStream().LA(1);
 		// if current token is consistent with what could come after current
 		// ATN state, then we know we're missing a token; error recovery
@@ -307,7 +307,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		return false;
 	}
 
-	public TSymbol singleTokenDeletion(BaseRecognizer<TSymbol> recognizer) {
+	public Symbol singleTokenDeletion(BaseRecognizer<Symbol> recognizer) {
 		int nextTokenType = recognizer.getInputStream().LA(2);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		if ( expecting.contains(nextTokenType) ) {
@@ -320,7 +320,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 			*/
 			recognizer.consume(); // simply delete extra token
 			// we want to return the token we're actually matching
-			TSymbol matchedSymbol = recognizer.getCurrentInputSymbol();
+			Symbol matchedSymbol = recognizer.getCurrentInputSymbol();
 			endErrorCondition(recognizer);  // we know current token is correct
 			return matchedSymbol;
 		}
@@ -346,8 +346,8 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	 *  If you change what tokens must be created by the lexer,
 	 *  override this method to create the appropriate tokens.
 	 */
-	protected TSymbol getMissingSymbol(BaseRecognizer<TSymbol> recognizer) {
-		TSymbol currentSymbol = recognizer.getCurrentInputSymbol();
+	protected Symbol getMissingSymbol(BaseRecognizer<Symbol> recognizer) {
+		Symbol currentSymbol = recognizer.getCurrentInputSymbol();
 		if (!(currentSymbol instanceof Token)) {
 			throw new UnsupportedOperationException("This error strategy only supports Token symbols.");
 		}
@@ -367,10 +367,10 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		t.channel = Token.DEFAULT_CHANNEL;
 		t.source = current.getTokenSource();
 		t.index = -1; // indicate we conjured this up because it has no index
-		return (TSymbol)t;
+		return (Symbol)t;
 	}
 
-	public IntervalSet getExpectedTokens(BaseRecognizer<TSymbol> recognizer) {
+	public IntervalSet getExpectedTokens(BaseRecognizer<Symbol> recognizer) {
 		return recognizer.getExpectedTokens();
 	}
 
@@ -382,7 +382,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	 *  your token objects because you don't have to go modify your lexer
 	 *  so that it creates a new Java type.
 	 */
-	public String getTokenErrorDisplay(TSymbol t) {
+	public String getTokenErrorDisplay(Symbol t) {
 		if ( t==null ) return "<no token>";
 		String s = getSymbolText(t);
 		if ( s==null ) {
@@ -396,7 +396,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		return escapeWSAndQuote(s);
 	}
 
-	protected String getSymbolText(@NotNull TSymbol symbol) {
+	protected String getSymbolText(@NotNull Symbol symbol) {
 		if (symbol instanceof Token) {
 			return ((Token)symbol).getText();
 		}
@@ -408,7 +408,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 		}
 	}
 
-	protected int getSymbolType(@NotNull TSymbol symbol) {
+	protected int getSymbolType(@NotNull Symbol symbol) {
 		if (symbol instanceof Token) {
 			return ((Token)symbol).getType();
 		}
@@ -520,7 +520,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	 *  Like Grosch I implement context-sensitive FOLLOW sets that are combined
 	 *  at run-time upon error to avoid overhead during parsing.
 	 */
-	protected IntervalSet getErrorRecoverySet(BaseRecognizer<TSymbol> recognizer) {
+	protected IntervalSet getErrorRecoverySet(BaseRecognizer<Symbol> recognizer) {
 		ATN atn = recognizer._interp.atn;
 		RuleContext ctx = recognizer._ctx;
 		IntervalSet recoverSet = new IntervalSet();
@@ -537,7 +537,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	}
 
 	/** Consume tokens until one matches the given token set */
-	public void consumeUntil(BaseRecognizer<TSymbol> recognizer, IntervalSet set) {
+	public void consumeUntil(BaseRecognizer<Symbol> recognizer, IntervalSet set) {
 //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {

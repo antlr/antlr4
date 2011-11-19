@@ -28,7 +28,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.*;
 
@@ -41,7 +40,7 @@ import java.util.*;
  *
  *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
-public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, ParserATNSimulator<TSymbol>> {
+public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
 	/** The RuleContext object for the currently executing rule. This
@@ -49,7 +48,7 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 	 *  When somebody calls the start rule, this gets set to the
 	 *  root context.
 	 */
-	protected ParserRuleContext<TSymbol> _ctx;
+	protected ParserRuleContext<Symbol> _ctx;
 
 	protected boolean buildParseTrees;
 	protected boolean traceATNStates;
@@ -80,9 +79,9 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
      *  to the set of symbols that can follow rule ref.
 	 *  TODO: mv into Parser etc... to get more precise return value/efficiency
 	 */
-	public TSymbol match(int ttype) throws RecognitionException {
+	public Symbol match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
-		TSymbol currentSymbol = getCurrentInputSymbol();
+		Symbol currentSymbol = getCurrentInputSymbol();
 		if ( getInputStream().LA(1)==ttype ) {
 			_errHandler.endErrorCondition(this);
 			consume();
@@ -148,7 +147,7 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 	}
 
 	@Override
-	public abstract SymbolStream<TSymbol> getInputStream();
+	public abstract SymbolStream<Symbol> getInputStream();
 
 	/** Match needs to return the current input symbol, which gets put
 	 *  into the label for the associated token ref; e.g., x=ID.  Token
@@ -157,13 +156,13 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 	 *  a simple method to ask the recognizer to tell me what the current
 	 *  input symbol is.
 	 */
-	public abstract TSymbol getCurrentInputSymbol();
+	public abstract Symbol getCurrentInputSymbol();
 
 	public void notifyListeners(String msg)	{
 		notifyListeners(getCurrentInputSymbol(), msg, null);
 	}
 
-	public void notifyListeners(TSymbol offendingToken, String msg,
+	public void notifyListeners(Symbol offendingToken, String msg,
 							   @Nullable RecognitionException e)
 	{
 		int line = -1;
@@ -172,17 +171,17 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 			line = ((Token) offendingToken).getLine();
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
-		ANTLRErrorListener<TSymbol>[] listeners = getListeners();
+		ANTLRErrorListener<Symbol>[] listeners = getListeners();
 		if ( listeners.length == 0 ) {
 			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
-		for (ANTLRErrorListener<TSymbol> pl : listeners) {
+		for (ANTLRErrorListener<Symbol> pl : listeners) {
 			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
-	public void enterOuterAlt(ParserRuleContext<TSymbol> localctx, int altNum) {
+	public void enterOuterAlt(ParserRuleContext<Symbol> localctx, int altNum) {
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( buildParseTrees && _ctx != localctx ) {
@@ -205,8 +204,8 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 	 *  If the parser is creating parse trees, the current symbol
 	 *  would also be added as a child to the current context (node).
 	 */
-	public TSymbol consume() {
-		TSymbol o = getCurrentInputSymbol();
+	public Symbol consume() {
+		Symbol o = getCurrentInputSymbol();
 		getInputStream().consume();
 		if ( buildParseTrees ) {
 			// TODO: tree parsers?
@@ -227,22 +226,22 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 		}
 	}
 
-	public abstract void enterRule(ParserRuleContext<TSymbol> localctx, int ruleIndex);
+	public abstract void enterRule(ParserRuleContext<Symbol> localctx, int ruleIndex);
 
 	public void exitRule(int ruleIndex) {
-		_ctx = (ParserRuleContext<TSymbol>)_ctx.parent;
+		_ctx = (ParserRuleContext<Symbol>)_ctx.parent;
 	}
 
-	public ParserRuleContext<TSymbol> getInvokingContext(int ruleIndex) {
-		ParserRuleContext<TSymbol> p = _ctx;
+	public ParserRuleContext<Symbol> getInvokingContext(int ruleIndex) {
+		ParserRuleContext<Symbol> p = _ctx;
 		while ( p!=null ) {
 			if ( p.getRuleIndex() == ruleIndex ) return p;
-			p = (ParserRuleContext<TSymbol>)p.parent;
+			p = (ParserRuleContext<Symbol>)p.parent;
 		}
 		return null;
 	}
 
-	public ParserRuleContext<TSymbol> getContext() {
+	public ParserRuleContext<Symbol> getContext() {
 		return _ctx;
 	}
 

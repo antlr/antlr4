@@ -29,17 +29,15 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
-public class ParserATNSimulator<TSymbol> extends ATNSimulator {
+public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 
@@ -49,7 +47,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	public static int retry_with_context_indicates_no_conflict = 0;
 
 	@Nullable
-	protected final BaseRecognizer<TSymbol> parser;
+	protected final BaseRecognizer<Symbol> parser;
 
 	@NotNull
 	public final Map<RuleContext, DFA[]> ctxToDFAs;
@@ -77,7 +75,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		this(null, atn);
 	}
 
-	public ParserATNSimulator(@Nullable BaseRecognizer<TSymbol> parser, @NotNull ATN atn) {
+	public ParserATNSimulator(@Nullable BaseRecognizer<Symbol> parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
 		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
@@ -88,7 +86,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<TSymbol> input, int decision, @Nullable RuleContext outerContext) {
+	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision, @Nullable RuleContext outerContext) {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
@@ -113,7 +111,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<TSymbol> input,
+	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Symbol> input,
 						  @Nullable RuleContext outerContext,
 						  boolean useContext)
 	{
@@ -151,14 +149,14 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	}
 
 	// doesn't create DFA when matching
-	public int matchATN(@NotNull SymbolStream<TSymbol> input, @NotNull ATNState startState) {
+	public int matchATN(@NotNull SymbolStream<Symbol> input, @NotNull ATNState startState) {
 		DFA dfa = new DFA(startState);
 		RuleContext ctx = RuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
-	public int execDFA(@NotNull SymbolStream<TSymbol> input, @NotNull DFA dfa, @NotNull DFAState s0, @Nullable RuleContext outerContext) {
+	public int execDFA(@NotNull SymbolStream<Symbol> input, @NotNull DFA dfa, @NotNull DFAState s0, @Nullable RuleContext outerContext) {
 //		dump(dfa);
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		this.outerContext = outerContext;
@@ -245,17 +243,17 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return prevAcceptState.prediction;
 	}
 
-	public String getInputString(@NotNull SymbolStream<TSymbol> input, int start) {
+	public String getInputString(@NotNull SymbolStream<Symbol> input, int start) {
 		if ( input instanceof TokenStream ) {
 			return ((TokenStream)input).toString(start,input.index());
 		}
 		else if ( input instanceof ASTNodeStream) {
-			return ((ASTNodeStream<TSymbol>)input).toString(input.get(start),input.LT(1));
+			return ((ASTNodeStream<Symbol>)input).toString(input.get(start),input.LT(1));
 		}
 		return "n/a";
 	}
 
-	public int execATN(@NotNull SymbolStream<TSymbol> input,
+	public int execATN(@NotNull SymbolStream<Symbol> input,
 					   @NotNull DFA dfa,
 					   int startIndex,
 					   @NotNull OrderedHashSet<ATNConfig> s0,
@@ -409,7 +407,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return exitAlt;
 	}
 
-	public int retryWithContext(@NotNull SymbolStream<TSymbol> input,
+	public int retryWithContext(@NotNull SymbolStream<Symbol> input,
 								@NotNull DFA dfa,
 								int startIndex,
 								@NotNull RuleContext originalContext,
@@ -837,7 +835,7 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 		return String.valueOf(t);
 	}
 
-	public String getLookaheadName(SymbolStream<TSymbol> input) {
+	public String getLookaheadName(SymbolStream<Symbol> input) {
 		return getTokenName(input.LA(1));
 	}
 
@@ -864,16 +862,16 @@ public class ParserATNSimulator<TSymbol> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<TSymbol> input, @NotNull RuleContext outerContext,
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input, @NotNull RuleContext outerContext,
 								@NotNull OrderedHashSet<ATNConfig> configs, int startIndex)
 	{
 		if ( parser instanceof TreeParser) {
-			TSymbol startNode = null;
+			Symbol startNode = null;
 			if ( input instanceof BufferedASTNodeStream ) {
 				startNode = input.get(startIndex);
 			}
 			return new NoViableTreeGrammarAltException(parser,
-													  (ASTNodeStream<TSymbol>)input,
+													  (ASTNodeStream<Symbol>)input,
 													  startNode,
 													  input.LT(1),
 													  configs, outerContext);

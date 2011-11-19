@@ -45,7 +45,7 @@ public class NoViableAltException extends RecognitionException {
  	 */
 	public Token startToken;
 
-	public <T extends Token> NoViableAltException(BaseRecognizer<T> recognizer) { // LL(1) error
+	public <Symbol extends Token> NoViableAltException(BaseRecognizer<Symbol> recognizer) { // LL(1) error
 		this(recognizer,recognizer.getInputStream(),
 			 recognizer.getCurrentInputSymbol(),
 			 recognizer.getCurrentInputSymbol(),
@@ -54,13 +54,13 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public <T> NoViableAltException(BaseRecognizer<T> recognizer,
-								SymbolStream<T> input,
-								Token startToken,
-								Token offendingToken,
-								T offendingNode,
-								OrderedHashSet<ATNConfig> deadEndConfigs,
-								RuleContext ctx)
+	public <Symbol> NoViableAltException(BaseRecognizer<Symbol> recognizer,
+										 SymbolStream<Symbol> input,
+										 Token startToken,
+										 Token offendingToken,
+										 Symbol offendingNode,
+										 OrderedHashSet<ATNConfig> deadEndConfigs,
+										 RuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;

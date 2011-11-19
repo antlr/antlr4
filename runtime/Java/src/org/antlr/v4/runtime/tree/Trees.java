@@ -29,17 +29,11 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.*;
+import java.util.*;
 
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
@@ -97,7 +91,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static <TSymbol> String getNodeText(Tree t, BaseRecognizer<TSymbol> recog) {
+	public static <Symbol> String getNodeText(Tree t, BaseRecognizer<Symbol> recog) {
 		if ( t instanceof AST ) {
 			return t.toString();
 		}
@@ -225,18 +219,18 @@ public class Trees {
 		//System.out.println("out="+toStringTree());
 	}
 
-	public static <T> T dupTree(ASTAdaptor<T> adaptor, T t, T parent) {
+	public static <Symbol> Symbol dupTree(ASTAdaptor<Symbol> adaptor, Symbol t, Symbol parent) {
 		if ( t==null ) {
 			return null;
 		}
-		T newTree = adaptor.dupNode(t);
+		Symbol newTree = adaptor.dupNode(t);
 		// ensure new subtree root has parent/child index set
 		adaptor.setChildIndex(newTree, adaptor.getChildIndex(t)); // same index in new tree
 		adaptor.setParent(newTree, parent);
 		int n = adaptor.getChildCount(t);
 		for (int i = 0; i < n; i++) {
-			T child = adaptor.getChild(t, i);
-			T newSubTree = dupTree(adaptor, child, t);
+			Symbol child = adaptor.getChild(t, i);
+			Symbol newSubTree = dupTree(adaptor, child, t);
 			adaptor.addChild(newTree, newSubTree);
 		}
 		return newTree;

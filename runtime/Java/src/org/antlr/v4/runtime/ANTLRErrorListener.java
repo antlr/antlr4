@@ -32,7 +32,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Nullable;
 
 /** How to emit recognition errors */
-public interface ANTLRErrorListener<TSymbol> {
+public interface ANTLRErrorListener<Symbol> {
 	/** Upon syntax error, notify any interested parties. This is not how to
 	 *  recover from errors or compute error messages. The parser
 	 *  ANTLRErrorStrategy specifies how to recover from syntax errors
@@ -66,8 +66,8 @@ public interface ANTLRErrorListener<TSymbol> {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void error(Recognizer<TSymbol, ?> recognizer,
-					  @Nullable TSymbol offendingSymbol,
+	public void error(Recognizer<Symbol, ?> recognizer,
+					  @Nullable Symbol offendingSymbol,
 					  int line,
 					  int charPositionInLine,
 					  String msg,

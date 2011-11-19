@@ -34,9 +34,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
-    public <TSymbol> void walk(ParseTreeListener<TSymbol> listener, ParseTree t) {
+    public <Symbol> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
 		if ( t instanceof ParseTree.TerminalNode) {
-			visitTerminal(listener, (ParseTree.TerminalNode<TSymbol>) t);
+			visitTerminal(listener, (ParseTree.TerminalNode<Symbol>) t);
 			return;
 		}
 		ParseTree.RuleNode r = (ParseTree.RuleNode)t;
@@ -48,7 +48,7 @@ public class ParseTreeWalker {
 		exitRule(listener, r);
     }
 
-    protected <TSymbol> void visitTerminal(ParseTreeListener<TSymbol> listener, ParseTree.TerminalNode<TSymbol> t) {
+    protected <Symbol> void visitTerminal(ParseTreeListener<Symbol> listener, ParseTree.TerminalNode<Symbol> t) {
         listener.visitTerminal(t.getSymbol());
     }
 
@@ -57,14 +57,14 @@ public class ParseTreeWalker {
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected <TSymbol> void enterRule(ParseTreeListener<TSymbol> listener, ParseTree.RuleNode r) {
-		ParserRuleContext<TSymbol> ctx = (ParserRuleContext<TSymbol>)r.getRuleContext();
-		listener.enterEveryRule((ParserRuleContext<TSymbol>) r.getRuleContext());
+    protected <Symbol> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
+		listener.enterEveryRule((ParserRuleContext<Symbol>) r.getRuleContext());
 		ctx.enterRule(listener);
     }
 
-    protected <TSymbol> void exitRule(ParseTreeListener<TSymbol> listener, ParseTree.RuleNode r) {
-		ParserRuleContext<TSymbol> ctx = (ParserRuleContext<TSymbol>)r.getRuleContext();
+    protected <Symbol> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);
 		listener.exitEveryRule(ctx);
     }

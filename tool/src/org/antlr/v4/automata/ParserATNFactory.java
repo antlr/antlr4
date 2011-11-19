@@ -30,14 +30,12 @@
 package org.antlr.v4.automata;
 
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;

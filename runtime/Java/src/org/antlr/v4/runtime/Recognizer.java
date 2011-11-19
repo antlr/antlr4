@@ -29,19 +29,17 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
 
 import java.util.*;
 
-public abstract class Recognizer<TSymbol, ATNInterpreter extends ATNSimulator> {
+public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	protected ANTLRErrorStrategy<TSymbol> _errHandler = new DefaultANTLRErrorStrategy();
+	protected ANTLRErrorStrategy<Symbol> _errHandler = new DefaultErrorStrategy();
 
-	private List<ANTLRErrorListener<TSymbol>> _listeners;
+	private List<ANTLRErrorListener<Symbol>> _listeners;
 
 	private static final ANTLRErrorListener[] EMPTY_LISTENERS = new ANTLRErrorListener[0];
 
@@ -200,19 +198,19 @@ public abstract class Recognizer<TSymbol, ATNInterpreter extends ATNSimulator> {
 		return "'"+s+"'";
 	}
 
-	public void addListener(ANTLRErrorListener<TSymbol> pl) {
+	public void addListener(ANTLRErrorListener<Symbol> pl) {
 		if ( _listeners ==null ) {
 			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<TSymbol>>(2));
+				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<Symbol>>(2));
 		}
 		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeListener(ANTLRErrorListener<TSymbol> pl) { _listeners.remove(pl); }
+	public void removeListener(ANTLRErrorListener<Symbol> pl) { _listeners.remove(pl); }
 
 	public void removeListeners() { _listeners.clear(); }
 
-	public @NotNull ANTLRErrorListener<TSymbol>[] getListeners() {
+	public @NotNull ANTLRErrorListener<Symbol>[] getListeners() {
 		if (_listeners == null) {
 			return EMPTY_LISTENERS;
 		}
@@ -220,9 +218,9 @@ public abstract class Recognizer<TSymbol, ATNInterpreter extends ATNSimulator> {
 		return _listeners.toArray(EMPTY_LISTENERS);
 	}
 
-	public ANTLRErrorStrategy<TSymbol> getErrorHandler() { return _errHandler; }
+	public ANTLRErrorStrategy<Symbol> getErrorHandler() { return _errHandler; }
 
-	public void setErrorHandler(ANTLRErrorStrategy<TSymbol> h) { this._errHandler = h; }
+	public void setErrorHandler(ANTLRErrorStrategy<Symbol> h) { this._errHandler = h; }
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
