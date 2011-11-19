@@ -140,7 +140,7 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     /** Seek to a 0-indexed position within data buffer.  Can't handle
      *  case where you seek beyond end of existing buffer.  Normally used
      *  to seek backwards in the buffer. Does not force loading of nodes.
-     *  Doesn't see to absolute position in input stream since this stream
+     *  Doesn't seek to absolute position in input stream since this stream
      *  is unbuffered. Seeks only into our moving window of elements.
      */
     public void seek(int index) {
