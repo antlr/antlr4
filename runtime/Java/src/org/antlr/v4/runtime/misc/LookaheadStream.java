@@ -153,7 +153,8 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
             for (int i = 0; i < currentElementIndex - index; i++) {
                 consume();
             }
-        } else {
+        }
+		else {
             currentElementIndex = index;
             p = index - bufferStartIndex;
         }
@@ -163,7 +164,8 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
         int bufferIndex = p - k;
         if (bufferIndex == -1) {
             return prevElement;
-        } else if (bufferIndex >= 0 && bufferIndex < data.size()) {
+        }
+		else if (bufferIndex >= 0 && bufferIndex < data.size()) {
             return data.get(bufferIndex);
         }
 
