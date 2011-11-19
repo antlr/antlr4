@@ -29,9 +29,8 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.AST;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -193,7 +192,7 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 			input = "<unknown input>";
 		}
 		String msg = "no viable alternative at input "+escapeWSAndQuote(input);
-		recognizer.notifyListeners((TSymbol)e.offendingNode, msg, e);
+		recognizer.notifyListeners((TSymbol) e.offendingNode, msg, e);
 	}
 
 	public void reportInputMismatch(BaseRecognizer<TSymbol> recognizer,
@@ -400,9 +399,11 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	protected String getSymbolText(@NotNull TSymbol symbol) {
 		if (symbol instanceof Token) {
 			return ((Token)symbol).getText();
-		} else if (symbol instanceof AST) {
+		}
+		else if (symbol instanceof AST) {
 			return ((AST)symbol).getText();
-		} else {
+		}
+		else {
 			return symbol.toString();
 		}
 	}
@@ -410,9 +411,11 @@ public class DefaultANTLRErrorStrategy<TSymbol> implements ANTLRErrorStrategy<TS
 	protected int getSymbolType(@NotNull TSymbol symbol) {
 		if (symbol instanceof Token) {
 			return ((Token)symbol).getType();
-		} else if (symbol instanceof AST) {
+		}
+		else if (symbol instanceof AST) {
 			return ((AST)symbol).getType();
-		} else {
+		}
+		else {
 			return Token.INVALID_TYPE;
 		}
 	}
