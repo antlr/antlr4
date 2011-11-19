@@ -31,27 +31,27 @@ TreeParserFile(file, parser, namedActions) ::= <<
 <ParserFile(...)>
 >>
 
-ListenerFile(listener, header) ::= <<
+ListenerFile(file, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
-public interface <listener.grammarName>Listener extends ParseTreeListener {
-	<listener.listenerNames:{lname |
-void enterRule(<listener.parserName>.<lname>Context ctx);
-void exitRule(<listener.parserName>.<lname>Context ctx);}; separator="\n">
+public interface <file.grammarName>Listener extends ParseTreeListener {
+	<file.listenerNames:{lname |
+void enterRule(<file.parserName>.<lname>Context ctx);
+void exitRule(<file.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
-BlankListenerFile(listener, header) ::= <<
+BlankListenerFile(file, header) ::= <<
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-public class Blank<listener.grammarName>Listener implements <listener.grammarName>Listener {
-	<listener.listenerNames:{lname |
-@Override public void enterRule(<listener.parserName>.<lname>Context ctx) { \}
-@Override public void exitRule(<listener.parserName>.<lname>Context ctx) { \}}; separator="\n">
+public class Blank<file.grammarName>Listener implements <file.grammarName>Listener {
+	<file.listenerNames:{lname |
+@Override public void enterRule(<file.parserName>.<lname>Context ctx) { \}
+@Override public void exitRule(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
 	@Override public void enterEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
