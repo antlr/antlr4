@@ -124,7 +124,7 @@ public abstract class BaseRecognizer<TSymbol> extends Recognizer<TSymbol, Parser
 		this.buildParseTrees = buildParseTrees;
 	}
 
-	public boolean getBuildParseTrees() {
+	public boolean getBuildParseTree() {
 		return buildParseTrees;
 	}
 
