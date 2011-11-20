@@ -30,43 +30,101 @@ package org.antlr.v4.runtime;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
-/** A kind of ReaderStream that pulls from an InputStream.
- *  Useful for reading from stdin and specifying file encodings etc...
-  */
-public class ANTLRInputStream extends ANTLRReaderStream {
+/** Vacuum all input from a Reader and then treat it like a StringStream.
+ *  Manage the buffer manually to avoid unnecessary data copying.
+ *
+ *  If you need encoding, use ANTLRInputStream.
+ */
+public class ANTLRInputStream extends ANTLRStringStream {
+	public static final int READ_BUFFER_SIZE = 1024;
+	public static final int INITIAL_BUFFER_SIZE = 1024;
+
 	public ANTLRInputStream() {
 	}
 
-	public ANTLRInputStream(InputStream input) throws IOException {
-		this(input, null);
+	public ANTLRInputStream(Reader r) throws IOException {
+		this(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
 	}
 
-	public ANTLRInputStream(InputStream input, int size) throws IOException {
-		this(input, size, null);
+	public ANTLRInputStream(Reader r, int size) throws IOException {
+		this(r, size, READ_BUFFER_SIZE);
 	}
 
-	public ANTLRInputStream(InputStream input, String encoding) throws IOException {
-		this(input, INITIAL_BUFFER_SIZE, encoding);
+	public ANTLRInputStream(Reader r, int size, int readChunkSize) throws IOException {
+		load(r, size, readChunkSize);
 	}
 
-	public ANTLRInputStream(InputStream input, int size, String encoding) throws IOException {
-		this(input, size, READ_BUFFER_SIZE, encoding);
-	}
+    public ANTLRInputStream(InputStream input) throws IOException {
+        this(input, null);
+    }
 
-	public ANTLRInputStream(InputStream input,
-							int size,
-							int readBufferSize,
-							String encoding)
+    public ANTLRInputStream(InputStream input, int size) throws IOException {
+        this(input, size, null);
+    }
+
+    public ANTLRInputStream(InputStream input, String encoding) throws IOException {
+        this(input, INITIAL_BUFFER_SIZE, encoding);
+    }
+
+    public ANTLRInputStream(InputStream input, int size, String encoding) throws IOException {
+        this(input, size, READ_BUFFER_SIZE, encoding);
+    }
+
+    public ANTLRInputStream(InputStream input,
+                            int size,
+                            int readBufferSize,
+                            String encoding)
+   		throws IOException
+   	{
+   		InputStreamReader isr;
+   		if ( encoding!=null ) {
+   			isr = new InputStreamReader(input, encoding);
+   		}
+   		else {
+   			isr = new InputStreamReader(input);
+   		}
+   		load(isr, size, readBufferSize);
+   	}
+
+	public void load(Reader r, int size, int readChunkSize)
 		throws IOException
 	{
-		InputStreamReader isr;
-		if ( encoding!=null ) {
-			isr = new InputStreamReader(input, encoding);
+		if ( r==null ) {
+			return;
 		}
-		else {
-			isr = new InputStreamReader(input);
+		if ( size<=0 ) {
+			size = INITIAL_BUFFER_SIZE;
 		}
-		load(isr, size, readBufferSize);
+		if ( readChunkSize<=0 ) {
+			readChunkSize = READ_BUFFER_SIZE;
+		}
+		// System.out.println("load "+size+" in chunks of "+readChunkSize);
+		try {
+			// alloc initial buffer size.
+			data = new char[size];
+			// read all the data in chunks of readChunkSize
+			int numRead=0;
+			int p = 0;
+			do {
+				if ( p+readChunkSize > data.length ) { // overflow?
+					// System.out.println("### overflow p="+p+", data.length="+data.length);
+					char[] newdata = new char[data.length*2]; // resize
+					System.arraycopy(data, 0, newdata, 0, data.length);
+					data = newdata;
+				}
+				numRead = r.read(data, p, readChunkSize);
+				// System.out.println("read "+numRead+" chars; p was "+p+" is now "+(p+numRead));
+				p += numRead;
+			} while (numRead!=-1); // while not EOF
+			// set the actual size of the data available;
+			// EOF subtracted one above in p+=numRead; add one back
+			super.n = p+1;
+			//System.out.println("n="+n);
+		}
+		finally {
+			r.close();
+		}
 	}
 }

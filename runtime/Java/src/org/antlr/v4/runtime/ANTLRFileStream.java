@@ -28,7 +28,10 @@
  */
 package org.antlr.v4.runtime;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /** This is a char buffer stream that is loaded from a file
  *  all at once when you construct the object.  This looks very
