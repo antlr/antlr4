@@ -28,6 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.stringtemplate.v4.ST;
 
 /** Rules return values in an object containing all the values.
@@ -48,8 +49,8 @@ import org.stringtemplate.v4.ST;
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-public class ParserRuleContext<SymbolType> extends RuleContext {
-	public SymbolType start, stop;
+public class ParserRuleContext<Symbol> extends RuleContext {
+	public Symbol start, stop;
 	public ST st;
 
 	/** Set during parsing to identify which rule parser is in. */
@@ -62,7 +63,7 @@ public class ParserRuleContext<SymbolType> extends RuleContext {
 
 	/** COPY a ctx
 	 */
-	public void copyFrom(ParserRuleContext<SymbolType> ctx) {
+	public void copyFrom(ParserRuleContext<Symbol> ctx) {
 		// from RuleContext
 		this.parent = ctx.parent;
 		this.s = ctx.s;
@@ -79,9 +80,23 @@ public class ParserRuleContext<SymbolType> extends RuleContext {
 	}
 
 	@Override
+	public int hashCode() {
+		return super.hashCode() + System.identityHashCode(s);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( !super.equals(o) ) return false;
+		return s != ((RuleContext)o).s; // must be parsing the same location in the ATN
+	}
+
+	public void enterRule(ParseTreeListener<Symbol> listener) { }
+	public void exitRule(ParseTreeListener<Symbol> listener) { }
+
+	@Override
 	public int getRuleIndex() { return ruleIndex; }
 
 	public ST getTemplate() { return st; }
-	public SymbolType getStart() { return start; }
-	public SymbolType getStop() { return stop; }
+	public Symbol getStart() { return start; }
+	public Symbol getStop() { return stop; }
 }

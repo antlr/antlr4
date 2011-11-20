@@ -33,9 +33,10 @@ TreeParserFile(file, parser, namedActions) ::= <<
 
 ListenerFile(file, header) ::= <<
 <header>
-import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Listener extends ParseTreeListener {
+public interface <file.grammarName>Listener extends ParseTreeListener\<<TokenLabelType()>\> {
 	<file.listenerNames:{lname |
 void enterRule(<file.parserName>.<lname>Context ctx);
 void exitRule(<file.parserName>.<lname>Context ctx);}; separator="\n">
@@ -582,14 +583,14 @@ public static class <s.label>Context extends <currentRule.name>Context {
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<TokenLabelType()>\> listener) {
 	if ( listener!=null ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
 }
 >>
 
 /*
 SwitchedVisitorDispatchMethod(method) ::= <<
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<TokenLabelType()>\> listener) {
 	switch ( altNum ) {
 		<method.listenerNames:{m |
 case <i> : ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><m>(this); break;}; separator="\n">

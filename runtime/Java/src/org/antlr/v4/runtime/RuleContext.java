@@ -28,19 +28,14 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -195,10 +190,10 @@ public class RuleContext implements ParseTree.RuleNode {
 	 */
 	public boolean equals(Object o) {
 		RuleContext other = ((RuleContext)o);
-		if ( this.cachedHashCode != other.cachedHashCode ) {
-			return false; // can't be same if hash is different
-		}
-		if ( this.hashCode() != other.hashCode() ) {
+//		if ( this.cachedHashCode != other.cachedHashCode ) {
+//			return false; // can't be same if hash is different
+//		}
+		if ( this.hashCode() != ((RuleContext)other).hashCode() ) {
 			return false; // can't be same if hash is different
 		}
 		if ( this==other ) return true;
@@ -340,9 +335,6 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	@Override
 	public String toStringTree() { return toStringTree(null); }
-
-	public void enterRule(ParseTreeListener<?> listener) { }
-	public void exitRule(ParseTreeListener<?> listener) { }
 
 	public String toString() {
 		return toString(null);

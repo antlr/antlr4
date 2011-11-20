@@ -31,8 +31,8 @@ package org.antlr.v4.parse;
 
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.Utils;
-import org.antlr.tool.ErrorManager;
 import org.antlr.v4.Tool;
+import org.antlr.v4.tool.ErrorType;
 
 import java.io.*;
 import java.util.*;
@@ -76,27 +76,27 @@ public class TokenVocabParser {
 					tokenID = "'"+tokenizer.sval+"'";
 				}
 				else {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+ CodeGenerator.VOCAB_FILE_EXTENSION,
-									   Utils.integer(lineNum));
+					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
+										  vocabName + CodeGenerator.VOCAB_FILE_EXTENSION,
+										  Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
 				}
 				token = tokenizer.nextToken();
 				if ( token != '=' ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
-									   Utils.integer(lineNum));
+					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
+										  vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
+										  Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
 				}
 				token = tokenizer.nextToken(); // skip '='
 				if ( token != StreamTokenizer.TT_NUMBER ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
-									   Utils.integer(lineNum));
+					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
+										  vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
+										  Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -108,9 +108,9 @@ public class TokenVocabParser {
 				maxTokenType = Math.max(maxTokenType,tokenType);
 				lineNum++;
 				if ( token != StreamTokenizer.TT_EOL ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
-									   Utils.integer(lineNum));
+					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
+										  vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
+										  Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -120,18 +120,18 @@ public class TokenVocabParser {
 			br.close();
 		}
 		catch (FileNotFoundException fnfe) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
-							   fullFile);
+			tool.errMgr.toolError(ErrorType.CANNOT_FIND_TOKENS_FILE,
+								  fullFile);
 		}
 		catch (IOException ioe) {
-			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   fullFile,
-							   ioe);
+			tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
+								  fullFile,
+								  ioe);
 		}
 		catch (Exception e) {
-			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   fullFile,
-							   e);
+			tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
+								  fullFile,
+								  e);
 		}
 		return tokens;
 	}
