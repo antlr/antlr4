@@ -36,6 +36,7 @@ public abstract class OutputFile extends OutputModelObject {
     public final String fileName;
     public final String TokenLabelType;
     public final String ASTLabelType;
+    public final String InputSymbolType;
 
     public OutputFile(OutputModelFactory factory, String fileName) {
         super(factory);
@@ -43,5 +44,7 @@ public abstract class OutputFile extends OutputModelObject {
         Grammar g = factory.getGrammar();
         TokenLabelType = g.getOptionString("TokenLabelType");
         ASTLabelType = g.getOptionString("ASTLabelType", "CommonAST");
+        if ( g.isTreeGrammar() ) InputSymbolType = ASTLabelType;
+        else InputSymbolType = TokenLabelType;
     }
 }

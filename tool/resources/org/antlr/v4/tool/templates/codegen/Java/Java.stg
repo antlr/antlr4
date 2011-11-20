@@ -36,7 +36,7 @@ ListenerFile(file, header) ::= <<
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Listener extends ParseTreeListener\<<TokenLabelType()>\> {
+public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
 	<file.listenerNames:{lname |
 void enterRule(<file.parserName>.<lname>Context ctx);
 void exitRule(<file.parserName>.<lname>Context ctx);}; separator="\n">
@@ -54,9 +54,9 @@ public class Blank<file.grammarName>Listener implements <file.grammarName>Listen
 @Override public void enterRule(<file.parserName>.<lname>Context ctx) { \}
 @Override public void exitRule(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<TokenLabelType()> > ctx) { }
-	@Override public void visitTerminal(<TokenLabelType()> symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
+	@Override public void visitTerminal(<InputSymbolType()> symbol) { }
 }
 >>
 
@@ -461,10 +461,10 @@ if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><els
 >>
 
 ParserASTExtensionMembers(s) ::= <<
-public ASTAdaptor\<<ASTLabelType()> > _adaptor = (ASTAdaptor)new CommonASTAdaptor();
+public ASTAdaptor\<<ASTLabelType()>\> _adaptor = (ASTAdaptor)new CommonASTAdaptor();
 >>
 
-ParserASTContextInterface(s) ::= "ASTContext\<<ASTLabelType()> >"
+ParserASTContextInterface(s) ::= "ASTContext\<<ASTLabelType()>>"
 ParserASTTreeFieldDecl(s) ::= "<ASTLabelType()> tree"
 ParserASTContextMembers(s) ::= <<
 @Override public <ASTLabelType()> getTree() { return tree; }
@@ -488,6 +488,7 @@ LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
 
 ASTLabelType() ::= "<file.ASTLabelType; null={Object}>"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
+InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
 TokenPropertyRef_text(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getText():null)"
 TokenPropertyRef_type(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getType():0)"
@@ -498,9 +499,9 @@ TokenPropertyRef_index(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.ge
 TokenPropertyRef_tree(t) ::= "_localctx.<t.label>_tree"
 TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localctx.<t.label>.getText()):0)"
 
-RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?((<TokenLabelType()>)_localctx.<r.label>.start):null)"
-RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?((<TokenLabelType()>)_localctx.<r.label>.stop):null)"
-RulePropertyRef_tree(r)	 ::= "(_localctx.<r.label>!=null?((<ASTLabelType()>)_localctx.<r.label>.tree):null)"
+RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.start):null)"
+RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.stop):null)"
+RulePropertyRef_tree(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.tree):null)"
 RulePropertyRef_text(r)	 ::= "(_localctx.<r.label>!=null?_input.toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
 RulePropertyRef_st(r)	 ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 
@@ -550,7 +551,7 @@ ListLabelName(label)		  ::= "<label>_list"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass={ParserRuleContext\<<TokenLabelType()>>}) ::= <<
+StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<if(s.ctorAttrs)>public <s.name>(RuleContext parent, int state) { super(parent, state); }<endif>
@@ -571,7 +572,7 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 >>
 
 TreeParserStructDecl(s,attrs,visitorDispatchMethods) ::= <<
-<StructDecl(superClass={TreeParserRuleContext\<<ASTLabelType()> >}, ...)>
+<StructDecl(superClass={ParserRuleContext\<<ASTLabelType()>\>}, ...)>
 >>
 
 AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
@@ -583,14 +584,14 @@ public static class <s.label>Context extends <currentRule.name>Context {
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<TokenLabelType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
 	if ( listener!=null ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
 }
 >>
 
 /*
 SwitchedVisitorDispatchMethod(method) ::= <<
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<TokenLabelType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
 	switch ( altNum ) {
 		<method.listenerNames:{m |
 case <i> : ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><m>(this); break;}; separator="\n">
