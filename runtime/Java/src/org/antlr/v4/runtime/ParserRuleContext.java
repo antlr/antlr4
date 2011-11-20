@@ -79,16 +79,16 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		super(parent, stateNumber);
 	}
 
-	@Override
-	public int hashCode() {
-		return super.hashCode() + s;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if ( !super.equals(o) ) return false;
-		return s != ((RuleContext)o).s; // must be parsing the same location in the ATN
-	}
+//	@Override
+//	public int hashCode() {
+//		return super.hashCode() + s;
+//	}
+//
+//	@Override
+//	public boolean equals(Object o) {
+//		if ( !super.equals(o) ) return false;
+//		return s != ((RuleContext)o).s; // must be parsing the same location in the ATN
+//	}
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
