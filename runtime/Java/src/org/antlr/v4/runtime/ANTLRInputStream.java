@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-/** Vacuum all input from a Reader and then treat it like a StringStream.
+/** Vacuum all input from a Reader/InputStream and then treat it like a StringStream.
  *  Manage the buffer manually to avoid unnecessary data copying.
  *
  *  If you need encoding, use ANTLRInputStream.
