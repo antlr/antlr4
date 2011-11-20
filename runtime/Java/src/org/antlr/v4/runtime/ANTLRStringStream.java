@@ -121,7 +121,7 @@ public class ANTLRStringStream implements CharStream {
     /** mark/release do nothing; we have entire buffer */
 	@Override
 	public int mark() {
-		return p;
+		return -1;
     }
 
 	@Override
