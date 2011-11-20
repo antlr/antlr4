@@ -40,6 +40,8 @@ import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.runtime.misc.LogManager;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -122,6 +124,7 @@ public class Tool {
 	protected List<String> grammarFiles = new ArrayList<String>();
 
 	public ErrorManager errMgr = new ErrorManager(this);
+    public LogManager logMgr = new LogManager();
 
 	List<ANTLRToolListener> listeners =
 	Collections.synchronizedList(new ArrayList<ANTLRToolListener>());
@@ -330,7 +333,7 @@ public class Tool {
 
 	/** Try current dir then dir of g then lib dir */
 	public GrammarRootAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
-		System.out.println("loadImportedGrammar "+fileName+" from "+g.fileName);
+		g.tool.log("grammar", "load "+fileName + " from " + g.fileName);
 		File importedFile = getImportedGrammarFile(g, fileName);
 		if ( importedFile==null ) {
 			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, fileName, g.fileName);
@@ -379,7 +382,8 @@ public class Tool {
 					if (dot != null) {
 						writeDOTFile(g, r, dot);
 					}
-				} catch (IOException ioe) {
+				}
+                catch (IOException ioe) {
 					errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 				}
 			}
@@ -521,6 +525,9 @@ public class Tool {
 			info(s);
 		}
 	}
+
+    public void log(@Nullable String component, String msg) { logMgr.log(component, msg); }
+    public void log(String msg) { log(msg); }
 
 	public int getNumErrors() { return errMgr.getNumErrors(); }
 

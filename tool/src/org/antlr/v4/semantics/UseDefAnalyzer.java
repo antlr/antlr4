@@ -104,7 +104,6 @@ public class UseDefAnalyzer {
 		ActionSplitter splitter = new ActionSplitter(in, listener);
 		// forces eval, triggers listener methods
 		splitter.getActionTokens();
-		System.out.println("action "+actionAST.getText()+" ctx depends="+dependent[0]);
 		return dependent[0];
 	}
 
@@ -159,9 +158,9 @@ public class UseDefAnalyzer {
 		RewriteRefs collector = new RewriteRefs(desiredShallowLevel);
 		if ( root.getType()==ANTLRParser.RESULT ) collector.visitRewrite(root);
 		else collector.visitRewriteEBNF(root);
-		System.out.println("from "+root.toStringTree());
-		System.out.println("shallow: "+collector.shallow);
-		System.out.println("deep: "+collector.deep);
+//		System.out.println("from "+root.toStringTree());
+//		System.out.println("shallow: "+collector.shallow);
+//		System.out.println("deep: "+collector.deep);
 		return deep ? collector.deep : collector.shallow;
 	}
 

@@ -127,7 +127,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		Token tokenWithinAction = node.token;
 		ActionTranslator translator = new ActionTranslator(factory, node);
 		translator.rf = rf;
-		System.out.println("translate " + action);
+        factory.getGrammar().tool.log("action-translator", "translate " + action);
 		ANTLRStringStream in = new ANTLRStringStream(action);
 		in.setLine(tokenWithinAction.getLine());
 		in.setCharPositionInLine(tokenWithinAction.getCharPositionInLine());
@@ -138,7 +138,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	public void attr(String expr, Token x) {
-		System.out.println("attr "+x);
+		gen.g.tool.log("action-translator", "attr "+x);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), node);
 		if ( a!=null ) {
 			switch ( a.dict.type ) {
@@ -169,14 +169,14 @@ public class ActionTranslator implements ActionSplitterListener {
 
 	/** $x.y = expr; */
 	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-		System.out.println("setQAttr "+x+"."+y+"="+rhs);
+		gen.g.tool.log("action-translator", "setQAttr "+x+"."+y+"="+rhs);
 		// x has to be current rule; just set y attr
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		chunks.add(new SetAttr(y.getText(), rhsChunks));
 	}
 
 	public void qualifiedAttr(String expr, Token x, Token y) {
-		System.out.println("qattr "+x+"."+y);
+		gen.g.tool.log("action-translator", "qattr "+x+"."+y);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(y.getText())); break; // has to be current rule
@@ -211,7 +211,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	public void setAttr(String expr, Token x, Token rhs) {
-		System.out.println("setAttr "+x+" "+rhs);
+		gen.g.tool.log("action-translator", "setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		SetAttr s = new SetAttr(x.getText(), rhsChunks);
 		if ( factory.getGrammar().isLexer() ) s = new LexerSetAttr(x.getText(), rhsChunks);
@@ -219,13 +219,13 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	public void nonLocalAttr(String expr, Token x, Token y) {
-		System.out.println("nonLocalAttr "+x+"::"+y);
+		gen.g.tool.log("action-translator", "nonLocalAttr "+x+"::"+y);
 		Rule r = factory.getGrammar().getRule(x.getText());
 		chunks.add(new NonLocalAttrRef(x.getText(), y.getText(), r.index));
 	}
 
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
-		System.out.println("setNonLocalAttr "+x+"::"+y+"="+rhs);
+		gen.g.tool.log("action-translator", "setNonLocalAttr "+x+"::"+y+"="+rhs);
 		Rule r = factory.getGrammar().getRule(x.getText());
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		SetNonLocalAttr s = new SetNonLocalAttr(x.getText(), y.getText(), r.index, rhsChunks);

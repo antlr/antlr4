@@ -97,7 +97,6 @@ public class AttributeChecks implements ActionSplitterListener {
         ActionSplitter splitter = new ActionSplitter(in, this);
 		// forces eval, triggers listener methods
         node.chunks = splitter.getActionTokens();
-		System.out.println(node.chunks);
     }
 
     // LISTENER METHODS

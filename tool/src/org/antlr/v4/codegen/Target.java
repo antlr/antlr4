@@ -31,8 +31,10 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 
@@ -102,9 +104,6 @@ public class Target {
 //			return getTargetCharLiteralFromANTLRCharLiteral(this,name);
 		}
 		String name = g.getTokenDisplayName(ttype);
-		if ( name==null ) {
-			System.out.println("null token?");
-		}
 		// If name is a literal, return the token type instead
 		if ( name.charAt(0)=='\'' ) {
 			return String.valueOf(ttype);

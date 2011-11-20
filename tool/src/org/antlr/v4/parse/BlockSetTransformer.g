@@ -49,10 +49,9 @@ setAlt
 			s.add(TOKEN_REF);
 			List<GrammarAST> nodes = ((GrammarAST)(currentAlt.getChild(1))).getNodesWithType(s);
 			for (GrammarAST n : nodes) {rewriteElems.add(n.getText());}
-			System.out.println("stuff in rewrite: "+rewriteElems);
 			}
 		)
-				
+
 	;
 
 // (BLOCK (ALT (+ (BLOCK (ALT INT) (ALT ID)))))
@@ -62,14 +61,14 @@ ebnfBlockSet
 }
 	:	^(ebnfSuffix blockSet) -> ^(ebnfSuffix ^(BLOCK<BlockAST> ^(ALT blockSet)))
 	;
-	
+
 ebnfSuffix
 @after {$tree = (GrammarAST)adaptor.dupNode($start);}
 	:	OPTIONAL
   	|	CLOSURE
    	|	POSITIVE_CLOSURE
 	;
-	
+
 blockSet
 @init {
 boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
@@ -81,7 +80,7 @@ boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
 		^(BLOCK ^(ALT setElement[inLexer]) ( ^(ALT setElement[inLexer]) )+)
 		-> ^(SET[$BLOCK.token, "SET"] setElement+)
 	;
-	
+
 setElement[boolean inLexer]
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);

@@ -29,16 +29,20 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.*;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -319,7 +323,6 @@ public class CodeGenerator {
 			code.write(wr);
 			w.close();
 			long stop = System.currentTimeMillis();
-			System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
 		}
 		catch (IOException ioe) {
 			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,

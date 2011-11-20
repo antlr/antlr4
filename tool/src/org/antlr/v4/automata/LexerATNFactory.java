@@ -49,7 +49,6 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	public ATN createATN() {
 		// BUILD ALL START STATES (ONE PER MODE)
-		System.out.println(((LexerGrammar)g).modes);
 		Set<String> modes = ((LexerGrammar) g).modes.keySet();
 		for (String modeName : modes) {
 			// create s0, start state; implied Tokens rule node

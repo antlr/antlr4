@@ -29,19 +29,28 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.TreeVisitor;
+import org.antlr.runtime.tree.TreeVisitorAction;
+import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.*;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.parse.TokenVocabParser;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntSet;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ast.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Grammar implements AttributeResolver {
@@ -222,11 +231,11 @@ public class Grammar implements AttributeResolver {
             String importedGrammarName = null;
             if ( t.getType()==ANTLRParser.ASSIGN ) {
                 importedGrammarName = t.getChild(1).getText();
-                System.out.println("import "+ importedGrammarName);
+                tool.log("grammar", "import "+ importedGrammarName);
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
-                System.out.println("import "+t.getText());
+                tool.log("grammar", "import " + t.getText());
 			}
 			GrammarAST grammarAST = null;
 			try {
@@ -403,7 +412,7 @@ public class Grammar implements AttributeResolver {
 			I = tokenNameToTypeMap.get(token);
 		}
 		int i = (I!=null)?I.intValue(): Token.INVALID_TYPE;
-		//System.out.println("grammar type "+type+" "+tokenName+"->"+i);
+		//tool.log("grammar", "grammar type "+type+" "+tokenName+"->"+i);
 		return i;
 	}
 
@@ -437,7 +446,7 @@ public class Grammar implements AttributeResolver {
 				tokenName = String.valueOf(ttype);
 			}
 		}
-//		System.out.println("getTokenDisplayName ttype="+ttype+", name="+tokenName);
+//		tool.log("grammar", "getTokenDisplayName ttype="+ttype+", name="+tokenName);
 		return tokenName;
 	}
 
@@ -518,7 +527,7 @@ public class Grammar implements AttributeResolver {
 		if ( vocab!=null ) {
 			TokenVocabParser vparser = new TokenVocabParser(tool, vocab);
 			Map<String,Integer> tokens = vparser.load();
-			System.out.println("tokens="+tokens);
+			tool.log("grammar", "tokens=" + tokens);
 			for (String t : tokens.keySet()) {
 				if ( t.charAt(0)=='\'' ) defineStringLiteral(t, tokens.get(t));
 				else defineTokenName(t, tokens.get(t));
@@ -731,7 +740,7 @@ public class Grammar implements AttributeResolver {
 		Map<String,String> lexerRuleToStringLiteral = new HashMap<String,String>();
 
         for (GrammarASTWithOptions r : ruleNodes) {
-			//System.out.println(r.toStringTree());
+			//tool.log("grammar", r.toStringTree());
             String ruleName = r.getChild(0).getText();
             if ( Character.isUpperCase(ruleName.charAt(0)) ) {
 				Map nodes = new HashMap();

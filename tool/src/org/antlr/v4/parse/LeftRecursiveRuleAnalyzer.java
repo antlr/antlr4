@@ -29,13 +29,18 @@
 
 package org.antlr.v4.parse;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.*;
+import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
 import java.util.*;
 
@@ -233,7 +238,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		ruleST.add("userRetvals", retvals);
 		fillRetValAssignments(ruleST, "recRuleName");
 
-		System.out.println(ruleST.render());
+		tool.log("left-recursion", ruleST.render());
 		return ruleST.render();
 	}
 
@@ -280,7 +285,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		ruleST.add("alts", prefixAlts);
 		ruleST.add("alts", otherAlts);
 		ruleST.add("userRetvals", retvals);
-		System.out.println(ruleST.render());
+        tool.log("left-recursion", ruleST.render());
 		return ruleST.render();
 	}
 

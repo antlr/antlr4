@@ -315,7 +315,7 @@ public class SymbolChecks {
 		for (GrammarAST dot : qualifiedRuleRefs) {
 			GrammarAST grammar = (GrammarAST)dot.getChild(0);
 			GrammarAST rule = (GrammarAST)dot.getChild(1);
-			System.out.println(grammar.getText()+"."+rule.getText());
+            g.tool.log("semantics", grammar.getText()+"."+rule.getText());
 			Grammar delegate = g.getImportedGrammar(grammar.getText());
 			if ( delegate==null ) {
 				errMgr.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,

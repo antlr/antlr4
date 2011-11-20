@@ -55,9 +55,8 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 		IntervalSet look = altLookSets[1];
 		IntervalSet followLook = altLookSets[2];
 
-		IntervalSet expecting = (IntervalSet)look.or(followLook);
+		IntervalSet expecting = look.or(followLook);
 		this.error = getThrowNoViableAlt(factory, blkAST, expecting);
-		System.out.println(blkAST.toStringTree()+" LL1OptionalBlockSingleAlt expecting="+expecting);
 
 		expr = addCodeForLookaheadTempVar(look);
 		followExpr = factory.getLL1Test(followLook, blkAST);

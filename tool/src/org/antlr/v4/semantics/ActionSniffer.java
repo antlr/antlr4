@@ -70,7 +70,6 @@ public class ActionSniffer extends BlankActionSplitterListener {
 		ActionSplitter splitter = new ActionSplitter(in, this);
 		// forces eval, triggers listener methods
 		node.chunks = splitter.getActionTokens();
-		System.out.println(node.chunks);
 	}
 
 	public void processNested(Token actionToken) {

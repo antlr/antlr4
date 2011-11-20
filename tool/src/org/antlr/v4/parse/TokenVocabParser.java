@@ -35,7 +35,8 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ErrorType;
 
 import java.io.*;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /** */
 public class TokenVocabParser {
@@ -103,7 +104,7 @@ public class TokenVocabParser {
 				}
 				int tokenType = (int)tokenizer.nval;
 				token = tokenizer.nextToken();
-				System.out.println("import "+tokenID+"="+tokenType);
+				tool.log("grammar", "import "+tokenID+"="+tokenType);
 				tokens.put(tokenID, tokenType);
 				maxTokenType = Math.max(maxTokenType,tokenType);
 				lineNum++;

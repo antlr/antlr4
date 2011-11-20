@@ -81,7 +81,6 @@ public class MatchTree extends RuleElement {
 		ATNState firstChildState = rootNode.downState.transition(0).target;
 		LL1Analyzer analyzer = new LL1Analyzer(firstChildState.atn);
 		IntervalSet look = analyzer.LOOK(firstChildState, RuleContext.EMPTY);
-		System.out.println(rootNode.toStringTree()+"==nullable? "+look.contains(Token.UP));
 		return look.contains(Token.UP);
 	}
 

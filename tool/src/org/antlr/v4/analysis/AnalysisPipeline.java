@@ -29,11 +29,13 @@
 
 package org.antlr.v4.analysis;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Vector;
 
 public class AnalysisPipeline {
 	public Grammar g;
@@ -56,14 +58,14 @@ public class AnalysisPipeline {
 		g.decisionLOOK =
 			new Vector<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
 		for (DecisionState s : g.atn.decisionToState) {
-			System.out.println("\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
+            g.tool.log("LL1", "\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
 
 			LL1Analyzer anal = new LL1Analyzer(g.atn);
 			IntervalSet[] look = anal.getDecisionLookahead(s);
-			System.out.println("look="+ Arrays.toString(look));
+            g.tool.log("LL1", "look=" + Arrays.toString(look));
 			g.decisionLOOK.setSize(s.decision+1);
 			g.decisionLOOK.set(s.decision, look);
-			System.out.println("LL(1)? "+disjoint(look));
+            g.tool.log("LL1", "LL(1)? " + disjoint(look));
 		}
 	}
 
@@ -74,7 +76,6 @@ public class AnalysisPipeline {
 		for (int a=1; a<altLook.length; a++) {
 			IntervalSet look = altLook[a];
 			if ( !look.and(combined).isNil() ) {
-				System.out.println("alt "+a+" not disjoint with "+combined+"; look = "+look);
 				collision = true;
 				break;
 			}

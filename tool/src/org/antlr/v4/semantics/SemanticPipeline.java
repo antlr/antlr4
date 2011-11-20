@@ -190,7 +190,7 @@ public class SemanticPipeline {
 
 		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
 		for (String s : strings) { g.defineStringLiteral(s); }
-		System.out.println("tokens="+g.tokenNameToTypeMap);
-		System.out.println("strings="+g.stringLiteralToTypeMap);
+		g.tool.log("semantics", "tokens="+g.tokenNameToTypeMap);
+        g.tool.log("semantics", "strings="+g.stringLiteralToTypeMap);
 	}
 }

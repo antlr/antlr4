@@ -49,6 +49,5 @@ public class LL1AltBlock extends LL1Choice {
 
 		IntervalSet expecting = IntervalSet.or(altLookSets); // combine alt sets
 		this.error = getThrowNoViableAlt(factory, blkAST, expecting);
-		System.out.println(blkAST.toStringTree()+" LL1AltBlock expecting="+expecting);
 	}
 }

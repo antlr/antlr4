@@ -31,7 +31,9 @@ package org.antlr.v4.tool;
 
 import org.antlr.runtime.*;
 import org.antlr.runtime.misc.DoubleKeyMap;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeVisitor;
+import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.ast.*;
@@ -51,14 +53,14 @@ public class GrammarTransformPipeline {
 	public void process() {
 		GrammarRootAST ast = g.ast;
 		if ( ast==null ) return;
-		System.out.println("before: "+ast.toStringTree());
+        tool.log("grammar", "before: "+ast.toStringTree());
 
 		if ( ast.grammarType==ANTLRParser.PARSER || ast.grammarType==ANTLRParser.COMBINED ) {
 			translateLeftRecursiveRules(ast);
 		}
 
 		reduceBlocksToSets(ast);
-		System.out.println("after: "+ast.toStringTree());
+        tool.log("grammar", "after: "+ast.toStringTree());
 	}
 
 	public void reduceBlocksToSets(GrammarRootAST ast) {
@@ -86,7 +88,7 @@ public class GrammarTransformPipeline {
 										   GrammarAST ruleAST,
 										   String language)
 	{
-		//System.out.println(ruleAST.toStringTree());
+		//tool.log("grammar", ruleAST.toStringTree());
 		TokenStream tokens = ast.tokens;
 		Grammar g = ast.g;
 		String ruleName = ruleAST.getChild(0).getText();
@@ -94,7 +96,7 @@ public class GrammarTransformPipeline {
 			new LeftRecursiveRuleAnalyzer(tokens, ruleAST, tool, ruleName, language);
 		boolean isLeftRec = false;
 		try {
-//			System.out.println("TESTING ---------------\n"+
+//			tool.log("grammar", "TESTING ---------------\n"+
 //							   leftRecursiveRuleWalker.text(ruleAST));
 			isLeftRec = leftRecursiveRuleWalker.rec_rule();
 		}
@@ -116,11 +118,11 @@ public class GrammarTransformPipeline {
 		rules.add( leftRecursiveRuleWalker.getArtificialOpPrecRule(buildAST) );
 		rules.add( leftRecursiveRuleWalker.getArtificialPrimaryRule() );
 		for (String ruleText : rules) {
-//			System.out.println("created: "+ruleText);
+//			tool.log("grammar", "created: "+ruleText);
 			GrammarAST t = parseArtificialRule(g, ruleText);
 			// insert into grammar tree
 			RULES.addChild(t);
-			System.out.println("added: "+t.toStringTree());
+            tool.log("grammar", "added: "+t.toStringTree());
 		}
 	}
 
@@ -197,7 +199,7 @@ public class GrammarTransformPipeline {
 			// COPY TOKENS
 			GrammarAST imp_tokensRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.TOKENS);
 			if ( imp_tokensRoot!=null ) {
-				System.out.println("imported tokens: "+imp_tokensRoot.getChildren());
+				rootGrammar.tool.log("grammar", "imported tokens: "+imp_tokensRoot.getChildren());
 				if ( tokensRoot==null ) {
 					tokensRoot = (GrammarAST)adaptor.create(ANTLRParser.TOKENS, "TOKENS");
 					tokensRoot.g = rootGrammar;
@@ -216,7 +218,7 @@ public class GrammarTransformPipeline {
 				DoubleKeyMap<String, String, GrammarAST> namedActions =
 					new DoubleKeyMap<String, String, GrammarAST>();
 
-				System.out.println("imported actions: "+imp_actionRoots);
+				rootGrammar.tool.log("grammar", "imported actions: "+imp_actionRoots);
 				for (GrammarAST at : all_actionRoots) {
 					String scopeName = rootGrammar.getDefaultActionScope();
 					GrammarAST scope, name, action;
@@ -255,7 +257,7 @@ public class GrammarTransformPipeline {
 				for (String scopeName : namedActions.keySet()) {
 					for (String name : namedActions.keySet(scopeName)) {
 						GrammarAST action = namedActions.get(scopeName, name);
-						System.out.println(action.g.name+" "+scopeName+":"+name+"="+action.getText());
+						rootGrammar.tool.log("grammar", action.g.name+" "+scopeName+":"+name+"="+action.getText());
 						if ( action.g != rootGrammar ) {
 							root.insertChild(1, action.getParent());
 						}
@@ -267,7 +269,7 @@ public class GrammarTransformPipeline {
 			List<GrammarAST> rules = imp.ast.getNodesWithType(ANTLRParser.RULE);
 			if ( rules!=null ) {
 				for (GrammarAST r : rules) {
-					System.out.println("imported rule: "+r.toStringTree());
+					rootGrammar.tool.log("grammar", "imported rule: "+r.toStringTree());
 					String name = r.getChild(0).getText();
 					boolean rootAlreadyHasRule = rootRuleNames.contains(name);
 					if ( !rootAlreadyHasRule ) {
@@ -283,7 +285,7 @@ public class GrammarTransformPipeline {
 									optionsRoot.g.fileName, optionsRoot.token, imp.name);
 			}
 		}
-		System.out.println("Grammar: "+rootGrammar.ast.toStringTree());
+		rootGrammar.tool.log("grammar", "Grammar: "+rootGrammar.ast.toStringTree());
 	}
 
 	/** Build lexer grammar from combined grammar that looks like:
@@ -305,7 +307,7 @@ public class GrammarTransformPipeline {
 	 */
 	public static GrammarRootAST extractImplicitLexer(Grammar combinedGrammar) {
 		GrammarRootAST combinedAST = combinedGrammar.ast;
-		//System.out.println("before="+combinedAST.toStringTree());
+		//tool.log("grammar", "before="+combinedAST.toStringTree());
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
 		List<GrammarAST> elements = combinedAST.getChildren();
 
@@ -379,7 +381,7 @@ public class GrammarTransformPipeline {
 		Set<String> stringLiterals = combinedGrammar.getStringLiterals();
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
-//		System.out.println("strings from parser: "+stringLiterals);
+//		tool.log("grammar", "strings from parser: "+stringLiterals);
 		for (String lit : stringLiterals) {
 			if ( litAliases!=null && litAliases.containsKey(lit) ) continue; // already has rule
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
@@ -402,10 +404,10 @@ public class GrammarTransformPipeline {
 		// TODO: take out after stable if slow
 		lexerAST.sanityCheckParentAndChildIndexes();
 		combinedAST.sanityCheckParentAndChildIndexes();
-//		System.out.println(combinedAST.toTokenString());
+//		tool.log("grammar", combinedAST.toTokenString());
 
-		System.out.println("after extract implicit lexer ="+combinedAST.toStringTree());
-		System.out.println("lexer ="+lexerAST.toStringTree());
+        combinedGrammar.tool.log("grammar", "after extract implicit lexer ="+combinedAST.toStringTree());
+        combinedGrammar.tool.log("grammar", "lexer ="+lexerAST.toStringTree());
 
 		if ( lexerRulesRoot.getChildCount()==0 )	return null;
 		return lexerAST;

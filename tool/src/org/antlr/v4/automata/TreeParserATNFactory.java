@@ -60,7 +60,6 @@ public class TreeParserATNFactory extends ParserATNFactory {
 			LL1Analyzer analyzer = new LL1Analyzer(atn);
 			IntervalSet look = analyzer.LOOK(firstChild, RuleContext.EMPTY);
 			TreePatternAST root = treePatternRootNodes.get(i);
-			System.out.println(root.toStringTree()+"==nullable? "+look.contains(Token.UP));
 
 			if ( look.contains(Token.UP) ) {
 				// nullable child list if we can see the UP as the next token.

@@ -32,7 +32,10 @@ package org.antlr.v4.automata;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** An ATN walker that knows how to dump them to serialized strings. */
 public class ATNPrinter {
@@ -104,9 +107,6 @@ public class ATNPrinter {
 	}
 
 	String getStateString(ATNState s) {
-		if ( s==null ) {
-			System.out.println("s==null");
-		}
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
 		if ( s instanceof StarBlockStartState ) stateStr = "StarBlockStart_"+n;
