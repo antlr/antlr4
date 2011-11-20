@@ -81,7 +81,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() + System.identityHashCode(s);
+		return super.hashCode() + s;
 	}
 
 	@Override
