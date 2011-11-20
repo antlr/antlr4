@@ -571,9 +571,7 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 }
 >>
 
-TreeParserStructDecl(s,attrs,visitorDispatchMethods) ::= <<
-<StructDecl(superClass={ParserRuleContext\<<ASTLabelType()>\>}, ...)>
->>
+TreeParserStructDecl ::= StructDecl
 
 AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
 public static class <s.label>Context extends <currentRule.name>Context {
