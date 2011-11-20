@@ -28,8 +28,6 @@
  */
 package org.antlr.v4.runtime;
 
-import java.util.*;
-
 /** A pretty quick CharStream that pulls all data from an array
  *  directly.  Every method call counts in the lexer.  Java's
  *  strings aren't very good so I'm avoiding.
@@ -43,25 +41,6 @@ public class ANTLRStringStream implements CharStream {
 
 	/** 0..n-1 index into string of next char */
 	protected int p=0;
-
-	/** line number 1..n within the input */
-	protected int line = 1;
-
-	/** The index of the character relative to the beginning of the line 0..n-1 */
-	protected int charPositionInLine = 0;
-
-	/** tracks how deep mark() calls are nested */
-	protected int markDepth = 0;
-
-	/** A list of CharStreamState objects that tracks the stream state
-	 *  values line, charPositionInLine, and p that can change as you
-	 *  move through the input stream.  Indexed from 1..markDepth.
-     *  A null is kept @ index 0.  Create upon first call to mark().
-	 */
-	protected List<CharStreamState> markers;
-
-	/** Track the last mark() call result value for use in rewind(). */
-	protected int lastMarker;
 
 	/** What is name or source of this char stream? */
 	public String name;
@@ -89,24 +68,12 @@ public class ANTLRStringStream implements CharStream {
 	 */
 	public void reset() {
 		p = 0;
-		line = 1;
-		charPositionInLine = 0;
-		markDepth = 0;
 	}
 
     @Override
     public void consume() {
 		//System.out.println("prev p="+p+", c="+(char)data[p]);
         if ( p < n ) {
-			charPositionInLine++;
-			if ( data[p]=='\n' ) {
-				/*
-				System.out.println("newline char found on line: "+line+
-								   "@ pos="+charPositionInLine);
-				*/
-				line++;
-				charPositionInLine=0;
-			}
             p++;
 			//System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
         }
@@ -151,47 +118,14 @@ public class ANTLRStringStream implements CharStream {
 		return n;
 	}
 
+    /** mark/release do nothing; we have entire buffer */
 	@Override
 	public int mark() {
-        if ( markers==null ) {
-            markers = new ArrayList<CharStreamState>();
-            markers.add(null); // depth 0
-        }
-        markDepth++;
-		CharStreamState state;
-		if ( markDepth>=markers.size() ) {
-			state = new CharStreamState();
-			markers.add(state);
-		}
-		else {
-			state = markers.get(markDepth);
-		}
-		state.p = p;
-		state.line = line;
-		state.charPositionInLine = charPositionInLine;
-		lastMarker = markDepth;
-		return markDepth;
+		return p;
     }
-
-    public void rewind(int m) {
-		CharStreamState state = markers.get(m);
-		// restore stream state
-		seek(state.p);
-		line = state.line;
-		charPositionInLine = state.charPositionInLine;
-		release(m);
-	}
-
-	public void rewind() {
-		rewind(lastMarker);
-	}
 
 	@Override
 	public void release(int marker) {
-		// unwind any other markers made after m and release m
-		markDepth = marker;
-		// release this marker
-		markDepth--;
 	}
 
 	/** consume() ahead until p==index; can't just set p=index as we must
@@ -218,22 +152,6 @@ public class ANTLRStringStream implements CharStream {
 //						   ", start="+start+
 //						   ", stop="+stop);
 		return new String(data, start, count);
-	}
-
-	public int getLine() {
-		return line;
-	}
-
-	public int getCharPositionInLine() {
-		return charPositionInLine;
-	}
-
-	public void setLine(int line) {
-		this.line = line;
-	}
-
-	public void setCharPositionInLine(int pos) {
-		this.charPositionInLine = pos;
 	}
 
 	@Override
