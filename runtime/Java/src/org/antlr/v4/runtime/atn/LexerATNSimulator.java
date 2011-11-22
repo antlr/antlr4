@@ -30,8 +30,11 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -161,7 +164,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			int predict = exec(input, s0_closure);
 			if ( debug ) System.out.println("DFA after matchATN: "+dfa[old_mode].toLexerString());
 			return predict;
-		} finally {
+		}
+        finally {
 			if (mark >= 0) {
 				input.release(mark);
 			}
