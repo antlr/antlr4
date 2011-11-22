@@ -51,7 +51,7 @@ public class LexerInterpreter implements TokenSource {
 	}
 
 	public void setInput(String inputString) {
-		input = new ANTLRStringStream(inputString);
+		input = new ANTLRInputStream(inputString);
 	}
 
 	public void setInput(CharStream input) {

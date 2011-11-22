@@ -47,7 +47,7 @@ public class TestCommonTokenStream extends BaseTest {
             "WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-        CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
+        CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
         BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
@@ -69,7 +69,7 @@ public class TestCommonTokenStream extends BaseTest {
             "WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-        CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
+        CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
         BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
@@ -91,7 +91,7 @@ public class TestCommonTokenStream extends BaseTest {
             "WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-        CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
+        CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
         BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
@@ -122,7 +122,7 @@ public class TestCommonTokenStream extends BaseTest {
             "WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-        CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
+        CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
         BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
@@ -154,7 +154,7 @@ public class TestCommonTokenStream extends BaseTest {
             "WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-        CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
+        CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
         BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);

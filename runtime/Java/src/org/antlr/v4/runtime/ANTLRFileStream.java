@@ -33,13 +33,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/** This is a char buffer stream that is loaded from a file
- *  all at once when you construct the object.  This looks very
- *  much like an ANTLReader or ANTLRInputStream, but it's a special case
+/** This is an ANTLRInputStream that is loaded from a file
+ *  all at once when you construct the object.  This is a special case
  *  since we know the exact size of the object to load.  We can avoid lots
  *  of data copying.
  */
-public class ANTLRFileStream extends ANTLRStringStream {
+public class ANTLRFileStream extends ANTLRInputStream {
 	protected String fileName;
 
 	public ANTLRFileStream(String fileName) throws IOException {

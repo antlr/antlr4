@@ -1,9 +1,13 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.LexerRecognitionExeption;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 import java.util.List;
@@ -242,7 +246,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 
 	protected LexerRecognitionExeption checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg);
-		CharStream input = new ANTLRStringStream(inputString);
+		CharStream input = new ANTLRInputStream(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);
 		System.out.println(dot.getDOT(startState, true));

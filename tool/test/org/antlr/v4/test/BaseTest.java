@@ -33,15 +33,24 @@ import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.Rule;
-import org.junit.*;
-import org.stringtemplate.v4.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupString;
 
-import javax.tools.*;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import java.io.*;
 import java.util.*;
 
@@ -142,7 +151,7 @@ public abstract class BaseTest {
 	}
 
 	public List<Integer> getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
-		ANTLRStringStream in = new ANTLRStringStream(input);
+		ANTLRInputStream in = new ANTLRInputStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
 		do {
