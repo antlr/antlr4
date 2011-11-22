@@ -40,12 +40,12 @@ import java.util.*;
  *
  *  You can't use this stream if you pass whitespace or other off-channel
  *  tokens to the parser. The stream can't ignore off-channel tokens.
- *  (UnbufferedTokenStream is the same way.)
+ *  (UnbufferedTokenStream is the same way.)  Use CommonTokenStream.
  *
  *  This is not a subclass of UnbufferedTokenStream because I don't want
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
-public class BufferedTokenStream implements TokenStream {
+public class BufferedTokenStream<T extends Token> implements TokenStream {
     protected TokenSource tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
@@ -53,7 +53,7 @@ public class BufferedTokenStream implements TokenStream {
      *  as its moving window moves through the input.  This list captures
      *  everything so we can access complete input text.
      */
-    protected List<Token> tokens = new ArrayList<Token>(100);
+    protected List<T> tokens = new ArrayList<T>(100);
 
     /** Track the last mark() call result value for use in rewind(). */
     protected int lastMarker;
@@ -65,9 +65,7 @@ public class BufferedTokenStream implements TokenStream {
      */
     protected int p = -1;
 
-//	protected int range = -1; // how deep have we gone?
-
-    public BufferedTokenStream() {;}
+    public BufferedTokenStream() { }
 
     public BufferedTokenStream(TokenSource tokenSource) {
         this.tokenSource = tokenSource;
@@ -136,16 +134,17 @@ public class BufferedTokenStream implements TokenStream {
     /** add n elements to buffer */
     protected void fetch(int n) {
         for (int i=1; i<=n; i++) {
-            WritableToken t = (WritableToken)tokenSource.nextToken();
-//            System.out.println("adding "+t+" at index "+tokens.size());
-            t.setTokenIndex(tokens.size());
+            T t = (T)tokenSource.nextToken();
+            if ( t instanceof WritableToken ) {
+                ((WritableToken)t).setTokenIndex(tokens.size());
+            }
             tokens.add(t);
             if ( t.getType()==Token.EOF ) break;
         }
     }
 
     @Override
-    public Token get(int i) {
+    public T get(int i) {
         if ( i < 0 || i >= tokens.size() ) {
             throw new NoSuchElementException("token index "+i+" out of range 0.."+(tokens.size()-1));
         }
@@ -153,13 +152,13 @@ public class BufferedTokenStream implements TokenStream {
     }
 
 	/** Get all tokens from start..stop inclusively */
-	public List<Token> get(int start, int stop) {
+	public List<T> get(int start, int stop) {
 		if ( start<0 || stop<0 ) return null;
 		if ( p == -1 ) setup();
-		List<Token> subset = new ArrayList<Token>();
+		List<T> subset = new ArrayList<T>();
 		if ( stop>=tokens.size() ) stop = tokens.size()-1;
 		for (int i = start; i <= stop; i++) {
-			Token t = tokens.get(i);
+			T t = tokens.get(i);
 			if ( t.getType()==Token.EOF ) break;
 			subset.add(t);
 		}
@@ -169,13 +168,13 @@ public class BufferedTokenStream implements TokenStream {
 	@Override
 	public int LA(int i) { return LT(i).getType(); }
 
-    protected Token LB(int k) {
+    protected T LB(int k) {
         if ( (p-k)<0 ) return null;
         return tokens.get(p-k);
     }
 
     @Override
-    public Token LT(int k) {
+    public T LT(int k) {
         if ( p == -1 ) setup();
         if ( k==0 ) return null;
         if ( k < 0 ) return LB(-k);
@@ -199,9 +198,9 @@ public class BufferedTokenStream implements TokenStream {
         p = -1;
     }
 
-    public List<Token> getTokens() { return tokens; }
+    public List<T> getTokens() { return tokens; }
 
-    public List<Token> getTokens(int start, int stop) {
+    public List<T> getTokens(int start, int stop) {
         return getTokens(start, stop, null);
     }
 
@@ -209,16 +208,16 @@ public class BufferedTokenStream implements TokenStream {
      *  the token type BitSet.  Return null if no tokens were found.  This
      *  method looks at both on and off channel tokens.
      */
-    public List<Token> getTokens(int start, int stop, Set<Integer> types) {
+    public List<T> getTokens(int start, int stop, Set<Integer> types) {
         if ( p == -1 ) setup();
         if ( stop>=tokens.size() ) stop=tokens.size()-1;
         if ( start<0 ) start=0;
         if ( start>stop ) return null;
 
-        // list = tokens[start:stop]:{Token t, t.getType() in types}
-        List<Token> filteredTokens = new ArrayList<Token>();
+        // list = tokens[start:stop]:{T t, t.getType() in types}
+        List<T> filteredTokens = new ArrayList<T>();
         for (int i=start; i<=stop; i++) {
-            Token t = tokens.get(i);
+            T t = tokens.get(i);
             if ( types==null || types.contains(t.getType()) ) {
                 filteredTokens.add(t);
             }
@@ -229,7 +228,7 @@ public class BufferedTokenStream implements TokenStream {
         return filteredTokens;
     }
 
-    public List<Token> getTokens(int start, int stop, int ttype) {
+    public List<T> getTokens(int start, int stop, int ttype) {
 		HashSet<Integer> s = new HashSet<Integer>(ttype);
 		s.add(ttype);
 		return getTokens(start,stop, s);
@@ -250,9 +249,9 @@ public class BufferedTokenStream implements TokenStream {
         if ( start<0 || stop<0 ) return "";
         if ( p == -1 ) setup();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = start; i <= stop; i++) {
-            Token t = tokens.get(i);
+            T t = tokens.get(i);
             if ( t.getType()==Token.EOF ) break;
             buf.append(t.getText());
         }

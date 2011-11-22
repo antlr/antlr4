@@ -34,7 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-public class ANTLRUnbufferedInputStream implements CharStream {
+public class UnbufferedCharStream implements CharStream {
     /** A buffer of the data being scanned */
    	protected char[] data;
 
@@ -59,20 +59,20 @@ public class ANTLRUnbufferedInputStream implements CharStream {
 	/** What is name or source of this char stream? */
 	public String name;
 
-    public ANTLRUnbufferedInputStream(InputStream input) {
+    public UnbufferedCharStream(InputStream input) {
    		this(input, 256);
    	}
 
-   	public ANTLRUnbufferedInputStream(Reader input) {
+   	public UnbufferedCharStream(Reader input) {
         this(input, 256);
    	}
 
-    public ANTLRUnbufferedInputStream(InputStream input, int bufferSize) {
+    public UnbufferedCharStream(InputStream input, int bufferSize) {
    		this.input = new InputStreamReader(input);
         data = new char[bufferSize];
    	}
 
-   	public ANTLRUnbufferedInputStream(Reader input, int bufferSize) {
+   	public UnbufferedCharStream(Reader input, int bufferSize) {
    		this.input = input;
         data = new char[bufferSize];
    	}

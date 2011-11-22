@@ -43,10 +43,10 @@ package org.antlr.v4.runtime;
  *  whitespace and comments etc. to the parser on a hidden channel (i.e.,
  *  you set $channel instead of calling skip() in lexer rules.)
  *
- *  @see org.antlr.runtime.UnbufferedTokenStream
- *  @see org.antlr.runtime.BufferedTokenStream
+ *  @see UnbufferedTokenStream
+ *  @see BufferedTokenStream
  */
-public class CommonTokenStream extends BufferedTokenStream {
+public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
 
@@ -74,7 +74,7 @@ public class CommonTokenStream extends BufferedTokenStream {
     }
 
     @Override
-    protected Token LB(int k) {
+    protected CommonToken LB(int k) {
         if ( k==0 || (p-k)<0 ) return null;
 
         int i = p;
@@ -90,7 +90,7 @@ public class CommonTokenStream extends BufferedTokenStream {
     }
 
     @Override
-    public Token LT(int k) {
+    public CommonToken LT(int k) {
         //System.out.println("enter LT("+k+")");
         if ( p == -1 ) setup();
         if ( k == 0 ) return null;

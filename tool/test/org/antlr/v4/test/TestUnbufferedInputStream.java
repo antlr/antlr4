@@ -29,15 +29,15 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.runtime.ANTLRUnbufferedInputStream;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.junit.Test;
 
 import java.io.StringReader;
 
 public class TestUnbufferedInputStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
-		CharStream input = new ANTLRUnbufferedInputStream(
+		CharStream input = new UnbufferedCharStream(
 				new StringReader("")
 		);
 		assertEquals(CharStream.EOF, input.LA(1));
@@ -48,7 +48,7 @@ public class TestUnbufferedInputStream extends BaseTest {
 	}
 
 	@Test public void test1Char() throws Exception {
-		CharStream input = new ANTLRUnbufferedInputStream(
+		CharStream input = new UnbufferedCharStream(
 				new StringReader("x")
 		);
 		assertEquals('x', input.LA(1));
@@ -57,7 +57,7 @@ public class TestUnbufferedInputStream extends BaseTest {
 	}
 
 	@Test public void test2Char() throws Exception {
-		CharStream input = new ANTLRUnbufferedInputStream(
+		CharStream input = new UnbufferedCharStream(
 				new StringReader("xy")
 		);
 		assertEquals('x', input.LA(1));
@@ -68,7 +68,7 @@ public class TestUnbufferedInputStream extends BaseTest {
 	}
 
     @Test public void test2CharAhead() throws Exception {
-   		CharStream input = new ANTLRUnbufferedInputStream(
+   		CharStream input = new UnbufferedCharStream(
    				new StringReader("xy")
    		);
    		assertEquals('x', input.LA(1));
@@ -77,7 +77,7 @@ public class TestUnbufferedInputStream extends BaseTest {
    	}
 
     @Test public void testBufferExpand() throws Exception {
-   		CharStream input = new ANTLRUnbufferedInputStream(
+   		CharStream input = new UnbufferedCharStream(
    				new StringReader("01234"),
                 2 // buff size 2
    		);
@@ -90,7 +90,7 @@ public class TestUnbufferedInputStream extends BaseTest {
    	}
 
     @Test public void testBufferWrapSize1() throws Exception {
-   		CharStream input = new ANTLRUnbufferedInputStream(
+   		CharStream input = new UnbufferedCharStream(
    				new StringReader("01234"),
                 1 // buff size 1
    		);
@@ -108,7 +108,7 @@ public class TestUnbufferedInputStream extends BaseTest {
    	}
 
     @Test public void testBufferWrapSize2() throws Exception {
-   		CharStream input = new ANTLRUnbufferedInputStream(
+   		CharStream input = new UnbufferedCharStream(
    				new StringReader("01234"),
                 2 // buff size 2
    		);
@@ -126,7 +126,7 @@ public class TestUnbufferedInputStream extends BaseTest {
    	}
 
     @Test public void test1Mark() throws Exception {
-   		CharStream input = new ANTLRUnbufferedInputStream(
+   		CharStream input = new UnbufferedCharStream(
    				new StringReader("xyz")
    		);
    		int m = input.mark();
@@ -138,7 +138,7 @@ public class TestUnbufferedInputStream extends BaseTest {
    	}
 
     @Test public void test2Mark() throws Exception {
-   		CharStream input = new ANTLRUnbufferedInputStream(
+   		CharStream input = new UnbufferedCharStream(
    				new StringReader("xyz"),
                 2
    		);
