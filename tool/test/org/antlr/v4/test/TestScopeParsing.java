@@ -1,6 +1,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.parse.ScopeParser;
+import org.antlr.v4.tool.ErrorManager;
 import org.junit.Test;
 
 public class TestScopeParsing extends BaseTest {
@@ -24,7 +25,7 @@ public class TestScopeParsing extends BaseTest {
         for (int i = 0; i < argPairs.length; i+=2) {
             String input = argPairs[i];
             String expected = argPairs[i+1];
-            String actual = ScopeParser.parseTypedArgList(input).attributes.toString();
+            String actual = ScopeParser.parseTypedArgList(input, new ErrorManager(null)).attributes.toString();
             assertEquals(expected, actual);
         }
     }

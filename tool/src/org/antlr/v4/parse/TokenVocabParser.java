@@ -29,14 +29,13 @@
 
 package org.antlr.v4.parse;
 
-import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.Utils;
 import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ErrorType;
 
 import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.antlr.v4.codegen.CodeGenerator;
 
 /** */
 public class TokenVocabParser {
@@ -79,7 +78,7 @@ public class TokenVocabParser {
 				else {
 					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
 										  vocabName + CodeGenerator.VOCAB_FILE_EXTENSION,
-										  Utils.integer(lineNum));
+										  lineNum);
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -88,7 +87,7 @@ public class TokenVocabParser {
 				if ( token != '=' ) {
 					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
 										  vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
-										  Utils.integer(lineNum));
+										  lineNum);
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -97,7 +96,7 @@ public class TokenVocabParser {
 				if ( token != StreamTokenizer.TT_NUMBER ) {
 					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
 										  vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
-										  Utils.integer(lineNum));
+										  lineNum);
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -111,7 +110,7 @@ public class TokenVocabParser {
 				if ( token != StreamTokenizer.TT_EOL ) {
 					tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
 										  vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
-										  Utils.integer(lineNum));
+										  lineNum);
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;

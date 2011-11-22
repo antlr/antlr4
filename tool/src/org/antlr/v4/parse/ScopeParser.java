@@ -29,7 +29,6 @@
 
 package org.antlr.v4.parse;
 
-import org.antlr.tool.ErrorManager;
 import org.antlr.v4.tool.*;
 
 import java.util.*;
@@ -56,9 +55,9 @@ public class ScopeParser {
      *
      *  convert to an attribute scope.
      */
-    public static AttributeDict parseTypedArgList(String s) { return parse(s, ','); }
+    public static AttributeDict parseTypedArgList(String s, ErrorManager errMgr) { return parse(s, ',', errMgr); }
 
-    public static AttributeDict parse(String s, char separator) {
+    public static AttributeDict parse(String s, char separator, ErrorManager errMgr) {
         int i = 0;
         int n = s.length();
         AttributeDict dict = new AttributeDict();
@@ -81,7 +80,7 @@ public class ScopeParser {
             String def = buf.toString();
             //System.out.println("def="+ def);
             if ( def.trim().length()>0 ) {
-                Attribute a = parseAttributeDef(def);
+                Attribute a = parseAttributeDef(def, errMgr);
                 dict.add(a);
             }
         }
@@ -93,7 +92,7 @@ public class ScopeParser {
      *  but if the separator is ',' you cannot use ',' in the initvalue
      *  unless you escape use "\," escape.
      */
-    public static Attribute parseAttributeDef(String decl) {
+    public static Attribute parseAttributeDef(String decl, ErrorManager errMgr) {
         if ( decl==null ) return null;
         Attribute attr = new Attribute();
         boolean inID = false;
@@ -122,7 +121,7 @@ public class ScopeParser {
             start = 0;
         }
         if ( start<0 ) {
-            ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL,decl);
+            errMgr.toolError(ErrorType.CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL,decl);
         }
         // walk forwards looking for end of an ID
         int stop=-1;

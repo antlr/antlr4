@@ -351,7 +351,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		if ( retvals==null ) return;
 
 		// complicated since we must be target-independent
-		AttributeDict args = ScopeParser.parseTypedArgList(retvals.token.getText());
+		AttributeDict args = ScopeParser.parseTypedArgList(retvals.token.getText(), tool.errMgr);
 
 		for (String name : args.attributes.keySet()) {
 			ST setRetValST =
