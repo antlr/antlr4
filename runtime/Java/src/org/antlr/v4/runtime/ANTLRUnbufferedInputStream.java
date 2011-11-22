@@ -36,7 +36,7 @@ import java.io.Reader;
 
 public class ANTLRUnbufferedInputStream implements CharStream {
     /** A buffer of the data being scanned */
-   	protected int[] data = new int[256];
+   	protected char[] data;
 
    	/** How many characters are actually in the buffer */
    	protected int n;
@@ -44,42 +44,58 @@ public class ANTLRUnbufferedInputStream implements CharStream {
     /** 0..n-1 index into string of next char */
    	protected int p=0;
 
-    protected int minMarker = -1;
+    protected int earliestMarker = -1;
 
 	/** Absolute char index. It's the index of the char about to be
 	 *  read via LA(1). Goes from 0 to numchar-1.
 	 */
-	protected int currentElementIndex = 0;
+    protected int currentCharIndex = 0;
+
+    /** Buf is window into stream. This is absolute index of data[0] */
+    protected int bufferStartIndex = 0;
 
     protected Reader input;
 
 	/** What is name or source of this char stream? */
 	public String name;
 
-	public ANTLRUnbufferedInputStream(InputStream input) {
-		this.input = new InputStreamReader(input);
-	}
+    public ANTLRUnbufferedInputStream(InputStream input) {
+   		this(input, 256);
+   	}
 
-	public ANTLRUnbufferedInputStream(Reader input) {
-		this.input = input;
-	}
+   	public ANTLRUnbufferedInputStream(Reader input) {
+        this(input, 256);
+   	}
+
+    public ANTLRUnbufferedInputStream(InputStream input, int bufferSize) {
+   		this.input = new InputStreamReader(input);
+        data = new char[bufferSize];
+   	}
+
+   	public ANTLRUnbufferedInputStream(Reader input, int bufferSize) {
+   		this.input = input;
+        data = new char[bufferSize];
+   	}
 
 	public void reset() {
 		p = 0;
-		minMarker = -1;
-		currentElementIndex = 0;
+		earliestMarker = -1;
+		currentCharIndex = 0;
+        bufferStartIndex = 0;
 		n = 0;
 	}
 
 	@Override
 	public void consume() {
-		sync(1);
 		p++;
+        currentCharIndex++;
 		// have we hit end of buffer when no markers?
-		if ( p==n && minMarker<0 ) {
+		if ( p==n && earliestMarker < 0 ) {
 			// if so, it's an opportunity to start filling at index 0 again
+//            System.out.println("p=="+n+", no marker; reset buf start index="+currentCharIndex);
             p = 0;
 			n = 0;
+            bufferStartIndex = currentCharIndex;
         }
     }
 
@@ -106,12 +122,12 @@ public class ANTLRUnbufferedInputStream implements CharStream {
 	}
 
     protected void add(int c) {
-        if ( p>=data.length ) {
-			int[] newdata = new int[data.length*2]; // resize
+        if ( n>=data.length ) {
+			char[] newdata = new char[data.length*2]; // resize
             System.arraycopy(data, 0, newdata, 0, data.length);
             data = newdata;
         }
-        data[n++] = c;
+        data[n++] = (char)c;
     }
 
     @Override
@@ -120,32 +136,52 @@ public class ANTLRUnbufferedInputStream implements CharStream {
         int index = p + i - 1;
         if ( index < 0 ) throw new IndexOutOfBoundsException();
 		if ( index > n ) return CharStream.EOF;
-        return data[index];
+        int c = data[index];
+        if ( c==(char)CharStream.EOF ) return CharStream.EOF;
+        return c;
     }
 
+    /** Return a marker that we can release later.  Marker happens to be
+     *  index into buffer (not index()).
+     */
     @Override
     public int mark() {
         int m = p;
-        if ( p < minMarker ) {
-            throw new IllegalArgumentException("can't set marker earlier than previous existing marker: "+p+"<"+minMarker);
+        if ( p < earliestMarker) {
+            // they must have done seek to before min marker
+            throw new IllegalArgumentException("can't set marker earlier than previous existing marker: "+p+"<"+ earliestMarker);
         }
-        if ( minMarker<0 ) minMarker = m; // set first marker
+        if ( earliestMarker < 0 ) earliestMarker = m; // set first marker
         return m;
     }
 
     @Override
     public void release(int marker) {
-        if ( marker == minMarker ) minMarker = -1;
+        // release is noop unless we remove earliest. then we don't need to
+        // keep anything in buffer. We only care about earliest. Releasing
+        // marker other than earliest does nothing as we can just keep in
+        // buffer.
+        if ( marker < earliestMarker || marker >= n ) {
+            throw new IllegalArgumentException("invalid marker: "+
+                    marker+" not in "+0+".."+n);
+        }
+        if ( marker == earliestMarker) earliestMarker = -1;
     }
 
     @Override
     public int index() {
-        return 0;
+        return p + bufferStartIndex;
     }
 
     @Override
     public void seek(int index) {
-        p = index;
+        // index == to bufferStartIndex should set p to 0
+        int i = index - bufferStartIndex;
+        if ( i < 0 || i >= n ) {
+            throw new UnsupportedOperationException("seek to index outside buffer: "+
+                    index+" not in "+bufferStartIndex+".."+(bufferStartIndex+n));
+        }
+        p = i;
     }
 
     @Override

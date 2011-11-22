@@ -53,7 +53,8 @@ public interface IntStream {
 	int mark();
 
 	/** Release requirement that stream holds tokens from marked location
-	 *  to current index().
+	 *  to current index().  Must release in reverse order (like stack)
+     *  of mark() otherwise undefined behavior.
 	 */
 	void release(int marker);
 
@@ -65,18 +66,16 @@ public interface IntStream {
 
 	/** Set the input cursor to the position indicated by index.  This is
 	 *  normally used to rewind the input stream but can move forward as well.
-	 *  It's up to the stream implementation to make sure that tokens are
-	 *  buffered as necessary to make seek land on a valid token.
+	 *  It's up to the stream implementation to make sure that symbols are
+	 *  buffered as necessary to make seek land on a valid symbol.
 	 *  Or, they should avoid moving the input cursor.
-	 *
-	 *  For char streams, seeking forward must update the stream state such
-	 *  as line number.  For seeking backwards, you will be presumably
-	 *  backtracking using the mark/rewind mechanism that restores state and
-	 *  so this method does not need to update state when seeking backwards.
 	 *
 	 *  The index is 0..n-1.  A seek to position i means that LA(1) will
 	 *  return the ith symbol.  So, seeking to 0 means LA(1) will return the
 	 *  first element in the stream.
+     *
+     *  For unbuffered streams, index i might not be in buffer. That throws
+     *  index exception
 	 */
 	void seek(int index);
 
