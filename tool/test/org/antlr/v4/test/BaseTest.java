@@ -342,7 +342,7 @@ public abstract class BaseTest {
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
-			final List options = new ArrayList();
+			final List<String> options = new ArrayList<String>();
 			if ( debug ) {
 				options.add("-debug");
 			}
@@ -361,7 +361,7 @@ public abstract class BaseTest {
 				allIsWell = false;
 				System.err.println("antlr reports errors from "+options);
 				for (int i = 0; i < equeue.errors.size(); i++) {
-					ANTLRMessage msg = (ANTLRMessage) equeue.errors.get(i);
+					ANTLRMessage msg = equeue.errors.get(i);
 					System.err.println(msg);
 				}
 				System.out.println("!!!\ngrammar:");
@@ -1285,39 +1285,41 @@ public abstract class BaseTest {
 		int p=0;
 		public IntTokenStream(List<Integer> types) { this.types = types; }
 
+		@Override
 		public void consume() { p++; }
 
+		@Override
 		public int LA(int i) { return LT(i).getType(); }
 
+		@Override
 		public int mark() {
 			return index();
 		}
 
+		@Override
 		public int index() { return p; }
 
-		public void rewind(int marker) {
-			seek(marker);
-		}
-
-		public void rewind() {
-		}
-
+		@Override
 		public void release(int marker) {
 			seek(marker);
 		}
 
+		@Override
 		public void seek(int index) {
 			p = index;
 		}
 
+		@Override
 		public int size() {
 			return types.size();
 		}
 
+		@Override
 		public String getSourceName() {
 			return null;
 		}
 
+		@Override
 		public Token LT(int i) {
 			CommonToken t;
 			int rawIndex = p + i - 1;
@@ -1327,18 +1329,22 @@ public abstract class BaseTest {
 			return t;
 		}
 
+		@Override
 		public Token get(int i) {
 			return new org.antlr.v4.runtime.CommonToken(types.get(i));
 		}
 
+		@Override
 		public TokenSource getTokenSource() {
 			return null;
 		}
 
+		@Override
 		public String toString(int start, int stop) {
 			return null;
 		}
 
+		@Override
 		public String toString(Token start, Token stop) {
 			return null;
 		}
