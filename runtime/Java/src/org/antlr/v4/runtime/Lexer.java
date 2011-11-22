@@ -29,8 +29,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.misc.QStack;
 
+import java.util.ArrayDeque;
 import java.util.EmptyStackException;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
@@ -85,7 +85,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** The token type for the current token */
 	public int type;
 
-	public QStack<Integer> modeStack; // TODO: List?
+	public ArrayDeque<Integer> modeStack; // TODO: List?
 	public int mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in
@@ -181,7 +181,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public void pushMode(int m) {
 		if ( LexerATNSimulator.debug ) System.out.println("pushMode "+m);
-		if ( modeStack==null ) modeStack = new QStack<Integer>();
+		if ( modeStack==null ) modeStack = new ArrayDeque<Integer>();
 		modeStack.push(mode);
 		mode(m);
 	}
