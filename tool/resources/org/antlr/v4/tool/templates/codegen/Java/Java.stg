@@ -144,14 +144,14 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
-	_interp = new ParserATNSimulator(this,_ATN);
+	_interp = new ParserATNSimulator\<Token>(this,_ATN);
 }
 >>
 
 treeparser_ctor(p) ::= <<
-public <p.name>(ASTNodeStream input) {
+public <p.name>(ASTNodeStream\<<ASTLabelType()>\> input) {
 	super(input);
-	_interp = new ParserATNSimulator(this,_ATN);
+	_interp = new ParserATNSimulator\<<ASTLabelType()>\>(this,_ATN);
 }
 >>
 
@@ -518,7 +518,7 @@ ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 /*
 TreeRulePropertyRef_text(r)	 ::= <%
 (_localctx.<r.label>!=null?
-	((ASTNodeStream)_input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop)
+	((ASTNodeStream\<<ASTLabelType()>>)_input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop)
 	:null
 )
 %>
@@ -540,7 +540,7 @@ NodeDecl(t) ::= "<ASTLabelType()> <t.name>;"
 NodeListDecl(t) ::= "List\<<ASTLabelType()>> <t.name> = new ArrayList\<<ASTLabelType()>>();"
 
 /** Default RuleContext type name for a Parser rule */
-ParserRuleContext() ::= "ParserRuleContext"
+ParserRuleContext() ::= "ParserRuleContext\<?>"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
  *	r becomes rContext.
