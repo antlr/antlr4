@@ -119,6 +119,7 @@ public class <parser.name> extends <superclass> {
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
+@Override
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch ( ruleIndex ) {
 		<recog.actionFuncs.values:{f|
@@ -128,6 +129,7 @@ case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break
 <actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
+@Override
 public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch ( ruleIndex ) {
 		<recog.sempredFuncs.values:{f|
@@ -738,7 +740,8 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
 public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
-	<lexer.modes:{m| public static final int <m> = <i0>;}; separator="\n">
+	// Lexer modes
+	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
 
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
@@ -756,10 +759,13 @@ public class <lexer.name> extends Lexer {
 	}
 
 	public String getGrammarFileName() { return "<lexerFile.fileName>"; }
+
 	@Override
 	public String[] getTokenNames() { return tokenNames; }
+
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
 	@Override
 	public ATN getATN() { return _ATN; }
 
