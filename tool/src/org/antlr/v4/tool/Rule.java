@@ -82,7 +82,6 @@ public class Rule implements AttributeResolver {
     public AttributeDict args;
     public AttributeDict retvals;
 	public AttributeDict locals;
-    public AttributeDict scope; // scope { int i; } // TODO: remove
 
 	/** In which grammar does this rule live? */
 	public Grammar g;
@@ -261,7 +260,6 @@ public class Rule implements AttributeResolver {
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
 		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict
-		if ( scope!=null ) return true;
 		return false;
 	}
 
@@ -307,7 +305,6 @@ public class Rule implements AttributeResolver {
 		buf.append("Rule{name="+name);
 		if ( args!=null ) buf.append(", args=" + args);
 		if ( retvals!=null ) buf.append(", retvals=" + retvals);
-		if ( scope!=null ) buf.append(", scope=" + scope);
 		buf.append("}");
 		return buf.toString();
     }

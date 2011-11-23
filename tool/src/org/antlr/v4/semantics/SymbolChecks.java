@@ -254,10 +254,6 @@ public class SymbolChecks {
         else if ( tokenIDs.contains(name) ) {
             etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
         }
-        else if ( r.scope !=null && r.scope.get(name)!=null ) {
-            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
-            arg2 = r.name;
-        }
         else if ( (r.retvals!=null&&r.retvals.get(name)!=null) ||
                   (r.args!=null&&r.args.get(name)!=null) )
         {

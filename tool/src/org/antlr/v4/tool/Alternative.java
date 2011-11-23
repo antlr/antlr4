@@ -99,7 +99,6 @@ public class Alternative implements AttributeResolver {
         LabelElementPair anyLabelDef = getAnyLabelDef(x);
         if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) return true;
 		if ( x.equals(rule.name) ) return true; // $r for action in rule r, $r is a dict
-		if ( rule!=null && rule.scope!=null ) return true;
 		return false;
 	}
 

@@ -87,7 +87,6 @@ public enum ErrorType {
 	SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(68, "symbol <arg> conflicts with global dynamic scope with same name", ErrorSeverity.ERROR),
 	LABEL_CONFLICTS_WITH_RULE(69, "label <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
 	LABEL_CONFLICTS_WITH_TOKEN(70, "label <arg> conflicts with token with same name", ErrorSeverity.ERROR),
-	LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE(71, "label <arg> conflicts with rule <arg2>'s dynamically-scoped attribute with same name", ErrorSeverity.ERROR),
 	LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL(72, "label <arg> conflicts with rule <arg2>'s return value or parameter with same name", ErrorSeverity.ERROR),
 	ATTRIBUTE_CONFLICTS_WITH_RULE(73, "rule <arg2>'s dynamically-scoped attribute <arg> conflicts with the rule name", ErrorSeverity.ERROR),
 	ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL(74, "rule <arg2>'s dynamically-scoped attribute <arg> conflicts with <arg2>'s return value or parameter", ErrorSeverity.ERROR),
