@@ -59,8 +59,8 @@ public class Grammar implements AttributeResolver {
 	public static final Set doNotCopyOptionsToLexer =
         new HashSet() {
             {
-                add("output"); add("ASTLabelType"); add("superClass");
-                add("k"); add("backtrack"); add("memoize"); add("rewrite");
+                add("output"); add("TokenLabelType"); add("ASTLabelType"); add("superClass");
+                add("rewrite");
             }
         };
 

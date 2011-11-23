@@ -31,13 +31,19 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** No side-effects except for setting options into the appropriate node.
  *  TODO:  make the side effects into a separate pass this
@@ -74,9 +80,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				add("TokenLabelType");
 				add("superClass");
 				add("filter");
-				add("k");
-				add("backtrack");
-				add("memoize");
 			}
 		};
 
@@ -87,9 +90,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				add("output"); add("rewrite"); add("ASTLabelType");
 				add("TokenLabelType");
 				add("superClass");
-				add("k");
-				add("backtrack");
-				add("memoize");
 			}
 		};
 
@@ -98,11 +98,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			{
 				add("language"); add("tokenVocab");
 				add("output"); add("rewrite"); add("ASTLabelType");
-				add("TokenLabelType");
 				add("superClass");
-				add("k");
-				add("backtrack");
-				add("memoize");
 				add("filter");
 			}
 		};
@@ -110,13 +106,12 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalRuleOptions =
 		new HashSet<String>() {
 			{
-				add("k"); add("greedy"); add("memoize");
-				add("backtrack"); add("strategy");
+				add("greedy");
 			}
 		};
 
 	public static final Set<String> legalBlockOptions =
-		new HashSet<String>() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
+		new HashSet<String>() {{add("greedy");}};
 
 	/** Legal options for terminal refs like ID<node=MyVarNode> */
 	public static final Set<String> legalTokenOptions =
