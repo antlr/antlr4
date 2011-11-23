@@ -37,7 +37,7 @@ import java.util.*;
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	protected ANTLRErrorStrategy<Symbol> _errHandler = new DefaultErrorStrategy();
+	protected ANTLRErrorStrategy<Symbol> _errHandler = new DefaultErrorStrategy<Symbol>();
 
 	private List<ANTLRErrorListener<Symbol>> _listeners;
 
