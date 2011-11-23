@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
 import java.util.regex.*;
 
@@ -51,9 +52,16 @@ public class TreeParser<T> extends BaseRecognizer<T> {
 
 	protected ASTNodeStream<T> _input;
 
-	public TreeParser(ASTNodeStream<T> input) {
-		super(input);
+	protected ParserATNSimulator.State<T> state;
+
+	public TreeParser(ASTNodeStream<T> input, ParserATNSimulator<T> interpreter) {
+		super(input, interpreter);
 		_errHandler = new DefaultTreeGrammarErrorStrategy<T>();
+		state = new ParserATNSimulator.State<T>(this);
+	}
+
+	public ParserATNSimulator.State<T> getState() {
+		return state;
 	}
 
 	@Override

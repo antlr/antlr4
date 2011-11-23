@@ -47,7 +47,12 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	private static final ANTLRErrorListener[] EMPTY_LISTENERS = new ANTLRErrorListener[0];
 
-	protected ATNInterpreter _interp;
+	@NotNull
+	private final ATNInterpreter _interp;
+
+	protected Recognizer(@NotNull ATNInterpreter interpreter) {
+		this._interp = interpreter;
+	}
 
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method
@@ -63,6 +68,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public ATN getATN() { return null; }
 
+	@NotNull
 	public ATNInterpreter getInterpreter() { return _interp; }
 
 	/** What is the error header, normally line/character position information? */

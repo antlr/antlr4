@@ -56,7 +56,8 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int syntaxErrors = 0;
 
-	public BaseRecognizer(IntStream input) {
+	public BaseRecognizer(IntStream input, ParserATNSimulator<Symbol> interpreter) {
+		super(interpreter);
 		setInputStream(input);
 	}
 
