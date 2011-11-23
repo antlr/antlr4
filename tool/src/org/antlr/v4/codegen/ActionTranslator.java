@@ -51,31 +51,33 @@ import java.util.Map;
 public class ActionTranslator implements ActionSplitterListener {
 	public static final Map<String, Class> thisRulePropToModelMap = new HashMap<String, Class>() {{
 		put("start", ThisRulePropertyRef_start.class);
-		put("stop", ThisRulePropertyRef_stop.class);
-		put("tree", ThisRulePropertyRef_tree.class);
-		put("text", ThisRulePropertyRef_text.class);
-		put("st", ThisRulePropertyRef_st.class);
+		put("stop",  ThisRulePropertyRef_stop.class);
+		put("tree",  ThisRulePropertyRef_tree.class);
+		put("text",  ThisRulePropertyRef_text.class);
+        put("st",    ThisRulePropertyRef_st.class);
+        put("ctx",   ThisRulePropertyRef_ctx.class);
 	}};
 
 	public static final Map<String, Class> rulePropToModelMap = new HashMap<String, Class>() {{
 		put("start", RulePropertyRef_start.class);
-		put("stop", RulePropertyRef_stop.class);
-		put("tree", RulePropertyRef_tree.class);
-		put("text", RulePropertyRef_text.class);
-		put("st", RulePropertyRef_st.class);
+		put("stop",  RulePropertyRef_stop.class);
+		put("tree",  RulePropertyRef_tree.class);
+		put("text",  RulePropertyRef_text.class);
+		put("st",    RulePropertyRef_st.class);
+        put("ctx",   RulePropertyRef_ctx.class);
 	}};
 
 	public static final Map<String, Class> treeRulePropToModelMap = rulePropToModelMap;
 
 	public static final Map<String, Class> tokenPropToModelMap = new HashMap<String, Class>() {{
-		put("text", TokenPropertyRef_text.class);
-		put("type", TokenPropertyRef_type.class);
-		put("line", TokenPropertyRef_line.class);
+		put("text",  TokenPropertyRef_text.class);
+		put("type",  TokenPropertyRef_type.class);
+		put("line",  TokenPropertyRef_line.class);
 		put("index", TokenPropertyRef_index.class);
-		put("pos", TokenPropertyRef_pos.class);
+		put("pos",   TokenPropertyRef_pos.class);
 		put("channel", TokenPropertyRef_channel.class);
-		put("tree", TokenPropertyRef_tree.class);
-		put("int", TokenPropertyRef_int.class);
+		put("tree",  TokenPropertyRef_tree.class);
+		put("int",   TokenPropertyRef_int.class);
 	}};
 
 	CodeGenerator gen;
@@ -295,7 +297,7 @@ public class ActionTranslator implements ActionSplitterListener {
 			return ref;
 		}
 		catch (Exception e) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
+			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e, prop.getText());
 		}
 		return null;
 	}

@@ -8,7 +8,7 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' {System.out.println(getRuleInvocationStack());} ;\n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "x", false);
@@ -21,7 +21,7 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' 'y'\n" +
 			"  ;\n";
@@ -35,7 +35,7 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' | 'y'\n" +
 			"  ;\n";
@@ -49,7 +49,7 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : ('x' | 'y')* 'z'\n" +
 			"  ;\n";
@@ -63,7 +63,7 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : b 'x'\n" +
 			"  ;\n" +
@@ -80,13 +80,13 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' 'y'\n" +
 			"  ;\n" +
 			"Z : 'z'; \n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xzy", false);
-		String expecting = "(a x <ERROR:z> y)\n";
+		String expecting = "(a x z y)\n"; // ERRORs not shown. z is colored red in tree view
 		assertEquals(expecting, result);
 	}
 
@@ -95,13 +95,13 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' | 'y'\n" +
 			"  ;\n" +
 			"Z : 'z'; \n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "z", false);
-		String expecting = "(a <ERROR:z>)\n";
+		String expecting = "(a z)\n";
 		assertEquals(expecting, result);
 	}
 
@@ -110,13 +110,13 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
-			"@after {System.out.println($r.toStringTree(this));}\n" +
+			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' 'y'* '!'\n" +
 			"  ;\n" +
 			"Z : 'z'; \n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xzyy!", false);
-		String expecting = "(a x <ERROR:z> y y !)\n";
+		String expecting = "(a x z y y !)\n";
 		assertEquals(expecting, result);
 	}
 }

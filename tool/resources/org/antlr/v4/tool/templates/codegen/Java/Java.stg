@@ -504,12 +504,14 @@ RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.st
 RulePropertyRef_tree(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.tree):null)"
 RulePropertyRef_text(r)	 ::= "(_localctx.<r.label>!=null?_input.toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
 RulePropertyRef_st(r)	 ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
+RulePropertyRef_ctx(r)	 ::= "_localctx.<r.label>"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
 ThisRulePropertyRef_tree(r)	 ::= "_localctx.tree"
 ThisRulePropertyRef_text(r)	 ::= "_input.toString(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_st(r)	 ::= "_localctx.st"
+ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 
 /*
 TreeRulePropertyRef_text(r)	 ::= <%

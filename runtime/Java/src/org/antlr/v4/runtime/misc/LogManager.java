@@ -89,14 +89,14 @@ public class LogManager {
         }
     }
 
-    public void save() throws IOException {
+    public String save() throws IOException {
         String dir = System.getProperty("java.io.tmpdir");
         dir = ".";
         String defaultFilename =
             dir + "/antlr-" +
             new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss").format(new Date()) + ".log";
-        System.out.println(defaultFilename);
         save(defaultFilename);
+        return defaultFilename;
     }
 
     @Override

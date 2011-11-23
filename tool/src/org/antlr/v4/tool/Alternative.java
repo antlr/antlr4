@@ -93,19 +93,11 @@ public class Alternative implements AttributeResolver {
 		return false;
 	}
 
-//	public String getTokenLabel(String x, ActionAST node) {
-//		LabelElementPair anyLabelDef = getAnyLabelDef(x);
-//		if ( anyLabelDef!=null ) return anyLabelDef.label.getText();
-//		if ( tokenRefs.get(x)!=null ) {
-//
-//		}
-//		LabelElementPair anyLabelDef = getAnyLabelDef(x);
-//		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
-//		return false;
-//	}
-
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
+        if ( ruleRefs.get(x)!=null ) return true; // rule ref in this alt?
+        LabelElementPair anyLabelDef = getAnyLabelDef(x);
+        if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) return true;
 		if ( x.equals(rule.name) ) return true; // $r for action in rule r, $r is a dict
 		if ( rule!=null && rule.scope!=null ) return true;
 		return false;

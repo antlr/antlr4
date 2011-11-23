@@ -92,22 +92,24 @@ public class Tool {
 	public boolean saveLexer = false;
 	public boolean genListener = true;
 	public boolean launch_ST_inspector = false;
-	public boolean force_atn = false;
+    public boolean force_atn = false;
+    public boolean log = false;
 
-	public static Option[] optionDefs = {
-		new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-		new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
-		new Option("report",			"-report", "print out a report about the grammar(s) processed"),
-		new Option("printGrammar",		"-print", "print out the grammar without actions"),
-		new Option("debug",				"-debug", "generate a parser that emits debugging events"),
-		new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-		new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
-		new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
-		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
-		new Option("genListener",		"-walker", "generate parse tree walker and listener"),
-		new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
-		new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
-		new Option("force_atn",			"-Xforceatn", "use the ATN simulator for all predictions"),
+    public static Option[] optionDefs = {
+        new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
+        new Option("report",			"-report", "print out a report about the grammar(s) processed"),
+        new Option("printGrammar",		"-print", "print out the grammar without actions"),
+        new Option("debug",				"-debug", "generate a parser that emits debugging events"),
+        new Option("profile",			"-profile", "generate a parser that computes profiling information"),
+        new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
+        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
+        new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+        new Option("genListener",		"-walker", "generate parse tree walker and listener"),
+        new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
+        new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+        new Option("force_atn",			"-Xforceatn", "use the ATN simulator for all predictions"),
+        new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	};
 
 	// helper vars for option management
@@ -135,11 +137,23 @@ public class Tool {
 	DefaultToolListener defaultListener = new DefaultToolListener(this);
 
 	public static void main(String[] args) {
-		Tool antlr = new Tool(args);
-		if ( args.length == 0 ) { antlr.help(); antlr.exit(0); }
+        Tool antlr = new Tool(args);
+        if ( args.length == 0 ) { antlr.help(); antlr.exit(0); }
 
-		antlr.processGrammarsOnCommandLine();
-
+        try {
+            antlr.processGrammarsOnCommandLine();
+        }
+        finally {
+            if ( antlr.log ) {
+                try {
+                    String logname = antlr.logMgr.save();
+                    System.out.println("wrote "+logname);
+                }
+                catch (IOException ioe) {
+                    antlr.errMgr.toolError(ErrorType.INTERNAL_ERROR, ioe);
+                }
+            }
+        }
 		if ( antlr.return_dont_exit ) return;
 
 		if (antlr.errMgr.getNumErrors() > 0) {

@@ -38,8 +38,10 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class Rule implements AttributeResolver {
-	    /** Rule refs have a predefined set of attributes as well as
+	/** Rule refs have a predefined set of attributes as well as
      *  the return values and args.
+     *
+     *  These must be consistent with ActionTranslator.rulePropToModelMap, ...
      */
     public static AttributeDict predefinedRulePropertiesDict =
         new AttributeDict(AttributeDict.DictType.PREDEFINED_RULE) {{
@@ -48,6 +50,7 @@ public class Rule implements AttributeResolver {
             add(new Attribute("stop"));
             add(new Attribute("tree"));
             add(new Attribute("st"));
+            add(new Attribute("ctx"));
         }};
 
     public static AttributeDict predefinedTreeRulePropertiesDict =
@@ -56,6 +59,7 @@ public class Rule implements AttributeResolver {
             add(new Attribute("start")); // note: no stop; not meaningful
             add(new Attribute("tree"));
             add(new Attribute("st"));
+            add(new Attribute("ctx"));
         }};
 
     public static AttributeDict predefinedLexerRulePropertiesDict =
