@@ -125,6 +125,7 @@ public class RuleContext implements ParseTree.RuleNode {
 		}
 	}
 
+	@Override
 	public int hashCode() {
 //		int h = 0;
 //		RuleContext p = this;
@@ -188,15 +189,18 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  The hashCode is cheap as it's computed once upon each context
 	 *  push on the stack.  Using it to make equals() more efficient.
 	 */
+	@Override
 	public boolean equals(Object o) {
-		RuleContext other = ((RuleContext)o);
-//		if ( this.cachedHashCode != other.cachedHashCode ) {
-//			return false; // can't be same if hash is different
-//		}
-		if ( this.hashCode() != ((RuleContext)other).hashCode() ) {
+		if (this == o) {
+			return true;
+		} else if (!(o instanceof RuleContext)) {
+			return false;
+		}
+
+		RuleContext other = (RuleContext)o;
+		if ( this.hashCode() != other.hashCode() ) {
 			return false; // can't be same if hash is different
 		}
-		if ( this==other ) return true;
 
 		// System.out.println("comparing "+this+" with "+other);
 		RuleContext sp = this;
@@ -336,6 +340,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	@Override
 	public String toStringTree() { return toStringTree(null); }
 
+	@Override
 	public String toString() {
 		return toString(null);
 	}
