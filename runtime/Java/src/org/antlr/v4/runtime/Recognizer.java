@@ -29,10 +29,14 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
@@ -60,111 +64,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public ATN getATN() { return null; }
 
 	public ATNInterpreter getInterpreter() { return _interp; }
-
-	/*
-	public void displayRecognitionError(RecognitionException e) {
-		String hdr = getErrorHeader(e);
-		String msg = getErrorMessage(e);
-		emitErrorMessage(hdr+" "+msg);
-	}
-	*/
-
-	/** What error message should be generated for the various
-	 *  exception types?
-	 *
-	 *  Not very object-oriented code, but I like having all error message
-	 *  generation within one method rather than spread among all of the
-	 *  exception classes. This also makes it much easier for the exception
-	 *  handling because the exception classes do not have to have pointers back
-	 *  to this object to access utility routines and so on. Also, changing
-	 *  the message for an exception type would be difficult because you
-	 *  would have to subclassing exception, but then somehow get ANTLR
-	 *  to make those kinds of exception objects instead of the default.
-	 *  This looks weird, but trust me--it makes the most sense in terms
-	 *  of flexibility.
-	 *
-	 *  For grammar debugging, you will want to override this to add
-	 *  more information such as the stack frame with
-	 *  getRuleInvocationStack(e, this.getClass().getName()) and,
-	 *  for no viable alts, the decision description and state etc...
-	 *
-	 *  Override this to change the message generated for one or more
-	 *  exception types.
-	public String getErrorMessage(RecognitionException e) {
-		String[] tokenNames = getTokenNames();
-		String msg = e.getMessage();
-		if ( e instanceof UnwantedTokenException ) {
-			UnwantedTokenException ute = (UnwantedTokenException)e;
-			String tokenName="<unknown>";
-			if ( ute.expecting.contains(Token.EOF) ) {
-				tokenName = "EOF";
-			}
-			else {
-				tokenName = tokenNames[ute.expecting.getSingleElement()];
-			}
-			msg = "extraneous input "+getTokenErrorDisplay(ute.getUnexpectedToken())+
-				" expecting "+tokenName;
-		}
-		else if ( e instanceof MissingTokenException ) {
-			MissingTokenException mte = (MissingTokenException)e;
-			String tokenName="<unknown>";
-			if ( mte.expecting.contains(Token.EOF) ) {
-				tokenName = "EOF";
-			}
-			else {
-				tokenName = tokenNames[mte.expecting.getSingleElement()];
-			}
-			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.offendingToken);
-		}
-		else if ( e instanceof MismatchedTokenException ) {
-			MismatchedTokenException mte = (MismatchedTokenException)e;
-			String tokenName="<unknown>";
-//			if ( mte.expecting.member(Token.EOF) ) {
-//				tokenName = "EOF";
-//			}
-//			else {
-//				tokenName = tokenNames[mte.expecting.getSingleElement()];
-//			}
-			msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
-				" expecting "+tokenName;
-		}
-		else if ( e instanceof MismatchedASTNodeException) {
-			MismatchedASTNodeException mtne = (MismatchedASTNodeException)e;
-			String tokenName="<unknown>";
-			if ( mtne.expecting.contains(Token.EOF) ) {
-				tokenName = "EOF";
-			}
-			else {
-				tokenName = tokenNames[mtne.expecting.getSingleElement()];
-			}
-			msg = "mismatched tree node: "+mtne.offendingNode +
-				" expecting "+tokenName;
-		}
-		else if ( e instanceof NoViableAltException ) {
-			//NoViableAltException nvae = (NoViableAltException)e;
-			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
-			// and "(decision="+nvae.decisionNumber+") and
-			// "state "+nvae.stateNumber
-			msg = "no viable alternative at input "+getTokenErrorDisplay(e.offendingToken);
-		}
-		else if ( e instanceof MismatchedSetException ) {
-			MismatchedSetException mse = (MismatchedSetException)e;
-			msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
-				" expecting set "+mse.expecting;
-		}
-		else if ( e instanceof MismatchedNotSetException ) {
-			MismatchedNotSetException mse = (MismatchedNotSetException)e;
-			msg = "mismatched input "+getTokenErrorDisplay(e.offendingToken)+
-				" expecting set "+mse.expecting;
-		}
-		else if ( e instanceof FailedPredicateException ) {
-			FailedPredicateException fpe = (FailedPredicateException)e;
-			msg = "rule "+fpe.ruleName+" failed predicate: {"+
-				fpe.predicateText+"}?";
-		}
-		return msg;
-	}
-	 */
 
 	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {
@@ -232,20 +131,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 
-	/** Create context for a rule reference IN fromRuleIndex using parent _localctx.
-	 *  Used only when there are arguments to the rule function. _localctx
-	 *  must be correct context for fromRuleIndex.
-	public RuleContext newContext(RuleContext _localctx, int s, int fromRuleIndex, int actionIndex) {
-		return new ParserRuleContext(_localctx, s);
-	}
-	 */
-
-	/** Map a rule index to appropriate RuleContext subclass. Used when rule
-	 *  has no arguments.
-	public RuleContext newContext(RuleContext _localctx, int s, int targetRuleIndex) {
-		return new ParserRuleContext(_localctx, s);
-	}
-	 */
 	public abstract IntStream getInputStream();
 
 	public abstract void setInputStream(IntStream input);
