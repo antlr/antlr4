@@ -76,7 +76,9 @@ public class Parser extends BaseRecognizer<Token> {
 	public TokenStream getInputStream() { return _input; }
 
 	@Override
-	public void setInputStream(IntStream input) { _input = (TokenStream)input; }
+	public final void setInputStream(IntStream input) {
+		setTokenStream((TokenStream)input);
+	}
 
 	/** Set the token stream and reset the parser */
 	public void setTokenStream(TokenStream input) {
