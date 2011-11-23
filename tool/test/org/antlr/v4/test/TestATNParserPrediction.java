@@ -285,13 +285,12 @@ public class TestATNParserPrediction extends BaseTest {
 		RuleContext a_e_ctx = new RuleContext(a_ctx, a_e_invoke.stateNumber, bStart.stateNumber);
 		RuleContext b_e_ctx = new RuleContext(b_ctx, b_e_invoke.stateNumber, bStart.stateNumber);
 
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
+		interp.setContextSensitive(true);
 		List<Integer> types = getTokenTypesViaATN("ab", lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
-		ParserATNSimulator.State<Token> state = new ParserATNSimulator.State<Token>(input);
-		interp.setContextSensitive(state, true);
-		int alt = interp.adaptivePredict(state, 0, b_e_ctx);
+		int alt = interp.adaptivePredict(input, 0, b_e_ctx);
 		assertEquals(alt, 2);
 		DFA dfa = interp.decisionToDFA[0];
 		String expecting =
@@ -300,7 +299,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"s2-EOF->:s3@{[10]=2}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 
-		alt = interp.adaptivePredict(state, 0, b_e_ctx); // cached
+		alt = interp.adaptivePredict(input, 0, b_e_ctx); // cached
 		assertEquals(alt, 2);
 		expecting =
 			"s0-'a'->s1\n" +
@@ -308,7 +307,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"s2-EOF->:s3@{[10]=2}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 
-		alt = interp.adaptivePredict(state, 0, a_e_ctx); // forces new context-sens ATN match
+		alt = interp.adaptivePredict(input, 0, a_e_ctx); // forces new context-sens ATN match
 		assertEquals(alt, 1);
 		expecting =
 			"s0-'a'->s1\n" +
@@ -316,7 +315,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 
-		alt = interp.adaptivePredict(state, 0, b_e_ctx); // cached
+		alt = interp.adaptivePredict(input, 0, b_e_ctx); // cached
 		assertEquals(alt, 2);
 		expecting =
 			"s0-'a'->s1\n" +
@@ -324,7 +323,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 
-		alt = interp.adaptivePredict(state, 0, a_e_ctx); // cached
+		alt = interp.adaptivePredict(input, 0, a_e_ctx); // cached
 		assertEquals(alt, 1);
 		expecting =
 			"s0-'a'->s1\n" +
@@ -335,8 +334,7 @@ public class TestATNParserPrediction extends BaseTest {
 		types = getTokenTypesViaATN("b", lexInterp);
 		System.out.println(types);
 		input = new IntTokenStream(types);
-		state = new ParserATNSimulator.State<Token>(input);
-		alt = interp.adaptivePredict(state, 0, null); // ctx irrelevant
+		alt = interp.adaptivePredict(input, 0, null); // ctx irrelevant
 		assertEquals(alt, 2);
 		expecting =
 			"s0-'a'->s1\n" +
@@ -348,8 +346,7 @@ public class TestATNParserPrediction extends BaseTest {
 		types = getTokenTypesViaATN("aab", lexInterp);
 		System.out.println(types);
 		input = new IntTokenStream(types);
-		state = new ParserATNSimulator.State<Token>(input);
-		alt = interp.adaptivePredict(state, 0, null);
+		alt = interp.adaptivePredict(input, 0, null);
 		assertEquals(alt, 1);
 		expecting =
 			"s0-'a'->s1\n" +
@@ -515,12 +512,11 @@ public class TestATNParserPrediction extends BaseTest {
 		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
 		ATNState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
-		ParserATNSimulator.State<Token> state = new ParserATNSimulator.State<Token>(input);
-		int alt = interp.predictATN(dfa, state, RuleContext.EMPTY, false);
+		int alt = interp.predictATN(dfa, input, RuleContext.EMPTY, false);
 
 		System.out.println(dot.getDOT(dfa, false));
 
@@ -528,11 +524,11 @@ public class TestATNParserPrediction extends BaseTest {
 
 		// Check adaptive prediction
 		input.seek(0);
-		alt = interp.adaptivePredict(state, decision, null);
+		alt = interp.adaptivePredict(input, decision, null);
 		assertEquals(expectedAlt, alt);
 		// run 2x; first time creates DFA in atn
 		input.seek(0);
-		alt = interp.adaptivePredict(state, decision, null);
+		alt = interp.adaptivePredict(input, decision, null);
 		assertEquals(expectedAlt, alt);
 	}
 
@@ -555,17 +551,16 @@ public class TestATNParserPrediction extends BaseTest {
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
 
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
-		ParserATNSimulator.State<Token> state = new ParserATNSimulator.State<Token>(input);
 		try {
 			ATNState startState = atn.decisionToState.get(0);
 			DFA dfa = new DFA(startState);
 //			Rule r = g.getRule(ruleName);
 			//ATNState startState = atn.ruleToStartState.get(r);
-			interp.predictATN(dfa, state, ctx, false);
+			interp.predictATN(dfa, input, ctx, false);
 		}
 		catch (NoViableAltException nvae) {
 			nvae.printStackTrace(System.err);
@@ -587,15 +582,14 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
 			List<Integer> types = getTokenTypesViaATN(inputString[i], lexInterp);
 			System.out.println(types);
 			TokenStream input = new IntTokenStream(types);
-			ParserATNSimulator.State<Token> state = new ParserATNSimulator.State<Token>(input);
 			try {
-				interp.adaptivePredict(state, decision, RuleContext.EMPTY);
+				interp.adaptivePredict(input, decision, RuleContext.EMPTY);
 			}
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);

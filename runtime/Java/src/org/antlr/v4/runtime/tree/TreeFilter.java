@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
 /**
  Cut-n-paste from material I'm not using in the book anymore (edit later
@@ -84,8 +83,8 @@ public class TreeFilter<T> extends TreeParser<T> {
     protected TokenStream originalTokenStream;
     protected ASTAdaptor<T> originalAdaptor;
 
-    public TreeFilter(ASTNodeStream<T> input, ParserATNSimulator<T> interpreter) {
-		super(input, interpreter);
+    public TreeFilter(ASTNodeStream<T> input) {
+		super(input);
         originalAdaptor = input.getTreeAdaptor();
         originalTokenStream = input.getTokenStream();
     }

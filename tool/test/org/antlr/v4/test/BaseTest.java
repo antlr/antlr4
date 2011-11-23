@@ -56,7 +56,6 @@ import java.util.*;
 
 
 public abstract class BaseTest {
-	public static boolean FORCE_ATN = false;
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -91,18 +90,14 @@ public abstract class BaseTest {
 
     }
 
-    protected org.antlr.v4.Tool newTool(String... args) {
+    protected org.antlr.v4.Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
 		return tool;
 	}
 
 	protected Tool newTool() {
-		if (FORCE_ATN) {
-			return newTool("-Xforceatn", "-o", tmpdir);
-		}
-		else {
-			return newTool("-o", tmpdir);
-		}
+		org.antlr.v4.Tool tool = new Tool(new String[] {"-o", tmpdir});
+		return tool;
 	}
 
 	ATN createATN(Grammar g) {
@@ -157,11 +152,10 @@ public abstract class BaseTest {
 
 	public List<Integer> getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
 		ANTLRInputStream in = new ANTLRInputStream(input);
-		LexerATNSimulator.State state = new LexerATNSimulator.State(in);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
 		int ttype = 0;
 		do {
-			ttype = lexerATN.matchATN(state);
+			ttype = lexerATN.matchATN(in);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
 		return tokenTypes;
@@ -173,7 +167,6 @@ public abstract class BaseTest {
 									  boolean adaptive)
 	{
 		LexerATNSimulator interp = new LexerATNSimulator(atn);
-		LexerATNSimulator.State state = new LexerATNSimulator.State(input);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		boolean hitEOF = false;
@@ -183,8 +176,8 @@ public abstract class BaseTest {
 				break;
 			}
 			int t = input.LA(1);
-			if ( adaptive ) ttype = interp.match(state, Lexer.DEFAULT_MODE);
-			else ttype = interp.matchATN(state);
+			if ( adaptive ) ttype = interp.match(input, Lexer.DEFAULT_MODE);
+			else ttype = interp.matchATN(input);
 			if ( ttype == Token.EOF ) {
 				tokenTypes.add("EOF");
 			}

@@ -93,12 +93,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	public String text;
 
-	protected LexerATNSimulator.State state;
-
-	public Lexer(CharStream input, LexerATNSimulator interpreter) {
-		super(interpreter);
+	public Lexer(CharStream input) {
 		this.input = input;
-		this.state = new LexerATNSimulator.State(this);
 	}
 
 	public void reset() {
@@ -120,7 +116,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			modeStack.clear();
 		}
 
-		getInterpreter().reset(state);
+		getInterpreter().reset();
 	}
 
 	/** Return a token from this source; i.e., match a token on the char
@@ -135,8 +131,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			token = null;
 			channel = Token.DEFAULT_CHANNEL;
 			tokenStartCharIndex = input.index();
-			tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine(state);
-			tokenStartLine = getInterpreter().getLine(state);
+			tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
+			tokenStartLine = getInterpreter().getLine();
 			text = null;
 			do {
 				type = Token.INVALID_TYPE;
@@ -145,7 +141,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 //								   " at index "+input.index());
 				int ttype;
 				try {
-					ttype = getInterpreter().match(state, mode);
+					ttype = getInterpreter().match(input, mode);
 				}
 				catch (LexerNoViableAltException e) {
 					notifyListeners(e);		// report error
@@ -263,12 +259,12 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	@Override
 	public int getLine() {
-		return getInterpreter().getLine(state);
+		return getInterpreter().getLine();
 	}
 
 	@Override
 	public int getCharPositionInLine() {
-		return getInterpreter().getCharPositionInLine(state);
+		return getInterpreter().getCharPositionInLine();
 	}
 
 	/** What is the index of the current character of lookahead? */
@@ -283,7 +279,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		if ( text!=null ) {
 			return text;
 		}
-		return getInterpreter().getText(state);
+		return getInterpreter().getText(input);
 //		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 
@@ -319,7 +315,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public void recover(LexerNoViableAltException e) {
-		getInterpreter().consume(state); // skip a char and try again
+		getInterpreter().consume(input); // skip a char and try again
 	}
 
 	public void notifyListeners(LexerNoViableAltException e) {

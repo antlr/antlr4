@@ -277,9 +277,8 @@ public class TestATNInterpreter extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
-		ParserATNSimulator.State<Token> state = new ParserATNSimulator.State<Token>(input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {
 			startState = startState.transition(0).target;
@@ -290,7 +289,7 @@ public class TestATNInterpreter extends BaseTest {
 		Rule r = g.getRule("e");
 		if ( r!=null ) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
-		int result = interp.matchATN(state, startState);
+		int result = interp.matchATN(input, startState);
 		assertEquals(expected, result);
 	}
 }

@@ -89,116 +89,98 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public static class State {
-		@Nullable
-		protected final Lexer recog;
+	@Nullable
+	protected final Lexer recog;
 
-		@Nullable
-		private final CharStream input;
+	/** The current token's starting index into the character stream.
+	 *  Shared across DFA to ATN simulation in case the ATN fails and the
+	 *  DFA did not have a previous accept state. In this case, we use the
+	 *  ATN-generated exception object.
+	 */
+	protected int startIndex = -1;
 
-		/** The current token's starting index into the character stream.
-		 *  Shared across DFA to ATN simulation in case the ATN fails and the
-		 *  DFA did not have a previous accept state. In this case, we use the
-		 *  ATN-generated exception object.
-		 */
-		protected int startIndex = -1;
+	/** line number 1..n within the input */
+	protected int line = 1;
 
-		/** line number 1..n within the input */
-		protected int line = 1;
-
-		/** The index of the character relative to the beginning of the line 0..n-1 */
-		protected int charPositionInLine = 0;
-
-		protected int mode = Lexer.DEFAULT_MODE;
-
-		/** Used during DFA/ATN exec to record the most recent accept configuration info */
-		@NotNull
-		protected final DFAExecState dfaPrevAccept = new DFAExecState();
-
-		@NotNull
-		protected final ATNExecState atnPrevAccept = new ATNExecState();
-
-		public State(@NotNull Lexer recog) {
-			this.recog = recog;
-			this.input = null;
-		}
-
-		public State(@NotNull CharStream input) {
-			this.recog = null;
-			this.input = input;
-		}
-
-		public CharStream getInput() {
-			if (recog != null) {
-				return recog.getInputStream();
-			}
-
-			return input;
-		}
-	}
+	/** The index of the character relative to the beginning of the line 0..n-1 */
+	protected int charPositionInLine = 0;
 
 	@NotNull
 	protected DFA[] dfa;
+	protected int mode = Lexer.DEFAULT_MODE;
+
+	/** Used during DFA/ATN exec to record the most recent accept configuration info */
+	@NotNull
+	protected final DFAExecState dfaPrevAccept = new DFAExecState();
+	@NotNull
+	protected final ATNExecState atnPrevAccept = new ATNExecState();
 
 	public static int ATN_failover = 0;
 	public static int match_calls = 0;
 
 	public LexerATNSimulator(@NotNull ATN atn) {
+		this(null, atn);
+	}
+
+	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn) {
 		super(atn);
 		dfa = new DFA[atn.modeToStartState.size()];
 		for (int i=0; i<atn.modeToStartState.size(); i++) {
 			dfa[i] = new DFA(atn.modeToStartState.get(i));
 		}
+		this.recog = recog;
 	}
 
-	public int match(@NotNull State state, int mode) {
+	public int match(@NotNull CharStream input, int mode) {
 		match_calls++;
-		state.mode = mode;
+		this.mode = mode;
 		if ( dfa[mode].s0==null ) {
-			return matchATN(state);
+			return matchATN(input);
 		}
 		else {
-			return exec(state, dfa[mode].s0);
+			return exec(input, dfa[mode].s0);
 		}
 	}
 
-	public void reset(@NotNull State state) {
-		state.dfaPrevAccept.reset();
-		state.atnPrevAccept.reset();
-		state.startIndex = -1;
-		state.line = 1;
-		state.charPositionInLine = 0;
-		state.mode = Lexer.DEFAULT_MODE;
+	public void reset() {
+		dfaPrevAccept.reset();
+		atnPrevAccept.reset();
+		startIndex = -1;
+		line = 1;
+		charPositionInLine = 0;
+		mode = Lexer.DEFAULT_MODE;
 	}
 
 	// only called from test code from outside
-	public int matchATN(@NotNull State state) {
-		int mark = state.getInput().mark();
+	public int matchATN(@NotNull CharStream input) {
+		int mark = input.mark();
 		try {
-			state.startIndex = state.getInput().index();
-			ATNState startState = atn.modeToStartState.get(state.mode);
-			if ( debug ) System.out.println("mode "+ state.mode +" start: "+startState);
-			OrderedHashSet<ATNConfig> s0_closure = computeStartState(state, startState);
-			int old_mode = state.mode;
-			dfa[state.mode].s0 = addDFAState(state, s0_closure);
-			int predict = exec(state, s0_closure);
+			startIndex = input.index();
+			ATNState startState = atn.modeToStartState.get(mode);
+			if ( debug ) System.out.println("mode "+ mode +" start: "+startState);
+			OrderedHashSet<ATNConfig> s0_closure = computeStartState(input, startState);
+			int old_mode = mode;
+			dfa[mode].s0 = addDFAState(s0_closure);
+			int predict = exec(input, s0_closure);
 			if ( debug ) System.out.println("DFA after matchATN: "+dfa[old_mode].toLexerString());
 			return predict;
 		}
         finally {
-			state.getInput().release(mark);
+			if (mark >= 0) {
+				input.release(mark);
+			}
 		}
 	}
 
-	protected int exec(@NotNull State state, @NotNull DFAState s0) {
-		if ( dfa_debug ) System.out.println("DFA[mode "+(state.recog==null?0:state.recog.mode)+"] exec LA(1)=="+
-											(char)state.getInput().LA(1));
+	protected int exec(@NotNull CharStream input, @NotNull DFAState s0) {
+		if ( dfa_debug ) System.out.println("DFA[mode "+(recog==null?0:recog.mode)+"] exec LA(1)=="+
+											(char)input.LA(1));
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
-		state.startIndex = state.getInput().index();
-		state.dfaPrevAccept.reset();
+		startIndex = input.index();
+		dfaPrevAccept.reset();
 		LexerNoViableAltException atnException = null;
 		DFAState s = s0;
-		int t = state.getInput().LA(1);
+		int t = input.LA(1);
 	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("state "+s.stateNumber+" LA(1)=="+(char)t);
@@ -208,7 +190,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			{
 				try {
 					ATN_failover++;
-					return failOverToATN(state, s);
+					return failOverToATN(input, s);
 				}
 				catch (LexerNoViableAltException nvae) {
 					atnException = nvae;
@@ -223,31 +205,31 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( s.isAcceptState ) {
 				if ( dfa_debug ) System.out.println("accept; predict "+s.prediction+
 													" in state "+s.stateNumber);
-				markAcceptState(state.dfaPrevAccept, state);
-				state.dfaPrevAccept.state = s;
+				markAcceptState(dfaPrevAccept, input);
+				dfaPrevAccept.state = s;
 				// keep going unless we're at EOF; check if something else could match
 				// EOF never in DFA
 				if ( t==CharStream.EOF ) break;
 			}
 
-			consume(state);
-			t = state.getInput().LA(1);
+			consume(input);
+			t = input.LA(1);
 		}
-		if ( state.dfaPrevAccept.state==null ) {
+		if ( dfaPrevAccept.state==null ) {
 			// if no accept and EOF is first char, return EOF
-			if ( t==CharStream.EOF && state.getInput().index()==state.startIndex ) {
+			if ( t==CharStream.EOF && input.index()==startIndex ) {
 				return Token.EOF;
 			}
 			if ( atnException!=null ) throw atnException;
-			throw new LexerNoViableAltException(state.recog, state.getInput(), state.startIndex, s.configs);
+			throw new LexerNoViableAltException(recog, input, startIndex, s.configs);
 		}
 
-		int ruleIndex = state.dfaPrevAccept.state.ruleIndex;
-		accept(state, ruleIndex, state.dfaPrevAccept);
-		return state.dfaPrevAccept.state.prediction;
+		int ruleIndex = dfaPrevAccept.state.ruleIndex;
+		accept(input, ruleIndex, dfaPrevAccept);
+		return dfaPrevAccept.state.prediction;
 	}
 
-	protected int exec(@NotNull State state, @NotNull OrderedHashSet<ATNConfig> s0) {
+	protected int exec(@NotNull CharStream input, @NotNull OrderedHashSet<ATNConfig> s0) {
 		//System.out.println("enter exec index "+input.index()+" from "+s0);
 		@NotNull
 		OrderedHashSet<ATNConfig> closure = new OrderedHashSet<ATNConfig>();
@@ -256,22 +238,22 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		@NotNull
 		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
-		state.atnPrevAccept.reset();
+		atnPrevAccept.reset();
 
-		int t = state.getInput().LA(1);
+		int t = input.LA(1);
 
 		do { // while more work
 			if ( debug ) System.out.println("in reach starting closure: " + closure);
 			for (int ci=0; ci<closure.size(); ci++) { // TODO: foreach
 				ATNConfig c = closure.get(ci);
-				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString(state.recog, true));
+				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString(recog, true));
 
 				int n = c.state.getNumberOfTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each transition
 					Transition trans = c.state.transition(ti);
 					ATNState target = getReachableTarget(trans, t);
 					if ( target!=null ) {
-						closure(state, new ATNConfig(c, target), reach);
+						closure(new ATNConfig(c, target), reach);
 					}
 				}
 			}
@@ -280,7 +262,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				// we reached state associated with closure for sure, so
 				// make sure it's defined. worst case, we define s0 from
 				// start state configs.
-				DFAState from = addDFAState(state, closure);
+				DFAState from = addDFAState(closure);
 				// we got nowhere on t, don't throw out this knowledge; it'd
 				// cause a failover from DFA later.
 				addDFAEdge(from, t, ERROR);
@@ -288,11 +270,11 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			// Did we hit a stop state during reach op?
-			processAcceptStates(state, reach);
+			processAcceptStates(input, reach);
 
-			consume(state);
-			addDFAEdge(state, closure, t, reach);
-			t = state.getInput().LA(1);
+			consume(input);
+			addDFAEdge(closure, t, reach);
+			t = input.LA(1);
 
 			// swap to avoid reallocating space
 			// TODO: faster to reallocate?
@@ -304,37 +286,37 @@ public class LexerATNSimulator extends ATNSimulator {
 		} while ( true );
 
 
-		if ( state.atnPrevAccept.config==null ) {
+		if ( atnPrevAccept.config==null ) {
 			// if no accept and EOF is first char, return EOF
-			if ( t==CharStream.EOF && state.getInput().index()==state.startIndex ) {
+			if ( t==CharStream.EOF && input.index()==startIndex ) {
 				return Token.EOF;
 			}
-			throw new LexerNoViableAltException(state.recog, state.getInput(), state.startIndex, reach);
+			throw new LexerNoViableAltException(recog, input, startIndex, reach);
 		}
 
-		int ruleIndex = state.atnPrevAccept.config.state.ruleIndex;
-		accept(state, ruleIndex, state.atnPrevAccept);
+		int ruleIndex = atnPrevAccept.config.state.ruleIndex;
+		accept(input, ruleIndex, atnPrevAccept);
 		return atn.ruleToTokenType[ruleIndex];
 	}
 
-	protected void processAcceptStates(@NotNull State state, @NotNull OrderedHashSet<ATNConfig> reach) {
+	protected void processAcceptStates(@NotNull CharStream input, @NotNull OrderedHashSet<ATNConfig> reach) {
 		for (int ci=0; ci<reach.size(); ci++) {
 			ATNConfig c = reach.get(ci);
 			if ( c.state instanceof RuleStopState) {
 				if ( debug ) {
 					System.out.println("in reach we hit accept state "+c+" index "+
-									   state.getInput().index()+", reach="+reach+
-									   ", prevAccept="+state.atnPrevAccept.config+
-									   ", prevIndex="+state.atnPrevAccept.index);
+									   input.index()+", reach="+reach+
+									   ", prevAccept="+atnPrevAccept.config+
+									   ", prevIndex="+atnPrevAccept.index);
 				}
-				int index = state.getInput().index();
-				if ( index > state.atnPrevAccept.index ) {
+				int index = input.index();
+				if ( index > atnPrevAccept.index ) {
 					// will favor prev accept at same index so "int" is keyword not ID
-					markAcceptState(state.atnPrevAccept, state);
-					state.atnPrevAccept.config = c;
+					markAcceptState(atnPrevAccept, input);
+					atnPrevAccept.config = c;
 					if ( debug ) {
 						System.out.println("mark "+c+" @ index="+index+", "+
-										  state.atnPrevAccept.line+":"+state.atnPrevAccept.charPos);
+										  atnPrevAccept.line+":"+atnPrevAccept.charPos);
 					}
 				}
 
@@ -349,21 +331,21 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void accept(@NotNull State state, int ruleIndex, @NotNull ExecState prevAccept) {
+	protected void accept(@NotNull CharStream input, int ruleIndex, @NotNull ExecState prevAccept) {
 		if ( debug ) {
-			if ( state.recog!=null ) System.out.println("ACTION "+
-												  state.recog.getRuleNames()[ruleIndex]+
+			if ( recog!=null ) System.out.println("ACTION "+
+												  recog.getRuleNames()[ruleIndex]+
 												  ":"+ruleIndex);
 			else System.out.println("ACTION "+ruleIndex+":"+ruleIndex);
 		}
 		int actionIndex = atn.ruleToActionIndex[ruleIndex];
-		if ( actionIndex>=0 && state.recog!=null ) state.recog.action(null, ruleIndex, actionIndex);
+		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
-		state.getInput().seek(prevAccept.index);
-		state.line = prevAccept.line;
-		state.charPositionInLine = prevAccept.charPos;
-		consume(state);
+		input.seek(prevAccept.index);
+		line = prevAccept.line;
+		charPositionInLine = prevAccept.charPos;
+		consume(input);
 	}
 
 	@Nullable
@@ -415,7 +397,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected OrderedHashSet<ATNConfig> computeStartState(@NotNull State state,
+	protected OrderedHashSet<ATNConfig> computeStartState(@NotNull IntStream input,
 														  @NotNull ATNState p)
 	{
 		RuleContext initialContext = RuleContext.EMPTY;
@@ -423,22 +405,22 @@ public class LexerATNSimulator extends ATNSimulator {
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
-			closure(state, c, configs);
+			closure(c, configs);
 		}
 		return configs;
 	}
 
-	protected void closure(@NotNull State state, @NotNull ATNConfig config, @NotNull OrderedHashSet<ATNConfig> configs) {
+	protected void closure(@NotNull ATNConfig config, @NotNull OrderedHashSet<ATNConfig> configs) {
 		if ( debug ) {
-			System.out.println("closure("+config.toString(state.recog, true)+")");
+			System.out.println("closure("+config.toString(recog, true)+")");
 		}
 
 		// TODO? if ( closure.contains(t) ) return;
 
 		if ( config.state instanceof RuleStopState ) {
 			if ( debug ) {
-				if ( state.recog!=null ) System.out.println("closure at "+
-													  state.recog.getRuleNames()[config.state.ruleIndex]+
+				if ( recog!=null ) System.out.println("closure at "+
+													  recog.getRuleNames()[config.state.ruleIndex]+
 													  " rule stop "+config);
 				else System.out.println("closure at rule stop "+config);
 			}
@@ -451,7 +433,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			RuleTransition rt = (RuleTransition)invokingState.transition(0);
 			ATNState retState = rt.followState;
 			ATNConfig c = new ATNConfig(retState, config.alt, newContext);
-			closure(state, c, configs);
+			closure(c, configs);
 			return;
 		}
 
@@ -463,13 +445,13 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
-			ATNConfig c = getEpsilonTarget(state, config, t);
-			if ( c!=null ) closure(state, c, configs);
+			ATNConfig c = getEpsilonTarget(config, t);
+			if ( c!=null ) closure(c, configs);
 		}
 	}
 
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull State state, @NotNull ATNConfig config, @NotNull Transition t) {
+	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t) {
 		ATNState p = config.state;
 		ATNConfig c = null;
 		if ( t.getClass() == RuleTransition.class ) {
@@ -479,7 +461,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 		else if ( t.getClass() == PredicateTransition.class ) {
 			PredicateTransition pt = (PredicateTransition)t;
-			if ( state.recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
+			if ( recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = new ATNConfig(config, t.target);
 				c.traversedPredicate = true;
 			}
@@ -494,38 +476,37 @@ public class LexerATNSimulator extends ATNSimulator {
 		return c;
 	}
 
-	int failOverToATN(@NotNull State state, @NotNull DFAState s) {
-		if ( dfa_debug ) System.out.println("no edge for "+(char)state.getInput().LA(1));
+	int failOverToATN(@NotNull CharStream input, @NotNull DFAState s) {
+		if ( dfa_debug ) System.out.println("no edge for "+(char)input.LA(1));
 		if ( dfa_debug ) {
 			System.out.println("ATN exec upon "+
-							   state.getInput().substring(state.startIndex, state.getInput().index())+
+							   input.substring(startIndex,input.index())+
 							   " at DFA state "+s.stateNumber+" = "+s.configs);
 		}
-		int ttype = exec(state, s.configs);
+		int ttype = exec(input, s.configs);
 		if ( dfa_debug ) {
 			System.out.println("back from DFA update, ttype="+ttype+
-							   ", dfa[mode "+state.mode+"]=\n"+
-							   dfa[state.mode].toLexerString());
+							   ", dfa[mode "+mode+"]=\n"+
+							   dfa[mode].toLexerString());
 		}
 		// action already executed by ATN
 		// we've updated DFA, exec'd action, and have our deepest answer
 		return ttype;
 	}
 
-	protected void markAcceptState(@NotNull ExecState execState, @NotNull State state) {
-		execState.index = state.getInput().index();
-		execState.line = state.line;
-		execState.charPos = state.charPositionInLine;
+	protected void markAcceptState(@NotNull ExecState state, @NotNull CharStream input) {
+		state.index = input.index();
+		state.line = line;
+		state.charPos = charPositionInLine;
 	}
 
-	protected void addDFAEdge(@NotNull State state,
-							  @NotNull OrderedHashSet<ATNConfig> p,
+	protected void addDFAEdge(@NotNull OrderedHashSet<ATNConfig> p,
 							  int t,
 							  @NotNull OrderedHashSet<ATNConfig> q)
 	{
 //		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
-		DFAState from = addDFAState(state, p);
-		DFAState to = addDFAState(state, q);
+		DFAState from = addDFAState(p);
+		DFAState to = addDFAState(q);
 		addDFAEdge(from, t, to);
 	}
 
@@ -566,9 +547,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		test them, we cannot cash the DFA state target of ID.
 	 */
 	@Nullable
-	protected DFAState addDFAState(@NotNull State state, @NotNull OrderedHashSet<ATNConfig> configs) {
+	protected DFAState addDFAState(@NotNull OrderedHashSet<ATNConfig> configs) {
 		DFAState proposed = new DFAState(configs);
-		DFAState existing = dfa[state.mode].states.get(proposed);
+		DFAState existing = dfa[mode].states.get(proposed);
 		if ( existing!=null ) return existing;
 
 		DFAState newState = proposed;
@@ -592,10 +573,10 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( traversedPredicate ) return null; // cannot cache
 
-		newState.stateNumber = dfa[state.mode].states.size();
+		newState.stateNumber = dfa[mode].states.size();
 		newState.configs = new OrderedHashSet<ATNConfig>();
 		newState.configs.addAll(configs);
-		dfa[state.mode].states.put(newState, newState);
+		dfa[mode].states.put(newState, newState);
 		return newState;
 	}
 
@@ -606,27 +587,27 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	/** Get the text of the current token */
 	@NotNull
-	public String getText(@NotNull State state) {
-		return state.getInput().substring(state.startIndex, state.getInput().index());
+	public String getText(@NotNull CharStream input) {
+		return input.substring(this.startIndex, input.index());
 	}
 
-	public int getLine(@NotNull State state) {
-		return state.line;
+	public int getLine() {
+		return line;
 	}
 
-	public int getCharPositionInLine(@NotNull State state) {
-		return state.charPositionInLine;
+	public int getCharPositionInLine() {
+		return charPositionInLine;
 	}
 
-	public void consume(@NotNull State state) {
-		int curChar = state.getInput().LA(1);
+	public void consume(@NotNull CharStream input) {
+		int curChar = input.LA(1);
 		if ( curChar=='\n' ) {
-			state.line++;
-			state.charPositionInLine=0;
+			line++;
+			charPositionInLine=0;
 		} else {
-			state.charPositionInLine++;
+			charPositionInLine++;
 		}
-		state.getInput().consume();
+		input.consume();
 	}
 
 	@NotNull

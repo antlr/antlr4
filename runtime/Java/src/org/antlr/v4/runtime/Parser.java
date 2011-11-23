@@ -28,9 +28,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.ParserATNSimulator.State;
 
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
@@ -38,16 +35,9 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator.State;
 public class Parser extends BaseRecognizer<Token> {
 	protected TokenStream _input;
 
-	protected ParserATNSimulator.State<Token> state;
-
-	public Parser(TokenStream input, ParserATNSimulator<Token> interpreter) {
-		super(input, interpreter);
-		state = new ParserATNSimulator.State<Token>(this);
+	public Parser(TokenStream input) {
+		super(input);
     }
-
-	public ParserATNSimulator.State<Token> getState() {
-		return state;
-	}
 
 	@Override
 	public void reset() {

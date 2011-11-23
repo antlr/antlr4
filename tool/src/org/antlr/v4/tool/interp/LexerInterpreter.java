@@ -37,7 +37,7 @@ import org.antlr.v4.tool.LexerGrammar;
 public class LexerInterpreter implements TokenSource {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
-	protected LexerATNSimulator.State state;
+	protected CharStream input;
 
 	public LexerInterpreter(LexerGrammar g, String inputString) {
 		this(g);
@@ -51,11 +51,11 @@ public class LexerInterpreter implements TokenSource {
 	}
 
 	public void setInput(String inputString) {
-		setInput(new ANTLRInputStream(inputString));
+		input = new ANTLRInputStream(inputString);
 	}
 
 	public void setInput(CharStream input) {
-		this.state = new LexerATNSimulator.State(input);
+		this.input = input;
 	}
 
 	public String getSourceName() {	return g.name; }
@@ -69,16 +69,16 @@ public class LexerInterpreter implements TokenSource {
 	}
 
 	public CharStream getInputStream() {
-		return state.getInput();
+		return input;
 	}
 
 	public Token nextToken() {
 		// TODO: Deal with off channel tokens
-		int start = state.getInput().index();
-		int tokenStartCharPositionInLine = interp.getCharPositionInLine(state);
-		int tokenStartLine = interp.getLine(state);
-		int ttype = interp.match(state, Lexer.DEFAULT_MODE);
-		int stop = state.getInput().index()-1;
+		int start = input.index();
+		int tokenStartCharPositionInLine = interp.getCharPositionInLine();
+		int tokenStartLine = interp.getLine();
+		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
+		int stop = input.index()-1;
 		WritableToken t = new CommonToken(this, ttype, Token.DEFAULT_CHANNEL, start, stop);
 		t.setLine(tokenStartLine);
 		t.setCharPositionInLine(tokenStartCharPositionInLine);
