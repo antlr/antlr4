@@ -85,7 +85,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** The token type for the current token */
 	public int type;
 
-	public ArrayDeque<Integer> modeStack; // TODO: List?
+	public ArrayDeque<Integer> modeStack;
 	public int mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in
