@@ -251,7 +251,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 	}
 
 	public IntervalSet getExpectedTokens() {
-		return _interp.atn.nextTokens(_ctx);
+		return getInterpreter().atn.nextTokens(_ctx);
 	}
 
 	/** Return List<String> of the rule names in your parser instance

@@ -317,7 +317,7 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
-switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
+switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
 	<alt>
@@ -328,7 +328,7 @@ case <i>:
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
-switch ( _interp.adaptivePredict(_input,<choice.decision>,_ctx) ) {
+switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
 	<alt>
@@ -341,7 +341,7 @@ case <i>:
 StarBlock(choice, alts, sync) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
-int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
+int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
@@ -351,14 +351,14 @@ case <i>:
 	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
-	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
+	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
-int _alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
+int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 do {
 	switch ( _alt<choice.uniqueID> ) {
 		<alts:{alt|
@@ -370,7 +370,7 @@ case <i>:
 	}
 	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
-	_alt<choice.uniqueID> = _interp.adaptivePredict(_input,<choice.decision>,_ctx);
+	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 } while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );
 >>
 

@@ -48,7 +48,7 @@ public class FailedPredicateException extends RecognitionException {
 
 	public FailedPredicateException(BaseRecognizer<?> recognizer, @Nullable String msg) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		ATNState s = recognizer._interp.atn.states.get(recognizer._ctx.s);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;

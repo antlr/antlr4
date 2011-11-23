@@ -84,7 +84,7 @@ public class RecognitionException extends RuntimeException {
 	public IntervalSet getExpectedTokens() {
         // TODO: do we really need this type check?
 		if ( recognizer!=null && recognizer instanceof BaseRecognizer) {
-			return recognizer._interp.atn.nextTokens(ctx);
+			return recognizer.getInterpreter().atn.nextTokens(ctx);
 		}
 		return null;
 	}

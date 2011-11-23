@@ -116,7 +116,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			modeStack.clear();
 		}
 
-		_interp.reset();
+		getInterpreter().reset();
 	}
 
 	/** Return a token from this source; i.e., match a token on the char
@@ -131,8 +131,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			token = null;
 			channel = Token.DEFAULT_CHANNEL;
 			tokenStartCharIndex = input.index();
-			tokenStartCharPositionInLine = _interp.getCharPositionInLine();
-			tokenStartLine = _interp.getLine();
+			tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
+			tokenStartLine = getInterpreter().getLine();
 			text = null;
 			do {
 				type = Token.INVALID_TYPE;
@@ -141,7 +141,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 //								   " at index "+input.index());
 				int ttype;
 				try {
-					ttype = _interp.match(input, mode);
+					ttype = getInterpreter().match(input, mode);
 				}
 				catch (LexerNoViableAltException e) {
 					notifyListeners(e);		// report error
@@ -259,12 +259,12 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	@Override
 	public int getLine() {
-		return _interp.getLine();
+		return getInterpreter().getLine();
 	}
 
 	@Override
 	public int getCharPositionInLine() {
-		return _interp.getCharPositionInLine();
+		return getInterpreter().getCharPositionInLine();
 	}
 
 	/** What is the index of the current character of lookahead? */
@@ -279,7 +279,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		if ( text!=null ) {
 			return text;
 		}
-		return _interp.getText(input);
+		return getInterpreter().getText(input);
 //		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 
@@ -315,7 +315,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public void recover(LexerNoViableAltException e) {
-		_interp.consume(input); // skip a char and try again
+		getInterpreter().consume(input); // skip a char and try again
 	}
 
 	public void notifyListeners(LexerNoViableAltException e) {

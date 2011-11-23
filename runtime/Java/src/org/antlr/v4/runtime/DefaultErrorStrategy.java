@@ -145,7 +145,7 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
  	 */
 	@Override
 	public void sync(BaseRecognizer<Symbol> recognizer) {
-		ATNState s = recognizer._interp.atn.states.get(recognizer._ctx.s);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
 		if ( errorRecoveryMode ) return;
@@ -296,9 +296,9 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 		// if current token is consistent with what could come after current
 		// ATN state, then we know we're missing a token; error recovery
 		// is free to conjure up and insert the missing token
-		ATNState currentState = recognizer._interp.atn.states.get(recognizer._ctx.s);
+		ATNState currentState = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 		ATNState next = currentState.transition(0).target;
-		IntervalSet expectingAtLL2 = recognizer._interp.atn.nextTokens(next, recognizer._ctx);
+		IntervalSet expectingAtLL2 = recognizer.getInterpreter().atn.nextTokens(next, recognizer._ctx);
 //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
 		if ( expectingAtLL2.contains(currentSymbolType) ) {
 			reportMissingToken(recognizer);
@@ -521,7 +521,7 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 	 *  at run-time upon error to avoid overhead during parsing.
 	 */
 	protected IntervalSet getErrorRecoverySet(BaseRecognizer<Symbol> recognizer) {
-		ATN atn = recognizer._interp.atn;
+		ATN atn = recognizer.getInterpreter().atn;
 		RuleContext ctx = recognizer._ctx;
 		IntervalSet recoverSet = new IntervalSet();
 		while ( ctx!=null && ctx.invokingState>=0 ) {
