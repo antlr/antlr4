@@ -28,10 +28,15 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /** A generic recognizer that can handle recognizers generated from
  *  parser and tree grammars.  This is all the parsing
@@ -77,7 +82,6 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
      *  This way any error in a rule will cause an exception and
      *  immediate exit from rule.  Rule would recover by resynchronizing
      *  to the set of symbols that can follow rule ref.
-	 *  TODO: mv into Parser etc... to get more precise return value/efficiency
 	 */
 	public Symbol match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
