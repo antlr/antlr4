@@ -57,6 +57,8 @@ public class IntervalSet implements IntSet {
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
 
+    protected boolean readonly;
+
 	/** Create a set with no elements */
     public IntervalSet() {
         intervals = new ArrayList<Interval>(2); // most sets are 1 or 2 elements
@@ -87,6 +89,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	public void clear() {
+        if ( readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
 		intervals.clear();
 	}
 
@@ -95,6 +98,7 @@ public class IntervalSet implements IntSet {
      */
     @Override
     public void add(int el) {
+        if ( readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
         add(el,el);
     }
 
@@ -111,6 +115,7 @@ public class IntervalSet implements IntSet {
 
 	// copy on write so we can cache a..a intervals and sets of that
 	protected void add(Interval addition) {
+        if ( readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
 		//System.out.println("add "+addition+" to "+intervals.toString());
 		if ( addition.b<addition.a ) {
 			return;
@@ -564,6 +569,7 @@ public class IntervalSet implements IntSet {
 
 	@Override
 	public void remove(int el) {
+        if ( readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
         int n = intervals.size();
         for (int i = 0; i < n; i++) {
             Interval I = intervals.get(i);
@@ -594,5 +600,13 @@ public class IntervalSet implements IntSet {
                 add(el+1, oldb); // add [x+1..b]
             }
         }
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
     }
 }
