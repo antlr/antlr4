@@ -33,7 +33,8 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestIntervalSet extends BaseTest {
 
@@ -388,4 +389,42 @@ public class TestIntervalSet extends BaseTest {
 		String result = (s.and(s2)).toString();
 		assertEquals(result, expecting);
 	}
+
+    @Test public void testRmSingleElement() throws Exception {
+        IntervalSet s = IntervalSet.of(1,10);
+        s.add(-3,-3);
+        s.remove(-3);
+        String expecting = "{1..10}";
+        String result = s.toString();
+        assertEquals(result, expecting);
+    }
+
+    @Test public void testRmLeftSide() throws Exception {
+        IntervalSet s = IntervalSet.of(1,10);
+        s.add(-3,-3);
+        s.remove(1);
+        String expecting = "{-3, 2..10}";
+        String result = s.toString();
+        assertEquals(result, expecting);
+    }
+
+    @Test public void testRmRightSide() throws Exception {
+        IntervalSet s = IntervalSet.of(1,10);
+        s.add(-3,-3);
+        s.remove(10);
+        String expecting = "{-3, 1..9}";
+        String result = s.toString();
+        assertEquals(result, expecting);
+    }
+
+    @Test public void testRmMiddleRange() throws Exception {
+        IntervalSet s = IntervalSet.of(1,10);
+        s.add(-3,-3);
+        s.remove(5);
+        String expecting = "{-3, 1..4, 6..10}";
+        String result = s.toString();
+        assertEquals(result, expecting);
+    }
+
+
 }
