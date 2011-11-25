@@ -33,6 +33,7 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,14 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 	protected boolean buildParseTrees;
 	protected boolean traceATNStates;
 
+    /** If the listener is non-null, trigger enter and exit rule events
+     *  *during* the parse. This is typically done only when not building
+     *  parse trees for later visiting. We either trigger events during
+     *  the parse or during tree walks later. Both could be done.
+     *  Not intended for tree parsing but would work.
+     */
+    protected ParseTreeListener<Symbol> _listener;
+
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int syntaxErrors = 0;
 
@@ -75,13 +84,6 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 	/** Match current input symbol against ttype.  Attempt
 	 *  single token insertion or deletion error recovery.  If
 	 *  that fails, throw MismatchedTokenException.
-	 *
-	 *  To turn off single token insertion or deletion error
-	 *  recovery, override recoverFromMismatchedToken() and have it
-     *  throw an exception. See TreeParser.recoverFromMismatchedToken().
-     *  This way any error in a rule will cause an exception and
-     *  immediate exit from rule.  Rule would recover by resynchronizing
-     *  to the set of symbols that can follow rule ref.
 	 */
 	public Symbol match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
@@ -139,7 +141,15 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		return traceATNStates;
 	}
 
-	/** Get number of recognition errors (lexer, parser, tree parser).  Each
+    public ParseTreeListener<Symbol> getListener() {
+        return _listener;
+    }
+
+    public void setListener(ParseTreeListener<Symbol> listener) {
+        this._listener = listener;
+    }
+
+    /** Get number of recognition errors (lexer, parser, tree parser).  Each
 	 *  recognizer tracks its own number.  So parser and lexer each have
 	 *  separate count.  Does not count the spurious errors found between
 	 *  an error and next valid token match
@@ -207,6 +217,8 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 	 *
 	 *  If the parser is creating parse trees, the current symbol
 	 *  would also be added as a child to the current context (node).
+     *
+     *  Trigger listener events if there's a listener.
 	 */
 	public Symbol consume() {
 		Symbol o = getCurrentInputSymbol();
@@ -219,6 +231,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 			}
 			else _ctx.addChild((Token)o);
 		}
+        if ( _listener != null) _listener.visitTerminal(o);
 		return o;
 	}
 

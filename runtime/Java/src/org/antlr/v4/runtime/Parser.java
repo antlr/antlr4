@@ -60,9 +60,23 @@ public class Parser extends BaseRecognizer<Token> {
 		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
 		if ( buildParseTrees ) addContextToParseTree();
+        if ( _listener != null) {
+            _ctx.enterRule(_listener);
+            _listener.enterEveryRule(_ctx);
+        }
 	}
 
-	@Override
+    @Override
+    public void exitRule(int ruleIndex) {
+        // trigger event on _ctx, before it reverts to parent
+        if ( _listener != null) {
+            _ctx.exitRule(_listener);
+            _listener.exitEveryRule(_ctx);
+        }
+        super.exitRule(ruleIndex);
+    }
+
+    @Override
 	public Token match(int ttype) throws RecognitionException {
 		return super.match(ttype);
 	}

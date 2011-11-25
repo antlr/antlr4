@@ -31,6 +31,9 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.stringtemplate.v4.ST;
 
+import java.util.Collections;
+import java.util.List;
+
 /** Rules return values in an object containing all the values.
  *  Besides the properties defined in
  *  RuleLabelScope.predefinedRulePropertiesScope there may be user-defined
@@ -99,4 +102,16 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public ST getTemplate() { return st; }
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }
+
+    /** Used for rule context info debugging during runtime, not so much for ATN debugging */
+    public String toInfoString(BaseRecognizer<Symbol> recognizer) {
+        List<String> rules = recognizer.getRuleInvocationStack();
+        Collections.reverse(rules);
+        return "ParserRuleContext"+rules+"{" +
+                "altNum=" + altNum +
+                ", start=" + start +
+                ", stop=" + stop +
+                ", st=" + st +
+                '}';
+    }
 }
