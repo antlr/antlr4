@@ -31,13 +31,9 @@ package org.antlr.v4.runtime.misc;
 
 import java.util.List;
 
-/** A generic set of ints that has an efficient implementation, BitSet,
- *  which is a compressed bitset and is useful for ints that
- *  are small, for example less than 500 or so, and w/o many ranges.  For
- *  ranges with large values like unicode char sets, this is not very efficient.
- *  Consider using IntervalSet.  Not all methods in IntervalSet are implemented.
+/** A generic set of ints.
  *
- *  @see org.antlr.misc.IntervalSet
+ *  @see IntervalSet
  */
 public interface IntSet {
     /** Add an element to the set */

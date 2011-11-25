@@ -28,10 +28,13 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /** A set of integers that relies on ranges being common to do
  *  "run-length-encoded" like compression (if you view an IntSet like
@@ -48,7 +51,7 @@ import java.util.*;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
-	public static final IntervalSet COMPLETE_SET = IntervalSet.of(0, Lexer.MAX_CHAR_VALUE);
+	public static final IntervalSet COMPLETE_CHAR_SET = IntervalSet.of(0, Lexer.MAX_CHAR_VALUE);
 	public static final IntervalSet EMPTY_SET = new IntervalSet();
 
 	/** The list of sorted, disjoint intervals. */
@@ -240,7 +243,7 @@ public class IntervalSet implements IntSet {
 		// will be empty.  The only problem would be when this' set max value
 		// goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
 		// will prevent this.
-		return this.and(((IntervalSet)other).complement(COMPLETE_SET));
+		return this.and(((IntervalSet)other).complement(COMPLETE_CHAR_SET));
 	}
 
 	@Override
@@ -561,6 +564,35 @@ public class IntervalSet implements IntSet {
 
 	@Override
 	public void remove(int el) {
-        throw new NoSuchMethodError("IntervalSet.remove() unimplemented");
+        int n = intervals.size();
+        for (int i = 0; i < n; i++) {
+            Interval I = intervals.get(i);
+            int a = I.a;
+            int b = I.b;
+            if ( el<a ) {
+                break; // list is sorted and el is before this interval; not here
+            }
+            // if whole interval x..x, rm
+            if ( el==a && el==b ) {
+                intervals.remove(i);
+                return;
+            }
+            // if on left edge x..b, adjust left
+            if ( el==a ) {
+                I.a++;
+                return;
+            }
+            // if on right edge a..x, adjust right
+            if ( el==b ) {
+                I.b--;
+                return;
+            }
+            // if in middle a..x..b, split interval
+            if ( el>a && el<b ) { // found in this interval
+                int oldb = I.b;
+                I.b = el-1;      // [a..x-1]
+                add(el+1, oldb); // add [x+1..b]
+            }
+        }
     }
 }
