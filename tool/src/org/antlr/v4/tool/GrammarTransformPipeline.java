@@ -55,11 +55,12 @@ public class GrammarTransformPipeline {
 		if ( ast==null ) return;
         tool.log("grammar", "before: "+ast.toStringTree());
 
+        integrateImportedGrammars(g);
 		if ( ast.grammarType==ANTLRParser.PARSER || ast.grammarType==ANTLRParser.COMBINED ) {
 			translateLeftRecursiveRules(ast);
 		}
-
 		reduceBlocksToSets(ast);
+
         tool.log("grammar", "after: "+ast.toStringTree());
 	}
 
@@ -146,6 +147,7 @@ public class GrammarTransformPipeline {
 		return null;
 	}
 
+    /** Utility visitor that sets grammar ptr in each node */
 	public static void setGrammarPtr(final Grammar g, GrammarAST tree) {
 		// ensure each node has pointer to surrounding grammar
 		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
@@ -169,7 +171,7 @@ public class GrammarTransformPipeline {
 	 	The goal is a complete combined grammar so we can ignore subordinate
 	 	grammars.
 	 */
-	public static void integrateImportedGrammars(Grammar rootGrammar) {
+	public void integrateImportedGrammars(Grammar rootGrammar) {
 		List<Grammar> imports = rootGrammar.getAllImportedGrammars();
 		if ( imports==null ) return;
 
@@ -305,7 +307,7 @@ public class GrammarTransformPipeline {
 	 *                in combined AST.  Anything cut out is dup'd before
 	 *                adding to lexer to avoid "who's ur daddy" issues
 	 */
-	public static GrammarRootAST extractImplicitLexer(Grammar combinedGrammar) {
+	public GrammarRootAST extractImplicitLexer(Grammar combinedGrammar) {
 		GrammarRootAST combinedAST = combinedGrammar.ast;
 		//tool.log("grammar", "before="+combinedAST.toStringTree());
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());

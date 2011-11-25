@@ -256,7 +256,6 @@ public class Tool {
 	public void process(Grammar g, boolean gencode) {
 		g.loadImportedGrammars();
 
-		GrammarTransformPipeline.integrateImportedGrammars(g);
 
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
@@ -266,7 +265,7 @@ public class Tool {
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
 			 !g.ast.hasErrors )
 		{
-			lexerAST = GrammarTransformPipeline.extractImplicitLexer(g); // alters g.ast
+			lexerAST = transform.extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
 				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
