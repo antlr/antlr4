@@ -51,27 +51,54 @@ public class GrammarTransformPipeline {
 	}
 
 	public void process() {
-		GrammarRootAST ast = g.ast;
-		if ( ast==null ) return;
-        tool.log("grammar", "before: "+ast.toStringTree());
+		GrammarRootAST root = g.ast;
+		if ( root==null ) return;
+        tool.log("grammar", "before: "+root.toStringTree());
 
         integrateImportedGrammars(g);
-		if ( ast.grammarType==ANTLRParser.PARSER || ast.grammarType==ANTLRParser.COMBINED ) {
-			translateLeftRecursiveRules(ast);
+		if ( root.grammarType==ANTLRParser.PARSER || root.grammarType==ANTLRParser.COMBINED ) {
+			translateLeftRecursiveRules(root);
 		}
-		reduceBlocksToSets(ast);
+		reduceBlocksToSets(root);
+        expandParameterizedLoops(root);
 
-        tool.log("grammar", "after: "+ast.toStringTree());
+        tool.log("grammar", "after: "+root.toStringTree());
 	}
 
-	public void reduceBlocksToSets(GrammarRootAST ast) {
+	public void reduceBlocksToSets(GrammarRootAST root) {
 		org.antlr.runtime.tree.CommonTreeNodeStream nodes =
-			new org.antlr.runtime.tree.CommonTreeNodeStream(ast);
+			new org.antlr.runtime.tree.CommonTreeNodeStream(root);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		BlockSetTransformer transformer = new BlockSetTransformer(nodes, g);
 		transformer.setTreeAdaptor(adaptor);
-		transformer.downup(ast);
+		transformer.downup(root);
 	}
+
+    /** Find and replace
+     *      ID*[','] with ID (',' ID)*
+     *      ID+[','] with ID (',' ID)+
+     *      (x {action} y)+[','] with x {action} y (',' x {action} y)+
+     *
+     *  Parameter must be a token.
+     *  todo: do we want?
+     */
+    public void expandParameterizedLoops(GrammarRootAST root) {
+        TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
+        v.visit(root, new TreeVisitorAction() {
+            public Object pre(Object t) {
+                if ( ((GrammarAST)t).getType() == 3 ) {
+                    return expandParameterizedLoop((GrammarAST)t);
+                }
+                return t;
+            }
+            public Object post(Object t) { return t; }
+        });
+    }
+
+    public GrammarAST expandParameterizedLoop(GrammarAST t) {
+        // todo: update grammar, alter AST
+        return t;
+    }
 
 	public void translateLeftRecursiveRules(GrammarRootAST ast) {
 		String language = Grammar.getLanguageOption(ast);
