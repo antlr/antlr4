@@ -86,7 +86,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalParserOptions =
 		new HashSet<String>() {
 			{
-				add("language"); add("tokenVocab");
+				add("tokenVocab");
 				add("output"); add("rewrite"); add("ASTLabelType");
 				add("TokenLabelType");
 				add("superClass");
@@ -96,8 +96,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalTreeParserOptions =
 		new HashSet<String>() {
 			{
-				add("language"); add("tokenVocab");
-				add("output"); add("rewrite"); add("ASTLabelType");
+				add("tokenVocab");
+				add("output"); add("ASTLabelType");
 				add("superClass");
 				add("filter");
 			}
@@ -106,7 +106,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalRuleOptions =
 		new HashSet<String>() {
 			{
-				add("greedy");
+
 			}
 		};
 
@@ -118,7 +118,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		new HashSet<String>() {
 			{
 				add(TerminalAST.defaultTokenOption);
-				add("associativity");
+				add("assoc");
 			}
 		};
 
