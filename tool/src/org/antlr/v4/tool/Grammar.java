@@ -264,7 +264,8 @@ public class Grammar implements AttributeResolver {
         }
         else {
 			String scope = atAST.getChild(0).getText();
-			if ( scope.equals(getTypeString()) ) {
+            String gtype = getTypeString();
+            if ( scope.equals(gtype) || (scope.equals("parser")&&gtype.equals("combined")) ) {
 				String name = atAST.getChild(1).getText();
 				namedActions.put(name, (ActionAST)atAST.getChild(2));
 			}
