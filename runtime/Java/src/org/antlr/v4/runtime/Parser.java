@@ -61,8 +61,8 @@ public class Parser extends BaseRecognizer<Token> {
 		_ctx.ruleIndex = ruleIndex;
 		if ( buildParseTrees ) addContextToParseTree();
         if ( _listener != null) {
-            _ctx.enterRule(_listener);
             _listener.enterEveryRule(_ctx);
+            _ctx.enterRule(_listener);
         }
 	}
 
