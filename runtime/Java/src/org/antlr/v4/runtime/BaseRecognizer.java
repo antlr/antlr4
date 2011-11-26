@@ -276,6 +276,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
         if ( !following.contains(Token.EPSILON) ) return following;
         IntervalSet expected = new IntervalSet();
         expected.addAll(following);
+        expected.remove(Token.EPSILON);
         while ( ctx!=null && ctx.invokingState>=0 && following.contains(Token.EPSILON) ) {
             ATNState invokingState = atn.states.get(ctx.invokingState);
             RuleTransition rt = (RuleTransition)invokingState.transition(0);
