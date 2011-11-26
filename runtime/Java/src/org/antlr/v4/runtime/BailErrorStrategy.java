@@ -29,7 +29,9 @@
 
 package org.antlr.v4.runtime;
 
-/** Bail out of parser at first syntax error */
+/** Bail out of parser at first syntax error. Do this to use it:
+ *      myparser.setErrorHandler(new BailErrorStrategy<Token>());
+ */
 public class BailErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol> {
     /** Instead of recovering from exception e, Re-throw wrote it wrapped
      *  in a generic RuntimeException so it is not caught by the
