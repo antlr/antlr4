@@ -29,17 +29,24 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.*;
+import org.abego.treelayout.NodeExtentProvider;
+import org.abego.treelayout.TreeForTreeLayout;
+import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.tree.Trees;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class TreeViewer extends JComponent {
 	public static final Color LIGHT_RED = new Color(244, 213, 211);
@@ -103,7 +110,7 @@ public class TreeViewer extends JComponent {
 	protected Color boxColor = null;     // set to a color to make it draw background
 
 	protected Color highlightedBoxColor = Color.lightGray;
-	protected Color borderColor = Color.white;
+	protected Color borderColor = null;
 	protected Color textColor = Color.black;
 
 	protected BaseRecognizer<?> parser;
@@ -111,11 +118,13 @@ public class TreeViewer extends JComponent {
 	public TreeViewer(BaseRecognizer<?> parser, Tree tree) {
 		this.parser = parser;
 		setTreeTextProvider(new DefaultTreeTextProvider(parser));
+        boolean useIdentity = true; // compare node identity
 		this.treeLayout =
 			new TreeLayout<Tree>(new TreeLayoutAdaptor(tree),
 								 new TreeViewer.VariableExtentProvide(this),
 								 new DefaultConfiguration<Tree>(gapBetweenLevels,
-																gapBetweenNodes));
+																gapBetweenNodes),
+                                 useIdentity);
 		Dimension size = treeLayout.getBounds().getBounds().getSize();
 		setPreferredSize(size);
 		setFont(font);
@@ -125,6 +134,10 @@ public class TreeViewer extends JComponent {
 
 	protected void paintEdges(Graphics g, Tree parent) {
 		if (!getTree().isLeaf(parent)) {
+            BasicStroke stroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND);
+            ((Graphics2D)g).setStroke(stroke);
+
 			Rectangle2D.Double parentBounds = getBoundsOfNode(parent);
 			double x1 = parentBounds.getCenterX();
 			double y1 = parentBounds.getMaxY();
@@ -152,9 +165,11 @@ public class TreeViewer extends JComponent {
 			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 							(int) box.height - 1, arcSize, arcSize);
 		}
-		g.setColor(borderColor);
-		g.drawRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
-						(int) box.height - 1, arcSize, arcSize);
+		if ( borderColor!=null ) {
+            g.setColor(borderColor);
+            g.drawRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
+                    (int) box.height - 1, arcSize, arcSize);
+        }
 
 		// draw the text on top of the box (possibly multiple lines)
 		g.setColor(textColor);
