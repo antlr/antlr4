@@ -28,8 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -267,9 +266,35 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		return false;
 	}
 
-	public IntervalSet getExpectedTokens() {
-		return getInterpreter().atn.nextTokens(_ctx);
-	}
+    public IntervalSet getExpectedTokens() {
+//   		return getInterpreter().atn.nextTokens(_ctx);
+        ATN atn = getInterpreter().atn;
+        RuleContext ctx = _ctx;
+        ATNState s = atn.states.get(ctx.s);
+        IntervalSet following = atn.nextTokens(s);
+//        System.out.println("following "+s+"="+following);
+        if ( !following.contains(Token.EPSILON) ) return following;
+        IntervalSet expected = new IntervalSet();
+        expected.addAll(following);
+        while ( ctx!=null && ctx.invokingState>=0 && following.contains(Token.EPSILON) ) {
+            ATNState invokingState = atn.states.get(ctx.invokingState);
+            RuleTransition rt = (RuleTransition)invokingState.transition(0);
+            following = atn.nextTokens(rt.followState);
+            expected.addAll(following);
+            expected.remove(Token.EPSILON);
+            ctx = ctx.parent;
+        }
+        if ( following.contains(Token.EPSILON) ) {
+            expected.add(Token.EOF);
+        }
+        return expected;
+   	}
+
+    public IntervalSet getExpectedTokensWithinCurrentRule() {
+        ATN atn = getInterpreter().atn;
+        ATNState s = atn.states.get(_ctx.s);
+   		return atn.nextTokens(s);
+   	}
 
 	/** Return List<String> of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if

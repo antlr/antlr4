@@ -30,7 +30,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.AST;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -148,17 +149,18 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
-		if ( errorRecoveryMode ) return;
+        if ( errorRecoveryMode ) return;
 
-		// TODO: CACHE THESE RESULTS!!
-		IntervalSet expecting = getExpectedTokens(recognizer);
-//		System.err.println("sync expecting: "+expecting);
+        SymbolStream<Symbol> tokens = recognizer.getInputStream();
+        int la = tokens.LA(1);
 
-		// TODO: subclass this class for treeparsers
-		SymbolStream<Symbol> tokens = recognizer.getInputStream();
-		int la = tokens.LA(1);
+        // try cheaper subset first; might get lucky. seems to shave a wee bit off
+        if ( recognizer.getATN().nextTokens(s).contains(la) || la==Token.EOF ) return;
+
+        IntervalSet expecting = recognizer.getExpectedTokens();
+
 		// Return but don't end recovery. only do that upon valid token match
-		if ( la==Token.EOF || expecting.contains(la) ) return;
+        if ( expecting.contains(la) ) return;
 
 		if ( s instanceof PlusBlockStartState ||
 			 s instanceof StarLoopEntryState ||
@@ -528,10 +530,11 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 			// compute what follows who invoked us
 			ATNState invokingState = atn.states.get(ctx.invokingState);
 			RuleTransition rt = (RuleTransition)invokingState.transition(0);
-			IntervalSet follow = atn.nextTokens(rt.followState, null);
+			IntervalSet follow = atn.nextTokens(rt.followState);
 			recoverSet.addAll(follow);
 			ctx = ctx.parent;
 		}
+        recoverSet.remove(Token.EPSILON);
 //		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
 		return recoverSet;
 	}

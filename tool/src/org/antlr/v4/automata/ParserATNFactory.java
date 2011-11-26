@@ -30,18 +30,28 @@
 package org.antlr.v4.automata;
 
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.ATNBuilder;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.UseDefAnalyzer;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.*;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 /** ATN construction routines triggered by ATNBuilder.g.
  *
@@ -109,7 +119,6 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
 		left.addTransition(new AtomTransition(right, ttype));
-		right.incidentTransition = left.transition(0);
 		node.atnState = left;
 		return new Handle(left, right);
 	}
@@ -133,7 +142,6 @@ public class ParserATNFactory implements ATNFactory {
 		else {
 			left.addTransition(new SetTransition(right, set));
 		}
-		right.incidentTransition = left.transition(0);
 		associatedAST.atnState = left;
 		return new Handle(left, right);
 	}
@@ -428,7 +436,6 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		left.addTransition(new WildcardTransition(right));
-		right.incidentTransition = left.transition(0);
 		node.atnState = left;
 		return new Handle(left, right);
 	}

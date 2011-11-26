@@ -481,7 +481,8 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				if ( a==-1 ) buf.append("<EOF>");
+                if ( a==Token.EOF ) buf.append("<EOF>");
+                else if ( a==Token.EPSILON ) buf.append("<EPSILON>");
 				else buf.append(tokenNames[a]);
 			}
 			else {

@@ -38,6 +38,11 @@ public interface Token {
 	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
 	public static final int MIN_TOKEN_TYPE = 1;
 
+    /** During lookahead operations, this "token" signifies we hit rule end ATN state
+     *  and did not follow it despite needing to.
+     */
+    public static final int EPSILON = -2;
+
 	/** imaginary tree navigation type; traverse "get child" link */
 	public static final int DOWN = 1;
 

@@ -1,6 +1,8 @@
 import org.antlr.runtime.debug.BlankDebugEventListener;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
 import java.io.File;
 
@@ -100,12 +102,14 @@ class TestJava {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
 					parser = new JavaParser(tokens);
+//                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}
 				parser.setTokenStream(tokens);
 				// start parsing at the compilationUnit rule
 				parser.compilationUnit();
 				//System.err.println("finished "+f);
+//                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
 			}
 		}
 		catch (Exception e) {

@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.IntervalSet;
+
 import java.util.*;
 
 public class ATNState {
@@ -73,20 +75,23 @@ public class ATNState {
 
 	public static final Map<Class<? extends ATNState>, Integer> serializationTypes =
 		Collections.unmodifiableMap(new HashMap<Class<? extends ATNState>, Integer>() {{
-			put(ATNState.class, BASIC);
-			put(RuleStartState.class, RULE_START);
-			put(BlockStartState.class, BLOCK_START);
-			put(PlusBlockStartState.class, PLUS_BLOCK_START);
-			put(StarBlockStartState.class, STAR_BLOCK_START);
-			put(TokensStartState.class, TOKEN_START);
-			put(RuleStopState.class, RULE_STOP);
-			put(BlockEndState.class, BLOCK_END);
-			put(PlusLoopbackState.class, PLUS_LOOP_BACK);
-			put(StarLoopbackState.class, STAR_LOOP_BACK);
-			put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
-		}});
+            put(ATNState.class, BASIC);
+            put(RuleStartState.class, RULE_START);
+            put(BlockStartState.class, BLOCK_START);
+            put(PlusBlockStartState.class, PLUS_BLOCK_START);
+            put(StarBlockStartState.class, STAR_BLOCK_START);
+            put(TokensStartState.class, TOKEN_START);
+            put(RuleStopState.class, RULE_STOP);
+            put(BlockEndState.class, BLOCK_END);
+            put(PlusLoopbackState.class, PLUS_LOOP_BACK);
+            put(StarLoopbackState.class, STAR_LOOP_BACK);
+            put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
+        }});
 
 	public static final int INVALID_STATE_NUMBER = -1;
+
+    /** Which ATN are we in? */
+   	public ATN atn = null;
 
 	public int stateNumber = INVALID_STATE_NUMBER;
 
@@ -94,20 +99,11 @@ public class ATNState {
 
 	public int epsilonOnlyTransitions = -1;
 
-	/** Which ATN are we in? */
-	public ATN atn = null;
-
-	//public Transition transition;
-
 	/** Track the transitions emanating from this ATN state. */
 	protected final List<Transition> transitions =
 		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 
-	/** For o-A->o type ATN tranitions, record the label that leads to this
-	 *  state.  Useful for creating rich error messages when we find
-	 *  insufficiently (with preds) covered states.
-	 */
-	public Transition incidentTransition;
+    public IntervalSet nextTokenWithinRule;
 
 	@Override
 	public int hashCode() { return stateNumber; }

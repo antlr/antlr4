@@ -132,7 +132,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		else {
 			left.addTransition(new SetTransition(right, set));
 		}
-		right.incidentTransition = left.transition(0);
 		associatedAST.atnState = left;
 		return new Handle(left, right);
 	}

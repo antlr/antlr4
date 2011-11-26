@@ -29,11 +29,14 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /** */
 public class ATN {
@@ -78,9 +81,9 @@ public class ATN {
 	public ATN() { }
 
 	/** Compute the set of valid tokens reachable from the current
-	 *  position in the parse. ctx must not be null.
+	 *  position in the parse.
 	 */
-	public IntervalSet nextTokens(RuleContext ctx) {
+	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
 		ATNState s = states.get(ctx.s);
 		if ( s == null ) return null;
 		return nextTokens(s, ctx);
@@ -96,6 +99,16 @@ public class ATN {
 		IntervalSet next = anal.LOOK(s, ctx);
 		return next;
 	}
+
+    /** Compute the set of valid tokens that can occur starting in s and staying in same rule.
+     *  EPSILON is in set if we reach end of rule.
+     */
+    public IntervalSet nextTokens(ATNState s) {
+        if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
+        s.nextTokenWithinRule = nextTokens(s, null);
+        s.nextTokenWithinRule.setReadonly(true);
+        return s.nextTokenWithinRule;
+    }
 
 	public void addState(@NotNull ATNState state) {
 		state.atn = this;

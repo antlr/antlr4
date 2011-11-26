@@ -29,13 +29,14 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LL1Analyzer {
 	/** Used during LOOK to detect computation cycles. E.g., ()* causes
@@ -64,52 +65,68 @@ public class LL1Analyzer {
 		return look;
 	}
 
-	@NotNull
-	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
-		IntervalSet r = new IntervalSet();
-		_LOOK(s, ctx, r, new HashSet<ATNConfig>());
-		return r;
-	}
+    /** Get lookahead, using ctx if we reach end of rule. If ctx is EMPTY, don't chase FOLLOW.
+     *  If ctx is null, EPSILON is in set if we can reach end of rule.
+     */
+    @NotNull
+   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
+   		IntervalSet r = new IntervalSet();
+   		_LOOK(s, ctx, r, new HashSet<ATNConfig>());
+   		return r;
+   	}
 
-	protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx, @NotNull IntervalSet look,
-						 @NotNull Set<ATNConfig> lookBusy) {
+    /** Computer set of tokens that can come next. If the context is EMPTY,
+     *  then we don't go anywhere when we hit the end of the rule. We have
+     *  the correct set.  If the context is null, that means that we did not want
+     *  any tokens following this rule--just the tokens that could be found within this
+     *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
+     *  to match a token.
+     */
+    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx, @NotNull IntervalSet look,
+                         @NotNull Set<ATNConfig> lookBusy) {
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
-		ATNConfig c = new ATNConfig(s, 0, ctx);
-		if ( lookBusy.contains(c) ) return;
-		lookBusy.add(c);
+        ATNConfig c = new ATNConfig(s, 0, ctx);
+        if ( lookBusy.contains(c) ) return;
+        lookBusy.add(c);
 
-		if ( s instanceof RuleStopState && ctx != null && ctx.invokingState!=-1 ) {
-			ATNState invokingState = atn.states.get(ctx.invokingState);
-			RuleTransition rt = (RuleTransition)invokingState.transition(0);
-			ATNState retState = rt.followState;
+        if ( s instanceof RuleStopState ) {
+            if ( ctx==null ) {
+                look.add(Token.EPSILON);
+                return;
+            }
+            if ( ctx.invokingState!=-1 ) {
+                ATNState invokingState = atn.states.get(ctx.invokingState);
+                RuleTransition rt = (RuleTransition)invokingState.transition(0);
+                ATNState retState = rt.followState;
 //			System.out.println("popping back to "+retState);
-			_LOOK(retState, ctx.parent, look, lookBusy);
-			return;
-		}
+                _LOOK(retState, ctx.parent, look, lookBusy);
+                return;
+            }
+        }
 
-		int n = s.getNumberOfTransitions();
-		for (int i=0; i<n; i++) {
-			Transition t = s.transition(i);
-			if ( t.getClass() == RuleTransition.class ) {
-				RuleContext newContext =
-					new RuleContext(ctx, s.stateNumber,  t.target.stateNumber);
-				_LOOK(t.target, newContext, look, lookBusy);
-			}
-			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, ctx, look, lookBusy);
-			}
-			else if ( t.getClass() == WildcardTransition.class ) {
-				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
-			}
-			else {
+        int n = s.getNumberOfTransitions();
+        for (int i=0; i<n; i++) {
+            Transition t = s.transition(i);
+            if ( t.getClass() == RuleTransition.class ) {
+                RuleContext newContext =
+                    new RuleContext(ctx, s.stateNumber,  t.target.stateNumber);
+                _LOOK(t.target, newContext, look, lookBusy);
+            }
+            else if ( t.isEpsilon() ) {
+                _LOOK(t.target, ctx, look, lookBusy);
+            }
+            else if ( t.getClass() == WildcardTransition.class ) {
+                look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
+            }
+            else {
 //				System.out.println("adding "+ t);
-				IntervalSet set = t.label();
-				if (t instanceof NotSetTransition) {
-					set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
-				}
-				look.addAll(set);
-			}
-		}
-	}
+                IntervalSet set = t.label();
+                if (t instanceof NotSetTransition) {
+                    set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
+                }
+                look.addAll(set);
+            }
+        }
+    }
 
 }
