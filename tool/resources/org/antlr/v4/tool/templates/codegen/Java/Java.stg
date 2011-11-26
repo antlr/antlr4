@@ -220,7 +220,7 @@ CodeBlockForAlt(c, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
+//_errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( _input.LA(1) ) {
@@ -234,7 +234,7 @@ switch ( _input.LA(1) ) {
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
+//_errHandler.sync(this);
 switch ( _input.LA(1) ) {
 	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
@@ -246,7 +246,7 @@ switch ( _input.LA(1) ) {
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
+//_errHandler.sync(this);
 <preamble; separator="\n">
 if ( <expr> ) {
 	<alts; separator="\n">
@@ -316,7 +316,7 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
+//_errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
@@ -329,7 +329,7 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
+//_errHandler.sync(this);
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
 case <i>:
