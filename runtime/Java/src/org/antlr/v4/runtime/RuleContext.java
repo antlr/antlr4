@@ -28,14 +28,18 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Rules can return start/stop info as well as possible trees and templates.
  *  Each context knows about invoking context and pointer into ATN so we
@@ -72,8 +76,10 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  for each element in the children list. For example, for a rule
 	 *  invocation there is the invoking state and the following state.
 	 *
-	 *  The parser move() method updates field s and adds it to this list
+	 *  The parser setState() method updates field s and adds it to this list
 	 *  if we are debugging/tracing.
+     *
+     *  This does not trace states visited during prediction.
 	 */
 	public List<Integer> states;
 

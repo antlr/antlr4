@@ -30,9 +30,14 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.tree.ASTNodeStream;
+import org.antlr.v4.runtime.tree.BufferedASTNodeStream;
+import org.antlr.v4.runtime.tree.TreeParser;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -624,10 +629,13 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		if ( debug ) {
 			System.out.println("PRED (ignore="+ignorePreds+") "+pt.ruleIndex+":"+pt.predIndex+
 							  ", ctx dependent="+pt.isCtxDependent);
-			if ( parser != null ) System.out.println("rule surrounding pred is "+
-													 parser.getRuleNames()[pt.ruleIndex]);
+			if ( parser != null ) {
+                System.out.println("context surrounding pred is "+
+                                   parser.getRuleInvocationStack());
+                System.out.println("config.context="+config.context.toString(parser));
+            }
 		}
-		// We know the correct context and exactly one spot: in the original
+		// We know the correct context in exactly one spot: in the original
 		// rule that invokes the ATN simulation. We know we are in this rule
 		// when the context stack is empty and we've not dipped into
 		// the outer context.
@@ -638,15 +646,17 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		// We see through the predicate if:
 		//	1) we are ignoring them
-		//	2) we aren't ignoring them but it is not context dependent and
+		//	2) we aren't ignoring them and it is not context dependent and
 		//	   pred is true
-		//	3) we aren't ignoring them, it is context dependent, but
-		//     we know the context and pred is true
+        //	3) we aren't ignoring them, it is context dependent, but
+      	//     we know the context and pred is true
+        //	4) we aren't ignoring them, it is context dependent, but we don't know context
 		ATNConfig c = null;
 		boolean seeThroughPred =
 			ignorePreds ||
 			(!ignorePreds&&!pt.isCtxDependent&&parser.sempred(ctx, pt.ruleIndex, pt.predIndex))||
-			(!ignorePreds&&pt.isCtxDependent&&inContext&&parser.sempred(ctx, pt.ruleIndex, pt.predIndex));
+            (!ignorePreds&&pt.isCtxDependent&&inContext&&parser.sempred(ctx, pt.ruleIndex, pt.predIndex)||
+            (!ignorePreds&&pt.isCtxDependent&&!inContext));
 		if ( seeThroughPred ) {
 			c = new ATNConfig(config, pt.target);
 			c.traversedPredicate = true;
