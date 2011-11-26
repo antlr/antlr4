@@ -481,14 +481,12 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-                if ( a==Token.EOF ) buf.append("<EOF>");
-                else if ( a==Token.EPSILON ) buf.append("<EPSILON>");
-				else buf.append(tokenNames[a]);
+				buf.append(elementName(tokenNames, a));
 			}
 			else {
 				for (int i=a; i<=b; i++) {
 					if ( i>a ) buf.append(", ");
-					buf.append(tokenNames[i]);
+                    buf.append(elementName(tokenNames, i));
 				}
 			}
 			if ( iter.hasNext() ) {
@@ -498,8 +496,15 @@ public class IntervalSet implements IntSet {
 		if ( this.size()>1 ) {
 			buf.append("}");
 		}
-		return buf.toString();
-	}
+        return buf.toString();
+    }
+
+    protected String elementName(String[] tokenNames, int a) {
+        if ( a==Token.EOF ) return "<EOF>";
+        else if ( a==Token.EPSILON ) return "<EPSILON>";
+        else return tokenNames[a];
+
+    }
 
     @Override
     public int size() {
@@ -582,17 +587,17 @@ public class IntervalSet implements IntSet {
             // if whole interval x..x, rm
             if ( el==a && el==b ) {
                 intervals.remove(i);
-                return;
+                break;
             }
             // if on left edge x..b, adjust left
             if ( el==a ) {
                 I.a++;
-                return;
+                break;
             }
             // if on right edge a..x, adjust right
             if ( el==b ) {
                 I.b--;
-                return;
+                break;
             }
             // if in middle a..x..b, split interval
             if ( el>a && el<b ) { // found in this interval
