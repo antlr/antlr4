@@ -310,7 +310,8 @@ public class TestLeftRecursion extends BaseTest {
 			"a=b=c+d.e","(= a (= b (+ c (. d e))))",
 			"a|b&c",	"(| a (& b c))",
 			"(a|b)&c",	"(& (| a b) c)",
-			"a > b",	"(> a b)",
+            "a > b",	"(> a b)",
+            "a > 0",	"(> a 0)",
 			"a >> b",	"(>> a b)",  // text is from one token
 			"a < b",	"(< a b)",
 
