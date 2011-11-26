@@ -1,4 +1,20 @@
-grammar JavaParserLR;
+grammar Java;
+
+@lexer::members {
+  protected boolean enumIsKeyword = true;
+  protected boolean assertIsKeyword = true;
+}
+
+@parser::members {
+/*
+public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
+	super.enterRule(localctx, ruleIndex);
+	System.out.println("enter "+ruleNames[ruleIndex]+
+              ", LT(1)="+_input.LT(1)+
+              ", LT(2)="+_input.LT(2));
+}
+*/
+}
 
 // starting point for parsing a java file
 /* The annotations are separated out to make parsing faster, but must be associated with
@@ -532,6 +548,8 @@ constantExpression
     :   expression
     ;
 
+//expression : expression_[0] ;
+
 expression
 	:   '(' expression ')'
     |   'this' 
@@ -554,8 +572,8 @@ expression
     |   ('~'|'!') expression
     |   expression ('*'|'/'|'%') expression
     |   expression ('+'|'-') expression
-    |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    |   expression ('<' '=' | '>' '=' | '>' | '<') expression
+//    |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression !!! can't handle multi-token ops :(
+    |   expression ('<=' | '>=' | '>' | '<') expression
     |   expression 'instanceof' type
     |   expression ('==' | '!=') expression
     |   expression '&' expression
@@ -573,16 +591,69 @@ expression
         |'&='<assoc=right>
         |'|='<assoc=right>
         |'='<assoc=right>
-/*
-        |'>' '>' '='<assoc=right>
-        |'>' '>' '>' '='<assoc=right>
-        |'<' '<' '='<assoc=right>
-        */
+//        |'>' '>' '='<assoc=right>
+//        |'>' '>' '>' '='<assoc=right>
+//        |'<' '<' '='<assoc=right>
         |'%='<assoc=right>
         )
         expression
     ;
 
+/*
+expression_[int _p]
+    :   expression_primary
+        (
+            {13 >= $_p}? ('*'|'/'|'%') expression_[14]{}
+                      | {12 >= $_p}? ('+'|'-') expression_[13]{}
+                      | {8 >= $_p}? ('==' | '!=') expression_[9]{}
+                      | {7 >= $_p}? '&' expression_[8]{}
+                      | {6 >= $_p}? '^'<assoc=right> expression_[6]{}
+                      | {5 >= $_p}? '|' expression_[6]{}
+                      | {4 >= $_p}? '&&' expression_[5]{}
+                      | {3 >= $_p}? '||' expression_[4]{}
+                      | {1 >= $_p}? ('^='<assoc=right>
+                    |'+='<assoc=right>
+                    |'-='<assoc=right>
+                    |'*='<assoc=right>
+                    |'/='<assoc=right>
+                    |'&='<assoc=right>
+                    |'|='<assoc=right>
+                    |'='<assoc=right>
+            /*
+                    |'>' '>' '='<assoc=right>
+                    |'>' '>' '>' '='<assoc=right>
+                    |'<' '<' '='<assoc=right>
+                    |'%='<assoc=right>
+                    )
+                    expression_[1]
+                      | {2 >= $_p}? '?' expression ':' expression_[3]{}
+                      | {26 >= $_p}? '.' Identifier
+                      | {25 >= $_p}? '.' 'this'
+                      | {24 >= $_p}? '.' 'super' '(' expressionList? ')'
+                      | {23 >= $_p}? '.' 'new' Identifier '(' expressionList? ')'
+                      | {22 >= $_p}? '.' 'super' '.' Identifier arguments?
+                      | {21 >= $_p}? '.' explicitGenericInvocation
+                      | {19 >= $_p}? '[' expression ']'
+                      | {17 >= $_p}? ('++' | '--')
+                      | {16 >= $_p}? '(' expressionList? ')'
+                      | {11 >= $_p}? ('<' '<' | '>' '>' '>' | '>' '>') expression
+                      | {10 >= $_p}? ('<' '=' | '>' '=' | '>' | '<') expression
+                      | {9 >= $_p}? 'instanceof' type
+        )*
+    ;
+expression_primary
+    : '(' type ')' expression_[18]{}
+    | ('+'|'-'|'++'|'--') expression_[15]{}
+    | ('~'|'!') expression_[14]{}
+    | '(' expression ')'
+    | 'this'
+    | 'super'
+    | literal
+    | Identifier
+    | type '.' 'class'
+    | 'new' creator
+    ;
+*/
 creator
     :   nonWildcardTypeArguments createdName classCreatorRest
     |   createdName (arrayCreatorRest | classCreatorRest)

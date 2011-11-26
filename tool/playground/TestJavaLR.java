@@ -12,7 +12,7 @@ class TestJavaLR {
 	public static long lexerTime = 0;
 	public static boolean profile = false;
 	public static JavaLexer lexer;
-	public static JavaParserLR parser = null;
+	public static JavaParser parser = null;
 
 	public static void main(String[] args) {
 		try {
@@ -26,6 +26,7 @@ class TestJavaLR {
 			else {
 				System.err.println("Usage: java Main <directory or file name>");
 			}
+
 			long stop = System.currentTimeMillis();
 			System.out.println("Lexer total time " + lexerTime + "ms.");
 			System.out.println("Total time " + (stop - start) + "ms.");
@@ -100,7 +101,7 @@ class TestJavaLR {
 			if ( true ) {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
-					parser = new JavaParserLR(tokens);
+					parser = new JavaParser(tokens);
                     parser.setBuildParseTree(true);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
@@ -108,7 +109,7 @@ class TestJavaLR {
 				parser.setTokenStream(tokens);
 				// start parsing at the compilationUnit rule
 				ParserRuleContext<Token> tree = parser.compilationUnit();
-                tree.inspect(parser);
+//                tree.inspect(parser);
 				//System.err.println("finished "+f);
 //                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
 			}
