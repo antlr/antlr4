@@ -274,7 +274,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			ruleST.add("alts", altST);
 		}
 
-		System.out.println(ruleST.render());
+		tool.log("left-recursion", ruleST.render());
 
 		return ruleST.render();
 	}
