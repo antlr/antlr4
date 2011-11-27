@@ -134,11 +134,17 @@ public class LexerATNSimulator extends ATNSimulator {
 	public int match(@NotNull CharStream input, int mode) {
 		match_calls++;
 		this.mode = mode;
-		if ( dfa[mode].s0==null ) {
-			return matchATN(input);
+		int mark = input.mark();
+		try {
+			if ( dfa[mode].s0==null ) {
+				return matchATN(input);
+			}
+			else {
+				return exec(input, dfa[mode].s0);
+			}
 		}
-		else {
-			return exec(input, dfa[mode].s0);
+        finally {
+			input.release(mark);
 		}
 	}
 
@@ -153,23 +159,15 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	// only called from test code from outside
 	public int matchATN(@NotNull CharStream input) {
-		int mark = input.mark();
-		try {
-			startIndex = input.index();
-			ATNState startState = atn.modeToStartState.get(mode);
-			if ( debug ) System.out.println("mode "+ mode +" start: "+startState);
-			OrderedHashSet<ATNConfig> s0_closure = computeStartState(input, startState);
-			int old_mode = mode;
-			dfa[mode].s0 = addDFAState(s0_closure);
-			int predict = exec(input, s0_closure);
-			if ( debug ) System.out.println("DFA after matchATN: "+dfa[old_mode].toLexerString());
-			return predict;
-		}
-        finally {
-			if (mark >= 0) {
-				input.release(mark);
-			}
-		}
+		startIndex = input.index();
+		ATNState startState = atn.modeToStartState.get(mode);
+		if ( debug ) System.out.println("mode "+ mode +" start: "+startState);
+		OrderedHashSet<ATNConfig> s0_closure = computeStartState(input, startState);
+		int old_mode = mode;
+		dfa[mode].s0 = addDFAState(s0_closure);
+		int predict = exec(input, s0_closure);
+		if ( debug ) System.out.println("DFA after matchATN: "+dfa[old_mode].toLexerString());
+		return predict;
 	}
 
 	protected int exec(@NotNull CharStream input, @NotNull DFAState s0) {
