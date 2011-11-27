@@ -136,6 +136,7 @@ public class ATNState {
 
 	//lexer atn sim: getEpTar: 13.2%
 	// ruleCtx.equals 10%
+    // TODO: Sam says this takes a lot of time; optimize
 	public boolean onlyHasEpsilonTransitions() { // 22% time
 		if ( epsilonOnlyTransitions>=0 ) return epsilonOnlyTransitions==1;
 		if ( transitions.size()==0 ) return false;
