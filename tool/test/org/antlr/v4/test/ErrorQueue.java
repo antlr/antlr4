@@ -28,9 +28,9 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.Utils;
-import org.antlr.v4.tool.ANTLRToolListener;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.ANTLRToolListener;
 import org.antlr.v4.tool.ToolMessage;
 import org.stringtemplate.v4.ST;
 

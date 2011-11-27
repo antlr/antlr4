@@ -1,11 +1,11 @@
 package org.antlr.v4.test;
 
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.LexerRecognitionExeption;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
