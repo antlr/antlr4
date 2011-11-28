@@ -32,6 +32,8 @@ package org.antlr.v4.runtime.dfa;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Arrays;
+
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {
 	@NotNull
@@ -77,7 +79,12 @@ public class DFASerializer {
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
 		if ( s.isAcceptState ) {
-			stateStr = ":s"+n+"=>"+s.prediction;
+            if ( s.altToPred!=null ) {
+                stateStr = ":s"+n+"=>"+Arrays.toString(Arrays.copyOfRange(s.altToPred, 1, s.altToPred.length));
+            }
+            else {
+                stateStr = ":s"+n+"=>"+s.prediction;
+            }
 		}
 		if ( s.isCtxSensitive ) {
 			stateStr = ":s"+n+"@"+s.ctxToPrediction;

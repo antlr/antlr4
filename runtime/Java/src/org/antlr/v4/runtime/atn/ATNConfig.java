@@ -29,9 +29,10 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.*;
 
 /** An ATN state, predicted alt, and syntactic/semantic context.
  *  The syntactic context is a pointer into the rule invocation
@@ -61,16 +62,7 @@ public class ATNConfig {
 	 * otherwise predicates would not get executed again (DFAs don't
 	 * have predicated edges in v4).
 	 */
-	public boolean traversedPredicate;
-
-	/**
-	 * Indicates that we have reached this ATN configuration after
-	 * traversing a non-forced action transition. We do not execute
-	 * predicates after such actions because the predicates could be
-	 * functions of the side effects. Force actions must be either side
-	 * effect free or automatically undone as the parse continues.
-	 */
-	public boolean traversedAction;
+	public boolean traversedPredicate; // TODO: don't need
 
 	/**
 	 * We cannot execute predicates dependent upon local context unless
@@ -85,6 +77,18 @@ public class ATNConfig {
 	 */
 	public int reachesIntoOuterContext;
 
+    @NotNull
+    public SemanticContext semanticContext = SemanticContext.NONE;
+
+    /** This bit is used to indicate a semantic predicate will be
+     *  used to resolve the conflict. Essentially, this is used
+     *  as an "ignore" bit so that upon a set of conflicting configurations,
+     *  such as (s|2|p) and (s|3|q), I can set (s|3) to resolved=true (and any
+     *  other configuration associated with alt 3) to make it look like that set
+     *  uniquely predicts an alt.
+     */
+    protected boolean resolveWithPredicate;
+
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable RuleContext context)
@@ -94,26 +98,36 @@ public class ATNConfig {
 		this.context = context;
 	}
 
-	public ATNConfig(@NotNull ATNConfig c) {
-		this(c, c.state, c.context);
-	}
+//	public ATNConfig(@NotNull ATNConfig c) {
+//		this(c, c.state, c.context, c.semanticContext);
+//	}
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
-		this(c, state, c.context);
-	}
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
+   		this(c, state, c.context, c.semanticContext);
+   	}
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context) {
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, SemanticContext semanticContext) {
+   		this(c, state, c.context, semanticContext);
+   	}
+
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context) {
+        this(c, state, context, c.semanticContext);
+    }
+
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context,
+                     SemanticContext semanticContext)
+    {
 		this.state = state;
 		this.alt = c.alt;
 		this.context = context;
 		this.traversedPredicate = c.traversedPredicate;
-		this.traversedAction = c.traversedAction;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
+        this.semanticContext = semanticContext;
 	}
 
-	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {
-		this(c, c.state, context);
-	}
+//	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {
+//		this(c, c.state, context);
+//	}
 
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
@@ -153,16 +167,20 @@ public class ATNConfig {
 //		}
 		buf.append(state);
 		if ( showAlt ) {
-			buf.append("|");
-			buf.append(alt);
-		}
-		if ( context!=null ) {
+            buf.append("|");
+            buf.append(alt);
+        }
+        if ( context!=null ) {
             buf.append("|");
             buf.append(context);
         }
-		if ( reachesIntoOuterContext>0 ) {
-			buf.append("|up=").append(reachesIntoOuterContext);
-		}
+        if ( semanticContext!=null ) {
+            buf.append("|");
+            buf.append(semanticContext);
+        }
+        if ( reachesIntoOuterContext>0 ) {
+            buf.append("|up=").append(reachesIntoOuterContext);
+        }
 //		if (isAccept) {
 //			buf.append("|=>"+alt);
 //		}

@@ -52,6 +52,10 @@ public class PredicateTransition extends Transition {
 	@Override
 	public boolean isEpsilon() { return true; }
 
+    public SemanticContext.Predicate getPredicate() {
+   		return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
+   	}
+
 	@Override
 	@NotNull
 	public String toString() {

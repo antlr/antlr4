@@ -29,12 +29,16 @@
 
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /** A DFA state represents a set of possible ATN configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -49,16 +53,15 @@ import java.util.*;
  *  state as well, however.  More importantly, we need to maintain
  *  a stack of states, tracking the closure operations as they
  *  jump from rule to rule, emulating rule invocations (method calls).
- *  Recall that ATNs do not normally have a stack like a pushdown-machine
- *  so I have to add one to simulate the proper lookahead sequences for
+ *  I have to add a stack to simulate the proper lookahead sequences for
  *  the underlying LL grammar from which the ATN was derived.
  *
- *  I use a list of ATNConfig objects.  An ATNConfig
+ *  I use a set of ATNConfig objects not simple states.  An ATNConfig
  *  is both a state (ala normal conversion) and a RuleContext describing
  *  the chain of rules (if any) followed to arrive at that state.
  *
  *  A DFA state may have multiple references to a particular state,
- *  but with different ATNContexts (with same or different alts)
+ *  but with different ATN contexts (with same or different alts)
  *  meaning that state was reached via a different set of rule invocations.
  */
 public class DFAState {
@@ -84,7 +87,9 @@ public class DFAState {
 	public boolean isCtxSensitive;
 
 	@Nullable
-	public Map<RuleContext, Integer> ctxToPrediction;
+	public Map<RuleContext, Integer> ctxToPrediction; // used for ctx sensitive parsing
+
+    public SemanticContext[] altToPred;
 
 	public DFAState() { }
 
@@ -150,6 +155,17 @@ public class DFAState {
 
 	@Override
 	public String toString() {
-		return stateNumber+":"+configs+(isAcceptState?("=>"+prediction):"");
+        StringBuilder buf = new StringBuilder();
+        buf.append(stateNumber + ":" + configs);
+        if ( isAcceptState ) {
+            buf.append("=>");
+            if ( altToPred!=null ) {
+                buf.append(Arrays.toString(Arrays.copyOfRange(altToPred, 1, altToPred.length)));
+            }
+            else {
+                buf.append(prediction);
+            }
+        }
+		return buf.toString();
 	}
 }

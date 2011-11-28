@@ -3,45 +3,45 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 public class TestSemPredEvalParser extends BaseTest {
-	@Test public void testToLeft() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"s : a+ ;\n" +
-			"a : {false}? ID {System.out.println(\"alt 1\");}\n" +
-			"  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
-			"  ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+    @Test public void testSimple() throws Exception {
+   		String grammar =
+   			"grammar T;\n" +
+   			"a : {false}? ID {System.out.println(\"alt 1\");}\n" +
+            "  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
+            "  | INT         {System.out.println(\"alt 3\");}\n" +
+   			"  ;\n" +
+   			"ID : 'a'..'z'+ ;\n" +
+   			"INT : '0'..'9'+;\n" +
+   			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "x x y", false);
-		String expecting =
-			"alt 2\n" +
-			"alt 2\n" +
-			"alt 2\n";
-		assertEquals(expecting, found);
-	}
+   		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+   								  "x", false);
+   		String expecting =
+   			"alt 2\n" +
+   			"alt 2\n" +
+   			"alt 2\n";
+   		assertEquals(expecting, found);
+   	}
 
-	@Test public void testToRight() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"s : a+ ;\n" +
-			"a : ID {false}? {System.out.println(\"alt 1\");}\n" +
-			"  | ID {true}?  {System.out.println(\"alt 2\");}\n" +
-			"  ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+    @Test public void testToLeft() throws Exception {
+   		String grammar =
+   			"grammar T;\n" +
+   			"s : a+ ;\n" +
+   			"a : {false}? ID {System.out.println(\"alt 1\");}\n" +
+   			"  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
+   			"  ;\n" +
+   			"ID : 'a'..'z'+ ;\n" +
+   			"INT : '0'..'9'+;\n" +
+   			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "x x y", false);
-		String expecting =
-			"alt 2\n" +
-			"alt 2\n" +
-			"alt 2\n";
-		assertEquals(expecting, found);
-	}
+   		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+   								  "x x y", false);
+   		String expecting =
+   			"alt 2\n" +
+   			"alt 2\n" +
+   			"alt 2\n";
+   		assertEquals(expecting, found);
+   	}
 
 	@Test public void testActionHidesPreds() throws Exception {
 		// can't see preds, resolves to first alt found (1 in this case)
