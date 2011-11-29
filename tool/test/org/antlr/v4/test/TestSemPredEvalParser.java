@@ -32,6 +32,57 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 public class TestSemPredEvalParser extends BaseTest {
+	// TEST VALIDATING PREDS
+
+	@Test public void testSimpleValidate() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+				"s : a a a;\n" +
+				"a : {false}? ID  {System.out.println(\"alt 1\");}\n" +
+				"  | {true}?  INT {System.out.println(\"alt 2\");}\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "3 4 x", false);
+		String expecting =
+			"alt 2\n" +
+			"alt 2\n";
+		assertEquals(expecting, found);
+
+		expecting = "line 1:4 no viable alternative at input 'x'\n";
+		assertEquals(expecting, stderrDuringParse);
+	}
+
+	@Test public void testValidateInDFA() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+				"s : a ';' a;\n" +
+				// ';' helps us to resynchronize without consuming
+				// 2nd 'a' reference. We our testing that the DFA also
+				// throws an exception if the validating predicate fails
+				"a : {false}? ID  {System.out.println(\"alt 1\");}\n" +
+				"  | {true}?  INT {System.out.println(\"alt 2\");}\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "x ; y", false);
+		String expecting = "";
+		assertEquals(expecting, found);
+
+		expecting =
+			"line 1:0 no viable alternative at input 'x'\n" +
+			"line 1:4 no viable alternative at input 'y'\n";
+		assertEquals(expecting, stderrDuringParse);
+	}
+
+	// TEST DISAMBIG PREDS
+
 	@Test public void testSimple() throws Exception {
 		String grammar =
 			"grammar T;\n" +

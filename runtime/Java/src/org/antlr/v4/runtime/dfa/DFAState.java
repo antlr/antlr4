@@ -35,8 +35,8 @@ import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -90,7 +90,50 @@ public class DFAState {
 	@Nullable
 	public Map<RuleContext, Integer> ctxToPrediction; // used for ctx sensitive parsing
 
-    public SemanticContext[] altToPred;
+	/** DFA accept states use predicates into situations:
+	 *  disambiguating and validating predicates. If an accept state
+	 *  predicts more than one alternative, It's ambiguous and we
+	 *  try to resolve with predicates.  Disambiguating predicates
+	 *  are evaluated when there is a unique prediction for this accept state.
+	 *  This array tracks the list of predicates to test in either case;
+	 *  there will only be one in the case of a disambiguating predicate.
+	 *
+	 *  Because there could be 20 alternatives for a decision,
+	 *  we don't want to map alt to predicates; we might have to walk
+	 *  all of the early alternatives just to get to the predicates.
+	 *
+	 *  If this is null then there are no predicates involved in
+	 *  decision-making for this state.
+	 *
+	 *  As an example, we might have:
+	 *
+	 *  predicates = [(p,2), (q,3), (null, 1)]
+	 *
+	 *  This means that there are 2 predicates for 3 ambiguous alternatives.
+	 *  If the first 2 predicates fail, then we default to the last
+	 *  preds value, which is alt 1. This comes from:
+	 *
+	 *  r :      A
+	 *    | {p}? A
+	 *    | {q}? A
+	 *    ;
+	 */
+	@Nullable
+	public List<PredPrediction> predicates;
+
+	/** Map a predicate to a predicted alternative */
+	public static class PredPrediction {
+		public SemanticContext pred;
+		public int alt;
+		public PredPrediction(SemanticContext pred, int alt) {
+			this.alt = alt;
+			this.pred = pred;
+		}
+		@Override
+		public String toString() {
+			return "("+pred+", "+alt+ ")";
+		}
+	}
 
 	public DFAState() { }
 
@@ -160,8 +203,8 @@ public class DFAState {
         buf.append(stateNumber + ":" + configs);
         if ( isAcceptState ) {
             buf.append("=>");
-            if ( altToPred!=null ) {
-                buf.append(Arrays.toString(Arrays.copyOfRange(altToPred, 1, altToPred.length)));
+            if ( predicates!=null ) {
+                buf.append(predicates);
             }
             else {
                 buf.append(prediction);

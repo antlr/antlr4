@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ASTNodeStream;
 import org.antlr.v4.runtime.tree.BufferedASTNodeStream;
 import org.antlr.v4.runtime.tree.TreeParser;
@@ -197,7 +196,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				return alt;
 			}
 			if ( s.isAcceptState ) {
-				if ( s.altToPred!=null ) {
+				if ( s.predicates!=null ) {
 					if ( dfa_debug ) System.out.println("accept "+s);
 				}
 				else {
@@ -257,25 +256,22 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			if ( debug ) System.out.println("!!! no viable alt in dfa");
 			return -1;
 		}
-		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" predicts "+prevAcceptState.prediction);
 
 		// TODO: Factor this code that is very similar to ATN version
-		if ( s.altToPred!=null ) {
+		// Before jumping to prediction, check to see if there are
+		// disambiguating or validating predicates to evaluate
+		if ( s.predicates!=null ) {
 			// rewind input so pred's LT(i) calls make sense
 			input.seek(startIndex);
-			int predictPredicatedAlt = evalSemanticContext(s.altToPred);
-			if ( predictPredicatedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				return predictPredicatedAlt;
+			int predictedAlt = evalSemanticContext(s.predicates);
+			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+				return predictedAlt;
 			}
-			// no predicate evaluated to true
-			if ( prevAcceptState.prediction==ATN.INVALID_ALT_NUMBER ) {
-				// and now we find out that we had no uncovered alt
-				// to fall back to. must announce parsing error.
-				throw noViableAlt(input, outerContext, s.configs, startIndex);
-			}
+			throw noViableAlt(input, outerContext, s.configs, startIndex);
 		}
 
+		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+											" predicts "+prevAcceptState.prediction);
 		return prevAcceptState.prediction;
 	}
 
@@ -355,29 +351,22 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					getPredsForAmbigAlts(decState, ambigAlts, reach);
                 if ( altToPred!=null ) {
 					// We need at least n-1 predicates for n ambiguous alts
-					// [1, 2]:[null, null, 1:0]
-					int nPredAlts = Utils.numNonnull(altToPred);
-					if ( nPredAlts < ambigAlts.size()-1 ) {
+					if ( tooFewPredicates(altToPred) ) {
 						reportInsufficientPredicates(startIndex, input.index(),
 													 ambigAlts, altToPred, reach);
 					}
+					List<DFAState.PredPrediction> predPredictions =
+						getPredicatePredictions(altToPred);
+					DFAState accept = addDFAEdge(dfa, closure, t, reach);
+					makeAcceptState(accept, predPredictions);
 					// rewind input so pred's LT(i) calls make sense
 					input.seek(startIndex);
-                    int uniqueAlt = evalSemanticContext(altToPred);
+                    int uniqueAlt = evalSemanticContext(predPredictions);
 					if ( uniqueAlt==ATN.INVALID_ALT_NUMBER ) {
-						// no predicate evaluated to true
-						uniqueAlt = getFirstUnpredicatedAmbigAlt(ambigAlts, altToPred);
-						if ( debug ) System.out.println("PREDICT firstUnpredicatedAmbigAlt "+
-											   uniqueAlt);
-						if ( uniqueAlt==ATN.INVALID_ALT_NUMBER ) {
-							// and now we find out that we had no uncovered alt
-							// to fall back to. must announce parsing error.
-							throw noViableAlt(input, outerContext, closure, startIndex);
-						}
+						// no true pred and/or no uncovered alt
+						// to fall back on. must announce parsing error.
+						throw noViableAlt(input, outerContext, closure, startIndex);
 					}
-                    DFAState accept = addDFAEdge(dfa, closure, t, reach);
-					// TODO: split into preds to test then firstUnpredicatedAlt
-                    makeAcceptState(accept, ambigAlts, altToPred);
                     return uniqueAlt;
                 }
 
@@ -413,7 +402,34 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				if ( debug ) System.out.println("PREDICT alt "+uniqueAlt+
 												" decision "+dfa.decision+
 												" at index "+input.index());
+				// edge from closure-t->reach now
                 DFAState accept = addDFAEdge(dfa, closure, t, reach);
+				// now check to see if we have a validating predicate.
+				// We know that it's validating because there is only
+				// one predicted alternative
+				Set<Integer> uniqueAltSet = new HashSet<Integer>();
+				uniqueAltSet.add(uniqueAlt);
+				SemanticContext[] altToPred =
+					getPredsForAmbigAlts(decState, uniqueAltSet, reach);
+				// altToPred[uniqueAlt] is now our validating predicate (if any)
+				if ( altToPred!=null ) {
+					// we have a validating predicate; test it
+					// Update DFA so reach becomes accept state with predicate
+					List<DFAState.PredPrediction> predPredictions =
+						getPredicatePredictions(altToPred);
+					makeAcceptState(accept, predPredictions);
+					// rewind input so pred's LT(i) calls make sense
+					input.seek(startIndex);
+					boolean validated = altToPred[uniqueAlt].eval(parser, outerContext);
+					if ( debug || dfa_debug ) {
+						System.out.println("eval alt "+uniqueAlt+" pred "+
+											   altToPred[uniqueAlt]+"="+ validated);
+					}
+					if ( !validated ) {
+						throw noViableAlt(input, outerContext, closure, startIndex);
+					}
+					return uniqueAlt;
+				}
 				makeAcceptState(accept, uniqueAlt);
 				return uniqueAlt;
 			}
@@ -456,35 +472,27 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return prevAccept.alt;
 	}
 
-    // eval preds first in alt order for ambigAlts; only ambig alts can
-	// can have preds, though some ambig alts will be unpredicated.
-    // if all preds false, then pick first unpredicated alt in ambigAlts
-    public int evalSemanticContext(SemanticContext[] altToPred) {
-        int uniqueAlt = ATN.INVALID_ALT_NUMBER;
-        for (int i = 1; i < altToPred.length; i++) {
-            SemanticContext or = altToPred[i];
-            if ( or==null ) {
-				if ( debug || dfa_debug ) System.out.println("eval alt "+i+" unpredicated");
-				continue;
+	/** Look through a list of predicate/alt pairs, returning alt for the
+	 *  first pair that wins. A null predicate indicates the default
+	 *  prediction for disambiguating predicates.
+	 */
+    public int evalSemanticContext(@NotNull List<DFAState.PredPrediction> predPredictions) {
+		for (DFAState.PredPrediction pair : predPredictions) {
+			if ( pair.pred==null ) return pair.alt; // default prediction
+			if ( debug || dfa_debug ) {
+				System.out.println("eval pred "+pair+"="+pair.pred.eval(parser, outerContext));
 			}
-            if ( debug || dfa_debug ) System.out.println("eval alt "+i+" pred "+or+"="+or.eval(parser, outerContext));
-            if ( or.eval(parser, outerContext) ) {
-				if ( debug || dfa_debug ) System.out.println("PREDICT "+i);
-                uniqueAlt = i;
-                break;
-            }
-        }
-        return uniqueAlt;
-    }
-
-	public int getFirstUnpredicatedAmbigAlt(Set<Integer> ambigAlts, SemanticContext[] altToPred) {
-		for (int i = 1; i < altToPred.length; i++) {
-			SemanticContext or = altToPred[i];
-			if ( or==null || or==SemanticContext.NONE ) {
-				if ( ambigAlts.contains(i) ) return i;
+			if ( pair.pred.eval(parser, outerContext) ) {
+				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
+				return pair.alt;
 			}
 		}
-		return 0;
+		if ( debug || dfa_debug ) {
+			System.out.println("failed validating predicate");
+		}
+		// no prediction; either all predicates are false and
+		// all alternatives were guarded, or a validating predicate failed.
+		return ATN.INVALID_ALT_NUMBER;
 	}
 
     protected int resolveToMinAlt(@NotNull OrderedHashSet<ATNConfig> reach, @NotNull Set<Integer> ambigAlts) {
@@ -917,10 +925,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
             }
         }
 
-		// Optimize away p||p and p&&p and also make any NONE = null
+		// Optimize away p||p and p&&p
 		for (int i = 0; i < altToPred.length; i++) {
 			if ( altToPred[i]!=null ) altToPred[i] = altToPred[i].optimize();
-			if ( altToPred[i] == SemanticContext.NONE ) altToPred[i] = null;
+//			if ( altToPred[i] == SemanticContext.NONE ) altToPred[i] = null;
 		}
 
 		// nonambig alts are null in altToPred
@@ -928,6 +936,37 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
         return altToPred;
     }
 
+	public List<DFAState.PredPrediction> getPredicatePredictions(SemanticContext[] altToPred) {
+		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
+		int firstUnpredicated = ATN.INVALID_ALT_NUMBER;
+		for (int i = 1; i < altToPred.length; i++) {
+			SemanticContext pred = altToPred[i];
+			// find first on predicated alternative, if any.
+			// Only ambiguous alternatives will have SemanticContext.NONE.
+			// All other alternatives will have null predicates in altToPred
+			if ( pred==SemanticContext.NONE && firstUnpredicated==ATN.INVALID_ALT_NUMBER ) {
+				firstUnpredicated = i;
+			}
+			if ( pred!=null && pred!=SemanticContext.NONE ) {
+				pairs.add(new DFAState.PredPrediction(pred, i));
+			}
+		}
+		if ( pairs.size()==0 ) pairs = null;
+		else if ( firstUnpredicated!=ATN.INVALID_ALT_NUMBER ) {
+			// add default prediction if we found null predicate
+			pairs.add(new DFAState.PredPrediction(null, firstUnpredicated));
+		}
+//		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
+		return pairs;
+	}
+
+	public boolean tooFewPredicates(SemanticContext[] altToPred) {
+		int unpredicated = 0;
+		for (int i = 1; i < altToPred.length; i++) {
+			if ( altToPred[i]==SemanticContext.NONE ) unpredicated++;
+		}
+		return unpredicated > 1;
+	}
 	public static int getMinAlt(@NotNull Set<Integer> ambigAlts) {
 		int min = Integer.MAX_VALUE;
 		for (int alt : ambigAlts) {
@@ -991,14 +1030,12 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
    	}
 
     public void makeAcceptState(@NotNull DFAState accept,
-								@NotNull Set<Integer> ambigAlts,
-								@NotNull SemanticContext[] altToPred) {
+								List<DFAState.PredPrediction> predPredictions)
+	{
    		accept.isAcceptState = true;
    		accept.complete = true;
-		accept.altToPred = altToPred;
-		// find min unpredicated ambig alt and default to it if no
-		// preds match (during dfa matching)
-		accept.prediction = getFirstUnpredicatedAmbigAlt(ambigAlts, altToPred);
+		accept.prediction = ATN.INVALID_ALT_NUMBER;
+		accept.predicates = predPredictions;
 	}
 
 	@NotNull

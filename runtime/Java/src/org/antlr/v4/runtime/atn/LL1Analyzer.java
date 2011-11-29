@@ -1,30 +1,30 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
- All rights reserved.
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
 
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -60,7 +60,11 @@ public class LL1Analyzer {
 		for (int alt=1; alt<=s.getNumberOfTransitions(); alt++) {
 			look[alt] = new IntervalSet();
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
-			_LOOK(s.transition(alt - 1).target, RuleContext.EMPTY, look[alt], lookBusy);
+			boolean seeThruPreds = false; // fail to get lookahead upon pred
+			_LOOK(s.transition(alt - 1).target,
+				  RuleContext.EMPTY,
+				  look[alt], lookBusy, seeThruPreds);
+			if ( look[alt].size()==0 ) look[alt] = null;
 		}
 		return look;
 	}
@@ -71,7 +75,8 @@ public class LL1Analyzer {
     @NotNull
    	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
    		IntervalSet r = new IntervalSet();
-   		_LOOK(s, ctx, r, new HashSet<ATNConfig>());
+		boolean seeThruPreds = true; // ignore preds; get all lookahead
+   		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds);
    		return r;
    	}
 
@@ -82,8 +87,11 @@ public class LL1Analyzer {
      *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
      *  to match a token.
      */
-    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx, @NotNull IntervalSet look,
-                         @NotNull Set<ATNConfig> lookBusy) {
+    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx,
+						 @NotNull IntervalSet look,
+                         @NotNull Set<ATNConfig> lookBusy,
+						 boolean seeThruPreds)
+	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
         ATNConfig c = new ATNConfig(s, 0, ctx);
         if ( lookBusy.contains(c) ) return;
@@ -99,7 +107,7 @@ public class LL1Analyzer {
                 RuleTransition rt = (RuleTransition)invokingState.transition(0);
                 ATNState retState = rt.followState;
 //			System.out.println("popping back to "+retState);
-                _LOOK(retState, ctx.parent, look, lookBusy);
+                _LOOK(retState, ctx.parent, look, lookBusy, seeThruPreds);
                 return;
             }
         }
@@ -110,10 +118,10 @@ public class LL1Analyzer {
             if ( t.getClass() == RuleTransition.class ) {
                 RuleContext newContext =
                     new RuleContext(ctx, s.stateNumber,  t.target.stateNumber);
-                _LOOK(t.target, newContext, look, lookBusy);
+                _LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
             }
-            else if ( t.isEpsilon() ) {
-                _LOOK(t.target, ctx, look, lookBusy);
+            else if ( t.isEpsilon() && seeThruPreds ) {
+                _LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
             }
             else if ( t.getClass() == WildcardTransition.class ) {
                 look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );

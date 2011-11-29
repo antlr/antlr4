@@ -1,4 +1,4 @@
-grammar Java;
+grammar JavaLR;
 
 @lexer::members {
   protected boolean enumIsKeyword = true;
