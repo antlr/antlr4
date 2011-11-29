@@ -102,9 +102,6 @@ public class TreeViewer extends JComponent {
 	protected int nodeHeightPadding = 0; // added above/below
 	protected int arcSize = 0;           // make an arc in node outline?
 
-	protected int width = 800;
-	protected int height = 600;
-
 	protected double scale = 1.0;
 
 	protected Color boxColor = null;     // set to a color to make it draw background
@@ -125,9 +122,17 @@ public class TreeViewer extends JComponent {
 								 new DefaultConfiguration<Tree>(gapBetweenLevels,
 																gapBetweenNodes),
                                  useIdentity);
-		Dimension size = treeLayout.getBounds().getBounds().getSize();
-		setPreferredSize(size);
+		updatePreferredSize();
 		setFont(font);
+	}
+
+	private void updatePreferredSize() {
+		setPreferredSize(getScaledTreeSize());
+		invalidate();
+		if (getParent() != null) {
+			getParent().validate();
+		}
+		repaint();
 	}
 
 	// ---------------- PAINT -----------------------------------------------
@@ -237,8 +242,7 @@ public class TreeViewer extends JComponent {
 
 		// Wrap viewer in scroll pane
 		JScrollPane scrollPane = new JScrollPane(viewer);
-		// Make it tree size up to width/height of viewer
-		viewer.setPreferredSizeToScaledTree();
+		// Make the scrollpane (containing the viewer) the center component
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
 	  	// Add button to bottom
@@ -259,8 +263,9 @@ public class TreeViewer extends JComponent {
 		bottomPanel.add(wrapper, BorderLayout.SOUTH);
 
 		// Add scale slider
+		int sliderValue = (int) ((viewer.getScale()-1.0) * 1000);
 		final JSlider scaleSlider = new JSlider(JSlider.HORIZONTAL,
-										  -1000,1000,0);
+										  -999,1000,sliderValue);
 		scaleSlider.addChangeListener(
 			new ChangeListener() {
 				@Override
@@ -278,18 +283,12 @@ public class TreeViewer extends JComponent {
 		dialog.setVisible(true);
 	}
 
-	protected void setPreferredSizeToScaledTree() {
+	private Dimension getScaledTreeSize() {
 		Dimension scaledTreeSize =
 			treeLayout.getBounds().getBounds().getSize();
 		scaledTreeSize = new Dimension((int)(scaledTreeSize.width*scale),
 									   (int)(scaledTreeSize.height*scale));
-		if ( scaledTreeSize.width < width ) {
-			setWidth(scaledTreeSize.width);
-		}
-		if ( scaledTreeSize.height < height ) {
-			setHeight(scaledTreeSize.height);
-		}
-		setPreferredSize(new Dimension(width, height));
+		return scaledTreeSize;
 	}
 
 	public void open() {
@@ -435,25 +434,10 @@ public class TreeViewer extends JComponent {
 	}
 
 	public void setScale(double scale) {
+		if(scale <= 0) {
+			scale = 1;
+		}
 		this.scale = scale;
-		repaint();
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
+		updatePreferredSize();
 	}
 }
