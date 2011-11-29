@@ -27,11 +27,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.tree.gui.TreeViewer;
-
-import java.util.ArrayList;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public class TestT {
 	public static void main(String[] args) throws Exception {
@@ -45,14 +42,14 @@ public class TestT {
 		p.setBuildParseTree(true);
 		final TParser.sContext tree = p.s();
 		System.out.println(tree.toStringTree(p));
-		TreeViewer v = new TreeViewer(p, tree);
-		v.setHighlightedBoxColor(TreeViewer.LIGHT_RED);
-		v.addHighlightedNodes(new ArrayList<Tree>() {{
-			ParseTree c0 = tree.getChild(0);
-			add(c0);
-			add(c0.getChild(0));
-		}});
-		v.open();
+//		TreeViewer v = new TreeViewer(p, tree);
+//		v.setHighlightedBoxColor(TreeViewer.LIGHT_RED);
+//		v.addHighlightedNodes(new ArrayList<Tree>() {{
+//			ParseTree c0 = tree.getChild(0);
+//			add(c0);
+//			add(c0.getChild(0));
+//		}});
+//		v.open();
 //		tree.inspect(p);
 //
 //		ParseTreeWalker walker = new ParseTreeWalker();

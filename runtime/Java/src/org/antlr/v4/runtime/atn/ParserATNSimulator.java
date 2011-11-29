@@ -1,30 +1,30 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
- All rights reserved.
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
 
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ASTNodeStream;
 import org.antlr.v4.runtime.tree.BufferedASTNodeStream;
 import org.antlr.v4.runtime.tree.TreeParser;
@@ -43,8 +44,8 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator<Symbol> extends ATNSimulator {
-	public static boolean debug = true;
-	public static boolean dfa_debug = true;
+	public static boolean debug = false;
+	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
@@ -106,7 +107,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			int m = input.mark();
 			int index = input.index();
 			try {
-				int alt = execDFA(input, dfa, dfa.s0, outerContext);
+				int alt = execDFA(input, dfa, index, dfa.s0, outerContext);
 				return alt;
 			}
 			finally {
@@ -139,7 +140,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		int m = input.mark();
 		int index = input.index();
 		try {
-			alt = execATN(input, dfa, m, s0_closure, useContext);
+			alt = execATN(input, dfa, index, s0_closure, useContext);
 		}
 		catch (NoViableAltException nvae) {
 			if ( debug ) dumpDeadEndConfigs(nvae);
@@ -154,14 +155,19 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	// doesn't create DFA when matching
-	public int matchATN(@NotNull SymbolStream<Symbol> input, @NotNull ATNState startState) {
+	public int matchATN(@NotNull SymbolStream<Symbol> input,
+						@NotNull ATNState startState)
+	{
 		DFA dfa = new DFA(startState);
 		RuleContext ctx = RuleContext.EMPTY;
-		OrderedHashSet<ATNConfig> s0_closure = computeStartState(dfa.decision, startState, ctx);
+		OrderedHashSet<ATNConfig> s0_closure =
+			computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
-	public int execDFA(@NotNull SymbolStream<Symbol> input, @NotNull DFA dfa, @NotNull DFAState s0,
+	public int execDFA(@NotNull SymbolStream<Symbol> input, @NotNull DFA dfa,
+					   int startIndex,
+					   @NotNull DFAState s0,
                        @Nullable RuleContext outerContext)
     {
 //		dump(dfa);
@@ -173,7 +179,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		DFAState prevAcceptState = null;
 		DFAState s = s0;
 		int t = input.LA(1);
-		int startIndex = input.index();
 	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+t);
@@ -192,10 +197,17 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				return alt;
 			}
 			if ( s.isAcceptState ) {
-				if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
+				if ( s.altToPred!=null ) {
+					if ( dfa_debug ) System.out.println("accept "+s);
+				}
+				else {
+					if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
+				}
 				prevAcceptState = s;
 				// keep going unless we're at EOF or state only has one alt number
 				// mentioned in configs; check if something else could match
+				// TODO: don't we always stop? only lexer would keep going
+				// TODO: v3 dfa don't do this.
 				if ( s.complete || t==CharStream.EOF ) break;
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
@@ -247,6 +259,23 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
 											" predicts "+prevAcceptState.prediction);
+
+		// TODO: Factor this code that is very similar to ATN version
+		if ( s.altToPred!=null ) {
+			// rewind input so pred's LT(i) calls make sense
+			input.seek(startIndex);
+			int predictPredicatedAlt = evalSemanticContext(s.altToPred);
+			if ( predictPredicatedAlt!=ATN.INVALID_ALT_NUMBER ) {
+				return predictPredicatedAlt;
+			}
+			// no predicate evaluated to true
+			if ( prevAcceptState.prediction==ATN.INVALID_ALT_NUMBER ) {
+				// and now we find out that we had no uncovered alt
+				// to fall back to. must announce parsing error.
+				throw noViableAlt(input, outerContext, s.configs, startIndex);
+			}
+		}
+
 		return prevAcceptState.prediction;
 	}
 
@@ -322,12 +351,33 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				}
 
                 // can we resolve with predicates?
-                // TODO: warn if we have uncovered alts?
-                SemanticContext[] altToPred = getPredsForAmbigAlts(decState, ambigAlts, reach);
+                SemanticContext[] altToPred =
+					getPredsForAmbigAlts(decState, ambigAlts, reach);
                 if ( altToPred!=null ) {
-                    int uniqueAlt = evalSemanticContext(ambigAlts, altToPred);
+					// We need at least n-1 predicates for n ambiguous alts
+					// [1, 2]:[null, null, 1:0]
+					int nPredAlts = Utils.numNonnull(altToPred);
+					if ( nPredAlts < ambigAlts.size()-1 ) {
+						reportInsufficientPredicates(startIndex, input.index(),
+													 ambigAlts, altToPred, reach);
+					}
+					// rewind input so pred's LT(i) calls make sense
+					input.seek(startIndex);
+                    int uniqueAlt = evalSemanticContext(altToPred);
+					if ( uniqueAlt==ATN.INVALID_ALT_NUMBER ) {
+						// no predicate evaluated to true
+						uniqueAlt = getFirstUnpredicatedAmbigAlt(ambigAlts, altToPred);
+						if ( debug ) System.out.println("PREDICT firstUnpredicatedAmbigAlt "+
+											   uniqueAlt);
+						if ( uniqueAlt==ATN.INVALID_ALT_NUMBER ) {
+							// and now we find out that we had no uncovered alt
+							// to fall back to. must announce parsing error.
+							throw noViableAlt(input, outerContext, closure, startIndex);
+						}
+					}
                     DFAState accept = addDFAEdge(dfa, closure, t, reach);
-                    makeAcceptState(accept, altToPred);
+					// TODO: split into preds to test then firstUnpredicatedAlt
+                    makeAcceptState(accept, ambigAlts, altToPred);
                     return uniqueAlt;
                 }
 
@@ -406,30 +456,36 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return prevAccept.alt;
 	}
 
-    // eval preds first in alt order for ambigAlts;
-    // if all false, then pick first unpredicated alt in ambigAlts
-    public int evalSemanticContext(Set<Integer> ambigAlts, SemanticContext[] altToPred) {
+    // eval preds first in alt order for ambigAlts; only ambig alts can
+	// can have preds, though some ambig alts will be unpredicated.
+    // if all preds false, then pick first unpredicated alt in ambigAlts
+    public int evalSemanticContext(SemanticContext[] altToPred) {
         int uniqueAlt = ATN.INVALID_ALT_NUMBER;
-        int firstUnpredicatedAmbigAlt = ATN.INVALID_ALT_NUMBER;
         for (int i = 1; i < altToPred.length; i++) {
             SemanticContext or = altToPred[i];
-            if ( or==null || or==SemanticContext.NONE ) {
-                if ( ambigAlts.contains(i) ) firstUnpredicatedAmbigAlt = i;
-                continue;
-            }
-            System.out.println("eval "+or+"="+or.eval(parser, outerContext));
+            if ( or==null ) {
+				if ( debug || dfa_debug ) System.out.println("eval alt "+i+" unpredicated");
+				continue;
+			}
+            if ( debug || dfa_debug ) System.out.println("eval alt "+i+" pred "+or+"="+or.eval(parser, outerContext));
             if ( or.eval(parser, outerContext) ) {
-                System.out.println("PREDICT "+i);
+				if ( debug || dfa_debug ) System.out.println("PREDICT "+i);
                 uniqueAlt = i;
                 break;
             }
         }
-        if ( uniqueAlt==ATN.INVALID_ALT_NUMBER ) {
-            System.out.println("PREDICT firstUnpredicatedAmbigAlt "+firstUnpredicatedAmbigAlt);
-            uniqueAlt = firstUnpredicatedAmbigAlt;
-        }
         return uniqueAlt;
     }
+
+	public int getFirstUnpredicatedAmbigAlt(Set<Integer> ambigAlts, SemanticContext[] altToPred) {
+		for (int i = 1; i < altToPred.length; i++) {
+			SemanticContext or = altToPred[i];
+			if ( or==null || or==SemanticContext.NONE ) {
+				if ( ambigAlts.contains(i) ) return i;
+			}
+		}
+		return 0;
+	}
 
     protected int resolveToMinAlt(@NotNull OrderedHashSet<ATNConfig> reach, @NotNull Set<Integer> ambigAlts) {
 		int min = getMinAlt(ambigAlts);
@@ -734,16 +790,44 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	public void reportConflict(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
+		if ( debug ) {
+			System.out.println("reportConflict "+alts+":"+configs);
+		}
 		if ( parser!=null ) parser.reportConflict(startIndex, stopIndex, alts, configs);
 	}
 
-	public void reportContextSensitivity(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
+	public void reportContextSensitivity(int startIndex, int stopIndex,
+										 @NotNull Set<Integer> alts,
+										 @NotNull OrderedHashSet<ATNConfig> configs)
+	{
 		if ( parser!=null ) parser.reportContextSensitivity(startIndex, stopIndex, alts, configs);
 	}
 
 	/** If context sensitive parsing, we know it's ambiguity not conflict */
-	public void reportAmbiguity(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
-		if ( parser!=null ) parser.reportAmbiguity(startIndex, stopIndex, alts, configs);
+	public void reportAmbiguity(int startIndex, int stopIndex,
+								@NotNull Set<Integer> ambigAlts,
+								@NotNull OrderedHashSet<ATNConfig> configs)
+	{
+		if ( debug ) {
+			System.out.println("reportAmbiguity "+
+								   ambigAlts+":"+configs);
+		}
+		if ( parser!=null ) parser.reportAmbiguity(startIndex, stopIndex, ambigAlts, configs);
+	}
+
+	public void reportInsufficientPredicates(int startIndex, int stopIndex,
+											 @NotNull Set<Integer> ambigAlts,
+											 @NotNull SemanticContext[] altToPred,
+											 @NotNull OrderedHashSet<ATNConfig> configs)
+	{
+		if ( debug ) {
+			System.out.println("reportInsufficientPredicates "+
+								   ambigAlts+":"+Arrays.toString(altToPred));
+		}
+		if ( parser!=null ) {
+			parser.reportInsufficientPredicates(startIndex, stopIndex, ambigAlts,
+												altToPred, configs);
+		}
 	}
 
 	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
@@ -824,17 +908,23 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
         int nalts = decState.getNumberOfTransitions();
         SemanticContext[] altToPred = new SemanticContext[nalts +1];
         for (int alt : ambigAlts) { altToPred[alt] = SemanticContext.NONE; }
-        boolean atLeastOne = false;
+		int nPredAlts = 0;
         for (ATNConfig c : configs) {
             if ( c.semanticContext!=SemanticContext.NONE && ambigAlts.contains(c.alt) ) {
                 altToPred[c.alt] = new SemanticContext.OR(altToPred[c.alt], c.semanticContext);
                 c.resolveWithPredicate = true;
-                atLeastOne = true;
+				nPredAlts++;
             }
         }
-        // nonambig alts are null in altToPred
-        if ( !atLeastOne ) altToPred = null;
-        System.out.println(Arrays.toString(altToPred));
+
+		// Optimize away p||p and p&&p and also make any NONE = null
+		for (int i = 0; i < altToPred.length; i++) {
+			if ( altToPred[i]!=null ) altToPred[i] = altToPred[i].optimize();
+			if ( altToPred[i] == SemanticContext.NONE ) altToPred[i] = null;
+		}
+
+		// nonambig alts are null in altToPred
+        if ( nPredAlts==0 ) altToPred = null;
         return altToPred;
     }
 
@@ -886,13 +976,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		DFAState newState = proposed;
 
-//		boolean traversedPredicate = false;
-//		for (ATNConfig c : configs) {
-//			if ( c.traversedPredicate ) {traversedPredicate = true; break;}
-//		}
-//
-//		if ( traversedPredicate ) return null; // cannot cache
-
 		newState.stateNumber = dfa.states.size();
 		newState.configs = new OrderedHashSet<ATNConfig>();
 		newState.configs.addAll(configs);
@@ -907,11 +990,16 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
    		accept.complete = true;
    	}
 
-    public void makeAcceptState(@NotNull DFAState accept, @NotNull SemanticContext[] altToPred) {
+    public void makeAcceptState(@NotNull DFAState accept,
+								@NotNull Set<Integer> ambigAlts,
+								@NotNull SemanticContext[] altToPred) {
    		accept.isAcceptState = true;
    		accept.complete = true;
-        accept.altToPred = altToPred;
-   	}
+		accept.altToPred = altToPred;
+		// find min unpredicated ambig alt and default to it if no
+		// preds match (during dfa matching)
+		accept.prediction = getFirstUnpredicatedAmbigAlt(ambigAlts, altToPred);
+	}
 
 	@NotNull
 	public String getTokenName(int t) {

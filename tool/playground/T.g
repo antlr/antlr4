@@ -1,13 +1,8 @@
 grammar T;
-options {output=AST;}
-
-s : i=ifstat  {System.out.println(_input.toString(0,_input.index()-1));} ;
-
-ifstat : 'if' '(' expr ')' assign ;
-assign : ID '=' expr ';' ;
-expr : INT | ID ;
-
-EQ : '=' ;
-INT : '0'..'9'+ ;
+s : a a;
+a : {_input.LT(1).equals("x")}? ID INT {System.out.println("alt 1");}
+  | {_input.LT(1).equals("y")}? ID INT {System.out.println("alt 2");}
+  ;
 ID : 'a'..'z'+ ;
-WS : (' '|'\n')+ {skip();} ;
+INT : '0'..'9'+;
+WS : (' '|'\n') {skip();} ;

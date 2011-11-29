@@ -1,6 +1,6 @@
 parser grammar HTMLParser;
 
-options { tokenVocab=HTMLLexer; }
+options { tokenVocab=HTMLParser; }
 
 file : ( TAG_START (starttag | endtag) | TEXT
 {System.out.println("TEXT "+$TEXT);} )+ EOF ;

@@ -1,32 +1,206 @@
+/*
+ [The "BSD license"]
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.junit.Test;
 
 public class TestSemPredEvalParser extends BaseTest {
-    @Test public void testSimple() throws Exception {
-   		String grammar =
-   			"grammar T;\n" +
-   			"a : {false}? ID {System.out.println(\"alt 1\");}\n" +
-            "  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
-            "  | INT         {System.out.println(\"alt 3\");}\n" +
-   			"  ;\n" +
-   			"ID : 'a'..'z'+ ;\n" +
-   			"INT : '0'..'9'+;\n" +
-   			"WS : (' '|'\\n') {skip();} ;\n";
+	@Test public void testSimple() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+				"s : a a a;\n" + // do 3x: once in ATN, next in DFA then INT in ATN
+				"a : {false}? ID {System.out.println(\"alt 1\");}\n" +
+				"  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
+				"  | INT         {System.out.println(\"alt 3\");}\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
 
-   		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
-   								  "x", false);
-   		String expecting =
-   			"alt 2\n" +
-   			"alt 2\n" +
-   			"alt 2\n";
-   		assertEquals(expecting, found);
-   	}
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "x y 3", false);
+		String expecting =
+			"alt 2\n" +
+				"alt 2\n" +
+				"alt 3\n";
+		assertEquals(expecting, found);
+	}
 
-    @Test public void testToLeft() throws Exception {
-   		String grammar =
-   			"grammar T;\n" +
-   			"s : a+ ;\n" +
+	@Test public void testOrder() throws Exception {
+		// Predicates disambiguate and so we don't arbitrarily choose the first alt
+		// Here, there are n-1 predicates for n=2 alts and so we simulate
+		// the nth predicate as !(others). We do that by testing the
+		// predicates first and then try the on predicated alternatives.
+		// Since the 2nd alternative has a true predicate, we always choose that one
+		String grammar =
+			"grammar T;\n" +
+				"s : a a;\n" + // do 2x: once in ATN, next in DFA
+				"a :          ID {System.out.println(\"alt 1\");}\n" +
+				"  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "x y", false);
+		String expecting =
+			"alt 2\n" +
+			"alt 2\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void test2UnpredicatedAlts() throws Exception {
+		// We have n-2 predicates for n alternatives. We have no choice
+		// but to pick the first on predicated alternative if the n-2
+		// predicates fail.
+		// this should call reportInsufficientPredicates()
+		String grammar =
+			"grammar T;\n" +
+			"@header {" +
+			"import java.util.*;" +
+			"}" +
+			"@parser::members {" +
+			"public void reportInsufficientPredicates(int startIndex, int stopIndex,\n" +
+			"\t\t\t\t\t\t\t\t\t\t\t @NotNull Set<Integer> ambigAlts,\n" +
+			"\t\t\t\t\t\t\t\t\t\t\t @NotNull SemanticContext[] altToPred,\n" +
+			"\t\t\t\t\t\t\t\t\t\t\t @NotNull OrderedHashSet<ATNConfig> configs)\n" +
+			"{\n" +
+			"System.out.println(\"reportInsufficientPredicates\");\n" +
+			"}\n" +
+			"}\n"+
+			"s : a a;\n" + // do 2x: once in ATN, next in DFA
+			"a :          ID {System.out.println(\"alt 1\");}\n" +
+			"  |          ID {System.out.println(\"alt 2\");}\n" +
+			"  | {false}? ID {System.out.println(\"alt 3\");}\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "x y", false);
+		String expecting =
+			"reportInsufficientPredicates\n" +
+			"alt 1\n" +
+			"alt 1\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
+		// We have n-2 predicates for n alternatives. We have no choice
+		// but to pick the first on predicated alternative if the n-2
+		// predicates fail.
+		// this should call reportInsufficientPredicates()
+		String grammar =
+			"grammar T;\n" +
+			"@header {" +
+			"import java.util.*;" +
+			"}" +
+			"@parser::members {" +
+			"public void reportInsufficientPredicates(int startIndex, int stopIndex,\n" +
+			"\t\t\t\t\t\t\t\t\t\t\t @NotNull Set<Integer> ambigAlts,\n" +
+			"\t\t\t\t\t\t\t\t\t\t\t @NotNull SemanticContext[] altToPred,\n" +
+			"\t\t\t\t\t\t\t\t\t\t\t @NotNull OrderedHashSet<ATNConfig> configs)\n" +
+			"{\n" +
+			"System.out.println(\"reportInsufficientPredicates\");\n" +
+			"}\n" +
+			"}\n"+
+			"s : a a a;\n" +
+			"a : INT         {System.out.println(\"alt 1\");}\n" +
+			"  |          ID {System.out.println(\"alt 2\");}\n" +
+			"  |          ID {System.out.println(\"alt 3\");}\n" +
+			"  | {false}? ID {System.out.println(\"alt 4\");}\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "34 x y", false);
+		String expecting =
+			"alt 1\n" +
+			"reportInsufficientPredicates\n" +
+			"alt 2\n" +
+			"alt 2\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testRewindBeforePredEval() throws Exception {
+		// The parser consumes ID and moves to the 2nd token INT.
+		// To properly evaluate the predicates after matching ID INT,
+		// we must correctly see come back to starting index so LT(1) works
+		String grammar =
+			"grammar T;\n" +
+				"s : a a;\n" +
+				"a : {_input.LT(1).getText().equals(\"x\")}? ID INT {System.out.println(\"alt 1\");}\n" +
+				"  | {_input.LT(1).getText().equals(\"y\")}? ID INT {System.out.println(\"alt 2\");}\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "y 3 x 4", false);
+		String expecting =
+			"alt 2\n" +
+			"alt 1\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testNoTruePredsThrowsNoViableAlt() throws Exception {
+		// checks that we throw exception if all alts
+		// are covered with a predicate and none succeeds
+		String grammar =
+			"grammar T;\n" +
+			"s : a a;\n" +
+			"a : {false}? ID INT {System.out.println(\"alt 1\");}\n" +
+			"  | {false}? ID INT {System.out.println(\"alt 2\");}\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+
+		execParser("T.g", grammar, "TParser", "TLexer", "s",
+				   "y 3 x 4", false);
+		String expecting = "line 1:0 no viable alternative at input 'y'\n";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
+
+	// TODO: test predicates that are validating predicates; not ambiguous decisions
+
+	@Test public void testToLeft() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+				"s : a+ ;\n" +
    			"a : {false}? ID {System.out.println(\"alt 1\");}\n" +
    			"  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
    			"  ;\n" +
@@ -151,31 +325,6 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	@Test public void testToRightWithVaryingPredicate() throws Exception {
-		// alternate predicted alt to ensure DFA doesn't cache
-		String grammar =
-			"grammar T;\n" +
-			"@members {int i=0;}\n" +
-			"s : ({i++; System.out.println(\"i=\"+i);} a)+ ;\n" +
-			"a : ID {i \\% 2 == 0}? {System.out.println(\"alt 1\");}\n" +
-			"  | ID {i \\% 2 != 0}? {System.out.println(\"alt 2\");}\n" +
-			"  ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
-
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "x x y", false);
-		String expecting =
-			"i=1\n" +
-			"alt 2\n" +
-			"i=2\n" +
-			"alt 1\n" +
-			"i=3\n" +
-			"alt 2\n";
-		assertEquals(expecting, found);
-	}
-
 	/** During a global follow operation, we still execute semantic
 	 *  predicates as long as they are not dependent on local context
 	 */
@@ -196,10 +345,6 @@ public class TestSemPredEvalParser extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "a!", false);
 		String expecting =
-			"eval=true\n" +	// do p(true), p(false) once during s0 computation from epsilon edge in e
-			"eval=false\n" +
-			"eval=true\n" +	// do them again during closure after passing ID in e
-			"eval=false\n" +
 			"eval=true\n" + // now we are parsing
 			"parse\n";
 		assertEquals(expecting, found);
