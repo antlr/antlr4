@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
 import org.junit.After;
@@ -284,7 +285,7 @@ public abstract class BaseTest {
 			fileManager.getJavaFileObjectsFromFiles(Arrays.asList(f));
 
 		Iterable<String> compileOptions =
-			Arrays.asList(new String[]{"-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH} );
+			Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
 
 		JavaCompiler.CompilationTask task =
 			compiler.getTask(null, fileManager, null, compileOptions, null,
@@ -522,7 +523,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													String parserName,
+													@Nullable String parserName,
 													String lexerName,
 													boolean debug,
 													String... extraOptions)
@@ -544,10 +545,10 @@ public abstract class BaseTest {
 	}
 
 	protected String rawExecRecognizer(String parserName,
-									   String treeParserName,
+									   @Nullable String treeParserName,
 									   String lexerName,
 									   String parserStartRuleName,
-									   String treeParserStartRuleName,
+									   @Nullable String treeParserStartRuleName,
 									   boolean parserBuildsTrees,
 									   boolean parserBuildsTemplate,
 									   boolean treeParserBuildsTrees,
@@ -1255,13 +1256,13 @@ public abstract class BaseTest {
      * @return A string that represents all the keys in sorted order.
      */
     public <K, V> String sortMapToString(Map<K, V> m) {
-
-        System.out.println("Map toString looks like: " + m.toString());
         // Pass in crap, and get nothing back
         //
         if  (m == null) {
             return null;
         }
+
+        System.out.println("Map toString looks like: " + m.toString());
 
         // Sort the keys in the Map
         //
