@@ -287,7 +287,9 @@ public class LexerATNSimulator extends ATNSimulator {
 				DFAState from = addDFAState(closure);
 				// we got nowhere on t, don't throw out this knowledge; it'd
 				// cause a failover from DFA later.
-				addDFAEdge(from, t, ERROR);
+				if (from != null) {
+					addDFAEdge(from, t, ERROR);
+				}
 				break;
 			}
 
@@ -535,15 +537,27 @@ public class LexerATNSimulator extends ATNSimulator {
 							  int t,
 							  @NotNull OrderedHashSet<ATNConfig> q)
 	{
+		// even if we can add the states, we can't add an edge for labels out of range
+		if (t < 0 || t > NUM_EDGES) {
+			return;
+		}
+
 //		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
 		DFAState from = addDFAState(p);
+		if (from == null) {
+			return;
+		}
+
 		DFAState to = addDFAState(q);
+		if (to == null) {
+			return;
+		}
+
 		addDFAEdge(from, t, to);
 	}
 
-	// TODO (sam): should we allow q==null?
-	protected void addDFAEdge(@Nullable DFAState p, int t, DFAState q) {
-		if ( p==null || t==CharStream.EOF || q==null ) return; // Don't track EOF edges from stop states
+	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
+		if (t < 0 || t > NUM_EDGES) return; // Only track edges within the DFA bounds
 		if ( p.edges==null ) {
 			//  make room for tokens 1..n and -1 masquerading as index 0
 			p.edges = new DFAState[NUM_EDGES+1]; // TODO: make adaptive
