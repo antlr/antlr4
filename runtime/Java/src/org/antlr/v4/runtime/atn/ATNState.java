@@ -97,7 +97,7 @@ public class ATNState {
 
 	public int ruleIndex; // at runtime, we don't have Rule objects
 
-	public int epsilonOnlyTransitions = -1;
+	public boolean epsilonOnlyTransitions = false;
 
 	/** Track the transitions emanating from this ATN state. */
 	protected final List<Transition> transitions =
@@ -122,7 +122,17 @@ public class ATNState {
 
 	public int getNumberOfTransitions() { return transitions.size(); }
 
-	public void addTransition(Transition e) { transitions.add(e); }
+	public void addTransition(Transition e) {
+		if (transitions.isEmpty()) {
+			epsilonOnlyTransitions = e.isEpsilon();
+		}
+		else if (epsilonOnlyTransitions != e.isEpsilon()) {
+			System.err.format("ATN state %d has both epsilon and non-epsilon transitions.\n", stateNumber);
+			epsilonOnlyTransitions = false;
+		}
+
+		transitions.add(e);
+	}
 
 	public Transition transition(int i) { return transitions.get(i); }
 
@@ -134,16 +144,8 @@ public class ATNState {
 		return serializationTypes.get(this.getClass());
 	}
 
-	//lexer atn sim: getEpTar: 13.2%
-	// ruleCtx.equals 10%
-    // TODO: Sam says this takes a lot of time; optimize
-	public boolean onlyHasEpsilonTransitions() { // 22% time
-		if ( epsilonOnlyTransitions>=0 ) return epsilonOnlyTransitions==1;
-		if ( transitions.size()==0 ) return false;
-		for (Transition t : transitions) {
-			if ( !t.isEpsilon() ) return false;
-		}
-		return true;
+	public final boolean onlyHasEpsilonTransitions() {
+		return epsilonOnlyTransitions;
 	}
 
 	public void setRuleIndex(int ruleIndex) { this.ruleIndex = ruleIndex; }

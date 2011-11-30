@@ -33,6 +33,4 @@ package org.antlr.v4.runtime.atn;
  *  one to the loop back to start of the block and one to exit.
  */
 public class PlusLoopbackState extends DecisionState {
-	@Override
-	public boolean onlyHasEpsilonTransitions() { return true; }
 }
