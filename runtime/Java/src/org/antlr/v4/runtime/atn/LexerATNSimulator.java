@@ -458,8 +458,12 @@ public class LexerATNSimulator extends ATNSimulator {
 			c = new ATNConfig(config, t.target, newContext);
 		}
 		else if ( t.getClass() == PredicateTransition.class ) {
+			if (recog == null) {
+				System.out.printf("Predicates cannot be evaluated without a recognizer; assuming true.\n");
+			}
+
 			PredicateTransition pt = (PredicateTransition)t;
-			if ( recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
+			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = new ATNConfig(config, t.target);
 				c.traversedPredicate = true;
 			}
