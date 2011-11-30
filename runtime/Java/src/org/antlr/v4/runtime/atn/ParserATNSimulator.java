@@ -116,6 +116,13 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 	}
 
+	public void reset() {
+		userWantsCtxSensitive = false;
+		outerContext = RuleContext.EMPTY;
+		prevAccept = null;
+		prevAcceptIndex = -1;
+	}
+
 	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Symbol> input,
 						  @Nullable RuleContext outerContext,
 						  boolean useContext)

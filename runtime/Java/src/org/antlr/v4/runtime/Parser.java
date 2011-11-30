@@ -39,14 +39,6 @@ public class Parser extends BaseRecognizer<Token> {
 		super(input);
     }
 
-	@Override
-	public void reset() {
-		super.reset(); // reset all recognizer state variables
-		if ( _input !=null ) {
-			_input.seek(0); // rewind the input
-		}
-	}
-
 	/** Always called by generated parsers upon entry to a rule.
 	 *  This occurs after the new context has been pushed. Access field
 	 *  _ctx get the current context.

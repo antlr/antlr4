@@ -79,6 +79,11 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		if ( getInputStream()!=null ) getInputStream().seek(0);
 		_errHandler.endErrorCondition(this);
 		_ctx = null;
+		syntaxErrors = 0;
+		ParserATNSimulator<?> interpreter = getInterpreter();
+		if (interpreter != null) {
+			interpreter.reset();
+		}
 	}
 
 	/** Match current input symbol against ttype.  Attempt
