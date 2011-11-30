@@ -345,7 +345,7 @@ public abstract class BaseTest {
 
 
 	/** Return true if all is ok, no errors */
-	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean debug) {
+	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean debug, String... extraOptions) {
 		boolean allIsWell = true;
 		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
@@ -355,6 +355,7 @@ public abstract class BaseTest {
 			if ( debug ) {
 				options.add("-debug");
 			}
+			Collections.addAll(options, extraOptions);
 			options.add("-o");
 			options.add(tmpdir);
 			options.add("-lib");
@@ -523,10 +524,11 @@ public abstract class BaseTest {
 													String grammarStr,
 													String parserName,
 													String lexerName,
-													boolean debug)
+													boolean debug,
+													String... extraOptions)
 	{
 		boolean allIsWell =
-			antlr(grammarFileName, grammarFileName, grammarStr, debug);
+			antlr(grammarFileName, grammarFileName, grammarStr, debug, extraOptions);
 		boolean ok;
 		if ( lexerName!=null ) {
 			ok = compile(lexerName+".java");
@@ -534,6 +536,8 @@ public abstract class BaseTest {
 		}
 		if ( parserName!=null ) {
 			ok = compile(parserName+".java");
+			if ( !ok ) { allIsWell = false; }
+			ok = compile("Blank"+grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
 			if ( !ok ) { allIsWell = false; }
 		}
 		return allIsWell;
