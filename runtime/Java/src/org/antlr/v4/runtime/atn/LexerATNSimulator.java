@@ -264,7 +264,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		traceLookahead1();
 		int t = input.LA(1);
 
-		do { // while more work
+		while ( true ) { // while more work
 			if ( debug ) System.out.println("in reach starting closure: " + closure);
 			for (int ci=0; ci<closure.size(); ci++) { // TODO: foreach
 				ATNConfig c = closure.get(ci);
@@ -306,7 +306,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			reach = closure;
 			closure = tmp;
 			reach.clear();
-		} while ( true );
+		}
 
 
 		if ( atnPrevAccept.config==null ) {
@@ -395,13 +395,13 @@ public class LexerATNSimulator extends ATNSimulator {
 			SetTransition st = (SetTransition)trans;
 			boolean not = trans instanceof NotSetTransition;
 			if ( (!not && st.set.contains(t)) ||
-				 (not && !st.set.contains(t) && t!=Token.EOF) ) // ~set doesn't not match EOF
+				 (not && !st.set.contains(t) && t!=CharStream.EOF) ) // ~set doesn't not match EOF
 			{
 				if ( debug ) System.out.println("match "+(not?"~":"")+"set "+st.set.toString(true));
 				return st.target;
 			}
 		}
-		else if ( trans instanceof WildcardTransition && t!=Token.EOF ) {
+		else if ( trans instanceof WildcardTransition && t!=CharStream.EOF ) {
 			return trans.target;
 		}
 		return null;
