@@ -141,7 +141,7 @@ public abstract class BaseTest {
 
 	List<Integer> getTypesFromString(Grammar g, String expecting) {
 		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
-		if ( expecting!=null && !expecting.trim().equals("") ) {
+		if ( expecting!=null && !expecting.trim().isEmpty() ) {
 			for (String tname : expecting.replace(" ", "").split(",")) {
 				int ttype = g.getTokenType(tname);
 				expectingTokenTypes.add(ttype);
@@ -153,7 +153,7 @@ public abstract class BaseTest {
 	public List<Integer> getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
 		ANTLRInputStream in = new ANTLRInputStream(input);
 		List<Integer> tokenTypes = new ArrayList<Integer>();
-		int ttype = 0;
+		int ttype;
 		do {
 			ttype = lexerATN.matchATN(in);
 			tokenTypes.add(ttype);
@@ -430,11 +430,11 @@ public abstract class BaseTest {
 									  debug);
 		writeFile(tmpdir, "input", input);
 		boolean parserBuildsTrees =
-			grammarStr.indexOf("output=AST")>=0 ||
-			grammarStr.indexOf("output = AST")>=0;
+			grammarStr.contains("output=AST") ||
+			grammarStr.contains("output = AST");
 		boolean parserBuildsTemplate =
-			grammarStr.indexOf("output=template")>=0 ||
-			grammarStr.indexOf("output = template")>=0;
+			grammarStr.contains("output=template") ||
+			grammarStr.contains("output = template");
 		return rawExecRecognizer(parserName,
 								 null,
 								 lexerName,
@@ -499,14 +499,14 @@ public abstract class BaseTest {
 		writeFile(tmpdir, "input", input);
 
 		boolean parserBuildsTrees =
-			parserGrammarStr.indexOf("output=AST")>=0 ||
-			parserGrammarStr.indexOf("output = AST")>=0;
+			parserGrammarStr.contains("output=AST") ||
+			parserGrammarStr.contains("output = AST");
 		boolean treeParserBuildsTrees =
-			treeParserGrammarStr.indexOf("output=AST")>=0 ||
-			treeParserGrammarStr.indexOf("output = AST")>=0;
+			treeParserGrammarStr.contains("output=AST") ||
+			treeParserGrammarStr.contains("output = AST");
 		boolean parserBuildsTemplate =
-			parserGrammarStr.indexOf("output=template")>=0 ||
-			parserGrammarStr.indexOf("output = template")>=0;
+			parserGrammarStr.contains("output=template") ||
+			parserGrammarStr.contains("output = template");
 
 		return rawExecRecognizer(parserName,
 								 treeParserName,
@@ -608,8 +608,7 @@ public abstract class BaseTest {
 			process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
-			String output = null;
-			output = stdoutVacuum.toString();
+			String output = stdoutVacuum.toString();
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: "+ stderrVacuum);
@@ -651,8 +650,7 @@ public abstract class BaseTest {
 			process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
-			String output = null;
-			output = stdoutVacuum.toString();
+			String output = stdoutVacuum.toString();
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: "+ stderrVacuum);
@@ -757,7 +755,7 @@ public abstract class BaseTest {
 //		}
 //	}
 
-	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class c) {
+	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
 		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
 		for (ANTLRMessage m : msgs) {
 			if ( m.getClass() == c ) filtered.add(m);
@@ -831,6 +829,7 @@ public abstract class BaseTest {
 			sucker = new Thread(this);
 			sucker.start();
 		}
+		@Override
 		public void run() {
 			try {
 				String line = in.readLine();
@@ -848,6 +847,7 @@ public abstract class BaseTest {
 		public void join() throws InterruptedException {
 			sucker.join();
 		}
+		@Override
 		public String toString() {
 			return buf.toString();
 		}
@@ -859,7 +859,7 @@ public abstract class BaseTest {
 	{
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
-			ANTLRMessage m = (ANTLRMessage)equeue.errors.get(i);
+			ANTLRMessage m = equeue.errors.get(i);
 			if (m.errorType==expectedMessage.errorType ) {
 				foundMsg = m;
 			}
@@ -900,7 +900,7 @@ public abstract class BaseTest {
 		//System.out.println("errors="+equeue);
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
-			ANTLRMessage m = (ANTLRMessage)equeue.errors.get(i);
+			ANTLRMessage m = equeue.errors.get(i);
 			if (m.errorType==expectedMessage.errorType ) {
 				foundMsg = m;
 			}
@@ -918,6 +918,7 @@ public abstract class BaseTest {
     public static class FilteringTokenStream extends CommonTokenStream {
         public FilteringTokenStream(TokenSource src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();
+        @Override
         protected void sync(int i) {
             super.sync(i);
 			Token t = get(i);
@@ -1253,7 +1254,7 @@ public abstract class BaseTest {
      * @param m The Map that contains keys we wish to return in sorted order
      * @return A string that represents all the keys in sorted order.
      */
-    public String sortMapToString(Map m) {
+    public <K, V> String sortMapToString(Map<K, V> m) {
 
         System.out.println("Map toString looks like: " + m.toString());
         // Pass in crap, and get nothing back
@@ -1264,13 +1265,13 @@ public abstract class BaseTest {
 
         // Sort the keys in the Map
         //
-        TreeMap nset = new TreeMap(m);
+        TreeMap<K, V> nset = new TreeMap<K, V>(m);
 
         System.out.println("Tree map looks like: " + nset.toString());
         return nset.toString();
     }
 
-	public List<String> realElements(Vector elements) {
+	public List<String> realElements(List<String> elements) {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
 	}
 
