@@ -647,8 +647,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("closure("+config+")");
 
-		if ( closureBusy.contains(config) ) return; // avoid infinite recursion
-		closureBusy.add(config);
+		if ( !closureBusy.add(config) ) return; // avoid infinite recursion
 
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it

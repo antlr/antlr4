@@ -94,8 +94,7 @@ public class LL1Analyzer {
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
         ATNConfig c = new ATNConfig(s, 0, ctx);
-        if ( lookBusy.contains(c) ) return;
-        lookBusy.add(c);
+        if ( !lookBusy.add(c) ) return;
 
         if ( s instanceof RuleStopState ) {
             if ( ctx==null ) {
