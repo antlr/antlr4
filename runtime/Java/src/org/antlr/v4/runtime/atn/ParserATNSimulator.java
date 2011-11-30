@@ -752,15 +752,16 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 //		RuleContext ctx = null;
 //		if ( inContext ) ctx = outerContext;
 
-        ATNConfig c = null;
-        if ( parser==null || !collectPredicates ) {
-            c = new ATNConfig(config, pt.target);
-        }
-        else if ( !pt.isCtxDependent || (pt.isCtxDependent&&inContext) ) {
+        ATNConfig c;
+        if ( !pt.isCtxDependent || (pt.isCtxDependent&&inContext) ) {
             SemanticContext newSemCtx = new SemanticContext.AND(config.semanticContext, pt.getPredicate());
             c = new ATNConfig(config, pt.target, newSemCtx);
         }
+		else {
+			c = new ATNConfig(config, pt.target);
+		}
 
+		if ( debug ) System.out.println("config from pred transition="+c);
         return c;
 
 		// We see through the predicate if:
