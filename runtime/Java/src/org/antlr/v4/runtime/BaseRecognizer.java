@@ -267,6 +267,36 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		return false;
 	}
 
+    public boolean isExpectedToken(int symbol) {
+//   		return getInterpreter().atn.nextTokens(_ctx);
+        ATN atn = getInterpreter().atn;
+        RuleContext ctx = _ctx;
+        ATNState s = atn.states.get(ctx.s);
+        IntervalSet following = atn.nextTokens(s);
+        if (following.contains(symbol)) {
+            return true;
+        }
+//        System.out.println("following "+s+"="+following);
+        if ( !following.contains(Token.EPSILON) ) return false;
+
+        while ( ctx!=null && ctx.invokingState>=0 && following.contains(Token.EPSILON) ) {
+            ATNState invokingState = atn.states.get(ctx.invokingState);
+            RuleTransition rt = (RuleTransition)invokingState.transition(0);
+            following = atn.nextTokens(rt.followState);
+            if (following.contains(symbol)) {
+                return true;
+            }
+
+            ctx = ctx.parent;
+        }
+
+        if ( following.contains(Token.EPSILON) && symbol == Token.EOF ) {
+            return true;
+        }
+
+        return false;
+    }
+
     public IntervalSet getExpectedTokens() {
 //   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;

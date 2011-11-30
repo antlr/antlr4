@@ -157,10 +157,10 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
         if ( recognizer.getATN().nextTokens(s).contains(la) || la==Token.EOF ) return;
 
-        IntervalSet expecting = recognizer.getExpectedTokens();
-
 		// Return but don't end recovery. only do that upon valid token match
-        if ( expecting.contains(la) ) return;
+		if (recognizer.isExpectedToken(la)) {
+			return;
+		}
 
 		if ( s instanceof PlusBlockStartState ||
 			 s instanceof StarLoopEntryState ||
@@ -175,6 +175,7 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 		{
 //			System.err.println("at loop back: "+s.getClass().getSimpleName());
 			reportUnwantedToken(recognizer);
+			IntervalSet expecting = recognizer.getExpectedTokens();
 			IntervalSet whatFollowsLoopIterationOrRule =
 				expecting.or(getErrorRecoverySet(recognizer));
 			consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
