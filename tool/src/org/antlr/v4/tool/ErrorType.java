@@ -136,7 +136,7 @@ public enum ErrorType {
 	AST_OP_IN_ALT_WITH_REWRITE(115, "rule <arg> alt <arg2> uses rewrite syntax and also an AST operator", ErrorSeverity.ERROR),
     WILDCARD_AS_ROOT(116, "Wildcard invalid as root; wildcard can itself be a tree", ErrorSeverity.ERROR),
     CONFLICTING_OPTION_IN_TREE_FILTER(117, "option <arg>=<arg2> conflicts with tree grammar filter mode", ErrorSeverity.ERROR),
-	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <alt> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
+	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	LEFT_RECURSION_CYCLES(119, "The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=\", \">]}; separator=\" and \">", ErrorSeverity.ERROR),
 	MODE_NOT_IN_LEXER(120, "lexical modes are only allowed in lexer grammars", ErrorSeverity.ERROR),
     CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(121, "cannot find an attribute name in attribute declaration", ErrorSeverity.ERROR),
