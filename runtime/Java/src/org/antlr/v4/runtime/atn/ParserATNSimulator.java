@@ -134,8 +134,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+
 										" exec LA(1)=="+ getLookaheadName(input) +
 										", outerContext="+outerContext.toString(parser));
-		RuleContext ctx = RuleContext.EMPTY;
-		if ( useContext ) ctx = outerContext;
+		PredictionContext ctx = PredictionContext.EMPTY;
+		if ( useContext ) ctx = PredictionContext.fromRuleContext(outerContext);
 		OrderedHashSet<ATNConfig> s0_closure =
 			computeStartState(dfa.decision, dfa.atnStartState, ctx);
 		dfa.s0 = addDFAState(dfa, s0_closure);
@@ -167,7 +167,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 						@NotNull ATNState startState)
 	{
 		DFA dfa = new DFA(startState);
-		RuleContext ctx = RuleContext.EMPTY;
+		PredictionContext ctx = PredictionContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure =
 			computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
@@ -593,9 +593,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	@NotNull
 	public OrderedHashSet<ATNConfig> computeStartState(int decision, @NotNull ATNState p,
-                                                       @Nullable RuleContext ctx)
+                                                       @NotNull PredictionContext ctx)
     {
-		RuleContext initialContext = ctx; // always at least the implicit call to start rule
+		PredictionContext initialContext = ctx; // always at least the implicit call to start rule
 		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 		prevAccept = null; // might reach end rule; track
 		prevAcceptIndex = -1;
@@ -659,7 +659,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			if ( config.context!=null && !config.context.isEmpty() ) {
-				RuleContext newContext = config.context.parent; // "pop" invoking state
+				PredictionContext newContext = config.context.parent; // "pop" invoking state
 				ATNState invokingState = atn.states.get(config.context.invokingState);
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
@@ -678,7 +678,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					if ( debug ) System.out.println("NONGREEDY at stop state of "+
 													getRuleName(config.state.ruleIndex));
 					// don't purse past end of a rule for any nongreedy decision
-					configs.add(config);
+					configs.add(config.getAsCached());
 					return;
 				}
 				if ( debug ) System.out.println("FALLING off rule "+
@@ -688,7 +688,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		ATNState p = config.state;
 		// optimization
-		if ( !p.onlyHasEpsilonTransitions() ) configs.add(config);
+		if ( !p.onlyHasEpsilonTransitions() ) configs.add(config.getAsCached());
 
         for (int i=0; i<p.getNumberOfTransitions(); i++) {
             Transition t = p.transition(i);
@@ -748,7 +748,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			if ( parser != null ) {
                 System.out.println("context surrounding pred is "+
                                    parser.getRuleInvocationStack());
-                System.out.println("config.context="+config.context.toString(parser));
+                System.out.println("config.context="+config.context.toString(parser, config.state.stateNumber));
             }
 		}
 		// We know the correct context in exactly one spot: in the original
@@ -756,7 +756,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		// when the context stack is empty and we've not dipped into
 		// the outer context.
 		boolean inContext =
-			config.context==RuleContext.EMPTY && config.reachesIntoOuterContext==0;
+			config.context==PredictionContext.EMPTY && config.reachesIntoOuterContext==0;
 //		RuleContext ctx = null;
 //		if ( inContext ) ctx = outerContext;
 
@@ -803,8 +803,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 							   ", ctx="+config.context);
 		}
 		ATNState p = config.state;
-		RuleContext newContext =
-			new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
+		PredictionContext newContext =
+			config.context.getChild(p.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
@@ -902,8 +902,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 							System.out.println("we reach state "+c.state.stateNumber+
 							   " in rule "+
 							   (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
-							   " alts "+goal.alt+","+c.alt+" from ctx "+goal.context.toString(parser)
-							   +" and "+ c.context.toString(parser));
+							   " alts "+goal.alt+","+c.alt+" from ctx "+goal.context.toString(parser, goal.state.stateNumber)
+							   +" and "+ c.context.toString(parser, c.state.stateNumber));
 						}
 						if ( ambigAlts==null ) ambigAlts = new HashSet<Integer>();
 						ambigAlts.add(goal.alt);

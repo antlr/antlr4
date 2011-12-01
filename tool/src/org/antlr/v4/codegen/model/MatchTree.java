@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
+import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TreePatternAST;
@@ -80,7 +81,7 @@ public class MatchTree extends RuleElement {
 	boolean isNullable(TreePatternAST rootNode) {
 		ATNState firstChildState = rootNode.downState.transition(0).target;
 		LL1Analyzer analyzer = new LL1Analyzer(firstChildState.atn);
-		IntervalSet look = analyzer.LOOK(firstChildState, RuleContext.EMPTY);
+		IntervalSet look = analyzer.LOOK(firstChildState, PredictionContext.EMPTY);
 		return look.contains(Token.UP);
 	}
 

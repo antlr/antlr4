@@ -301,7 +301,7 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 		// is free to conjure up and insert the missing token
 		ATNState currentState = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 		ATNState next = currentState.transition(0).target;
-		IntervalSet expectingAtLL2 = recognizer.getInterpreter().atn.nextTokens(next, recognizer._ctx);
+		IntervalSet expectingAtLL2 = recognizer.getInterpreter().atn.nextTokens(next, PredictionContext.fromRuleContext(recognizer._ctx));
 //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
 		if ( expectingAtLL2.contains(currentSymbolType) ) {
 			reportMissingToken(recognizer);
