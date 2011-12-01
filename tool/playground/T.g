@@ -1,7 +1,7 @@
 grammar T;
-s : a a;
-a :          ID {System.out.println("alt 1");}
-  | {true}?  ID {System.out.println("alt 2");}
+s : e ;
+e : e ('+='<assoc=right>|'-='<assoc=right>) e
+  | INT
   ;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;

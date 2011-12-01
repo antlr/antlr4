@@ -1,30 +1,30 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
- All rights reserved.
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
 
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.parse;
@@ -32,6 +32,7 @@ package org.antlr.v4.parse;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.tool.AttributeDict;
@@ -125,6 +126,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		altTree = altTree.dupTree();
 
 		stripLeftRecursion(altTree);
+		stripAssocOptions(altTree);
 
 		// rewrite e to be e_[rec_arg]
 		int nextPrec = nextPrecedence(alt);
@@ -135,7 +137,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		String altText = text(altTree);
 		altText = altText.trim();
-		altText += "{}"; // add empty alt to prevent pred hoisting
 		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
 		nameST.add("ruleName", ruleName);
 		if ( rewriteTree!=null ) {
@@ -153,6 +154,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		altTree = altTree.dupTree();
 
 		stripLeftRecursion(altTree);
+		stripAssocOptions(altTree);
 
 		int nextPrec = nextPrecedence(alt);
 		ST refST = recRuleTemplates.getInstanceOf("recRuleRef");
@@ -162,7 +164,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		String altText = text(altTree);
 		altText = altText.trim();
-		altText += "{}"; // add empty alt to prevent pred hoisting
 		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
 		nameST.add("ruleName", ruleName);
 		if ( rewriteTree!=null ) {
@@ -186,7 +187,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		altTree = replaceRuleRefs(altTree, refST.render());
 		String altText = text(altTree);
 		altText = altText.trim();
-		altText += "{}"; // add empty alt to prevent pred hoisting
 
 		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
 		nameST.add("ruleName", ruleName);
@@ -297,6 +297,27 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		return t;
 	}
 
+	public void stripAssocOptions(GrammarAST t) {
+		if ( t==null ) return;
+		for (GrammarAST options : t.getNodesWithType(ELEMENT_OPTIONS)) {
+			int i=0;
+			while ( i<options.getChildCount() ) {
+				GrammarAST c = (GrammarAST)options.getChild(i);
+				if ( c.getChild(0).getText().equals("assoc") ) {
+					options.deleteChild(i); // kill this option
+				}
+				else {
+					i++;
+				}
+			}
+			if ( options.getChildCount()==0 )	{
+				Tree parent = options.getParent();
+				parent.deleteChild(options.getChildIndex()); // no more options
+				return;
+			}
+		}
+	}
+
 	/**
 	 * Match (RULE ID (BLOCK (ALT .*) (ALT RULE_REF[self] .*) (ALT .*)))
 	 */
@@ -316,6 +337,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		return t;
 	}
 
+	// TODO: this strips the tree properly, but since text()
+	// uses the start of stop token index and gets text from that
+	// ineffectively ignores this routine.
 	public void stripLeftRecursion(GrammarAST altAST) {
 		GrammarAST rref = (GrammarAST)altAST.getChild(0);
 		if ( rref.getType()== ANTLRParser.RULE_REF &&

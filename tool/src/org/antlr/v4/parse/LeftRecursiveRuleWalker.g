@@ -134,11 +134,11 @@ outerAlternative[GrammarAST rew] returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT recurseNoLabel op=token recurse ) {setTokenPrec($op.t, currentOuterAltNumber);}
+	:	^( ALT recurseNoLabel (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse ) 
 	;
 
 binaryMultipleOp
-	:	^( ALT recurseNoLabel ^( BLOCK ( ^( ALT op=token {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ ) recurse )
+	:	^( ALT recurseNoLabel ^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ ) recurse )
 	;
 
 ternary

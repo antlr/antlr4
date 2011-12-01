@@ -121,7 +121,7 @@ class TestJavaLR {
 
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			long start = System.currentTimeMillis();
-//			tokens.fill();
+			tokens.fill(); // load all and check time
 //			System.out.println(tokens.getTokens());
 			long stop = System.currentTimeMillis();
 			lexerTime += stop-start;
@@ -130,7 +130,7 @@ class TestJavaLR {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
 					parser = new JavaLRParser(null);
-//                    parser.setBuildParseTree(true);
+					if ( showTree ) parser.setBuildParseTree(true);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}

@@ -349,7 +349,7 @@ constructorBody
 
 explicitConstructorInvocation
     :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   expression '.' nonWildcardTypeArguments? 'super' arguments ';'
+    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
     ;
 
 qualifiedName
@@ -561,12 +561,7 @@ constantExpression
 //expression : expression_[0] ;
 
 expression
-	:   '(' expression ')'
-    |   'this' 
-    |   'super'
-    |   literal
-    |   Identifier
-    |   type '.' 'class'
+	:   primary
     |   expression '.' Identifier
     |   expression '.' 'this'
     |   expression '.' 'super' '(' expressionList? ')'
@@ -582,8 +577,8 @@ expression
     |   ('~'|'!') expression
     |   expression ('*'|'/'|'%') expression
     |   expression ('+'|'-') expression
-//    |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression !!! can't handle multi-token ops :(
-    |   expression ('<=' | '>=' | '>' | '<') expression
+    |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
+    |   expression ('<' '=' | '>' '=' | '>' | '<') expression
     |   expression 'instanceof' type
     |   expression ('==' | '!=') expression
     |   expression '&' expression
@@ -601,27 +596,38 @@ expression
         |'&='<assoc=right>
         |'|='<assoc=right>
         |'='<assoc=right>
-//        |'>' '>' '='<assoc=right>
-//        |'>' '>' '>' '='<assoc=right>
-//        |'<' '<' '='<assoc=right>
+        |'>' '>' '='<assoc=right>
+        |'>' '>' '>' '='<assoc=right>
+        |'<' '<' '='<assoc=right>
         |'%='<assoc=right>
         )
         expression
     ;
 
+primary
+	:	'(' expression ')'
+    |   'this' 
+    |   'super'
+    |   literal
+    |   Identifier
+    |   type '.' 'class'
+    |   'void' '.' 'class'
+    ;
+    
 /*
 expression_[int _p]
     :   expression_primary
         (
-                {12 >= $_p}? ('*'|'/'|'%') expression_[13]{}
-                          | {11 >= $_p}? ('+'|'-') expression_[12]{}
-                          | {10 >= $_p}? ('<=' | '>=' | '>' | '<') expression_[11]{}
-                          | {8 >= $_p}? ('==' | '!=') expression_[9]{}
-                          | {7 >= $_p}? '&' expression_[8]{}
-                          | {6 >= $_p}? '^'<assoc=right> expression_[6]{}
-                          | {5 >= $_p}? '|' expression_[6]{}
-                          | {4 >= $_p}? '&&' expression_[5]{}
-                          | {3 >= $_p}? '||' expression_[4]{}
+                {13 >= $_p}? ('*'|'/'|'%') expression_[14]
+                          | {12 >= $_p}? ('+'|'-') expression_[13]
+                          | {11 >= $_p}? ('<' '<' | '>' '>' '>' | '>' '>') expression_[12]
+                          | {10 >= $_p}? ('<=' | '>=' | '>' | '<') expression_[11]
+                          | {8 >= $_p}? ('==' | '!=') expression_[9]
+                          | {7 >= $_p}? '&' expression_[8]
+                          | {6 >= $_p}? '^'<assoc=right> expression_[6]
+                          | {5 >= $_p}? '|' expression_[6]
+                          | {4 >= $_p}? '&&' expression_[5]
+                          | {3 >= $_p}? '||' expression_[4]
                           | {1 >= $_p}? ('^='<assoc=right>
                         |'+='<assoc=right>
                         |'-='<assoc=right>
@@ -630,29 +636,29 @@ expression_[int _p]
                         |'&='<assoc=right>
                         |'|='<assoc=right>
                         |'='<assoc=right>
-                //        |'>' '>' '='<assoc=right>
-                //        |'>' '>' '>' '='<assoc=right>
-                //        |'<' '<' '='<assoc=right>
+                        |'>' '>' '='<assoc=right>
+                        |'>' '>' '>' '='<assoc=right>
+                        |'<' '<' '='<assoc=right>
                         |'%='<assoc=right>
                         )
-                        expression_[1]{}
-                          | {2 >= $_p}? '?' expression ':' expression_[3]{}
-                          | {25 >= $_p}? '.' Identifier
-                          | {24 >= $_p}? '.' 'this'
-                          | {23 >= $_p}? '.' 'super' '(' expressionList? ')'
-                          | {22 >= $_p}? '.' 'new' Identifier '(' expressionList? ')'
-                          | {21 >= $_p}? '.' 'super' '.' Identifier arguments?
-                          | {20 >= $_p}? '.' explicitGenericInvocation
-                          | {18 >= $_p}? '[' expression ']'
-                          | {16 >= $_p}? ('++' | '--')
-                          | {15 >= $_p}? '(' expressionList? ')'
+                        expression_[1]
+                          | {2 >= $_p}? '?' expression ':' expression_[3]
+                          | {26 >= $_p}? '.' Identifier
+                          | {25 >= $_p}? '.' 'this'
+                          | {24 >= $_p}? '.' 'super' '(' expressionList? ')'
+                          | {23 >= $_p}? '.' 'new' Identifier '(' expressionList? ')'
+                          | {22 >= $_p}? '.' 'super' '.' Identifier arguments?
+                          | {21 >= $_p}? '.' explicitGenericInvocation
+                          | {19 >= $_p}? '[' expression ']'
+                          | {17 >= $_p}? ('++' | '--')
+                          | {16 >= $_p}? '(' expressionList? ')'
                           | {9 >= $_p}? 'instanceof' type
         )*
     ;
-2011-11-30 12:07:02:218 left-recursion LogManager.java:48 expression_primary
-    : '(' type ')' expression_[17]{}
-    | ('+'|'-'|'++'|'--') expression_[14]{}
-    | ('~'|'!') expression_[13]{}
+2011-11-30 18:39:48:343 left-recursion LogManager.java:48 expression_primary
+    : '(' type ')' expression_[18]
+    | ('+'|'-'|'++'|'--') expression_[15]
+    | ('~'|'!') expression_[14]
     | '(' expression ')'
     | 'this'
     | 'super'
@@ -662,6 +668,7 @@ expression_[int _p]
     | 'new' creator
     ;
 */
+
 creator
     :   nonWildcardTypeArguments createdName classCreatorRest
     |   createdName (arrayCreatorRest | classCreatorRest)
@@ -718,6 +725,12 @@ FloatingPointLiteral
     |   '.' ('0'..'9')+ Exponent? FloatTypeSuffix?
     |   ('0'..'9')+ Exponent FloatTypeSuffix?
     |   ('0'..'9')+ FloatTypeSuffix
+    |   ('0x' | '0X') (HexDigit )*
+        ('.' (HexDigit)*)?
+        ( 'p' | 'P' )
+        ( '+' | '-' )?
+        ( '0' .. '9' )+
+        FloatTypeSuffix?
     ;
 
 fragment
