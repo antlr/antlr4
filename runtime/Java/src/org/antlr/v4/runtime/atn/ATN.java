@@ -79,15 +79,6 @@ public class ATN {
 	/** Used for runtime deserialization of ATNs from strings */
 	public ATN() { }
 
-	/** Compute the set of valid tokens reachable from the current
-	 *  position in the parse.
-	 */
-	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
-		ATNState s = states.get(ctx.s);
-		if ( s == null ) return null;
-		return nextTokens(s, ctx);
-	}
-
 	/** Compute the set of valid tokens that can occur starting in s.
 	 *  If ctx is null, the set of tokens will not include what can follow
 	 *  the rule surrounding s. In other words, the set will be

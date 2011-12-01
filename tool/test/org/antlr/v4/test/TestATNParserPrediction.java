@@ -1,11 +1,45 @@
+/*
+ [The "BSD license"]
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.junit.Test;
 
 import java.util.List;
@@ -280,10 +314,10 @@ public class TestATNParserPrediction extends BaseTest {
 		RuleStartState eStart = atn.ruleToStartState[g.getRule("e").index];
 		ATNState a_e_invoke = aStart.transition(0).target; //
 		ATNState b_e_invoke = bStart.transition(0).target; //
-		RuleContext a_ctx = new RuleContext(null, -1, a_e_invoke.stateNumber);
-		RuleContext b_ctx = new RuleContext(null, -1, b_e_invoke.stateNumber);
-		RuleContext a_e_ctx = new RuleContext(a_ctx, a_e_invoke.stateNumber, bStart.stateNumber);
-		RuleContext b_e_ctx = new RuleContext(b_ctx, b_e_invoke.stateNumber, bStart.stateNumber);
+		ParserRuleContext a_ctx = new ParserRuleContext(null, -1, a_e_invoke.stateNumber);
+		ParserRuleContext b_ctx = new ParserRuleContext(null, -1, b_e_invoke.stateNumber);
+		ParserRuleContext a_e_ctx = new ParserRuleContext(a_ctx, a_e_invoke.stateNumber, bStart.stateNumber);
+		ParserRuleContext b_e_ctx = new ParserRuleContext(b_ctx, b_e_invoke.stateNumber, bStart.stateNumber);
 
 		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		interp.setContextSensitive(true);
@@ -516,7 +550,7 @@ public class TestATNParserPrediction extends BaseTest {
 		TokenStream input = new IntTokenStream(types);
 		ATNState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
-		int alt = interp.predictATN(dfa, input, RuleContext.EMPTY, false);
+		int alt = interp.predictATN(dfa, input, ParserRuleContext.EMPTY, false);
 
 		System.out.println(dot.getDOT(dfa, false));
 
@@ -533,7 +567,7 @@ public class TestATNParserPrediction extends BaseTest {
 	}
 
 	public DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-					  String inputString, RuleContext ctx)
+					  String inputString, ParserRuleContext ctx)
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
@@ -589,7 +623,7 @@ public class TestATNParserPrediction extends BaseTest {
 			System.out.println(types);
 			TokenStream input = new IntTokenStream(types);
 			try {
-				interp.adaptivePredict(input, decision, RuleContext.EMPTY);
+				interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
 			}
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);

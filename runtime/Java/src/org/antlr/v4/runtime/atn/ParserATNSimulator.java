@@ -43,7 +43,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator<Symbol> extends ATNSimulator {
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
@@ -73,7 +73,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	 *  The full stack at any moment is [config.outerContext + config.context].
 	 */
 	@NotNull
-	protected RuleContext outerContext = RuleContext.EMPTY;
+	protected ParserRuleContext outerContext = ParserRuleContext.EMPTY;
 	@Nullable
 	protected ATNConfig prevAccept; // TODO Move down? used to avoid passing int down and back up in method calls
 	protected int prevAcceptIndex = -1;
@@ -93,7 +93,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision, @Nullable RuleContext outerContext) {
+	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision,
+							   @Nullable ParserRuleContext outerContext)
+	{
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( !buildDFA || dfa==null || dfa.s0==null ) {
@@ -120,21 +122,21 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	public void reset() {
 		userWantsCtxSensitive = false;
-		outerContext = RuleContext.EMPTY;
+		outerContext = ParserRuleContext.EMPTY;
 		prevAccept = null;
 		prevAcceptIndex = -1;
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Symbol> input,
-						  @Nullable RuleContext outerContext,
+						  @Nullable ParserRuleContext outerContext,
 						  boolean useContext)
 	{
-		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
+		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		this.outerContext = outerContext;
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+
 										" exec LA(1)=="+ getLookaheadName(input) +
 										", outerContext="+outerContext.toString(parser));
-		RuleContext ctx = RuleContext.EMPTY;
+		RuleContext ctx = ParserRuleContext.EMPTY;
 		if ( useContext ) ctx = outerContext;
 		OrderedHashSet<ATNConfig> s0_closure =
 			computeStartState(dfa.decision, dfa.atnStartState, ctx);
@@ -167,7 +169,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 						@NotNull ATNState startState)
 	{
 		DFA dfa = new DFA(startState);
-		RuleContext ctx = RuleContext.EMPTY;
+		RuleContext ctx = ParserRuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure =
 			computeStartState(dfa.decision, startState, ctx);
 		return execATN(input, dfa, input.index(), s0_closure, false);
@@ -176,10 +178,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public int execDFA(@NotNull SymbolStream<Symbol> input, @NotNull DFA dfa,
 					   int startIndex,
 					   @NotNull DFAState s0,
-                       @Nullable RuleContext outerContext)
+                       @Nullable ParserRuleContext outerContext)
     {
 //		dump(dfa);
-		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
+		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		this.outerContext = outerContext;
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
 											" exec LA(1)=="+ getLookaheadName(input) +
@@ -315,9 +317,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 
 		@NotNull DecisionState decState = null;
-		//if ( atn.decisionToState.size()>0 )
-        decState = atn.decisionToState.get(dfa.decision);
-		if ( debug ) System.out.println("decision state = "+decState);
+		if ( atn.decisionToState.size()>0 ) {
+        	decState = atn.decisionToState.get(dfa.decision);
+			if ( debug ) System.out.println("decision state = "+decState);
+		}
 
 		prevAccept = null;
 		prevAcceptIndex = -1;
@@ -390,7 +393,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 //								   input.toString(startIndex, input.index()));
 				if ( !userWantsCtxSensitive || useContext ) {
 					// resolve ambiguity
-					if ( decState.isGreedy ) {
+					if ( decState!=null && decState.isGreedy ) {
 						// if greedy, resolve in favor of alt coming first
 						resolveToMinAlt(reach, ambigAlts);
 					}
@@ -531,7 +534,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public int retryWithContext(@NotNull SymbolStream<Symbol> input,
 								@NotNull DFA dfa,
 								int startIndex,
-								@NotNull RuleContext originalContext,
+								@NotNull ParserRuleContext originalContext,
 								@NotNull OrderedHashSet<ATNConfig> closure,
 								int t,
 								@NotNull OrderedHashSet<ATNConfig> reach,
@@ -544,7 +547,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		if ( debug ) System.out.println("RETRY "+ getInputString(input, startIndex) +
 										" with ctx="+ originalContext);
 		int min = getMinAlt(ambigAlts);
-		if ( originalContext==RuleContext.EMPTY ) {
+		if ( originalContext==ParserRuleContext.EMPTY ) {
 			// no point in retrying with ctx since it's same.
 			// this implies that we have a true ambiguity
 			reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
@@ -652,7 +655,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                            @NotNull SemanticContext semanticContext,
                            boolean collectPredicates)
 	{
-		if ( debug ) System.out.println("closure("+config+")");
+		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( !closureBusy.add(config) ) return; // avoid infinite recursion
 
@@ -738,7 +741,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig predTransition(@NotNull ATNConfig config, @NotNull PredicateTransition pt,
+	public ATNConfig predTransition(@NotNull ATNConfig config,
+									@NotNull PredicateTransition pt,
 									boolean collectPredicates)
 	{
 		if ( debug ) {
@@ -756,7 +760,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		// when the context stack is empty and we've not dipped into
 		// the outer context.
 		boolean inContext =
-			config.context==RuleContext.EMPTY && config.reachesIntoOuterContext==0;
+			config.context==ParserRuleContext.EMPTY && config.reachesIntoOuterContext==0;
 //		RuleContext ctx = null;
 //		if ( inContext ) ctx = outerContext;
 
@@ -804,7 +808,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 		ATNState p = config.state;
 		RuleContext newContext =
-			new RuleContext(config.context, p.stateNumber,  t.target.stateNumber);
+			new ParserRuleContext((ParserRuleContext)config.context,
+								  p.stateNumber,
+								  t.target.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
@@ -918,11 +924,12 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return ambigAlts;
 	}
 
-    public SemanticContext[] getPredsForAmbigAlts(@NotNull DecisionState decState,
+    public SemanticContext[] getPredsForAmbigAlts(@Nullable DecisionState decState,
                                                   @NotNull Set<Integer> ambigAlts,
                                                   @NotNull OrderedHashSet<ATNConfig> configs)
     {
         // REACH=[1|1|[]|0:0, 1|2|[]|0:1]
+		if ( decState==null ) return null;
         if ( debug ) System.out.println("getPredsForAmbigAlts decision "+decState.decision);
         int nalts = decState.getNumberOfTransitions();
         SemanticContext[] altToPred = new SemanticContext[nalts +1];
@@ -1093,8 +1100,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input, @NotNull RuleContext outerContext,
-								@NotNull OrderedHashSet<ATNConfig> configs, int startIndex)
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input,
+											@NotNull ParserRuleContext outerContext,
+											@NotNull OrderedHashSet<ATNConfig> configs,
+											int startIndex)
 	{
 		if ( parser instanceof TreeParser) {
 			Symbol startNode = null;

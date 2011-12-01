@@ -204,7 +204,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( buildParseTrees && _ctx != localctx ) {
-			RuleContext parent = _ctx.parent;
+			ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
 			parent.removeLastChild();
 			if ( parent!=null )	parent.addChild(localctx);
 		}
@@ -241,7 +241,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 	}
 
 	protected void addContextToParseTree() {
-		RuleContext parent = _ctx.parent;
+		ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
 		// add current context to parent if we have a parent
 		if ( parent!=null )	{
 			parent.addChild(_ctx);
@@ -275,7 +275,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
     public boolean isExpectedToken(int symbol) {
 //   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;
-        RuleContext ctx = _ctx;
+		ParserRuleContext ctx = _ctx;
         ATNState s = atn.states.get(ctx.s);
         IntervalSet following = atn.nextTokens(s);
         if (following.contains(symbol)) {
@@ -292,7 +292,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
                 return true;
             }
 
-            ctx = ctx.parent;
+            ctx = (ParserRuleContext)ctx.parent;
         }
 
         if ( following.contains(Token.EPSILON) && symbol == Token.EOF ) {
@@ -302,10 +302,12 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
         return false;
     }
 
+	/** Compute the set of valid tokens reachable from the current
+	 *  position in the parse.
+	 */
     public IntervalSet getExpectedTokens() {
-//   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;
-        RuleContext ctx = _ctx;
+		ParserRuleContext ctx = _ctx;
         ATNState s = atn.states.get(ctx.s);
         IntervalSet following = atn.nextTokens(s);
 //        System.out.println("following "+s+"="+following);
@@ -319,7 +321,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
             following = atn.nextTokens(rt.followState);
             expected.addAll(following);
             expected.remove(Token.EPSILON);
-            ctx = ctx.parent;
+            ctx = (ParserRuleContext)ctx.parent;
         }
         if ( following.contains(Token.EPSILON) ) {
             expected.add(Token.EOF);
@@ -332,6 +334,16 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
         ATNState s = atn.states.get(_ctx.s);
    		return atn.nextTokens(s);
    	}
+
+//	/** Compute the set of valid tokens reachable from the current
+//	 *  position in the parse.
+//	 */
+//	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
+//		ATN atn = getInterpreter().atn;
+//		ATNState s = atn.states.get(ctx.s);
+//		if ( s == null ) return null;
+//		return atn.nextTokens(s, ctx);
+//	}
 
 	/** Return List<String> of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if

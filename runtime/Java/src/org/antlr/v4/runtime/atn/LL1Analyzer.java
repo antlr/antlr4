@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -62,7 +63,7 @@ public class LL1Analyzer {
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
 			_LOOK(s.transition(alt - 1).target,
-				  RuleContext.EMPTY,
+				  ParserRuleContext.EMPTY,
 				  look[alt], lookBusy, seeThruPreds);
 			if ( look[alt].size()==0 ) look[alt] = null;
 		}
@@ -116,7 +117,7 @@ public class LL1Analyzer {
             Transition t = s.transition(i);
             if ( t.getClass() == RuleTransition.class ) {
                 RuleContext newContext =
-                    new RuleContext(ctx, s.stateNumber,  t.target.stateNumber);
+                    new RuleContext(ctx, s.stateNumber);
                 _LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
             }
             else if ( t.isEpsilon() && seeThruPreds ) {

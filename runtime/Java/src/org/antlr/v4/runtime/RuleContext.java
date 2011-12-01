@@ -28,67 +28,38 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-/** Rules can return start/stop info as well as possible trees and templates.
- *  Each context knows about invoking context and pointer into ATN so we
- *  can compute FOLLOW for errors and lookahead.
+/** A rule context is a record of a single rule invocation. It knows
+ *  which context invoked it, if any. If there is no parent context, then
+ *  naturally the invoking state is not valid.  The parent link
+ *  provides a chain upwards from the current rule invocation to the root
+ *  of the invocation tree, forming a stack. We actually carry no
+ *  information about the rule associated with this context (except
+ *  when parsing). We keep only the state number of the invoking state from
+ *  the ATN submachine that invoked this. Contrast this with the s
+ *  pointer inside ParserRuleContext that tracks the current state
+ *  being "executed" for the current rule.
  *
- *  Used during parse to record stack of rule invocations and during
- *  ATN simulation to record invoking states.
+ *  The parent contexts are useful for computing lookahead sets and
+ *  getting error information.
+ *
+ *  These objects are used during lexing, parsing, and prediction.
+ *  For the special case of parsers and tree parsers, we use the subclass
+ *  ParserRuleContext.
+ *
+ *  @see ParserRuleContext
  */
 public class RuleContext implements ParseTree.RuleNode {
-	@NotNull
-	public static final RuleContext EMPTY = new RuleContext();
-
 	/** What context invoked this rule? */
 	public RuleContext parent;
-
-	/** If we are debugging or building a parse tree for a visitor,
-	 *  we need to track all of the tokens and rule invocations associated
-	 *  with this rule's context. This is empty for normal parsing
-	 *  operation because we don't the need to track the details about
-	 *  how we parse this rule.
-	 */
-	public List<ParseTree> children;
-
-	/** For debugging/tracing purposes, we want to track all of the nodes in
-	 *  the ATN traversed by the parser for a particular rule.
-	 *  This list indicates the sequence of ATN nodes used to match
-	 *  the elements of the children list. This list does not include
-	 *  ATN nodes and other rules used to match rule invocations. It
-	 *  traces the rule invocation node itself but nothing inside that
-	 *  other rule's ATN submachine.
-	 *
-	 *  There is NOT a one-to-one correspondence between the children and
-	 *  states list. There are typically many nodes in the ATN traversed
-	 *  for each element in the children list. For example, for a rule
-	 *  invocation there is the invoking state and the following state.
-	 *
-	 *  The parser setState() method updates field s and adds it to this list
-	 *  if we are debugging/tracing.
-     *
-     *  This does not trace states visited during prediction.
-	 */
-	public List<Integer> states;
-
-	/** Current ATN state number we are executing.
-	 *
-	 *  Not used during ATN simulation; only used during parse that updates
-	 *  current location in ATN.
-	 */
-	public int s = -1;
 
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
@@ -109,20 +80,19 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	public RuleContext() {}
 
-	public RuleContext(RuleContext parent) {
-		this(parent, -1);
-	}
+//	public RuleContext(RuleContext parent) {
+//		this(parent, -1);
+//	}
+//
+//	public RuleContext(RuleContext parent, int stateNumber) {
+//		// capture state that called us as we create this context; use later for
+//		// return state in closure
+//		this(parent, parent != null ? parent.s : -1, stateNumber);
+//	}
 
-	public RuleContext(RuleContext parent, int stateNumber) {
-		// capture state that called us as we create this context; use later for
-		// return state in closure
-		this(parent, parent!=null ? parent.s : -1, stateNumber);
-	}
-
-	public RuleContext(RuleContext parent, int invokingState, int stateNumber) {
+	public RuleContext(RuleContext parent, int invokingState) {
 		this.parent = parent;
 		//if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
-		this.s = stateNumber;
 		this.invokingState = invokingState;
 
 		this.cachedHashCode = invokingState;
@@ -151,41 +121,6 @@ public class RuleContext implements ParseTree.RuleNode {
 			n++;
 		}
 		return n;
-	}
-
-	public void addChild(Token matchedToken) {
-		TerminalNodeImpl<?> t = new TerminalNodeImpl<Token>(matchedToken);
-		addChild(t);
-	}
-
-	public void addErrorNode(Token badToken) {
-		TerminalNodeImpl<?> t = new ErrorNodeImpl<Token>(badToken);
-		addChild(t);
-	}
-
-	public void addChild(TerminalNode<?> t) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
-		children.add(t);
-	}
-
-	public void addChild(RuleContext ruleInvocation) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
-		children.add(ruleInvocation);
-	}
-
-	/** Used by enterOuterAlt to toss out a RuleContext previously added as
-	 *  we entered a rule. If we have # label, we will need to remove
-	 *  generic ruleContext object.
- 	 */
-	public void removeLastChild() {
-		if ( children!=null ) {
-			children.remove(children.size()-1);
-		}
-	}
-
-	public void trace(int s) {
-		if ( states==null ) states = new ArrayList<Integer>();
-		states.add(s);
 	}
 
 	/** Two contexts are equals() if both have
@@ -291,11 +226,6 @@ public class RuleContext implements ParseTree.RuleNode {
 	// satisfy the ParseTree interface
 
 	@Override
-	public ParseTree getChild(int i) {
-		return children!=null ? children.get(i) : null;
-	}
-
-	@Override
 	public RuleContext getRuleContext() { return this; }
 
 	@Override
@@ -304,10 +234,17 @@ public class RuleContext implements ParseTree.RuleNode {
 	@Override
 	public RuleContext getPayload() { return this; }
 
-	@Override
-	public int getChildCount() { return children!=null ? children.size() : 0; }
-
 	public int getRuleIndex() { return -1; }
+
+	@Override
+	public ParseTree getChild(int i) {
+		return null;
+	}
+
+	@Override
+	public int getChildCount() {
+		return 0;
+	}
 
 	@Override
 	public Interval getSourceInterval() {
@@ -351,29 +288,18 @@ public class RuleContext implements ParseTree.RuleNode {
 		return toString(null);
 	}
 
-	public String toString(BaseRecognizer<?> recog) {
-		return toString(recog, RuleContext.EMPTY);
+	public String toString(@Nullable Recognizer<?,?> recog) {
+		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
-	public String toString(BaseRecognizer<?> recog, RuleContext stop) {
+	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
+	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
 		StringBuilder buf = new StringBuilder();
 		RuleContext p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
-			if ( recog!=null ) {
-				ATN atn = recog.getATN();
-				ATNState s = atn.states.get(p.s);
-				String ruleName = recog.getRuleNames()[s.ruleIndex];
-				buf.append(ruleName);
-				if ( p.parent != null ) buf.append(" ");
-//				ATNState invoker = atn.states.get(ctx.invokingState);
-//				RuleTransition rt = (RuleTransition)invoker.transition(0);
-//				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
-			}
-			else {
-				if ( !p.isEmpty() ) buf.append(p.invokingState);
-				if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
-			}
+			if ( !p.isEmpty() ) buf.append(p.invokingState);
+			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
 			p = p.parent;
 		}
 		buf.append("]");

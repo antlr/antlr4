@@ -172,7 +172,7 @@ public class ATNConfig {
         }
         if ( context!=null ) {
             buf.append("|");
-            buf.append(context);
+            buf.append(context.toString(recog));
         }
         if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
             buf.append("|");

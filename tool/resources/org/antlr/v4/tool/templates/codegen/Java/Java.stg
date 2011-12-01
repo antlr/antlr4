@@ -558,8 +558,8 @@ CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
-	<if(s.ctorAttrs)>public <s.name>(RuleContext parent, int state) { super(parent, state); }<endif>
-	public <s.name>(RuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
+	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
+	public <s.name>(ParserRuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
 		<s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}

@@ -38,11 +38,11 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
+	public static final RuleContext EMPTY_LEXER_RULE_CONTEXT = new RuleContext();
+
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static final int NUM_EDGES = 255;
@@ -456,7 +456,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected OrderedHashSet<ATNConfig> computeStartState(@NotNull IntStream input,
 														  @NotNull ATNState p)
 	{
-		RuleContext initialContext = RuleContext.EMPTY;
+		RuleContext initialContext = EMPTY_LEXER_RULE_CONTEXT;
 		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -515,7 +515,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNConfig c = null;
 		if ( t.getClass() == RuleTransition.class ) {
 			RuleContext newContext =
-				new RuleContext(config.context, p.stateNumber, t.target.stateNumber);
+				new RuleContext(config.context, p.stateNumber);
 			c = new ATNConfig(config, t.target, newContext);
 		}
 		else if ( t.getClass() == PredicateTransition.class ) {
