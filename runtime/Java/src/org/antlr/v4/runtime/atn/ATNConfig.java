@@ -53,7 +53,7 @@ public class ATNConfig {
 	 *  execution of the ATN simulator.
 	 */
 	@Nullable
-	public final PredictionContext context;
+	public final RuleContext context;
 
 	/**
 	 * Indicates that we have reached this ATN configuration after
@@ -91,7 +91,7 @@ public class ATNConfig {
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
-					 @Nullable PredictionContext context)
+					 @Nullable RuleContext context)
 	{
 		this.state = state;
 		this.alt = alt;
@@ -110,11 +110,11 @@ public class ATNConfig {
    		this(c, state, c.context, semanticContext);
    	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context) {
         this(c, state, context, c.semanticContext);
     }
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context,
                      SemanticContext semanticContext)
     {
 		this.state = state;
@@ -125,17 +125,9 @@ public class ATNConfig {
         this.semanticContext = semanticContext;
 	}
 
-//	public ATNConfig(@NotNull ATNConfig c, @Nullable PredictionContext context) {
+//	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {
 //		this(c, c.state, context);
 //	}
-
-	public ATNConfig getAsCached() {
-		if (this.context == null || this.context.isCached()) {
-			return this;
-		}
-
-		return new ATNConfig(this, this.state, this.context.getAsCached(), this.semanticContext);
-	}
 
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and

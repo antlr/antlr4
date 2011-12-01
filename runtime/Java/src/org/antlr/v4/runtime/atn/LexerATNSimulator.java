@@ -456,7 +456,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected OrderedHashSet<ATNConfig> computeStartState(@NotNull IntStream input,
 														  @NotNull ATNState p)
 	{
-		PredictionContext initialContext = PredictionContext.EMPTY;
+		RuleContext initialContext = RuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -487,7 +487,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				configs.add(config);
 				return;
 			}
-			PredictionContext newContext = config.context.parent; // "pop" invoking state
+			RuleContext newContext = config.context.parent; // "pop" invoking state
 			ATNState invokingState = atn.states.get(config.context.invokingState);
 			RuleTransition rt = (RuleTransition)invokingState.transition(0);
 			ATNState retState = rt.followState;
@@ -498,7 +498,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		// optimization
 		if ( !config.state.onlyHasEpsilonTransitions() )	{
-			configs.add(config.getAsCached());
+			configs.add(config);
 		}
 
 		ATNState p = config.state;
@@ -514,7 +514,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		ATNConfig c = null;
 		if ( t.getClass() == RuleTransition.class ) {
-			PredictionContext newContext = config.context.getChild(p.stateNumber);
+			RuleContext newContext =
+				new RuleContext(config.context, p.stateNumber, t.target.stateNumber);
 			c = new ATNConfig(config, t.target, newContext);
 		}
 		else if ( t.getClass() == PredicateTransition.class ) {

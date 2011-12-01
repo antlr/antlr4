@@ -28,7 +28,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
@@ -85,7 +84,7 @@ public class RecognitionException extends RuntimeException {
 	public IntervalSet getExpectedTokens() {
         // TODO: do we really need this type check?
 		if ( recognizer!=null && recognizer instanceof BaseRecognizer<?> ) {
-			return recognizer.getInterpreter().atn.nextTokens(PredictionContext.fromRuleContext(ctx), ctx.s);
+			return recognizer.getInterpreter().atn.nextTokens(ctx);
 		}
 		return null;
 	}

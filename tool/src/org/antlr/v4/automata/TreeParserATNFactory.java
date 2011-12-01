@@ -58,7 +58,7 @@ public class TreeParserATNFactory extends ParserATNFactory {
 		for (int i=0; i<firstChildStates.size(); i++) {
 			ATNState firstChild = firstChildStates.get(i);
 			LL1Analyzer analyzer = new LL1Analyzer(atn);
-			IntervalSet look = analyzer.LOOK(firstChild, PredictionContext.EMPTY);
+			IntervalSet look = analyzer.LOOK(firstChild, RuleContext.EMPTY);
 			TreePatternAST root = treePatternRootNodes.get(i);
 
 			if ( look.contains(Token.UP) ) {

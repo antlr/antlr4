@@ -82,8 +82,8 @@ public class ATN {
 	/** Compute the set of valid tokens reachable from the current
 	 *  position in the parse.
 	 */
-	public IntervalSet nextTokens(@NotNull PredictionContext ctx, int stateNumber) {
-		ATNState s = states.get(stateNumber);
+	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
+		ATNState s = states.get(ctx.s);
 		if ( s == null ) return null;
 		return nextTokens(s, ctx);
 	}
@@ -93,7 +93,7 @@ public class ATN {
 	 *  the rule surrounding s. In other words, the set will be
 	 *  restricted to tokens reachable staying within s's rule.
 	 */
-	public IntervalSet nextTokens(ATNState s, PredictionContext ctx) {
+	public IntervalSet nextTokens(ATNState s, RuleContext ctx) {
 		LL1Analyzer anal = new LL1Analyzer(this);
 		IntervalSet next = anal.LOOK(s, ctx);
 		return next;
