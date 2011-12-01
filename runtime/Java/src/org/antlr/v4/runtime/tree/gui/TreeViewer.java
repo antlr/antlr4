@@ -138,7 +138,7 @@ public class TreeViewer extends JComponent {
 
 	// ---------------- PAINT -----------------------------------------------
 
-	private boolean useCurvedEdges = true;
+	private boolean useCurvedEdges = false;
 	
 	public boolean getUseCurvedEdges() {
 		return useCurvedEdges;
@@ -161,7 +161,7 @@ public class TreeViewer extends JComponent {
 				Rectangle2D.Double childBounds = getBoundsOfNode(child);
 				double x2 = childBounds.getCenterX();
 				double y2 = childBounds.getMinY();
-				if (useCurvedEdges) {
+				if (getUseCurvedEdges()) {
 					CubicCurve2D c = new CubicCurve2D.Double();
 					double ctrlx1 = x1;
 					double ctrly1 = (y1+y2)/2;
