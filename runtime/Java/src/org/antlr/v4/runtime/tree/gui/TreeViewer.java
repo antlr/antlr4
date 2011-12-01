@@ -44,6 +44,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -137,6 +138,16 @@ public class TreeViewer extends JComponent {
 
 	// ---------------- PAINT -----------------------------------------------
 
+	private boolean useCurvedEdges = true;
+	
+	public boolean getUseCurvedEdges() {
+		return useCurvedEdges;
+	}
+
+	public void setUseCurvedEdges(boolean useCurvedEdges) {
+		this.useCurvedEdges = useCurvedEdges;
+	}
+
 	protected void paintEdges(Graphics g, Tree parent) {
 		if (!getTree().isLeaf(parent)) {
             BasicStroke stroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
@@ -150,9 +161,18 @@ public class TreeViewer extends JComponent {
 				Rectangle2D.Double childBounds = getBoundsOfNode(child);
 				double x2 = childBounds.getCenterX();
 				double y2 = childBounds.getMinY();
-				g.drawLine((int) x1, (int) y1,
-						   (int) x2, (int) y2);
-
+				if (useCurvedEdges) {
+					CubicCurve2D c = new CubicCurve2D.Double();
+					double ctrlx1 = x1;
+					double ctrly1 = (y1+y2)/2;
+					double ctrlx2 = x2;
+					double ctrly2 = y1;
+					c.setCurve(x1, y1, ctrlx1, ctrly1, ctrlx2, ctrly2, x2, y2);
+					((Graphics2D) g).draw(c);
+				} else {
+					g.drawLine((int) x1, (int) y1,
+							   (int) x2, (int) y2);
+				}
 				paintEdges(g, child);
 			}
 		}
