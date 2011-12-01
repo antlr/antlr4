@@ -808,9 +808,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 		ATNState p = config.state;
 		RuleContext newContext =
-			new ParserRuleContext((ParserRuleContext)config.context,
-								  p.stateNumber,
-								  t.target.stateNumber);
+			new RuleContext(config.context, p.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
