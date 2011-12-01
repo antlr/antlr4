@@ -51,7 +51,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
 
-	public static boolean buildDFA = false;
+	public static boolean buildDFA = true;
 
 	@Nullable
 	protected final BaseRecognizer<Symbol> parser;
