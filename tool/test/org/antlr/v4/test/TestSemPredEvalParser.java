@@ -112,7 +112,9 @@ public class TestSemPredEvalParser extends BaseTest {
 		// Since the 2nd alternative has a true predicate, we always choose that one
 		String grammar =
 			"grammar T;\n" +
-				"s : a a;\n" + // do 2x: once in ATN, next in DFA
+				"s : a {} a;\n" + // do 2x: once in ATN, next in DFA;
+								  // action blocks lookahead from falling off of 'a'
+								  // and looking into 2nd 'a' ref. !ctx dependent pred
 				"a :          ID {System.out.println(\"alt 1\");}\n" +
 				"  | {true}?  ID {System.out.println(\"alt 2\");}\n" +
 				"  ;\n" +

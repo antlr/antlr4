@@ -42,6 +42,7 @@ class TestJavaLR {
 	public static boolean profile = false;
 	public static JavaLRLexer lexer;
 	public static JavaLRParser parser = null;
+	public static boolean showTree = false;
 
 	public static void main(String[] args) {
 		try {
@@ -49,6 +50,7 @@ class TestJavaLR {
 			if (args.length > 0 ) {
 				// for each directory/file specified on the command line
 				for(int i=0; i< args.length;i++) {
+					if ( args[i].equals("-tree") ) showTree = true;
 					doFile(new File(args[i])); // parse it
 				}
 			}
@@ -94,7 +96,7 @@ class TestJavaLR {
 				f.getName().substring(f.getName().length()-5).equals(".java"))
 			|| f.getName().equals("input") )
 		{
-			System.err.println("parsing "+f.getAbsolutePath());
+			System.err.println(f.getAbsolutePath());
 			parseFile(f.getAbsolutePath());
 		}
 	}
@@ -119,26 +121,24 @@ class TestJavaLR {
 
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			long start = System.currentTimeMillis();
-			tokens.fill();
+//			tokens.fill();
 //			System.out.println(tokens.getTokens());
 			long stop = System.currentTimeMillis();
 			lexerTime += stop-start;
-//			for (Object t : tokens.getTokens()) {
-//				System.out.println(t);
-//			}
 
 			if ( true ) {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
-					parser = new JavaLRParser(tokens);
-                    parser.setBuildParseTree(true);
+					parser = new JavaLRParser(null);
+//                    parser.setBuildParseTree(true);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}
+
 				parser.setTokenStream(tokens);
 				// start parsing at the compilationUnit rule
 				ParserRuleContext<Token> tree = parser.compilationUnit();
-//                tree.inspect(parser);
+                if ( showTree ) tree.inspect(parser);
 				//System.err.println("finished "+f);
 //                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
 			}

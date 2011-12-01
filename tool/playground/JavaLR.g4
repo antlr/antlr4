@@ -13,6 +13,14 @@ public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
               ", LT(1)="+_input.LT(1)+
               ", LT(2)="+_input.LT(2));
 }
+	@Override
+	public void exitRule(int ruleIndex) {
+		super.exitRule(ruleIndex);
+		System.err.println("exit "+ruleNames[ruleIndex]+
+	              ", LT(1)="+_input.LT(1)+
+	              ", LT(2)="+_input.LT(2));
+	}
+
 */
 }
 
@@ -24,7 +32,9 @@ compilationUnit
         (   packageDeclaration importDeclaration* typeDeclaration*
         |   classOrInterfaceDeclaration typeDeclaration*
         )
+        EOF
     |   packageDeclaration? importDeclaration* typeDeclaration*
+    	EOF
     ;
 
 packageDeclaration
@@ -603,48 +613,46 @@ expression
 expression_[int _p]
     :   expression_primary
         (
-            {13 >= $_p}? ('*'|'/'|'%') expression_[14]{}
-                      | {12 >= $_p}? ('+'|'-') expression_[13]{}
-                      | {8 >= $_p}? ('==' | '!=') expression_[9]{}
-                      | {7 >= $_p}? '&' expression_[8]{}
-                      | {6 >= $_p}? '^'<assoc=right> expression_[6]{}
-                      | {5 >= $_p}? '|' expression_[6]{}
-                      | {4 >= $_p}? '&&' expression_[5]{}
-                      | {3 >= $_p}? '||' expression_[4]{}
-                      | {1 >= $_p}? ('^='<assoc=right>
-                    |'+='<assoc=right>
-                    |'-='<assoc=right>
-                    |'*='<assoc=right>
-                    |'/='<assoc=right>
-                    |'&='<assoc=right>
-                    |'|='<assoc=right>
-                    |'='<assoc=right>
-            /*
-                    |'>' '>' '='<assoc=right>
-                    |'>' '>' '>' '='<assoc=right>
-                    |'<' '<' '='<assoc=right>
-                    |'%='<assoc=right>
-                    )
-                    expression_[1]
-                      | {2 >= $_p}? '?' expression ':' expression_[3]{}
-                      | {26 >= $_p}? '.' Identifier
-                      | {25 >= $_p}? '.' 'this'
-                      | {24 >= $_p}? '.' 'super' '(' expressionList? ')'
-                      | {23 >= $_p}? '.' 'new' Identifier '(' expressionList? ')'
-                      | {22 >= $_p}? '.' 'super' '.' Identifier arguments?
-                      | {21 >= $_p}? '.' explicitGenericInvocation
-                      | {19 >= $_p}? '[' expression ']'
-                      | {17 >= $_p}? ('++' | '--')
-                      | {16 >= $_p}? '(' expressionList? ')'
-                      | {11 >= $_p}? ('<' '<' | '>' '>' '>' | '>' '>') expression
-                      | {10 >= $_p}? ('<' '=' | '>' '=' | '>' | '<') expression
-                      | {9 >= $_p}? 'instanceof' type
+                {12 >= $_p}? ('*'|'/'|'%') expression_[13]{}
+                          | {11 >= $_p}? ('+'|'-') expression_[12]{}
+                          | {10 >= $_p}? ('<=' | '>=' | '>' | '<') expression_[11]{}
+                          | {8 >= $_p}? ('==' | '!=') expression_[9]{}
+                          | {7 >= $_p}? '&' expression_[8]{}
+                          | {6 >= $_p}? '^'<assoc=right> expression_[6]{}
+                          | {5 >= $_p}? '|' expression_[6]{}
+                          | {4 >= $_p}? '&&' expression_[5]{}
+                          | {3 >= $_p}? '||' expression_[4]{}
+                          | {1 >= $_p}? ('^='<assoc=right>
+                        |'+='<assoc=right>
+                        |'-='<assoc=right>
+                        |'*='<assoc=right>
+                        |'/='<assoc=right>
+                        |'&='<assoc=right>
+                        |'|='<assoc=right>
+                        |'='<assoc=right>
+                //        |'>' '>' '='<assoc=right>
+                //        |'>' '>' '>' '='<assoc=right>
+                //        |'<' '<' '='<assoc=right>
+                        |'%='<assoc=right>
+                        )
+                        expression_[1]{}
+                          | {2 >= $_p}? '?' expression ':' expression_[3]{}
+                          | {25 >= $_p}? '.' Identifier
+                          | {24 >= $_p}? '.' 'this'
+                          | {23 >= $_p}? '.' 'super' '(' expressionList? ')'
+                          | {22 >= $_p}? '.' 'new' Identifier '(' expressionList? ')'
+                          | {21 >= $_p}? '.' 'super' '.' Identifier arguments?
+                          | {20 >= $_p}? '.' explicitGenericInvocation
+                          | {18 >= $_p}? '[' expression ']'
+                          | {16 >= $_p}? ('++' | '--')
+                          | {15 >= $_p}? '(' expressionList? ')'
+                          | {9 >= $_p}? 'instanceof' type
         )*
     ;
-expression_primary
-    : '(' type ')' expression_[18]{}
-    | ('+'|'-'|'++'|'--') expression_[15]{}
-    | ('~'|'!') expression_[14]{}
+2011-11-30 12:07:02:218 left-recursion LogManager.java:48 expression_primary
+    : '(' type ')' expression_[17]{}
+    | ('+'|'-'|'++'|'--') expression_[14]{}
+    | ('~'|'!') expression_[13]{}
     | '(' expression ')'
     | 'this'
     | 'super'

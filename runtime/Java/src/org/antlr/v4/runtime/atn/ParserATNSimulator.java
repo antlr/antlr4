@@ -51,6 +51,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
 
+	public static boolean buildDFA = false;
+
 	@Nullable
 	protected final BaseRecognizer<Symbol> parser;
 
@@ -94,7 +96,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision, @Nullable RuleContext outerContext) {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
-		if ( dfa==null || dfa.s0==null ) {
+		if ( !buildDFA || dfa==null || dfa.s0==null ) {
 			ATNState startState = atn.decisionToState.get(decision);
 			decisionToDFA[decision] = dfa = new DFA(startState);
 			dfa.decision = decision;
@@ -247,7 +249,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					return alt; // we've updated DFA, exec'd action, and have our deepest answer
 				}
 				catch (NoViableAltException nvae) {
-					addDFAEdge(s, t, ERROR);
+					if ( buildDFA ) addDFAEdge(s, t, ERROR);
 					throw nvae;
 				}
 			}
@@ -364,8 +366,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					}
 					List<DFAState.PredPrediction> predPredictions =
 						getPredicatePredictions(altToPred);
-					DFAState accept = addDFAEdge(dfa, closure, t, reach);
-					makeAcceptState(accept, predPredictions);
+					if ( buildDFA ) {
+						DFAState accept = addDFAEdge(dfa, closure, t, reach);
+						makeAcceptState(accept, predPredictions);
+					}
 					// rewind input so pred's LT(i) calls make sense
 					input.seek(startIndex);
                     int uniqueAlt = evalSemanticContext(predPredictions);
@@ -409,6 +413,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				if ( debug ) System.out.println("PREDICT alt "+uniqueAlt+
 												" decision "+dfa.decision+
 												" at index "+input.index());
+				if ( !buildDFA ) return uniqueAlt;
 				// edge from closure-t->reach now
                 DFAState accept = addDFAEdge(dfa, closure, t, reach);
 				// now check to see if we have a validating predicate.
@@ -460,7 +465,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			// If we matched t anywhere, need to consume and add closer-t->reach DFA edge
 			// else error if no previous accept
 			input.consume();
-			addDFAEdge(dfa, closure, t, reach);
+			if ( buildDFA ) addDFAEdge(dfa, closure, t, reach);
 			t = input.LA(1);
 
 			// swap to avoid reallocating space
@@ -573,12 +578,14 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		// TODO: if ambig, why turn on ctx sensitive?
 
 		int predictedAlt = ctx_alt;
-		DFAState reachTarget = addDFAEdge(dfa, closure, t, reach);
-		reachTarget.isCtxSensitive = true;
-		if ( reachTarget.ctxToPrediction==null ) {
-			reachTarget.ctxToPrediction = new LinkedHashMap<RuleContext, Integer>();
+		if ( buildDFA) {
+			DFAState reachTarget = addDFAEdge(dfa, closure, t, reach);
+			reachTarget.isCtxSensitive = true;
+			if ( reachTarget.ctxToPrediction==null ) {
+				reachTarget.ctxToPrediction = new LinkedHashMap<RuleContext, Integer>();
+			}
+			reachTarget.ctxToPrediction.put(originalContext, predictedAlt);
 		}
-		reachTarget.ctxToPrediction.put(originalContext, predictedAlt);
 //					System.out.println("RESOLVE to "+predictedAlt);
 		//System.out.println(reachTarget.ctxToPrediction.size()+" size of ctx map");
 		return predictedAlt;
@@ -685,13 +692,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
         for (int i=0; i<p.getNumberOfTransitions(); i++) {
             Transition t = p.transition(i);
-            boolean continueCollecting = !(t instanceof ActionTransition) && collectPredicates;
-            if ( debug ) {
-                if ( t instanceof ActionTransition && collectPredicates ) {
-                    System.out.println("pruning future pred eval derived from s"+
-                                       config.state.stateNumber);
-                }
-            }
+            boolean continueCollecting =
+				!(t instanceof ActionTransition) && collectPredicates;
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting);
 			if ( c!=null ) {
 				if ( config.state instanceof RuleStopState ) {
@@ -759,12 +761,14 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 //		if ( inContext ) ctx = outerContext;
 
         ATNConfig c;
-        if ( !pt.isCtxDependent || (pt.isCtxDependent&&inContext) ) {
-            SemanticContext newSemCtx = new SemanticContext.AND(config.semanticContext, pt.getPredicate());
+        if ( collectPredicates &&
+			 (!pt.isCtxDependent || (pt.isCtxDependent&&inContext)) )
+		{
+            SemanticContext newSemCtx = SemanticContext.and(config.semanticContext, pt.getPredicate());
             c = new ATNConfig(config, pt.target, newSemCtx);
         }
 		else {
-			c = new ATNConfig(config, pt.target);
+			c = new ATNConfig(config, pt.target, SemanticContext.NONE);
 		}
 
 		if ( debug ) System.out.println("config from pred transition="+c);
@@ -926,7 +930,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		int nPredAlts = 0;
         for (ATNConfig c : configs) {
             if ( c.semanticContext!=SemanticContext.NONE && ambigAlts.contains(c.alt) ) {
-                altToPred[c.alt] = new SemanticContext.OR(altToPred[c.alt], c.semanticContext);
+                altToPred[c.alt] = SemanticContext.or(altToPred[c.alt], c.semanticContext);
                 c.resolveWithPredicate = true;
 				nPredAlts++;
             }
@@ -940,6 +944,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		// nonambig alts are null in altToPred
         if ( nPredAlts==0 ) altToPred = null;
+		if ( debug ) System.out.println("getPredsForAmbigAlts result "+Arrays.toString(altToPred));
         return altToPred;
     }
 

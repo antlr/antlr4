@@ -32,6 +32,10 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Utils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /** A tree structure used to record the semantic context in which
  *  an ATN configuration is valid.  It's either a single predicate,
@@ -43,10 +47,11 @@ import org.antlr.v4.runtime.misc.NotNull;
 public abstract class SemanticContext {
     public static final SemanticContext NONE = new Predicate();
 
+	public SemanticContext parent;
+
     public abstract boolean eval(Recognizer<?,?> parser, RuleContext ctx);
 
-	/** Optimize tree and return altered one */
-	public abstract SemanticContext optimize();
+	public SemanticContext optimize() { return this; }
 
     public static class Predicate extends SemanticContext {
         public final int ruleIndex;
@@ -65,17 +70,9 @@ public abstract class SemanticContext {
             this.isCtxDependent = isCtxDependent;
         }
 
-        public Predicate(Predicate p) {
-            this.ruleIndex = p.ruleIndex;
-            this.predIndex = p.predIndex;
-            this.isCtxDependent = p.isCtxDependent;
-		}
-
         public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
             return parser.sempred(ctx, ruleIndex, predIndex);
         }
-
-		public SemanticContext optimize() { return this; }
 
 		@Override
 		public int hashCode() {
@@ -97,80 +94,86 @@ public abstract class SemanticContext {
         }
     }
 
-//	public static class TruePredicate extends Predicate {
-//		@Override
-//		public String toString() {
-//			return "true"; // not used for code gen, just DOT and print outs
-//		}
-//	}
-//
-//	public static class FalsePredicate extends Predicate {
-//        @Override
-//		public String toString() {
-//			return "false"; // not used for code gen, just DOT and print outs
-//		}
-//	}
-
     public static class AND extends SemanticContext {
-        public SemanticContext a;
-        public SemanticContext b;
+		@NotNull public Set<SemanticContext> opnds = new HashSet<SemanticContext>();
         public AND() { }
 		public AND(@NotNull SemanticContext a, @NotNull SemanticContext b) {
-            this.a = a;
-            this.b = b;
+			if ( a instanceof AND ) opnds.addAll(((AND)a).opnds);
+			else opnds.add(a);
+			if ( b instanceof AND ) opnds.addAll(((AND)b).opnds);
+			else opnds.add(b);
         }
 
-        public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
-            if ( a == NONE ) return b.eval(parser, ctx);
-            if ( b == NONE ) return a.eval(parser, ctx);
-            return a.eval(parser, ctx) && b.eval(parser, ctx);
-        }
-
-		public SemanticContext optimize() {
-			SemanticContext a_ = a.optimize();
-			SemanticContext b_ = b.optimize();
-			if ( a_ == NONE ) return b_;
-			if ( b_ == NONE ) return a_;
-			if ( a_.equals(b_) ) return a_;
-			return new AND(a_, b_);
+		@Override
+		public boolean equals(@NotNull Object obj) {
+			if ( this==obj ) return true;
+			if ( !(obj instanceof AND) ) return false;
+			AND other = (AND)obj;
+			return this.opnds.equals(other.opnds);
 		}
 
+		@Override
+		public int hashCode() {
+			return opnds.hashCode();
+		}
+
+		public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
+			for (SemanticContext opnd : opnds) {
+				if ( !opnd.eval(parser, ctx) ) return false;
+			}
+			return true;
+        }
+
 		public String toString() {
-            if ( a == NONE ) return b.toString();
-            if ( b == NONE ) return a.toString();
-            return a+"&&"+b;
+			return Utils.join(opnds.iterator(), "&&");
         }
     }
 
     public static class OR extends SemanticContext {
-        public SemanticContext a;
-        public SemanticContext b;
+		@NotNull public Set<SemanticContext> opnds = new HashSet<SemanticContext>();
         public OR() { }
         public OR(@NotNull SemanticContext a, @NotNull SemanticContext b) {
-            this.a = a;
-            this.b = b;
+			if ( a instanceof OR ) opnds.addAll(((OR)a).opnds);
+			else opnds.add(a);
+			if ( b instanceof OR ) opnds.addAll(((OR)b).opnds);
+			else opnds.add(b);
         }
+
+		@Override
+		public boolean equals(@NotNull Object obj) {
+			if ( this==obj ) return true;
+			if ( !(obj instanceof OR) ) return false;
+			OR other = (OR)obj;
+			return this.opnds.equals(other.opnds);
+		}
+
+		@Override
+		public int hashCode() {
+			return opnds.hashCode() + 1; // differ from AND slightly
+		}
 
         public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
-            if ( a == NONE ) return b.eval(parser, ctx);
-            if ( b == NONE ) return a.eval(parser, ctx);
-            return a.eval(parser, ctx) && b.eval(parser, ctx);
+			for (SemanticContext opnd : opnds) {
+				if ( opnd.eval(parser, ctx) ) return true;
+			}
+			return false;
         }
-
-		public SemanticContext optimize() {
-			SemanticContext a_ = a.optimize();
-			SemanticContext b_ = b.optimize();
-			if ( a_ == NONE ) return b_;
-			if ( b_ == NONE ) return a_;
-			if ( a_.equals(b_) ) return a_;
-			return new OR(a_, b_);
-		}
 
         @Override
         public String toString() {
-            if ( a == NONE ) return b.toString();
-            if ( b == NONE ) return a.toString();
-            return a+"||"+b;
+			return Utils.join(opnds.iterator(), "||");
         }
     }
+
+	public static SemanticContext and(SemanticContext a, SemanticContext b) {
+		if ( a == NONE ) return b;
+		if ( b == NONE ) return a;
+		return new AND(a, b);
+	}
+
+	public static SemanticContext or(SemanticContext a, SemanticContext b) {
+		if ( a == NONE ) return b;
+		if ( b == NONE ) return a;
+		return new OR(a, b);
+	}
 }
