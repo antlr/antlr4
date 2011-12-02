@@ -38,7 +38,6 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -340,7 +339,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( t==CharStream.EOF && input.index()==startIndex ) {
 				return Token.EOF;
 			}
-			throw new LexerNoViableAltException(recog, input, startIndex, reach.toArray(new ATNConfig[reach.size()]));
+			throw new LexerNoViableAltException(recog, input, startIndex, reach);
 		}
 
 		int ruleIndex = atnPrevAccept.config.state.ruleIndex;
@@ -546,10 +545,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) {
 			System.out.format("no edge for %s\n", getTokenName(input.LA(1)));
 			System.out.format("ATN exec upon %s at DFA state %d = %s\n",
-							  input.substring(startIndex, input.index()), s.stateNumber, Arrays.toString(s.configs));
+							  input.substring(startIndex, input.index()), s.stateNumber, s.configs);
 		}
 
-		int ttype = exec(input, new OrderedHashSet<ATNConfig>(s.configs));
+		int ttype = exec(input, s.configs);
 
 		if ( dfa_debug ) {
 			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",
@@ -654,9 +653,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( traversedPredicate ) return null; // cannot cache
 
 		newState.stateNumber = dfa[mode].states.size();
-		// Note: the configs array is copied in the DFAState ctor, no need to copy again
-		//newState.configs = new OrderedHashSet<ATNConfig>();
-		//newState.configs.addAll(configs);
+		newState.configs = new OrderedHashSet<ATNConfig>();
+		newState.configs.addAll(configs);
 		dfa[mode].states.put(newState, newState);
 		return newState;
 	}

@@ -29,7 +29,10 @@
 
 package org.antlr.v4.runtime.misc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /** A HashMap that remembers the order that the elements were added.
  *  You can alter the ith element with set(i,value) too :)  Unique list.
@@ -39,13 +42,6 @@ import java.util.*;
 public class OrderedHashSet<T> extends LinkedHashSet<T> {
     /** Track the elements as they are added to the set */
     protected List<T> elements = new ArrayList<T>();
-
-    public OrderedHashSet() {
-    }
-
-    public OrderedHashSet(T[] values) {
-        Collections.addAll(this, values);
-    }
 
     public T get(int i) {
         return elements.get(i);
@@ -98,12 +94,6 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		} else if (!(o instanceof OrderedHashSet<?>)) {
-			return false;
-		}
-
 //		System.out.print("equals " + this + ", " + o+" = ");
 		boolean same = elements!=null && elements.equals(((OrderedHashSet<?>)o).elements);
 //		System.out.println(same);

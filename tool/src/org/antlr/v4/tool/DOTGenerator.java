@@ -32,7 +32,6 @@ package org.antlr.v4.tool;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.stringtemplate.v4.*;
 
 import java.util.*;
@@ -107,24 +106,25 @@ public class DOTGenerator {
 
 	protected String getStateLabel(DFAState s) {
 		if ( s==null ) return "null";
-		StringBuilder buf = new StringBuilder(250);
+		StringBuffer buf = new StringBuffer(250);
 		buf.append('s');
 		buf.append(s.stateNumber);
 		if ( s.isAcceptState ) {
-			buf.append("=>").append(s.prediction);
+			buf.append("=>"+s.prediction);
 		}
 //		if ( Tool.internalOption_ShowATNConfigsInDFA ) {
 		if ( false ) {
-			Set<Integer> alts = s.getAltSet();
+			Set<Integer> alts = ((DFAState)s).getAltSet();
 			if ( alts!=null ) {
 				buf.append("\\n");
 				// separate alts
 				List<Integer> altList = new ArrayList<Integer>();
 				altList.addAll(alts);
 				Collections.sort(altList);
-				Set<ATNConfig> configurations = new OrderedHashSet<ATNConfig>(s.configs);
+				Set<ATNConfig> configurations = ((DFAState)s).configs;
 				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
-					int alt = altList.get(altIndex);
+					Integer altI = (Integer) altList.get(altIndex);
+					int alt = altI.intValue();
 					if ( altIndex>0 ) {
 						buf.append("\\n");
 					}
