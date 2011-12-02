@@ -1,30 +1,30 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
- All rights reserved.
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
 
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.automata;
@@ -58,6 +58,31 @@ import java.util.List;
  *  No side-effects. It builds an ATN object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
+	class TailEpsilonRemover extends ATNVisitor {
+		@Override
+		public void visitState(ATNState p) {
+			if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 ) {
+				ATNState q = p.transition(0).target;
+				if ( q.getClass() == ATNState.class ) {
+					// we have p-x->q for x in {rule, action, pred, token, ...}
+					// if edge out of q is single epsilon to block end
+					// we can strip epsilon p-x->q-eps->r
+					if ( q.getNumberOfTransitions()==1 && q.transition(0).isEpsilon() ) {
+						ATNState r = q.transition(0).target;
+						if ( r instanceof BlockEndState ||
+							r instanceof PlusLoopbackState ||
+							r instanceof StarLoopbackState )
+						{
+							// skip over q
+							p.transition(0).target = r;
+							atn.removeState(q);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	@NotNull
 	public final Grammar g;
 
@@ -269,23 +294,23 @@ public class ParserATNFactory implements ATNFactory {
 				blkAST.atnState = h.left;
 				return h;
 			}
-			BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
+			BlockStartState start = newState(BlockStartState.class, blkAST);
 			if ( alts.size()>1 ) atn.defineDecisionState(start);
 			return makeBlock(start, blkAST, alts);
 		}
 		switch ( ebnfRoot.getType() ) {
 			case ANTLRParser.OPTIONAL :
-				BlockStartState start = (BlockStartState)newState(BlockStartState.class, blkAST);
+				BlockStartState start = newState(BlockStartState.class, blkAST);
 				atn.defineDecisionState(start);
 				Handle h = makeBlock(start, blkAST, alts);
 				return optional(ebnfRoot, h);
 			case ANTLRParser.CLOSURE :
-				BlockStartState star = (StarBlockStartState)newState(StarBlockStartState.class, ebnfRoot);
+				BlockStartState star = newState(StarBlockStartState.class, ebnfRoot);
 				if ( alts.size()>1 ) atn.defineDecisionState(star);
 				h = makeBlock(star, blkAST, alts);
 				return star(ebnfRoot, h);
 			case ANTLRParser.POSITIVE_CLOSURE :
-				PlusBlockStartState plus = (PlusBlockStartState)newState(PlusBlockStartState.class, ebnfRoot);
+				PlusBlockStartState plus = newState(PlusBlockStartState.class, ebnfRoot);
 				if ( alts.size()>1 ) atn.defineDecisionState(plus);
 				h = makeBlock(plus, blkAST, alts);
 				return plus(ebnfRoot, h);
@@ -294,26 +319,23 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	protected Handle makeBlock(BlockStartState start, GrammarAST blkAST, List<Handle> alts) {
-		BlockEndState end = (BlockEndState)newState(BlockEndState.class, blkAST);
+		BlockEndState end = newState(BlockEndState.class, blkAST);
 		start.endState = end;
 		for (Handle alt : alts) {
+			// hook alts up to decision block
 			epsilon(start, alt.left);
 			epsilon(alt.right, end);
+			// no back link in ATN so must walk entire alt to see if we can
+			// strip out the epsilon to 'end' state
+			TailEpsilonRemover opt = new TailEpsilonRemover();
+			opt.visit(alt.left);
 		}
-//		if ( alts.size()>1 ) atn.defineDecisionState(start);
 		Handle h = new Handle(start, end);
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		blkAST.atnState = start;
 		return h;
 	}
-
-//	public Handle notBlock(GrammarAST notAST, Handle set) {
-//		SetTransition st = (SetTransition)set.left.transition;
-//		set.left.addTransition(new NotSetTransition(st.label, set.right);
-//		notAST.atnState = set.left;
-//		return set;
-//	}
 
 	@NotNull
 	public Handle alt(@NotNull List<Handle> els) {
@@ -322,13 +344,26 @@ public class ParserATNFactory implements ATNFactory {
 
 	@NotNull
 	public Handle elemList(@NotNull List<Handle> els) {
-		Handle prev = null;
-		for (Handle el : els) { // hook up elements
-			if ( prev!=null ) epsilon(prev.right, el.left);
-			prev = el;
+		int n = els.size();
+		for (int i = 0; i < n - 1; i++) {	// hook up elements (visit all but last)
+			Handle el = els.get(i);
+			// if el is of form o-x->o for x in {rule, action, pred, token, ...}
+			// and not last in alt
+			if ( el.left.getClass() == ATNState.class &&
+				el.right.getClass() == ATNState.class &&
+				el.left.getNumberOfTransitions()==1 &&
+				el.left.transition(0).target == el.right)
+			{
+				// we can avoid epsilon edge to next el
+				el.left.transition(0).target = els.get(i+1).left;
+				atn.removeState(el.right); // we skipped over this state
+			}
+			else { // need epsilon if previous block's right end node is complicated
+				epsilon(el.right, els.get(i+1).left);
+			}
 		}
 		Handle first = els.get(0);
-		Handle last = els.get(els.size()-1);
+		Handle last = els.get(n -1);
 		if ( first==null || last==null ) {
 			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "element list has first|last == null");
 		}
@@ -546,4 +581,5 @@ public class ParserATNFactory implements ATNFactory {
 		}
 		return false;
 	}
+
 }

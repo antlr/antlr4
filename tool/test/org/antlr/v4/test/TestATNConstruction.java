@@ -1,3 +1,32 @@
+/*
+ [The "BSD license"]
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ATNPrinter;
@@ -29,8 +58,7 @@ public class TestATNConstruction extends BaseTest {
 			"a : A B ;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-A->s3\n" +
-			"s3->s4\n" +
+			"s2-A->s4\n" +
 			"s4-B->s5\n" +
 			"s5->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s6\n";
@@ -45,14 +73,11 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_8\n" +
 			"BlockStart_8->s2\n" +
 			"BlockStart_8->s4\n" +
-			"s2-A->s3\n" +
-			"s4-B->s5\n" +
-			"s3->BlockEnd_9\n" +
-			"s5->s6\n" +
+			"s2-A->BlockEnd_9\n" +
+			"s4-B->s6\n" +
 			"BlockEnd_9->RuleStop_a_1\n" +
-			"s6-action_0:-1->s7\n" + // actionIndex -1 since not forced action
-			"RuleStop_a_1-EOF->s10\n" +
-			"s7->BlockEnd_9\n";
+			"s6-action_0:-1->BlockEnd_9\n" +
+			"RuleStop_a_1-EOF->s10\n";
 		checkRuleATN(g, "a", expecting);
 	}
 
@@ -64,10 +89,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_6\n" +
 			"BlockStart_6->s2\n" +
 			"BlockStart_6->s4\n" +
-			"s2-A->s3\n" +
-			"s4-B->s5\n" +
-			"s3->BlockEnd_7\n" +
-			"s5->BlockEnd_7\n" +
+			"s2-A->BlockEnd_7\n" +
+			"s4-B->BlockEnd_7\n" +
 			"BlockEnd_7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
 		checkRuleATN(g, "a", expecting);
@@ -84,10 +107,8 @@ public class TestATNConstruction extends BaseTest {
 			"BlockStart_9->s6\n" +
 			"s3-'0'->s4\n" +
 			"s6-'0'->s7\n" +
-			"s4-'x'->s5\n" +
-			"s7-'X'->s8\n" +
-			"s5->BlockEnd_10\n" +
-			"s8->BlockEnd_10\n" +
+			"s4-'x'->BlockEnd_10\n" +
+			"s7-'X'->BlockEnd_10\n" +
 			"BlockEnd_10->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
@@ -115,14 +136,10 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_A_1->BlockStart_11\n" +
 			"BlockStart_11->s3\n" +
 			"BlockStart_11->s7\n" +
-			"s3-'a'..'c'->s4\n" +
-			"s7-'q'->s8\n" +
-			"s4->s5\n" +
-			"s8->s9\n" +
-			"s5-'h'->s6\n" +
-			"s9-'j'..'l'->s10\n" +
-			"s6->BlockEnd_12\n" +
-			"s10->BlockEnd_12\n" +
+			"s3-'a'..'c'->s5\n" +
+			"s7-'q'->s9\n" +
+			"s5-'h'->BlockEnd_12\n" +
+			"s9-'j'..'l'->BlockEnd_12\n" +
 			"BlockEnd_12->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
@@ -136,10 +153,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_6\n" +
 			"BlockStart_6->s2\n" +
 			"BlockStart_6->s4\n" +
-			"s2-A->s3\n" +
-			"s4-'b'->s5\n" +
-			"s3->BlockEnd_7\n" +
-			"s5->BlockEnd_7\n" +
+			"s2-A->BlockEnd_7\n" +
+			"s4-'b'->BlockEnd_7\n" +
 			"BlockEnd_7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
 		checkRuleATN(g, "a", expecting);
@@ -153,14 +168,10 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_10\n" +
 			"BlockStart_10->s2\n" +
 			"BlockStart_10->s6\n" +
-			"s2-A->s3\n" +
-			"s6-C->s7\n" +
-			"s3->s4\n" +
-			"s7->s8\n" +
-			"s4-B->s5\n" +
-			"s8-D->s9\n" +
-			"s5->BlockEnd_11\n" +
-			"s9->BlockEnd_11\n" +
+			"s2-A->s4\n" +
+			"s6-C->s8\n" +
+			"s4-B->BlockEnd_11\n" +
+			"s8-D->BlockEnd_11\n" +
 			"BlockEnd_11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
 		checkRuleATN(g, "a", expecting);
@@ -210,10 +221,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_6\n" +
 			"BlockStart_6->s2\n" +
 			"BlockStart_6->s4\n" +
-			"s2-A->s3\n" +
-			"s4->s5\n" +
-			"s3->BlockEnd_7\n" +
-			"s5->BlockEnd_7\n" +
+			"s2-A->BlockEnd_7\n" +
+			"s4->BlockEnd_7\n" +
 			"BlockEnd_7->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s8\n";
 		checkRuleATN(g, "a", expecting);
@@ -227,9 +236,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_4\n" +
 			"BlockStart_4->s2\n" +
 			"BlockStart_4->BlockEnd_5\n" +
-			"s2-A->s3\n" +
+			"s2-A->BlockEnd_5\n" +
 			"BlockEnd_5->RuleStop_a_1\n" +
-			"s3->BlockEnd_5\n" +
 			"RuleStop_a_1-EOF->s6\n";
 		checkRuleATN(g, "a", expecting);
 	}
@@ -243,14 +251,11 @@ public class TestATNConstruction extends BaseTest {
 			"BlockStart_8->s2\n" +
 			"BlockStart_8->s6\n" +
 			"BlockStart_8->BlockEnd_9\n" +
-			"s2-A->s3\n" +
-			"s6-B->s7\n" +
+			"s2-A->s4\n" +
+			"s6-B->BlockEnd_9\n" +
 			"BlockEnd_9->RuleStop_a_1\n" +
-			"s3->s4\n" +
-			"s7->BlockEnd_9\n" +
-			"RuleStop_a_1-EOF->s10\n" +
-			"s4-action_0:-1->s5\n" +
-			"s5->BlockEnd_9\n";
+			"s4-action_0:-1->BlockEnd_9\n" +
+			"RuleStop_a_1-EOF->s10\n";
 		checkRuleATN(g, "a", expecting);
 	}
 
@@ -262,9 +267,8 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_4\n" +
 			"BlockStart_4->s2\n" +
 			"BlockStart_4->BlockEnd_5\n" +
-			"s2-{A, B}->s3\n" +
+			"s2-{A, B}->BlockEnd_5\n" +
 			"BlockEnd_5->RuleStop_a_1\n" +
-			"s3->BlockEnd_5\n" +
 			"RuleStop_a_1-EOF->s6\n";
 		checkRuleATN(g, "a", expecting);
 	}
@@ -275,8 +279,7 @@ public class TestATNConstruction extends BaseTest {
 			"a : (A | B) C;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-{A, B}->s3\n" +
-			"s3->s4\n" +
+			"s2-{A, B}->s4\n" +
 			"s4-C->s5\n" +
 			"s5->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s6\n";
@@ -290,8 +293,7 @@ public class TestATNConstruction extends BaseTest {
 		String expecting =
 			"RuleStart_a_0->PlusBlockStart_4\n" +
 			"PlusBlockStart_4->s2\n" +
-			"s2-A->s3\n" +
-			"s3->BlockEnd_5\n" +
+			"s2-A->BlockEnd_5\n" +
 			"BlockEnd_5->PlusLoopBack_6\n" +
 			"PlusLoopBack_6->PlusBlockStart_4\n" +
 			"PlusLoopBack_6->s7\n" +
@@ -308,15 +310,12 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->PlusBlockStart_8\n" +
 			"PlusBlockStart_8->s2\n" +
 			"PlusBlockStart_8->s4\n" +
-			"s2-A->s3\n" +
-			"s4-B->s5\n" +
-			"s3->BlockEnd_9\n" +
-			"s5->s6\n" +
+			"s2-A->BlockEnd_9\n" +
+			"s4-B->s6\n" +
 			"BlockEnd_9->PlusLoopBack_10\n" +
-			"s6-action_0:-1->s7\n" +
+			"s6-action_0:-1->BlockEnd_9\n" +
 			"PlusLoopBack_10->PlusBlockStart_8\n" +
 			"PlusLoopBack_10->s11\n" +
-			"s7->BlockEnd_9\n" +
 			"s11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
 		checkRuleATN(g, "a", expecting);
@@ -331,12 +330,9 @@ public class TestATNConstruction extends BaseTest {
 			"PlusBlockStart_8->s2\n" +
 			"PlusBlockStart_8->s4\n" +
 			"PlusBlockStart_8->s6\n" +
-			"s2-A->s3\n" +
-			"s4-B->s5\n" +
-			"s6->s7\n" +
-			"s3->BlockEnd_9\n" +
-			"s5->BlockEnd_9\n" +
-			"s7->BlockEnd_9\n" +
+			"s2-A->BlockEnd_9\n" +
+			"s4-B->BlockEnd_9\n" +
+			"s6->BlockEnd_9\n" +
 			"BlockEnd_9->PlusLoopBack_10\n" +
 			"PlusLoopBack_10->PlusBlockStart_8\n" +
 			"PlusLoopBack_10->s11\n" +
@@ -355,9 +351,8 @@ public class TestATNConstruction extends BaseTest {
 			"StarLoopEntry_6->s7\n" +
 			"StarBlockStart_4->s2\n" +
 			"s7->RuleStop_a_1\n" +
-			"s2-A->s3\n" +
+			"s2-A->BlockEnd_5\n" +
 			"RuleStop_a_1-EOF->s9\n" +
-			"s3->BlockEnd_5\n" +
 			"BlockEnd_5->StarLoopBack_8\n" +
 			"StarLoopBack_8->StarLoopEntry_6\n";
 		checkRuleATN(g, "a", expecting);
@@ -373,18 +368,16 @@ public class TestATNConstruction extends BaseTest {
 			"StarLoopEntry_13->s14\n" +
 			"StarBlockStart_11->s2\n" +
 			"s14->RuleStop_a_1\n" +
-			"s2-','->s3\n" +
+			"s2-','->StarLoopEntry_8\n" +
 			"RuleStop_a_1-EOF->s16\n" +
-			"s3->StarLoopEntry_8\n" +
 			"StarLoopEntry_8->StarBlockStart_6\n" +
 			"StarLoopEntry_8->s9\n" +
 			"StarBlockStart_6->s4\n" +
 			"s9->BlockEnd_12\n" +
-			"s4-ID->s5\n" +
+			"s4-ID->BlockEnd_7\n" +
 			"BlockEnd_12->StarLoopBack_15\n" +
-			"s5->BlockEnd_7\n" +
-			"StarLoopBack_15->StarLoopEntry_13\n" +
 			"BlockEnd_7->StarLoopBack_10\n" +
+			"StarLoopBack_15->StarLoopEntry_13\n" +
 			"StarLoopBack_10->StarLoopEntry_8\n";
 		checkRuleATN(g, "a", expecting);
 	}
@@ -400,15 +393,12 @@ public class TestATNConstruction extends BaseTest {
 			"StarBlockStart_8->s2\n" +
 			"StarBlockStart_8->s4\n" +
 			"s11->RuleStop_a_1\n" +
-			"s2-A->s3\n" +
-			"s4-B->s5\n" +
+			"s2-A->BlockEnd_9\n" +
+			"s4-B->s6\n" +
 			"RuleStop_a_1-EOF->s13\n" +
-			"s3->BlockEnd_9\n" +
-			"s5->s6\n" +
 			"BlockEnd_9->StarLoopBack_12\n" +
-			"s6-action_0:-1->s7\n" +
-			"StarLoopBack_12->StarLoopEntry_10\n" +
-			"s7->BlockEnd_9\n";
+			"s6-action_0:-1->BlockEnd_9\n" +
+			"StarLoopBack_12->StarLoopEntry_10\n";
 		checkRuleATN(g, "a", expecting);
 	}
 
@@ -420,14 +410,10 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStart_a_0->BlockStart_10\n" +
 			"BlockStart_10->s2\n" +
 			"BlockStart_10->s6\n" +
-			"s2-pred_0:0->s3\n" +
-			"s6-pred_0:1->s7\n" +
-			"s3->s4\n" +
-			"s7->s8\n" +
-			"s4-A->s5\n" +
-			"s8-B->s9\n" +
-			"s5->BlockEnd_11\n" +
-			"s9->BlockEnd_11\n" +
+			"s2-pred_0:0->s4\n" +
+			"s6-pred_0:1->s8\n" +
+			"s4-A->BlockEnd_11\n" +
+			"s8-B->BlockEnd_11\n" +
 			"BlockEnd_11->RuleStop_a_1\n" +
 			"RuleStop_a_1-EOF->s12\n";
 		checkRuleATN(g, "a", expecting);

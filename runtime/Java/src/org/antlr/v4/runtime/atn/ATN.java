@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -100,10 +101,15 @@ public class ATN {
         return s.nextTokenWithinRule;
     }
 
-	public void addState(@NotNull ATNState state) {
+	public void addState(@Nullable ATNState state) {
+		if ( state==null ) { states.add(null); stateNumber++; return; }
 		state.atn = this;
 		states.add(state);
 		state.stateNumber = stateNumber++;
+	}
+
+	public void removeState(@NotNull ATNState state) {
+		states.set(state.stateNumber, null); // just free mem, don't shift states in list
 	}
 
 	public int defineDecisionState(@NotNull DecisionState s) {
