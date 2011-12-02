@@ -37,12 +37,12 @@ public class LexerNoViableAltException extends RecognitionException {
 	public int startIndex;
 
 	/** Which configurations did we try at input.index() that couldn't match input.LA(1)? */
-	public OrderedHashSet<ATNConfig> deadEndConfigs;
+	public ATNConfig[] deadEndConfigs;
 
 	public LexerNoViableAltException(Lexer lexer,
 									 CharStream input,
 									 int startIndex,
-									 OrderedHashSet<ATNConfig> deadEndConfigs) {
+									 ATNConfig[] deadEndConfigs) {
 		super(lexer, input, null);
 		this.startIndex = startIndex;
 		this.deadEndConfigs = deadEndConfigs;

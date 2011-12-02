@@ -202,7 +202,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				// start all over with ATN; can't use DFA
 				input.seek(startIndex);
 				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, false);
+				int alt = execATN(input, throwAwayDFA, startIndex, new OrderedHashSet<ATNConfig>(s0.configs), false);
 				s.ctxToPrediction.put(outerContext, alt);
 				return alt;
 			}
@@ -230,7 +230,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 									   " at DFA state "+s.stateNumber);
 				}
 				try {
-					alt = execATN(input, dfa, startIndex, s.configs, false);
+					alt = execATN(input, dfa, startIndex, new OrderedHashSet<ATNConfig>(s.configs), false);
 					// this adds edge even if next state is accept for
 					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 					// TODO: This next stuff kills edge, but extra states remain. :(
@@ -1033,8 +1033,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		DFAState newState = proposed;
 
 		newState.stateNumber = dfa.states.size();
-		newState.configs = new OrderedHashSet<ATNConfig>();
-		newState.configs.addAll(configs);
+		// Note: the configs array is copied in the DFAState ctor, no need to copy again
+		//newState.configs = new OrderedHashSet<ATNConfig>();
+		//newState.configs.addAll(configs);
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
@@ -1100,7 +1101,16 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	@NotNull
 	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input,
 											@NotNull ParserRuleContext outerContext,
-											@NotNull OrderedHashSet<ATNConfig> configs,
+											@NotNull Set<ATNConfig> configs,
+											int startIndex)
+	{
+		return noViableAlt(input, outerContext, configs.toArray(new ATNConfig[configs.size()]), startIndex);
+	}
+
+	@NotNull
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input,
+											@NotNull ParserRuleContext outerContext,
+											@NotNull ATNConfig[] configs,
 											int startIndex)
 	{
 		if ( parser instanceof TreeParser) {

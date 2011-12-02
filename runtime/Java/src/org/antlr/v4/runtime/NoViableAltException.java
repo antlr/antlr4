@@ -29,6 +29,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** The parser could not decide which path in the decision to take based
@@ -36,7 +37,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
  */
 public class NoViableAltException extends RecognitionException {
 	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
-	public OrderedHashSet<ATNConfig> deadEndConfigs;
+	public ATNConfig[] deadEndConfigs;
 
 	/** The token object at the start index; the input stream might
 	 * 	not be buffering tokens so get a reference to it. (At the
@@ -59,7 +60,7 @@ public class NoViableAltException extends RecognitionException {
 										 Token startToken,
 										 Token offendingToken,
 										 Symbol offendingNode,
-										 OrderedHashSet<ATNConfig> deadEndConfigs,
+										 @Nullable ATNConfig[] deadEndConfigs,
 										 ParserRuleContext ctx)
 	{
 		super(recognizer, input, ctx);

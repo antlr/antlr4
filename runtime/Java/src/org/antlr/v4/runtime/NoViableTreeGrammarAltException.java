@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.runtime.tree.ASTNodeStream;
 import org.antlr.v4.runtime.tree.TreeParser;
@@ -50,7 +51,7 @@ public class NoViableTreeGrammarAltException extends NoViableAltException {
 													ASTNodeStream<Symbol> input,
 													Symbol startNode,
 													Symbol offendingNode,
-													OrderedHashSet<ATNConfig> deadEndConfigs,
+													@Nullable ATNConfig[] deadEndConfigs,
 													ParserRuleContext ctx) {
 		super(recognizer, input,
 			  input.getTreeAdaptor().getToken(startNode),

@@ -35,10 +35,7 @@ import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** A DFA state represents a set of possible ATN configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -69,7 +66,7 @@ public class DFAState {
 
 	/** The set of ATN configurations (state,alt,context) for this DFA state */
 	@Nullable
-	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
+	public ATNConfig[] configs;
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable
@@ -139,17 +136,21 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(OrderedHashSet<ATNConfig> configs) { this.configs = configs; }
+	public DFAState(OrderedHashSet<ATNConfig> configs) { this.configs = configs.elements().toArray(new ATNConfig[configs.size()]); }
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
 	 */
 	public Set<Integer> getAltSet() {
-		// TODO (sam): what to do when configs==null?
+		if (configs == null) {
+			return null;
+		}
+
 		Set<Integer> alts = new HashSet<Integer>();
 		for (ATNConfig c : configs) {
 			alts.add(c.alt);
 		}
+
 		if ( alts.size()==0 ) return null;
 		return alts;
 	}
@@ -167,11 +168,15 @@ public class DFAState {
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	@Override
 	public int hashCode() {
-		// TODO (sam): what to do when configs==null?
+		if (configs == null) {
+			return 0;
+		}
+
 		int h = 0;
 		for (ATNConfig c : configs) {
 			h += c.alt;
 		}
+
 		return h;
 	}
 
@@ -190,9 +195,9 @@ public class DFAState {
 	public boolean equals(Object o) {
 		// compare set of ATN configurations in this set with other
 		if ( this==o ) return true;
+		if (!(o instanceof DFAState)) return false;
 		DFAState other = (DFAState)o;
-		// TODO (sam): what to do when configs==null?
-		boolean sameSet = this.configs.equals(other.configs);
+		boolean sameSet = this.configs == other.configs || (this.configs != null && Arrays.equals(this.configs, other.configs));
 //		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
 		return sameSet;
 	}
@@ -200,7 +205,7 @@ public class DFAState {
 	@Override
 	public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(stateNumber + ":" + configs);
+        buf.append(stateNumber).append(":").append(Arrays.toString(configs));
         if ( isAcceptState ) {
             buf.append("=>");
             if ( predicates!=null ) {
