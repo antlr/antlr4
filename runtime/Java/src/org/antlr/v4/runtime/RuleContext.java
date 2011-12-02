@@ -146,6 +146,7 @@ public class RuleContext implements ParseTree.RuleNode {
 		// System.out.println("comparing "+this+" with "+other);
 		RuleContext sp = this;
 		while ( sp!=null && other!=null ) {
+			if ( sp == other ) return true;
 			if ( sp.invokingState != other.invokingState) return false;
 			sp = sp.parent;
 			other = other.parent;
