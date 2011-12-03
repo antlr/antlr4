@@ -58,11 +58,26 @@ import java.util.List;
  *  No side-effects. It builds an ATN object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
-	class TailEpsilonRemover extends ATNVisitor {
-		@Override
-		public void visitState(ATNState p) {
-			if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 ) {
-				ATNState q = p.transition(0).target;
+    /** Add follow links from rule stop states to every following state for rule invocations.
+     *  Must do after construction since we optimize away some epsilon transitions.
+     */
+    class FollowLinkAdder extends ATNVisitor {
+        @Override
+        public void visitState(ATNState p) {
+            if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 &&
+                 p.transition(0) instanceof RuleTransition )
+            {
+                RuleTransition rt = (RuleTransition) p.transition(0);
+                addFollowLink(rt.ruleIndex, rt.followState);
+            }
+        }
+    }
+
+    class TailEpsilonRemover extends ATNVisitor {
+        @Override
+        public void visitState(ATNState p) {
+            if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 ) {
+                ATNState q = p.transition(0).target;
 				if ( q.getClass() == ATNState.class ) {
 					// we have p-x->q for x in {rule, action, pred, token, ...}
 					// if edge out of q is single epsilon to block end
@@ -96,11 +111,12 @@ public class ParserATNFactory implements ATNFactory {
 	public ATN createATN() {
 		_createATN(g.rules.values());
 		atn.maxTokenType = g.getMaxTokenType();
+        addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		return atn;
 	}
 
-	public void _createATN(Collection<Rule> rules) {
+    public void _createATN(Collection<Rule> rules) {
 		createRuleStartAndStopATNStates();
 
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
@@ -205,8 +221,8 @@ public class ParserATNFactory implements ATNFactory {
 	 */
 	public Handle ruleRef(GrammarAST node) {
 		Handle h = _ruleRef(node);
-		Rule r = g.getRule(node.getText());
-		addFollowLink(r, h.right);
+//		Rule r = g.getRule(node.getText());
+//		addFollowLink(r, h.right);
 		return h;
 	}
 
@@ -222,9 +238,9 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	public void addFollowLink(Rule r, ATNState right) {
+	public void addFollowLink(int ruleIndex, ATNState right) {
 		// add follow edge from end of invoked rule
-		RuleStopState stop = atn.ruleToStopState[r.index];
+		RuleStopState stop = atn.ruleToStopState[ruleIndex];
 		epsilon(stop, right);
 	}
 
@@ -349,13 +365,16 @@ public class ParserATNFactory implements ATNFactory {
 			Handle el = els.get(i);
 			// if el is of form o-x->o for x in {rule, action, pred, token, ...}
 			// and not last in alt
-			if ( el.left.getClass() == ATNState.class &&
+            Transition tr = null;
+            if ( el.left.getNumberOfTransitions()==1 ) tr = el.left.transition(0);
+            boolean isRuleTrans = tr instanceof RuleTransition;
+            if ( el.left.getClass() == ATNState.class &&
 				el.right.getClass() == ATNState.class &&
-				el.left.getNumberOfTransitions()==1 &&
-				el.left.transition(0).target == el.right)
+				tr!=null && (isRuleTrans || tr.target == el.right) )
 			{
 				// we can avoid epsilon edge to next el
-				el.left.transition(0).target = els.get(i+1).left;
+				if ( isRuleTrans ) ((RuleTransition)tr).followState = els.get(i+1).left;
+                else tr.target = els.get(i+1).left;
 				atn.removeState(el.right); // we skipped over this state
 			}
 			else { // need epsilon if previous block's right end node is complicated
@@ -500,6 +519,14 @@ public class ParserATNFactory implements ATNFactory {
 			atn.ruleToStopState[r.index] = stop;
 		}
 	}
+
+    public void addRuleFollowLinks() {
+        FollowLinkAdder flinker = new FollowLinkAdder();
+        for (Rule r : g.rules.values()) {
+        	ATNState start = atn.ruleToStartState[r.index];
+            flinker.visit(start);
+        }
+    }
 
 	/** add an EOF transition to any rule end ATNState that points to nothing
      *  (i.e., for all those rules not invoked by another rule).  These

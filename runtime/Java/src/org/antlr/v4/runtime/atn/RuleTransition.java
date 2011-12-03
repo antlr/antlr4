@@ -38,7 +38,7 @@ public class RuleTransition extends Transition {
 
 	/** What node to begin computations following ref to rule */
 	@NotNull
-	public final ATNState followState;
+	public ATNState followState;
 
 	public RuleTransition(@NotNull RuleStartState ruleStart,
 						  int ruleIndex,

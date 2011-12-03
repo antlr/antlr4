@@ -184,17 +184,16 @@ public class TestATNConstruction extends BaseTest {
 			"b : B ;");
 		String expecting =
 			"RuleStart_a_0->s4\n" +
-			"s4-b->RuleStart_b_2\n" +
-			"s5->s6\n" +
-			"s6-A->s7\n" +
-			"s7->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s10\n";
+            "s4-b->RuleStart_b_2\n" +
+            "s6-A->s7\n" +
+            "s7->RuleStop_a_1\n" +
+            "RuleStop_a_1-EOF->s10\n";
 		checkRuleATN(g, "a", expecting);
 		expecting =
 			"RuleStart_b_2->s8\n" +
 			"s8-B->s9\n" +
 			"s9->RuleStop_b_3\n" +
-			"RuleStop_b_3->s5\n";
+			"RuleStop_b_3->s6\n";
 		checkRuleATN(g, "b", expecting);
 	}
 
@@ -206,10 +205,10 @@ public class TestATNConstruction extends BaseTest {
 			"c : b C;");
 		String expecting =
 			"RuleStart_b_2->s10\n" +
-			"s10-B->s11\n" +
-			"s11->RuleStop_b_3\n" +
-			"RuleStop_b_3->s7\n" +
-			"RuleStop_b_3->s13\n";
+            "s10-B->s11\n" +
+            "s11->RuleStop_b_3\n" +
+            "RuleStop_b_3->s8\n" +
+            "RuleStop_b_3->s14\n";
 		checkRuleATN(g, "b", expecting);
 	}
 
