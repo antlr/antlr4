@@ -98,6 +98,17 @@ public class ATNConfig {
 		this.context = context;
 	}
 
+	public ATNConfig(@NotNull ATNState state,
+					 int alt,
+					 @Nullable RuleContext context,
+					 SemanticContext semanticContext)
+	{
+		this.state = state;
+		this.alt = alt;
+		this.context = context;
+		this.semanticContext = semanticContext;
+	}
+
 //	public ATNConfig(@NotNull ATNConfig c) {
 //		this(c, c.state, c.context, c.semanticContext);
 //	}
@@ -142,14 +153,17 @@ public class ATNConfig {
 		}
 
 		ATNConfig other = (ATNConfig)o;
-		return this.state.stateNumber==other.state.stateNumber &&
-		this.alt==other.alt &&
-		(this.context==other.context || (this.context != null && this.context.equals(other.context)));
+		return
+            this.state.stateNumber==other.state.stateNumber &&
+            this.alt==other.alt &&
+            (this.context==other.context || (this.context != null && this.context.equals(other.context))) &&
+            (this.semanticContext==other.semanticContext || (this.semanticContext != null && this.semanticContext.equals(other.semanticContext)));
+
     }
 
     @Override
     public int hashCode() {
-        int h = state.stateNumber + alt;
+        int h = state.stateNumber + alt + (semanticContext!=null ? semanticContext.hashCode() : 0);
 		if ( context!=null ) h += context.hashCode();
         return h;
     }

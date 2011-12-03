@@ -49,7 +49,20 @@ public abstract class SemanticContext {
 
 	public SemanticContext parent;
 
-    public abstract boolean eval(Recognizer<?,?> parser, RuleContext ctx);
+    /**
+     For context independent predicates, we evaluate them without a local
+     context (i.e., null context). That way, we can evaluate them without having to create
+     proper rule-specific context during prediction (as opposed to the parser,
+     which creates them naturally). In a practical sense, this avoids a cast exception
+     from RuleContext to myruleContext.
+
+     For context dependent predicates, we must pass in a local context so that
+     references such as $arg evaluate properly as _localctx.arg. We only capture
+     context dependent predicates in the context in which we begin prediction,
+     so we passed in the outer context here in case of context dependent predicate
+     evaluation.
+    */
+    public abstract boolean eval(Recognizer<?,?> parser, RuleContext outerContext);
 
 	public SemanticContext optimize() { return this; }
 
@@ -70,8 +83,9 @@ public abstract class SemanticContext {
             this.isCtxDependent = isCtxDependent;
         }
 
-        public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
-            return parser.sempred(ctx, ruleIndex, predIndex);
+        public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
+            RuleContext localctx = isCtxDependent ? outerContext : null;
+            return parser.sempred(localctx, ruleIndex, predIndex);
         }
 
 		@Override
@@ -117,9 +131,9 @@ public abstract class SemanticContext {
 			return opnds.hashCode();
 		}
 
-		public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
+		public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
-				if ( !opnd.eval(parser, ctx) ) return false;
+				if ( !opnd.eval(parser, outerContext) ) return false;
 			}
 			return true;
         }
@@ -152,9 +166,9 @@ public abstract class SemanticContext {
 			return opnds.hashCode() + 1; // differ from AND slightly
 		}
 
-        public boolean eval(Recognizer<?,?> parser, RuleContext ctx) {
+        public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
-				if ( opnd.eval(parser, ctx) ) return true;
+				if ( opnd.eval(parser, outerContext) ) return true;
 			}
 			return false;
         }

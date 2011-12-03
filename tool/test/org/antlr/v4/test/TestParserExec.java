@@ -153,7 +153,7 @@ public class TestParserExec extends BaseTest {
 								  input, false);
 		assertEquals("{ab{}\n", found);
 		input =
-			"{ } a 2) { }"; // FAILS to match since it terminates loop at first { }
+			"{ } a 2 { }"; // FAILS to match since it terminates loop at first { }
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		assertEquals("", found); // should not print output; resync kills rest of input
@@ -180,7 +180,7 @@ public class TestParserExec extends BaseTest {
 								  input, false);
 		assertEquals("if()))){};\n", found);
 		input =
-			"if (() { } a 2) { } ;"; // FAILS to match since it terminates loop at first { }
+			"if (() { } a 2) { } ;";  // The first { } should match block so should stop
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  input, false);
 		assertEquals("", found); // should not finish to print output

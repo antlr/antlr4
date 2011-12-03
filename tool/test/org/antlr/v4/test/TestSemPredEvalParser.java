@@ -355,80 +355,119 @@ public class TestSemPredEvalParser extends BaseTest {
 	 does not know what the parameter is. The context stack will not
 	 be empty and so they should be ignored. It will not affect
 	 recognition, however. We are really making sure the ATN
-	 simulation doesn't crash with context object issues when it
-	 encounters preds during FOLLOW.
-	 */
-	@Test public void testPredicateDependentOnArg2() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"@members {int i=0;}\n" +
-			"s : a[2] a[1];\n" +
-			"a[int i]" +
-			"  : {$i==1}? ID\n" +
-			"  | {$i==2}? ID\n" +
-			"  ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+     simulation doesn't crash with context object issues when it
+     encounters preds during FOLLOW.
+     */
+    @Test public void testPredicateDependentOnArg2() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "s : a[2] a[1];\n" +
+            "a[int i]" +
+            "  : {$i==1}? ID\n" +
+            "  | {$i==2}? ID\n" +
+            "  ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "a b", false);
-		String expecting =
-			"";
-		assertEquals(expecting, found);
-	}
+        String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  "a b", false);
+        String expecting =
+        "";
+        assertEquals(expecting, found);
+    }
 
-	/** During a global follow operation, we still execute semantic
-	 *  predicates as long as they are not dependent on local context
-	 */
-	@Test public void testPredsInGlobalFOLLOW() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"@members {" +
-			"void f(Object s) {System.out.println(s);}\n" +
-			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
-			"}\n" +
-			"s : e {p(true)}? {f(\"parse\");} '!' ;\n" +
-			"t : e {p(false)}? ID ;\n" +
-			"e : ID | ;\n" + // non-LL(1) so we use ATN
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+    @Test public void testDependentPredNotInOuterCtxShouldBeIgnored() throws Exception {
+        // uses ID ';' or ID '.' lookahead to solve s. preds not tested.
+        String grammar =
+            "grammar T;\n" +
+            "s : b[2] ';' |  b[2] '.' ;\n" + // decision in s drills down to ctx-dependent pred in a;
+            "b[int i] : a[i] ;\n" +
+            "a[int i]" +
+            "  : {$i==1}? ID {System.out.println(\"alt 1\");}\n" +
+            "  | {$i==2}? ID {System.out.println(\"alt 2\");}\n" +
+            "  ;" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "a!", false);
-		String expecting =
-			"eval=true\n" + // now we are parsing
-			"parse\n";
-		assertEquals(expecting, found);
-	}
+        String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  "a;", false);
+        String expecting =
+            "alt 2\n";
+        assertEquals(expecting, found);
+    }
 
-	/** We cannot execute predicates that are dependent on local context if
-	 *  we are doing a global follow. They appear as if they were true
-	 *  predicates or not there at all.
-	 */
-	@Test public void testDepedentPredsInGlobalFOLLOW() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"@members {" +
-			"void f(Object s) {System.out.println(s);}\n" +
-			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
-			"}\n" +
-			"s : a[99] ;\n" +
-			"a[int i] : e {p($i==99)}? {f(\"parse\");} '!' ;\n" +
-			"b[int i] : e {p($i==99)}? ID ;\n" +
-			"e : ID | ;\n" + // non-LL(1) so we use ATN
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+    @Test public void testIndependentPredNotPassedOuterCtxToAvoidCastException() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "s : b ';' |  b '.' ;\n" +
+            "b : a ;\n" +
+            "a" +
+            "  : {false}? ID {System.out.println(\"alt 1\");}\n" +
+            "  | {true}? ID {System.out.println(\"alt 2\");}\n" +
+            "  ;" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "a!", false);
-		String expecting =
-			"eval=true\n" +
-			"parse\n";
-		assertEquals(expecting, found);
-	}
+        String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  "a;", false);
+        String expecting =
+            "alt 2\n";
+        assertEquals(expecting, found);
+    }
+
+    /** During a global follow operation, we still collect semantic
+     *  predicates as long as they are not dependent on local context
+     */
+    @Test public void testPredsInGlobalFOLLOW() throws Exception {
+        String grammar =
+        "grammar T;\n" +
+        "@members {" +
+        "void f(Object s) {System.out.println(s);}\n" +
+        "boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
+        "}\n" +
+        "s : e {p(true)}? {f(\"parse\");} '!' ;\n" +
+        "t : e {p(false)}? ID ;\n" +
+        "e : ID | ;\n" + // non-LL(1) so we use ATN
+        "ID : 'a'..'z'+ ;\n" +
+        "INT : '0'..'9'+;\n" +
+        "WS : (' '|'\\n') {skip();} ;\n";
+
+   		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+   								  "a!", false);
+   		String expecting =
+   			"eval=true\n" + // now we are parsing
+   			"parse\n";
+   		assertEquals(expecting, found);
+   	}
+
+   	/** We cannot collect predicates that are dependent on local context if
+   	 *  we are doing a global follow. They appear as if they were not there at all.
+   	 */
+   	@Test public void testDepedentPredsInGlobalFOLLOW() throws Exception {
+   		String grammar =
+   			"grammar T;\n" +
+   			"@members {" +
+   			"void f(Object s) {System.out.println(s);}\n" +
+   			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
+   			"}\n" +
+   			"s : a[99] ;\n" +
+   			"a[int i] : e {p($i==99)}? {f(\"parse\");} '!' ;\n" +
+   			"b[int i] : e {p($i==99)}? ID ;\n" +
+   			"e : ID | ;\n" + // non-LL(1) so we use ATN
+   			"ID : 'a'..'z'+ ;\n" +
+   			"INT : '0'..'9'+;\n" +
+   			"WS : (' '|'\\n') {skip();} ;\n";
+
+   		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+   								  "a!", false);
+   		String expecting =
+   			"eval=true\n" +
+   			"parse\n";
+   		assertEquals(expecting, found);
+   	}
 
 	/** Regular non-forced actions can create side effects used by semantic
 	 *  predicates and so we cannot evaluate any semantic predicate

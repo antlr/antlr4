@@ -39,11 +39,10 @@ public class TestATNTreeGrammarConstruction extends BaseTest {
 			"a : A B ;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-A->s3\n" +
-			"s3->s4\n" +
-			"s4-B->s5\n" +
-			"s5->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s6\n";
+            "s2-A->s4\n" +
+            "s4-B->s5\n" +
+            "s5->RuleStop_a_1\n" +
+            "RuleStop_a_1-EOF->s6\n";
 		checkRuleATN(g, "a", expecting);
 	}
 
@@ -53,15 +52,12 @@ public class TestATNTreeGrammarConstruction extends BaseTest {
 			"a : ^(A B) ;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-A->s3\n" +
-			"s3->s4\n" +
-			"s4-DOWN->s5\n" +
-			"s5->s6\n" +
-			"s6-B->s7\n" +
-			"s7->s8\n" +
-			"s8-UP->s9\n" +
-			"s9->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s10\n";
+            "s2-A->s4\n" +
+            "s4-DOWN->s6\n" +
+            "s6-B->s8\n" +
+            "s8-UP->s9\n" +
+            "s9->RuleStop_a_1\n" +
+            "RuleStop_a_1-EOF->s10\n";
 		checkRuleATN(g, "a", expecting);
 	}
 

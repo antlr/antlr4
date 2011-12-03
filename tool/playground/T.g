@@ -1,11 +1,8 @@
 grammar T;
-s : e # foo;
-f : ID # A
-  | INT # B
-  ;
-e : e ('+='<assoc=right>|'-='<assoc=right>) e 
-  | INT					     
-  ;
-ID : 'a'..'z'+ ;
+s : b ';' |  b '.' ;
+b : a ;
+a  : {false}? ID {System.out.println("alt 1");}
+  | {true}? ID {System.out.println("alt 2");}
+  ;ID : 'a'..'z'+ ;
 INT : '0'..'9'+;
 WS : (' '|'\n') {skip();} ;

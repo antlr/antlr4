@@ -43,7 +43,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.*;
 
 public class ParserATNSimulator<Symbol> extends ATNSimulator {
-	public static boolean debug = false;
+	public static boolean debug = true;
 	public static boolean dfa_debug = false;
 
 	public static int ATN_failover = 0;
@@ -338,8 +338,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					ATNState target = getReachableTarget(trans, t);
 					if ( target!=null ) {
 						Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-						closure(new ATNConfig(c, target), reach, decState, closureBusy,
-                                c.semanticContext, false);
+						closure(new ATNConfig(c, target), reach, decState, closureBusy, false);
 					}
 				}
 			}
@@ -387,10 +386,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				dfa.conflict = true; // at least one DFA state is ambiguous
 				if ( !userWantsCtxSensitive ) reportConflict(startIndex, input.index(), ambigAlts, reach);
 
-//				ATNState loc = atn.states.get(outerContext.s);
-//				String rname = recog.getRuleNames()[loc.ruleIndex];
-//				System.out.println("AMBIG orig="+outerContext.toString((BaseRecognizer)recog)+" for alt "+ambigAlts+" upon "+
-//								   input.toString(startIndex, input.index()));
 				if ( !userWantsCtxSensitive || useContext ) {
 					// resolve ambiguity
 					if ( decState!=null && decState.isGreedy ) {
@@ -610,7 +605,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-			closure(c, configs, decState, closureBusy, SemanticContext.NONE, true);
+			closure(c, configs, decState, closureBusy, true);
 		}
 
 		return configs;
@@ -652,7 +647,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 						   @NotNull OrderedHashSet<ATNConfig> configs,
 						   @Nullable DecisionState decState,
 						   @NotNull Set<ATNConfig> closureBusy,
-                           @NotNull SemanticContext semanticContext,
                            boolean collectPredicates)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
@@ -666,12 +660,12 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				ATNState invokingState = atn.states.get(config.context.invokingState);
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
-				ATNConfig c = new ATNConfig(retState, config.alt, newContext);
+				ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
 				// While we have context to pop back from, we may have
 				// gotten that context AFTER having fallen off a rule.
 				// Make sure we track that we are now out of context.
 				c.reachesIntoOuterContext = config.reachesIntoOuterContext;
-				closure(c, configs, decState, closureBusy, semanticContext, collectPredicates);
+				closure(c, configs, decState, closureBusy, collectPredicates);
 				return;
 			}
 			else {
@@ -691,7 +685,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		ATNState p = config.state;
 		// optimization
-		if ( !p.onlyHasEpsilonTransitions() ) configs.add(config);
+		if ( !p.onlyHasEpsilonTransitions() ) {
+            configs.add(config);
+            if ( debug ) System.out.println("added config "+configs);
+        }
 
         for (int i=0; i<p.getNumberOfTransitions(); i++) {
             Transition t = p.transition(i);
@@ -706,7 +703,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					// preds if this is > 0.
 					c.reachesIntoOuterContext++;
 				}
-				closure(c, configs, decState, closureBusy, semanticContext, continueCollecting);
+				closure(c, configs, decState, closureBusy, continueCollecting);
 			}
 		}
 	}
@@ -752,7 +749,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			if ( parser != null ) {
                 System.out.println("context surrounding pred is "+
                                    parser.getRuleInvocationStack());
-                System.out.println("config.context="+config.context.toString(parser));
             }
 		}
 		// We know the correct context in exactly one spot: in the original
@@ -761,8 +757,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		// the outer context.
 		boolean inContext =
 			config.context==ParserRuleContext.EMPTY && config.reachesIntoOuterContext==0;
-//		RuleContext ctx = null;
-//		if ( inContext ) ctx = outerContext;
 
         ATNConfig c;
         if ( collectPredicates &&
@@ -772,7 +766,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
             c = new ATNConfig(config, pt.target, newSemCtx);
         }
 		else {
-			c = new ATNConfig(config, pt.target, SemanticContext.NONE);
+			c = new ATNConfig(config, pt.target);
 		}
 
 		if ( debug ) System.out.println("config from pred transition="+c);
