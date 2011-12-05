@@ -58,21 +58,6 @@ import java.util.List;
  *  No side-effects. It builds an ATN object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
-    /** Add follow links from rule stop states to every following state for rule invocations.
-     *  Must do after construction since we optimize away some epsilon transitions.
-     */
-    class FollowLinkAdder extends ATNVisitor {
-        @Override
-        public void visitState(ATNState p) {
-            if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 &&
-                 p.transition(0) instanceof RuleTransition )
-            {
-                RuleTransition rt = (RuleTransition) p.transition(0);
-                addFollowLink(rt.ruleIndex, rt.followState);
-            }
-        }
-    }
-
     class TailEpsilonRemover extends ATNVisitor {
         @Override
         public void visitState(ATNState p) {
@@ -241,6 +226,7 @@ public class ParserATNFactory implements ATNFactory {
 	public void addFollowLink(int ruleIndex, ATNState right) {
 		// add follow edge from end of invoked rule
 		RuleStopState stop = atn.ruleToStopState[ruleIndex];
+//        System.out.println("add follow link from "+ruleIndex+" to "+right);
 		epsilon(stop, right);
 	}
 
@@ -521,10 +507,14 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
     public void addRuleFollowLinks() {
-        FollowLinkAdder flinker = new FollowLinkAdder();
-        for (Rule r : g.rules.values()) {
-        	ATNState start = atn.ruleToStartState[r.index];
-            flinker.visit(start);
+        for (ATNState p : atn.states) {
+            if ( p!=null &&
+                 p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 &&
+                 p.transition(0) instanceof RuleTransition )
+            {
+                RuleTransition rt = (RuleTransition) p.transition(0);
+                addFollowLink(rt.ruleIndex, rt.followState);
+            }
         }
     }
 
