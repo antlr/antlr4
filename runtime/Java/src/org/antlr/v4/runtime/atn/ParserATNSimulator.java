@@ -892,10 +892,12 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
      Walk and find state config lists with > 1 alt. If none, no conflict. return null. Here, states 11
      and 8 have lists with both alts 1 and 2. Must check these config lists for conflicting configs.
 
+     s : (ID | ID ID?) ';' ;
+
      */
     @Nullable
     public Set<Integer> getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
-//		System.out.println("### check ambiguous "+configs);
+		System.out.println("### check ambiguous "+configs);
         Set<Integer> ambigAlts = null;
         // First get a list of configurations for each state.
         // Most of the time, each state will have one associated configuration.
@@ -925,7 +927,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
             }
         }
 
-//        System.out.println("### stateToConfigListMap="+stateToConfigListMap);
+        System.out.println("### stateToConfigListMap="+stateToConfigListMap);
 
         if ( numPotentialConflicts==0 ) return null;
 
@@ -959,7 +961,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
             }
         }
 
-//        System.out.println("### ambigAlts="+ambigAlts);
+        System.out.println("### ambigAlts="+ambigAlts);
 
 		return ambigAlts;
 	}

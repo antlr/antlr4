@@ -1,4 +1,5 @@
 grammar T;
-s : b c ;
-b : A ;
-c : C ;
+s : (ID | ID ID?) ';' ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') {skip();} ;
