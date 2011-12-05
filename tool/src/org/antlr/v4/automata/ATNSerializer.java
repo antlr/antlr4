@@ -84,7 +84,6 @@ public class ATNSerializer {
 		for (ATNState s : atn.states) {
 			if ( s==null ) { // might be optimized away
 				data.add(ATNState.INVALID_TYPE);
-				data.add(-1);
 				continue;
 			}
 			data.add(s.getStateType());
@@ -109,10 +108,6 @@ public class ATNSerializer {
 				String ruleName = g.rules.getKey(r);
 				Rule rule = g.getRule(ruleName);
 				data.add(rule.actionIndex);
-			}
-			else {
-				data.add(0);
-				data.add(0);
 			}
 		}
 		int nmodes = atn.modeToStartState.size();
@@ -203,8 +198,8 @@ public class ATNSerializer {
 		int nstates = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
 			int stype = ATNSimulator.toInt(data[p++]);
+            if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
-			if ( stype==0 ) continue; // ignore bad type of states
 			buf.append((i - 1) + ":" +
 					   ATNState.serializationNames.get(stype) + " "+
 					   ruleIndex + "\n");
@@ -212,9 +207,14 @@ public class ATNSerializer {
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
-			int arg1 = ATNSimulator.toInt(data[p++]);
-			int arg2 = ATNSimulator.toInt(data[p++]);
-			buf.append("rule "+i+":"+s+" "+arg1+","+arg2+'\n');
+            if ( g.isLexer() ) {
+                int arg1 = ATNSimulator.toInt(data[p++]);
+                int arg2 = ATNSimulator.toInt(data[p++]);
+                buf.append("rule "+i+":"+s+" "+arg1+","+arg2+'\n');
+            }
+            else {
+                buf.append("rule "+i+":"+s+'\n');
+            }
 		}
 		int nmodes = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nmodes; i++) {

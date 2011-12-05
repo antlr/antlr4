@@ -62,9 +62,8 @@ public abstract class ATNSimulator {
 		int nstates = toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
 			int stype = toInt(data[p++]);
-			// ignore bad type of states, skip it's bad ruleIndex too
+			// ignore bad type of states
 			if ( stype==ATNState.INVALID_TYPE ) {
-				p++;
 				atn.addState(null);
 				continue;
 			}
@@ -87,9 +86,6 @@ public abstract class ATNSimulator {
 				atn.ruleToTokenType[i] = tokenType;
 				int actionIndex = toInt(data[p++]);
 				atn.ruleToActionIndex[i] = actionIndex;
-			}
-			else {
-				p += 2;
 			}
 		}
 		int nmodes = toInt(data[p++]);
@@ -182,6 +178,9 @@ public abstract class ATNSimulator {
 			case ATNState.STAR_LOOP_BACK : s = new StarLoopbackState(); break;
 			case ATNState.STAR_LOOP_ENTRY : s = new StarLoopEntryState(); break;
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
+            default :
+                System.err.println("invalid state type in ATN deserialization: "+type+" for state "+stateNumber);
+                break;
 		}
 		s.stateNumber = stateNumber;
 		return s;

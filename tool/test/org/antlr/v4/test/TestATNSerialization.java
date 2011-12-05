@@ -49,7 +49,7 @@ public class TestATNSerialization extends BaseTest {
 			"4:BASIC 0\n" +
 			"5:BASIC 0\n" +
 			"6:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0->2 EPSILON 0,0,0\n" +
 			"1->6 ATOM -1,0,0\n" +
 			"2->4 ATOM 3,0,0\n" +
@@ -72,7 +72,7 @@ public class TestATNSerialization extends BaseTest {
 			"4:BASIC 0\n" +
 			"5:BASIC 0\n" +
 			"6:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0->2 EPSILON 0,0,0\n" +
 			"1->6 ATOM -1,0,0\n" +
 			"2->4 ATOM 3,0,0\n" +
@@ -94,7 +94,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:BASIC 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0:EOF..EOF, A..A\n" +
 			"0->2 EPSILON 0,0,0\n" +
 			"1->4 ATOM -1,0,0\n" +
@@ -117,7 +117,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:BASIC 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0:A..A\n" +
 			"0->2 EPSILON 0,0,0\n" +
 			"1->4 ATOM -1,0,0\n" +
@@ -142,7 +142,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:BASIC 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0->2 EPSILON 0,0,0\n" +
 			"1->4 ATOM -1,0,0\n" +
 			"2->3 WILDCARD 0,0,0\n" +
@@ -166,7 +166,7 @@ public class TestATNSerialization extends BaseTest {
 			"8:BLOCK_START 0\n" +
 			"9:BLOCK_END 0\n" +
 			"10:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0->8 EPSILON 0,0,0\n" +
 			"1->10 ATOM -1,0,0\n" +
 			"2->9 ATOM 3,0,0\n" +
@@ -198,7 +198,7 @@ public class TestATNSerialization extends BaseTest {
 			"14:BLOCK_START 0\n" +
 			"15:BLOCK_END 0\n" +
 			"16:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0->14 EPSILON 0,0,0\n" +
 			"1->16 ATOM -1,0,0\n" +
 			"2->15 ATOM 3,0,0\n" +
@@ -233,7 +233,7 @@ public class TestATNSerialization extends BaseTest {
 			"8:BASIC 0\n" +
 			"9:BASIC 0\n" +
 			"10:BASIC 0\n" +
-			"rule 0:0 0,0\n" +
+			"rule 0:0\n" +
 			"0->4 EPSILON 0,0,0\n" +
 			"1->10 ATOM -1,0,0\n" +
 			"2->5 ATOM 3,0,0\n" +
@@ -266,8 +266,8 @@ public class TestATNSerialization extends BaseTest {
 			"6:BASIC 1\n" +
 			"7:BASIC 1\n" +
 			"8:BASIC 1\n" +
-			"rule 0:0 0,0\n" +
-			"rule 1:2 0,0\n" +
+			"rule 0:0\n" +
+			"rule 1:2\n" +
 			"0->4 EPSILON 0,0,0\n" +
 			"1->8 ATOM -1,0,0\n" +
 			"2->6 EPSILON 0,0,0\n" +
