@@ -884,11 +884,11 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			stateToConfigListMap.map(c.state.stateNumber, c);
 		}
 		// potential conflicts are states with > 1 configuration and diff alts
-		for (List<ATNConfig> configsPerAlt : stateToConfigListMap.values()) {
-			ATNConfig goal = configsPerAlt.get(0);
-			int size = configsPerAlt.size();
+		for (List<ATNConfig> configsPerState : stateToConfigListMap.values()) {
+			ATNConfig goal = configsPerState.get(0);
+			int size = configsPerState.size();
 			for (int i=1; i< size; i++) {
-				ATNConfig c = configsPerAlt.get(i);
+				ATNConfig c = configsPerState.get(i);
 				if ( c.alt!=goal.alt ) {
 					//System.out.println("chk stack "+goal+", "+c);
 					boolean sameCtx =
