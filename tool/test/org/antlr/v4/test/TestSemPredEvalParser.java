@@ -248,8 +248,6 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	// TODO: test predicates that are validating predicates; not ambiguous decisions
-
 	@Test public void testToLeft() throws Exception {
 		String grammar =
 			"grammar T;\n" +

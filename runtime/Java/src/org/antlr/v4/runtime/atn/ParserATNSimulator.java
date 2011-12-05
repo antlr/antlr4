@@ -867,52 +867,100 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				if ( c.state.getClass() == RuleStopState.class ) {
 					return c;
 				}
-			}
-		}
-		return null;
-	}
+            }
+        }
+        return null;
+    }
 
-	@Nullable
-	public Set<Integer> getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
-//		System.err.println("check ambiguous "+configs);
-		Set<Integer> ambigAlts = null;
-		// First get a list of configurations for each state.
-		// Most of the time, each state will have one associated configuration.
-		MultiMap<Integer, ATNConfig> stateToConfigListMap =
-			new MultiMap<Integer, ATNConfig>();
-		for (ATNConfig c : configs) {
-			stateToConfigListMap.map(c.state.stateNumber, c);
-		}
-		// potential conflicts are states with > 1 configuration and diff alts
-		for (List<ATNConfig> configsPerState : stateToConfigListMap.values()) {
-			ATNConfig goal = configsPerState.get(0);
-			int size = configsPerState.size();
-			for (int i=1; i< size; i++) {
-				ATNConfig c = configsPerState.get(i);
-				if ( c.alt!=goal.alt ) {
-					//System.out.println("chk stack "+goal+", "+c);
-					boolean sameCtx =
-						(goal.context==null&&c.context==null) ||
-						goal.context.equals(c.context) ||
-						c.context.conflictsWith(goal.context);
-					if ( sameCtx ) {
-						if ( debug ) {
-							System.out.println("we reach state "+c.state.stateNumber+
-							   " in rule "+
-							   (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
-							   " alts "+goal.alt+","+c.alt+" from ctx "+goal.context.toString(parser)
-							   +" and "+ c.context.toString(parser));
-						}
-						if ( ambigAlts==null ) ambigAlts = new HashSet<Integer>();
-						ambigAlts.add(goal.alt);
-						ambigAlts.add(c.alt);
-					}
-				}
-			}
-		}
-		if ( ambigAlts!=null ) {
-			//System.err.println("ambig upon "+input.toString(startIndex, input.index()));
-		}
+    /**
+     * From grammar:
+
+     s' : s s ;
+     s : x? | x ;
+     x : 'a' ;
+
+     config list: (4,1), (11,1,4), (7,1), (3,1,1), (4,1,1), (8,1,1), (7,1,1), (8,2), (11,2,8), (11,1,[8 1])
+
+     state to config list:
+
+     3  -> (3,1,1)
+     4  -> (4,1), (4,1,1)
+     7  -> (7,1), (7,1,1)
+     8  -> (8,1,1), (8,2)
+     11 -> (11,1,4), (11,2,8), (11,1,8 1)
+
+     Walk and find state config lists with > 1 alt. If none, no conflict. return null. Here, states 11
+     and 8 have lists with both alts 1 and 2. Must check these config lists for conflicting configs.
+
+     */
+    @Nullable
+    public Set<Integer> getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
+//		System.out.println("### check ambiguous "+configs);
+        Set<Integer> ambigAlts = null;
+        // First get a list of configurations for each state.
+        // Most of the time, each state will have one associated configuration.
+        MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
+        for (ATNConfig c : configs) {
+            stateToConfigListMap.map(c.state.stateNumber, c);
+        }
+        // potential conflicts are states, s, with > 1 configurations and diff alts
+        // find all alts with potential conflicts
+        int numPotentialConflicts = 0;
+        for (int state : stateToConfigListMap.keySet()) { // for each state
+            List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
+            ATNConfig goal = configsPerState.get(0);
+            int goalAlt = goal.alt;
+            boolean thisStateHasMultipleAlts = false;
+            for (ATNConfig c : configsPerState) { // look for diff alt in state's config list
+                if ( c.alt!=goalAlt ) {
+                    numPotentialConflicts++;
+                    thisStateHasMultipleAlts = true; // found diff alt
+                    break;
+                }
+            }
+            if ( !thisStateHasMultipleAlts ) {
+                // remove state's configurations from further checking; no issues with them.
+                // (can't remove as it's concurrent modification; set to null)
+                stateToConfigListMap.put(state, null);
+            }
+        }
+
+//        System.out.println("### stateToConfigListMap="+stateToConfigListMap);
+
+        if ( numPotentialConflicts==0 ) return null;
+
+        // compare each pair of configs in sets for states with > 1 alt in config list, looking for
+        // (s, i, ctx) and (s, j, ctx') where ctx==ctx' or one is suffix of the other.
+        for (List<ATNConfig> configsPerState : stateToConfigListMap.values()) {
+            if (configsPerState == null) continue;
+            int size = configsPerState.size();
+            for (int i = 0; i < size; i++) {
+                ATNConfig c = configsPerState.get(i);
+                for (int j = i+1; j < size; j++) {
+                    ATNConfig d = configsPerState.get(j);
+                    boolean sameCtx =
+                        (c.context==null&&d.context==null) ||
+                        c.context.equals(d.context) ||
+                        c.context.conflictsWith(d.context);
+//                    System.out.println("compare "+c+" to "+d+", same="+sameCtx);
+                    if ( sameCtx ) {
+                        if ( debug ) {
+                            System.out.println("we reach state "+c.state.stateNumber+
+                                               " in rule "+
+                                               (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
+                                               " alts "+c.alt+","+d.alt+" from ctx "+c.context.toString(parser)
+                                               +" and "+ d.context.toString(parser));
+                        }
+                        if ( ambigAlts==null ) ambigAlts = new HashSet<Integer>();
+                        ambigAlts.add(c.alt);
+                        ambigAlts.add(d.alt);
+                    }
+                }
+            }
+        }
+
+//        System.out.println("### ambigAlts="+ambigAlts);
+
 		return ambigAlts;
 	}
 
@@ -1076,17 +1124,19 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public void dumpDeadEndConfigs(@NotNull NoViableAltException nvae) {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.deadEndConfigs) {
-			Transition t = c.state.transition(0);
-			String trans = "";
-			if ( t instanceof AtomTransition) {
-				AtomTransition at = (AtomTransition)t;
-				trans = "Atom "+getTokenName(at.label);
-			}
-			else if ( t instanceof SetTransition ) {
-				SetTransition st = (SetTransition)t;
-				boolean not = st instanceof NotSetTransition;
-				trans = (not?"~":"")+"Set "+st.set.toString();
-			}
+            String trans = "no edges";
+            if ( c.state.getNumberOfTransitions()>0 ) {
+                Transition t = c.state.transition(0);
+                if ( t instanceof AtomTransition) {
+                    AtomTransition at = (AtomTransition)t;
+                    trans = "Atom "+getTokenName(at.label);
+                }
+                else if ( t instanceof SetTransition ) {
+                    SetTransition st = (SetTransition)t;
+                    boolean not = st instanceof NotSetTransition;
+                    trans = (not?"~":"")+"Set "+st.set.toString();
+                }
+            }
 			System.err.println(c.toString(parser, true)+":"+trans);
 		}
 	}
