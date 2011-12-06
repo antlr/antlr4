@@ -94,6 +94,7 @@ public class Tool {
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
+	public boolean verbose_dfa = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -106,10 +107,11 @@ public class Tool {
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
         new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
         new Option("genListener",		"-walker", "generate parse tree walker and listener"),
-        new Option("saveLexer",			"-Xsavelexer", "save temp lexer file created for combined grammars"),
+        new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
-        new Option("force_atn",			"-Xforceatn", "use the ATN simulator for all predictions"),
-        new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+        new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
+		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+		new Option("verbose_dfa",   	"-Xverbose-dfa", "add config set to DFA states"),
 	};
 
 	// helper vars for option management
