@@ -53,12 +53,21 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
+
+	public static final boolean TEST_IN_SAME_PROCESS = true;
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -261,7 +270,7 @@ public abstract class BaseTest {
 	/** Wow! much faster than compiling outside of VM. Finicky though.
 	 *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
 	 */
-	protected boolean compile(String fileName) {
+	protected boolean compile(String... fileNames) {
 		String classpathOption = "-classpath";
 
 		String[] args = new String[] {
@@ -272,8 +281,12 @@ public abstract class BaseTest {
 		String cmdLine = "javac" +" -d "+tmpdir+" "+classpathOption+" "+tmpdir+pathSep+CLASSPATH+" "+fileName;
 		//System.out.println("compile: "+cmdLine);
 
+		List<File> files = new ArrayList<File>();
+		for (String fileName : fileNames) {
+			File f = new File(tmpdir, fileName);
+			files.add(f);
+		}
 
-		File f = new File(tmpdir, fileName);
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 //		DiagnosticCollector<JavaFileObject> diagnostics =
 //			new DiagnosticCollector<JavaFileObject>();
@@ -282,7 +295,7 @@ public abstract class BaseTest {
 			compiler.getStandardFileManager(null, null, null);
 
 		Iterable<? extends JavaFileObject> compilationUnits =
-			fileManager.getJavaFileObjectsFromFiles(Arrays.asList(f));
+			fileManager.getJavaFileObjectsFromFiles(files);
 
 		Iterable<String> compileOptions =
 			Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
@@ -531,16 +544,16 @@ public abstract class BaseTest {
 		boolean allIsWell =
 			antlr(grammarFileName, grammarFileName, grammarStr, debug, extraOptions);
 		boolean ok;
+		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
-			ok = compile(lexerName+".java");
-			if ( !ok ) { allIsWell = false; }
+			files.add(lexerName+".java");
 		}
 		if ( parserName!=null ) {
-			ok = compile(parserName+".java");
-			if ( !ok ) { allIsWell = false; }
-			ok = compile("Blank"+grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
-			if ( !ok ) { allIsWell = false; }
+			files.add(parserName+".java");
+			files.add("Blank"+grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
 		}
+		ok = compile(files.toArray(new String[files.size()]));
+		if ( !ok ) { allIsWell = false; }
 		return allIsWell;
 	}
 
@@ -634,6 +647,66 @@ public abstract class BaseTest {
 			ex.printStackTrace(System.err);
 		}
 		*/
+
+		if (TEST_IN_SAME_PROCESS) {
+			PrintStream originalOut = System.out;
+			PrintStream originalErr = System.err;
+			try {
+				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+				final Class<?> mainClass = (Class<?>)loader.loadClass(className);
+				final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
+				PipedInputStream stdoutIn = new PipedInputStream();
+				PipedInputStream stderrIn = new PipedInputStream();
+				PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
+				PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
+				System.setOut(new PrintStream(stdoutOut));
+				System.setErr(new PrintStream(stderrOut));
+				StreamVacuum stdoutVacuum = new StreamVacuum(stdoutIn);
+				StreamVacuum stderrVacuum = new StreamVacuum(stderrIn);
+				stdoutVacuum.start();
+				stderrVacuum.start();
+				mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
+				System.setOut(originalOut);
+				originalOut = null;
+				System.setErr(originalErr);
+				originalErr = null;
+				stdoutOut.close();
+				stderrOut.close();
+				stdoutVacuum.join();
+				stderrVacuum.join();
+				String output = stdoutVacuum.toString();
+				if ( stderrVacuum.toString().length()>0 ) {
+					this.stderrDuringParse = stderrVacuum.toString();
+					System.err.println("exec stderrVacuum: "+ stderrVacuum);
+				}
+				return output;
+			} catch (MalformedURLException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (IOException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (InterruptedException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (IllegalAccessException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (IllegalArgumentException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (InvocationTargetException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (NoSuchMethodException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (SecurityException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (ClassNotFoundException ex) {
+				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+			} finally {
+				if (originalOut != null) {
+					System.setOut(originalOut);
+				}
+				if (originalErr != null) {
+					System.setErr(originalErr);
+				}
+			}
+		}
 
 		try {
 			String[] args = new String[] {
