@@ -271,16 +271,6 @@ public abstract class BaseTest {
 	 *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
 	 */
 	protected boolean compile(String... fileNames) {
-		String classpathOption = "-classpath";
-
-		String[] args = new String[] {
-					"javac", "-d", tmpdir,
-					classpathOption, tmpdir+pathSep+CLASSPATH,
-					tmpdir+"/"+fileName
-		};
-		String cmdLine = "javac" +" -d "+tmpdir+" "+classpathOption+" "+tmpdir+pathSep+CLASSPATH+" "+fileName;
-		//System.out.println("compile: "+cmdLine);
-
 		List<File> files = new ArrayList<File>();
 		for (String fileName : fileNames) {
 			File f = new File(tmpdir, fileName);
