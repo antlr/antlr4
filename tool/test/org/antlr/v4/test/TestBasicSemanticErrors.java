@@ -1,3 +1,32 @@
+/*
+ [The "BSD license"]
+  Copyright (c) 2011 Terence Parr
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote products
+     derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.junit.Test;
@@ -24,7 +53,6 @@ public class TestBasicSemanticErrors extends BaseTest {
         "tree grammar B;\n" +
         "options {\n" +
         "\tfilter=true;\n" +
-        "\tbacktrack=false;\n" +
         "\toutput=template;\n" +
         "}\n" +
         "\n" +
@@ -32,15 +60,14 @@ public class TestBasicSemanticErrors extends BaseTest {
         "\n" +
         "b : ^(. A) ;",
         // YIELDS
-        "error(80): B.g:10:6: Wildcard invalid as root; wildcard can itself be a tree\n" +
-		"error(81): B.g:1:5: option backtrack=false conflicts with tree grammar filter mode\n" +
+        "error(80): B.g:9:6: Wildcard invalid as root; wildcard can itself be a tree\n" +
 		"error(81): B.g:1:5: option output=template conflicts with tree grammar filter mode\n"
     };
 
     static String[] U = {
         // INPUT
         "parser grammar U;\n" +
-        "options { foo=bar; k=\"*\"; backtrack=true;}\n" +
+        "options { foo=bar; k=\"*\";}\n" +
         "tokens {\n" +
         "        f='fkj';\n" +
         "        S = 'a';\n" +
@@ -55,16 +82,18 @@ public class TestBasicSemanticErrors extends BaseTest {
         "b : ( options { ick=bar; greedy=true; } : ID )+ ;\n" +
         "c : ID<blue> ID<x=y> ;",
         // YIELDS
-		"warning(51): U.g:2:10: illegal option foo\n" +
-		"error(26): U.g:4:8: token names must start with an uppercase letter: f\n" +
-		"error(25): U.g:4:8: can't assign string value to token name f in non-combined grammar\n" +
-		"error(25): U.g:5:8: can't assign string value to token name S in non-combined grammar\n" +
-		"warning(51): U.g:8:10: illegal option x\n" +
-		"error(21): U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"error(21): U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"warning(51): U.g:11:10: illegal option blech\n" +
-		"warning(51): U.g:14:16: illegal option ick\n" +
-		"warning(51): U.g:15:16: illegal option x\n",
+		"warning(47): U.g:2:10: illegal option foo\n" +
+		"warning(47): U.g:2:19: illegal option k\n" +
+		": U.g:4:8: token names must start with an uppercase letter: f\n" +
+		": U.g:4:8: can't assign string value to token name f in non-combined grammar\n" +
+		": U.g:5:8: can't assign string value to token name S in non-combined grammar\n" +
+		"warning(47): U.g:8:10: illegal option x\n" +
+		": U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
+		": U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
+		"warning(47): U.g:11:10: illegal option blech\n" +
+		"warning(47): U.g:11:21: illegal option greedy\n" +
+		"warning(47): U.g:14:16: illegal option ick\n" +
+		"warning(47): U.g:15:16: illegal option x\n",
 
         // INPUT
         "tree grammar V;\n" +
@@ -76,7 +105,8 @@ public class TestBasicSemanticErrors extends BaseTest {
         "  | A B -> template() \"kjsfdkdsj\" \n" +
         "  ;",
         // YIELDS
-        "error(66): V.g:7:4: with rewrite=true, alt 2 not simple node or obvious tree element; text attribute for rule not guaranteed to be correct\n",
+        "warning(47): V.g:3:8: illegal option rewrite\n",
+
 
         // INPUT
         "tree grammar V;\n" +
@@ -85,7 +115,7 @@ public class TestBasicSemanticErrors extends BaseTest {
         "  | A B -> template() \"kjsfdkdsj\" \n" +
         "  ;",
         // YIELDS
-        "error(62): V.g:4:8: rule a uses rewrite syntax or operator with no output option\n",
+        "warning(47): V.g:3:8: illegal option rewrite\n"
     };
 
 	static String[] C = {
