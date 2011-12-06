@@ -897,7 +897,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
      */
     @Nullable
     public Set<Integer> getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
-		System.out.println("### check ambiguous "+configs);
+//		System.out.println("### check ambiguous "+configs);
         Set<Integer> ambigAlts = null;
         // First get a list of configurations for each state.
         // Most of the time, each state will have one associated configuration.
@@ -927,7 +927,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
             }
         }
 
-        System.out.println("### stateToConfigListMap="+stateToConfigListMap);
+//        System.out.println("### stateToConfigListMap="+stateToConfigListMap);
 
         if ( numPotentialConflicts==0 ) return null;
 
@@ -961,7 +961,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
             }
         }
 
-        System.out.println("### ambigAlts="+ambigAlts);
+//        System.out.println("### ambigAlts="+ambigAlts);
 
 		return ambigAlts;
 	}
