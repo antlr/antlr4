@@ -1,3 +1,3 @@
-epsilon-edge(src,label,target,arrowhead) ::= <<
-<src> -> <target> [fontname="Times-Italic", label = "e"];
+epsilon-edge(src,label,target,arrowhead,loopback=false) ::= <<
+<src> -> <target> [fontname="Times-Italic", label="&epsilon;"<if(loopback)>, style="dashed"<endif>];
 >>

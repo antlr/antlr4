@@ -237,6 +237,14 @@ public class DOTGenerator {
 				else if ( edge.isEpsilon() ) {
 					edgeST = stlib.getInstanceOf("epsilon-edge");
 					edgeST.add("label", getEdgeLabel(edge.toString()));
+					boolean loopback = false;
+					if (edge.target instanceof PlusBlockStartState) {
+						loopback = s.equals(((PlusBlockStartState)edge.target).loopBackState);
+					}
+					else if (edge.target instanceof StarLoopEntryState) {
+						loopback = s.equals(((StarLoopEntryState)edge.target).loopBackState);
+					}
+					edgeST.add("loopback", loopback);
 				}
 				else if ( edge instanceof AtomTransition ) {
 					edgeST = stlib.getInstanceOf("edge");
@@ -410,10 +418,28 @@ public class DOTGenerator {
 
 	protected String getStateLabel(ATNState s) {
 		if ( s==null ) return "null";
-		String stateLabel = String.valueOf(s.stateNumber);
+		String stateLabel = "";
+
+		if (s instanceof BlockStartState) {
+			stateLabel += "&rarr;\\n";
+		}
+		else if (s instanceof BlockEndState) {
+			stateLabel += "&larr;\\n";
+		}
+
+		stateLabel += String.valueOf(s.stateNumber);
+
+		if (s instanceof PlusBlockStartState || s instanceof PlusLoopbackState) {
+			stateLabel += "+";
+		}
+		else if (s instanceof StarBlockStartState || s instanceof StarLoopEntryState || s instanceof StarLoopbackState) {
+			stateLabel += "*";
+		}
+
 		if ( s instanceof DecisionState && ((DecisionState)s).decision>=0 ) {
 			stateLabel = stateLabel+"\\nd="+((DecisionState)s).decision;
 		}
+
 		return stateLabel;
 	}
 
