@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -328,9 +329,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		do { // while more work
 			if ( debug ) System.out.println("in reach starting closure: " + closure);
-			int ncl = closure.size();
-			for (int ci=0; ci<ncl; ci++) { // TODO: foreach
-				ATNConfig c = closure.get(ci);
+			for (ATNConfig c : closure) {
 				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
 				int n = c.state.getNumberOfTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each transition
@@ -344,7 +343,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			}
 
 			// resolve ambig in DFAState for reach
-			Set<Integer> ambigAlts = getAmbiguousAlts(reach);
+			IntervalSet ambigAlts = getAmbiguousAlts(reach);
 			if ( ambigAlts!=null ) {
 				if ( debug ) {
 					int i = -1;
@@ -384,7 +383,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                 }
 
 				dfa.conflict = true; // at least one DFA state is ambiguous
-				if ( !userWantsCtxSensitive ) reportConflict(startIndex, input.index(), ambigAlts, reach);
+				if ( !userWantsCtxSensitive ) {
+					reportConflict(startIndex, input.index(), ambigAlts, reach);
+				}
 
 				if ( !userWantsCtxSensitive || useContext ) {
 					// resolve ambiguity
@@ -417,7 +418,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				// now check to see if we have a validating predicate.
 				// We know that it's validating because there is only
 				// one predicted alternative
-				Set<Integer> uniqueAltSet = new HashSet<Integer>();
+				IntervalSet uniqueAltSet = new IntervalSet();
 				uniqueAltSet.add(uniqueAlt);
 				SemanticContext[] altToPred =
 					getPredsForAmbigAlts(decState, uniqueAltSet, reach);
@@ -505,8 +506,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return ATN.INVALID_ALT_NUMBER;
 	}
 
-    protected int resolveToMinAlt(@NotNull OrderedHashSet<ATNConfig> reach, @NotNull Set<Integer> ambigAlts) {
-		int min = getMinAlt(ambigAlts);
+    protected int resolveToMinAlt(@NotNull OrderedHashSet<ATNConfig> reach,
+								  @NotNull IntervalSet ambigAlts)
+	{
+		int min = ambigAlts.getMinElement();
 		// create DFA accept state for resolved alt
 		ambigAlts.remove(min);
 		// kill dead alts so we don't chase them ever
@@ -515,7 +518,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return min;
 	}
 
-	protected int resolveNongreedyToExitBranch(@NotNull OrderedHashSet<ATNConfig> reach, @NotNull Set<Integer> ambigAlts) {
+	protected int resolveNongreedyToExitBranch(@NotNull OrderedHashSet<ATNConfig> reach,
+											   @NotNull IntervalSet ambigAlts)
+	{
 		// exit branch is alt 2 always; alt 1 is entry or loopback branch
 		// since we're predicting, create DFA accept state for exit alt
 		int exitAlt = 2;
@@ -533,7 +538,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 								@NotNull OrderedHashSet<ATNConfig> closure,
 								int t,
 								@NotNull OrderedHashSet<ATNConfig> reach,
-								@NotNull Set<Integer> ambigAlts)
+								@NotNull IntervalSet ambigAlts)
 	{
 		// ASSUMES PREDICT ONLY
 		retry_with_context++;
@@ -541,7 +546,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		// retry using context, if any; if none, kill all but min as before
 		if ( debug ) System.out.println("RETRY "+ getInputString(input, startIndex) +
 										" with ctx="+ originalContext);
-		int min = getMinAlt(ambigAlts);
+		int min = ambigAlts.getMinElement();
 		if ( originalContext==ParserRuleContext.EMPTY ) {
 			// no point in retrying with ctx since it's same.
 			// this implies that we have a true ambiguity
@@ -553,7 +558,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		input.seek(startIndex); // rewind
 		DFA ctx_dfa = new DFA(dfa.atnStartState);
 		int ctx_alt = predictATN(ctx_dfa, input, originalContext, true);
-		if ( debug ) System.out.println("retry predicts "+ctx_alt+" vs "+getMinAlt(ambigAlts)+
+		if ( debug ) System.out.println("retry predicts "+ctx_alt+" vs "+ambigAlts.getMinElement()+
 										" with conflict="+ctx_dfa.conflict+
 										" dfa="+ctx_dfa);
 
@@ -806,7 +811,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	public void reportConflict(int startIndex, int stopIndex, @NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
+	public void reportConflict(int startIndex, int stopIndex,
+							   @NotNull IntervalSet alts,
+							   @NotNull OrderedHashSet<ATNConfig> configs)
+	{
 		if ( debug ) {
 			System.out.println("reportConflict "+alts+":"+configs);
 		}
@@ -814,7 +822,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	public void reportContextSensitivity(int startIndex, int stopIndex,
-										 @NotNull Set<Integer> alts,
+										 @NotNull IntervalSet alts,
 										 @NotNull OrderedHashSet<ATNConfig> configs)
 	{
 		if ( parser!=null ) parser.reportContextSensitivity(startIndex, stopIndex, alts, configs);
@@ -822,18 +830,18 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	/** If context sensitive parsing, we know it's ambiguity not conflict */
 	public void reportAmbiguity(int startIndex, int stopIndex,
-								@NotNull Set<Integer> ambigAlts,
+								@NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
 	{
 		if ( debug ) {
 			System.out.println("reportAmbiguity "+
-								   ambigAlts+":"+configs);
+							   ambigAlts+":"+configs);
 		}
 		if ( parser!=null ) parser.reportAmbiguity(startIndex, stopIndex, ambigAlts, configs);
 	}
 
 	public void reportInsufficientPredicates(int startIndex, int stopIndex,
-											 @NotNull Set<Integer> ambigAlts,
+											 @NotNull IntervalSet ambigAlts,
 											 @NotNull SemanticContext[] altToPred,
 											 @NotNull OrderedHashSet<ATNConfig> configs)
 	{
@@ -894,80 +902,96 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
      s : (ID | ID ID?) ';' ;
 
+	 TODO: describe Sam's fix.
      */
     @Nullable
-    public Set<Integer> getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
-//		System.out.println("### check ambiguous "+configs);
-        Set<Integer> ambigAlts = null;
+    public IntervalSet getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
+		if ( debug ) System.out.println("### check ambiguous  "+configs);
         // First get a list of configurations for each state.
         // Most of the time, each state will have one associated configuration.
         MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
+		Map<Integer, IntervalSet> stateToAltListMap = new HashMap<Integer, IntervalSet>();
+
         for (ATNConfig c : configs) {
             stateToConfigListMap.map(c.state.stateNumber, c);
+			IntervalSet alts = stateToAltListMap.get(c.state.stateNumber);
+			if ( alts==null ) {
+				alts = new IntervalSet();
+				stateToAltListMap.put(c.state.stateNumber, alts);
+			}
+			alts.add(c.alt);
         }
         // potential conflicts are states, s, with > 1 configurations and diff alts
         // find all alts with potential conflicts
         int numPotentialConflicts = 0;
+		IntervalSet altsToIgnore = new IntervalSet();
         for (int state : stateToConfigListMap.keySet()) { // for each state
-            List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
-            ATNConfig goal = configsPerState.get(0);
-            int goalAlt = goal.alt;
-            boolean thisStateHasMultipleAlts = false;
-            for (ATNConfig c : configsPerState) { // look for diff alt in state's config list
-                if ( c.alt!=goalAlt ) {
-                    numPotentialConflicts++;
-                    thisStateHasMultipleAlts = true; // found diff alt
-                    break;
-                }
-            }
-            if ( !thisStateHasMultipleAlts ) {
-                // remove state's configurations from further checking; no issues with them.
-                // (can't remove as it's concurrent modification; set to null)
-                stateToConfigListMap.put(state, null);
-            }
+			IntervalSet alts = stateToAltListMap.get(state);
+			if ( alts.size()==1 ) {
+				if ( !atn.states.get(state).onlyHasEpsilonTransitions() ) {
+					List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
+					ATNConfig anyConfig = configsPerState.get(0);
+					altsToIgnore.add(anyConfig.alt);
+					if ( debug ) System.out.println("### one alt and all non-ep: "+configsPerState);
+				}
+				// remove state's configurations from further checking; no issues with them.
+				// (can't remove as it's concurrent modification; set to null)
+				stateToConfigListMap.put(state, null);
+			}
+			else {
+				numPotentialConflicts++;
+			}
         }
 
-//        System.out.println("### stateToConfigListMap="+stateToConfigListMap);
+		if ( debug ) System.out.println("### altsToIgnore: "+altsToIgnore);
+		if ( debug ) System.out.println("### stateToConfigListMap="+stateToConfigListMap);
 
-        if ( numPotentialConflicts==0 ) return null;
+        if ( numPotentialConflicts==0 ) {
+			return null;
+		}
 
         // compare each pair of configs in sets for states with > 1 alt in config list, looking for
         // (s, i, ctx) and (s, j, ctx') where ctx==ctx' or one is suffix of the other.
-        for (List<ATNConfig> configsPerState : stateToConfigListMap.values()) {
+		IntervalSet ambigAlts = new IntervalSet();
+		for (int state : stateToConfigListMap.keySet()) {
+        	List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
             if (configsPerState == null) continue;
+			IntervalSet alts = stateToAltListMap.get(state);
+			// Sam's correction to ambig def is here:
+			if ( !altsToIgnore.isNil() && alts.and(altsToIgnore).size()<=1 ) {
+//				System.err.println("ignoring alt since "+alts+"&"+altsToIgnore+
+//								   ".size is "+alts.and(altsToIgnore).size());
+				continue;
+			}
             int size = configsPerState.size();
             for (int i = 0; i < size; i++) {
                 ATNConfig c = configsPerState.get(i);
                 for (int j = i+1; j < size; j++) {
-                    ATNConfig d = configsPerState.get(j);
-                    boolean sameCtx =
-                        (c.context==null&&d.context==null) ||
-                        c.context.equals(d.context) ||
-                        c.context.conflictsWith(d.context);
-//                    System.out.println("compare "+c+" to "+d+", same="+sameCtx);
-                    if ( sameCtx ) {
-                        if ( debug ) {
-                            System.out.println("we reach state "+c.state.stateNumber+
-                                               " in rule "+
-                                               (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
-                                               " alts "+c.alt+","+d.alt+" from ctx "+c.context.toString(parser)
-                                               +" and "+ d.context.toString(parser));
-                        }
-                        if ( ambigAlts==null ) ambigAlts = new HashSet<Integer>();
-                        ambigAlts.add(c.alt);
-                        ambigAlts.add(d.alt);
-                    }
-                }
-            }
+					ATNConfig d = configsPerState.get(j);
+					if ( c.alt != d.alt && c.context.conflictsWith(d.context) ) {
+						if ( debug ) {
+							System.out.println("we reach state "+c.state.stateNumber+
+											   " in rule "+
+											   (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
+											   " alts "+c.alt+","+d.alt+" from ctx "+c.context.toString(parser)
+											   +" and "+ d.context.toString(parser));
+						}
+						ambigAlts.add(c.alt);
+						ambigAlts.add(d.alt);
+					}
+				}
+			}
         }
 
-//        System.out.println("### ambigAlts="+ambigAlts);
+		if ( debug ) System.out.println("### ambigAlts="+ambigAlts);
+
+		if ( ambigAlts.isNil() ) return null;
 
 		return ambigAlts;
 	}
 
     public SemanticContext[] getPredsForAmbigAlts(@Nullable DecisionState decState,
-                                                  @NotNull Set<Integer> ambigAlts,
+                                                  @NotNull IntervalSet ambigAlts,
                                                   @NotNull OrderedHashSet<ATNConfig> configs)
     {
         // REACH=[1|1|[]|0:0, 1|2|[]|0:1]
@@ -975,7 +999,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
         if ( debug ) System.out.println("getPredsForAmbigAlts decision "+decState.decision);
         int nalts = decState.getNumberOfTransitions();
         SemanticContext[] altToPred = new SemanticContext[nalts +1];
-        for (int alt : ambigAlts) { altToPred[alt] = SemanticContext.NONE; }
+		int n = altToPred.length;
+		for (int i = 0; i < n; i++) altToPred[i] = SemanticContext.NONE;
 		int nPredAlts = 0;
         for (ATNConfig c : configs) {
             if ( c.semanticContext!=SemanticContext.NONE && ambigAlts.contains(c.alt) ) {
@@ -1036,7 +1061,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return min;
 	}
 
-	public static void killAlts(@NotNull Set<Integer> alts, @NotNull OrderedHashSet<ATNConfig> configs) {
+	public static void killAlts(@NotNull IntervalSet alts, @NotNull OrderedHashSet<ATNConfig> configs) {
 		int i = 0;
 		while ( i<configs.size() ) {
 			ATNConfig c = configs.get(i);

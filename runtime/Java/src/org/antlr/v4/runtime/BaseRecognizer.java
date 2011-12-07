@@ -37,7 +37,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /** A generic recognizer that can handle recognizers generated from
  *  parser and tree grammars.  This is all the parsing
@@ -398,22 +397,22 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 
-	public void reportConflict(int startIndex, int stopIndex, Set<Integer> alts,
+	public void reportConflict(int startIndex, int stopIndex, IntervalSet alts,
 							   OrderedHashSet<ATNConfig> configs) {}
 
 	public void reportContextSensitivity(int startIndex, int stopIndex,
-										 Set<Integer> alts,
+										 IntervalSet alts,
 										 OrderedHashSet<ATNConfig> configs) {}
 
 	/** If context sensitive parsing, we know it's ambiguity not conflict */
 	public void reportAmbiguity(int startIndex, int stopIndex,
-								@NotNull Set<Integer> ambigAlts,
+								@NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs) {
 
 	}
 
 	public void reportInsufficientPredicates(int startIndex, int stopIndex,
-											 @NotNull Set<Integer> ambigAlts,
+											 @NotNull IntervalSet ambigAlts,
 											 @NotNull SemanticContext[] altToPred,
 											 @NotNull OrderedHashSet<ATNConfig> configs)
 	{

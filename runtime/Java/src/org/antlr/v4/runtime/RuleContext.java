@@ -180,7 +180,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  fast enough upon nondeterminism.
 	 */
 	public boolean conflictsWith(RuleContext other) {
-		return this.suffix(other); // || this.equals(other);
+		return this.suffix(other) || this.equals(other);
 	}
 
 	/** [$] suffix any context
