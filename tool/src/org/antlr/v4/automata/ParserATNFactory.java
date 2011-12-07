@@ -63,6 +63,9 @@ public class ParserATNFactory implements ATNFactory {
         public void visitState(ATNState p) {
             if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 ) {
                 ATNState q = p.transition(0).target;
+				if ( p.transition(0) instanceof RuleTransition ) {
+					q = ((RuleTransition)p.transition(0)).followState;
+				}
 				if ( q.getClass() == ATNState.class ) {
 					// we have p-x->q for x in {rule, action, pred, token, ...}
 					// if edge out of q is single epsilon to block end
@@ -74,7 +77,12 @@ public class ParserATNFactory implements ATNFactory {
 							r instanceof StarLoopbackState )
 						{
 							// skip over q
-							p.transition(0).target = r;
+							if ( p.transition(0) instanceof RuleTransition ) {
+								((RuleTransition)p.transition(0)).followState = r;
+							}
+							else {
+								p.transition(0).target = r;
+							}
 							atn.removeState(q);
 						}
 					}
@@ -133,7 +141,7 @@ public class ParserATNFactory implements ATNFactory {
 		RuleStopState stop = atn.ruleToStopState[r.index];
 		epsilon(blk.right, stop);
 		Handle h = new Handle(start, stop);
-		ATNPrinter ser = new ATNPrinter(g, h.left);
+//		ATNPrinter ser = new ATNPrinter(g, h.left);
 //		System.out.println(ruleAST.toStringTree()+":\n"+ser.asString());
 		ruleAST.atnState = start;
 		return h;
