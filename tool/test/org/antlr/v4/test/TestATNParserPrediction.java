@@ -520,18 +520,17 @@ public class TestATNParserPrediction extends BaseTest {
 		// unambig state maybe. keep going.
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +
-			"ID : 'a'..'z'+ ;\n" +
+			"ID : 'a'..'z' ;\n" + // one char
 			"SEMI : ';' ;\n"+
-			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\n'|'\t')+ {skip();} ;"
+			"INT : '0'..'9'+ ;\n"
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {ID;SEMI;INT;WS;}\n" +
-			"a : (ID | ID ID?) ';' ;");
+			"tokens {ID;SEMI;INT;}\n" +
+			"a : (ID | ID ID?) SEMI ;");
 		int decision = 1;
 		checkPredictedAlt(lg, g, decision, "a;", 1);
-		checkPredictedAlt(lg, g, decision, "a b;", 2);
+		checkPredictedAlt(lg, g, decision, "ab;", 2);
 
 		// After matching these inputs for decision, what is DFA after each prediction?
 //		String[] inputs = {
