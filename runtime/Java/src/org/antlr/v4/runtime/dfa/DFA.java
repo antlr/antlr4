@@ -28,18 +28,19 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.atn.ATNState;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DFA {
 	/** A set of all DFA states. Use Map so we can get old state back
 	 *  (Set only allows you to see if it's there).
      */
     @NotNull
-    public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
+	public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
 	@Nullable
 	public DFAState s0;
 	public int decision;
@@ -69,4 +70,5 @@ public class DFA {
 		DFASerializer serializer = new LexerDFASerializer(this);
 		return serializer.toString();
 	}
+
 }

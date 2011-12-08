@@ -131,6 +131,7 @@ class TestJavaLR {
 				if ( parser==null ) {
 					parser = new JavaLRParser(null);
 					if ( showTree ) parser.setBuildParseTree(true);
+					parser.getInterpreter().setContextSensitive(true);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}
