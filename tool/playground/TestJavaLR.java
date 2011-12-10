@@ -45,6 +45,11 @@ class TestJavaLR {
 	public static boolean showTree = false;
 
 	public static void main(String[] args) {
+		doall(args);
+//		doall(args);
+	}
+
+	public static void doall(String[] args) {
 		try {
 			long start = System.currentTimeMillis();
 			if (args.length > 0 ) {
@@ -96,7 +101,7 @@ class TestJavaLR {
 				f.getName().substring(f.getName().length()-5).equals(".java"))
 			|| f.getName().equals("input") )
 		{
-			System.err.println(f.getAbsolutePath());
+//			System.err.println(f.getAbsolutePath());
 			parseFile(f.getAbsolutePath());
 		}
 	}

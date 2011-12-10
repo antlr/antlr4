@@ -36,10 +36,12 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
 import java.util.List;
@@ -320,7 +322,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserRuleContext b_e_ctx = new ParserRuleContext(b_ctx, b_e_invoke.stateNumber, bStart.stateNumber);
 
 		ParserATNSimulator interp = new ParserATNSimulator(atn);
-		interp.setContextSensitive(true);
+//		interp.setContextSensitive(true); the default
 		List<Integer> types = getTokenTypesViaATN("ab", lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
@@ -389,6 +391,122 @@ public class TestATNParserPrediction extends BaseTest {
 			"s1-'b'->s2\n" +
 			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+	}
+
+	@Test public void testFullContextIF_THEN_ELSEParse() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"LC : '{' ;\n" +
+			"RC : '}' ;\n" +
+			"IF : 'if' ;\n" +
+			"ELSE : 'else' ;\n" +
+			"BREAK : 'break' ;\n" +
+			"RETURN : 'return' ;\n" +
+			"THEN : 'then' ;\n" +
+			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n");
+		// AB predicted in both alts of e but in diff contexts.
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"tokens {LC; RC; IF; ELSE; BREAK; RETURN; THEN;}\n" +
+			"s : LC stat* RC ;\n" +
+			"stat: IF ID THEN stat (ELSE stat)?\n" +
+			"    | BREAK\n" +
+			"    | RETURN\n" +
+			"    ;");
+
+		ATN lexatn = createATN(lg);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
+
+		semanticProcess(lg);
+		g.importVocab(lg);
+		semanticProcess(g);
+
+		ParserATNFactory f = new ParserATNFactory(g);
+		ATN atn = f.createATN();
+
+		ATNState sStart = atn.ruleToStartState[g.getRule("s").index];
+		if ( sStart.transition(0).target instanceof BlockStartState ) {
+			sStart = sStart.transition(0).target;
+		}
+		DecisionState decState = (DecisionState)sStart;
+
+		DOTGenerator dot = new DOTGenerator(g);
+		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("s").index]));
+
+		ParserATNSimulator interp = new ParserATNSimulator(atn);
+		List<Integer> types = getTokenTypesViaATN("{break}", lexInterp);
+		int WS = lg.getTokenType("WS");
+		Utils.removeAllElements(types, WS);
+		System.out.println(types);
+		TokenStream input = new IntTokenStream(types);
+
+
+		int alt = interp.matchATN(input, decState);
+//		int alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY);
+		assertEquals(alt, 1);
+		DFA dfa = interp.decisionToDFA[0];
+		String expecting =
+			"s0-'a'->s1\n" +
+			"s1-'b'->s2\n" +
+			"s2-EOF->:s3@{[10]=2}\n";
+		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+
+//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY);
+//		assertEquals(alt, 2);
+//		expecting =
+//			"s0-'a'->s1\n" +
+//			"s1-'b'->s2\n" +
+//			"s2-EOF->:s3@{[10]=2}\n";
+//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+//
+//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY);
+//		assertEquals(alt, 1);
+//		expecting =
+//			"s0-'a'->s1\n" +
+//			"s1-'b'->s2\n" +
+//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
+//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+//
+//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY); // cached
+//		assertEquals(alt, 2);
+//		expecting =
+//			"s0-'a'->s1\n" +
+//			"s1-'b'->s2\n" +
+//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
+//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+//
+//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY); // cached
+//		assertEquals(alt, 1);
+//		expecting =
+//			"s0-'a'->s1\n" +
+//			"s1-'b'->s2\n" +
+//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
+//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+//
+//		types = getTokenTypesViaATN("b", lexInterp);
+//		System.out.println(types);
+//		input = new IntTokenStream(types);
+//		alt = interp.adaptivePredict(input, 0, null); // ctx irrelevant
+//		assertEquals(alt, 2);
+//		expecting =
+//			"s0-'a'->s1\n" +
+//			"s0-'b'->:s4=>2\n" +
+//			"s1-'b'->s2\n" +
+//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
+//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
+//
+//		types = getTokenTypesViaATN("aab", lexInterp);
+//		System.out.println(types);
+//		input = new IntTokenStream(types);
+//		alt = interp.adaptivePredict(input, 0, null);
+//		assertEquals(alt, 1);
+//		expecting =
+//			"s0-'a'->s1\n" +
+//			"s0-'b'->:s4=>2\n" +
+//			"s1-'a'->:s5=>1\n" +
+//			"s1-'b'->s2\n" +
+//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
+//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 	}
 
 	@Test public void testRecursiveLeftPrefix() throws Exception {
@@ -605,8 +723,9 @@ public class TestATNParserPrediction extends BaseTest {
 		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
-		ParserATNSimulator interp = new ParserATNSimulator(atn);
+//		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
 		TokenStream input = new IntTokenStream(types);
+		ParserInterpreter interp = new ParserInterpreter(g, input);
 		ATNState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
 		dfa.decision = decision;
@@ -673,10 +792,7 @@ public class TestATNParserPrediction extends BaseTest {
 		g.importVocab(lg);
 		semanticProcess(g);
 
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
-
-		ParserATNSimulator interp = new ParserATNSimulator(atn);
+		ParserInterpreter interp = new ParserInterpreter(g, null);
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
 			List<Integer> types = getTokenTypesViaATN(inputString[i], lexInterp);
@@ -688,7 +804,7 @@ public class TestATNParserPrediction extends BaseTest {
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);
 			}
-			DFA dfa = interp.decisionToDFA[decision];
+			DFA dfa = interp.getATNSimulator().decisionToDFA[decision];
 			assertEquals(dfaString[i], dfa.toString(g.getTokenDisplayNames()));
 		}
 	}

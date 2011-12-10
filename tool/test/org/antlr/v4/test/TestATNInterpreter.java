@@ -1,9 +1,17 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
 import java.util.List;
@@ -261,7 +269,7 @@ public class TestATNInterpreter extends BaseTest {
 		checkMatchedAlt(lg, g, "((34))c", 2);
 	}
 
-	public void checkMatchedAlt(LexerGrammar lg, Grammar g,
+	public void checkMatchedAlt(LexerGrammar lg, final Grammar g,
 								String inputString,
 								int expected)
 	{
@@ -277,8 +285,8 @@ public class TestATNInterpreter extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
+		ParserInterpreter interp = new ParserInterpreter(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {
 			startState = startState.transition(0).target;

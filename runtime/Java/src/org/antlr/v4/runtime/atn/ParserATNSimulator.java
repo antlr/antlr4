@@ -63,7 +63,13 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public Map<RuleContext, DFA>[] decisionToDFAPerCtx; // TODO: USE THIS ONE
 	@NotNull
 	public final DFA[] decisionToDFA;
-	protected boolean userWantsCtxSensitive = false;
+
+	/** By default we do full context-sensitive LL(*) parsing not
+	 *  Strong LL(*) parsing. That means we use context information
+	 *  when closure operations fall off the end of the rule that
+	 *  holds the decision were evaluating.
+	 */
+	protected boolean userWantsCtxSensitive = true;
 
 	/** This is the original context upon entry to the ATN simulator.
 	 *  ATNConfig objects carry on tracking the new context derived from
@@ -80,6 +86,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	protected ATNConfig prevAccept; // TODO Move down? used to avoid passing int down and back up in method calls
 	protected int prevAcceptIndex = -1;
 
+	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
 	}
@@ -165,15 +172,20 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return alt;
 	}
 
-	// doesn't create DFA when matching
+	/** Match the input stream starting at the indicated start state within the
+	 *  ATN. A DFA is created as part of the process, but it is really
+	 *  just a placeholder because all of the interpretation routines
+	 *  expecting a non-null DFA. This returns the matched alternative.
+	 */
 	public int matchATN(@NotNull SymbolStream<Symbol> input,
 						@NotNull ATNState startState)
 	{
 		DFA dfa = new DFA(startState);
-		RuleContext ctx = ParserRuleContext.EMPTY;
+		ParserRuleContext ctx = ParserRuleContext.EMPTY;
 		OrderedHashSet<ATNConfig> s0_closure =
 			computeStartState(dfa.decision, startState, ctx);
-		return execATN(input, dfa, input.index(), s0_closure, false);
+		return predictATN(dfa, input, ctx, false);
+//		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
 	public int execDFA(@NotNull SymbolStream<Symbol> input, @NotNull DFA dfa,
@@ -203,7 +215,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				// start all over with ATN; can't use DFA
 				input.seek(startIndex);
 				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, false);
+				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, true);
 				s.ctxToPrediction.put(outerContext, alt);
 				return alt;
 			}
@@ -538,6 +550,61 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return exitAlt;
 	}
 
+	/** Retry a simulation using full outer context.
+	 *
+	 *  One of the key assumptions here is that using full context
+	 *  can use at most the same amount of input as a simulation
+	 *  that is not useful context (i.e., it uses all possible contexts
+	 *  that could invoke our entry rule. I believe that this is true
+	 *  and the proof might go like this.
+	 *
+	 *  THEOREM:  The amount of input consumed during a full context
+	 *  simulation is at most the amount of input consumed during a
+	 *  non full context simulation.
+	 *
+	 *  PROOF: Let D be the DFA state at which non-context simulation
+	 *  terminated. That means that D does not have a configuration for
+	 *  which we can legally pursue more input. (It is legal to work only
+	 *  on configurations for which there is no conflict with another
+	 *  configuration.) Now we restrict ourselves to following ATN edges
+	 *  associated with a single context. Choose any DFA state D' along
+	 *  the path (same input) to D. That state has either the same number
+	 *  of configurations or fewer. (If the number of configurations is
+	 *  the same, then we have degenerated to the non-context case.) Now
+	 *  imagine that we restrict to following edges associated with
+	 *  another single context and that we reach DFA state D'' for the
+	 *  same amount of input as D'. The non-context simulation merges D'
+	 *  and D''. The union of the configuration sets either has the same
+	 *  number of configurations as both D' and D'' or it has more. If it
+	 *  has the same number, we are no worse off and the merge does not
+	 *  force us to look for more input than we would otherwise have to
+	 *  do. If the union has more configurations, it can introduce
+	 *  conflicts but not new alternatives--we cannot conjure up alternatives
+	 *  by computing closure on the DFA state.  Here are the cases for
+	 *  D' union D'':
+	 *
+	 *  1. No increase in configurations, D' = D''
+	 *  2. Add configuration that introduces a new alternative number.
+	 *     This cannot happen because no new alternatives are introduced
+	 *     while computing closure, even during start state computation.
+	 *  3. D'' adds a configuration that does not conflict with any
+	 *     configuration in D'.  Simulating without context would then have
+	 *     forced us to use more lookahead than D' (full context) alone.
+	 *  3. D'' adds a configuration that introduces a conflict with a
+	 *     configuration in D'. There are 2 cases:
+	 *     a. The conflict does not cause termination (D' union D''
+	 *        is added to the work list). Again no context simulation requires
+	 *        more input.
+	 *     b. The conflict does cause termination, but this cannot happen.
+	 *        By definition, we know that with ALL contexts merged we
+	 *        don't terminate until D and D' uses less input than D. Therefore
+	 *        no context simulation requires more input than full context
+	 *        simulation.
+	 *
+	 *  We have covered all the cases and there is never a situation where
+	 *  a single, full context simulation requires more input than a
+	 *  no context simulation.
+	 */
 	public int retryWithContext(@NotNull SymbolStream<Symbol> input,
 								@NotNull DFA dfa,
 								int startIndex,
@@ -598,7 +665,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			reachTarget.ctxToPrediction.put(originalContext, predictedAlt);
 			if ( retry_debug ) {
 				System.out.println("adding edge upon "+getTokenName(t));
-				System.out.println("DFA is "+dfa.toString(parser.getTokenNames()));
+				System.out.println("DFA decision "+dfa.decision+" is "+dfa.toString(parser.getTokenNames()));
 			}
 		}
 //					System.out.println("RESOLVE to "+predictedAlt);
@@ -906,7 +973,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
      s : x? | x ;
      x : 'a' ;
 
-     config list: (4,1), (11,1,4), (7,1), (3,1,1), (4,1,1), (8,1,1), (7,1,1), (8,2), (11,2,8), (11,1,[8 1])
+     config list: (4,1), (11,1,4), (7,1), (3,1,1), (4,1,1), (8,1,1), (7,1,1),
+	 			  (8,2), (11,2,8), (11,1,[8 1])
 
      state to config list:
 
@@ -919,9 +987,52 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
      Walk and find state config lists with > 1 alt. If none, no conflict. return null. Here, states 11
      and 8 have lists with both alts 1 and 2. Must check these config lists for conflicting configs.
 
+	 Sam pointed out a problem with the previous definition, v3, of
+	 ambiguous states. If we have another state associated with conflicting
+	 alternatives, we should keep going. For example, the following grammar
+
      s : (ID | ID ID?) ';' ;
 
-	 TODO: describe Sam's fix.
+	 When the ATN simulation reaches the state before ';', it has a DFA
+	 state that looks like: [12|1|[], 6|2|[], 12|2|[]]. Naturally
+	 12|1|[] and 12|2|[] conflict, but we cannot stop processing this node
+	 because alternative to has another way to continue, via [6|2|[]].
+	 The key is that we have a single state that has config's only associated
+	 with a single alternative, 2, and crucially the state transitions
+	 among the configurations are all non-epsilon transitions. That means
+	 we don't consider any conflicts that include alternative 2. So, we
+	 ignore the conflict between alts 1 and 2. We ignore a set of
+	 conflicting alts when there is an intersection with an alternative
+	 associated with a single alt state in the state->config-list map.
+
+	 It's also the case that we might have two conflicting configurations but
+	 also a 3rd nonconflicting configuration for a different alternative:
+	 [1|1|[], 1|2|[], 8|3|[]]. This can come about from grammar:
+
+	 a : A | A | A B ;
+
+	 After matching input A, we reach the stop state for rule A, state 1.
+	 State 8 is the state right before B. Clearly alternatives 1 and 2
+	 conflict and no amount of further lookahead will separate the two.
+	 However, alternative 3 will be able to continue and so we do not
+	 stop working on this state. In the previous example, we're concerned
+	 with states associated with the conflicting alternatives. Here alt
+	 3 is not associated with the conflicting configs, but since we can continue
+	 looking for input reasonably, I don't declare the state done. We
+	 ignore a set of conflicting alts when we have an alternative
+	 that we still need to pursue.
+
+	 So, in summary, as long as there is a single configuration that is
+	 not conflicting with any other configuration for that state, then
+	 there is more input we can use to keep going. E.g.,
+	 s->[(s,1,[x]), (s,2,[x]), (s,2,[y])]
+	 s->[(s,1,_)]
+	 s->[(s,1,[y]), (s,2,[x])]
+	 Regardless of what goes on for the other states, this is
+	 sufficient to force us to add this new state to the ATN-to-DFA work list.
+
+	 TODO: split into "has nonconflict config--add to work list" and getambigalts
+	       functions
      */
     @Nullable
     public IntervalSet getAmbiguousAlts(@NotNull OrderedHashSet<ATNConfig> configs) {
@@ -955,6 +1066,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				}
 				// remove state's configurations from further checking; no issues with them.
 				// (can't remove as it's concurrent modification; set to null)
+//				return null;
 				stateToConfigListMap.put(state, null);
 			}
 			else {
@@ -1100,7 +1212,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		DFAState to = addDFAState(dfa, q);
         if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		addDFAEdge(from, t, to);
-		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser.getTokenNames()));
+		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
 		return to;
 	}
 

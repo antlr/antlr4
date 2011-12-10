@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.misc;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 public class Utils {
@@ -51,5 +52,10 @@ public class Utils {
 			if ( o!=null ) n++;
 		}
 		return n;
+	}
+
+	public  static <T> void removeAllElements(Collection<T> data, T value) {
+		if ( data==null ) return;
+		while ( data.contains(value) ) data.remove(value);
 	}
 }
