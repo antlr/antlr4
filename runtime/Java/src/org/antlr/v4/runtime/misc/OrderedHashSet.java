@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class OrderedHashSet<T> extends LinkedHashSet<T> {
     /** Track the elements as they are added to the set */
-    protected List<T> elements = new ArrayList<T>();
+    protected ArrayList<T> elements = new ArrayList<T>();
 
     public T get(int i) {
         return elements.get(i);
@@ -112,7 +112,14 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
         return elements;
     }
 
-	@Override
+    @Override
+    public Object clone() {
+        OrderedHashSet<T> dup = (OrderedHashSet<T>)super.clone();
+        dup.elements = (ArrayList<T>)this.elements.clone();
+        return dup;
+    }
+
+    @Override
 	public Object[] toArray() {
 		return elements.toArray();
 	}
