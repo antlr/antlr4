@@ -643,14 +643,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		// retry using context, if any; if none, kill all but min as before
 		if ( retry_debug ) System.out.println("RETRY '"+ parser.getInputString(startIndex) +
 										"' with ctx="+ originalContext);
-//		int min = ambigAlts.getMinElement();
-//		if ( originalContext==ParserRuleContext.EMPTY ) {
-//			if ( retry_debug ) System.out.println("ctx empty; no need to retry");
-//			// no point in retrying with ctx since it's same.
-//			// this implies that we have a true ambiguity
-//			reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
-//            return min;
-//		}
 		// otherwise we have to retry with context, filling in tmp DFA.
 		// if it comes back with conflict, we have a true ambiguity
 		input.seek(startIndex); // rewind
