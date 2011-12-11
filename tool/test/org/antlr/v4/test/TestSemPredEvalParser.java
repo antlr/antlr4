@@ -140,16 +140,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"@header {" +
 			"import java.util.*;" +
 			"}" +
-			"@parser::members {" +
-			"public void reportInsufficientPredicates(int startIndex, int stopIndex,\n" +
-			"\t\t\t\t\t\t\t\t\t\t\t @NotNull Set<Integer> ambigAlts,\n" +
-			"\t\t\t\t\t\t\t\t\t\t\t @NotNull SemanticContext[] altToPred,\n" +
-			"\t\t\t\t\t\t\t\t\t\t\t @NotNull OrderedHashSet<ATNConfig> configs)\n" +
-			"{\n" +
-			"System.out.println(\"reportInsufficientPredicates\");\n" +
-			"}\n" +
-			"}\n"+
-			"s : a a;\n" + // do 2x: once in ATN, next in DFA
+			"s : a ';' a;\n" + // do 2x: once in ATN, next in DFA
 			"a :          ID {System.out.println(\"alt 1\");}\n" +
 			"  |          ID {System.out.println(\"alt 2\");}\n" +
 			"  | {false}? ID {System.out.println(\"alt 3\");}\n" +
@@ -159,12 +150,13 @@ public class TestSemPredEvalParser extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n";
 
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "x y", false);
+								  "x; y", true);
 		String expecting =
-			"reportInsufficientPredicates\n" +
 			"alt 1\n" +
 			"alt 1\n";
 		assertEquals(expecting, found);
+        assertEquals("line 1:0 reportInsufficientPredicates {1..3}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [6|1|[]|up=1, 1|1|[]|up=1, 6|2|[]|up=1, 1|2|[]|up=1, 6|3|[]|{1:0}?|up=1, 1|3|[]|{1:0}?|up=1], input=x\n",
+                     this.stderrDuringParse);
 	}
 
 	@Test public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
@@ -177,18 +169,9 @@ public class TestSemPredEvalParser extends BaseTest {
 			"@header {" +
 			"import java.util.*;" +
 			"}" +
-			"@parser::members {" +
-			"public void reportInsufficientPredicates(int startIndex, int stopIndex,\n" +
-			"\t\t\t\t\t\t\t\t\t\t\t @NotNull Set<Integer> ambigAlts,\n" +
-			"\t\t\t\t\t\t\t\t\t\t\t @NotNull SemanticContext[] altToPred,\n" +
-			"\t\t\t\t\t\t\t\t\t\t\t @NotNull OrderedHashSet<ATNConfig> configs)\n" +
-			"{\n" +
-			"System.out.println(\"reportInsufficientPredicates\");\n" +
-			"}\n" +
-			"}\n"+
-			"s : a a a;\n" +
+			"s : a ';' a ';' a;\n" +
 			"a : INT         {System.out.println(\"alt 1\");}\n" +
-			"  |          ID {System.out.println(\"alt 2\");}\n" +
+			"  |          ID {System.out.println(\"alt 2\");}\n" + // must pick this one for ID since pred is false
 			"  |          ID {System.out.println(\"alt 3\");}\n" +
 			"  | {false}? ID {System.out.println(\"alt 4\");}\n" +
 			"  ;\n" +
@@ -197,13 +180,14 @@ public class TestSemPredEvalParser extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n";
 
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
-								  "34 x y", false);
+								  "34; x; y", true);
 		String expecting =
 			"alt 1\n" +
-			"reportInsufficientPredicates\n" +
 			"alt 2\n" +
 			"alt 2\n";
 		assertEquals(expecting, found);
+        assertEquals("line 1:4 reportInsufficientPredicates {2..4}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [6|2|[]|up=1, 10|2|[]|up=1, 1|2|[]|up=1, 6|3|[]|up=1, 10|3|[]|up=1, 1|3|[]|up=1, 6|4|[]|{1:0}?|up=1, 10|4|[]|{1:0}?|up=1, 1|4|[]|{1:0}?|up=1], input=x\n",
+                     this.stderrDuringParse);
 	}
 
 	@Test public void testRewindBeforePredEval() throws Exception {

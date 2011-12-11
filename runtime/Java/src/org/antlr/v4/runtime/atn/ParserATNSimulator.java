@@ -397,8 +397,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 						reportInsufficientPredicates(startIndex, input.index(),
 													 ambigAlts, altToPred, reach);
 					}
-					List<DFAState.PredPrediction> predPredictions =
-						getPredicatePredictions(altToPred);
+					List<DFAState.PredPrediction> predPredictions =	getPredicatePredictions(ambigAlts, altToPred);
 					if ( buildDFA ) {
 						DFAState accept = addDFAEdge(dfa, closure, t, reach);
 						makeAcceptState(accept, predPredictions);
@@ -470,8 +469,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				if ( altToPred!=null ) {
 					// we have a validating predicate; test it
 					// Update DFA so reach becomes accept state with predicate
-					List<DFAState.PredPrediction> predPredictions =
-						getPredicatePredictions(altToPred);
+					List<DFAState.PredPrediction> predPredictions = getPredicatePredictions(null, altToPred);
 					makeAcceptState(accept, predPredictions);
 					// rewind input so pred's LT(i) calls make sense
 					input.seek(startIndex);
@@ -1177,15 +1175,20 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
         return altToPred;
     }
 
-	public List<DFAState.PredPrediction> getPredicatePredictions(SemanticContext[] altToPred) {
+	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
 		int firstUnpredicated = ATN.INVALID_ALT_NUMBER;
 		for (int i = 1; i < altToPred.length; i++) {
+//            if ( ambigAlts!=null && !ambigAlts.contains(i) ) continue; // only care about ambig alts here
 			SemanticContext pred = altToPred[i];
-			// find first on predicated alternative, if any.
+			// find first unpredicated but ambig alternative, if any.
 			// Only ambiguous alternatives will have SemanticContext.NONE.
-			// All other alternatives will have null predicates in altToPred
-			if ( pred==SemanticContext.NONE && firstUnpredicated==ATN.INVALID_ALT_NUMBER ) {
+			// Any unambig alts or ambig naked alts after first ambig naked are ignored
+			// (null, i) means alt i is the default prediction
+            // if no (null, i), then no default prediction.
+			if ( ambigAlts!=null && ambigAlts.contains(i) &&
+                 pred==SemanticContext.NONE && firstUnpredicated==ATN.INVALID_ALT_NUMBER )
+            {
 				firstUnpredicated = i;
 			}
 			if ( pred!=null && pred!=SemanticContext.NONE ) {
