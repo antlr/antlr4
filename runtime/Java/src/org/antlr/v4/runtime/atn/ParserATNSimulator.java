@@ -336,7 +336,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
         DecisionState decState = atn.getDecisionState(dfa.decision);
 		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
 
-		do { // while more work
+		while (true) { // while more work
             computeReachSet(decState, closure, t, reach);
 
             // resolve ambig in DFAState for reach
@@ -378,7 +378,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			reach = closure;
 			closure = tmp;
 			reach.clear(); // TODO: THIS MIGHT BE SLOW! kills each element; realloc might be faster
-		} while ( true );
+
+//            closure = reach;
+//            reach = new OrderedHashSet<ATNConfig>();
+		}
 
         throw noViableAlt(input, outerContext, closure, startIndex);
 	}
