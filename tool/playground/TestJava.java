@@ -16,40 +16,47 @@ class TestJava {
 	public static JavaParser parser = null;
 
 	public static void main(String[] args) {
-		try {
-			long start = System.currentTimeMillis();
-			if (args.length > 0 ) {
-				// for each directory/file specified on the command line
-				for(int i=0; i< args.length;i++) {
-					doFile(new File(args[i])); // parse it
-				}
-			}
-			else {
-				System.err.println("Usage: java Main <directory or file name>");
-			}
-			long stop = System.currentTimeMillis();
-			System.out.println("Lexer total time " + lexerTime + "ms.");
-			System.out.println("Total time " + (stop - start) + "ms.");
+        doAll(args);
+//        doAll(args);
+//        doAll(args);
+    }
 
-			System.out.println("finished parsing OK");
-			System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
-			System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
-			System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
-			System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
-			System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
-			System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
-			if ( profile ) {
-				System.out.println("num decisions "+profiler.numDecisions);
-			}
-		}
-		catch(Exception e) {
-			System.err.println("exception: "+e);
-			e.printStackTrace(System.err);   // so we can get stack trace
-		}
-	}
+    static void doAll(String[] args) {
+        try {
+            lexerTime = 0;
+            long start = System.currentTimeMillis();
+            if (args.length > 0 ) {
+                // for each directory/file specified on the command line
+                for(int i=0; i< args.length;i++) {
+                    doFile(new File(args[i])); // parse it
+                }
+            }
+            else {
+                System.err.println("Usage: java Main <directory or file name>");
+            }
+            long stop = System.currentTimeMillis();
+            System.out.println("Lexer total time " + lexerTime + "ms.");
+            System.out.println("Total time " + (stop - start) + "ms.");
+
+            System.out.println("finished parsing OK");
+            System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
+            System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
+            System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
+            System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
+            System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
+            System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
+            if ( profile ) {
+                System.out.println("num decisions "+profiler.numDecisions);
+            }
+        }
+        catch(Exception e) {
+            System.err.println("exception: "+e);
+            e.printStackTrace(System.err);   // so we can get stack trace
+        }
+    }
 
 
-	// This method decides what action to take based on the type of
+    // This method decides what action to take based on the type of
 	//   file we are looking at
 	public static void doFile(File f)
 							  throws Exception {
@@ -102,6 +109,7 @@ class TestJava {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
 					parser = new JavaParser(tokens);
+//                    parser.getInterpreter().setContextSensitive(false);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}

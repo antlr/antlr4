@@ -45,12 +45,13 @@ class TestJavaLR {
 	public static boolean showTree = false;
 
 	public static void main(String[] args) {
-		doall(args);
-//		doall(args);
+		doAll(args);
+//        doAll(args);
 	}
 
-	public static void doall(String[] args) {
+	public static void doAll(String[] args) {
 		try {
+            lexerTime = 0;
 			long start = System.currentTimeMillis();
 			if (args.length > 0 ) {
 				// for each directory/file specified on the command line
@@ -87,8 +88,7 @@ class TestJavaLR {
 
 	// This method decides what action to take based on the type of
 	//   file we are looking at
-	public static void doFile(File f)
-							  throws Exception {
+	public static void doFile(File f) throws Exception {
 		// If this is a directory, walk each file/dir in that directory
 		if (f.isDirectory()) {
 			String files[] = f.list();
@@ -136,7 +136,7 @@ class TestJavaLR {
 				if ( parser==null ) {
 					parser = new JavaLRParser(null);
 					if ( showTree ) parser.setBuildParseTree(true);
-					parser.getInterpreter().setContextSensitive(true);
+					parser.getInterpreter().setContextSensitive(false);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}
