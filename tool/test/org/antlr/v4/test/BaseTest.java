@@ -68,7 +68,7 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
-	public static final boolean TEST_IN_SAME_PROCESS = false;
+	public static final boolean TEST_IN_SAME_PROCESS = true;
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -641,7 +641,7 @@ public abstract class BaseTest {
 			PrintStream originalErr = System.err;
 			try {
 				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-				final Class<?> mainClass = (Class<?>)loader.loadClass(className);
+                final Class<?> mainClass = (Class<?>)loader.loadClass(className);
 				final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
 				PipedInputStream stdoutIn = new PipedInputStream();
 				PipedInputStream stderrIn = new PipedInputStream();
