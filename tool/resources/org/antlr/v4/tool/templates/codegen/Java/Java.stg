@@ -745,7 +745,7 @@ public class <lexer.name> extends Lexer {
 
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
-		<lexer.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>
+		<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
 	};
 	public static final String[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>

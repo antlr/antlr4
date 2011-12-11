@@ -3,20 +3,31 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 public class TestLexerExec extends BaseTest {
-	@Test public void testRefToRuleDoesNotSetTokenNorEmitAnother() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"A : '-' I ;\n" +
-			"I : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
-		String found = execLexer("L.g", grammar, "L", "34 -21 3");
-		String expecting =
-			"[@0,0:1='34',<4>,1:0]\n" +
-			"[@1,3:5='-21',<3>,1:3]\n" +
-			"[@2,7:7='3',<4>,1:7]\n" +
-			"[@3,8:7='<EOF>',<-1>,1:8]\n"; // EOF has no length so range is 8:7 not 8:8
-		assertEquals(expecting, found);
-	}
+    @Test public void testQuoteTranslation() throws Exception {
+   		String grammar =
+   			"lexer grammar L;\n"+
+   			"QUOTE : '\"' ;\n"; // make sure this compiles
+   		String found = execLexer("L.g", grammar, "L", "\"");
+   		String expecting =
+   			"[@0,0:0='\"',<3>,1:0]\n" +
+            "[@1,1:0='<EOF>',<-1>,1:1]\n";
+   		assertEquals(expecting, found);
+   	}
+
+    @Test public void testRefToRuleDoesNotSetTokenNorEmitAnother() throws Exception {
+   		String grammar =
+   			"lexer grammar L;\n"+
+   			"A : '-' I ;\n" +
+   			"I : '0'..'9'+ ;\n"+
+   			"WS : (' '|'\\n') {skip();} ;";
+   		String found = execLexer("L.g", grammar, "L", "34 -21 3");
+   		String expecting =
+   			"[@0,0:1='34',<4>,1:0]\n" +
+   			"[@1,3:5='-21',<3>,1:3]\n" +
+   			"[@2,7:7='3',<4>,1:7]\n" +
+   			"[@3,8:7='<EOF>',<-1>,1:8]\n"; // EOF has no length so range is 8:7 not 8:8
+   		assertEquals(expecting, found);
+   	}
 
 	@Test public void testActionExecutedInDFA() throws Exception {
 		String grammar =

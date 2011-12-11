@@ -29,10 +29,16 @@
 
 package org.antlr.v4.codegen.model;
 
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Lexer extends OutputModelObject {
 	public String name;
@@ -64,6 +70,16 @@ public class Lexer extends OutputModelObject {
 		}
 
 		tokenNames = g.getTokenDisplayNames();
+        for (int i = 0; i < tokenNames.length; i++) {
+            if ( tokenNames[i]==null ) continue;
+            CodeGenerator gen = factory.getGenerator();
+            if ( tokenNames[i].charAt(0)=='\'' ) {
+                tokenNames[i] = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen, tokenNames[i]);
+            }
+            else {
+                tokenNames[i] = gen.target.getTargetStringLiteralFromString(tokenNames[i], true);
+            }
+        }
 		ruleNames = g.rules.keySet();
 	}
 
