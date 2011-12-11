@@ -30,8 +30,10 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.runtime.tree.AST;
 
 /** This is the default error handling mechanism for ANTLR parsers
@@ -545,10 +547,38 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
-			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
+            //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
 //			recognizer.getInputStream().consume();
-			recognizer.consume();
-			ttype = recognizer.getInputStream().LA(1);
-		}
-	}
+            recognizer.consume();
+            ttype = recognizer.getInputStream().LA(1);
+        }
+    }
+
+    @Override
+    public void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
+                                int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+                                @NotNull OrderedHashSet<ATNConfig> configs)
+    {
+    }
+
+    @Override
+    public void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
+                               int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+                               @NotNull OrderedHashSet<ATNConfig> configs)
+    {
+    }
+
+    @Override
+    public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
+                                         int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
+    {
+    }
+
+    @Override
+    public void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+                                             int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+                                             @NotNull SemanticContext[] altToPred,
+                                             @NotNull OrderedHashSet<ATNConfig> configs)
+    {
+    }
 }

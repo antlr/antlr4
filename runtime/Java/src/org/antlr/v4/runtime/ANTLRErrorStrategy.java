@@ -1,5 +1,13 @@
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
+
 /** The interface for defining strategies to deal with syntax errors
  *  encountered during a parse by ANTLR-generated parsers and tree parsers.
  *  We distinguish between three different kinds of errors:
@@ -23,8 +31,8 @@ package org.antlr.v4.runtime;
  */
 public interface ANTLRErrorStrategy<Symbol> {
 	/** Report any kind of RecognitionException. */
-	void reportError(BaseRecognizer<Symbol> recognizer,
-					 RecognitionException e)
+	void reportError(@NotNull BaseRecognizer<Symbol> recognizer,
+					 @Nullable RecognitionException e)
 		throws RecognitionException;
 
 	/** When matching elements within alternative, use this method
@@ -43,7 +51,7 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  "inserting" tokens, we need to specify what that implicitly created
 	 *  token is. We use object, because it could be a tree node.
 	 */
-	Symbol recoverInline(BaseRecognizer<Symbol> recognizer)
+	Symbol recoverInline(@NotNull BaseRecognizer<Symbol> recognizer)
 		throws RecognitionException;
 
 	/** Resynchronize the parser by consuming tokens until we find one
@@ -51,8 +59,8 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  the current rule. The exception contains info you might want to
 	 *  use to recover better.
 	 */
-	void recover(BaseRecognizer<Symbol> recognizer,
-				 RecognitionException e);
+	void recover(@NotNull BaseRecognizer<Symbol> recognizer,
+                 @Nullable RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN. You can call this
@@ -81,14 +89,14 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
 	 */
-	void sync(BaseRecognizer<Symbol> recognizer);
+	void sync(@NotNull BaseRecognizer<Symbol> recognizer);
 
 	/** Notify handler that parser has entered an error state.  The
 	 *  parser currently doesn't call this--the handler itself calls this
 	 *  in report error methods.  But, for symmetry with endErrorCondition,
 	 *  this method is in the interface.
 	 */
-	void beginErrorCondition(BaseRecognizer<Symbol> recognizer);
+	void beginErrorCondition(@NotNull BaseRecognizer<Symbol> recognizer);
 
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
@@ -96,11 +104,52 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  avoid sending out spurious error messages. We only want one error
 	 *  message per syntax error
 	 */
-	boolean inErrorRecoveryMode(BaseRecognizer<Symbol> recognizer);
+	boolean inErrorRecoveryMode(@NotNull BaseRecognizer<Symbol> recognizer);
 
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
-	 *  and from its own reset method.
-	 */
-	void endErrorCondition(BaseRecognizer<Symbol> recognizer);
+     *  and from its own reset method.
+     */
+    void endErrorCondition(@NotNull BaseRecognizer<Symbol> recognizer);
+
+    /** Called when the parser detects a true ambiguity: an input sequence can be matched
+     * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
+     * favor of the alternative appearing first in the grammar. The start and stop index are
+     * zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
+     * that can match the input sequence. This method is only called when we are parsing with
+     * full context.
+     */
+    void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
+                         int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+                         @NotNull OrderedHashSet<ATNConfig> configs);
+
+    /** Called by the parser when it detects an input sequence that can be matched by two paths
+     *  through the grammar. The difference between this and the reportAmbiguity method lies in
+     *  the difference between Strong LL parsing and LL parsing. If we are not parsing with context,
+     *  we can't be sure if a conflict is an ambiguity or simply a weakness in the Strong LL parsing
+     *  strategy. If we are parsing with full context, this method is never called.
+     */
+    void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
+                        int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+                        @NotNull OrderedHashSet<ATNConfig> configs);
+
+    /** Called by the parser when it find a conflict that is resolved by retrying the parse
+     *  with full context. This is not a warning; it simply notifies you that your grammar
+     *  is more complicated than Strong LL can handle. The parser moved up to full context
+     *  parsing for that input sequence.
+     */
+    void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer,
+                                  @NotNull DFA dfa,
+                                  int startIndex, int stopIndex,
+                                  @NotNull OrderedHashSet<ATNConfig> configs);
+
+    /** Called by the parser when it finds less than n-1 predicates for n ambiguous alternatives.
+     *  If there are n-1, we assume that the missing predicate is !(the "or" of the other predicates).
+     *  If there are fewer than n-1, then we don't know which make it alternative to protect
+     *  if the predicates fail.
+     */
+    void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+                                      int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+                                      @NotNull SemanticContext[] altToPred,
+                                      @NotNull OrderedHashSet<ATNConfig> configs);
 }

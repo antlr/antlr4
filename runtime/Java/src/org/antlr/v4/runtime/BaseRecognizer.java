@@ -28,11 +28,14 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.tree.ASTNodeStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
@@ -164,19 +167,34 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		return syntaxErrors;
 	}
 
-	@Override
-	public abstract SymbolStream<Symbol> getInputStream();
+    @Override
+    public abstract SymbolStream<Symbol> getInputStream();
 
-	/** Match needs to return the current input symbol, which gets put
-	 *  into the label for the associated token ref; e.g., x=ID.  Token
-	 *  and tree parsers need to return different objects. Rather than test
-	 *  for input stream type or change the IntStream interface, I use
-	 *  a simple method to ask the recognizer to tell me what the current
-	 *  input symbol is.
-	 */
-	public abstract Symbol getCurrentInputSymbol();
+    public String getInputString(int start) {
+        return getInputString(start, getInputStream().index());
+    }
 
-	public void notifyListeners(String msg)	{
+    public String getInputString(int start, int stop) {
+        SymbolStream<Symbol> input = getInputStream();
+        if ( input instanceof TokenStream ) {
+            return ((TokenStream)input).toString(start,stop);
+        }
+        else if ( input instanceof ASTNodeStream) {
+            return ((ASTNodeStream<Symbol>)input).toString(input.get(start),input.get(stop));
+        }
+        return "n/a";
+    }
+
+    /** Match needs to return the current input symbol, which gets put
+     *  into the label for the associated token ref; e.g., x=ID.  Token
+     *  and tree parsers need to return different objects. Rather than test
+     *  for input stream type or change the IntStream interface, I use
+     *  a simple method to ask the recognizer to tell me what the current
+     *  input symbol is.
+     */
+    public abstract Symbol getCurrentInputSymbol();
+
+    public void notifyListeners(String msg)	{
 		notifyListeners(getCurrentInputSymbol(), msg, null);
 	}
 
@@ -370,6 +388,30 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		return null;
 	}
 
+    /** For debugging and other purposes */
+    public List<String> getDFAStrings() {
+        List<String> s = new ArrayList<String>();
+        for (int d = 0; d < _interp.decisionToDFA.length; d++) {
+            DFA dfa = _interp.decisionToDFA[d];
+            s.add( dfa.toString(getTokenNames()) );
+        }
+        return s;
+    }
+
+    /** For debugging and other purposes */
+    public void dumpDFA() {
+        boolean seenOne = false;
+        for (int d = 0; d < _interp.decisionToDFA.length; d++) {
+            DFA dfa = _interp.decisionToDFA[d];
+            if ( dfa!=null ) {
+                if ( seenOne ) System.out.println();
+                System.out.println("Decision " + dfa.decision + ":");
+                System.out.print(dfa.toString(getTokenNames()));
+                seenOne = true;
+            }
+        }
+    }
+
 	public abstract String getSourceName();
 
 	/** A convenience method for use most often with template rewrites.
@@ -396,26 +438,4 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		_ctx.s = atnState;
 		if ( traceATNStates ) _ctx.trace(atnState);
 	}
-
-	public void reportConflict(int startIndex, int stopIndex, IntervalSet alts,
-							   OrderedHashSet<ATNConfig> configs) {}
-
-	public void reportContextSensitivity(int startIndex, int stopIndex,
-										 IntervalSet alts,
-										 OrderedHashSet<ATNConfig> configs) {}
-
-	/** If context sensitive parsing, we know it's ambiguity not conflict */
-	public void reportAmbiguity(int startIndex, int stopIndex,
-								@NotNull IntervalSet ambigAlts,
-								@NotNull OrderedHashSet<ATNConfig> configs) {
-
-	}
-
-	public void reportInsufficientPredicates(int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull OrderedHashSet<ATNConfig> configs)
-	{
-	}
-
 }

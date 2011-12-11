@@ -357,9 +357,6 @@ public abstract class BaseTest {
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
 			final List<String> options = new ArrayList<String>();
-			if ( debug ) {
-				options.add("-debug");
-			}
 			Collections.addAll(options, extraOptions);
 			options.add("-o");
 			options.add(tmpdir);
@@ -1036,18 +1033,12 @@ public abstract class BaseTest {
 			"    }\n" +
 			"}"
 			);
-		ST createParserST =
-			new ST(
-			"class Profiler2 extends Profiler {\n" +
-			"    public void terminate() { ; }\n" +
-			"}\n"+
-			"        Profiler2 profiler = new Profiler2();\n"+
-			"        <parserName> parser = new <parserName>(tokens,profiler);\n" +
-			"        profiler.setParser(parser);\n");
-		if ( !debug ) {
+        ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
+		if ( debug ) {
 			createParserST =
 				new ST(
-				"        <parserName> parser = new <parserName>(tokens);\n");
+				"        <parserName> parser = new <parserName>(tokens);\n" +
+                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -1086,7 +1077,6 @@ public abstract class BaseTest {
 		ST outputFileST = new ST(
 			"import org.antlr.v4.runtime.*;\n" +
 			"import org.antlr.v4.runtime.tree.*;\n" +
-//			"import org.antlr.v4.runtime.debug.*;\n" +
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
@@ -1109,18 +1099,12 @@ public abstract class BaseTest {
 			"    }\n" +
 			"}"
 			);
-		ST createParserST =
-			new ST(
-			"class Profiler2 extends Profiler {\n" +
-			"    public void terminate() { ; }\n" +
-			"}\n"+
-			"        Profiler2 profiler = new Profiler2();\n"+
-			"        <parserName> parser = new <parserName>(tokens,profiler);\n" +
-			"        profiler.setParser(parser);\n");
-		if ( !debug ) {
+        ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
+		if ( debug ) {
 			createParserST =
 				new ST(
-				"        <parserName> parser = new <parserName>(tokens);\n");
+				"        <parserName> parser = new <parserName>(tokens);\n" +
+                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -1142,7 +1126,6 @@ public abstract class BaseTest {
 		ST outputFileST = new ST(
 			"import org.antlr.v4.runtime.*;\n" +
 			"import org.antlr.v4.runtime.tree.*;\n" +
-//			"import org.antlr.v4.runtime.debug.*;\n" +
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
@@ -1161,18 +1144,12 @@ public abstract class BaseTest {
 			"    }\n" +
 			"}"
 			);
-		ST createParserST =
-			new ST(
-			"class Profiler2 extends Profiler {\n" +
-			"    public void terminate() { ; }\n" +
-			"}\n"+
-			"        Profiler2 profiler = new Profiler2();\n"+
-			"        <parserName> parser = new <parserName>(tokens,profiler);\n" +
-			"        profiler.setParser(parser);\n");
-		if ( !debug ) {
+        ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
+		if ( debug ) {
 			createParserST =
 				new ST(
-				"        <parserName> parser = new <parserName>(tokens);\n");
+				"        <parserName> parser = new <parserName>(tokens);\n" +
+                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -1192,7 +1169,6 @@ public abstract class BaseTest {
 			"import org.antlr.v4.runtime.*;\n" +
 			"import org.antlr.v4.stringtemplate.*;\n" +
 			"import org.antlr.v4.stringtemplate.language.*;\n" +
-//			"import org.antlr.v4.runtime.debug.*;\n" +
 			"import java.io.*;\n" +
 			"\n" +
 			"public class Test {\n" +
@@ -1216,18 +1192,12 @@ public abstract class BaseTest {
 			"    }\n" +
 			"}"
 			);
-		ST createParserST =
-			new ST(
-			"class Profiler2 extends Profiler {\n" +
-			"    public void terminate() { ; }\n" +
-			"}\n"+
-			"        Profiler2 profiler = new Profiler2();\n"+
-			"        <parserName> parser = new <parserName>(tokens,profiler);\n" +
-			"        profiler.setParser(parser);\n");
-		if ( !debug ) {
+        ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
+		if ( debug ) {
 			createParserST =
-			new ST(
-			"        <parserName> parser = new <parserName>(tokens);\n");
+				new ST(
+				"        <parserName> parser = new <parserName>(tokens);\n" +
+                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);

@@ -36,7 +36,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -321,14 +320,16 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserRuleContext a_e_ctx = new ParserRuleContext(a_ctx, a_e_invoke.stateNumber, bStart.stateNumber);
 		ParserRuleContext b_e_ctx = new ParserRuleContext(b_ctx, b_e_invoke.stateNumber, bStart.stateNumber);
 
-		ParserATNSimulator interp = new ParserATNSimulator(atn);
+        List<Integer> types = getTokenTypesViaATN("ab", lexInterp);
+        System.out.println(types);
+        TokenStream input = new IntTokenStream(types);
+
+//		ParserATNSimulator interp = new ParserATNSimulator(atn);
+        ParserInterpreter interp = new ParserInterpreter(g, input);
 //		interp.setContextSensitive(true); the default
-		List<Integer> types = getTokenTypesViaATN("ab", lexInterp);
-		System.out.println(types);
-		TokenStream input = new IntTokenStream(types);
 		int alt = interp.adaptivePredict(input, 0, b_e_ctx);
 		assertEquals(alt, 2);
-		DFA dfa = interp.decisionToDFA[0];
+		DFA dfa = interp.getATNSimulator().decisionToDFA[0];
 		String expecting =
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
@@ -393,121 +394,112 @@ public class TestATNParserPrediction extends BaseTest {
 		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
 	}
 
-	@Test public void testFullContextIF_THEN_ELSEParse() throws Exception {
-		LexerGrammar lg = new LexerGrammar(
-			"lexer grammar L;\n" +
-			"LC : '{' ;\n" +
-			"RC : '}' ;\n" +
-			"IF : 'if' ;\n" +
-			"ELSE : 'else' ;\n" +
-			"BREAK : 'break' ;\n" +
-			"RETURN : 'return' ;\n" +
-			"THEN : 'then' ;\n" +
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n");
-		// AB predicted in both alts of e but in diff contexts.
-		Grammar g = new Grammar(
-			"parser grammar T;\n"+
-			"tokens {LC; RC; IF; ELSE; BREAK; RETURN; THEN;}\n" +
-			"s : LC stat* RC ;\n" +
-			"stat: IF ID THEN stat (ELSE stat)?\n" +
-			"    | BREAK\n" +
-			"    | RETURN\n" +
-			"    ;");
+    @Test public void testFullContextIF_THEN_ELSEParse() {
+        String grammar =
+            "grammar T;\n"+
+            "s" +
+            "@after {dumpDFA();}\n" +
+            "    : '{' stat* '}'" +
+            "    ;\n" +
+            "stat: 'if' ID 'then' stat ('else' stat)?\n" +
+            "    | 'break'\n" +
+            "    | 'return'\n" +
+            "    ;" +
+            "ID : 'a'..'z'+ ;\n"+
+			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+        String input = "{ if x then break }";
+        String result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        String expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'}'->:s1=>2\n";
+        assertEquals(expecting, result);
+        assertEquals(null, this.stderrDuringParse);
 
-		ATN lexatn = createATN(lg);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
+        input = "{ if x then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1}\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
+                     this.stderrDuringParse);
 
-		semanticProcess(lg);
-		g.importVocab(lg);
-		semanticProcess(g);
+        input = "{ if x then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1}\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
+                     this.stderrDuringParse);
 
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
+        input =
+            "{ if x then break else return\n" +
+            "if x then if y then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
+            "s0-'}'->:s2=>2\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n" +
+                     "line 2:26 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
+                     this.stderrDuringParse);
 
-		ATNState sStart = atn.ruleToStartState[g.getRule("s").index];
-		if ( sStart.transition(0).target instanceof BlockStartState ) {
-			sStart = sStart.transition(0).target;
-		}
-		DecisionState decState = (DecisionState)sStart;
+        input =
+            "{ if x then break else return\n" +
+            "if x then if y then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
+            "s0-'}'->:s2=>2\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n" +
+                     "line 2:26 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
+                     this.stderrDuringParse);
 
-		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("s").index]));
-
-		ParserATNSimulator interp = new ParserATNSimulator(atn);
-		List<Integer> types = getTokenTypesViaATN("{break}", lexInterp);
-		int WS = lg.getTokenType("WS");
-		Utils.removeAllElements(types, WS);
-		System.out.println(types);
-		TokenStream input = new IntTokenStream(types);
-
-
-		int alt = interp.matchATN(input, decState);
-//		int alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY);
-		assertEquals(alt, 1);
-		DFA dfa = interp.decisionToDFA[0];
-		String expecting =
-			"s0-'a'->s1\n" +
-			"s1-'b'->s2\n" +
-			"s2-EOF->:s3@{[10]=2}\n";
-		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-
-//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY);
-//		assertEquals(alt, 2);
-//		expecting =
-//			"s0-'a'->s1\n" +
-//			"s1-'b'->s2\n" +
-//			"s2-EOF->:s3@{[10]=2}\n";
-//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-//
-//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY);
-//		assertEquals(alt, 1);
-//		expecting =
-//			"s0-'a'->s1\n" +
-//			"s1-'b'->s2\n" +
-//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
-//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-//
-//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY); // cached
-//		assertEquals(alt, 2);
-//		expecting =
-//			"s0-'a'->s1\n" +
-//			"s1-'b'->s2\n" +
-//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
-//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-//
-//		alt = interp.adaptivePredict(input, 0, ParserRuleContext.EMPTY); // cached
-//		assertEquals(alt, 1);
-//		expecting =
-//			"s0-'a'->s1\n" +
-//			"s1-'b'->s2\n" +
-//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
-//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-//
-//		types = getTokenTypesViaATN("b", lexInterp);
-//		System.out.println(types);
-//		input = new IntTokenStream(types);
-//		alt = interp.adaptivePredict(input, 0, null); // ctx irrelevant
-//		assertEquals(alt, 2);
-//		expecting =
-//			"s0-'a'->s1\n" +
-//			"s0-'b'->:s4=>2\n" +
-//			"s1-'b'->s2\n" +
-//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
-//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-//
-//		types = getTokenTypesViaATN("aab", lexInterp);
-//		System.out.println(types);
-//		input = new IntTokenStream(types);
-//		alt = interp.adaptivePredict(input, 0, null);
-//		assertEquals(alt, 1);
-//		expecting =
-//			"s0-'a'->s1\n" +
-//			"s0-'b'->:s4=>2\n" +
-//			"s1-'a'->:s5=>1\n" +
-//			"s1-'b'->s2\n" +
-//			"s2-EOF->:s3@{[10]=2, [6]=1}\n";
-//		assertEquals(expecting, dfa.toString(g.getTokenDisplayNames()));
-	}
+        input =
+            "{ if x then if y then break else break }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[21 6]=1}\n" +
+            "s0-'}'->:s2=>2\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:28 reportAmbiguity {1..2}:[15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
+                     this.stderrDuringParse);
+    }
 
 	@Test public void testRecursiveLeftPrefix() throws Exception {
 		LexerGrammar lg = new LexerGrammar(

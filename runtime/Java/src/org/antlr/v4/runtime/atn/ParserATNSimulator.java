@@ -65,7 +65,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public final DFA[] decisionToDFA;
 
 	/** By default we do full context-sensitive LL(*) parsing not
-	 *  Strong LL(*) parsing. That means we use context information
+	 *  Strong LL(*) parsing. If we fail with Strong LL(*) we
+     *  try full LL(*). That means we rewind and use context information
 	 *  when closure operations fall off the end of the rule that
 	 *  holds the decision were evaluating.
 	 */
@@ -78,7 +79,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	 *  value is reset upon prediction call to adaptivePredict() or the
 	 *  predictATN/DFA methods.
 	 *
-	 *  The full stack at any moment is [config.outerContext + config.context].
+	 *  The full stack at any moment is [outerContext + config.context].
 	 */
 	@NotNull
 	protected ParserRuleContext outerContext = ParserRuleContext.EMPTY;
@@ -182,10 +183,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	{
 		DFA dfa = new DFA(startState);
 		ParserRuleContext ctx = ParserRuleContext.EMPTY;
-		OrderedHashSet<ATNConfig> s0_closure =
-			computeStartState(dfa.decision, startState, ctx);
 		return predictATN(dfa, input, ctx, false);
-//		return execATN(input, dfa, input.index(), s0_closure, false);
 	}
 
 	public int execDFA(@NotNull SymbolStream<Symbol> input, @NotNull DFA dfa,
@@ -204,20 +202,49 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		int t = input.LA(1);
 	loop:
 		while ( true ) {
-			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+t);
+			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			// TODO: ctxSensitive
 			if ( s.isCtxSensitive ) {
 				Integer predI = s.ctxToPrediction.get(outerContext);
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+"->"+predI+
 								 				    " in "+s);
 				if ( predI!=null ) return predI;
-//				System.out.println("start all over with ATN; can't use DFA");
-				// start all over with ATN; can't use DFA
-				input.seek(startIndex);
-				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, true);
-				s.ctxToPrediction.put(outerContext, alt);
-				return alt;
+
+                // TODO: this was cut / pasted from retryWithContext. refactor somehow to call retryWithContext
+                int old_k = input.index();
+                input.seek(startIndex);
+                DFA ctx_dfa = new DFA(dfa.atnStartState);
+                int ctx_alt = predictATN(ctx_dfa, input, outerContext, true);
+                if ( retry_debug ) System.out.println("retry from DFA predicts "+ctx_alt+
+                                                      " with conflict="+(ctx_dfa.conflictSet!=null) +
+                                                      " full ctx dfa="+ctx_dfa.toString(parser.getTokenNames()));
+
+                if ( ctx_dfa.conflictSet!=null ) {
+                    reportAmbiguity(startIndex, input.index(), getAmbiguousAlts(ctx_dfa.conflictSet), ctx_dfa.conflictSet);
+                }
+                else {
+                    if ( old_k != input.index() ) {
+                        if ( retry_debug ) System.out.println("used diff amount of k; old="+(old_k-startIndex+1)+", new="+(input.index()-startIndex+1));
+                    }
+                    retry_with_context_indicates_no_conflict++;
+                    reportContextSensitivity(dfa, ctx_dfa.conflictSet, startIndex, input.index());
+                }
+                // END cut/paste from retryWithContext
+
+                s.ctxToPrediction.put(outerContext, ctx_alt);
+                if ( retry_debug ) System.out.println("updated DFA:\n"+dfa.toString(parser.getTokenNames()));
+                return ctx_alt;
+
+////				System.out.println("start all over with ATN; can't use DFA");
+//				// start all over with ATN; can't use DFA
+//				input.seek(startIndex);
+//				DFA throwAwayDFA = new DFA(dfa.atnStartState);
+//				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, true);
+//                if ( dfa_debug ) {
+//                    System.out.print("back from DFA update for ctx sensitive state; DFA=\n" + dfa.toString(parser.getTokenNames()));
+//                }
+//				s.ctxToPrediction.put(outerContext, alt);
+//				return alt;
 			}
 			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
@@ -235,11 +262,11 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-				if ( dfa_debug ) System.out.println("no edge for "+t);
+				if ( dfa_debug ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt = -1;
 				if ( dfa_debug ) {
 					System.out.println("ATN exec upon "+
-									   getInputString(input, startIndex) +
+                                       parser.getInputString(startIndex) +
 									   " at DFA state "+s.stateNumber);
 				}
 				try {
@@ -299,20 +326,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return prevAcceptState.prediction;
 	}
 
-	public String getInputString(@NotNull SymbolStream<Symbol> input, int start) {
-		return getInputString(input, start, input.index());
-	}
-
-	public String getInputString(@NotNull SymbolStream<Symbol> input, int start, int stop) {
-		if ( input instanceof TokenStream ) {
-			return ((TokenStream)input).toString(start,stop);
-		}
-		else if ( input instanceof ASTNodeStream) {
-			return ((ASTNodeStream<Symbol>)input).toString(input.get(start),input.get(stop));
-		}
-		return "n/a";
-	}
-
 	public int execATN(@NotNull SymbolStream<Symbol> input,
 					   @NotNull DFA dfa,
 					   int startIndex,
@@ -368,11 +381,11 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					}
 					String rname = getRuleName(i);
 					System.out.println("AMBIG dec "+dfa.decision+" in "+rname+" for alt "+ambigAlts+" upon "+
-									   getInputString(input, startIndex));
+									   parser.getInputString(startIndex));
 					System.out.println("REACH="+reach);
 				}
 //				System.out.println("AMBIG dec "+dfa.decision+" for alt "+ambigAlts+" upon "+
-//								   getInputString(input, startIndex));
+//								   parser.getInputString(startIndex));
 //				System.out.println("userWantsCtxSensitive="+userWantsCtxSensitive);
 
                 // can we resolve with predicates?
@@ -401,16 +414,28 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                     return uniqueAlt;
                 }
 
-				dfa.conflict = true; // at least one DFA state is ambiguous
-				if ( !userWantsCtxSensitive ) {
-					reportConflict(startIndex, input.index(), ambigAlts, reach);
-				}
+                boolean resolveConflict = false;
+                dfa.conflictSet = (OrderedHashSet<ATNConfig>)reach.clone(); // most recent set with conflict
+                if ( !userWantsCtxSensitive ) {
+                    reportConflict(startIndex, input.index(), ambigAlts, reach);
+                    resolveConflict = true;
+                }
+                else {
+                    // TODO: add optimization to avoid retry if no config dips into outer config
+                    if ( outerContext==ParserRuleContext.EMPTY ) { // TODO: or no configs dip into outer ctx
+                        if ( retry_debug ) System.out.println("ctx empty; no need to retry");
+                        // no point in retrying with ctx since it's same.
+                        // this implies that we have a true ambiguity
+                        reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
+                        resolveConflict = true;
+                    }
+                }
 
-				if ( !userWantsCtxSensitive || useContext ) {
-					// resolve ambiguity
-					if ( decState!=null && decState.isGreedy ) {
-						// if greedy, resolve in favor of alt coming first
-						resolveToMinAlt(reach, ambigAlts);
+                if ( resolveConflict || useContext ) {
+                    // resolve ambiguity
+                    if ( decState!=null && decState.isGreedy ) {
+                        // if greedy, resolve in favor of alt coming first
+                        resolveToMinAlt(reach, ambigAlts);
 					}
 					else {
 						// if nongreedy loop, always pick exit branch to match
@@ -618,26 +643,26 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		retry_with_context++;
 		int old_k = input.index();
 		// retry using context, if any; if none, kill all but min as before
-		if ( retry_debug ) System.out.println("RETRY '"+ getInputString(input, startIndex) +
+		if ( retry_debug ) System.out.println("RETRY '"+ parser.getInputString(startIndex) +
 										"' with ctx="+ originalContext);
-		int min = ambigAlts.getMinElement();
-		if ( originalContext==ParserRuleContext.EMPTY ) {
-			if ( retry_debug ) System.out.println("ctx empty; no need to retry");
-			// no point in retrying with ctx since it's same.
-			// this implies that we have a true ambiguity
-			reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
-			return min;
-		}
+//		int min = ambigAlts.getMinElement();
+//		if ( originalContext==ParserRuleContext.EMPTY ) {
+//			if ( retry_debug ) System.out.println("ctx empty; no need to retry");
+//			// no point in retrying with ctx since it's same.
+//			// this implies that we have a true ambiguity
+//			reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
+//            return min;
+//		}
 		// otherwise we have to retry with context, filling in tmp DFA.
 		// if it comes back with conflict, we have a true ambiguity
 		input.seek(startIndex); // rewind
 		DFA ctx_dfa = new DFA(dfa.atnStartState);
 		int ctx_alt = predictATN(ctx_dfa, input, originalContext, true);
 		if ( retry_debug ) System.out.println("retry predicts "+ctx_alt+" vs "+ambigAlts.getMinElement()+
-										" with conflict="+ctx_dfa.conflict+
+										" with conflict="+(ctx_dfa.conflictSet!=null) +
 										" full ctx dfa="+ctx_dfa.toString(parser.getTokenNames()));
 
-		if ( ctx_dfa.conflict ) {
+		if ( ctx_dfa.conflictSet!=null ) {
 //			System.out.println("retry gives ambig for "+input.toString(startIndex, input.index()));
 			reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
 		}
@@ -645,10 +670,11 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 //			System.out.println("NO ambig for "+input.toString(startIndex, input.index()));
 //			System.out.println(ctx_dfa.toString(parser.getTokenNames()));
 			if ( old_k != input.index() ) {
-				if ( retry_debug ) System.out.println("used diff amount of k; old="+(old_k-startIndex+1)+", new="+(input.index()-startIndex+1));
+				if ( retry_debug ) System.out.println("used diff amount of k; old="+(old_k-startIndex+1)+
+                                                      ", new="+(input.index()-startIndex+1));
 			}
 			retry_with_context_indicates_no_conflict++;
-			reportContextSensitivity(startIndex, input.index(), ambigAlts, reach);
+			reportContextSensitivity(dfa, reach, startIndex, input.index());
 		}
 		// it's not context-sensitive; true ambig. fall thru to strip dead alts
 
@@ -896,63 +922,61 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	{
 		if ( debug || retry_debug ) {
 			System.out.println("reportConflict "+alts+":"+configs+
-							   ", input="+getInputString(parser.getInputStream(), startIndex, stopIndex));
+							   ", input="+parser.getInputString(startIndex, stopIndex));
 		}
-		if ( parser!=null ) parser.reportConflict(startIndex, stopIndex, alts, configs);
+		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
 	}
 
-	public void reportContextSensitivity(int startIndex, int stopIndex,
-										 @NotNull IntervalSet alts,
-										 @NotNull OrderedHashSet<ATNConfig> configs)
-	{
-		if ( debug || retry_debug ) {
-			System.out.println("reportContextSensitivity "+alts+":"+configs+
-							   ", input="+getInputString(parser.getInputStream(), startIndex, stopIndex));
-		}
-		if ( parser!=null ) parser.reportContextSensitivity(startIndex, stopIndex, alts, configs);
-	}
+	public void reportContextSensitivity(DFA dfa, OrderedHashSet<ATNConfig> configs, int startIndex, int stopIndex) {
+        if ( debug || retry_debug ) {
+            System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
+                               ", input="+parser.getInputString(startIndex, stopIndex));
+        }
+        if ( parser!=null ) parser.getErrorHandler().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
+    }
 
-	/** If context sensitive parsing, we know it's ambiguity not conflict */
-	public void reportAmbiguity(int startIndex, int stopIndex,
-								@NotNull IntervalSet ambigAlts,
-								@NotNull OrderedHashSet<ATNConfig> configs)
-	{
-		if ( debug || retry_debug ) {
-			System.out.println("reportAmbiguity "+
-							   ambigAlts+":"+configs+
-							   ", input="+getInputString(parser.getInputStream(), startIndex, stopIndex));
-		}
-		if ( parser!=null ) parser.reportAmbiguity(startIndex, stopIndex, ambigAlts, configs);
-	}
+    /** If context sensitive parsing, we know it's ambiguity not conflict */
+    public void reportAmbiguity(int startIndex, int stopIndex,
+                                @NotNull IntervalSet ambigAlts,
+                                @NotNull OrderedHashSet<ATNConfig> configs)
+    {
+        if ( debug || retry_debug ) {
+            System.out.println("reportAmbiguity "+
+                               ambigAlts+":"+configs+
+                               ", input="+parser.getInputString(startIndex, stopIndex));
+        }
+        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, startIndex, stopIndex,
+                                                                     ambigAlts, configs);
+    }
 
-	public void reportInsufficientPredicates(int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull OrderedHashSet<ATNConfig> configs)
-	{
-		if ( debug || retry_debug ) {
-			System.out.println("reportInsufficientPredicates "+
-							   ambigAlts+":"+Arrays.toString(altToPred)+
-							   getInputString(parser.getInputStream(), startIndex, stopIndex));
-		}
-		if ( parser!=null ) {
-			parser.reportInsufficientPredicates(startIndex, stopIndex, ambigAlts,
-												altToPred, configs);
-		}
-	}
+    public void reportInsufficientPredicates(int startIndex, int stopIndex,
+                                             @NotNull IntervalSet ambigAlts,
+                                             @NotNull SemanticContext[] altToPred,
+                                             @NotNull OrderedHashSet<ATNConfig> configs)
+    {
+        if ( debug || retry_debug ) {
+            System.out.println("reportInsufficientPredicates "+
+                               ambigAlts+":"+Arrays.toString(altToPred)+
+                               parser.getInputString(startIndex, stopIndex));
+        }
+        if ( parser!=null ) {
+            parser.getErrorHandler().reportInsufficientPredicates(parser, startIndex, stopIndex, ambigAlts,
+                                                                  altToPred, configs);
+        }
+    }
 
-	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
-		int alt = ATN.INVALID_ALT_NUMBER;
-		for (ATNConfig c : configs) {
-			if ( alt == ATN.INVALID_ALT_NUMBER ) {
-				alt = c.alt; // found first alt
-			}
-			else if ( c.alt!=alt ) {
-				return ATN.INVALID_ALT_NUMBER;
-			}
-		}
-		return alt;
-	}
+    public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
+        int alt = ATN.INVALID_ALT_NUMBER;
+        for (ATNConfig c : configs) {
+            if ( alt == ATN.INVALID_ALT_NUMBER ) {
+                alt = c.alt; // found first alt
+            }
+            else if ( c.alt!=alt ) {
+                return ATN.INVALID_ALT_NUMBER;
+            }
+        }
+        return alt;
+    }
 
 	@Nullable
 	public ATNConfig configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
