@@ -75,8 +75,6 @@ public class DFAState {
 	@Nullable
 	public DFAState[] edges;
 
-//	public IntervalSet viableChars;
-
 	public boolean isAcceptState = false;
 
 	public int prediction; // if accept state, what ttype do we match? is "else" clause if predicated
@@ -107,13 +105,14 @@ public class DFAState {
 	 *
 	 *  As an example, we might have:
 	 *
-	 *  predicates = [(p,2), (q,3), (null, 1)]
+	 *  predicates = [(p,3), (q,4), (null, 2)]
 	 *
 	 *  This means that there are 2 predicates for 3 ambiguous alternatives.
 	 *  If the first 2 predicates fail, then we default to the last
-	 *  preds value, which is alt 1. This comes from:
+	 *  PredPrediction pair, which predicts alt 2. This comes from:
 	 *
-	 *  r :      A
+	 *  r : B
+     *    |      A
 	 *    | {p}? A
 	 *    | {q}? A
 	 *    ;
