@@ -118,6 +118,13 @@ public class ATN {
 		return s.decision;
 	}
 
+    public DecisionState getDecisionState(int decision) {
+        if ( decisionToState.size()>0 ) {
+            return decisionToState.get(decision);
+        }
+        return null;
+    }
+
 	public int getNumberOfDecisions() {
 		return decisionToState.size();
 	}
