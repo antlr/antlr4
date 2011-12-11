@@ -225,17 +225,6 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                 s.ctxToPrediction.put(outerContext, ctx_alt);
                 if ( retry_debug ) System.out.println("updated DFA:\n"+dfa.toString(parser.getTokenNames()));
                 return ctx_alt;
-
-////				System.out.println("start all over with ATN; can't use DFA");
-//				// start all over with ATN; can't use DFA
-//				input.seek(startIndex);
-//				DFA throwAwayDFA = new DFA(dfa.atnStartState);
-//				int alt = execATN(input, throwAwayDFA, startIndex, s0.configs, true);
-//                if ( dfa_debug ) {
-//                    System.out.print("back from DFA update for ctx sensitive state; DFA=\n" + dfa.toString(parser.getTokenNames()));
-//                }
-//				s.ctxToPrediction.put(outerContext, alt);
-//				return alt;
 			}
 			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
