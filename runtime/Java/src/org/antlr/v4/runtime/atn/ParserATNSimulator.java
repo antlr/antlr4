@@ -454,6 +454,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                 // this implies that we have a true ambiguity
                 reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
                 resolveToProperAlt(decState, ambigAlts, reach);
+                return ATN.INVALID_ALT_NUMBER;
             }
             else {
                 return retryWithContext(input, dfa, startIndex, outerContext,
@@ -648,15 +649,14 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	{
 		// ASSUMES PREDICT ONLY
 		retry_with_context++;
-        int ctx_alt = predictATNWithDummyDFA(dfa, input, startIndex, reach, outerContext);
+        int predictedAlt = predictATNWithDummyDFA(dfa, input, startIndex, reach, outerContext);
 		// it's not context-sensitive; true ambig. fall thru to strip dead alts
 
 		// TODO: if ambig, why turn on ctx sensitive?
 
-		int predictedAlt = ctx_alt;
 		if ( buildDFA ) {
 			DFAState reachTarget = addDFAEdge(dfa, closure, t, reach);
-			makeAcceptState(reachTarget, ctx_alt);
+			makeAcceptState(reachTarget, predictedAlt);
 			reachTarget.isCtxSensitive = true;
 			if ( reachTarget.ctxToPrediction==null ) {
 				reachTarget.ctxToPrediction = new LinkedHashMap<RuleContext, Integer>();
