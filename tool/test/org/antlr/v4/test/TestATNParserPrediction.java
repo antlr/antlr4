@@ -420,70 +420,6 @@ public class TestATNParserPrediction extends BaseTest {
         assertEquals(expecting, result);
         assertEquals(null, this.stderrDuringParse);
 
-        input = "{ if x then break else return }";
-        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
-                                  input, true);
-        expecting =
-            "Decision 0:\n" +
-            "s0-'if'->:s1=>1\n" +
-            "s0-'}'->:s2=>2\n" +
-            "\n" +
-            "Decision 1:\n" +
-            "s0-'else'->:s1@{[6]=1}\n";
-        assertEquals(expecting, result);
-        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
-                     this.stderrDuringParse);
-
-        input = "{ if x then break else return }";
-        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
-                                  input, true);
-        expecting =
-            "Decision 0:\n" +
-            "s0-'if'->:s1=>1\n" +
-            "s0-'}'->:s2=>2\n" +
-            "\n" +
-            "Decision 1:\n" +
-            "s0-'else'->:s1@{[6]=1}\n";
-        assertEquals(expecting, result);
-        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
-                     this.stderrDuringParse);
-
-        input =
-            "{ if x then break else return\n" +
-            "if x then if y then break else return }";
-        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
-                                  input, true);
-        expecting =
-            "Decision 0:\n" +
-            "s0-'if'->:s1=>1\n" +
-            "s0-'}'->:s2=>2\n" +
-            "\n" +
-            "Decision 1:\n" +
-            "s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
-            "s0-'}'->:s2=>2\n";
-        assertEquals(expecting, result);
-        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n" +
-                     "line 2:26 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
-                     this.stderrDuringParse);
-
-        input =
-            "{ if x then break else return\n" +
-            "if x then if y then break else return }";
-        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
-                                  input, true);
-        expecting =
-            "Decision 0:\n" +
-            "s0-'if'->:s1=>1\n" +
-            "s0-'}'->:s2=>2\n" +
-            "\n" +
-            "Decision 1:\n" +
-            "s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
-            "s0-'}'->:s2=>2\n";
-        assertEquals(expecting, result);
-        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n" +
-                     "line 2:26 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
-                     this.stderrDuringParse);
-
         input =
             "{ if x then if y then break else break }";
         result = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -497,7 +433,71 @@ public class TestATNParserPrediction extends BaseTest {
             "s0-'else'->:s1@{[21 6]=1}\n" +
             "s0-'}'->:s2=>2\n";
         assertEquals(expecting, result);
-        assertEquals("line 1:28 reportAmbiguity {1..2}:[15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
+        assertEquals("line 1:28 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
+                     this.stderrDuringParse);
+
+        input = "{ if x then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1}\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
+                     this.stderrDuringParse);
+
+        input = "{ if x then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1}\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n",
+                     this.stderrDuringParse);
+
+        input =
+            "{ if x then break else return\n" +
+            "if x then if y then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
+            "s0-'}'->:s2=>2\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n" +
+                     "line 2:26 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
+                     this.stderrDuringParse);
+
+        input =
+            "{ if x then break else return\n" +
+            "if x then if y then break else return }";
+        result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+                                  input, true);
+        expecting =
+            "Decision 0:\n" +
+            "s0-'if'->:s1=>1\n" +
+            "s0-'}'->:s2=>2\n" +
+            "\n" +
+            "Decision 1:\n" +
+            "s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
+            "s0-'}'->:s2=>2\n";
+        assertEquals(expecting, result);
+        assertEquals("line 1:18 reportContextSensitivity: [15|1|[25], 29|1|[25], 31|1|[25], 15|2|[25]|up=1, 29|2|[25]|up=1, 31|2|[25]|up=1], input=else\n" +
+                     "line 2:26 reportAmbiguity {1..2}:[1|1|[], 1|2|[]], input=else\n",
                      this.stderrDuringParse);
     }
 
