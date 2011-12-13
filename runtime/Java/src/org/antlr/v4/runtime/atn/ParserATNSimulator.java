@@ -43,6 +43,57 @@ import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
+/**
+ The embodiment of the adaptive LL(*) parsing strategy.
+
+ The basic complexity of the adaptive strategy makes it harder to
+ understand. We begin with ATN simulation to build paths in a
+ DFA. Subsequent prediction requests go through the DFA first. If
+ they reach a state without an edge for the current symbol, the
+ algorithm fails over to the ATN simulation to complete the DFA
+ path for the current input (until it finds a conflict state or
+ uniquely predicting state).
+
+ All of that is done without using the outer context because we
+ want to create a DFA that is not dependent upon the rule
+ invocation stack when we do a prediction.  One DFA works in all
+ contexts. We avoid using context not necessarily because it
+ slower, although it can be, but because of the DFA caching
+ problem.  The closure routine only considers the rule invocation
+ stack created during prediction beginning in the entry rule.  For
+ example, if prediction occurs without invoking another rule's
+ ATN, there are no context stacks in the configurations. When this
+ leads to a conflict, we don't know if it's an ambiguity or a
+ weakness in the strong LL(*) parsing strategy (versus full
+ LL(*)).
+
+ So, we simply retry the ATN simulation again, this time
+ using full outer context and filling a dummy DFA (to avoid
+ polluting the context insensitive DFA). Configuration context
+ stacks will be the full invocation stack from the start rule. If
+ we get a conflict using full context, then we can definitively
+ say we have a true ambiguity for that input sequence. If we don't
+ get a conflict, it implies that the decision is sensitive to the
+ outer context. (It is not context-sensitive in the sense of
+ context sensitive grammars.) We create a special DFA accept state
+ that maps rule context to a predicted alternative. That is the
+ only modification needed to handle full LL(*) prediction. In
+ general, full context prediction will use more lookahead than
+ necessary, but it pays to share the same DFA. For a schedule
+ proof that full context prediction uses that most the same amount
+ of lookahead as a context insensitive prediction, see the comment
+ on method retryWithContext().
+
+ So, the strategy is complex because we bounce back and forth from
+ the ATN to the DFA, simultaneously performing predictions and
+ extending the DFA according to previously unseen input
+ sequences. The retry with full context is a recursive call to the
+ same function naturally because it does the same thing, just with
+ a different initial context. The problem is, that we need to pass
+ in a "full context mode" parameter so that it knows to report
+ conflicts differently. It also knows not to do a retry, to avoid
+ infinite recursion, if it is already using full context.
+ */
 public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
@@ -222,7 +273,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-				if ( dfa_debug ) System.out.println("no edge for "+parser.getTokenNames()[t]);
+				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt = -1;
 				if ( dfa_debug ) {
 					System.out.println("ATN exec upon "+
@@ -285,6 +336,39 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return prevAcceptState.prediction;
 	}
 
+	/** Performs ATN simulation to compute a predicted alternative based
+	 *  upon the remaining input, but also updates the DFA cache to avoid
+	 *  having to traverse the ATN again for the same input sequence.
+
+	 There are some key conditions we're looking for after computing a new
+	 set of ATN configs (proposed DFA state):
+	       * if the set is empty, there is no viable alternative for current symbol
+	       * does the state uniquely predict an alternative?
+	       * does the state have a conflict that would prevent us from
+	         putting it on the work list?
+	       * if in non-greedy decision is there a config at a rule stop state?
+
+	 We also have some key operations to do:
+	       * add an edge from previous DFA state to potentially new DFA state, D,
+	         upon current symbol but only if adding to work list, which means in all
+	         cases except no viable alternative (and possibly non-greedy decisions?)
+	       * collecting predicates and adding semantic context to DFA accept states
+	       * adding rule context to context-sensitive DFA accept states
+	       * consuming an input symbol
+	       * reporting a conflict
+	       * reporting an ambiguity
+	       * reporting a context sensitivity
+	       * reporting insufficient predicates
+
+	 We should isolate those operations, which are side-effecting, to the
+	 main work loop. We can isolate lots of code into other functions, but
+	 they should be side effect free. They can return package that
+	 indicates whether we should report something, whether we need to add a
+	 DFA edge, whether we need to augment accept state with semantic
+	 context or rule invocation context. Actually, it seems like we always
+	 add predicates if they exist, so that can simply be done in the main
+	 loop for any accept state creation or modification request.
+	 */
 	public int execATN(@NotNull SymbolStream<Symbol> input,
 					   @NotNull DFA dfa,
 					   int startIndex,
