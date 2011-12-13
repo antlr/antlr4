@@ -526,7 +526,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			PredicateTransition pt = (PredicateTransition)t;
 			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = new ATNConfig(config, t.target);
-				c.traversedPredicate = true;
+//				c.traversedPredicate = true;
 			}
 		}
 		// ignore actions; just exec one per rule upon accept
@@ -641,7 +641,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			{
 				firstConfigWithRuleStopState = c;
 			}
-			if ( c.traversedPredicate ) traversedPredicate = true;
+//			if ( c.traversedPredicate ) traversedPredicate = true;
 		}
 
 		if ( firstConfigWithRuleStopState!=null ) {

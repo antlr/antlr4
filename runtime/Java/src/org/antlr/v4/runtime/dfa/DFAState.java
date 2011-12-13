@@ -31,6 +31,7 @@ package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -70,6 +71,9 @@ public class DFAState {
 	/** The set of ATN configurations (state,alt,context) for this DFA state */
 	@Nullable
 	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
+
+	// TODO: rename to configs after flipping to new ATN sim
+	public ATNConfigSet configset = new ATNConfigSet();
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable

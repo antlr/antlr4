@@ -39,6 +39,8 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  chain used to arrive at the state.  The semantic context is
  *  the unordered set semantic predicates encountered before reaching
  *  an ATN state.
+ *
+ *  (state, alt, rule context, semantic context)
  */
 public class ATNConfig {
 	/** The ATN state associated with this configuration */
@@ -62,7 +64,10 @@ public class ATNConfig {
 	 * otherwise predicates would not get executed again (DFAs don't
 	 * have predicated edges in v4).
 	 */
-	public boolean traversedPredicate; // TODO: don't need
+	//public boolean traversedPredicate; // TODO: don't need
+
+	/** Ignore this config when examining config sets */
+	public boolean resolved;
 
 	/**
 	 * We cannot execute predicates dependent upon local context unless
@@ -109,10 +114,6 @@ public class ATNConfig {
 		this.semanticContext = semanticContext;
 	}
 
-//	public ATNConfig(@NotNull ATNConfig c) {
-//		this(c, c.state, c.context, c.semanticContext);
-//	}
-
     public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
    		this(c, state, c.context, c.semanticContext);
    	}
@@ -131,7 +132,6 @@ public class ATNConfig {
 		this.state = state;
 		this.alt = c.alt;
 		this.context = context;
-		this.traversedPredicate = c.traversedPredicate;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
         this.semanticContext = semanticContext;
 	}
