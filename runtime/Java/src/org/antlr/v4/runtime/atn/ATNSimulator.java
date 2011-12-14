@@ -53,6 +53,8 @@ public abstract class ATNSimulator {
 		this.atn = atn;
 	}
 
+	public abstract void reset();
+
 	public static ATN deserialize(@NotNull char[] data) {
 		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();

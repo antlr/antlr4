@@ -40,4 +40,23 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 	public int uniqueAlt;
 	public IntervalSet conflictingAlts;
 	public boolean hasSemanticContext;
+
+	public ATNConfigSet() { }
+
+	public ATNConfigSet(ATNConfigSet old) {
+		addAll(old);
+		this.uniqueAlt = old.uniqueAlt;
+		this.conflictingAlts = old.conflictingAlts;
+		this.hasSemanticContext = old.hasSemanticContext;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append(super.toString());
+		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
+		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
+		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
+		return buf.toString();
+	}
 }

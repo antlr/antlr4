@@ -28,10 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -48,7 +45,7 @@ import java.util.List;
  *
  *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
  */
-public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
+public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2ParserATNSimulator<Symbol>> {
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
 	/** The RuleContext object for the currently executing rule. This
@@ -82,7 +79,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, ParserAT
 		_errHandler.endErrorCondition(this);
 		_ctx = null;
 		syntaxErrors = 0;
-		ParserATNSimulator<?> interpreter = getInterpreter();
+		ATNSimulator interpreter = getInterpreter();
 		if (interpreter != null) {
 			interpreter.reset();
 		}

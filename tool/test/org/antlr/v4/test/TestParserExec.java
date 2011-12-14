@@ -34,7 +34,6 @@ import org.junit.Test;
  *  the remaining input to match.
  */
 public class TestParserExec extends BaseTest {
-
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -46,6 +45,21 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
 								  "abc 34", false);
 		assertEquals("abc34\n", found);
+	}
+
+	@Test public void testAorB() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : ID {System.out.println(\" alt 1\");}" +
+			"  | INT {System.out.println(\"alt 2\");}" +
+				";\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+								  "34", false);
+		assertEquals("alt 2\n", found);
 	}
 
 	@Test public void testAPlus() throws Exception {

@@ -68,7 +68,7 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
-	public static final boolean TEST_IN_SAME_PROCESS = true;
+	public static final boolean TEST_IN_SAME_PROCESS = false;
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)

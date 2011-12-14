@@ -89,10 +89,13 @@ public class DFAState {
 	public boolean complete; // all alts predict "prediction"
 	public boolean isCtxSensitive;
 
+	// TODO: refactor to subclass?
 	@Nullable
 	public Map<RuleContext, Integer> ctxToPrediction; // used for ctx sensitive parsing
 
-	/** DFA accept states use predicates into situations:
+	public Map<RuleContext, List<PredPrediction>> ctxToPredicates; // used for ctx sensitive parsing
+
+	/** DFA accept states use predicates in two situations:
 	 *  disambiguating and validating predicates. If an accept state
 	 *  predicts more than one alternative, It's ambiguous and we
 	 *  try to resolve with predicates.  Disambiguating predicates
@@ -120,6 +123,8 @@ public class DFAState {
 	 *    | {p}? A
 	 *    | {q}? A
 	 *    ;
+	 *
+	 *  This is used only when isCtxSensitive = false;
 	 */
 	@Nullable
 	public List<PredPrediction> predicates;

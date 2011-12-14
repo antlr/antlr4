@@ -179,28 +179,24 @@ public class ATNConfig {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
 //			else buf.append(state.ruleIndex+":");
 //		}
+		buf.append('(');
 		buf.append(state);
 		if ( showAlt ) {
-            buf.append("|");
+            buf.append(",");
             buf.append(alt);
         }
         if ( context!=null ) {
-            buf.append("|");
+            buf.append(",");
             buf.append(context.toString(recog));
         }
         if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
-            buf.append("|");
+            buf.append(",");
             buf.append(semanticContext);
         }
         if ( reachesIntoOuterContext>0 ) {
-            buf.append("|up=").append(reachesIntoOuterContext);
+            buf.append(",up=").append(reachesIntoOuterContext);
         }
-//		if (isAccept) {
-//			buf.append("|=>"+alt);
-//		}
-//		if ( context.approximated ) {
-//			buf.append("|approx");
-//		}
+		buf.append(')');
 		return buf.toString();
     }
 }
