@@ -74,6 +74,14 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
     }
 
     @Override
+    public void seek(int index) {
+        super.seek(index);
+        while (p < index) {
+            consume();
+        }
+    }
+
+    @Override
     protected CommonToken LB(int k) {
         if ( k==0 || (p-k)<0 ) return null;
 

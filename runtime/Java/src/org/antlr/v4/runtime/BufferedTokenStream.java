@@ -105,7 +105,13 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     }
 
     @Override
-    public void seek(int index) { p = index; }
+    public void seek(int index) {
+        if (p == -1) {
+            setup();
+        }
+
+        p = index;
+    }
 
     @Override
     public int size() { return tokens.size(); }
