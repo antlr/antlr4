@@ -226,7 +226,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, outerContext, greedy);
 				ATNConfigSet fullCtxSet = execATNWithFullContext(s0_closure, input, startIndex, greedy);
 				if ( fullCtxSet.conflictingAlts!=null ) {
-					reportAmbiguity(startIndex, input.index(), fullCtxSet.conflictingAlts, fullCtxSet);
+					reportAmbiguity(dfa, startIndex, input.index(), fullCtxSet.conflictingAlts, fullCtxSet);
 					ctx_alt = fullCtxSet.conflictingAlts.getMinElement();
 				}
 				else {
@@ -356,6 +356,8 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	    conflict
 	    conflict + preds
 
+	 TODO: greedy + those
+
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull SymbolStream<Symbol> input, int startIndex,
@@ -377,7 +379,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		while (true) { // while more work
 			ATNConfigSet reach = computeReachSet(previous, t, greedy);
-			if ( reach.size()==0 ) noViableAlt(input, outerContext, previous, startIndex);
+			if ( reach==null ) throw noViableAlt(input, outerContext, previous, startIndex);
 			D = addDFAEdge(dfa, previous, t, reach); // always adding edge even if to a conflict state
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
@@ -389,9 +391,9 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				D.configset.conflictingAlts = getConflictingAlts(reach);
 				if ( D.configset.conflictingAlts!=null ) {
 					D.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
-					if ( decState.isGreedy ) {
+					if ( greedy ) {
 						if ( outerContext == ParserRuleContext.EMPTY ) {
-							reportAmbiguity(startIndex, input.index(), D.configset.conflictingAlts, D.configset);
+							reportAmbiguity(dfa, startIndex, input.index(), D.configset.conflictingAlts, D.configset);
 							resolveToMinAlt(D, D.configset.conflictingAlts);
 						}
 						else {
@@ -399,7 +401,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 							ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, outerContext, greedy);
 							fullCtxSet = execATNWithFullContext(s0_closure, input, startIndex, greedy);
 							if ( fullCtxSet.conflictingAlts!=null ) {
-								reportAmbiguity(startIndex, input.index(), fullCtxSet.conflictingAlts, fullCtxSet);
+								reportAmbiguity(dfa, startIndex, input.index(), fullCtxSet.conflictingAlts, fullCtxSet);
 								predictedAlt = fullCtxSet.conflictingAlts.getMinElement();
 								resolveToMinAlt(D, fullCtxSet.conflictingAlts);
 							}
@@ -410,15 +412,31 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 						}
 					}
 					else {
-						// if we reached end of rule via exit branch and decision nongreedy, we matched
+						// upon ambiguity for nongreedy, default to exit branch to avoid inf loop
+						// this handles case where we find ambiguity that stops DFA construction
+						// before a config hits rule stop state. Was leaving prediction blank.
 						int exitAlt = 2;
-						ATNConfig cstop = configWithAltAtStopState(reach, exitAlt);
-						if ( cstop!=null ) {
-							if ( debug ) System.out.println("nongreedy at stop state for exit branch");
-		                    return cstop.alt;
-						}
+						D.prediction = exitAlt;
 					}
 				}
+			}
+
+			if ( !greedy ) {
+				int exitAlt = 2;
+				if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(reach, 1) ) {
+					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configset.uniqueAlt+" at "+reach);
+					// reaches end via .* means nothing after.
+					D.isAcceptState = true;
+					D.prediction = predictedAlt = exitAlt;
+				}
+				else {// if we reached end of rule via exit branch and decision nongreedy, we matched
+					if ( configWithAltAtStopState(reach, exitAlt) ) {
+						if ( debug ) System.out.println("nongreedy at stop state for exit branch");
+						D.isAcceptState = true;
+						D.prediction = predictedAlt = exitAlt;
+					}
+				}
+
 			}
 
 			ATNConfigSet configs = D.configset;
@@ -428,7 +446,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				predicateDFAState(D, configs, outerContext, nalts);
 				if ( tooFewPredicates(D, outerContext, nalts) ) {
 					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
-					reportInsufficientPredicates(startIndex, input.index(),
+					reportInsufficientPredicates(dfa, startIndex, input.index(),
 												 conflictingAlts,
 												 getPredsForAmbigAlts(conflictingAlts, configs, nalts),
 												 configs);
@@ -459,6 +477,9 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		int t = input.LA(1);
 		while (true) { // while more work
 			ATNConfigSet reach = computeReachSet(previous, t, greedy);
+			if ( reach==null ) {
+				parser.notifyListeners("ERROR: how can reach be empty after doing no-ctx ATN sim?");
+			}
 			reach.uniqueAlt = getUniqueAlt(reach);
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) return reach;
 			reach.conflictingAlts = getConflictingAlts(reach);
@@ -470,7 +491,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t, boolean greedy) {
-		if ( debug ) System.out.println("in reach starting closure: " + closure);
+		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
 		ATNConfigSet reach = new ATNConfigSet();
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
@@ -484,6 +505,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				}
 			}
 		}
+		if ( reach.size()==0 ) return null;
 		return reach;
 	}
 
@@ -651,6 +673,13 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		if ( !closureBusy.add(config) ) return; // avoid infinite recursion
 
 		if ( config.state instanceof RuleStopState ) {
+			if ( !greedy ) {
+				// don't see past end of a rule for any nongreedy decision
+				if ( debug ) System.out.println("NONGREEDY at stop state of "+
+												getRuleName(config.state.ruleIndex));
+				configs.add(config);
+				return;
+			}
 			// We hit rule end. If we have context info, use it
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				RuleContext newContext = config.context.parent; // "pop" invoking state
@@ -667,13 +696,13 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 			}
 			else {
 				// else if we have no context info, just chase follow links (if greedy)
-				if ( !greedy ) {
-					if ( debug ) System.out.println("NONGREEDY at stop state of "+
-													getRuleName(config.state.ruleIndex));
-					// don't purse past end of a rule for any nongreedy decision
-					configs.add(config);
-					return;
-				}
+//				if ( !greedy ) {
+//					if ( debug ) System.out.println("NONGREEDY at stop state of "+
+//													getRuleName(config.state.ruleIndex));
+//					// don't purse past end of a rule for any nongreedy decision
+//					configs.add(config);
+//					return;
+//				}
 				if ( debug ) System.out.println("FALLING off rule "+
 												getRuleName(config.state.ruleIndex));
 			}
@@ -1080,17 +1109,16 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
+	public boolean configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
 		for (ATNConfig c : configs) {
 			if ( c.alt == alt ) {
 				if ( c.state.getClass() == RuleStopState.class ) {
-					return c;
+					return true;
 				}
 			}
 		}
-		return null;
+		return false;
 	}
-
 
 	protected DFAState addDFAEdge(@NotNull DFA dfa,
 								  @NotNull ATNConfigSet p,
@@ -1149,7 +1177,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    public void reportAmbiguity(int startIndex, int stopIndex,
+    public void reportAmbiguity(@NotNull DFA dfa, int startIndex, int stopIndex,
                                 @NotNull IntervalSet ambigAlts,
                                 @NotNull ATNConfigSet configs)
     {
@@ -1158,11 +1186,11 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
                                ambigAlts+":"+configs+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, startIndex, stopIndex,
+        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);
     }
 
-    public void reportInsufficientPredicates(int startIndex, int stopIndex,
+    public void reportInsufficientPredicates(@NotNull DFA dfa, int startIndex, int stopIndex,
                                              @NotNull IntervalSet ambigAlts,
                                              @NotNull SemanticContext[] altToPred,
                                              @NotNull ATNConfigSet configs)
@@ -1173,7 +1201,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
                                parser.getInputString(startIndex, stopIndex));
         }
         if ( parser!=null ) {
-            parser.getErrorHandler().reportInsufficientPredicates(parser, startIndex, stopIndex, ambigAlts,
+            parser.getErrorHandler().reportInsufficientPredicates(parser, dfa, startIndex, stopIndex, ambigAlts,
                                                                   altToPred, configs);
         }
     }

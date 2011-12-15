@@ -120,8 +120,8 @@ public interface ANTLRErrorStrategy<Symbol> {
      * full context.
      */
     void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
-                         int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                         @NotNull OrderedHashSet<ATNConfig> configs);
+						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+						 @NotNull OrderedHashSet<ATNConfig> configs);
 
     /** Called by the parser when it detects an input sequence that can be matched by two paths
      *  through the grammar. The difference between this and the reportAmbiguity method lies in
@@ -129,9 +129,9 @@ public interface ANTLRErrorStrategy<Symbol> {
      *  we can't be sure if a conflict is an ambiguity or simply a weakness in the Strong LL parsing
      *  strategy. If we are parsing with full context, this method is never called.
      */
-    void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
-                        int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                        @NotNull OrderedHashSet<ATNConfig> configs);
+//    void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
+//                        int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+//                        @NotNull OrderedHashSet<ATNConfig> configs);
 
     /** Called by the parser when it find a conflict that is resolved by retrying the parse
      *  with full context. This is not a warning; it simply notifies you that your grammar
@@ -149,6 +149,7 @@ public interface ANTLRErrorStrategy<Symbol> {
      *  if the predicates fail.
      */
     void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+									  @NotNull DFA dfa,
                                       int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
                                       @NotNull SemanticContext[] altToPred,
                                       @NotNull OrderedHashSet<ATNConfig> configs);

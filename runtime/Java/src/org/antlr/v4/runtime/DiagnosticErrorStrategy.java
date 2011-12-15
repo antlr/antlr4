@@ -41,17 +41,10 @@ import java.util.Arrays;
 public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol> {
     @Override
     public void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
-                                int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                                @NotNull OrderedHashSet<ATNConfig> configs)
+								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+								@NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportAmbiguity " + ambigAlts + ":" + configs + ", input=" +
-                                   recognizer.getInputString(startIndex, stopIndex));
-    }
-
-    @Override
-    public void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
-                               int startIndex, int stopIndex, IntervalSet ambigAlts, OrderedHashSet<ATNConfig> configs) {
-        recognizer.notifyListeners("reportConflict " + ambigAlts + ":" + configs + ", input=" +
+        recognizer.notifyListeners("reportAmbiguity d="+dfa.decision + ": "+ ambigAlts + ":" + configs + ", input=" +
                                    recognizer.getInputString(startIndex, stopIndex));
     }
 
@@ -59,17 +52,18 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
     public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportContextSensitivity: " + configs + ", input=" +
+        recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input=" +
                                    recognizer.getInputString(startIndex, stopIndex));
     }
 
     @Override
     public void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+											 @NotNull DFA dfa,
                                              int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
                                              @NotNull SemanticContext[] altToPred,
                                              @NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportInsufficientPredicates " + ambigAlts + ":" + Arrays.toString(altToPred) +
+        recognizer.notifyListeners("reportInsufficientPredicates d="+dfa.decision +": " +ambigAlts + ":" + Arrays.toString(altToPred) +
                                    ", " + configs + ", input=" + recognizer.getInputString(startIndex, stopIndex));
     }
 }

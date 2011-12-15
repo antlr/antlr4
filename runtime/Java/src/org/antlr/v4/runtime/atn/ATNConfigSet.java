@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
  */
 public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
+	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
 	public IntervalSet conflictingAlts;
 	public boolean hasSemanticContext;

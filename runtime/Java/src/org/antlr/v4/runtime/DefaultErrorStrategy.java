@@ -192,7 +192,8 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 		SymbolStream<Symbol> tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream) {
-			input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);
+			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
+			else input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);
 		} else {
 			input = "<unknown input>";
 		}
@@ -556,15 +557,8 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 
     @Override
     public void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
-                                int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                                @NotNull OrderedHashSet<ATNConfig> configs)
-    {
-    }
-
-    @Override
-    public void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
-                               int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                               @NotNull OrderedHashSet<ATNConfig> configs)
+								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+								@NotNull OrderedHashSet<ATNConfig> configs)
     {
     }
 
@@ -576,6 +570,7 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
 
     @Override
     public void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+											 @NotNull DFA dfa,
                                              int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
                                              @NotNull SemanticContext[] altToPred,
                                              @NotNull OrderedHashSet<ATNConfig> configs)

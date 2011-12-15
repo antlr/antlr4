@@ -536,7 +536,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                 if ( retry_debug ) System.out.println("ctx empty; no need to retry");
                 // no point in retrying with ctx since it's same.
                 // this implies that we have a true ambiguity
-                reportAmbiguity(startIndex, input.index(), ambigAlts, reach);
+                reportAmbiguity(dfa, startIndex, input.index(), ambigAlts, reach);
                 resolveToProperAlt(decState, ambigAlts, reach);
                 return ATN.INVALID_ALT_NUMBER;
             }
@@ -547,7 +547,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
         }
 
         dfa.conflictSet = (OrderedHashSet<ATNConfig>)reach.clone(); // most recent set with conflict
-        reportConflict(startIndex, input.index(), ambigAlts, reach);
+//        reportConflict(startIndex, input.index(), ambigAlts, reach);
         resolveToProperAlt(decState, ambigAlts, reach);
         return ATN.INVALID_ALT_NUMBER;
     }
@@ -595,7 +595,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
     {
         // We need at least n-1 predicates for n ambiguous alts
         if ( tooFewPredicates(altToPred) ) {
-            reportInsufficientPredicates(startIndex, input.index(),
+            reportInsufficientPredicates(dfa, startIndex, input.index(),
                                          ambigAlts, altToPred, reach);
         }
         List<DFAState.PredPrediction> predPredictions =	getPredicatePredictions(ambigAlts, altToPred);
@@ -776,7 +776,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
         if ( ctx_dfa.conflictSet!=null ) {
 //			System.out.println("retry gives ambig for "+input.toString(startIndex, input.index()));
-            reportAmbiguity(startIndex, input.index(), getAmbiguousAlts(ctx_dfa.conflictSet), ctx_dfa.conflictSet);
+            reportAmbiguity(dfa, startIndex, input.index(), getAmbiguousAlts(ctx_dfa.conflictSet), ctx_dfa.conflictSet);
         }
         else {
 //			System.out.println("NO ambig for "+input.toString(startIndex, input.index()));
@@ -1006,16 +1006,16 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	public void reportConflict(int startIndex, int stopIndex,
-							   @NotNull IntervalSet alts,
-							   @NotNull OrderedHashSet<ATNConfig> configs)
-	{
-		if ( debug || retry_debug ) {
-			System.out.println("reportConflict "+alts+":"+configs+
-							   ", input="+parser.getInputString(startIndex, stopIndex));
-		}
-		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
-	}
+//	public void reportConflict(int startIndex, int stopIndex,
+//							   @NotNull IntervalSet alts,
+//							   @NotNull OrderedHashSet<ATNConfig> configs)
+//	{
+//		if ( debug || retry_debug ) {
+//			System.out.println("reportConflict "+alts+":"+configs+
+//							   ", input="+parser.getInputString(startIndex, stopIndex));
+//		}
+//		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
+//	}
 
 	public void reportContextSensitivity(DFA dfa, OrderedHashSet<ATNConfig> configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
@@ -1026,7 +1026,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    public void reportAmbiguity(int startIndex, int stopIndex,
+    public void reportAmbiguity(@NotNull DFA dfa, int startIndex, int stopIndex,
                                 @NotNull IntervalSet ambigAlts,
                                 @NotNull OrderedHashSet<ATNConfig> configs)
     {
@@ -1035,11 +1035,11 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                                ambigAlts+":"+configs+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, startIndex, stopIndex,
+        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);
     }
 
-    public void reportInsufficientPredicates(int startIndex, int stopIndex,
+    public void reportInsufficientPredicates(@NotNull DFA dfa, int startIndex, int stopIndex,
                                              @NotNull IntervalSet ambigAlts,
                                              @NotNull SemanticContext[] altToPred,
                                              @NotNull OrderedHashSet<ATNConfig> configs)
@@ -1050,7 +1050,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
                                parser.getInputString(startIndex, stopIndex));
         }
         if ( parser!=null ) {
-            parser.getErrorHandler().reportInsufficientPredicates(parser, startIndex, stopIndex, ambigAlts,
+            parser.getErrorHandler().reportInsufficientPredicates(parser, dfa, startIndex, stopIndex, ambigAlts,
                                                                   altToPred, configs);
         }
     }

@@ -155,8 +155,8 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 1\n" +
 			"alt 1\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:0 reportAmbiguity {1..3}:[(6,1,[]), (6,2,[]), (6,3,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={1..3}, input=x\n" +
-					 "line 1:0 reportInsufficientPredicates {1..3}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [(6,1,[],up=1), (1,1,[],up=1), (6,2,[],up=1), (1,2,[],up=1), (6,3,[],{1:0}?,up=1), (1,3,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={1..3}, input=x\n",
+        assertEquals("line 1:0 reportAmbiguity d=0: {1..3}:[(6,1,[]), (6,2,[]), (6,3,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={1..3}, input=x\n" +
+					 "line 1:0 reportInsufficientPredicates d=0: {1..3}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [(6,1,[],up=1), (1,1,[],up=1), (6,2,[],up=1), (1,2,[],up=1), (6,3,[],{1:0}?,up=1), (1,3,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={1..3}, input=x\n",
                      this.stderrDuringParse);
 	}
 
@@ -187,8 +187,8 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 2\n" +
 			"alt 2\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:4 reportAmbiguity {2..4}:[(10,2,[]), (10,3,[]), (10,4,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={2..4}, input=x\n" +
-					 "line 1:4 reportInsufficientPredicates {2..4}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [(6,2,[],up=1), (10,2,[],up=1), (1,2,[],up=1), (6,3,[],up=1), (10,3,[],up=1), (1,3,[],up=1), (6,4,[],{1:0}?,up=1), (10,4,[],{1:0}?,up=1), (1,4,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={2..4}, input=x\n",
+        assertEquals("line 1:4 reportAmbiguity d=0: {2..4}:[(10,2,[]), (10,3,[]), (10,4,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={2..4}, input=x\n" +
+					 "line 1:4 reportInsufficientPredicates d=0: {2..4}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [(6,2,[],up=1), (10,2,[],up=1), (1,2,[],up=1), (6,3,[],up=1), (10,3,[],up=1), (1,3,[],up=1), (6,4,[],{1:0}?,up=1), (10,4,[],{1:0}?,up=1), (1,4,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={2..4}, input=x\n",
                      this.stderrDuringParse);
 	}
 
