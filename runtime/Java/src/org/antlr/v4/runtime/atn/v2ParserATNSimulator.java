@@ -92,6 +92,61 @@ import java.util.*;
  in a "full context mode" parameter so that it knows to report
  conflicts differently. It also knows not to do a retry, to avoid
  infinite recursion, if it is already using full context.
+
+ Retry a simulation using full outer context.
+	 *
+	 *  One of the key assumptions here is that using full context
+	 *  can use at most the same amount of input as a simulation
+	 *  that is not useful context (i.e., it uses all possible contexts
+	 *  that could invoke our entry rule. I believe that this is true
+	 *  and the proof might go like this.
+	 *
+	 *  THEOREM:  The amount of input consumed during a full context
+	 *  simulation is at most the amount of input consumed during a
+	 *  non full context simulation.
+	 *
+	 *  PROOF: Let D be the DFA state at which non-context simulation
+	 *  terminated. That means that D does not have a configuration for
+	 *  which we can legally pursue more input. (It is legal to work only
+	 *  on configurations for which there is no conflict with another
+	 *  configuration.) Now we restrict ourselves to following ATN edges
+	 *  associated with a single context. Choose any DFA state D' along
+	 *  the path (same input) to D. That state has either the same number
+	 *  of configurations or fewer. (If the number of configurations is
+	 *  the same, then we have degenerated to the non-context case.) Now
+	 *  imagine that we restrict to following edges associated with
+	 *  another single context and that we reach DFA state D'' for the
+	 *  same amount of input as D'. The non-context simulation merges D'
+	 *  and D''. The union of the configuration sets either has the same
+	 *  number of configurations as both D' and D'' or it has more. If it
+	 *  has the same number, we are no worse off and the merge does not
+	 *  force us to look for more input than we would otherwise have to
+	 *  do. If the union has more configurations, it can introduce
+	 *  conflicts but not new alternatives--we cannot conjure up alternatives
+	 *  by computing closure on the DFA state.  Here are the cases for
+	 *  D' union D'':
+	 *
+	 *  1. No increase in configurations, D' = D''
+	 *  2. Add configuration that introduces a new alternative number.
+	 *     This cannot happen because no new alternatives are introduced
+	 *     while computing closure, even during start state computation.
+	 *  3. D'' adds a configuration that does not conflict with any
+	 *     configuration in D'.  Simulating without context would then have
+	 *     forced us to use more lookahead than D' (full context) alone.
+	 *  3. D'' adds a configuration that introduces a conflict with a
+	 *     configuration in D'. There are 2 cases:
+	 *     a. The conflict does not cause termination (D' union D''
+	 *        is added to the work list). Again no context simulation requires
+	 *        more input.
+	 *     b. The conflict does cause termination, but this cannot happen.
+	 *        By definition, we know that with ALL contexts merged we
+	 *        don't terminate until D and D' uses less input than D. Therefore
+	 *        no context simulation requires more input than full context
+	 *        simulation.
+	 *
+	 *  We have covered all the cases and there is never a situation where
+	 *  a single, full context simulation requires more input than a
+	 *  no context simulation.
  */
 public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static boolean debug = false;
