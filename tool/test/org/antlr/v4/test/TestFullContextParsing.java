@@ -75,7 +75,7 @@ public class TestFullContextParsing extends BaseTest {
 		String expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->:s2@{[18 10]=1}\n";
+			"s1-ID->s2^\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:2 reportContextSensitivity d=1: [(20,1,[10])],uniqueAlt=1, input=34\n",
 					 this.stderrDuringParse);
@@ -85,7 +85,7 @@ public class TestFullContextParsing extends BaseTest {
 		expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->:s2@{[22 14]=2}\n";
+			"s1-ID->s2^\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportContextSensitivity d=1: [(1,2,[])],uniqueAlt=2, input=34abc\n",
 					 this.stderrDuringParse);
@@ -112,7 +112,7 @@ public class TestFullContextParsing extends BaseTest {
 			"\n" +
 			"Decision 2:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->:s2@{[20 10]=1, [24 14]=2}\n";
+			"s1-ID->s2^\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:2 reportContextSensitivity d=2: [(22,1,[10])],uniqueAlt=1, input=34\n" +
 					 "line 1:14 reportContextSensitivity d=2: [(8,2,[]), (12,2,[]), (1,2,[])],uniqueAlt=2, input=34abc\n",
@@ -126,13 +126,12 @@ public class TestFullContextParsing extends BaseTest {
 			"@after {dumpDFA();}\n" +
 			"    : '{' stat* '}'" +
 			"    ;\n" +
-			"stat: 'if' ID 'then' stat ('else' stat)?\n" +
-			"    | 'break'\n" +
+			"stat: 'if' ID 'then' stat ('else' 'foo')?\n" +
 			"    | 'return'\n" +
 			"    ;" +
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
-		String input = "{ if x then break }";
+		String input = "{ if x then return }";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								   input, true);
 		String expecting =
@@ -146,7 +145,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals(null, this.stderrDuringParse);
 
 		input =
-			"{ if x then if y then break else break }";
+			"{ if x then if y then return else foo }";
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
@@ -158,10 +157,10 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'else'->:s1=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:39 reportAmbiguity d=1: {1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input=elsebreak}\n",
+		assertEquals("line 1:29 reportAmbiguity d=1: {1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2}, input=else\n",
 					 this.stderrDuringParse);
 
-		input = "{ if x then break else return }";
+		input = "{ if x then return else foo }";
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
@@ -170,12 +169,18 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'}'->:s2=>2\n" +
 			"\n" +
 			"Decision 1:\n" +
-			"s0-'else'->:s1@{[6]=1}\n";
+			"s0-'else'->:s1=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:18 reportContextSensitivity d=1: [(15,1,[25 6]), (29,1,[25 6]), (31,1,[25 6])],uniqueAlt=1, input=else\n",
+		// Technically, this input sequence is not ambiguous because else
+		// uniquely predicts going into the optional subrule. else cannot
+		// be matched by exiting stat since that would only match '}' or
+		// the start of a stat. But, we are using the theory that
+		// SLL(1)=LL(1) and so we are avoiding full context parsing
+		// by declaring all else clause parsing to be ambiguous.
+		assertEquals("line 1:19 reportAmbiguity d=1: {1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2}, input=else\n",
 					 this.stderrDuringParse);
 
-		input = "{ if x then break else return }";
+		input = "{ if x then return else foo }";
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
@@ -184,32 +189,14 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'}'->:s2=>2\n" +
 			"\n" +
 			"Decision 1:\n" +
-			"s0-'else'->:s1@{[6]=1}\n";
+			"s0-'else'->:s1=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:18 reportContextSensitivity d=1: [(15,1,[25 6]), (29,1,[25 6]), (31,1,[25 6])],uniqueAlt=1, input=else\n",
-					 this.stderrDuringParse);
-
-		input =
-			"{ if x then break else return\n" +
-			"if x then if y then break else return }";
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
-							input, true);
-		expecting =
-			"Decision 0:\n" +
-			"s0-'if'->:s1=>1\n" +
-			"s0-'}'->:s2=>2\n" +
-			"\n" +
-			"Decision 1:\n" +
-			"s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
-			"s0-'}'->:s2=>2\n";
-		assertEquals(expecting, result);
-		assertEquals("line 1:18 reportContextSensitivity d=1: [(15,1,[25 6]), (29,1,[25 6]), (31,1,[25 6])],uniqueAlt=1, input=else\n" +
-					 "line 2:38 reportAmbiguity d=1: {1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input=elsereturn}\n",
+		assertEquals("line 1:19 reportAmbiguity d=1: {1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2}, input=else\n",
 					 this.stderrDuringParse);
 
 		input =
-			"{ if x then break else return\n" +
-			"if x then if y then break else return }";
+			"{ if x then return else foo\n" +
+			"if x then if y then return else foo }";
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
@@ -218,11 +205,27 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'}'->:s2=>2\n" +
 			"\n" +
 			"Decision 1:\n" +
-			"s0-'else'->:s1@{[6]=1, [21 6]=1}\n" +
+			"s0-'else'->:s1=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:18 reportContextSensitivity d=1: [(15,1,[25 6]), (29,1,[25 6]), (31,1,[25 6])],uniqueAlt=1, input=else\n" +
-					 "line 2:38 reportAmbiguity d=1: {1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input=elsereturn}\n",
+		assertEquals("line 1:19 reportAmbiguity d=1: {1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2}, input=else\n",
+					 this.stderrDuringParse);
+
+		input =
+			"{ if x then return else foo\n" +
+			"if x then if y then return else foo }";
+		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+							input, true);
+		expecting =
+			"Decision 0:\n" +
+				"s0-'if'->:s1=>1\n" +
+				"s0-'}'->:s2=>2\n" +
+				"\n" +
+				"Decision 1:\n" +
+				"s0-'else'->:s1=>1\n" +
+				"s0-'}'->:s2=>2\n";
+		assertEquals(expecting, result);
+		assertEquals("line 1:19 reportAmbiguity d=1: {1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2}, input=else\n",
 					 this.stderrDuringParse);
 	}
 

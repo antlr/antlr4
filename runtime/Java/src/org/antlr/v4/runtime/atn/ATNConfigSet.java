@@ -41,6 +41,7 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 	public int uniqueAlt;
 	public IntervalSet conflictingAlts;
 	public boolean hasSemanticContext;
+	public boolean dipsIntoOuterContext;
 
 	public ATNConfigSet() { }
 
@@ -49,6 +50,7 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 		this.uniqueAlt = old.uniqueAlt;
 		this.conflictingAlts = old.conflictingAlts;
 		this.hasSemanticContext = old.hasSemanticContext;
+		this.dipsIntoOuterContext = old.dipsIntoOuterContext;
 	}
 
 	@Override
@@ -58,6 +60,7 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
+		if ( dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
 		return buf.toString();
 	}
 }

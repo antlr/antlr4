@@ -32,7 +32,7 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ASTNodeStream;
+import org.antlr.v4.runtime.tree.BufferedASTNodeStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
@@ -176,8 +176,8 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
         if ( input instanceof TokenStream ) {
             return ((TokenStream)input).toString(start,stop);
         }
-        else if ( input instanceof ASTNodeStream) {
-            return ((ASTNodeStream<Symbol>)input).toString(input.get(start),input.get(stop));
+        else if ( input instanceof BufferedASTNodeStream ) {
+            return ((BufferedASTNodeStream<Symbol>)input).toString(input.get(start),input.get(stop));
         }
         return "n/a";
     }

@@ -89,8 +89,8 @@ public class DFASerializer {
                 stateStr = ":s"+n+"=>"+s.prediction;
             }
 		}
-		if ( s.isCtxSensitive ) {
-			stateStr = ":s"+n+"@"+s.ctxToPrediction;
+		else if ( s.isCtxSensitive ) {
+			stateStr = "s"+n+"^";
 		}
 		return stateStr;
 	}
