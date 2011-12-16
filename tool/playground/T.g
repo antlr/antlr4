@@ -1,10 +1,8 @@
 grammar T;
-s : ( .* (tag {System.out.println($tag.text);} |header) )* EOF;
-tag : '<' .+ '>'  ;
-header : 'x' 'y' ;
-EQ : '=' ;
-COMMA : ',' ;
-ID : 'a'..'z'+ ;
-STR : '"' (options {greedy=false;}:.)* '"' ;
-INT : '0'..'9'+;
-WS : (' '|'\n') {skip();} ;
+s@after {dumpDFA();}
+    : '{' stat* '}'    ;
+stat: 'if' ID 'then' stat ('else' stat)?
+    | 'break'
+    | 'return'
+    ;ID : 'a'..'z'+ ;
+WS : (' '|'\t'|'\n')+ {skip();} ;

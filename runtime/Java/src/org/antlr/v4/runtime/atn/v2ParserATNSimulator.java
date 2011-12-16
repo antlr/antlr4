@@ -149,9 +149,9 @@ import java.util.*;
 	 *  no context simulation.
  */
 public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
-	public static boolean debug = false;
-	public static boolean dfa_debug = false;
-	public static boolean retry_debug = false;
+	public static boolean debug = true;
+	public static boolean dfa_debug = true;
+	public static boolean retry_debug = true;
 
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
@@ -453,8 +453,13 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 						}
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
+							int old_k = input.index();
 							ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, outerContext, greedy);
 							fullCtxSet = execATNWithFullContext(s0_closure, input, startIndex, greedy);
+							if ( old_k != input.index() ) {
+								parser.notifyListeners("used diff amount of k; old="+(old_k-startIndex+1)+
+																	  ", new="+(input.index()-startIndex+1));
+							}
 							if ( fullCtxSet.conflictingAlts!=null ) {
 								reportAmbiguity(dfa, startIndex, input.index(), fullCtxSet.conflictingAlts, fullCtxSet);
 								predictedAlt = fullCtxSet.conflictingAlts.getMinElement();
@@ -462,6 +467,11 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 							}
 							else {
 								D.isCtxSensitive = true;
+								predictedAlt = fullCtxSet.uniqueAlt;
+								if ( D.ctxToPrediction==null ) {
+									D.ctxToPrediction = new LinkedHashMap<RuleContext, Integer>();
+								}
+								D.ctxToPrediction.put(outerContext, predictedAlt);
 								reportContextSensitivity(dfa, fullCtxSet, startIndex, input.index());
 							}
 						}
