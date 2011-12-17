@@ -599,6 +599,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 											   int nalts,
 											   boolean greedy)
 	{
+		retry_with_context++;
 		if ( debug ) System.out.println("execATNWithFullContext "+s0+", greedy="+greedy);
 		ATNConfigSet reach = null;
 		ATNConfigSet previous = s0;
@@ -619,6 +620,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
+			retry_with_context_indicates_no_conflict++;
 			reportContextSensitivity(dfa, reach, startIndex, input.index());
 			return reach;
 		}
