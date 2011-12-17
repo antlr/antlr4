@@ -115,7 +115,7 @@ public class DOTGenerator {
 		if ( s.isAcceptState ) {
 			buf.append("=>"+s.prediction);
 		}
-		if ( grammar.tool.verbose_dfa ) {
+		if ( grammar!=null && grammar.tool.verbose_dfa ) {
 			Set<Integer> alts = s.getAltSet();
 			if ( alts!=null ) {
 				buf.append("\\n");
