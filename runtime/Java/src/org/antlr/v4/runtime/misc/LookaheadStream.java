@@ -150,7 +150,8 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
         }
 
         if (index > currentElementIndex) {
-            for (int i = 0; i < currentElementIndex - index; i++) {
+            int startElementIndex = currentElementIndex;
+            for (int i = 0; i < index - startElementIndex; i++) {
                 consume();
             }
         }
