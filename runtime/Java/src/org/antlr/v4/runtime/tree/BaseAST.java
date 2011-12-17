@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import java.io.IOException;
@@ -256,6 +257,7 @@ public abstract class BaseAST implements AST {
     /** Return a list of all ancestors of this node.  The first node of
      *  list is the root and the last is the parent of this node.
      */
+    @NotNull
     public List<? extends Tree> getAncestors() { return Trees.getAncestors(this); }
 
 	public void inspect(BaseRecognizer<?> parser) {

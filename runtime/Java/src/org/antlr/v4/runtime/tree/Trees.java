@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
 
 import java.io.*;
@@ -132,8 +133,9 @@ public class Trees {
 	/** Return a list of all ancestors of this node.  The first node of
 	 *  list is the root and the last is the parent of this node.
 	 */
-	public static List<? extends Tree> getAncestors(Tree t) {
-		if ( t.getParent()==null ) return null;
+	@NotNull
+	public static List<? extends Tree> getAncestors(@NotNull Tree t) {
+		if ( t.getParent()==null ) return Collections.emptyList();
 		List<Tree> ancestors = new ArrayList<Tree>();
 		t = t.getParent();
 		while ( t!=null ) {
