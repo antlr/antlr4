@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,7 @@ public abstract class ATNSimulator {
 	public final ATN atn;
 
 	static {
-		ERROR = new DFAState(new OrderedHashSet<ATNConfig>());
+		ERROR = new DFAState(new ATNConfigSet());
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 

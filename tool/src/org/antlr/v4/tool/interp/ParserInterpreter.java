@@ -32,7 +32,6 @@ package org.antlr.v4.tool.interp;
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.v2ParserATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -88,7 +87,8 @@ public class ParserInterpreter {
 	public int matchATN(@NotNull TokenStream input,
 						@NotNull ATNState startState)
 	{
-		return new ParserATNSimulator<Token>(new DummyParser(g, input), g.atn).matchATN(input, startState);
+//		return new v2ParserATNSimulator<Token>(new DummyParser(g, input), g.atn).matchATN(input, startState);
+		return 0;
 	}
 
 	public v2ParserATNSimulator<Token> getATNSimulator() {

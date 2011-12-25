@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Assert;
 import org.junit.Test;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
 import java.io.*;
 import java.lang.reflect.Constructor;

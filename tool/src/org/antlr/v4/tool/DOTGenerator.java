@@ -123,7 +123,7 @@ public class DOTGenerator {
 				List<Integer> altList = new ArrayList<Integer>();
 				altList.addAll(alts);
 				Collections.sort(altList);
-				Set<ATNConfig> configurations = s.configs;
+				Set<ATNConfig> configurations = s.configset;
 				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
 					int alt = altList.get(altIndex);
 					if ( altIndex>0 ) {

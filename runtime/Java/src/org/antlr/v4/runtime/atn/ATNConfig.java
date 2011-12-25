@@ -67,7 +67,7 @@ public class ATNConfig {
 	//public boolean traversedPredicate; // TODO: don't need
 
 	/** Ignore this config when examining config sets */
-	public boolean resolved;
+//	public boolean resolved;
 
 	/**
 	 * We cannot execute predicates dependent upon local context unless

@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -184,7 +183,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.format("mode %d start: %s\n", mode, startState);
 		}
 
-		OrderedHashSet<ATNConfig> s0_closure = computeStartState(input, startState);
+		ATNConfigSet s0_closure = computeStartState(input, startState);
 		int old_mode = mode;
 		dfa[mode].s0 = addDFAState(s0_closure);
 		int predict = exec(input, s0_closure);
@@ -257,7 +256,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				return Token.EOF;
 			}
 			if ( atnException!=null ) throw atnException;
-			throw new LexerNoViableAltException(recog, input, startIndex, s.configs);
+			throw new LexerNoViableAltException(recog, input, startIndex, s.configset);
 		}
 
 		int ruleIndex = dfaPrevAccept.state.ruleIndex;
@@ -266,17 +265,17 @@ public class LexerATNSimulator extends ATNSimulator {
 		return dfaPrevAccept.state.prediction;
 	}
 
-	protected int exec(@NotNull CharStream input, @NotNull OrderedHashSet<ATNConfig> s0) {
+	protected int exec(@NotNull CharStream input, @NotNull ATNConfigSet s0) {
 		//System.out.println("enter exec index "+input.index()+" from "+s0);
 		@NotNull
-		OrderedHashSet<ATNConfig> closure = new OrderedHashSet<ATNConfig>();
+		ATNConfigSet closure = new ATNConfigSet();
 		closure.addAll(s0);
 		if ( debug ) {
 			System.out.format("start state closure=%s\n", closure);
 		}
 
 		@NotNull
-		OrderedHashSet<ATNConfig> reach = new OrderedHashSet<ATNConfig>();
+		ATNConfigSet reach = new ATNConfigSet();
 		atnPrevAccept.reset();
 
 		traceLookahead1();
@@ -327,7 +326,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			// swap to avoid reallocating space
 			// TODO: faster to reallocate?
 			@NotNull
-			OrderedHashSet<ATNConfig> tmp = reach;
+			ATNConfigSet tmp = reach;
 			reach = closure;
 			closure = tmp;
 			reach.clear();
@@ -347,7 +346,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		return atn.ruleToTokenType[ruleIndex];
 	}
 
-	protected void processAcceptStates(@NotNull CharStream input, @NotNull OrderedHashSet<ATNConfig> reach) {
+	protected void processAcceptStates(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
 		for (int ci=0; ci<reach.size(); ci++) {
 			ATNConfig c = reach.get(ci);
 			if ( c.state instanceof RuleStopState) {
@@ -435,7 +434,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	public void deleteWildcardConfigsForAlt(@NotNull OrderedHashSet<ATNConfig> closure, int ci, int alt) {
+	public void deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
 		int j=ci+1;
 		while ( j<closure.size() ) {
 			ATNConfig c = closure.get(j);
@@ -453,11 +452,11 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected OrderedHashSet<ATNConfig> computeStartState(@NotNull IntStream input,
+	protected ATNConfigSet computeStartState(@NotNull IntStream input,
 														  @NotNull ATNState p)
 	{
 		RuleContext initialContext = EMPTY_LEXER_RULE_CONTEXT;
-		OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
+		ATNConfigSet configs = new ATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
@@ -466,7 +465,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		return configs;
 	}
 
-	protected void closure(@NotNull ATNConfig config, @NotNull OrderedHashSet<ATNConfig> configs) {
+	protected void closure(@NotNull ATNConfig config, @NotNull ATNConfigSet configs) {
 		if ( debug ) {
 			System.out.println("closure("+config.toString(recog, true)+")");
 		}
@@ -545,10 +544,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) {
 			System.out.format("no edge for %s\n", getTokenName(input.LA(1)));
 			System.out.format("ATN exec upon %s at DFA state %d = %s\n",
-							  input.substring(startIndex, input.index()), s.stateNumber, s.configs);
+							  input.substring(startIndex, input.index()), s.stateNumber, s.configset);
 		}
 
-		int ttype = exec(input, s.configs);
+		int ttype = exec(input, s.configset);
 
 		if ( dfa_debug ) {
 			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",
@@ -567,9 +566,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		state.charPos = charPositionInLine;
 	}
 
-	protected void addDFAEdge(@NotNull OrderedHashSet<ATNConfig> p,
+	protected void addDFAEdge(@NotNull ATNConfigSet p,
 							  int t,
-							  @NotNull OrderedHashSet<ATNConfig> q)
+							  @NotNull ATNConfigSet q)
 	{
 		// even if we can add the states, we can't add an edge for labels out of range
 		if (t < 0 || t > NUM_EDGES) {
@@ -626,7 +625,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		test them, we cannot cash the DFA state target of ID.
 	 */
 	@Nullable
-	protected DFAState addDFAState(@NotNull OrderedHashSet<ATNConfig> configs) {
+	protected DFAState addDFAState(@NotNull ATNConfigSet configs) {
 		DFAState proposed = new DFAState(configs);
 		DFAState existing = dfa[mode].states.get(proposed);
 		if ( existing!=null ) return existing;
@@ -653,8 +652,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( traversedPredicate ) return null; // cannot cache
 
 		newState.stateNumber = dfa[mode].states.size();
-		newState.configs = new OrderedHashSet<ATNConfig>();
-		newState.configs.addAll(configs);
+		newState.configset = new ATNConfigSet();
+		newState.configset.addAll(configs);
 		dfa[mode].states.put(newState, newState);
 		return newState;
 	}

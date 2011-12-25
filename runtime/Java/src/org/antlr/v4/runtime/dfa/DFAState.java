@@ -29,16 +29,13 @@
 
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /** A DFA state represents a set of possible ATN configurations.
@@ -69,8 +66,8 @@ public class DFAState {
 	public int stateNumber = -1;
 
 	/** The set of ATN configurations (state,alt,context) for this DFA state */
-	@Nullable
-	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
+//	@Nullable
+//	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 
 	// TODO: rename to configs after flipping to new ATN sim
 	public ATNConfigSet configset = new ATNConfigSet();
@@ -88,12 +85,6 @@ public class DFAState {
 	// todo: rename as unique?
 	public boolean complete; // all alts predict "prediction"
 	public boolean isCtxSensitive;
-
-	// TODO: refactor to subclass?
-	@Nullable
-	public Map<RuleContext, Integer> ctxToPrediction; // used for ctx sensitive parsing
-
-	public Map<RuleContext, List<PredPrediction>> ctxToPredicates; // used for ctx sensitive parsing
 
 	/** DFA accept states use predicates in two situations:
 	 *  disambiguating and validating predicates. If an accept state
@@ -147,7 +138,7 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(OrderedHashSet<ATNConfig> configs) { this.configs = configs; }
+	public DFAState(ATNConfigSet configs) { this.configset = configs; }
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
@@ -155,7 +146,7 @@ public class DFAState {
 	public Set<Integer> getAltSet() {
 		// TODO (sam): what to do when configs==null?
 		Set<Integer> alts = new HashSet<Integer>();
-		for (ATNConfig c : configs) {
+		for (ATNConfig c : configset) {
 			alts.add(c.alt);
 		}
 		if ( alts.size()==0 ) return null;
@@ -177,7 +168,7 @@ public class DFAState {
 	public int hashCode() {
 		// TODO (sam): what to do when configs==null?
 		int h = 0;
-		for (ATNConfig c : configs) {
+		for (ATNConfig c : configset) {
 			h += c.alt;
 		}
 		return h;
@@ -200,7 +191,7 @@ public class DFAState {
 		if ( this==o ) return true;
 		DFAState other = (DFAState)o;
 		// TODO (sam): what to do when configs==null?
-		boolean sameSet = this.configs.equals(other.configs);
+		boolean sameSet = this.configset.equals(other.configset);
 //		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
 		return sameSet;
 	}

@@ -568,7 +568,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				int nalts = decState.getNumberOfTransitions();
 				List<DFAState.PredPrediction> predPredictions =
 					predicateDFAState(D, D.configset, outerContext, nalts);
-				if ( tooFewPredicates(D, outerContext, nalts) ) {
+				if ( D.predicates.size() < nalts ) {
 					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configset);
 					reportInsufficientPredicates(dfa, startIndex, input.index(),
 												 conflictingAlts,
@@ -1135,26 +1135,6 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		return ambigAlts;
 	}
 
-	public boolean tooFewPredicates(DFAState D, RuleContext outerContext, int nalts) {
-		List<DFAState.PredPrediction> pairs;
-		if ( D.isCtxSensitive ) {
-			pairs = D.ctxToPredicates.get(outerContext); // TODO: rm
-		}
-		else {
-			pairs = D.predicates;
-		}
-		return pairs==null || pairs.size() < nalts;
-
-//		IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
-//		SemanticContext[] altToPred = getPredsForAmbigAlts(conflictingAlts, configs, nalts);
-//		// We need at least n-1 predicates for n ambiguous alts
-//		int unpredicated = 0;
-//		for (int i = 1; i < altToPred.length; i++) {
-//			if ( altToPred[i]==SemanticContext.NONE ) unpredicated++;
-//		}
-//		return unpredicated > 1;
-	}
-
 	protected IntervalSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
 		IntervalSet conflictingAlts;
 		if ( configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER ) {
@@ -1168,7 +1148,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	protected int resolveToMinAlt(@NotNull DFAState D, IntervalSet conflictingAlts) {
 		// kill dead alts so we don't chase them ever
-		killAlts(conflictingAlts, D.configset);
+//		killAlts(conflictingAlts, D.configset);
 		D.prediction = conflictingAlts.getMinElement();
 		if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
 		return D.prediction;
@@ -1182,15 +1162,9 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		int exitAlt = 2;
 		conflictingAlts.remove(exitAlt);
 		// kill dead alts so we don't chase them ever
-		killAlts(conflictingAlts, reach);
+//		killAlts(conflictingAlts, reach);
 		if ( debug ) System.out.println("RESOLVED TO "+reach);
 		return exitAlt;
-	}
-
-	public static void killAlts(@NotNull IntervalSet alts, @NotNull ATNConfigSet configs) {
-		for (ATNConfig c : configs) {
-			if ( alts.contains(c.alt) ) c.resolved = true;
-		}
 	}
 
 	@NotNull
