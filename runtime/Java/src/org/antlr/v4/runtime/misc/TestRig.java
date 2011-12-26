@@ -86,7 +86,7 @@ public class TestRig {
 							String psFile)
 		throws Exception
 	{
-		System.out.println("exec "+grammarName+"."+startRuleName);
+//		System.out.println("exec "+grammarName+"."+startRuleName);
 		String lexerName = grammarName+"Lexer";
 		String parserName = grammarName+"Parser";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
