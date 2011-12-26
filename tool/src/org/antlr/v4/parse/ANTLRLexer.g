@@ -392,7 +392,7 @@ NESTED_ACTION
 // Keywords
 // --------
 // keywords used to specify ANTLR v3 grammars. Keywords may not be used as
-// labels for rules or in any other context where they woudl be ambiguous
+// labels for rules or in any other context where they would be ambiguous
 // with the keyword vs some other identifier
 // OPTIONS and TOKENS must also consume the opening brace that captures
 // their option block, as this is teh easiest way to parse it separate
@@ -418,6 +418,11 @@ CATCH        : 'catch'                ;
 FINALLY      : 'finally'              ;
 TEMPLATE     : 'template'             ;
 MODE         : 'mode'                 ;
+CHANNEL		 : 'channel'			  ;
+PUSH		 : 'push'				  ;
+SKIP		 : 'skip'				  ;
+MORE		 : 'more'				  ;
+POP		     : 'pop'				  ;
 
 // -----------
 // Punctuation

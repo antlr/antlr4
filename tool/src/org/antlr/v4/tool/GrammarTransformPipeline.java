@@ -422,7 +422,7 @@ public class GrammarTransformPipeline {
 			TerminalAST slit = new TerminalAST(new CommonToken(ANTLRParser.STRING_LITERAL, lit));
 			alt.addChild(slit);
 			blk.addChild(alt);
-			CommonToken idToken = new CommonToken(ANTLRParser.ID, rname);
+			CommonToken idToken = new CommonToken(ANTLRParser.TOKEN_REF, rname);
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
 			lexerRulesRoot.insertChild(0, litRule);        // add first

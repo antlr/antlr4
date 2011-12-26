@@ -319,11 +319,12 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	}
 
 	/**
-	 * Match (RULE ID (BLOCK (ALT .*) (ALT RULE_REF[self] .*) (ALT .*)))
+	 * Match (RULE RULE_REF (BLOCK (ALT .*) (ALT RULE_REF[self] .*) (ALT .*)))
 	 */
 	public static boolean hasImmediateRecursiveRuleRefs(GrammarAST t, String ruleName) {
 		if ( t==null ) return false;
-		for (GrammarAST rref : t.getNodesWithType(RULE_REF)) {
+		GrammarAST blk = (GrammarAST)t.getFirstChildWithType(BLOCK);
+		for (GrammarAST rref : blk.getNodesWithType(RULE_REF)) {
 			if ( rref.getChildIndex()==0 && rref.getText().equals(ruleName) ) return true;
 		}
 		return false;

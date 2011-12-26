@@ -62,7 +62,7 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
 		else {
 			t = (GrammarAST)super.create(tokenType, text);
 		}
-        ((CommonToken)t.token).setInputStream(input);
+        t.token.setInputStream(input);
         return t;
     }
 

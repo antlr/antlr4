@@ -83,10 +83,10 @@ block[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 
 alternative returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> els = new ArrayList<ATNFactory.Handle>();}
-    :	^(ALT_REWRITE a=alternative .*)	{$p = $a.p;}
-    |	^(ALT EPSILON)					{$p = factory.epsilon($EPSILON);}
-    |   ^(ALT (e=element {els.add($e.p);})+)
-    									{$p = factory.alt(els);}
+    :	^(ALT_REWRITE a=alternative .*)			{$p = $a.p;}
+    |	^(LEXER_ALT_ACTION a=alternative .*)	{$p = $a.p;}
+    |	^(ALT EPSILON)							{$p = factory.epsilon($EPSILON);}
+    |   ^(ALT (e=element {els.add($e.p);})+)	{$p = factory.alt(els);}
     ;
 
 element returns [ATNFactory.Handle p]

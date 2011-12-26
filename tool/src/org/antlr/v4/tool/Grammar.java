@@ -29,6 +29,7 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.runtime.tree.TreeWizard;
@@ -744,11 +745,21 @@ public class Grammar implements AttributeResolver {
 
         for (GrammarASTWithOptions r : ruleNodes) {
 			//tool.log("grammar", r.toStringTree());
-            String ruleName = r.getChild(0).getText();
-            if ( Character.isUpperCase(ruleName.charAt(0)) ) {
+			Tree name = r.getChild(0);
+            if ( name.getType()==ANTLRParser.TOKEN_REF ) {
 				Map nodes = new HashMap();
 				boolean isLitRule =
-					wiz.parse(r, "(RULE %name:ID (BLOCK (ALT %lit:STRING_LITERAL)))", nodes);
+					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL)))", nodes);
+				if ( isLitRule ) {
+					GrammarAST litNode = (GrammarAST)nodes.get("lit");
+					GrammarAST nameNode = (GrammarAST)nodes.get("name");
+					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
+					continue;
+				}
+				nodes = new HashMap();
+				// try with doc comment in there
+				isLitRule =
+					wiz.parse(r, "(RULE %name:TOKEN_REF DOC_COMMENT (BLOCK (ALT %lit:STRING_LITERAL)))", nodes);
 				if ( isLitRule ) {
 					GrammarAST litNode = (GrammarAST)nodes.get("lit");
 					GrammarAST nameNode = (GrammarAST)nodes.get("name");

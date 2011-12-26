@@ -69,8 +69,8 @@ rec_rule returns [boolean isLeftRec]
 {
 	currentOuterAltNumber = 1;
 }
-	:	^(	r=RULE id=ID {ruleName=$id.getText();}
-			ruleModifier?
+	:	^(	r=RULE id=RULE_REF {ruleName=$id.getText();}
+			DOC_COMMENT? ruleModifier?
 //			(ARG_ACTION)? shouldn't allow args, right?
 			(^(RETURNS a=ARG_ACTION {setReturnValues($a);}))?
 //      		( ^(THROWS .+) )? don't allow
@@ -81,8 +81,6 @@ rec_rule returns [boolean isLeftRec]
 			ruleBlock {$isLeftRec = $ruleBlock.isLeftRec;}
 			exceptionGroup
 		)
-		// why do this?
-//		{if ($ruleBlock.isLeftRec) $r.setType(PREC_RULE);}
 	;
 
 exceptionGroup
@@ -101,7 +99,6 @@ ruleModifier
     : PUBLIC
     | PRIVATE
     | PROTECTED
-    | FRAGMENT
     ;
 
 ruleBlock returns [boolean isLeftRec]
@@ -134,7 +131,7 @@ outerAlternative[GrammarAST rew] returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT recurseNoLabel (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse ) 
+	:	^( ALT recurseNoLabel (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse )
 	;
 
 binaryMultipleOp

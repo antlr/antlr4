@@ -93,6 +93,9 @@ tokens {
     ST_RESULT;			  // distinguish between ST and tree rewrites
     RESULT;
     ALT_REWRITE;		  // indicate ALT is rewritten
+    
+    // lexer action stuff
+    LEXER_ALT_ACTION;
 
     DOWN_TOKEN;			  // AST node representing DOWN node in tree parser code gen
     UP_TOKEN;
@@ -320,7 +323,7 @@ actionScopeName
     |   PARSER	-> ID[$PARSER]
 	;
 
-mode:	MODE id SEMI sync (rule sync)+  -> ^(MODE id rule+) ;
+mode:	MODE id SEMI sync (lexerRule sync)+  -> ^(MODE id lexerRule+) ;
 
 rules
     :	sync (rule sync)*
@@ -342,6 +345,10 @@ sync
 }	:
 	;
 
+rule:	parserRule
+	|	lexerRule
+	;
+	
 // The specification of an EBNF rule in ANTLR style, with all the
 // rule level parameters, declarations, actions, rewrite specs and so
 // on.
@@ -351,7 +358,7 @@ sync
 // verification of the AST determine if things are repeated or if a
 // particular functional element is not valid in the context of the
 // grammar type, such as using returns in lexer rules and so on.
-rule
+parserRule
 @init { paraphrases.push("matching a rule"); }
 @after {
 	paraphrases.pop();
@@ -373,7 +380,7 @@ rule
 	  // parser or lexer rules, the semantic verification phase will
 	  // reject any rules that make no sense, such as lexer rules in
 	  // a pure parser or tree parser.
-	  id
+	  RULE_REF
 
 	  // Immediately following the rulename, there may be a specification
 	  // of input parameters for the rule. We do not do anything with the
@@ -414,7 +421,7 @@ rule
 
       exceptionGroup
 
-      -> ^( RULE<RuleAST> id DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
+      -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
       		ruleReturns? throwsSpec? locals? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
@@ -538,8 +545,59 @@ ruleAltList
 	;
 
 labeledAlt
-	:	alternative (POUND id {((AltAST)$alternative.tree).altLabel=$id.tree;})?
-		-> alternative
+	:	alternative	(POUND id {((AltAST)$alternative.tree).altLabel=$id.tree;})?
+	;
+
+
+lexerRule
+@init { paraphrases.push("matching a lexer rule"); }
+@after {
+	paraphrases.pop();
+}
+    : DOC_COMMENT? FRAGMENT?
+	  TOKEN_REF COLON lexerRuleBlock SEMI
+      -> ^( RULE<RuleAST> TOKEN_REF DOC_COMMENT?
+      		^(RULEMODIFIERS FRAGMENT)? lexerRuleBlock
+      	  )
+	;
+
+lexerRuleBlock
+@init {Token colon = input.LT(-1);}
+    :	lexerRuleAltList -> ^(BLOCK<BlockAST>[colon,"BLOCK"] lexerRuleAltList)
+    ;
+    catch [ResyncToEndOfRuleBlock e] {
+    	// just resyncing; ignore error
+		retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), null);
+    }
+    
+lexerRuleAltList
+	:	lexerAlt (OR lexerAlt)* -> lexerAlt+
+	;
+
+lexerAlt
+	:	elements
+		(	lexerActions	-> ^(LEXER_ALT_ACTION elements lexerActions)
+		|					-> elements
+		)
+	;
+	
+// channel=HIDDEN, skip, more, mode(INSIDE), push(INSIDE), pop
+lexerActions
+	:	IMPLIES lexerAction (COMMA lexerAction)* -> lexerAction+
+	;
+
+lexerAction
+	:	CHANNEL LPAREN lexerActionExpr RPAREN -> ^(CHANNEL lexerActionExpr)
+	|	MODE LPAREN lexerActionExpr RPAREN	  -> ^(MODE lexerActionExpr)
+	|	PUSH LPAREN lexerActionExpr RPAREN	  -> ^(PUSH lexerActionExpr)
+	|	SKIP
+	|	MORE
+	|	POP
+	;
+
+lexerActionExpr
+	:	ID 
+	|	INT
 	;
 
 altList

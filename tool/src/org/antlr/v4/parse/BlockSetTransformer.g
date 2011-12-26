@@ -32,7 +32,7 @@ public BlockSetTransformer(TreeNodeStream input, Grammar g) {
 }
 
 topdown
-    :	^(RULE ID {currentRuleName=$ID.text;} .+)
+    :	^(RULE (id=TOKEN_REF|id=RULE_REF) {currentRuleName=$id.text;} .+)
     |	setAlt
     |	ebnfBlockSet
     |	blockSet

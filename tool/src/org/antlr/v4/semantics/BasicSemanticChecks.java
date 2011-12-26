@@ -214,6 +214,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
+								  GrammarAST block)
+	{
+		checkInvalidRuleDef(ID.token);
+	}
+
+	@Override
 	public void ruleRef(GrammarAST ref, ActionAST arg) {
 		checkInvalidRuleRef(ref.token);
 	}

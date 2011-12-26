@@ -275,6 +275,8 @@ public class ATNSerializer {
 	}
 
 	public static String getDecoded(Grammar g, ATN atn) {
-		return new ATNSerializer(g, atn).decode(Utils.toCharArray(getSerialized(g, atn)));
+		List<Integer> serialized = getSerialized(g, atn);
+		char[] data = Utils.toCharArray(serialized);
+		return new ATNSerializer(g, atn).decode(data);
 	}
 }

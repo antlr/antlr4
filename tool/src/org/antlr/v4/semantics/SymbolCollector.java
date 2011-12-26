@@ -29,11 +29,18 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.parse.ScopeParser;
+import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** Collects (create) rules, terminals, strings, actions, scopes etc... from AST
  *  side-effects: sets resolver field of asts for actions and
@@ -106,8 +113,8 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	{
 		int numAlts = block.getChildCount();
 		Rule r = new Rule(g, ID.getText(), rule, numAlts);
-		if ( g.isLexer() ) r.mode = currentModeName;
-		if ( modifiers.size()>0 ) r.modifiers = modifiers;
+//		if ( g.isLexer() ) r.mode = currentModeName;
+//		if ( modifiers.size()>0 ) r.modifiers = modifiers;
 		rules.add(r);
 		currentRule = r;
 
@@ -136,6 +143,18 @@ public class SymbolCollector extends GrammarTreeVisitor {
 			currentRule.namedActions.put(a.getChild(0).getText(), action);
 			action.resolver = currentRule;
 		}
+	}
+
+	@Override
+	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
+								  GrammarAST block)
+	{
+		int numAlts = block.getChildCount();
+		Rule r = new Rule(g, ID.getText(), rule, numAlts);
+		r.mode = currentModeName;
+		if ( modifiers.size()>0 ) r.modifiers = modifiers;
+		rules.add(r);
+		currentRule = r;
 	}
 
 	@Override

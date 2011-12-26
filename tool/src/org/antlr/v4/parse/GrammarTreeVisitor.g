@@ -138,7 +138,10 @@ public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers
 						 GrammarAST options, GrammarAST locals,
 						 List<GrammarAST> actions,
 						 GrammarAST block) { }
-public void finishRule(GrammarAST rule, GrammarAST ID, GrammarAST block) { }
+public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
+public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
+                              GrammarAST block) { }
+public void finishLexerRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
 public void ruleCatch(GrammarAST arg, ActionAST action) { }
 public void finallyAction(ActionAST action) { }
 /** outermost alt */
@@ -252,10 +255,27 @@ action
 	;
 
 rules
-    : ^(RULES {discoverRules($RULES);} rule* {finishRules($RULES);})
+    : ^(RULES {discoverRules($RULES);} (rule|lexerRule)* {finishRules($RULES);})
     ;
 
-mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} rule+ ) ;
+mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ ) ;
+
+lexerRule
+@init {
+List<GrammarAST> mods = new ArrayList<GrammarAST>();
+currentOuterAltNumber=0;
+}
+	:	^(	RULE TOKEN_REF
+			{currentRuleName=$TOKEN_REF.text; currentRuleAST=$RULE;}
+			DOC_COMMENT? (^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
+      		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, (GrammarAST)input.LT(1));}
+      		ruleBlock
+      		{
+      		finishLexerRule((RuleAST)$RULE, $TOKEN_REF, $ruleBlock.start);
+      		currentRuleName=null; currentRuleAST=null;
+      		}
+      	 )
+	;
 
 rule
 @init {
@@ -263,7 +283,7 @@ List<GrammarAST> mods = new ArrayList<GrammarAST>();
 List<GrammarAST> actions = new ArrayList<GrammarAST>(); // track roots
 currentOuterAltNumber=0;
 }
-	:   ^(	RULE ID {currentRuleName=$ID.text; currentRuleAST=$RULE;}
+	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
@@ -272,13 +292,13 @@ currentOuterAltNumber=0;
       		(	opts=optionsSpec
 		    |   a=ruleAction {actions.add($a.start);}
 		    )*
-      		{discoverRule((RuleAST)$RULE, $ID, mods, (ActionAST)$ARG_ACTION,
+      		{discoverRule((RuleAST)$RULE, $RULE_REF, mods, (ActionAST)$ARG_ACTION,
       					  $ret.start!=null?(ActionAST)$ret.start.getChild(0):null,
       					  $thr.start, $opts.start,
       					  $loc.start!=null?(ActionAST)$loc.start.getChild(0):null,
       					  actions, (GrammarAST)input.LT(1));}
       		ruleBlock exceptionGroup
-      		{finishRule($RULE, $ID, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
+      		{finishRule((RuleAST)$RULE, $RULE_REF, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
       	 )
     ;
 
@@ -347,10 +367,25 @@ outerAlternative
 
 alternative
 	:	^(ALT_REWRITE alternative {inRewrite=true;} rewrite {inRewrite=false;})
+	|	^(LEXER_ALT_ACTION alternative lexerAction*)
 	|	^(ALT element+)
 	|	^(ALT EPSILON)
     ;
 
+lexerAction
+	:	^(CHANNEL lexerActionExpr)
+	|	^(MODE lexerActionExpr)
+	|	^(PUSH lexerActionExpr)
+	|	SKIP
+	|	MORE
+	|	POP
+	;
+
+lexerActionExpr
+	:	ID 
+	|	INT
+	;
+	
 element
 	:	labeledElement
 	|	atom
