@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
 /** Run a lexer/parser combo, optionally printing tree string or generating
  *  postscript file. Optionally taking input file.
  *
- *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-tree | -ps file.ps] [input-filename]
+ *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-tree] [-gui] [-ps file.ps] [input-filename]
  */
 public class TestRig {
 	public static void main(String[] args) throws Exception {
@@ -47,9 +47,10 @@ public class TestRig {
 		String startRuleName;
 		String inputFile = null;
 		boolean printTree = false;
+		boolean gui = false;
 		String psFile = null;
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-tree | -ps file.ps] [input-filename]");
+			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-tree] [-gui] [-ps file.ps] [input-filename]");
 			return;
 		}
 		int i=0;
@@ -67,6 +68,9 @@ public class TestRig {
 			if ( arg.equals("-tree") ) {
 				printTree = true;
 			}
+			if ( arg.equals("-gui") ) {
+				gui = true;
+			}
 			else if ( arg.equals("-ps") ) {
 				if ( i>=args.length ) {
 					System.err.println("missing filename on -ps");
@@ -76,13 +80,14 @@ public class TestRig {
 				i++;
 			}
 		}
-		exec(grammarName, startRuleName, inputFile, printTree, psFile);
+		exec(grammarName, startRuleName, inputFile, printTree, gui, psFile);
 	}
 
 	public static void exec(String grammarName,
 							String startRuleName,
 							String inputFile,
 							boolean printTree,
+							boolean gui,
 							String psFile)
 		throws Exception
 	{
@@ -120,6 +125,9 @@ public class TestRig {
 
 		if ( printTree ) {
 			System.out.println(tree.toStringTree(parser));
+		}
+		if ( gui ) {
+			tree.inspect(parser);
 		}
 		if ( psFile!=null ) {
 			tree.save(parser, psFile); // Generate postscript
