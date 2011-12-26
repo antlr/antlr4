@@ -29,10 +29,17 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import org.abego.treelayout.*;
+import org.abego.treelayout.Configuration;
+import org.abego.treelayout.NodeExtentProvider;
+import org.abego.treelayout.TreeForTreeLayout;
+import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.tree.CommonAST;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.tree.Trees;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -78,12 +85,14 @@ public class TreePostScriptGenerator {
 		this.root = root;
 		setTreeTextProvider(new TreeViewer.DefaultTreeTextProvider(parser));
 		doc = new PostScriptDocument(fontName, fontSize);
+		boolean compareNodeIdentities = true;
 		this.treeLayout =
 			new TreeLayout<Tree>(new TreeLayoutAdaptor(root),
 								 new VariableExtentProvide(),
 								 new DefaultConfiguration<Tree>(gapBetweenLevels,
 																gapBetweenNodes,
-																Configuration.Location.Bottom));
+																Configuration.Location.Bottom),
+                                 compareNodeIdentities);
 	}
 
 	public String getPS() {
