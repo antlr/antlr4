@@ -68,12 +68,12 @@ public class TestRig {
 				printTree = true;
 			}
 			else if ( arg.equals("-ps") ) {
-				if ( (i+1)>=args.length ) {
+				if ( i>=args.length ) {
 					System.err.println("missing filename on -ps");
 					return;
 				}
-				i++;
 				psFile = args[i];
+				i++;
 			}
 		}
 		exec(grammarName, startRuleName, inputFile, printTree, psFile);
