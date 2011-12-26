@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
 /** Run a lexer/parser combo, optionally printing tree string or generating
  *  postscript file. Optionally taking input file.
  *
- *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-tree] [-gui] [-ps file.ps] [input-filename]
+ *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-print] [-gui] [-ps file.ps] [input-filename]
  */
 public class TestRig {
 	public static void main(String[] args) throws Exception {
@@ -50,7 +50,7 @@ public class TestRig {
 		boolean gui = false;
 		String psFile = null;
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-tree] [-gui] [-ps file.ps] [input-filename]");
+			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-print] [-gui] [-ps file.ps] [input-filename]");
 			return;
 		}
 		int i=0;
@@ -65,7 +65,7 @@ public class TestRig {
 				inputFile = arg;
 				continue;
 			}
-			if ( arg.equals("-tree") ) {
+			if ( arg.equals("-print") ) {
 				printTree = true;
 			}
 			if ( arg.equals("-gui") ) {
