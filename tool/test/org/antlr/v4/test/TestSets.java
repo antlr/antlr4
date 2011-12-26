@@ -286,4 +286,17 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
+	@Test public void testCharSetLiteral() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : (A {System.out.println($A.text);})+ ;\n" +
+			"A : [AaBb] ;\n" +
+			"WS : (' '|'\\n')+ {skip();} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "A a B b", debug);
+		assertEquals("A\n" +
+					 "a\n" +
+					 "B\n" +
+					 "b\n", found);
+	}
 }

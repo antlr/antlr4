@@ -563,24 +563,46 @@ lexerRule
 
 lexerRuleBlock
 @init {Token colon = input.LT(-1);}
-    :	lexerRuleAltList -> ^(BLOCK<BlockAST>[colon,"BLOCK"] lexerRuleAltList)
+    :	lexerAltList -> ^(BLOCK<BlockAST>[colon,"BLOCK"] lexerAltList)
     ;
     catch [ResyncToEndOfRuleBlock e] {
     	// just resyncing; ignore error
 		retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), null);
     }
     
-lexerRuleAltList
+lexerAltList
 	:	lexerAlt (OR lexerAlt)* -> lexerAlt+
 	;
 
 lexerAlt
-	:	elements
-		(	lexerActions	-> ^(LEXER_ALT_ACTION elements lexerActions)
-		|					-> elements
+	:	lexerElements
+		(	lexerActions	-> ^(LEXER_ALT_ACTION lexerElements lexerActions)
+		|					-> lexerElements
 		)
 	;
-	
+
+lexerElements
+    :	lexerElement+ -> ^(ALT<AltAST> lexerElement+)
+    ;
+
+lexerElement
+@init {
+	paraphrases.push("looking for lexer rule element");
+	int m = input.mark();
+}
+@after { paraphrases.pop(); }
+	:	lexerAtom
+	|	lexerBlock
+		(	ebnfSuffix	-> ^(ebnfSuffix lexerBlock)
+		|				-> lexerBlock
+		)
+	|	actionElement // only allowed at end of outer alt actually
+	;
+
+lexerBlock
+ 	:	LPAREN lexerAltList RPAREN
+      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] lexerAltList )
+    ;
 // channel=HIDDEN, skip, more, mode(INSIDE), push(INSIDE), pop
 lexerActions
 	:	IMPLIES lexerAction (COMMA lexerAction)* -> lexerAction+
@@ -752,6 +774,15 @@ ebnfSuffix
 	:	QUESTION	-> OPTIONAL<OptionalBlockAST>[$start]
   	|	STAR 		-> CLOSURE<StarBlockAST>[$start]
    	|	PLUS	 	-> POSITIVE_CLOSURE<PlusBlockAST>[$start]
+	;
+	
+lexerAtom
+	:	range 
+	|	terminal
+    |   RULE_REF
+    |	notSet 
+    |	wildcard
+    |	ARG_ACTION
 	;
 
 atom

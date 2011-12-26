@@ -205,6 +205,12 @@ public class ParserATNFactory implements ATNFactory {
 		return tokenRef(stringLiteralAST);
 	}
 
+	/** [Aa] char sets not allowed in parser */
+	@Override
+	public Handle charSetLiteral(GrammarAST charSetAST) {
+		return null;
+	}
+
 	/** For reference to rule r, build
 	 *
 	 *  o->(r)  o

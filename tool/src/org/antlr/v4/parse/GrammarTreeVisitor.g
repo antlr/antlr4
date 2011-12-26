@@ -402,6 +402,7 @@ element
 	|	^(NOT block)
 	|	DOWN_TOKEN
 	|	UP_TOKEN
+	|	ARG_ACTION // lexer [Aa] set
 	;
 
 astOperand

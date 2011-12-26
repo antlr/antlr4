@@ -158,6 +158,22 @@ public class LexerATNFactory extends ParserATNFactory {
 		return new Handle(left, right);
 	}
 
+	/** [Aa] char sets */
+	@Override
+	public Handle charSetLiteral(GrammarAST charSetAST) {
+		ATNState left = newState(charSetAST);
+		ATNState right = newState(charSetAST);
+		IntervalSet set = new IntervalSet();
+		String cset = '"'+charSetAST.getText()+'"';
+		String chars = CharSupport.getStringFromGrammarStringLiteral(cset);
+		for (int i=0; i<chars.length(); i++) {
+			set.add((int)chars.charAt(i));
+		}
+		left.addTransition(new SetTransition(right, set));
+		charSetAST.atnState = left;
+		return new Handle(left, right);
+	}
+
 	@Override
 	public Handle tokenRef(TerminalAST node) {
 		// Ref to EOF in lexer yields char transition on -1

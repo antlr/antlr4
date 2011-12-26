@@ -1,3 +1,4 @@
 grammar T;
-s : a ;
-a : 'x' ;
+s : A+ ;
+A : [AaBb] ;
+WS : (' '|'\n')+ {skip();} ;

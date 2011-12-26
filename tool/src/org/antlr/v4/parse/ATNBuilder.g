@@ -103,6 +103,7 @@ element returns [ATNFactory.Handle p]
     |	^(NOT b=blockSet[true])		{$p = $b.p;}
     |	DOWN_TOKEN					{$p = factory.tokenRef((DownAST)$start);}
     |	UP_TOKEN					{$p = factory.tokenRef((UpAST)$start);}
+    |	ARG_ACTION					{$p = factory.charSetLiteral($start);}
 	;
 
 astOperand returns [ATNFactory.Handle p]
