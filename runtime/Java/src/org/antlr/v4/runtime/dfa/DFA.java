@@ -28,11 +28,9 @@
  */
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -54,7 +52,7 @@ public class DFA {
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 	 *  from predictATN() for retry.
 	 */
-	public OrderedHashSet<ATNConfig> conflictSet;
+//	public OrderedHashSet<ATNConfig> conflictSet;
 
 	public DFA(@NotNull ATNState atnStartState) { this.atnStartState = atnStartState; }
 
