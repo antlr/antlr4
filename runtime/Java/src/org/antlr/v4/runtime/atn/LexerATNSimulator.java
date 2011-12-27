@@ -453,7 +453,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	@NotNull
 	protected ATNConfigSet computeStartState(@NotNull IntStream input,
-														  @NotNull ATNState p)
+											 @NotNull ATNState p)
 	{
 		RuleContext initialContext = EMPTY_LEXER_RULE_CONTEXT;
 		ATNConfigSet configs = new ATNConfigSet();
@@ -524,7 +524,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 			PredicateTransition pt = (PredicateTransition)t;
 			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
-				c = new ATNConfig(config, t.target);
+				c = new ATNConfig(config, t.target, pt.getPredicate());
 //				c.traversedPredicate = true;
 			}
 		}
@@ -640,6 +640,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			{
 				firstConfigWithRuleStopState = c;
 			}
+			if ( c.semanticContext!=null ) traversedPredicate = true;
 //			if ( c.traversedPredicate ) traversedPredicate = true;
 		}
 
