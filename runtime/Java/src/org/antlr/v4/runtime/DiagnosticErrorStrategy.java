@@ -44,16 +44,16 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportAmbiguity d="+dfa.decision + ": "+ ambigAlts + ":" + configs + ", input=" +
-                                   recognizer.getInputString(startIndex, stopIndex));
+        recognizer.notifyListeners("reportAmbiguity d="+dfa.decision + ": "+ ambigAlts + ":" + configs + ", input='" +
+                                   recognizer.getInputString(startIndex, stopIndex)+"'");
     }
 
     @Override
     public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input=" +
-                                   recognizer.getInputString(startIndex, stopIndex));
+        recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input='" +
+                                   recognizer.getInputString(startIndex, stopIndex)+"'");
     }
 
     @Override
@@ -64,6 +64,6 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
                                              @NotNull OrderedHashSet<ATNConfig> configs)
     {
         recognizer.notifyListeners("reportInsufficientPredicates d="+dfa.decision +": " +ambigAlts + ":" + Arrays.toString(altToPred) +
-                                   ", " + configs + ", input=" + recognizer.getInputString(startIndex, stopIndex));
+                                   ", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex)+"'");
     }
 }
