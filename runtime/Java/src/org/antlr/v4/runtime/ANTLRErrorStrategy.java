@@ -134,7 +134,13 @@ public interface ANTLRErrorStrategy<Symbol> {
 //                        int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 //                        @NotNull OrderedHashSet<ATNConfig> configs);
 
-    /** Called by the parser when it find a conflict that is resolved by retrying the parse
+
+	void reportAttemptingFullContext(@NotNull BaseRecognizer<Symbol> recognizer,
+									 @NotNull DFA dfa,
+									 int startIndex, int stopIndex,
+									 @NotNull OrderedHashSet<ATNConfig> configs);
+
+	/** Called by the parser when it find a conflict that is resolved by retrying the parse
      *  with full context. This is not a warning; it simply notifies you that your grammar
      *  is more complicated than Strong LL can handle. The parser moved up to full context
      *  parsing for that input sequence.

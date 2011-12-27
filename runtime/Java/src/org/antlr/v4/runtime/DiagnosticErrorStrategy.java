@@ -49,8 +49,18 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
                                    recognizer.getInputString(startIndex, stopIndex)+"'");
     }
 
-    @Override
-    public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
+	@Override
+	public void reportAttemptingFullContext(@NotNull BaseRecognizer<Symbol> recognizer,
+											@NotNull DFA dfa,
+											int startIndex, int stopIndex,
+											@NotNull OrderedHashSet<ATNConfig> configs)
+	{
+		recognizer.notifyListeners("reportAttemptingFullContext d="+dfa.decision +": "+ configs + ", input='" +
+								   recognizer.getInputString(startIndex, stopIndex)+"'");
+	}
+
+	@Override
+	public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
         recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input='" +

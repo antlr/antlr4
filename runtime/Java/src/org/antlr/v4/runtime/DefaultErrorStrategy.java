@@ -562,7 +562,15 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
     {
     }
 
-    @Override
+	@Override
+	public void reportAttemptingFullContext(@NotNull BaseRecognizer<Symbol> recognizer,
+											@NotNull DFA dfa,
+											int startIndex, int stopIndex,
+											@NotNull OrderedHashSet<ATNConfig> configs)
+	{
+	}
+
+	@Override
     public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {

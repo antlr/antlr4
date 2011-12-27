@@ -602,6 +602,8 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 											   boolean greedy)
 	{
 		retry_with_context++;
+		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
+
 		if ( debug ) System.out.println("execATNWithFullContext "+s0+", greedy="+greedy);
 		ATNConfigSet reach = null;
 		ATNConfigSet previous = s0;
@@ -1312,6 +1314,14 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 //		}
 //		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
 //	}
+
+	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+        if ( debug || retry_debug ) {
+            System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
+                               ", input="+parser.getInputString(startIndex, stopIndex));
+        }
+        if ( parser!=null ) parser.getErrorHandler().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
+    }
 
 	public void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
