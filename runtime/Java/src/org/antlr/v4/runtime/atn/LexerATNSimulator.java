@@ -44,7 +44,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
-	public static final int NUM_EDGES = 255;
+	public static final int NUM_EDGES = 255; // forces unicode to stay in ATN
 
 	private boolean trace = false;
 	private OutputStream traceStream = null;
