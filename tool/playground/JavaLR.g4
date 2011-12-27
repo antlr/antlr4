@@ -820,7 +820,7 @@ WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}
     ;
 
 COMMENT
-    :   '/*' . '*/' {$channel=HIDDEN;}
+    :   '/*' .* '*/' {$channel=HIDDEN;}
     ;
 
 LINE_COMMENT

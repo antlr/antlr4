@@ -101,7 +101,7 @@ class TestJavaLR {
 				f.getName().substring(f.getName().length()-5).equals(".java"))
 			|| f.getName().equals("input") )
 		{
-//			System.err.println(f.getAbsolutePath());
+			System.err.println(f.getAbsolutePath());
 			parseFile(f.getAbsolutePath());
 		}
 	}
