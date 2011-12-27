@@ -568,12 +568,14 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				int nalts = decState.getNumberOfTransitions();
 				List<DFAState.PredPrediction> predPredictions =
 					predicateDFAState(D, D.configset, outerContext, nalts);
-				if ( D.predicates.size() < nalts ) {
-					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configset);
+				IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configset);
+				if ( D.predicates.size() < conflictingAlts.size() ) {
 					reportInsufficientPredicates(dfa, startIndex, input.index(),
 												 conflictingAlts,
+												 decState,
 												 getPredsForAmbigAlts(conflictingAlts, D.configset, nalts),
-												 D.configset);
+												 D.configset,
+												 false);
 				}
 				input.seek(startIndex);
 				predictedAlt = evalSemanticContext(predPredictions, outerContext);
@@ -634,10 +636,11 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
 				if ( predPredictions.size() < nalts ) {
 					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(reach);
+					DecisionState decState = atn.getDecisionState(dfa.decision);
 					reportInsufficientPredicates(dfa, startIndex, input.index(),
 												 conflictingAlts,
-												 altToPred,
-												 reach);
+												 decState, altToPred,
+												 reach, true);
 				}
 				input.seek(startIndex);
 				reach.uniqueAlt = evalSemanticContext(predPredictions, outerContext);
@@ -1333,18 +1336,20 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
     }
 
     public void reportInsufficientPredicates(@NotNull DFA dfa, int startIndex, int stopIndex,
-                                             @NotNull IntervalSet ambigAlts,
-                                             @NotNull SemanticContext[] altToPred,
-                                             @NotNull ATNConfigSet configs)
+											 @NotNull IntervalSet ambigAlts,
+											 DecisionState decState,
+											 @NotNull SemanticContext[] altToPred,
+											 @NotNull ATNConfigSet configs,
+											 boolean fullContextParse)
     {
         if ( debug || retry_debug ) {
             System.out.println("reportInsufficientPredicates "+
-                               ambigAlts+":"+Arrays.toString(altToPred)+
+                               ambigAlts+", decState="+decState+": "+Arrays.toString(altToPred)+
                                parser.getInputString(startIndex, stopIndex));
         }
         if ( parser!=null ) {
             parser.getErrorHandler().reportInsufficientPredicates(parser, dfa, startIndex, stopIndex, ambigAlts,
-                                                                  altToPred, configs);
+																  decState, altToPred, configs, fullContextParse);
         }
     }
 

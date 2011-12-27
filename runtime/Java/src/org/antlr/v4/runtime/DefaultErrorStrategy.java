@@ -571,9 +571,11 @@ public class DefaultErrorStrategy<Symbol> implements ANTLRErrorStrategy<Symbol> 
     @Override
     public void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
 											 @NotNull DFA dfa,
-                                             int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                                             @NotNull SemanticContext[] altToPred,
-                                             @NotNull OrderedHashSet<ATNConfig> configs)
+											 int startIndex, int stopIndex,
+											 @NotNull IntervalSet ambigAlts,
+											 DecisionState decState,
+											 @NotNull SemanticContext[] altToPred,
+											 @NotNull OrderedHashSet<ATNConfig> configs, boolean fullContextParse)
     {
     }
 }

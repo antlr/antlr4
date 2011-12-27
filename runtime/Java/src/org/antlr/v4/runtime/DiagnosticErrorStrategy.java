@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -44,7 +45,7 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportAmbiguity d="+dfa.decision + ": "+ ambigAlts + ":" + configs + ", input='" +
+        recognizer.notifyListeners("reportAmbiguity d="+dfa.decision + ": ambigAlts="+ ambigAlts + ":" + configs + ", input='" +
                                    recognizer.getInputString(startIndex, stopIndex)+"'");
     }
 
@@ -59,11 +60,14 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
     @Override
     public void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
 											 @NotNull DFA dfa,
-                                             int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                                             @NotNull SemanticContext[] altToPred,
-                                             @NotNull OrderedHashSet<ATNConfig> configs)
+											 int startIndex, int stopIndex,
+											 @NotNull IntervalSet ambigAlts,
+											 DecisionState decState,
+											 @NotNull SemanticContext[] altToPred,
+											 @NotNull OrderedHashSet<ATNConfig> configs, boolean fullContextParse)
     {
-        recognizer.notifyListeners("reportInsufficientPredicates d="+dfa.decision +": " +ambigAlts + ":" + Arrays.toString(altToPred) +
+        recognizer.notifyListeners("reportInsufficientPredicates d="+dfa.decision +", decState="+decState+
+								   ", ambigAlts=" +ambigAlts + ":" + Arrays.toString(altToPred) +
                                    ", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex)+"'");
     }
 }

@@ -1,6 +1,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -150,7 +151,8 @@ public interface ANTLRErrorStrategy<Symbol> {
      */
     void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
 									  @NotNull DFA dfa,
-                                      int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-                                      @NotNull SemanticContext[] altToPred,
-                                      @NotNull OrderedHashSet<ATNConfig> configs);
+									  int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+									  DecisionState decState,
+									  @NotNull SemanticContext[] altToPred,
+									  @NotNull OrderedHashSet<ATNConfig> configs, boolean fullContextParse);
 }
