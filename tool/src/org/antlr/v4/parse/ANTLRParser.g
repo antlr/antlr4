@@ -591,14 +591,29 @@ lexerElement
 	int m = input.mark();
 }
 @after { paraphrases.pop(); }
-	:	lexerAtom
+	:	labeledLexerElement
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$labeledLexerElement.start,"BLOCK"] ^(ALT<AltAST> labeledLexerElement) ) )
+		|				-> labeledLexerElement
+		)		
+	|	lexerAtom
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$lexerAtom.start,"BLOCK"] ^(ALT<AltAST> lexerAtom) ) )
+		|				-> lexerAtom
+		)		
 	|	lexerBlock
 		(	ebnfSuffix	-> ^(ebnfSuffix lexerBlock)
 		|				-> lexerBlock
 		)
-	|	actionElement // only allowed at end of outer alt actually
+	|	actionElement // actions only allowed at end of outer alt actually,
+					  // but preds can be anywhere
 	;
 
+labeledLexerElement
+	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
+		(	lexerAtom	-> ^($ass id lexerAtom)
+		|	block 		-> ^($ass id block)
+		)
+	;
+	
 lexerBlock
  	:	LPAREN lexerAltList RPAREN
       -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] lexerAltList )

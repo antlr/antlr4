@@ -227,8 +227,6 @@ public class TestSets extends BaseTest {
 	}
 
 	@Test public void testNotCharSetWithLabel() throws Exception {
-		// This doesn't work in lexer yet.
-		// Generates: h=input.LA(1); but h is defined as a Token
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +

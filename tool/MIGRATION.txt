@@ -9,3 +9,7 @@ Trees
 * added parse trees
 
  no -> and other tree construct in tree grammars
+
+Lexers
+
+* Added [Abc] notation

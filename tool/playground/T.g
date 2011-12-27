@@ -1,4 +1,4 @@
 grammar T;
 s : A+ ;
-A : [AaBb] ;
+A : {true}? 'a' ;
 WS : (' '|'\n')+ {skip();} ;
