@@ -7,7 +7,6 @@ public class TestU {
 		ULexer t = new ULexer(new ANTLRFileStream(args[0]));
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		UParser p = new UParser(tokens);
-		p.getInterpreter().setContextSensitive(true);
 		p.setBuildParseTree(true);
 		ParserRuleContext r = p.s();
 		System.out.println(r.toStringTree(p));
