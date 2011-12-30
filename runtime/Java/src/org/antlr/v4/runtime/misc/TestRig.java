@@ -119,7 +119,6 @@ public class TestRig {
 		Parser parser = parserCtor.newInstance(tokens);
 
 		parser.setErrorHandler(new DiagnosticErrorStrategy<Token>());
-		parser.getInterpreter().setTrace(true);
 
 		if ( printTree || gui || psFile!=null ) {
 			parser.setBuildParseTree(true);
