@@ -49,6 +49,7 @@ public class ATNState {
 	public static final int STAR_LOOP_BACK = 9;
 	public static final int STAR_LOOP_ENTRY = 10;
 	public static final int PLUS_LOOP_BACK = 11;
+	public static final int LOOP_END = 12;
 
 	public static final List<String> serializationNames =
 		Collections.unmodifiableList(Arrays.asList(
@@ -63,7 +64,8 @@ public class ATNState {
 			"BLOCK_END",
 			"STAR_LOOP_BACK",
 			"STAR_LOOP_ENTRY",
-			"PLUS_LOOP_BACK"
+			"PLUS_LOOP_BACK",
+			"LOOP_END"
 		));
 
 	public static final Map<Class<? extends ATNState>, Integer> serializationTypes =
@@ -78,7 +80,8 @@ public class ATNState {
             put(BlockEndState.class, BLOCK_END);
             put(PlusLoopbackState.class, PLUS_LOOP_BACK);
             put(StarLoopbackState.class, STAR_LOOP_BACK);
-            put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
+			put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
+			put(LoopEndState.class, LOOP_END);
         }});
 
 	public static final int INVALID_STATE_NUMBER = -1;

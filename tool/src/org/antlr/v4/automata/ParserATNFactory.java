@@ -424,10 +424,11 @@ public class ParserATNFactory implements ATNFactory {
 		PlusBlockStartState blkStart = (PlusBlockStartState)blk.left;
 		BlockEndState blkEnd = (BlockEndState)blk.right;
 
-		PlusLoopbackState loop = (PlusLoopbackState)newState(PlusLoopbackState.class, plusAST);
+		PlusLoopbackState loop = newState(PlusLoopbackState.class, plusAST);
 		atn.defineDecisionState(loop);
-		ATNState end = newState(ATNState.class, plusAST);
+		LoopEndState end = newState(LoopEndState.class, plusAST);
 		blkStart.loopBackState = loop;
+		end.loopBackStateNumber = loop.stateNumber;
 
 		plusAST.atnState = blkStart;
 		epsilon(blkEnd, loop);		// blk can see loop back
@@ -452,9 +453,9 @@ public class ParserATNFactory implements ATNFactory {
 	 *
 	 *   |-------------|
 	 *   v             |
-	 *   o--[o-blk-o]->o->o
+	 *   o--[o-blk-o]->o  o
 	 *   |                ^
-	 *   o----------------|
+	 *   -----------------|
 	 *
 	 *  Note that the optional bypass must jump outside the loop as (A|B)* is
 	 *  not the same thing as (A|B|)+.
@@ -464,11 +465,12 @@ public class ParserATNFactory implements ATNFactory {
 		StarBlockStartState blkStart = (StarBlockStartState)elem.left;
 		BlockEndState blkEnd = (BlockEndState)elem.right;
 
-		StarLoopEntryState entry = (StarLoopEntryState)newState(StarLoopEntryState.class, starAST);
+		StarLoopEntryState entry = newState(StarLoopEntryState.class, starAST);
 		atn.defineDecisionState(entry);
-		ATNState end = newState(ATNState.class, starAST);
-		StarLoopbackState loop = (StarLoopbackState)newState(StarLoopbackState.class, starAST);
+		LoopEndState end = newState(LoopEndState.class, starAST);
+		StarLoopbackState loop = newState(StarLoopbackState.class, starAST);
 		entry.loopBackState = loop;
+		end.loopBackStateNumber = loop.stateNumber;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
 		entry.isGreedy = isGreedy(blkAST);

@@ -30,7 +30,12 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /** Specialized OrderedHashSet that can track info about the set.
  *  Might be able to optimize later w/o affecting code that uses this set.
@@ -51,6 +56,14 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 		this.conflictingAlts = old.conflictingAlts;
 		this.hasSemanticContext = old.hasSemanticContext;
 		this.dipsIntoOuterContext = old.dipsIntoOuterContext;
+	}
+
+	public Set<ATNState> getStates() {
+		Set<ATNState> states = new HashSet<ATNState>();
+		for (ATNConfig c : this.elements) {
+			states.add(c.state);
+		}
+		return states;
 	}
 
 	@Override

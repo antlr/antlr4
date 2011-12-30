@@ -56,7 +56,7 @@ public class ATNSerializer {
 	 * 		grammar-type, (ANTLRParser.LEXER, ...)
 	 *  	max token type,
 	 *  	num states,
-	 *  	state-0-type ruleIndex, state-1-type ruleIndex, ...
+	 *  	state-0-type ruleIndex, state-1-type ruleIndex, ... state-i-type ruleIndex optional-arg ...
 	 *  	num rules,
 	 *  	rule-1-start-state rule-1-args, rule-2-start-state  rule-2-args, ...
 	 *  	(args are token type,actionIndex in lexer else 0,0)
@@ -88,6 +88,7 @@ public class ATNSerializer {
 			}
 			data.add(s.getStateType());
 			data.add(s.ruleIndex);
+			if ( s.getStateType() == ATNState.LOOP_END ) data.add(((LoopEndState)s).loopBackStateNumber);
 			nedges += s.getNumberOfTransitions();
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
@@ -200,9 +201,14 @@ public class ATNSerializer {
 			int stype = ATNSimulator.toInt(data[p++]);
             if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
+			String arg = "";
+			if ( stype == ATNState.LOOP_END ) {
+				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
+				arg = " "+loopBackStateNumber;
+			}
 			buf.append((i - 1) + ":" +
 					   ATNState.serializationNames.get(stype) + " "+
-					   ruleIndex + "\n");
+					   ruleIndex + arg + "\n");
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {

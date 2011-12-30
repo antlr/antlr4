@@ -34,10 +34,7 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.v2ParserATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -506,7 +503,7 @@ public class TestATNParserPrediction extends BaseTest {
 //		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
 		TokenStream input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
-		ATNState startState = atn.decisionToState.get(decision);
+		DecisionState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState);
 		dfa.decision = decision;
 		int alt = interp.predictATN(dfa, input, ParserRuleContext.EMPTY, false);
@@ -549,7 +546,7 @@ public class TestATNParserPrediction extends BaseTest {
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
 		try {
-			ATNState startState = atn.decisionToState.get(0);
+			DecisionState startState = atn.decisionToState.get(0);
 			DFA dfa = new DFA(startState);
 //			Rule r = g.getRule(ruleName);
 			//ATNState startState = atn.ruleToStartState.get(r);

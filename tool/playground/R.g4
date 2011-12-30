@@ -51,10 +51,20 @@ grammar R;
     This seems reusable as opposed to the input index. It might be complicated
     to track this. In the general case, we would need a mapping from rule
     invocation of rule r to a count, and within a specific rule context. That
-    might add a HashMap for every RuleContext. ick. Also, one about the context
+    might add a HashMap for every RuleContext. ick. Also, what about the context
     that I create during ATN simulation? I would have to track that as well
     as the generated code in the parser. Rule invocation states would act
     like triggers that would bump account for that target rule in the current ctx.
+
+    Actually, maybe only my ATN sim would have to do it. prog then expr_or_assign
+    would be real elements on stack then I would create expr, expr_primary, pop
+    them both (for 2nd alt of expr_or_assign) and pop back into prog. Then, I'd
+    push expr_or_assign again but could notice I was calling 2nd time from prog.
+    Maybe make one big map: count[ctx][invocation-state] -> value to keep out
+    of RuleContext. Used only during sim anyway.
+
+    Make sure that this doesn't cause r* for optional r to miss an ambiguity
+    since 2nd invocation would have diff stack.
 */
 prog	:	expr_or_assign* ;
 
@@ -67,9 +77,11 @@ prog	:	expr_or_assign* ;
 //prog	:	expr_or_assign prog | ;
 
 expr_or_assign
-	:	expr '=' expr_or_assign
+	:	expr '++'
 	|	expr	// match ID a, fall out, reenter, match "(i)<-x" via alt 1
-        ;
+                // it thinks it's same context from prog, but it's not; it's
+               // 2nd time through expr_or_assign* loop.
+    ;
 
 expr : expr_primary ('<-' ID)? ;
 expr_primary

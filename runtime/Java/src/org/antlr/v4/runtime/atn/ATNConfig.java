@@ -55,7 +55,7 @@ public class ATNConfig {
 	 *  execution of the ATN simulator.
 	 */
 	@Nullable
-	public final RuleContext context;
+	public RuleContext context;
 
 	/**
 	 * Indicates that we have reached this ATN configuration after

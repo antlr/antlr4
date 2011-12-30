@@ -31,12 +31,15 @@ package org.antlr.v4.tool.interp;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.v2ParserATNSimulator;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ParserInterpreter {
 	class DummyParser extends Parser {
@@ -94,4 +97,5 @@ public class ParserInterpreter {
 	public v2ParserATNSimulator<Token> getATNSimulator() {
 		return atnSimulator;
 	}
+
 }
