@@ -127,7 +127,8 @@ build.sysclasspath=ignore
 
         <jar jarfile="${jar.file}">
             <fileset dir="${build.dir}/classes" includes="**/*.class"/>
-
+            <fileset dir="${lib.dir}" includes="**/*.jar" />
+            <fileset dir="${basedir}/runtime/Java/lib" includes="**/*.jar" />
             <manifest>
                 <attribute name="Version" value="${version}"/>
             </manifest>
