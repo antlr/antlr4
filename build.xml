@@ -19,7 +19,7 @@ build.sysclasspath=ignore
     <property name="build.dir" value="${basedir}/build" />
     <property name="lib.dir" value="${basedir}/lib" />
     <property name="install.root.dir" value="${dist.dir}/antlr-${version}" />
-    <property name="jar.file" value="${dist.dir}/antlr-${version}.jar" />
+    <property name="jar.file" value="${dist.dir}/antlr-${version}-complete.jar" />
 
 	<path id="classpath">
         <pathelement location="${antlr3.jar}"/> <!-- general setup -->
@@ -127,8 +127,8 @@ build.sysclasspath=ignore
 
         <jar jarfile="${jar.file}">
             <fileset dir="${build.dir}/classes" includes="**/*.class"/>
-            <fileset dir="${lib.dir}" includes="**/*.jar" />
-            <fileset dir="${basedir}/runtime/Java/lib" includes="**/*.jar" />
+            <zipfileset includes="**/*.class" src="${antlr3.jar}"/>
+            <zipfileset includes="**/*.class" src="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             <manifest>
                 <attribute name="Version" value="${version}"/>
             </manifest>
