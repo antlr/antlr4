@@ -131,7 +131,7 @@ build.sysclasspath=ignore
 		    <include name="**/*.st"/>
 		    <include name="**/*.stg"/>
 	    </fileset>
-            <zipfileset includes="org/antlr, org/antlr/stringtemplate" src="${antlr3.jar}"/>
+            <zipfileset includes="org/antlr/**, org/antlr/stringtemplate/**" src="${antlr3.jar}"/>
             <zipfileset includes="**/*.class" src="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             <manifest>
                 <attribute name="Version" value="${version}"/>
