@@ -135,6 +135,7 @@ build.sysclasspath=ignore
             <zipfileset includes="**/*.class" src="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             <manifest>
                 <attribute name="Version" value="${version}"/>
+                <attribute name="Main-Class" value="org.antlr.v4.Tool"/>
             </manifest>
         </jar>
     </target>
