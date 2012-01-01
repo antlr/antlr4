@@ -127,7 +127,7 @@ build.sysclasspath=ignore
 
         <jar jarfile="${jar.file}">
             <fileset dir="${build.dir}/classes" includes="**/*.class"/>
-            <zipfileset includes="**/*.class" src="${antlr3.jar}"/>
+            <zipfileset includes="org/antlr, org/antlr/stringtemplate" src="${antlr3.jar}"/>
             <zipfileset includes="**/*.class" src="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             <manifest>
                 <attribute name="Version" value="${version}"/>
