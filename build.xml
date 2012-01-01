@@ -127,6 +127,10 @@ build.sysclasspath=ignore
 
         <jar jarfile="${jar.file}">
             <fileset dir="${build.dir}/classes" includes="**/*.class"/>
+	    <fileset dir="${basedir}/tool/resources">
+		    <include name="**/*.st"/>
+		    <include name="**/*.stg"/>
+	    </fileset>
             <zipfileset includes="org/antlr, org/antlr/stringtemplate" src="${antlr3.jar}"/>
             <zipfileset includes="**/*.class" src="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             <manifest>
@@ -143,6 +147,10 @@ build.sysclasspath=ignore
 			<fileset dir="${basedir}/tool/src/">
 				<include name="**/*.java"/>
 				<include name="**/*.g"/>
+				<include name="**/*.st"/>
+				<include name="**/*.stg"/>
+			</fileset>
+			<fileset dir="${basedir}/tool/resources/">
 				<include name="**/*.st"/>
 				<include name="**/*.stg"/>
 			</fileset>
