@@ -67,9 +67,12 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
         if ( p == -1 ) setup();
         p++;
         sync(p);
-        while ( tokens.get(p).getChannel()!=channel ) {
+		CommonToken t = tokens.get(p);
+		int n = size();
+		while ( p<n && t.getChannel()!=channel ) {
             p++;
             sync(p);
+			t = tokens.get(p);
         }
     }
 
