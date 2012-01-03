@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
@@ -44,7 +44,7 @@ import java.util.List;
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
 
-	public static String getPS(Tree t, BaseRecognizer recog,
+	public static String getPS(Tree t, Parser recog,
 							   String fontName, int fontSize)
 	{
 		TreePostScriptGenerator psgen =
@@ -52,11 +52,11 @@ public class Trees {
 		return psgen.getPS();
 	}
 
-	public static String getPS(Tree t, BaseRecognizer recog) {
+	public static String getPS(Tree t, Parser recog) {
 		return getPS(t, recog, "Helvetica", 11);
 	}
 
-	public static void writePS(Tree t, BaseRecognizer recog,
+	public static void writePS(Tree t, Parser recog,
 							   String fileName,
 							   String fontName, int fontSize)
 		throws IOException
@@ -68,7 +68,7 @@ public class Trees {
 		bw.close();
 	}
 
-	public static void writePS(Tree t, BaseRecognizer recog, String fileName)
+	public static void writePS(Tree t, Parser recog, String fileName)
 		throws IOException
 	{
 		writePS(t, recog, fileName, "Helvetica", 11);
@@ -78,7 +78,7 @@ public class Trees {
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(Tree t, BaseRecognizer recog) {
+	public static String toStringTree(Tree t, Parser recog) {
 		if ( t.getChildCount()==0 ) return getNodeText(t, recog);
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
@@ -92,7 +92,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static <Symbol> String getNodeText(Tree t, BaseRecognizer recog) {
+	public static <Symbol> String getNodeText(Tree t, Parser recog) {
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
 				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();

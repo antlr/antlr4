@@ -39,7 +39,7 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
      *  RuntimeException.
      */
     @Override
-    public void recover(BaseRecognizer recognizer, RecognitionException e) {
+    public void recover(Parser recognizer, RecognitionException e) {
         throw new RuntimeException(e);
     }
 
@@ -47,7 +47,7 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
      *  successfully recovers, it won't throw an exception.
      */
     @Override
-    public Token recoverInline(BaseRecognizer recognizer)
+    public Token recoverInline(Parser recognizer)
         throws RecognitionException
     {
         throw new RuntimeException(new InputMismatchException(recognizer));
@@ -55,5 +55,5 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
 
     /** Make sure we don't attempt to recover from problems in subrules. */
     @Override
-    public void sync(BaseRecognizer recognizer) { }
+    public void sync(Parser recognizer) { }
 }

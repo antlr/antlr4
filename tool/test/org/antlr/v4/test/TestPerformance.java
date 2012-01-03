@@ -38,12 +38,12 @@ public class TestPerformance extends BaseTest {
     private static final boolean RUN_PARSER = true;
     /** True to use {@link BailErrorStrategy}, False to use {@link DefaultErrorStrategy} */
     private static final boolean BAIL_ON_ERROR = false;
-    /** This value is passed to {@link BaseRecognizer#setBuildParseTree}. */
+    /** This value is passed to {@link org.antlr.v4.runtime.Parser#setBuildParseTree}. */
     private static final boolean BUILD_PARSE_TREES = false;
     /**
      *  Use ParseTreeWalker.DEFAULT.walk with the BlankJavaParserListener to show parse tree walking overhead.
      *  If {@link #BUILD_PARSE_TREES} is false, the listener will instead be called during the parsing process via
-     *  {@link BaseRecognizer#setListener}.
+     *  {@link org.antlr.v4.runtime.Parser#setListener}.
      */
     private static final boolean BLANK_LISTENER = false;
 

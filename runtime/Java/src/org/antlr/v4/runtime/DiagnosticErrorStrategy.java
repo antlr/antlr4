@@ -41,7 +41,7 @@ import java.util.Arrays;
 
 public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     @Override
-    public void reportAmbiguity(@NotNull BaseRecognizer recognizer,
+    public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
     {
@@ -50,7 +50,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     }
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull BaseRecognizer recognizer,
+	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
 											@NotNull OrderedHashSet<ATNConfig> configs)
@@ -60,7 +60,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull BaseRecognizer recognizer, @NotNull DFA dfa,
+	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
         recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input='" +
@@ -68,7 +68,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     }
 
     @Override
-    public void reportInsufficientPredicates(@NotNull BaseRecognizer recognizer,
+    public void reportInsufficientPredicates(@NotNull Parser recognizer,
 											 @NotNull DFA dfa,
 											 int startIndex, int stopIndex,
 											 @NotNull IntervalSet ambigAlts,

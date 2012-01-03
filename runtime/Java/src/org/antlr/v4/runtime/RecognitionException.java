@@ -79,8 +79,8 @@ public class RecognitionException extends RuntimeException {
 
 	public IntervalSet getExpectedTokens() {
         // TODO: do we really need this type check?
-		if ( recognizer!=null && recognizer instanceof BaseRecognizer ) {
-			return ((BaseRecognizer) recognizer).getExpectedTokens();
+		if ( recognizer!=null && recognizer instanceof Parser) {
+			return ((Parser) recognizer).getExpectedTokens();
 		}
 		return null;
 	}

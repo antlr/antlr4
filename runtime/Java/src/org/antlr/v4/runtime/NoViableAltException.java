@@ -45,7 +45,7 @@ public class NoViableAltException extends RecognitionException {
  	 */
 	public Token startToken;
 
-	public <Symbol extends Token> NoViableAltException(BaseRecognizer recognizer) { // LL(1) error
+	public <Symbol extends Token> NoViableAltException(Parser recognizer) { // LL(1) error
 		this(recognizer,recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),
 			 recognizer.getCurrentToken(),
@@ -53,7 +53,7 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public <Symbol> NoViableAltException(BaseRecognizer recognizer,
+	public <Symbol> NoViableAltException(Parser recognizer,
 										 SymbolStream<Symbol> input,
 										 Token startToken,
 										 Token offendingToken,

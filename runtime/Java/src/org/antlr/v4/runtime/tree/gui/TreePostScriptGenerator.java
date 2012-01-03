@@ -34,7 +34,7 @@ import org.abego.treelayout.NodeExtentProvider;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
-import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 
@@ -71,11 +71,11 @@ public class TreePostScriptGenerator {
 
 	protected PostScriptDocument doc;
 
-	public TreePostScriptGenerator(BaseRecognizer parser, Tree root) {
+	public TreePostScriptGenerator(Parser parser, Tree root) {
 		this(parser, root, "CourierNew", 11);
 	}
 
-	public TreePostScriptGenerator(BaseRecognizer parser, Tree root,
+	public TreePostScriptGenerator(Parser parser, Tree root,
 								   String fontName, int fontSize)
 	{
 		this.root = root;

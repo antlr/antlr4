@@ -56,24 +56,24 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	protected IntervalSet lastErrorStates;
 
 	@Override
-	public void beginErrorCondition(BaseRecognizer recognizer) {
+	public void beginErrorCondition(Parser recognizer) {
 		errorRecoveryMode = true;
 	}
 
 	@Override
-	public boolean inErrorRecoveryMode(BaseRecognizer recognizer) {
+	public boolean inErrorRecoveryMode(Parser recognizer) {
 		return errorRecoveryMode;
 	}
 
 	@Override
-	public void endErrorCondition(BaseRecognizer recognizer) {
+	public void endErrorCondition(Parser recognizer) {
 		errorRecoveryMode = false;
 		lastErrorStates = null;
 		lastErrorIndex = -1;
 	}
 
 	@Override
-	public void reportError(BaseRecognizer recognizer,
+	public void reportError(Parser recognizer,
 							RecognitionException e)
 		throws RecognitionException
 	{
@@ -106,7 +106,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  token that the match() routine could not recover from.
 	 */
 	@Override
-	public void recover(BaseRecognizer recognizer, RecognitionException e) {
+	public void recover(Parser recognizer, RecognitionException e) {
 //		System.out.println("recover in "+recognizer.getRuleInvocationStack()+
 //						   " index="+recognizer.getInputStream().index()+
 //						   ", lastErrorIndex="+
@@ -146,7 +146,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  We opt to stay in the loop as long as possible.
  	 */
 	@Override
-	public void sync(BaseRecognizer recognizer) {
+	public void sync(Parser recognizer) {
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
@@ -184,7 +184,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		// do nothing if we can't identify the exact kind of ATN state
 	}
 
-	public void reportNoViableAlternative(BaseRecognizer recognizer,
+	public void reportNoViableAlternative(Parser recognizer,
 										  NoViableAltException e)
 	throws RecognitionException
 	{
@@ -201,7 +201,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		recognizer.notifyListeners((Token) e.offendingToken, msg, e);
 	}
 
-	public void reportInputMismatch(BaseRecognizer recognizer,
+	public void reportInputMismatch(Parser recognizer,
 									InputMismatchException e)
 		throws RecognitionException
 	{
@@ -210,7 +210,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		recognizer.notifyListeners((Token)e.offendingToken, msg, e);
 	}
 
-	public void reportFailedPredicate(BaseRecognizer recognizer,
+	public void reportFailedPredicate(Parser recognizer,
 									  FailedPredicateException e)
 		throws RecognitionException
 	{
@@ -219,7 +219,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		recognizer.notifyListeners((Token)e.offendingToken, msg, e);
 	}
 
-	public void reportUnwantedToken(BaseRecognizer recognizer) {
+	public void reportUnwantedToken(Parser recognizer) {
 		if (errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
@@ -232,7 +232,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		recognizer.notifyListeners(t, msg, null);
 	}
 
-	public void reportMissingToken(BaseRecognizer recognizer) {
+	public void reportMissingToken(Parser recognizer) {
 		if (errorRecoveryMode) return;
 		recognizer.syntaxErrors++;
 		beginErrorCondition(recognizer);
@@ -275,7 +275,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  reference in rule atom.  It can assume that you forgot the ')'.
 	 */
 	@Override
-	public Token recoverInline(BaseRecognizer recognizer)
+	public Token recoverInline(Parser recognizer)
 		throws RecognitionException
 	{
 		// SINGLE TOKEN DELETION
@@ -297,7 +297,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	// if next token is what we are looking for then "delete" this token
-	public boolean singleTokenInsertion(BaseRecognizer recognizer) {
+	public boolean singleTokenInsertion(Parser recognizer) {
 		int currentSymbolType = recognizer.getInputStream().LA(1);
 		// if current token is consistent with what could come after current
 		// ATN state, then we know we're missing a token; error recovery
@@ -313,7 +313,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		return false;
 	}
 
-	public Token singleTokenDeletion(BaseRecognizer recognizer) {
+	public Token singleTokenDeletion(Parser recognizer) {
 		int nextTokenType = recognizer.getInputStream().LA(2);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		if ( expecting.contains(nextTokenType) ) {
@@ -352,7 +352,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  If you change what tokens must be created by the lexer,
 	 *  override this method to create the appropriate tokens.
 	 */
-	protected Token getMissingSymbol(BaseRecognizer recognizer) {
+	protected Token getMissingSymbol(Parser recognizer) {
 		Token currentSymbol = recognizer.getCurrentToken();
 		if (!(currentSymbol instanceof Token)) {
 			throw new UnsupportedOperationException("This error strategy only supports Token symbols.");
@@ -376,7 +376,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		return (Token)t;
 	}
 
-	public IntervalSet getExpectedTokens(BaseRecognizer recognizer) {
+	public IntervalSet getExpectedTokens(Parser recognizer) {
 		return recognizer.getExpectedTokens();
 	}
 
@@ -520,7 +520,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  Like Grosch I implement context-sensitive FOLLOW sets that are combined
 	 *  at run-time upon error to avoid overhead during parsing.
 	 */
-	protected IntervalSet getErrorRecoverySet(BaseRecognizer recognizer) {
+	protected IntervalSet getErrorRecoverySet(Parser recognizer) {
 		ATN atn = recognizer.getInterpreter().atn;
 		RuleContext ctx = recognizer._ctx;
 		IntervalSet recoverSet = new IntervalSet();
@@ -538,7 +538,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	/** Consume tokens until one matches the given token set */
-	public void consumeUntil(BaseRecognizer recognizer, IntervalSet set) {
+	public void consumeUntil(Parser recognizer, IntervalSet set) {
 //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
@@ -550,14 +550,14 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
     }
 
     @Override
-    public void reportAmbiguity(@NotNull BaseRecognizer recognizer,
+    public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
     {
     }
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull BaseRecognizer recognizer,
+	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
 											@NotNull OrderedHashSet<ATNConfig> configs)
@@ -565,13 +565,13 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	@Override
-    public void reportContextSensitivity(@NotNull BaseRecognizer recognizer, @NotNull DFA dfa,
+    public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
     }
 
     @Override
-    public void reportInsufficientPredicates(@NotNull BaseRecognizer recognizer,
+    public void reportInsufficientPredicates(@NotNull Parser recognizer,
 											 @NotNull DFA dfa,
 											 int startIndex, int stopIndex,
 											 @NotNull IntervalSet ambigAlts,

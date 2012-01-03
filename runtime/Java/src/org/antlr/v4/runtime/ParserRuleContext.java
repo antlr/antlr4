@@ -220,7 +220,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	}
 
     /** Used for rule context info debugging during runtime, not so much for ATN debugging */
-    public String toInfoString(BaseRecognizer recognizer) {
+    public String toInfoString(Parser recognizer) {
         List<String> rules = recognizer.getRuleInvocationStack();
         Collections.reverse(rules);
         return "ParserRuleContext"+rules+"{" +

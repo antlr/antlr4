@@ -236,7 +236,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static int retry_with_context_indicates_no_conflict = 0;
 
 	@Nullable
-	protected final BaseRecognizer parser;
+	protected final Parser parser;
 
 	@NotNull
 	public final DFA[] decisionToDFA;
@@ -246,7 +246,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		this(null, atn);
 	}
 
-	public v2ParserATNSimulator(@Nullable BaseRecognizer parser, @NotNull ATN atn) {
+	public v2ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
 //		ctxToDFAs = new HashMap<RuleContext, DFA[]>();

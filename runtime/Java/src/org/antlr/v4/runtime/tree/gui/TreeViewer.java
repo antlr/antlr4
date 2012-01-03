@@ -33,7 +33,7 @@ import org.abego.treelayout.NodeExtentProvider;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
-import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
@@ -53,9 +53,9 @@ public class TreeViewer extends JComponent {
 	public static final Color LIGHT_RED = new Color(244, 213, 211);
 
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
-		BaseRecognizer parser;
+		Parser parser;
 
-		public DefaultTreeTextProvider(BaseRecognizer parser) {
+		public DefaultTreeTextProvider(Parser parser) {
 			this.parser = parser;
 		}
 
@@ -111,9 +111,9 @@ public class TreeViewer extends JComponent {
 	protected Color borderColor = null;
 	protected Color textColor = Color.black;
 
-	protected BaseRecognizer parser;
+	protected Parser parser;
 
-	public TreeViewer(BaseRecognizer parser, Tree tree) {
+	public TreeViewer(Parser parser, Tree tree) {
 		this.parser = parser;
 		setTreeTextProvider(new DefaultTreeTextProvider(parser));
         boolean useIdentity = true; // compare node identity

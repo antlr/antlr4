@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.BaseRecognizer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStream;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ParserATNPathFinder extends v2ParserATNSimulator {
-	public ParserATNPathFinder(@Nullable BaseRecognizer parser, @NotNull ATN atn) {
+	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn) {
 		super(parser, atn);
 	}
 
