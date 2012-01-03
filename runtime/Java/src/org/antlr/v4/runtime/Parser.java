@@ -132,13 +132,13 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 		return buildParseTrees;
 	}
 
-	public void setTraceATNStates(boolean traceATNStates) {
-		this.traceATNStates = traceATNStates;
-	}
-
-	public boolean getTraceATNStates() {
-		return traceATNStates;
-	}
+//	public void setTraceATNStates(boolean traceATNStates) {
+//		this.traceATNStates = traceATNStates;
+//	}
+//
+//	public boolean getTraceATNStates() {
+//		return traceATNStates;
+//	}
 
     public ParseTreeListener<Token> getListener() {
         return _listener;
@@ -469,6 +469,6 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 	public void setState(int atnState) {
 //		System.err.println("setState "+atnState);
 		_ctx.s = atnState;
-		if ( traceATNStates ) _ctx.trace(atnState);
+//		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 }

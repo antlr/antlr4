@@ -92,7 +92,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
      *
      *  This does not trace states visited during prediction.
 	 */
-	public List<Integer> states;
+//	public List<Integer> states;
 
 	/** Current ATN state number we are executing.
 	 *
@@ -168,10 +168,10 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		}
 	}
 
-	public void trace(int s) {
-		if ( states==null ) states = new ArrayList<Integer>();
-		states.add(s);
-	}
+//	public void trace(int s) {
+//		if ( states==null ) states = new ArrayList<Integer>();
+//		states.add(s);
+//	}
 
 	public void addChild(Token matchedToken) {
 		TerminalNodeImpl<?> t = new TerminalNodeImpl<Token>(matchedToken);
