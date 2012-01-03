@@ -227,18 +227,6 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 		}
 	}
 
-	public void enterOuterAlt(ParserRuleContext<Token> localctx, int altNum) {
-		// if we have new localctx, make sure we replace existing ctx
-		// that is previous child of parse tree
-		if ( buildParseTrees && _ctx != localctx ) {
-			ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
-			parent.removeLastChild();
-			if ( parent!=null )	parent.addChild(localctx);
-		}
-		_ctx = localctx;
-		_ctx.altNum = altNum;
-	}
-
 	/** Consume the current symbol and return it. E.g., given the following
 	 *  input with A being the current lookahead symbol:
 	 *
@@ -301,6 +289,18 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
         }
 		_ctx = (ParserRuleContext<Token>)_ctx.parent;
     }
+
+	public void enterOuterAlt(ParserRuleContext<Token> localctx, int altNum) {
+		// if we have new localctx, make sure we replace existing ctx
+		// that is previous child of parse tree
+		if ( buildParseTrees && _ctx != localctx ) {
+			ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
+			parent.removeLastChild();
+			if ( parent!=null )	parent.addChild(localctx);
+		}
+		_ctx = localctx;
+		_ctx.altNum = altNum;
+	}
 
 	public ParserRuleContext<Token> getInvokingContext(int ruleIndex) {
 		ParserRuleContext<Token> p = _ctx;
