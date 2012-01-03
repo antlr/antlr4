@@ -209,6 +209,10 @@ public class TestCommonTokenStream extends BaseTest {
 				public CharStream getInputStream() {
 					return null;
 				}
+
+				@Override
+				public void setTokenFactory(TokenFactory<?> factory) {
+				}
 			};
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);

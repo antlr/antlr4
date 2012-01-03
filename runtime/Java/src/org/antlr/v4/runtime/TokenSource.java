@@ -62,4 +62,7 @@ public interface TokenSource {
 	 *  ask lexers input stream.
 	 */
 	public String getSourceName();
+
+	/** Optional method that lets users set factory in lexer or other source */
+	public void setTokenFactory(TokenFactory<?> factory);
 }

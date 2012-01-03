@@ -31,10 +31,8 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
  *  TODO: what to do about lexers
  */
 public interface ANTLRErrorStrategy {
-	/** Report any kind of RecognitionException. */
-	void reportError(@NotNull Parser recognizer,
-					 @Nullable RecognitionException e)
-		throws RecognitionException;
+	/** To create missing tokens, we need a factory */
+	public void setTokenFactory(TokenFactory<?> factory);
 
 	/** When matching elements within alternative, use this method
 	 *  to recover. The default implementation uses single token
@@ -109,13 +107,18 @@ public interface ANTLRErrorStrategy {
 
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
-     *  and from its own reset method.
-     */
-    void endErrorCondition(@NotNull Parser recognizer);
+	 *  and from its own reset method.
+	 */
+	void endErrorCondition(@NotNull Parser recognizer);
 
-    /** Called when the parser detects a true ambiguity: an input sequence can be matched
-     * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
-     * favor of the alternative appearing first in the grammar. The start and stop index are
+	/** Report any kind of RecognitionException. */
+	void reportError(@NotNull Parser recognizer,
+					 @Nullable RecognitionException e)
+	throws RecognitionException;
+
+	/** Called when the parser detects a true ambiguity: an input sequence can be matched
+	 * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
+	 * favor of the alternative appearing first in the grammar. The start and stop index are
      * zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
      * that can match the input sequence. This method is only called when we are parsing with
      * full context.
@@ -123,17 +126,6 @@ public interface ANTLRErrorStrategy {
     void reportAmbiguity(@NotNull Parser recognizer,
 						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 						 @NotNull OrderedHashSet<ATNConfig> configs);
-
-    /** Called by the parser when it detects an input sequence that can be matched by two paths
-     *  through the grammar. The difference between this and the reportAmbiguity method lies in
-     *  the difference between Strong LL parsing and LL parsing. If we are not parsing with context,
-     *  we can't be sure if a conflict is an ambiguity or simply a weakness in the Strong LL parsing
-     *  strategy. If we are parsing with full context, this method is never called.
-     */
-//    void reportConflict(@NotNull BaseRecognizer recognizer,
-//                        int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-//                        @NotNull OrderedHashSet<ATNConfig> configs);
-
 
 	void reportAttemptingFullContext(@NotNull Parser recognizer,
 									 @NotNull DFA dfa,

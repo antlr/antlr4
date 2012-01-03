@@ -39,6 +39,9 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
  *  and tree parsers.
  */
 public class DefaultErrorStrategy implements ANTLRErrorStrategy {
+	/** How to create token objects */
+	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
+
 	/** This is true after we see an error and before having successfully
 	 *  matched a token. Prevents generation of more than one error message
 	 *  per error.
@@ -54,6 +57,11 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	protected int lastErrorIndex = -1;
 
 	protected IntervalSet lastErrorStates;
+
+	@Override
+	public void setTokenFactory(TokenFactory<?> factory) {
+		this._factory = factory;
+	}
 
 	@Override
 	public void beginErrorCondition(Parser recognizer) {
@@ -354,26 +362,20 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 */
 	protected Token getMissingSymbol(Parser recognizer) {
 		Token currentSymbol = recognizer.getCurrentToken();
-		if (!(currentSymbol instanceof Token)) {
-			throw new UnsupportedOperationException("This error strategy only supports Token symbols.");
-		}
-
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		int expectedTokenType = expecting.getMinElement(); // get any element
 		String tokenText;
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+recognizer.getTokenNames()[expectedTokenType]+">";
-		CommonToken t = new CommonToken(expectedTokenType, tokenText);
-		Token current = (Token)currentSymbol;
+		Token current = currentSymbol;
 		if ( current.getType() == Token.EOF ) {
-			current = ((TokenStream)recognizer.getInputStream()).LT(-1);
+			current = recognizer.getInputStream().LT(-1);
 		}
-		t.line = current.getLine();
-		t.charPositionInLine = current.getCharPositionInLine();
-		t.channel = Token.DEFAULT_CHANNEL;
-		t.source = current.getTokenSource();
-		t.index = -1; // indicate we conjured this up because it has no index
-		return (Token)t;
+		return
+			_factory.create(current.getTokenSource(), expectedTokenType, tokenText,
+							Token.DEFAULT_CHANNEL,
+							-1, -1,
+							current.getLine(), current.getCharPositionInLine());
 	}
 
 	public IntervalSet getExpectedTokens(Parser recognizer) {

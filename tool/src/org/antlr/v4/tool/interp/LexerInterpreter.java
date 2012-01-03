@@ -60,6 +60,11 @@ public class LexerInterpreter implements TokenSource {
 
 	public String getSourceName() {	return g.name; }
 
+	@Override
+	public void setTokenFactory(TokenFactory<?> factory) {
+			// TODO: use TokenFactory
+	}
+
 	public int getCharPositionInLine() {
 		return 0;
 	}
@@ -79,6 +84,7 @@ public class LexerInterpreter implements TokenSource {
 		int tokenStartLine = interp.getLine();
 		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
 		int stop = input.index()-1;
+		// TODO: use TokenFactory
 		WritableToken t = new CommonToken(this, ttype, Token.DEFAULT_CHANNEL, start, stop);
 		t.setLine(tokenStartLine);
 		t.setCharPositionInLine(tokenStartCharPositionInLine);

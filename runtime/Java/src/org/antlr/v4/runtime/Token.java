@@ -35,7 +35,7 @@ package org.antlr.v4.runtime;
  */
 public interface Token {
 	public static final int INVALID_TYPE = 0;
-	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
+//	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
 	public static final int MIN_TOKEN_TYPE = 1;
 
     /** During lookahead operations, this "token" signifies we hit rule end ATN state

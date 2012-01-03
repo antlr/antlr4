@@ -50,7 +50,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public static final int MIN_CHAR_VALUE = '\u0000';
 	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
-	public CharStream input;
+	public CharStream _input;
+
+	/** How to create token objects */
+	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
 
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to
@@ -94,13 +97,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public String text;
 
 	public Lexer(CharStream input) {
-		this.input = input;
+		this._input = input;
 	}
 
 	public void reset() {
 		// wack Lexer state variables
-		if ( input!=null ) {
-			input.seek(0); // rewind the input
+		if ( _input !=null ) {
+			_input.seek(0); // rewind the input
 		}
 		token = null;
 		type = Token.INVALID_TYPE;
@@ -124,13 +127,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	@Override
 	public Token nextToken() {
-		if ( hitEOF ) return emitEOF();
+		if ( hitEOF ) return anEOF();
 
 		outer:
 		while (true) {
 			token = null;
 			channel = Token.DEFAULT_CHANNEL;
-			tokenStartCharIndex = input.index();
+			tokenStartCharIndex = _input.index();
 			tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
 			tokenStartLine = getInterpreter().getLine();
 			text = null;
@@ -141,14 +144,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 //								   " at index "+input.index());
 				int ttype;
 				try {
-					ttype = getInterpreter().match(input, mode);
+					ttype = getInterpreter().match(_input, mode);
 				}
 				catch (LexerNoViableAltException e) {
 					notifyListeners(e);		// report error
 					recover(e);
 					ttype = SKIP;
 				}
-				if ( input.LA(1)==CharStream.EOF ) {
+				if ( _input.LA(1)==CharStream.EOF ) {
 					hitEOF = true;
 				}
 				if ( type == Token.INVALID_TYPE ) type = ttype;
@@ -195,22 +198,27 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return mode;
 	}
 
+	@Override
+	public void setTokenFactory(TokenFactory<?> factory) {
+		this._factory = factory;
+	}
+
 	/** Set the char stream and reset the lexer */
 	@Override
 	public void setInputStream(IntStream input) {
-		this.input = null;
+		this._input = null;
 		reset();
-		this.input = (CharStream)input;
+		this._input = (CharStream)input;
 	}
 
 	@Override
 	public String getSourceName() {
-		return input.getSourceName();
+		return _input.getSourceName();
 	}
 
 	@Override
 	public CharStream getInputStream() {
-		return input;
+		return _input;
 	}
 
 	/** Currently does not support multiple emits per nextToken invocation
@@ -228,35 +236,25 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  outermost lexical rule.  The token object should point into the
 	 *  char buffer start..stop.  If there is a text override in 'text',
 	 *  use that to set the token's text.  Override this method to emit
-	 *  custom Token objects.
-	 *
-	 *  If you are building trees, then you should also override
-	 *  Parser or TreeParser.getMissingSymbol().
+	 *  custom Token objects or provide a new factory.
 	 */
 	public Token emit() {
-		WritableToken t = new CommonToken(this, type,
-										  channel, tokenStartCharIndex,
-										  getCharIndex()-1);
-		t.setLine(tokenStartLine);
-		if ( text!=null ) t.setText(text);
-		t.setCharPositionInLine(tokenStartCharPositionInLine);
+		Token t = _factory.create(this, type, text, channel, tokenStartCharIndex, getCharIndex()-1,
+								  tokenStartLine, tokenStartCharPositionInLine);
 		emit(t);
 		return t;
 	}
 
-	public Token emitEOF() {
-		WritableToken eof = new CommonToken(this,Token.EOF,
-											Token.DEFAULT_CHANNEL,
-											input.index(),input.index()-1);
-		eof.setLine(getLine());
+	public Token anEOF() {
+		int cpos = getCharPositionInLine();
 		// The character position for EOF is one beyond the position of
 		// the previous token's last character
-		int cpos = getCharPositionInLine();
 		if ( token!=null ) {
 			int n = token.getStopIndex() - token.getStartIndex() + 1;
 			cpos = token.getCharPositionInLine()+n;
 		}
-		eof.setCharPositionInLine(cpos);
+		Token eof = _factory.create(this, Token.EOF, null, channel, _input.index(), _input.index()-1,
+									getLine(), cpos);
 		return eof;
 	}
 
@@ -272,7 +270,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
-		return input.index();
+		return _input.index();
 	}
 
 	/** Return the text matched so far for the current token or any
@@ -282,7 +280,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		if ( text!=null ) {
 			return text;
 		}
-		return getInterpreter().getText(input);
+		return getInterpreter().getText(_input);
 //		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 
@@ -318,12 +316,12 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public void recover(LexerNoViableAltException e) {
-		getInterpreter().consume(input); // skip a char and try again
+		getInterpreter().consume(_input); // skip a char and try again
 	}
 
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
-			input.substring(tokenStartCharIndex,input.index())+"'";
+			_input.substring(tokenStartCharIndex, _input.index())+"'";
 		ANTLRErrorListener<Integer>[] listeners = getListeners();
 		if ( listeners.length == 0 ) {
 			System.err.println("line "+tokenStartLine+":"+
@@ -364,6 +362,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		//System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
 		//re.printStackTrace();
 		// TODO: Do we lose character or line position information?
-		input.consume();
+		_input.consume();
 	}
 }
