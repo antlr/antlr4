@@ -116,21 +116,6 @@ public class CodeGenerator {
 		}
 	}
 
-//	public void buildOutputModel() {
-//		OutputModelFactory factory;
-//		if ( g.isLexer() ) factory = new LexerFactory(this);
-//		else factory = new ParserFactory(this);
-//		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
-//		OutputModelController controller = new OutputModelController(factory);
-//		if ( g.hasASTOption() ) {
-//			controller.addExtension( new ParserASTExtension(factory) );
-//		}
-//		factory.setController(controller);
-//
-//		if ( g.isLexer() ) outputModel = controller.buildLexerOutputModel();
-//		else outputModel = controller.buildParserOutputModel();
-//	}
-
 	// CREATE TEMPLATES BY WALKING MODEL
 	public ST generateLexer() {
 		OutputModelFactory factory = new LexerFactory(this);
@@ -160,35 +145,9 @@ public class CodeGenerator {
 
 		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 		OutputModelController controller = new OutputModelController(factory);
-		if ( g.hasASTOption() ) {
-			controller.addExtension( new ParserASTExtension(factory) );
-		}
 		factory.setController(controller);
 
 		OutputModelObject outputModel = controller.buildParserOutputModel();
-
-		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(outputModel);
-
-		if ( tool.launch_ST_inspector ) {
-			st.inspect();
-			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
-		}
-
-		return st;
-	}
-
-	public ST generateTreeParser() {
-		OutputModelFactory factory = new TreeParserFactory(this);
-
-		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
-		OutputModelController controller = new OutputModelController(factory);
-		if ( g.hasASTOption() ) {
-			controller.addExtension( new ParserASTExtension(factory) );
-		}
-		factory.setController(controller);
-
-		OutputModelObject outputModel = controller.buildTreeParserOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		ST st = walker.walk(outputModel);

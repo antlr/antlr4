@@ -36,9 +36,6 @@ public class TestBasicSemanticErrors extends BaseTest {
         // INPUT
         "grammar A;\n" +
         "\n" +
-        "options {\n" +
-        "        output=template;\n" +
-        "}\n" +
         "\n" +
         "a : ID<Foo> -> ID ;\n" +
         "\n" +
@@ -51,10 +48,6 @@ public class TestBasicSemanticErrors extends BaseTest {
 
         // INPUT
         "tree grammar B;\n" +
-        "options {\n" +
-        "\tfilter=true;\n" +
-        "\toutput=template;\n" +
-        "}\n" +
         "\n" +
         "a : A;\n" +
         "\n" +
@@ -97,10 +90,6 @@ public class TestBasicSemanticErrors extends BaseTest {
 
         // INPUT
         "tree grammar V;\n" +
-        "options {\n" +
-        "        rewrite=true;\n" +
-        "        output=template;\n" +
-        "}\n" +
         "a : A\n" +
         "  | A B -> template() \"kjsfdkdsj\" \n" +
         "  ;",
@@ -118,16 +107,6 @@ public class TestBasicSemanticErrors extends BaseTest {
         "warning(47): V.g:3:8: illegal option rewrite\n"
     };
 
-	static String[] C = {
-		"parser grammar C;\n" +
-		"options {output=AST;}\n" +
-		"tokens { A; B; C; }\n" +
-		"a : A -> B $a A ;", // no problem with or $a.
-
-		""
-	};
-
     @Test public void testA() { super.testErrors(A, false); }
 	@Test public void testU() { super.testErrors(U, false); }
-	@Test public void testE() { super.testErrors(C, false); }
 }

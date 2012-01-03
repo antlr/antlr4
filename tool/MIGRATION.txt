@@ -13,3 +13,5 @@ Trees
 Lexers
 
 * Added [Abc] notation
+
+* unicode rule/token names

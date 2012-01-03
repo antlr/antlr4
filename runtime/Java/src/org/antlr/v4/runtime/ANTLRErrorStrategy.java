@@ -30,9 +30,9 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
  *
  *  TODO: what to do about lexers
  */
-public interface ANTLRErrorStrategy<Symbol> {
+public interface ANTLRErrorStrategy {
 	/** Report any kind of RecognitionException. */
-	void reportError(@NotNull BaseRecognizer<Symbol> recognizer,
+	void reportError(@NotNull BaseRecognizer recognizer,
 					 @Nullable RecognitionException e)
 		throws RecognitionException;
 
@@ -52,7 +52,7 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  "inserting" tokens, we need to specify what that implicitly created
 	 *  token is. We use object, because it could be a tree node.
 	 */
-	Symbol recoverInline(@NotNull BaseRecognizer<Symbol> recognizer)
+	Token recoverInline(@NotNull BaseRecognizer recognizer)
 		throws RecognitionException;
 
 	/** Resynchronize the parser by consuming tokens until we find one
@@ -60,7 +60,7 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  the current rule. The exception contains info you might want to
 	 *  use to recover better.
 	 */
-	void recover(@NotNull BaseRecognizer<Symbol> recognizer,
+	void recover(@NotNull BaseRecognizer recognizer,
                  @Nullable RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
@@ -90,14 +90,14 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
 	 */
-	void sync(@NotNull BaseRecognizer<Symbol> recognizer);
+	void sync(@NotNull BaseRecognizer recognizer);
 
 	/** Notify handler that parser has entered an error state.  The
 	 *  parser currently doesn't call this--the handler itself calls this
 	 *  in report error methods.  But, for symmetry with endErrorCondition,
 	 *  this method is in the interface.
 	 */
-	void beginErrorCondition(@NotNull BaseRecognizer<Symbol> recognizer);
+	void beginErrorCondition(@NotNull BaseRecognizer recognizer);
 
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
@@ -105,13 +105,13 @@ public interface ANTLRErrorStrategy<Symbol> {
 	 *  avoid sending out spurious error messages. We only want one error
 	 *  message per syntax error
 	 */
-	boolean inErrorRecoveryMode(@NotNull BaseRecognizer<Symbol> recognizer);
+	boolean inErrorRecoveryMode(@NotNull BaseRecognizer recognizer);
 
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
      *  and from its own reset method.
      */
-    void endErrorCondition(@NotNull BaseRecognizer<Symbol> recognizer);
+    void endErrorCondition(@NotNull BaseRecognizer recognizer);
 
     /** Called when the parser detects a true ambiguity: an input sequence can be matched
      * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
@@ -120,7 +120,7 @@ public interface ANTLRErrorStrategy<Symbol> {
      * that can match the input sequence. This method is only called when we are parsing with
      * full context.
      */
-    void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
+    void reportAmbiguity(@NotNull BaseRecognizer recognizer,
 						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 						 @NotNull OrderedHashSet<ATNConfig> configs);
 
@@ -130,12 +130,12 @@ public interface ANTLRErrorStrategy<Symbol> {
      *  we can't be sure if a conflict is an ambiguity or simply a weakness in the Strong LL parsing
      *  strategy. If we are parsing with full context, this method is never called.
      */
-//    void reportConflict(@NotNull BaseRecognizer<Symbol> recognizer,
+//    void reportConflict(@NotNull BaseRecognizer recognizer,
 //                        int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 //                        @NotNull OrderedHashSet<ATNConfig> configs);
 
 
-	void reportAttemptingFullContext(@NotNull BaseRecognizer<Symbol> recognizer,
+	void reportAttemptingFullContext(@NotNull BaseRecognizer recognizer,
 									 @NotNull DFA dfa,
 									 int startIndex, int stopIndex,
 									 @NotNull OrderedHashSet<ATNConfig> configs);
@@ -145,7 +145,7 @@ public interface ANTLRErrorStrategy<Symbol> {
      *  is more complicated than Strong LL can handle. The parser moved up to full context
      *  parsing for that input sequence.
      */
-    void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer,
+    void reportContextSensitivity(@NotNull BaseRecognizer recognizer,
                                   @NotNull DFA dfa,
                                   int startIndex, int stopIndex,
                                   @NotNull OrderedHashSet<ATNConfig> configs);
@@ -155,7 +155,7 @@ public interface ANTLRErrorStrategy<Symbol> {
      *  If there are fewer than n-1, then we don't know which make it alternative to protect
      *  if the predicates fail.
      */
-    void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+    void reportInsufficientPredicates(@NotNull BaseRecognizer recognizer,
 									  @NotNull DFA dfa,
 									  int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 									  DecisionState decState,

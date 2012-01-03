@@ -30,15 +30,16 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ast.ElementASTOp;
 import org.antlr.v4.codegen.model.decl.Decl;
 
 /** */
-public class AddToLabelList extends ElementASTOp {
+public class AddToLabelList extends SrcOp {
+	public Decl label;
 	public String listName;
 
 	public AddToLabelList(OutputModelFactory factory, String listName, Decl label) {
-		super(factory, null, label);
+		super(factory);
+		this.label = label;
 		this.listName = listName;
 	}
 }

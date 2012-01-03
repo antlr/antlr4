@@ -30,7 +30,10 @@ package org.antlr.v4.test;
 
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.automata.*;
+import org.antlr.v4.automata.ATNFactory;
+import org.antlr.v4.automata.ATNPrinter;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.*;
@@ -431,20 +434,9 @@ public abstract class BaseTest {
 									  lexerName,
 									  debug);
 		writeFile(tmpdir, "input", input);
-		boolean parserBuildsTrees =
-			grammarStr.contains("output=AST") ||
-			grammarStr.contains("output = AST");
-		boolean parserBuildsTemplate =
-			grammarStr.contains("output=template") ||
-			grammarStr.contains("output = template");
 		return rawExecRecognizer(parserName,
-								 null,
 								 lexerName,
 								 startRuleName,
-								 null,
-								 parserBuildsTrees,
-								 parserBuildsTemplate,
-								 false,
 								 debug);
 	}
 
@@ -500,24 +492,9 @@ public abstract class BaseTest {
 
 		writeFile(tmpdir, "input", input);
 
-		boolean parserBuildsTrees =
-			parserGrammarStr.contains("output=AST") ||
-			parserGrammarStr.contains("output = AST");
-		boolean treeParserBuildsTrees =
-			treeParserGrammarStr.contains("output=AST") ||
-			treeParserGrammarStr.contains("output = AST");
-		boolean parserBuildsTemplate =
-			parserGrammarStr.contains("output=template") ||
-			parserGrammarStr.contains("output = template");
-
 		return rawExecRecognizer(parserName,
-								 treeParserName,
 								 lexerName,
 								 parserStartRuleName,
-								 treeParserStartRuleName,
-								 parserBuildsTrees,
-								 parserBuildsTemplate,
-								 treeParserBuildsTrees,
 								 debug);
 	}
 
@@ -546,39 +523,12 @@ public abstract class BaseTest {
 	}
 
 	protected String rawExecRecognizer(String parserName,
-									   @Nullable String treeParserName,
 									   String lexerName,
 									   String parserStartRuleName,
-									   @Nullable String treeParserStartRuleName,
-									   boolean parserBuildsTrees,
-									   boolean parserBuildsTemplate,
-									   boolean treeParserBuildsTrees,
 									   boolean debug)
 	{
         this.stderrDuringParse = null;
-		if ( treeParserBuildsTrees && parserBuildsTrees ) {
-			writeTreeAndTreeTestFile(parserName,
-									 treeParserName,
-									 lexerName,
-									 parserStartRuleName,
-									 treeParserStartRuleName,
-									 debug);
-		}
-		else if ( parserBuildsTrees ) {
-			writeTreeTestFile(parserName,
-							  treeParserName,
-							  lexerName,
-							  parserStartRuleName,
-							  treeParserStartRuleName,
-							  debug);
-		}
-		else if ( parserBuildsTemplate ) {
-			writeTemplateTestFile(parserName,
-								  lexerName,
-								  parserStartRuleName,
-								  debug);
-		}
-		else if ( parserName==null ) {
+		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, false);
 		}
 		else {
@@ -827,7 +777,6 @@ public abstract class BaseTest {
 
 	void checkRuleATN(Grammar g, String ruleName, String expecting) {
 		ParserATNFactory f = new ParserATNFactory(g);
-		if ( g.isTreeGrammar() ) f = new TreeParserATNFactory(g);
 		ATN atn = f.createATN();
 
 		DOTGenerator dot = new DOTGenerator(g);
@@ -1206,30 +1155,10 @@ public abstract class BaseTest {
 		writeFile(tmpdir, "Test.java", outputFileST.render());
 	}
 
-	public void writeRecognizerAndCompile(String parserName, String treeParserName, String lexerName, String parserStartRuleName, String treeParserStartRuleName, boolean parserBuildsTrees, boolean parserBuildsTemplate, boolean treeParserBuildsTrees, boolean debug) {
-		if ( treeParserBuildsTrees && parserBuildsTrees ) {
-			writeTreeAndTreeTestFile(parserName,
-									 treeParserName,
-									 lexerName,
-									 parserStartRuleName,
-									 treeParserStartRuleName,
-									 debug);
-		}
-		else if ( parserBuildsTrees ) {
-			writeTreeTestFile(parserName,
-							  treeParserName,
-							  lexerName,
-							  parserStartRuleName,
-							  treeParserStartRuleName,
-							  debug);
-		}
-		else if ( parserBuildsTemplate ) {
-			writeTemplateTestFile(parserName,
-								  lexerName,
-								  parserStartRuleName,
-								  debug);
-		}
-		else if ( parserName==null ) {
+	public void writeRecognizerAndCompile(String parserName, String lexerName,
+										  String parserStartRuleName,
+										  boolean debug) {
+		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, debug);
 		}
 		else {

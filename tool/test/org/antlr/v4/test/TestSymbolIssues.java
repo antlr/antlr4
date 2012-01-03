@@ -48,22 +48,6 @@ public class TestSymbolIssues extends BaseTest {
 		"error(42): B.g:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n"
     };
 
-    static String[] C = {
-        // INPUT
-        "grammar C;\n"+
-        "options {output=AST;}\n"+
-        "a : A x=b y+=Z 'hi' -> ID A r $foo $x b $y+ 'hi' 'eh?'\n"+
-        "  | ID -> $x A ID  // shouldn't see these refs from other alt ('cept ID)\n"+
-        "  ;\n"+
-        "b : B ;\n"+
-        "A : 'a';",
-        // YIELDS
-        "error(51): C.g:3:28: reference to rewrite element r not found to left of ->\n" +
-		"error(51): C.g:3:30: reference to rewrite element foo not found to left of ->\n" +
-		"error(51): C.g:3:49: reference to rewrite element 'eh?' not found to left of ->\n" +
-		"error(51): C.g:4:10: reference to rewrite element x not found to left of ->\n"
-    };
-
     static String[] D = {
         // INPUT
         "parser grammar D;\n" +
@@ -101,7 +85,6 @@ public class TestSymbolIssues extends BaseTest {
 
     @Test public void testA() { super.testErrors(A, false); }
     @Test public void testB() { super.testErrors(B, false); }
-    @Test public void testC() { super.testErrors(C, false); }
 	@Test public void testD() { super.testErrors(D, false); }
 	@Test public void testE() { super.testErrors(E, false); }
 }

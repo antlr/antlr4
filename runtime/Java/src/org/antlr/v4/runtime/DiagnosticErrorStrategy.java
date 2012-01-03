@@ -39,9 +39,9 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.Arrays;
 
-public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol> {
+public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     @Override
-    public void reportAmbiguity(@NotNull BaseRecognizer<Symbol> recognizer,
+    public void reportAmbiguity(@NotNull BaseRecognizer recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
     {
@@ -50,7 +50,7 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
     }
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull BaseRecognizer<Symbol> recognizer,
+	public void reportAttemptingFullContext(@NotNull BaseRecognizer recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
 											@NotNull OrderedHashSet<ATNConfig> configs)
@@ -60,7 +60,7 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull BaseRecognizer<Symbol> recognizer, @NotNull DFA dfa,
+	public void reportContextSensitivity(@NotNull BaseRecognizer recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
         recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input='" +
@@ -68,7 +68,7 @@ public class DiagnosticErrorStrategy<Symbol> extends DefaultErrorStrategy<Symbol
     }
 
     @Override
-    public void reportInsufficientPredicates(@NotNull BaseRecognizer<Symbol> recognizer,
+    public void reportInsufficientPredicates(@NotNull BaseRecognizer recognizer,
 											 @NotNull DFA dfa,
 											 int startIndex, int stopIndex,
 											 @NotNull IntervalSet ambigAlts,

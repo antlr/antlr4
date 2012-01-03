@@ -1,4 +1,4 @@
-ûparser grammar JavaParser;
+parser grammar JavaParser;
 options {backtrack=true; memoize=true; tokenVocab=JavaLexer;}
 
 // starting point for parsing a java file

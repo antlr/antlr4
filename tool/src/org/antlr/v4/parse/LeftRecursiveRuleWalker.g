@@ -105,9 +105,7 @@ ruleBlock returns [boolean isLeftRec]
 @init{boolean lr=false; this.numAlts = $start.getChildCount();}
 	:	^(	BLOCK
 			(
-				(	o=outerAlternative[null]
-				|	^( r=ALT_REWRITE o=outerAlternative[(GrammarAST)$r.getChild(1)] rewrite )
-				)
+				o=outerAlternative[null]
 				{if ($o.isLeftRec) $isLeftRec = true;}
 				{currentOuterAltNumber++;}
 			)+
@@ -162,8 +160,6 @@ recurseNoLabel : {((CommonTree)input.LT(1)).getText().equals(ruleName)}? RULE_RE
 token returns [GrammarAST t=null]
 	:	^(ASSIGN ID s=token {$t = $s.t;})
 	|	^(PLUS_ASSIGN ID s=token {$t = $s.t;})
-	|	^(ROOT s=token {$t = $s.t;})
-	|	^(BANG s=token {$t = $s.t;})
 	|	b=STRING_LITERAL    					{$t = $b;}
     |	^(b=STRING_LITERAL elementOptions)		{$t = $b;}
     |	^(c=TOKEN_REF elementOptions)			{$t = $c;}
@@ -181,9 +177,7 @@ elementOption
     ;
 
 element
-	:	^(ROOT element)
-	|	^(BANG element)
-	|	atom
+	:	atom
 	|	^(NOT element)
 	|	^(RANGE atom atom)
 	|	^(ASSIGN ID element)
@@ -191,7 +185,6 @@ element
     |	^(SET setElement+)
     |   RULE_REF
 	|	ebnf
-	|	tree_
 	|	ACTION
 	|	SEMPRED
 	|	EPSILON
@@ -213,13 +206,8 @@ block
     ;
 
 alternative
-	:	^(ALT_REWRITE alternative rewrite)
-	|	^(ALT element+)
+	:	^(ALT element+)
     ;
-
-tree_
-	:	^(TREE_BEGIN element+)
-	;
 
 atom
 	:	^(RULE_REF ARG_ACTION?)
@@ -230,18 +218,4 @@ atom
     |	^(WILDCARD elementOptions)
 	|	WILDCARD
 	|	^(DOT ID element)
-	;
-
-ast_suffix
-	:	ROOT
-	|	BANG
-	;
-
-rewrite
-	:	rewrite_result*
-	;
-
-rewrite_result
-	:	^(ST_RESULT .*)
-	|	^(RESULT .*)
 	;

@@ -392,21 +392,6 @@ public class Target {
 		return st.render();
 	}
 
-	// AST
-
-	public String getRootName(int level) {
-		ST st = gen.templates.getInstanceOf("RootName");
-		st.add("level", level);
-		return st.render();
-	}
-
-	public String getRewriteIteratorName(GrammarAST elem, int level) {
-		ST st = gen.templates.getInstanceOf("RewriteIteratorName");
-		st.add("elemName", getElementName(elem.getText()));
-		st.add("level", level);
-		return st.render();
-	}
-
 	public String getElementListName(String name) {
 		ST st = gen.templates.getInstanceOf("ElementListName");
 		st.add("elemName", getElementName(name));

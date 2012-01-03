@@ -40,18 +40,7 @@ topdown
 
 setAlt
 	:	{inContext("RULE BLOCK")}?
-		(	ALT {currentAlt = $start; rewriteElems.clear();}
-		|	ALT_REWRITE {currentAlt = $start;}
-			{
-			IntervalSet s = new IntervalSet();
-			s.add(RULE_REF);
-			s.add(STRING_LITERAL);
-			s.add(TOKEN_REF);
-			List<GrammarAST> nodes = ((GrammarAST)(currentAlt.getChild(1))).getNodesWithType(s);
-			for (GrammarAST n : nodes) {rewriteElems.add(n.getText());}
-			}
-		)
-
+		ALT {currentAlt = $start; rewriteElems.clear();}
 	;
 
 // (BLOCK (ALT (+ (BLOCK (ALT INT) (ALT ID)))))

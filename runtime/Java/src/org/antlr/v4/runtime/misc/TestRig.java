@@ -33,6 +33,8 @@ import org.antlr.v4.runtime.*;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -50,8 +52,9 @@ public class TestRig {
 		boolean gui = false;
 		String psFile = null;
 		boolean showTokens = false;
+		String encoding = null;
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-print] [-tokens] [-gui] [-ps file.ps] [input-filename]");
+			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-print] [-tokens] [-gui] [-encoding encodingname] [-ps file.ps] [input-filename]");
 			return;
 		}
 		int i=0;
@@ -74,6 +77,14 @@ public class TestRig {
 			}
 			if ( arg.equals("-tokens") ) {
 				showTokens = true;
+			}
+			else if ( arg.equals("-encoding") ) {
+				if ( i>=args.length ) {
+					System.err.println("missing encoding on -encoding");
+					return;
+				}
+				encoding = args[i];
+				i++;
 			}
 			else if ( arg.equals("-ps") ) {
 				if ( i>=args.length ) {
@@ -101,40 +112,53 @@ public class TestRig {
 		if ( inputFile!=null ) {
 			is = new FileInputStream(inputFile);
 		}
+		Reader r;
+		if ( encoding!=null ) {
+			r = new InputStreamReader(is, encoding);
+		}
+		else {
+			r = new InputStreamReader(is);
+		}
 
-		ANTLRInputStream input = new ANTLRInputStream(is);
+		try {
+			ANTLRInputStream input = new ANTLRInputStream(r);
 
-		Constructor<Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-		Lexer lexer = lexerCtor.newInstance(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
+			Constructor<Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+			Lexer lexer = lexerCtor.newInstance(input);
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		if ( showTokens ) {
-			tokens.fill();
-			for (Object tok : tokens.getTokens()) {
-				System.out.println(tok);
+			if ( showTokens ) {
+				tokens.fill();
+				for (Object tok : tokens.getTokens()) {
+					System.out.println(tok);
+				}
+			}
+
+			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+			Parser parser = parserCtor.newInstance(tokens);
+
+			parser.setErrorHandler(new DiagnosticErrorStrategy());
+
+			if ( printTree || gui || psFile!=null ) {
+				parser.setBuildParseTree(true);
+			}
+
+			Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
+			ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
+
+			if ( printTree ) {
+				System.out.println(tree.toStringTree(parser));
+			}
+			if ( gui ) {
+				tree.inspect(parser);
+			}
+			if ( psFile!=null ) {
+				tree.save(parser, psFile); // Generate postscript
 			}
 		}
-
-		Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-		Parser parser = parserCtor.newInstance(tokens);
-
-		parser.setErrorHandler(new DiagnosticErrorStrategy<Token>());
-
-		if ( printTree || gui || psFile!=null ) {
-			parser.setBuildParseTree(true);
-		}
-
-		Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-		ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
-
-		if ( printTree ) {
-			System.out.println(tree.toStringTree(parser));
-		}
-		if ( gui ) {
-			tree.inspect(parser);
-		}
-		if ( psFile!=null ) {
-			tree.save(parser, psFile); // Generate postscript
+		finally {
+			if ( r!=null ) r.close();
+			if ( is!=null ) is.close();
 		}
 	}
 }

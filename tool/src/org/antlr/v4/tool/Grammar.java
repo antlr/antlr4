@@ -60,8 +60,7 @@ public class Grammar implements AttributeResolver {
 	public static final Set doNotCopyOptionsToLexer =
         new HashSet() {
             {
-                add("output"); add("TokenLabelType"); add("ASTLabelType"); add("superClass");
-                add("rewrite");
+                add("TokenLabelType"); add("superClass");
             }
         };
 
@@ -214,13 +213,6 @@ public class Grammar implements AttributeResolver {
     }
 
 	protected void initTokenSymbolTables() {
-		if ( isTreeGrammar() ) {
-			typeToTokenList.setSize(Token.UP + 1);
-			typeToTokenList.set(Token.DOWN, "DOWN");
-			typeToTokenList.set(Token.UP, "UP");
-			tokenNameToTypeMap.put("DOWN", Token.DOWN);
-			tokenNameToTypeMap.put("UP", Token.UP);
-		}
 		tokenNameToTypeMap.put("EOF", Token.EOF);
 	}
 
@@ -643,8 +635,6 @@ public class Grammar implements AttributeResolver {
             case ANTLRParser.PARSER :
             case ANTLRParser.COMBINED :
                 return "parser";
-            case ANTLRParser.TREE :
-                return "treeparser";
         }
         return null;
     }
@@ -661,7 +651,6 @@ public class Grammar implements AttributeResolver {
 
 	public boolean isLexer() { return getType()==ANTLRParser.LEXER; }
 	public boolean isParser() { return getType()==ANTLRParser.PARSER; }
-	public boolean isTreeGrammar() { return getType()==ANTLRParser.TREE; }
 	public boolean isCombined() { return getType()==ANTLRParser.COMBINED; }
 
     public String getTypeString() {
@@ -673,7 +662,6 @@ public class Grammar implements AttributeResolver {
         switch ( type ) {
             case ANTLRParser.LEXER : return "Lexer";
             case ANTLRParser.PARSER : return "Parser";
-            case ANTLRParser.TREE : return "";
             // if combined grammar, gen Parser and Lexer will be done later
             // TODO: we are separate now right?
             case ANTLRParser.COMBINED : return "Parser";
@@ -689,11 +677,6 @@ public class Grammar implements AttributeResolver {
 		String v = ast.getOptionString(key);
 		if ( v!=null ) return v;
 		return defaultValue;
-	}
-
-	public boolean hasASTOption() {
-		String outputOption = getOptionString("output");
-		return outputOption!=null && outputOption.equals("AST");
 	}
 
 	/** Manually get language option from tree */

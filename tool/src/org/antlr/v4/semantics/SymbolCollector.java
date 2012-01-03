@@ -61,19 +61,9 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 	public Set<String> strings = new HashSet<String>();
 	public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
-	public List<AttributeDict> scopes = new ArrayList<AttributeDict>();
-
-	/** Tracks named actions like @parser::members {...}.
-	 *  Key is scope::name, value is action ast node.
-	 */
-//	public DoubleKeyMap<String,String,GrammarAST> namedActions =
-//		new DoubleKeyMap<String, String, GrammarAST>();
 
 	/** Track action name node in @parser::members {...} or @members {...} */
 	List<GrammarAST> namedActions = new ArrayList<GrammarAST>();
-
-	/** All labels, rule references, and token references to right of -> */
-	public List<GrammarAST> rewriteElements = new ArrayList<GrammarAST>();
 
 	// context
 	public Rule currentRule;
@@ -158,9 +148,6 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void discoverAltWithRewrite(AltAST alt) { discoverAlt(alt); }
-
-	@Override
 	public void discoverAlt(AltAST alt) {
 		currentRule.alt[currentOuterAltNumber].ast = alt;
 	}
@@ -221,28 +208,6 @@ public class SymbolCollector extends GrammarTreeVisitor {
     	if ( currentRule!=null ) {
     		currentRule.alt[currentOuterAltNumber].ruleRefs.map(ref.getText(), ref);
     	}
-	}
-
-	@Override
-	public void rewriteLabelRef(GrammarAST ast) { rewriteElements.add(ast);	}
-
-	@Override
-	public void rewriteRuleRef(GrammarAST ast) { rewriteElements.add(ast);	}
-
-	@Override
-	public void rewriteStringRef(TerminalAST ast) {
-		 rewriteElements.add(ast);
-	}
-
-	@Override
-	public void rewriteTokenRef(TerminalAST ast, ActionAST arg) {
-		rewriteElements.add(ast);
-		if ( arg!=null ) arg.resolver = currentRule.alt[currentOuterAltNumber];
-	}
-
-	@Override
-	public void rewriteAction(ActionAST ast) {
-		ast.resolver = currentRule.alt[currentOuterAltNumber];
 	}
 
 	@Override

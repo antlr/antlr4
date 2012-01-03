@@ -34,7 +34,6 @@ import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.automata.TreeParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -88,6 +87,7 @@ public class Tool {
 	public boolean profile = false;
 	public boolean trace = false;
 	public boolean generate_ATN_dot = false;
+	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean saveLexer = false;
 	public boolean genListener = true;
@@ -105,7 +105,8 @@ public class Tool {
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
         new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
-        new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
+		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
         new Option("genListener",		"-walker", "generate parse tree walker and listener"),
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
@@ -299,7 +300,6 @@ public class Tool {
 		// BUILD ATN FROM AST
 		ATNFactory factory;
 		if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
-		else if ( g.isTreeGrammar() ) factory = new TreeParserATNFactory(g);
 		else factory = new ParserATNFactory(g);
 		g.atn = factory.createATN();
 
@@ -338,7 +338,7 @@ public class Tool {
 
 	public GrammarRootAST loadGrammar(String fileName) {
 		try {
-			ANTLRFileStream in = new ANTLRFileStream(fileName);
+			ANTLRFileStream in = new ANTLRFileStream(fileName, grammarEncoding);
 			GrammarRootAST t = load(in);
 			return t;
 		}

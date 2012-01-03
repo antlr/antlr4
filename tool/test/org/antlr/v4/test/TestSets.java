@@ -96,16 +96,6 @@ public class TestSets extends BaseTest {
 		assertEquals("b\n", found);
 	}
 
-	@Test public void testRuleAsSetAST() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : 'a' | 'b' |'c' ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "b", debug);
-		assertEquals("b\n", found);
-	}
-
 	@Test public void testNotChar() throws Exception {
 		String grammar =
 			"grammar T;\n" +

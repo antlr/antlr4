@@ -496,7 +496,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"EQ : '=' ;\n" +
 			"COMMA : ',' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"STR : '\"' (options {greedy=false;}:.)* '\"' ;\n" +
+			"STR : '\"' .* '\"' ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -601,7 +601,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"EQ : '=' ;\n" +
 			"COMMA : ',' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"STR : '\"' (options {greedy=false;}:.)* '\"' ;\n" +
+			"STR : '\"' .* '\"' ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 

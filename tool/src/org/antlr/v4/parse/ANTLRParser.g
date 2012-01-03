@@ -64,8 +64,6 @@ tokens {
     RULEMODIFIERS;
     RULEACTIONS;
     BLOCK;
-    REWRITE_BLOCK;
-    REWRITE_SEQ;
     OPTIONAL;
     CLOSURE;
     POSITIVE_CLOSURE;
@@ -90,15 +88,10 @@ tokens {
     //
     LIST;
     ELEMENT_OPTIONS;      // TOKEN<options>
-    ST_RESULT;			  // distinguish between ST and tree rewrites
     RESULT;
-    ALT_REWRITE;		  // indicate ALT is rewritten
     
     // lexer action stuff
     LEXER_ALT_ACTION;
-
-    DOWN_TOKEN;			  // AST node representing DOWN node in tree parser code gen
-    UP_TOKEN;
 }
 
 // Include the copyright in this source and also the generated source
@@ -216,9 +209,6 @@ grammarType
 		| // A standalone parser specification
 		  	t=PARSER g=GRAMMAR -> GRAMMAR<GrammarRootAST>[$g, "PARSER_GRAMMAR"]
 
-		| // A standalone tree parser specification
-		  	t=TREE g=GRAMMAR   -> GRAMMAR<GrammarRootAST>[$g, "TREE_GRAMMAR"]
-
 		// A combined lexer and parser specification
 		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
 		)
@@ -269,7 +259,6 @@ optionValue
       // and so on. Many option values meet this description
       qid
     | STRING_LITERAL
-	| DOUBLE_QUOTE_STRING_LITERAL
 	| ACTION<ActionAST>
     | INT
     ;
@@ -442,8 +431,6 @@ exceptionHandler
 	: CATCH ARG_ACTION ACTION -> ^(CATCH ARG_ACTION<ActionAST> ACTION<ActionAST>)
 	;
 
-// Specifies a block of code to run after the rule and any
-// expcetion blocks have exceuted.
 finallyClause
 	: FINALLY ACTION -> ^(FINALLY ACTION<ActionAST>)
 	;
@@ -606,7 +593,33 @@ lexerElement
 	|	actionElement // actions only allowed at end of outer alt actually,
 					  // but preds can be anywhere
 	;
-
+    catch [RecognitionException re] {
+    	retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+    	int ttype = input.get(input.range()).getType();
+	    // look for anything that really belongs at the start of the rule minus the initial ID
+    	if ( ttype==COLON || ttype==RETURNS || ttype==CATCH || ttype==FINALLY || ttype==AT ) {
+			RecognitionException missingSemi =
+				new v4ParserException("unterminated rule (missing ';') detected at '"+
+									  input.LT(1).getText()+" "+input.LT(2).getText()+"'", input);
+			reportError(missingSemi);
+			if ( ttype==CATCH || ttype==FINALLY ) {
+				input.seek(input.range()); // ignore what's before rule trailer stuff
+			}
+			if ( ttype==RETURNS || ttype==AT ) { // scan back looking for ID of rule header
+				int p = input.index();
+				Token t = input.get(p);
+				while ( t.getType()!=RULE_REF && t.getType()!=TOKEN_REF ) {
+					p--;
+					t = input.get(p);
+				}
+				input.seek(p);
+			}
+			throw new ResyncToEndOfRuleBlock(); // make sure it goes back to rule block level to recover
+		}
+        reportError(re);
+        recover(input,re);
+	}
+	
 labeledLexerElement
 	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
 		(	lexerAtom	-> ^($ass id lexerAtom)
@@ -646,11 +659,7 @@ altList
 alternative
 @init { paraphrases.push("matching alternative"); }
 @after { paraphrases.pop(); }
-    :	elements
-    	(	rewrite -> ^(ALT_REWRITE elements rewrite)
-    	|			-> elements
-    	)
-    |	rewrite		-> ^(ALT_REWRITE ^(ALT<AltAST> EPSILON) rewrite) // empty alt with rewrite
+    :	elements	-> elements
     |				-> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
@@ -674,10 +683,6 @@ element
 		)
 	|	ebnf
 	|	actionElement
-	|   treeSpec
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$treeSpec.start,"BLOCK"] ^(ALT<AltAST> treeSpec ) ) )
-		|				-> treeSpec
-		)
 	;
     catch [RecognitionException re] {
     	retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
@@ -722,46 +727,9 @@ actionElement
 labeledElement
 	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
 		(	atom						-> ^($ass id atom)
-		|	block (op=ROOT|op=BANG)?	-> {$op!=null}? ^($ass id ^($op block))
-										->				^($ass id block)
+		|	block						-> ^($ass id block)
 		)
 	;
-
-// Tree specifying alt
-// Tree grammars need to have alts that describe a tree structure they
-// will walk of course. Alts for trees therefore start with ^( XXX, which
-// says we will see a root node of XXX then DOWN etc
-treeSpec
-@after {
-	GrammarAST down = new DownAST(DOWN_TOKEN, $begin);
-	GrammarAST up = new UpAST(UP_TOKEN, $begin);
-	int i = 1; // skip root element
-	GrammarAST p = (GrammarAST)$tree.getChild(i);
-	while ( p.getType()==ACTION || p.getType()==SEMPRED ) {
-		i++;
-		p = (GrammarAST)$tree.getChild(i);
-	}
-	$tree.insertChild(i, down); // ADD DOWN
-	i = $tree.getChildCount()-1;
-	p = (GrammarAST)$tree.getChild(i);
-	while ( p.getType()==ACTION || p.getType()==SEMPRED ) {
-		i--;
-		p = (GrammarAST)$tree.getChild(i);
-	}
-	if ( i+1 >= $tree.getChildCount() ) $tree.addChild(up);
-   	else $tree.insertChild(i+1, up); // ADD UP
-}
-    : begin=TREE_BEGIN
-         // Only a subset of elements are allowed to be a root node. However
-         // we allow any element to appear here and reject silly ones later
-         // when we walk the AST.
-         root=element
-         // After the tree root we get the usual suspects,
-         // all members of the element set.
-         (kids+=element)+
-      RPAREN
-      -> ^( TREE_BEGIN<TreePatternAST> $root $kids+ )
-    ;
 
 // A block of gramamr structure optionally followed by standard EBNF
 // notation, or ANTLR specific notation. I.E. ? + ^ and so on
@@ -778,11 +746,6 @@ ebnf
 // sense only to ANTLR, in the context of a grammar block.
 blockSuffix
     : ebnfSuffix // Standard EBNF
-
-	  // ANTLR Specific Suffixes
-    | ROOT
-//    | IMPLIES   // We will change this to syn/sem pred in the next phase
-    | BANG
     ;
 
 ebnfSuffix
@@ -815,10 +778,10 @@ atom
 
     |
     	*/
-        range (ROOT^ | BANG^)? // Range x..y - only valid in lexers
-	|	terminal (ROOT^ | BANG^)?
+        range  // Range x..y - only valid in lexers
+	|	terminal
     |   ruleref
-    |	notSet   (ROOT^|BANG^)?
+    |	notSet
     |	wildcard
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
@@ -835,9 +798,8 @@ wildcard
 		// Because the terminal rule is allowed to be the node
 		// specification for the start of a tree rule, we must
 		// later check that wildcard was not used for that.
-	    DOT elementOptions?	(astop=ROOT|astop=BANG)?
-	    -> {astop!=null}?	^($astop ^(WILDCARD<TerminalAST>[$DOT] elementOptions?))
-	    -> 					^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
+	    DOT elementOptions?
+	    -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
 	;
 
 // --------------------
@@ -893,10 +855,7 @@ if ( options!=null ) {
 // directive to become the root node or ignore the tree produced
 //
 ruleref
-    :	RULE_REF ARG_ACTION?
-		(	(op=ROOT|op=BANG)	-> ^($op ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>?))
-		|						-> ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>?)
-		)
+    :	RULE_REF ARG_ACTION? -> ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>?)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
 
@@ -938,138 +897,6 @@ elementOption
     | id ASSIGN^ optionValue
     ;
 
-rewrite
-	:	predicatedRewrite* nakedRewrite -> predicatedRewrite* nakedRewrite
-	;
-
-predicatedRewrite
-	:	RARROW SEMPRED rewriteAlt
-		-> {$rewriteAlt.isTemplate}? ^(ST_RESULT[$RARROW] SEMPRED<PredAST> rewriteAlt)
-		-> ^(RESULT[$RARROW] SEMPRED<PredAST> rewriteAlt)
-	;
-
-nakedRewrite
-	:	RARROW rewriteAlt -> {$rewriteAlt.isTemplate}? ^(ST_RESULT[$RARROW] rewriteAlt)
-	 					  -> ^(RESULT[$RARROW] rewriteAlt)
-	;
-
-// distinguish between ST and tree rewrites; for ETC/EPSILON and trees,
-// rule altAndRewrite makes REWRITE root. for ST, we use ST_REWRITE
-rewriteAlt returns [boolean isTemplate]
-options {backtrack=true;}
-    : // If we are not building templates, then we must be
-      // building ASTs or have rewrites in a grammar that does not
-      // have output=AST; options. If that is the case, we will issue
-      // errors/warnings in the next phase, so we just eat them here
-      rewriteTreeAlt
-
-	| // try to parse a template rewrite
-      rewriteTemplate {$isTemplate=true;} // must be 2nd so "ACTION ..." matches as tree rewrite
-
-    | ETC
-
-    | /* empty rewrite */ -> EPSILON
-    ;
-
-rewriteTreeAlt
-    :	rewriteTreeElement+ -> ^(REWRITE_SEQ rewriteTreeElement+)
-    ;
-
-rewriteTreeElement
-	:	rewriteTreeAtom
-	|	rewriteTreeAtom ebnfSuffix -> ^( ebnfSuffix ^(REWRITE_BLOCK ^(REWRITE_SEQ rewriteTreeAtom)) )
-	|   rewriteTree
-		(	ebnfSuffix
-			-> ^(ebnfSuffix ^(REWRITE_BLOCK ^(REWRITE_SEQ rewriteTree)) )
-		|	-> rewriteTree
-		)
-	|   rewriteTreeEbnf
-	;
-
-rewriteTreeAtom
-@after {
-GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.ELEMENT_OPTIONS);
-if ( options!=null ) {
-	Grammar.setNodeOptions($tree, options);
-}
-}
-    :   TOKEN_REF elementOptions? ARG_ACTION? -> ^(TOKEN_REF<TerminalAST> elementOptions? ARG_ACTION<ActionAST>?) // for imaginary nodes
-    |   RULE_REF
-	|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL<TerminalAST> elementOptions?)
-	|   DOLLAR id -> LABEL[$DOLLAR,$id.text] // reference to a label in a rewrite rule
-	|	ACTION<ActionAST>
-	;
-
-rewriteTreeEbnf
-@init {
-    Token firstToken = input.LT(1);
-}
-@after {
-	$rewriteTreeEbnf.tree.getToken().setLine(firstToken.getLine());
-	$rewriteTreeEbnf.tree.getToken().setCharPositionInLine(firstToken.getCharPositionInLine());
-}
-	:	lp=LPAREN rewriteTreeAlt RPAREN rewriteEbnfSuffix
-		-> ^(rewriteEbnfSuffix ^(REWRITE_BLOCK[$lp,"REWRITE_BLOCK"] rewriteTreeAlt))
-	;
-
-rewriteEbnfSuffix
-	:	QUESTION	-> OPTIONAL[$start]
-  	|	STAR 		-> CLOSURE[$start]
-	;
-
-rewriteTree
-	:	TREE_BEGIN rewriteTreeAtom rewriteTreeElement* RPAREN
-		-> ^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )
-	;
-
-/** Build a tree for a template rewrite:
-      ^(TEMPLATE (ID|ACTION) ^(ARGLIST ^(ARG ID ACTION) ...) )
-    ID can be "template" keyword.  If first child is ACTION then it's
-    an indirect template ref
-
-    -> foo(a={...}, b={...})
-    -> ({string-e})(a={...}, b={...})  // e evaluates to template name
-    -> {%{$ID.text}} // create literal template from string (done in ActionTranslator)
-	-> {st-expr} // st-expr evaluates to ST
- */
-rewriteTemplate
-	:   // -> template(a={...},...) "..."    inline template
-		TEMPLATE LPAREN rewriteTemplateArgs RPAREN
-		( str=DOUBLE_QUOTE_STRING_LITERAL | str=DOUBLE_ANGLE_STRING_LITERAL )
-		-> ^(TEMPLATE[$TEMPLATE,"TEMPLATE"] rewriteTemplateArgs? $str)
-
-	|	// -> foo(a={...}, ...)
-		rewriteTemplateRef
-
-	|	// -> ({expr})(a={...}, ...)
-		rewriteIndirectTemplateHead
-
-	|	// -> {...}
-		ACTION<ActionAST>
-	;
-
-/** -> foo(a={...}, ...) */
-rewriteTemplateRef
-	:	id LPAREN rewriteTemplateArgs RPAREN
-		-> ^(TEMPLATE[$LPAREN,"TEMPLATE"] id rewriteTemplateArgs?)
-	;
-
-/** -> ({expr})(a={...}, ...) */
-rewriteIndirectTemplateHead
-	:	lp=LPAREN ACTION RPAREN LPAREN rewriteTemplateArgs RPAREN
-		-> ^(TEMPLATE[$lp,"TEMPLATE"] ACTION<ActionAST> rewriteTemplateArgs?)
-	;
-
-rewriteTemplateArgs
-	:	rewriteTemplateArg (COMMA rewriteTemplateArg)*
-		-> ^(ARGLIST rewriteTemplateArg+)
-	|
-	;
-
-rewriteTemplateArg
-	:   id ASSIGN ACTION -> ^(ARG[$ASSIGN] id ACTION<ActionAST>)
-	;
-
 // The name of the grammar, and indeed some other grammar elements may
 // come through to the parser looking like a rule reference or a token
 // reference, hence this rule is used to pick up whichever it is and rewrite
@@ -1079,7 +906,6 @@ id
 @after { paraphrases.pop(); }
     : RULE_REF  ->ID[$RULE_REF]
     | TOKEN_REF ->ID[$TOKEN_REF]
-    | TEMPLATE  ->ID[$TEMPLATE] // keyword
     ;
 
 qid

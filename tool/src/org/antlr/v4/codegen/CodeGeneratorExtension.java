@@ -31,7 +31,6 @@ package org.antlr.v4.codegen;
 
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
@@ -51,10 +50,6 @@ public class CodeGeneratorExtension {
 	public LexerFile lexerFile(LexerFile f) { return f; }
 
 	public Lexer lexer(Lexer l) { return l; }
-
-	public TreeParserFile treeParserFile(TreeParserFile f) { return f; }
-
-	public TreeParserModel treeParser(TreeParserModel p) { return p; }
 
 	public RuleFunction rule(RuleFunction rf) { return rf; }
 
@@ -76,35 +71,11 @@ public class CodeGeneratorExtension {
 
 	public List<SrcOp> wildcard(List<SrcOp> ops) { return ops; }
 
-	public MatchTree tree(MatchTree matchTree) { return matchTree; }
-
 	// ACTIONS
 
 	public List<SrcOp> action(List<SrcOp> ops) { return ops; }
 
 	public List<SrcOp> sempred(List<SrcOp> ops) { return ops; }
-
-	// AST OPS
-
-	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> leafRule(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> leafToken(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rootString(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> leafString(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rootSet(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> leafSet(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rootWildcard(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> leafWildcard(List<SrcOp> ops) { return ops; }
 
 	// BLOCKS
 
@@ -113,28 +84,4 @@ public class CodeGeneratorExtension {
 	public Choice getEBNFBlock(Choice c) { return c; }
 
 	public boolean needsImplicitLabel(GrammarAST ID, LabeledOp op) { return false; }
-
-	// AST REWRITEs
-
-	public TreeRewrite treeRewrite(TreeRewrite r) { return r; }
-
-	public RewriteChoice rewrite_choice(RewriteChoice r) { return r; }
-
-	public RewriteTreeOptional rewrite_optional(RewriteTreeOptional o) { return o; }
-
-	public RewriteTreeClosure rewrite_closure(RewriteTreeClosure c) { return c; }
-
-	public RewriteTreeStructure rewrite_treeStructure(RewriteTreeStructure t) { return t; }
-
-	public List<SrcOp> rewrite_ruleRef(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rewrite_tokenRef(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rewrite_stringRef(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rewrite_labelRef(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rewrite_action(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rewrite_epsilon(List<SrcOp> ops) { return ops; }
 }

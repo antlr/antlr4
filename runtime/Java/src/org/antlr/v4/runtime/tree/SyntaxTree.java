@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.misc.Interval;
 
 /** A tree that knows about an interval in a token stream
  *  is some kind of syntax tree. Subinterfaces distinguish
- *  between parse trees and ASTs.
+ *  between parse trees and other kinds of syntax trees we might want to create.
  */
 public interface SyntaxTree extends Tree {
 	/** Return an interval indicating the index in the TokenStream of

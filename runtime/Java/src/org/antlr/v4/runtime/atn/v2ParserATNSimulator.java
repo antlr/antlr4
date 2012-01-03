@@ -35,9 +35,6 @@ import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ASTNodeStream;
-import org.antlr.v4.runtime.tree.BufferedASTNodeStream;
-import org.antlr.v4.runtime.tree.TreeParser;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -239,7 +236,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static int retry_with_context_indicates_no_conflict = 0;
 
 	@Nullable
-	protected final BaseRecognizer<Symbol> parser;
+	protected final BaseRecognizer parser;
 
 	@NotNull
 	public final DFA[] decisionToDFA;
@@ -249,7 +246,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		this(null, atn);
 	}
 
-	public v2ParserATNSimulator(@Nullable BaseRecognizer<Symbol> parser, @NotNull ATN atn) {
+	public v2ParserATNSimulator(@Nullable BaseRecognizer parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
 //		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
@@ -264,7 +261,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	public void reset() {
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision,
+	public int adaptivePredict(@NotNull SymbolStream<Token> input, int decision,
 							   @Nullable ParserRuleContext outerContext)
 	{
 		predict_calls++;
@@ -291,7 +288,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Symbol> input,
+	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Token> input,
 						  @Nullable ParserRuleContext outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -323,7 +320,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<Symbol> input, int startIndex,
+					   @NotNull SymbolStream<Token> input, int startIndex,
                        @Nullable ParserRuleContext outerContext)
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -476,7 +473,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<Symbol> input, int startIndex,
+					   @NotNull SymbolStream<Token> input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
@@ -597,7 +594,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	public ATNConfigSet execATNWithFullContext(DFA dfa,
 											   DFAState D, // how far we got before failing over
 											   @NotNull ATNConfigSet s0,
-											   @NotNull SymbolStream<Symbol> input, int startIndex,
+											   @NotNull SymbolStream<Token> input, int startIndex,
 											   ParserRuleContext outerContext,
 											   int nalts,
 											   boolean greedy)
@@ -1219,7 +1216,7 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		return String.valueOf(t);
 	}
 
-	public String getLookaheadName(SymbolStream<Symbol> input) {
+	public String getLookaheadName(SymbolStream<Token> input) {
 		return getTokenName(input.LA(1));
 	}
 
@@ -1244,29 +1241,15 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input,
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<Token> input,
 											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{
-		if ( parser instanceof TreeParser) {
-			Symbol startNode = null;
-			if ( input instanceof BufferedASTNodeStream) {
-				startNode = input.get(startIndex);
-			}
-			return new NoViableTreeGrammarAltException(parser,
-													   (ASTNodeStream<Symbol>)input,
-													   startNode,
-													   input.LT(1),
-													   configs, outerContext);
-		}
-		else {
-			return new NoViableAltException(parser, input,
+		return new NoViableAltException(parser, input,
 											(Token)input.get(startIndex),
 											(Token)input.LT(1),
-											input.LT(1),
 											configs, outerContext);
-		}
 	}
 
 	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {

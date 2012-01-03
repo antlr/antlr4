@@ -39,12 +39,11 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testTernaryExpr() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
-			"e : e '*'^ e" +
-			"  | e '+'^ e" +
-			"  | e '?'<assoc=right>^ e ':'! e" +
-			"  | e '='<assoc=right>^ e" +
+			"e : e '*' e" +
+			"  | e '+' e" +
+			"  | e '?'<assoc=right> e ':' e" +
+			"  | e '='<assoc=right> e" +
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -66,14 +65,13 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testDeclarationsUsingASTOperators() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
-			"        : declarator '['^ e ']'!\n" +
-			"        | declarator '['^ ']'!\n" +
-			"        | declarator '('^ ')'!\n" +
-			"        | '*'^ declarator\n" + // binds less tight than suffixes
-			"        | '('! declarator ')'!\n" +
+			"        : declarator '[' e ']'\n" +
+			"        | declarator '[' ']'\n" +
+			"        | declarator '(' ')'\n" +
+			"        | '*' declarator\n" + // binds less tight than suffixes
+			"        | '(' declarator ')'\n" +
 			"        | ID\n" +
 			"        ;\n" +
 			"e : INT ;\n" +
@@ -98,15 +96,14 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testDeclarationsUsingRewriteOperators() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
-			"        : declarator '[' e ']' -> ^('[' declarator e)\n" +
-			"        | declarator '[' ']' -> ^('[' declarator)\n" +
-			"        | declarator '(' ')' -> ^('(' declarator)\n" +
-			"        | '*' declarator -> ^('*' declarator) \n" + // binds less tight than suffixes
-			"        | '(' declarator ')' -> declarator\n" +
-			"        | ID -> ID\n" +
+			"        : declarator '[' e ']'" +
+			"        | declarator '[' ']'" +
+			"        | declarator '(' ')'" +
+			"        | '*' declarator" + // binds less tight than suffixes
+			"        | '(' declarator ')'" +
+			"        | ID" +
 			"        ;\n" +
 			"e : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -130,13 +127,12 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testExpressionsUsingASTOperators() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : e EOF ;\n" + // must indicate EOF can follow
-			"e : e '.'^ ID\n" +
-			"  | e '.'^ 'this'\n" +
-			"  | '-'^ e\n" +
-			"  | e '*'^ e\n" +
-			"  | e ('+'^|'-'^) e\n" +
+			"e : e '.' ID\n" +
+			"  | e '.' 'this'\n" +
+			"  | '-' e\n" +
+			"  | e '*' e\n" +
+			"  | e ('+'|'-') e\n" +
 			"  | INT\n" +
 			"  | ID\n" +
 			"  ;\n" +
@@ -160,50 +156,17 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "e");
 	}
 
-	@Test public void testExpressionsUsingRewriteOperators() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"s : e EOF ;\n" + // must indicate EOF can follow
-			"e : e '.' ID 				-> ^('.' e ID)\n" +
-			"  | e '.' 'this' 			-> ^('.' e 'this')\n" +
-			"  | '-' e 					-> ^('-' e)\n" +
-			"  | e '*' b=e 				-> ^('*' e $b)\n" +
-			"  | e (op='+'|op='-') b=e	-> ^($op e $b)\n" +
-			"  | INT 					-> INT\n" +
-			"  | ID 					-> ID\n" +
-			"  ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
-		String[] tests = {
-			"a",		"a",
-			"1",		"1",
-			"a+1",		"(+ a 1)",
-			"a*1",		"(* a 1)",
-			"a.b",		"(. a b)",
-			"a.this",	"(. a this)",
-			"a+b*c",	"(+ a (* b c))",
-			"a.b+1",	"(+ (. a b) 1)",
-			"-a",		"(- a)",
-			"-a+b",		"(+ (- a) b)",
-			"-a.b",		"(- (. a b))",
-		};
-		runTests(grammar, tests, "e");
-	}
-
 	@Test public void testExpressionAssociativity() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : e EOF ;\n" + // must indicate EOF can follow
 			"e\n" +
-			"  : e '.'^ ID\n" +
-			"  | '-'^ e\n" +
-			"  | e '^'<assoc=right>^ e\n" +
-			"  | e '*'^ e\n" +
-			"  | e ('+'^|'-'^) e\n" +
-			"  | e ('='<assoc=right>^ |'+='<assoc=right>^) e\n" +
+			"  : e '.' ID\n" +
+			"  | '-' e\n" +
+			"  | e ''<assoc=right> e\n" +
+			"  | e '*' e\n" +
+			"  | e ('+'|'-') e\n" +
+			"  | e ('='<assoc=right> |'+='<assoc=right>) e\n" +
 			"  | INT\n" +
 			"  | ID\n" +
 			"  ;\n" +
@@ -237,57 +200,56 @@ public class TestLeftRecursion extends BaseTest {
 		// this is simplified from real java
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : e EOF ;\n" + // must indicate EOF can follow
 			"expressionList\n" +
-			"    :   e (','! e)*\n" +
+			"    :   e (',' e)*\n" +
 			"    ;\n" +
-			"e   :   '('! e ')'!\n" +
+			"e   :   '(' e ')'\n" +
 			"    |   'this' \n" +
 			"    |   'super'\n" +
 			"    |   INT\n" +
 			"    |   ID\n" +
-			"    |   type '.'^ 'class'\n" +
-			"    |   e '.'^ ID\n" +
-			"    |   e '.'^ 'this'\n" +
-			"    |   e '.'^ 'super' '('^ expressionList? ')'!\n" +
-			"    |   e '.'^ 'new'^ ID '('! expressionList? ')'!\n" +
-			"	 |	 'new'^ type ( '(' expressionList? ')'! | ('[' e ']'!)+)\n" +
-			"    |   e '['^ e ']'!\n" +
-			"    |   '('^ type ')'! e\n" +
-			"    |   e ('++'^ | '--'^)\n" +
-			"    |   e '('^ expressionList? ')'!\n" +
-			"    |   ('+'^|'-'^|'++'^|'--'^) e\n" +
-			"    |   ('~'^|'!'^) e\n" +
-			"    |   e ('*'^|'/'^|'%'^) e\n" +
-			"    |   e ('+'^|'-'^) e\n" +
-			"    |   e ('<<'^ | '>>>'^ | '>>'^) e\n" +
-			"    |   e ('<='^ | '>='^ | '>'^ | '<'^) e\n" +
-			"    |   e 'instanceof'^ e\n" +
-			"    |   e ('=='^ | '!='^) e\n" +
-			"    |   e '&'^ e\n" +
-			"    |   e '^'<assoc=right>^ e\n" +
-			"    |   e '|'^ e\n" +
-			"    |   e '&&'^ e\n" +
-			"    |   e '||'^ e\n" +
+			"    |   type '.' 'class'\n" +
+			"    |   e '.' ID\n" +
+			"    |   e '.' 'this'\n" +
+			"    |   e '.' 'super' '(' expressionList? ')'\n" +
+			"    |   e '.' 'new' ID '(' expressionList? ')'\n" +
+			"	 |	 'new' type ( '(' expressionList? ')' | ('[' e ']')+)\n" +
+			"    |   e '[' e ']'\n" +
+			"    |   '(' type ')' e\n" +
+			"    |   e ('++' | '--')\n" +
+			"    |   e '(' expressionList? ')'\n" +
+			"    |   ('+'|'-'|'++'|'--') e\n" +
+			"    |   ('~'|'!') e\n" +
+			"    |   e ('*'|'/'|'%') e\n" +
+			"    |   e ('+'|'-') e\n" +
+			"    |   e ('<<' | '>>>' | '>>') e\n" +
+			"    |   e ('<=' | '>=' | '>' | '<') e\n" +
+			"    |   e 'instanceof' e\n" +
+			"    |   e ('==' | '!=') e\n" +
+			"    |   e '&' e\n" +
+			"    |   e '^'<assoc=right> e\n" +
+			"    |   e '|' e\n" +
+			"    |   e '&&' e\n" +
+			"    |   e '||' e\n" +
 			"    |   e '?' e ':' e\n" +
-			"    |   e ('='<assoc=right>^\n" +
-			"          |'+='<assoc=right>^\n" +
-			"          |'-='<assoc=right>^\n" +
-			"          |'*='<assoc=right>^\n" +
-			"          |'/='<assoc=right>^\n" +
-			"          |'&='<assoc=right>^\n" +
-			"          |'|='<assoc=right>^\n" +
-			"          |'^='<assoc=right>^\n" +
-			"          |'>>='<assoc=right>^\n" +
-			"          |'>>>='<assoc=right>^\n" +
-			"          |'<<='<assoc=right>^\n" +
-			"          |'%='<assoc=right>^) e\n" +
+			"    |   e ('='<assoc=right>\n" +
+			"          |'+='<assoc=right>\n" +
+			"          |'-='<assoc=right>\n" +
+			"          |'*='<assoc=right>\n" +
+			"          |'/='<assoc=right>\n" +
+			"          |'&='<assoc=right>\n" +
+			"          |'|='<assoc=right>\n" +
+			"          |'^='<assoc=right>\n" +
+			"          |'>>='<assoc=right>\n" +
+			"          |'>>>='<assoc=right>\n" +
+			"          |'<<='<assoc=right>\n" +
+			"          |'%='<assoc=right>) e\n" +
 			"    ;\n" +
 			"type: ID \n" +
-			"    | ID '['^ ']'!\n" +
+			"    | ID '[' ']'\n" +
 			"    | 'int'\n" +
-			"	 | 'int' '['^ ']'! \n" +
+			"	 | 'int' '[' ']' \n" +
 			"    ;\n" +
 			"ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;\n" +
 			"INT : '0'..'9'+ ;\n" +
@@ -346,11 +308,10 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testReturnValueAndActionsAndASTs() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
 			"s : e {System.out.print(\"v=\"+$e.v+\", \");} ;\n" +
 			"e returns [int v, List<String> ignored]\n" +
-			"  : e '*'^ b=e {$v *= $b.v;}\n" +
-			"  | e '+'^ b=e {$v += $b.v;}\n" +
+			"  : e '*' b=e {$v *= $b.v;}\n" +
+			"  | e '+' b=e {$v += $b.v;}\n" +
 			"  | INT {$v = $INT.int;}\n" +
 			"  ;\n" +
 			"INT : '0'..'9'+ ;\n" +
@@ -364,18 +325,10 @@ public class TestLeftRecursion extends BaseTest {
 
 	public void runTests(String grammar, String[] tests, String startRule) {
 		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer", debug);
-		boolean parserBuildsTrees =
-			grammar.indexOf("output=AST")>=0 ||
-			grammar.indexOf("output = AST")>=0;
 		writeRecognizerAndCompile("TParser",
-										 null,
-										 "TLexer",
-										 startRule,
-										 null,
-										 parserBuildsTrees,
-										 false,
-										 false,
-										 debug);
+								  "TLexer",
+								  startRule,
+								  debug);
 
 		for (int i=0; i<tests.length; i+=2) {
 			String test = tests[i];

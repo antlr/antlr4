@@ -32,70 +32,10 @@ package org.antlr.v4.runtime;
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */
-public class Parser extends BaseRecognizer<Token> {
-	protected TokenStream _input;
-
+public class Parser extends BaseRecognizer {
 	public Parser(TokenStream input) {
 		super(input);
     }
-
-	/** Always called by generated parsers upon entry to a rule.
-	 *  This occurs after the new context has been pushed. Access field
-	 *  _ctx get the current context.
-	 *
-	 *  This is flexible because users do not have to regenerate parsers
-	 *  to get trace facilities.
-	 */
-	@Override
-	public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
-		_ctx = localctx;
-		_ctx.start = _input.LT(1);
-		_ctx.ruleIndex = ruleIndex;
-		if ( buildParseTrees ) addContextToParseTree();
-        if ( _listener != null) {
-            _listener.enterEveryRule(_ctx);
-            _ctx.enterRule(_listener);
-        }
-	}
-
-    @Override
-    public void exitRule(int ruleIndex) {
-        // trigger event on _ctx, before it reverts to parent
-        if ( _listener != null) {
-            _ctx.exitRule(_listener);
-            _listener.exitEveryRule(_ctx);
-        }
-        super.exitRule(ruleIndex);
-    }
-
-    @Override
-	public Token match(int ttype) throws RecognitionException {
-		return super.match(ttype);
-	}
-
-	@Override
-	public Token getCurrentInputSymbol() {
-		return _input.LT(1);
-	}
-
-	@Override
-	public TokenStream getInputStream() { return _input; }
-
-	@Override
-	public final void setInputStream(IntStream input) {
-		setTokenStream((TokenStream)input);
-	}
-
-	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream input) {
-		this._input = null;
-		reset();
-		this._input = input;
-	}
-
-    public TokenStream getTokenStream() {
-		return _input;
-	}
 
 	@Override
 	public String getSourceName() {

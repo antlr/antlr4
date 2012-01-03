@@ -44,9 +44,6 @@ public class CodeGenPipeline {
 		if ( g.isLexer() ) {
 			gen.writeRecognizer(gen.generateLexer());
 		}
-		else if ( g.isTreeGrammar() ) {
-			gen.writeRecognizer(gen.generateTreeParser());
-		}
 		else {
 			gen.writeRecognizer(gen.generateParser());
 			if ( g.tool.genListener) {

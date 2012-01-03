@@ -30,7 +30,6 @@
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorStrategy;
-import org.antlr.v4.runtime.Token;
 
 public class TestR {
 	public static void main(String[] args) throws Exception {
@@ -42,7 +41,7 @@ public class TestR {
 //		}
 		RParser p = new RParser(tokens);
 		p.setBuildParseTree(true);
-		p.setErrorHandler(new DiagnosticErrorStrategy<Token>());
+		p.setErrorHandler(new DiagnosticErrorStrategy());
 		p.prog();
 	}
 }

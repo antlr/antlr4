@@ -83,8 +83,7 @@ block[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 
 alternative returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> els = new ArrayList<ATNFactory.Handle>();}
-    :	^(ALT_REWRITE a=alternative .*)			{$p = $a.p;}
-    |	^(LEXER_ALT_ACTION a=alternative .*)	{$p = $a.p;}
+    :	^(LEXER_ALT_ACTION a=alternative .*)	{$p = $a.p;}
     |	^(ALT EPSILON)							{$p = factory.epsilon($EPSILON);}
     |   ^(ALT (e=element {els.add($e.p);})+)	{$p = factory.alt(els);}
     ;
@@ -97,12 +96,7 @@ element returns [ATNFactory.Handle p]
 	|   SEMPRED						{$p = factory.sempred((PredAST)$SEMPRED);}
 	|   ^(ACTION .)					{$p = factory.action((ActionAST)$ACTION);}
 	|   ^(SEMPRED .)				{$p = factory.sempred((PredAST)$SEMPRED);}
-	|	treeSpec					{$p = $treeSpec.p;}
-	|	^(ROOT a=astOperand)		{$p = $a.p;}
-	|	^(BANG a=astOperand)		{$p = $a.p;}
     |	^(NOT b=blockSet[true])		{$p = $b.p;}
-    |	DOWN_TOKEN					{$p = factory.tokenRef((DownAST)$start);}
-    |	UP_TOKEN					{$p = factory.tokenRef((UpAST)$start);}
     |	ARG_ACTION					{$p = factory.charSetLiteral($start);}
 	;
 
@@ -116,15 +110,8 @@ labeledElement returns [ATNFactory.Handle p]
 	|	^(PLUS_ASSIGN ID element)   {$p = factory.listLabel($element.p);}
 	;
 
-treeSpec returns [ATNFactory.Handle p]
-@init {List<ATNFactory.Handle> els = new ArrayList<ATNFactory.Handle>();}
-    :	^(TREE_BEGIN (e=element {els.add($e.p);})+ )
-    	{$p = factory.tree($TREE_BEGIN, els);}
-    ;
-
 subrule returns [ATNFactory.Handle p]
-	:	^(astBlockSuffix block[null])		{$p = $block.p;}
-	|	^(OPTIONAL block[$start])			{$p = $block.p;}
+	:	^(OPTIONAL block[$start])			{$p = $block.p;}
 	|	^(CLOSURE block[$start])			{$p = $block.p;}
 	|	^(POSITIVE_CLOSURE block[$start])	{$p = $block.p;}
 	| 	block[null] 						{$p = $block.p;}
@@ -141,12 +128,6 @@ setElement
 	|	TOKEN_REF
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
 	;
-
-astBlockSuffix
-    : ROOT
-    | IMPLIES
-    | BANG
-    ;
 
 atom returns [ATNFactory.Handle p]
 	:	range					{$p = $range.p;}

@@ -87,19 +87,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		new HashSet<String>() {
 			{
 				add("tokenVocab");
-				add("output"); add("rewrite"); add("ASTLabelType");
 				add("TokenLabelType");
 				add("superClass");
-			}
-		};
-
-	public static final Set<String> legalTreeParserOptions =
-		new HashSet<String>() {
-			{
-				add("tokenVocab");
-				add("output"); add("ASTLabelType");
-				add("superClass");
-				add("filter");
 			}
 		};
 
@@ -117,7 +106,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalTokenOptions =
 		new HashSet<String>() {
 			{
-				add(TerminalAST.defaultTokenOption);
 				add("assoc");
 			}
 		};
@@ -143,8 +131,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				map(ANTLRParser.PARSER, ANTLRParser.PARSER);
 				map(ANTLRParser.PARSER, ANTLRParser.COMBINED);
 
-				map(ANTLRParser.TREE, ANTLRParser.TREE);
-
 				map(ANTLRParser.COMBINED, ANTLRParser.COMBINED);
 			}
 		};
@@ -164,11 +150,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	public void discoverGrammar(GrammarRootAST root, GrammarAST ID) {
 		checkGrammarName(ID.token);
-	}
-
-	@Override
-	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
-		checkTreeFilterOptions(root);
 	}
 
 	@Override
@@ -255,39 +236,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 //		}
 	}
 
-	@Override
-	public void discoverAltWithRewrite(AltAST alt) {
-		GrammarAST firstNode = (GrammarAST)alt.getChild(0);
-		checkRewriteForMultiRootAltInTreeGrammar(g.ast,
-												 firstNode.token,
-												 currentOuterAltNumber);
-	}
-
-	@Override
-	public void rootOp(GrammarAST op, GrammarAST opnd) {
-		checkASTOps(g.ast, op, opnd);
-	}
-
-	@Override
-	public void bangOp(GrammarAST op, GrammarAST opnd) {
-		checkASTOps(g.ast, op, opnd);
-	}
-
-	@Override
-	public void discoverTreeRewrite(GrammarAST rew) {
-		checkRewriteOk(g.ast, rew);
-	}
-
-	@Override
-	public void discoverSTRewrite(GrammarAST rew) {
-		checkRewriteOk(g.ast, rew);
-	}
-
-	@Override
-	public void wildcardRef(GrammarAST ref) {
-		checkWildcardRoot(ref);
-	}
-
 	// Routines to do the actual work of checking issues with a grammar.
 	// They are triggered by the visitor methods above.
 
@@ -349,7 +297,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			g.tool.errMgr.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
 									   fileName, ruleID, ruleID.getText());
 		}
-		if ( (g.isParser()||g.isTreeGrammar()) &&
+		if ( g.isParser() &&
 			 Character.isUpperCase(ruleID.getText().charAt(0)) )
 		{
 			g.tool.errMgr.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
@@ -454,12 +402,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 									   optionID.getText());
 			return false;
 		}
-		// example (ALT_REWRITE (ALT (ID (ELEMENT_OPTIONS Foo))) (-> (ALT ID))
-		if ( !inRewrite && this.currentOuterAltHasRewrite ) {
-			g.tool.errMgr.grammarError(ErrorType.HETERO_ILLEGAL_IN_REWRITE_ALT,
-									   fileName,
-									   optionID);
-		}
 		// TODO: extra checks depending on terminal kind?
 		return true;
 	}
@@ -470,118 +412,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				return legalLexerOptions.contains(key);
 			case ANTLRParser.PARSER :
 				return legalParserOptions.contains(key);
-			case ANTLRParser.TREE :
-				return legalTreeParserOptions.contains(key);
 			default :
 				return legalParserOptions.contains(key);
-		}
-	}
-
-	/** Rules in tree grammar that use -> rewrites and are spitting out
-	 *  templates via output=template and then use rewrite=true must only
-	 *  use -> on alts that are simple nodes or trees or single rule refs
-	 *  that match either nodes or trees.
-	 */
-	void checkRewriteForMultiRootAltInTreeGrammar(
-		GrammarRootAST root,
-		Token altStart,
-		int alt)
-	{
-		if ( g.isTreeGrammar() &&
-			 root.getOptions()!=null && root.getOptionString("output")!=null &&
-			 root.getOptionString("output").equals("template") &&
-			 root.getOptionString("rewrite")!=null &&
-			 root.getOptionString("rewrite").equals("true") )
-		{
-			String fileName = altStart.getInputStream().getSourceName();
-			g.tool.errMgr.grammarError(ErrorType.REWRITE_FOR_MULTI_ELEMENT_ALT,
-									   fileName,
-									   altStart,
-									   alt);
-		}
-	}
-
-	void checkASTOps(GrammarRootAST root,
-					 GrammarAST op,
-					 GrammarAST elementRoot)
-	{
-		RuleAST rule = (RuleAST)op.getAncestor(ANTLRParser.RULE);
-		String ruleName = rule.getChild(0).getText();
-		String fileName = elementRoot.token.getInputStream().getSourceName();
-		if ( root.getOptions()==null || !root.getOptionString("output").equals("AST") ) {
-			g.tool.errMgr.grammarError(ErrorType.AST_OP_WITH_NON_AST_OUTPUT_OPTION,
-									   fileName,
-									   elementRoot.token,
-									   op.getText());
-		}
-		if ( root.getOptions()!=null && root.getOptionString("output")==null ) {
-			g.tool.errMgr.grammarError(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
-									   fileName,
-									   elementRoot.token,
-									   ruleName);
-		}
-		if ( op.hasAncestor(ANTLRParser.ALT_REWRITE) ) {
-			GrammarAST rew = (GrammarAST)op.getAncestor(ANTLRParser.ALT_REWRITE);
-			int altNum = rew.getChildIndex() + 1; // alts are 1..n
-			g.tool.errMgr.grammarError(ErrorType.AST_OP_IN_ALT_WITH_REWRITE,
-									   fileName,
-									   elementRoot.token,
-									   ruleName,
-									   altNum);
-		}
-	}
-
-	void checkRewriteOk(GrammarRootAST root, GrammarAST elementRoot) {
-		String ruleName = currentRuleAST.getChild(0).getText();
-		String fileName = elementRoot.token.getInputStream().getSourceName();
-		if ( root.getOptions()!=null && root.getOptionString("output")==null ) {
-			g.tool.errMgr.grammarError(ErrorType.REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
-									   fileName,
-									   elementRoot.token,
-									   ruleName);
-		}
-	}
-
-	void checkTreeFilterOptions(GrammarRootAST root) {
-		if ( root.getOptions()==null ) return;
-		String fileName = root.token.getInputStream().getSourceName();
-		String filter = root.getOptionString("filter");
-		if ( g.isTreeGrammar() && filter!=null && filter.equals("true") ) {
-			// check for conflicting options
-			// filter => backtrack=true (can't be false)
-			// filter&&output!=AST => error
-			// filter&&output=AST => rewrite=true
-			// any deviation from valid option set is an error
-			String backtrack = root.getOptionString("backtrack");
-			String output = root.getOptionString("output");
-			String rewrite = root.getOptionString("rewrite");
-			if ( backtrack!=null && !backtrack.toString().equals("true") ) {
-				g.tool.errMgr.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
-										   fileName,
-										   root.token,
-										   "backtrack", backtrack);
-			}
-			if ( output!=null && !output.equals("AST") ) {
-				g.tool.errMgr.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
-										   fileName,
-										   root.token,
-										   "output", output);
-			}
-			else if ( rewrite!=null && !rewrite.equals("true") ) { // && AST output
-				g.tool.errMgr.grammarError(ErrorType.CONFLICTING_OPTION_IN_TREE_FILTER,
-										   fileName,
-										   root.token,
-										   "rewrite", rewrite);
-			}
-		}
-	}
-
-	void checkWildcardRoot(GrammarAST wild) {
-		if ( wild.getChildIndex()==0 && wild.getParent().getType()==ANTLRParser.TREE_BEGIN ) {
-			String fileName = wild.token.getInputStream().getSourceName();
-			g.tool.errMgr.grammarError(ErrorType.WILDCARD_AS_ROOT,
-									   fileName,
-									   wild.token);
 		}
 	}
 

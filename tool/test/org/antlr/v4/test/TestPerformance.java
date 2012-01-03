@@ -265,7 +265,7 @@ public class TestPerformance extends BaseTest {
                                 sharedParser.setListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
-                                sharedParser.setErrorHandler(new BailErrorStrategy<Token>());
+                                sharedParser.setErrorHandler(new BailErrorStrategy());
                             }
                         }
 

@@ -29,7 +29,8 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
@@ -37,8 +38,7 @@ import org.antlr.v4.runtime.misc.Interval;
  *  This node represents both internal nodes, rule invocations,
  *  and leaf nodes, token matches.
  *
- *  Unlike the common AST stuff in the runtime library, there is no such thing
- *  as a nil node. The payload is either a token or a context object.
+ *  The payload is either a token or a context object.
  */
 public interface ParseTree extends SyntaxTree {
 	public interface RuleNode extends ParseTree {
@@ -89,13 +89,8 @@ public interface ParseTree extends SyntaxTree {
 			if (symbol instanceof Token) {
 				if ( ((Token)symbol).getType() == Token.EOF ) return "<EOF>";
 				return ((Token)symbol).getText();
-			} else if (symbol instanceof AST) {
-				if (((AST)symbol).getType() == Token.EOF) {
-					return "<EOF>";
-				} else {
-					return ((AST)symbol).getText();
-				}
-			} else {
+			}
+			else {
 				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
 			}
 		}

@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -31,17 +31,20 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.*;
-import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.codegen.model.decl.RuleContextDecl;
+import org.antlr.v4.codegen.model.decl.TokenDecl;
+import org.antlr.v4.codegen.model.decl.TokenListDecl;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.util.List;
 
@@ -80,20 +83,15 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public List<SrcOp> sempred(GrammarAST ast) { return list(new SemPred(this, ast)); }
 
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args,
-							   GrammarAST astOp)
-	{
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
 		InvokeRule invokeOp = new InvokeRule(this, ID, label);
-		// If no manual label and action refs as token/rule not label or
-		// we're adding to trees, we need to define implicit label
+		// If no manual label and action refs as token/rule not label, we need to define implicit label
 		if ( controller.needsImplicitLabel(ID, invokeOp) ) defineImplicitLabel(ID, invokeOp);
 		AddToLabelList listLabelOp = getListLabelIfPresent(invokeOp, label);
 		return list(invokeOp, listLabelOp);
 	}
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST labelAST, GrammarAST args,
-								GrammarAST astOp)
-	{
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST labelAST, GrammarAST args) {
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
@@ -119,9 +117,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST,
-						   GrammarAST astOp, boolean invert)
-	{
+	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST, boolean invert) {
 		LabeledOp matchOp;
 		if ( invert ) matchOp = new MatchNotSet(this, setAST);
 		else matchOp = new MatchSet(this, setAST);
@@ -141,7 +137,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp) {
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
 		Wildcard wild = new Wildcard(this, ast);
 		// TODO: dup with tokenRef
 		if ( labelAST!=null ) {
@@ -263,127 +259,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		return	op.getLabels().size()==0 &&	(actionRefsAsToken || actionRefsAsRule);
 	}
 
-	// AST REWRITE
-
-
-	@Override
-	public TreeRewrite treeRewrite(GrammarAST ast) {
-		TreeRewrite tr = new TreeRewrite(this, getTreeLevel(), getCodeBlockLevel());
-		tr.addLocalDecl(new RootDecl(this, 0));
-		List<GrammarAST> refs =
-			UseDefAnalyzer.getElementReferencesShallowInOuterAlt(ast);
-		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
-		if ( refs!=null ) {
-			for (GrammarAST ref : refs) {
-				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
-				tr.addLocalDecl(d);
-				RewriteIteratorInit init = new RewriteIteratorInit(this, d);
-				tr.addPreambleOp(init);
-			}
-		}
-		return tr;
-	}
-
-	@Override
-	public RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops) {
-		RewriteAction predAction = null;
-		if ( pred!=null ) predAction = new RewriteAction(this, pred);
-		RewriteChoice c = new RewriteChoice(this, predAction, ops);
-		return c;
-	}
-
-	@Override
-	public RewriteTreeOptional rewrite_optional(GrammarAST ast) {
-		RewriteTreeOptional o =
-			new RewriteTreeOptional(this, ast, getTreeLevel(), getCodeBlockLevel());
-		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(ast, true);
-		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
-		if ( refs!=null ) {
-			for (GrammarAST ref : refs) {
-				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
-				o.addLocalDecl(d);
-				o.conditionalDecls.add(d);
-				RewriteIteratorInit init = new RewriteIteratorInit(this, d);
-				o.addPreambleOp(init);
-			}
-		}
-		return o;
-	}
-
-	@Override
-	public RewriteTreeClosure rewrite_closure(GrammarAST ast) {
-		RewriteTreeClosure c =
-			new RewriteTreeClosure(this, ast, getTreeLevel(), getCodeBlockLevel());
-		List<GrammarAST> refs = UseDefAnalyzer.getElementReferencesInEBNF(ast, false);
-		refs = UseDefAnalyzer.filterForRuleAndTokenRefs(getCurrentOuterMostAlt(), refs);
-		if ( refs!=null ) {
-			for (GrammarAST ref : refs) {
-				RewriteIteratorDecl d = new RewriteIteratorDecl(this, ref, getCodeBlockLevel());
-				c.addLocalDecl(d);
-				c.iteratorDecls.add(d);
-				RewriteIteratorInit init = new RewriteIteratorInit(this, d);
-				c.addPreambleOp(init);
-			}
-		}
-		return c;
-	}
-
-	@Override
-	public RewriteTreeStructure rewrite_treeStructure(GrammarAST root) {
-		RewriteTreeStructure t = new RewriteTreeStructure(this, root, getTreeLevel(), getCodeBlockLevel());
-		t.addLocalDecl( new RootDecl(this, getTreeLevel()) );
-		return t;
-	}
-
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {
-		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
-		RewriteRuleRef ruleRef = new RewriteRuleRef(this, ID, iterName);
-		return list(makeChildOrRoot(ruleRef, isRoot));
-	}
-
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) {
-		Alternative alt = getCurrentOuterMostAlt();
-		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
-		// not ref'd on left hand side or it is but we have an argument like ID["x"]
-		// implies create new node
-		SrcOp tokenRef;
-		if ( alt.tokenRefs.get(ID.getText())==null || argAST!=null ) {
-			tokenRef = new RewriteImagTokenRef(this, ID, ID.getText(), argAST);
-		}
-		else { // must be token ref on left of ->
-			tokenRef = new RewriteTokenRef(this, ID, iterName);
-		}
-		return list(makeChildOrRoot(tokenRef, isRoot));
-	}
-
-	@Override
-	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) {
-		String iterName = gen.target.getRewriteIteratorName(ID, getCodeBlockLevel());
-		SrcOp labelRef;
-		if ( ID.getText().equals(getCurrentRuleFunction().rule.name) ) { // $e in rule e
-			labelRef = new RewriteSelfRuleLabelRef(this, ID);
-		}
-		else { // normal element label
-			labelRef = new RewriteLabelRef(this, ID, iterName);
-		}
-		return list(makeChildOrRoot(labelRef, isRoot));
-	}
-
-	@Override
-	public List<SrcOp> rewrite_action(ActionAST actionAST, boolean isRoot) {
-		RewriteAction action = new RewriteAction(this, actionAST);
-		return list(makeChildOrRoot(action, isRoot));
-	}
-
 	// support
-
-	public SrcOp makeChildOrRoot(SrcOp elemToAdd, boolean isRoot) {
-		String rootName = gen.target.getRootName(getTreeLevel());
-		SrcOp op;
-		if ( isRoot ) op = new BecomeRoot(this, rootName, elemToAdd);
-		else op = new AddChild(this, rootName, elemToAdd);
-		return op;
-	}
 
 	public void defineImplicitLabel(GrammarAST ast, LabeledOp op) {
 		Decl d;

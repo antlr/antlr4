@@ -253,16 +253,4 @@ public class TestParseErrors extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	// AST nodes with missing information
-
-	@Test public void testASTHasErrorNode() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options { output=AST; }\n"+
-			"a : 'a' 'b' ;";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "a", "aab", false);
-		String expecting = "a b\n";
-		assertEquals(expecting, result);
-	}
-
 }

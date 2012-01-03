@@ -324,7 +324,10 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public static boolean hasImmediateRecursiveRuleRefs(GrammarAST t, String ruleName) {
 		if ( t==null ) return false;
 		GrammarAST blk = (GrammarAST)t.getFirstChildWithType(BLOCK);
-		for (GrammarAST rref : blk.getNodesWithType(RULE_REF)) {
+		if ( blk==null ) return false;
+		List<GrammarAST> ruleRefs = blk.getNodesWithType(RULE_REF);
+		if ( ruleRefs==null ) return false;
+		for (GrammarAST rref : ruleRefs) {
 			if ( rref.getChildIndex()==0 && rref.getText().equals(ruleName) ) return true;
 		}
 		return false;

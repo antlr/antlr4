@@ -28,9 +28,9 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.tree.AST;
 
 /** A semantic predicate failed during validation.  Validation of predicates
  *  occurs when normally parsing the alternative just like matching a token.
@@ -42,24 +42,18 @@ public class FailedPredicateException extends RecognitionException {
 	public int predIndex;
 	public String msg;
 
-	public FailedPredicateException(BaseRecognizer<?> recognizer) {
+	public FailedPredicateException(BaseRecognizer recognizer) {
 		this(recognizer, null);
 	}
 
-	public FailedPredicateException(BaseRecognizer<?> recognizer, @Nullable String msg) {
+	public FailedPredicateException(BaseRecognizer recognizer, @Nullable String msg) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;
 		this.msg = msg;
-		Object la = recognizer.getCurrentInputSymbol();
-		this.offendingNode = la;
-		if ( la instanceof AST) {
-			this.offendingToken = ((AST)la).getPayload();
-		}
-		else {
-			this.offendingToken = (Token)la;
-		}
+		Token la = recognizer.getCurrentToken();
+		this.offendingToken = la;
 	}
 }

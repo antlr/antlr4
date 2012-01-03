@@ -17,14 +17,12 @@ grammarSpec:
 
     <<
     parser grammar P;
-    options {k=2; output=AST;}
     tokens { A; B='33'; }
     @header {foo}
     a : A;
     >>
     ->
     (PARSER_GRAMMAR P
-    (OPTIONS (= k 2) (= output AST))
     (tokens { A (= B '33'))
     (@ header {foo})
     (RULES (RULE a (BLOCK (ALT A)))))
@@ -33,14 +31,12 @@ grammarSpec:
     parser grammar P;
     @header {foo}
     tokens { A; B='33'; }
-    options {k=2; ASTLabel=a.b.c; output=AST;}
     a : A;
     >>
     ->
     (PARSER_GRAMMAR P
     (@ header {foo})
     (tokens { A (= B '33'))
-    (OPTIONS (= k 2) (= ASTLabel a.b.c) (= output AST))
     (RULES (RULE a (BLOCK (ALT A)))))
 
     <<
@@ -123,79 +119,11 @@ rule:
 	>>
 	-> (RULE a int i (throws a.b.c) (BLOCK (ALT A)))
 
-block:
-	"( ^(A B) | ^(b C) )"	-> (BLOCK (ALT ("^(" A DOWN B UP)) (ALT ("^(" b DOWN C UP)))
-
 ebnf:
 	"(A|B)"					-> (BLOCK (ALT A) (ALT B))
 	"(A|B)?"				-> (? (BLOCK (ALT A) (ALT B)))
 	"(A|B)*"				-> (* (BLOCK (ALT A) (ALT B)))
 	"(A|B)+"				-> (+ (BLOCK (ALT A) (ALT B)))
-
-alternative:
-	"x+=ID* -> $x*" ->
-	    (ALT_REWRITE
-		    (ALT (* (BLOCK (ALT (+= x ID)))))
-            (-> (REWRITE_SEQ (* (REWRITE_BLOCK (REWRITE_SEQ x))))))
-
-	"A -> ..." -> (ALT_REWRITE (ALT A) (-> ...))
-	"A -> "	   -> (ALT_REWRITE (ALT A) (-> EPSILON))
-
-	"A -> foo(a={x}, b={y})" ->
-	    (ALT_REWRITE
- 	        (ALT A)
-		    (-> (TEMPLATE foo (ARGLIST (= a {x}) (= b {y})))))
-
-	"A -> template(a={x}, b={y}) <<ick>>" ->
-	    (ALT_REWRITE
-	   	    (ALT A)
-		 	(-> (TEMPLATE (ARGLIST (= a {x}) (= b {y})) <<ick>>)))
-
-	"A -> ({name})()" -> (ALT_REWRITE (ALT A) (-> (TEMPLATE {name})))
-
-	"A -> {expr}" -> (ALT_REWRITE (ALT A) (-> (REWRITE_SEQ {expr})))
-
-    <<
-    A -> {p1}? {e1}
-    -> {e2}
-    ->
-    >>
-    ->
-    ( ALT_REWRITE
-      (ALT A)
-      (-> {p1}? (REWRITE_SEQ {e1}))
-      (-> (REWRITE_SEQ {e2}))
-    )
-
-	"A -> A" -> (ALT_REWRITE (ALT A) (-> (REWRITE_SEQ A)))
-
-	"a -> a" -> (ALT_REWRITE (ALT a) (-> (REWRITE_SEQ a)))
-
-	"a A X? Y* -> A a ^(TOP X)? Y*" ->
-        (ALT_REWRITE
-            (ALT a A (? (BLOCK (ALT X))) (* (BLOCK (ALT Y))))
-            (-> (REWRITE_SEQ
-                A a
-                (? (REWRITE_BLOCK (REWRITE_SEQ ("^(" TOP X))))
-                (* (REWRITE_BLOCK (REWRITE_SEQ Y))))))
-
-	"A -> A[33]" -> (ALT_REWRITE (ALT A) (-> (REWRITE_SEQ (A 33))))
-
-	"A -> 'int' ^(A A)*" ->
-        (ALT_REWRITE
-            (ALT A)
-            (-> (REWRITE_SEQ 'int' (* (REWRITE_BLOCK (REWRITE_SEQ ("^(" A A)))))))
-
-    <<
-    A -> {p1}? A
-      -> {p2}? B
-      ->
-    >>
-    ->
-    (ALT_REWRITE (ALT A)
-    (-> {p1}? (REWRITE_SEQ A))
-    (-> {p2}? (REWRITE_SEQ B))
-    (-> EPSILON))
 
 element:
 	"~A"		-> (~ (SET A))
@@ -224,6 +152,3 @@ element:
 	"x+=b+"		-> (+ (BLOCK (ALT (+= x b))))
 	"('*'^)*"	-> (* (BLOCK (ALT (^ '*'))))
 	"({blort} 'x')*" -> (* (BLOCK (ALT {blort} 'x')))
-	"A!"	    -> (! A)
-	"A^"		-> (^ A)
-	"x=A^"		-> (= x (^ A))

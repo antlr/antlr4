@@ -30,16 +30,13 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
 
 import java.util.List;
 
@@ -58,10 +55,6 @@ public interface OutputModelFactory {
 
 	Lexer lexer(LexerFile file);
 
-	TreeParserFile treeParserFile(String fileName);
-
-	TreeParserModel treeParser(TreeParserFile file);
-
 	RuleFunction rule(Rule r);
 
 	List<SrcOp> rulePostamble(RuleFunction function, Rule r);
@@ -74,27 +67,21 @@ public interface OutputModelFactory {
 
 	CodeBlockForAlt epsilon();
 
-	List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp);
+	List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args);
 
-	List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp);
+	List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args);
 
-	List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp);
+	List<SrcOp> stringRef(GrammarAST ID, GrammarAST label);
 
-	List<SrcOp> set(GrammarAST setAST, GrammarAST label, GrammarAST astOp, boolean invert);
+	List<SrcOp> set(GrammarAST setAST, GrammarAST label, boolean invert);
+
+	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST);
 
 	List<SrcOp> action(GrammarAST ast);
 
 	List<SrcOp> forcedAction(GrammarAST ast);
 
 	List<SrcOp> sempred(GrammarAST ast);
-
-	List<SrcOp> rootToken(List<SrcOp> ops);
-
-	List<SrcOp> rootRule(List<SrcOp> ops);
-
-	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp);
-
-	MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos);
 
 	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label);
 
@@ -111,32 +98,6 @@ public interface OutputModelFactory {
 	List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST);
 
 	boolean needsImplicitLabel(GrammarAST ID, LabeledOp op);
-
-	// AST REWRITE TRIGGERS
-	// Though dealing with ASTs, we must deal with here since these are
-	// triggered from elements in ANTLR's internal GrammarAST
-
-	TreeRewrite treeRewrite(GrammarAST ast);
-
-	RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops);
-
-	RewriteTreeOptional rewrite_optional(GrammarAST ast);
-
-	RewriteTreeClosure rewrite_closure(GrammarAST ast);
-
-	RewriteTreeStructure rewrite_treeStructure(GrammarAST root);
-
-	List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot);
-
-	List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST);
-
-	List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot);
-
-	List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot);
-
-	List<SrcOp> rewrite_action(ActionAST action, boolean isRoot);
-
-	List<SrcOp> rewrite_epsilon(GrammarAST epsilon);
 
 	// CONTEXT INFO
 

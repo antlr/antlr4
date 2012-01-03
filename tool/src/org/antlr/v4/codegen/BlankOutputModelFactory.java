@@ -30,14 +30,11 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
 
 import java.util.List;
 
@@ -62,13 +59,15 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public CodeBlockForAlt epsilon() { return null; }
 
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp) { return null; }
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args, GrammarAST astOp) { return null; }
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
 
-	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp) { return tokenRef(ID, label, null, astOp); }
+	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) { return tokenRef(ID, label, null); }
 
-	public List<SrcOp> set(GrammarAST setAST, GrammarAST label, GrammarAST astOp, boolean invert) {	return null; }
+	public List<SrcOp> set(GrammarAST setAST, GrammarAST label, boolean invert) {	return null; }
+
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) { return null; }
 
 	// ACTIONS
 
@@ -77,40 +76,6 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 	public List<SrcOp> forcedAction(GrammarAST ast) { return null; }
 
 	public List<SrcOp> sempred(GrammarAST ast) { return null; }
-
-	// AST OPS
-
-	public List<SrcOp> rootToken(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> rootRule(List<SrcOp> ops) { return ops; }
-
-	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp) { return null; }
-
-	// AST REWRITES
-
-	public TreeRewrite treeRewrite(GrammarAST ast) { return null; }
-
-	public RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops) {	return null; }
-
-	public RewriteTreeOptional rewrite_optional(GrammarAST ast) { return null; }
-
-	public RewriteTreeClosure rewrite_closure(GrammarAST ast) { return null; }
-
-	public RewriteTreeStructure rewrite_treeStructure(GrammarAST root) { return null; }
-
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) { return null; }
-
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) { return null; }
-
-	public List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot) {
-		return rewrite_tokenRef(ID, isRoot, null);
-	}
-
-	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) { return null; }
-
-	public List<SrcOp> rewrite_action(ActionAST action, boolean isRoot) { return null; }
-
-	public List<SrcOp> rewrite_epsilon(GrammarAST epsilon) { return null; }
 
 	// BLOCKS
 

@@ -29,7 +29,6 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -84,7 +83,6 @@ public class SymbolChecks {
         //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
         checkForLabelConflicts(collector.rules);
-        //checkRewriteElementsPresentOnLeftSide(collector.rules); // move to after token type assignment
     }
 
     public void checkForRuleConflicts(List<Rule> rules) {
@@ -189,19 +187,6 @@ public class SymbolChecks {
 //            tokenIDs.add(ID);
 //        }
     }
-
-	public void checkForUndefinedTokensInRewrite() {
-		// Ensure that all tokens refs on the right of -> have been defined.
-		for (GrammarAST elem : collector.rewriteElements) {
-			if ( elem.getType()==ANTLRParser.TOKEN_REF ) {
-				int ttype = g.getTokenType(elem.getText());
-				if ( ttype == Token.INVALID_TOKEN_TYPE ) {
-					g.tool.errMgr.grammarError(ErrorType.UNDEFINED_TOKEN_REF_IN_REWRITE,
-											   g.fileName, elem.token, elem.getText());
-				}
-			}
-		}
-	}
 
     /** Make sure a label doesn't conflict with another symbol.
      *  Labels must not conflict with: rules, tokens, scope names,

@@ -58,11 +58,6 @@ public class RecognitionException extends RuntimeException {
 	 */
 	protected Token offendingToken;
 
-	/** If this is a tree parser exception, node is set to the node with
-	 *  the problem.
-	 */
-	protected Object offendingNode;
-
 	protected int offendingState;
 
 	public RecognitionException(@Nullable Recognizer<?, ?> recognizer, IntStream input,
@@ -84,7 +79,7 @@ public class RecognitionException extends RuntimeException {
 
 	public IntervalSet getExpectedTokens() {
         // TODO: do we really need this type check?
-		if ( recognizer!=null && recognizer instanceof BaseRecognizer<?> ) {
+		if ( recognizer!=null && recognizer instanceof BaseRecognizer ) {
 			return ((BaseRecognizer) recognizer).getExpectedTokens();
 		}
 		return null;
@@ -105,18 +100,4 @@ public class RecognitionException extends RuntimeException {
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
 	}
-
-	//	/** Return the token type or char of the unexpected input element */
-//	public int getUnexpectedType() {
-//		if ( recognizer==null ) return offendingToken.getType();
-//		if ( recognizer.getInputStream() instanceof TokenStream) {
-//			return offendingToken.getType();
-//		}
-//		else if ( recognizer.getInputStream() instanceof ASTNodeStream) {
-//			ASTNodeStream nodes = (ASTNodeStream)recognizer.getInputStream();
-//			ASTAdaptor adaptor = nodes.getTreeAdaptor();
-//			return adaptor.getType(offendingNode);
-//		}
-//		return Token.INVALID_TYPE;
-//	}
 }

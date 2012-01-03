@@ -64,12 +64,6 @@ public class LabelElementPair {
                 if ( labelOp==ANTLRParser.ASSIGN ) type = LabelType.LEXER_STRING_LABEL;
             }
         }
-        else if ( g.isTreeGrammar() ) {
-            if ( element.getFirstDescendantWithType(ANTLRParser.WILDCARD)!=null ) {
-                if ( labelOp==ANTLRParser.ASSIGN ) type = LabelType.WILDCARD_TREE_LABEL;
-                else type = LabelType.WILDCARD_TREE_LIST_LABEL;
-            }
-        }
     }
 
     public String toString() {

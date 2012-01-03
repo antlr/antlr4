@@ -32,7 +32,6 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.BufferedASTNodeStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
@@ -43,17 +42,19 @@ import java.util.List;
  *  support code essentially; most of it is error recovery stuff and
  *  backtracking.
  *
- *  TODO: rename since lexer not under. or reorg parser/treeparser; treeparser under parser?
+ *  TODO: rename / reorg with parser
  */
-public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2ParserATNSimulator<Symbol>> {
+public abstract class BaseRecognizer extends Recognizer<Token, v2ParserATNSimulator<Token>> {
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
+
+	protected TokenStream _input;
 
 	/** The RuleContext object for the currently executing rule. This
 	 *  must be non-null during parsing, but is initially null.
 	 *  When somebody calls the start rule, this gets set to the
 	 *  root context.
 	 */
-	protected ParserRuleContext<Symbol> _ctx;
+	protected ParserRuleContext<Token> _ctx;
 
 	protected boolean buildParseTrees;
 	protected boolean traceATNStates;
@@ -64,7 +65,7 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
      *  the parse or during tree walks later. Both could be done.
      *  Not intended for tree parsing but would work.
      */
-    protected ParseTreeListener<Symbol> _listener;
+    protected ParseTreeListener<Token> _listener;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int syntaxErrors = 0;
@@ -89,9 +90,9 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
 	 *  single token insertion or deletion error recovery.  If
 	 *  that fails, throw MismatchedTokenException.
 	 */
-	public Symbol match(int ttype) throws RecognitionException {
+	public Token match(int ttype) throws RecognitionException {
 //		System.out.println("match "+((TokenStream)input).LT(1)+" vs expected "+ttype);
-		Symbol currentSymbol = getCurrentInputSymbol();
+		Token currentSymbol = getCurrentToken();
 		if ( getInputStream().LA(1)==ttype ) {
 			_errHandler.endErrorCondition(this);
 			consume();
@@ -145,11 +146,11 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
 		return traceATNStates;
 	}
 
-    public ParseTreeListener<Symbol> getListener() {
+    public ParseTreeListener<Token> getListener() {
         return _listener;
     }
 
-    public void setListener(ParseTreeListener<Symbol> listener) {
+    public void setListener(ParseTreeListener<Token> listener) {
         this._listener = listener;
     }
 
@@ -164,38 +165,49 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
 		return syntaxErrors;
 	}
 
-    @Override
-    public abstract SymbolStream<Symbol> getInputStream();
+	@Override
+	public TokenStream getInputStream() { return getTokenStream(); }
+
+	@Override
+	public final void setInputStream(IntStream input) {
+		setTokenStream((TokenStream)input);
+	}
+
+	public TokenStream getTokenStream() {
+		return _input;
+	}
+
+	/** Set the token stream and reset the parser */
+	public void setTokenStream(TokenStream input) {
+		this._input = null;
+		reset();
+		this._input = input;
+	}
 
     public String getInputString(int start) {
         return getInputString(start, getInputStream().index());
     }
 
     public String getInputString(int start, int stop) {
-        SymbolStream<Symbol> input = getInputStream();
+        SymbolStream<Token> input = getInputStream();
         if ( input instanceof TokenStream ) {
             return ((TokenStream)input).toString(start,stop);
-        }
-        else if ( input instanceof BufferedASTNodeStream ) {
-            return ((BufferedASTNodeStream<Symbol>)input).toString(input.get(start),input.get(stop));
         }
         return "n/a";
     }
 
     /** Match needs to return the current input symbol, which gets put
-     *  into the label for the associated token ref; e.g., x=ID.  Token
-     *  and tree parsers need to return different objects. Rather than test
-     *  for input stream type or change the IntStream interface, I use
-     *  a simple method to ask the recognizer to tell me what the current
-     *  input symbol is.
+     *  into the label for the associated token ref; e.g., x=ID.
      */
-    public abstract Symbol getCurrentInputSymbol();
-
-    public void notifyListeners(String msg)	{
-		notifyListeners(getCurrentInputSymbol(), msg, null);
+    public Token getCurrentToken() {
+		return _input.LT(1);
 	}
 
-	public void notifyListeners(Symbol offendingToken, String msg,
+    public void notifyListeners(String msg)	{
+		notifyListeners(getCurrentToken(), msg, null);
+	}
+
+	public void notifyListeners(Token offendingToken, String msg,
 							   @Nullable RecognitionException e)
 	{
 		int line = -1;
@@ -204,17 +216,17 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
 			line = ((Token) offendingToken).getLine();
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
-		ANTLRErrorListener<Symbol>[] listeners = getListeners();
+		ANTLRErrorListener<Token>[] listeners = getListeners();
 		if ( listeners.length == 0 ) {
 			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
-		for (ANTLRErrorListener<Symbol> pl : listeners) {
+		for (ANTLRErrorListener<Token> pl : listeners) {
 			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
-	public void enterOuterAlt(ParserRuleContext<Symbol> localctx, int altNum) {
+	public void enterOuterAlt(ParserRuleContext<Token> localctx, int altNum) {
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( buildParseTrees && _ctx != localctx ) {
@@ -239,8 +251,8 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
      *
      *  Trigger listener events if there's a listener.
 	 */
-	public Symbol consume() {
-		Symbol o = getCurrentInputSymbol();
+	public Token consume() {
+		Token o = getCurrentToken();
 		getInputStream().consume();
 		if ( buildParseTrees ) {
 			// TODO: tree parsers?
@@ -262,22 +274,43 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
 		}
 	}
 
-	public abstract void enterRule(ParserRuleContext<Symbol> localctx, int ruleIndex);
-
-	public void exitRule(int ruleIndex) {
-		_ctx = (ParserRuleContext<Symbol>)_ctx.parent;
+	/** Always called by generated parsers upon entry to a rule.
+	 *  This occurs after the new context has been pushed. Access field
+	 *  _ctx get the current context.
+	 *
+	 *  This is flexible because users do not have to regenerate parsers
+	 *  to get trace facilities.
+	 */
+	public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
+		_ctx = localctx;
+		_ctx.start = _input.LT(1);
+		_ctx.ruleIndex = ruleIndex;
+		if ( buildParseTrees ) addContextToParseTree();
+        if ( _listener != null) {
+            _listener.enterEveryRule(_ctx);
+            _ctx.enterRule(_listener);
+        }
 	}
 
-	public ParserRuleContext<Symbol> getInvokingContext(int ruleIndex) {
-		ParserRuleContext<Symbol> p = _ctx;
+    public void exitRule(int ruleIndex) {
+        // trigger event on _ctx, before it reverts to parent
+        if ( _listener != null) {
+            _ctx.exitRule(_listener);
+            _listener.exitEveryRule(_ctx);
+        }
+		_ctx = (ParserRuleContext<Token>)_ctx.parent;
+    }
+
+	public ParserRuleContext<Token> getInvokingContext(int ruleIndex) {
+		ParserRuleContext<Token> p = _ctx;
 		while ( p!=null ) {
 			if ( p.getRuleIndex() == ruleIndex ) return p;
-			p = (ParserRuleContext<Symbol>)p.parent;
+			p = (ParserRuleContext<Token>)p.parent;
 		}
 		return null;
 	}
 
-	public ParserRuleContext<Symbol> getContext() {
+	public ParserRuleContext<Token> getContext() {
 		return _ctx;
 	}
 
@@ -409,7 +442,9 @@ public abstract class BaseRecognizer<Symbol> extends Recognizer<Symbol, v2Parser
         }
     }
 
-	public abstract String getSourceName();
+	public String getSourceName() {
+		return _input.getSourceName();
+	}
 
 	/** A convenience method for use most often with template rewrites.
 	 *  Convert a List<Token> to List<String>

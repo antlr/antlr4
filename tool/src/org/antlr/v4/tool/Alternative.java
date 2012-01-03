@@ -30,7 +30,6 @@
 package org.antlr.v4.tool;
 
 
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -77,14 +76,6 @@ public class Alternative implements AttributeResolver {
     public List<ActionAST> actions = new ArrayList<ActionAST>();
 
     public Alternative(Rule r, int altNum) { this.rule = r; this.altNum = altNum; }
-
-	/** (ALT_REWRITE (ALT ...) (-> (ALT ...))); rewrite might nested in subrule */
-	public boolean hasRewrite() {
-		return
-			ast.parent.getType()==ANTLRParser.ALT_REWRITE ||
-			ast.getNodesWithType(ANTLRParser.ALT_REWRITE).size()>0;
-//		return ast.parent.getType()==ANTLRParser.ALT_REWRITE;
-	}
 
 	public boolean resolvesToToken(String x, ActionAST node) {
 		if ( tokenRefs.get(x)!=null ) return true;

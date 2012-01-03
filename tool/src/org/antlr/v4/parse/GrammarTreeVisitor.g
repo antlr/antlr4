@@ -89,16 +89,12 @@ public String currentRuleName;
 public GrammarAST currentOuterAltRoot;
 public int currentOuterAltNumber = 1; // 1..n
 public int rewriteEBNFLevel = 0;
-public boolean inRewrite;
-public boolean currentOuterAltHasRewrite;
 
 public GrammarTreeVisitor() { this(null); }
 
 public ErrorManager getErrorManager() { return null; }
 
 public void visitGrammar(GrammarAST t) { visit(t, "grammarSpec"); }
-public void visitRewrite(GrammarAST t) { visit(t, "rewrite"); }
-public void visitRewriteEBNF(GrammarAST t) { visit(t, "rewriteTreeEbnf"); }
 public void visit(GrammarAST t, String ruleName) {
 	CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
 	setTreeNodeStream(nodes);
@@ -148,12 +144,6 @@ public void finallyAction(ActionAST action) { }
 public void discoverAlt(AltAST alt) { }
 /** outermost alt */
 public void finishAlt(AltAST alt) { }
-/** outermost alt */
-public void discoverAltWithRewrite(AltAST alt) { }
-/** outermost alt */
-public void finishAltWithRewrite(AltAST alt) { }
-public void discoverSTRewrite(GrammarAST rew) { }
-public void discoverTreeRewrite(GrammarAST rew) { }
 
 public void ruleRef(GrammarAST ref, ActionAST arg) { }
 public void tokenRef(TerminalAST ref) { }
@@ -163,18 +153,6 @@ public void wildcardRef(GrammarAST ref) { }
 public void actionInAlt(ActionAST action) { }
 public void sempredInAlt(PredAST pred) { }
 public void label(GrammarAST op, GrammarAST ID, GrammarAST element) { }
-
-public void rootOp(GrammarAST op, GrammarAST opnd) { }
-public void bangOp(GrammarAST op, GrammarAST opnd) { }
-
-public void discoverRewrites(GrammarAST result) { }
-public void finishRewrites(GrammarAST result) { }
-public void rewriteTokenRef(TerminalAST ast, ActionAST arg) { }
-public void rewriteTerminalOption(TerminalAST t, GrammarAST ID, GrammarAST value) { }
-public void rewriteStringRef(TerminalAST ast) { }
-public void rewriteRuleRef(GrammarAST ast) { }
-public void rewriteLabelRef(GrammarAST ast) { }
-public void rewriteAction(ActionAST ast) { }
 
 	public void traceIn(String ruleName, int ruleIndex)  {
 		System.err.println("enter "+ruleName+": "+input.LT(1));
@@ -228,7 +206,6 @@ optionValue returns [String v]
 @init {$v = $start.token.getText();}
     :   ID
     |   STRING_LITERAL
-    |	DOUBLE_QUOTE_STRING_LITERAL
     |   INT
     ;
 
@@ -341,12 +318,6 @@ ruleBlock
     		(	{
     			currentOuterAltRoot = (GrammarAST)input.LT(1);
 				currentOuterAltNumber++;
-				currentOuterAltHasRewrite=false;
-				inRewrite=false;
-				currentOuterAltHasRewrite = false;
-				if ( currentOuterAltRoot.getType()==ALT_REWRITE ) {
-					currentOuterAltHasRewrite=true;
-				}
 				}
     			outerAlternative
     		)+
@@ -355,19 +326,16 @@ ruleBlock
 
 outerAlternative
 @init {
-	if ( $start.getType()==ALT_REWRITE ) discoverAltWithRewrite((AltAST)$start.getChild(0));
-	else discoverAlt((AltAST)$start);
+	discoverAlt((AltAST)$start);
 }
 @after {
-	if ( $start.getType()==ALT_REWRITE ) finishAltWithRewrite((AltAST)$start.getChild(0));
-	else finishAlt((AltAST)$start);
+	finishAlt((AltAST)$start);
 }
 	:	alternative
 	;
 
 alternative
-	:	^(ALT_REWRITE alternative {inRewrite=true;} rewrite {inRewrite=false;})
-	|	^(LEXER_ALT_ACTION alternative lexerAction*)
+	:	^(LEXER_ALT_ACTION alternative lexerAction*)
 	|	^(ALT element+)
 	|	^(ALT EPSILON)
     ;
@@ -395,13 +363,8 @@ element
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
 	
-	|	treeSpec
-	|	^(ROOT astOperand)			{rootOp($ROOT, $astOperand.start);}
-	|	^(BANG astOperand)			{bangOp($BANG, $astOperand.start);}
 	|	^(NOT blockSet)
 	|	^(NOT block)
-	|	DOWN_TOKEN
-	|	UP_TOKEN
 	|	ARG_ACTION // lexer [Aa] set
 	;
 
@@ -415,10 +378,6 @@ labeledElement
 	:	^((ASSIGN|PLUS_ASSIGN) ID element) {label($start, $ID, $element.start);}
 	;
 
-treeSpec
-    : ^(TREE_BEGIN element element+ ) // UP_TOKEN and DOWN_TOKEN in there somewhere
-    ;
-
 subrule
 	:	^(blockSuffix block)
 	| 	block
@@ -426,9 +385,6 @@ subrule
 
 blockSuffix
     : ebnfSuffix
-    | ROOT
-    | IMPLIES
-    | BANG
     ;
 
 ebnfSuffix
@@ -493,96 +449,5 @@ elementOption[GrammarASTWithOptions t]
     :	ID								{elementOption(t, $ID, null);}
     |   ^(ASSIGN id=ID v=ID)			{elementOption(t, $id, $v);}
     |   ^(ASSIGN ID v=STRING_LITERAL)	{elementOption(t, $ID, $v);}
-    |   ^(ASSIGN ID v=DOUBLE_QUOTE_STRING_LITERAL)	{elementOption(t, $ID, $v);}
     |   ^(ASSIGN ID v=ACTION)			{elementOption(t, $ID, $v);}
     ;
-
-rewrite
-	:	{discoverRewrites($start);} predicatedRewrite* nakedRewrite {finishRewrites($start);}
-	;
-
-predicatedRewrite
-	:	^(ST_RESULT SEMPRED {discoverSTRewrite($start);} rewriteAlt)
-	|	^(RESULT SEMPRED {discoverTreeRewrite($start);} rewriteAlt)
-	;
-
-nakedRewrite
-	:	^(ST_RESULT rewriteAlt)
-	|	^(RESULT rewriteAlt)
-	;
-
-rewriteAlt
-@init {rewriteEBNFLevel=0;}
-    :	rewriteTemplate
-    |	rewriteTreeAlt
-    |	ETC
-    |	EPSILON
-    ;
-
-rewriteTreeAlt
-    :	^(REWRITE_SEQ rewriteTreeElement+)
-    ;
-
-rewriteTreeElement
-	:	rewriteTreeAtom
-	|	rewriteTree
-	|   rewriteTreeEbnf
-	;
-
-rewriteTreeAtom
-    :   ^(TOKEN_REF rewriteElementOptions ARG_ACTION)
-    	{rewriteTokenRef((TerminalAST)$start,(ActionAST)$ARG_ACTION);}
-    |   ^(TOKEN_REF rewriteElementOptions)
-    	{rewriteTokenRef((TerminalAST)$start,null);}
-    |   ^(TOKEN_REF ARG_ACTION)
-    	{rewriteTokenRef((TerminalAST)$start,(ActionAST)$ARG_ACTION);}
-	|   TOKEN_REF							{rewriteTokenRef((TerminalAST)$start,null);}
-    |   RULE_REF							{rewriteRuleRef($start);}
-	|   ^(STRING_LITERAL rewriteElementOptions)
-		{rewriteStringRef((TerminalAST)$start);}
-	|   STRING_LITERAL						{rewriteStringRef((TerminalAST)$start);}
-	|   LABEL								{rewriteLabelRef($start);}
-	|	ACTION								{rewriteAction((ActionAST)$start);}
-	;
-
-rewriteElementOptions
-    :	^(ELEMENT_OPTIONS rewriteElementOption[(TerminalAST)$start.getParent()]+)
-    ;
-
-rewriteElementOption[TerminalAST t]
-    :	ID								{rewriteTerminalOption(t, $ID, null);}
-    |   ^(ASSIGN id=ID v=ID)			{rewriteTerminalOption(t, $id, $v);}
-    |   ^(ASSIGN ID v=STRING_LITERAL)	{rewriteTerminalOption(t, $ID, $v);}
-    ;
-
-rewriteTreeEbnf
-	:	^(ebnfSuffix ^(REWRITE_BLOCK {rewriteEBNFLevel++;} rewriteTreeAlt {rewriteEBNFLevel--;}))
-	;
-
-rewriteTree
-	:	^(TREE_BEGIN rewriteTreeAtom rewriteTreeElement* )
-	;
-
-rewriteTemplate
-	:	^(TEMPLATE rewriteTemplateArgs? DOUBLE_QUOTE_STRING_LITERAL)
-	|	^(TEMPLATE rewriteTemplateArgs? DOUBLE_ANGLE_STRING_LITERAL)
-	|	rewriteTemplateRef
-	|	rewriteIndirectTemplateHead
-	|	ACTION
-	;
-
-rewriteTemplateRef
-	:	^(TEMPLATE ID rewriteTemplateArgs?)
-	;
-
-rewriteIndirectTemplateHead
-	:	^(TEMPLATE ACTION rewriteTemplateArgs?)
-	;
-
-rewriteTemplateArgs
-	:	^(ARGLIST rewriteTemplateArg+)
-	;
-
-rewriteTemplateArg
-	:   ^(ARG ID ACTION)
-	;

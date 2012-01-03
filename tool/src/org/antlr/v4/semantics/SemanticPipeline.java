@@ -126,9 +126,6 @@ public class SemanticPipeline {
 		// CHECK ATTRIBUTE EXPRESSIONS FOR SEMANTIC VALIDITY
 		AttributeChecks.checkAllAttributeExpressions(g);
 
-		symcheck.checkForUndefinedTokensInRewrite();
-
-		UseDefAnalyzer.checkRewriteElementsPresentOnLeftSide(g);
 		UseDefAnalyzer.trackTokenRuleRefsInActions(g);
 	}
 

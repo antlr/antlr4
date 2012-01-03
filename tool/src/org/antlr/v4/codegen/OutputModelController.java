@@ -31,7 +31,6 @@ package org.antlr.v4.codegen;
 
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.ast.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -111,21 +110,6 @@ public class OutputModelController {
 		return file;
 	}
 
-	public OutputModelObject buildTreeParserOutputModel() {
-		Grammar g = delegate.getGrammar();
-		CodeGenerator gen = delegate.getGenerator();
-		TreeParserFile file = treeParserFile(gen.getRecognizerFileName());
-		setRoot(file);
-		Parser parser = treeParser(file);
-		file.parser = parser;
-
-		for (Rule r : g.rules.values()) {
-			buildRuleFunction(parser, r);
-		}
-
-		return file;
-	}
-
 	public OutputModelObject buildListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
 		return new ListenerFile(delegate, gen.getListenerFileName());
@@ -156,18 +140,6 @@ public class OutputModelController {
 		return new Lexer(delegate, file);
 	}
 
-	public TreeParserFile treeParserFile(String fileName) {
-		TreeParserFile f = delegate.treeParserFile(fileName);
-		for (CodeGeneratorExtension ext : extensions) f = ext.treeParserFile(f);
-		return f;
-	}
-
-	public TreeParserModel treeParser(TreeParserFile file) {
-		TreeParserModel p = delegate.treeParser(file);
-		for (CodeGeneratorExtension ext : extensions) p = ext.treeParser(p);
-		return p;
-	}
-
 	/** Create RuleFunction per rule and update sempreds,actions of parser
 	 *  output object with stuff found in r.
 	 */
@@ -183,7 +155,8 @@ public class OutputModelController {
 		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
 		walker = new SourceGenTriggers(nodes, this);
 		try {
-			function.code = DefaultOutputModelFactory.list(walker.block(null, null, null)); // walk AST of rule alts/elements
+			// walk AST of rule alts/elements
+			function.code = DefaultOutputModelFactory.list(walker.block(null, null));
 		}
 		catch (Exception e){
 			e.printStackTrace(System.err);
@@ -284,64 +257,36 @@ public class OutputModelController {
 		return blk;
 	}
 
-	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args,
-								GrammarAST astOp)
-	{
-		List<SrcOp> ops = delegate.ruleRef(ID, label, args, astOp);
+	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {
+		List<SrcOp> ops = delegate.ruleRef(ID, label, args);
 		for (CodeGeneratorExtension ext : extensions) {
 			ops = ext.ruleRef(ops);
-			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
-				ops = ext.rootRule(ops);
-			}
-			else if ( astOp==null ) {
-				ops = ext.leafRule(ops);
-			}
 		}
 		return ops;
 	}
 
-	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args,
-								GrammarAST astOp)
+	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST label, GrammarAST args)
 	{
-		List<SrcOp> ops = delegate.tokenRef(ID, label, args, astOp);
+		List<SrcOp> ops = delegate.tokenRef(ID, label, args);
 		for (CodeGeneratorExtension ext : extensions) {
 			ops = ext.tokenRef(ops);
-			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
-				ops = ext.rootToken(ops);
-			}
-			else if ( astOp==null ) {
-				ops = ext.leafToken(ops);
-			}
 		}
 		return ops;
 	}
 
-	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label, GrammarAST astOp) {
-		List<SrcOp> ops = delegate.stringRef(ID, label, astOp);
+	public List<SrcOp> stringRef(GrammarAST ID, GrammarAST label) {
+		List<SrcOp> ops = delegate.stringRef(ID, label);
 		for (CodeGeneratorExtension ext : extensions) {
 			ops = ext.stringRef(ops);
-			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
-				ops = ext.rootString(ops);
-			}
-			else if ( astOp==null ) {
-				ops = ext.leafString(ops);
-			}
 		}
 		return ops;
 	}
 
 	/** (A|B|C) possibly with ebnfRoot and label */
-	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST,
-						   GrammarAST astOp, boolean invert) {
-		List<SrcOp> ops = delegate.set(setAST, labelAST, astOp, invert);
+	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST, boolean invert) {
+		List<SrcOp> ops = delegate.set(setAST, labelAST, invert);
 		for (CodeGeneratorExtension ext : extensions) {
 			ops = ext.set(ops);
-			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
-				ops = ext.rootSet(ops);
-			}
-			else if ( astOp==null ) {
-				ops = ext.leafSet(ops);
-			}
 		}
 		return ops;
 	}
@@ -350,6 +295,14 @@ public class OutputModelController {
 		CodeBlockForAlt blk = delegate.epsilon();
 		for (CodeGeneratorExtension ext : extensions) blk = ext.epsilon(blk);
 		return blk;
+	}
+
+	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
+		List<SrcOp> ops = delegate.wildcard(ast, labelAST);
+		for (CodeGeneratorExtension ext : extensions) {
+			ops = ext.set(ops);
+		}
+		return ops;
 	}
 
 	public List<SrcOp> action(GrammarAST ast) {
@@ -362,26 +315,6 @@ public class OutputModelController {
 		List<SrcOp> ops = delegate.sempred(ast);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.sempred(ops);
 		return ops;
-	}
-
-	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST, GrammarAST astOp) {
-		List<SrcOp> ops = delegate.wildcard(ast, labelAST, astOp);
-		for (CodeGeneratorExtension ext : extensions) {
-			ops = ext.set(ops);
-			if ( astOp!=null && astOp.getType()==ANTLRParser.ROOT ) {
-				ops = ext.rootWildcard(ops);
-			}
-			else if ( astOp==null ) {
-				ops = ext.leafWildcard(ops);
-			}
-		}
-		return ops;
-	}
-
-	public MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos) {
-		MatchTree matchTree = delegate.tree(treeBeginAST, omos);
-		for (CodeGeneratorExtension ext : extensions) matchTree = ext.tree(matchTree);
-		return matchTree;
 	}
 
 	public Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label) {
@@ -400,72 +333,6 @@ public class OutputModelController {
 		boolean needs = delegate.needsImplicitLabel(ID, op);
 		for (CodeGeneratorExtension ext : extensions) needs |= ext.needsImplicitLabel(ID, op);
 		return needs;
-	}
-
-	// REWRITES
-
-	public TreeRewrite treeRewrite(GrammarAST ast) {
-		TreeRewrite r = delegate.treeRewrite(ast);
-		for (CodeGeneratorExtension ext : extensions) r = ext.treeRewrite(r);
-		return r;
-	}
-
-	public RewriteChoice rewrite_choice(PredAST pred, List<SrcOp> ops) {
-		RewriteChoice r = delegate.rewrite_choice(pred, ops);
-		for (CodeGeneratorExtension ext : extensions) r = ext.rewrite_choice(r);
-		return r;
-	}
-
-	public RewriteTreeOptional rewrite_optional(GrammarAST ast) {
-		RewriteTreeOptional o = delegate.rewrite_optional(ast);
-		for (CodeGeneratorExtension ext : extensions) o = ext.rewrite_optional(o);
-		return o;
-	}
-
-	public RewriteTreeClosure rewrite_closure(GrammarAST ast) {
-		RewriteTreeClosure c = delegate.rewrite_closure(ast);
-		for (CodeGeneratorExtension ext : extensions) c = ext.rewrite_closure(c);
-		return c;
-	}
-
-	public RewriteTreeStructure rewrite_treeStructure(GrammarAST root) {
-		RewriteTreeStructure t = delegate.rewrite_treeStructure(root);
-		for (CodeGeneratorExtension ext : extensions) t = ext.rewrite_treeStructure(t);
-		return t;
-	}
-
-	public List<SrcOp> rewrite_ruleRef(GrammarAST ID, boolean isRoot) {
-		List<SrcOp> ops = delegate.rewrite_ruleRef(ID, isRoot);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_ruleRef(ops);
-		return ops;
-	}
-
-	public List<SrcOp> rewrite_tokenRef(GrammarAST ID, boolean isRoot, ActionAST argAST) {
-		List<SrcOp> ops = delegate.rewrite_tokenRef(ID, isRoot, argAST);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_tokenRef(ops);
-		return ops;
-	}
-
-	public List<SrcOp> rewrite_stringRef(GrammarAST ID, boolean isRoot) {
-		return rewrite_tokenRef(ID, isRoot, null);
-	}
-
-	public List<SrcOp> rewrite_labelRef(GrammarAST ID, boolean isRoot) {
-		List<SrcOp> ops = delegate.rewrite_labelRef(ID, isRoot);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_labelRef(ops);
-		return ops;
-	}
-
-	public List<SrcOp> rewrite_action(ActionAST action, boolean isRoot) {
-		List<SrcOp> ops = delegate.rewrite_action(action, isRoot);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_action(ops);
-		return ops;
-	}
-
-	public List<SrcOp> rewrite_epsilon(GrammarAST epsilon) {
-		List<SrcOp> ops = delegate.rewrite_epsilon(epsilon);
-		for (CodeGeneratorExtension ext : extensions) ops = ext.rewrite_epsilon(ops);
-		return ops;
 	}
 
 	public OutputModelObject getRoot() { return root; }

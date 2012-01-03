@@ -29,14 +29,15 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,21 +94,6 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	@Override
 	public int getTreeLevel() { return controller.treeLevel; }
-
-	@Override
-	public TreeParserFile treeParserFile(String fileName) {
-		return null;
-	}
-
-	@Override
-	public TreeParserModel treeParser(TreeParserFile file) {
-		return null;
-	}
-
-	@Override
-	public MatchTree tree(GrammarAST treeBeginAST, List<? extends SrcOp> omos) {
-		throw new UnsupportedOperationException("^(...) in non-tree grammar");
-	}
 
 	// MISC
 

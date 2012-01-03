@@ -27,10 +27,6 @@ import java.util.ArrayList;
 <parser>
 >>
 
-TreeParserFile(file, parser, namedActions) ::= <<
-<ParserFile(...)>
->>
-
 ListenerFile(file, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.*;
@@ -62,16 +58,6 @@ public class Blank<file.grammarName>Listener implements <file.grammarName>Listen
 
 Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
->>
-
-TreeParserModel(parser, funcs, atn, sempredFuncs, superclass) ::= <<
-<Parser_(ctor="treeparser_ctor",
-		 extras={
-@Override
-public <ASTLabelType()> match(int ttype) throws RecognitionException {
-	return (<ASTLabelType()>)super.match(ttype);
-\}
-}, ...)>
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
@@ -145,13 +131,6 @@ parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
 	_interp = new v2ParserATNSimulator\<Token>(this,_ATN);
-}
->>
-
-treeparser_ctor(p) ::= <<
-public <p.name>(ASTNodeStream\<<ASTLabelType()>\> input) {
-	super(input);
-	_interp = new v2ParserATNSimulator\<<ASTLabelType()>\>(this,_ATN);
 }
 >>
 
@@ -379,14 +358,6 @@ case <i>:
 Sync(s) ::= "sync(<s.expecting.name>);"
 
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
-ThrowNoViableTreeAlt(t) ::= <<
-/*
-NoViableTreeGrammarAltException e<choice.uniqueID> = new NoViableTreeGrammarAltException(this);
-_errHandler.reportError(this, e<choice.uniqueID>);
-throw e<choice.uniqueID>;
-*/
-throw new NoViableTreeGrammarAltException(this);
->>
 
 TestSetInline(s) ::= <<
 <s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
@@ -394,32 +365,6 @@ TestSetInline(s) ::= <<
 
 cases(ttypes) ::= <<
 <ttypes:{t | case <t>:}; separator="\n">
->>
-
-MatchTree(t, root, down, leftActions, kids, rightActions, up) ::= <<
-// match tree
-<root>
-<leftActions>
-<if(t.isNullable)>
-if ( _input.LA(1)==Token.DOWN ) {
-	<down>
-	<kids; separator="\n">
-	<up>
-}
-<else>
-<down>
-<kids; separator="\n">
-<up>
-<endif>
-<rightActions>
->>
-
-MatchDOWN(m) ::= <<
-setState(<m.stateNumber>); match(Token.DOWN);
->>
-
-MatchUP(m) ::= <<
-setState(<m.stateNumber>); match(Token.UP);
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -462,18 +407,7 @@ setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
 >>
 
-ParserASTExtensionMembers(s) ::= <<
-public ASTAdaptor\<<ASTLabelType()>\> _adaptor = (ASTAdaptor)new CommonASTAdaptor();
->>
-
-ParserASTContextInterface(s) ::= "ASTContext\<<ASTLabelType()>>"
-ParserASTTreeFieldDecl(s) ::= "<ASTLabelType()> tree"
-ParserASTContextMembers(s) ::= <<
-@Override public <ASTLabelType()> getTree() { return tree; }
->>
-
 DefaultParserSuperClass(s) ::= "Parser"
-DefaultTreeParserSuperClass(s) ::= "TreeParser\<<ASTLabelType()>>"
 
 ActionText(t) ::= "<t.text>"
 ArgRef(a) ::= "_localctx.<a.name>"
@@ -488,7 +422,6 @@ SetAttr(s,rhsChunks) ::= "_localctx.<s.name> = <rhsChunks>;"
 LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
 //SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
 
-ASTLabelType() ::= "<file.ASTLabelType; null={Object}>"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
@@ -498,31 +431,17 @@ TokenPropertyRef_line(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.get
 TokenPropertyRef_pos(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getCharPositionInLine():0)"
 TokenPropertyRef_channel(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getChannel():0)"
 TokenPropertyRef_index(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getTokenIndex():0)"
-TokenPropertyRef_tree(t) ::= "_localctx.<t.label>_tree"
 TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localctx.<t.label>.getText()):0)"
 
 RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.start):null)"
 RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.stop):null)"
-RulePropertyRef_tree(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.tree):null)"
 RulePropertyRef_text(r)	 ::= "(_localctx.<r.label>!=null?_input.toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
-RulePropertyRef_st(r)	 ::= "(_localctx.<r.label>!=null?_localctx.<r.label>.st:null)"
 RulePropertyRef_ctx(r)	 ::= "_localctx.<r.label>"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
-ThisRulePropertyRef_tree(r)	 ::= "_localctx.tree"
 ThisRulePropertyRef_text(r)	 ::= "_input.toString(_localctx.start, _input.LT(-1))"
-ThisRulePropertyRef_st(r)	 ::= "_localctx.st"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
-
-/*
-TreeRulePropertyRef_text(r)	 ::= <%
-(_localctx.<r.label>!=null?
-	((ASTNodeStream\<<ASTLabelType()>>)_input).toString(_localctx.<r.label>.start,_localctx.<r.label>.stop)
-	:null
-)
-%>
-*/
 
 NonLocalAttrRef(s)		 ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks)	  ::=
@@ -535,9 +454,6 @@ TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
-
-NodeDecl(t) ::= "<ASTLabelType()> <t.name>;"
-NodeListDecl(t) ::= "List\<<ASTLabelType()>> <t.name> = new ArrayList\<<ASTLabelType()>>();"
 
 /** Default RuleContext type name for a Parser rule */
 ParserRuleContext() ::= "ParserRuleContext\<?>"
@@ -575,8 +491,6 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 }
 >>
 
-TreeParserStructDecl ::= StructDecl
-
 AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
 public static class <s.label>Context extends <currentRule.name>Context {
 	public <s.label>Context(<currentRule.name>Context ctx) { copyFrom(ctx); }
@@ -591,17 +505,6 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<I
 }
 >>
 
-/*
-SwitchedVisitorDispatchMethod(method) ::= <<
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	switch ( altNum ) {
-		<method.listenerNames:{m |
-case <i> : ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><m>(this); break;}; separator="\n">
-	}
-}
->>
-*/
-
 AttributeDecl(d) ::= "<d.decl>"
 
 /** If we don't know location of label def x, use this template */
@@ -613,112 +516,6 @@ recRuleArg()						  ::= "$_p"
 recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
 recRuleSetResultAction()			  ::= "$tree=$<ruleName>_primary.tree;"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
-
-// AST stuff (TODO: separate?)
-
-RootDecl(d)		::= "<ASTLabelType()> <d.name> = _adaptor.nil();"
-RootName(level) ::= "_root<level>"
-
-TokenAST(t) ::= "_adaptor.create(<labelref(t.label)>)"
-RuleAST(r) ::= "<labelref(r.label)>.tree"
-AssignTreeResult(a) ::= "_localctx.tree = _root0;"
-RuleASTCleanup(r) ::= <<
-_localctx.tree = _adaptor.rulePostProcessing(_localctx.tree);
-_adaptor.setTokenBoundaries(_localctx.tree, _localctx.start, _localctx.stop);
->>
-
-ElementListDecl(d) ::= "List\<<ASTLabelType()>> <d.name> = _adaptor.createElementList();"
-ElementListName(elemName) ::= "_track_<elemName>"
-ClearElementList(c) ::= "<c.name>.clear();"
-TrackRuleElement(e) ::= "<e.name>.add(<labelref(e.label)>.tree);"
-TrackTokenElement(e) ::= "<e.name>.add(_adaptor.create(<labelref(e.label)>));"
-
-// REWRITE AST stuff
-// assume roots are always locals in tree rewrites
-
-TreeRewrite(tr, locals, preamble, alts) ::= <<
-// rewrite: code level= <tr.codeBlockLevel>, tree level = <tr.treeLevel>
-<locals; separator="\n">
-<preamble; separator="\n">
-<alts; separator="else\n">
-_localctx.tree = _root0;
->>
-
-RewriteChoice(c, predicate, ops) ::= <<
-<if(predicate)>
-if ( <predicate> ) {
-	<ops; separator="\n">
-}
-<else>
-{
-	<ops; separator="\n"> <! empty if EPSILON alt !>
-}
-<endif>
->>
-
-RewriteIteratorDecl(d) ::= "Iterator\<<ASTLabelType()>> <d.name>;"
-RewriteIteratorInit(i) ::= "<i.decl.name> = <i.decl.listName>.iterator();"
-RewriteIteratorName(elemName,level) ::= "it<level>_<elemName>"
-
-RewriteTreeOptional(o, locals, preamble, ops) ::= <<
-// ? code level= <o.codeBlockLevel>, tree level = <o.treeLevel>
-{
-	<locals; separator="\n">
-	<preamble; separator="\n">
-	if ( <o.conditionalDecls:{d | <d.name>.hasNext()}; separator=" || "> ) {
-		<ops; separator="\n">
-	}
-}
->>
-
-RewriteTreeClosure(c, locals, preamble, ops) ::= <<
-// * code level= <c.codeBlockLevel>, tree level = <c.treeLevel>
-{
-	<locals; separator="\n">
-	<preamble; separator="\n">
-	while ( <c.iteratorDecls:{d | <d.name>.hasNext()}; separator=" || "> ) {
-		<ops; separator="\n">
-	}
-}
->>
-
-RewriteTreeStructure(t, locals, ops) ::= <<
-// TREE code level= <t.codeBlockLevel>, tree level = <t.treeLevel>
-{
-	<locals; separator="\n">
-	<ops; separator="\n">
-	_adaptor.addChild(_root<t.enclosingTreeLevel>, _root<t.treeLevel>);
-}
->>
-
-RewriteTokenRef(t) ::= "<t.iterName>.next()"
-
-RewriteImagTokenRef(t, argChunks) ::= <<
-_adaptor.create(<t.tokenType>, <if(argChunks)><argChunks><else>"<t.tokenType>"<endif>)
->>
-
-RewriteRuleRef(r) ::= "<r.iterName>.next()"
-
-RewriteLabelRef(t) ::= "<t.iterName>.next()"
-
-// -> $e in rule e
-RewriteSelfRuleLabelRef(s) ::= "_localctx.tree"
-
-RewriteAction(a, chunks) ::= "<chunks>"
-
-/** how to add child in rewrite section */
-AddChild(x, rootName, child) ::= "_adaptor.addChild(<x.rootName>, <child>);"
-
-/** how to make something a new root in rewrite section */
-BecomeRoot(x, rootName, newRoot) ::=
-	"<x.rootName> = _adaptor.becomeRoot(<newRoot>, <x.rootName>);"
-
-
-/*
-BitSetDecl(b) ::= <<
-public static final LABitSet <b.name>=new LABitSet(new long[]{<b.hexWords:{it|<it>L};separator=",">}<if(b.fset.EOF)>, true<endif>);
->>
-*/
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>

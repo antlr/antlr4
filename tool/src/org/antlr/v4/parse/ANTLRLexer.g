@@ -82,7 +82,7 @@ options {
 	//superclass    = AbstractA3Lexer;
 }
 
-tokens { SEMPRED; }
+tokens { SEMPRED; TOKEN_REF; RULE_REF; }
 
 // Include the copyright in this source and also the generated source
 //
@@ -219,14 +219,6 @@ COMMENT
        }
     ;
 
-
-DOUBLE_QUOTE_STRING_LITERAL
-	:	'"' (('\\')=>'\\' . | ~'"' )* '"'
-	;
-
-DOUBLE_ANGLE_STRING_LITERAL
-	:	'<<' (options {greedy=false;} : . )* '>>'
-	;
 
 // --------------
 // Argument specs
@@ -401,12 +393,10 @@ NESTED_ACTION
 OPTIONS      : 'options' WSNLCHARS* '{'  ;
 TOKENS       : 'tokens'  WSNLCHARS* '{'  ;
 
-SCOPE        : 'scope'                ;
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;
 LEXER        : 'lexer'                ;
 PARSER       : 'parser'               ;
-TREE         : 'tree'                 ;
 GRAMMAR      : 'grammar'              ;
 PROTECTED    : 'protected'            ;
 PUBLIC       : 'public'               ;
@@ -440,23 +430,20 @@ LT           : '<'                    ;
 GT           : '>'                    ;
 ASSIGN       : '='                    ;
 QUESTION     : '?'                    ;
-BANG         : '!'                    ;
 STAR         : '*'                    ;
 PLUS         : '+'                    ;
 PLUS_ASSIGN  : '+='                   ;
 OR           : '|'                    ;
-ROOT         : '^'                    ;
 DOLLAR       : '$'                    ;
 DOT		     : '.'                    ; // can be WILDCARD or DOT in qid or imported rule ref
 RANGE        : '..'                   ;
 ETC          : '...'                  ;
-RARROW       : '->'                   ;
-TREE_BEGIN   : '^('                   ;
 AT           : '@'                    ;
 POUND        : '#'                    ;
 NOT          : '~'                    ;
 RBRACE       : '}'                    ;
 
+/*
 // ---------------
 // Token reference
 //
@@ -477,7 +464,38 @@ TOKEN_REF
 RULE_REF
     : ('a'..'z') ('A'..'Z' | 'a'..'z' | '0'..'9' | '_')*
     ;
+    */
 
+/** Allow unicode rule/token names */
+ID			:	a=NameStartChar NameChar*
+				{
+				if ( Character.isUpperCase($a.text.charAt(0)) ) $type = TOKEN_REF;
+				else $type = RULE_REF;
+				};
+
+fragment
+NameChar    :   NameStartChar
+            |   '0'..'9'
+            |   '\u00B7'
+            |   '\u0300'..'\u036F'
+            |   '\u203F'..'\u2040'
+            ;
+
+fragment
+NameStartChar
+            :   'A'..'Z' | 'a'..'z'|'_'
+            |   '\u00C0'..'\u00D6'
+            |   '\u00D8'..'\u00F6'
+            |   '\u00F8'..'\u02FF'
+            |   '\u0370'..'\u037D'
+            |   '\u037F'..'\u1FFF'
+            |   '\u200C'..'\u200D'
+            |   '\u2070'..'\u218F'
+            |   '\u2C00'..'\u2FEF'
+            |   '\u3001'..'\uD7FF'
+            |   '\uF900'..'\uFDCF'
+            |   '\uFDF0'..'\uFFFD'
+            ; // ignores | ['\u10000-'\uEFFFF] ;
 
 // ----------------------------
 // Literals embedded in actions
@@ -657,10 +675,7 @@ WS
         | '\n'
         | '\f'
       )+
-      {
-
-	$channel=2;
-      }
+      {$channel=HIDDEN;}
     ;
 
 // A fragment rule for use in recognizing end of line in

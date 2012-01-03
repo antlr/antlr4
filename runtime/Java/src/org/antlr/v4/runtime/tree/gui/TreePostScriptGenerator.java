@@ -35,15 +35,11 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.BaseRecognizer;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.tree.CommonAST;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
-import org.antlr.v4.runtime.tree.Trees;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
 
 public class TreePostScriptGenerator {
 	public class VariableExtentProvide implements NodeExtentProvider<Tree> {
@@ -75,11 +71,11 @@ public class TreePostScriptGenerator {
 
 	protected PostScriptDocument doc;
 
-	public TreePostScriptGenerator(BaseRecognizer<?> parser, Tree root) {
+	public TreePostScriptGenerator(BaseRecognizer parser, Tree root) {
 		this(parser, root, "CourierNew", 11);
 	}
 
-	public TreePostScriptGenerator(BaseRecognizer<?> parser, Tree root,
+	public TreePostScriptGenerator(BaseRecognizer parser, Tree root,
 								   String fontName, int fontSize)
 	{
 		this.root = root;
@@ -167,36 +163,4 @@ public class TreePostScriptGenerator {
 		this.treeTextProvider = treeTextProvider;
 	}
 
-	public static void main(String[] args) throws IOException {
-		CommonAST t = new CommonAST(new CommonToken(1, "s"));
-		CommonAST ifstat = new CommonAST(new CommonToken(1, "ifstat"));
-		CommonAST iff = new CommonAST(new CommonToken(1, "if"));
-		CommonAST b = new CommonAST(new CommonToken(1, "("));
-		CommonAST c = new CommonAST(new CommonToken(1, "expr"));
-		CommonAST d = new CommonAST(new CommonToken(1, ")"));
-		CommonAST e = new CommonAST(new CommonToken(1, "assign"));
-		CommonAST f = new CommonAST(new CommonToken(1, "34"));
-		CommonAST g = new CommonAST(new CommonToken(1, "a"));
-		CommonAST h = new CommonAST(new CommonToken(1, "="));
-		CommonAST i = new CommonAST(new CommonToken(1, "expr"));
-		CommonAST j = new CommonAST(new CommonToken(1, ";"));
-		CommonAST k = new CommonAST(new CommonToken(1, "b"));
-		t.addChild(ifstat);
-		ifstat.addChild(iff);
-		ifstat.addChild(b);
-		ifstat.addChild(c);
-		ifstat.addChild(d);
-		ifstat.addChild(e);
-		c.addChild(f);
-		e.addChild(g);
-		e.addChild(h);
-		e.addChild(i);
-		e.addChild(j);
-		i.addChild(k);
-		Trees.writePS(t, null,
-					  "/Users/parrt/antlr/code/antlr4/main/tool/playground/t.eps",
-					  "ArialNarrow", 11);
-//		TreePostScriptGenerator psgen = new TreePostScriptGenerator(null, t, "CourierNew", 11);
-//		System.out.println(psgen.getPS());
-	}
 }

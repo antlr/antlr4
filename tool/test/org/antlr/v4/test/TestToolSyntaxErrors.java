@@ -36,9 +36,9 @@ public class TestToolSyntaxErrors extends BaseTest {
 		"grammar A;\n" +
 		"a  ( A | B ) D ;\n" +
 		"b : B ;",
-		"error(17): A.g:2:3: '(' came as a complete surprise to me while matching rule preamble\n" +
-		"error(17): A.g:2:11: mismatched input ')' expecting SEMI while matching a rule\n" +
-		"error(17): A.g:2:15: ';' came as a complete surprise to me while matching rule preamble\n",
+		": A.g:2:3: '(' came as a complete surprise to me while matching rule preamble\n" +
+		": A.g:2:11: mismatched input ')' expecting SEMI while matching a rule\n" +
+		": A.g:2:15: mismatched input ';' expecting COLON while matching a lexer rule\n",
     };
 
 	@Test public void testA() { super.testErrors(A, true); }
@@ -68,7 +68,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"lexer grammar A;\n" +
 			"A : 'a' \n" +
 			"B : 'b' ;",
-			"error(17): A.g:3:0: unterminated rule (missing ';') detected at 'B :' while looking for rule element\n",
+			"error(17): A.g:3:0: unterminated rule (missing ';') detected at 'B :' while looking for lexer rule element\n",
 		};
 		super.testErrors(pair, true);
 	}
