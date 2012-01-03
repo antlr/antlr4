@@ -52,7 +52,7 @@ public class Blank<file.grammarName>Listener implements <file.grammarName>Listen
 
 	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void visitTerminal(<InputSymbolType()> symbol) { }
+	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()> > ctx, <InputSymbolType()> symbol) { }
 }
 >>
 

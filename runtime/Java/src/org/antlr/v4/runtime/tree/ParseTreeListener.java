@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public interface ParseTreeListener<Symbol> {
-    void visitTerminal(Symbol symbol);
+    void visitTerminal(ParserRuleContext<Symbol> ctx, Symbol symbol);
     void enterEveryRule(ParserRuleContext<Symbol> ctx);
     void exitEveryRule(ParserRuleContext<Symbol> ctx);
 }

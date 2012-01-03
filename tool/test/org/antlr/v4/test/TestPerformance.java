@@ -43,7 +43,7 @@ public class TestPerformance extends BaseTest {
     /**
      *  Use ParseTreeWalker.DEFAULT.walk with the BlankJavaParserListener to show parse tree walking overhead.
      *  If {@link #BUILD_PARSE_TREES} is false, the listener will instead be called during the parsing process via
-     *  {@link org.antlr.v4.runtime.Parser#setListener}.
+     *  {@link org.antlr.v4.runtime.Parser#addParseListener}.
      */
     private static final boolean BLANK_LISTENER = false;
 
@@ -262,7 +262,7 @@ public class TestPerformance extends BaseTest {
                             sharedParser = parserCtor.newInstance(tokens);
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-                                sharedParser.setListener(sharedListener);
+                                sharedParser.addParseListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
                                 sharedParser.setErrorHandler(new BailErrorStrategy());

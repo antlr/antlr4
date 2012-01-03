@@ -322,7 +322,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
 			_input.substring(tokenStartCharIndex, _input.index())+"'";
-		ANTLRErrorListener<Integer>[] listeners = getListeners();
+		ANTLRErrorListener<Integer>[] listeners = getErrorListeners();
 		if ( listeners.length == 0 ) {
 			System.err.println("line "+tokenStartLine+":"+
 							   tokenStartCharPositionInLine+" "+

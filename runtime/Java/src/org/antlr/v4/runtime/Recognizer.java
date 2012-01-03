@@ -97,7 +97,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return "'"+s+"'";
 	}
 
-	public void addListener(ANTLRErrorListener<Symbol> pl) {
+	public void addErrorListener(ANTLRErrorListener<Symbol> pl) {
 		if ( _listeners ==null ) {
 			_listeners =
 				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<Symbol>>(2));
@@ -105,11 +105,13 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeListener(ANTLRErrorListener<Symbol> pl) { _listeners.remove(pl); }
+	public void removeErrorListener(ANTLRErrorListener<Symbol> pl) {
+		if ( _listeners!=null ) _listeners.remove(pl);
+	}
 
-	public void removeListeners() { _listeners.clear(); }
+	public void removeErrorListeners() { if ( _listeners!=null ) _listeners.clear(); }
 
-	public @NotNull ANTLRErrorListener<Symbol>[] getListeners() {
+	public @NotNull ANTLRErrorListener<Symbol>[] getErrorListeners() {
 		if (_listeners == null) {
 			return EMPTY_LISTENERS;
 		}
