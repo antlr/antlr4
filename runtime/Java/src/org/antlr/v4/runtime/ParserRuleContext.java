@@ -145,6 +145,8 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 //		return s != ((RuleContext)o).s; // must be parsing the same location in the ATN
 //	}
 
+	// Double dispatch methods
+
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
