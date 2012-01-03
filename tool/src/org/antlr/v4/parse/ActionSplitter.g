@@ -76,47 +76,13 @@ ATTR
 	:	'$' x=ID {delegate.attr($text, $x);}
 	;
 
-/** %foo(a={},b={},...) ctor */
-TEMPLATE_INSTANCE
-	:	'%' ID '(' ( WS? ARG (',' WS? ARG)* WS? )? ')'
-	;
-
-/** %({name-expr})(a={},...) indirect template ctor reference */
-INDIRECT_TEMPLATE_INSTANCE
-	:	'%' '(' ACTION ')' '(' ( WS? ARG (',' WS? ARG)* WS? )? ')'
-	;
-
-/**	%{expr}.y = z; template attribute y of StringTemplate-typed expr to z */
-SET_EXPR_ATTRIBUTE
-	:	'%' a=ACTION '.' ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-	;
-
-/*    %x.y = z; set template attribute y of x (always set never get attr)
- *        to z [languages like python without ';' must still use the
- *        ';' which the code generator is free to remove during code gen]
- */
-SET_ATTRIBUTE
-	:	'%' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-	;
-
-/** %{string-expr} anonymous template from string expr */
-TEMPLATE_EXPR
-	:	'%' a=ACTION
-	;
-
-UNKNOWN_SYNTAX
-@after {delegate.unknownSyntax(emit());}
-	:	'%' (ID|'.'|'('|')'|','|'{'|'}'|'"')*
-	;
-
 // Anything else is just random text
 TEXT
 @init {StringBuilder buf = new StringBuilder();}
 @after {delegate.text(buf.toString());}
-	:	(	c=~('\\'| '$'|'%') {buf.append((char)$c);}
+	:	(	c=~('\\'| '$') {buf.append((char)$c);}
 		|	'\\$' {buf.append("$");}
-		|	'\\%' {buf.append("\%");}
-		|	'\\' c=~('$'|'%') {buf.append("\\"+(char)$c);}
+		|	'\\' c=~('$') {buf.append("\\"+(char)$c);}
 		)+
 	;
 
