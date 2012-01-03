@@ -45,8 +45,8 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportAmbiguity d="+dfa.decision + ": ambigAlts="+ ambigAlts + ":" + configs + ", input='" +
-                                   recognizer.getInputString(startIndex, stopIndex)+"'");
+        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
+										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
 	@Override
@@ -55,16 +55,16 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 											int startIndex, int stopIndex,
 											@NotNull OrderedHashSet<ATNConfig> configs)
 	{
-		recognizer.notifyListeners("reportAttemptingFullContext d="+dfa.decision +": "+ configs + ", input='" +
-								   recognizer.getInputString(startIndex, stopIndex)+"'");
+		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
+										recognizer.getInputString(startIndex, stopIndex) + "'");
 	}
 
 	@Override
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
     {
-        recognizer.notifyListeners("reportContextSensitivity d="+dfa.decision +": "+ configs + ", input='" +
-                                   recognizer.getInputString(startIndex, stopIndex)+"'");
+        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
+										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
     @Override
@@ -76,8 +76,8 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 											 @NotNull SemanticContext[] altToPred,
 											 @NotNull OrderedHashSet<ATNConfig> configs, boolean fullContextParse)
     {
-        recognizer.notifyListeners("reportInsufficientPredicates d="+dfa.decision +", decState="+decState+
-								   ", ambigAlts=" +ambigAlts + ":" + Arrays.toString(altToPred) +
-                                   ", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex)+"'");
+        recognizer.notifyErrorListeners("reportInsufficientPredicates d=" + dfa.decision + ", decState=" + decState +
+										", ambigAlts=" + ambigAlts + ":" + Arrays.toString(altToPred) +
+										", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 }
