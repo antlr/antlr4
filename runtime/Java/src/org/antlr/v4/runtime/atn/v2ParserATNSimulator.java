@@ -177,7 +177,7 @@ import java.util.*;
 
 	 Or, you might see something like
 
-	 stat : superCall ';' | expression ';' | … ;
+	 stat : superCall ';' | expression ';' | ... ;
 
 	 In both cases I believe that no closure operations will dip into the
 	 outer context. In the first case ctorBody in the worst case will stop
