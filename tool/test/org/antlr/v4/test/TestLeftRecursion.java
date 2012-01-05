@@ -9,37 +9,37 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testSimple() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : a {System.out.println($a.text);} ;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
 			"a : a ID\n" +
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "s", "a b c", debug);
-		String expecting = "abc\n";
+								  "s", "x y z", debug);
+		String expecting = "(s (a x y z))\n";
 		assertEquals(expecting, found);
 	}
 
 	@Test public void testSemPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : a {System.out.println($a.text);} ;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
 			"a : a {true}? ID\n" +
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "s", "a b c", debug);
-		String expecting = "abc\n";
+								  "s", "x y z", debug);
+		String expecting = "(s (a x y z))\n";
 		assertEquals(expecting, found);
 	}
 
 	@Test public void testTernaryExpr() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
+			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
 			"e : e '*' e" +
 			"  | e '+' e" +
 			"  | e '?'<assoc=right> e ':' e" +
@@ -49,8 +49,8 @@ public class TestLeftRecursion extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String[] tests = {
-			"a",			"a",
-			"a+b",			"(+ a b)",
+			"a",			"(s (e a) <EOF>)",
+			"a+b",			"(s (e a + (e b)) <EOF>)",
 			"a*b",			"(* a b)",
 			"a?b:c",		"(? a b c)",
 			"a=b=c",		"(= a (= b c))",
@@ -59,13 +59,13 @@ public class TestLeftRecursion extends BaseTest {
 			"a? b?c:d : e",	"(? a (? b c d) e)",
 			"a?b: c?d:e",	"(? a b (? c d e))",
 		};
-		runTests(grammar, tests, "e");
+		runTests(grammar, tests, "s");
 	}
 
 	@Test public void testDeclarationsUsingASTOperators() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : declarator EOF ;\n" + // must indicate EOF can follow
+			"s @after {System.out.println($ctx.toStringTree(this));} : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
 			"        : declarator '[' e ']'\n" +
 			"        | declarator '[' ']'\n" +
@@ -90,13 +90,13 @@ public class TestLeftRecursion extends BaseTest {
 			"*a[]",		"(* ([ a))",
 			"(*a)[]",	"([ (* a))",
 		};
-		runTests(grammar, tests, "declarator");
+		runTests(grammar, tests, "s");
 	}
 
 	@Test public void testDeclarationsUsingRewriteOperators() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : declarator EOF ;\n" + // must indicate EOF can follow
+			"s @after {System.out.println($ctx.toStringTree(this));} : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
 			"        : declarator '[' e ']'" +
 			"        | declarator '[' ']'" +
@@ -121,13 +121,13 @@ public class TestLeftRecursion extends BaseTest {
 			"*a[]",		"(* ([ a))",
 			"(*a)[]",	"([ (* a))",
 		};
-		runTests(grammar, tests, "declarator");
+		runTests(grammar, tests, "s");
 	}
 
 	@Test public void testExpressionsUsingASTOperators() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e EOF ;\n" + // must indicate EOF can follow
+			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow
 			"e : e '.' ID\n" +
 			"  | e '.' 'this'\n" +
 			"  | '-' e\n" +
@@ -153,13 +153,13 @@ public class TestLeftRecursion extends BaseTest {
 			"-a+b",		"(+ (- a) b)",
 			"-a.b",		"(- (. a b))",
 		};
-		runTests(grammar, tests, "e");
+		runTests(grammar, tests, "s");
 	}
 
 	@Test public void testExpressionAssociativity() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e EOF ;\n" + // must indicate EOF can follow
+			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow
 			"e\n" +
 			"  : e '.' ID\n" +
 			"  | '-' e\n" +
@@ -200,7 +200,7 @@ public class TestLeftRecursion extends BaseTest {
 		// this is simplified from real java
 		String grammar =
 			"grammar T;\n" +
-			"s : e EOF ;\n" + // must indicate EOF can follow
+			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow
 			"expressionList\n" +
 			"    :   e (',' e)*\n" +
 			"    ;\n" +
@@ -284,13 +284,13 @@ public class TestLeftRecursion extends BaseTest {
 			"a.f().g(x,1)",					"(( (. (( (. a f)) g) x 1)",
 			"new T[((n-1) * x) + 1]",		"(new T [ (+ (* (- n 1) x) 1))",
 		};
-		runTests(grammar, tests, "e");
+		runTests(grammar, tests, "s");
 	}
 
 	@Test public void testReturnValueAndActions() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e {System.out.println($e.v);} ;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e {System.out.println($e.v);} ;\n" +
 			"e returns [int v, List<String> ignored]\n" +
 			"  : e '*' b=e {$v *= $b.v;}\n" +
 			"  | e '+' b=e {$v += $b.v;}\n" +
@@ -308,7 +308,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testReturnValueAndActionsAndASTs() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e {System.out.print(\"v=\"+$e.v+\", \");} ;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e {System.out.print(\"v=\"+$e.v+\", \");} ;\n" +
 			"e returns [int v, List<String> ignored]\n" +
 			"  : e '*' b=e {$v *= $b.v;}\n" +
 			"  | e '+' b=e {$v += $b.v;}\n" +
@@ -324,7 +324,7 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	public void runTests(String grammar, String[] tests, String startRule) {
-		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer", debug);
+		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
 								  "TLexer",
 								  startRule,

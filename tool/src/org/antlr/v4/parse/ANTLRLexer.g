@@ -406,13 +406,7 @@ LOCALS       : 'locals'               ;
 THROWS       : 'throws'               ;
 CATCH        : 'catch'                ;
 FINALLY      : 'finally'              ;
-TEMPLATE     : 'template'             ;
 MODE         : 'mode'                 ;
-CHANNEL		 : 'channel'			  ;
-PUSH		 : 'push'				  ;
-SKIP		 : 'skip'				  ;
-MORE		 : 'more'				  ;
-POP		     : 'pop'				  ;
 
 // -----------
 // Punctuation
@@ -425,7 +419,7 @@ COMMA        : ','                    ;
 SEMI         : ';'                    ;
 LPAREN       : '('                    ;
 RPAREN       : ')'                    ;
-IMPLIES      : '=>'                   ;
+RARROW       : '->'                   ;
 LT           : '<'                    ;
 GT           : '>'                    ;
 ASSIGN       : '='                    ;
@@ -476,6 +470,7 @@ ID			:	a=NameStartChar NameChar*
 fragment
 NameChar    :   NameStartChar
             |   '0'..'9'
+            |   '_'
             |   '\u00B7'
             |   '\u0300'..'\u036F'
             |   '\u203F'..'\u2040'
@@ -483,7 +478,7 @@ NameChar    :   NameStartChar
 
 fragment
 NameStartChar
-            :   'A'..'Z' | 'a'..'z'|'_'
+            :   'A'..'Z' | 'a'..'z'
             |   '\u00C0'..'\u00D6'
             |   '\u00D8'..'\u00F6'
             |   '\u00F8'..'\u02FF'

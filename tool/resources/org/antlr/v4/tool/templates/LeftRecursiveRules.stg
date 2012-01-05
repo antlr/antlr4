@@ -33,47 +33,23 @@
  */
 group LeftRecursiveRules;
 
-recRuleName(ruleName) ::= "<ruleName>_"
-recPrimaryName(ruleName) ::= "<ruleName>_primary"
-
-recRuleStart(ruleName, minPrec, userRetvals, userRetvalAssignments) ::= <<
-<ruleName><if(userRetvals)> returns [<userRetvals>]<endif>
-  : <recRuleName(...)>[<minPrec>]
-    <if(userRetvals)>
-    {
-        <userRetvalAssignments; separator="\n">
-    }
-    <endif>
-  ;
->>
-
-recRule(ruleName, precArgDef, argName, alts, setResultAction, buildAST,
-        userRetvals, userRetvalAssignments) ::= <<
-<recRuleName(...)>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
-    :   <recPrimaryName(...)>
-        <if(buildAST)>
-        {
-            <setResultAction>
-        }
-        <endif>
+recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
+        userRetvals, userRetvalAssignments) ::=
+<<
+<ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
+    :   ( <primaryAlts; separator="\n        | ">
+        )
         <if(userRetvals)>
         {
             <userRetvalAssignments; separator="\n">
         }
         <endif>
-        (
-        	<alts; separator="\n          | ">
+        ( <opAlts; separator="\n        | ">
         )*
-    ;
->>
-
-recPrimaryRule(ruleName, alts, userRetvals) ::= <<
-<recPrimaryName(...)><if(userRetvals)> returns [<userRetvals>]<endif>
-    : <alts; separator="\n    | ">
     ;
 >>
 
 recRuleAlt(alt, pred) ::= "{<pred>}? <alt>"
 
-recRuleRef(ruleName, arg) ::= "<recRuleName(...)>[<arg>]"
+recRuleRef(ruleName, arg) ::= "<ruleName>[<arg>]"
 

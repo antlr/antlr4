@@ -30,7 +30,7 @@ public class TestPerformance extends BaseTest {
     private static final boolean USE_LR_GRAMMAR = false;
     /**
      *  True to specify the -Xforceatn option when generating the grammar, forcing all decisions in JavaParser to
-     *  be handled by {@link ParserATNSimulator#adaptivePredict}.
+     *  be handled by {@link v2ParserATNSimulator#adaptivePredict}.
      */
     private static final boolean FORCE_ATN = false;
 
@@ -188,7 +188,7 @@ public class TestPerformance extends BaseTest {
         String body = load(sourceName, null);
         @SuppressWarnings({"ConstantConditions"})
         String[] extraOptions = FORCE_ATN ? new String[] {"-Xforceatn"} : new String[0];
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", false, extraOptions);
+        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", extraOptions);
         assertTrue(success);
     }
 

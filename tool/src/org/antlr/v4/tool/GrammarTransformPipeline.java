@@ -101,20 +101,35 @@ public class GrammarTransformPipeline {
     }
 
 	public void translateLeftRecursiveRules(GrammarRootAST ast) {
+		// TODO: what about -language foo cmd line?
 		String language = Grammar.getLanguageOption(ast);
+		// translate all recursive rules
+		List<String> leftRecursiveRuleNames = new ArrayList<String>();
 		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE)) {
 			String ruleName = r.getChild(0).getText();
 			if ( !Character.isUpperCase(ruleName.charAt(0)) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r, ruleName) ) {
-					translateLeftRecursiveRule(ast, r, language);
+					boolean fitsPattern = translateLeftRecursiveRule(ast, r, language);
+					if ( fitsPattern ) leftRecursiveRuleNames.add(ruleName);
 				}
+			}
+		}
+		// update all refs to recursive rules to have [0] argument
+		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
+			if ( r.getParent().getType()==ANTLRParser.RULE ) continue; // must be rule def
+			if ( r.getChildCount()>0 ) continue; // already has arg; must be in rewritten rule
+			if ( leftRecursiveRuleNames.contains(r.getText()) ) {
+				// found ref to recursive rule not already rewritten with arg
+				ActionAST arg = new ActionAST(new CommonToken(ANTLRParser.ARG_ACTION, "0"));
+				r.addChild(arg);
 			}
 		}
 	}
 
-	public void translateLeftRecursiveRule(GrammarRootAST ast,
-										   GrammarAST ruleAST,
-										   String language)
+	/** Return true if successful */
+	public boolean translateLeftRecursiveRule(GrammarRootAST ast,
+											  GrammarAST ruleAST,
+											  String language)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
 		TokenStream tokens = ast.tokens;
@@ -124,34 +139,23 @@ public class GrammarTransformPipeline {
 			new LeftRecursiveRuleAnalyzer(tokens, ruleAST, tool, ruleName, language);
 		boolean isLeftRec = false;
 		try {
-//			tool.log("grammar", "TESTING ---------------\n"+
-//							   leftRecursiveRuleWalker.text(ruleAST));
+			System.out.println("TESTING ---------------\n"+
+							   leftRecursiveRuleWalker.text(ruleAST));
 			isLeftRec = leftRecursiveRuleWalker.rec_rule();
 		}
 		catch (RecognitionException re) {
 			isLeftRec = false; // didn't match; oh well
 		}
-		if ( !isLeftRec ) return;
+		if ( !isLeftRec ) return false;
 
-		// delete old rule
+		// replace old rule
 		GrammarAST RULES = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);
-		RULES.deleteChild(ruleAST);
-
-		List<String> rules = new ArrayList<String>();
-		rules.add( leftRecursiveRuleWalker.getArtificialPrecStartRule() ) ;
-
-		String outputOption = ast.getOptionString("output");
-		boolean buildAST = outputOption!=null && outputOption.equals("AST");
-
-		rules.add( leftRecursiveRuleWalker.getArtificialOpPrecRule(buildAST) );
-		rules.add( leftRecursiveRuleWalker.getArtificialPrimaryRule() );
-		for (String ruleText : rules) {
-//			tool.log("grammar", "created: "+ruleText);
-			GrammarAST t = parseArtificialRule(g, ruleText);
-			// insert into grammar tree
-			RULES.addChild(t);
-            tool.log("grammar", "added: "+t.toStringTree());
-		}
+		String newRuleText = leftRecursiveRuleWalker.getArtificialOpPrecRule();
+		System.out.println("created: "+newRuleText);
+		GrammarAST t = parseArtificialRule(g, newRuleText);
+		RULES.setChild(ruleAST.getChildIndex(), t);
+		tool.log("grammar", "added: "+t.toStringTree());
+		return true;
 	}
 
 	public GrammarAST parseArtificialRule(final Grammar g, String ruleText) {

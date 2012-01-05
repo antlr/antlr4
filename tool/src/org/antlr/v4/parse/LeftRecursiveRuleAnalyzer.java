@@ -47,7 +47,7 @@ import java.util.*;
 
 /** */
 public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
-	public static enum ASSOC { left, right };
+	public static enum ASSOC { left, right }
 
 	public Tool tool;
 	public String ruleName;
@@ -79,7 +79,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public void loadPrecRuleTemplates() {
 		String templateGroupFile = "org/antlr/v4/tool/templates/LeftRecursiveRules.stg";
 		recRuleTemplates = new STGroupFile(templateGroupFile);
-		if ( recRuleTemplates==null || !recRuleTemplates.isDefined("recRuleName") ) {
+		if ( !recRuleTemplates.isDefined("recRule") ) {
 			tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES, "LeftRecursiveRules");
 		}
 
@@ -137,11 +137,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		String altText = text(altTree);
 		altText = altText.trim();
-		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
-		nameST.add("ruleName", ruleName);
 		if ( rewriteTree!=null ) {
 			rewriteTree = rewriteTree.dupTree();
-			rewriteTree = replaceRuleRefs(rewriteTree, "$" + nameST.render());
+			rewriteTree = replaceRuleRefs(rewriteTree, "$"+ruleName);
 		}
 		String rewriteText = text(rewriteTree);
 		binaryAlts.put(alt, altText + " " + rewriteText);
@@ -164,11 +162,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		String altText = text(altTree);
 		altText = altText.trim();
-		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
-		nameST.add("ruleName", ruleName);
 		if ( rewriteTree!=null ) {
 			rewriteTree = rewriteTree.dupTree();
-			rewriteTree = replaceRuleRefs(rewriteTree, "$" + nameST.render());
+			rewriteTree = replaceRuleRefs(rewriteTree, "$" + ruleName);
 		}
 		String rewriteText = text(rewriteTree);
 		ternaryAlts.put(alt, altText + " " + rewriteText);
@@ -188,11 +184,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		String altText = text(altTree);
 		altText = altText.trim();
 
-		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
-		nameST.add("ruleName", ruleName);
 		if ( rewriteTree!=null ) {
 			rewriteTree = rewriteTree.dupTree();
-			rewriteTree = replaceRuleRefs(rewriteTree, nameST.render());
+			rewriteTree = replaceRuleRefs(rewriteTree, ruleName);
 		}
 		String rewriteText = text(rewriteTree);
 
@@ -204,11 +198,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public void suffixAlt(GrammarAST altTree, GrammarAST rewriteTree, int alt) {
 		altTree = altTree.dupTree();
 		stripLeftRecursion(altTree);
-		ST nameST = recRuleTemplates.getInstanceOf("recRuleName");
-		nameST.add("ruleName", ruleName);
 		if ( rewriteTree!=null ) {
 			rewriteTree = rewriteTree.dupTree();
-			rewriteTree = replaceRuleRefs(rewriteTree, "$" + nameST.render());
+			rewriteTree = replaceRuleRefs(rewriteTree, "$" + ruleName);
 		}
 		String rewriteText = text(rewriteTree);
 		String altText = text(altTree);
@@ -231,29 +223,14 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	// --------- get transformed rules ----------------
 
-	public String getArtificialPrecStartRule() {
-		ST ruleST = recRuleTemplates.getInstanceOf("recRuleStart");
-		ruleST.add("ruleName", ruleName);
-		ruleST.add("minPrec", 0);
-		ruleST.add("userRetvals", retvals);
-		fillRetValAssignments(ruleST, "recRuleName");
-
-		tool.log("left-recursion", ruleST.render());
-		return ruleST.render();
-	}
-
-	public String getArtificialOpPrecRule(boolean buildAST) {
+	public String getArtificialOpPrecRule() {
 		ST ruleST = recRuleTemplates.getInstanceOf("recRule");
 		ruleST.add("ruleName", ruleName);
-		ruleST.add("buildAST", buildAST);
-		ST argDefST =
-			codegenTemplates.getInstanceOf("recRuleDefArg");
+		ST argDefST = codegenTemplates.getInstanceOf("recRuleDefArg");
 		ruleST.add("precArgDef", argDefST);
-		ST ruleArgST =
-			codegenTemplates.getInstanceOf("recRuleArg");
+		ST ruleArgST = codegenTemplates.getInstanceOf("recRuleArg");
 		ruleST.add("argName", ruleArgST);
-		ST setResultST =
-			codegenTemplates.getInstanceOf("recRuleSetResultAction");
+		ST setResultST = codegenTemplates.getInstanceOf("recRuleSetResultAction");
 		ruleST.add("setResultAction", setResultST);
 		ruleST.add("userRetvals", retvals);
 		fillRetValAssignments(ruleST, "recPrimaryName");
@@ -265,29 +242,31 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		for (int alt : opPrecRuleAlts.keySet()) {
 			String altText = opPrecRuleAlts.get(alt);
 			ST altST = recRuleTemplates.getInstanceOf("recRuleAlt");
-			ST predST =
-				codegenTemplates.getInstanceOf("recRuleAltPredicate");
+			ST predST = codegenTemplates.getInstanceOf("recRuleAltPredicate");
 			predST.add("opPrec", precedence(alt));
 			predST.add("ruleName", ruleName);
 			altST.add("pred", predST);
 			altST.add("alt", altText);
-			ruleST.add("alts", altST);
+			ruleST.add("opAlts", altST);
 		}
+
+		ruleST.add("primaryAlts", prefixAlts);
+		ruleST.add("primaryAlts", otherAlts);
 
 		tool.log("left-recursion", ruleST.render());
 
 		return ruleST.render();
 	}
 
-	public String getArtificialPrimaryRule() {
-		ST ruleST = recRuleTemplates.getInstanceOf("recPrimaryRule");
-		ruleST.add("ruleName", ruleName);
-		ruleST.add("alts", prefixAlts);
-		ruleST.add("alts", otherAlts);
-		ruleST.add("userRetvals", retvals);
-        tool.log("left-recursion", ruleST.render());
-		return ruleST.render();
-	}
+//	public String getArtificialPrimaryRule() {
+//		ST ruleST = recRuleTemplates.getInstanceOf("recPrimaryRule");
+//		ruleST.add("ruleName", ruleName);
+//		ruleST.add("alts", prefixAlts);
+//		ruleST.add("alts", otherAlts);
+//		ruleST.add("userRetvals", retvals);
+//        tool.log("left-recursion", ruleST.render());
+//		return ruleST.render();
+//	}
 
 	public GrammarAST replaceRuleRefs(GrammarAST t, String name) {
 		if ( t==null ) return null;

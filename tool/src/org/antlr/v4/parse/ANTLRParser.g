@@ -92,6 +92,7 @@ tokens {
     
     // lexer action stuff
     LEXER_ALT_ACTION;
+    LEXER_ACTION_CALL; // ID(foo)
 }
 
 // Include the copyright in this source and also the generated source
@@ -178,7 +179,7 @@ if ( options!=null ) {
 	  //
 	  rules
 
-	  mode*
+	  modeSpec*
 
       // And we force ANTLR to process everything it finds in the input
       // stream by specifying hte need to match End Of File before the
@@ -196,7 +197,7 @@ if ( options!=null ) {
              DOC_COMMENT?    // We may or may not have a global documentation comment for the file
              prequelConstruct* // The set of declarations we accumulated
              rules           // And of course, we need the set of rules we discovered
-             mode*
+             modeSpec*
          )
 	;
 
@@ -312,7 +313,9 @@ actionScopeName
     |   PARSER	-> ID[$PARSER]
 	;
 
-mode:	MODE id SEMI sync (lexerRule sync)+  -> ^(MODE id lexerRule+) ;
+modeSpec
+    :	MODE id SEMI sync (lexerRule sync)+  -> ^(MODE id lexerRule+)
+    ;
 
 rules
     :	sync (rule sync)*
@@ -383,7 +386,7 @@ parserRule
 
 	  throwsSpec?
 
-	  locals?
+	  localsSpec?
 
 	  // Now, before the rule specification itself, which is introduced
 	  // with a COLON, we may have zero or more configuration sections.
@@ -411,7 +414,7 @@ parserRule
       exceptionGroup
 
       -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
-      		ruleReturns? throwsSpec? locals? rulePrequels? ruleBlock exceptionGroup*
+      		ruleReturns? throwsSpec? localsSpec? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
 
@@ -475,7 +478,7 @@ throwsSpec
     ;
 
 // locals [Cat x, float g]
-locals : LOCALS^ ARG_ACTION<ActionAST> ;
+localsSpec : LOCALS^ ARG_ACTION<ActionAST> ;
 
 // @ Sections are generally target language specific things
 // such as local variable declarations, code to run before the
@@ -631,18 +634,15 @@ lexerBlock
  	:	LPAREN lexerAltList RPAREN
       -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] lexerAltList )
     ;
+
 // channel=HIDDEN, skip, more, mode(INSIDE), push(INSIDE), pop
 lexerActions
-	:	IMPLIES lexerAction (COMMA lexerAction)* -> lexerAction+
+	:	RARROW lexerAction (COMMA lexerAction)* -> lexerAction+
 	;
 
 lexerAction
-	:	CHANNEL LPAREN lexerActionExpr RPAREN -> ^(CHANNEL lexerActionExpr)
-	|	MODE LPAREN lexerActionExpr RPAREN	  -> ^(MODE lexerActionExpr)
-	|	PUSH LPAREN lexerActionExpr RPAREN	  -> ^(PUSH lexerActionExpr)
-	|	SKIP
-	|	MORE
-	|	POP
+	:	id LPAREN lexerActionExpr RPAREN -> ^(LEXER_ACTION_CALL id lexerActionExpr)
+	|	id
 	;
 
 lexerActionExpr
@@ -757,7 +757,7 @@ ebnfSuffix
 lexerAtom
 	:	range 
 	|	terminal
-    |   RULE_REF
+    |   RULE_REF<RuleRefAST>
     |	notSet 
     |	wildcard
     |	ARG_ACTION

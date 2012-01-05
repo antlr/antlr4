@@ -30,7 +30,9 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.Test;
 
 public class TestCompositeGrammars extends BaseTest {
@@ -486,7 +488,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
 		boolean ok =
-			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null, false);
+			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
@@ -542,7 +544,7 @@ public class TestCompositeGrammars extends BaseTest {
 					 realElements(g.typeToTokenList).toString());
 
 		boolean ok =
-			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null, false);
+			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
@@ -628,7 +630,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
 		boolean ok =
-			rawGenerateAndBuildRecognizer("G3.g", G3str, "G3Parser", null, false);
+			rawGenerateAndBuildRecognizer("G3.g", G3str, "G3Parser", null);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
@@ -647,7 +649,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') {skip();} ;\n" ;
-		boolean ok = antlr("M.g", "M.g", master, debug);
+		boolean ok = antlr("M.g", "M.g", master);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}

@@ -341,12 +341,8 @@ alternative
     ;
 
 lexerAction
-	:	^(CHANNEL lexerActionExpr)
-	|	^(MODE lexerActionExpr)
-	|	^(PUSH lexerActionExpr)
-	|	SKIP
-	|	MORE
-	|	POP
+	:	^(LEXER_ACTION_CALL lexerActionExpr)
+	|	ID
 	;
 
 lexerActionExpr
