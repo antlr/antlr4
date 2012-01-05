@@ -103,7 +103,6 @@ public class Tool {
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-        new Option("trace",				"-trace", "generate a recognizer that traces rule entry/exit"),
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),

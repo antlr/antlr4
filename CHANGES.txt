@@ -6,3 +6,4 @@ Jan 4, 2012
 * fix unit tests
 * Allow labels in left-recursive rules
 * lr rules now gen only 1 rule e->e not e->e_ etc... altered tests to build parse trees.
+* no more -trace, use Parser.setTrace(true)
