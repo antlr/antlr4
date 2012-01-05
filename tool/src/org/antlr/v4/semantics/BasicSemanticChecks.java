@@ -95,12 +95,18 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public static final Set<String> legalRuleOptions =
 		new HashSet<String>() {
 			{
-
+				add("context");
+				add("simrecursion_");
 			}
 		};
 
 	public static final Set<String> legalBlockOptions =
-		new HashSet<String>() {{add("greedy");}};
+		new HashSet<String>() {
+			{
+				add("greedy");
+				add("simrecursion_");
+			}
+		};
 
 	/** Legal options for terminal refs like ID<node=MyVarNode> */
 	public static final Set<String> legalTokenOptions =

@@ -61,7 +61,13 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	public RuleFunction rule(Rule r) {
-		return new RuleFunction(this, r);
+		GrammarAST optionNode = r.ast.getOption("simrecursion_");
+		if ( optionNode!=null && optionNode.getText().equals("true") ) {
+			return new LRecursiveRuleFunction(this, r);
+		}
+		else {
+			return new RuleFunction(this, r);
+		}
 	}
 
 	public CodeBlockForAlt epsilon() { return new CodeBlockForAlt(this); }

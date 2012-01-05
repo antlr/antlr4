@@ -173,6 +173,22 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 
 	public void removeParseListeners() { if ( _parseListeners!=null ) _parseListeners.clear(); }
 
+	public void triggerEnterRuleEvent() {
+		for (ParseTreeListener<Token> l : _parseListeners) {
+			l.enterEveryRule(_ctx);
+			_ctx.enterRule(l);
+		}
+	}
+
+	public void triggerExitRuleEvent() {
+		// reverse order walk of listeners
+		for (int i = _parseListeners.size()-1; i >= 0; i--) {
+			ParseTreeListener<Token> l = _parseListeners.get(i);
+			_ctx.exitRule(l);
+			l.exitEveryRule(_ctx);
+		}
+	}
+
     /** Get number of recognition errors (lexer, parser, tree parser).  Each
 	 *  recognizer tracks its own number.  So parser and lexer each have
 	 *  separate count.  Does not count the spurious errors found between
@@ -302,22 +318,12 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
 		if (_buildParseTrees) addContextToParseTree();
-        if ( _parseListeners != null) {
-            for (ParseTreeListener<Token> l : _parseListeners) {
-				_ctx.enterRule(l);
-				l.enterEveryRule(_ctx);
-			}
-        }
+        if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
-    public void exitRule(int ruleIndex) {
+    public void exitRule() {
         // trigger event on _ctx, before it reverts to parent
-        if ( _parseListeners != null) {
-			for (ParseTreeListener<Token> l : _parseListeners) {
-				_ctx.exitRule(l);
-				l.exitEveryRule(_ctx);
-			}
-        }
+        if ( _parseListeners != null) triggerExitRuleEvent();
 		_ctx = (ParserRuleContext<Token>)_ctx.parent;
     }
 
@@ -331,6 +337,31 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 		}
 		_ctx = localctx;
 		_ctx.altNum = altNum;
+	}
+
+	/* like enterRule but for recursive rules; no enter events for recursive rules. */
+	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
+		_ctx = localctx;
+		_ctx.start = _input.LT(1);
+		_ctx.ruleIndex = ruleIndex;
+	}
+
+	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
+		ParserRuleContext<Token> retctx = _ctx; // save current ctx (return value)
+
+		// unroll so _ctx is as it was before call to recursive method
+		if ( _parseListeners != null ) {
+			while ( _ctx != _parentctx ) {
+				triggerExitRuleEvent();
+				_ctx = (ParserRuleContext<Token>)_ctx.parent;
+			}
+		}
+		else {
+			_ctx = _parentctx;
+		}
+		// hook into tree
+		retctx.parent = _parentctx;
+		if (_buildParseTrees) _parentctx.addChild(retctx); // add return ctx into invoking rule's tree
 	}
 
 	public ParserRuleContext<Token> getInvokingContext(int ruleIndex) {

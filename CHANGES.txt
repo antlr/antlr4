@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger early access
 
+Jan 5, 2012
+
+* Deleted code to call specific listeners by mistake. added back.
+
 Jan 4, 2012
 
 * '_' was allowed first in symbol names in grammar
@@ -7,3 +11,5 @@ Jan 4, 2012
 * Allow labels in left-recursive rules
 * lr rules now gen only 1 rule e->e not e->e_ etc... altered tests to build parse trees.
 * no more -trace, use Parser.setTrace(true)
+* add context rule option; not hooked up
+* 1+2*3 now gives new parse tree: (e (e 1) + (e (e 2) * (e 3)))

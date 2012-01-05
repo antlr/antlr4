@@ -1,11 +1,12 @@
 /*
  [The "BSD license"]
- Copyright (c) 2010 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
+
  1. Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
  2. Redistributions in binary form must reproduce the above copyright
@@ -24,34 +25,15 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-/** How to generate rules derived from left-recursive rules.
- *  These rely on recRuleDefArg(), recRuleAltPredicate(),
- *  recRuleArg(), recRuleSetResultAction(), recRuleSetReturnAction()
- *  templates in main language.stg
  */
-group LeftRecursiveRules;
 
-recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
-        userRetvals, userRetvalAssignments) ::=
-<<
-<ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
-options {simrecursion_=true;}
-    :   ( <primaryAlts; separator="\n        | ">
-        )
-        <if(userRetvals)>
-        {
-            <userRetvalAssignments; separator="\n">
-        }
-        <endif>
-        ( options {simrecursion_=true;}
-        : <opAlts; separator="\n        | ">
-        )*
-    ;
->>
+package org.antlr.v4.codegen.model;
 
-recRuleAlt(alt, pred) ::= "{<pred>}? <alt>"
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.Rule;
 
-recRuleRef(ruleName, arg) ::= "<ruleName>[<arg>]"
-
+public class LRecursiveRuleFunction extends RuleFunction {
+	public LRecursiveRuleFunction(OutputModelFactory factory, Rule r) {
+		super(factory, r);
+	}
+}

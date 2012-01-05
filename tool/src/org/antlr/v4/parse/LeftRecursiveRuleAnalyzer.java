@@ -233,7 +233,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		ST setResultST = codegenTemplates.getInstanceOf("recRuleSetResultAction");
 		ruleST.add("setResultAction", setResultST);
 		ruleST.add("userRetvals", retvals);
-		fillRetValAssignments(ruleST, "recPrimaryName");
+		fillRetValAssignments(ruleST);
 
 		LinkedHashMap<Integer, String> opPrecRuleAlts = new LinkedHashMap<Integer, String>();
 		opPrecRuleAlts.putAll(binaryAlts);
@@ -354,7 +354,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		return p;
 	}
 
-	public void fillRetValAssignments(ST ruleST, String srcName) {
+	public void fillRetValAssignments(ST ruleST) {
 		if ( retvals==null ) return;
 
 		// complicated since we must be target-independent
@@ -363,9 +363,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		for (String name : args.attributes.keySet()) {
 			ST setRetValST =
 				codegenTemplates.getInstanceOf("recRuleSetReturnAction");
-			ST ruleNameST = recRuleTemplates.getInstanceOf(srcName);
-			ruleNameST.add("ruleName", ruleName);
-			setRetValST.add("src", ruleNameST);
+			setRetValST.add("src", ruleName);
 			setRetValST.add("name", name);
 			ruleST.add("userRetvalAssignments",setRetValST);
 		}

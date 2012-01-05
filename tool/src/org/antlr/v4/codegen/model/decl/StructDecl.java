@@ -54,6 +54,7 @@ public class StructDecl extends Decl {
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
+		addVisitorDispatchMethods(r);
 	}
 
 	public void addVisitorDispatchMethods(Rule r) {

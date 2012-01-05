@@ -175,7 +175,36 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 	}
 	finally {
 		<finallyAction>
-		exitRule(RULE_<currentRule.name>);
+		exitRule();
+	}
+	return _localctx;
+}
+>>
+
+LRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
+
+<ruleCtx>
+<altLabelCtxs; separator="\n">
+
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+    ParserRuleContext\<Token> _parentctx = _ctx;
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
+    pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+		<code>
+		_localctx.stop = _input.LT(-1);
+		<postamble; separator="\n">
+		<namedActions.after>
+	}
+	catch (RecognitionException re) {
+		_errHandler.reportError(this, re);
+		_errHandler.recover(this, re);
+	}
+	finally {
+		<finallyAction>
+		unrollRecursionContexts(_parentctx);
 	}
 	return _localctx;
 }
@@ -322,12 +351,15 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
-	switch ( _alt<choice.uniqueID> ) {
-		<alts:{alt|
-case <i>:
-	<alt>
-	break;}; separator="\n">
-	}
+    if ( _alt<choice.uniqueID>==1 ) {
+        <if(choice.isForRecursiveRule)>
+		if ( _parseListeners!=null ) triggerExitRuleEvent();
+        _localctx = new <currentRule.name>Context(_parentctx, <currentRule.startState>, _p);
+        _localctx.addChild(_ctx);
+        pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+        <endif>
+        <alts> <! should only be one !>
+    }
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
@@ -512,7 +544,7 @@ labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 recRuleDefArg()						  ::= "int _p"
 recRuleArg()						  ::= "$_p"
 recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
-recRuleSetResultAction()			  ::= "$tree=$<ruleName>_primary.tree;"
+recRuleSetResultAction()			  ::= "$tree=$<ruleName>.tree;"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<

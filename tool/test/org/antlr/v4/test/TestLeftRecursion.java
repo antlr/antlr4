@@ -17,7 +17,7 @@ public class TestLeftRecursion extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "s", "x y z", debug);
-		String expecting = "(s (a x y z))\n";
+		String expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
 	}
 
@@ -32,7 +32,7 @@ public class TestLeftRecursion extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "s", "x y z", debug);
-		String expecting = "(s (a x y z))\n";
+		String expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
 	}
 
@@ -50,81 +50,20 @@ public class TestLeftRecursion extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String[] tests = {
 			"a",			"(s (e a) <EOF>)",
-			"a+b",			"(s (e a + (e b)) <EOF>)",
-			"a*b",			"(* a b)",
-			"a?b:c",		"(? a b c)",
-			"a=b=c",		"(= a (= b c))",
-			"a?b+c:d",		"(? a (+ b c) d)",
-			"a?b=c:d",		"(? a (= b c) d)",
-			"a? b?c:d : e",	"(? a (? b c d) e)",
-			"a?b: c?d:e",	"(? a b (? c d e))",
+			"a+b",			"(s (e (e a) + (e b)) <EOF>)",
+			"a*b",			"(s (e (e a) * (e b)) <EOF>)",
+			"a?b:c",		"(s (e (e a) ? (e b) : (e c)) <EOF>)",
+			"a=b=c",		"(s (e (e a) = (e (e b) = (e c))) <EOF>)",
+			"a?b+c:d",		"(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)",
+			"a?b=c:d",		"(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)",
+			"a? b?c:d : e",	"(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)",
+			"a?b: c?d:e",	"(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)",
 		};
 		runTests(grammar, tests, "s");
 	}
 
-	@Test public void testDeclarationsUsingASTOperators() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"s @after {System.out.println($ctx.toStringTree(this));} : declarator EOF ;\n" + // must indicate EOF can follow
-			"declarator\n" +
-			"        : declarator '[' e ']'\n" +
-			"        | declarator '[' ']'\n" +
-			"        | declarator '(' ')'\n" +
-			"        | '*' declarator\n" + // binds less tight than suffixes
-			"        | '(' declarator ')'\n" +
-			"        | ID\n" +
-			"        ;\n" +
-			"e : INT ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
-		String[] tests = {
-			"a",		"a",
-			"*a",		"(* a)",
-			"**a",		"(* (* a))",
-			"a[3]",		"([ a 3)",
-			"b[]",		"([ b)",
-			"(a)",		"a",
-			"a[]()",	"(( ([ a))",
-			"a[][]",	"([ ([ a))",
-			"*a[]",		"(* ([ a))",
-			"(*a)[]",	"([ (* a))",
-		};
-		runTests(grammar, tests, "s");
-	}
 
-	@Test public void testDeclarationsUsingRewriteOperators() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"s @after {System.out.println($ctx.toStringTree(this));} : declarator EOF ;\n" + // must indicate EOF can follow
-			"declarator\n" +
-			"        : declarator '[' e ']'" +
-			"        | declarator '[' ']'" +
-			"        | declarator '(' ')'" +
-			"        | '*' declarator" + // binds less tight than suffixes
-			"        | '(' declarator ')'" +
-			"        | ID" +
-			"        ;\n" +
-			"e : INT ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
-		String[] tests = {
-			"a",		"a",
-			"*a",		"(* a)",
-			"**a",		"(* (* a))",
-			"a[3]",		"([ a 3)",
-			"b[]",		"([ b)",
-			"(a)",		"a",
-			"a[]()",	"(( ([ a))",
-			"a[][]",	"([ ([ a))",
-			"*a[]",		"(* ([ a))",
-			"(*a)[]",	"([ (* a))",
-		};
-		runTests(grammar, tests, "s");
-	}
-
-	@Test public void testExpressionsUsingASTOperators() throws Exception {
+	@Test public void testExpressions() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow
@@ -140,57 +79,15 @@ public class TestLeftRecursion extends BaseTest {
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String[] tests = {
-			"a",		"a",
-			"1",		"1",
-			"a+1",		"(+ a 1)",
-			"a*1",		"(* a 1)",
-			"a.b",		"(. a b)",
-			"a.this",	"(. a this)",
-			"a-b+c",	"(+ (- a b) c)",
-			"a+b*c",	"(+ a (* b c))",
-			"a.b+1",	"(+ (. a b) 1)",
-			"-a",		"(- a)",
-			"-a+b",		"(+ (- a) b)",
-			"-a.b",		"(- (. a b))",
+			"a",		"(s (e a) <EOF>)",
+			"1",		"(s (e 1) <EOF>)",
+			"a-1",		"(s (e (e a) - (e 1)) <EOF>)",
+			"a.b",		"(s (e (e a) . b) <EOF>)",
+			"a.this",	"(s (e (e a) . this) <EOF>)",
+			"-a",		"(s (e - (e a)) <EOF>)",
+			"-a+b",		"(s (e (e - (e a)) + (e b)) <EOF>)",
 		};
 		runTests(grammar, tests, "s");
-	}
-
-	@Test public void testExpressionAssociativity() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow
-			"e\n" +
-			"  : e '.' ID\n" +
-			"  | '-' e\n" +
-			"  | e ''<assoc=right> e\n" +
-			"  | e '*' e\n" +
-			"  | e ('+'|'-') e\n" +
-			"  | e ('='<assoc=right> |'+='<assoc=right>) e\n" +
-			"  | INT\n" +
-			"  | ID\n" +
-			"  ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
-		String[] tests = {
-			"a",		"a",
-			"1",		"1",
-			"a+1",		"(+ a 1)",
-			"a*1",		"(* a 1)",
-			"a.b",		"(. a b)",
-			"a-b+c",	"(+ (- a b) c)",
-
-			"a+b*c",	"(+ a (* b c))",
-			"a.b+1",	"(+ (. a b) 1)",
-			"-a",		"(- a)",
-			"-a+b",		"(+ (- a) b)",
-			"-a.b",		"(- (. a b))",
-			"a^b^c",	"(^ a (^ b c))",
-			"a=b=c",	"(= a (= b c))",
-			"a=b=c+d.e","(= a (= b (+ c (. d e))))",
-		};
-		runTests(grammar, tests, "e");
 	}
 
 	@Test public void testJavaExpressions() throws Exception {
@@ -255,34 +152,47 @@ public class TestLeftRecursion extends BaseTest {
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String[] tests = {
-			"a",		"a",
-			"1",		"1",
-			"a+1",		"(+ a 1)",
-			"a*1",		"(* a 1)",
-			"a.b",		"(. a b)",
-			"a-b+c",	"(+ (- a b) c)",
+			"a|b&c",	"(s (e (e a) | (e (e b) & (e c))) <EOF>)",
+			"(a|b)&c",	"(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)",
+            "a > b",	"(s (e (e a) > (e b)) <EOF>)",
+			"a >> b",	"(s (e (e a) >> (e b)) <EOF>)",
+			"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)",
+			"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)",
+			"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)",
+			"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
+			"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)",
+			"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)",
+		};
+		runTests(grammar, tests, "s");
+	}
 
-			"a+b*c",	"(+ a (* b c))",
-			"a.b+1",	"(+ (. a b) 1)",
-			"-a",		"(- a)",
-			"-a+b",		"(+ (- a) b)",
-			"-a.b",		"(- (. a b))",
-			"a^b^c",	"(^ a (^ b c))",
-			"a=b=c",	"(= a (= b c))",
-			"a=b=c+d.e","(= a (= b (+ c (. d e))))",
-			"a|b&c",	"(| a (& b c))",
-			"(a|b)&c",	"(& (| a b) c)",
-            "a > b",	"(> a b)",
-            "a > 0",	"(> a 0)",
-			"a >> b",	"(>> a b)",  // text is from one token
-			"a < b",	"(< a b)",
-
-			"(T)x",							"(( T x)",
-			"new A().b",					"(. (new A () b)",
-			"(T)t.f()",						"(( (( T (. t f)))",
-			"a.f(x)==T.c",					"(== (( (. a f) x) (. T c))",
-			"a.f().g(x,1)",					"(( (. (( (. a f)) g) x 1)",
-			"new T[((n-1) * x) + 1]",		"(new T [ (+ (* (- n 1) x) 1))",
+	@Test public void testDeclarations() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : declarator EOF ;\n" + // must indicate EOF can follow
+			"declarator\n" +
+			"        : declarator '[' e ']'\n" +
+			"        | declarator '[' ']'\n" +
+			"        | declarator '(' ')'\n" +
+			"        | '*' declarator\n" + // binds less tight than suffixes
+			"        | '(' declarator ')'\n" +
+			"        | ID\n" +
+			"        ;\n" +
+			"e : INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		String[] tests = {
+			"a",		"(s (declarator a) <EOF>)",
+			"*a",		"(s (declarator * (declarator a)) <EOF>)",
+			"**a",		"(s (declarator * (declarator * (declarator a))) <EOF>)",
+			"a[3]",		"(s (declarator (declarator a) [ (e 3) ]) <EOF>)",
+			"b[]",		"(s (declarator (declarator b) [ ]) <EOF>)",
+			"(a)",		"(s (declarator ( (declarator a) )) <EOF>)",
+			"a[]()",	"(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)",
+			"a[][]",	"(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)",
+			"*a[]",		"(s (declarator * (declarator (declarator a) [ ])) <EOF>)",
+			"(*a)[]",	"(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)",
 		};
 		runTests(grammar, tests, "s");
 	}
@@ -290,7 +200,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testReturnValueAndActions() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {System.out.println($ctx.toStringTree(this));} : e {System.out.println($e.v);} ;\n" +
+			"s : e {System.out.println($e.v);} ;\n" +
 			"e returns [int v, List<String> ignored]\n" +
 			"  : e '*' b=e {$v *= $b.v;}\n" +
 			"  | e '+' b=e {$v += $b.v;}\n" +
