@@ -139,8 +139,8 @@ public class GrammarTransformPipeline {
 			new LeftRecursiveRuleAnalyzer(tokens, ruleAST, tool, ruleName, language);
 		boolean isLeftRec = false;
 		try {
-			System.out.println("TESTING ---------------\n"+
-							   leftRecursiveRuleWalker.text(ruleAST));
+//			System.out.println("TESTING ---------------\n"+
+//							   leftRecursiveRuleWalker.text(ruleAST));
 			isLeftRec = leftRecursiveRuleWalker.rec_rule();
 		}
 		catch (RecognitionException re) {
@@ -151,7 +151,7 @@ public class GrammarTransformPipeline {
 		// replace old rule
 		GrammarAST RULES = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);
 		String newRuleText = leftRecursiveRuleWalker.getArtificialOpPrecRule();
-		System.out.println("created: "+newRuleText);
+//		System.out.println("created: "+newRuleText);
 		GrammarAST t = parseArtificialRule(g, newRuleText);
 		RULES.setChild(ruleAST.getChildIndex(), t);
 		tool.log("grammar", "added: "+t.toStringTree());
