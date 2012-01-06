@@ -189,6 +189,8 @@ LRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
     ParserRuleContext\<Token> _parentctx = _ctx;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _prevctx = _localctx;
+	int _startState = <currentRule.startState>;
     pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -354,9 +356,7 @@ while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
     if ( _alt<choice.uniqueID>==1 ) {
         <if(choice.isForRecursiveRule)>
 		if ( _parseListeners!=null ) triggerExitRuleEvent();
-        _localctx = new <currentRule.name>Context(_parentctx, <currentRule.startState>, _p);
-        _localctx.addChild(_ctx);
-        pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+		_prevctx = _localctx;
         <endif>
         <alts> <! should only be one !>
     }
@@ -546,6 +546,12 @@ recRuleArg()						  ::= "$_p"
 recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
 recRuleSetResultAction()			  ::= "$tree=$<ruleName>.tree;"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
+recRuleAltStartAction(ruleName, ctxName, label) ::= <<
+_localctx = new <ctxName>Context(_parentctx, _startState, _p);
+_localctx.addChild(_prevctx);
+<if(label)>_localctx.<label> = _prevctx;<endif>
+pushNewRecursionContext(_localctx, RULE_<ruleName>);
+>>
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>

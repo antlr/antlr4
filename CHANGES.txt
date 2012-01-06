@@ -3,6 +3,14 @@ ANTLR v4 Honey Badger early access
 Jan 5, 2012
 
 * Deleted code to call specific listeners by mistake. added back.
+* Labels allowed in left-recursive rules:
+    e returns [int v]
+      : a=e '*' b=e {$v = $a.v * $b.v;}
+      | a=e '+' b=e {$v = $a.v + $b.v;}
+      | INT         {$v = $INT.int;}
+      | '(' x=e ')' {$v = $x.v;}
+      ;
+
 
 Jan 4, 2012
 

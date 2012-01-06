@@ -34,24 +34,27 @@
 group LeftRecursiveRules;
 
 recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
-        userRetvals, userRetvalAssignments) ::=
+        userRetvals, leftRecursiveRuleRefLabels) ::=
 <<
 <ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
 options {simrecursion_=true;}
-    :   ( <primaryAlts; separator="\n        | ">
+    :   ( <primaryAlts:{alt | <alt.altText> /* <alt.altLabel> */}; separator="\n        | ">
         )
-        <if(userRetvals)>
-        {
-            <userRetvalAssignments; separator="\n">
-        }
-        <endif>
         ( options {simrecursion_=true;}
-        : <opAlts; separator="\n        | ">
+        :
+          <opAlts; separator=" |\n\n">
+<if(leftRecursiveRuleRefLabels)>
+        | {/* (safely) force ANTLR to know about left-recursive rule labels we removed */}
+          BOGUS_ <leftRecursiveRuleRefLabels:{lab | <lab>=<ruleName> BOGUS_}; separator=" ">
+<endif>
         )*
     ;
 >>
 
-recRuleAlt(alt, pred) ::= "{<pred>}? <alt>"
-
-recRuleRef(ruleName, arg) ::= "<ruleName>[<arg>]"
-
+recRuleAlt(alt, startAction, pred) ::= <<
+{<pred>}?
+{
+    <startAction>
+}
+<alt>
+>>
