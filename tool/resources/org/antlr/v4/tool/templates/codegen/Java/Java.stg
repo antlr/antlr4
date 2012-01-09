@@ -69,7 +69,7 @@ public class <parser.name> extends <superclass> {
 	<endif>
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
-		<parser.tokenNames:{k | "<k>"}; separator=", ", wrap, anchor>
+		<parser.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
 	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;

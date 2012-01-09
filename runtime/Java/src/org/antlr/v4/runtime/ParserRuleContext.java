@@ -177,11 +177,13 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	public void addChild(Token matchedToken) {
 		TerminalNodeImpl<?> t = new TerminalNodeImpl<Token>(matchedToken);
+		t.parent = this;
 		addChild(t);
 	}
 
 	public void addErrorNode(Token badToken) {
 		TerminalNodeImpl<?> t = new ErrorNodeImpl<Token>(badToken);
+		t.parent = this;
 		addChild(t);
 	}
 
@@ -204,7 +206,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
 		if ( recog==null ) return super.toString(recog, stop);
 		StringBuilder buf = new StringBuilder();
-		ParserRuleContext p = this;
+		ParserRuleContext<?> p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
 			ATN atn = recog.getATN();
@@ -215,7 +217,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 //				ATNState invoker = atn.states.get(ctx.invokingState);
 //				RuleTransition rt = (RuleTransition)invoker.transition(0);
 //				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
-			p = (ParserRuleContext)p.parent;
+			p = (ParserRuleContext<?>)p.parent;
 		}
 		buf.append("]");
 		return buf.toString();

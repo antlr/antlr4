@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
+    @SuppressWarnings("unchecked")
     public <Symbol> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
 		if ( t instanceof ParseTree.TerminalNode) {
 			visitTerminal(listener, (ParseTree.TerminalNode<Symbol>) t);
@@ -48,12 +49,13 @@ public class ParseTreeWalker {
 		exitRule(listener, r);
     }
 
+    @SuppressWarnings("unchecked")
     protected <Symbol> void visitTerminal(ParseTreeListener<Symbol> listener,
 										  ParseTree.TerminalNode<Symbol> t)
 	{
 		ParseTree.RuleNode r = (ParseTree.RuleNode)t.getParent();
 		ParserRuleContext<Symbol> ctx = null;
-		if ( r.getRuleContext() instanceof ParserRuleContext ) {
+		if ( r != null && r.getRuleContext() instanceof ParserRuleContext<?> ) {
 			ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		}
         listener.visitTerminal(ctx, t.getSymbol());
@@ -65,12 +67,14 @@ public class ParseTreeWalker {
 	 *  We to them in reverse order upon finishing the node.
 	 */
     protected <Symbol> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
-		listener.enterEveryRule((ParserRuleContext<Symbol>) r.getRuleContext());
+		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
     }
 
     protected <Symbol> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);
 		listener.exitEveryRule(ctx);

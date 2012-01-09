@@ -253,7 +253,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			int n = token.getStopIndex() - token.getStartIndex() + 1;
 			cpos = token.getCharPositionInLine()+n;
 		}
-		Token eof = _factory.create(this, Token.EOF, null, channel, _input.index(), _input.index()-1,
+		Token eof = _factory.create(this, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
 									getLine(), cpos);
 		return eof;
 	}

@@ -68,8 +68,7 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
         p++;
         sync(p);
 		CommonToken t = tokens.get(p);
-		int n = size();
-		while ( p<n && t.getChannel()!=channel ) {
+		while ( t.getType()!=Token.EOF && t.getChannel()!=channel ) {
             p++;
             sync(p);
 			t = tokens.get(p);
@@ -123,9 +122,11 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
      */
     protected int skipOffTokenChannels(int i) {
         sync(i);
-        while ( tokens.get(i).getChannel()!=channel ) { // also stops at EOF (it's onchannel)
+        Token token = tokens.get(i);
+        while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
             i++;
             sync(i);
+            token = tokens.get(i);
         }
         return i;
     }
@@ -142,9 +143,11 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
         p = 0;
         sync(0);
         int i = 0;
-        while ( tokens.get(i).getChannel()!=channel ) {
+        Token token = tokens.get(i);
+        while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
             i++;
             sync(i);
+            token = tokens.get(i);
         }
         p = i;
     }

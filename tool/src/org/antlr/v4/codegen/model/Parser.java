@@ -29,6 +29,7 @@
 
 package org.antlr.v4.codegen.model;
 
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.actions.ActionChunk;
 import org.antlr.v4.codegen.model.actions.ActionText;
@@ -65,6 +66,16 @@ public class Parser extends OutputModelObject {
 			if ( ttype>0 ) tokens.put(t, ttype);
 		}
 		tokenNames = g.getTokenDisplayNames();
+		for (int i = 0; i < tokenNames.length; i++) {
+			if ( tokenNames[i]==null ) continue;
+			CodeGenerator gen = factory.getGenerator();
+			if ( tokenNames[i].charAt(0)=='\'' ) {
+				tokenNames[i] = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen, tokenNames[i]);
+			}
+			else {
+				tokenNames[i] = gen.target.getTargetStringLiteralFromString(tokenNames[i], true);
+			}
+		}
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);

@@ -90,8 +90,18 @@ public class ParserInterpreter {
 	public int matchATN(@NotNull TokenStream input,
 						@NotNull ATNState startState)
 	{
-//		return new v2ParserATNSimulator<Token>(new DummyParser(g, input), g.atn).matchATN(input, startState);
-		return 0;
+		if (startState.getNumberOfTransitions() == 1) {
+			return 1;
+		}
+		else if (startState instanceof DecisionState) {
+			return atnSimulator.adaptivePredict(input, ((DecisionState)startState).decision, null);
+		}
+		else if (startState.getNumberOfTransitions() > 0) {
+			return 1;
+		}
+		else {
+			return -1;
+		}
 	}
 
 	public v2ParserATNSimulator<Token> getATNSimulator() {
