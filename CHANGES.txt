@@ -1,5 +1,13 @@
 ANTLR v4 Honey Badger early access
 
+Jan 11, 2012
+
+* -> id labels work now for outermost alternatives, even for left-recursive
+  rules; e.g.,
+
+  | a=e '*' b=e {$v = $a.v * $b.v;}     -> mult
+* Fixed a bug where visitTerminal got a NPE
+
 Jan 5, 2012
 
 * Deleted code to call specific listeners by mistake. added back.
