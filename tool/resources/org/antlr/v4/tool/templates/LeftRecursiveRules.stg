@@ -37,24 +37,13 @@ recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
         userRetvals, leftRecursiveRuleRefLabels) ::=
 <<
 <ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
-options {simrecursion_=true;}
-    :   ( <primaryAlts:{alt | <alt.altText> /* <alt.altLabel> */}; separator="\n        | ">
+    :   ( <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
         )
-        ( options {simrecursion_=true;}
-        :
-          <opAlts; separator=" |\n\n">
-<if(leftRecursiveRuleRefLabels)>
-        | {/* (safely) force ANTLR to know about left-recursive rule labels we removed */}
-          BOGUS_ <leftRecursiveRuleRefLabels:{lab | <lab>=<ruleName> BOGUS_}; separator=" ">
-<endif>
+        ( <opAlts; separator="\n        | ">
         )*
     ;
 >>
 
-recRuleAlt(alt, startAction, pred) ::= <<
-{<pred>}?
-{
-    <startAction>
-}
-<alt>
+recRuleAlt(alt, pred) ::= <<
+{<pred>}? <alt.altText>
 >>

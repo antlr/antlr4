@@ -26,10 +26,8 @@ public class ListenerFile extends OutputFile {
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
 			List<String> labels = r.getAltLabels();
-			if ( labels==null ) {
-				listenerNames.add(r.name);
-			}
-			else { // alt(s) with label(s)
+			listenerNames.add(r.name);
+			if ( labels!=null ) {
 				for (String label : labels) {
 					listenerNames.add(label);
 				}

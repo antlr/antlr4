@@ -29,6 +29,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -78,6 +79,20 @@ public class SemanticPipeline {
 		// don't continue if we get errors in this basic check
 		if ( false ) return;
 
+		// COLLECT RULE OBJECTS
+		RuleCollector ruleCollector = new RuleCollector(g);
+		ruleCollector.process(g.ast);
+
+		// TRANSFORM LEFT-RECURSIVE RULES
+		LeftRecursiveRuleTransformer lrtrans =
+			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules, g.tool);
+		lrtrans.translateLeftRecursiveRules();
+
+		// STORE RULES IN GRAMMAR
+		for (Rule r : ruleCollector.rules) {
+			g.defineRule(r);
+		}
+
 		// COLLECT SYMBOLS: RULES, ACTIONS, TERMINALS, ...
 		SymbolCollector collector = new SymbolCollector(g);
 		collector.process(g.ast);
@@ -86,14 +101,6 @@ public class SemanticPipeline {
 		SymbolChecks symcheck = new SymbolChecks(g, collector);
 		symcheck.process(); // side-effect: strip away redef'd rules.
 
-		// don't continue if we get symbol errors
-		//if ( ErrorManager.getNumErrors()>0 ) return;
-		// hmm...we don't get missing arg errors and such if we bail out here
-
-		// STORE RULES/ACTIONS/SCOPES IN GRAMMAR
-		for (Rule r : collector.rules) {
-			g.defineRule(r);
-		}
 		for (GrammarAST a : collector.namedActions) {
 			g.defineAction(a);
 		}

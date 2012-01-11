@@ -192,6 +192,11 @@ public class Rule implements AttributeResolver {
         return defs;
     }
 
+	public boolean hasAltSpecificContexts() {
+		return getAltLabels()!=null;
+	}
+
+	/** Get -> labels. */
 	public List<String> getAltLabels() {
 		List<String> labels = new ArrayList<String>();
 		for (int i=1; i<=numberOfAlts; i++) {

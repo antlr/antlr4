@@ -52,11 +52,11 @@ private int currentOuterAltNumber; // which outer alt of rule?
 public int numAlts;  // how many alts for this rule total?
 
 public void setTokenPrec(GrammarAST t, int alt) {}
-public void binaryAlt(GrammarAST altTree, int alt) {}
-public void ternaryAlt(GrammarAST altTree, int alt) {}
-public void prefixAlt(GrammarAST altTree, int alt) {}
-public void suffixAlt(GrammarAST altTree, int alt) {}
-public void otherAlt(GrammarAST altTree, int alt) {}
+public void binaryAlt(AltAST altTree, int alt) {}
+public void ternaryAlt(AltAST altTree, int alt) {}
+public void prefixAlt(AltAST altTree, int alt) {}
+public void suffixAlt(AltAST altTree, int alt) {}
+public void otherAlt(AltAST altTree, int alt) {}
 public void setReturnValues(GrammarAST t) {}
 }
 
@@ -115,17 +115,17 @@ ruleBlock returns [boolean isLeftRec]
 /** An alt is either prefix, suffix, binary, or ternary operation or "other" */
 outerAlternative returns [boolean isLeftRec]
     :   (binaryMultipleOp)=> binaryMultipleOp
-                             {binaryAlt($start, currentOuterAltNumber); $isLeftRec=true;}
+                             {binaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
     |   (binary)=>           binary
-                             {binaryAlt($start, currentOuterAltNumber); $isLeftRec=true;}
+                             {binaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
     |   (ternary)=>          ternary
-                             {ternaryAlt($start, currentOuterAltNumber); $isLeftRec=true;}
+                             {ternaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
     |   (prefix)=>           prefix
-                             {prefixAlt($start, currentOuterAltNumber);}
+                             {prefixAlt((AltAST)$start, currentOuterAltNumber);}
     |   (suffix)=>           suffix
-                             {suffixAlt($start, currentOuterAltNumber); $isLeftRec=true;}
+                             {suffixAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
     |   ^(ALT element+) // "other" case
-                             {otherAlt($start, currentOuterAltNumber);}
+                             {otherAlt((AltAST)$start, currentOuterAltNumber);}
     ;
 
 binary
@@ -133,7 +133,12 @@ binary
 	;
 
 binaryMultipleOp
-	:	^( ALT recurse ^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ ) recurse ACTION? )
+	:	^( ALT recurse
+            (   ^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ )
+            |   ^(SET (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);})
+            )
+            recurse ACTION?
+         )
 	;
 
 ternary

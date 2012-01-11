@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,37 +27,45 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.misc;
+package org.antlr.v4.tool;
+
+import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-/** I need the get-element-i functionality so I'm subclassing
- *  LinkedHashMap.
- */
-public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
-	/** Track the elements as they are added to the set */
-	protected List<K> elements = new ArrayList<K>();
+public class LeftRecursiveRule extends Rule {
+	public List<LeftRecursiveRuleAltInfo> recPrimaryAlts;
+	public OrderedHashMap<Integer, LeftRecursiveRuleAltInfo> recOpAlts;
 
-	public K getKey(int i) { return elements.get(i); }
-
-	public V getElement(int i) { return get(elements.get(i)); }
-
-	@Override
-	public V put(K key, V value) {
-		elements.add(key);
-		return super.put(key, value);
+	public LeftRecursiveRule(Grammar g, String name, RuleAST ast) {
+		super(g, name, ast, 1);
+		alt = new Alternative[numberOfAlts+1]; // always just one
+		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
 	}
 
 	@Override
-	public V remove(Object key) {
-		throw new UnsupportedOperationException();
+	public boolean hasAltSpecificContexts() {
+		return super.hasAltSpecificContexts() || getAltLabels()!=null;
 	}
 
+	/** Get -> labels and also those we deleted for left-recursive rules. */
 	@Override
-	public void clear() {
-		elements.clear();
-		super.clear();
+	public List<String> getAltLabels() {
+		List<String> labels = new ArrayList<String>();
+		List<String> normalAltLabels = super.getAltLabels();
+		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
+		for (int i = 0; i < recPrimaryAlts.size(); i++) {
+			LeftRecursiveRuleAltInfo altInfo = recPrimaryAlts.get(i);
+			if ( altInfo.altLabel!=null ) labels.add(altInfo.altLabel);
+		}
+		for (int i = 0; i < recOpAlts.size(); i++) {
+			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
+			if ( altInfo.altLabel!=null ) labels.add(altInfo.altLabel);
+		}
+		if ( labels.size()==0 ) return null;
+		return labels;
 	}
 }

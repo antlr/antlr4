@@ -30,17 +30,21 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.PredAST;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,12 +148,110 @@ public class OutputModelController {
 	 *  output object with stuff found in r.
 	 */
 	public void buildRuleFunction(Parser parser, Rule r) {
-		CodeGenerator gen = delegate.getGenerator();
 		RuleFunction function = rule(r);
 		parser.funcs.add(function);
-
-		// TRIGGER factory functions for rule alts, elements
 		pushCurrentRule(function);
+
+		if ( r instanceof LeftRecursiveRule ) {
+			buildLeftRecursiveRuleFunction((LeftRecursiveRule)r,
+										   (LeftRecursiveRuleFunction)function);
+		}
+		else {
+			buildNormalRuleFunction(r, function);
+		}
+
+		Grammar g = getGrammar();
+		for (ActionAST a : r.actions) {
+			if ( a instanceof PredAST ) {
+				PredAST p = (PredAST)a;
+				RuleSempredFunction rsf = parser.sempredFuncs.get(r);
+				if ( rsf==null ) {
+					rsf = new RuleSempredFunction(delegate, r, function.ctxType);
+					parser.sempredFuncs.put(r, rsf);
+				}
+				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+			}
+		}
+
+		popCurrentRule();
+	}
+
+	public void buildLeftRecursiveRuleFunction(LeftRecursiveRule r, LeftRecursiveRuleFunction function) {
+		buildNormalRuleFunction(r, function);
+
+		// now inject code to start alts
+		CodeGenerator gen = delegate.getGenerator();
+		STGroup codegenTemplates = gen.templates;
+
+		// pick out alt(s) for primaries
+		CodeBlockForOuterMostAlt outerAlt = (CodeBlockForOuterMostAlt)function.code.get(0);
+		List<CodeBlockForAlt> primaryAltsCode = new ArrayList<CodeBlockForAlt>();
+		SrcOp primaryStuff = outerAlt.ops.get(0);
+		if ( primaryStuff instanceof Choice ) {
+			Choice primaryAltBlock = (Choice) primaryStuff;
+			primaryAltsCode.addAll(primaryAltBlock.alts);
+		}
+		else { // just a single alt I guess; no block
+			primaryAltsCode.add((CodeBlockForAlt)primaryStuff);
+		}
+
+		// pick out alt(s) for op alts
+		StarBlock opAltStarBlock = (StarBlock)outerAlt.ops.get(1);
+		CodeBlockForAlt altForOpAltBlock = opAltStarBlock.alts.get(0);
+		List<CodeBlockForAlt> opAltsCode = new ArrayList<CodeBlockForAlt>();
+		SrcOp opStuff = altForOpAltBlock.ops.get(0);
+		if ( opStuff instanceof AltBlock ) {
+			AltBlock opAltBlock = (AltBlock)opStuff;
+			opAltsCode.addAll(opAltBlock.alts);
+		}
+		else { // just a single alt I guess; no block
+			opAltsCode.add((CodeBlockForAlt)opStuff);
+		}
+
+		// Insert code in front of each primary alt to create specialized ctx if there was a label
+		for (int i = 0; i < primaryAltsCode.size(); i++) {
+			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
+			if ( altInfo.altLabel==null ) continue;
+			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
+			altActionST.add("ctxName", altInfo.altLabel);
+			Action altAction = new Action(delegate, altActionST.render());
+			CodeBlockForAlt alt = primaryAltsCode.get(i);
+			alt.insertOp(0, altAction);
+		}
+
+		// Insert code to set ctx.stop after primary block and before op * loop
+		ST setStopTokenAST = codegenTemplates.getInstanceOf("recRuleSetStopToken");
+		Action setStopTokenAction = new Action(delegate, setStopTokenAST.render());
+		outerAlt.insertOp(1, setStopTokenAction);
+
+		// Insert code to set _prevctx at start of * loop
+		ST setPrevCtx = codegenTemplates.getInstanceOf("recRuleSetPrevCtx");
+		Action setPrevCtxAction = new Action(delegate, setPrevCtx.render());
+		opAltStarBlock.addIterationOp(setPrevCtxAction);
+
+		// Insert code in front of each op alt to create specialized ctx if there was a label
+		for (int i = 0; i < opAltsCode.size(); i++) {
+			ST altActionST;
+			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
+			if ( altInfo.altLabel!=null ) {
+				altActionST = codegenTemplates.getInstanceOf("recRuleLabeledAltStartAction");
+				altActionST.add("ctxName", altInfo.altLabel);
+			}
+			else {
+				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
+				altActionST.add("ctxName", r.name);
+			}
+			altActionST.add("ruleName", r.name);
+			altActionST.add("label", altInfo.leftRecursiveRuleRefLabel);
+			Action altAction = new Action(delegate, altActionST.render());
+			CodeBlockForAlt alt = opAltsCode.get(i);
+			alt.insertOp(0, altAction);
+		}
+	}
+
+	public void buildNormalRuleFunction(Rule r, RuleFunction function) {
+		CodeGenerator gen = delegate.getGenerator();
+		// TRIGGER factory functions for rule alts, elements
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(r.ast.token.getInputStream());
 		GrammarAST blk = (GrammarAST)r.ast.getFirstChildWithType(ANTLRParser.BLOCK);
 		CommonTreeNodeStream nodes = new CommonTreeNodeStream(adaptor,blk);
@@ -165,27 +267,6 @@ public class OutputModelController {
 		function.ctxType = gen.target.getRuleFunctionContextStructName(function);
 
 		function.postamble = rulePostamble(function, r);
-
-		Grammar g = getGrammar();
-		for (ActionAST a : r.actions) {
-			if ( a instanceof PredAST ) {
-				PredAST p = (PredAST)a;
-				RuleSempredFunction rsf = parser.sempredFuncs.get(r);
-				if ( rsf==null ) {
-					rsf = new RuleSempredFunction(delegate, r, function.ctxType);
-					parser.sempredFuncs.put(r, rsf);
-				}
-				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
-			}
-		}
-
-		// we will usually have to build one of these because of labels
-		// and it will come in very handy for visitors on the parse tree.
-		// I think I will just always generate this structure now.
-		// It makes it easier for code generation as well because every
-		// rule context has a real name.
-		//if ( function.ruleCtx.isEmpty() ) function.ruleCtx = null;
-		popCurrentRule();
 	}
 
 	public void buildLexerRuleActions(Lexer lexer, Rule r) {

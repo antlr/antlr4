@@ -140,9 +140,9 @@ public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modi
 public void finishLexerRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
 public void ruleCatch(GrammarAST arg, ActionAST action) { }
 public void finallyAction(ActionAST action) { }
-/** outermost alt */
+public void discoverOuterAlt(AltAST alt) { }
+public void finishOuterAlt(AltAST alt) { }
 public void discoverAlt(AltAST alt) { }
-/** outermost alt */
 public void finishAlt(AltAST alt) { }
 
 public void ruleRef(GrammarAST ref, ActionAST arg) { }
@@ -246,9 +246,9 @@ currentOuterAltNumber=0;
 			{currentRuleName=$TOKEN_REF.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
       		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, (GrammarAST)input.LT(1));}
-      		ruleBlock
+      		lexerRuleBlock
       		{
-      		finishLexerRule((RuleAST)$RULE, $TOKEN_REF, $ruleBlock.start);
+      		finishLexerRule((RuleAST)$RULE, $TOKEN_REF, $lexerRuleBlock.start);
       		currentRuleName=null; currentRuleAST=null;
       		}
       	 )
@@ -313,6 +313,17 @@ ruleModifier
     | FRAGMENT
     ;
 
+lexerRuleBlock
+    :	^(	BLOCK
+    		(	{
+    			currentOuterAltRoot = (GrammarAST)input.LT(1);
+				currentOuterAltNumber++;
+				}
+    			lexerOuterAlternative
+    		)+
+    	)
+    ;
+
 ruleBlock
     :	^(	BLOCK
     		(	{
@@ -324,19 +335,39 @@ ruleBlock
     	)
     ;
 
+lexerOuterAlternative
+@init {
+	discoverOuterAlt((AltAST)$start);
+}
+@after {
+	finishOuterAlt((AltAST)$start);
+}
+	:	lexerAlternative 
+	;
+
+
 outerAlternative
+@init {
+	discoverOuterAlt((AltAST)$start);
+}
+@after {
+	finishOuterAlt((AltAST)$start);
+}
+	:	alternative 
+	;
+
+lexerAlternative
+	:	alternative
+    ;
+
+alternative
 @init {
 	discoverAlt((AltAST)$start);
 }
 @after {
 	finishAlt((AltAST)$start);
 }
-	:	alternative
-	;
-
-alternative
-	:	^(LEXER_ALT_ACTION alternative lexerAction*)
-	|	^(ALT element+)
+	:	^(ALT element+)
 	|	^(ALT EPSILON)
     ;
 

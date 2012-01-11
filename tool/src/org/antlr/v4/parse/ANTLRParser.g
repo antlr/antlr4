@@ -535,7 +535,9 @@ ruleAltList
 	;
 
 labeledAlt
-	:	alternative	(POUND id {((AltAST)$alternative.tree).altLabel=$id.tree;})?
+	:	alternative
+		(	RARROW! id! {((AltAST)$alternative.tree).altLabel=$id.tree;}
+		)?
 	;
 
 

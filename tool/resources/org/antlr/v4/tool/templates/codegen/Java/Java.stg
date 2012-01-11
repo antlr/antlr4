@@ -181,7 +181,9 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 }
 >>
 
-LRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
+LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
+    namedActions,finallyAction,postamble) ::=
+<<
 
 <ruleCtx>
 <altLabelCtxs; separator="\n">
@@ -195,7 +197,7 @@ LRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
-		<code>
+	    <code>
 		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
@@ -348,16 +350,13 @@ case <i>:
 
 // TODO: we we need uniqueID? a single _alt might work
 
-StarBlock(choice, alts, sync) ::= <<
+StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
 int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
     if ( _alt<choice.uniqueID>==1 ) {
-        <if(choice.isForRecursiveRule)>
-		if ( _parseListeners!=null ) triggerExitRuleEvent();
-		_prevctx = _localctx;
-        <endif>
+	    <iteration>
         <alts> <! should only be one !>
     }
 	setState(<choice.loopBackStateNumber>);
@@ -501,7 +500,8 @@ ListLabelName(label)		  ::= "<label>_list"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
+StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,
+           superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
@@ -509,7 +509,7 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 		super(parent, state);
 		<s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
-<if(!visitorDispatchMethods)> <! don't need copy if no subclasses !>
+<if(s.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <s.name>() { }
 	public void copyFrom(<s.name> ctx) {
 		super.copyFrom(ctx);
@@ -546,12 +546,33 @@ recRuleArg()						  ::= "$_p"
 recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
 recRuleSetResultAction()			  ::= "$tree=$<ruleName>.tree;"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
+recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
+
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 _localctx = new <ctxName>Context(_parentctx, _startState, _p);
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
 >>
+
+recRuleLabeledAltStartAction(ruleName, ctxName, label) ::= <<
+_localctx = new <ctxName>Context(new <ruleName>Context(_parentctx, _startState, _p));
+_localctx.addChild(_prevctx);
+<if(label)>_localctx.<label> = _prevctx;<endif>
+pushNewRecursionContext(_localctx, RULE_<ruleName>);
+>>
+
+recRuleReplaceContext(ctxName) ::= <<
+_localctx = new <ctxName>Context(_localctx);
+_ctx = _localctx;
+_prevctx = _localctx;
+>>
+
+recRuleSetPrevCtx() ::= <<
+if ( _parseListeners!=null ) triggerExitRuleEvent();
+_prevctx = _localctx;
+>>
+
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>

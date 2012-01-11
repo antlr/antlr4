@@ -229,7 +229,7 @@ public class TestATNSerialization extends BaseTest {
 			"4:PLUS_BLOCK_START 0\n" +
 			"5:BLOCK_END 0\n" +
 			"6:PLUS_LOOP_BACK 0\n" +
-			"7:LOOP_END 0\n" +
+			"7:LOOP_END 0 6\n" +
 			"8:BASIC 0\n" +
 			"9:BASIC 0\n" +
 			"10:BASIC 0\n" +
@@ -406,7 +406,7 @@ public class TestATNSerialization extends BaseTest {
 			"5:PLUS_BLOCK_START 0\n" +
 			"6:BLOCK_END 0\n" +
 			"7:PLUS_LOOP_BACK 0\n" +
-			"8:LOOP_END 0\n" +
+			"8:LOOP_END 0 6\n" +
 			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0,0\n" +

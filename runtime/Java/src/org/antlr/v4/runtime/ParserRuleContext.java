@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.stringtemplate.v4.ST;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +101,6 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public int s = -1;
 
 	public Symbol start, stop;
-	public ST st;
 
 	/** Set during parsing to identify which rule parser is in. */
 	public int ruleIndex;
@@ -112,7 +110,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	public ParserRuleContext() { }
 
-	/** COPY a ctx (it deliberately not using copy constructor) */
+	/** COPY a ctx (I'm deliberately not using copy constructor) */
 	public void copyFrom(ParserRuleContext<Symbol> ctx) {
 		// from RuleContext
 		this.parent = ctx.parent;
@@ -121,16 +119,15 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 		this.start = ctx.start;
 		this.stop = ctx.stop;
-		this.st = ctx.st;
 		this.ruleIndex = ctx.ruleIndex;
 	}
 
-	public ParserRuleContext(@Nullable ParserRuleContext parent, int invokingStateNumber, int stateNumber) {
+	public ParserRuleContext(@Nullable ParserRuleContext<Symbol> parent, int invokingStateNumber, int stateNumber) {
 		super(parent, invokingStateNumber);
 		this.s = stateNumber;
 	}
 
-	public ParserRuleContext(@Nullable ParserRuleContext parent, int stateNumber) {
+	public ParserRuleContext(@Nullable ParserRuleContext<Symbol> parent, int stateNumber) {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
@@ -150,7 +147,8 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
-	public void addChild(TerminalNode<?> t) {
+	/** Does not set parent link; other add methods do */
+	public void addChild(TerminalNode<Symbol> t) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(t);
 	}
@@ -175,16 +173,16 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 //		states.add(s);
 //	}
 
-	public void addChild(Token matchedToken) {
-		TerminalNodeImpl<?> t = new TerminalNodeImpl<Token>(matchedToken);
-		t.parent = this;
+	public void addChild(Symbol matchedToken) {
+		TerminalNodeImpl<Symbol> t = new TerminalNodeImpl<Symbol>(matchedToken);
 		addChild(t);
+		t.parent = this;
 	}
 
-	public void addErrorNode(Token badToken) {
-		TerminalNodeImpl<?> t = new ErrorNodeImpl<Token>(badToken);
-		t.parent = this;
+	public void addErrorNode(Symbol badToken) {
+		TerminalNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
 		addChild(t);
+		t.parent = this;
 	}
 
 	@Override
@@ -198,7 +196,6 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	@Override
 	public int getRuleIndex() { return ruleIndex; }
 
-	public ST getTemplate() { return st; }
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }
 
@@ -206,7 +203,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
 		if ( recog==null ) return super.toString(recog, stop);
 		StringBuilder buf = new StringBuilder();
-		ParserRuleContext<?> p = this;
+		ParserRuleContext p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
 			ATN atn = recog.getATN();
@@ -217,21 +214,20 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 //				ATNState invoker = atn.states.get(ctx.invokingState);
 //				RuleTransition rt = (RuleTransition)invoker.transition(0);
 //				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
-			p = (ParserRuleContext<?>)p.parent;
+			p = (ParserRuleContext)p.parent;
 		}
 		buf.append("]");
 		return buf.toString();
 	}
 
-    /** Used for rule context info debugging during runtime, not so much for ATN debugging */
+    /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
     public String toInfoString(Parser recognizer) {
-        List<String> rules = recognizer.getRuleInvocationStack();
+        List<String> rules = recognizer.getRuleInvocationStack(this);
         Collections.reverse(rules);
         return "ParserRuleContext"+rules+"{" +
                 "altNum=" + altNum +
                 ", start=" + start +
                 ", stop=" + stop +
-                ", st=" + st +
                 '}';
     }
 }

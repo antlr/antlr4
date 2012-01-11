@@ -463,9 +463,12 @@ public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Toke
 	 *  This is very useful for error messages.
 	 */
 	public List<String> getRuleInvocationStack() {
+		return getRuleInvocationStack(_ctx);
+	}
+
+	public List<String> getRuleInvocationStack(RuleContext p) {
 		String[] ruleNames = getRuleNames();
 		List<String> stack = new ArrayList<String>();
-		RuleContext p = _ctx;
 		while ( p!=null ) {
 			// compute what follows who invoked us
 			stack.add(ruleNames[p.getRuleIndex()]);

@@ -48,7 +48,7 @@ ebnfBlockSet
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);
 }
-	:	^(ebnfSuffix blockSet) -> ^(ebnfSuffix ^(BLOCK<BlockAST> ^(ALT blockSet)))
+	:	^(ebnfSuffix blockSet) -> ^(ebnfSuffix ^(BLOCK<BlockAST> ^(ALT<AltAST> blockSet)))
 	;
 
 ebnfSuffix

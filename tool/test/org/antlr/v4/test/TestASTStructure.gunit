@@ -142,7 +142,6 @@ element:
 	"x=ID*"		-> (* (BLOCK (ALT (= x ID))))
 	"x=b"		-> (= x b)
 	"x=(A|B)"	-> (= x (BLOCK (ALT A) (ALT B)))
-	"x=(A|B)^"	-> (= x (^ (BLOCK (ALT A) (ALT B))))
 	"x=~(A|B)"	-> (= x (~ (SET A B)))
 	"x+=~(A|B)"	-> (+= x (~ (SET A B)))
 	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (SET A B))))))
@@ -150,5 +149,4 @@ element:
 	"x+=ID*"	-> (* (BLOCK (ALT (+= x ID))))
 	"x+='int'*"	-> (* (BLOCK (ALT (+= x 'int'))))
 	"x+=b+"		-> (+ (BLOCK (ALT (+= x b))))
-	"('*'^)*"	-> (* (BLOCK (ALT (^ '*'))))
 	"({blort} 'x')*" -> (* (BLOCK (ALT {blort} 'x')))

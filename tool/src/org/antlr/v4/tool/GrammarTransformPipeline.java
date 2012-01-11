@@ -29,13 +29,15 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.DoubleKeyMap;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.BlockSetTransformer;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.ast.*;
 
 import java.util.*;
@@ -56,16 +58,13 @@ public class GrammarTransformPipeline {
         tool.log("grammar", "before: "+root.toStringTree());
 
         integrateImportedGrammars(g);
-		if ( root.grammarType==ANTLRParser.PARSER || root.grammarType==ANTLRParser.COMBINED ) {
-			translateLeftRecursiveRules(root);
-		}
 		reduceBlocksToSets(root);
         expandParameterizedLoops(root);
 
         tool.log("grammar", "after: "+root.toStringTree());
 	}
 
-	public void reduceBlocksToSets(GrammarRootAST root) {
+	public void reduceBlocksToSets(GrammarAST root) {
 		org.antlr.runtime.tree.CommonTreeNodeStream nodes =
 			new org.antlr.runtime.tree.CommonTreeNodeStream(root);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
@@ -82,7 +81,7 @@ public class GrammarTransformPipeline {
      *  Parameter must be a token.
      *  todo: do we want?
      */
-    public void expandParameterizedLoops(GrammarRootAST root) {
+    public void expandParameterizedLoops(GrammarAST root) {
         TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
         v.visit(root, new TreeVisitorAction() {
             public Object pre(Object t) {
@@ -99,84 +98,6 @@ public class GrammarTransformPipeline {
         // todo: update grammar, alter AST
         return t;
     }
-
-	public void translateLeftRecursiveRules(GrammarRootAST ast) {
-		// TODO: what about -language foo cmd line?
-		String language = Grammar.getLanguageOption(ast);
-		// translate all recursive rules
-		List<String> leftRecursiveRuleNames = new ArrayList<String>();
-		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE)) {
-			String ruleName = r.getChild(0).getText();
-			if ( !Character.isUpperCase(ruleName.charAt(0)) ) {
-				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r, ruleName) ) {
-					boolean fitsPattern = translateLeftRecursiveRule(ast, r, language);
-					if ( fitsPattern ) leftRecursiveRuleNames.add(ruleName);
-				}
-			}
-		}
-		// update all refs to recursive rules to have [0] argument
-		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
-			if ( r.getParent().getType()==ANTLRParser.RULE ) continue; // must be rule def
-			if ( r.getChildCount()>0 ) continue; // already has arg; must be in rewritten rule
-			if ( leftRecursiveRuleNames.contains(r.getText()) ) {
-				// found ref to recursive rule not already rewritten with arg
-				ActionAST arg = new ActionAST(new CommonToken(ANTLRParser.ARG_ACTION, "0"));
-				r.addChild(arg);
-			}
-		}
-	}
-
-	/** Return true if successful */
-	public boolean translateLeftRecursiveRule(GrammarRootAST ast,
-											  GrammarAST ruleAST,
-											  String language)
-	{
-		//tool.log("grammar", ruleAST.toStringTree());
-		TokenStream tokens = ast.tokens;
-		Grammar g = ast.g;
-		String ruleName = ruleAST.getChild(0).getText();
-		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
-			new LeftRecursiveRuleAnalyzer(tokens, ruleAST, tool, ruleName, language);
-		boolean isLeftRec = false;
-		try {
-//			System.out.println("TESTING ---------------\n"+
-//							   leftRecursiveRuleWalker.text(ruleAST));
-			isLeftRec = leftRecursiveRuleWalker.rec_rule();
-		}
-		catch (RecognitionException re) {
-			isLeftRec = false; // didn't match; oh well
-		}
-		if ( !isLeftRec ) return false;
-
-		// replace old rule
-		GrammarAST RULES = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);
-		String newRuleText = leftRecursiveRuleWalker.getArtificialOpPrecRule();
-//		System.out.println("created: "+newRuleText);
-		GrammarAST t = parseArtificialRule(g, newRuleText);
-		RULES.setChild(ruleAST.getChildIndex(), t);
-		tool.log("grammar", "added: "+t.toStringTree());
-		return true;
-	}
-
-	public GrammarAST parseArtificialRule(final Grammar g, String ruleText) {
-		ANTLRLexer lexer = new ANTLRLexer(new ANTLRStringStream(ruleText));
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		ToolANTLRParser p = new ToolANTLRParser(tokens, tool);
-		p.setTreeAdaptor(adaptor);
-		try {
-			ParserRuleReturnScope r = p.rule();
-			GrammarAST tree = (GrammarAST) r.getTree();
-			setGrammarPtr(g, tree);
-			return tree;
-		}
-		catch (Exception e) {
-			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR,
-								  "error parsing rule created during left-recursion detection: "+ruleText,
-								  e);
-		}
-		return null;
-	}
 
     /** Utility visitor that sets grammar ptr in each node */
 	public static void setGrammarPtr(final Grammar g, GrammarAST tree) {

@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,37 +27,26 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.misc;
+package org.antlr.v4.analysis;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import org.antlr.v4.tool.ast.AltAST;
 
-/** I need the get-element-i functionality so I'm subclassing
- *  LinkedHashMap.
- */
-public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
-	/** Track the elements as they are added to the set */
-	protected List<K> elements = new ArrayList<K>();
+public class LeftRecursiveRuleAltInfo {
+	public int alt;
+	public String leftRecursiveRuleRefLabel;
+	public String altLabel;
+	public String altText;
+	public AltAST altAST;
+	public int nextPrec;
 
-	public K getKey(int i) { return elements.get(i); }
-
-	public V getElement(int i) { return get(elements.get(i)); }
-
-	@Override
-	public V put(K key, V value) {
-		elements.add(key);
-		return super.put(key, value);
+	public LeftRecursiveRuleAltInfo(int alt, String altText) {
+		this(alt, altText, null, null);
 	}
 
-	@Override
-	public V remove(Object key) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void clear() {
-		elements.clear();
-		super.clear();
+	public LeftRecursiveRuleAltInfo(int alt, String altText, String leftRecursiveRuleRefLabel, String altLabel) {
+		this.alt = alt;
+		this.altText = altText;
+		this.leftRecursiveRuleRefLabel = leftRecursiveRuleRefLabel;
+		this.altLabel = altLabel;
 	}
 }

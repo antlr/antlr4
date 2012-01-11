@@ -32,16 +32,25 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Loop extends Choice {
 	public int blockStartStateNumber;
 	public int loopBackStateNumber;
 	public int exitAlt;
+
+	@ModelElement public List<SrcOp> iteration;
+
 	public Loop(OutputModelFactory factory,
 				GrammarAST blkOrEbnfRootAST,
 				List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST, alts);
+	}
+
+	public void addIterationOp(SrcOp op) {
+		if ( iteration==null ) iteration = new ArrayList<SrcOp>();
+		iteration.add(op);
 	}
 }

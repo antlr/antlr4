@@ -30,8 +30,6 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.Rule;
@@ -53,11 +51,9 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public Grammar g;
 
 	// stuff to collect
-	public List<Rule> rules = new ArrayList<Rule>();
 	public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
 	public List<GrammarAST> qualifiedRulerefs = new ArrayList<GrammarAST>();
 	public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
-	public List<GrammarAST> labels = new ArrayList<GrammarAST>();
 	public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 	public Set<String> strings = new HashSet<String>();
 	public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
@@ -101,54 +97,18 @@ public class SymbolCollector extends GrammarTreeVisitor {
 							 List<GrammarAST> actions,
 							 GrammarAST block)
 	{
-		int numAlts = block.getChildCount();
-		Rule r = new Rule(g, ID.getText(), rule, numAlts);
-//		if ( g.isLexer() ) r.mode = currentModeName;
-//		if ( modifiers.size()>0 ) r.modifiers = modifiers;
-		rules.add(r);
-		currentRule = r;
-
-		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg.getText(), g.tool.errMgr);
-			r.args.type = AttributeDict.DictType.ARG;
-			r.args.ast = arg;
-			arg.resolver = r.alt[currentOuterAltNumber];
-		}
-
-		if ( returns!=null ) {
-			r.retvals = ScopeParser.parseTypedArgList(returns.getText(), g.tool.errMgr);
-			r.retvals.type = AttributeDict.DictType.RET;
-			r.retvals.ast = returns;
-		}
-
-		if ( locals!=null ) {
-			r.locals = ScopeParser.parseTypedArgList(locals.getText(), g.tool.errMgr);
-			r.locals.type = AttributeDict.DictType.LOCAL;
-			r.locals.ast = returns;
-		}
-
-		for (GrammarAST a : actions) {
-			// a = ^(AT ID ACTION)
-			ActionAST action = (ActionAST) a.getChild(1);
-			currentRule.namedActions.put(a.getChild(0).getText(), action);
-			action.resolver = currentRule;
-		}
+		currentRule = g.getRule(ID.getText());
 	}
 
 	@Override
 	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
 								  GrammarAST block)
 	{
-		int numAlts = block.getChildCount();
-		Rule r = new Rule(g, ID.getText(), rule, numAlts);
-		r.mode = currentModeName;
-		if ( modifiers.size()>0 ) r.modifiers = modifiers;
-		rules.add(r);
-		currentRule = r;
+		currentRule = g.getRule(ID.getText());
 	}
 
 	@Override
-	public void discoverAlt(AltAST alt) {
+	public void discoverOuterAlt(AltAST alt) {
 		currentRule.alt[currentOuterAltNumber].ast = alt;
 	}
 
@@ -180,7 +140,6 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void label(GrammarAST op, GrammarAST ID, GrammarAST element) {
 		LabelElementPair lp = new LabelElementPair(g, ID, element, op.getType());
 		currentRule.alt[currentOuterAltNumber].labelDefs.map(ID.getText(), lp);
-		labels.add(ID);
 	}
 
 	@Override

@@ -41,6 +41,7 @@ import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -61,9 +62,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	public RuleFunction rule(Rule r) {
-		GrammarAST optionNode = r.ast.getOption("simrecursion_");
-		if ( optionNode!=null && optionNode.getText().equals("true") ) {
-			return new LRecursiveRuleFunction(this, r);
+		if ( r instanceof LeftRecursiveRule ) {
+			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
 		}
 		else {
 			return new RuleFunction(this, r);

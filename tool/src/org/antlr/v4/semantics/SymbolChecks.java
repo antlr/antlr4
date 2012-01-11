@@ -77,15 +77,15 @@ public class SymbolChecks {
         // So, call order sensitive
 		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
 		// done in sem pipe for now
-        checkForRuleConflicts(collector.rules);         // sets nameToRuleMap
+        checkForRuleConflicts(g.rules.values());         // sets nameToRuleMap
 		checkActionRedefinitions(collector.namedActions);
         checkTokenAliasRedefinitions(collector.tokensDefs);
         //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
-        checkForLabelConflicts(collector.rules);
+        checkForLabelConflicts(g.rules.values());
     }
 
-    public void checkForRuleConflicts(List<Rule> rules) {
+    public void checkForRuleConflicts(Collection<Rule> rules) {
         if ( rules==null ) return;
         for (Rule r : rules) {
 			Rule prevRule = nameToRuleMap.get(r.name);
@@ -194,7 +194,7 @@ public class SymbolChecks {
      *  defined in surrounding rule.  Also they must have same type
      *  for repeated defs.
      */
-    public void checkForLabelConflicts(List<Rule> rules) {
+    public void checkForLabelConflicts(Collection<Rule> rules) {
         for (Rule r : rules) {
             checkForRuleArgumentAndReturnValueConflicts(r);
             Map<String, LabelElementPair> labelNameSpace =

@@ -32,35 +32,10 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 public class TestBasicSemanticErrors extends BaseTest {
-    static String[] A = {
-        // INPUT
-        "grammar A;\n" +
-        "\n" +
-        "\n" +
-        "a : ID<Foo> -> ID ;\n" +
-        "\n" +
-        "b : A^ | ((B!|C)) -> C;",
-        // YIELDS
-        "error(68): A.g:7:7: alts with rewrites can't use heterogeneous types left of ->\n" +
-		"error(78): A.g:9:4: AST operator with non-AST output option: ^\n" +
-		"error(78): A.g:9:11: AST operator with non-AST output option: !\n" +
-		"error(79): A.g:9:11: rule b alt 2 uses rewrite syntax and also an AST operator\n",
-
-        // INPUT
-        "tree grammar B;\n" +
-        "\n" +
-        "a : A;\n" +
-        "\n" +
-        "b : ^(. A) ;",
-        // YIELDS
-        "error(80): B.g:9:6: Wildcard invalid as root; wildcard can itself be a tree\n" +
-		"error(81): B.g:1:5: option output=template conflicts with tree grammar filter mode\n"
-    };
-
     static String[] U = {
         // INPUT
         "parser grammar U;\n" +
-        "options { foo=bar; k=\"*\";}\n" +
+        "options { foo=bar; k=\"3\";}\n" +
         "tokens {\n" +
         "        f='fkj';\n" +
         "        S = 'a';\n" +
@@ -87,26 +62,7 @@ public class TestBasicSemanticErrors extends BaseTest {
 		"warning(47): U.g:11:21: illegal option greedy\n" +
 		"warning(47): U.g:14:16: illegal option ick\n" +
 		"warning(47): U.g:15:16: illegal option x\n",
-
-        // INPUT
-        "tree grammar V;\n" +
-        "a : A\n" +
-        "  | A B -> template() \"kjsfdkdsj\" \n" +
-        "  ;",
-        // YIELDS
-        "warning(47): V.g:3:8: illegal option rewrite\n",
-
-
-        // INPUT
-        "tree grammar V;\n" +
-        "options { rewrite=true; }\n" +
-        "a : A\n" +
-        "  | A B -> template() \"kjsfdkdsj\" \n" +
-        "  ;",
-        // YIELDS
-        "warning(47): V.g:3:8: illegal option rewrite\n"
     };
 
-    @Test public void testA() { super.testErrors(A, false); }
 	@Test public void testU() { super.testErrors(U, false); }
 }

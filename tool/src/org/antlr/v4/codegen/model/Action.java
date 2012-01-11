@@ -29,9 +29,11 @@
 
 package org.antlr.v4.codegen.model;
 
+import org.antlr.runtime.CommonToken;
 import org.antlr.v4.codegen.ActionTranslator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.actions.ActionChunk;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -51,5 +53,13 @@ public class Action extends RuleElement {
 			chunks = new ArrayList<ActionChunk>();
 		}
 		//System.out.println("actions="+chunks);
+	}
+
+	public Action(OutputModelFactory factory, String action) {
+		super(factory,null);
+		RuleFunction rf = factory.getCurrentRuleFunction();
+		ActionAST ast = new ActionAST(new CommonToken(ANTLRParser.ACTION, action));
+		ast.resolver = rf.rule;
+		chunks = ActionTranslator.translateActionChunk(factory, rf, action, ast);
 	}
 }

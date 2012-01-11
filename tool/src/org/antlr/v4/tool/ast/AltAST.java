@@ -45,6 +45,7 @@ public class AltAST extends GrammarAST {
 	public AltAST(GrammarAST node) {
 		super(node);
 		this.alt = ((AltAST)node).alt;
+		this.altLabel = ((AltAST)node).altLabel;
 	}
 
 	public AltAST(Token t) { super(t); }

@@ -30,10 +30,12 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CodeBlock extends SrcOp {
 	public int codeBlockLevel;
@@ -68,6 +70,11 @@ public class CodeBlock extends SrcOp {
 	public void addOp(SrcOp op) {
 		if ( ops==null ) ops = new ArrayList<SrcOp>();
 		ops.add(op);
+	}
+
+	public void insertOp(int i, SrcOp op) {
+		if ( ops==null ) ops = new ArrayList<SrcOp>();
+		ops.add(i, op);
 	}
 
 	public void addOps(List<SrcOp> ops) {

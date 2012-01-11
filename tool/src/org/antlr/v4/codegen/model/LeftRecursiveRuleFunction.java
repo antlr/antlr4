@@ -29,11 +29,32 @@
 
 package org.antlr.v4.codegen.model;
 
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.decl.RuleContextDecl;
+import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
+import org.stringtemplate.v4.misc.MultiMap;
 
-public class LRecursiveRuleFunction extends RuleFunction {
-	public LRecursiveRuleFunction(OutputModelFactory factory, Rule r) {
+import java.util.Iterator;
+import java.util.Set;
+
+public class LeftRecursiveRuleFunction extends RuleFunction {
+	public LeftRecursiveRuleFunction(OutputModelFactory factory, LeftRecursiveRule r) {
 		super(factory, r);
+
+		// Since we delete x=lr, we have to manually add decls for all labels on left-recur refs
+		CodeGenerator gen = factory.getGenerator();
+		MultiMap<String,LabelElementPair> labelDefs = r.alt[1].labelDefs;
+		Set<String> labels = labelDefs.keySet();
+		for (Iterator<String> iterator = labels.iterator(); iterator.hasNext(); ) {
+			String label = iterator.next();
+			LabelElementPair l = r.getAnyLabelDef(label);
+			Rule targetRule = factory.getGrammar().getRule(l.element.getText());
+			String ctxName = gen.target.getRuleFunctionContextStructName(targetRule);
+			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+			addContextDecl(d);
+		}
 	}
 }

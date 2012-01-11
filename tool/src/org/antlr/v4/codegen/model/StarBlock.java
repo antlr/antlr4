@@ -31,23 +31,18 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
-import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 
 public class StarBlock extends Loop {
 	public String loopLabel;
-	public boolean isForRecursiveRule;
 
 	public StarBlock(OutputModelFactory factory,
 					 GrammarAST blkOrEbnfRootAST,
 					 List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST, alts);
-		BlockAST blk = (BlockAST)ast.getChild(0);
-		GrammarAST optionNode = blk.getOption("simrecursion_");
-		isForRecursiveRule = optionNode!=null && optionNode.getText().equals("true");
 		loopLabel = factory.getGenerator().target.getLoopLabel(blkOrEbnfRootAST);
 		StarLoopEntryState star = (StarLoopEntryState)blkOrEbnfRootAST.atnState;
 		loopBackStateNumber = star.loopBackState.stateNumber;

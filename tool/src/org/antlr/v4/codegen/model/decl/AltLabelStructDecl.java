@@ -30,22 +30,13 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.VisitorDispatchMethod;
 import org.antlr.v4.tool.Rule;
 
-import java.util.ArrayList;
-
+/** A StructDecl to handle a -> label on alt */
 public class AltLabelStructDecl extends StructDecl {
 	public String label;
 	public AltLabelStructDecl(OutputModelFactory factory, Rule r, String label) {
 		super(factory, r);
 		this.label = label;
-	}
-
-	@Override
-	public void addVisitorDispatchMethods(Rule r) {
-		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
-		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, true));
-		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
 	}
 }

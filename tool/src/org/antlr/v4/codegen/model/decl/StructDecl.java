@@ -46,6 +46,7 @@ import java.util.List;
  */
 public class StructDecl extends Decl {
 	public String superClass;
+	public boolean provideCopyFrom;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
@@ -55,15 +56,13 @@ public class StructDecl extends Decl {
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
 		addVisitorDispatchMethods(r);
+		provideCopyFrom = r.hasAltSpecificContexts();
 	}
 
 	public void addVisitorDispatchMethods(Rule r) {
-		List<String> labels = r.getAltLabels();
-		if ( labels==null ) {
-			visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
-			visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, true));
-			visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
-		}
+		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
+		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, true));
+		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
 	}
 
 	public void addDecl(Decl d) { attrs.add(d); }

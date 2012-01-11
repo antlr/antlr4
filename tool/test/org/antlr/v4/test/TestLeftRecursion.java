@@ -16,8 +16,18 @@ public class TestLeftRecursion extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "s", "x y z", debug);
-		String expecting = "(s (a (a (a x) y) z))\n";
+								  "s", "x", debug);
+		String expecting = "(s (a x))\n";
+		assertEquals(expecting, found);
+
+		found = execParser("T.g", grammar, "TParser", "TLexer",
+						   "s", "x y", debug);
+		expecting = "(s (a (a x) y))\n";
+		assertEquals(expecting, found);
+
+		found = execParser("T.g", grammar, "TParser", "TLexer",
+						   "s", "x y z", debug);
+		expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
 	}
 
