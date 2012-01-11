@@ -1,12 +1,13 @@
 grammar U;
-s : '{' stat* '}' ;
-// if x then break else if y then return else break
-// still ambig: if x then if y then break else break
-stat: 'if' ID 'then' stat ('else' stat)?
-    | 'break'
-    | 'return'
-    ;
-
-INT : '0'..'9'+ ;
+s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;
+e : e '.' ID
+  | e '.' 'this'
+  | '-' e
+  | e '*' e
+  | e ('+'|'-') e
+  | INT
+  | ID
+  ;
 ID : 'a'..'z'+ ;
-WS : (' '|'\n')+ {skip();} ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') {skip();} ;
