@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
 
 import java.io.BufferedWriter;
@@ -105,7 +106,9 @@ public class Trees {
 			else if ( t instanceof ParseTree.TerminalNode) {
 				Object symbol = ((ParseTree.TerminalNode<?>)t).getSymbol();
 				if (symbol instanceof Token) {
-					return ((Token)symbol).getText();
+					String s = ((Token)symbol).getText();
+					s = Utils.escapeWhitespace(s);
+					return s;
 				}
 			}
 		}

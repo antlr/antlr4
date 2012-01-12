@@ -7,6 +7,8 @@ Jan 11, 2012
 
   | a=e '*' b=e {$v = $a.v * $b.v;}     -> mult
 * Fixed a bug where visitTerminal got a NPE
+* in tree views, spaces/newlines were blanks. I converted to \n and middle dot
+  for space.
 
 Jan 5, 2012
 

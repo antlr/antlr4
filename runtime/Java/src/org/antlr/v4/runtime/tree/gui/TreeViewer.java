@@ -34,6 +34,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
@@ -211,6 +212,7 @@ public class TreeViewer extends JComponent {
 
 	public void text(Graphics g, String s, int x, int y) {
 //		System.out.println("drawing '"+s+"' @ "+x+","+y);
+		s = Utils.escapeWhitespace(s);
 		g.drawString(s, x, y);
 	}
 
