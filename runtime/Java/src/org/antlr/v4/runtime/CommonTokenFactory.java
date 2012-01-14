@@ -42,8 +42,6 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 		t.setCharPositionInLine(charPositionInLine);
 		if ( text!=null ) {
 			t.setText(text);
-			t.setStartIndex(-1);
-			t.setStopIndex(-1);
 		}
 		return t;
 	}
