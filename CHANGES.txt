@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger early access
 
+Jan 14, 2012
+
+* labels on tokens in left-recursive rules caused codegen exception.
+
 Jan 11, 2012
 
 * -> id labels work now for outermost alternatives, even for left-recursive

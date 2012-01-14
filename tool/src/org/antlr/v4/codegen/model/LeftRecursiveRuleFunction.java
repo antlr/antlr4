@@ -33,6 +33,7 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
 import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LabelType;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.misc.MultiMap;
@@ -52,9 +53,11 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 			String label = iterator.next();
 			LabelElementPair l = r.getAnyLabelDef(label);
 			Rule targetRule = factory.getGrammar().getRule(l.element.getText());
-			String ctxName = gen.target.getRuleFunctionContextStructName(targetRule);
-			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
-			addContextDecl(d);
+			if ( l.type == LabelType.RULE_LABEL ) {
+				String ctxName = gen.target.getRuleFunctionContextStructName(targetRule);
+				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+				addContextDecl(d);
+			}
 		}
 	}
 }
