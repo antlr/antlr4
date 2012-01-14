@@ -5,8 +5,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** A model object representing a parse tree listener file.
  *  These are the rules specific events triggered by a parse tree visitor.
@@ -14,7 +15,7 @@ import java.util.List;
 public class ListenerFile extends OutputFile {
 	public String grammarName;
 	public String parserName;
-	public List<String> listenerNames = new ArrayList<String>();
+	public Set<String> listenerNames = new HashSet<String>();
 //	public List<String> ruleNames = new ArrayList<String>();
 
 	@ModelElement public Action header;

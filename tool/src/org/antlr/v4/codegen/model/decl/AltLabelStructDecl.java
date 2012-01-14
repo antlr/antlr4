@@ -39,4 +39,19 @@ public class AltLabelStructDecl extends StructDecl {
 		super(factory, r);
 		this.label = label;
 	}
+
+	@Override
+	public int hashCode() {
+		return label.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) return true;
+		if ( obj.hashCode() != this.hashCode() ) return false;
+		if ( obj instanceof AltLabelStructDecl ) {
+			return label.equals(((AltLabelStructDecl)obj).label);
+		}
+		return false;
+	}
 }

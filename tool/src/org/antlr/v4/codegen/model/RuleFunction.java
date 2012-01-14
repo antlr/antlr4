@@ -49,7 +49,6 @@ public class RuleFunction extends OutputModelObject {
 	public String ctxType;
 	public Collection<String> ruleLabels;
 	public Collection<String> tokenLabels;
-	public List<String> elementsReferencedInRewrite;
 	public List<String> exceptions;
 	public ATNState startState;
 	public int index;
@@ -59,7 +58,7 @@ public class RuleFunction extends OutputModelObject {
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
 	@ModelElement public StructDecl ruleCtx;
-	@ModelElement public List<AltLabelStructDecl> altLabelCtxs;
+	@ModelElement public Set<AltLabelStructDecl> altLabelCtxs;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public Action finallyAction;
 	@ModelElement public List<SrcOp> postamble;
@@ -80,7 +79,7 @@ public class RuleFunction extends OutputModelObject {
 
 		List<String> labels = r.getAltLabels();
 		if ( labels!=null ) {
-			altLabelCtxs = new ArrayList<AltLabelStructDecl>();
+			altLabelCtxs = new HashSet<AltLabelStructDecl>();
 			for (String label : labels) {
 				altLabelCtxs.add(new AltLabelStructDecl(factory, r, label));
 			}

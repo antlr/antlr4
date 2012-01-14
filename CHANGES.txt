@@ -4,6 +4,7 @@ Jan 14, 2012
 
 * labels on tokens in left-recursive rules caused codegen exception.
 * leave start/stop char index alone in CommonTokenFactory; refers to original text.
+* reuse of -> label on multiple alts in rule caused dup ctx object defs.
 
 Jan 11, 2012
 
