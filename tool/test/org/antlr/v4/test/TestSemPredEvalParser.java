@@ -252,6 +252,32 @@ public class TestSemPredEvalParser extends BaseTest {
    		assertEquals(expecting, found);
    	}
 
+	@Test
+	public void testUnpredicatedPathsInAlt() throws Exception{
+		String grammar =
+			"grammar T;\n" +
+				"s : a {System.out.println(\"alt 1\");}\n" +
+				"  | b {System.out.println(\"alt 2\");}\n" +
+				"  ;\n" +
+				"a : {false}? ID INT\n" +
+				"  | ID INT\n" +
+				"  ;\n" +
+				"b : ID ID\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+								  "x 4", false);
+		String expecting =
+			"alt 1\n";
+		assertEquals(expecting, found);
+
+		expecting = "";
+		assertEquals(expecting, stderrDuringParse);
+	}
+
 	@Test public void testActionHidesPreds() throws Exception {
 		// can't see preds, resolves to first alt found (1 in this case)
 		String grammar =
