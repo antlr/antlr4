@@ -357,9 +357,42 @@ outerAlternative
 	;
 
 lexerAlternative
-	:	alternative
+	:	^(LEXER_ALT_ACTION lexerElements lexerAction+)
+    |   lexerElements
     ;
 
+lexerElements
+    :	^(ALT lexerElement+)
+    ;
+
+lexerElement
+	:	element
+	;
+
+labeledLexerElement
+    :   ^((ASSIGN|PLUS_ASSIGN) ID (lexerAtom|block))
+	;
+	
+lexerBlock
+ 	:	^(BLOCK lexerAlternative+)
+    ;
+
+lexerAtom
+    :   terminal
+    |   ^(NOT blockSet)
+    |   blockSet
+    |   ^(WILDCARD elementOptions)
+    |   WILDCARD
+    |	ARG_ACTION
+	;
+
+actionElement
+	:	ACTION
+	|   ^(ACTION elementOptions)
+	|   SEMPRED
+	|   ^(SEMPRED elementOptions)
+	;
+    
 alternative
 @init {
 	discoverAlt((AltAST)$start);
