@@ -85,8 +85,6 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
 
-	public List<SrcOp> forcedAction(GrammarAST ast) { return list(new ForcedAction(this, ast)); }
-
 	public List<SrcOp> sempred(GrammarAST ast) { return list(new SemPred(this, ast)); }
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {

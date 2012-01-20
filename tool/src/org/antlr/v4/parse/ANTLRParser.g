@@ -568,7 +568,7 @@ lexerAltList
 
 lexerAlt
 	:	lexerElements
-		(	lexerActions	-> ^(LEXER_ALT_ACTION lexerElements lexerActions)
+		(	lexerActions	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerActions)
 		|					-> lexerElements
 		)
 	;

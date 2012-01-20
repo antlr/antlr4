@@ -427,8 +427,6 @@ setState(<w.stateNumber>);
 
 Action(a, chunks) ::= "<chunks>"
 
-ForcedAction(a, chunks) ::= "<chunks>"
-
 ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks, failChunks) ::= <<

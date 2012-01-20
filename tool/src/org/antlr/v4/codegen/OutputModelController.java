@@ -289,7 +289,7 @@ public class OutputModelController {
 					raf = new RuleActionFunction(delegate, r, ctxType);
 					lexer.actionFuncs.put(r, raf);
 				}
-				raf.actions.put(g.lexerActions.get(a), new ForcedAction(delegate, a));
+				raf.actions.put(g.lexerActions.get(a), new Action(delegate, a));
 			}
 
 			if ( a instanceof PredAST ) {
@@ -302,7 +302,7 @@ public class OutputModelController {
 				// lexer sees {{...}} and {..} as same; neither are done until accept
 				RuleActionFunction raf = new RuleActionFunction(delegate, r, ctxType);
 				lexer.actionFuncs.put(r, raf);
-				raf.actions.put(g.lexerActions.get(a), new ForcedAction(delegate, a));
+				raf.actions.put(g.lexerActions.get(a), new Action(delegate, a));
 			}
 		}
 	}
