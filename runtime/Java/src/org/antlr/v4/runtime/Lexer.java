@@ -63,38 +63,38 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  something nonnull so that the auto token emit mechanism will not
 	 *  emit another token.
 	 */
-	public Token token;
+	public Token _token;
 
 	/** What character index in the stream did the current token start at?
 	 *  Needed, for example, to get the text for current token.  Set at
 	 *  the start of nextToken.
 	 */
-	public int tokenStartCharIndex = -1;
+	public int _tokenStartCharIndex = -1;
 
 	/** The line on which the first character of the token resides */
-	public int tokenStartLine;
+	public int _tokenStartLine;
 
 	/** The character position of first character within the line */
-	public int tokenStartCharPositionInLine;
+	public int _tokenStartCharPositionInLine;
 
 	/** Once we see EOF on char stream, next token will be EOF.
 	 *  If you have DONE : EOF ; then you see DONE EOF.
 	 */
-	public boolean hitEOF;
+	public boolean _hitEOF;
 
 	/** The channel number for the current token */
-	public int channel;
+	public int _channel;
 
 	/** The token type for the current token */
-	public int type;
+	public int _type;
 
-	public ArrayDeque<Integer> modeStack;
-	public int mode = Lexer.DEFAULT_MODE;
+	public ArrayDeque<Integer> _modeStack;
+	public int _mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in
 	 *  the input char buffer.  Use setText() or can set this instance var.
 	 */
-	public String text;
+	public String _text;
 
 	public Lexer(CharStream input) {
 		this._input = input;
@@ -105,18 +105,18 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		if ( _input !=null ) {
 			_input.seek(0); // rewind the input
 		}
-		token = null;
-		type = Token.INVALID_TYPE;
-		channel = Token.DEFAULT_CHANNEL;
-		tokenStartCharIndex = -1;
-		tokenStartCharPositionInLine = -1;
-		tokenStartLine = -1;
-		text = null;
+		_token = null;
+		_type = Token.INVALID_TYPE;
+		_channel = Token.DEFAULT_CHANNEL;
+		_tokenStartCharIndex = -1;
+		_tokenStartCharPositionInLine = -1;
+		_tokenStartLine = -1;
+		_text = null;
 
-		hitEOF = false;
-		mode = Lexer.DEFAULT_MODE;
-		if (modeStack != null) {
-			modeStack.clear();
+		_hitEOF = false;
+		_mode = Lexer.DEFAULT_MODE;
+		if (_modeStack != null) {
+			_modeStack.clear();
 		}
 
 		getInterpreter().reset();
@@ -127,24 +127,24 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	@Override
 	public Token nextToken() {
-		if ( hitEOF ) return anEOF();
+		if (_hitEOF) return anEOF();
 
 		outer:
 		while (true) {
-			token = null;
-			channel = Token.DEFAULT_CHANNEL;
-			tokenStartCharIndex = _input.index();
-			tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
-			tokenStartLine = getInterpreter().getLine();
-			text = null;
+			_token = null;
+			_channel = Token.DEFAULT_CHANNEL;
+			_tokenStartCharIndex = _input.index();
+			_tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
+			_tokenStartLine = getInterpreter().getLine();
+			_text = null;
 			do {
-				type = Token.INVALID_TYPE;
+				_type = Token.INVALID_TYPE;
 //				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
 //								   " in mode "+mode+
 //								   " at index "+input.index());
 				int ttype;
 				try {
-					ttype = getInterpreter().match(_input, mode);
+					ttype = getInterpreter().match(_input, _mode);
 				}
 				catch (LexerNoViableAltException e) {
 					notifyListeners(e);		// report error
@@ -152,15 +152,15 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 					ttype = SKIP;
 				}
 				if ( _input.LA(1)==CharStream.EOF ) {
-					hitEOF = true;
+					_hitEOF = true;
 				}
-				if ( type == Token.INVALID_TYPE ) type = ttype;
-				if ( type==SKIP ) {
+				if ( _type == Token.INVALID_TYPE ) _type = ttype;
+				if ( _type ==SKIP ) {
 					continue outer;
 				}
-			} while ( type==MORE );
-			if ( token==null ) emit();
-			return token;
+			} while ( _type ==MORE );
+			if ( _token ==null ) emit();
+			return _token;
 		}
 	}
 
@@ -171,31 +171,31 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  and emits it.
 	 */
 	public void skip() {
-		type = SKIP;
+		_type = SKIP;
 	}
 
 	public void more() {
-		type = MORE;
+		_type = MORE;
 	}
 
 	public void mode(int m) {
-		mode = m;
+		_mode = m;
 	}
 
 	public void pushMode(int m) {
 		if ( LexerATNSimulator.debug ) System.out.println("pushMode "+m);
-		if ( modeStack==null ) modeStack = new ArrayDeque<Integer>();
+		if ( _modeStack ==null ) _modeStack = new ArrayDeque<Integer>();
 		getInterpreter().tracePushMode(m);
-		modeStack.push(mode);
+		_modeStack.push(_mode);
 		mode(m);
 	}
 
 	public int popMode() {
-		if ( modeStack==null ) throw new EmptyStackException();
-		if ( LexerATNSimulator.debug ) System.out.println("popMode back to "+modeStack.peek());
+		if ( _modeStack ==null ) throw new EmptyStackException();
+		if ( LexerATNSimulator.debug ) System.out.println("popMode back to "+ _modeStack.peek());
 		getInterpreter().tracePopMode();
-		mode( modeStack.pop() );
-		return mode;
+		mode( _modeStack.pop() );
+		return _mode;
 	}
 
 	@Override
@@ -229,7 +229,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void emit(Token token) {
 		getInterpreter().traceEmit(token);
 		//System.err.println("emit "+token);
-		this.token = token;
+		this._token = token;
 	}
 
 	/** The standard method called to automatically emit a token at the
@@ -239,8 +239,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  custom Token objects or provide a new factory.
 	 */
 	public Token emit() {
-		Token t = _factory.create(this, type, text, channel, tokenStartCharIndex, getCharIndex()-1,
-								  tokenStartLine, tokenStartCharPositionInLine);
+		Token t = _factory.create(this, _type, _text, _channel, _tokenStartCharIndex, getCharIndex()-1,
+								  _tokenStartLine, _tokenStartCharPositionInLine);
 		emit(t);
 		return t;
 	}
@@ -249,9 +249,9 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		int cpos = getCharPositionInLine();
 		// The character position for EOF is one beyond the position of
 		// the previous token's last character
-		if ( token!=null ) {
-			int n = token.getStopIndex() - token.getStartIndex() + 1;
-			cpos = token.getCharPositionInLine()+n;
+		if ( _token !=null ) {
+			int n = _token.getStopIndex() - _token.getStartIndex() + 1;
+			cpos = _token.getCharPositionInLine()+n;
 		}
 		Token eof = _factory.create(this, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
 									getLine(), cpos);
@@ -277,8 +277,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  text override.
 	 */
 	public String getText() {
-		if ( text!=null ) {
-			return text;
+		if ( _text !=null ) {
+			return _text;
 		}
 		return getInterpreter().getText(_input);
 //		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
@@ -288,7 +288,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  changes to the text.
 	 */
 	public void setText(String text) {
-		this.text = text;
+		this._text = text;
 	}
 
 	public String[] getModeNames() {
@@ -310,16 +310,16 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
-			_input.substring(tokenStartCharIndex, _input.index())+"'";
+			_input.substring(_tokenStartCharIndex, _input.index())+"'";
 		ANTLRErrorListener<Integer>[] listeners = getErrorListeners();
 		if ( listeners.length == 0 ) {
-			System.err.println("line "+tokenStartLine+":"+
-							   tokenStartCharPositionInLine+" "+
+			System.err.println("line "+ _tokenStartLine +":"+
+							   _tokenStartCharPositionInLine +" "+
 							   msg);
 			return;
 		}
 		for (ANTLRErrorListener<Integer> pl : listeners) {
-			pl.error(this, null, tokenStartLine, tokenStartCharPositionInLine, msg, e);
+			pl.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 		}
 	}
 

@@ -440,9 +440,9 @@ LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
 LexerPopMode()     ::= "popMode();"
 
-LexerTypeCommand(arg)      ::= "type = <arg>;"
-LexerChannelCommand(arg)   ::= "channel = <arg>;"
-LexerModeCommand(arg)      ::= "mode = <arg>;"
+LexerTypeCommand(arg)      ::= "_type = <arg>;"
+LexerChannelCommand(arg)   ::= "_channel = <arg>;"
+LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
 DefaultParserSuperClass(s) ::= "Parser"
@@ -457,8 +457,7 @@ TokenRef(t) ::= "_localctx.<t.name>"
 LabelRef(t) ::= "_localctx.<t.name>"
 ListLabelRef(t) ::= "_localctx.<ListLabelName(t.name)>"
 SetAttr(s,rhsChunks) ::= "_localctx.<s.name> = <rhsChunks>;"
-LexerSetAttr(s,rhsChunks) ::= "<s.name> = <rhsChunks>;"
-//SetQAttr(s,rhsChunks) ::= "<s.dict>.<s.name> = <rhsChunks>;"
+LexerSetAttr(s,rhsChunks) ::= "_<s.name> = <rhsChunks>;" // _type etc...
 
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"

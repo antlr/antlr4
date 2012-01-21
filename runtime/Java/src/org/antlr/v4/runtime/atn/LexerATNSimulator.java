@@ -200,7 +200,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		traceMatchDFA();
 
 		if ( dfa_debug ) {
-			System.out.format("DFA[mode %d] exec LA(1)==%s\n", recog == null ? 0 : recog.mode, getTokenName(input.LA(1)));
+			System.out.format("DFA[mode %d] exec LA(1)==%s\n", recog == null ? 0 : recog._mode, getTokenName(input.LA(1)));
 		}
 
 		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
