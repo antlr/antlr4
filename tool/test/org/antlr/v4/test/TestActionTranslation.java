@@ -23,24 +23,6 @@ public class TestActionTranslation extends BaseTest {
 		"d	 :   ;\n" +
 		">>";
 
-	String scopeTemplate =
-		"scopeTemplate(members,init,inline,finally,inline2) ::= <<\n" +
-		"parser grammar A;\n"+
-		"@members {\n" +
-		"#members#<members>#end-members#\n" +
-		"}\n" +
-		"scope S { int i; }\n" +
-		"a\n" +
-		"scope { int z; }\n" +
-		"scope S;\n" +
-		"@init {#init#<init>#end-init#}\n" +
-		"    :   {\n" +
-		"		 #inline#<inline>#end-inline#" +
-		"		 }\n" +
-		"    ;\n" +
-		"    finally {#finally#<finally>#end-finally#}\n" +
-		">>";
-
     @Test public void testEscapedLessThanInAction() throws Exception {
         String action = "i<3; '<xmltag>'";
 		String expected = "i<3; '<xmltag>'";
