@@ -41,12 +41,6 @@ public interface ActionSplitterListener {
 	void setNonLocalAttr(String expr, Token x, Token y, Token rhs);
 	void nonLocalAttr(String expr, Token x, Token y);
 
-    void templateInstance(String expr);
-    void indirectTemplateInstance(String expr);
-    void setExprAttribute(String expr); // TODO: rename
-    void setSTAttribute(String expr);
-    void templateExpr(String expr);
-
     void unknownSyntax(Token t);
     void text(String text);
 }

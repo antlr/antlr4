@@ -63,8 +63,6 @@ public class ActionTranslator implements ActionSplitterListener {
         put("ctx",   RulePropertyRef_ctx.class);
 	}};
 
-	public static final Map<String, Class> treeRulePropToModelMap = rulePropToModelMap;
-
 	public static final Map<String, Class> tokenPropToModelMap = new HashMap<String, Class>() {{
 		put("text",  TokenPropertyRef_text.class);
 		put("type",  TokenPropertyRef_type.class);
@@ -106,13 +104,6 @@ public class ActionTranslator implements ActionSplitterListener {
 				action = action.substring(firstCurly+1, lastCurly); // trim {...}
 			}
 		}
-//		else if ( action.charAt(0)=='"' ) {
-//			int firstQuote = action.indexOf('"');
-//			int lastQuote = action.lastIndexOf('"');
-//			if ( firstQuote>=0 && lastQuote>=0 ) {
-//				action = action.substring(firstQuote+1, lastQuote); // trim "..."
-//			}
-//		}
 		return translateActionChunk(factory, rf, action, node);
 	}
 
@@ -143,7 +134,6 @@ public class ActionTranslator implements ActionSplitterListener {
 				case RET: chunks.add(new RetValueRef(x.getText())); break;
 				case LOCAL: chunks.add(new LocalRef(x.getText())); break;
 				case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x));	break;
-				case PREDEFINED_TREE_RULE: chunks.add(getRulePropertyRef(x)); break;
 			}
 		}
 		if ( node.resolver.resolvesToToken(x.getText(), node) ) {
@@ -187,23 +177,9 @@ public class ActionTranslator implements ActionSplitterListener {
 					chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
 				}
 			case PREDEFINED_RULE:
-			case PREDEFINED_TREE_RULE:
-				if ( factory.getCurrentRuleFunction()!=null &&
-					 factory.getCurrentRuleFunction().name.equals(x.getText()) )
-				{
-					chunks.add(getRulePropertyRef(y));
-				}
-				else {
-					chunks.add(getRulePropertyRef(x, y));
-				}
-				break;
 			case TOKEN:
 				chunks.add(getTokenPropertyRef(x, y));
 				break;
-//			case PREDEFINED_TREE_RULE:
-//				chunks.add(new RetValueRef(x.getText()));
-//				break;
-//			case PREDEFINED_LEXER_RULE: chunks.add(new RetValueRef(x.getText())); break;
 		}
 	}
 
@@ -227,21 +203,6 @@ public class ActionTranslator implements ActionSplitterListener {
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		SetNonLocalAttr s = new SetNonLocalAttr(x.getText(), y.getText(), r.index, rhsChunks);
 		chunks.add(s);
-	}
-
-	public void templateInstance(String expr) {
-	}
-
-	public void indirectTemplateInstance(String expr) {
-	}
-
-	public void setExprAttribute(String expr) {
-	}
-
-	public void setSTAttribute(String expr) {
-	}
-
-	public void templateExpr(String expr) {
 	}
 
 	public void unknownSyntax(Token t) {
@@ -305,12 +266,4 @@ public class ActionTranslator implements ActionSplitterListener {
 		return factory.getGenerator().target.getImplicitRuleLabel(x);
 	}
 
-//	public String getTokenLabel(String x, ActionAST node) {
-//		Alternative alt = node.resolver.
-//		Rule r = node.ATNState.rule;
-//		if ( r.tokenRefs.get(x)!=null ) return true;
-//		LabelElementPair anyLabelDef = getAnyLabelDef(x);
-//		if ( anyLabelDef!=null && anyLabelDef.type== LabelType.TOKEN_LABEL ) return true;
-//		return false;
-//	}
 }

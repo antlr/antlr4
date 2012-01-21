@@ -65,7 +65,7 @@ public class AttributeDict {
 
     public static enum DictType {
         ARG, RET, LOCAL, TOKEN,
-		PREDEFINED_RULE, PREDEFINED_TREE_RULE, PREDEFINED_LEXER_RULE,
+		PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
     }
 
     /** The list of Attribute objects */
@@ -80,12 +80,6 @@ public class AttributeDict {
     public Attribute get(String name) { return attributes.get(name); }
 
     public String getName() {
-//        if ( isParameterScope ) {
-//            return name+"_parameter";
-//        }
-//        else if ( isReturnScope ) {
-//            return name+"_return";
-//        }
         return name;
     }
 
