@@ -603,6 +603,9 @@ public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
+    public static String[] modeNames = {
+        <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
+    };
 
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
@@ -626,6 +629,9 @@ public class <lexer.name> extends Lexer {
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
+	@Override
+	public String[] getModeNames() { return modeNames; }
 
 	@Override
 	public ATN getATN() { return _ATN; }

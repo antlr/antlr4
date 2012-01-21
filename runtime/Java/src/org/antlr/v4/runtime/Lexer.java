@@ -291,19 +291,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		this.text = text;
 	}
 
-	public void reportError(RecognitionException e) {
-		/** TODO: not thought about recovery in lexer yet.
-		 *
-		// if we've already reported an error and have not matched a token
-		// yet successfully, don't report any errors.
-		if ( errorRecovery ) {
-			//System.err.print("[SPURIOUS] ");
-			return;
-		}
-		errorRecovery = true;
-		 */
-
-		//displayRecognitionError(this.getTokenNames(), e);
+	public String[] getModeNames() {
+		return null;
 	}
 
 	/** Used to print out token names like ID during debugging and
