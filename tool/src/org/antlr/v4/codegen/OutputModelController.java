@@ -269,10 +269,15 @@ public class OutputModelController {
 		function.postamble = rulePostamble(function, r);
 	}
 
-	public void buildLexerRuleActions(Lexer lexer, Rule r) {
+	public void buildLexerRuleActions(Lexer lexer, final Rule r) {
 		CodeGenerator gen = delegate.getGenerator();
 		Grammar g = delegate.getGrammar();
 		String ctxType = gen.target.getRuleFunctionContextStructName(r);
+		RuleActionFunction raf = lexer.actionFuncs.get(r);
+		if ( raf==null ) {
+			raf = new RuleActionFunction(delegate, r, ctxType);
+			lexer.actionFuncs.put(r, raf);
+		}
 		for (ActionAST a : r.actions) {
 			if ( a instanceof PredAST ) {
 				PredAST p = (PredAST)a;
@@ -284,24 +289,6 @@ public class OutputModelController {
 				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
 			}
 			else if ( a.getType()== ANTLRParser.ACTION ) {
-				RuleActionFunction raf = lexer.sempredFuncs.get(r);
-				if ( raf==null ) {
-					raf = new RuleActionFunction(delegate, r, ctxType);
-					lexer.actionFuncs.put(r, raf);
-				}
-				raf.actions.put(g.lexerActions.get(a), new Action(delegate, a));
-			}
-
-			if ( a instanceof PredAST ) {
-				PredAST p = (PredAST)a;
-				RuleSempredFunction rsf = new RuleSempredFunction(delegate, r, ctxType);
-				lexer.sempredFuncs.put(r, rsf);
-				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
-			}
-			else if ( a.getType()==ANTLRParser.ACTION ) {
-				// lexer sees {{...}} and {..} as same; neither are done until accept
-				RuleActionFunction raf = new RuleActionFunction(delegate, r, ctxType);
-				lexer.actionFuncs.put(r, raf);
 				raf.actions.put(g.lexerActions.get(a), new Action(delegate, a));
 			}
 		}

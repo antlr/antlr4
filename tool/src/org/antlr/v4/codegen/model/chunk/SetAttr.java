@@ -27,44 +27,28 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
+package org.antlr.v4.codegen.model.chunk;
 
-import org.antlr.v4.codegen.ActionTranslator;
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.chunk.ActionChunk;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.codegen.model.ModelElement;
 
 import java.util.List;
 
 /** */
-public class SemPred extends Action {
-	public String msg; // user-specified in grammar option
+public class SetAttr extends ActionChunk {
+	public String name;
+	@ModelElement public List<ActionChunk> rhsChunks;
 
-	@ModelElement public List<ActionChunk> failChunks;
-
-	public SemPred(OutputModelFactory factory, GrammarAST ast) {
-		super(factory,ast);
-		GrammarAST failNode = ((PredAST)ast).getOption("fail");
-		CodeGenerator gen = factory.getGenerator();
-		if ( failNode==null ) {
-			msg = "failed predicate: "+ast.getText();
-			msg = gen.target.getTargetStringLiteralFromString(msg);
-			return;
-		}
-
-		if ( failNode instanceof ActionAST ) {
-			ActionAST failActionNode = (ActionAST)failNode;
-			RuleFunction rf = factory.getCurrentRuleFunction();
-			failChunks = ActionTranslator.translateAction(factory, rf,
-														  failActionNode.token,
-														  failActionNode);
-		}
-		else {
-			msg = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
-																		  failNode.getText());
-		}
+	public SetAttr(String name, List<ActionChunk> rhsChunks) {
+		this.name = name;
+		this.rhsChunks = rhsChunks;
 	}
+
+//	@Override
+//	public List<String> getChildren() {
+//		final List<String> sup = super.getChildren();
+//		return new ArrayList<String>() {{
+//			if ( sup!=null ) addAll(sup);
+//			add("rhsChunks");
+//		}};
+//	}
 }

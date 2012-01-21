@@ -759,7 +759,6 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 		for (ATNConfig c : configs) {
 			if ( c.semanticContext!=SemanticContext.NONE && ambigAlts.contains(c.alt) ) {
 				altToPred[c.alt] = SemanticContext.or(altToPred[c.alt], c.semanticContext);
-				c.resolveWithPredicate = true;
 				nPredAlts++;
 			}
 		}

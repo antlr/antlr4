@@ -75,12 +75,25 @@ public class Rule implements AttributeResolver {
             add(new Attribute("int"));
         }};
 
-    public String name;
+	public static Set<String> validLexerCommands = new HashSet<String>() {{
+		// CALLS
+		add("mode");
+		add("pushMode");
+		add("type");
+		add("channel");
+
+		// ACTIONS
+		add("popMode");
+		add("skip");
+		add("more");
+	}};
+
+	public String name;
 	public List<GrammarAST> modifiers;
 
-    public RuleAST ast;
-    public AttributeDict args;
-    public AttributeDict retvals;
+	public RuleAST ast;
+	public AttributeDict args;
+	public AttributeDict retvals;
 	public AttributeDict locals;
 
 	/** In which grammar does this rule live? */
@@ -123,7 +136,7 @@ public class Rule implements AttributeResolver {
 	/** All rules have unique index 0..n-1 */
 	public int index;
 
-	public int actionIndex = -1; // if lexer; 0..n-1
+	public int actionIndex = -1; // if lexer; 0..n-1 for n actions in a rule
 
 	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
 		this.g = g;
@@ -138,10 +151,15 @@ public class Rule implements AttributeResolver {
 		actions.add(actionAST);
 		alt[currentAlt].actions.add(actionAST);
 		if ( g.isLexer() ) {
-			actionIndex = g.lexerActions.size();
-			if ( g.lexerActions.get(actionAST)==null ) {
-				g.lexerActions.put(actionAST, actionIndex);
-			}
+			defineLexerAction(actionAST);
+		}
+	}
+
+	/** Lexer actions are numbered across rules 0..n-1 */
+	public void defineLexerAction(ActionAST actionAST) {
+		actionIndex = g.lexerActions.size();
+		if ( g.lexerActions.get(actionAST)==null ) {
+			g.lexerActions.put(actionAST, actionIndex);
 		}
 	}
 

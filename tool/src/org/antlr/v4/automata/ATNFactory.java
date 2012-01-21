@@ -58,6 +58,8 @@ public interface ATNFactory {
 
 	void setCurrentRuleName(String name);
 
+	void setCurrentOuterAlt(int alt);
+
 	Handle rule(GrammarAST ruleAST, String name, Handle blk);
 
 	ATNState newState();
@@ -76,8 +78,6 @@ public interface ATNFactory {
 	Handle tree(GrammarAST node, List<Handle> els);
 
 	Handle range(GrammarAST a, GrammarAST b);
-
-//	Handle not(GrammarAST a);
 
 	/** For a non-lexer, just build a simple token reference atom.
 	 *  For a lexer, a string is a sequence of char to match.  That is,
@@ -116,10 +116,10 @@ public interface ATNFactory {
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during analysis.
-	 *  It slows things down a bit, but I must ignore predicates after
-	 *  having seen an action (5-5-2008).
 	 */
 	Handle action(ActionAST action);
+
+	Handle action(String action);
 
 	Handle alt(List<Handle> els);
 
@@ -214,4 +214,10 @@ public interface ATNFactory {
 	 *  (^(. .+) | .) to be safe.
 	 */
 	Handle wildcardTree(GrammarAST associatedAST);
+
+	Handle lexerAltCommands(ATNFactory.Handle alt, ATNFactory.Handle cmds);
+
+	String lexerCallCommand(GrammarAST ID, GrammarAST arg);
+
+	String lexerCommand(GrammarAST ID);
 }

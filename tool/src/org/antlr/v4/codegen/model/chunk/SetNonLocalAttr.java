@@ -27,44 +27,19 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen.model;
-
-import org.antlr.v4.codegen.ActionTranslator;
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.chunk.ActionChunk;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
+package org.antlr.v4.codegen.model.chunk;
 
 import java.util.List;
 
-/** */
-public class SemPred extends Action {
-	public String msg; // user-specified in grammar option
+public class SetNonLocalAttr extends SetAttr {
+	public String ruleName;
+	public int ruleIndex;
 
-	@ModelElement public List<ActionChunk> failChunks;
-
-	public SemPred(OutputModelFactory factory, GrammarAST ast) {
-		super(factory,ast);
-		GrammarAST failNode = ((PredAST)ast).getOption("fail");
-		CodeGenerator gen = factory.getGenerator();
-		if ( failNode==null ) {
-			msg = "failed predicate: "+ast.getText();
-			msg = gen.target.getTargetStringLiteralFromString(msg);
-			return;
-		}
-
-		if ( failNode instanceof ActionAST ) {
-			ActionAST failActionNode = (ActionAST)failNode;
-			RuleFunction rf = factory.getCurrentRuleFunction();
-			failChunks = ActionTranslator.translateAction(factory, rf,
-														  failActionNode.token,
-														  failActionNode);
-		}
-		else {
-			msg = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
-																		  failNode.getText());
-		}
+	public SetNonLocalAttr(String ruleName, String name, int ruleIndex,
+						   List<ActionChunk> rhsChunks)
+	{
+		super(name, rhsChunks);
+		this.ruleName = ruleName;
+		this.ruleIndex = ruleIndex;
 	}
 }

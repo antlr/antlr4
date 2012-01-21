@@ -70,8 +70,10 @@ public class ParserATNFactory implements ATNFactory {
 					// we have p-x->q for x in {rule, action, pred, token, ...}
 					// if edge out of q is single epsilon to block end
 					// we can strip epsilon p-x->q-eps->r
-					if ( q.getNumberOfTransitions()==1 && q.transition(0).isEpsilon() ) {
-						ATNState r = q.transition(0).target;
+					Transition trans = q.transition(0);
+					if ( q.getNumberOfTransitions()==1 && trans.isEpsilon() &&
+					     !(trans instanceof ActionTransition) ) {
+						ATNState r = trans.target;
 						if ( r instanceof BlockEndState ||
 							r instanceof PlusLoopbackState ||
 							r instanceof StarLoopbackState )
@@ -99,6 +101,8 @@ public class ParserATNFactory implements ATNFactory {
 
 	public Rule currentRule;
 
+	public int currentOuterAlt;
+
 	public ParserATNFactory(@NotNull Grammar g) { this.g = g; atn = new ATN(); }
 
 	public ATN createATN() {
@@ -120,7 +124,7 @@ public class ParserATNFactory implements ATNFactory {
 			ATNBuilder b = new ATNBuilder(nodes,this);
 			try {
 				setCurrentRuleName(r.name);
-				Handle h = b.block(null);
+				Handle h = b.ruleBlock(null);
 				rule(r.ast, r.name, h);
 			}
 			catch (RecognitionException re) {
@@ -131,6 +135,11 @@ public class ParserATNFactory implements ATNFactory {
 
 	public void setCurrentRuleName(String name) {
 		this.currentRule = g.getRule(name);
+	}
+
+	@Override
+	public void setCurrentOuterAlt(int alt) {
+		currentOuterAlt = alt;
 	}
 
 	/* start->ruleblock->end */
@@ -170,7 +179,7 @@ public class ParserATNFactory implements ATNFactory {
 			set.add(ttype);
 		}
 		if ( invert ) {
-			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
+			IntervalSet notSet = set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
 			left.addTransition(new NotSetTransition(right, set, notSet));
 		}
 		else {
@@ -284,6 +293,11 @@ public class ParserATNFactory implements ATNFactory {
 		left.addTransition(a);
 		action.atnState = left;
 		return new Handle(left, right);
+	}
+
+	@Override
+	public Handle action(String action) {
+		return null;
 	}
 
 	/** From A|B|..|Z alternative block build
@@ -619,4 +633,18 @@ public class ParserATNFactory implements ATNFactory {
 		return false;
 	}
 
+	@Override
+	public Handle lexerAltCommands(Handle alt, Handle cmds) {
+		return null;
+	}
+
+	@Override
+	public String lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+		return null;
+	}
+
+	@Override
+	public String lexerCommand(GrammarAST ID) {
+		return null;
+	}
 }

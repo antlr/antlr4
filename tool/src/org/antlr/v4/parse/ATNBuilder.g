@@ -75,6 +75,21 @@ import org.antlr.v4.automata.ATNFactory;
 
 dummy : block[null] ; // avoid error about no start rule
 
+ruleBlock[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
+@init {
+    List<ATNFactory.Handle> alts = new ArrayList<ATNFactory.Handle>();
+    int alt = 1;
+    factory.setCurrentOuterAlt(alt);
+}
+    :	^(BLOCK
+            (^(OPTIONS .+))?
+            (   a=alternative
+                {alts.add($a.p); factory.setCurrentOuterAlt(++alt);}
+            )+
+        )
+    	{$p = factory.block((BlockAST)$BLOCK, ebnfRoot, alts);}
+    ;
+
 block[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> alts = new ArrayList<ATNFactory.Handle>();}
     :	^(BLOCK (^(OPTIONS .+))? (a=alternative {alts.add($a.p);})+)
@@ -83,10 +98,31 @@ block[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 
 alternative returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> els = new ArrayList<ATNFactory.Handle>();}
-    :	^(LEXER_ALT_ACTION a=alternative .*)	{$p = $a.p;}
+    :	^(LEXER_ALT_ACTION a=alternative lexerCommands)
+        {$p = factory.lexerAltCommands($a.p,$lexerCommands.p);}
     |	^(ALT EPSILON)							{$p = factory.epsilon($EPSILON);}
     |   ^(ALT (e=element {els.add($e.p);})+)	{$p = factory.alt(els);}
     ;
+
+lexerCommands returns [ATNFactory.Handle p]
+@init {StringBuilder cmds = new StringBuilder();}
+    :   (c=lexerCommand {cmds.append($c.cmd+" ");})+
+        {
+        $p = factory.action(cmds.toString());
+        }
+    ;
+
+lexerCommand returns [String cmd]
+	:	^(LEXER_ACTION_CALL ID lexerCommandExpr)
+        {$cmd = factory.lexerCallCommand($ID, $lexerCommandExpr.start);}
+	|	ID
+        {$cmd = factory.lexerCommand($ID);}
+	;
+
+lexerCommandExpr
+	:	ID
+	|	INT
+	;
 
 element returns [ATNFactory.Handle p]
 	:	labeledElement				{$p = $labeledElement.p;}

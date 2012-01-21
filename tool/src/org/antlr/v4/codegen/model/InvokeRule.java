@@ -32,7 +32,7 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.codegen.ActionTranslator;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.actions.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
 import org.antlr.v4.codegen.model.decl.RuleContextListDecl;

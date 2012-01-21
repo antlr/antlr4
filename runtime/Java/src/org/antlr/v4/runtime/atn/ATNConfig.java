@@ -58,18 +58,6 @@ public class ATNConfig {
 	public RuleContext context;
 
 	/**
-	 * Indicates that we have reached this ATN configuration after
-	 * traversing a predicate transition. This is important because we
-	 * cannot cache DFA states derived from such configurations
-	 * otherwise predicates would not get executed again (DFAs don't
-	 * have predicated edges in v4).
-	 */
-	//public boolean traversedPredicate; // TODO: don't need
-
-	/** Ignore this config when examining config sets */
-//	public boolean resolved;
-
-	/**
 	 * We cannot execute predicates dependent upon local context unless
 	 * we know for sure we are in the correct context. Because there is
 	 * no way to do this efficiently, we simply cannot evaluate
@@ -82,17 +70,11 @@ public class ATNConfig {
 	 */
 	public int reachesIntoOuterContext;
 
+	/** Capture lexer action we traverse */
+	public int lexerActionIndex = -1; // TOOD: move to subclass
+
     @NotNull
     public SemanticContext semanticContext = SemanticContext.NONE;
-
-    /** This bit is used to indicate a semantic predicate will be
-     *  used to resolve the conflict. Essentially, this is used
-     *  as an "ignore" bit so that upon a set of conflicting configurations,
-     *  such as (s|2|p) and (s|3|q), I can set (s|3) to resolved=true (and any
-     *  other configuration associated with alt 3) to make it look like that set
-     *  uniquely predicts an alt.
-     */
-    protected boolean resolveWithPredicate;
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
@@ -134,6 +116,7 @@ public class ATNConfig {
 		this.context = context;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
         this.semanticContext = semanticContext;
+		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
 //	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {

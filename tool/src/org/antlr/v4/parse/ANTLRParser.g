@@ -648,7 +648,7 @@ lexerAction
 	;
 
 lexerActionExpr
-	:	ID 
+	:	id 
 	|	INT
 	;
 

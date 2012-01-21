@@ -153,6 +153,8 @@ public void wildcardRef(GrammarAST ref) { }
 public void actionInAlt(ActionAST action) { }
 public void sempredInAlt(PredAST pred) { }
 public void label(GrammarAST op, GrammarAST ID, GrammarAST element) { }
+public void lexerCallCommand(int outerAltNumber, GrammarAST ID, GrammarAST arg) { }
+public void lexerCommand(int outerAltNumber, GrammarAST ID) { }
 
 	public void traceIn(String ruleName, int ruleIndex)  {
 		System.err.println("enter "+ruleName+": "+input.LT(1));
@@ -357,7 +359,7 @@ outerAlternative
 	;
 
 lexerAlternative
-	:	^(LEXER_ALT_ACTION lexerElements lexerAction+)
+	:	^(LEXER_ALT_ACTION lexerElements lexerCommand+)
     |   lexerElements
     ;
 
@@ -404,12 +406,14 @@ alternative
 	|	^(ALT EPSILON)
     ;
 
-lexerAction
-	:	^(LEXER_ACTION_CALL lexerActionExpr)
+lexerCommand
+	:	^(LEXER_ACTION_CALL ID lexerCommandExpr)
+        {lexerCallCommand(currentOuterAltNumber, $ID, $lexerCommandExpr.start);}
 	|	ID
+        {lexerCommand(currentOuterAltNumber, $ID);}
 	;
 
-lexerActionExpr
+lexerCommandExpr
 	:	ID 
 	|	INT
 	;

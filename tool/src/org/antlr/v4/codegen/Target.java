@@ -339,15 +339,9 @@ public class Target {
 
 	public String getRuleFunctionContextStructName(Rule r) {
 		if ( r.g.isLexer() ) {
-			return gen.templates.getInstanceOf("ParserRuleContext").render();
+			return gen.templates.getInstanceOf("LexerRuleContext").render();
 		}
 		return r.name+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
-//		boolean hasNoExternallyVisibleElements =
-//			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
-//		if ( hasNoExternallyVisibleElements ) {
-//			return gen.templates.getInstanceOf("ParserRuleContext").render();
-//		}
-//		return r.name+"_ctx";
 	}
 
 	/** If we know which actual function, we can provide the actual ctx type.
@@ -358,16 +352,9 @@ public class Target {
 	public String getRuleFunctionContextStructName(RuleFunction function) {
 		Rule r = function.rule;
 		if ( r.g.isLexer() ) {
-			return gen.templates.getInstanceOf("ParserRuleContext").render();
+			return gen.templates.getInstanceOf("LexerRuleContext").render();
 		}
 		return r.name+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
-//		boolean hasNoExternallyVisibleElements =
-//			r.args==null && r.retvals==null && r.scope==null && r.getLabelNames()==null;
-//
-//		if ( hasNoExternallyVisibleElements && function.ruleCtx.isEmpty() ) {
-//			return gen.templates.getInstanceOf("ParserRuleContext").render();
-//		}
-//		return r.name+"_ctx";
 	}
 
 	// should be same for all refs to same token like $ID within single rule function

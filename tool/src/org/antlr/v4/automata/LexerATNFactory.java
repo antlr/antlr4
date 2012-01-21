@@ -29,23 +29,35 @@
 
 package org.antlr.v4.automata;
 
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 import java.util.List;
 import java.util.Set;
 
 public class LexerATNFactory extends ParserATNFactory {
-	public LexerATNFactory(LexerGrammar g) { super(g); }
+	public STGroup codegenTemplates;
+	public LexerATNFactory(LexerGrammar g) {
+		super(g);
+		// use codegen to get correct language templates for lexer commands
+		String language = Grammar.getLanguageOption(g.ast);
+		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
+		codegenTemplates = gen.templates;
+	}
 
 	public ATN createATN() {
 		// BUILD ALL START STATES (ONE PER MODE)
@@ -87,13 +99,48 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public Handle action(ActionAST action) {
-//		Handle h = super.action(action);
-//		ActionTransition a = (ActionTransition)h.left.transition(0);
-//		a.actionIndex = g.actions.get(action);
-//		return h;
-		// no actions in lexer ATN; just one on end and we exec via action number
-		ATNState x = newState(action);
-		return new Handle(x, x); // return just one blank state
+		ATNState left = newState(action);
+		ATNState right = newState(action);
+		boolean isCtxDependent = false;
+		int actionIndex = g.lexerActions.get(action);
+		ActionTransition a =
+			new ActionTransition(right, currentRule.index, actionIndex, isCtxDependent);
+		left.addTransition(a);
+		action.atnState = left;
+		Handle h = new Handle(left, right);
+		return h;
+	}
+
+	@Override
+	public Handle action(String action) {
+        // define action AST for this rule as if we had found in grammar
+        ActionAST ast =	new ActionAST(new CommonToken(ANTLRParser.ACTION, action));
+		currentRule.defineActionInAlt(currentOuterAlt, ast);
+		return action(ast);
+	}
+
+	@Override
+	public Handle lexerAltCommands(Handle alt, Handle cmds) {
+		Handle h = new Handle(alt.left, cmds.right);
+		epsilon(alt.right, cmds.left);
+		return h;
+	}
+
+	@Override
+	public String lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
+												  CharSupport.capitalize(ID.getText())+
+												  "Command");
+		cmdST.add("arg", arg.getText());
+		return cmdST.render();
+	}
+
+	@Override
+	public String lexerCommand(GrammarAST ID) {
+		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
+												  CharSupport.capitalize(ID.getText())+
+												  "Command");
+		return cmdST.render();
 	}
 
 	@Override
@@ -126,7 +173,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		if ( invert ) {
 			// TODO: what? should be chars not token types
-			IntervalSet notSet = (IntervalSet)set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
+			IntervalSet notSet = set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
 			left.addTransition(new NotSetTransition(right, set, notSet));
 		}
 		else {

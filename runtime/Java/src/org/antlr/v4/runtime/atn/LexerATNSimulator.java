@@ -259,8 +259,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			throw new LexerNoViableAltException(recog, input, startIndex, s.configset);
 		}
 
-		int ruleIndex = dfaPrevAccept.state.ruleIndex;
-		accept(input, ruleIndex, dfaPrevAccept);
+		int ruleIndex = dfaPrevAccept.state.lexerRuleIndex;
+		int actionIndex = dfaPrevAccept.state.lexerActionIndex;
+		accept(input, ruleIndex, actionIndex,
+			   dfaPrevAccept.index, dfaPrevAccept.line, dfaPrevAccept.charPos);
 		tracePredict(dfaPrevAccept.state.prediction);
 		return dfaPrevAccept.state.prediction;
 	}
@@ -342,7 +344,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		int ruleIndex = atnPrevAccept.config.state.ruleIndex;
-		accept(input, ruleIndex, atnPrevAccept);
+		accept(input, ruleIndex, atnPrevAccept.config.lexerActionIndex,
+			   atnPrevAccept.index, atnPrevAccept.line, atnPrevAccept.charPos);
 		return atn.ruleToTokenType[ruleIndex];
 	}
 
@@ -377,19 +380,20 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void accept(@NotNull CharStream input, int ruleIndex, @NotNull ExecState prevAccept) {
+	protected void accept(@NotNull CharStream input, int ruleIndex, int actionIndex,
+						  int index, int line, int charPos)
+	{
 		if ( debug ) {
-			System.out.format("ACTION %s:%d\n", recog != null ? recog.getRuleNames()[ruleIndex] : ruleIndex, ruleIndex);
+			System.out.format("ACTION %s:%d\n", recog != null ? recog.getRuleNames()[ruleIndex] : ruleIndex, actionIndex);
 		}
 
-		int actionIndex = atn.ruleToActionIndex[ruleIndex];
 		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
-		traceSeek(prevAccept.index);
-		input.seek(prevAccept.index);
-		line = prevAccept.line;
-		charPositionInLine = prevAccept.charPos;
+		traceSeek(index);
+		input.seek(index);
+		this.line = line;
+		this.charPositionInLine = charPos;
 		consume(input);
 	}
 
@@ -530,6 +534,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		// ignore actions; just exec one per rule upon accept
 		else if ( t.getClass() == ActionTransition.class ) {
 			c = new ATNConfig(config, t.target);
+			c.lexerActionIndex = ((ActionTransition)t).actionIndex;
 		}
 		else if ( t.isEpsilon() ) {
 			c = new ATNConfig(config, t.target);
@@ -611,7 +616,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		future. Rather than creating collections of semantic predicates
 		like v3 and testing them on prediction, v4 will test them on the
 		fly all the time using the ATN not the DFA. This is slower but
-		semantically it's not use that often. One of the key elements to
+		semantically it's not used that often. One of the key elements to
 		this predicate mechanism is not adding DFA states that see
 		predicates immediately afterwards in the ATN. For example,
 
@@ -639,14 +644,16 @@ public class LexerATNSimulator extends ATNSimulator {
 			{
 				firstConfigWithRuleStopState = c;
 			}
-			if ( c.semanticContext!=null && c.semanticContext!=SemanticContext.NONE ) traversedPredicate = true;
-//			if ( c.traversedPredicate ) traversedPredicate = true;
+			if ( c.semanticContext!=null && c.semanticContext!=SemanticContext.NONE ) {
+				traversedPredicate = true;
+			}
 		}
 
 		if ( firstConfigWithRuleStopState!=null ) {
 			newState.isAcceptState = true;
-			newState.ruleIndex = firstConfigWithRuleStopState.state.ruleIndex;
-			newState.prediction = atn.ruleToTokenType[newState.ruleIndex];
+			newState.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
+			newState.lexerActionIndex = firstConfigWithRuleStopState.lexerActionIndex;
+			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
 		}
 
 		if ( traversedPredicate ) return null; // cannot cache

@@ -80,7 +80,8 @@ public class DFAState {
 
 	public int prediction; // if accept state, what ttype do we match? is "else" clause if predicated
 
-	public int ruleIndex; // if accept, exec what action?
+	public int lexerRuleIndex = -1;		// if accept, exec action in what rule?
+	public int lexerActionIndex = -1;	// if accept, exec what action?
 
 	// todo: rename as unique?
 	public boolean complete; // all alts predict "prediction"

@@ -44,11 +44,70 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test public void testSkipCommand() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"WS : (' '|'\\n') -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "34 34");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,3:4='34',<3>,1:3]\n" +
+			"[@2,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testMoreCommand() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"WS : '#' -> more ;";
+		String found = execLexer("L.g", grammar, "L", "34#10");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,2:4='#10',<3>,1:2]\n" +
+			"[@2,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testTypeCommand() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"HASH : '#' -> type(HASH) ;";
+		String found = execLexer("L.g", grammar, "L", "34#");
+		String expecting =
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,2:2='#',<4>,1:2]\n" +
+			"[@2,3:2='<EOF>',<-1>,1:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCombinedCommand() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"HASH : '#' -> type(HASH), skip, more  ;";
+		String found = execLexer("L.g", grammar, "L", "34#11");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,2:4='#11',<3>,1:2]\n" +
+			"[@2,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test public void testLexerMode() throws Exception {
 		String grammar =
 			"lexer grammar L;\n" +
 			"STRING_START : '\"' {pushMode(STRING_MODE); more();} ;\n" +
-			"WS : ' '|'\n' {skip();} ;\n"+
+			"WS : (' '|'\n') {skip();} ;\n"+
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' {popMode();} ;\n"+
 			"ANY : . {more();} ;\n";

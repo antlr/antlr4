@@ -129,7 +129,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return true;
 	}
 
-	/** In lexer, both indexes are same; one action per rule. */
 	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 

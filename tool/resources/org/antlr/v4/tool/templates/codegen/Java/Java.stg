@@ -434,6 +434,17 @@ setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
 >>
 
+// lexer actions are not associated with model objects
+
+LexerSkipCommand()  ::= "skip();"
+LexerMoreCommand()  ::= "more();"
+LexerPopMode()     ::= "popMode();"
+
+LexerTypeCommand(arg)      ::= "type = <arg>;"
+LexerChannelCommand(arg)   ::= "channel = <arg>;"
+LexerModeCommand(arg)      ::= "mode = <arg>;"
+LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
+
 DefaultParserSuperClass(s) ::= "Parser"
 
 ActionText(t) ::= "<t.text>"
@@ -482,8 +493,7 @@ TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
-/** Default RuleContext type name for a Parser rule */
-ParserRuleContext() ::= "ParserRuleContext\<?>"
+LexerRuleContext() ::= "RuleContext"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
  *	r becomes rContext.
@@ -538,7 +548,7 @@ AttributeDecl(d) ::= "<d.decl>"
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 
-// used for left-recursive rules
+// used for left-recursive rules 
 recRuleDefArg()						  ::= "int _p"
 recRuleArg()						  ::= "$_p"
 recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
@@ -592,7 +602,6 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
 public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
-	// Lexer modes
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
 
 	public static final String[] tokenNames = {

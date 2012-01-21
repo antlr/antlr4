@@ -31,10 +31,11 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.actions.ActionChunk;
-import org.antlr.v4.codegen.model.actions.ActionText;
-import org.antlr.v4.codegen.model.actions.DefaultParserSuperClass;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionText;
+import org.antlr.v4.codegen.model.chunk.DefaultParserSuperClass;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 import java.util.*;
 
