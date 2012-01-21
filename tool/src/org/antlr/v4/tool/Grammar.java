@@ -147,8 +147,8 @@ public class Grammar implements AttributeResolver {
      */
 	public Map<String,ActionAST> namedActions = new HashMap<String,ActionAST>();
 
-	/** Tracks all lexer actions in all alternatives of all rules.
-	 *  Doesn't track sempreds.  maps tree node to action index.
+	/** Tracks all user lexer actions in all alternatives of all rules.
+	 *  Doesn't track sempreds.  maps tree node to action index (alt number 1..n).
  	 */
 	public LinkedHashMap<ActionAST, Integer> lexerActions = new LinkedHashMap<ActionAST, Integer>();
 
