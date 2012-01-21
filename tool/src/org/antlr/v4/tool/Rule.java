@@ -53,15 +53,6 @@ public class Rule implements AttributeResolver {
             add(new Attribute("ctx"));
         }};
 
-    public static AttributeDict predefinedTreeRulePropertiesDict =
-        new AttributeDict(AttributeDict.DictType.PREDEFINED_TREE_RULE) {{
-            add(new Attribute("text"));
-            add(new Attribute("start")); // note: no stop; not meaningful
-            add(new Attribute("tree"));
-            add(new Attribute("st"));
-            add(new Attribute("ctx"));
-        }};
-
     public static AttributeDict predefinedLexerRulePropertiesDict =
         new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
             add(new Attribute("text"));

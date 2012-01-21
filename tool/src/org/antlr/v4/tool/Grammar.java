@@ -71,9 +71,6 @@ public class Grammar implements AttributeResolver {
 			put("lexer:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
             put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
             put("parser:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-            put("tree:RULE_LABEL", Rule.predefinedTreeRulePropertiesDict);
-            put("tree:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-            put("tree:WILDCARD_TREE_LABEL", AttributeDict.predefinedTokenDict);
             put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
             put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
 		}};
