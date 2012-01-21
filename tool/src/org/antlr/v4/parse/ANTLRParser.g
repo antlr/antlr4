@@ -568,7 +568,7 @@ lexerAltList
 
 lexerAlt
 	:	lexerElements
-		(	lexerActions	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerActions)
+		(	lexerCommands	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerCommands)
 		|					-> lexerElements
 		)
 	;
@@ -638,16 +638,16 @@ lexerBlock
     ;
 
 // channel=HIDDEN, skip, more, mode(INSIDE), push(INSIDE), pop
-lexerActions
-	:	RARROW lexerAction (COMMA lexerAction)* -> lexerAction+
+lexerCommands
+	:	RARROW lexerCommand (COMMA lexerCommand)* -> lexerCommand+
 	;
 
-lexerAction
-	:	id LPAREN lexerActionExpr RPAREN -> ^(LEXER_ACTION_CALL id lexerActionExpr)
+lexerCommand
+	:	id LPAREN lexerCommandExpr RPAREN -> ^(LEXER_ACTION_CALL id lexerCommandExpr)
 	|	id
 	;
 
-lexerActionExpr
+lexerCommandExpr
 	:	id 
 	|	INT
 	;
