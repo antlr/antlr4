@@ -205,16 +205,57 @@ public class LexerATNFactory extends ParserATNFactory {
 		return new Handle(left, right);
 	}
 
-	/** [Aa] char sets */
+	/** [Aa\t \u1234a-z\]\-] char sets */
 	@Override
 	public Handle charSetLiteral(GrammarAST charSetAST) {
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
-		IntervalSet set = new IntervalSet();
 		String cset = '"'+charSetAST.getText()+'"';
+
+		IntervalSet set = new IntervalSet();
+//		int n = cset.length();
+//		int i = 0;
+//		while ( i < n ) {
+//			if ( (i+2)<n && cset.charAt(i+1)=='-' ) { // range x-y
+//				int x = cset.charAt(i);
+//				int y = cset.charAt(i+2);
+//				if ( y=='\\' ) { i = i+3; continue; } // x-\
+//				if ( x<=y ) set.add(x,y);
+//			}
+//			else if ( cset.charAt(i)=='\\' ) {
+//				int end = i+2;
+//				if ( (i+1)>=n ) break; // ignore spurious \ on end
+//				if ( cset.charAt(i+1) == 'u' ) end = i+6;
+//				if ( end>n ) break;
+//				int c = CharSupport.getCharValueFromCharInGrammarLiteral(cset.substring(i,end));
+//				set.add(c);
+//				i = end;
+//			}
+//			else {
+//				set.add(cset.charAt(i));
+//				i++;
+//			}
+//		}
+
+		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
+		// so we can avoid seeing them as '-' range ops.
 		String chars = CharSupport.getStringFromGrammarStringLiteral(cset);
-		for (int i=0; i<chars.length(); i++) {
-			set.add((int)chars.charAt(i));
+		// now make x-y become set of char
+		int n = chars.length();
+		for (int i=0; i< n; i++) {
+			int c = chars.charAt(i);
+			if ( c=='\\' && (i+1)<n && chars.charAt(i+1)=='-' ) { // \-
+				set.add('-');
+				i++;
+			}
+			else if ( (i+2)<n && chars.charAt(i+1)=='-' ) { // range x-y
+				int x = c;
+				int y = chars.charAt(i+2);
+				if ( x<=y ) set.add(x,y);
+			}
+			else {
+				set.add(c);
+			}
 		}
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;

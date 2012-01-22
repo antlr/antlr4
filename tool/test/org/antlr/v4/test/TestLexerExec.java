@@ -198,5 +198,108 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test public void testCharSet() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"WS : [ \\n\\u000D] -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "34\r\n 34");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,5:6='34',<3>,2:1]\n" +
+			"[@2,7:6='<EOF>',<-1>,2:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetPlus() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"WS : [ \\n\\u000D]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "34\r\n 34");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,5:6='34',<3>,2:1]\n" +
+			"[@2,7:6='<EOF>',<-1>,2:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetRange() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
+			"ID : [a-zA-Z] [a-zA-Z0-9]* {System.out.println(\"ID\");} ;\n"+
+			"WS : [ \\n\\u0009\r]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "34\r 34 a2 abc \n   ");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"ID\n" +
+			"ID\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,4:5='34',<3>,1:4]\n" +
+			"[@2,7:8='a2',<4>,1:7]\n" +
+			"[@3,10:12='abc',<4>,1:10]\n" +
+			"[@4,18:17='<EOF>',<-1>,2:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetWithMissingEndRange() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : [0-]+ {System.out.println(\"I\");} ;\n"+
+			"WS : [ \\n\\u000D]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "00\r\n");
+		String expecting =
+			"I\n" +
+			"[@0,0:1='00',<3>,1:0]\n" +
+			"[@1,4:3='<EOF>',<-1>,2:0]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetWithMissingEscapeChar() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
+			"WS : [ \\u]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "34 ");
+		String expecting =
+			"I\n" +
+			"[@0,0:1='34',<3>,1:0]\n" +
+			"[@1,3:2='<EOF>',<-1>,1:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetWithEscapedChar() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"DASHBRACK : [\\-\\]]+ {System.out.println(\"DASHBRACK\");} ;\n"+
+			"WS : [ \\u]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "- ] ");
+		String expecting =
+			"DASHBRACK\n" +
+			"DASHBRACK\n" +
+			"[@0,0:0='-',<3>,1:0]\n" +
+			"[@1,2:2=']',<3>,1:2]\n" +
+			"[@2,4:3='<EOF>',<-1>,1:4]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetWithReversedRange() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"A : [z-a9]+ {System.out.println(\"A\");} ;\n"+
+			"WS : [ \\u]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "9");
+		String expecting =
+			"A\n" +
+			"[@0,0:0='9',<3>,1:0]\n" +
+			"[@1,1:0='<EOF>',<-1>,1:1]\n";
+		assertEquals(expecting, found);
+	}
 
 }

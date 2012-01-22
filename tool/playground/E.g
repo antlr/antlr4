@@ -1,2 +1,2 @@
 lexer grammar E;
-I : 'z' -> popMode ;
+I : [\-\]] {System.out.println("I");} ;

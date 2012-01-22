@@ -1,5 +1,19 @@
 ANTLR v4 Honey Badger early access
 
+Jan 22, 2012
+
+* Added ranges, escapes to [a-z] notation in lexer:
+
+    a-z is the inclusive range
+    escape characters with special meaning: trnbf\'" such as \t
+    \uXXXX Unicode character with text digits
+    \- is the - character
+    \] is the ] character
+
+    Missing final range value gives just first char.
+    Inverted ranges give nothing
+    Bad escape sequence gives nothing
+
 Jan 21, 2012
 
 * Added modeNames to gen'd lexers
