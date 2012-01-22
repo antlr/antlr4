@@ -177,6 +177,15 @@ public class ActionTranslator implements ActionSplitterListener {
 					chunks.add(new QRetValueRef(getRuleLabel(x.getText()), y.getText())); break;
 				}
 			case PREDEFINED_RULE:
+				if ( factory.getCurrentRuleFunction()!=null &&
+					 factory.getCurrentRuleFunction().name.equals(x.getText()) )
+				{
+					chunks.add(getRulePropertyRef(y));
+				}
+				else {
+					chunks.add(getRulePropertyRef(x, y));
+				}
+				break;
 			case TOKEN:
 				chunks.add(getTokenPropertyRef(x, y));
 				break;
