@@ -438,7 +438,7 @@ if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><els
 
 LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
-LexerPopMode()     ::= "popMode();"
+LexerPopModeCommand() ::= "popMode();"
 
 LexerTypeCommand(arg)      ::= "_type = <arg>;"
 LexerChannelCommand(arg)   ::= "_channel = <arg>;"

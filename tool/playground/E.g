@@ -1,2 +1,2 @@
 lexer grammar E;
-I : 'z'       {$type = 3;} ;
+I : 'z' -> popMode ;
