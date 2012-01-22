@@ -15,6 +15,7 @@ Jan 21, 2012
   WS : (' '|'\n')+ -> skip ;
 
   use commas to separate commands: "-> skip, mode(FOO)"
+* Lexer fields mv from x to _x like type changed to _type.
 
 Jan 14, 2012
 
