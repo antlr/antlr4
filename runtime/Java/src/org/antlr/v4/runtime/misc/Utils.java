@@ -59,10 +59,10 @@ public class Utils {
 		while ( data.contains(value) ) data.remove(value);
 	}
 
-	public static String escapeWhitespace(String s) {
+	public static String escapeWhitespace(String s, boolean escapeSpaces) {
 		StringBuilder buf = new StringBuilder();
 		for (char c : s.toCharArray()) {
-			if ( c==' ' ) buf.append('\u00B7');
+			if ( c==' ' && escapeSpaces ) buf.append('\u00B7');
 			else if ( c=='\t' ) buf.append("\\t");
 			else if ( c=='\n' ) buf.append("\\n");
 			else if ( c=='\r' ) buf.append("\\r");

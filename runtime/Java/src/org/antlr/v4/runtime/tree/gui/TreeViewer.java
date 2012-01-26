@@ -62,8 +62,7 @@ public class TreeViewer extends JComponent {
 
 		@Override
 		public String getText(Tree node) {
-			boolean escapeWhitespace = true;
-			return String.valueOf(Trees.getNodeText(node, parser, escapeWhitespace));
+			return String.valueOf(Trees.getNodeText(node, parser));
 		}
 	}
 
@@ -213,7 +212,7 @@ public class TreeViewer extends JComponent {
 
 	public void text(Graphics g, String s, int x, int y) {
 //		System.out.println("drawing '"+s+"' @ "+x+","+y);
-		s = Utils.escapeWhitespace(s);
+		s = Utils.escapeWhitespace(s, true);
 		g.drawString(s, x, y);
 	}
 
