@@ -80,10 +80,11 @@ public class Trees {
 	 *  parse trees and extract data appropriately.
 	 */
 	public static String toStringTree(Tree t, Parser recog) {
-		if ( t.getChildCount()==0 ) return getNodeText(t, recog);
+		boolean escapeWhitespace = false;
+		if ( t.getChildCount()==0 ) return getNodeText(t, recog, escapeWhitespace);
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
-		buf.append(getNodeText(t, recog));
+		buf.append(getNodeText(t, recog, escapeWhitespace));
 		buf.append(' ');
 		for (int i = 0; i<t.getChildCount(); i++) {
 			if ( i>0 ) buf.append(' ');
@@ -93,7 +94,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static <Symbol> String getNodeText(Tree t, Parser recog) {
+	public static <Symbol> String getNodeText(Tree t, Parser recog, boolean escapeWhitespace) {
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
 				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
@@ -107,7 +108,7 @@ public class Trees {
 				Object symbol = ((ParseTree.TerminalNode<?>)t).getSymbol();
 				if (symbol instanceof Token) {
 					String s = ((Token)symbol).getText();
-					s = Utils.escapeWhitespace(s);
+					if ( escapeWhitespace ) s = Utils.escapeWhitespace(s);
 					return s;
 				}
 			}

@@ -62,7 +62,8 @@ public class TreeViewer extends JComponent {
 
 		@Override
 		public String getText(Tree node) {
-			return String.valueOf(Trees.getNodeText(node, parser));
+			boolean escapeWhitespace = true;
+			return String.valueOf(Trees.getNodeText(node, parser, escapeWhitespace));
 		}
 	}
 
