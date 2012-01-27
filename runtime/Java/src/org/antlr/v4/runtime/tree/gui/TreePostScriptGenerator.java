@@ -35,6 +35,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 
@@ -152,7 +153,9 @@ public class TreePostScriptGenerator {
 	}
 
 	protected String getText(Tree tree) {
-		return treeTextProvider.getText(tree);
+		String s = treeTextProvider.getText(tree);
+		s = Utils.escapeWhitespace(s, false);
+		return s;
 	}
 
 	public TreeTextProvider getTreeTextProvider() {

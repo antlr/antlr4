@@ -347,7 +347,9 @@ public class TreeViewer extends JComponent {
 	}
 
 	protected String getText(Tree tree) {
-		return treeTextProvider.getText(tree);
+		String s = treeTextProvider.getText(tree);
+		s = Utils.escapeWhitespace(s, true);
+		return s;
 	}
 
 	public TreeTextProvider getTreeTextProvider() {
