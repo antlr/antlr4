@@ -221,7 +221,7 @@ delegateGrammar
     ;
 
 tokensSpec
-	:   ^(TOKENS tokenSpec+)
+	:   ^(TOKENS_SPEC tokenSpec+)
 	;
 
 tokenSpec
@@ -368,7 +368,13 @@ lexerElements
     ;
 
 lexerElement
-	:	element
+	:	labeledLexerElement
+	|	lexerAtom
+	|	subrule
+	|   ACTION						{actionInAlt((ActionAST)$ACTION);}
+	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
+	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
+	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
 	;
 
 labeledLexerElement
@@ -385,8 +391,8 @@ lexerAtom
     |   blockSet
     |   ^(WILDCARD elementOptions)
     |   WILDCARD
-    |	ARG_ACTION
-	;
+    |	LEXER_CHAR_SET
+    ;
 
 actionElement
 	:	ACTION
@@ -429,7 +435,6 @@ element
 	
 	|	^(NOT blockSet)
 	|	^(NOT block)
-	|	ARG_ACTION // lexer [Aa] set
 	;
 
 astOperand
@@ -479,6 +484,7 @@ setElement
 		stringRef((TerminalAST)$a);
 		stringRef((TerminalAST)$b);
 		}
+        |       LEXER_CHAR_SET
 	;
 
 block

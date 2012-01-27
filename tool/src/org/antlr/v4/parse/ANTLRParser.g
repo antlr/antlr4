@@ -284,7 +284,7 @@ delegateGrammar
  *  {tree} parser.
  */
 tokensSpec
-	: TOKENS tokenSpec+ RBRACE -> ^(TOKENS tokenSpec+)
+	: TOKENS_SPEC tokenSpec+ RBRACE -> ^(TOKENS_SPEC tokenSpec+)
 	;
 
 tokenSpec
@@ -762,7 +762,7 @@ lexerAtom
     |   RULE_REF<RuleRefAST>
     |	notSet 
     |	wildcard
-    |	ARG_ACTION
+    |	LEXER_CHAR_SET
 	;
 
 atom

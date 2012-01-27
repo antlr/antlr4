@@ -82,7 +82,7 @@ options {
 	//superclass    = AbstractA3Lexer;
 }
 
-tokens { SEMPRED; TOKEN_REF; RULE_REF; }
+tokens { SEMPRED; TOKEN_REF; RULE_REF; LEXER_CHAR_SET; ARG_ACTION; }
 
 // Include the copyright in this source and also the generated source
 //
@@ -117,9 +117,15 @@ tokens { SEMPRED; TOKEN_REF; RULE_REF; }
 package org.antlr.v4.parse;
 }
 
-// +=====================+
-// | Lexer specification |
-// +=====================+
+
+@members {
+    public Token prevToken;
+    @Override
+    public void emit(Token token) {
+        super.emit(token);
+        if ( token.getChannel()==Token.DEFAULT_CHANNEL ) prevToken = token;
+    }
+}
 
 // --------
 // Comments
@@ -219,6 +225,16 @@ COMMENT
        }
     ;
 
+ARG_OR_CHARSET
+options {k=1;}
+    :   {prevToken.getType()!=RULE_REF}?=> LEXER_CHAR_SET {$type=LEXER_CHAR_SET;}
+    |   {prevToken.getType()==RULE_REF}?=> ARG_ACTION     {$type=ARG_ACTION;}
+    ;
+    
+fragment
+LEXER_CHAR_SET
+    :   '[' ('\\]'|'\\'|~('\\'|']'))* ']'
+    ;
 
 // --------------
 // Argument specs
@@ -228,6 +244,7 @@ COMMENT
 // are contained within square brackets. In the lexer we consume them
 // all at once and sort them out later in the grammar analysis.
 //
+fragment
 ARG_ACTION
 @init
 {
@@ -391,7 +408,7 @@ NESTED_ACTION
 // to an ACTION block, despite it usingthe same {} delimiters.
 //
 OPTIONS      : 'options' WSNLCHARS* '{'  ;
-TOKENS       : 'tokens'  WSNLCHARS* '{'  ;
+TOKENS_SPEC  : 'tokens'  WSNLCHARS* '{'  ;
 
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;

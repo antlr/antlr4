@@ -164,7 +164,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		GrammarAST parent = (GrammarAST)firstPrequel.parent;
 		List<GrammarAST> options = parent.getAllChildrenWithType(OPTIONS);
 		List<GrammarAST> imports = parent.getAllChildrenWithType(IMPORT);
-		List<GrammarAST> tokens = parent.getAllChildrenWithType(TOKENS);
+		List<GrammarAST> tokens = parent.getAllChildrenWithType(TOKENS_SPEC);
 		checkNumPrequels(options, imports, tokens);
 	}
 

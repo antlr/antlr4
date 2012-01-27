@@ -131,7 +131,7 @@ public class GrammarTransformPipeline {
 		GrammarAST id = (GrammarAST) root.getChild(0);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(id.token.getInputStream());
 
-	 	GrammarAST tokensRoot = (GrammarAST)root.getFirstChildWithType(ANTLRParser.TOKENS);
+	 	GrammarAST tokensRoot = (GrammarAST)root.getFirstChildWithType(ANTLRParser.TOKENS_SPEC);
 
 		List<GrammarAST> actionRoots = root.getNodesWithType(ANTLRParser.AT);
 
@@ -151,11 +151,11 @@ public class GrammarTransformPipeline {
 
 		for (Grammar imp : imports) {
 			// COPY TOKENS
-			GrammarAST imp_tokensRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.TOKENS);
+			GrammarAST imp_tokensRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.TOKENS_SPEC);
 			if ( imp_tokensRoot!=null ) {
 				rootGrammar.tool.log("grammar", "imported tokens: "+imp_tokensRoot.getChildren());
 				if ( tokensRoot==null ) {
-					tokensRoot = (GrammarAST)adaptor.create(ANTLRParser.TOKENS, "TOKENS");
+					tokensRoot = (GrammarAST)adaptor.create(ANTLRParser.TOKENS_SPEC, "TOKENS");
 					tokensRoot.g = rootGrammar;
 					root.insertChild(1, tokensRoot); // ^(GRAMMAR ID TOKENS...)
 				}
