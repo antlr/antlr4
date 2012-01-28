@@ -232,21 +232,19 @@ public class Target {
 	 *  around the incoming literal.  Just flip the quotes and replace
 	 *  double quotes with \"
      *
-     *  Note that we have decided to allow poeple to use '\"' without
-     *  penalty, so we must build the target string in a loop as Utils.replae
-     *  cannot handle both \" and " without a lot of messing around.
-     *
+     *  Note that we have decided to allow people to use '\"' without
+	 *  penalty, so we must build the target string in a loop as Utils.replae
+	 *  cannot handle both \" and " without a lot of messing around.
+	 *
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
-		String literal)
+		String literal, boolean addQuotes)
 	{
-        StringBuilder sb = new StringBuilder();
-        StringBuffer is = new StringBuffer(literal);
+		StringBuilder sb = new StringBuilder();
+		StringBuffer is = new StringBuffer(literal);
 
-        // Opening quote
-        //
-        sb.append('"');
+        if ( addQuotes ) sb.append('"');
 
         for (int i = 1; i < is.length() -1; i++) {
             if  (is.charAt(i) == '\\') {
@@ -272,30 +270,23 @@ public class Target {
                     default:
                         // Remove the escape by virtue of not adding it here
                         // Thus \' becomes ' and so on
-                        //
                         break;
                 }
 
                 // Go past the \ character
-                //
                 i++;
             } else {
-                // Chracters that don't need \ in ANTLR 'strings' but do in Java
-                //
+                // Characters that don't need \ in ANTLR 'strings' but do in Java
                 if (is.charAt(i) == '"') {
                     // We need to escape " in Java
-                    //
                     sb.append('\\');
                 }
             }
             // Add in the next character, which may have been escaped
-            //
             sb.append(is.charAt(i));
         }
 
-        // Append closing " and return
-        //
-        sb.append('"');
+		if ( addQuotes ) sb.append('"');
 
 		return sb.toString();
 	}

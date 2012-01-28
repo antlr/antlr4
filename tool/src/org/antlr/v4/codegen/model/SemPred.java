@@ -64,7 +64,8 @@ public class SemPred extends Action {
 		}
 		else {
 			msg = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
-																		  failNode.getText());
+																		  failNode.getText(),
+																		  true);
 		}
 	}
 }

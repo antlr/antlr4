@@ -71,7 +71,12 @@ public class Parser extends OutputModelObject {
 			if ( tokenNames[i]==null ) continue;
 			CodeGenerator gen = factory.getGenerator();
 			if ( tokenNames[i].charAt(0)=='\'' ) {
-				tokenNames[i] = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen, tokenNames[i]);
+				boolean addQuotes = false;
+				tokenNames[i] =
+					gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
+																			tokenNames[i],
+																			addQuotes);
+				tokenNames[i] = "\"'"+tokenNames[i]+"'\"";
 			}
 			else {
 				tokenNames[i] = gen.target.getTargetStringLiteralFromString(tokenNames[i], true);
