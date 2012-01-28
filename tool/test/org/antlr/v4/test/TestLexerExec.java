@@ -228,6 +228,34 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test public void testCharSetNot() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : ~[ab \n] ~[ \ncd]* {System.out.println(\"I\");} ;\n"+
+			"WS : [ \\n\\u000D]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "xaf");
+		String expecting =
+			"I\n" +
+			"[@0,0:2='xaf',<3>,1:0]\n" +
+			"[@1,3:2='<EOF>',<-1>,1:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetInSet() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : (~[ab \n]|'a') {System.out.println(\"I\");} ;\n"+
+			"WS : [ \\n\\u000D]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "a x");
+		String expecting =
+			"I\n" +
+			"I\n" +
+			"[@0,0:0='a',<3>,1:0]\n" +
+			"[@1,2:2='x',<3>,1:2]\n" +
+			"[@2,3:2='<EOF>',<-1>,1:3]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test public void testCharSetRange() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+

@@ -30,7 +30,6 @@
 package org.antlr.v4.automata;
 
 import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
@@ -161,10 +160,13 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(associatedAST);
 		IntervalSet set = new IntervalSet();
 		for (GrammarAST t : alts) {
-			if ( t.getType()== ANTLRParser.RANGE ) {
+			if ( t.getType()==ANTLRParser.RANGE ) {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
 				set.add(a, b);
+			}
+			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
+				set.addAll(getSetFromCharSetLiteral(t));
 			}
 			else {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
@@ -172,9 +174,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			}
 		}
 		if ( invert ) {
-			// TODO: what? should be chars not token types
-			IntervalSet notSet = set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
-			left.addTransition(new NotSetTransition(right, set, notSet));
+			left.addTransition(new NotSetTransition(right, set));
 		}
 		else {
 			left.addTransition(new SetTransition(right, set));
@@ -210,36 +210,21 @@ public class LexerATNFactory extends ParserATNFactory {
 	public Handle charSetLiteral(GrammarAST charSetAST) {
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
-		String cset = '"'+charSetAST.getText()+'"';
+		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
+		left.addTransition(new SetTransition(right, set));
+		charSetAST.atnState = left;
+		return new Handle(left, right);
+	}
 
+	public IntervalSet getSetFromCharSetLiteral(GrammarAST charSetAST) {
+		String chars = charSetAST.getText();
+		chars = chars.substring(1, chars.length()-1);
+		String cset = '"'+ chars +'"';
 		IntervalSet set = new IntervalSet();
-//		int n = cset.length();
-//		int i = 0;
-//		while ( i < n ) {
-//			if ( (i+2)<n && cset.charAt(i+1)=='-' ) { // range x-y
-//				int x = cset.charAt(i);
-//				int y = cset.charAt(i+2);
-//				if ( y=='\\' ) { i = i+3; continue; } // x-\
-//				if ( x<=y ) set.add(x,y);
-//			}
-//			else if ( cset.charAt(i)=='\\' ) {
-//				int end = i+2;
-//				if ( (i+1)>=n ) break; // ignore spurious \ on end
-//				if ( cset.charAt(i+1) == 'u' ) end = i+6;
-//				if ( end>n ) break;
-//				int c = CharSupport.getCharValueFromCharInGrammarLiteral(cset.substring(i,end));
-//				set.add(c);
-//				i = end;
-//			}
-//			else {
-//				set.add(cset.charAt(i));
-//				i++;
-//			}
-//		}
 
 		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
 		// so we can avoid seeing them as '-' range ops.
-		String chars = CharSupport.getStringFromGrammarStringLiteral(cset);
+		chars = CharSupport.getStringFromGrammarStringLiteral(cset);
 		// now make x-y become set of char
 		int n = chars.length();
 		for (int i=0; i< n; i++) {
@@ -257,9 +242,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				set.add(c);
 			}
 		}
-		left.addTransition(new SetTransition(right, set));
-		charSetAST.atnState = left;
-		return new Handle(left, right);
+		return set;
 	}
 
 	@Override

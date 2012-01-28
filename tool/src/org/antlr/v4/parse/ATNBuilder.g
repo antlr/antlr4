@@ -163,6 +163,7 @@ setElement
 	:	STRING_LITERAL
 	|	TOKEN_REF
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
+    |   LEXER_CHAR_SET
 	;
 
 atom returns [ATNFactory.Handle p]

@@ -179,8 +179,7 @@ public class ParserATNFactory implements ATNFactory {
 			set.add(ttype);
 		}
 		if ( invert ) {
-			IntervalSet notSet = set.complement(Token.MIN_TOKEN_TYPE, g.getMaxTokenType());
-			left.addTransition(new NotSetTransition(right, set, notSet));
+			left.addTransition(new NotSetTransition(right, set));
 		}
 		else {
 			left.addTransition(new SetTransition(right, set));

@@ -29,19 +29,13 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
 public class NotSetTransition extends SetTransition {
-	// keep both set, notSet; we can only compute at construction time
-	// since only then do we have grammar, which knows token set for complement.
-	@Nullable
-	public final IntervalSet notSet;
-
-	public NotSetTransition(@NotNull ATNState target, @Nullable IntervalSet set, @Nullable IntervalSet notSet) {
+	public NotSetTransition(@NotNull ATNState target, @Nullable IntervalSet set) {
 		super(target, set);
-		this.notSet = notSet;
 	}
 
 	@Override

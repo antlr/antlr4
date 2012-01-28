@@ -31,6 +31,8 @@ package org.antlr.v4.runtime;
 /** A source of characters for an ANTLR lexer */
 public interface CharStream extends IntStream {
 	public static final int EOF = -1;
+	public static final int MIN_CHAR = Character.MIN_VALUE;
+	public static final int MAX_CHAR = Character.MAX_VALUE-1; // FFFE is max
 
 	/** For unbuffered streams, you can't use this; primarily I'm providing
 	 *  a useful interface for action code.  Just make sure actions don't

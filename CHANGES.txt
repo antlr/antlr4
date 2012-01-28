@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger early access
 
+Jan 28, 2012
+
+* ~[] stuff is allowed and works inside sets etc...
+
 Jan 22, 2012
 
 * Added ranges, escapes to [a-z] notation in lexer:
