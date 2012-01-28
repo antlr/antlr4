@@ -370,7 +370,7 @@ lexerElements
 lexerElement
 	:	labeledLexerElement
 	|	lexerAtom
-	|	subrule
+	|	lexerSubrule
 	|   ACTION						{actionInAlt((ActionAST)$ACTION);}
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
@@ -392,6 +392,7 @@ lexerAtom
     |   ^(WILDCARD elementOptions)
     |   WILDCARD
     |	LEXER_CHAR_SET
+    |   range
     ;
 
 actionElement
@@ -452,6 +453,11 @@ subrule
 	| 	block
     ;
 
+lexerSubrule
+	:	^(blockSuffix lexerBlock)
+	| 	lexerBlock
+    ;
+
 blockSuffix
     : ebnfSuffix
     ;
@@ -462,8 +468,7 @@ ebnfSuffix
    	|	POSITIVE_CLOSURE
 	;
 
-atom:	range
-	|	^(DOT ID terminal)
+atom:	^(DOT ID terminal)
 	|	^(DOT ID ruleref)
     |	^(WILDCARD elementOptions)	{wildcardRef($WILDCARD);}
     |	WILDCARD					{wildcardRef($WILDCARD);}

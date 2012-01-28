@@ -310,8 +310,8 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g", grammar, "L", "b\"a");
 		String expecting =
 			"A\n" +
-			"[@0,0:0='9',<3>,1:0]\n" +
-			"[@1,1:0='<EOF>',<-1>,1:1]\n";
+			"[@0,0:2='b\"a',<3>,1:0]\n" +
+			"[@1,3:2='<EOF>',<-1>,1:3]\n";
 		assertEquals(expecting, found);
 	}
 
