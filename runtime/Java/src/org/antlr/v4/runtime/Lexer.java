@@ -88,7 +88,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** The token type for the current token */
 	public int _type;
 
-	public ArrayDeque<Integer> _modeStack;
+	public ArrayDeque<Integer> _modeStack = new ArrayDeque<Integer>();
 	public int _mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in
@@ -115,9 +115,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 		_hitEOF = false;
 		_mode = Lexer.DEFAULT_MODE;
-		if (_modeStack != null) {
-			_modeStack.clear();
-		}
+		_modeStack.clear();
 
 		getInterpreter().reset();
 	}
@@ -184,14 +182,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public void pushMode(int m) {
 		if ( LexerATNSimulator.debug ) System.out.println("pushMode "+m);
-		if ( _modeStack ==null ) _modeStack = new ArrayDeque<Integer>();
 		getInterpreter().tracePushMode(m);
 		_modeStack.push(_mode);
 		mode(m);
 	}
 
 	public int popMode() {
-		if ( _modeStack ==null ) throw new EmptyStackException();
+		if ( _modeStack.isEmpty() ) throw new EmptyStackException();
 		if ( LexerATNSimulator.debug ) System.out.println("popMode back to "+ _modeStack.peek());
 		getInterpreter().tracePopMode();
 		mode( _modeStack.pop() );
