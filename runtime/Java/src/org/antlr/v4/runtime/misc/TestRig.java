@@ -41,7 +41,11 @@ import java.lang.reflect.Method;
 /** Run a lexer/parser combo, optionally printing tree string or generating
  *  postscript file. Optionally taking input file.
  *
- *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-print] [-tokens] [-gui] [-ps file.ps] [input-filename]
+ *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName
+ *        [-print]
+ *        [-tokens] [-gui] [-ps file.ps]
+ *        [-trace]
+ *        [input-filename]
  */
 public class TestRig {
 	public static void main(String[] args) throws Exception {
@@ -52,9 +56,12 @@ public class TestRig {
 		boolean gui = false;
 		String psFile = null;
 		boolean showTokens = false;
+		boolean trace = false;
 		String encoding = null;
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName [-print] [-tokens] [-gui] [-encoding encodingname] [-ps file.ps] [input-filename]");
+			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName" +
+							   " [-print] [-tokens] [-gui] [-encoding encodingname]" +
+							   " [-ps file.ps] [-trace] [input-filename]");
 			return;
 		}
 		int i=0;
@@ -77,6 +84,9 @@ public class TestRig {
 			}
 			if ( arg.equals("-tokens") ) {
 				showTokens = true;
+			}
+			else if ( arg.equals("-trace") ) {
+				trace = true;
 			}
 			else if ( arg.equals("-encoding") ) {
 				if ( i>=args.length ) {
@@ -142,6 +152,8 @@ public class TestRig {
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);
 			}
+
+			parser.setTrace(trace);
 
 			Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
 			ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
