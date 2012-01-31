@@ -538,7 +538,7 @@ public static class <s.label>Context extends <currentRule.name>Context {
 VisitorDispatchMethod(method) ::= <<
 @Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	if ( listener!=null ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
+	if ( listener!=null && listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
 }
 >>
 
@@ -547,7 +547,7 @@ AttributeDecl(d) ::= "<d.decl>"
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
 
-// used for left-recursive rules 
+// used for left-recursive rules
 recRuleDefArg()						  ::= "int _p"
 recRuleArg()						  ::= "$_p"
 recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
