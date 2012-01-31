@@ -237,6 +237,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				int x = c;
 				int y = chars.charAt(i+2);
 				if ( x<=y ) set.add(x,y);
+				i+=2;
 			}
 			else {
 				set.add(c);
