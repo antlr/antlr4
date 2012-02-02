@@ -368,6 +368,7 @@ public class Tool {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ANTLRLexer lexer = new ANTLRLexer(in);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			lexer.tokens = tokens;
 			ToolANTLRParser p = new ToolANTLRParser(tokens, this);
 			p.setTreeAdaptor(adaptor);
 			ParserRuleReturnScope r = p.grammarSpec();
