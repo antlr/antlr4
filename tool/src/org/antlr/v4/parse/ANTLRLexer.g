@@ -119,7 +119,27 @@ package org.antlr.v4.parse;
 
 
 @members {
-    public boolean isLexer = false;
+    public CommonTokenStream tokens; // track stream we push to; need for context info
+    public boolean isLexerRule = false;
+
+	/** scan backwards from current point in this.tokens list
+	 *  looking for the start of the rule or subrule.
+	 *  Return token or null if for some reason we can't find the start.
+	 */
+	public Token getRuleOrSubruleStartToken() {
+	    if ( tokens==null ) return null;
+		int i = tokens.index();
+        int n = tokens.size();
+        if ( i>=n ) i = n-1; // seems index == n as we lex
+		while ( i>=0 && i<n) {
+			int ttype = tokens.get(i).getType();
+			if ( ttype == LPAREN || ttype == TOKEN_REF || ttype == RULE_REF ) {
+				return tokens.get(i);
+			}
+			i--;
+		}
+		return null;
+	}
 }
 
 // --------
@@ -222,8 +242,8 @@ COMMENT
 
 ARG_OR_CHARSET
 options {k=1;}
-    :   {isLexer}?=> LEXER_CHAR_SET {$type=LEXER_CHAR_SET;}
-    |   {!isLexer}?=> ARG_ACTION    {$type=ARG_ACTION;}
+    :   {isLexerRule}?=> LEXER_CHAR_SET {$type=LEXER_CHAR_SET;}
+    |   {!isLexerRule}?=> ARG_ACTION    {$type=ARG_ACTION;}
     ;
 
 fragment
@@ -407,7 +427,7 @@ TOKENS_SPEC  : 'tokens'  WSNLCHARS* '{'  ;
 
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;
-LEXER        : 'lexer'     {isLexer=true;} ;
+LEXER        : 'lexer'                ;
 PARSER       : 'parser'               ;
 GRAMMAR      : 'grammar'              ;
 PROTECTED    : 'protected'            ;
@@ -425,7 +445,22 @@ MODE         : 'mode'                 ;
 //
 // Character sequences used as separators, delimters, operators, etc
 //
-COLON        : ':'                    ;
+COLON        : ':'
+               {
+               // scan backwards, looking for a RULE_REF or TOKEN_REF.
+               // which would indicate the start of a rule definition.
+               // If we see a LPAREN, then it's the start of the subrule.
+               // this.tokens is the token string we are pushing into, so
+               // just loop backwards looking for a rule definition. Then
+               // we set isLexerRule.
+               Token t = getRuleOrSubruleStartToken();
+               if ( t!=null ) {
+                    if ( t.getType()==RULE_REF ) isLexerRule = false;
+                    else if ( t.getType()==TOKEN_REF ) isLexerRule = true;
+                    // else must be subrule; don't alter context
+               }
+               }
+             ;
 COLONCOLON   : '::'                   ;
 COMMA        : ','                    ;
 SEMI         : ';'                    ;
@@ -449,35 +484,13 @@ POUND        : '#'                    ;
 NOT          : '~'                    ;
 RBRACE       : '}'                    ;
 
-/*
-// ---------------
-// Token reference
-//
-// The names of all tokens must start with an upper case letter and so
-// the lexer can distinguish them directly.
-//
-TOKEN_REF
-    : ('A'..'Z') ('A'..'Z' | 'a'..'z' | '0'..'9' | '_')*
-    ;
-
-// --------------
-// Rule reference
-//
-// The names of all rules must start with a lower case letter
-// so the lexer can distibguish them directly. The parser takes
-// care of the case such as id=rulename
-//
-RULE_REF
-    : ('a'..'z') ('A'..'Z' | 'a'..'z' | '0'..'9' | '_')*
-    ;
-    */
-
 /** Allow unicode rule/token names */
 ID			:	a=NameStartChar NameChar*
 				{
 				if ( Character.isUpperCase($a.text.charAt(0)) ) $type = TOKEN_REF;
 				else $type = RULE_REF;
-				};
+				}
+			;
 
 fragment
 NameChar    :   NameStartChar

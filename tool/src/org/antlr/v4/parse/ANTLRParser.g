@@ -57,7 +57,6 @@ options {
 // nodes for the AST we are generating. The tokens section is where we
 // specify any such tokens
 tokens {
-    LEXER;
     RULE;
 	PREC_RULE; // flip to this if we find that it's left-recursive
     RULES;
@@ -89,7 +88,7 @@ tokens {
     LIST;
     ELEMENT_OPTIONS;      // TOKEN<options>
     RESULT;
-    
+
     // lexer action stuff
     LEXER_ALT_ACTION;
     LEXER_ACTION_CALL; // ID(foo)
@@ -340,7 +339,7 @@ sync
 rule:	parserRule
 	|	lexerRule
 	;
-	
+
 // The specification of an EBNF rule in ANTLR style, with all the
 // rule level parameters, declarations, actions, rewrite specs and so
 // on.
@@ -561,7 +560,7 @@ lexerRuleBlock
     	// just resyncing; ignore error
 		retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), null);
     }
-    
+
 lexerAltList
 	:	lexerAlt (OR lexerAlt)* -> lexerAlt+
 	;
@@ -586,11 +585,11 @@ lexerElement
 	:	labeledLexerElement
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$labeledLexerElement.start,"BLOCK"] ^(ALT<AltAST> labeledLexerElement) ) )
 		|				-> labeledLexerElement
-		)		
+		)
 	|	lexerAtom
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$lexerAtom.start,"BLOCK"] ^(ALT<AltAST> lexerAtom) ) )
 		|				-> lexerAtom
-		)		
+		)
 	|	lexerBlock
 		(	ebnfSuffix	-> ^(ebnfSuffix lexerBlock)
 		|				-> lexerBlock
@@ -624,14 +623,14 @@ lexerElement
         reportError(re);
         recover(input,re);
 	}
-	
+
 labeledLexerElement
 	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
 		(	lexerAtom	-> ^($ass id lexerAtom)
 		|	block 		-> ^($ass id block)
 		)
 	;
-	
+
 lexerBlock
  	:	LPAREN lexerAltList RPAREN
       -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] lexerAltList )
@@ -648,7 +647,7 @@ lexerCommand
 	;
 
 lexerCommandExpr
-	:	id 
+	:	id
 	|	INT
 	;
 
@@ -755,12 +754,12 @@ ebnfSuffix
   	|	STAR 		-> CLOSURE<StarBlockAST>[$start]
    	|	PLUS	 	-> POSITIVE_CLOSURE<PlusBlockAST>[$start]
 	;
-	
+
 lexerAtom
-	:	range 
+	:	range
 	|	terminal
     |   RULE_REF<RuleRefAST>
-    |	notSet 
+    |	notSet
     |	wildcard
     |	LEXER_CHAR_SET
 	;
