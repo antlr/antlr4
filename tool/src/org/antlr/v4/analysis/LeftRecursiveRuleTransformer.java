@@ -157,6 +157,7 @@ public class LeftRecursiveRuleTransformer {
 		ANTLRLexer lexer = new ANTLRLexer(new ANTLRStringStream(ruleText));
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		lexer.tokens = tokens;
 		ToolANTLRParser p = new ToolANTLRParser(tokens, tool);
 		p.setTreeAdaptor(adaptor);
 		try {
