@@ -119,12 +119,7 @@ package org.antlr.v4.parse;
 
 
 @members {
-    public Token prevToken;
-    @Override
-    public void emit(Token token) {
-        super.emit(token);
-        if ( token.getChannel()==Token.DEFAULT_CHANNEL ) prevToken = token;
-    }
+    public boolean isLexer = false;
 }
 
 // --------
@@ -227,10 +222,10 @@ COMMENT
 
 ARG_OR_CHARSET
 options {k=1;}
-    :   {prevToken.getType()!=RULE_REF}?=> LEXER_CHAR_SET {$type=LEXER_CHAR_SET;}
-    |   {prevToken.getType()==RULE_REF}?=> ARG_ACTION     {$type=ARG_ACTION;}
+    :   {isLexer}?=> LEXER_CHAR_SET {$type=LEXER_CHAR_SET;}
+    |   {!isLexer}?=> ARG_ACTION    {$type=ARG_ACTION;}
     ;
-    
+
 fragment
 LEXER_CHAR_SET
     :   '[' ('\\]'|'\\'|~('\\'|']'))* ']'
@@ -412,7 +407,7 @@ TOKENS_SPEC  : 'tokens'  WSNLCHARS* '{'  ;
 
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;
-LEXER        : 'lexer'                ;
+LEXER        : 'lexer'     {isLexer=true;} ;
 PARSER       : 'parser'               ;
 GRAMMAR      : 'grammar'              ;
 PROTECTED    : 'protected'            ;

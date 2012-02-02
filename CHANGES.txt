@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger early access
 
+Jan 30, 2012
+
+* Moving to github.
+
 Jan 28, 2012
 
 * ~[] stuff is allowed and works inside sets etc...
