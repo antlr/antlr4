@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ParserATNPathFinder extends v2ParserATNSimulator {
+public class ParserATNPathFinder extends ParserATNSimulator {
 	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn) {
 		super(parser, atn);
 	}

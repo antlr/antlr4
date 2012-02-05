@@ -28,10 +28,8 @@
  */
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -83,7 +81,7 @@ public class DFA {
 //		return states;
 //	}
 
-	public List<Set<ATNState>> getATNStatesAlongPath(v2ParserATNSimulator atn,
+	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator atn,
 													 List<DFAState> dfaStates,
 													 TokenStream input, int start, int stop)
 	{
