@@ -225,7 +225,7 @@ import java.util.*;
  	 *  when closure operations fall off the end of the rule that
  	 *  holds the decision were evaluating
 */
-public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
+public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
@@ -242,11 +242,11 @@ public class v2ParserATNSimulator<Symbol> extends ATNSimulator {
 	public final DFA[] decisionToDFA;
 
 	/** Testing only! */
-	public v2ParserATNSimulator(@NotNull ATN atn) {
+	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
 	}
 
-	public v2ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn) {
+	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
 //		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
