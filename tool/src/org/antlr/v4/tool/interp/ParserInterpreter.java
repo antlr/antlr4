@@ -33,13 +33,9 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ParserInterpreter {
 	class DummyParser extends Parser {
@@ -61,7 +57,7 @@ public class ParserInterpreter {
 	}
 
 	protected Grammar g;
-	protected v2ParserATNSimulator<Token> atnSimulator;
+	protected ParserATNSimulator<Token> atnSimulator;
 	protected TokenStream input;
 
 	public ParserInterpreter(@NotNull Grammar g) {
@@ -71,7 +67,7 @@ public class ParserInterpreter {
 	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		atnSimulator = new v2ParserATNSimulator<Token>(new DummyParser(g, input), g.atn);
+		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, input), g.atn);
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Token> input,
@@ -104,7 +100,7 @@ public class ParserInterpreter {
 		}
 	}
 
-	public v2ParserATNSimulator<Token> getATNSimulator() {
+	public ParserATNSimulator<Token> getATNSimulator() {
 		return atnSimulator;
 	}
 

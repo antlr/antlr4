@@ -60,8 +60,8 @@ public class TestRig {
 		String encoding = null;
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName" +
-							   " [-print] [-tokens] [-gui] [-encoding encodingname]" +
-							   " [-ps file.ps] [-trace] [input-filename]");
+							   " [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname] [-trace]"+
+							   " [input-filename]");
 			return;
 		}
 		int i=0;
@@ -155,17 +155,22 @@ public class TestRig {
 
 			parser.setTrace(trace);
 
-			Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-			ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
+			try {
+				Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
+				ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
 
-			if ( printTree ) {
-				System.out.println(tree.toStringTree(parser));
+				if ( printTree ) {
+					System.out.println(tree.toStringTree(parser));
+				}
+				if ( gui ) {
+					tree.inspect(parser);
+				}
+				if ( psFile!=null ) {
+					tree.save(parser, psFile); // Generate postscript
+				}
 			}
-			if ( gui ) {
-				tree.inspect(parser);
-			}
-			if ( psFile!=null ) {
-				tree.save(parser, psFile); // Generate postscript
+			catch (NoSuchMethodException nsme) {
+				System.err.println("No method for rule "+startRuleName+" or it has arguments");
 			}
 		}
 		finally {

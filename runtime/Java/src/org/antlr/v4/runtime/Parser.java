@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
-public abstract class Parser extends Recognizer<Token, v2ParserATNSimulator<Token>> {
+public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>> {
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
 		public void enterEveryRule(ParserRuleContext<Token> ctx) {
