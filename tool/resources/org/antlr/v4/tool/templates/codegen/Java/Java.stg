@@ -130,7 +130,7 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
-	_interp = new v2ParserATNSimulator\<Token>(this,_ATN);
+	_interp = new ParserATNSimulator\<Token>(this,_ATN);
 }
 >>
 
