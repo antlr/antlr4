@@ -2,7 +2,7 @@ import org.antlr.runtime.debug.BlankDebugEventListener;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.v2ParserATNSimulator;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
 import java.io.File;
 
@@ -34,8 +34,8 @@ class TestYang {
 			System.out.println("finished parsing OK");
 			System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
 			System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
-			System.out.println(v2ParserATNSimulator.ATN_failover+" parser failovers");
-			System.out.println(v2ParserATNSimulator.predict_calls +" parser predict calls");
+			System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
+			System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 			if ( profile ) {
 				System.out.println("num decisions "+profiler.numDecisions);
 			}
