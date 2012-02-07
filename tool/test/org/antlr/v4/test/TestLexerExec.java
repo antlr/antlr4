@@ -343,4 +343,17 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test public void testCharSetWithQuote2() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"A : [\"\\\\ab]+ {System.out.println(\"A\");} ;\n"+
+			"WS : [ \n\t]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "b\"\\a");
+		String expecting =
+			"A\n" +
+			"[@0,0:3='b\"\\a',<3>,1:0]\n" +
+			"[@1,4:3='<EOF>',<-1>,1:4]\n";
+		assertEquals(expecting, found);
+	}
+
 }
