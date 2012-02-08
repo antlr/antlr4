@@ -299,7 +299,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
 	protected void addContextToParseTree() {
-		ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
+		ParserRuleContext<?> parent = (ParserRuleContext<?>)_ctx.parent;
 		// add current context to parent if we have a parent
 		if ( parent!=null )	{
 			parent.addChild(_ctx);
@@ -331,7 +331,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( _buildParseTrees && _ctx != localctx ) {
-			ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
+			ParserRuleContext<?> parent = (ParserRuleContext<?>)_ctx.parent;
 			parent.removeLastChild();
 			if ( parent!=null )	parent.addChild(localctx);
 		}
@@ -385,7 +385,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
     public boolean isExpectedToken(int symbol) {
 //   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;
-		ParserRuleContext ctx = _ctx;
+		ParserRuleContext<?> ctx = _ctx;
         ATNState s = atn.states.get(ctx.s);
         IntervalSet following = atn.nextTokens(s);
         if (following.contains(symbol)) {
@@ -402,7 +402,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
                 return true;
             }
 
-            ctx = (ParserRuleContext)ctx.parent;
+            ctx = (ParserRuleContext<?>)ctx.parent;
         }
 
         if ( following.contains(Token.EPSILON) && symbol == Token.EOF ) {
@@ -417,7 +417,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	 */
     public IntervalSet getExpectedTokens() {
         ATN atn = getInterpreter().atn;
-		ParserRuleContext ctx = _ctx;
+		ParserRuleContext<?> ctx = _ctx;
         ATNState s = atn.states.get(ctx.s);
         IntervalSet following = atn.nextTokens(s);
 //        System.out.println("following "+s+"="+following);
@@ -431,7 +431,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
             following = atn.nextTokens(rt.followState);
             expected.addAll(following);
             expected.remove(Token.EPSILON);
-            ctx = (ParserRuleContext)ctx.parent;
+            ctx = (ParserRuleContext<?>)ctx.parent;
         }
         if ( following.contains(Token.EPSILON) ) {
             expected.add(Token.EOF);
