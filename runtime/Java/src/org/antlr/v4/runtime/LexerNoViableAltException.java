@@ -29,20 +29,19 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
 
 public class LexerNoViableAltException extends RecognitionException {
 	/** Matching attempted at what input index? */
 	public int startIndex;
 
 	/** Which configurations did we try at input.index() that couldn't match input.LA(1)? */
-	public OrderedHashSet<ATNConfig> deadEndConfigs;
+	public ATNConfigSet deadEndConfigs;
 
 	public LexerNoViableAltException(Lexer lexer,
 									 CharStream input,
 									 int startIndex,
-									 OrderedHashSet<ATNConfig> deadEndConfigs) {
+									 ATNConfigSet deadEndConfigs) {
 		super(lexer, input, null);
 		this.startIndex = startIndex;
 		this.deadEndConfigs = deadEndConfigs;
