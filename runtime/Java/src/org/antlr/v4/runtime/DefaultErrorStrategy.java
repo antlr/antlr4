@@ -554,7 +554,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull OrderedHashSet<ATNConfig> configs)
+								@NotNull ATNConfigSet configs)
     {
     }
 
@@ -562,13 +562,13 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
-											@NotNull OrderedHashSet<ATNConfig> configs)
+											@NotNull ATNConfigSet configs)
 	{
 	}
 
 	@Override
     public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
+                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
     }
 
@@ -579,7 +579,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 											 @NotNull IntervalSet ambigAlts,
 											 DecisionState decState,
 											 @NotNull SemanticContext[] altToPred,
-											 @NotNull OrderedHashSet<ATNConfig> configs, boolean fullContextParse)
+											 @NotNull ATNConfigSet configs, boolean fullContextParse)
     {
     }
 }
