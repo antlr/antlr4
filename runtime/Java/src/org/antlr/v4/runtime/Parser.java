@@ -80,7 +80,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int _syntaxErrors = 0;
 
-	public Parser(IntStream input) {
+	public Parser(TokenStream input) {
 		setInputStream(input);
 	}
 
