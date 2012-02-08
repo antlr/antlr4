@@ -288,8 +288,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				System.out.format("in reach starting closure: %s\n", closure);
 			}
 
-			for (int ci=0; ci<closure.size(); ci++) { // TODO: foreach
-				ATNConfig c = closure.get(ci);
+			for (ATNConfig c : closure) {
 				if ( debug ) {
 					System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
 				}
@@ -304,7 +303,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( reach.size()==0 ) {
+			if ( reach.isEmpty() ) {
 				// we reached state associated with closure for sure, so
 				// make sure it's defined. worst case, we define s0 from
 				// start state configs.
