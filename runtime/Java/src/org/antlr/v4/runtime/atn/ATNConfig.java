@@ -74,21 +74,19 @@ public class ATNConfig {
 	public int lexerActionIndex = -1; // TOOD: move to subclass
 
     @NotNull
-    public SemanticContext semanticContext = SemanticContext.NONE;
+    public final SemanticContext semanticContext;
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable RuleContext context)
 	{
-		this.state = state;
-		this.alt = alt;
-		this.context = context;
+		this(state, alt, context, SemanticContext.NONE);
 	}
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable RuleContext context,
-					 SemanticContext semanticContext)
+					 @NotNull SemanticContext semanticContext)
 	{
 		this.state = state;
 		this.alt = alt;
@@ -100,7 +98,7 @@ public class ATNConfig {
    		this(c, state, c.context, c.semanticContext);
    	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, SemanticContext semanticContext) {
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull SemanticContext semanticContext) {
    		this(c, state, c.context, semanticContext);
    	}
 
@@ -109,7 +107,7 @@ public class ATNConfig {
     }
 
 	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context,
-                     SemanticContext semanticContext)
+                     @NotNull SemanticContext semanticContext)
     {
 		this.state = state;
 		this.alt = c.alt;
