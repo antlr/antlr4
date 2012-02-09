@@ -32,8 +32,9 @@ package org.antlr.v4.runtime.atn;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -197,6 +198,32 @@ public class ATNConfig {
 		hashCode = 5 * hashCode + semanticContext.hashCode();
         return hashCode;
     }
+
+	public String toDotString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("digraph G {\n");
+		builder.append("rankdir=LR;\n");
+
+		Map<PredictionContext, PredictionContext> visited = new IdentityHashMap<PredictionContext, PredictionContext>();
+		Deque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
+		workList.add(context);
+		visited.put(context, context);
+		while (!workList.isEmpty()) {
+			PredictionContext current = workList.pop();
+			for (int i = 0; i < current.invokingStates.length; i++) {
+				builder.append("  s").append(System.identityHashCode(current));
+				builder.append("->");
+				builder.append("s").append(System.identityHashCode(current.parents[i]));
+				builder.append("[label=\"").append(current.invokingStates[i]).append("\"];\n");
+				if (visited.put(current.parents[i], current.parents[i]) == null) {
+					workList.push(current.parents[i]);
+				}
+			}
+		}
+
+		builder.append("}\n");
+		return builder.toString();
+	}
 
 	@Override
 	public String toString() {

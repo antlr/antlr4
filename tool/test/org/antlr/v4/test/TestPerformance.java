@@ -92,6 +92,8 @@ public class TestPerformance extends BaseTest {
      */
     private static final boolean BLANK_LISTENER = false;
 
+    private static final boolean EXPORT_LARGEST_CONFIG_CONTEXTS = false;
+
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
@@ -334,6 +336,20 @@ public class TestPerformance extends BaseTest {
                         }
 
                         contextsInDFAState[state.configset.size()]++;
+                    }
+                }
+
+                if (EXPORT_LARGEST_CONFIG_CONTEXTS) {
+                    for (DFAState state : dfa.states.keySet()) {
+                        for (ATNConfig config : state.configset) {
+                            String configOutput = config.toDotString();
+                            if (configOutput.length() <= configOutputSize) {
+                                continue;
+                            }
+
+                            configOutputSize = configOutput.length();
+                            writeFile(tmpdir, "d" + dfa.decision + ".s" + state.stateNumber + ".a" + config.alt + ".config.dot", configOutput);
+                        }
                     }
                 }
             }
