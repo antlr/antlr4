@@ -1200,7 +1200,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	@NotNull
 	public String getTokenName(int t) {
-		if ( t==-1 ) return "EOF";
+		if ( t==Token.EOF ) return "EOF";
 		if ( parser!=null && parser.getTokenNames()!=null ) {
 			String[] tokensNames = parser.getTokenNames();
 			if ( t>=tokensNames.length ) {
@@ -1240,7 +1240,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	@NotNull
 	public NoViableAltException noViableAlt(@NotNull SymbolStream<Token> input,
-											@NotNull ParserRuleContext outerContext,
+											@NotNull ParserRuleContext<?> outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{
@@ -1250,7 +1250,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 											configs, outerContext);
 	}
 
-	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
+	public int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
@@ -1275,6 +1275,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return false;
 	}
 
+	@NotNull
 	protected DFAState addDFAEdge(@NotNull DFA dfa,
 								  @NotNull ATNConfigSet p,
 								  int t,
@@ -1297,7 +1298,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	/** See comment on LexerInterpreter.addDFAState. */
-	@Nullable
+	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
 		DFAState proposed = new DFAState(configs);
 		DFAState existing = dfa.states.get(proposed);
