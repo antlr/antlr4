@@ -167,12 +167,11 @@ public class DFAState {
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	@Override
 	public int hashCode() {
-		// TODO (sam): what to do when configs==null?
-		int h = 0;
-		for (ATNConfig c : configset) {
-			h += c.alt;
+		if (configset == null) {
+			return 1;
 		}
-		return h;
+
+		return configset.hashCode();
 	}
 
 	/** Two DFAStates are equal if their ATN configuration sets are the
