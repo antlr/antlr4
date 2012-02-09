@@ -367,7 +367,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
-				int alt = -1;
+				int alt;
 				if ( dfa_debug ) {
 					System.out.println("ATN exec upon "+
                                        parser.getInputString(startIndex) +
@@ -480,8 +480,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		ATN_failover++;
 
 		ATNConfigSet previous = s0.configset;
-		DFAState D = null;
-		ATNConfigSet fullCtxSet = null;
+		DFAState D;
+		ATNConfigSet fullCtxSet;
 
 		if ( debug ) System.out.println("s0 = "+s0);
 
@@ -631,7 +631,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		if ( reach.hasSemanticContext ) {
 			SemanticContext[] altToPred = getPredsForAmbigAlts(reach.conflictingAlts, reach, nalts);
 			// altToPred[uniqueAlt] is now our validating predicate (if any)
-			List<DFAState.PredPrediction> predPredictions = null;
+			List<DFAState.PredPrediction> predPredictions;
 			if ( altToPred!=null ) {
 				// we have a validating predicate; test it
 				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
@@ -793,7 +793,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				pairs.add(new DFAState.PredPrediction(pred, i));
 			}
 		}
-		if ( pairs.size()==0 ) pairs = null;
+		if ( pairs.isEmpty() ) pairs = null;
 		else if ( firstUnpredicated!=ATN.INVALID_ALT_NUMBER ) {
 			// add default prediction if we found null predicate
 			pairs.add(new DFAState.PredPrediction(null, firstUnpredicated));
