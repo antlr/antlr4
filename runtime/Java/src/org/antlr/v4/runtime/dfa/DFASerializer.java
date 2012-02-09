@@ -53,13 +53,12 @@ public class DFASerializer {
 		Map<DFAState,DFAState> states = dfa.states;
 		if ( states!=null ) {
 			for (DFAState s : states.values()) {
-				int n = 0;
-				if ( s.edges!=null ) n = s.edges.length;
-				for (int i=0; i<n; i++) {
-					DFAState t = s.edges[i];
+				Map<Integer, DFAState> edges = s.getEdgeMap();
+				for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
+					DFAState t = entry.getValue();
 					if ( t!=null && t.stateNumber != Integer.MAX_VALUE ) {
 						buf.append(getStateString(s));
-						String label = getEdgeLabel(i);
+						String label = getEdgeLabel(entry.getKey());
 						buf.append("-"+label+"->"+ getStateString(t)+'\n');
 					}
 				}
@@ -72,9 +71,9 @@ public class DFASerializer {
 
 	protected String getEdgeLabel(int i) {
 		String label;
-		if ( i==0 ) return "EOF";
-		if ( tokenNames!=null ) label = tokenNames[i-1];
-		else label = String.valueOf(i-1);
+		if ( i==-1 ) return "EOF";
+		if ( tokenNames!=null ) label = tokenNames[i];
+		else label = String.valueOf(i);
 		return label;
 	}
 

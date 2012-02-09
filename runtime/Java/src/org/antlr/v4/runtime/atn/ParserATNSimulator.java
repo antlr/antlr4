@@ -365,7 +365,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				break;
 			}
 			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
+			DFAState target = s.getTarget(t);
+			if ( target == null ) {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt = -1;
 				if ( dfa_debug ) {
@@ -379,10 +380,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 					// TODO: This next stuff kills edge, but extra states remain. :(
 					if ( s.isAcceptState && alt!=-1 ) {
-						DFAState d = s.edges[input.LA(1)+1];
+						DFAState d = s.getTarget(input.LA(1));
 						if ( d.isAcceptState && d.prediction==s.prediction ) {
 							// we can carve it out.
-							s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
+							s.setTarget(input.LA(1), ERROR); // IGNORE really not error
 						}
 					}
 					if ( dfa_debug ) {
@@ -399,8 +400,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 					throw nvae;
 				}
 			}
-			DFAState target = s.edges[t+1];
-			if ( target == ERROR ) {
+			else if ( target == ERROR ) {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
 			s = target;
@@ -1290,17 +1290,15 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	protected void addDFAEdge(@Nullable DFAState p, int t, @Nullable DFAState q) {
-		if ( p==null || t < -1 || q == null ) return;
-		if ( p.edges==null ) {
-			p.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
+		if ( p!=null ) {
+			p.setTarget(t, q);
 		}
-		p.edges[t+1] = q; // connect
 	}
 
 	/** See comment on LexerInterpreter.addDFAState. */
 	@Nullable
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
-		DFAState proposed = new DFAState(configs);
+		DFAState proposed = new DFAState(configs, -1, atn.maxTokenType);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 

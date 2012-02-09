@@ -84,22 +84,21 @@ public class DOTGenerator {
 		}
 
 		for (DFAState d : dfa.states.keySet()) {
-			if ( d.edges!=null ) {
-				for (int i = 0; i < d.edges.length; i++) {
-					DFAState target = d.edges[i];
-					if ( target==null) continue;
-					if ( target.stateNumber == Integer.MAX_VALUE ) continue;
-					int ttype = i-1; // we shift up for EOF as -1 for parser
-					String label = String.valueOf(ttype);
-					if ( isLexer ) label = "'"+getEdgeLabel(String.valueOf((char) i))+"'";
-					else if ( grammar!=null ) label = grammar.getTokenDisplayName(ttype);
-					ST st = stlib.getInstanceOf("edge");
-					st.add("label", label);
-					st.add("src", "s"+d.stateNumber);
-					st.add("target", "s"+target.stateNumber);
-					st.add("arrowhead", arrowhead);
-					dot.add("edges", st);
-				}
+			Map<Integer, DFAState> edges = d.getEdgeMap();
+			for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
+				DFAState target = entry.getValue();
+				if ( target==null) continue;
+				if ( target.stateNumber == Integer.MAX_VALUE ) continue;
+				int ttype = entry.getKey();
+				String label = String.valueOf(ttype);
+				if ( isLexer ) label = "'"+getEdgeLabel(String.valueOf((char)ttype))+"'";
+				else if ( grammar!=null ) label = grammar.getTokenDisplayName(ttype);
+				ST st = stlib.getInstanceOf("edge");
+				st.add("label", label);
+				st.add("src", "s"+d.stateNumber);
+				st.add("target", "s"+target.stateNumber);
+				st.add("arrowhead", arrowhead);
+				dot.add("edges", st);
 			}
 		}
 

@@ -34,8 +34,10 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** A DFA state represents a set of possible ATN configurations.
@@ -74,7 +76,9 @@ public class DFAState {
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable
-	public DFAState[] edges;
+	private EdgeMap<DFAState> edges;
+	private final int minSymbol;
+	private final int maxSymbol;
 
 	public boolean isAcceptState = false;
 
@@ -135,11 +139,35 @@ public class DFAState {
 		}
 	}
 
-	public DFAState() { }
+	public DFAState(ATNConfigSet configs, int minSymbol, int maxSymbol) {
+		this.configset = configs;
+		this.minSymbol = minSymbol;
+		this.maxSymbol = maxSymbol;
+	}
 
-	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
+	public DFAState getTarget(int symbol) {
+		if (edges == null) {
+			return null;
+		}
 
-	public DFAState(ATNConfigSet configs) { this.configset = configs; }
+		return edges.get(symbol);
+	}
+
+	public void setTarget(int symbol, DFAState target) {
+		if (edges == null) {
+			edges = new SingletonEdgeMap<DFAState>(minSymbol, maxSymbol);
+		}
+
+		edges = edges.put(symbol, target);
+	}
+
+	public Map<Integer, DFAState> getEdgeMap() {
+		if (edges == null) {
+			return Collections.emptyMap();
+		}
+
+		return edges.toMap();
+	}
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
