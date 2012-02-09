@@ -181,7 +181,9 @@ compilationUnit
         (   packageDeclaration importDeclaration* typeDeclaration*
         |   classOrInterfaceDeclaration typeDeclaration*
         )
+        EOF
     |   packageDeclaration? importDeclaration* typeDeclaration*
+        EOF
     ;
 
 packageDeclaration
@@ -1021,7 +1023,7 @@ WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}
     ;
 
 COMMENT
-    :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
+    :   '/*' .* '*/' {$channel=HIDDEN;}
     ;
 
 LINE_COMMENT

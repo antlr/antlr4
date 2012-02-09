@@ -169,7 +169,6 @@
  *      Character.isJavaIdentifierPart(int) returns true."
  */
 grammar Java;
-options {backtrack=true; memoize=true;}
 
 @lexer::members {
   protected boolean enumIsKeyword = true;
@@ -184,7 +183,9 @@ compilationUnit
         (   packageDeclaration importDeclaration* typeDeclaration*
         |   classOrInterfaceDeclaration typeDeclaration*
         )
+        EOF
     |   packageDeclaration? importDeclaration* typeDeclaration*
+        EOF
     ;
 
 packageDeclaration
@@ -499,7 +500,7 @@ constructorBody
 
 explicitConstructorInvocation
     :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   expression '.' nonWildcardTypeArguments? 'super' arguments ';'
+    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
     ;
 
 
@@ -711,17 +712,12 @@ constantExpression
     ;
     
 expression
-    :   parExpression
-    |   'this' 
-    |   'super'
-    |   literal
-    |   Identifier
+	:   primary
     |   expression '.' Identifier
-	|   expression '.' 'class' // should be type.class but causes backtracking
     |   expression '.' 'this'
     |   expression '.' 'super' '(' expressionList? ')'
-    |   expression '.' 'super' '.' Identifier arguments?
     |   expression '.' 'new' Identifier '(' expressionList? ')'
+    |   expression '.' 'super' '.' Identifier arguments?
     |	expression '.' explicitGenericInvocation
     |   'new' creator
     |   expression '[' expression ']'
@@ -754,8 +750,20 @@ expression
         |	'>' '>' '='<assoc=right>
         |	'>' '>' '>' '='<assoc=right>
         |	'<' '<' '='<assoc=right>
-        |	'%='<assoc=right>) expression
-	;
+        |	'%='<assoc=right>
+        )
+        expression
+    ;
+
+primary
+	:	'(' expression ')'
+    |   'this'
+    |   'super'
+    |   literal
+    |   Identifier
+    |   type '.' 'class'
+    |   'void' '.' 'class'
+    ;
 
 creator
     :   nonWildcardTypeArguments createdName classCreatorRest
@@ -827,15 +835,16 @@ FloatingPointLiteral
     |   ('0'..'9')+ Exponent FloatTypeSuffix?
     |   ('0'..'9')+ FloatTypeSuffix
     |   '0' ('x'|'X')
-        (   HexDigit+ '.' HexDigit* Exponent? FloatTypeSuffix?
-        |   '.' HexDigit+ Exponent? FloatTypeSuffix?
-        |   HexDigit+ Exponent FloatTypeSuffix?
-        |   HexDigit+ FloatTypeSuffix
+        (   HexDigit+ ('.' HexDigit*)? HexExponent FloatTypeSuffix?
+        |   '.' HexDigit+ HexExponent FloatTypeSuffix?
         )
     ;
 
 fragment
-Exponent : ('e'|'E'|'p'|'P') ('+'|'-')? ('0'..'9')+ ;
+Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+fragment
+HexExponent : ('p'|'P') ('+'|'-')? ('0'..'9')+ ;
 
 fragment
 FloatTypeSuffix : ('f'|'F'|'d'|'D') ;
@@ -917,13 +926,13 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}//-> channel(HIDDEN)
     ;
 
 COMMENT
-    :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
+    :   '/*' .* '*/' {$channel=HIDDEN;}//-> channel(HIDDEN)
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+    : '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}//-> channel(HIDDEN)
     ;
