@@ -117,36 +117,40 @@ public class ATNConfig {
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
-//	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {
-//		this(c, c.state, context);
-//	}
-
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
      *  syntactic/semantic contexts are the same.
      */
     @Override
     public boolean equals(Object o) {
-		if ( o==null ) return false;
-		if ( this==o ) return true;
 		if (!(o instanceof ATNConfig)) {
 			return false;
 		}
 
-		ATNConfig other = (ATNConfig)o;
-		return
-            this.state.stateNumber==other.state.stateNumber &&
-            this.alt==other.alt &&
-            (this.context==other.context || (this.context != null && this.context.equals(other.context))) &&
-            (this.semanticContext==other.semanticContext || (this.semanticContext != null && this.semanticContext.equals(other.semanticContext)));
+		return this.equals((ATNConfig)o);
+	}
 
-    }
+	public boolean equals(ATNConfig other) {
+		if (this == other) {
+			return true;
+		} else if (other == null) {
+			return false;
+		}
 
-    @Override
-    public int hashCode() {
-        int h = state.stateNumber + alt + (semanticContext!=null ? semanticContext.hashCode() : 0);
-		if ( context!=null ) h += context.hashCode();
-        return h;
+		return this.state.stateNumber==other.state.stateNumber
+			&& this.alt==other.alt
+			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
+			&& this.semanticContext.equals(other.semanticContext);
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = 7;
+		hashCode = 5 * hashCode + state.stateNumber;
+		hashCode = 5 * hashCode + alt;
+		hashCode = 5 * hashCode + (context != null ? context.hashCode() : 0);
+		hashCode = 5 * hashCode + semanticContext.hashCode();
+        return hashCode;
     }
 
 	@Override
