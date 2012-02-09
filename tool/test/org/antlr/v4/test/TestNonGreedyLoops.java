@@ -303,9 +303,9 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'{'->:s1=>1\n" +
-					 "s0-'}'->:s3=>2\n" +
-					 "s0-INT->:s2=>1\n" +
-					 "s0-ID->:s2=>1\n", found);
+					 "s0-'}'->:s2=>2\n" +
+					 "s0-INT->:s1=>1\n" +
+					 "s0-ID->:s1=>1\n", found);
 
 		input =
 			"if ( ()) ) { {return a} b 34 } ;";
@@ -328,9 +328,9 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'{'->:s1=>1\n" +
-					 "s0-'}'->:s3=>2\n" +
-					 "s0-INT->:s2=>1\n" +
-					 "s0-ID->:s2=>1\n", found);
+					 "s0-'}'->:s2=>2\n" +
+					 "s0-INT->:s1=>1\n" +
+					 "s0-ID->:s1=>1\n", found);
 	}
 
 	@Test public void testStatLoopNongreedyNotNecessary() throws Exception {
@@ -528,7 +528,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
 		assertEquals("line 1:6 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='<a>foo<'\n" +
-					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(26,1,[32 32 32 32 14 6]), (33,1,[14 6]), (22,1,[14 6 10 10]), (26,1,[14 6 10 10]), (33,1,[14 6 10 10]), (20,1,[14 6 10 10 10]), (16,1,[6 10 10 10]), (1,1,[]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (16,2,[6 10 10 10 10 10]), (1,2,[])],conflictingAlts={1..2}, input='<a>foo<'\n" +
+					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(26,1,[14 6 10 10]), (26,1,[32 32 32 32 14 6]), (33,1,[14 6]), (22,1,[14 6 10 10]), (20,1,[14 6 10 10 10]), (16,1,[6 10 10 10]), (1,1,[]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (16,2,[6 10 10 10 10 10]), (1,2,[])],conflictingAlts={1..2}, input='<a>foo<'\n" +
 					 "line 1:10 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='</a>'\n" +
 					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}:[(35,1,[]), (35,2,[])],conflictingAlts={1..2}, input='</a>'\n" +
 					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}:[(26,1,[]), (33,1,[]), (26,2,[]), (33,2,[])],conflictingAlts={1..2}, input='/'\n",

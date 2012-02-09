@@ -89,7 +89,7 @@ public class LL1Analyzer {
      *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
      *  to match a token.
      */
-    protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,
+    protected void _LOOK(@NotNull ATNState s, @NotNull PredictionContext ctx,
 						 boolean epsilonStopState,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
@@ -104,14 +104,18 @@ public class LL1Analyzer {
                 look.add(Token.EPSILON);
                 return;
             }
-            if ( !ctx.isEmpty() ) {
-                ATNState invokingState = atn.states.get(ctx.invokingState);
-                RuleTransition rt = (RuleTransition)invokingState.transition(0);
-                ATNState retState = rt.followState;
+			for (int i = 0; i < ctx.invokingStates.length; i++) {
+				if ( ctx.invokingStates[i]!=-1 ) {
+					ATNState invokingState = atn.states.get(ctx.invokingStates[i]);
+					RuleTransition rt = (RuleTransition)invokingState.transition(0);
+					ATNState retState = rt.followState;
 //			System.out.println("popping back to "+retState);
-                _LOOK(retState, ctx.parent, epsilonStopState, look, lookBusy, seeThruPreds);
-                return;
-            }
+					for (PredictionContext parent : ctx.parents) {
+						_LOOK(retState, parent, epsilonStopState, look, lookBusy, seeThruPreds);
+					}
+					return;
+				}
+			}
         }
 
         int n = s.getNumberOfTransitions();
