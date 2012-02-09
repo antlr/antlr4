@@ -502,20 +502,20 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			}
 			else {
 				boolean fullCtx = false;
-				D.configset.conflictingAlts = getConflictingAlts(reach, fullCtx);
-				if ( D.configset.conflictingAlts!=null ) {
+				D.configset.setConflictingAlts(getConflictingAlts(reach, fullCtx));
+				if ( D.configset.getConflictingAlts()!=null ) {
 					if ( greedy ) {
 						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-							 !D.configset.dipsIntoOuterContext ||
+							 !D.configset.getDipsIntoOuterContext() ||
 							 k == 1 ) // SLL(1) == LL(1)
 						{
-							if ( !D.configset.hasSemanticContext ) {
-								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.conflictingAlts, D.configset);
+							if ( !D.configset.hasSemanticContext() ) {
+								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.getConflictingAlts(), D.configset);
 							}
 							D.isAcceptState = true;
-							predictedAlt = resolveToMinAlt(D, D.configset.conflictingAlts);
+							predictedAlt = resolveToMinAlt(D, D.configset.getConflictingAlts());
 						}
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
@@ -546,7 +546,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			if ( !greedy ) {
 				int exitAlt = 2;
 				if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(reach, 1) ) {
-					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configset.uniqueAlt+" at "+reach);
+					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configset.getUniqueAlt()+" at "+reach);
 					// reaches end via .* means nothing after.
 					D.isAcceptState = true;
 					D.prediction = predictedAlt = exitAlt;
@@ -560,7 +560,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				}
 			}
 
-			if ( D.isAcceptState && D.configset.hasSemanticContext ) {
+			if ( D.isAcceptState && D.configset.hasSemanticContext() ) {
 				int nalts = decState.getNumberOfTransitions();
 				List<DFAState.PredPrediction> predPredictions =
 					predicateDFAState(D, D.configset, outerContext, nalts);
@@ -611,28 +611,28 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 			if ( reach==null ) {
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
-			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
+			if ( reach.getUniqueAlt()!=ATN.INVALID_ALT_NUMBER ) break;
 			boolean fullCtx = true;
-			reach.conflictingAlts = getConflictingAlts(reach, fullCtx);
-			if ( reach.conflictingAlts!=null ) break;
+			reach.setConflictingAlts(getConflictingAlts(reach, fullCtx));
+			if ( reach.getConflictingAlts()!=null ) break;
 			previous = reach;
 			input.consume();
 			t = input.LA(1);
 		}
 
-		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
+		if ( reach.getUniqueAlt() != ATN.INVALID_ALT_NUMBER ) {
 			retry_with_context_indicates_no_conflict++;
 			reportContextSensitivity(dfa, reach, startIndex, input.index());
-			return reach.uniqueAlt;
+			return reach.getUniqueAlt();
 		}
 
-		if ( reach.hasSemanticContext ) {
-			SemanticContext[] altToPred = getPredsForAmbigAlts(reach.conflictingAlts, reach, nalts);
+		if ( reach.hasSemanticContext() ) {
+			SemanticContext[] altToPred = getPredsForAmbigAlts(reach.getConflictingAlts(), reach, nalts);
 			// altToPred[uniqueAlt] is now our validating predicate (if any)
 			List<DFAState.PredPrediction> predPredictions = null;
 			if ( altToPred!=null ) {
 				// we have a validating predicate; test it
-				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
+				predPredictions = getPredicatePredictions(reach.getConflictingAlts(), altToPred);
 				if ( predPredictions.size() < nalts ) {
 					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(reach);
 					DecisionState decState = atn.getDecisionState(dfa.decision);
@@ -651,8 +651,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 
 		// must have conflict and no semantic preds
-		reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
-		int prediction = reach.conflictingAlts.getMinElement();
+		reportAmbiguity(dfa, D, startIndex, input.index(), reach.getConflictingAlts(), reach);
+		int prediction = reach.getConflictingAlts().getMinElement();
 		return prediction;
 	}
 
@@ -1200,11 +1200,11 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	protected IntervalSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
 		IntervalSet conflictingAlts;
-		if ( configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER ) {
-			conflictingAlts = IntervalSet.of(configs.uniqueAlt);
+		if ( configs.getUniqueAlt()!= ATN.INVALID_ALT_NUMBER ) {
+			conflictingAlts = IntervalSet.of(configs.getUniqueAlt());
 		}
 		else {
-			conflictingAlts = configs.conflictingAlts;
+			conflictingAlts = configs.getConflictingAlts();
 		}
 		return conflictingAlts;
 	}
@@ -1338,7 +1338,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		DFAState newState = proposed;
 
 		newState.stateNumber = dfa.states.size();
-		newState.configset = configs.clone();
+		newState.configset = configs.clone(true);
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;

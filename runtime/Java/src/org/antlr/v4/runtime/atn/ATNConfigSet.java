@@ -25,6 +25,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.antlr.v4.runtime.atn;
 
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  *
@@ -51,10 +51,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public int outerContextDepth;
 
-	public int uniqueAlt;
-	public IntervalSet conflictingAlts;
-	public boolean hasSemanticContext;
-	public boolean dipsIntoOuterContext;
+	private int uniqueAlt;
+	private IntervalSet conflictingAlts;
+	private boolean hasSemanticContext;
+	private boolean dipsIntoOuterContext;
 
 	public ATNConfigSet() {
 		this.mergedConfigs = new HashMap<Long, ATNConfig>();
@@ -64,9 +64,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.uniqueAlt = ATN.INVALID_ALT_NUMBER;
 	}
 
-	private ATNConfigSet(ATNConfigSet set) {
-		this.mergedConfigs = new HashMap<Long, ATNConfig>(set.mergedConfigs);
-		this.unmerged = new ArrayList<ATNConfig>(set.unmerged);
+	private ATNConfigSet(ATNConfigSet set, boolean readonly) {
+		if (readonly) {
+			this.mergedConfigs = null;
+			this.unmerged = null;
+		} else {
+			this.mergedConfigs = new HashMap<Long, ATNConfig>(set.mergedConfigs);
+			this.unmerged = new ArrayList<ATNConfig>(set.unmerged);
+		}
+
 		this.configs = new ArrayList<ATNConfig>(set.configs);
 
 		this.outerContextDepth = set.outerContextDepth;
@@ -85,8 +91,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return states;
 	}
 
-	public ATNConfigSet clone() {
-		return new ATNConfigSet(this);
+	public ATNConfigSet clone(boolean readonly) {
+		return new ATNConfigSet(this, readonly);
 	}
 
 	@Override
@@ -137,6 +143,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean add(ATNConfig e) {
+		ensureWritable();
+
 		boolean added;
 		boolean addKey;
 		long key = getKey(e);
@@ -239,6 +247,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean remove(Object o) {
+		ensureWritable();
+
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -259,6 +269,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean addAll(Collection<? extends ATNConfig> c) {
+		ensureWritable();
+
 		boolean changed = false;
 		for (ATNConfig group : c) {
 			changed |= add(group);
@@ -269,16 +281,20 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
+		ensureWritable();
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
+		ensureWritable();
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public void clear() {
+		ensureWritable();
+
 		mergedConfigs.clear();
 		unmerged.clear();
 		configs.clear();
@@ -323,11 +339,33 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return buf.toString();
 	}
 
+	public int getUniqueAlt() {
+		return uniqueAlt;
+	}
+
+	public boolean hasSemanticContext() {
+		return hasSemanticContext;
+	}
+
+	public IntervalSet getConflictingAlts() {
+		return conflictingAlts;
+	}
+
+	public void setConflictingAlts(IntervalSet conflictingAlts) {
+		//ensureWritable(); <-- these do end up set after the DFAState is created, but set to a distinct value
+		this.conflictingAlts = conflictingAlts;
+	}
+
+	public boolean getDipsIntoOuterContext() {
+		return dipsIntoOuterContext;
+	}
+
 	public ATNConfig get(int index) {
 		return configs.get(index);
 	}
 
 	public void remove(int index) {
+		ensureWritable();
 		ATNConfig config = configs.get(index);
 		configs.remove(config);
 		long key = getKey(config);
@@ -340,6 +378,13 @@ public class ATNConfigSet implements Set<ATNConfig> {
 					return;
 				}
 			}
+		}
+	}
+
+	protected final void ensureWritable() {
+		boolean readonly = mergedConfigs == null;
+		if (readonly) {
+			throw new IllegalStateException("This ATNConfigSet is read only.");
 		}
 	}
 
