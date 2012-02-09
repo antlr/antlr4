@@ -83,6 +83,12 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
         }
     }
 
+	@Override
+	public void reset() {
+		super.reset();
+		p = skipOffTokenChannels(p);
+	}
+
     @Override
     protected CommonToken LB(int k) {
         if ( k==0 || (p-k)<0 ) return null;
