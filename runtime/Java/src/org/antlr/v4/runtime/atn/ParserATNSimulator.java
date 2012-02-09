@@ -225,7 +225,7 @@ import java.util.*;
  	 *  when closure operations fall off the end of the rule that
  	 *  holds the decision were evaluating
 */
-public class ParserATNSimulator<Symbol> extends ATNSimulator {
+public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
@@ -261,7 +261,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public void reset() {
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<Token> input, int decision,
+	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input, int decision,
 							   @Nullable ParserRuleContext outerContext)
 	{
 		predict_calls++;
@@ -287,7 +287,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Token> input,
+	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<? extends Symbol> input,
 						  @Nullable ParserRuleContext outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -319,7 +319,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<Token> input, int startIndex,
+					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
                        @Nullable ParserRuleContext outerContext)
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -472,7 +472,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<Token> input, int startIndex,
+					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
@@ -593,7 +593,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public ATNConfigSet execATNWithFullContext(DFA dfa,
 											   DFAState D, // how far we got before failing over
 											   @NotNull ATNConfigSet s0,
-											   @NotNull SymbolStream<Token> input, int startIndex,
+											   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
 											   ParserRuleContext outerContext,
 											   int nalts,
 											   boolean greedy)
@@ -1214,7 +1214,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		return String.valueOf(t);
 	}
 
-	public String getLookaheadName(SymbolStream<Token> input) {
+	public String getLookaheadName(SymbolStream<? extends Symbol> input) {
 		return getTokenName(input.LA(1));
 	}
 
@@ -1239,14 +1239,14 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<Token> input,
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<? extends Symbol> input,
 											@NotNull ParserRuleContext<?> outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{
 		return new NoViableAltException(parser, input,
-											(Token)input.get(startIndex),
-											(Token)input.LT(1),
+											input.get(startIndex),
+											input.LT(1),
 											configs, outerContext);
 	}
 
