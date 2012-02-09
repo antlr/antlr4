@@ -29,12 +29,21 @@
 
 package org.antlr.v4.runtime.misc;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
 public class Utils {
+	public static String join(Iterable<?> iter, String separator) {
+		return join(iter.iterator(), separator);
+	}
+
+	public static <T> String join(T[] array, String separator) {
+		return join(Arrays.asList(array), separator);
+	}
+
     // Seriously: why isn't this built in to java? ugh!
-    public static String join(Iterator iter, String separator) {
+    public static String join(Iterator<?> iter, String separator) {
         StringBuilder buf = new StringBuilder();
         while ( iter.hasNext() ) {
             buf.append(iter.next());
