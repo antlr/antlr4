@@ -63,7 +63,8 @@ public class LL1Analyzer {
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
 			_LOOK(s.transition(alt - 1).target,
-				  ParserRuleContext.EMPTY,
+				  PredictionContext.EMPTY,
+				  false,
 				  look[alt], lookBusy, seeThruPreds);
 			if ( look[alt].size()==0 ) look[alt] = null;
 		}
@@ -74,10 +75,10 @@ public class LL1Analyzer {
      *  If ctx is null, EPSILON is in set if we can reach end of rule.
      */
     @NotNull
-   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
+   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx) {
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
-   		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds);
+   		_LOOK(s, ctx != null ? ctx : PredictionContext.EMPTY, ctx == null, r, new HashSet<ATNConfig>(), seeThruPreds);
    		return r;
    	}
 
@@ -88,7 +89,8 @@ public class LL1Analyzer {
      *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
      *  to match a token.
      */
-    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx,
+    protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,
+						 boolean epsilonStopState,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
 						 boolean seeThruPreds)
@@ -98,16 +100,16 @@ public class LL1Analyzer {
         if ( !lookBusy.add(c) ) return;
 
         if ( s instanceof RuleStopState ) {
-            if ( ctx==null ) {
+            if ( ctx.isEmpty() && epsilonStopState ) {
                 look.add(Token.EPSILON);
                 return;
             }
-            if ( ctx.invokingState!=-1 ) {
+            if ( !ctx.isEmpty() ) {
                 ATNState invokingState = atn.states.get(ctx.invokingState);
                 RuleTransition rt = (RuleTransition)invokingState.transition(0);
                 ATNState retState = rt.followState;
 //			System.out.println("popping back to "+retState);
-                _LOOK(retState, ctx.parent, look, lookBusy, seeThruPreds);
+                _LOOK(retState, ctx.parent, epsilonStopState, look, lookBusy, seeThruPreds);
                 return;
             }
         }
@@ -116,12 +118,11 @@ public class LL1Analyzer {
         for (int i=0; i<n; i++) {
             Transition t = s.transition(i);
             if ( t.getClass() == RuleTransition.class ) {
-                RuleContext newContext =
-                    new RuleContext(ctx, s.stateNumber);
-                _LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
+                PredictionContext newContext = ctx.getChild(s.stateNumber);
+                _LOOK(t.target, newContext, epsilonStopState, look, lookBusy, seeThruPreds);
             }
             else if ( t.isEpsilon() && seeThruPreds ) {
-                _LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
+                _LOOK(t.target, ctx, epsilonStopState, look, lookBusy, seeThruPreds);
             }
             else if ( t.getClass() == WildcardTransition.class ) {
                 look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
