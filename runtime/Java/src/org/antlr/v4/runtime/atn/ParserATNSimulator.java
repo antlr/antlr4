@@ -230,6 +230,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
+	public static boolean optimize_closure_busy = true;
+
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
@@ -848,7 +850,9 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
-		if ( !closureBusy.add(config) ) return; // avoid infinite recursion
+		if ( !optimize_closure_busy && !closureBusy.add(config) ) {
+			return; // avoid infinite recursion
+		}
 
 		if ( config.state instanceof RuleStopState ) {
 			if ( !greedy ) {
@@ -869,6 +873,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				// gotten that context AFTER having falling off a rule.
 				// Make sure we track that we are now out of context.
 				c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+				if (optimize_closure_busy && c.context.isEmpty() && !closureBusy.add(c)) {
+					return;
+				}
+
 				closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion);
 				return;
 			}
@@ -915,6 +923,23 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				!(t instanceof ActionTransition) && collectPredicates;
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting);
 			if ( c!=null ) {
+				if (optimize_closure_busy) {
+					boolean checkClosure = false;
+					if (c.state instanceof StarLoopEntryState || c.state instanceof BlockEndState) {
+						checkClosure = true;
+					}
+					else if (c.state instanceof PlusBlockStartState) {
+						checkClosure = true;
+					}
+					else if (config.state instanceof RuleStopState && c.context.isEmpty()) {
+						checkClosure = true;
+					}
+
+					if (checkClosure && !closureBusy.add(c)) {
+						continue;
+					}
+				}
+
 				if ( config.state instanceof RuleStopState ) {
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
