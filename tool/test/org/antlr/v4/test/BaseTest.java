@@ -1097,22 +1097,22 @@ public abstract class BaseTest {
 
     // override to track errors
 
-    public void assertEquals(String msg, Object a, Object b) { try {Assert.assertEquals(msg,a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(Object a, Object b) { try {Assert.assertEquals(a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(String msg, long a, long b) { try {Assert.assertEquals(msg,a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(long a, long b) { try {Assert.assertEquals(a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(String msg, Object expected, Object actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(Object expected, Object actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(String msg, long expected, long actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(long expected, long actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertTrue(String msg, boolean b) { try {Assert.assertTrue(msg,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertTrue(boolean b) { try {Assert.assertTrue(b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertTrue(String message, boolean condition) { try {Assert.assertTrue(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertTrue(boolean condition) { try {Assert.assertTrue(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertFalse(String msg, boolean b) { try {Assert.assertFalse(msg,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertFalse(boolean b) { try {Assert.assertFalse(b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertFalse(String message, boolean condition) { try {Assert.assertFalse(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertFalse(boolean condition) { try {Assert.assertFalse(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertNotNull(String msg, Object p) { try {Assert.assertNotNull(msg, p);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNotNull(Object p) { try {Assert.assertNotNull(p);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNotNull(String message, Object object) { try {Assert.assertNotNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNotNull(Object object) { try {Assert.assertNotNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertNull(String msg, Object p) { try {Assert.assertNull(msg, p);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNull(Object p) { try {Assert.assertNull(p);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
 	public static class IntTokenStream implements TokenStream {
 		List<Integer> types;
