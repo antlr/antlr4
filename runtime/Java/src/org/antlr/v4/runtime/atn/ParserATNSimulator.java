@@ -658,7 +658,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t, boolean greedy, boolean loopsSimulateTailRecursion) {
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
-		ATNConfigSet reach = new ATNConfigSet();
+		ATNConfigSet reach = new ATNConfigSet(true);
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
 			int n = c.state.getNumberOfTransitions();
@@ -681,7 +681,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 										  boolean greedy, boolean loopsSimulateTailRecursion)
 	{
 		PredictionContext initialContext = PredictionContext.fromRuleContext(ctx); // always at least the implicit call to start rule
-		ATNConfigSet configs = new ATNConfigSet();
+		ATNConfigSet configs = new ATNConfigSet(true);
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -919,7 +919,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 									remainingContext = p.parents[i];
 								}
 								else {
-									remainingContext = PredictionContext.join(remainingContext, p.parents[i]);
+									remainingContext = PredictionContext.join(remainingContext, p.parents[i], true);
 								}
 							}
 

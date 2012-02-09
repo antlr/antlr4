@@ -45,6 +45,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  */
 public class ATNConfigSet implements Set<ATNConfig> {
 
+	private final boolean localContext;
 	private final Map<Long, ATNConfig> mergedConfigs;
 	private final List<ATNConfig> unmerged;
 	private final List<ATNConfig> configs;
@@ -56,7 +57,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private boolean hasSemanticContext;
 	private boolean dipsIntoOuterContext;
 
-	public ATNConfigSet() {
+	public ATNConfigSet(boolean localContext) {
+		this.localContext = localContext;
 		this.mergedConfigs = new HashMap<Long, ATNConfig>();
 		this.unmerged = new ArrayList<ATNConfig>();
 		this.configs = new ArrayList<ATNConfig>();
@@ -65,6 +67,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	private ATNConfigSet(ATNConfigSet set, boolean readonly) {
+		this.localContext = set.localContext;
+
 		if (readonly) {
 			this.mergedConfigs = null;
 			this.unmerged = null;
@@ -153,7 +157,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if (mergedConfig != null && canMerge(e, key, mergedConfig)) {
 			mergedConfig.reachesIntoOuterContext = Math.max(mergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
 
-			PredictionContext joined = PredictionContext.join(mergedConfig.context, e.context);
+			PredictionContext joined = PredictionContext.join(mergedConfig.context, e.context, localContext);
 			if (mergedConfig.context == joined) {
 				return false;
 			}
@@ -168,7 +172,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			if (canMerge(e, key, unmergedConfig)) {
 				unmergedConfig.reachesIntoOuterContext = Math.max(unmergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
 
-				PredictionContext joined = PredictionContext.join(unmergedConfig.context, e.context);
+				PredictionContext joined = PredictionContext.join(unmergedConfig.context, e.context, localContext);
 				if (unmergedConfig.context == joined) {
 					return false;
 				}

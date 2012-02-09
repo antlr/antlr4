@@ -70,7 +70,7 @@ public class DFAState {
 //	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
 
 	// TODO: rename to configs after flipping to new ATN sim
-	public ATNConfigSet configset = new ATNConfigSet();
+	public ATNConfigSet configset;
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable

@@ -284,14 +284,14 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected int exec(@NotNull CharStream input, @NotNull ATNConfigSet s0) {
 		//System.out.println("enter exec index "+input.index()+" from "+s0);
 		@NotNull
-		ATNConfigSet closure = new ATNConfigSet();
+		ATNConfigSet closure = new ATNConfigSet(false);
 		closure.addAll(s0);
 		if ( debug ) {
 			System.out.format("start state closure=%s\n", closure);
 		}
 
 		@NotNull
-		ATNConfigSet reach = new ATNConfigSet();
+		ATNConfigSet reach = new ATNConfigSet(false);
 		atnPrevAccept.reset();
 
 		traceLookahead1();
@@ -473,7 +473,7 @@ public class LexerATNSimulator extends ATNSimulator {
 											 @NotNull ATNState p)
 	{
 		PredictionContext initialContext = PredictionContext.EMPTY;
-		ATNConfigSet configs = new ATNConfigSet();
+		ATNConfigSet configs = new ATNConfigSet(false);
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
