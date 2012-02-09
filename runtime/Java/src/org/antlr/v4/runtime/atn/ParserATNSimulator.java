@@ -1338,6 +1338,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 		DFAState newState = proposed;
 
 		newState.stateNumber = dfa.states.size();
+		configs.optimizeConfigs(this);
 		newState.configset = configs.clone(true);
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);

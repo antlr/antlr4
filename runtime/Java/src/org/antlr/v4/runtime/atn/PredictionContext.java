@@ -192,6 +192,53 @@ public class PredictionContext {
 		return new PredictionContext(parentsList, invokingStatesList, parentHashCode, invokingStateHashCode);
 	}
 
+	public static PredictionContext getCachedContext(
+		@NotNull PredictionContext context,
+		@NotNull Map<PredictionContext, PredictionContext> contextCache,
+		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited) {
+		if (context.isEmpty()) {
+			return context;
+		}
+
+		PredictionContext existing = visited.get(context);
+		if (existing != null) {
+			return existing;
+		}
+
+		existing = contextCache.get(context);
+		if (existing != null) {
+			visited.put(context, existing);
+			return existing;
+		}
+
+		boolean changed = false;
+		PredictionContext[] parents = new PredictionContext[context.parents.length];
+		for (int i = 0; i < parents.length; i++) {
+			PredictionContext parent = getCachedContext(context.parents[i], contextCache, visited);
+			if (changed || parent != context.parents[i]) {
+				if (!changed) {
+					parents = Arrays.copyOf(context.parents, context.parents.length);
+					changed = true;
+				}
+
+				parents[i] = parent;
+			}
+		}
+
+		if (!changed) {
+			contextCache.put(context, context);
+			visited.put(context, context);
+			return context;
+		}
+
+		PredictionContext updated = new PredictionContext(parents, context.invokingStates, context.parentHashCode, context.invokingStateHashCode);
+		contextCache.put(updated, updated);
+		visited.put(updated, updated);
+		visited.put(context, updated);
+
+		return updated;
+	}
+
 	public PredictionContext getChild(int invokingState) {
 		return new PredictionContext(this, invokingState);
 	}

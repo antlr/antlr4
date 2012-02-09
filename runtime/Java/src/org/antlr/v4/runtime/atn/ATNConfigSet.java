@@ -95,6 +95,17 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return states;
 	}
 
+	public void optimizeConfigs(ATNSimulator interpreter) {
+		if (configs.isEmpty()) {
+			return;
+		}
+
+		for (int i = 0; i < configs.size(); i++) {
+			ATNConfig config = configs.get(i);
+			config.context = interpreter.getCachedContext(config.context);
+		}
+	}
+
 	public ATNConfigSet clone(boolean readonly) {
 		return new ATNConfigSet(this, readonly);
 	}

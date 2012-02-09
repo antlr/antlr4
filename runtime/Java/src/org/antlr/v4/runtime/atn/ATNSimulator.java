@@ -34,7 +34,10 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -43,6 +46,9 @@ public abstract class ATNSimulator {
 	@NotNull
 	public final ATN atn;
 
+	private final Map<PredictionContext, PredictionContext> contextCache =
+		new HashMap<PredictionContext, PredictionContext>();
+
 	static {
 		ERROR = new DFAState(new ATNConfigSet(false));
 		ERROR.stateNumber = Integer.MAX_VALUE;
@@ -50,6 +56,10 @@ public abstract class ATNSimulator {
 
 	public ATNSimulator(@NotNull ATN atn) {
 		this.atn = atn;
+	}
+
+	public PredictionContext getCachedContext(PredictionContext context) {
+		return PredictionContext.getCachedContext(context, contextCache, new IdentityHashMap<PredictionContext, PredictionContext>());
 	}
 
 	public abstract void reset();
