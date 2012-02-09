@@ -98,10 +98,15 @@ public class PredictionContext {
 	}
 
 	public static PredictionContext join(PredictionContext context0, PredictionContext context1, boolean local) {
+		return join(context0, context1, local ? PredictionContextCache.UNCACHED_LOCAL : PredictionContextCache.UNCACHED_FULL);
+	}
+
+	/*package*/ static PredictionContext join(@NotNull PredictionContext context0, @NotNull PredictionContext context1, @NotNull PredictionContextCache contextCache) {
 		if (context0 == context1) {
 			return context0;
 		}
 
+		boolean local = !contextCache.isContextSensitive();
 		if (context0.isEmpty()) {
 			return local ? context0 : addEmptyContext(context1);
 		} else if (context1.isEmpty()) {
@@ -113,7 +118,7 @@ public class PredictionContext {
 		}
 
 		if (context0.parents.length == 1 && context1.parents.length == 1 && context0.invokingStates[0] == context1.invokingStates[0]) {
-			PredictionContext merged = join(context0.parents[0], context1.parents[0], local);
+			PredictionContext merged = contextCache.join(context0.parents[0], context1.parents[0]);
 			if (merged == context0.parents[0]) {
 				return context0;
 			} else if (merged == context1.parents[0]) {
@@ -134,7 +139,7 @@ public class PredictionContext {
 		boolean canReturnRight = true;
 		while (leftIndex < context0.parents.length && rightIndex < context1.parents.length) {
 			if (context0.invokingStates[leftIndex] == context1.invokingStates[rightIndex]) {
-				parentsList[count] = join(context0.parents[leftIndex], context1.parents[rightIndex], local);
+				parentsList[count] = contextCache.join(context0.parents[leftIndex], context1.parents[rightIndex]);
 				invokingStatesList[count] = context0.invokingStates[leftIndex];
 				canReturnLeft = canReturnLeft && parentsList[count] == context0.parents[leftIndex];
 				canReturnRight = canReturnRight && parentsList[count] == context1.parents[rightIndex];
