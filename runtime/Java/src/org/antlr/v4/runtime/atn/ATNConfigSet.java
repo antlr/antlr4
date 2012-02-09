@@ -322,12 +322,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 
 		ATNConfigSet other = (ATNConfigSet)obj;
-		return configs.equals(other.configs);
+		return this.localContext == other.localContext
+			&& configs.equals(other.configs);
 	}
 
 	@Override
 	public int hashCode() {
 		int hashCode = 1;
+		hashCode = 5 * hashCode + (localContext ? 1 : 0);
 		hashCode = 5 * hashCode + configs.hashCode();
 		return hashCode;
 	}
