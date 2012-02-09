@@ -139,6 +139,17 @@ public class LexerATNSimulator extends ATNSimulator {
 		this.recog = recog;
 	}
 
+	public void copyState(@NotNull LexerATNSimulator simulator) {
+		this.charPositionInLine = simulator.charPositionInLine;
+		this.line = simulator.line;
+		this.mode = simulator.mode;
+		this.startIndex = simulator.startIndex;
+
+		this.trace = simulator.trace;
+		this.traceStream = simulator.traceStream;
+		this.traceFailed = simulator.traceFailed;
+	}
+
 	public OutputStream getTraceStream() {
 		return this.traceStream;
 	}
