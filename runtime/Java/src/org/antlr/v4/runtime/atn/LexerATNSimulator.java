@@ -139,6 +139,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		this.recog = recog;
 	}
 
+	public OutputStream getTraceStream() {
+		return this.traceStream;
+	}
+
 	public void setTraceStream(OutputStream traceStream) {
 		this.traceStream = traceStream;
 		this.trace = traceStream != null;
