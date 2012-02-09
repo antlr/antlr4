@@ -29,6 +29,9 @@
 
 package org.antlr.v4.runtime.atn;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -117,6 +120,48 @@ public class ATNConfig {
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
+	public boolean contains(ATNConfig subconfig) {
+		if (this.state.stateNumber != subconfig.state.stateNumber
+			|| this.alt != subconfig.alt
+			|| !this.semanticContext.equals(subconfig.semanticContext)) {
+			return false;
+		}
+
+		Deque<PredictionContext> leftWorkList = new ArrayDeque<PredictionContext>();
+		Deque<PredictionContext> rightWorkList = new ArrayDeque<PredictionContext>();
+		leftWorkList.add(context);
+		rightWorkList.add(subconfig.context);
+		while (!leftWorkList.isEmpty()) {
+			PredictionContext left = leftWorkList.pop();
+			PredictionContext right = rightWorkList.pop();
+
+			if (left == right) {
+				return true;
+			}
+
+			if (left.invokingStates.length < right.invokingStates.length) {
+				return false;
+			}
+
+			if (right.isEmpty()) {
+				return left.hasEmpty();
+			} else {
+				for (int i = 0; i < right.parents.length; i++) {
+					int index = Arrays.binarySearch(left.invokingStates, right.invokingStates[i]);
+					if (index < 0) {
+						// assumes invokingStates has no duplicate entries
+						return false;
+					}
+
+					leftWorkList.push(left.parents[index]);
+					rightWorkList.push(right.parents[i]);
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
      *  syntactic/semantic contexts are the same.
@@ -164,24 +209,35 @@ public class ATNConfig {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
 //			else buf.append(state.ruleIndex+":");
 //		}
-		buf.append('(');
-		buf.append(state);
-		if ( showAlt ) {
-            buf.append(",");
-            buf.append(alt);
-        }
-        if ( context!=null ) {
-            buf.append(",");
-            buf.append(context.toString(recog, this.state.stateNumber));
-        }
-        if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
-            buf.append(",");
-            buf.append(semanticContext);
-        }
-        if ( reachesIntoOuterContext>0 ) {
-            buf.append(",up=").append(reachesIntoOuterContext);
-        }
-		buf.append(')');
+		String[] contexts = context.toStrings(recog, this.state.stateNumber);
+		boolean first = true;
+		for (String contextDesc : contexts) {
+			if ( first ) {
+				first = false;
+			}
+			else {
+				buf.append(", ");
+			}
+
+			buf.append('(');
+			buf.append(state);
+			if ( showAlt ) {
+				buf.append(",");
+				buf.append(alt);
+			}
+			if ( context!=null ) {
+				buf.append(",");
+				buf.append(contextDesc);
+			}
+			if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
+				buf.append(",");
+				buf.append(semanticContext);
+			}
+			if ( reachesIntoOuterContext>0 ) {
+				buf.append(",up=").append(reachesIntoOuterContext);
+			}
+			buf.append(')');
+		}
 		return buf.toString();
     }
 }

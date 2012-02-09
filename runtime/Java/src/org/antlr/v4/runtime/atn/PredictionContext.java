@@ -27,6 +27,7 @@
  */
 package org.antlr.v4.runtime.atn;
 
+import java.util.*;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -37,29 +38,32 @@ public class PredictionContext {
 	public static final int EMPTY_STATE_KEY = Integer.MAX_VALUE;
 	public static final int EMPTY_HASH_CODE = EMPTY.hashCode();
 
-	public final PredictionContext parent;
-	public final int invokingState;
+	@NotNull
+	public final PredictionContext[] parents;
+	@NotNull
+	public final int[] invokingStates;
 	private final int parentHashCode;
 	private final int invokingStateHashCode;
 
 	private PredictionContext() {
-		parent = null;
-		invokingState = EMPTY_STATE_KEY;
-		parentHashCode = EMPTY_HASH_CODE;
+		parents = new PredictionContext[0];
+		invokingStates = new int[0];
+		parentHashCode = 1;
 		invokingStateHashCode = 1;
 	}
 
 	private PredictionContext(@NotNull PredictionContext parent, int invokingState) {
-		this(parent, invokingState, 31 + parent.hashCode(), 31 + invokingState);
+		this(new PredictionContext[] { parent }, new int[] { invokingState }, 31 + parent.hashCode(), 31 + invokingState);
 		assert invokingState >= 0;
 		assert parent != null;
 	}
 
-	private PredictionContext(@NotNull PredictionContext parent, int invokingState, int parentHashCode, int invokingStateHashCode) {
-		assert invokingState != EMPTY_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+	private PredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int parentHashCode, int invokingStateHashCode) {
+		assert parents.length == invokingStates.length;
+		assert invokingStates.length > 0 && invokingStates[0] != EMPTY_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
-		this.parent = parent;
-		this.invokingState = invokingState;
+		this.parents = parents;
+		this.invokingStates = invokingStates;
 		this.parentHashCode = parentHashCode;
 		this.invokingStateHashCode = invokingStateHashCode;
 	}
@@ -79,12 +83,121 @@ public class PredictionContext {
 		return parent.getChild(outerContext.invokingState);
 	}
 
+	private static PredictionContext addEmptyContext(PredictionContext context) {
+		if (context.hasEmpty()) {
+			return context;
+		}
+
+		PredictionContext[] parents = Arrays.copyOf(context.parents, context.parents.length + 1);
+		int[] invokingStates = Arrays.copyOf(context.invokingStates, context.invokingStates.length + 1);
+		parents[parents.length - 1] = PredictionContext.EMPTY;
+		invokingStates[invokingStates.length - 1] = PredictionContext.EMPTY_STATE_KEY;
+		int newParentHashCode = 31 * context.parentHashCode + EMPTY_HASH_CODE;
+		int newInvokingStateHashCode = 31 * context.invokingStateHashCode + PredictionContext.EMPTY_STATE_KEY;
+		return new PredictionContext(parents, invokingStates, newParentHashCode, newInvokingStateHashCode);
+	}
+
+	public static PredictionContext join(PredictionContext context0, PredictionContext context1) {
+		if (context0 == context1) {
+			return context0;
+		}
+
+		if (context0.isEmpty()) {
+			return addEmptyContext(context1);
+		} else if (context1.isEmpty()) {
+			return addEmptyContext(context0);
+		}
+
+		if (context0.parents.length == 1 && context1.parents.length == 1 && context0.invokingStates[0] == context1.invokingStates[0]) {
+			PredictionContext merged = join(context0.parents[0], context1.parents[0]);
+			if (merged == context0.parents[0]) {
+				return context0;
+			} else if (merged == context1.parents[0]) {
+				return context1;
+			} else {
+				return new PredictionContext(merged, context0.invokingStates[0]);
+			}
+		}
+
+		int count = 0;
+		int parentHashCode = 1;
+		int invokingStateHashCode = 1;
+		PredictionContext[] parentsList = new PredictionContext[context0.parents.length + context1.parents.length];
+		int[] invokingStatesList = new int[parentsList.length];
+		int leftIndex = 0;
+		int rightIndex = 0;
+		boolean canReturnLeft = true;
+		boolean canReturnRight = true;
+		while (leftIndex < context0.parents.length && rightIndex < context1.parents.length) {
+			if (context0.invokingStates[leftIndex] == context1.invokingStates[rightIndex]) {
+				parentsList[count] = join(context0.parents[leftIndex], context1.parents[rightIndex]);
+				invokingStatesList[count] = context0.invokingStates[leftIndex];
+				canReturnLeft = canReturnLeft && parentsList[count] == context0.parents[leftIndex];
+				canReturnRight = canReturnRight && parentsList[count] == context1.parents[rightIndex];
+				leftIndex++;
+				rightIndex++;
+			} else if (context0.invokingStates[leftIndex] < context1.invokingStates[rightIndex]) {
+				parentsList[count] = context0.parents[leftIndex];
+				invokingStatesList[count] = context0.invokingStates[leftIndex];
+				canReturnRight = false;
+				leftIndex++;
+			} else {
+				assert context1.invokingStates[rightIndex] < context0.invokingStates[leftIndex];
+				parentsList[count] = context1.parents[rightIndex];
+				invokingStatesList[count] = context1.invokingStates[rightIndex];
+				canReturnLeft = false;
+				rightIndex++;
+			}
+
+			parentHashCode = 31 * parentHashCode + parentsList[count].hashCode();
+			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
+			count++;
+		}
+
+		while (leftIndex < context0.parents.length) {
+			parentsList[count] = context0.parents[leftIndex];
+			invokingStatesList[count] = context0.invokingStates[leftIndex];
+			leftIndex++;
+			canReturnRight = false;
+			parentHashCode = 31 * parentHashCode + parentsList[count].hashCode();
+			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
+			count++;
+		}
+
+		while (rightIndex < context1.parents.length) {
+			parentsList[count] = context1.parents[rightIndex];
+			invokingStatesList[count] = context1.invokingStates[rightIndex];
+			rightIndex++;
+			canReturnLeft = false;
+			parentHashCode = 31 * parentHashCode + parentsList[count].hashCode();
+			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
+			count++;
+		}
+
+		if (canReturnLeft) {
+			return context0;
+		} else if (canReturnRight) {
+			return context1;
+		}
+
+		if (count < parentsList.length) {
+			parentsList = Arrays.copyOf(parentsList, count);
+			invokingStatesList = Arrays.copyOf(invokingStatesList, count);
+		}
+
+		return new PredictionContext(parentsList, invokingStatesList, parentHashCode, invokingStateHashCode);
+	}
+
 	public PredictionContext getChild(int invokingState) {
 		return new PredictionContext(this, invokingState);
 	}
 
 	public boolean isEmpty() {
-		return invokingState == EMPTY_STATE_KEY;
+		return parents.length == 0;
+	}
+
+	public boolean hasEmpty() {
+		return isEmpty() || invokingStates[invokingStates.length - 1] == EMPTY_STATE_KEY;
 	}
 
 	/** Two contexts conflict() if they are equals() or one is a stack suffix
@@ -110,7 +223,7 @@ public class PredictionContext {
 	 *  fast enough upon nondeterminism.
 	 */
 	public boolean conflictsWith(PredictionContext other) {
-		return this.suffix(other) || this.equals(other);
+		return this.suffix(other); // || this.equals(other);
 	}
 
 	/** [$] suffix any context
@@ -135,15 +248,70 @@ public class PredictionContext {
 	 */
 	protected boolean suffix(PredictionContext other) {
 		PredictionContext sp = this;
-		// if one of the contexts is empty, it never enters loop and returns true
-		while ( sp.parent!=null && other.parent!=null ) {
-			if ( sp.invokingState != other.invokingState ) {
-				return false;
-			}
-			sp = sp.parent;
-			other = other.parent;
+
+		if (invokingStates.length == 0 || other.invokingStates.length == 0) {
+			return true;
 		}
-		//System.out.println("suffix");
+
+		Deque<PredictionContext> leftWorkList = new ArrayDeque<PredictionContext>();
+		Deque<PredictionContext> rightWorkList = new ArrayDeque<PredictionContext>();
+		leftWorkList.add(this);
+		rightWorkList.add(other);
+		while (!leftWorkList.isEmpty()) {
+			PredictionContext left = leftWorkList.pop();
+			PredictionContext right = rightWorkList.pop();
+
+			if (left == right || left.isEmpty() || right.isEmpty()) {
+				continue;
+			}
+
+			int leftIndex = 0;
+			int rightIndex = 0;
+			int leftState = left.invokingStates[0];
+			int rightState = right.invokingStates[0];
+			boolean leftHasEmpty = left.hasEmpty();
+			boolean rightHasEmpty = right.hasEmpty();
+			while (leftIndex < left.invokingStates.length || rightIndex < right.invokingStates.length) {
+				if (leftState == rightState) {
+					PredictionContext leftParent = left.parents[leftIndex];
+					PredictionContext rightParent = right.parents[rightIndex];
+					if (leftParent != rightParent) {
+						leftWorkList.push(left.parents[leftIndex]);
+						rightWorkList.push(right.parents[rightIndex]);
+					}
+					if (leftState != -1) {
+						leftIndex++;
+						leftState = (leftIndex < left.invokingStates.length) ? left.invokingStates[leftIndex] : -1;
+					}
+					if (rightState != -1) {
+						rightIndex++;
+						rightState = (rightIndex < right.invokingStates.length) ? right.invokingStates[rightIndex] : -1;
+					}
+
+					continue;
+				}
+
+				if (leftState < rightState) {
+					if (leftState == -1 && rightState != EMPTY_STATE_KEY) {
+						return false;
+					} else if (leftState != -1) {
+						return false;
+					}
+
+					break;
+				} else {
+					assert rightState < leftState;
+					if (rightState == -1 && leftState != EMPTY_STATE_KEY) {
+						return false;
+					} else if (rightState != -1) {
+						return false;
+					}
+
+					break;
+				}
+			}
+		}
+
 		return true;
 	}
 
@@ -163,8 +331,8 @@ public class PredictionContext {
 			return false; // can't be same if hash is different
 		}
 
-		return invokingState == other.invokingState
-			&& (parent == other.parent || (parent != null && parent.equals(other.parent)));
+		return Arrays.equals(invokingStates, other.invokingStates)
+			&& Arrays.equals(parents, other.parents);
 	}
 
 	@Override
@@ -178,47 +346,75 @@ public class PredictionContext {
 		return this.equals((PredictionContext)o);
 	}
 
-	@Override
-	public String toString() {
-		return toString(null, Integer.MAX_VALUE);
+	//@Override
+	//public String toString() {
+	//	return toString(null, Integer.MAX_VALUE);
+	//}
+
+	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
+		return toStrings(recognizer, PredictionContext.EMPTY, currentState);
 	}
 
-	public String toString(Recognizer<?, ?> recognizer, int currentState) {
-		return toString(recognizer, PredictionContext.EMPTY, currentState);
-	}
+	public String[] toStrings(Recognizer<?, ?> recognizer, PredictionContext stop, int currentState) {
+		List<String> result = new ArrayList<String>();
 
-	public String toString(Recognizer<?, ?> recognizer, PredictionContext stop, int currentState) {
-		if ( recognizer==null ) {
-			StringBuilder buf = new StringBuilder();
-			PredictionContext p = this;
-			buf.append("[");
-			while ( p != null && p != stop ) {
-				if ( !p.isEmpty() ) buf.append(p.invokingState);
-				if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
-				p = p.parent;
-			}
-			buf.append("]");
-			return buf.toString();
-		}
-		else {
-			StringBuilder buf = new StringBuilder();
+		outer:
+		for (int perm = 0; ; perm++) {
+			int offset = 0;
+			boolean last = true;
 			PredictionContext p = this;
 			int stateNumber = currentState;
-			buf.append("[");
+			StringBuilder localBuffer = new StringBuilder();
+			localBuffer.append("[");
 			while ( p != null && p != stop ) {
-				ATN atn = recognizer.getATN();
-				ATNState s = atn.states.get(stateNumber);
-				String ruleName = recognizer.getRuleNames()[s.ruleIndex];
-				buf.append(ruleName);
-				if ( p.parent != null ) buf.append(" ");
-//				ATNState invoker = atn.states.get(ctx.invokingState);
-//				RuleTransition rt = (RuleTransition)invoker.transition(0);
-//				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
-				stateNumber = p.invokingState;
-				p = p.parent;
+				int index = 0;
+				if (p.parents.length > 0) {
+					int bits = 1;
+					while ((1 << bits) < p.parents.length) {
+						bits++;
+					}
+
+					int mask = (1 << bits) - 1;
+					index = (perm >> offset) & mask;
+					last &= index >= p.parents.length - 1;
+					if (index >= p.parents.length) {
+						continue outer;
+					}
+					offset += bits;
+				}
+
+				if ( recognizer!=null ) {
+					if (localBuffer.length() > 1) {
+						// first char is '[', if more than that this isn't the first rule
+						localBuffer.append(' ');
+					}
+
+					ATN atn = recognizer.getATN();
+					ATNState s = atn.states.get(stateNumber);
+					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
+					localBuffer.append(ruleName);
+				}
+				else if ( p.invokingStates[index]!=EMPTY_STATE_KEY ) {
+					if ( !p.isEmpty() ) {
+						if (localBuffer.length() > 1) {
+							// first char is '[', if more than that this isn't the first rule
+							localBuffer.append(' ');
+						}
+
+						localBuffer.append(p.invokingStates[index]);
+					}
+				}
+				stateNumber = p.invokingStates[index];
+				p = p.parents[index];
 			}
-			buf.append("]");
-			return buf.toString();
+			localBuffer.append("]");
+			result.add(localBuffer.toString());
+
+			if (last) {
+				break;
+			}
 		}
+
+		return result.toArray(new String[result.size()]);
 	}
 }
