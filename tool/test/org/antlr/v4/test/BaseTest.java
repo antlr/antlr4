@@ -538,49 +538,10 @@ public abstract class BaseTest {
 	}
 
 	public String execRecognizer() {
-		try {
-			String inputFile = new File(tmpdir, "input").getAbsolutePath();
-			String[] args = new String[] {
-				"java", "-classpath", tmpdir+pathSep+CLASSPATH,
-				"Test", inputFile
-			};
-			//String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
-			//System.out.println("execParser: "+cmdLine);
-			Process process =
-				Runtime.getRuntime().exec(args, null, new File(tmpdir));
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("exec stderrVacuum: "+ stderrVacuum);
-			}
-			return output;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec recognizer");
-			e.printStackTrace(System.err);
-		}
-		return null;
+		return execClass("Test");
 	}
 
 	public String execClass(String className) {
-		/* HOW TO GET STDOUT?
-		try {
-			ClassLoader cl_new = new DirectoryLoader(new File(tmpdir));
-			Class compiledClass = cl_new.loadClass(className);
-			Method m = compiledClass.getMethod("main");
-			m.invoke(null);
-		} catch (Exception ex) {
-			ex.printStackTrace(System.err);
-		}
-		*/
-
 		if (TEST_IN_SAME_PROCESS) {
 			PrintStream originalOut = System.out;
 			PrintStream originalErr = System.err;
