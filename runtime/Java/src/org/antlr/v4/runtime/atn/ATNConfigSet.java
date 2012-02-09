@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  *
@@ -68,7 +69,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	private ATNConfigSet(ATNConfigSet set, boolean readonly) {
 		this.localContext = set.localContext;
-
 		if (readonly) {
 			this.mergedConfigs = null;
 			this.unmerged = null;
@@ -158,8 +158,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean add(ATNConfig e) {
-		ensureWritable();
+		return add(e, null);
+	}
 
+	public boolean add(ATNConfig e, @Nullable PredictionContextCache contextCache) {
+		ensureWritable();
 		boolean added;
 		boolean addKey;
 		long key = getKey(e);
@@ -167,8 +170,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		addKey = (mergedConfig == null);
 		if (mergedConfig != null && canMerge(e, key, mergedConfig)) {
 			mergedConfig.reachesIntoOuterContext = Math.max(mergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
+			if (contextCache == null) {
+				boolean localJoin = localContext || dipsIntoOuterContext || mergedConfig.reachesIntoOuterContext > 0;
+				contextCache = localJoin ? PredictionContextCache.UNCACHED_LOCAL : PredictionContextCache.UNCACHED_FULL;
+			}
 
-			PredictionContext joined = PredictionContext.join(mergedConfig.context, e.context, localContext);
+			PredictionContext joined = PredictionContext.join(mergedConfig.context, e.context, contextCache);
 			if (mergedConfig.context == joined) {
 				return false;
 			}
@@ -182,8 +189,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			ATNConfig unmergedConfig = unmerged.get(i);
 			if (canMerge(e, key, unmergedConfig)) {
 				unmergedConfig.reachesIntoOuterContext = Math.max(unmergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
+				if (contextCache == null) {
+					boolean localJoin = localContext || dipsIntoOuterContext || unmergedConfig.reachesIntoOuterContext > 0;
+					contextCache = localJoin ? PredictionContextCache.UNCACHED_LOCAL : PredictionContextCache.UNCACHED_FULL;
+				}
 
-				PredictionContext joined = PredictionContext.join(unmergedConfig.context, e.context, localContext);
+				PredictionContext joined = PredictionContext.join(unmergedConfig.context, e.context, contextCache);
 				if (unmergedConfig.context == joined) {
 					return false;
 				}
@@ -284,11 +295,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean addAll(Collection<? extends ATNConfig> c) {
+		return addAll(c, null);
+	}
+
+	public boolean addAll(Collection<? extends ATNConfig> c, PredictionContextCache contextCache) {
 		ensureWritable();
 
 		boolean changed = false;
 		for (ATNConfig group : c) {
-			changed |= add(group);
+			changed |= add(group, contextCache);
 		}
 
 		return changed;
