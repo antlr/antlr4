@@ -150,7 +150,7 @@ public class DFAState {
 		for (ATNConfig c : configset) {
 			alts.add(c.alt);
 		}
-		if ( alts.size()==0 ) return null;
+		if ( alts.isEmpty() ) return null;
 		return alts;
 	}
 

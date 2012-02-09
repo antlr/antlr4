@@ -81,23 +81,13 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     @Override
     public int mark() {
-        if ( p == -1 ) setup();
-		lastMarker = index();
-		return lastMarker;
+		return 0;
 	}
 
 	@Override
 	public void release(int marker) {
 		// no resources to release
 	}
-
-    public void rewind(int marker) {
-        seek(marker);
-    }
-
-    public void rewind() {
-        seek(lastMarker);
-    }
 
     public void reset() {
         p = 0;

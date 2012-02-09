@@ -363,7 +363,7 @@ public class IntervalSet implements IntSet {
     /** return true if this set has no members */
     @Override
     public boolean isNil() {
-        return intervals==null || intervals.size()==0;
+        return intervals==null || intervals.isEmpty();
     }
 
     /** If this set is a single integer, return it otherwise Token.INVALID_TYPE */
@@ -422,6 +422,7 @@ public class IntervalSet implements IntSet {
      *  to make sure they are the same.  Interval.equals() is used
      *  by the List.equals() method to check the ranges.
      */
+    @Override
     public boolean equals(Object obj) {
         if ( obj==null || !(obj instanceof IntervalSet) ) {
             return false;
@@ -430,11 +431,12 @@ public class IntervalSet implements IntSet {
 		return this.intervals.equals(other.intervals);
 	}
 
+	@Override
 	public String toString() { return toString(false); }
 
 	public String toString(boolean elemAreChar) {
-		StringBuffer buf = new StringBuffer();
-		if ( this.intervals==null || this.intervals.size()==0 ) {
+		StringBuilder buf = new StringBuilder();
+		if ( this.intervals==null || this.intervals.isEmpty() ) {
 			return "{}";
 		}
 		if ( this.size()>1 ) {
@@ -447,12 +449,12 @@ public class IntervalSet implements IntSet {
 			int b = I.b;
 			if ( a==b ) {
 				if ( a==-1 ) buf.append("<EOF>");
-				else if ( elemAreChar ) buf.append("'"+(char)a+"'");
+				else if ( elemAreChar ) buf.append("'").append((char)a).append("'");
 				else buf.append(a);
 			}
 			else {
-				if ( elemAreChar ) buf.append("'"+(char)a+"'..'"+(char)b+"'");
-				else buf.append(a+".."+b);
+				if ( elemAreChar ) buf.append("'").append((char)a).append("'..'").append((char)b).append("'");
+				else buf.append(a).append("..").append(b);
 			}
 			if ( iter.hasNext() ) {
 				buf.append(", ");
@@ -465,8 +467,8 @@ public class IntervalSet implements IntSet {
 	}
 
 	public String toString(String[] tokenNames) {
-		StringBuffer buf = new StringBuffer();
-		if ( this.intervals==null || this.intervals.size()==0 ) {
+		StringBuilder buf = new StringBuilder();
+		if ( this.intervals==null || this.intervals.isEmpty() ) {
 			return "{}";
 		}
 		if ( this.size()>1 ) {

@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -43,7 +44,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull OrderedHashSet<ATNConfig> configs)
+								@NotNull ATNConfigSet configs)
     {
         recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
@@ -53,7 +54,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
-											@NotNull OrderedHashSet<ATNConfig> configs)
+											@NotNull ATNConfigSet configs)
 	{
 		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
@@ -61,7 +62,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 
 	@Override
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull OrderedHashSet<ATNConfig> configs)
+                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
@@ -74,7 +75,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 											 @NotNull IntervalSet ambigAlts,
 											 DecisionState decState,
 											 @NotNull SemanticContext[] altToPred,
-											 @NotNull OrderedHashSet<ATNConfig> configs, boolean fullContextParse)
+											 @NotNull ATNConfigSet configs, boolean fullContextParse)
     {
         recognizer.notifyErrorListeners("reportInsufficientPredicates d=" + dfa.decision + ", decState=" + decState +
 										", ambigAlts=" + ambigAlts + ":" + Arrays.toString(altToPred) +

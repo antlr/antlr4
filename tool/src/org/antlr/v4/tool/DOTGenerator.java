@@ -109,11 +109,11 @@ public class DOTGenerator {
 
 	protected String getStateLabel(DFAState s) {
 		if ( s==null ) return "null";
-		StringBuffer buf = new StringBuffer(250);
+		StringBuilder buf = new StringBuilder(250);
 		buf.append('s');
 		buf.append(s.stateNumber);
 		if ( s.isAcceptState ) {
-			buf.append("=>"+s.prediction);
+			buf.append("=>").append(s.prediction);
 		}
 		if ( grammar!=null && grammar.tool.verbose_dfa ) {
 			Set<Integer> alts = s.getAltSet();
@@ -135,8 +135,8 @@ public class DOTGenerator {
 					// get a list of configs for just this alt
 					// it will help us print better later
 					List<ATNConfig> configsInAlt = new ArrayList<ATNConfig>();
-					for (Iterator it = configurations.iterator(); it.hasNext();) {
-						ATNConfig c = (ATNConfig) it.next();
+					for (Iterator<ATNConfig> it = configurations.iterator(); it.hasNext();) {
+						ATNConfig c = it.next();
 						if ( c.alt!=alt ) continue;
 						configsInAlt.add(c);
 					}
@@ -179,9 +179,8 @@ public class DOTGenerator {
 		if ( startState==null )	return null;
 
 		// The output DOT graph for visualization
-		ST dot = null;
 		Set<ATNState> markedStates = new HashSet<ATNState>();
-		dot = stlib.getInstanceOf("atn");
+		ST dot = stlib.getInstanceOf("atn");
 		dot.add("startState", startState.stateNumber);
 		dot.add("rankdir", rankdir);
 
@@ -211,7 +210,7 @@ public class DOTGenerator {
 //			}
 
 			// make a DOT edge for each transition
-			ST edgeST = null;
+			ST edgeST;
 			for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 				Transition edge = s.transition(i);
 				if ( edge instanceof RuleTransition ) {

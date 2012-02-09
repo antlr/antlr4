@@ -50,9 +50,9 @@ public class Blank<file.grammarName>Listener implements <file.grammarName>Listen
 @Override public void enterRule(<file.parserName>.<lname>Context ctx) { \}
 @Override public void exitRule(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()> > ctx, <InputSymbolType()> symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
 }
 >>
 
@@ -61,7 +61,7 @@ Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superclass> {
 	<if(parser.tokens)>
 	public static final int
@@ -182,22 +182,22 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 >>
 
 LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
-    namedActions,finallyAction,postamble) ::=
+	namedActions,finallyAction,postamble) ::=
 <<
 
 <ruleCtx>
 <altLabelCtxs; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-    ParserRuleContext\<Token> _parentctx = _ctx;
+	ParserRuleContext\<Token> _parentctx = _ctx;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-    pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+	pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
-	    <code>
+		<code>
 		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
@@ -355,10 +355,10 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
-    if ( _alt<choice.uniqueID>==1 ) {
-	    <iteration>
-        <alts> <! should only be one !>
-    }
+	if ( _alt<choice.uniqueID>==1 ) {
+		<iteration>
+		<alts> <! should only be one !>
+	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
@@ -511,8 +511,8 @@ StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
-	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
-	public <s.name>(ParserRuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
+	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
+	public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<s.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
 		<s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
@@ -560,6 +560,7 @@ _localctx = new <ctxName>Context(_parentctx, _startState, _p);
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
+_localctx.start = _prevctx.start;
 >>
 
 recRuleLabeledAltStartAction(ruleName, ctxName, label) ::= <<
@@ -567,6 +568,7 @@ _localctx = new <ctxName>Context(new <ruleName>Context(_parentctx, _startState, 
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
+_localctx.start = _prevctx.start;
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
@@ -578,6 +580,7 @@ _prevctx = _localctx;
 recRuleSetPrevCtx() ::= <<
 if ( _parseListeners!=null ) triggerExitRuleEvent();
 _prevctx = _localctx;
+_prevctx.stop = _input.LT(-1);
 >>
 
 
@@ -597,14 +600,14 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
-    public static String[] modeNames = {
-        <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
-    };
+	public static String[] modeNames = {
+		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
+	};
 
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
@@ -645,7 +648,7 @@ public class <lexer.name> extends Lexer {
 
 SerializedATN(model) ::= <<
 public static final String _serializedATN =
-	"<model.serialized; wrap={"+<\n>"}, anchor>";
+	"<model.serialized; wrap={"+<\n><\t>"}>";
 public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {

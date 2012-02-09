@@ -292,7 +292,7 @@ public abstract class BaseTest {
 			fileManager.getJavaFileObjectsFromFiles(files);
 
 		Iterable<String> compileOptions =
-			Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
+			Arrays.asList("-g", "-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
 
 		JavaCompiler.CompilationTask task =
 			compiler.getTask(null, fileManager, null, compileOptions, null,
@@ -538,49 +538,10 @@ public abstract class BaseTest {
 	}
 
 	public String execRecognizer() {
-		try {
-			String inputFile = new File(tmpdir, "input").getAbsolutePath();
-			String[] args = new String[] {
-				"java", "-classpath", tmpdir+pathSep+CLASSPATH,
-				"Test", inputFile
-			};
-			//String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
-			//System.out.println("execParser: "+cmdLine);
-			Process process =
-				Runtime.getRuntime().exec(args, null, new File(tmpdir));
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("exec stderrVacuum: "+ stderrVacuum);
-			}
-			return output;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec recognizer");
-			e.printStackTrace(System.err);
-		}
-		return null;
+		return execClass("Test");
 	}
 
 	public String execClass(String className) {
-		/* HOW TO GET STDOUT?
-		try {
-			ClassLoader cl_new = new DirectoryLoader(new File(tmpdir));
-			Class compiledClass = cl_new.loadClass(className);
-			Method m = compiledClass.getMethod("main");
-			m.invoke(null);
-		} catch (Exception ex) {
-			ex.printStackTrace(System.err);
-		}
-		*/
-
 		if (TEST_IN_SAME_PROCESS) {
 			PrintStream originalOut = System.out;
 			PrintStream originalErr = System.err;
@@ -1097,22 +1058,22 @@ public abstract class BaseTest {
 
     // override to track errors
 
-    public void assertEquals(String msg, Object a, Object b) { try {Assert.assertEquals(msg,a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(Object a, Object b) { try {Assert.assertEquals(a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(String msg, long a, long b) { try {Assert.assertEquals(msg,a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(long a, long b) { try {Assert.assertEquals(a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(String msg, Object expected, Object actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(Object expected, Object actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(String msg, long expected, long actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(long expected, long actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertTrue(String msg, boolean b) { try {Assert.assertTrue(msg,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertTrue(boolean b) { try {Assert.assertTrue(b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertTrue(String message, boolean condition) { try {Assert.assertTrue(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertTrue(boolean condition) { try {Assert.assertTrue(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertFalse(String msg, boolean b) { try {Assert.assertFalse(msg,b);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertFalse(boolean b) { try {Assert.assertFalse(b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertFalse(String message, boolean condition) { try {Assert.assertFalse(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertFalse(boolean condition) { try {Assert.assertFalse(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertNotNull(String msg, Object p) { try {Assert.assertNotNull(msg, p);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNotNull(Object p) { try {Assert.assertNotNull(p);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNotNull(String message, Object object) { try {Assert.assertNotNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNotNull(Object object) { try {Assert.assertNotNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-    public void assertNull(String msg, Object p) { try {Assert.assertNull(msg, p);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNull(Object p) { try {Assert.assertNull(p);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
 	public static class IntTokenStream implements TokenStream {
 		List<Integer> types;
