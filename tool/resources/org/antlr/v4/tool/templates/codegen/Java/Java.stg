@@ -182,22 +182,22 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 >>
 
 LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
-    namedActions,finallyAction,postamble) ::=
+	namedActions,finallyAction,postamble) ::=
 <<
 
 <ruleCtx>
 <altLabelCtxs; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-    ParserRuleContext\<Token> _parentctx = _ctx;
+	ParserRuleContext\<Token> _parentctx = _ctx;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-    pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+	pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
-	    <code>
+		<code>
 		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
@@ -355,10 +355,10 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
-    if ( _alt<choice.uniqueID>==1 ) {
-	    <iteration>
-        <alts> <! should only be one !>
-    }
+	if ( _alt<choice.uniqueID>==1 ) {
+		<iteration>
+		<alts> <! should only be one !>
+	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
@@ -602,9 +602,9 @@ public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
-    public static String[] modeNames = {
-        <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
-    };
+	public static String[] modeNames = {
+		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
+	};
 
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
@@ -645,7 +645,7 @@ public class <lexer.name> extends Lexer {
 
 SerializedATN(model) ::= <<
 public static final String _serializedATN =
-	"<model.serialized; wrap={"+<\n>"}, anchor>";
+	"<model.serialized; wrap={"+<\n><\t>"}>";
 public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
