@@ -50,9 +50,9 @@ public class Blank<file.grammarName>Listener implements <file.grammarName>Listen
 @Override public void enterRule(<file.parserName>.<lname>Context ctx) { \}
 @Override public void exitRule(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()> > ctx, <InputSymbolType()> symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
 }
 >>
 
@@ -511,8 +511,8 @@ StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
-	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
-	public <s.name>(ParserRuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
+	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
+	public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<s.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
 		<s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
