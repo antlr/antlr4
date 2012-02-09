@@ -676,8 +676,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( traversedPredicate ) return null; // cannot cache
 
 		newState.stateNumber = dfa[mode].states.size();
-		newState.configset = new ATNConfigSet();
-		newState.configset.addAll(configs);
+		newState.configset = configs.clone(true);
 		dfa[mode].states.put(newState, newState);
 		return newState;
 	}
