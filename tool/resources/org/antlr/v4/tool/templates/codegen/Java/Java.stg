@@ -560,6 +560,7 @@ _localctx = new <ctxName>Context(_parentctx, _startState, _p);
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
+_localctx.start = _prevctx.start;
 >>
 
 recRuleLabeledAltStartAction(ruleName, ctxName, label) ::= <<
@@ -567,6 +568,7 @@ _localctx = new <ctxName>Context(new <ruleName>Context(_parentctx, _startState, 
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
+_localctx.start = _prevctx.start;
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
@@ -578,6 +580,7 @@ _prevctx = _localctx;
 recRuleSetPrevCtx() ::= <<
 if ( _parseListeners!=null ) triggerExitRuleEvent();
 _prevctx = _localctx;
+_prevctx.stop = _input.LT(-1);
 >>
 
 
