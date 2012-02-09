@@ -406,7 +406,7 @@ public class TestATNSerialization extends BaseTest {
 			"5:PLUS_BLOCK_START 0\n" +
 			"6:BLOCK_END 0\n" +
 			"7:PLUS_LOOP_BACK 0\n" +
-			"8:LOOP_END 0 6\n" +
+			"8:LOOP_END 0 7\n" +
 			"rule 0:1 3,-1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0,0\n" +
@@ -441,10 +441,12 @@ public class TestATNSerialization extends BaseTest {
 			"6:RULE_STOP 2\n" +
 			"7:BASIC 0\n" +
 			"9:BASIC 0\n" +
-			"10:BASIC 1\n" +
+			"10:BASIC 0\n" +
 			"11:BASIC 1\n" +
-			"12:BASIC 2\n" +
-			"14:BASIC 2\n" +
+			"12:BASIC 1\n" +
+			"13:BASIC 2\n" +
+			"15:BASIC 2\n" +
+			"16:BASIC 2\n" +
 			"rule 0:1 3,0\n" +
 			"rule 1:3 4,-1\n" +
 			"rule 2:5 5,1\n" +
@@ -453,14 +455,16 @@ public class TestATNSerialization extends BaseTest {
 			"0->3 EPSILON 0,0,0\n" +
 			"0->5 EPSILON 0,0,0\n" +
 			"1->7 EPSILON 0,0,0\n" +
-			"3->10 EPSILON 0,0,0\n" +
-			"5->12 EPSILON 0,0,0\n" +
+			"3->11 EPSILON 0,0,0\n" +
+			"5->13 EPSILON 0,0,0\n" +
 			"7->9 ATOM 97,0,0\n" +
-			"9->2 EPSILON 0,0,0\n" +
-			"10->11 ATOM 98,0,0\n" +
-			"11->4 EPSILON 0,0,0\n" +
-			"12->14 ATOM 99,0,0\n" +
-			"14->6 EPSILON 0,0,0\n" +
+			"9->10 ACTION 0,0,0\n" +
+			"10->2 EPSILON 0,0,0\n" +
+			"11->12 ATOM 98,0,0\n" +
+			"12->4 EPSILON 0,0,0\n" +
+			"13->15 ATOM 99,0,0\n" +
+			"15->16 ACTION 2,1,0\n" +
+			"16->6 EPSILON 0,0,0\n" +
 			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
@@ -560,13 +564,15 @@ public class TestATNSerialization extends BaseTest {
 			"10:PLUS_BLOCK_START 0\n" +
 			"11:BLOCK_END 0\n" +
 			"12:PLUS_LOOP_BACK 0\n" +
-			"13:LOOP_END 0\n" +
+			"13:LOOP_END 0 12\n" +
 			"14:BASIC 1\n" +
 			"15:BASIC 1\n" +
 			"16:BASIC 1\n" +
 			"17:BASIC 1\n" +
-			"18:BASIC 2\n" +
-			"20:BASIC 2\n" +
+			"18:BASIC 1\n" +
+			"19:BASIC 2\n" +
+			"21:BASIC 2\n" +
+			"22:BASIC 2\n" +
 			"rule 0:2 3,-1\n" +
 			"rule 1:4 4,0\n" +
 			"rule 2:6 5,1\n" +
@@ -577,7 +583,7 @@ public class TestATNSerialization extends BaseTest {
 			"1->6 EPSILON 0,0,0\n" +
 			"2->10 EPSILON 0,0,0\n" +
 			"4->14 EPSILON 0,0,0\n" +
-			"6->18 EPSILON 0,0,0\n" +
+			"6->19 EPSILON 0,0,0\n" +
 			"8->11 RANGE 97,122,0\n" +
 			"10->8 EPSILON 0,0,0\n" +
 			"11->12 EPSILON 0,0,0\n" +
@@ -587,9 +593,11 @@ public class TestATNSerialization extends BaseTest {
 			"14->15 ATOM 42,0,0\n" +
 			"15->16 ATOM 47,0,0\n" +
 			"16->17 EPSILON 0,0,0\n" +
-			"17->5 EPSILON 0,0,0\n" +
-			"18->20 WILDCARD 0,0,0\n" +
-			"20->7 EPSILON 0,0,0\n" +
+			"17->18 ACTION 1,0,0\n" +
+			"18->5 EPSILON 0,0,0\n" +
+			"19->21 WILDCARD 0,0,0\n" +
+			"21->22 ACTION 2,1,0\n" +
+			"22->7 EPSILON 0,0,0\n" +
 			"0:0 1\n" +
 			"1:1 1\n" +
 			"2:12 1\n";

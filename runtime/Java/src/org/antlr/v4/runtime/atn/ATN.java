@@ -85,7 +85,7 @@ public class ATN {
 	 *  the rule surrounding s. In other words, the set will be
 	 *  restricted to tokens reachable staying within s's rule.
 	 */
-	public IntervalSet nextTokens(ATNState s, RuleContext ctx) {
+	public IntervalSet nextTokens(ATNState s, PredictionContext ctx) {
 		LL1Analyzer anal = new LL1Analyzer(this);
 		IntervalSet next = anal.LOOK(s, ctx);
 		return next;
