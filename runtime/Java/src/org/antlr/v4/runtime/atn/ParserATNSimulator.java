@@ -286,8 +286,7 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 		if ( dfa==null || dfa.s0==null ) {
 			DecisionState startState = atn.decisionToState.get(decision);
-			decisionToDFA[decision] = dfa = new DFA(startState);
-			dfa.decision = decision;
+			decisionToDFA[decision] = dfa = new DFA(startState, decision);
 			return predictATN(dfa, input, outerContext);
 		}
 		else {

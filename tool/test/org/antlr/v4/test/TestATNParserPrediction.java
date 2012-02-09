@@ -505,8 +505,7 @@ public class TestATNParserPrediction extends BaseTest {
 		TokenStream input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
-		DFA dfa = new DFA(startState);
-		dfa.decision = decision;
+		DFA dfa = new DFA(startState, decision);
 		int alt = interp.predictATN(dfa, input, ParserRuleContext.EMPTY, false);
 
 		System.out.println(dot.getDOT(dfa, false));
