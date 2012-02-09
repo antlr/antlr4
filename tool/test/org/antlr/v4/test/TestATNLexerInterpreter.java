@@ -2,7 +2,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.LexerRecognitionExeption;
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Utils;
@@ -72,7 +72,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"  | 'xy' .\n" +  // should not pursue '.' since xy already hit stop
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
-		LexerRecognitionExeption e = checkLexerMatches(lg, "xyz", "A, EOF");
+		RecognitionException e = checkLexerMatches(lg, "xyz", "A, EOF");
 		assertEquals("NoViableAltException('z')", e.toString());
 	}
 
@@ -83,7 +83,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"  | 'xy' . 'z'\n" + // will not pursue '.' since xy already hit stop (prior alt)
 			"  ;\n");
 //		checkLexerMatches(lg, "xy", "A, EOF");
-		LexerRecognitionExeption e = checkLexerMatches(lg, "xyqz", "A, EOF");
+		RecognitionException e = checkLexerMatches(lg, "xyqz", "A, EOF");
 		assertEquals("NoViableAltException('q')", e.toString());
 	}
 
@@ -244,7 +244,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "a", expecting);
 	}
 
-	protected LexerRecognitionExeption checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
+	protected RecognitionException checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg);
 		CharStream input = new ANTLRInputStream(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
@@ -252,11 +252,11 @@ public class TestATNLexerInterpreter extends BaseTest {
 		System.out.println(dot.getDOT(startState, true));
 
 		List<String> tokenTypes = null;
-		LexerRecognitionExeption retException = null;
+		RecognitionException retException = null;
 		try {
 			tokenTypes = getTokenTypes(lg, atn, input, false);
 		}
-		catch (LexerRecognitionExeption lre) { retException = lre; }
+		catch (RecognitionException lre) { retException = lre; }
 		if ( retException!=null ) return retException;
 
 		String result = Utils.join(tokenTypes.iterator(), ", ");
