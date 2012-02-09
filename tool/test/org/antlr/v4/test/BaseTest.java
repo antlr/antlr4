@@ -292,7 +292,7 @@ public abstract class BaseTest {
 			fileManager.getJavaFileObjectsFromFiles(files);
 
 		Iterable<String> compileOptions =
-			Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
+			Arrays.asList("-g", "-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
 
 		JavaCompiler.CompilationTask task =
 			compiler.getTask(null, fileManager, null, compileOptions, null,
