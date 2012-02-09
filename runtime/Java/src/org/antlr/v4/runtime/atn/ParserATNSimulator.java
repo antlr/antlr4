@@ -230,6 +230,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
+	public boolean optimize_ll1 = true;
+
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
@@ -240,6 +242,8 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 
 	@NotNull
 	public final DFA[] decisionToDFA;
+
+	protected final Map<Integer, Integer> LL1Table = new HashMap<Integer, Integer>();
 
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
@@ -266,6 +270,17 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 	{
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
+		if (optimize_ll1 && dfa != null) {
+			int ll_1 = input.LA(1);
+			if (ll_1 >= 0 && ll_1 <= Short.MAX_VALUE) {
+				int key = (decision << 16) + ll_1;
+				Integer alt = LL1Table.get(key);
+				if (alt != null) {
+					return alt;
+				}
+			}
+		}
+
 		if ( dfa==null || dfa.s0==null ) {
 			DecisionState startState = atn.decisionToState.get(decision);
 			decisionToDFA[decision] = dfa = new DFA(startState);
@@ -500,6 +515,18 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				D.isAcceptState = true;
 				D.configset.uniqueAlt = predictedAlt;
 				D.prediction = predictedAlt;
+
+				if (optimize_ll1
+					&& input.index() == startIndex
+					&& dfa.decision >= 0
+					&& greedy
+					&& !D.configset.hasSemanticContext)
+				{
+					if (t >= 0 && t <= Short.MAX_VALUE) {
+						int key = (dfa.decision << 16) + t;
+						LL1Table.put(key, predictedAlt);
+					}
+				}
 			}
 			else {
 				boolean fullCtx = false;
