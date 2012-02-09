@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -75,7 +76,7 @@ public class TestPerformance extends BaseTest {
     private int tokenCount;
 
     @Test
-//    @Ignore
+    @Ignore
     public void compileJdk() throws IOException {
         compileParser(USE_LR_GRAMMAR);
         JavaParserFactory factory = getParserFactory();
