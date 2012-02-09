@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -43,7 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ParserATNPathFinder extends ParserATNSimulator {
+public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn) {
 		super(parser, atn);
 	}
