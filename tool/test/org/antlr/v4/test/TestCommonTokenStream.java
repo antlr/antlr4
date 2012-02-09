@@ -178,24 +178,17 @@ public class TestCommonTokenStream extends BaseTest {
             new TokenSource() {
                 int i = 0;
                 WritableToken[] tokens = {
-                    new CommonToken(1," "),
+                    new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(1,"x"),
-                    new CommonToken(1," "),
+                    new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(1,"="),
                     new CommonToken(1,"34"),
-                    new CommonToken(1," "),
-                    new CommonToken(1," "),
+                    new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
+                    new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(1,";"),
-                    new CommonToken(1,"\n"),
+                    new CommonToken(1,"\n") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(Token.EOF,"")
                 };
-                {
-                    tokens[0].setChannel(Lexer.HIDDEN);
-                    tokens[2].setChannel(Lexer.HIDDEN);
-                    tokens[5].setChannel(Lexer.HIDDEN);
-                    tokens[6].setChannel(Lexer.HIDDEN);
-                    tokens[8].setChannel(Lexer.HIDDEN);
-                }
                 public Token nextToken() {
                     return tokens[i++];
                 }
