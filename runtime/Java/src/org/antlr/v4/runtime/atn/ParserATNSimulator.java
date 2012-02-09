@@ -930,7 +930,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// Make sure we track that we are now out of context.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					if (optimize_closure_busy && c.context.isEmpty() && !closureBusy.add(c)) {
-						return;
+						continue;
 					}
 
 					closure(c, configs, closureBusy, collectPredicates, fullContext, greedy, loopsSimulateTailRecursion, contextCache);
