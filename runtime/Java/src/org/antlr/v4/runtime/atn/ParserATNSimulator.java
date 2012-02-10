@@ -372,31 +372,26 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                        parser.getInputString(startIndex) +
 									   " at DFA state "+s.stateNumber);
 				}
-				try {
-					alt = execATN(dfa, s, input, startIndex, outerContext);
-					// this adds edge even if next state is accept for
-					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-					// TODO: This next stuff kills edge, but extra states remain. :(
-					if ( s.isAcceptState && alt!=-1 ) {
-						DFAState d = s.edges[input.LA(1)+1];
-						if ( d.isAcceptState && d.prediction==s.prediction ) {
-							// we can carve it out.
-							s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
-						}
+
+				alt = execATN(dfa, s, input, startIndex, outerContext);
+				// this adds edge even if next state is accept for
+				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
+				// TODO: This next stuff kills edge, but extra states remain. :(
+				if ( s.isAcceptState && alt!=-1 ) {
+					DFAState d = s.edges[input.LA(1)+1];
+					if ( d.isAcceptState && d.prediction==s.prediction ) {
+						// we can carve it out.
+						s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
 					}
-					if ( dfa_debug ) {
-						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
-						//dump(dfa);
-					}
-					// action already executed
-					if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-														" predicts "+alt);
-					return alt; // we've updated DFA, exec'd action, and have our deepest answer
 				}
-				catch (NoViableAltException nvae) {
-					addDFAEdge(s, t, ERROR);
-					throw nvae;
+				if ( dfa_debug ) {
+					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
+					//dump(dfa);
 				}
+				// action already executed
+				if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+													" predicts "+alt);
+				return alt; // we've updated DFA, exec'd action, and have our deepest answer
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) {
