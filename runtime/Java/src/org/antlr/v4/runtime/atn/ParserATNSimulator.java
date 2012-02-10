@@ -231,6 +231,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
+	public boolean disable_global_context = false;
+
 	public boolean optimize_ll1 = true;
 
 	public static boolean optimize_closure_busy = true;
@@ -301,7 +303,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		useContext |= dfa != null && dfa.isContextSensitive();
-		userWantsCtxSensitive = useContext;
+		userWantsCtxSensitive = useContext || (!disable_global_context && (outerContext != null));
 		if (outerContext == null) {
 			outerContext = ParserRuleContext.EMPTY;
 		}
