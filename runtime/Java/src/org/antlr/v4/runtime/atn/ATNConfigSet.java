@@ -30,6 +30,8 @@ package org.antlr.v4.runtime.atn;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -363,7 +365,22 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append(configs.toString());
+		List<ATNConfig> sortedConfigs = new ArrayList<ATNConfig>(configs);
+		Collections.sort(sortedConfigs, new Comparator<ATNConfig>() {
+			@Override
+			public int compare(ATNConfig o1, ATNConfig o2) {
+				if (o1.alt != o2.alt) {
+					return o1.alt - o2.alt;
+				}
+				else if (o1.state.stateNumber != o2.state.stateNumber) {
+					return o1.state.stateNumber - o2.state.stateNumber;
+				}
+				else {
+					return o1.semanticContext.toString().compareTo(o2.semanticContext.toString());
+				}
+			}
+		});
+		buf.append(sortedConfigs.toString());
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
