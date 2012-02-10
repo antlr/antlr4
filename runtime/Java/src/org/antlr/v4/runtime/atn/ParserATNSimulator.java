@@ -630,8 +630,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 			}
 			else {
-				boolean fullCtx = contextCache.isContextSensitive();
-				D.configset.setConflictingAlts(getConflictingAlts(reach, fullCtx));
+				D.configset.setConflictingAlts(getConflictingAlts(reach));
 				if ( D.configset.getConflictingAlts()!=null ) {
 					if ( greedy ) {
 						D.isAcceptState = true;
@@ -1421,7 +1420,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 functions
 	 */
 	@Nullable
-	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs, boolean fullCtx) {
+	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs) {
 		if ( debug ) System.out.println("### check ambiguous  "+configs);
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
