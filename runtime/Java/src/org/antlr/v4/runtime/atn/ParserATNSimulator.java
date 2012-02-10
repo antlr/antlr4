@@ -1098,9 +1098,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   PredictionContextCache contextCache)
 	{
 		boolean stepIntoGlobal = false;
+		ATNConfigSet currentConfigs = sourceConfigs;
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-		for (ATNConfig config : sourceConfigs) {
-			stepIntoGlobal |= closure(config, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache, 0);
+		while (currentConfigs.size() > 0) {
+			ATNConfigSet intermediate = new ATNConfigSet(!contextSensitiveDfa);
+			for (ATNConfig config : currentConfigs) {
+				stepIntoGlobal |= closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache, 0);
+			}
+
+			currentConfigs = intermediate;
 		}
 
 		return stepIntoGlobal;
@@ -1108,6 +1114,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	protected boolean closure(@NotNull ATNConfig config,
 						   @NotNull ATNConfigSet configs,
+						   @NotNull ATNConfigSet intermediate,
 						   @NotNull Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion,
@@ -1152,7 +1159,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						continue;
 					}
 
-					stepIntoGlobal |= closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
+					stepIntoGlobal |= closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
 				}
 
 				if (!hasEmpty || !hasMoreContexts) {
@@ -1207,7 +1214,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							}
 
 							ATNConfig extraConfig = new ATNConfig(config, config.state, remainingContext);
-							stepIntoGlobal |= closure(extraConfig, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth);
+							stepIntoGlobal |= closure(extraConfig, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth);
 							p = config.context = config.context.parents[loopbackIndex];
 							continue;
 						}
@@ -1261,12 +1268,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
+					if (intermediate != null && !collectPredicates) {
+						intermediate.add(c, contextCache);
+						continue;
+					}
+
 					if (newDepth >= 0) {
 						newDepth++;
 					}
 				}
 
-				stepIntoGlobal |= closure(c, configs, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, newDepth);
+				stepIntoGlobal |= closure(c, configs, intermediate, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, newDepth);
 			}
 		}
 
