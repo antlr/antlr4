@@ -32,11 +32,13 @@ package org.antlr.v4.runtime.dfa;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,7 +156,7 @@ public class DFAState {
 	public void setContextSensitive(ATN atn) {
 		if (!isCtxSensitive) {
 			isCtxSensitive = true;
-			contextEdges = new SingletonEdgeMap<DFAState>(0, atn.maxTokenType + 1);
+			contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
 			contextSymbols = new HashSet<Integer>();
 			if (edges != null) {
 				edges = edges.clear();
@@ -191,12 +193,20 @@ public class DFAState {
 			return null;
 		}
 
+		if (invokingState == PredictionContext.EMPTY_STATE_KEY) {
+			invokingState = -1;
+		}
+
 		return contextEdges.get(invokingState);
 	}
 
 	public void setContextTarget(int invokingState, DFAState target) {
 		if (contextEdges == null) {
 			throw new IllegalStateException("The state is not context sensitive.");
+		}
+
+		if (invokingState == PredictionContext.EMPTY_STATE_KEY) {
+			invokingState = -1;
 		}
 
 		contextEdges = contextEdges.put(invokingState, target);
@@ -207,7 +217,23 @@ public class DFAState {
 			return Collections.emptyMap();
 		}
 
-		return contextEdges.toMap();
+		Map<Integer, DFAState> map = contextEdges.toMap();
+		if (map.containsKey(-1)) {
+			if (map.size() == 1) {
+				return Collections.singletonMap(PredictionContext.EMPTY_STATE_KEY, map.get(-1));
+			}
+			else {
+				try {
+					map.put(PredictionContext.EMPTY_STATE_KEY, map.remove(-1));
+				} catch (UnsupportedOperationException ex) {
+					// handles read only, non-singleton maps
+					map = new LinkedHashMap<Integer, DFAState>(map);
+					map.put(PredictionContext.EMPTY_STATE_KEY, map.remove(-1));
+				}
+			}
+		}
+
+		return map;
 	}
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
