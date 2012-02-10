@@ -1541,19 +1541,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return D.prediction;
 	}
 
-	protected int resolveNongreedyToExitBranch(@NotNull ATNConfigSet reach,
-											   @NotNull IntervalSet conflictingAlts)
-	{
-		// exit branch is alt 2 always; alt 1 is entry or loopback branch
-		// since we're predicting, create DFA accept state for exit alt
-		int exitAlt = 2;
-		conflictingAlts.remove(exitAlt);
-		// kill dead alts so we don't chase them ever
-//		killAlts(conflictingAlts, reach);
-		if ( debug ) System.out.println("RESOLVED TO "+reach);
-		return exitAlt;
-	}
-
 	@NotNull
 	public String getTokenName(int t) {
 		if ( t==Token.EOF ) return "EOF";
