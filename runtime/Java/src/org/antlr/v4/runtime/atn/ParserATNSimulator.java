@@ -845,6 +845,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion)
 	{
+		final int initialDepth = 0;
+		closure(config, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, initialDepth);
+	}
+
+	protected void closure(@NotNull ATNConfig config,
+						   @NotNull ATNConfigSet configs,
+						   @NotNull Set<ATNConfig> closureBusy,
+						   boolean collectPredicates,
+						   boolean greedy, boolean loopsSimulateTailRecursion,
+						   int depth)
+	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( !closureBusy.add(config) ) return; // avoid infinite recursion
@@ -868,7 +879,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// gotten that context AFTER having falling off a rule.
 				// Make sure we track that we are now out of context.
 				c.reachesIntoOuterContext = config.reachesIntoOuterContext;
-				closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion);
+				closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
 				return;
 			}
 			else {
@@ -912,8 +923,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             Transition t = p.transition(i);
             boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
-            ATNConfig c = getEpsilonTarget(config, t, continueCollecting);
+            ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0);
 			if ( c!=null ) {
+				int newDepth = depth;
 				if ( config.state instanceof RuleStopState ) {
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
@@ -922,9 +934,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// preds if this is > 0.
 					c.reachesIntoOuterContext++;
 					configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
+					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
-				closure(c, configs, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion);
+				else if (t instanceof RuleTransition) {
+					if (newDepth >= 0) {
+						newDepth++;
+					}
+				}
+
+				closure(c, configs, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, newDepth);
 			}
 		}
 	}
@@ -936,12 +955,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates) {
+	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, boolean inContext) {
 		if ( t instanceof RuleTransition ) {
 			return ruleTransition(config, t);
 		}
 		else if ( t instanceof PredicateTransition ) {
-			return predTransition(config, (PredicateTransition)t, collectPredicates);
+			return predTransition(config, (PredicateTransition)t, collectPredicates, inContext);
 		}
 		else if ( t instanceof ActionTransition ) {
 			return actionTransition(config, (ActionTransition)t);
@@ -961,7 +980,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@Nullable
 	public ATNConfig predTransition(@NotNull ATNConfig config,
 									@NotNull PredicateTransition pt,
-									boolean collectPredicates)
+									boolean collectPredicates,
+									boolean inContext)
 	{
 		if ( debug ) {
 			System.out.println("PRED (collectPredicates="+collectPredicates+") "+
@@ -972,12 +992,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                    parser.getRuleInvocationStack());
             }
 		}
-		// We know the correct context in exactly one spot: in the original
-		// rule that invokes the ATN simulation. We know we are in this rule
-		// when the context stack is empty and we've not dipped into
-		// the outer context.
-		boolean inContext =
-			config.context==ParserRuleContext.EMPTY && config.reachesIntoOuterContext==0;
 
         ATNConfig c;
         if ( collectPredicates &&
