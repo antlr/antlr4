@@ -22,7 +22,7 @@ public class TestLexerAttributes extends BaseTest {
 		int start = output.indexOf('#');
 		int end = output.lastIndexOf('#');
 		String snippet = output.substring(start+1,end);
-		assertEquals("type = 101;", snippet);
+		assertEquals("_type = 101;", snippet);
 	}
 
 }
