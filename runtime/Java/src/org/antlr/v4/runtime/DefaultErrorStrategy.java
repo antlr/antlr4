@@ -562,13 +562,13 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
-											@NotNull ATNConfigSet configs)
+											@NotNull SimulatorState initialState)
 	{
 	}
 
 	@Override
     public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
+                                         int startIndex, int stopIndex, @NotNull SimulatorState acceptState)
     {
     }
 

@@ -397,7 +397,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			input.seek(index);
 			input.release(m);
 		}
-		if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getTokenNames()));
+		if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
 		return alt;
 	}
 
@@ -409,7 +409,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
 											" exec LA(1)=="+ getLookaheadName(input) +
 											", outerContext="+outerContext.toString(parser));
-		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames()));
+		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
 		DFAState acceptState = null;
 		DFAState s = state.s0;
 
@@ -470,7 +470,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 				if ( dfa_debug ) {
-					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
+					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
 					//dump(dfa);
 				}
 				// action already executed
@@ -634,7 +634,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 				if (useContext && always_try_local_context) {
 					retry_with_context_indicates_no_conflict++;
-					reportContextSensitivity(dfa, reach, startIndex, input.index());
+					reportContextSensitivity(dfa, nextState, startIndex, input.index());
 				}
 			}
 			else {
@@ -680,10 +680,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							}
 
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-							reportAttemptingFullContext(dfa, reach, startIndex, ambigIndex);
-							input.seek(startIndex);
 							dfa.setContextSensitive(true);
-							return predictATN(dfa, input, outerContext, true);
+							SimulatorState fullContextState = computeStartState(dfa, outerContext, true);
+							reportAttemptingFullContext(dfa, fullContextState, startIndex, ambigIndex);
+							input.seek(startIndex);
+							return execATN(dfa, input, startIndex, fullContextState);
 						}
 					}
 					else {
@@ -1649,7 +1650,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
         if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		addDFAEdge(from, t, to);
-		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null, parser!=null?parser.getRuleNames():null));
 		return to;
 	}
 
@@ -1703,20 +1704,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
 //	}
 
-	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	public void reportAttemptingFullContext(DFA dfa, SimulatorState initialState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
-            System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
+            System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+initialState.s0.configset+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorHandler().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, initialState);
     }
 
-	public void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	public void reportContextSensitivity(DFA dfa, SimulatorState acceptState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
-            System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
+            System.out.println("reportContextSensitivity decision="+dfa.decision+":"+acceptState.s0.configset+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorHandler().reportContextSensitivity(parser, dfa, startIndex, stopIndex, acceptState);
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */

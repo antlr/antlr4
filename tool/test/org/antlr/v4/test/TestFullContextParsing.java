@@ -74,8 +74,8 @@ public class TestFullContextParsing extends BaseTest {
 								   "$ 34 abc", true);
 		String expecting =
 			"Decision 1:\n" +
-			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s0**-ctx:18(a)->s1\n" +
+			"s1-INT->:s2=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=1: [(28,1,[18 10]), (20,2,[10])], input='34abc'\n" +
 					 "line 1:2 reportContextSensitivity d=1: [(20,1,[10])],uniqueAlt=1, input='34'\n",
@@ -85,8 +85,10 @@ public class TestFullContextParsing extends BaseTest {
 							"@ 34 abc", true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s0**-ctx:22(b)->s1\n" +
+			"s1-INT->s2*\n" +
+			"s2*-ctx:14(s)->s4\n" +
+			"s4-ID->:s3=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=1: [(28,1,[22 14]), (24,2,[14])], input='34abc'\n" +
 					 "line 1:5 reportContextSensitivity d=1: [(1,2,[])],uniqueAlt=2, input='34abc'\n",
@@ -113,8 +115,14 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'$'->:s1=>1\n" +
 			"\n" +
 			"Decision 2:\n" +
-			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s0**-INT->s3\n" +
+			"s0**-ctx:20(a)->s1\n" +
+			"s0**-ctx:24(b)->s5\n" +
+			"s1-INT->:s2=>1\n" +
+			"s3-ID->:s4=>1\n" +
+			"s5-INT->s6*\n" +
+			"s6*-ctx:14(s)->s8\n" +
+			"s8-ID->:s7=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=2: [(30,1,[20 10]), (22,2,[10])], input='34abc'\n" +
 					 "line 1:2 reportContextSensitivity d=2: [(22,1,[10])],uniqueAlt=1, input='34'\n" +

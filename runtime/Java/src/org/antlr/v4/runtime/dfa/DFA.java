@@ -144,6 +144,12 @@ public class DFA {
 		return serializer.toString();
 	}
 
+	public String toString(@Nullable String[] tokenNames, @Nullable String[] ruleNames) {
+		if ( s0==null ) return "";
+		DFASerializer serializer = new DFASerializer(this,tokenNames,ruleNames,atnStartState.atn);
+		return serializer.toString();
+	}
+
 	public String toLexerString() {
 		if ( s0==null ) return "";
 		DFASerializer serializer = new LexerDFASerializer(this);

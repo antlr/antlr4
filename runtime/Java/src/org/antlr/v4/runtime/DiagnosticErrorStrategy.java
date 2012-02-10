@@ -32,7 +32,9 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -54,17 +56,17 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
-											@NotNull ATNConfigSet configs)
+											@NotNull SimulatorState initialState)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
+		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + getFullContextConfigs(initialState) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
 	}
 
 	@Override
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
+                                         int startIndex, int stopIndex, @NotNull SimulatorState acceptState)
     {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
+        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + getFullContextConfigs(acceptState) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
@@ -81,4 +83,15 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 										", ambigAlts=" + ambigAlts + ":" + Arrays.toString(altToPred) +
 										", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
     }
+
+	protected static ATNConfigSet getFullContextConfigs(SimulatorState state) {
+		ATNConfigSet configs = new ATNConfigSet(false);
+		PredictionContext suffix = PredictionContext.fromRuleContext(state.remainingOuterContext);
+		for (ATNConfig config : state.s0.configset) {
+			configs.add(config.appendContext(suffix));
+		}
+
+		return configs;
+	}
+
 }

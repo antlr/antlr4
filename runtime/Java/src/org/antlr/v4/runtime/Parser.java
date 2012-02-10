@@ -489,7 +489,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
         List<String> s = new ArrayList<String>();
         for (int d = 0; d < _interp.decisionToDFA.length; d++) {
             DFA dfa = _interp.decisionToDFA[d];
-            s.add( dfa.toString(getTokenNames()) );
+            s.add( dfa.toString(getTokenNames(), getRuleNames()) );
         }
         return s;
     }
@@ -502,7 +502,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
             if ( dfa!=null ) {
                 if ( seenOne ) System.out.println();
                 System.out.println("Decision " + dfa.decision + ":");
-                System.out.print(dfa.toString(getTokenNames()));
+                System.out.print(dfa.toString(getTokenNames(), getRuleNames()));
                 seenOne = true;
             }
         }

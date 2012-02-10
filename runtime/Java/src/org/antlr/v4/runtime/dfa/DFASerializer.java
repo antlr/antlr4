@@ -29,6 +29,12 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -40,10 +46,27 @@ public class DFASerializer {
 	final DFA dfa;
 	@Nullable
 	final String[] tokenNames;
+	@Nullable
+	final String[] ruleNames;
+	@Nullable
+	final ATN atn;
 
 	public DFASerializer(@NotNull DFA dfa, @Nullable String[] tokenNames) {
+		this(dfa, tokenNames, null, null);
+	}
+
+	public DFASerializer(@NotNull DFA dfa, @Nullable Recognizer<?, ?> parser) {
+		this(dfa,
+			 parser != null ? parser.getTokenNames() : null,
+			 parser != null ? parser.getRuleNames() : null,
+			 parser != null ? parser.getATN() : null);
+	}
+
+	public DFASerializer(@NotNull DFA dfa, @Nullable String[] tokenNames, @Nullable String[] ruleNames, @Nullable ATN atn) {
 		this.dfa = dfa;
 		this.tokenNames = tokenNames;
+		this.ruleNames = ruleNames;
+		this.atn = atn;
 	}
 
 	@Override
@@ -54,12 +77,37 @@ public class DFASerializer {
 		if ( states!=null ) {
 			for (DFAState s : states.values()) {
 				Map<Integer, DFAState> edges = s.getEdgeMap();
+				Map<Integer, DFAState> contextEdges = s.getContextEdgeMap();
+				int n = edges.size();
 				for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
+					if ((entry.getValue() == null || entry.getValue() == ATNSimulator.ERROR) && (!s.isCtxSensitive || !s.contextSymbols.contains(entry.getKey()))) {
+						continue;
+					}
+
+					boolean contextSymbol = false;
+					buf.append(getStateString(s)).append("-").append(getEdgeLabel(entry.getKey())).append("->");
+					if (s.isCtxSensitive && s.contextSymbols.contains(entry.getKey())) { // indexing in the edges array starts with -1 (EOF)
+						buf.append("!");
+						contextSymbol = true;
+					}
+
 					DFAState t = entry.getValue();
 					if ( t!=null && t.stateNumber != Integer.MAX_VALUE ) {
-						buf.append(getStateString(s));
-						String label = getEdgeLabel(entry.getKey());
-						buf.append("-"+label+"->"+ getStateString(t)+'\n');
+						buf.append(getStateString(t)).append('\n');
+					}
+					else if (contextSymbol) {
+						buf.append("ctx\n");
+					}
+				}
+
+				if (s.isCtxSensitive) {
+					for (Map.Entry<Integer, DFAState> entry : contextEdges.entrySet()) {
+						buf.append(getStateString(s))
+							.append("-")
+							.append(getContextLabel(entry.getKey()))
+							.append("->")
+							.append(getStateString(entry.getValue()))
+							.append("\n");
 					}
 				}
 			}
@@ -67,6 +115,22 @@ public class DFASerializer {
 		String output = buf.toString();
 		//return Utils.sortLinesInString(output);
 		return output;
+	}
+
+	protected String getContextLabel(int i) {
+		if (i == PredictionContext.EMPTY_STATE_KEY) {
+			return "ctx:EMPTY";
+		}
+
+		if (atn != null && i > 0 && i <= atn.states.size()) {
+			ATNState state = atn.states.get(i);
+			int ruleIndex = state.ruleIndex;
+			if (ruleNames != null && ruleIndex >= 0 && ruleIndex < ruleNames.length) {
+				return "ctx:" + String.valueOf(i) + "(" + ruleNames[ruleIndex] + ")";
+			}
+		}
+
+		return "ctx:" + String.valueOf(i);
 	}
 
 	protected String getEdgeLabel(int i) {
@@ -78,6 +142,10 @@ public class DFASerializer {
 	}
 
 	String getStateString(DFAState s) {
+		if (s == ATNSimulator.ERROR) {
+			return "ERROR";
+		}
+
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
 		if ( s.isAcceptState ) {
@@ -88,8 +156,15 @@ public class DFASerializer {
                 stateStr = ":s"+n+"=>"+s.prediction;
             }
 		}
-		else if ( s.isCtxSensitive ) {
-			stateStr = "s"+n+"^";
+
+		if ( s.isCtxSensitive ) {
+			stateStr += "*";
+			for (ATNConfig config : s.configset) {
+				if (config.reachesIntoOuterContext > 0) {
+					stateStr += "*";
+					break;
+				}
+			}
 		}
 		return stateStr;
 	}

@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 public class LexerDFASerializer extends DFASerializer {
 	public LexerDFASerializer(@NotNull DFA dfa) {
-		super(dfa, null);
+		super(dfa, (String[])null);
 	}
 
 	@Override

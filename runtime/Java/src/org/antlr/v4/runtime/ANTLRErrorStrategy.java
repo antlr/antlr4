@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -131,7 +132,7 @@ public interface ANTLRErrorStrategy {
 	void reportAttemptingFullContext(@NotNull Parser recognizer,
 									 @NotNull DFA dfa,
 									 int startIndex, int stopIndex,
-									 @NotNull ATNConfigSet configs);
+									 @NotNull SimulatorState initialState);
 
 	/** Called by the parser when it find a conflict that is resolved by retrying the parse
      *  with full context. This is not a warning; it simply notifies you that your grammar
@@ -141,7 +142,7 @@ public interface ANTLRErrorStrategy {
     void reportContextSensitivity(@NotNull Parser recognizer,
                                   @NotNull DFA dfa,
                                   int startIndex, int stopIndex,
-                                  @NotNull ATNConfigSet configs);
+                                  @NotNull SimulatorState acceptState);
 
     /** Called by the parser when it finds less than n-1 predicates for n ambiguous alternatives.
      *  If there are n-1, we assume that the missing predicate is !(the "or" of the other predicates).

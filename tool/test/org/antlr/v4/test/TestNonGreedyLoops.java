@@ -297,9 +297,12 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s4-ID->s4\n" +
 					 "\n" +
 					 "Decision 1:\n" +
-					 "s0-'{'->:s1=>1\n" +
-					 "s0-INT->:s2=>2\n" +
-					 "s0-ID->:s2=>2\n" +
+					 "s0-'{'->s1\n" +
+					 "s0-INT->:s4=>2\n" +
+					 "s0-ID->:s4=>2\n" +
+					 "s1-'}'->s2\n" +
+					 "s1-ID->s1\n" +
+					 "s2-ID->:s3=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'{'->:s1=>1\n" +
@@ -322,9 +325,12 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s5-ID->s5\n" +
 					 "\n" +
 					 "Decision 1:\n" +
-					 "s0-'{'->:s1=>1\n" +
-					 "s0-INT->:s2=>2\n" +
-					 "s0-ID->:s2=>2\n" +
+					 "s0-'{'->s1\n" +
+					 "s0-INT->:s4=>2\n" +
+					 "s0-ID->:s4=>2\n" +
+					 "s1-'}'->s2\n" +
+					 "s1-ID->s1\n" +
+					 "s2-ID->:s3=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'{'->:s1=>1\n" +
@@ -510,15 +516,22 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-ID->:s2=>1\n" +
 					 "\n" +
 					 "Decision 1:\n" +
-					 "s0-'<'->s1\n" +
-					 "s0-ID->:s5=>2\n" +
-					 "s1-'/'->s2\n" +
-					 "s1-ID->s2\n" +
-					 "s2-'>'->s3\n" +
-					 "s2-ID->s2\n" +
-					 "s3-EOF->s6^\n" +
-					 "s3-'<'->s4^\n" +
-					 "s3-ID->s3\n" +
+					 "s0*-'<'->!s8\n" +
+					 "s0*-ID->:s7=>2\n" +
+					 "s0*-ctx:6(s)->s2\n" +
+					 "s1-'/'->s13\n" +
+					 "s1-ID->s3\n" +
+					 "s2-'<'->s1\n" +
+					 "s3-'>'->s4\n" +
+					 "s4-ID->s5\n" +
+					 "s5-'<'->:s6=>1\n" +
+					 "s8-'/'->s9\n" +
+					 "s9-ID->s10\n" +
+					 "s10-'>'->s11\n" +
+					 "s11-EOF->:s12=>1\n" +
+					 "s13-ID->s14\n" +
+					 "s14-'>'->s15\n" +
+					 "s15-EOF->:s16=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'/'->:s2=>1\n" +
@@ -542,13 +555,20 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-'<'->:s1=>1\n" +
 					 "\n" +
 					 "Decision 1:\n" +
-					 "s0-'<'->s1\n" +
-					 "s1-'/'->s2\n" +
-					 "s1-ID->s2\n" +
-					 "s2-'>'->s3\n" +
-					 "s2-ID->s2\n" +
-					 "s3-EOF->s5^\n" +
-					 "s3-'<'->s4^\n" +
+					 "s0*-'<'->!s6\n" +
+					 "s0*-ctx:6(s)->s2\n" +
+					 "s1-'/'->s11\n" +
+					 "s1-ID->s3\n" +
+					 "s2-'<'->s1\n" +
+					 "s3-'>'->s4\n" +
+					 "s4-'<'->:s5=>1\n" +
+					 "s6-'/'->s7\n" +
+					 "s7-ID->s8\n" +
+					 "s8-'>'->s9\n" +
+					 "s9-EOF->:s10=>1\n" +
+					 "s11-ID->s12\n" +
+					 "s12-'>'->s13\n" +
+					 "s13-EOF->:s14=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'/'->:s2=>1\n" +
@@ -565,17 +585,33 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-'<'->:s1=>1\n" +
 					 "\n" +
 					 "Decision 1:\n" +
-					 "s0-'<'->s1\n" +
-					 "s1-'/'->s2\n" +
-					 "s1-ID->s2\n" +
-					 "s2-'>'->s3\n" +
-					 "s2-'='->s2\n" +
-					 "s2-','->s2\n" +
-					 "s2-ID->s2\n" +
-					 "s2-STR->s2\n" +
-					 "s2-INT->s2\n" +
-					 "s3-EOF->s5^\n" +
-					 "s3-'<'->s4^\n" +
+					 "s0*-'<'->!s7\n" +
+					 "s0*-ctx:6(s)->s2\n" +
+					 "s1-'/'->s3\n" +
+					 "s1-ID->s18\n" +
+					 "s2-'<'->s1\n" +
+					 "s3-ID->s4\n" +
+					 "s4-'>'->s5\n" +
+					 "s5-'<'->:s6=>1\n" +
+					 "s7-ID->s8\n" +
+					 "s8-ID->s9\n" +
+					 "s9-'='->s10\n" +
+					 "s10-STR->s11\n" +
+					 "s11-','->s12\n" +
+					 "s12-ID->s13\n" +
+					 "s13-'='->s14\n" +
+					 "s14-INT->s15\n" +
+					 "s15-'>'->s16\n" +
+					 "s16-EOF->:s17=>1\n" +
+					 "s18-ID->s19\n" +
+					 "s19-'='->s20\n" +
+					 "s20-STR->s21\n" +
+					 "s21-','->s22\n" +
+					 "s22-ID->s23\n" +
+					 "s23-'='->s24\n" +
+					 "s24-INT->s25\n" +
+					 "s25-'>'->s26\n" +
+					 "s26-EOF->:s27=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'/'->:s1=>1\n" +
