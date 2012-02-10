@@ -80,6 +80,8 @@ public class TestPerformance extends BaseTest {
      */
     private static final boolean DELETE_TEMP_FILES = true;
 
+    private static final boolean PAUSE_FOR_HEAP_DUMP = false;
+
     /** Parse each file with JavaParser.compilationUnit */
     private static final boolean RUN_PARSER = true;
     /** True to use {@link BailErrorStrategy}, False to use {@link DefaultErrorStrategy} */
@@ -96,6 +98,10 @@ public class TestPerformance extends BaseTest {
     private static final boolean EXPORT_LARGEST_CONFIG_CONTEXTS = false;
 
     private static final boolean SHOW_DFA_STATE_STATS = true;
+
+    private static final boolean DISABLE_GLOBAL_CONTEXT = true;
+    private static final boolean FORCE_GLOBAL_CONTEXT = false;
+    private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
 
@@ -163,6 +169,17 @@ public class TestPerformance extends BaseTest {
 
             parse2(factory, sources);
         }
+
+		sources.clear();
+		if (PAUSE_FOR_HEAP_DUMP) {
+			System.gc();
+			System.out.println("Pausing before application exit.");
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException ex) {
+				Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
     }
 
     @Override
@@ -454,6 +471,9 @@ public class TestPerformance extends BaseTest {
                             sharedParser.setInputStream(tokens);
                         } else {
                             sharedParser = parserCtor.newInstance(tokens);
+                            sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT;
+                            sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
+                            sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
                                 sharedParser.addParseListener(sharedListener);
