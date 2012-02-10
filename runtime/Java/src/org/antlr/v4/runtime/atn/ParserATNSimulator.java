@@ -626,9 +626,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
-						if ( !userWantsCtxSensitive ||
-							 !D.configset.getDipsIntoOuterContext() ||
-							 k == 1 ) // SLL(1) == LL(1)
+						if ( k == 1 || // SLL(1) == LL(1)
+							 !userWantsCtxSensitive ||
+							 !D.configset.getDipsIntoOuterContext() )
 						{
 							if ( !D.configset.hasSemanticContext() ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.getConflictingAlts(), D.configset);
