@@ -48,18 +48,18 @@ public class DFA {
 
 	/** From which ATN state did we create this DFA? */
 	@NotNull
-	public final DecisionState atnStartState;
+	public final ATNState atnStartState;
 
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 	 *  from predictATN() for retry.
 	 */
 //	public OrderedHashSet<ATNConfig> conflictSet;
 
-	public DFA(@NotNull DecisionState atnStartState) {
+	public DFA(@NotNull ATNState atnStartState) {
 		this(atnStartState, 0);
 	}
 
-	public DFA(@NotNull DecisionState atnStartState, int decision) {
+	public DFA(@NotNull ATNState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
 	}
