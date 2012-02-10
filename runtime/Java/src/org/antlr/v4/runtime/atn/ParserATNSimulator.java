@@ -1114,12 +1114,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	protected boolean closure(@NotNull ATNConfig config,
 						   @NotNull ATNConfigSet configs,
-						   @NotNull ATNConfigSet intermediate,
+						   @Nullable ATNConfigSet intermediate,
 						   @NotNull Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion,
 						   boolean hasMoreContexts,
-						   PredictionContextCache contextCache,
+						   @Nullable PredictionContextCache contextCache,
 						   int depth)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
@@ -1619,7 +1619,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return alt;
 	}
 
-	@Nullable
 	public boolean configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
 		for (ATNConfig c : configs) {
 			if ( c.alt == alt ) {
