@@ -281,7 +281,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input, int decision,
-							   @Nullable ParserRuleContext outerContext)
+							   @Nullable ParserRuleContext<?> outerContext)
 	{
 		return adaptivePredict(input, decision, outerContext, false);
 	}
@@ -456,32 +456,27 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                        parser.getInputString(startIndex) +
 									   " at DFA state "+s.stateNumber);
 				}
-				try {
-					SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
-					alt = execATN(dfa, input, startIndex, initialState);
-					// this adds edge even if next state is accept for
-					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-					// TODO: This next stuff kills edge, but extra states remain. :(
-					if ( s.isAcceptState && alt!=-1 ) {
-						DFAState d = s.getTarget(input.LA(1));
-						if ( d.isAcceptState && d.prediction==s.prediction ) {
-							// we can carve it out.
-							s.setTarget(input.LA(1), ERROR); // IGNORE really not error
-						}
+
+				SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
+				alt = execATN(dfa, input, startIndex, initialState);
+				// this adds edge even if next state is accept for
+				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
+				// TODO: This next stuff kills edge, but extra states remain. :(
+				if ( s.isAcceptState && alt!=-1 ) {
+					DFAState d = s.getTarget(input.LA(1));
+					if ( d.isAcceptState && d.prediction==s.prediction ) {
+						// we can carve it out.
+						s.setTarget(input.LA(1), ERROR); // IGNORE really not error
 					}
-					if ( dfa_debug ) {
-						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
-						//dump(dfa);
-					}
-					// action already executed
-					if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-														" predicts "+alt);
-					return alt; // we've updated DFA, exec'd action, and have our deepest answer
 				}
-				catch (NoViableAltException nvae) {
-					addDFAEdge(s, t, ERROR);
-					throw nvae;
+				if ( dfa_debug ) {
+					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
+					//dump(dfa);
 				}
+				// action already executed
+				if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+													" predicts "+alt);
+				return alt; // we've updated DFA, exec'd action, and have our deepest answer
 			}
 			else if ( target == ERROR ) {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
@@ -981,7 +976,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 *  prediction for disambiguating predicates.
 	 */
 	public int evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-								   ParserRuleContext outerContext)
+								   ParserRuleContext<?> outerContext)
 	{
 		int predictedAlt = ATN.INVALID_ALT_NUMBER;
 //		List<DFAState.PredPrediction> predPredictions = D.predicates;
