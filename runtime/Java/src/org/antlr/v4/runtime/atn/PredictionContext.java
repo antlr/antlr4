@@ -244,6 +244,44 @@ public class PredictionContext {
 		return updated;
 	}
 
+	public PredictionContext appendContext(int invokingContext) {
+		return appendContext(this, invokingContext, new IdentityHashMap<PredictionContext, PredictionContext>());
+	}
+
+	private static PredictionContext appendContext(PredictionContext context, int invokingContext, IdentityHashMap<PredictionContext, PredictionContext> visited) {
+		PredictionContext result = visited.get(context);
+		if (result == null) {
+			if (context.isEmpty()) {
+				result = PredictionContext.EMPTY.getChild(invokingContext);
+			}
+			else {
+				int parentCount = context.parents.length;
+				if (context.hasEmpty()) {
+					parentCount--;
+				}
+
+				PredictionContext[] updatedParents = new PredictionContext[parentCount];
+				int[] updatedInvokingStates = context.hasEmpty() ? Arrays.copyOf(context.invokingStates, parentCount) : context.invokingStates;
+				int updatedParentHashCode = 1;
+				int updatedInvokingStateHashCode = 1;
+				for (int i = 0; i < parentCount; i++) {
+					updatedParents[i] = appendContext(context.parents[i], invokingContext, visited);
+					updatedParentHashCode = 31 * updatedParentHashCode + updatedParents[i].hashCode();
+					updatedInvokingStateHashCode = 31 * updatedInvokingStateHashCode + context.invokingStates[i];
+				}
+
+				result = new PredictionContext(updatedParents, updatedInvokingStates, updatedParentHashCode, updatedInvokingStateHashCode);
+				if (context.hasEmpty()) {
+					result = PredictionContext.join(result, PredictionContext.EMPTY.getChild(invokingContext), false);
+				}
+			}
+
+			visited.put(context, result);
+		}
+
+		return result;
+	}
+
 	public PredictionContext getChild(int invokingState) {
 		return new PredictionContext(this, invokingState);
 	}

@@ -121,6 +121,12 @@ public class ATNConfig {
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
+	public ATNConfig appendContext(int context) {
+		ATNConfig result = new ATNConfig(this, state);
+		result.context = result.context.appendContext(context);
+		return result;
+	}
+
 	public boolean contains(ATNConfig subconfig) {
 		if (this.state.stateNumber != subconfig.state.stateNumber
 			|| this.alt != subconfig.alt
