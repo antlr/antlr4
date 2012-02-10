@@ -490,6 +490,26 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //			return -1;
 //		}
 
+		if ( acceptState.configset.getConflictingAlts()!=null ) {
+			if ( dfa.atnStartState instanceof DecisionState && ((DecisionState)dfa.atnStartState).isGreedy ) {
+				int k = input.index() - startIndex + 1; // how much input we used
+				if ( k == 1 || // SLL(1) == LL(1)
+					!userWantsCtxSensitive ||
+					!acceptState.configset.getDipsIntoOuterContext() )
+				{
+					if ( !acceptState.configset.hasSemanticContext() ) {
+						reportAmbiguity(dfa, acceptState, startIndex, input.index(), acceptState.configset.getConflictingAlts(), acceptState.configset);
+					}
+				}
+				else {
+					assert !state.useContext;
+					input.seek(startIndex);
+					dfa.setContextSensitive(true);
+					return adaptivePredict(input, dfa.decision, outerContext, true);
+				}
+			}
+		}
+
 		// Before jumping to prediction, check to see if there are
 		// disambiguating or validating predicates to evaluate
 		if ( s.predicates!=null ) {
