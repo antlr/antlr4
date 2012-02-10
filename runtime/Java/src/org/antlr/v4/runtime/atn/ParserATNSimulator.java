@@ -883,13 +883,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			final boolean collectPredicates = true;
 			boolean stepIntoGlobal = closure(reachIntermediate, configs, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
 
-			if (!useContext || !stepIntoGlobal) {
-				break;
-			}
-
-			// TODO: make sure it distinguishes empty stack states
 			DFAState next = addDFAState(dfa, configs);
-			next.setContextSensitive(atn);
 			if (s0 == null) {
 				dfa.s0 = next;
 			}
@@ -897,6 +891,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				s0.setContextTarget(previousContext, next);
 			}
 			s0 = next;
+
+			if (!useContext || !stepIntoGlobal) {
+				break;
+			}
+
+			// TODO: make sure it distinguishes empty stack states
+			next.setContextSensitive(atn);
 
 			configs.clear();
 			int nextContextElement = remainingGlobalContext.isEmpty() ? PredictionContext.EMPTY_STATE_KEY : remainingGlobalContext.invokingState;
@@ -912,16 +913,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			previousContext = nextContextElement;
-		}
-
-		if (s0 == null) {
-			s0 = addDFAState(dfa, configs);
-			dfa.s0 = s0;
-		}
-		else {
-			DFAState next = addDFAState(dfa, configs);
-			s0.setContextTarget(previousContext, next);
-			s0 = next;
 		}
 
 		return new SimulatorState(globalContext, s0, useContext, (ParserRuleContext<?>)remainingGlobalContext);
