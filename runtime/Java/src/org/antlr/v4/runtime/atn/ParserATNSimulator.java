@@ -503,6 +503,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 				else {
 					assert !state.useContext;
+
+					// Before attempting full context prediction, check to see if there are
+					// disambiguating or validating predicates to evaluate which allow an
+					// immediate decision
+					if ( acceptState.predicates!=null ) {
+						// rewind input so pred's LT(i) calls make sense
+						input.seek(startIndex);
+						int predictedAlt = evalSemanticContext(s.predicates, outerContext, true);
+						if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+							return predictedAlt;
+						}
+					}
+
 					input.seek(startIndex);
 					dfa.setContextSensitive(true);
 					return adaptivePredict(input, dfa.decision, outerContext, true);
@@ -515,7 +528,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( s.predicates!=null ) {
 			// rewind input so pred's LT(i) calls make sense
 			input.seek(startIndex);
-			int predictedAlt = evalSemanticContext(s.predicates, outerContext);
+			int predictedAlt = evalSemanticContext(s.predicates, outerContext, false);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 				return predictedAlt;
 			}
@@ -635,8 +648,32 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							}
 						}
 						else {
+							int ambigIndex = input.index();
+
+							if ( D.isAcceptState && D.configset.hasSemanticContext() ) {
+								int nalts = decState.getNumberOfTransitions();
+								List<DFAState.PredPrediction> predPredictions =
+									predicateDFAState(D, D.configset, outerContext, nalts);
+								if (predPredictions != null) {
+									IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configset);
+									if ( D.predicates.size() < conflictingAlts.size() ) {
+										reportInsufficientPredicates(dfa, startIndex, ambigIndex,
+																	conflictingAlts,
+																	decState,
+																	getPredsForAmbigAlts(conflictingAlts, D.configset, nalts),
+																	D.configset,
+																	false);
+									}
+									input.seek(startIndex);
+									predictedAlt = evalSemanticContext(predPredictions, outerContext, true);
+									if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+										return predictedAlt;
+									}
+								}
+							}
+
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-							reportAttemptingFullContext(dfa, reach, startIndex, input.index());
+							reportAttemptingFullContext(dfa, reach, startIndex, ambigIndex);
 							input.seek(startIndex);
 							dfa.setContextSensitive(true);
 							return predictATN(dfa, input, outerContext, true);
@@ -685,7 +722,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 													false);
 					}
 					input.seek(startIndex);
-					predictedAlt = evalSemanticContext(predPredictions, outerContext);
+					predictedAlt = evalSemanticContext(predPredictions, outerContext, false);
 					if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 						return predictedAlt;
 					}
@@ -994,17 +1031,32 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** Look through a list of predicate/alt pairs, returning alt for the
 	 *  first pair that wins. A null predicate indicates the default
 	 *  prediction for disambiguating predicates.
+	 *
+	 * @param checkUniqueMatch If true, {@link ATN#INVALID_ALT_NUMBER} will be returned
+	 *      if the match in not unique.
 	 */
-	public int evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-								   ParserRuleContext<?> outerContext)
+	public int evalSemanticContext(@NotNull List<DFAState.PredPrediction> predPredictions,
+								   ParserRuleContext<?> outerContext,
+								   boolean checkUniqueMatch)
 	{
 		int predictedAlt = ATN.INVALID_ALT_NUMBER;
 //		List<DFAState.PredPrediction> predPredictions = D.predicates;
 //		if ( D.isCtxSensitive ) predPredictions = D.ctxToPredicates.get(outerContext);
 		for (DFAState.PredPrediction pair : predPredictions) {
 			if ( pair.pred==null ) {
-				predictedAlt = pair.alt; // default prediction
-				break;
+				if (checkUniqueMatch && predictedAlt != ATN.INVALID_ALT_NUMBER) {
+					// multiple predicates succeeded.
+					return ATN.INVALID_ALT_NUMBER;
+				}
+				else {
+					predictedAlt = pair.alt; // default prediction
+					if (checkUniqueMatch) {
+						continue;
+					}
+					else {
+						break;
+					}
+				}
 			}
 
 			boolean evaluatedResult = pair.pred.eval(parser, outerContext);
@@ -1013,8 +1065,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			if ( evaluatedResult ) {
 				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
-				predictedAlt = pair.alt;
-				break;
+				if (checkUniqueMatch && predictedAlt != ATN.INVALID_ALT_NUMBER) {
+					// multiple predicates succeeded.
+					return ATN.INVALID_ALT_NUMBER;
+				}
+				else {
+					predictedAlt = pair.alt;
+					if (!checkUniqueMatch) {
+						break;
+					}
+				}
 			}
 		}
 		// if no prediction: either all predicates are false and
