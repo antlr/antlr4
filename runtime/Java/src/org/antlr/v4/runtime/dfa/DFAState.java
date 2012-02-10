@@ -68,10 +68,7 @@ public class DFAState {
 	public int stateNumber = -1;
 
 	/** The set of ATN configurations (state,alt,context) for this DFA state */
-//	@Nullable
-//	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
-
-	// TODO: rename to configs after flipping to new ATN sim
+	@Nullable
 	public ATNConfigSet configset;
 
 	/** edges[symbol] points to target of symbol */
@@ -88,7 +85,7 @@ public class DFAState {
 	public int lexerActionIndex = -1;	// if accept, exec what action?
 
 	// todo: rename as unique?
-	public boolean complete; // all alts predict "prediction"
+//	public boolean complete; // all alts predict "prediction"
 	public boolean isCtxSensitive;
 
 	/** DFA accept states use predicates in two situations:
