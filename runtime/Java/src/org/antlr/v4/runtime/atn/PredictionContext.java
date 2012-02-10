@@ -245,14 +245,26 @@ public class PredictionContext {
 	}
 
 	public PredictionContext appendContext(int invokingContext) {
-		return appendContext(this, invokingContext, new IdentityHashMap<PredictionContext, PredictionContext>());
+		return appendContext(PredictionContext.EMPTY.getChild(invokingContext));
 	}
 
-	private static PredictionContext appendContext(PredictionContext context, int invokingContext, IdentityHashMap<PredictionContext, PredictionContext> visited) {
+	public PredictionContext appendContext(PredictionContext suffix) {
+		if (suffix.isEmpty()) {
+			return this;
+		}
+
+		if (suffix.invokingStates.length != 1) {
+			throw new UnsupportedOperationException("Appending a tree suffix is not yet supported.");
+		}
+
+		return appendContext(this, suffix, new IdentityHashMap<PredictionContext, PredictionContext>());
+	}
+
+	private static PredictionContext appendContext(PredictionContext context, PredictionContext suffix, IdentityHashMap<PredictionContext, PredictionContext> visited) {
 		PredictionContext result = visited.get(context);
 		if (result == null) {
 			if (context.isEmpty()) {
-				result = PredictionContext.EMPTY.getChild(invokingContext);
+				result = suffix;
 			}
 			else {
 				int parentCount = context.parents.length;
@@ -265,14 +277,14 @@ public class PredictionContext {
 				int updatedParentHashCode = 1;
 				int updatedInvokingStateHashCode = 1;
 				for (int i = 0; i < parentCount; i++) {
-					updatedParents[i] = appendContext(context.parents[i], invokingContext, visited);
+					updatedParents[i] = appendContext(context.parents[i], suffix, visited);
 					updatedParentHashCode = 31 * updatedParentHashCode + updatedParents[i].hashCode();
 					updatedInvokingStateHashCode = 31 * updatedInvokingStateHashCode + context.invokingStates[i];
 				}
 
 				result = new PredictionContext(updatedParents, updatedInvokingStates, updatedParentHashCode, updatedInvokingStateHashCode);
 				if (context.hasEmpty()) {
-					result = PredictionContext.join(result, PredictionContext.EMPTY.getChild(invokingContext), false);
+					result = PredictionContext.join(result, suffix, false);
 				}
 			}
 

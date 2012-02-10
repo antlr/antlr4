@@ -127,6 +127,12 @@ public class ATNConfig {
 		return result;
 	}
 
+	public ATNConfig appendContext(PredictionContext context) {
+		ATNConfig result = new ATNConfig(this, state);
+		result.context = result.context.appendContext(context);
+		return result;
+	}
+
 	public boolean contains(ATNConfig subconfig) {
 		if (this.state.stateNumber != subconfig.state.stateNumber
 			|| this.alt != subconfig.alt
