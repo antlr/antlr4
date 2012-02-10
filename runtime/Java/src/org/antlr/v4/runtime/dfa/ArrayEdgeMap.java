@@ -29,7 +29,7 @@ package org.antlr.v4.runtime.dfa;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,7 +147,7 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 			return Collections.emptyMap();
 		}
 
-		Map<Integer, T> result = new HashMap<Integer, T>();
+		Map<Integer, T> result = new LinkedHashMap<Integer, T>();
 		for (int i = 0; i < arrayData.length; i++) {
 			if (arrayData[i] == null) {
 				continue;
