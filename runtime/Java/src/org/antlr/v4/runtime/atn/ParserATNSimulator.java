@@ -233,6 +233,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public boolean disable_global_context = false;
 	public boolean force_global_context = false;
+	public boolean always_try_local_context = true;
 
 	public boolean optimize_ll1 = true;
 
@@ -306,7 +307,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if (force_global_context) {
 			useContext = true;
 		}
-		else {
+		else if (!always_try_local_context) {
 			useContext |= dfa != null && dfa.isContextSensitive();
 		}
 
@@ -595,7 +596,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				if (useContext) {
+				if (useContext && always_try_local_context) {
 					retry_with_context_indicates_no_conflict++;
 					reportContextSensitivity(dfa, reach, startIndex, input.index());
 				}
