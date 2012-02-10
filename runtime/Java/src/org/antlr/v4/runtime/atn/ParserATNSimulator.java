@@ -504,9 +504,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					!userWantsCtxSensitive ||
 					!acceptState.configset.getDipsIntoOuterContext() )
 				{
-					if ( !acceptState.configset.hasSemanticContext() ) {
-						reportAmbiguity(dfa, acceptState, startIndex, input.index(), acceptState.configset.getConflictingAlts(), acceptState.configset);
-					}
+					// we don't report the ambiguity again
+					//if ( !acceptState.configset.hasSemanticContext() ) {
+					//	reportAmbiguity(dfa, acceptState, startIndex, input.index(), acceptState.configset.getConflictingAlts(), acceptState.configset);
+					//}
 				}
 				else {
 					assert !state.useContext;
