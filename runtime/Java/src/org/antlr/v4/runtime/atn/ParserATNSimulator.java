@@ -896,6 +896,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean greedy, boolean loopsSimulateTailRecursion,
 						   PredictionContextCache contextCache)
 	{
+		final int initialDepth = 0;
+		closure(config, configs, closureBusy, collectPredicates, fullContext, greedy, loopsSimulateTailRecursion, contextCache, initialDepth);
+	}
+
+	protected void closure(@NotNull ATNConfig config,
+						   @NotNull ATNConfigSet configs,
+						   @NotNull Set<ATNConfig> closureBusy,
+						   boolean collectPredicates,
+						   boolean fullContext,
+						   boolean greedy, boolean loopsSimulateTailRecursion,
+						   PredictionContextCache contextCache,
+						   int depth)
+	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( !optimize_closure_busy && !closureBusy.add(config) ) {
@@ -933,7 +946,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						continue;
 					}
 
-					closure(c, configs, closureBusy, collectPredicates, fullContext, greedy, loopsSimulateTailRecursion, contextCache);
+					closure(c, configs, closureBusy, collectPredicates, fullContext, greedy, loopsSimulateTailRecursion, contextCache, depth - 1);
 				}
 
 				if (!hasEmpty || !hasMoreContexts) {
@@ -1010,7 +1023,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             Transition t = p.transition(i);
             boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
-            ATNConfig c = getEpsilonTarget(config, t, continueCollecting, contextCache);
+            ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
 			if ( c!=null ) {
 				if (optimize_closure_busy) {
 					boolean checkClosure = false;
@@ -1029,6 +1042,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
+				int newDepth = depth;
 				if ( config.state instanceof RuleStopState ) {
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
@@ -1036,9 +1050,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
 					c.reachesIntoOuterContext++;
+					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
-				closure(c, configs, closureBusy, continueCollecting, fullContext, greedy, loopsSimulateTailRecursion, contextCache);
+				else if (t instanceof RuleTransition) {
+					if (newDepth >= 0) {
+						newDepth++;
+					}
+				}
+
+				closure(c, configs, closureBusy, continueCollecting, fullContext, greedy, loopsSimulateTailRecursion, contextCache, newDepth);
 			}
 		}
 	}
@@ -1050,12 +1071,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, PredictionContextCache contextCache) {
+	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, boolean inContext, PredictionContextCache contextCache) {
 		if ( t instanceof RuleTransition ) {
 			return ruleTransition(config, t, contextCache);
 		}
 		else if ( t instanceof PredicateTransition ) {
-			return predTransition(config, (PredicateTransition)t, collectPredicates);
+			return predTransition(config, (PredicateTransition)t, collectPredicates, inContext);
 		}
 		else if ( t instanceof ActionTransition ) {
 			return actionTransition(config, (ActionTransition)t);
@@ -1075,7 +1096,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@Nullable
 	public ATNConfig predTransition(@NotNull ATNConfig config,
 									@NotNull PredicateTransition pt,
-									boolean collectPredicates)
+									boolean collectPredicates,
+									boolean inContext)
 	{
 		if ( debug ) {
 			System.out.println("PRED (collectPredicates="+collectPredicates+") "+
@@ -1086,12 +1108,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                    parser.getRuleInvocationStack());
             }
 		}
-		// We know the correct context in exactly one spot: in the original
-		// rule that invokes the ATN simulation. We know we are in this rule
-		// when the context stack is empty and we've not dipped into
-		// the outer context.
-		boolean inContext =
-			config.context==PredictionContext.EMPTY && config.reachesIntoOuterContext==0;
 
         ATNConfig c;
         if ( collectPredicates &&
