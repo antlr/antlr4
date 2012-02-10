@@ -725,13 +725,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 						return predictedAlt;
 					}
-
-					if (D.prediction == ATN.INVALID_ALT_NUMBER) {
-						throw noViableAlt(input, outerContext, D.configset, startIndex);
-					}
-
-					predictedAlt = D.prediction;
 				}
+
+				if (D.prediction == ATN.INVALID_ALT_NUMBER) {
+					throw noViableAlt(input, outerContext, D.configset, startIndex);
+				}
+
+				predictedAlt = D.prediction;
 			}
 
 			if ( D.isAcceptState ) return predictedAlt;
