@@ -550,7 +550,7 @@ public class TestATNParserPrediction extends BaseTest {
 			DFA dfa = new DFA(startState);
 //			Rule r = g.getRule(ruleName);
 			//ATNState startState = atn.ruleToStartState.get(r);
-			interp.predictATN(dfa, input, ctx);
+			interp.predictATN(dfa, input, ctx, false);
 		}
 		catch (NoViableAltException nvae) {
 			nvae.printStackTrace(System.err);

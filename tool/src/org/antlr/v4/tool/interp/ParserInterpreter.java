@@ -74,7 +74,7 @@ public class ParserInterpreter {
 						  @Nullable ParserRuleContext outerContext,
 						  boolean useContext)
 	{
-		return atnSimulator.predictATN(dfa, input, outerContext);
+		return atnSimulator.predictATN(dfa, input, outerContext, useContext);
 	}
 
 	public int adaptivePredict(@NotNull SymbolStream<Token> input, int decision,
@@ -90,7 +90,7 @@ public class ParserInterpreter {
 			return 1;
 		}
 		else if (startState instanceof DecisionState) {
-			return atnSimulator.adaptivePredict(input, ((DecisionState)startState).decision, null);
+			return atnSimulator.adaptivePredict(input, ((DecisionState)startState).decision, null, false);
 		}
 		else if (startState.getNumberOfTransitions() > 0) {
 			return 1;

@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SemanticContext;
@@ -88,6 +89,14 @@ public class DFAState {
 //	public boolean complete; // all alts predict "prediction"
 	public boolean isCtxSensitive;
 
+	/** These keys for these edges are the top level element of the global context. */
+	@Nullable
+	private EdgeMap<DFAState> contextEdges;
+
+	/** Symbols in this set require a global context transition before matching an input symbol. */
+	@Nullable
+	public Set<Integer> contextSymbols;
+
 	/** DFA accept states use predicates in two situations:
 	 *  disambiguating and validating predicates. If an accept state
 	 *  predicts more than one alternative, It's ambiguous and we
@@ -142,6 +151,17 @@ public class DFAState {
 		this.maxSymbol = maxSymbol;
 	}
 
+	public void setContextSensitive(ATN atn) {
+		if (!isCtxSensitive) {
+			isCtxSensitive = true;
+			contextEdges = new SingletonEdgeMap<DFAState>(0, atn.maxTokenType + 1);
+			contextSymbols = new HashSet<Integer>();
+			if (edges != null) {
+				edges = edges.clear();
+			}
+		}
+	}
+
 	public DFAState getTarget(int symbol) {
 		if (edges == null) {
 			return null;
@@ -164,6 +184,30 @@ public class DFAState {
 		}
 
 		return edges.toMap();
+	}
+
+	public DFAState getContextTarget(int invokingState) {
+		if (contextEdges == null) {
+			return null;
+		}
+
+		return contextEdges.get(invokingState);
+	}
+
+	public void setContextTarget(int invokingState, DFAState target) {
+		if (contextEdges == null) {
+			throw new IllegalStateException("The state is not context sensitive.");
+		}
+
+		contextEdges = contextEdges.put(invokingState, target);
+	}
+
+	public Map<Integer, DFAState> getContextEdgeMap() {
+		if (contextEdges == null) {
+			return Collections.emptyMap();
+		}
+
+		return contextEdges.toMap();
 	}
 
 	/** Get the set of all alts mentioned by all ATN configurations in this

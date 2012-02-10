@@ -55,6 +55,11 @@ public class DFA {
 	 */
 //	public OrderedHashSet<ATNConfig> conflictSet;
 
+	/** true if the decision has at least one decision which was resolved through
+	 *  global context.
+	 */
+	private boolean contextSensitive;
+
 	public DFA(@NotNull ATNState atnStartState) {
 		this(atnStartState, 0);
 	}
@@ -62,6 +67,24 @@ public class DFA {
 	public DFA(@NotNull ATNState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
+	}
+
+	public boolean isContextSensitive() {
+		return contextSensitive;
+	}
+
+	public void setContextSensitive(boolean contextSensitive) {
+		if (this.contextSensitive == contextSensitive) {
+			return;
+		}
+
+		if (this.contextSensitive && !contextSensitive) {
+			throw new IllegalStateException();
+		}
+
+		this.contextSensitive = contextSensitive;
+		this.s0 = null;
+		this.states.clear();
 	}
 
 	/** Find the path in DFA from s0 to s, returning list of states encountered (inclusively) */
