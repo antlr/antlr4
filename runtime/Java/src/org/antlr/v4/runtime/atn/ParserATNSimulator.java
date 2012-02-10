@@ -262,7 +262,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input, int decision,
-							   @Nullable ParserRuleContext outerContext)
+							   @Nullable ParserRuleContext<?> outerContext)
 	{
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
@@ -288,7 +288,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<? extends Symbol> input,
-						  @Nullable ParserRuleContext outerContext)
+						  @Nullable ParserRuleContext<?> outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+
@@ -320,7 +320,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
-                       @Nullable ParserRuleContext outerContext)
+                       @Nullable ParserRuleContext<?> outerContext)
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
@@ -473,7 +473,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
-					   ParserRuleContext outerContext)
+					   ParserRuleContext<?> outerContext)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
 		ATN_failover++;
@@ -594,7 +594,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											   DFAState D, // how far we got before failing over
 											   @NotNull ATNConfigSet s0,
 											   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
-											   ParserRuleContext outerContext,
+											   ParserRuleContext<?> outerContext,
 											   int nalts,
 											   boolean greedy)
 	{
@@ -806,7 +806,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 *  prediction for disambiguating predicates.
 	 */
 	public int evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-								   ParserRuleContext outerContext)
+								   ParserRuleContext<?> outerContext)
 	{
 		int predictedAlt = ATN.INVALID_ALT_NUMBER;
 //		List<DFAState.PredPrediction> predPredictions = D.predicates;
