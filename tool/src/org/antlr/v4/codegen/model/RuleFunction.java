@@ -126,13 +126,15 @@ public class RuleFunction extends OutputModelObject {
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
 		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
 
+		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+	}
+
+	public void fillNamedActions(OutputModelFactory factory, Rule r) {
 		namedActions = new HashMap<String, Action>();
 		for (String name : r.namedActions.keySet()) {
 			GrammarAST ast = r.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
-
-		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 
 	/** Get list of decls for token/rule refs.

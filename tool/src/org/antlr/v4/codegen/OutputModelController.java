@@ -140,6 +140,7 @@ public class OutputModelController {
 		RuleFunction function = rule(r);
 		parser.funcs.add(function);
 		pushCurrentRule(function);
+		function.fillNamedActions(delegate, r);
 
 		if ( r instanceof LeftRecursiveRule ) {
 			buildLeftRecursiveRuleFunction((LeftRecursiveRule)r,

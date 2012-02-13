@@ -57,7 +57,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
 		}
 		else {
-			return new RuleFunction(this, r);
+			RuleFunction rf = new RuleFunction(this, r);
+			return rf;
 		}
 	}
 

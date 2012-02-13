@@ -113,7 +113,9 @@ public class GrammarAST extends CommonTree {
 	 *  If not a rule element, just returns null.
 	 */
 	public String getAltLabel() {
-		for (Object o : this.getAncestors()) {
+		List ancestors = this.getAncestors();
+		if ( ancestors==null ) return null;
+		for (Object o : ancestors) {
 			GrammarAST p = (GrammarAST)o;
 			if ( p.getType()== ANTLRParser.ALT ) {
 				AltAST a = (AltAST)p;
