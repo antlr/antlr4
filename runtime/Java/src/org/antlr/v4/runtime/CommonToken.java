@@ -64,8 +64,10 @@ public class CommonToken implements WritableToken, Serializable {
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
-        this.line = source.getLine();
-        this.charPositionInLine = source.getCharPositionInLine();
+		if (source != null) {
+			this.line = source.getLine();
+			this.charPositionInLine = source.getCharPositionInLine();
+		}
 	}
 
 	public CommonToken(int type, String text) {
@@ -190,7 +192,7 @@ public class CommonToken implements WritableToken, Serializable {
 	}
 
 	public CharStream getInputStream() {
-		return source.getInputStream();
+		return source != null ? source.getInputStream() : null;
 	}
 
 	public String toString() {
