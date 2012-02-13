@@ -30,7 +30,14 @@
 package org.antlr.v4.codegen.model.chunk;
 
 import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.model.decl.StructDecl;
 
 /** */
 public class ActionChunk extends OutputModelObject {
+	/** Where is the ctx that defines attrs,labels etc... for this action? */
+	public StructDecl ctx;
+
+	public ActionChunk(StructDecl ctx) {
+		this.ctx = ctx;
+	}
 }

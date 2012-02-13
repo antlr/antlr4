@@ -32,11 +32,8 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Alternative;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.BlockAST;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 
@@ -46,6 +43,8 @@ public interface OutputModelFactory {
 	CodeGenerator getGenerator();
 
 	void setController(OutputModelController controller);
+
+	OutputModelController getController();
 
 	ParserFile parserFile(String fileName);
 
@@ -109,7 +108,7 @@ public interface OutputModelFactory {
 
 	CodeBlock getCurrentBlock();
 
-	CodeBlock getCurrentOuterMostAlternativeBlock();
+	CodeBlockForOuterMostAlt getCurrentOuterMostAlternativeBlock();
 
 	int getCodeBlockLevel();
 

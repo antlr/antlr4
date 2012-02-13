@@ -34,15 +34,21 @@ import org.antlr.v4.tool.Rule;
 
 /** A StructDecl to handle a -> label on alt */
 public class AltLabelStructDecl extends StructDecl {
-	public String label;
-	public AltLabelStructDecl(OutputModelFactory factory, Rule r, String label) {
+	public int altNum;
+	public AltLabelStructDecl(OutputModelFactory factory, Rule r,
+							  int altNum, String label)
+	{
 		super(factory, r);
-		this.label = label;
+		this.altNum = altNum;
+		this.name = // override name set in super to the label ctx
+			label+
+			factory.getGenerator().templates
+			.getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	@Override
 	public int hashCode() {
-		return label.hashCode();
+		return name.hashCode();
 	}
 
 	@Override
@@ -50,7 +56,7 @@ public class AltLabelStructDecl extends StructDecl {
 		if ( obj == this ) return true;
 		if ( obj.hashCode() != this.hashCode() ) return false;
 		if ( obj instanceof AltLabelStructDecl ) {
-			return label.equals(((AltLabelStructDecl)obj).label);
+			return name.equals(((AltLabelStructDecl)obj).name);
 		}
 		return false;
 	}
