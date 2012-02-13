@@ -35,7 +35,4 @@ public interface GrammarASTVisitor {
 	Object visit(SetAST node);
 	Object visit(RuleRefAST node);
 	Object visit(TerminalAST node);
-	Object visit(TreePatternAST node);
-	Object visit(UpAST node);
-	Object visit(DownAST node);
 }
