@@ -540,7 +540,7 @@ public static class <s.name> extends <currentRule.name>Context {
 VisitorDispatchMethod(method) ::= <<
 @Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	if ( listener!=null && listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
+	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
 }
 >>
 
