@@ -31,7 +31,9 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 public class TestATNSerialization extends BaseTest {
@@ -463,8 +465,7 @@ public class TestATNSerialization extends BaseTest {
 			"13->15 ATOM 99,0,0\n" +
 			"15->16 ACTION 2,1,0\n" +
 			"16->6 EPSILON 0,0,0\n" +
-			"0:0 1\n" +
-			"\n";
+			"0:0 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
@@ -599,8 +600,7 @@ public class TestATNSerialization extends BaseTest {
 			"22->7 EPSILON 0,0,0\n" +
 			"0:0 1\n" +
 			"1:1 1\n" +
-			"2:12 1\n" +
-			"\n";
+			"2:12 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);

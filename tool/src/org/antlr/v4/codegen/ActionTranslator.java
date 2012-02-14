@@ -29,16 +29,24 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.chunk.*;
 import org.antlr.v4.codegen.model.decl.StructDecl;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.parse.ActionSplitter;
+import org.antlr.v4.parse.ActionSplitterListener;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
@@ -111,7 +119,6 @@ public class ActionTranslator implements ActionSplitterListener {
 		translator.rf = rf;
         factory.getGrammar().tool.log("action-translator", "translate " + action);
 		String altLabel = node.getAltLabel();
-		System.out.println("label="+altLabel);
 		if ( rf!=null ) translator.nodeContext = rf.ruleCtx;
 		if ( altLabel!=null ) translator.nodeContext = rf.altLabelCtxs.get(altLabel);
 		ANTLRStringStream in = new ANTLRStringStream(action);

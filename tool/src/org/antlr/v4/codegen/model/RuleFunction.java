@@ -31,12 +31,17 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.*;
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.FrequencySet;
+import org.antlr.v4.misc.Triple;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.*;
 
@@ -149,7 +154,6 @@ public class RuleFunction extends OutputModelObject {
 		IntervalSet reftypes = new IntervalSet(RULE_REF,
 											   TOKEN_REF);
 		List<GrammarAST> refs = altAST.getNodesWithType(reftypes);
-		System.out.println(refs);
 		FrequencySet<String> freq = new FrequencySet<String>();
 		for (GrammarAST t : refs) {
 			freq.add(t.getText());
@@ -193,10 +197,10 @@ public class RuleFunction extends OutputModelObject {
 		CodeBlockForOuterMostAlt alt = d.getOuterMostAltCodeBlock();
 		// if we found code blk and might be alt label, try to add to that label ctx
 		if ( alt!=null && altLabelCtxs!=null ) {
-			System.out.println(d.name+" lives in alt "+alt.alt.altNum);
+//			System.out.println(d.name+" lives in alt "+alt.alt.altNum);
 			AltLabelStructDecl altCtx = altLabelCtxs.get(altLabel);
 			if ( altCtx!=null ) { // we have an alt ctx
-				System.out.println("ctx is "+ altCtx.name);
+//				System.out.println("ctx is "+ altCtx.name);
 				altCtx.addDecl(d);
 				return;
 			}

@@ -31,12 +31,14 @@ package org.antlr.v4.analysis;
 
 import org.antlr.runtime.*;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.*;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.misc.Pair;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Remove left-recursive rule refs, add precedence args to recursive rule refs.
  *  Rewrite rule so we can create ATN.
@@ -192,7 +194,7 @@ public class LeftRecursiveRuleTransformer {
 
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {
-		System.out.println("RULE: "+t.toStringTree());
+//		System.out.println("RULE: "+t.toStringTree());
 		BlockAST ruleBlk = (BlockAST)t.getFirstChildWithType(ANTLRParser.BLOCK);
 		AltAST mainAlt = (AltAST)ruleBlk.getChild(0);
 		BlockAST primaryBlk = (BlockAST)mainAlt.getChild(0);

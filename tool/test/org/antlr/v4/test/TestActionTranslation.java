@@ -68,8 +68,9 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testComplicatedArgParsingWithTranslation() throws Exception {
 		String action = "x, $ID.text+\"3242\", (*$ID).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
-		String expected = "x, (_localctx.ID!=null?_localctx.ID.getText():null)+\"3242\"," +
-						  " (*_localctx.ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expected =
+			"x, (((aContext)_localctx).ID!=null?((aContext)_localctx).ID.getText():null)+\"3242\", " +
+			"(*((aContext)_localctx).ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
@@ -99,25 +100,25 @@ public class TestActionTranslation extends BaseTest {
 
 	@Test public void testReturnValues() throws Exception {
 		String action = "$lab.e; $b.e;";
-		String expected = "_localctx.lab.e; _localctx.b.e;";
+		String expected = "((aContext)_localctx).lab.e; ((aContext)_localctx).b.e;";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
     @Test public void testReturnWithMultipleRuleRefs() throws Exception {
 		String action = "$c.x; $c.y;";
-		String expected = "_localctx.c.x; _localctx.c.y;";
+		String expected = "((aContext)_localctx).c.x; ((aContext)_localctx).c.y;";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testTokenRefs() throws Exception {
 		String action = "$id; $ID; $id.text; $id.getText(); $id.line;";
-		String expected = "_localctx.id; _localctx.ID; (_localctx.id!=null?_localctx.id.getText():null); _localctx.id.getText(); (_localctx.id!=null?_localctx.id.getLine():0);";
+		String expected = "((aContext)_localctx).id; ((aContext)_localctx).ID; (((aContext)_localctx).id!=null?((aContext)_localctx).id.getText():null); ((aContext)_localctx).id.getText(); (((aContext)_localctx).id!=null?((aContext)_localctx).id.getLine():0);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testRuleRefs() throws Exception {
         String action = "$lab.start; $c.text;";
-		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx.c!=null?_input.toString(_localctx.c.start,_localctx.c.stop):null);";
+		String expected = "(((aContext)_localctx).lab!=null?(((aContext)_localctx).lab.start):null); (((aContext)_localctx).c!=null?_input.toString(((aContext)_localctx).c.start,((aContext)_localctx).c.stop):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
