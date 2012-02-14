@@ -108,6 +108,26 @@ public class GrammarAST extends CommonTree {
 		return null;
 	}
 
+	/** Walk ancestors of this node until we find ALT with
+	 *  alt!=null or leftRecursiveAltInfo!=null. Then grab label if any.
+	 *  If not a rule element, just returns null.
+	 */
+	public String getAltLabel() {
+		List ancestors = this.getAncestors();
+		if ( ancestors==null ) return null;
+		for (Object o : ancestors) {
+			GrammarAST p = (GrammarAST)o;
+			if ( p.getType()== ANTLRParser.ALT ) {
+				AltAST a = (AltAST)p;
+				if ( a.altLabel!=null ) return a.altLabel.getText();
+				if ( a.leftRecursiveAltInfo!=null ) {
+					return a.leftRecursiveAltInfo.altLabel;
+				}
+			}
+		}
+		return null;
+	}
+
 	public boolean deleteChild(org.antlr.runtime.tree.Tree t) {
 		for (int i=0; i<children.size(); i++) {
 			Object c = children.get(i);

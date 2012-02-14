@@ -30,16 +30,11 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ModelElement;
-import org.antlr.v4.codegen.model.OutputModelObject;
-import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /** This object models the structure holding all of the parameters,
  *  return values, local variables, and labels associated with a rule.
@@ -65,7 +60,7 @@ public class StructDecl extends Decl {
 		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
 	}
 
-	public void addDecl(Decl d) { attrs.add(d); }
+	public void addDecl(Decl d) { attrs.add(d); d.ctx = this; }
 
 	public void addDecl(Attribute a) {
 		addDecl(new AttributeDecl(factory, a.name, a.decl));

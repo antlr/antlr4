@@ -642,8 +642,8 @@ lexerCommands
 	;
 
 lexerCommand
-	:	id LPAREN lexerCommandExpr RPAREN -> ^(LEXER_ACTION_CALL id lexerCommandExpr)
-	|	id
+	:	lexerCommandName LPAREN lexerCommandExpr RPAREN -> ^(LEXER_ACTION_CALL lexerCommandName lexerCommandExpr)
+	|	lexerCommandName
 	;
 
 lexerCommandExpr
@@ -651,6 +651,11 @@ lexerCommandExpr
 	|	INT
 	;
 
+lexerCommandName
+        :       id
+        |       MODE    ->ID[$MODE]
+        ;
+        
 altList
     :	alternative (OR alternative)* -> alternative+
     ;

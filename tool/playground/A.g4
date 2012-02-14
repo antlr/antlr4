@@ -1,16 +1,22 @@
 grammar A;
 
-s : q=e {System.out.println("result = "+$e.v);} ;
-
-e returns [int v]
-  : a=e op='*' b=e {$v = $a.v * $b.v;}	-> mult
-  | a=e '+' b=e {$v = $a.v + $b.v;}	-> add
-  | INT 	{$v = $INT.int;}
-  | '(' x=e ')' {$v = $x.v;}
-  | e '++' 				-> inc
-  | e '--'
-  | ID					-> anID
+s : Q q=e {Object o=$q.v;} -> one
+  | z=e {Object o=$z.v;}
   ;
 
-INT : '0'..'9'+ ;
-WS : (' '|'\n')+ {skip();} ;
+e returns [int v]
+  : a=e op='*' b=e {$v = $a.v * $b.v;}  -> mult
+  | b=e '+' e
+  | '(' x=e ')'
+  ;
+
+INT : '9';
+/*
+a : u=A A -> x
+  | B b {Token t=$B;} -> y
+  | C+  -> z
+  | d=D
+  ;
+
+b : B ;
+*/

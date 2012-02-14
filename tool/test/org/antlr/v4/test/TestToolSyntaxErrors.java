@@ -135,7 +135,8 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"mode foo;\n" +
 			"b : B ;",
 
-			"error(87): A.g:3:5: lexical modes are only allowed in lexer grammars\n"
+			": A.g:4:0: 'b' came as a complete surprise to me\n" +
+			": A.g:4:6: mismatched input ';' expecting COLON while matching a lexer rule\n"
 		};
 		super.testErrors(pair, true);
 	}

@@ -31,29 +31,18 @@ package org.antlr.v4;
 
 import org.antlr.runtime.*;
 import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.automata.ATNFactory;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenPipeline;
-import org.antlr.v4.parse.ANTLRLexer;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.ToolANTLRParser;
-import org.antlr.v4.runtime.misc.LogManager;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTErrorNode;
-import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.STGroup;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
@@ -90,11 +79,12 @@ public class Tool {
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean saveLexer = false;
-	public boolean genListener = true;
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
 	public boolean verbose_dfa = false;
+	public boolean no_auto_element_labels = false;
+	public boolean no_listener = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -103,10 +93,13 @@ public class Tool {
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
+        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
-        new Option("genListener",		"-walker", "generate parse tree walker and listener"),
+		new Option("no_listener",		"-no-listener", "don't generate parse tree listener"),
+		new Option("no_auto_element_labels",
+				   						"-no-auto-ctx-labels", "don't auto generate context fields for each rule element"),
+
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),

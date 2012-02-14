@@ -32,6 +32,7 @@ package org.antlr.v4.analysis;
 import org.antlr.runtime.*;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.misc.Pair;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
@@ -142,12 +143,16 @@ public class LeftRecursiveRuleTransformer {
 		}
 
 		// define labels on recursive rule refs we delete; they don't point to nodes of course
-		for (GrammarAST labelNode : leftRecursiveRuleWalker.leftRecursiveRuleRefLabels) {
+		// these are so $label in action translation works
+		for (Pair<GrammarAST,String> pair : leftRecursiveRuleWalker.leftRecursiveRuleRefLabels) {
+			GrammarAST labelNode = pair.a;
 			GrammarAST labelOpNode = (GrammarAST)labelNode.getParent();
 			GrammarAST elementNode = (GrammarAST)labelOpNode.getChild(1);
 			LabelElementPair lp = new LabelElementPair(g, labelNode, elementNode, labelOpNode.getType());
 			r.alt[1].labelDefs.map(labelNode.getText(), lp);
 		}
+		// copy to rule from walker
+		r.leftRecursiveRuleRefLabels = leftRecursiveRuleWalker.leftRecursiveRuleRefLabels;
 
 		tool.log("grammar", "added: "+t.toStringTree());
 		return true;
@@ -189,6 +194,7 @@ public class LeftRecursiveRuleTransformer {
 
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {
+//		System.out.println("RULE: "+t.toStringTree());
 		BlockAST ruleBlk = (BlockAST)t.getFirstChildWithType(ANTLRParser.BLOCK);
 		AltAST mainAlt = (AltAST)ruleBlk.getChild(0);
 		BlockAST primaryBlk = (BlockAST)mainAlt.getChild(0);
@@ -196,12 +202,14 @@ public class LeftRecursiveRuleTransformer {
 		for (int i = 0; i < r.recPrimaryAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			altInfo.altAST = (AltAST)primaryBlk.getChild(i);
-//			System.out.println(altInfo.altAST.toStringTree());
+			altInfo.altAST.leftRecursiveAltInfo = altInfo;
+			System.out.println(altInfo.altAST.toStringTree());
 		}
 		for (int i = 0; i < r.recOpAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
 			altInfo.altAST = (AltAST)opsBlk.getChild(i);
-//			System.out.println(altInfo.altAST.toStringTree());
+			altInfo.altAST.leftRecursiveAltInfo = altInfo;
+			System.out.println(altInfo.altAST.toStringTree());
 		}
 	}
 
