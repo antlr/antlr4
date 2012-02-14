@@ -28,7 +28,6 @@
  */
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class TestA {
@@ -41,7 +40,7 @@ public class TestA {
 		}
 
 		@Override
-		public void enterRule(AParser.eContext ctx) {
+		public void enter(AParser.eContext ctx) {
 			System.out.println("enter alt w/o -> label: "+ctx.toInfoString(p));
 		}
 
@@ -54,14 +53,9 @@ public class TestA {
 		}
 
 		@Override
-		public void exitRule(AParser.multContext ctx) {
+		public void exit(AParser.multContext ctx) {
 			System.out.println("mult "+ctx.a.v+" * "+ctx.b.v);
 			ctx.v = ctx.a.v * ctx.b.v; // repeat of what parser did--set return value
-		}
-		@Override
-		public void exitRule(AParser.addContext ctx) {
-			System.out.println("add "+ctx.a.v+" + "+ctx.b.v);
-			ctx.v = ctx.a.v + ctx.b.v;
 		}
 	}
 	public static void main(String[] args) throws Exception {

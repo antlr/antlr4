@@ -34,8 +34,8 @@ import org.antlr.v4.runtime.Token;
 
 public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
 	<file.listenerNames:{lname |
-void enterRule(<file.parserName>.<lname>Context ctx);
-void exitRule(<file.parserName>.<lname>Context ctx);}; separator="\n">
+void enter(<file.parserName>.<lname>Context ctx);
+void exit(<file.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
@@ -47,8 +47,8 @@ import org.antlr.v4.runtime.Token;
 
 public class Blank<file.grammarName>Listener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
-@Override public void enterRule(<file.parserName>.<lname>Context ctx) { \}
-@Override public void exitRule(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
+@Override public void enter(<file.parserName>.<lname>Context ctx) { \}
+@Override public void exit(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
 	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
@@ -540,7 +540,7 @@ public static class <s.name> extends <currentRule.name>Context {
 VisitorDispatchMethod(method) ::= <<
 @Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
+	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>(this);
 }
 >>
 

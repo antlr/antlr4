@@ -10,6 +10,7 @@ e returns [int v]
   | '(' x=e ')'
   ;
 
+INT : '9';
 /*
 a : u=A A -> x
   | B b {Token t=$B;} -> y
