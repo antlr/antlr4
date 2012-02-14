@@ -31,46 +31,46 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class TestA {
-	public static class Do extends BlankAListener {
-		Parser p;
-		public Do(Parser p ) { this.p = p; }
-		@Override
-		public void exitEveryRule(ParserRuleContext<Token> ctx) {
-			System.out.println("exit "+ctx.toStringTree(p));
-		}
-
-		@Override
-		public void enter(AParser.eContext ctx) {
-			System.out.println("enter alt w/o -> label: "+ctx.toInfoString(p));
-		}
-
-		@Override
-		public void visitTerminal(ParserRuleContext<Token> ctx, Token symbol) {
-			if ( ctx instanceof AParser.eContext && symbol.getType()==AParser.INT ) {
-				AParser.eContext ectx = (AParser.eContext)ctx;
-				ectx.v = Integer.valueOf(symbol.getText());
-			}
-		}
-
-		@Override
-		public void exit(AParser.multContext ctx) {
-			System.out.println("mult "+ctx.a.v+" * "+ctx.b.v);
-			ctx.v = ctx.a.v * ctx.b.v; // repeat of what parser did--set return value
-		}
-	}
-	public static void main(String[] args) throws Exception {
-		ALexer lexer = new ALexer(new ANTLRFileStream(args[0]));
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		AParser p = new AParser(tokens);
-		p.setBuildParseTree(true);
-//		p.addParseListener(new Do(p));
-		ParserRuleContext<Token> t = p.s();
-		System.out.println("tree = "+t.toStringTree(p));
-
-		ParseTreeWalker walker = new ParseTreeWalker();
-		Do doer = new Do(p);
-		walker.walk(doer, t);
-		AParser.eContext ectx = (AParser.eContext)t.getChild(0);
-		System.out.println("result from tree walk = "+ ectx.v);
-	}
+//	public static class Do extends BlankAListener {
+//		Parser p;
+//		public Do(Parser p ) { this.p = p; }
+//		@Override
+//		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+//			System.out.println("exit "+ctx.toStringTree(p));
+//		}
+//
+//		@Override
+//		public void enter(AParser.eContext ctx) {
+//			System.out.println("enter alt w/o -> label: "+ctx.toInfoString(p));
+//		}
+//
+//		@Override
+//		public void visitTerminal(ParserRuleContext<Token> ctx, Token symbol) {
+//			if ( ctx instanceof AParser.eContext && symbol.getType()==AParser.INT ) {
+//				AParser.eContext ectx = (AParser.eContext)ctx;
+//				ectx.v = Integer.valueOf(symbol.getText());
+//			}
+//		}
+//
+//		@Override
+//		public void exit(AParser.multContext ctx) {
+//			System.out.println("mult "+ctx.a.v+" * "+ctx.b.v);
+//			ctx.v = ctx.a.v * ctx.b.v; // repeat of what parser did--set return value
+//		}
+//	}
+//	public static void main(String[] args) throws Exception {
+//		ALexer lexer = new ALexer(new ANTLRFileStream(args[0]));
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		AParser p = new AParser(tokens);
+//		p.setBuildParseTree(true);
+////		p.addParseListener(new Do(p));
+//		ParserRuleContext<Token> t = p.s();
+//		System.out.println("tree = "+t.toStringTree(p));
+//
+//		ParseTreeWalker walker = new ParseTreeWalker();
+//		Do doer = new Do(p);
+//		walker.walk(doer, t);
+//		AParser.eContext ectx = (AParser.eContext)t.getChild(0);
+//		System.out.println("result from tree walk = "+ ectx.v);
+//	}
 }
