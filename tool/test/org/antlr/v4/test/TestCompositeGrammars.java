@@ -42,10 +42,14 @@ public class TestCompositeGrammars extends BaseTest {
 		String grammar =
 			"parser grammar S;\n" +
 			"a : B . C ;\n"; // not qualified ID
-		Grammar g = new Grammar(grammar);
+		mkdir(tmpdir);
+		Grammar g = new Grammar(tmpdir + "/S.g", grammar);
+		g.name = "S";
 
 		ErrorQueue equeue = new ErrorQueue();
-		Tool antlr = new Tool();
+		Tool antlr = g.tool;
+		antlr.outputDirectory = tmpdir;
+		antlr.libDirectory = tmpdir;
 		antlr.addListener(equeue);
 		antlr.process(g,true);
 
