@@ -493,12 +493,30 @@ TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
-ContextTokenGetterDecl(t)      ::= "public Token <t.name>() { return null; }"
-ContextTokenListGetterDecl(t)  ::= "public List\<Token> <t.name>() { return null; }"
-ContextTokenListIndexedGetterDecl(t)  ::= "public Token <t.name>(int i) { return null; }"
-ContextRuleGetterDecl(r)       ::= "public <r.ctxName> <r.name>() { return null; }"
-ContextRuleListGetterDecl(r)   ::= "public List\<<r.ctxName>> <r.name>() { return null; }"
-ContextRuleListIndexedGetterDecl(r)   ::= "public <r.ctxName> <r.name>(int i) { return null; }"
+ContextTokenGetterDecl(t)      ::=
+    "public Token <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+ContextTokenListGetterDecl(t)  ::=
+    "public List\<Token> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+ContextTokenListIndexedGetterDecl(t)  ::= <<
+public Token <t.name>(int i) {
+    return getToken(<parser.name>.<t.name>, i);
+}
+>>
+ContextRuleGetterDecl(r)       ::= <<
+public <r.ctxName> <r.name>() {
+    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,0);
+}
+>>
+ContextRuleListGetterDecl(r)   ::= <<
+public List\<<r.ctxName>\> <r.name>() {
+    return (List\<<r.ctxName>\>)getRuleContexts(<r.ctxName>.class);
+}
+>>
+ContextRuleListIndexedGetterDecl(r)   ::= <<
+public <r.ctxName> <r.name>(int i) {
+    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,i);
+}
+>>
 
 LexerRuleContext() ::= "RuleContext"
 

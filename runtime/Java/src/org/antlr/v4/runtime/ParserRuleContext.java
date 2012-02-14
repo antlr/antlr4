@@ -131,17 +131,6 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
-//	@Override
-//	public int hashCode() {
-//		return super.hashCode() + s;
-//	}
-//
-//	@Override
-//	public boolean equals(Object o) {
-//		if ( !super.equals(o) ) return false;
-//		return s != ((RuleContext)o).s; // must be parsing the same location in the ATN
-//	}
-
 	// Double dispatch methods
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
@@ -188,6 +177,51 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	@Override
 	public ParseTree getChild(int i) {
 		return children!=null ? children.get(i) : null;
+	}
+
+	public Object getChild(Class ctxType, int i) {
+		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+		int j = -1; // what element have we found with ctxType?
+		for (Object o : children) {
+			if ( o.getClass().isInstance(ctxType) ) {
+				j++;
+				if ( j == i ) return o;
+			}
+		}
+		return null;
+	}
+
+	public Token getToken(int ttype, int i) {
+		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+		return (Token)getChild(Token.class, i);
+	}
+
+	public List<Token> getTokens(int ttype) {
+		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+		List<Token> tokens = null;
+		for (Object o : children) {
+			if ( o instanceof Token ) {
+				if ( tokens==null ) tokens = new ArrayList<Token>();
+				tokens.add((Token)o);
+			}
+		}
+		return tokens;
+	}
+
+	public ParserRuleContext getRuleContext(Class ctxType, int i) {
+		return (ParserRuleContext)getChild(ctxType, i);
+	}
+
+	public List<? extends ParserRuleContext> getRuleContexts(Class ctxType) {
+		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+		List<ParserRuleContext> contexts = null;
+		for (Object o : children) {
+			if ( o.getClass().isInstance(ctxType) ) {
+				if ( contexts==null ) contexts = new ArrayList<ParserRuleContext>();
+				contexts.add((ParserRuleContext)o);
+			}
+		}
+		return contexts;
 	}
 
 	@Override
