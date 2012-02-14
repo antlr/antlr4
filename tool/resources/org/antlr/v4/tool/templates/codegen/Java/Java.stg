@@ -485,15 +485,20 @@ NonLocalAttrRef(s)		 ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>
 SetNonLocalAttr(s, rhsChunks)	  ::=
 	"((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
 
-AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
+AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "Token <t.name>"
+TokenDecl(t) ::= "public Token <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>()"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>"
-RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>()"
+TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
+RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
+RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
-ContextGetterDecl(g) ::= "public <g.decl> get<t.name>() { }"
+ContextTokenGetterDecl(t)      ::= "public Token <t.name>() { return null; }"
+ContextTokenListGetterDecl(t)  ::= "public List\<Token> <t.name>() { return null; }"
+ContextTokenListIndexedGetterDecl(t)  ::= "public Token <t.name>(int i) { return null; }"
+ContextRuleGetterDecl(r)       ::= "public <r.ctxName> <r.name>() { return null; }"
+ContextRuleListGetterDecl(r)   ::= "public List\<<r.ctxName>> <r.name>() { return null; }"
+ContextRuleListIndexedGetterDecl(r)   ::= "public <r.ctxName> <r.name>(int i) { return null; }"
 
 LexerRuleContext() ::= "RuleContext"
 
@@ -502,18 +507,19 @@ LexerRuleContext() ::= "RuleContext"
  */
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
-ImplicitRuleLabel(ruleName)	  ::= "_<ruleName>"
+ImplicitTokenLabel(tokenName) ::= "<tokenName>"
+ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
 ListLabelName(label)		  ::= "<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,
+StructDecl(s,attrs,getters,visitorDispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
-	<attrs:{a | public <a>;}; separator="\n">
+	<attrs:{a | <a>}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
 	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
 	public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<s.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
@@ -531,9 +537,10 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 }
 >>
 
-AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
+AltLabelStructDecl(s,attrs,getters,visitorDispatchMethods) ::= <<
 public static class <s.name> extends <currentRule.name>Context {
-	<attrs:{a | public <a.decl> get<a.name>() {\}}; separator="\n">
+	<attrs:{a | <a>}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
 	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
 	<visitorDispatchMethods; separator="\n">
 }
@@ -546,7 +553,7 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<I
 }
 >>
 
-AttributeDecl(d) ::= "<d.decl>"
+AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"

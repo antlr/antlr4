@@ -88,11 +88,9 @@ public class RuleFunction extends OutputModelObject {
 		if ( !factory.getGrammar().tool.no_auto_element_labels ) {
 			List<Alternative> altsNoLabels = r.getUnlabeledAlts();
 			if ( altsNoLabels!=null ) {
-				for (Alternative alt : altsNoLabels) {
-					List<Decl> decls = getLabelsForAltElements(alt.ast);
+				Set<Decl> decls = getDeclsForAllElements(altsNoLabels);
 					// we know to put in rule ctx, so do it directly
-					for (Decl d : decls) ruleCtx.addDecl(d);
-				}
+				for (Decl d : decls) ruleCtx.addDecl(d);
 			}
 		}
 
@@ -107,7 +105,7 @@ public class RuleFunction extends OutputModelObject {
 				altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
 				altLabelCtxs.put(label, altToContext[altNum]);
 				if ( !factory.getGrammar().tool.no_auto_element_labels ) {
-					List<Decl> decls = getLabelsForAltElements(altAST);
+					Set<Decl> decls = getDeclsForAltElements(altAST);
 					// we know which ctx to put in, so do it directly
 					for (Decl d : decls) altToContext[altNum].addDecl(d);
 				}
@@ -142,45 +140,86 @@ public class RuleFunction extends OutputModelObject {
 		}
 	}
 
+	/** for all alts, find which ref X or r in way which needs List
+	   Must see across alts.  If any alt needs X or r as list, then
+	   define as list.
+	 */
+	public Set<Decl> getDeclsForAllElements(List<Alternative> alts) {
+		Set<String> needsList = new HashSet<String>();
+		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
+		for (Alternative a :alts) {
+			IntervalSet reftypes = new IntervalSet(RULE_REF, TOKEN_REF);
+			List<GrammarAST> refs = a.ast.getNodesWithType(reftypes);
+			FrequencySet<String> altFreq = new FrequencySet<String>();
+			for (GrammarAST t : refs) {
+				String refLabelName = t.getText();
+				altFreq.add(refLabelName);
+				allRefs.add(t);
+			}
+			for (GrammarAST t : refs) {
+				String refLabelName = t.getText();
+				if ( altFreq.count(t.getText())>1 ) needsList.add(refLabelName);
+			}
+		}
+		Set<Decl> decls = new HashSet<Decl>();
+		for (GrammarAST t : allRefs) {
+			String refLabelName = t.getText();
+			List<Decl> d = getDeclForAltElement(t,
+												refLabelName,
+												needsList.contains(refLabelName));
+			decls.addAll(d);
+		}
+		return decls;
+	}
+
 	/** Get list of decls for token/rule refs.
-	 *  Single ref X becomes label X
-	 *  Multiple refs to X become X1, X2, ...
-	 *  Ref X in a loop then is part of List
+	 *  Single ref X becomes X() getter
+	 *  Multiple refs to X becomes List X() method, X(int i) method.
+	 *  Ref X in a loop then we get List X(), X(int i)
 	 *
 	 *  Does not gen labels for literals like '+', 'begin', ';', ...
  	 */
-	public List<Decl> getLabelsForAltElements(AltAST altAST) {
-		List<Decl> decls = new ArrayList<Decl>();
+	public Set<Decl> getDeclsForAltElements(AltAST altAST) {
 		IntervalSet reftypes = new IntervalSet(RULE_REF,
 											   TOKEN_REF);
 		List<GrammarAST> refs = altAST.getNodesWithType(reftypes);
+		Set<Decl> decls = new HashSet<Decl>();
 		FrequencySet<String> freq = new FrequencySet<String>();
+		for (GrammarAST t : refs) freq.add(t.getText());
 		for (GrammarAST t : refs) {
-			freq.add(t.getText());
-		}
-		// track which ref for X we are at so we can gen X1 if necessary
-		FrequencySet<String> counter = new FrequencySet<String>();
-		for (GrammarAST t : refs) {
-			boolean inLoop = t.hasAncestor(CLOSURE) || t.hasAncestor(POSITIVE_CLOSURE);
-//			System.out.println(altAST.toStringTree()+" "+t+" inLoop? "+inLoop);
-			Decl d;
 			String refLabelName = t.getText();
-			if ( !inLoop && freq.count(refLabelName)>1 ) {
-				counter.add(refLabelName);
-				refLabelName = refLabelName+counter.count(refLabelName);
-			}
-			if ( t.getType()==RULE_REF ) {
-				Rule rref = factory.getGrammar().getRule(t.getText());
-				String ctxName = factory.getGenerator().target
-								 .getRuleFunctionContextStructName(rref);
-				if ( inLoop ) d = new RuleContextListDecl(factory, refLabelName, ctxName);
-				else d = new RuleContextDecl(factory, refLabelName, ctxName);
+			boolean inLoop = t.hasAncestor(CLOSURE) || t.hasAncestor(POSITIVE_CLOSURE);
+			boolean multipleRefs = freq.count(refLabelName)>1;
+			boolean needList = inLoop || multipleRefs;
+//			System.out.println(altAST.toStringTree()+" "+t+" inLoop? "+inLoop);
+			List<Decl> d = getDeclForAltElement(t, refLabelName, needList);
+			decls.addAll(d);
+		}
+		return decls;
+	}
+
+	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
+		List<Decl> decls = new ArrayList<Decl>();
+		if ( t.getType()==RULE_REF ) {
+			Rule rref = factory.getGrammar().getRule(t.getText());
+			String ctxName = factory.getGenerator().target
+							 .getRuleFunctionContextStructName(rref);
+			if ( needList ) {
+				decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
+				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
 			}
 			else {
-				if ( inLoop ) d = new TokenListDecl(factory, refLabelName);
-				else d = new TokenDecl(factory, refLabelName);
+				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName) );
 			}
-			decls.add(d);
+		}
+		else {
+			if ( needList ) {
+				decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
+				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
+			}
+			else {
+				decls.add( new ContextTokenGetterDecl(factory, refLabelName) );
+			}
 		}
 		return decls;
 	}
