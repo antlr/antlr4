@@ -493,6 +493,8 @@ TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>()"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>()"
 
+ContextGetterDecl(g) ::= "public <g.decl> get<t.name>() { }"
+
 LexerRuleContext() ::= "RuleContext"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
@@ -500,10 +502,10 @@ LexerRuleContext() ::= "RuleContext"
  */
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "<tokenName>"
-ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
+ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
+ImplicitRuleLabel(ruleName)	  ::= "_<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
-ListLabelName(label)		  ::= "<label>_list"
+ListLabelName(label)		  ::= "<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
@@ -531,7 +533,7 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 
 AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
 public static class <s.name> extends <currentRule.name>Context {
-	<attrs:{a | public <a>;}; separator="\n">
+	<attrs:{a | public <a.decl> get<a.name>() {\}}; separator="\n">
 	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
 	<visitorDispatchMethods; separator="\n">
 }

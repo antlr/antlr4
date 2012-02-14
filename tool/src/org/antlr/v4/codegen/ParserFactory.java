@@ -91,6 +91,12 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
+			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+				TokenListDecl l = getTokenListLabelDecl(label);
+				getCurrentRuleFunction().addContextDecl(ID.getAltLabel(), l);
+			}
+
+//			String label = labelAST.getText();
 			Decl d = getTokenLabelDecl(label);
 			((MatchToken)matchOp).labels.add(d);
 			getCurrentRuleFunction().addContextDecl(ID.getAltLabel(), d);
