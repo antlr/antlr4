@@ -66,7 +66,8 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
 		}
 		else {
-			return new RuleFunction(this, r);
+			RuleFunction rf = new RuleFunction(this, r);
+			return rf;
 		}
 	}
 
@@ -91,7 +92,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		InvokeRule invokeOp = new InvokeRule(this, ID, label);
 		// If no manual label and action refs as token/rule not label, we need to define implicit label
 		if ( controller.needsImplicitLabel(ID, invokeOp) ) defineImplicitLabel(ID, invokeOp);
-		AddToLabelList listLabelOp = getListLabelIfPresent(invokeOp, label);
+		AddToLabelList listLabelOp = getAddToListOpIfListLabelPresent(invokeOp, label);
 		return list(invokeOp, listLabelOp);
 	}
 
@@ -99,16 +100,29 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
-			Decl d = getTokenLabelDecl(label);
-			((MatchToken)matchOp).labels.add(d);
-			getCurrentRuleFunction().addContextDecl(d);
+			RuleFunction rf = getCurrentRuleFunction();
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+				// add Token _X and List<Token> X decls
+				defineImplicitLabel(ID, matchOp); // adds _X
 				TokenListDecl l = getTokenListLabelDecl(label);
-				getCurrentRuleFunction().addContextDecl(l);
+				rf.addContextDecl(ID.getAltLabel(), l);
 			}
+			else {
+				Decl d = getTokenLabelDecl(label);
+				((MatchToken) matchOp).labels.add(d);
+				rf.addContextDecl(ID.getAltLabel(), d);
+			}
+
+//			Decl d = getTokenLabelDecl(label);
+//			((MatchToken)matchOp).labels.add(d);
+//			getCurrentRuleFunction().addContextDecl(ID.getAltLabel(), d);
+//			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+//				TokenListDecl l = getTokenListLabelDecl(label);
+//				getCurrentRuleFunction().addContextDecl(ID.getAltLabel(), l);
+//			}
 		}
 		if ( controller.needsImplicitLabel(ID, matchOp) ) defineImplicitLabel(ID, matchOp);
-		AddToLabelList listLabelOp = getListLabelIfPresent(matchOp, labelAST);
+		AddToLabelList listLabelOp = getAddToListOpIfListLabelPresent(matchOp, labelAST);
 		return list(matchOp, listLabelOp);
 	}
 
@@ -129,14 +143,14 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			String label = labelAST.getText();
 			Decl d = getTokenLabelDecl(label);
 			((MatchSet)matchOp).labels.add(d);
-			getCurrentRuleFunction().addContextDecl(d);
+			getCurrentRuleFunction().addContextDecl(setAST.getAltLabel(), d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
 				TokenListDecl l = getTokenListLabelDecl(label);
-				getCurrentRuleFunction().addContextDecl(l);
+				getCurrentRuleFunction().addContextDecl(setAST.getAltLabel(), l);
 			}
 		}
 		if ( controller.needsImplicitLabel(setAST, matchOp) ) defineImplicitLabel(setAST, matchOp);
-		AddToLabelList listLabelOp = getListLabelIfPresent(matchOp, labelAST);
+		AddToLabelList listLabelOp = getAddToListOpIfListLabelPresent(matchOp, labelAST);
 		return list(matchOp, listLabelOp);
 	}
 
@@ -148,14 +162,14 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			String label = labelAST.getText();
 			Decl d = getTokenLabelDecl(label);
 			wild.labels.add(d);
-			getCurrentRuleFunction().addContextDecl(d);
+			getCurrentRuleFunction().addContextDecl(ast.getAltLabel(), d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
 				TokenListDecl l = getTokenListLabelDecl(label);
-				getCurrentRuleFunction().addContextDecl(l);
+				getCurrentRuleFunction().addContextDecl(ast.getAltLabel(), l);
 			}
 		}
 		if ( controller.needsImplicitLabel(ast, wild) ) defineImplicitLabel(ast, wild);
-		AddToLabelList listLabelOp = getListLabelIfPresent(wild, labelAST);
+		AddToLabelList listLabelOp = getAddToListOpIfListLabelPresent(wild, labelAST);
 		return list(wild, listLabelOp);
 	}
 
@@ -173,11 +187,11 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			String label = labelAST.getText();
 			Decl d = getTokenLabelDecl(label);
 			c.label = d;
-			getCurrentRuleFunction().addContextDecl(d);
+			getCurrentRuleFunction().addContextDecl(labelAST.getAltLabel(), d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				String listLabel = gen.target.getListLabel(label);
 				TokenListDecl l = new TokenListDecl(this, listLabel);
-				getCurrentRuleFunction().addContextDecl(l);
+				getCurrentRuleFunction().addContextDecl(labelAST.getAltLabel(), l);
 			}
 		}
 
@@ -288,10 +302,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		}
 		op.getLabels().add(d);
 		// all labels must be in scope struct in case we exec action out of context
-		getCurrentRuleFunction().addContextDecl(d);
+		getCurrentRuleFunction().addContextDecl(ast.getAltLabel(), d);
 	}
 
-	public AddToLabelList getListLabelIfPresent(LabeledOp op, GrammarAST label) {
+	public AddToLabelList getAddToListOpIfListLabelPresent(LabeledOp op, GrammarAST label) {
 		AddToLabelList labelOp = null;
 		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
 			String listLabel = gen.target.getListLabel(label.getText());

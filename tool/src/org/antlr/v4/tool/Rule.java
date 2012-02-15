@@ -29,10 +29,8 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
-import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.misc.Triple;
+import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
@@ -205,16 +203,32 @@ public class Rule implements AttributeResolver {
 		return getAltLabels()!=null;
 	}
 
+	/** Used for recursive rules (subclass), which have 1 alt, but many original alts */
+	public int getOriginalNumberOfAlts() {
+		return numberOfAlts;
+	}
+
 	/** Get -> labels. */
-	public List<String> getAltLabels() {
-		List<String> labels = new ArrayList<String>();
+	public List<Triple<Integer,AltAST,String>> getAltLabels() {
+		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
-			if ( altLabel==null ) break; // all or none
-			labels.add(altLabel.getText());
+			if ( altLabel!=null ) {
+				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
+			}
 		}
 		if ( labels.size()==0 ) return null;
 		return labels;
+	}
+
+	public List<AltAST> getUnlabeledAltASTs() {
+		List<AltAST> alts = new ArrayList<AltAST>();
+		for (int i=1; i<=numberOfAlts; i++) {
+			GrammarAST altLabel = alt[i].ast.altLabel;
+			if ( altLabel==null ) alts.add(alt[i].ast);
+		}
+		if ( alts.size()==0 ) return null;
+		return alts;
 	}
 
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.

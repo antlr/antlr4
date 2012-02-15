@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger early access
 
+Feb 14, 2012
+
+* Fixed https://github.com/antlr/antlr4/issues/8 and lots of other little things.
+
 Jan 30, 2012
 
 * Moving to github.

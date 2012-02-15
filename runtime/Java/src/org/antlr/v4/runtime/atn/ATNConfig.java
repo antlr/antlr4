@@ -74,21 +74,19 @@ public class ATNConfig {
 	public int lexerActionIndex = -1; // TOOD: move to subclass
 
     @NotNull
-    public SemanticContext semanticContext = SemanticContext.NONE;
+    public final SemanticContext semanticContext;
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable RuleContext context)
 	{
-		this.state = state;
-		this.alt = alt;
-		this.context = context;
+		this(state, alt, context, SemanticContext.NONE);
 	}
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable RuleContext context,
-					 SemanticContext semanticContext)
+					 @NotNull SemanticContext semanticContext)
 	{
 		this.state = state;
 		this.alt = alt;
@@ -100,7 +98,7 @@ public class ATNConfig {
    		this(c, state, c.context, c.semanticContext);
    	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, SemanticContext semanticContext) {
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull SemanticContext semanticContext) {
    		this(c, state, c.context, semanticContext);
    	}
 
@@ -109,7 +107,7 @@ public class ATNConfig {
     }
 
 	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context,
-                     SemanticContext semanticContext)
+                     @NotNull SemanticContext semanticContext)
     {
 		this.state = state;
 		this.alt = c.alt;
@@ -119,36 +117,40 @@ public class ATNConfig {
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
-//	public ATNConfig(@NotNull ATNConfig c, @Nullable RuleContext context) {
-//		this(c, c.state, context);
-//	}
-
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
      *  syntactic/semantic contexts are the same.
      */
     @Override
     public boolean equals(Object o) {
-		if ( o==null ) return false;
-		if ( this==o ) return true;
 		if (!(o instanceof ATNConfig)) {
 			return false;
 		}
 
-		ATNConfig other = (ATNConfig)o;
-		return
-            this.state.stateNumber==other.state.stateNumber &&
-            this.alt==other.alt &&
-            (this.context==other.context || (this.context != null && this.context.equals(other.context))) &&
-            (this.semanticContext==other.semanticContext || (this.semanticContext != null && this.semanticContext.equals(other.semanticContext)));
+		return this.equals((ATNConfig)o);
+	}
 
-    }
+	public boolean equals(ATNConfig other) {
+		if (this == other) {
+			return true;
+		} else if (other == null) {
+			return false;
+		}
 
-    @Override
-    public int hashCode() {
-        int h = state.stateNumber + alt + (semanticContext!=null ? semanticContext.hashCode() : 0);
-		if ( context!=null ) h += context.hashCode();
-        return h;
+		return this.state.stateNumber==other.state.stateNumber
+			&& this.alt==other.alt
+			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
+			&& this.semanticContext.equals(other.semanticContext);
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = 7;
+		hashCode = 5 * hashCode + state.stateNumber;
+		hashCode = 5 * hashCode + alt;
+		hashCode = 5 * hashCode + (context != null ? context.hashCode() : 0);
+		hashCode = 5 * hashCode + semanticContext.hashCode();
+        return hashCode;
     }
 
 	@Override

@@ -119,6 +119,38 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test public void testLexerPushPopModeAction() throws Exception {
+		String grammar =
+			"lexer grammar L;\n" +
+			"STRING_START : '\"' -> pushMode(STRING_MODE), more ;\n" +
+			"WS : (' '|'\n') -> skip ;\n"+
+			"mode STRING_MODE;\n"+
+			"STRING : '\"' -> popMode ;\n"+
+			"ANY : . -> more ;\n";
+		String found = execLexer("L.g", grammar, "L", "\"abc\" \"ab\"");
+		String expecting =
+			"[@0,0:4='\"abc\"',<5>,1:0]\n" +
+			"[@1,6:9='\"ab\"',<5>,1:6]\n" +
+			"[@2,10:9='<EOF>',<-1>,1:10]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testLexerModeAction() throws Exception {
+		String grammar =
+			"lexer grammar L;\n" +
+			"STRING_START : '\"' -> mode(STRING_MODE), more ;\n" +
+			"WS : (' '|'\n') -> skip ;\n"+
+			"mode STRING_MODE;\n"+
+			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+
+			"ANY : . -> more ;\n";
+		String found = execLexer("L.g", grammar, "L", "\"abc\" \"ab\"");
+		String expecting =
+			"[@0,0:4='\"abc\"',<5>,1:0]\n" +
+			"[@1,6:9='\"ab\"',<5>,1:6]\n" +
+			"[@2,10:9='<EOF>',<-1>,1:10]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test public void testKeywordID() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
@@ -340,6 +372,19 @@ public class TestLexerExec extends BaseTest {
 			"A\n" +
 			"[@0,0:2='b\"a',<3>,1:0]\n" +
 			"[@1,3:2='<EOF>',<-1>,1:3]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testCharSetWithQuote2() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"A : [\"\\\\ab]+ {System.out.println(\"A\");} ;\n"+
+			"WS : [ \n\t]+ -> skip ;";
+		String found = execLexer("L.g", grammar, "L", "b\"\\a");
+		String expecting =
+			"A\n" +
+			"[@0,0:3='b\"\\a',<3>,1:0]\n" +
+			"[@1,4:3='<EOF>',<-1>,1:4]\n";
 		assertEquals(expecting, found);
 	}
 

@@ -29,9 +29,11 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 /** */
 public class ArgRef extends LocalRef {
-	public ArgRef(String name) {
-		super(name);
+	public ArgRef(StructDecl ctx, String name) {
+		super(ctx, name);
 	}
 }

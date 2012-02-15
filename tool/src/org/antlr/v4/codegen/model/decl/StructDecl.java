@@ -48,6 +48,7 @@ public class StructDecl extends Decl {
 	public String superClass;
 	public boolean provideCopyFrom;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
 	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
 	@ModelElement public List<OutputModelObject> interfaces;
@@ -65,7 +66,11 @@ public class StructDecl extends Decl {
 		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
 	}
 
-	public void addDecl(Decl d) { attrs.add(d); }
+	public void addDecl(Decl d) {
+		d.ctx = this;
+		if ( d instanceof ContextGetterDecl ) getters.add(d);
+		else attrs.add(d);
+	}
 
 	public void addDecl(Attribute a) {
 		addDecl(new AttributeDecl(factory, a.name, a.decl));

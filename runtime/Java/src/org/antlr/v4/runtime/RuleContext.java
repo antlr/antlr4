@@ -80,16 +80,6 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	public RuleContext() {}
 
-//	public RuleContext(RuleContext parent) {
-//		this(parent, -1);
-//	}
-//
-//	public RuleContext(RuleContext parent, int stateNumber) {
-//		// capture state that called us as we create this context; use later for
-//		// return state in closure
-//		this(parent, parent != null ? parent.s : -1, stateNumber);
-//	}
-
 	public RuleContext(RuleContext parent, int invokingState) {
 		this.parent = parent;
 		//if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
@@ -103,13 +93,6 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	@Override
 	public int hashCode() {
-//		int h = 0;
-//		RuleContext p = this;
-//		while ( p!=null ) {
-//			h += p.stateNumber;
-//			p = p.parent;
-//		}
-//		return h;
 		return cachedHashCode; // works with tests; don't recompute.
 	}
 
