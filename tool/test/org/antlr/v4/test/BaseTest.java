@@ -71,7 +71,7 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
-	public static final boolean TEST_IN_SAME_PROCESS = false;
+	public static final boolean TEST_IN_SAME_PROCESS = Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -510,7 +510,7 @@ public abstract class BaseTest {
 		}
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
-			files.add("Blank"+grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
+			files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
 		}
 		ok = compile(files.toArray(new String[files.size()]));
 		if ( !ok ) { allIsWell = false; }
