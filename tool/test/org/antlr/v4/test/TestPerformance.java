@@ -99,7 +99,7 @@ public class TestPerformance extends BaseTest {
 
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
-    private static final boolean DISABLE_GLOBAL_CONTEXT = true;
+    private static final boolean DISABLE_GLOBAL_CONTEXT = false;
     private static final boolean FORCE_GLOBAL_CONTEXT = false;
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 
