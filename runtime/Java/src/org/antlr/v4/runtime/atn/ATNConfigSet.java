@@ -88,6 +88,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.conflictingAlts = set.conflictingAlts;
 	}
 
+	public boolean isLocalContext() {
+		return localContext;
+	}
+
 	public Set<ATNState> getStates() {
 		Set<ATNState> states = new HashSet<ATNState>();
 		for (ATNConfig c : this.configs) {
