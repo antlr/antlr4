@@ -439,7 +439,7 @@ public class TestPerformance extends BaseTest {
             @SuppressWarnings({"unchecked"})
             final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass("JavaParser");
             @SuppressWarnings({"unchecked"})
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass("BlankJavaListener");
+            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass("JavaBaseListener");
             TestPerformance.sharedListener = listenerClass.newInstance();
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
