@@ -926,13 +926,13 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}//-> channel(HIDDEN)
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
     ;
 
 COMMENT
-    :   '/*' .* '*/' {$channel=HIDDEN;}//-> channel(HIDDEN)
+    :   '/*' .* '*/' -> channel(HIDDEN)
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}//-> channel(HIDDEN)
+    : '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
     ;

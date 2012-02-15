@@ -55,7 +55,7 @@ import org.antlr.v4.runtime.dfa.DFAState;
 
 public class TestPerformance extends BaseTest {
     /** Parse all java files under this package within the JDK_SOURCE_ROOT. */
-    private static final String TOP_PACKAGE = "java";
+    private static final String TOP_PACKAGE = "java.lang";
     /** True to load java files from sub-packages of {@link #TOP_PACKAGE}. */
     private static final boolean RECURSIVE = true;
 
@@ -136,8 +136,6 @@ public class TestPerformance extends BaseTest {
     @Test
     //@Ignore
     public void compileJdk() throws IOException {
-        compileParser(USE_LR_GRAMMAR);
-        JavaParserFactory factory = getParserFactory();
         String jdkSourceRoot = System.getenv("JDK_SOURCE_ROOT");
         if (jdkSourceRoot == null) {
             jdkSourceRoot = System.getProperty("JDK_SOURCE_ROOT");
@@ -146,6 +144,9 @@ public class TestPerformance extends BaseTest {
             System.err.println("The JDK_SOURCE_ROOT environment variable must be set for performance testing.");
             return;
         }
+
+        compileParser(USE_LR_GRAMMAR);
+        JavaParserFactory factory = getParserFactory();
 
         if (!TOP_PACKAGE.isEmpty()) {
             jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.replace('.', '/');
@@ -156,7 +157,7 @@ public class TestPerformance extends BaseTest {
 
         Collection<CharStream> sources = loadSources(directory, RECURSIVE);
 
-        System.out.print(getOptionsDescription());
+		System.out.print(getOptionsDescription());
 
         currentPass = 0;
         parse1(factory, sources);
@@ -211,7 +212,7 @@ public class TestPerformance extends BaseTest {
 
         builder.append('\n');
 
-        builder.append(", Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
+        builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
         builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
