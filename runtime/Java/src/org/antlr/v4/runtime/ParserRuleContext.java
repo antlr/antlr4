@@ -176,15 +176,18 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	@Override
 	public ParseTree getChild(int i) {
-		return children!=null ? children.get(i) : null;
+		return children!=null && i>=0 && i<children.size() ? children.get(i) : null;
 	}
 
-	public <T> T getChild(Class<? extends T> ctxType, int i) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+	public <T extends ParseTree> T getChild(Class<? extends T> ctxType, int i) {
+		if ( children==null || i < 0 || i >= children.size() ) {
+			return null;
+		}
+
 		int j = -1; // what element have we found with ctxType?
-		for (Object o : children) {
+		for (ParseTree o : children) {
 			if ( ctxType.isInstance(o) ) {
-				j = j+1;
+				j++;
 				if ( j == i ) {
 					return ctxType.cast(o);
 				}
@@ -194,9 +197,12 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	}
 
 	public Token getToken(int ttype, int i) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+		if ( children==null || i < 0 || i >= children.size() ) {
+			return null;
+		}
+
 		int j = -1; // what token with ttype have we found?
-		for (Object o : children) {
+		for (ParseTree o : children) {
 			if ( o instanceof TerminalNode<?> ) {
 				TerminalNode<?> tnode = (TerminalNode<?>)o;
 				if ( tnode.getSymbol() instanceof Token ) {
@@ -210,18 +216,33 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 				}
 			}
 		}
+
 		return null;
 	}
 
-	public List<Token> getTokens(int ttype) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+	public List<? extends Token> getTokens(int ttype) {
+		if ( children==null ) {
+			return Collections.emptyList();
+		}
+
 		List<Token> tokens = null;
-		for (Object o : children) {
-			if ( o instanceof Token ) {
-				if ( tokens==null ) tokens = new ArrayList<Token>();
-				tokens.add((Token)o);
+		for (ParseTree o : children) {
+			if ( o instanceof TerminalNode<?> ) {
+				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				if ( tnode.getSymbol() instanceof Token ) {
+					Token symbol = (Token)tnode.getSymbol();
+					if ( tokens==null ) {
+						tokens = new ArrayList<Token>();
+					}
+					tokens.add(symbol);
+				}
 			}
 		}
+
+		if ( tokens==null ) {
+			return Collections.emptyList();
+		}
+
 		return tokens;
 	}
 
@@ -230,9 +251,12 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	}
 
 	public <T extends ParserRuleContext<?>> List<? extends T> getRuleContexts(Class<? extends T> ctxType) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
+		if ( children==null ) {
+			return Collections.emptyList();
+		}
+
 		List<T> contexts = null;
-		for (Object o : children) {
+		for (ParseTree o : children) {
 			if ( ctxType.isInstance(o) ) {
 				if ( contexts==null ) {
 					contexts = new ArrayList<T>();
@@ -241,6 +265,11 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 				contexts.add(ctxType.cast(o));
 			}
 		}
+
+		if ( contexts==null ) {
+			return Collections.emptyList();
+		}
+
 		return contexts;
 	}
 

@@ -496,7 +496,7 @@ RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new
 ContextTokenGetterDecl(t)      ::=
     "public Token <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public List\<Token> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+    "public List\<? extends Token> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public Token <t.name>(int i) {
     return getToken(<parser.name>.<t.name>, i);
@@ -508,7 +508,7 @@ public <r.ctxName> <r.name>() {
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public List\<<r.ctxName>\> <r.name>() {
+public List\<? extends <r.ctxName>\> <r.name>() {
     return (List\<<r.ctxName>\>)getRuleContexts(<r.ctxName>.class);
 }
 >>
