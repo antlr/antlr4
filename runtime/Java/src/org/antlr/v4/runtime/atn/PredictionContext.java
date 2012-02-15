@@ -36,7 +36,6 @@ public class PredictionContext {
 	@NotNull
 	public static final PredictionContext EMPTY = new PredictionContext();
 	public static final int EMPTY_STATE_KEY = Integer.MAX_VALUE;
-	public static final int EMPTY_HASH_CODE = EMPTY.hashCode();
 
 	@NotNull
 	public final PredictionContext[] parents;
@@ -53,7 +52,7 @@ public class PredictionContext {
 	}
 
 	private PredictionContext(@NotNull PredictionContext parent, int invokingState) {
-		this(new PredictionContext[] { parent }, new int[] { invokingState }, 31 + parent.hashCode(), 31 + invokingState);
+		this(new PredictionContext[] { parent }, new int[] { invokingState }, 31 ^ parent.hashCode(), 31 + invokingState);
 		assert invokingState >= 0;
 		assert parent != null;
 	}
@@ -92,7 +91,7 @@ public class PredictionContext {
 		int[] invokingStates = Arrays.copyOf(context.invokingStates, context.invokingStates.length + 1);
 		parents[parents.length - 1] = PredictionContext.EMPTY;
 		invokingStates[invokingStates.length - 1] = PredictionContext.EMPTY_STATE_KEY;
-		int newParentHashCode = 31 * context.parentHashCode + EMPTY_HASH_CODE;
+		int newParentHashCode = 31 * context.parentHashCode ^ EMPTY.hashCode();
 		int newInvokingStateHashCode = 31 * context.invokingStateHashCode + PredictionContext.EMPTY_STATE_KEY;
 		return new PredictionContext(parents, invokingStates, newParentHashCode, newInvokingStateHashCode);
 	}
@@ -158,7 +157,7 @@ public class PredictionContext {
 				rightIndex++;
 			}
 
-			parentHashCode = 31 * parentHashCode + parentsList[count].hashCode();
+			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
 			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
 			count++;
 		}
@@ -168,7 +167,7 @@ public class PredictionContext {
 			invokingStatesList[count] = context0.invokingStates[leftIndex];
 			leftIndex++;
 			canReturnRight = false;
-			parentHashCode = 31 * parentHashCode + parentsList[count].hashCode();
+			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
 			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
 			count++;
 		}
@@ -178,7 +177,7 @@ public class PredictionContext {
 			invokingStatesList[count] = context1.invokingStates[rightIndex];
 			rightIndex++;
 			canReturnLeft = false;
-			parentHashCode = 31 * parentHashCode + parentsList[count].hashCode();
+			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
 			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
 			count++;
 		}
@@ -278,7 +277,7 @@ public class PredictionContext {
 				int updatedInvokingStateHashCode = 1;
 				for (int i = 0; i < parentCount; i++) {
 					updatedParents[i] = appendContext(context.parents[i], suffix, visited);
-					updatedParentHashCode = 31 * updatedParentHashCode + updatedParents[i].hashCode();
+					updatedParentHashCode = 31 * updatedParentHashCode ^ updatedParents[i].hashCode();
 					updatedInvokingStateHashCode = 31 * updatedInvokingStateHashCode + context.invokingStates[i];
 				}
 
