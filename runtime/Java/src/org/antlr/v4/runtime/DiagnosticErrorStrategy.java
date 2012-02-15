@@ -48,7 +48,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
+        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs.toString(true) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
@@ -58,7 +58,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 											int startIndex, int stopIndex,
 											@NotNull SimulatorState initialState)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + getFullContextConfigs(initialState) + ", input='" +
+		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + getFullContextConfigs(initialState).toString(true) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
 	}
 
@@ -66,7 +66,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull SimulatorState acceptState)
     {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + getFullContextConfigs(acceptState) + ", input='" +
+        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + getFullContextConfigs(acceptState).toString(true) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
@@ -81,7 +81,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     {
         recognizer.notifyErrorListeners("reportInsufficientPredicates d=" + dfa.decision + ", decState=" + decState +
 										", ambigAlts=" + ambigAlts + ":" + Arrays.toString(altToPred) +
-										", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
+										", " + configs.toString(true) + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
 	protected static ATNConfigSet getFullContextConfigs(SimulatorState state) {

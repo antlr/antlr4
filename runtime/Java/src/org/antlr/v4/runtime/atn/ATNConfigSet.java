@@ -368,6 +368,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public String toString() {
+		return toString(false);
+	}
+
+	public String toString(boolean showContext) {
 		StringBuilder buf = new StringBuilder();
 		List<ATNConfig> sortedConfigs = new ArrayList<ATNConfig>(configs);
 		Collections.sort(sortedConfigs, new Comparator<ATNConfig>() {
@@ -384,7 +388,16 @@ public class ATNConfigSet implements Set<ATNConfig> {
 				}
 			}
 		});
-		buf.append(sortedConfigs.toString());
+
+		buf.append("[");
+		for (int i = 0; i < sortedConfigs.size(); i++) {
+			if (i > 0) {
+				buf.append(", ");
+			}
+			buf.append(sortedConfigs.get(i).toString(null, true, true));
+		}
+		buf.append("]");
+
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);

@@ -239,16 +239,26 @@ public class ATNConfig {
 
 	@Override
 	public String toString() {
-		return toString(null, true);
+		return toString(null, true, false);
 	}
 
 	public String toString(@Nullable Recognizer<?, ?> recog, boolean showAlt) {
+		return toString(recog, showAlt, true);
+	}
+
+	public String toString(@Nullable Recognizer<?, ?> recog, boolean showAlt, boolean showContext) {
 		StringBuilder buf = new StringBuilder();
 //		if ( state.ruleIndex>=0 ) {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
 //			else buf.append(state.ruleIndex+":");
 //		}
-		String[] contexts = context.toStrings(recog, this.state.stateNumber);
+		String[] contexts;
+		if (showContext) {
+			contexts = context.toStrings(recog, this.state.stateNumber);
+		}
+		else {
+			contexts = new String[] { "?" };
+		}
 		boolean first = true;
 		for (String contextDesc : contexts) {
 			if ( first ) {
