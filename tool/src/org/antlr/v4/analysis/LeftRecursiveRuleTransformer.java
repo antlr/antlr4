@@ -203,13 +203,13 @@ public class LeftRecursiveRuleTransformer {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			altInfo.altAST = (AltAST)primaryBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
-			System.out.println(altInfo.altAST.toStringTree());
+//			System.out.println(altInfo.altAST.toStringTree());
 		}
 		for (int i = 0; i < r.recOpAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
 			altInfo.altAST = (AltAST)opsBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
-			System.out.println(altInfo.altAST.toStringTree());
+//			System.out.println(altInfo.altAST.toStringTree());
 		}
 	}
 

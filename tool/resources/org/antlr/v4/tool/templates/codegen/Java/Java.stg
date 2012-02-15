@@ -39,13 +39,13 @@ void exit(<file.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
-BlankListenerFile(file, header) ::= <<
+BaseListenerFile(file, header) ::= <<
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-public class Blank<file.grammarName>Listener implements <file.grammarName>Listener {
+public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 @Override public void enter(<file.parserName>.<lname>Context ctx) { \}
 @Override public void exit(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
@@ -485,13 +485,38 @@ NonLocalAttrRef(s)		 ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>
 SetNonLocalAttr(s, rhsChunks)	  ::=
 	"((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
 
-AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
+AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "Token <t.name>"
+TokenDecl(t) ::= "public Token <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>()"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>"
-RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>()"
+TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
+RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
+RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
+
+ContextTokenGetterDecl(t)      ::=
+    "public Token <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+ContextTokenListGetterDecl(t)  ::=
+    "public List\<Token> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+ContextTokenListIndexedGetterDecl(t)  ::= <<
+public Token <t.name>(int i) {
+    return getToken(<parser.name>.<t.name>, i);
+}
+>>
+ContextRuleGetterDecl(r)       ::= <<
+public <r.ctxName> <r.name>() {
+    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,0);
+}
+>>
+ContextRuleListGetterDecl(r)   ::= <<
+public List\<<r.ctxName>\> <r.name>() {
+    return (List\<<r.ctxName>\>)getRuleContexts(<r.ctxName>.class);
+}
+>>
+ContextRuleListIndexedGetterDecl(r)   ::= <<
+public <r.ctxName> <r.name>(int i) {
+    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,i);
+}
+>>
 
 LexerRuleContext() ::= "RuleContext"
 
@@ -503,15 +528,16 @@ RuleContextNameSuffix() ::= "Context"
 ImplicitTokenLabel(tokenName) ::= "<tokenName>"
 ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
-ListLabelName(label)		  ::= "<label>_list"
+ListLabelName(label)		  ::= "<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,
+StructDecl(s,attrs,getters,visitorDispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
-	<attrs:{a | public <a>;}; separator="\n">
+	<attrs:{a | <a>}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
 	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
 	public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<s.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
@@ -529,9 +555,10 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 }
 >>
 
-AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
+AltLabelStructDecl(s,attrs,getters,visitorDispatchMethods) ::= <<
 public static class <s.name> extends <currentRule.name>Context {
-	<attrs:{a | public <a>;}; separator="\n">
+	<attrs:{a | <a>}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
 	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
 	<visitorDispatchMethods; separator="\n">
 }
@@ -544,7 +571,7 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<I
 }
 >>
 
-AttributeDecl(d) ::= "<d.decl>"
+AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"

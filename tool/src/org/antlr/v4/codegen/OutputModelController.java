@@ -33,12 +33,22 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -110,7 +120,7 @@ public class OutputModelController {
 
 	public OutputModelObject buildBlankListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BlankListenerFile(delegate, gen.getBlankListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBlankListenerFileName());
 	}
 
 	public ParserFile parserFile(String fileName) {

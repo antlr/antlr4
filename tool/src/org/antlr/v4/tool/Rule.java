@@ -221,11 +221,11 @@ public class Rule implements AttributeResolver {
 		return labels;
 	}
 
-	public List<Alternative> getUnlabeledAlts() {
-		List<Alternative> alts = new ArrayList<Alternative>();
+	public List<AltAST> getUnlabeledAltASTs() {
+		List<AltAST> alts = new ArrayList<AltAST>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
-			if ( altLabel==null ) alts.add(alt[i]);
+			if ( altLabel==null ) alts.add(alt[i].ast);
 		}
 		if ( alts.size()==0 ) return null;
 		return alts;

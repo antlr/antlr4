@@ -29,14 +29,22 @@
 
 package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-import org.antlr.v4.parse.*;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GrammarAST extends CommonTree {
 	/** For error msgs, nice to know which grammar this AST lives in */
@@ -115,8 +123,8 @@ public class GrammarAST extends CommonTree {
 	public String getAltLabel() {
 		List ancestors = this.getAncestors();
 		if ( ancestors==null ) return null;
-		for (Object o : ancestors) {
-			GrammarAST p = (GrammarAST)o;
+		for (int i=ancestors.size()-1; i>=0; i--) {
+			GrammarAST p = (GrammarAST)ancestors.get(i);
 			if ( p.getType()== ANTLRParser.ALT ) {
 				AltAST a = (AltAST)p;
 				if ( a.altLabel!=null ) return a.altLabel.getText();

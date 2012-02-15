@@ -27,35 +27,70 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import java.util.Stack;
+
 public class TestA {
-	public static class Do extends BlankAListener {
-		Parser p;
-		public Do(Parser p ) { this.p = p; }
+	/** An example listener that uses a stack to store return values
+	 *  so that exit methods executed on notes further up the parse tree
+	 *  can see the results of these computations.
+	 *
+	 *  Because we are using only the exit routines, the same listener works
+	 *  as a parse listener and is a parse tree listener. It generates
+	 *  the following output from input 3+4*5:
+
+		 Int: 3
+		 Int: 4
+		 Int: 5
+		 Mult: 20
+		 Add: 23
+		 tree = (s (e (e 3) + (e (e 4) * (e 5))))
+		 Int: 3
+		 Int: 4
+		 Int: 5
+		 Mult: 20
+		 Add: 23
+		 result from tree walk = 23
+
+	 *  The key things to notice are that there are no actions
+	 *  and the labels in the grammar--it is completely language neutral.
+	 *  Also, I have labeled each alternative so that we get a different
+	 *  context object. That way we get a listener method for each
+	 *  alternative.
+	 *
+	 *  Compare this to A2.g4, which adds a field to the context objects
+	 *  by using a "returns [int v]" on the expression rule.
+	 */
+	public static class Do extends ABaseListener {
+		Stack<Integer> results = new Stack<Integer>();
+
 		@Override
-		public void exitEveryRule(ParserRuleContext<Token> ctx) {
-			System.out.println("exit "+ctx.toStringTree(p));
+		public void exit(AParser.AddContext ctx) {
+			results.push( results.pop() + results.pop() );
+			System.out.println("Add: " + results.peek());
 		}
 
 		@Override
-		public void enter(AParser.eContext ctx) {
-			System.out.println("enter alt w/o -> label: "+ctx.toInfoString(p));
+		public void exit(AParser.IntContext ctx) {
+			results.push( Integer.valueOf(ctx.INT().getText()) );
+			System.out.println("Int: "+results.peek());
 		}
 
 		@Override
-		public void visitTerminal(ParserRuleContext<Token> ctx, Token symbol) {
-			if ( ctx instanceof AParser.eContext && symbol.getType()==AParser.INT ) {
-				AParser.eContext ectx = (AParser.eContext)ctx;
-				ectx.v = Integer.valueOf(symbol.getText());
-			}
+		public void exit(AParser.MultContext ctx) {
+			results.push( results.pop() * results.pop() );
+			System.out.println("Mult: " + results.peek());
 		}
 
 		@Override
-		public void exit(AParser.multContext ctx) {
-			System.out.println("mult "+ctx.a.v+" * "+ctx.b.v);
-			ctx.v = ctx.a.v * ctx.b.v; // repeat of what parser did--set return value
+		public void exit(AParser.ParensContext ctx) {
+			// result already on stack
+			System.out.println("Parens: "+results.peek());
 		}
 	}
 	public static void main(String[] args) throws Exception {
@@ -63,14 +98,13 @@ public class TestA {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		AParser p = new AParser(tokens);
 		p.setBuildParseTree(true);
-//		p.addParseListener(new Do(p));
+		p.addParseListener(new Do());
 		ParserRuleContext<Token> t = p.s();
 		System.out.println("tree = "+t.toStringTree(p));
 
 		ParseTreeWalker walker = new ParseTreeWalker();
-		Do doer = new Do(p);
+		Do doer = new Do();
 		walker.walk(doer, t);
-		AParser.eContext ectx = (AParser.eContext)t.getChild(0);
-		System.out.println("result from tree walk = "+ ectx.v);
+		System.out.println("result from tree walk = "+ doer.results.pop());
 	}
 }

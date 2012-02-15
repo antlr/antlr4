@@ -46,7 +46,7 @@ public class CodeGenPipeline {
 		}
 		else {
 			gen.writeRecognizer(gen.generateParser());
-			if ( !g.tool.no_listener) {
+			if ( g.tool.gen_listener) {
 				gen.writeListener(gen.generateListener());
 				gen.writeBlankListener(gen.generateBlankListener());
 			}
