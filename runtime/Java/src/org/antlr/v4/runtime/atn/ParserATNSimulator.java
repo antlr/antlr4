@@ -1207,7 +1207,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				if (loopsSimulateTailRecursion && false) {
+				if (loopsSimulateTailRecursion) {
 					if ( c.state instanceof StarLoopbackState || c.state instanceof PlusLoopbackState ) {
 						c.context = contextCache.getChild(c.context, c.state.stateNumber);
 						if ( debug ) System.out.println("Loop back; push "+c.state.stateNumber+", stack="+c.context);
