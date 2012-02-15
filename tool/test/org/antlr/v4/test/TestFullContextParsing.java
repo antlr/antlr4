@@ -118,7 +118,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=2: [(30,1,[20 10]), (22,2,[10])], input='34abc'\n" +
 					 "line 1:2 reportContextSensitivity d=2: [(22,1,[10])],uniqueAlt=1, input='34'\n" +
-					 "line 1:17 reportAttemptingFullContext d=2: [(30,1,[24 14]), (26,2,[14])], input='34abc'\n" +
+					 "line 1:14 reportAttemptingFullContext d=2: [(30,1,[24 14]), (26,2,[14])], input='34abc'\n" +
 					 "line 1:14 reportContextSensitivity d=2: [(8,2,[18]), (12,2,[18]), (1,2,[])],uniqueAlt=2, input='34abc'\n",
 					 this.stderrDuringParse);
 	}
