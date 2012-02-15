@@ -293,6 +293,32 @@ public class PredictionContext {
 		return result;
 	}
 
+	public PredictionContext popAll(int invokingState, PredictionContextCache contextCache) {
+		int index = Arrays.binarySearch(this.invokingStates, invokingState);
+		if (index < 0) {
+			return this;
+		}
+
+		PredictionContext result = this.parents[index].popAll(invokingState, contextCache);
+		for (int i = 0; i < this.invokingStates.length; i++) {
+			if (i == index) {
+				continue;
+			}
+
+			PredictionContext next;
+			if (this.invokingStates[i] == EMPTY_STATE_KEY) {
+				next = PredictionContext.EMPTY;
+			}
+			else {
+				next = contextCache.getChild(this.parents[i], this.invokingStates[i]);
+			}
+
+			result = PredictionContext.join(result, next, contextCache);
+		}
+
+		return result;
+	}
+
 	public PredictionContext getChild(int invokingState) {
 		return new PredictionContext(this, invokingState);
 	}

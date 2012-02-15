@@ -1095,14 +1095,22 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean contextSensitiveDfa,
 						   boolean greedy, boolean loopsSimulateTailRecursion,
 						   boolean hasMoreContext,
-						   PredictionContextCache contextCache)
+						   @Nullable PredictionContextCache contextCache)
 	{
+		if (contextCache == null) {
+			contextCache = contextSensitiveDfa ? PredictionContextCache.UNCACHED_FULL : PredictionContextCache.UNCACHED_LOCAL;
+		}
+
 		boolean stepIntoGlobal = false;
 		ATNConfigSet currentConfigs = sourceConfigs;
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		while (currentConfigs.size() > 0) {
 			ATNConfigSet intermediate = new ATNConfigSet(!contextSensitiveDfa);
 			for (ATNConfig config : currentConfigs) {
+				if (optimize_closure_busy && !closureBusy.add(config)) {
+					continue;
+				}
+
 				stepIntoGlobal |= closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache, 0);
 			}
 
@@ -1119,7 +1127,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion,
 						   boolean hasMoreContexts,
-						   @Nullable PredictionContextCache contextCache,
+						   @NotNull PredictionContextCache contextCache,
 						   int depth)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
@@ -1178,52 +1186,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												getRuleName(config.state.ruleIndex));
 			}
 		}
-		else if ( loopsSimulateTailRecursion ) {
-			if ( config.state.getClass()==StarLoopbackState.class ||
-			config.state.getClass()==PlusLoopbackState.class )
-			{
-				config.context = config.context.getChild(config.state.stateNumber);
-				// alter config; it's ok, since all calls to closure pass in a fresh config for us to chase
-				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
-			}
-			else if ( config.state.getClass()==LoopEndState.class ) {
-				//throw new UnsupportedOperationException("Not implemented yet.");
-				if ( debug ) System.out.println("Loop end; pop, stack="+config.context);
-				PredictionContext p = config.context;
-				LoopEndState end = (LoopEndState) config.state;
-				while ( !p.isEmpty() ) {
-					if ( p.invokingStates.length == 1 && p.invokingStates[0] == end.loopBackStateNumber ) {
-						p = config.context = config.context.parents[0]; // pop loopback state
-						continue;
-					}
-					else if ( p.invokingStates.length > 1 ) {
-						int loopbackIndex = Arrays.binarySearch(p.invokingStates, end.loopBackStateNumber);
-						if ( loopbackIndex >= 0 ) {
-							PredictionContext remainingContext = null;
-							for (int i = 0; i < p.invokingStates.length; i++) {
-								if (p.invokingStates[i] == end.loopBackStateNumber) {
-									continue;
-								}
-
-								if (remainingContext == null) {
-									remainingContext = p.parents[i];
-								}
-								else {
-									remainingContext = PredictionContext.join(remainingContext, p.parents[i], true);
-								}
-							}
-
-							ATNConfig extraConfig = new ATNConfig(config, config.state, remainingContext);
-							stepIntoGlobal |= closure(extraConfig, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth);
-							p = config.context = config.context.parents[loopbackIndex];
-							continue;
-						}
-					}
-
-					break;
-				}
-			}
-		}
 
 		ATNState p = config.state;
 		// optimization
@@ -1238,9 +1200,28 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				!(t instanceof ActionTransition) && collectPredicates;
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
 			if ( c!=null ) {
+				if (t instanceof RuleTransition) {
+					if (intermediate != null && !collectPredicates) {
+						intermediate.add(c, contextCache);
+						continue;
+					}
+				}
+
+				if (loopsSimulateTailRecursion && false) {
+					if ( c.state instanceof StarLoopbackState || c.state instanceof PlusLoopbackState ) {
+						c.context = contextCache.getChild(c.context, c.state.stateNumber);
+						if ( debug ) System.out.println("Loop back; push "+c.state.stateNumber+", stack="+c.context);
+					}
+					else if (c.state instanceof LoopEndState) {
+						if ( debug ) System.out.println("Loop end; pop, stack="+c.context);
+						LoopEndState end = (LoopEndState)c.state;
+						c.context = c.context.popAll(end.loopBackStateNumber, contextCache);
+					}
+				}
+
 				if (optimize_closure_busy) {
 					boolean checkClosure = false;
-					if (c.state instanceof StarLoopEntryState || c.state instanceof BlockEndState) {
+					if (c.state instanceof StarLoopEntryState || c.state instanceof BlockEndState || c.state instanceof LoopEndState) {
 						checkClosure = true;
 					}
 					else if (c.state instanceof PlusBlockStartState) {
@@ -1268,11 +1249,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
-					if (intermediate != null && !collectPredicates) {
-						intermediate.add(c, contextCache);
-						continue;
-					}
-
 					if (newDepth >= 0) {
 						newDepth++;
 					}
