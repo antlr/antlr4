@@ -315,7 +315,7 @@ public class CodeGenerator {
 	public String getBlankListenerFileName() {
 		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
-		String listenerName = "Blank" + g.name + "Listener";
+		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
 

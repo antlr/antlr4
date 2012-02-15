@@ -30,10 +30,15 @@
 package org.antlr.v4.tool;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
-import org.antlr.v4.misc.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.misc.Pair;
+import org.antlr.v4.misc.Triple;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LeftRecursiveRule extends Rule {
 	public List<LeftRecursiveRuleAltInfo> recPrimaryAlts;
@@ -60,6 +65,21 @@ public class LeftRecursiveRule extends Rule {
 		if ( recPrimaryAlts!=null ) n += recPrimaryAlts.size();
 		if ( recOpAlts!=null ) n += recOpAlts.size();
 		return n;
+	}
+
+	@Override
+	public List<AltAST> getUnlabeledAltASTs() {
+		List<AltAST> alts = new ArrayList<AltAST>();
+		for (int i = 0; i < recPrimaryAlts.size(); i++) {
+			LeftRecursiveRuleAltInfo altInfo = recPrimaryAlts.get(i);
+			if ( altInfo.altLabel==null ) alts.add(altInfo.altAST);
+		}
+		for (int i = 0; i < recOpAlts.size(); i++) {
+			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
+			if ( altInfo.altLabel==null ) alts.add(altInfo.altAST);
+		}
+		if ( alts.size()==0 ) return null;
+		return alts;
 	}
 
 	/** Get -> labels from those alts we deleted for left-recursive rules. */

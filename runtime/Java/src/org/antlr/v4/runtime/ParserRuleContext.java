@@ -183,8 +183,8 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		if ( children==null ) throw new UnsupportedOperationException("there are no children");
 		int j = -1; // what element have we found with ctxType?
 		for (Object o : children) {
-			if ( o.getClass().isInstance(ctxType) ) {
-				j++;
+			if ( ctxType.isAssignableFrom(o.getClass()) ) {
+				j = j+1;
 				if ( j == i ) return o;
 			}
 		}
@@ -193,7 +193,17 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	public Token getToken(int ttype, int i) {
 		if ( children==null ) throw new UnsupportedOperationException("there are no children");
-		return (Token)getChild(Token.class, i);
+		int j = -1; // what token with ttype have we found?
+		for (Object o : children) {
+			if ( o instanceof TerminalNode ) {
+				TerminalNode<Token> tnode = (TerminalNode<Token>)o;
+				if ( tnode.getSymbol().getType()==ttype ) {
+					j++;
+					if ( j == i ) return tnode.getSymbol();
+				}
+			}
+		}
+		return null;
 	}
 
 	public List<Token> getTokens(int ttype) {

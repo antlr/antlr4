@@ -37,7 +37,6 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.AltAST;
@@ -86,7 +85,7 @@ public class RuleFunction extends OutputModelObject {
 
 		// Add ctx labels for elements in alts with no -> label
 		if ( !factory.getGrammar().tool.no_auto_element_labels ) {
-			List<Alternative> altsNoLabels = r.getUnlabeledAlts();
+			List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
 			if ( altsNoLabels!=null ) {
 				Set<Decl> decls = getDeclsForAllElements(altsNoLabels);
 					// we know to put in rule ctx, so do it directly
@@ -144,12 +143,13 @@ public class RuleFunction extends OutputModelObject {
 	   Must see across alts.  If any alt needs X or r as list, then
 	   define as list.
 	 */
-	public Set<Decl> getDeclsForAllElements(List<Alternative> alts) {
+	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
 		Set<String> needsList = new HashSet<String>();
 		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
-		for (Alternative a :alts) {
+//		for (Alternative a :alts) {
+		for (AltAST ast : altASTs) {
 			IntervalSet reftypes = new IntervalSet(RULE_REF, TOKEN_REF);
-			List<GrammarAST> refs = a.ast.getNodesWithType(reftypes);
+			List<GrammarAST> refs = ast.getNodesWithType(reftypes);
 			FrequencySet<String> altFreq = new FrequencySet<String>();
 			for (GrammarAST t : refs) {
 				String refLabelName = t.getText();

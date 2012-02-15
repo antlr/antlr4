@@ -39,13 +39,13 @@ void exit(<file.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
-BlankListenerFile(file, header) ::= <<
+BaseListenerFile(file, header) ::= <<
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-public class Blank<file.grammarName>Listener implements <file.grammarName>Listener {
+public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 @Override public void enter(<file.parserName>.<lname>Context ctx) { \}
 @Override public void exit(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
