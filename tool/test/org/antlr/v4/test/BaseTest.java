@@ -510,7 +510,7 @@ public abstract class BaseTest {
 		}
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
-			files.add("Blank"+grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
+			files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
 		}
 		ok = compile(files.toArray(new String[files.size()]));
 		if ( !ok ) { allIsWell = false; }
