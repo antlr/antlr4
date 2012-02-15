@@ -44,7 +44,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
-	public static final int NUM_EDGES = 255; // forces unicode to stay in ATN
+	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
 	private boolean trace = false;
 	private OutputStream traceStream = null;
@@ -137,6 +137,21 @@ public class LexerATNSimulator extends ATNSimulator {
 			dfa[i] = new DFA(atn.modeToStartState.get(i));
 		}
 		this.recog = recog;
+	}
+
+	public void copyState(@NotNull LexerATNSimulator simulator) {
+		this.charPositionInLine = simulator.charPositionInLine;
+		this.line = simulator.line;
+		this.mode = simulator.mode;
+		this.startIndex = simulator.startIndex;
+
+		this.trace = simulator.trace;
+		this.traceStream = simulator.traceStream;
+		this.traceFailed = simulator.traceFailed;
+	}
+
+	public OutputStream getTraceStream() {
+		return this.traceStream;
 	}
 
 	public void setTraceStream(OutputStream traceStream) {
@@ -288,8 +303,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				System.out.format("in reach starting closure: %s\n", closure);
 			}
 
-			for (int ci=0; ci<closure.size(); ci++) { // TODO: foreach
-				ATNConfig c = closure.get(ci);
+			for (ATNConfig c : closure) {
 				if ( debug ) {
 					System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
 				}
@@ -304,7 +318,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( reach.size()==0 ) {
+			if ( reach.isEmpty() ) {
 				// we reached state associated with closure for sure, so
 				// make sure it's defined. worst case, we define s0 from
 				// start state configs.
@@ -575,7 +589,7 @@ public class LexerATNSimulator extends ATNSimulator {
 							  @NotNull ATNConfigSet q)
 	{
 		// even if we can add the states, we can't add an edge for labels out of range
-		if (t < 0 || t > NUM_EDGES) {
+		if (t < 0 || t > MAX_DFA_EDGE) {
 			return;
 		}
 
@@ -594,10 +608,10 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
-		if (t < 0 || t > NUM_EDGES) return; // Only track edges within the DFA bounds
+		if (t < 0 || t > MAX_DFA_EDGE) return; // Only track edges within the DFA bounds
 		if ( p.edges==null ) {
 			//  make room for tokens 1..n and -1 masquerading as index 0
-			p.edges = new DFAState[NUM_EDGES+1]; // TODO: make adaptive
+			p.edges = new DFAState[MAX_DFA_EDGE+1]; // TODO: make adaptive
 		}
 //		if ( t==Token.EOF ) {
 //			System.out.println("state "+p+" has EOF edge");

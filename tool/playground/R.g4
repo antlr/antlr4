@@ -77,6 +77,7 @@ prog	:	expr_or_assign* ;
 //prog	:	expr_or_assign prog | ;
 
 expr_or_assign
+@after {System.out.println(getRuleInvocationStack());}
 	:	expr '++'
 	|	expr	// match ID a, fall out, reenter, match "(i)<-x" via alt 1
                 // it thinks it's same context from prog, but it's not; it's

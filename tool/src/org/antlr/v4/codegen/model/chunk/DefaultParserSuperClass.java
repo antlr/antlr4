@@ -30,4 +30,5 @@
 package org.antlr.v4.codegen.model.chunk;
 
 public class DefaultParserSuperClass extends ActionChunk {
+	public DefaultParserSuperClass() { super(null); }
 }

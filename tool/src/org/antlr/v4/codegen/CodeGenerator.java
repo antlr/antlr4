@@ -303,6 +303,7 @@ public class CodeGenerator {
 	 *  TListener.java, if we're using the Java target.
  	 */
 	public String getListenerFileName() {
+		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Listener";
 		return listenerName+extST.render();
@@ -312,8 +313,9 @@ public class CodeGenerator {
 	 *  such as BlankTListener.java, if we're using the Java target.
  	 */
 	public String getBlankListenerFileName() {
+		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
-		String listenerName = "Blank" + g.name + "Listener";
+		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
 

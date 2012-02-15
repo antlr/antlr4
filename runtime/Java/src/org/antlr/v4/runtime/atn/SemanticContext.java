@@ -83,6 +83,7 @@ public abstract class SemanticContext {
             this.isCtxDependent = isCtxDependent;
         }
 
+        @Override
         public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
             RuleContext localctx = isCtxDependent ? outerContext : null;
             return parser.sempred(localctx, ruleIndex, predIndex);
@@ -90,7 +91,11 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			return ruleIndex + predIndex;
+			int hashCode = 1;
+			hashCode = 31 * hashCode + ruleIndex;
+			hashCode = 31 * hashCode + predIndex;
+			hashCode = 31 * hashCode + (isCtxDependent ? 1 : 0);
+			return hashCode;
 		}
 
 		@Override
@@ -103,6 +108,7 @@ public abstract class SemanticContext {
 				   this.isCtxDependent == p.isCtxDependent;
 		}
 
+		@Override
 		public String toString() {
             return "{"+ruleIndex+":"+predIndex+"}?";
         }
@@ -131,6 +137,7 @@ public abstract class SemanticContext {
 			return opnds.hashCode();
 		}
 
+		@Override
 		public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
 				if ( !opnd.eval(parser, outerContext) ) return false;
@@ -138,6 +145,7 @@ public abstract class SemanticContext {
 			return true;
         }
 
+		@Override
 		public String toString() {
 			return Utils.join(opnds.iterator(), "&&");
         }
@@ -166,6 +174,7 @@ public abstract class SemanticContext {
 			return opnds.hashCode() + 1; // differ from AND slightly
 		}
 
+		@Override
         public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
 				if ( opnd.eval(parser, outerContext) ) return true;

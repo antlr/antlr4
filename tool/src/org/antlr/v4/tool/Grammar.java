@@ -36,6 +36,7 @@ import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.GrammarTreeVisitor;
@@ -105,7 +106,7 @@ public class Grammar implements AttributeResolver {
 
 	public Map<Integer, DFA> decisionDFAs = new HashMap<Integer, DFA>();
 
-	public Vector<IntervalSet[]> decisionLOOK;
+	public List<IntervalSet[]> decisionLOOK;
 
 	@NotNull
 	public final Tool tool;
@@ -130,12 +131,12 @@ public class Grammar implements AttributeResolver {
 	public Map<String, Integer> stringLiteralToTypeMap = new LinkedHashMap<String, Integer>();
 	/** Reverse index for stringLiteralToTypeMap.  Indexed with raw token type.
 	 *  0 is invalid. */
-	public Vector<String> typeToStringLiteralList = new Vector<String>();
+	public List<String> typeToStringLiteralList = new ArrayList<String>();
 
 	/** Map a token type to its token name. Indexed with raw token type.
 	 *  0 is invalid.
 	 */
-	public Vector<String> typeToTokenList = new Vector<String>();
+	public List<String> typeToTokenList = new ArrayList<String>();
 
     /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
@@ -538,7 +539,7 @@ public class Grammar implements AttributeResolver {
 //		this.tokenNameToTypeMap.putAll( importG.tokenNameToTypeMap );
 //		this.stringLiteralToTypeMap.putAll( importG.stringLiteralToTypeMap );
 		int max = Math.max(this.typeToTokenList.size(), importG.typeToTokenList.size());
-		this.typeToTokenList.setSize(max);
+		Utils.setSize(typeToTokenList, max);
 		for (int ttype=0; ttype<importG.typeToTokenList.size(); ttype++) {
 			maxTokenType = Math.max(maxTokenType, ttype);
 			this.typeToTokenList.set(ttype, importG.typeToTokenList.get(ttype));
@@ -573,7 +574,7 @@ public class Grammar implements AttributeResolver {
 			stringLiteralToTypeMap.put(lit, ttype);
 			// track in reverse index too
 			if ( ttype>=typeToStringLiteralList.size() ) {
-				typeToStringLiteralList.setSize(ttype+1);
+				Utils.setSize(typeToStringLiteralList, ttype+1);
 			}
 			typeToStringLiteralList.set(ttype, lit);
 
@@ -592,7 +593,7 @@ public class Grammar implements AttributeResolver {
 
 	public void setTokenForType(int ttype, String text) {
 		if ( ttype>=typeToTokenList.size() ) {
-			typeToTokenList.setSize(ttype+1);
+			Utils.setSize(typeToTokenList, ttype+1);
 		}
 		String prevToken = typeToTokenList.get(ttype);
 		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {

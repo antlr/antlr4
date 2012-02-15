@@ -29,11 +29,13 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 /** */
 public class QRetValueRef extends RetValueRef {
 	public String dict;
-	public QRetValueRef(String dict, String name) {
-		super(name);
+	public QRetValueRef(StructDecl ctx, String dict, String name) {
+		super(ctx,name);
 		this.dict = dict;
 	}
 }

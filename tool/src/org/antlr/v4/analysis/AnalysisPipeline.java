@@ -32,10 +32,11 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
 
 public class AnalysisPipeline {
 	public Grammar g;
@@ -56,14 +57,14 @@ public class AnalysisPipeline {
 
 	void processParserOrTreeParser() {
 		g.decisionLOOK =
-			new Vector<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
+			new ArrayList<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
 		for (DecisionState s : g.atn.decisionToState) {
             g.tool.log("LL1", "\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
 
 			LL1Analyzer anal = new LL1Analyzer(g.atn);
 			IntervalSet[] look = anal.getDecisionLookahead(s);
             g.tool.log("LL1", "look=" + Arrays.toString(look));
-			g.decisionLOOK.setSize(s.decision+1);
+			Utils.setSize(g.decisionLOOK, s.decision+1);
 			g.decisionLOOK.set(s.decision, look);
             g.tool.log("LL1", "LL(1)? " + disjoint(look));
 		}

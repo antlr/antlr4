@@ -1,13 +1,11 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.misc.Triple;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** A model object representing a parse tree listener file.
  *  These are the rules specific events triggered by a parse tree visitor.
@@ -26,11 +24,11 @@ public class ListenerFile extends OutputFile {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
-			List<String> labels = r.getAltLabels();
+			List<Triple<Integer,AltAST,String>> labels = r.getAltLabels();
 			listenerNames.add(r.name);
 			if ( labels!=null ) {
-				for (String label : labels) {
-					listenerNames.add(label);
+				for (Triple<Integer,AltAST,String> pair : labels) {
+					listenerNames.add(pair.c);
 				}
 			}
 		}

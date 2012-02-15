@@ -30,17 +30,21 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.codegen.model.decl.StructDecl;
+import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.misc.FrequencySet;
+import org.antlr.v4.misc.Triple;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.*;
+
+import static org.antlr.v4.parse.ANTLRParser.*;
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -54,12 +58,13 @@ public class RuleFunction extends OutputModelObject {
 	public int index;
 	public Collection<Attribute> args = null;
 	public Rule rule;
+	public AltLabelStructDecl[] altToContext;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
 	@ModelElement public StructDecl ruleCtx;
-	@ModelElement public Set<AltLabelStructDecl> altLabelCtxs;
-	@ModelElement public Map<String, Action> namedActions;
+	@ModelElement public Map<String,AltLabelStructDecl> altLabelCtxs;
+	@ModelElement public Map<String,Action> namedActions;
 	@ModelElement public Action finallyAction;
 	@ModelElement public List<SrcOp> postamble;
 
@@ -76,12 +81,33 @@ public class RuleFunction extends OutputModelObject {
 		index = r.index;
 
 		ruleCtx = new StructDecl(factory, r);
+		altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
 
-		List<String> labels = r.getAltLabels();
+		// Add ctx labels for elements in alts with no -> label
+		if ( !factory.getGrammar().tool.no_auto_element_labels ) {
+			List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
+			if ( altsNoLabels!=null ) {
+				Set<Decl> decls = getDeclsForAllElements(altsNoLabels);
+					// we know to put in rule ctx, so do it directly
+				for (Decl d : decls) ruleCtx.addDecl(d);
+			}
+		}
+
+		// make structs for -> labeled alts, define ctx labels for elements
+		altLabelCtxs = new HashMap<String,AltLabelStructDecl>();
+		List<Triple<Integer,AltAST,String>> labels = r.getAltLabels();
 		if ( labels!=null ) {
-			altLabelCtxs = new HashSet<AltLabelStructDecl>();
-			for (String label : labels) {
-				altLabelCtxs.add(new AltLabelStructDecl(factory, r, label));
+			for (Triple<Integer,AltAST,String> pair : labels) {
+				Integer altNum = pair.a;
+				AltAST altAST = pair.b;
+				String label = pair.c;
+				altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
+				altLabelCtxs.put(label, altToContext[altNum]);
+				if ( !factory.getGrammar().tool.no_auto_element_labels ) {
+					Set<Decl> decls = getDeclsForAltElements(altAST);
+					// we know which ctx to put in, so do it directly
+					for (Decl d : decls) altToContext[altNum].addDecl(d);
+				}
 			}
 		}
 
@@ -102,13 +128,100 @@ public class RuleFunction extends OutputModelObject {
 		exceptions = Utils.nodesToStrings(r.exceptionActions);
 		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
 
+		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+	}
+
+	public void fillNamedActions(OutputModelFactory factory, Rule r) {
 		namedActions = new HashMap<String, Action>();
 		for (String name : r.namedActions.keySet()) {
 			GrammarAST ast = r.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
+	}
 
-		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+	/** for all alts, find which ref X or r in way which needs List
+	   Must see across alts.  If any alt needs X or r as list, then
+	   define as list.
+	 */
+	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
+		Set<String> needsList = new HashSet<String>();
+		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
+//		for (Alternative a :alts) {
+		for (AltAST ast : altASTs) {
+			IntervalSet reftypes = new IntervalSet(RULE_REF, TOKEN_REF);
+			List<GrammarAST> refs = ast.getNodesWithType(reftypes);
+			FrequencySet<String> altFreq = new FrequencySet<String>();
+			for (GrammarAST t : refs) {
+				String refLabelName = t.getText();
+				altFreq.add(refLabelName);
+				allRefs.add(t);
+			}
+			for (GrammarAST t : refs) {
+				String refLabelName = t.getText();
+				if ( altFreq.count(t.getText())>1 ) needsList.add(refLabelName);
+			}
+		}
+		Set<Decl> decls = new HashSet<Decl>();
+		for (GrammarAST t : allRefs) {
+			String refLabelName = t.getText();
+			List<Decl> d = getDeclForAltElement(t,
+												refLabelName,
+												needsList.contains(refLabelName));
+			decls.addAll(d);
+		}
+		return decls;
+	}
+
+	/** Get list of decls for token/rule refs.
+	 *  Single ref X becomes X() getter
+	 *  Multiple refs to X becomes List X() method, X(int i) method.
+	 *  Ref X in a loop then we get List X(), X(int i)
+	 *
+	 *  Does not gen labels for literals like '+', 'begin', ';', ...
+ 	 */
+	public Set<Decl> getDeclsForAltElements(AltAST altAST) {
+		IntervalSet reftypes = new IntervalSet(RULE_REF,
+											   TOKEN_REF);
+		List<GrammarAST> refs = altAST.getNodesWithType(reftypes);
+		Set<Decl> decls = new HashSet<Decl>();
+		FrequencySet<String> freq = new FrequencySet<String>();
+		for (GrammarAST t : refs) freq.add(t.getText());
+		for (GrammarAST t : refs) {
+			String refLabelName = t.getText();
+			boolean inLoop = t.hasAncestor(CLOSURE) || t.hasAncestor(POSITIVE_CLOSURE);
+			boolean multipleRefs = freq.count(refLabelName)>1;
+			boolean needList = inLoop || multipleRefs;
+//			System.out.println(altAST.toStringTree()+" "+t+" inLoop? "+inLoop);
+			List<Decl> d = getDeclForAltElement(t, refLabelName, needList);
+			decls.addAll(d);
+		}
+		return decls;
+	}
+
+	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
+		List<Decl> decls = new ArrayList<Decl>();
+		if ( t.getType()==RULE_REF ) {
+			Rule rref = factory.getGrammar().getRule(t.getText());
+			String ctxName = factory.getGenerator().target
+							 .getRuleFunctionContextStructName(rref);
+			if ( needList ) {
+				decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
+				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
+			}
+			else {
+				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName) );
+			}
+		}
+		else {
+			if ( needList ) {
+				decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
+				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
+			}
+			else {
+				decls.add( new ContextTokenGetterDecl(factory, refLabelName) );
+			}
+		}
+		return decls;
 	}
 
 	/** Add local var decl */
@@ -118,8 +231,19 @@ public class RuleFunction extends OutputModelObject {
 		d.isLocal = true;
 	}
 
-	/** Add decl to struct ctx */
-	public void addContextDecl(Decl d) {
-		ruleCtx.addDecl(d);
+	/** Add decl to struct ctx for rule or alt if labeled */
+	public void addContextDecl(String altLabel, Decl d) {
+		CodeBlockForOuterMostAlt alt = d.getOuterMostAltCodeBlock();
+		// if we found code blk and might be alt label, try to add to that label ctx
+		if ( alt!=null && altLabelCtxs!=null ) {
+//			System.out.println(d.name+" lives in alt "+alt.alt.altNum);
+			AltLabelStructDecl altCtx = altLabelCtxs.get(altLabel);
+			if ( altCtx!=null ) { // we have an alt ctx
+//				System.out.println("ctx is "+ altCtx.name);
+				altCtx.addDecl(d);
+				return;
+			}
+		}
+		ruleCtx.addDecl(d); // stick in overall rule's ctx
 	}
 }

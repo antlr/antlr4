@@ -34,25 +34,25 @@ import org.antlr.v4.runtime.Token;
 
 public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
 	<file.listenerNames:{lname |
-void enterRule(<file.parserName>.<lname>Context ctx);
-void exitRule(<file.parserName>.<lname>Context ctx);}; separator="\n">
+void enter(<file.parserName>.<lname>Context ctx);
+void exit(<file.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
-BlankListenerFile(file, header) ::= <<
+BaseListenerFile(file, header) ::= <<
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-public class Blank<file.grammarName>Listener implements <file.grammarName>Listener {
+public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
-@Override public void enterRule(<file.parserName>.<lname>Context ctx) { \}
-@Override public void exitRule(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
+@Override public void enter(<file.parserName>.<lname>Context ctx) { \}
+@Override public void exit(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()> > ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()> > ctx, <InputSymbolType()> symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
 }
 >>
 
@@ -61,7 +61,7 @@ Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superclass> {
 	<if(parser.tokens)>
 	public static final int
@@ -130,7 +130,7 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
-	_interp = new v2ParserATNSimulator\<Token>(this,_ATN);
+	_interp = new ParserATNSimulator\<Token>(this,_ATN);
 }
 >>
 
@@ -156,7 +156,7 @@ case <index> : return <actions.(index)>;}; separator="\n">
 RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
 
 <ruleCtx>
-<altLabelCtxs; separator="\n">
+<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
@@ -182,22 +182,22 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 >>
 
 LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
-    namedActions,finallyAction,postamble) ::=
+	namedActions,finallyAction,postamble) ::=
 <<
 
 <ruleCtx>
-<altLabelCtxs; separator="\n">
+<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-    ParserRuleContext\<Token> _parentctx = _ctx;
+	ParserRuleContext\<Token> _parentctx = _ctx;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-    pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+	pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
-	    <code>
+		<code>
 		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
@@ -214,13 +214,13 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 }
 >>
 
-CodeBlockForOuterMostAlt(c, locals, preamble, ops) ::= <<
-<if(c.altLabel)>_localctx = new <c.altLabel>Context(_localctx);<endif>
-enterOuterAlt(_localctx, <c.alt.altNum>);
-<CodeBlockForAlt(...)>
+CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
+<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel>Context(_localctx);<endif>
+enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
+<CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
 
-CodeBlockForAlt(c, locals, preamble, ops) ::= <<
+CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 {
 <locals; separator="\n">
 <preamble; separator="\n">
@@ -355,10 +355,10 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
-    if ( _alt<choice.uniqueID>==1 ) {
-	    <iteration>
-        <alts> <! should only be one !>
-    }
+	if ( _alt<choice.uniqueID>==1 ) {
+		<iteration>
+		<alts> <! should only be one !>
+	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
 	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
@@ -425,7 +425,7 @@ setState(<w.stateNumber>);
 
 // ACTION STUFF
 
-Action(a, chunks) ::= "<chunks>"
+Action(a, foo, chunks) ::= "<chunks>"
 
 ArgAction(a, chunks) ::= "<chunks>"
 
@@ -448,32 +448,33 @@ LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 DefaultParserSuperClass(s) ::= "Parser"
 
 ActionText(t) ::= "<t.text>"
+ActionTemplate(t) ::= "<t.st>"
 ArgRef(a) ::= "_localctx.<a.name>"
 LocalRef(a) ::= "_localctx.<a.name>"
 RetValueRef(a) ::= "_localctx.<a.name>"
-QRetValueRef(a) ::= "_localctx.<a.dict>.<a.name>"
+QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "_localctx.<t.name>"
-LabelRef(t) ::= "_localctx.<t.name>"
-ListLabelRef(t) ::= "_localctx.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "_localctx.<s.name> = <rhsChunks>;"
+TokenRef(t) ::= "<ctx(t)>.<t.name>"
+LabelRef(t) ::= "<ctx(t)>.<t.name>"
+ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
 LexerSetAttr(s,rhsChunks) ::= "_<s.name> = <rhsChunks>;" // _type etc...
 
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
-TokenPropertyRef_text(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getText():null)"
-TokenPropertyRef_type(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getType():0)"
-TokenPropertyRef_line(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getLine():0)"
-TokenPropertyRef_pos(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getCharPositionInLine():0)"
-TokenPropertyRef_channel(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getChannel():0)"
-TokenPropertyRef_index(t) ::= "(_localctx.<t.label>!=null?_localctx.<t.label>.getTokenIndex():0)"
-TokenPropertyRef_int(t) ::= "(_localctx.<t.label>!=null?Integer.valueOf(_localctx.<t.label>.getText()):0)"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getText():null)"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getType():0)"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getLine():0)"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getCharPositionInLine():0)"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getChannel():0)"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getTokenIndex():0)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label>!=null?Integer.valueOf(<ctx(t)>.<t.label>.getText()):0)"
 
-RulePropertyRef_start(r) ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.start):null)"
-RulePropertyRef_stop(r)	 ::= "(_localctx.<r.label>!=null?(_localctx.<r.label>.stop):null)"
-RulePropertyRef_text(r)	 ::= "(_localctx.<r.label>!=null?_input.toString(_localctx.<r.label>.start,_localctx.<r.label>.stop):null)"
-RulePropertyRef_ctx(r)	 ::= "_localctx.<r.label>"
+RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.start):null)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.stop):null)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>!=null?_input.toString(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop):null)"
+RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
@@ -484,13 +485,38 @@ NonLocalAttrRef(s)		 ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>
 SetNonLocalAttr(s, rhsChunks)	  ::=
 	"((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
 
-AddToLabelList(a) ::= "_localctx.<a.listName>.add(<labelref(a.label)>);"
+AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "Token <t.name>;"
+TokenDecl(t) ::= "public Token <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
+TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
+RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
+RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
+
+ContextTokenGetterDecl(t)      ::=
+    "public Token <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+ContextTokenListGetterDecl(t)  ::=
+    "public List\<Token> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+ContextTokenListIndexedGetterDecl(t)  ::= <<
+public Token <t.name>(int i) {
+    return getToken(<parser.name>.<t.name>, i);
+}
+>>
+ContextRuleGetterDecl(r)       ::= <<
+public <r.ctxName> <r.name>() {
+    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,0);
+}
+>>
+ContextRuleListGetterDecl(r)   ::= <<
+public List\<<r.ctxName>\> <r.name>() {
+    return (List\<<r.ctxName>\>)getRuleContexts(<r.ctxName>.class);
+}
+>>
+ContextRuleListIndexedGetterDecl(r)   ::= <<
+public <r.ctxName> <r.name>(int i) {
+    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,i);
+}
+>>
 
 LexerRuleContext() ::= "RuleContext"
 
@@ -499,20 +525,21 @@ LexerRuleContext() ::= "RuleContext"
  */
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "_t<tokenName>"
-ImplicitRuleLabel(ruleName)	  ::= "_r<ruleName>"
+ImplicitTokenLabel(tokenName) ::= "<tokenName>"
+ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
-ListLabelName(label)		  ::= "<label>_list"
+ListLabelName(label)		  ::= "<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,visitorDispatchMethods,interfaces,extensionMembers,
+StructDecl(s,attrs,getters,visitorDispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
-	<attrs:{a | public <a>;}; separator="\n">
-	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
-	public <s.name>(ParserRuleContext parent, int state<s.ctorAttrs:{a | , <a>}>) {
+	<attrs:{a | <a>}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
+	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
+	public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<s.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
 		<s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
@@ -528,9 +555,11 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 }
 >>
 
-AltLabelStructDecl(s,attrs,visitorDispatchMethods) ::= <<
-public static class <s.label>Context extends <currentRule.name>Context {
-	public <s.label>Context(<currentRule.name>Context ctx) { copyFrom(ctx); }
+AltLabelStructDecl(s,attrs,getters,visitorDispatchMethods) ::= <<
+public static class <s.name> extends <currentRule.name>Context {
+	<attrs:{a | <a>}; separator="\n">
+	<getters:{g | <g>}; separator="\n">
+	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
 	<visitorDispatchMethods; separator="\n">
 }
 >>
@@ -538,14 +567,17 @@ public static class <s.label>Context extends <currentRule.name>Context {
 VisitorDispatchMethod(method) ::= <<
 @Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	if ( listener!=null && listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>Rule(this);
+	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>(this);
 }
 >>
 
-AttributeDecl(d) ::= "<d.decl>"
+AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
+
+/** For any action chunk, what is correctly-typed context struct ptr? */
+ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
 
 // used for left-recursive rules
 recRuleDefArg()						  ::= "int _p"
@@ -560,13 +592,15 @@ _localctx = new <ctxName>Context(_parentctx, _startState, _p);
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
+_localctx.start = _prevctx.start;
 >>
 
-recRuleLabeledAltStartAction(ruleName, ctxName, label) ::= <<
-_localctx = new <ctxName>Context(new <ruleName>Context(_parentctx, _startState, _p));
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
+_localctx = new <currentAltLabel>Context(new <ruleName>Context(_parentctx, _startState, _p));
 _localctx.addChild(_prevctx);
-<if(label)>_localctx.<label> = _prevctx;<endif>
+<if(label)>((<currentAltLabel>Context)_localctx).<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
+_localctx.start = _prevctx.start;
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
@@ -578,6 +612,7 @@ _prevctx = _localctx;
 recRuleSetPrevCtx() ::= <<
 if ( _parseListeners!=null ) triggerExitRuleEvent();
 _prevctx = _localctx;
+_prevctx.stop = _input.LT(-1);
 >>
 
 
@@ -597,14 +632,14 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
-    public static String[] modeNames = {
-        <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
-    };
+	public static String[] modeNames = {
+		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
+	};
 
 	public static final String[] tokenNames = {
 		"\<INVALID>", "\<INVALID>", "\<INVALID>",
@@ -645,7 +680,7 @@ public class <lexer.name> extends Lexer {
 
 SerializedATN(model) ::= <<
 public static final String _serializedATN =
-	"<model.serialized; wrap={"+<\n>"}, anchor>";
+	"<model.serialized; wrap={"+<\n><\t>"}>";
 public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {

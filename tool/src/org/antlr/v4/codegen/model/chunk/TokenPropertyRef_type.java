@@ -29,9 +29,11 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 /** */
 public class TokenPropertyRef_type extends TokenPropertyRef {
-	public TokenPropertyRef_type(String label) {
-		super(label);
+	public TokenPropertyRef_type(StructDecl ctx, String label) {
+		super(ctx, label);
 	}
 }

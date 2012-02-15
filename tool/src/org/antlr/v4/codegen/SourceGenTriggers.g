@@ -84,8 +84,10 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 alt[boolean outerMost] returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 	:	{
 		// set alt if outer ALT only (the only ones with alt field set to Alternative object)
-		if ( outerMost ) controller.setCurrentOuterMostAlt(((AltAST)$start).alt);
-    	List<SrcOp> elems = new ArrayList<SrcOp>();
+		AltAST altAST = (AltAST)retval.start;
+		if ( outerMost ) controller.setCurrentOuterMostAlt(altAST.alt);
+		List<SrcOp> elems = new ArrayList<SrcOp>();
+		// TODO: shouldn't we pass $start to controller.alternative()?
 		$altCodeBlock = controller.alternative(controller.getCurrentOuterMostAlt(), outerMost);
 		$altCodeBlock.ops = $ops = elems;
 		controller.setCurrentBlock($altCodeBlock);
