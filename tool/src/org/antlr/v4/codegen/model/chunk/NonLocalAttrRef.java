@@ -29,12 +29,15 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 public class NonLocalAttrRef extends ActionChunk {
 	public String ruleName;
 	public String name;
 	public int ruleIndex;
 
-	public NonLocalAttrRef(String ruleName, String name, int ruleIndex) {
+	public NonLocalAttrRef(StructDecl ctx, String ruleName, String name, int ruleIndex) {
+		super(ctx);
 		this.name = name;
 		this.ruleName = ruleName;
 		this.ruleIndex = ruleIndex;

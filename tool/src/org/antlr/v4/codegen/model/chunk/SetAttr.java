@@ -30,6 +30,7 @@
 package org.antlr.v4.codegen.model.chunk;
 
 import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.decl.StructDecl;
 
 import java.util.List;
 
@@ -38,17 +39,9 @@ public class SetAttr extends ActionChunk {
 	public String name;
 	@ModelElement public List<ActionChunk> rhsChunks;
 
-	public SetAttr(String name, List<ActionChunk> rhsChunks) {
+	public SetAttr(StructDecl ctx, String name, List<ActionChunk> rhsChunks) {
+		super(ctx);
 		this.name = name;
 		this.rhsChunks = rhsChunks;
 	}
-
-//	@Override
-//	public List<String> getChildren() {
-//		final List<String> sup = super.getChildren();
-//		return new ArrayList<String>() {{
-//			if ( sup!=null ) addAll(sup);
-//			add("rhsChunks");
-//		}};
-//	}
 }

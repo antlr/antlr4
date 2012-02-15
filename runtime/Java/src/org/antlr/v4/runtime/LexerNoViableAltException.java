@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.misc.Utils;
 
 public class LexerNoViableAltException extends RecognitionException {
 	/** Matching attempted at what input index? */
@@ -47,7 +48,19 @@ public class LexerNoViableAltException extends RecognitionException {
 		this.deadEndConfigs = deadEndConfigs;
 	}
 
+	@Override
+	public CharStream getInputStream() {
+		return (CharStream)super.getInputStream();
+	}
+
+	@Override
 	public String toString() {
-		return "NoViableAltException('')";
+		String symbol = "";
+		if (startIndex >= 0 && startIndex < input.size()) {
+			symbol = getInputStream().substring(startIndex, startIndex);
+			symbol = Utils.escapeWhitespace(symbol, false);
+		}
+
+		return "NoViableAltException('" + symbol + "')";
 	}
 }

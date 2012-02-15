@@ -29,10 +29,12 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 import java.util.List;
 
 public class LexerSetAttr extends SetAttr {
-	public LexerSetAttr(String name, List<ActionChunk> rhsChunks) {
-		super(name, rhsChunks);
+	public LexerSetAttr(StructDecl ctx, String name, List<ActionChunk> rhsChunks) {
+		super(ctx, name, rhsChunks);
 	}
 }

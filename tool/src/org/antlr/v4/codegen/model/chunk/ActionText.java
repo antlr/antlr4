@@ -29,11 +29,14 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 /** */
 public class ActionText extends ActionChunk {
 	public String text;
 
-	public ActionText(String text) {
+	public ActionText(StructDecl ctx, String text) {
+		super(ctx);
 		this.text = text;
 	}
 }

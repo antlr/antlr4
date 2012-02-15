@@ -63,7 +63,7 @@ import java.util.List;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext<Symbol> extends RuleContext {
-	public static final ParserRuleContext EMPTY = new ParserRuleContext();
+	public static final ParserRuleContext<?> EMPTY = new ParserRuleContext<Object>();
 
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
@@ -131,17 +131,6 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
-//	@Override
-//	public int hashCode() {
-//		return super.hashCode() + s;
-//	}
-//
-//	@Override
-//	public boolean equals(Object o) {
-//		if ( !super.equals(o) ) return false;
-//		return s != ((RuleContext)o).s; // must be parsing the same location in the ATN
-//	}
-
 	// Double dispatch methods
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
@@ -187,7 +176,101 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	@Override
 	public ParseTree getChild(int i) {
-		return children!=null ? children.get(i) : null;
+		return children!=null && i>=0 && i<children.size() ? children.get(i) : null;
+	}
+
+	public <T extends ParseTree> T getChild(Class<? extends T> ctxType, int i) {
+		if ( children==null || i < 0 || i >= children.size() ) {
+			return null;
+		}
+
+		int j = -1; // what element have we found with ctxType?
+		for (ParseTree o : children) {
+			if ( ctxType.isInstance(o) ) {
+				j++;
+				if ( j == i ) {
+					return ctxType.cast(o);
+				}
+			}
+		}
+		return null;
+	}
+
+	public Token getToken(int ttype, int i) {
+		if ( children==null || i < 0 || i >= children.size() ) {
+			return null;
+		}
+
+		int j = -1; // what token with ttype have we found?
+		for (ParseTree o : children) {
+			if ( o instanceof TerminalNode<?> ) {
+				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				if ( tnode.getSymbol() instanceof Token ) {
+					Token symbol = (Token)tnode.getSymbol();
+					if ( symbol.getType()==ttype ) {
+						j++;
+						if ( j == i ) {
+							return symbol;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public List<? extends Token> getTokens(int ttype) {
+		if ( children==null ) {
+			return Collections.emptyList();
+		}
+
+		List<Token> tokens = null;
+		for (ParseTree o : children) {
+			if ( o instanceof TerminalNode<?> ) {
+				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				if ( tnode.getSymbol() instanceof Token ) {
+					Token symbol = (Token)tnode.getSymbol();
+					if ( tokens==null ) {
+						tokens = new ArrayList<Token>();
+					}
+					tokens.add(symbol);
+				}
+			}
+		}
+
+		if ( tokens==null ) {
+			return Collections.emptyList();
+		}
+
+		return tokens;
+	}
+
+	public <T extends ParserRuleContext<?>> T getRuleContext(Class<? extends T> ctxType, int i) {
+		return getChild(ctxType, i);
+	}
+
+	public <T extends ParserRuleContext<?>> List<? extends T> getRuleContexts(Class<? extends T> ctxType) {
+		if ( children==null ) {
+			return Collections.emptyList();
+		}
+
+		List<T> contexts = null;
+		for (ParseTree o : children) {
+			if ( ctxType.isInstance(o) ) {
+				if ( contexts==null ) {
+					contexts = new ArrayList<T>();
+				}
+
+				contexts.add(ctxType.cast(o));
+			}
+		}
+
+		if ( contexts==null ) {
+			return Collections.emptyList();
+		}
+
+		return contexts;
 	}
 
 	@Override
@@ -203,7 +286,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
 		if ( recog==null ) return super.toString(recog, stop);
 		StringBuilder buf = new StringBuilder();
-		ParserRuleContext p = this;
+		ParserRuleContext<?> p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
 			ATN atn = recog.getATN();
@@ -214,7 +297,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 //				ATNState invoker = atn.states.get(ctx.invokingState);
 //				RuleTransition rt = (RuleTransition)invoker.transition(0);
 //				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
-			p = (ParserRuleContext)p.parent;
+			p = (ParserRuleContext<?>)p.parent;
 		}
 		buf.append("]");
 		return buf.toString();

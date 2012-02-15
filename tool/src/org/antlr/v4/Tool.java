@@ -58,7 +58,7 @@ import java.util.List;
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
 
-	public static enum OptionArgType { NONE, STRING }
+	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
 		String fieldName;
 		String name;
@@ -90,11 +90,13 @@ public class Tool {
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean saveLexer = false;
-	public boolean genListener = true;
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
 	public boolean verbose_dfa = false;
+	public boolean no_auto_element_labels = false;
+	public boolean gen_listener = true;
+	public boolean gen_visitor = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -103,10 +105,14 @@ public class Tool {
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
+        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
-        new Option("genListener",		"-walker", "generate parse tree walker and listener"),
+		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
+		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
+		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
+		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
+
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
@@ -182,17 +188,20 @@ public class Tool {
 			}
 			for (Option o : optionDefs) {
 				if ( arg.equals(o.name) ) {
-					String value = null;
+					String argValue = null;
 					if ( o.argType==OptionArgType.STRING ) {
-						value = args[i];
+						argValue = args[i];
 						i++;
 					}
 					// use reflection to set field
 					Class c = this.getClass();
 					try {
 						Field f = c.getField(o.fieldName);
-						if ( value==null ) f.setBoolean(this, true);
-						else f.set(this, value);
+						if ( argValue==null ) {
+							if ( o.fieldName.startsWith("-no-") ) f.setBoolean(this, false);
+							else f.setBoolean(this, true);
+						}
+						else f.set(this, argValue);
 					}
 					catch (Exception e) {
 						errMgr.toolError(ErrorType.INTERNAL_ERROR, "can't access field "+o.fieldName);

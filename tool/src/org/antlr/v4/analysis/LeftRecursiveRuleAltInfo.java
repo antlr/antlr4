@@ -32,19 +32,19 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.tool.ast.AltAST;
 
 public class LeftRecursiveRuleAltInfo {
-	public int alt;
+	public int altNum; // original alt index (from 1)
 	public String leftRecursiveRuleRefLabel;
 	public String altLabel;
 	public String altText;
 	public AltAST altAST;
 	public int nextPrec;
 
-	public LeftRecursiveRuleAltInfo(int alt, String altText) {
-		this(alt, altText, null, null);
+	public LeftRecursiveRuleAltInfo(int altNum, String altText) {
+		this(altNum, altText, null, null);
 	}
 
-	public LeftRecursiveRuleAltInfo(int alt, String altText, String leftRecursiveRuleRefLabel, String altLabel) {
-		this.alt = alt;
+	public LeftRecursiveRuleAltInfo(int altNum, String altText, String leftRecursiveRuleRefLabel, String altLabel) {
+		this.altNum = altNum;
 		this.altText = altText;
 		this.leftRecursiveRuleRefLabel = leftRecursiveRuleRefLabel;
 		this.altLabel = altLabel;

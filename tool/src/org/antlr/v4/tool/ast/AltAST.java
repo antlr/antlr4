@@ -31,13 +31,17 @@ package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.tool.Alternative;
 
 /** Any ALT (which can be child of ALT_REWRITE node) */
 public class AltAST extends GrammarAST {
 	public Alternative alt;
 
-	/** If someone specified an outermost alternative label with #foo.
+	/** If we transformed this alt from a left-recursive one, need info on it */
+	public LeftRecursiveRuleAltInfo leftRecursiveAltInfo;
+
+	/** If someone specified an outermost alternative label with -> foo.
 	 *  Token type will be ID.
 	 */
 	public GrammarAST altLabel;

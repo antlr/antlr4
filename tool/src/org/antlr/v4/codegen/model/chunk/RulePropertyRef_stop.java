@@ -29,9 +29,11 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 /** */
 public class RulePropertyRef_stop extends RulePropertyRef {
-	public RulePropertyRef_stop(String label) {
-		super(label);
+	public RulePropertyRef_stop(StructDecl ctx, String label) {
+		super(ctx, label);
 	}
 }
