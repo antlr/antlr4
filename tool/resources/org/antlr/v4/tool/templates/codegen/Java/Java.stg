@@ -551,6 +551,7 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 	}
 <endif>
 	<visitorDispatchMethods; separator="\n">
+        public \<T, V extends <parser.grammarName>Visitor\<T>\> T dispatch(V visitor) { return visitor.visit(this); }
 	<extensionMembers; separator="\n">
 }
 >>
@@ -561,6 +562,7 @@ public static class <s.name> extends <currentRule.name>Context {
 	<getters:{g | <g>}; separator="\n">
 	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
 	<visitorDispatchMethods; separator="\n">
+        public \<T, V extends <parser.grammarName>Visitor\<T>\> T dispatch(V visitor) { return visitor.visit(this); }
 }
 >>
 

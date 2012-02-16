@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -131,10 +132,11 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
-	// Double dispatch methods
+	// Double dispatch methods for listeners and visitors
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
+	public <T,V extends ParseTreeVisitor<T>> T dispatch(V visitor) { visitor.visitChildren(this); return null; }
 
 	/** Does not set parent link; other add methods do */
 	public void addChild(TerminalNode<Symbol> t) {
