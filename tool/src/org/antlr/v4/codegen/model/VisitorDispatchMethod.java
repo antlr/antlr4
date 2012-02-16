@@ -1,20 +1,9 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.misc.Triple;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.AltAST;
 
-import java.util.List;
-
-public class VisitorDispatchMethod extends OutputModelObject {
-	public String listenerName = "Rule";
-	public boolean isEnter;
-
-	public VisitorDispatchMethod(OutputModelFactory factory, Rule r, boolean isEnter) {
+public class VisitorDispatchMethod extends DispatchMethod {
+	public VisitorDispatchMethod(OutputModelFactory factory) {
 		super(factory);
-		this.isEnter = isEnter;
-		List<Triple<Integer,AltAST,String>> label = r.getAltLabels();
-		if ( label!=null ) listenerName = label.get(0).c;
 	}
 }

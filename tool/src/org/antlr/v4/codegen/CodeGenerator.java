@@ -33,16 +33,12 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.*;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -173,6 +169,19 @@ public class CodeGenerator {
 		return st;
 	}
 
+	public ST generateVisitor() {
+		OutputModelFactory factory = new ParserFactory(this);
+
+		OutputModelController controller = new OutputModelController(factory);
+		factory.setController(controller);
+
+		OutputModelObject visitorModel = controller.buildVisitorOutputModel();
+
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		ST st = walker.walk(visitorModel);
+		return st;
+	}
+
 	public ST generateBlankListener() {
 		OutputModelFactory factory = new ParserFactory(this);
 
@@ -228,6 +237,10 @@ public class CodeGenerator {
 
 	public void writeBlankListener(ST outputFileST) {
 		target.genFile(g,outputFileST, getBlankListenerFileName());
+	}
+
+	public void writeVisitor(ST outputFileST) {
+		target.genFile(g,outputFileST, getVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
@@ -306,6 +319,16 @@ public class CodeGenerator {
 		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Listener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return the visitor name such as
+	 *  TVisitor.java, if we're using the Java target.
+ 	 */
+	public String getVisitorFileName() {
+		assert g.name != null;
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "Visitor";
 		return listenerName+extST.render();
 	}
 

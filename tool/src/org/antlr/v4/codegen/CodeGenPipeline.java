@@ -48,6 +48,7 @@ public class CodeGenPipeline {
 			gen.writeRecognizer(gen.generateParser());
 			if ( g.tool.gen_listener) {
 				gen.writeListener(gen.generateListener());
+				gen.writeVisitor(gen.generateVisitor());
 				gen.writeBlankListener(gen.generateBlankListener());
 			}
 			gen.writeHeaderFile();

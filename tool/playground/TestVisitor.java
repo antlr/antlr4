@@ -27,18 +27,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class TestVisitor {
 	public static class MyVisitor extends ParseTreeVisitor<Integer> implements AVisitor<Integer> {
 		@Override
 		public Integer visit(AParser.AddContext ctx) {
-			return ctx.e(0).dispatch(this) + ctx.e(1).dispatch(this);
+			return ctx.e(0).accept(this) + ctx.e(1).accept(this);
 		}
 
 		@Override
@@ -48,18 +44,19 @@ public class TestVisitor {
 
 		@Override
 		public Integer visit(AParser.MultContext ctx) {
-//			return ctx.e(0).dispatch(this) * ctx.e(1).dispatch(this);
+//			return ctx.e(0).accept(this) * ctx.e(1).accept(this);
 			return visit(ctx.e(0)) * visit(ctx.e(1));
 		}
 
 		@Override
 		public Integer visit(AParser.ParensContext ctx) {
-			return ctx.e().dispatch(this);
+			return ctx.e().accept(this);
 		}
 
 		@Override
 		public Integer visit(AParser.sContext ctx) {
-			return ctx.e().dispatch(this);
+			return visit(ctx.e());
+			//return ctx.e().accept(this);
 		}
 	}
 
@@ -73,7 +70,7 @@ public class TestVisitor {
 
 		MyVisitor visitor = new MyVisitor();
 		Integer result = visitor.visit(t);
-//		Integer result = t.dispatch(visitor);
+//		Integer result = t.accept(visitor);
 		System.out.println("result from tree walk = " + result);
 	}
 }

@@ -56,6 +56,18 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 }
 >>
 
+VisitorFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
+
+public interface <file.grammarName>Visitor\<T> {
+	<file.visitorNames:{lname |
+T visit(<file.parserName>.<lname>Context ctx);}; separator="\n">
+}
+>>
+
+
 Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
@@ -571,10 +583,10 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<I
 }
 >>
 
-VisitorDispatchMethod() ::= <<
+VisitorDispatchMethod(method) ::= <<
 @Override
-public \<T> T dispatch(ParseTreeVisitor\<? extends T> visitor) { 
-    if ( listener instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit(this);
+public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) { 
+    if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit(this);
     else return null;
 }
 >>
