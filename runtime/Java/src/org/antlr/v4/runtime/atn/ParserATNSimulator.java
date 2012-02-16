@@ -448,7 +448,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			// t is not updated if one of these states is reached
-			assert !s.isCtxSensitive && !s.isAcceptState;
+			assert !s.isAcceptState;
 
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			DFAState target = s.getTarget(t);
@@ -486,7 +486,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
 			s = target;
-			if (!s.isCtxSensitive && !s.isAcceptState) {
+			if (!s.isAcceptState) {
 				input.consume();
 				t = input.LA(1);
 			}
