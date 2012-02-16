@@ -104,14 +104,14 @@ public class LL1Analyzer {
                 look.add(Token.EPSILON);
                 return;
             }
-			for (int i = 0; i < ctx.invokingStates.length; i++) {
-				if ( ctx.invokingStates[i]!=-1 ) {
-					ATNState invokingState = atn.states.get(ctx.invokingStates[i]);
+			for (int i = 0; i < ctx.size(); i++) {
+				if ( ctx.getInvokingState(i)!=-1 ) {
+					ATNState invokingState = atn.states.get(ctx.getInvokingState(i));
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
 					ATNState retState = rt.followState;
 //			System.out.println("popping back to "+retState);
-					for (PredictionContext parent : ctx.parents) {
-						_LOOK(retState, parent, epsilonStopState, look, lookBusy, seeThruPreds);
+					for (int j = 0; j < ctx.size(); j++) {
+						_LOOK(retState, ctx.getParent(j), epsilonStopState, look, lookBusy, seeThruPreds);
 					}
 					return;
 				}

@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime.atn;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -121,15 +120,15 @@ public class ATNConfig {
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
-	public ATNConfig appendContext(int context) {
+	public ATNConfig appendContext(int context, PredictionContextCache contextCache) {
 		ATNConfig result = new ATNConfig(this, state);
-		result.context = result.context.appendContext(context);
+		result.context = result.context.appendContext(context, contextCache);
 		return result;
 	}
 
-	public ATNConfig appendContext(PredictionContext context) {
+	public ATNConfig appendContext(PredictionContext context, PredictionContextCache contextCache) {
 		ATNConfig result = new ATNConfig(this, state);
-		result.context = result.context.appendContext(context);
+		result.context = result.context.appendContext(context, contextCache);
 		return result;
 	}
 
@@ -152,22 +151,22 @@ public class ATNConfig {
 				return true;
 			}
 
-			if (left.invokingStates.length < right.invokingStates.length) {
+			if (left.size() < right.size()) {
 				return false;
 			}
 
 			if (right.isEmpty()) {
 				return left.hasEmpty();
 			} else {
-				for (int i = 0; i < right.parents.length; i++) {
-					int index = Arrays.binarySearch(left.invokingStates, right.invokingStates[i]);
+				for (int i = 0; i < right.size(); i++) {
+					int index = left.findInvokingState(right.getInvokingState(i));
 					if (index < 0) {
 						// assumes invokingStates has no duplicate entries
 						return false;
 					}
 
-					leftWorkList.push(left.parents[index]);
-					rightWorkList.push(right.parents[i]);
+					leftWorkList.push(left.getParent(index));
+					rightWorkList.push(right.getParent(i));
 				}
 			}
 		}
@@ -222,13 +221,13 @@ public class ATNConfig {
 		visited.put(context, context);
 		while (!workList.isEmpty()) {
 			PredictionContext current = workList.pop();
-			for (int i = 0; i < current.invokingStates.length; i++) {
+			for (int i = 0; i < current.size(); i++) {
 				builder.append("  s").append(System.identityHashCode(current));
 				builder.append("->");
-				builder.append("s").append(System.identityHashCode(current.parents[i]));
-				builder.append("[label=\"").append(current.invokingStates[i]).append("\"];\n");
-				if (visited.put(current.parents[i], current.parents[i]) == null) {
-					workList.push(current.parents[i]);
+				builder.append("s").append(System.identityHashCode(current.getParent(i)));
+				builder.append("[label=\"").append(current.getInvokingState(i)).append("\"];\n");
+				if (visited.put(current.getParent(i), current.getParent(i)) == null) {
+					workList.push(current.getParent(i));
 				}
 			}
 		}

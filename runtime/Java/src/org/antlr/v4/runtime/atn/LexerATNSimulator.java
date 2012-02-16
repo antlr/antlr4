@@ -505,9 +505,9 @@ public class LexerATNSimulator extends ATNSimulator {
 				return;
 			}
 
-			for (int i = 0; i < config.context.parents.length; i++) {
-				PredictionContext newContext = config.context.parents[i]; // "pop" invoking state
-				ATNState invokingState = atn.states.get(config.context.invokingStates[i]);
+			for (int i = 0; i < config.context.size(); i++) {
+				PredictionContext newContext = config.context.getParent(i); // "pop" invoking state
+				ATNState invokingState = atn.states.get(config.context.getInvokingState(i));
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
 				ATNConfig c = new ATNConfig(retState, config.alt, newContext);

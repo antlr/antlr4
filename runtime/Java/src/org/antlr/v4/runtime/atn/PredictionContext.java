@@ -32,40 +32,49 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 
-public class PredictionContext {
+public abstract class PredictionContext {
 	@NotNull
-	public static final PredictionContext EMPTY = new PredictionContext();
+	public static final PredictionContext EMPTY = new EmptyPredictionContext();
 	public static final int EMPTY_STATE_KEY = Integer.MAX_VALUE;
 
+	private final int cachedHashCode;
+
+	protected PredictionContext(int cachedHashCode) {
+		this.cachedHashCode = cachedHashCode;
+	}
+
+	protected static int calculateParentHashCode(PredictionContext[] parents) {
+		int hashCode = 1;
+		for (PredictionContext context : parents) {
+			hashCode = hashCode * 31 ^ context.hashCode();
+		}
+
+		return hashCode;
+	}
+
+	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
+		int hashCode = 1;
+		for (int state : invokingStates) {
+			hashCode = hashCode * 31 ^ state;
+		}
+
+		return hashCode;
+	}
+
+	protected static int calculateHashCode(int parentHashCode, int invokingStateHashCode) {
+		return 5 * 5 * 7 + 5 * parentHashCode + invokingStateHashCode;
+	}
+
+	public abstract int size();
+
+	public abstract int getInvokingState(int index);
+
+	public abstract int findInvokingState(int invokingState);
+
 	@NotNull
-	public final PredictionContext[] parents;
-	@NotNull
-	public final int[] invokingStates;
-	private final int parentHashCode;
-	private final int invokingStateHashCode;
+	public abstract PredictionContext getParent(int index);
 
-	private PredictionContext() {
-		parents = new PredictionContext[0];
-		invokingStates = new int[0];
-		parentHashCode = 1;
-		invokingStateHashCode = 1;
-	}
-
-	private PredictionContext(@NotNull PredictionContext parent, int invokingState) {
-		this(new PredictionContext[] { parent }, new int[] { invokingState }, 31 ^ parent.hashCode(), 31 + invokingState);
-		assert invokingState >= 0;
-		assert parent != null;
-	}
-
-	private PredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int parentHashCode, int invokingStateHashCode) {
-		assert parents.length == invokingStates.length;
-		assert invokingStates.length > 0 && invokingStates[0] != EMPTY_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
-
-		this.parents = parents;
-		this.invokingStates = invokingStates;
-		this.parentHashCode = parentHashCode;
-		this.invokingStateHashCode = invokingStateHashCode;
-	}
+	protected abstract PredictionContext addEmptyContext();
 
 	public static PredictionContext fromRuleContext(@NotNull RuleContext outerContext) {
 		if (outerContext.isEmpty()) {
@@ -83,24 +92,14 @@ public class PredictionContext {
 	}
 
 	private static PredictionContext addEmptyContext(PredictionContext context) {
-		if (context.hasEmpty()) {
-			return context;
-		}
-
-		PredictionContext[] parents = Arrays.copyOf(context.parents, context.parents.length + 1);
-		int[] invokingStates = Arrays.copyOf(context.invokingStates, context.invokingStates.length + 1);
-		parents[parents.length - 1] = PredictionContext.EMPTY;
-		invokingStates[invokingStates.length - 1] = PredictionContext.EMPTY_STATE_KEY;
-		int newParentHashCode = 31 * context.parentHashCode ^ EMPTY.hashCode();
-		int newInvokingStateHashCode = 31 * context.invokingStateHashCode + PredictionContext.EMPTY_STATE_KEY;
-		return new PredictionContext(parents, invokingStates, newParentHashCode, newInvokingStateHashCode);
+		return context.addEmptyContext();
 	}
 
 	public static PredictionContext join(PredictionContext context0, PredictionContext context1, boolean local) {
 		return join(context0, context1, local ? PredictionContextCache.UNCACHED_LOCAL : PredictionContextCache.UNCACHED_FULL);
 	}
 
-	/*package*/ static PredictionContext join(@NotNull PredictionContext context0, @NotNull PredictionContext context1, @NotNull PredictionContextCache contextCache) {
+	/*package*/ static PredictionContext join(@NotNull final PredictionContext context0, @NotNull final PredictionContext context1, @NotNull PredictionContextCache contextCache) {
 		if (context0 == context1) {
 			return context0;
 		}
@@ -116,75 +115,80 @@ public class PredictionContext {
 			return PredictionContext.EMPTY;
 		}
 
-		if (context0.parents.length == 1 && context1.parents.length == 1 && context0.invokingStates[0] == context1.invokingStates[0]) {
-			PredictionContext merged = contextCache.join(context0.parents[0], context1.parents[0]);
-			if (merged == context0.parents[0]) {
+		final int context0size = context0.size();
+		final int context1size = context1.size();
+		if (context0size == 1 && context1size == 1 && context0.getInvokingState(0) == context1.getInvokingState(0)) {
+			PredictionContext merged = contextCache.join(context0.getParent(0), context1.getParent(0));
+			if (merged == context0.getParent(0)) {
 				return context0;
-			} else if (merged == context1.parents[0]) {
+			} else if (merged == context1.getParent(0)) {
 				return context1;
 			} else {
-				return new PredictionContext(merged, context0.invokingStates[0]);
+				return merged.getChild(context0.getInvokingState(0));
 			}
 		}
 
 		int count = 0;
 		int parentHashCode = 1;
 		int invokingStateHashCode = 1;
-		PredictionContext[] parentsList = new PredictionContext[context0.parents.length + context1.parents.length];
+		PredictionContext[] parentsList = new PredictionContext[context0size + context1size];
 		int[] invokingStatesList = new int[parentsList.length];
 		int leftIndex = 0;
 		int rightIndex = 0;
 		boolean canReturnLeft = true;
 		boolean canReturnRight = true;
-		while (leftIndex < context0.parents.length && rightIndex < context1.parents.length) {
-			if (context0.invokingStates[leftIndex] == context1.invokingStates[rightIndex]) {
-				parentsList[count] = contextCache.join(context0.parents[leftIndex], context1.parents[rightIndex]);
-				invokingStatesList[count] = context0.invokingStates[leftIndex];
-				canReturnLeft = canReturnLeft && parentsList[count] == context0.parents[leftIndex];
-				canReturnRight = canReturnRight && parentsList[count] == context1.parents[rightIndex];
+		while (leftIndex < context0size && rightIndex < context1size) {
+			if (context0.getInvokingState(leftIndex) == context1.getInvokingState(rightIndex)) {
+				parentsList[count] = contextCache.join(context0.getParent(leftIndex), context1.getParent(rightIndex));
+				invokingStatesList[count] = context0.getInvokingState(leftIndex);
+				canReturnLeft = canReturnLeft && parentsList[count] == context0.getParent(leftIndex);
+				canReturnRight = canReturnRight && parentsList[count] == context1.getParent(rightIndex);
 				leftIndex++;
 				rightIndex++;
-			} else if (context0.invokingStates[leftIndex] < context1.invokingStates[rightIndex]) {
-				parentsList[count] = context0.parents[leftIndex];
-				invokingStatesList[count] = context0.invokingStates[leftIndex];
+			}
+			else if (context0.getInvokingState(leftIndex) < context1.getInvokingState(rightIndex)) {
+				parentsList[count] = context0.getParent(leftIndex);
+				invokingStatesList[count] = context0.getInvokingState(leftIndex);
 				canReturnRight = false;
 				leftIndex++;
-			} else {
-				assert context1.invokingStates[rightIndex] < context0.invokingStates[leftIndex];
-				parentsList[count] = context1.parents[rightIndex];
-				invokingStatesList[count] = context1.invokingStates[rightIndex];
+			}
+			else {
+				assert context1.getInvokingState(rightIndex) < context0.getInvokingState(leftIndex);
+				parentsList[count] = context1.getParent(rightIndex);
+				invokingStatesList[count] = context1.getInvokingState(rightIndex);
 				canReturnLeft = false;
 				rightIndex++;
 			}
 
 			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
-			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
+			invokingStateHashCode = 31 * invokingStateHashCode ^ invokingStatesList[count];
 			count++;
 		}
 
-		while (leftIndex < context0.parents.length) {
-			parentsList[count] = context0.parents[leftIndex];
-			invokingStatesList[count] = context0.invokingStates[leftIndex];
+		while (leftIndex < context0size) {
+			parentsList[count] = context0.getParent(leftIndex);
+			invokingStatesList[count] = context0.getInvokingState(leftIndex);
 			leftIndex++;
 			canReturnRight = false;
 			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
-			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
+			invokingStateHashCode = 31 * invokingStateHashCode ^ invokingStatesList[count];
 			count++;
 		}
 
-		while (rightIndex < context1.parents.length) {
-			parentsList[count] = context1.parents[rightIndex];
-			invokingStatesList[count] = context1.invokingStates[rightIndex];
+		while (rightIndex < context1size) {
+			parentsList[count] = context1.getParent(rightIndex);
+			invokingStatesList[count] = context1.getInvokingState(rightIndex);
 			rightIndex++;
 			canReturnLeft = false;
 			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
-			invokingStateHashCode = 31 * invokingStateHashCode + invokingStatesList[count];
+			invokingStateHashCode = 31 * invokingStateHashCode ^ invokingStatesList[count];
 			count++;
 		}
 
 		if (canReturnLeft) {
 			return context0;
-		} else if (canReturnRight) {
+		}
+		else if (canReturnRight) {
 			return context1;
 		}
 
@@ -193,7 +197,15 @@ public class PredictionContext {
 			invokingStatesList = Arrays.copyOf(invokingStatesList, count);
 		}
 
-		return new PredictionContext(parentsList, invokingStatesList, parentHashCode, invokingStateHashCode);
+		if (parentsList.length == 0) {
+			return EMPTY;
+		}
+		else if (parentsList.length == 1) {
+			return new SingletonPredictionContext(parentsList[0], invokingStatesList[0]);
+		}
+		else {
+			return new ArrayPredictionContext(parentsList, invokingStatesList, parentHashCode, invokingStateHashCode);
+		}
 	}
 
 	public static PredictionContext getCachedContext(
@@ -216,12 +228,16 @@ public class PredictionContext {
 		}
 
 		boolean changed = false;
-		PredictionContext[] parents = new PredictionContext[context.parents.length];
+		PredictionContext[] parents = new PredictionContext[context.size()];
 		for (int i = 0; i < parents.length; i++) {
-			PredictionContext parent = getCachedContext(context.parents[i], contextCache, visited);
-			if (changed || parent != context.parents[i]) {
+			PredictionContext parent = getCachedContext(context.getParent(i), contextCache, visited);
+			if (changed || parent != context.getParent(i)) {
 				if (!changed) {
-					parents = Arrays.copyOf(context.parents, context.parents.length);
+					parents = new PredictionContext[context.size()];
+					for (int j = 0; j < context.size(); j++) {
+						parents[j] = context.getParent(j);
+					}
+
 					changed = true;
 				}
 
@@ -235,7 +251,18 @@ public class PredictionContext {
 			return context;
 		}
 
-		PredictionContext updated = new PredictionContext(parents, context.invokingStates, context.parentHashCode, context.invokingStateHashCode);
+		PredictionContext updated;
+		if (parents.length == 0) {
+			updated = EMPTY;
+		}
+		else if (parents.length == 1) {
+			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
+		}
+		else {
+			ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
+			updated = new ArrayPredictionContext(parents, arrayPredictionContext.invokingStates, context.cachedHashCode);
+		}
+
 		contextCache.put(updated, updated);
 		visited.put(updated, updated);
 		visited.put(context, updated);
@@ -243,93 +270,21 @@ public class PredictionContext {
 		return updated;
 	}
 
-	public PredictionContext appendContext(int invokingContext) {
-		return appendContext(PredictionContext.EMPTY.getChild(invokingContext));
+	public PredictionContext appendContext(int invokingContext, PredictionContextCache contextCache) {
+		return appendContext(PredictionContext.EMPTY.getChild(invokingContext), contextCache);
 	}
 
-	public PredictionContext appendContext(PredictionContext suffix) {
-		if (suffix.isEmpty()) {
-			return this;
-		}
+	public abstract PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache);
 
-		if (suffix.invokingStates.length != 1) {
-			throw new UnsupportedOperationException("Appending a tree suffix is not yet supported.");
-		}
-
-		return appendContext(this, suffix, new IdentityHashMap<PredictionContext, PredictionContext>());
-	}
-
-	private static PredictionContext appendContext(PredictionContext context, PredictionContext suffix, IdentityHashMap<PredictionContext, PredictionContext> visited) {
-		PredictionContext result = visited.get(context);
-		if (result == null) {
-			if (context.isEmpty()) {
-				result = suffix;
-			}
-			else {
-				int parentCount = context.parents.length;
-				if (context.hasEmpty()) {
-					parentCount--;
-				}
-
-				PredictionContext[] updatedParents = new PredictionContext[parentCount];
-				int[] updatedInvokingStates = context.hasEmpty() ? Arrays.copyOf(context.invokingStates, parentCount) : context.invokingStates;
-				int updatedParentHashCode = 1;
-				int updatedInvokingStateHashCode = 1;
-				for (int i = 0; i < parentCount; i++) {
-					updatedParents[i] = appendContext(context.parents[i], suffix, visited);
-					updatedParentHashCode = 31 * updatedParentHashCode ^ updatedParents[i].hashCode();
-					updatedInvokingStateHashCode = 31 * updatedInvokingStateHashCode + context.invokingStates[i];
-				}
-
-				result = new PredictionContext(updatedParents, updatedInvokingStates, updatedParentHashCode, updatedInvokingStateHashCode);
-				if (context.hasEmpty()) {
-					result = PredictionContext.join(result, suffix, false);
-				}
-			}
-
-			visited.put(context, result);
-		}
-
-		return result;
-	}
-
-	public PredictionContext popAll(int invokingState, PredictionContextCache contextCache) {
-		int index = Arrays.binarySearch(this.invokingStates, invokingState);
-		if (index < 0) {
-			return this;
-		}
-
-		PredictionContext result = this.parents[index].popAll(invokingState, contextCache);
-		for (int i = 0; i < this.invokingStates.length; i++) {
-			if (i == index) {
-				continue;
-			}
-
-			PredictionContext next;
-			if (this.invokingStates[i] == EMPTY_STATE_KEY) {
-				next = PredictionContext.EMPTY;
-			}
-			else {
-				next = contextCache.getChild(this.parents[i], this.invokingStates[i]);
-			}
-
-			result = PredictionContext.join(result, next, contextCache);
-		}
-
-		return result;
-	}
+	public abstract PredictionContext popAll(int invokingState, PredictionContextCache contextCache);
 
 	public PredictionContext getChild(int invokingState) {
-		return new PredictionContext(this, invokingState);
+		return new SingletonPredictionContext(this, invokingState);
 	}
 
-	public boolean isEmpty() {
-		return parents.length == 0;
-	}
+	public abstract boolean isEmpty();
 
-	public boolean hasEmpty() {
-		return isEmpty() || invokingStates[invokingStates.length - 1] == EMPTY_STATE_KEY;
-	}
+	public abstract boolean hasEmpty();
 
 	/** Two contexts conflict() if they are equals() or one is a stack suffix
 	 *  of the other.  For example, contexts [21 12 $] and [21 9 $] do not
@@ -378,9 +333,11 @@ public class PredictionContext {
 	 *  comparison case.
 	 */
 	protected boolean suffix(PredictionContext other) {
-		PredictionContext sp = this;
 
-		if (invokingStates.length == 0 || other.invokingStates.length == 0) {
+		int currentSize = this.size();
+		int otherSize = other.size();
+
+		if (currentSize == 0 || otherSize == 0) {
 			return true;
 		}
 
@@ -396,27 +353,27 @@ public class PredictionContext {
 				continue;
 			}
 
+			final int leftSize = left.size();
+			final int rightSize = right.size();
 			int leftIndex = 0;
 			int rightIndex = 0;
-			int leftState = left.invokingStates[0];
-			int rightState = right.invokingStates[0];
-			boolean leftHasEmpty = left.hasEmpty();
-			boolean rightHasEmpty = right.hasEmpty();
-			while (leftIndex < left.invokingStates.length || rightIndex < right.invokingStates.length) {
+			int leftState = left.getInvokingState(0);
+			int rightState = right.getInvokingState(0);
+			while (leftIndex < leftSize || rightIndex < rightSize) {
 				if (leftState == rightState) {
-					PredictionContext leftParent = left.parents[leftIndex];
-					PredictionContext rightParent = right.parents[rightIndex];
+					PredictionContext leftParent = left.getParent(leftIndex);
+					PredictionContext rightParent = right.getParent(rightIndex);
 					if (leftParent != rightParent) {
-						leftWorkList.push(left.parents[leftIndex]);
-						rightWorkList.push(right.parents[rightIndex]);
+						leftWorkList.push(left.getParent(leftIndex));
+						rightWorkList.push(right.getParent(rightIndex));
 					}
 					if (leftState != -1) {
 						leftIndex++;
-						leftState = (leftIndex < left.invokingStates.length) ? left.invokingStates[leftIndex] : -1;
+						leftState = (leftIndex < leftSize) ? left.getInvokingState(leftIndex) : -1;
 					}
 					if (rightState != -1) {
 						rightIndex++;
-						rightState = (rightIndex < right.invokingStates.length) ? right.invokingStates[rightIndex] : -1;
+						rightState = (rightIndex < rightSize) ? right.getInvokingState(rightIndex) : -1;
 					}
 
 					continue;
@@ -448,34 +405,11 @@ public class PredictionContext {
 
 	@Override
 	public int hashCode() {
-		return 5 * 5 * 7 + 5 * parentHashCode + invokingStateHashCode;
-	}
-
-	public boolean equals(PredictionContext other) {
-		if (this == other) {
-			return true;
-		} else if (other == null) {
-			return false;
-		}
-
-		if ( this.hashCode() != other.hashCode() ) {
-			return false; // can't be same if hash is different
-		}
-
-		return Arrays.equals(invokingStates, other.invokingStates)
-			&& Arrays.equals(parents, other.parents);
+		return cachedHashCode;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		} else if (!(o instanceof PredictionContext)) {
-			return false;
-		}
-
-		return this.equals((PredictionContext)o);
-	}
+	public abstract boolean equals(Object o);
 
 	//@Override
 	//public String toString() {
@@ -499,16 +433,16 @@ public class PredictionContext {
 			localBuffer.append("[");
 			while ( p != null && p != stop ) {
 				int index = 0;
-				if (p.parents.length > 0) {
+				if (p.size() > 0) {
 					int bits = 1;
-					while ((1 << bits) < p.parents.length) {
+					while ((1 << bits) < p.size()) {
 						bits++;
 					}
 
 					int mask = (1 << bits) - 1;
 					index = (perm >> offset) & mask;
-					last &= index >= p.parents.length - 1;
-					if (index >= p.parents.length) {
+					last &= index >= p.size() - 1;
+					if (index >= p.size()) {
 						continue outer;
 					}
 					offset += bits;
@@ -525,18 +459,18 @@ public class PredictionContext {
 					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
 					localBuffer.append(ruleName);
 				}
-				else if ( p.invokingStates[index]!=EMPTY_STATE_KEY ) {
+				else if ( p.getInvokingState(index)!=EMPTY_STATE_KEY ) {
 					if ( !p.isEmpty() ) {
 						if (localBuffer.length() > 1) {
 							// first char is '[', if more than that this isn't the first rule
 							localBuffer.append(' ');
 						}
 
-						localBuffer.append(p.invokingStates[index]);
+						localBuffer.append(p.getInvokingState(index));
 					}
 				}
-				stateNumber = p.invokingStates[index];
-				p = p.parents[index];
+				stateNumber = p.getInvokingState(index);
+				p = p.getParent(index);
 			}
 			localBuffer.append("]");
 			result.add(localBuffer.toString());

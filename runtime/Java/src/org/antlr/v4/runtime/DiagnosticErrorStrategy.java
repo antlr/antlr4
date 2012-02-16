@@ -33,6 +33,7 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.PredictionContext;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -88,7 +89,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 		ATNConfigSet configs = new ATNConfigSet(false);
 		PredictionContext suffix = PredictionContext.fromRuleContext(state.remainingOuterContext);
 		for (ATNConfig config : state.s0.configset) {
-			configs.add(config.appendContext(suffix));
+			configs.add(config.appendContext(suffix, PredictionContextCache.UNCACHED_FULL));
 		}
 
 		return configs;
