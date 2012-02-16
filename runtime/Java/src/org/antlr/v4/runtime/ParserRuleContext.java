@@ -136,7 +136,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
-	public <T,V extends ParseTreeVisitor<T>> T dispatch(V visitor) { visitor.visitChildren(this); return null; }
+	public <T> T dispatch(ParseTreeVisitor<? extends T> visitor) { visitor.visitChildren(this); return null; }
 
 	/** Does not set parent link; other add methods do */
 	public void addChild(TerminalNode<Symbol> t) {

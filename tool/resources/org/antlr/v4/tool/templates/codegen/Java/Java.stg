@@ -533,7 +533,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,getters,visitorDispatchMethods,interfaces,extensionMembers,
+StructDecl(s,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
@@ -550,26 +550,32 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 		<s.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
 <endif>
-	<visitorDispatchMethods; separator="\n">
-        public \<T, V extends <parser.grammarName>Visitor\<T>\> T dispatch(V visitor) { return visitor.visit(this); }
+	<dispatchMethods; separator="\n">
 	<extensionMembers; separator="\n">
 }
 >>
 
-AltLabelStructDecl(s,attrs,getters,visitorDispatchMethods) ::= <<
+AltLabelStructDecl(s,attrs,getters,dispatchMethods) ::= <<
 public static class <s.name> extends <currentRule.name>Context {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
-	<visitorDispatchMethods; separator="\n">
-        public \<T, V extends <parser.grammarName>Visitor\<T>\> T dispatch(V visitor) { return visitor.visit(this); }
+	<dispatchMethods; separator="\n">
 }
 >>
 
-VisitorDispatchMethod(method) ::= <<
+ListenerDispatchMethod(method) ::= <<
 @Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>(this);
+}
+>>
+
+VisitorDispatchMethod() ::= <<
+@Override
+public \<T> T dispatch(ParseTreeVisitor\<? extends T> visitor) { 
+    if ( listener instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit(this);
+    else return null;
 }
 >>
 

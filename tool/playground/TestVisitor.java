@@ -48,7 +48,8 @@ public class TestVisitor {
 
 		@Override
 		public Integer visit(AParser.MultContext ctx) {
-			return ctx.e(0).dispatch(this) * ctx.e(1).dispatch(this);
+//			return ctx.e(0).dispatch(this) * ctx.e(1).dispatch(this);
+			return visit(ctx.e(0)) * visit(ctx.e(1));
 		}
 
 		@Override
@@ -76,4 +77,3 @@ public class TestVisitor {
 		System.out.println("result from tree walk = " + result);
 	}
 }
-

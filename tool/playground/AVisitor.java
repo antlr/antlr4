@@ -7,5 +7,4 @@ public interface AVisitor<T> {
 	T visit(AParser.sContext ctx);
 	T visit(AParser.AddContext ctx);
 	T visit(AParser.IntContext ctx);
-//	T visit(Token t);
 }
