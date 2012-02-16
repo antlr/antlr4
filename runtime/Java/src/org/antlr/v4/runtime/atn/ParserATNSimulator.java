@@ -446,6 +446,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// TODO: v3 dfa don't do this.
 				break;
 			}
+
+			// t is not updated if one of these states is reached
+			assert !s.isCtxSensitive && !s.isAcceptState;
+
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			DFAState target = s.getTarget(t);
 			if ( target == null ) {
@@ -482,14 +486,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
 			s = target;
-			if ( dfa_debug ) {
-				if (s.isAcceptState && (!state.useContext || !s.isCtxSensitive)) {
-					System.out.println("TODO (performance): consumed an unnecessary symbol in execDFA" +
-							" - make sure to update k below when this is fixed.");
-				}
+			if (!s.isCtxSensitive && !s.isAcceptState) {
+				input.consume();
+				t = input.LA(1);
 			}
-			input.consume();
-			t = input.LA(1);
 		}
 //		if ( acceptState==null ) {
 //			if ( debug ) System.out.println("!!! no viable alt in dfa");
@@ -498,8 +498,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if ( acceptState.configset.getConflictingAlts()!=null ) {
 			if ( dfa.atnStartState instanceof DecisionState && ((DecisionState)dfa.atnStartState).isGreedy ) {
-				// formula for k here is different than execATN because the loop above
-				int k = input.index() - startIndex; // how much input we used
+				int k = input.index() - startIndex + 1; // how much input we used
 				if ( k == 1 || // SLL(1) == LL(1)
 					!userWantsCtxSensitive ||
 					!acceptState.configset.getDipsIntoOuterContext() )
