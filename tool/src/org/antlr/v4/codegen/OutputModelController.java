@@ -108,14 +108,19 @@ public class OutputModelController {
 		return new ListenerFile(delegate, gen.getListenerFileName());
 	}
 
-	public OutputModelObject buildBlankListenerOutputModel() {
+	public OutputModelObject buildBaseListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseListenerFile(delegate, gen.getBlankListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
 	}
 
 	public OutputModelObject buildVisitorOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
 		return new VisitorFile(delegate, gen.getVisitorFileName());
+	}
+
+	public OutputModelObject buildBaseVisitorOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName());
 	}
 
 	public ParserFile parserFile(String fileName) {

@@ -14,7 +14,6 @@ public class ListenerFile extends OutputFile {
 	public String grammarName;
 	public String parserName;
 	public Set<String> listenerNames = new HashSet<String>();
-//	public List<String> ruleNames = new ArrayList<String>();
 
 	@ModelElement public Action header;
 

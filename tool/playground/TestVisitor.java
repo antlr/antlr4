@@ -31,7 +31,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 public class TestVisitor {
-	public static class MyVisitor extends ParseTreeVisitor<Integer> implements AVisitor<Integer> {
+	public static class MyVisitor extends ABaseVisitor<Integer> implements AVisitor<Integer> {
 		@Override
 		public Integer visit(AParser.AddContext ctx) {
 			return ctx.e(0).accept(this) + ctx.e(1).accept(this);

@@ -67,6 +67,16 @@ T visit(<file.parserName>.<lname>Context ctx);}; separator="\n">
 }
 >>
 
+BaseVisitorFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
+
+public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+	<file.visitorNames:{lname |
+public T visit(<file.parserName>.<lname>Context ctx) { visitChildren(ctx); return null; \}}; separator="\n">
+}
+>>
 
 Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>

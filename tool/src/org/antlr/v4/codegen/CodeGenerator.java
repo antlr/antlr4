@@ -182,16 +182,29 @@ public class CodeGenerator {
 		return st;
 	}
 
-	public ST generateBlankListener() {
+	public ST generateBaseListener() {
 		OutputModelFactory factory = new ParserFactory(this);
 
 		OutputModelController controller = new OutputModelController(factory);
 		factory.setController(controller);
 
-		OutputModelObject blankModel = controller.buildBlankListenerOutputModel();
+		OutputModelObject baseModel = controller.buildBaseListenerOutputModel();
 
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(blankModel);
+		ST st = walker.walk(baseModel);
+		return st;
+	}
+
+	public ST generateBaseVisitor() {
+		OutputModelFactory factory = new ParserFactory(this);
+
+		OutputModelController controller = new OutputModelController(factory);
+		factory.setController(controller);
+
+		OutputModelObject baseModel = controller.buildBaseVisitorOutputModel();
+
+		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		ST st = walker.walk(baseModel);
 		return st;
 	}
 
@@ -235,12 +248,16 @@ public class CodeGenerator {
 		target.genFile(g,outputFileST, getListenerFileName());
 	}
 
-	public void writeBlankListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getBlankListenerFileName());
+	public void writeBaseListener(ST outputFileST) {
+		target.genFile(g,outputFileST, getBaseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
 		target.genFile(g,outputFileST, getVisitorFileName());
+	}
+
+	public void writeBaseVisitor(ST outputFileST) {
+		target.genFile(g,outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
@@ -333,12 +350,22 @@ public class CodeGenerator {
 	}
 
 	/** A given grammar T, return a blank listener implementation
-	 *  such as BlankTListener.java, if we're using the Java target.
+	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBlankListenerFileName() {
+	public String getBaseListenerFileName() {
 		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseVisitorFileName() {
+		assert g.name != null;
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
 
