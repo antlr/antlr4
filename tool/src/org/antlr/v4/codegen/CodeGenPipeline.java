@@ -46,9 +46,13 @@ public class CodeGenPipeline {
 		}
 		else {
 			gen.writeRecognizer(gen.generateParser());
-			if ( g.tool.gen_listener) {
+			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
-				gen.writeBlankListener(gen.generateBlankListener());
+				gen.writeBaseListener(gen.generateBaseListener());
+			}
+			if ( g.tool.gen_visitor ) {
+				gen.writeVisitor(gen.generateVisitor());
+				gen.writeBaseVisitor(gen.generateBaseVisitor());
 			}
 			gen.writeHeaderFile();
 		}

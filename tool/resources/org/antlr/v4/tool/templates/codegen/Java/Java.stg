@@ -56,6 +56,28 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 }
 >>
 
+VisitorFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
+
+public interface <file.grammarName>Visitor\<T> {
+	<file.visitorNames:{lname |
+T visit(<file.parserName>.<lname>Context ctx);}; separator="\n">
+}
+>>
+
+BaseVisitorFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
+
+public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+	<file.visitorNames:{lname |
+public T visit(<file.parserName>.<lname>Context ctx) { visitChildren(ctx); return null; \}}; separator="\n">
+}
+>>
+
 Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
@@ -533,7 +555,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,getters,visitorDispatchMethods,interfaces,extensionMembers,
+StructDecl(s,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
 public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
@@ -550,24 +572,32 @@ public static class <s.name> extends <superClass><if(interfaces)> implements <in
 		<s.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
 <endif>
-	<visitorDispatchMethods; separator="\n">
+	<dispatchMethods; separator="\n">
 	<extensionMembers; separator="\n">
 }
 >>
 
-AltLabelStructDecl(s,attrs,getters,visitorDispatchMethods) ::= <<
+AltLabelStructDecl(s,attrs,getters,dispatchMethods) ::= <<
 public static class <s.name> extends <currentRule.name>Context {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
-	<visitorDispatchMethods; separator="\n">
+	<dispatchMethods; separator="\n">
+}
+>>
+
+ListenerDispatchMethod(method) ::= <<
+@Override
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
+	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>(this);
+public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) { 
+    if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit(this);
+    else return null;
 }
 >>
 

@@ -43,8 +43,9 @@ package org.antlr.v4.tool;
 public enum ErrorType {
     INVALID(0, "<INVALID>", ErrorSeverity.ERROR),
 
+	// Tool errors
 	CANNOT_WRITE_FILE(1, "cannot write file <arg>: <arg2>", ErrorSeverity.ERROR),
-//	CANNOT_CLOSE_FILE(2, "cannot close file <arg>", ErrorSeverity.ERROR),
+	INVALID_CMDLINE_ARG(2, "unknown command-line option <arg>", ErrorSeverity.ERROR),
 	CANNOT_FIND_TOKENS_FILE(3, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
 	ERROR_READING_TOKENS_FILE(4, "cannot find tokens file <arg>: <arg2>", ErrorSeverity.ERROR),
 	DIR_NOT_FOUND(5, "directory not found: <arg>", ErrorSeverity.ERROR),
@@ -139,7 +140,9 @@ public enum ErrorType {
 	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	LEFT_RECURSION_CYCLES(119, "The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=\", \">]}; separator=\" and \">", ErrorSeverity.ERROR),
 	MODE_NOT_IN_LEXER(120, "lexical modes are only allowed in lexer grammars", ErrorSeverity.ERROR),
-    CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(121, "cannot find an attribute name in attribute declaration", ErrorSeverity.ERROR),
+	CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(121, "cannot find an attribute name in attribute declaration", ErrorSeverity.ERROR),
+	RULE_WITH_TOO_FEW_ALT_LABELS(122, "rule <arg>: must label all alternatives or none", ErrorSeverity.ERROR),
+	ALT_LABEL_REDEF(123, "rule alt label <arg> redefined in rule <arg2>, originally in <arg3>", ErrorSeverity.ERROR),
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
 

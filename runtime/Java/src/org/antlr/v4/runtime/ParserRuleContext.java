@@ -28,16 +28,11 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /** A rule invocation record for parsing and tree parsing.
  *
@@ -131,10 +126,11 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
-	// Double dispatch methods
+	// Double dispatch methods for listeners and visitors
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { visitor.visitChildren(this); return null; }
 
 	/** Does not set parent link; other add methods do */
 	public void addChild(TerminalNode<Symbol> t) {
