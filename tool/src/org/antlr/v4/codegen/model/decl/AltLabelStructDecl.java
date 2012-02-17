@@ -50,7 +50,9 @@ public class AltLabelStructDecl extends StructDecl {
 	@Override
 	public void addDispatchMethods(Rule r) {
 		super.addDispatchMethods(r);
-		dispatchMethods.add(new VisitorDispatchMethod(factory));
+		if ( factory.getGrammar().tool.gen_visitor ) {
+			dispatchMethods.add(new VisitorDispatchMethod(factory));
+		}
 	}
 
 	@Override

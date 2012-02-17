@@ -58,7 +58,7 @@ public class StructDecl extends Decl {
 		dispatchMethods = new ArrayList<DispatchMethod>();
 		dispatchMethods.add(new ListenerDispatchMethod(factory, true));
 		dispatchMethods.add(new ListenerDispatchMethod(factory, false));
-		if ( !r.hasAltSpecificContexts() ) {
+		if ( factory.getGrammar().tool.gen_visitor && !r.hasAltSpecificContexts() ) {
 			dispatchMethods.add(new VisitorDispatchMethod(factory));
 		}
 	}
