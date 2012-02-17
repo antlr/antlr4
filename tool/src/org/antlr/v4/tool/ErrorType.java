@@ -43,8 +43,9 @@ package org.antlr.v4.tool;
 public enum ErrorType {
     INVALID(0, "<INVALID>", ErrorSeverity.ERROR),
 
+	// Tool errors
 	CANNOT_WRITE_FILE(1, "cannot write file <arg>: <arg2>", ErrorSeverity.ERROR),
-//	CANNOT_CLOSE_FILE(2, "cannot close file <arg>", ErrorSeverity.ERROR),
+	INVALID_CMDLINE_ARG(2, "unknown command-line option <arg>", ErrorSeverity.ERROR),
 	CANNOT_FIND_TOKENS_FILE(3, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
 	ERROR_READING_TOKENS_FILE(4, "cannot find tokens file <arg>: <arg2>", ErrorSeverity.ERROR),
 	DIR_NOT_FOUND(5, "directory not found: <arg>", ErrorSeverity.ERROR),

@@ -186,8 +186,10 @@ public class Tool {
 				grammarFiles.add(arg);
 				continue;
 			}
+			boolean found = false;
 			for (Option o : optionDefs) {
 				if ( arg.equals(o.name) ) {
+					found = true;
 					String argValue = null;
 					if ( o.argType==OptionArgType.STRING ) {
 						argValue = args[i];
@@ -198,7 +200,7 @@ public class Tool {
 					try {
 						Field f = c.getField(o.fieldName);
 						if ( argValue==null ) {
-							if ( o.fieldName.startsWith("-no-") ) f.setBoolean(this, false);
+							if ( arg.startsWith("-no-") ) f.setBoolean(this, false);
 							else f.setBoolean(this, true);
 						}
 						else f.set(this, argValue);
@@ -207,6 +209,9 @@ public class Tool {
 						errMgr.toolError(ErrorType.INTERNAL_ERROR, "can't access field "+o.fieldName);
 					}
 				}
+			}
+			if ( !found ) {
+				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, arg);
 			}
 		}
 		if ( outputDirectory!=null ) {

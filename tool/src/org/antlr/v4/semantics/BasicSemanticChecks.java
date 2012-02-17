@@ -250,7 +250,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		for (int i=0; i< nalts; i++) {
 			AltAST altAST = (AltAST)blk.getChild(i);
 			if ( altAST.altLabel!=null ) {
-				System.out.println("alt label "+altAST.altLabel);
 				ruleToAltLabels.map(rule.getRuleName(), altAST.altLabel);
 				String altLabel = altAST.altLabel.getText();
 				String prevRuleForLabel = altLabelToRuleName.get(altLabel);
@@ -266,11 +265,9 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				}
 			}
 		}
-		System.out.println(rule.getRuleName()+" has "+ nalts +" alts");
 		List<GrammarAST> altLabels = ruleToAltLabels.get(rule.getRuleName());
 		int numAltLabels = 0;
 		if ( altLabels!=null ) numAltLabels = altLabels.size();
-		System.out.println("labels="+altLabels);
 		if ( numAltLabels>0 && nalts != numAltLabels ) {
 			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
 									   g.fileName, rule.getToken(), rule.getRuleName());
