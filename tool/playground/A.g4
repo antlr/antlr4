@@ -8,5 +8,11 @@ e : e '*' e 		-> Mult
   | '(' e ')'		-> Parens
   ;
 
+x : A -> Foo
+  | B
+  ;
+
+y : Y -> Mult ;
+
 INT : [0-9]+ ;
 WS : [ \t\n]+ -> skip ;

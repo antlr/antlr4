@@ -40,10 +40,7 @@ import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /** No side-effects except for setting options into the appropriate node.
  *  TODO:  make the side effects into a separate pass this
@@ -240,6 +237,44 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 //				t.setOption(TerminalAST.defaultTokenOption, v);
 //			}
 //		}
+	}
+
+	Map<String,String> altLabelToRuleName = new HashMap<String, String>();
+
+	@Override
+	public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) {
+		MultiMap<String,GrammarAST> ruleToAltLabels = new MultiMap<String, GrammarAST>();
+		if ( rule.isLexerRule() ) return;
+		BlockAST blk = (BlockAST)rule.getFirstChildWithType(BLOCK);
+		int nalts = blk.getChildCount();
+		for (int i=0; i< nalts; i++) {
+			AltAST altAST = (AltAST)blk.getChild(i);
+			if ( altAST.altLabel!=null ) {
+				System.out.println("alt label "+altAST.altLabel);
+				ruleToAltLabels.map(rule.getRuleName(), altAST.altLabel);
+				String altLabel = altAST.altLabel.getText();
+				String prevRuleForLabel = altLabelToRuleName.get(altLabel);
+				if ( prevRuleForLabel!=null ) {
+					g.tool.errMgr.grammarError(ErrorType.ALT_LABEL_REDEF,
+											   g.fileName, rule.getToken(),
+											   altLabel,
+											   rule.getRuleName(),
+											   prevRuleForLabel);
+				}
+				else {
+					altLabelToRuleName.put(altLabel, rule.getRuleName());
+				}
+			}
+		}
+		System.out.println(rule.getRuleName()+" has "+ nalts +" alts");
+		List<GrammarAST> altLabels = ruleToAltLabels.get(rule.getRuleName());
+		int numAltLabels = 0;
+		if ( altLabels!=null ) numAltLabels = altLabels.size();
+		System.out.println("labels="+altLabels);
+		if ( numAltLabels>0 && nalts != numAltLabels ) {
+			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
+									   g.fileName, rule.getToken(), rule.getRuleName());
+		}
 	}
 
 	// Routines to do the actual work of checking issues with a grammar.
