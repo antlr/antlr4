@@ -48,7 +48,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 
 	@ModelElement public List<ActionChunk> argExprsChunks;
 
-	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
+	public InvokeRule(ParserFactory factory, GrammarAST ast, GrammarAST labelAST) {
 		super(factory, ast);
 		if ( ast.atnState!=null ) {
 			RuleTransition ruleTrans = (RuleTransition)ast.atnState.transition(0);
@@ -65,13 +65,16 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		if ( labelAST!=null ) {
 			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();
-			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
-			labels.add(d);
-			rf.addContextDecl(ast.getAltLabel(), d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
+				factory.defineImplicitLabel(ast, this);
 				String listLabel = gen.target.getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, ctxName);
 				rf.addContextDecl(ast.getAltLabel(), l);
+			}
+			else {
+				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+				labels.add(d);
+				rf.addContextDecl(ast.getAltLabel(), d);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {

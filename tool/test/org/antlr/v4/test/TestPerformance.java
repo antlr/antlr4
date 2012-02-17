@@ -44,7 +44,9 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.atn.ATNConfig;
@@ -298,6 +300,8 @@ public class TestPerformance extends BaseTest {
 
             if (SHOW_DFA_STATE_STATS) {
                 int states = 0;
+				int configs = 0;
+				Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
                 for (int i = 0; i < decisionToDFA.length; i++) {
                     DFA dfa = decisionToDFA[i];
@@ -306,9 +310,13 @@ public class TestPerformance extends BaseTest {
                     }
 
                     states += dfa.states.size();
+					for (DFAState state : dfa.states.values()) {
+						configs += state.configset.size();
+						uniqueConfigs.addAll(state.configset);
+					}
                 }
 
-                System.out.format("There are %d DFAState instances.\n", states);
+                System.out.format("There are %d DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
             }
 
             int localDfaCount = 0;
@@ -418,7 +426,7 @@ public class TestPerformance extends BaseTest {
             @SuppressWarnings({"unchecked"})
             final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass("JavaParser");
             @SuppressWarnings({"unchecked"})
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass("BlankJavaListener");
+            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass("JavaBaseListener");
             TestPerformance.sharedListener = listenerClass.newInstance();
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
