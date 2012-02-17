@@ -28,16 +28,11 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /** A rule invocation record for parsing and tree parsing.
  *
@@ -63,7 +58,7 @@ import java.util.List;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext<Symbol> extends RuleContext {
-	public static final ParserRuleContext EMPTY = new ParserRuleContext();
+	public static final ParserRuleContext<?> EMPTY = new ParserRuleContext<Object>();
 
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
@@ -131,10 +126,11 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
-	// Double dispatch methods
+	// Double dispatch methods for listeners and visitors
 
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { visitor.visitChildren(this); return null; }
 
 	/** Does not set parent link; other add methods do */
 	public void addChild(TerminalNode<Symbol> t) {
@@ -176,61 +172,100 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	@Override
 	public ParseTree getChild(int i) {
-		return children!=null ? children.get(i) : null;
+		return children!=null && i>=0 && i<children.size() ? children.get(i) : null;
 	}
 
-	public Object getChild(Class ctxType, int i) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
-		int j = -1; // what element have we found with ctxType?
-		for (Object o : children) {
-			if ( ctxType.isAssignableFrom(o.getClass()) ) {
-				j = j+1;
-				if ( j == i ) return o;
-			}
+	public <T extends ParseTree> T getChild(Class<? extends T> ctxType, int i) {
+		if ( children==null || i < 0 || i >= children.size() ) {
+			return null;
 		}
-		return null;
-	}
 
-	public Token getToken(int ttype, int i) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
-		int j = -1; // what token with ttype have we found?
-		for (Object o : children) {
-			if ( o instanceof TerminalNode ) {
-				TerminalNode<Token> tnode = (TerminalNode<Token>)o;
-				if ( tnode.getSymbol().getType()==ttype ) {
-					j++;
-					if ( j == i ) return tnode.getSymbol();
+		int j = -1; // what element have we found with ctxType?
+		for (ParseTree o : children) {
+			if ( ctxType.isInstance(o) ) {
+				j++;
+				if ( j == i ) {
+					return ctxType.cast(o);
 				}
 			}
 		}
 		return null;
 	}
 
-	public List<Token> getTokens(int ttype) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
-		List<Token> tokens = null;
-		for (Object o : children) {
-			if ( o instanceof Token ) {
-				if ( tokens==null ) tokens = new ArrayList<Token>();
-				tokens.add((Token)o);
+	public Token getToken(int ttype, int i) {
+		if ( children==null || i < 0 || i >= children.size() ) {
+			return null;
+		}
+
+		int j = -1; // what token with ttype have we found?
+		for (ParseTree o : children) {
+			if ( o instanceof TerminalNode<?> ) {
+				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				if ( tnode.getSymbol() instanceof Token ) {
+					Token symbol = (Token)tnode.getSymbol();
+					if ( symbol.getType()==ttype ) {
+						j++;
+						if ( j == i ) {
+							return symbol;
+						}
+					}
+				}
 			}
 		}
+
+		return null;
+	}
+
+	public List<? extends Token> getTokens(int ttype) {
+		if ( children==null ) {
+			return Collections.emptyList();
+		}
+
+		List<Token> tokens = null;
+		for (ParseTree o : children) {
+			if ( o instanceof TerminalNode<?> ) {
+				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				if ( tnode.getSymbol() instanceof Token ) {
+					Token symbol = (Token)tnode.getSymbol();
+					if ( tokens==null ) {
+						tokens = new ArrayList<Token>();
+					}
+					tokens.add(symbol);
+				}
+			}
+		}
+
+		if ( tokens==null ) {
+			return Collections.emptyList();
+		}
+
 		return tokens;
 	}
 
-	public ParserRuleContext getRuleContext(Class ctxType, int i) {
-		return (ParserRuleContext)getChild(ctxType, i);
+	public <T extends ParserRuleContext<?>> T getRuleContext(Class<? extends T> ctxType, int i) {
+		return getChild(ctxType, i);
 	}
 
-	public List<? extends ParserRuleContext> getRuleContexts(Class ctxType) {
-		if ( children==null ) throw new UnsupportedOperationException("there are no children");
-		List<ParserRuleContext> contexts = null;
-		for (Object o : children) {
-			if ( o.getClass().isInstance(ctxType) ) {
-				if ( contexts==null ) contexts = new ArrayList<ParserRuleContext>();
-				contexts.add((ParserRuleContext)o);
+	public <T extends ParserRuleContext<?>> List<? extends T> getRuleContexts(Class<? extends T> ctxType) {
+		if ( children==null ) {
+			return Collections.emptyList();
+		}
+
+		List<T> contexts = null;
+		for (ParseTree o : children) {
+			if ( ctxType.isInstance(o) ) {
+				if ( contexts==null ) {
+					contexts = new ArrayList<T>();
+				}
+
+				contexts.add(ctxType.cast(o));
 			}
 		}
+
+		if ( contexts==null ) {
+			return Collections.emptyList();
+		}
+
 		return contexts;
 	}
 
@@ -247,7 +282,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
 		if ( recog==null ) return super.toString(recog, stop);
 		StringBuilder buf = new StringBuilder();
-		ParserRuleContext p = this;
+		ParserRuleContext<?> p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
 			ATN atn = recog.getATN();
@@ -258,7 +293,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 //				ATNState invoker = atn.states.get(ctx.invokingState);
 //				RuleTransition rt = (RuleTransition)invoker.transition(0);
 //				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
-			p = (ParserRuleContext)p.parent;
+			p = (ParserRuleContext<?>)p.parent;
 		}
 		buf.append("]");
 		return buf.toString();

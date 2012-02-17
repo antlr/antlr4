@@ -30,40 +30,37 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ModelElement;
-import org.antlr.v4.codegen.model.OutputModelObject;
-import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.Attribute;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /** This object models the structure holding all of the parameters,
  *  return values, local variables, and labels associated with a rule.
  */
 public class StructDecl extends Decl {
-	public String superClass;
 	public boolean provideCopyFrom;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
-	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
+	@ModelElement public List<? super DispatchMethod> dispatchMethods;
 	@ModelElement public List<OutputModelObject> interfaces;
 	@ModelElement public List<OutputModelObject> extensionMembers;
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
-		addVisitorDispatchMethods(r);
+		addDispatchMethods(r);
 		provideCopyFrom = r.hasAltSpecificContexts();
 	}
 
-	public void addVisitorDispatchMethods(Rule r) {
-		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
-		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, true));
-		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
+	public void addDispatchMethods(Rule r) {
+		dispatchMethods = new ArrayList<DispatchMethod>();
+		dispatchMethods.add(new ListenerDispatchMethod(factory, true));
+		dispatchMethods.add(new ListenerDispatchMethod(factory, false));
+		if ( factory.getGrammar().tool.gen_visitor && !r.hasAltSpecificContexts() ) {
+			dispatchMethods.add(new VisitorDispatchMethod(factory));
+		}
 	}
 
 	public void addDecl(Decl d) {

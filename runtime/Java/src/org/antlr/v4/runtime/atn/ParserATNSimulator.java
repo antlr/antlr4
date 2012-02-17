@@ -364,6 +364,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				// TODO: v3 dfa don't do this.
 				break;
 			}
+
+			// t is not updated if one of these states is reached
+			assert !s.isCtxSensitive && !s.isAcceptState;
+
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
@@ -404,8 +408,10 @@ public class ParserATNSimulator<Symbol> extends ATNSimulator {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
 			s = target;
-			input.consume();
-			t = input.LA(1);
+			if (!s.isCtxSensitive && !s.isAcceptState) {
+				input.consume();
+				t = input.LA(1);
+			}
 		}
 //		if ( acceptState==null ) {
 //			if ( debug ) System.out.println("!!! no viable alt in dfa");
