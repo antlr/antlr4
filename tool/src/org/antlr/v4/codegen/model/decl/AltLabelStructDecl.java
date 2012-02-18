@@ -30,8 +30,10 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.tool.Rule;
+
+import java.util.ArrayList;
 
 /** A StructDecl to handle a -> label on alt */
 public class AltLabelStructDecl extends StructDecl {
@@ -42,13 +44,15 @@ public class AltLabelStructDecl extends StructDecl {
 		super(factory, r);
 		this.altNum = altNum;
 		this.name = // override name set in super to the label ctx
-			factory.getGenerator().target.getAltLabelContextStructName(label);
+		factory.getGenerator().target.getAltLabelContextStructName(label);
 		derivedFromName = label;
 	}
 
 	@Override
 	public void addDispatchMethods(Rule r) {
-		super.addDispatchMethods(r);
+		dispatchMethods = new ArrayList<DispatchMethod>();
+		dispatchMethods.add(new ListenerDispatchMethod(factory, true));
+		dispatchMethods.add(new ListenerDispatchMethod(factory, false));
 		if ( factory.getGrammar().tool.gen_visitor ) {
 			dispatchMethods.add(new VisitorDispatchMethod(factory));
 		}
