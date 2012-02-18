@@ -33,6 +33,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
@@ -213,7 +214,7 @@ public class OutputModelController {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			if ( altInfo.altLabel==null ) continue;
 			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
-			altActionST.add("ctxName", altInfo.altLabel);
+			altActionST.add("ctxName", Utils.capitalize(altInfo.altLabel));
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = primaryAltsCode.get(i);
@@ -240,7 +241,7 @@ public class OutputModelController {
 			}
 			else {
 				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
-				altActionST.add("ctxName", r.name);
+				altActionST.add("ctxName", Utils.capitalize(r.name));
 			}
 			altActionST.add("ruleName", r.name);
 			// add label of any lr ref we deleted

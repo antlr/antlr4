@@ -24,11 +24,14 @@ public class ListenerFile extends OutputFile {
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
 			List<Triple<Integer,AltAST,String>> labels = r.getAltLabels();
-			listenerNames.add(r.name);
 			if ( labels!=null ) {
 				for (Triple<Integer,AltAST,String> pair : labels) {
 					listenerNames.add(pair.c);
 				}
+			}
+			else {
+				// only add rule context if no labels
+				listenerNames.add(r.name);
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");

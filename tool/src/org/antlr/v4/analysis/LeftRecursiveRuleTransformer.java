@@ -31,14 +31,12 @@ package org.antlr.v4.analysis;
 
 import org.antlr.runtime.*;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.misc.Pair;
+import org.antlr.v4.misc.*;
 import org.antlr.v4.parse.*;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Remove left-recursive rule refs, add precedence args to recursive rule refs.
  *  Rewrite rule so we can create ATN.
@@ -47,10 +45,10 @@ import java.util.List;
  */
 public class LeftRecursiveRuleTransformer {
 	public GrammarRootAST ast;
-	public List<Rule> rules;
+	public Collection<Rule> rules;
 	public Tool tool;
 
-	public LeftRecursiveRuleTransformer(GrammarRootAST ast, List<Rule> rules, Tool tool) {
+	public LeftRecursiveRuleTransformer(GrammarRootAST ast, Collection<Rule> rules, Tool tool) {
 		this.ast = ast;
 		this.rules = rules;
 		this.tool = tool;
