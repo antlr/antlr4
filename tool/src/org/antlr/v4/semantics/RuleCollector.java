@@ -30,25 +30,24 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAnalyzer;
-import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.AttributeDict;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LeftRecursiveRule;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.misc.*;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
+import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RuleCollector extends GrammarTreeVisitor {
 	/** which grammar are we checking */
 	public Grammar g;
 
 	// stuff to collect. this is the output
-	public List<Rule> rules = new ArrayList<Rule>();
+	public OrderedHashMap<String, Rule> rules = new OrderedHashMap<String, Rule>();
+	public MultiMap<String,GrammarAST> ruleToAltLabels = new MultiMap<String, GrammarAST>();
+	public Map<String,String> altLabelToRuleName = new HashMap<String, String>();
+
+	public Rule currentRule;
 
 	public RuleCollector(Grammar g) { this.g = g; }
 
@@ -70,7 +69,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 		else {
 			r = new Rule(g, ID.getText(), rule, numAlts);
 		}
-		rules.add(r);
+		rules.put(r.name, r);
 
 		if ( arg!=null ) {
 			r.args = ScopeParser.parseTypedArgList(arg.getText(), g.tool.errMgr);
@@ -100,6 +99,16 @@ public class RuleCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void discoverOuterAlt(AltAST alt) {
+		if ( alt.altLabel!=null ) {
+			ruleToAltLabels.map(currentRuleName, alt.altLabel);
+			String altLabel = alt.altLabel.getText();
+			altLabelToRuleName.put(Utils.capitalize(altLabel), currentRuleName);
+			altLabelToRuleName.put(Utils.decapitalize(altLabel), currentRuleName);
+		}
+	}
+
+	@Override
 	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
 								  GrammarAST block)
 	{
@@ -107,6 +116,6 @@ public class RuleCollector extends GrammarTreeVisitor {
 		Rule r = new Rule(g, ID.getText(), rule, numAlts);
 		r.mode = currentModeName;
 		if ( modifiers.size()>0 ) r.modifiers = modifiers;
-		rules.add(r);
+		rules.put(r.name, r);
 	}
 }

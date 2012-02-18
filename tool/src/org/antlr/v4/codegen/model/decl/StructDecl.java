@@ -40,6 +40,7 @@ import java.util.*;
  *  return values, local variables, and labels associated with a rule.
  */
 public class StructDecl extends Decl {
+	public String derivedFromName; // rule name or label name
 	public boolean provideCopyFrom;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
@@ -51,15 +52,19 @@ public class StructDecl extends Decl {
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
 		addDispatchMethods(r);
+		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
 	}
 
 	public void addDispatchMethods(Rule r) {
 		dispatchMethods = new ArrayList<DispatchMethod>();
-		dispatchMethods.add(new ListenerDispatchMethod(factory, true));
-		dispatchMethods.add(new ListenerDispatchMethod(factory, false));
-		if ( factory.getGrammar().tool.gen_visitor && !r.hasAltSpecificContexts() ) {
-			dispatchMethods.add(new VisitorDispatchMethod(factory));
+		if ( !r.hasAltSpecificContexts() ) {
+			// no enter/exit for this ruleContext if rule has labels
+			dispatchMethods.add(new ListenerDispatchMethod(factory, true));
+			dispatchMethods.add(new ListenerDispatchMethod(factory, false));
+			if ( factory.getGrammar().tool.gen_visitor ) {
+				dispatchMethods.add(new VisitorDispatchMethod(factory));
+			}
 		}
 	}
 

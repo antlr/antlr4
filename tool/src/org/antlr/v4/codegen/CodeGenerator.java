@@ -104,6 +104,7 @@ public class CodeGenerator {
 		try {
 			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+".stg");
 			templates.registerRenderer(Integer.class, new NumberRenderer());
+			templates.registerRenderer(String.class, new StringRenderer());
 		}
 		catch (IllegalArgumentException iae) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,

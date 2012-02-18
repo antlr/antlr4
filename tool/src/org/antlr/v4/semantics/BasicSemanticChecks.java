@@ -31,11 +31,8 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.misc.MultiMap;
 
@@ -139,10 +136,12 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		};
 
 	public Grammar g;
+	public RuleCollector ruleCollector;
 	public ErrorManager errMgr;
 
-	public BasicSemanticChecks(Grammar g) {
+	public BasicSemanticChecks(Grammar g, RuleCollector ruleCollector) {
 		this.g = g;
+		this.ruleCollector = ruleCollector;
 		this.errMgr = g.tool.errMgr;
 	}
 
@@ -239,38 +238,43 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 //		}
 	}
 
-	Map<String,String> altLabelToRuleName = new HashMap<String, String>();
-
 	@Override
 	public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) {
-		MultiMap<String,GrammarAST> ruleToAltLabels = new MultiMap<String, GrammarAST>();
 		if ( rule.isLexerRule() ) return;
 		BlockAST blk = (BlockAST)rule.getFirstChildWithType(BLOCK);
 		int nalts = blk.getChildCount();
+		GrammarAST idAST = (GrammarAST)rule.getChild(0);
 		for (int i=0; i< nalts; i++) {
 			AltAST altAST = (AltAST)blk.getChild(i);
 			if ( altAST.altLabel!=null ) {
-				ruleToAltLabels.map(rule.getRuleName(), altAST.altLabel);
 				String altLabel = altAST.altLabel.getText();
-				String prevRuleForLabel = altLabelToRuleName.get(altLabel);
-				if ( prevRuleForLabel!=null ) {
+				// first check that label doesn't conflict with a rule
+				// label X or x can't be rule x.
+				Rule r = ruleCollector.rules.get(Utils.decapitalize(altLabel));
+				if ( r!=null ) {
+					g.tool.errMgr.grammarError(ErrorType.ALT_LABEL_CONFLICTS_WITH_RULE,
+											   g.fileName, altAST.altLabel.token,
+											   altLabel,
+											   r.name);
+				}
+				// Now verify that label X or x doesn't conflict with label
+				// in another rule. altLabelToRuleName has both X and x mapped.
+				String prevRuleForLabel = ruleCollector.altLabelToRuleName.get(altLabel);
+				if ( prevRuleForLabel!=null && !prevRuleForLabel.equals(rule.getRuleName()) ) {
 					g.tool.errMgr.grammarError(ErrorType.ALT_LABEL_REDEF,
-											   g.fileName, rule.getToken(),
+											   g.fileName, altAST.altLabel.token,
 											   altLabel,
 											   rule.getRuleName(),
 											   prevRuleForLabel);
 				}
-				else {
-					altLabelToRuleName.put(altLabel, rule.getRuleName());
-				}
 			}
 		}
-		List<GrammarAST> altLabels = ruleToAltLabels.get(rule.getRuleName());
+		List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(rule.getRuleName());
 		int numAltLabels = 0;
 		if ( altLabels!=null ) numAltLabels = altLabels.size();
 		if ( numAltLabels>0 && nalts != numAltLabels ) {
 			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
-									   g.fileName, rule.getToken(), rule.getRuleName());
+									   g.fileName, idAST.token, rule.getRuleName());
 		}
 	}
 

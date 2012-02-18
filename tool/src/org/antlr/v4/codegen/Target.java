@@ -30,11 +30,10 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 
@@ -332,7 +331,11 @@ public class Target {
 		if ( r.g.isLexer() ) {
 			return gen.templates.getInstanceOf("LexerRuleContext").render();
 		}
-		return r.name+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+	}
+
+	public String getAltLabelContextStructName(String label) {
+		return Utils.capitalize(label)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	/** If we know which actual function, we can provide the actual ctx type.
@@ -345,7 +348,7 @@ public class Target {
 		if ( r.g.isLexer() ) {
 			return gen.templates.getInstanceOf("LexerRuleContext").render();
 		}
-		return r.name+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like $ID within single rule function

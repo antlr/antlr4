@@ -31,13 +31,10 @@ package org.antlr.v4.semantics;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** Do as much semantic checking as we can and fill in grammar
  *  with rules, actions, and token definitions.
@@ -72,24 +69,24 @@ public class SemanticPipeline {
 	public void process() {
 		if ( g.ast==null ) return;
 
+		// COLLECT RULE OBJECTS
+		RuleCollector ruleCollector = new RuleCollector(g);
+		ruleCollector.process(g.ast);
+
 		// DO BASIC / EASY SEMANTIC CHECKS
-		BasicSemanticChecks basics = new BasicSemanticChecks(g);
+		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);
 		basics.process();
 
 		// don't continue if we get errors in this basic check
 		if ( false ) return;
 
-		// COLLECT RULE OBJECTS
-		RuleCollector ruleCollector = new RuleCollector(g);
-		ruleCollector.process(g.ast);
-
 		// TRANSFORM LEFT-RECURSIVE RULES
 		LeftRecursiveRuleTransformer lrtrans =
-			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules, g.tool);
+			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g.tool);
 		lrtrans.translateLeftRecursiveRules();
 
 		// STORE RULES IN GRAMMAR
-		for (Rule r : ruleCollector.rules) {
+		for (Rule r : ruleCollector.rules.values()) {
 			g.defineRule(r);
 		}
 
