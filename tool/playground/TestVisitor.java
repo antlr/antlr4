@@ -28,33 +28,27 @@
  */
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 public class TestVisitor {
 	public static class MyVisitor extends ABaseVisitor<Integer> implements AVisitor<Integer> {
 		@Override
-		public Integer visit(AParser.AddContext ctx) {
+		public Integer visitAdd(AParser.AddContext ctx) {
 			return ctx.e(0).accept(this) + ctx.e(1).accept(this);
 		}
 
 		@Override
-		public Integer visit(AParser.IntContext ctx) {
-			return Integer.valueOf(ctx.INT().getText());
-		}
-
-		@Override
-		public Integer visit(AParser.MultContext ctx) {
+		public Integer visitMult(AParser.MultContext ctx) {
 //			return ctx.e(0).accept(this) * ctx.e(1).accept(this);
 			return visit(ctx.e(0)) * visit(ctx.e(1));
 		}
 
 		@Override
-		public Integer visit(AParser.ParensContext ctx) {
+		public Integer visitParens(AParser.ParensContext ctx) {
 			return ctx.e().accept(this);
 		}
 
 		@Override
-		public Integer visit(AParser.sContext ctx) {
+		public Integer visitS(AParser.SContext ctx) {
 			return visit(ctx.e());
 			//return ctx.e().accept(this);
 		}

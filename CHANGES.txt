@@ -1,5 +1,13 @@
 ANTLR v4 Honey Badger early access
 
+Feb 17, 2012
+
+* names changed. visit() -> visitX(). enter/exit() -> enter/exitX()
+* capitalizing automatically now. rule s -> SContext not sContext
+* no enter/exit method in generic rule context object if rule has alt labels, nor in interfaces.
+* dup labels allowed in same rule
+* label X or x illegal if rule x exists
+
 Feb 14, 2012
 
 * Fixed https://github.com/antlr/antlr4/issues/8 and lots of other little things.
