@@ -155,13 +155,63 @@ public class TestA {
 			printMethodName(ctx);
 		}
 
-		public void printMethodName(ParserRuleContext ctx) {
-			Throwable t = new Throwable();
-			StackTraceElement[] stack = t.getStackTrace();
-			String m = stack[1].getMethodName();
-			System.out.println(m+"("+ctx.getClass().getSimpleName()+")");
+	}
+
+	public static class TraceDuringParse extends ABaseParseListener {
+		@Override
+		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void enterS(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitAdd(AParser.AddContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitMult(AParser.MultContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitParens(AParser.ParensContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitPrimary(AParser.PrimaryContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitS(AParser.SContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void visitTerminal(ParserRuleContext<Token> ctx, Token symbol) {
+			printMethodName(ctx);
+			System.out.println("visiting "+symbol);
 		}
 	}
+
+	public static void printMethodName(ParserRuleContext ctx) {
+		Throwable t = new Throwable();
+		StackTraceElement[] stack = t.getStackTrace();
+		String m = stack[1].getMethodName();
+		System.out.println(m+"("+ctx.getClass().getSimpleName()+")");
+	}
+
 	public static void main(String[] args) throws Exception {
 		InputStream is = System.in;
 		if ( args.length>0 && args[0]!=null ) {
@@ -171,7 +221,7 @@ public class TestA {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		AParser p = new AParser(tokens);
 		p.setBuildParseTree(true);
-//		p.addParseListener(new Tracer());
+		p.addParseListener(new TraceDuringParse());
 		ParserRuleContext<Token> t = p.s();
 		System.out.println("tree = "+t.toStringTree(p));
 
