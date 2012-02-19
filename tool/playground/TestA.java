@@ -145,6 +145,16 @@ public class TestA {
 			printMethodName(ctx);
 		}
 
+		@Override
+		public void enterPrimary(AParser.PrimaryContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitPrimary(AParser.PrimaryContext ctx) {
+			printMethodName(ctx);
+		}
+
 		public void printMethodName(ParserRuleContext ctx) {
 			Throwable t = new Throwable();
 			StackTraceElement[] stack = t.getStackTrace();
@@ -161,7 +171,7 @@ public class TestA {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		AParser p = new AParser(tokens);
 		p.setBuildParseTree(true);
-		p.addParseListener(new Tracer());
+//		p.addParseListener(new Tracer());
 		ParserRuleContext<Token> t = p.s();
 		System.out.println("tree = "+t.toStringTree(p));
 
