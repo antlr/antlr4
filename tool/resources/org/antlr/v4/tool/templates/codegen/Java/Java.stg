@@ -47,12 +47,42 @@ import org.antlr.v4.runtime.Token;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
-@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
-@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+}
+>>
+
+ParseListenerFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.*;
+
+public interface <file.grammarName>ParseListener extends ParseListener\<<InputSymbolType()>\> {
+	<file.listenerEnterNames:{lname |
+void enter<lname; format="cap">(ParseListener\<<InputSymbolType()>\> ctx);}; separator="\n">
+	<file.listenerExitNames:{lname |
+void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+}
+>>
+
+BaseParseListenerFile(file, header) ::= <<
+<header>
+
+import org.antlr.v4.runtime.*;
+
+public class <file.grammarName>BaseParseListener implements <file.grammarName>ParseListener {
+	<file.listenerEnterNames:{lname |
+public void enter<lname; format="cap">(ParseListener\<<InputSymbolType()>\> ctx) { \}}; separator="\n">
+	<file.listenerExitNames:{lname |
+public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+
+	public void enterNonLRRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
 }
 >>
 
@@ -587,14 +617,12 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 >>
 
 ListenerDispatchMethod(method) ::= <<
-@Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
-@Override
 public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) { 
     if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit<struct.derivedFromName; format="cap">(this);
     else return null;

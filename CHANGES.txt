@@ -2,6 +2,10 @@ ANTLR v4 Honey Badger early access
 
 Feb 17, 2012
 
+* added -parse-listener option and differentiated between parse and parse
+  tree listener interfaces now.  Only parse tree listener stuff generated
+  by default.
+
 * names changed. visit() -> visitX(). enter/exit() -> enter/exitX()
 * capitalizing automatically now. rule s -> SContext not sContext
 * no enter/exit method in generic rule context object if rule has alt labels, nor in interfaces.
