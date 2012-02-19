@@ -33,24 +33,27 @@ public class TestVisitor {
 	public static class MyVisitor extends ABaseVisitor<Integer> implements AVisitor<Integer> {
 		@Override
 		public Integer visitAdd(AParser.AddContext ctx) {
-			return ctx.e(0).accept(this) + ctx.e(1).accept(this);
+			return visit(ctx.e(0)) + visit(ctx.e(1));
 		}
 
 		@Override
 		public Integer visitMult(AParser.MultContext ctx) {
-//			return ctx.e(0).accept(this) * ctx.e(1).accept(this);
 			return visit(ctx.e(0)) * visit(ctx.e(1));
 		}
 
 		@Override
 		public Integer visitParens(AParser.ParensContext ctx) {
-			return ctx.e().accept(this);
+			return visit(ctx.e());
 		}
 
 		@Override
 		public Integer visitS(AParser.SContext ctx) {
 			return visit(ctx.e());
-			//return ctx.e().accept(this);
+		}
+
+		@Override
+		public Integer visitPrimary(AParser.PrimaryContext ctx) {
+			return Integer.valueOf(ctx.INT().getText());
 		}
 	}
 

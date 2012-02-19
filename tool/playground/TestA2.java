@@ -43,25 +43,25 @@ public class TestA2 {
 		A2Parser p;
 		public Do(A2Parser p) { this.p = p; }
 		@Override
-		public void exit(A2Parser.AddContext ctx) {
+		public void exitAdd(A2Parser.AddContext ctx) {
 			ctx.v = ctx.e(0).v + ctx.e(1).v;
 			System.out.println("Add: " + ctx.v);
 		}
 
 		@Override
-		public void exit(A2Parser.IntContext ctx) {
+		public void exitInt(A2Parser.IntContext ctx) {
 			ctx.v = Integer.valueOf(ctx.INT().getText());
 			System.out.println("Int: "+ctx.v);
 		}
 
 		@Override
-		public void exit(A2Parser.MultContext ctx) {
+		public void exitMult(A2Parser.MultContext ctx) {
 			ctx.v = ctx.e(0).v * ctx.e(1).v;
 			System.out.println("Mult: " + ctx.v);
 		}
 
 		@Override
-		public void exit(A2Parser.ParensContext ctx) {
+		public void exitParens(A2Parser.ParensContext ctx) {
 			ctx.v = ctx.e().v;
 			System.out.println("Parens: "+ctx.v);
 		}
@@ -71,14 +71,13 @@ public class TestA2 {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		A2Parser p = new A2Parser(tokens);
 		p.setBuildParseTree(true);
-		p.addParseListener(new Do(p));
 		ParserRuleContext<Token> t = p.s();
 		System.out.println("tree = "+t.toStringTree(p));
 
 		ParseTreeWalker walker = new ParseTreeWalker();
 		Do doer = new Do(p);
 		walker.walk(doer, t);
-		A2Parser.eContext ectx = (A2Parser.eContext)t.getChild(0);
+		A2Parser.EContext ectx = (A2Parser.EContext)t.getChild(0);
 		System.out.println("result from tree walk = "+ ectx.v);
 	}
 }

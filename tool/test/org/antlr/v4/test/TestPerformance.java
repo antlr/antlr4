@@ -29,30 +29,17 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.*;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.junit.Assert;
-import org.junit.Test;
+import org.antlr.v4.runtime.tree.*;
+import org.junit.*;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.dfa.DFAState;
+import java.lang.reflect.*;
+import java.net.*;
+import java.util.*;
+import java.util.logging.*;
 
 public class TestPerformance extends BaseTest {
     /** Parse all java files under this package within the JDK_SOURCE_ROOT. */
@@ -461,7 +448,8 @@ public class TestPerformance extends BaseTest {
                             sharedParser = parserCtor.newInstance(tokens);
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-                                sharedParser.addParseListener(sharedListener);
+								// TJP commented out for now; changed interface
+//                                sharedParser.addParseListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
                                 sharedParser.setErrorHandler(new BailErrorStrategy());
