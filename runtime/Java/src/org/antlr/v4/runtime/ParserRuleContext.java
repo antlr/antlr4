@@ -128,10 +128,6 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 
 	// Double dispatch methods for listeners and visitors
 
-	// parse listener
-	public void enterRule(ParseListener<Symbol> listener) { }
-	public void exitRule(ParseListener<Symbol> listener) { }
-
 	// parse tree listener
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }

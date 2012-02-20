@@ -85,7 +85,6 @@ public class Tool {
 	public boolean verbose_dfa = false;
 	public boolean no_auto_element_labels = false;
 	public boolean gen_listener = true;
-	public boolean gen_parse_listener = false;
 	public boolean gen_visitor = false;
 
     public static Option[] optionDefs = {
@@ -100,8 +99,6 @@ public class Tool {
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
 		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
-		new Option("gen_parse_listener",  "-parse-listener", "generate parse listener"),
-		new Option("gen_parse_listener",  "-no-parse-listener", "don't generate parse listener (default)"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 

@@ -452,8 +452,7 @@ public class TestPerformance extends BaseTest {
                             sharedParser = parserCtor.newInstance(tokens);
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-								// TJP commented out for now; changed interface
-//                                sharedParser.addParseListener(sharedListener);
+                                sharedParser.addParseListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
                                 sharedParser.setErrorHandler(new BailErrorStrategy());
