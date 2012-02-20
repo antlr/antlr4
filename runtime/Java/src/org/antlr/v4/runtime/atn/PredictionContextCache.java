@@ -143,10 +143,14 @@ public class PredictionContextCache {
 
         private final T x;
         private final T y;
+		private final int xHashCode;
+		private final int yHashCode;
 
         public IdentityCommutativeOperands(T x, T y) {
             this.x = x;
             this.y = y;
+			this.xHashCode = System.identityHashCode(x);
+			this.yHashCode = System.identityHashCode(y);
         }
 
         public T getX() {
@@ -172,7 +176,7 @@ public class PredictionContextCache {
 
         @Override
         public int hashCode() {
-            return System.identityHashCode(x) ^ System.identityHashCode(y);
+            return xHashCode ^ yHashCode;
         }
     }
 
