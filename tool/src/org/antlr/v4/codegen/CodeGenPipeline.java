@@ -30,6 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.tool.Grammar;
+import org.stringtemplate.v4.ST;
 
 public class CodeGenPipeline {
 	Grammar g;
@@ -42,13 +43,25 @@ public class CodeGenPipeline {
 		CodeGenerator gen = new CodeGenerator(g);
 
 		if ( g.isLexer() ) {
-			gen.writeRecognizer(gen.generateLexer());
+			ST lexer = gen.generateLexer();
+			if ( g.tool.launch_ST_inspector ) lexer.inspect();
+			gen.writeRecognizer(lexer);
 		}
 		else {
-			gen.writeRecognizer(gen.generateParser());
-			if ( g.tool.gen_listener) {
+			ST parser = gen.generateParser();
+			if ( g.tool.launch_ST_inspector ) parser.inspect();
+			gen.writeRecognizer(parser);
+			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
-				gen.writeBlankListener(gen.generateBlankListener());
+				gen.writeBaseListener(gen.generateBaseListener());
+			}
+			if ( g.tool.gen_parse_listener ) {
+				gen.writeParseListener(gen.generateParseListener());
+				gen.writeBaseParseListener(gen.generateBaseParseListener());
+			}
+			if ( g.tool.gen_visitor ) {
+				gen.writeVisitor(gen.generateVisitor());
+				gen.writeBaseVisitor(gen.generateBaseVisitor());
 			}
 			gen.writeHeaderFile();
 		}

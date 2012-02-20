@@ -34,8 +34,8 @@ import org.antlr.v4.runtime.Token;
 
 public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
 	<file.listenerNames:{lname |
-void enter(<file.parserName>.<lname>Context ctx);
-void exit(<file.parserName>.<lname>Context ctx);}; separator="\n">
+void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -47,12 +47,64 @@ import org.antlr.v4.runtime.Token;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
-@Override public void enter(<file.parserName>.<lname>Context ctx) { \}
-@Override public void exit(<file.parserName>.<lname>Context ctx) { \}}; separator="\n">
+public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+}
+>>
+
+ParseListenerFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.*;
+
+public interface <file.grammarName>ParseListener extends ParseListener\<<InputSymbolType()>\> {
+	<file.listenerEnterNames:{lname |
+void enter<lname; format="cap">(ParserRuleContext\<<InputSymbolType()>\> ctx);}; separator="\n">
+	<file.listenerExitNames:{lname |
+void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+}
+>>
+
+BaseParseListenerFile(file, header) ::= <<
+<header>
+
+import org.antlr.v4.runtime.*;
+
+public class <file.grammarName>BaseParseListener implements <file.grammarName>ParseListener {
+	<file.listenerEnterNames:{lname |
+public void enter<lname; format="cap">(ParserRuleContext\<<InputSymbolType()>\> ctx) { \}}; separator="\n">
+	<file.listenerExitNames:{lname |
+public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+
+	public void enterNonLRRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+}
+>>
+
+VisitorFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
+
+public interface <file.grammarName>Visitor\<T> {
+	<file.visitorNames:{lname |
+T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+}
+>>
+
+BaseVisitorFile(file, header) ::= <<
+<header>
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Token;
+
+public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+	<file.visitorNames:{lname |
+public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { visitChildren(ctx); return null; \}}; separator="\n">
 }
 >>
 
@@ -215,7 +267,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel>Context(_localctx);<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
 enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -481,9 +533,9 @@ ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "_input.toString(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 
-NonLocalAttrRef(s)		 ::= "((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
+NonLocalAttrRef(s)		 ::= "((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks)	  ::=
-	"((<s.ruleName>Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
+	"((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
@@ -504,17 +556,17 @@ public Token <t.name>(int i) {
 >>
 ContextRuleGetterDecl(r)       ::= <<
 public <r.ctxName> <r.name>() {
-    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,0);
+    return getRuleContext(<r.ctxName>.class,0);
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
 public List\<? extends <r.ctxName>\> <r.name>() {
-    return (List\<<r.ctxName>\>)getRuleContexts(<r.ctxName>.class);
+    return getRuleContexts(<r.ctxName>.class);
 }
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 public <r.ctxName> <r.name>(int i) {
-    return (<r.ctxName>)getRuleContext(<r.ctxName>.class,i);
+    return getRuleContext(<r.ctxName>.class,i);
 }
 >>
 
@@ -533,41 +585,53 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(s,attrs,getters,visitorDispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
-public static class <s.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
+public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(s.ctorAttrs)>public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
-	public <s.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<s.ctorAttrs:{a | , <a>}>) {
+	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
+	public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<struct.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
-		<s.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
-<if(s.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	public <s.name>() { }
-	public void copyFrom(<s.name> ctx) {
+<if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
+	public <struct.name>() { }
+	public void copyFrom(<struct.name> ctx) {
 		super.copyFrom(ctx);
-		<s.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
 <endif>
-	<visitorDispatchMethods; separator="\n">
+	<dispatchMethods; separator="\n">
 	<extensionMembers; separator="\n">
 }
 >>
 
-AltLabelStructDecl(s,attrs,getters,visitorDispatchMethods) ::= <<
-public static class <s.name> extends <currentRule.name>Context {
+AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
+public static class <struct.name> extends <currentRule.name; format="cap">Context {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	public <s.name>(<currentRule.name>Context ctx) { copyFrom(ctx); }
-	<visitorDispatchMethods; separator="\n">
+	public <struct.name>(<currentRule.name; format="cap">Context ctx) { copyFrom(ctx); }
+	<dispatchMethods; separator="\n">
+}
+>>
+
+ListenerDispatchMethod(method) ::= <<
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
+	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
-@Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
-	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif>(this);
+public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) { 
+    if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit<struct.derivedFromName; format="cap">(this);
+    else return null;
+}
+>>
+
+ParseListenerDispatchMethod(method) ::= <<
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseListener\<<InputSymbolType()>\> listener) {
+	if ( listener instanceof <parser.grammarName>ParseListener ) ((<parser.grammarName>ParseListener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
@@ -596,9 +660,9 @@ _localctx.start = _prevctx.start;
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
-_localctx = new <currentAltLabel>Context(new <ruleName>Context(_parentctx, _startState, _p));
+_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _startState, _p));
 _localctx.addChild(_prevctx);
-<if(label)>((<currentAltLabel>Context)_localctx).<label> = _prevctx;<endif>
+<if(label)>((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, RULE_<ruleName>);
 _localctx.start = _prevctx.start;
 >>

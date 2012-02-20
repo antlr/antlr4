@@ -4,7 +4,7 @@ s : e ;
 
 e : e '*' e 		-> Mult
   | e '+' e 		-> Add
-  | INT        		-> Int
+  | INT        		-> primary
   | '(' e ')'		-> Parens
   ;
 

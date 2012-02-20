@@ -27,46 +27,47 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool.ast;
+import org.antlr.v4.runtime.*;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.parse.ANTLRParser;
-
-public class RuleAST extends GrammarASTWithOptions {
-	public RuleAST(GrammarAST node) {
-		super(node);
-	}
-
-	public RuleAST(Token t) { super(t); }
-    public RuleAST(int type) { super(type); }
-
-	public boolean isLexerRule() {
-		String name = getRuleName();
-		return name!=null && Character.isUpperCase(name.charAt(0));
-	}
-
-	public String getRuleName() {
-		GrammarAST nameNode = (GrammarAST)getChild(0);
-		if ( nameNode!=null ) return nameNode.getText();
-		return null;
-	}
-
-	@Override
-	public Tree dupNode() { return new RuleAST(this); }
-
-	public ActionAST getLexerAction() {
-		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);
-		if ( blk.getChildCount()==1 ) {
-			Tree onlyAlt = blk.getChild(0);
-			Tree lastChild = onlyAlt.getChild(onlyAlt.getChildCount()-1);
-			if ( lastChild.getType()==ANTLRParser.ACTION ) {
-				return (ActionAST)lastChild;
-			}
+public class TestVisitor {
+	public static class MyVisitor extends ABaseVisitor<Integer> implements AVisitor<Integer> {
+		@Override
+		public Integer visitAdd(AParser.AddContext ctx) {
+			return visit(ctx.e(0)) + visit(ctx.e(1));
 		}
-		return null;
+
+		@Override
+		public Integer visitMult(AParser.MultContext ctx) {
+			return visit(ctx.e(0)) * visit(ctx.e(1));
+		}
+
+		@Override
+		public Integer visitParens(AParser.ParensContext ctx) {
+			return visit(ctx.e());
+		}
+
+		@Override
+		public Integer visitS(AParser.SContext ctx) {
+			return visit(ctx.e());
+		}
+
+		@Override
+		public Integer visitPrimary(AParser.PrimaryContext ctx) {
+			return Integer.valueOf(ctx.INT().getText());
+		}
 	}
 
-	@Override
-	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
+	public static void main(String[] args) throws Exception {
+		ALexer lexer = new ALexer(new ANTLRFileStream(args[0]));
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		AParser p = new AParser(tokens);
+		p.setBuildParseTree(true);
+		ParserRuleContext<Token> t = p.s();
+		System.out.println("tree = "+t.toStringTree(p));
+
+		MyVisitor visitor = new MyVisitor();
+		Integer result = visitor.visit(t);
+//		Integer result = t.accept(visitor);
+		System.out.println("result from tree walk = " + result);
+	}
 }

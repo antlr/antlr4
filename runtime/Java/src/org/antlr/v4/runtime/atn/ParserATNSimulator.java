@@ -733,13 +733,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 						return predictedAlt;
 					}
-				}
 
-				if (D.prediction == ATN.INVALID_ALT_NUMBER) {
+					// Consistency check - the DFAState should not have a "fallback"
+					// prediction specified for the case where no predicates succeed.
+					assert D.prediction == ATN.INVALID_ALT_NUMBER;
+
 					throw noViableAlt(input, outerContext, D.configset, startIndex);
 				}
-
-				predictedAlt = D.prediction;
 			}
 
 			if ( D.isAcceptState ) return predictedAlt;
@@ -969,6 +969,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												  int nalts)
 	{
 		// REACH=[1|1|[]|0:0, 1|2|[]|0:1]
+
+		/* altToPred starts as an array of all null contexts. The entry at index i
+		 * corresponds to alternative i. altToPred[i] may have one of three values:
+		 *   1. null: no ATNConfig c is found such that c.alt==i
+		 *   2. SemanticContext.NONE: At least one ATNConfig c exists such that
+		 *      c.alt==i and c.semanticContext==SemanticContext.NONE. In other words,
+		 *      alt i has at least one unpredicated config.
+		 *   3. Non-NONE Semantic Context: There exists at least one, and for all
+		 *      ATNConfig c such that c.alt==i, c.semanticContext!=SemanticContext.NONE.
+		 *
+		 * From this, it is clear that NONE||anything==NONE.
+		 */
 		SemanticContext[] altToPred = new SemanticContext[nalts +1];
 		int n = altToPred.length;
 		for (ATNConfig c : configs) {
@@ -1162,6 +1174,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// gotten that context AFTER having fallen off a rule.
 					// Make sure we track that we are now out of context.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+					assert depth > Integer.MIN_VALUE;
 					if (optimize_closure_busy && c.context.isEmpty() && !closureBusy.add(c)) {
 						continue;
 					}
@@ -1244,10 +1257,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// preds if this is > 0.
 					c.reachesIntoOuterContext++;
 					stepIntoGlobal = true;
+					assert newDepth > Integer.MIN_VALUE;
 					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
+					// latch when newDepth goes negative - once we step out of the entry context we can't return
 					if (newDepth >= 0) {
 						newDepth++;
 					}

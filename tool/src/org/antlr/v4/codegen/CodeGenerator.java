@@ -33,16 +33,12 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.*;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -108,6 +104,7 @@ public class CodeGenerator {
 		try {
 			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+".stg");
 			templates.registerRenderer(Integer.class, new NumberRenderer());
+			templates.registerRenderer(String.class, new StringRenderer());
 		}
 		catch (IllegalArgumentException iae) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
@@ -117,74 +114,35 @@ public class CodeGenerator {
 	}
 
 	// CREATE TEMPLATES BY WALKING MODEL
-	public ST generateLexer() {
-		OutputModelFactory factory = new LexerFactory(this);
 
-		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
-		OutputModelController controller = new OutputModelController(factory);
-		factory.setController(controller);
-
-		OutputModelObject outputModel = controller.buildLexerOutputModel();
-
-		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(outputModel);
-
-		if ( tool.launch_ST_inspector ) {
-			st.inspect();
-			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
-		}
-
-//		String x = ATNSerializer.getDecoded(g, g.atn);
-//		System.out.println(x);
-
-		return st;
-	}
-
-	public ST generateParser() {
+	public ST generateModelST(String factoryMethod) {
 		OutputModelFactory factory = new ParserFactory(this);
 
 		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 		OutputModelController controller = new OutputModelController(factory);
 		factory.setController(controller);
 
-		OutputModelObject outputModel = controller.buildParserOutputModel();
-
-		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(outputModel);
-
-		if ( tool.launch_ST_inspector ) {
-			st.inspect();
-			//if ( templates.isDefined("headerFile") ) headerFileST.inspect();
+		OutputModelObject outputModel = null;
+		try {
+			Method m = OutputModelController.class.getDeclaredMethod(factoryMethod);
+			outputModel = (OutputModelObject)m.invoke(controller);
+		}
+		catch (Exception e) {
+			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "can't exec factory method", e);
 		}
 
-		return st;
-	}
-
-	public ST generateListener() {
-		OutputModelFactory factory = new ParserFactory(this);
-
-		OutputModelController controller = new OutputModelController(factory);
-		factory.setController(controller);
-
-		OutputModelObject listenerModel = controller.buildListenerOutputModel();
-
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(listenerModel);
-		return st;
+		return walker.walk(outputModel);
 	}
 
-	public ST generateBlankListener() {
-		OutputModelFactory factory = new ParserFactory(this);
-
-		OutputModelController controller = new OutputModelController(factory);
-		factory.setController(controller);
-
-		OutputModelObject blankModel = controller.buildBlankListenerOutputModel();
-
-		OutputModelWalker walker = new OutputModelWalker(tool, templates);
-		ST st = walker.walk(blankModel);
-		return st;
-	}
+	public ST generateLexer() { return generateModelST("buildLexerOutputModel"); }
+	public ST generateParser() { return generateModelST("buildParserOutputModel"); }
+	public ST generateListener() { return generateModelST("buildListenerOutputModel"); }
+	public ST generateBaseListener() { return generateModelST("buildBaseListenerOutputModel"); }
+	public ST generateParseListener() { return generateModelST("buildParseListenerOutputModel"); }
+	public ST generateBaseParseListener() { return generateModelST("buildBaseParseListenerOutputModel"); }
+	public ST generateVisitor() { return generateModelST("buildVisitorOutputModel"); }
+	public ST generateBaseVisitor() { return generateModelST("buildBaseVisitorOutputModel"); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -226,8 +184,24 @@ public class CodeGenerator {
 		target.genFile(g,outputFileST, getListenerFileName());
 	}
 
-	public void writeBlankListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getBlankListenerFileName());
+	public void writeBaseListener(ST outputFileST) {
+		target.genFile(g,outputFileST, getBaseListenerFileName());
+	}
+
+	public void writeParseListener(ST outputFileST) {
+		target.genFile(g,outputFileST, getParseListenerFileName());
+	}
+
+	public void writeBaseParseListener(ST outputFileST) {
+		target.genFile(g,outputFileST, getBaseParseListenerFileName());
+	}
+
+	public void writeVisitor(ST outputFileST) {
+		target.genFile(g,outputFileST, getVisitorFileName());
+	}
+
+	public void writeBaseVisitor(ST outputFileST) {
+		target.genFile(g,outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
@@ -309,13 +283,47 @@ public class CodeGenerator {
 		return listenerName+extST.render();
 	}
 
-	/** A given grammar T, return a blank listener implementation
-	 *  such as BlankTListener.java, if we're using the Java target.
+	/** A given grammar T, return the visitor name such as
+	 *  TVisitor.java, if we're using the Java target.
  	 */
-	public String getBlankListenerFileName() {
+	public String getVisitorFileName() {
+		assert g.name != null;
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "Visitor";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseListenerFileName() {
 		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
+		return listenerName+extST.render();
+	}
+
+	public String getParseListenerFileName() {
+		assert g.name != null;
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "ParseListener";
+		return listenerName+extST.render();
+	}
+
+	public String getBaseParseListenerFileName() {
+		assert g.name != null;
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "BaseParseListener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseVisitorFileName() {
+		assert g.name != null;
+		ST extST = templates.getInstanceOf("codeFileExtension");
+		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
 

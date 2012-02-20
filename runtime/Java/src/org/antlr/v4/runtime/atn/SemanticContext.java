@@ -194,6 +194,10 @@ public abstract class SemanticContext {
 		return new AND(a, b);
 	}
 
+	/**
+	 *
+	 *  @see ParserATNSimulator#getPredsForAmbigAlts
+	 */
 	public static SemanticContext or(SemanticContext a, SemanticContext b) {
 		if ( a == null ) return b;
 		if ( b == null ) return a;

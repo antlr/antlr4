@@ -31,9 +31,7 @@ package org.antlr.v4.misc;
 
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /** */
 public class Utils {
@@ -144,6 +142,14 @@ public class Utils {
 		int[] a = new int[list.size()];
 		for (int i=0; i<list.size(); i++) a[i] = list.get(i);
 		return a;
+	}
+
+	public static String capitalize(String s) {
+		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
+
+	public static String decapitalize(String s) {
+		return Character.toLowerCase(s.charAt(0)) + s.substring(1);
 	}
 
 	public static char[] toCharArray(List<Integer> data) {

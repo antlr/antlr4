@@ -31,29 +31,18 @@ package org.antlr.v4;
 
 import org.antlr.runtime.*;
 import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.automata.ATNFactory;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.automata.*;
 import org.antlr.v4.codegen.CodeGenPipeline;
-import org.antlr.v4.parse.ANTLRLexer;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.ToolANTLRParser;
-import org.antlr.v4.runtime.misc.LogManager;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTErrorNode;
-import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.STGroup;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
@@ -96,6 +85,7 @@ public class Tool {
 	public boolean verbose_dfa = false;
 	public boolean no_auto_element_labels = false;
 	public boolean gen_listener = true;
+	public boolean gen_parse_listener = false;
 	public boolean gen_visitor = false;
 
     public static Option[] optionDefs = {
@@ -110,6 +100,8 @@ public class Tool {
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
 		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
+		new Option("gen_parse_listener",  "-parse-listener", "generate parse listener"),
+		new Option("gen_parse_listener",  "-no-parse-listener", "don't generate parse listener (default)"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 
@@ -186,8 +178,10 @@ public class Tool {
 				grammarFiles.add(arg);
 				continue;
 			}
+			boolean found = false;
 			for (Option o : optionDefs) {
 				if ( arg.equals(o.name) ) {
+					found = true;
 					String argValue = null;
 					if ( o.argType==OptionArgType.STRING ) {
 						argValue = args[i];
@@ -198,7 +192,7 @@ public class Tool {
 					try {
 						Field f = c.getField(o.fieldName);
 						if ( argValue==null ) {
-							if ( o.fieldName.startsWith("-no-") ) f.setBoolean(this, false);
+							if ( arg.startsWith("-no-") ) f.setBoolean(this, false);
 							else f.setBoolean(this, true);
 						}
 						else f.set(this, argValue);
@@ -207,6 +201,9 @@ public class Tool {
 						errMgr.toolError(ErrorType.INTERNAL_ERROR, "can't access field "+o.fieldName);
 					}
 				}
+			}
+			if ( !found ) {
+				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, arg);
 			}
 		}
 		if ( outputDirectory!=null ) {

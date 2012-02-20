@@ -33,22 +33,13 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.Alternative;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LeftRecursiveRule;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.BlockAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
+import org.stringtemplate.v4.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -118,9 +109,29 @@ public class OutputModelController {
 		return new ListenerFile(delegate, gen.getListenerFileName());
 	}
 
-	public OutputModelObject buildBlankListenerOutputModel() {
+	public OutputModelObject buildBaseListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseListenerFile(delegate, gen.getBlankListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
+	}
+
+	public OutputModelObject buildParseListenerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new ParseListenerFile(delegate, gen.getParseListenerFileName());
+	}
+
+	public OutputModelObject buildBaseParseListenerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseParseListenerFile(delegate, gen.getBaseParseListenerFileName());
+	}
+
+	public OutputModelObject buildVisitorOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new VisitorFile(delegate, gen.getVisitorFileName());
+	}
+
+	public OutputModelObject buildBaseVisitorOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName());
 	}
 
 	public ParserFile parserFile(String fileName) {
@@ -213,7 +224,7 @@ public class OutputModelController {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			if ( altInfo.altLabel==null ) continue;
 			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
-			altActionST.add("ctxName", altInfo.altLabel);
+			altActionST.add("ctxName", Utils.capitalize(altInfo.altLabel));
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = primaryAltsCode.get(i);
@@ -240,7 +251,7 @@ public class OutputModelController {
 			}
 			else {
 				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
-				altActionST.add("ctxName", r.name);
+				altActionST.add("ctxName", Utils.capitalize(r.name));
 			}
 			altActionST.add("ruleName", r.name);
 			// add label of any lr ref we deleted

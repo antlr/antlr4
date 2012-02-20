@@ -27,13 +27,9 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.*;
 
-import java.util.Stack;
+import java.io.*;
 
 public class TestA {
 	/** An example listener that uses a stack to store return values
@@ -66,45 +62,172 @@ public class TestA {
 	 *  Compare this to A2.g4, which adds a field to the context objects
 	 *  by using a "returns [int v]" on the expression rule.
 	 */
-	public static class Do extends ABaseListener {
-		Stack<Integer> results = new Stack<Integer>();
-
+//	public static class Do extends ABaseListener {
+//		Stack<Integer> results = new Stack<Integer>();
+//
+//		@Override
+//		public void exit(AParser.AddContext ctx) {
+//			results.push( results.pop() + results.pop() );
+//			System.out.println("Add: " + results.peek());
+//		}
+//
+//		@Override
+//		public void exit(AParser.IntContext ctx) {
+//			results.push( Integer.valueOf(ctx.INT().getText()) );
+//			System.out.println("Int: "+results.peek());
+//		}
+//
+//		@Override
+//		public void exit(AParser.MultContext ctx) {
+//			results.push( results.pop() * results.pop() );
+//			System.out.println("Mult: " + results.peek());
+//		}
+//
+//		@Override
+//		public void exit(AParser.ParensContext ctx) {
+//			// result already on stack
+//			System.out.println("Parens: "+results.peek());
+//		}
+//	}
+	public static class Tracer extends ABaseListener {
 		@Override
-		public void exit(AParser.AddContext ctx) {
-			results.push( results.pop() + results.pop() );
-			System.out.println("Add: " + results.peek());
+		public void enterAdd(AParser.AddContext ctx) {
+			printMethodName(ctx);
 		}
 
 		@Override
-		public void exit(AParser.IntContext ctx) {
-			results.push( Integer.valueOf(ctx.INT().getText()) );
-			System.out.println("Int: "+results.peek());
+		public void enterEveryRule(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
 		}
 
 		@Override
-		public void exit(AParser.MultContext ctx) {
-			results.push( results.pop() * results.pop() );
-			System.out.println("Mult: " + results.peek());
+		public void enterMult(AParser.MultContext ctx) {
+			printMethodName(ctx);
 		}
 
 		@Override
-		public void exit(AParser.ParensContext ctx) {
-			// result already on stack
-			System.out.println("Parens: "+results.peek());
+		public void enterParens(AParser.ParensContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void enterS(AParser.SContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitAdd(AParser.AddContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitMult(AParser.MultContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitParens(AParser.ParensContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitS(AParser.SContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void visitTerminal(ParserRuleContext<Token> ctx, Token symbol) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void enterPrimary(AParser.PrimaryContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitPrimary(AParser.PrimaryContext ctx) {
+			printMethodName(ctx);
+		}
+
+	}
+
+	public static class TraceDuringParse extends ABaseParseListener {
+		@Override
+		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void enterS(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitAdd(AParser.AddContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitMult(AParser.MultContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitParens(AParser.ParensContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitPrimary(AParser.PrimaryContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void exitS(AParser.SContext ctx) {
+			printMethodName(ctx);
+		}
+
+		@Override
+		public void visitTerminal(ParserRuleContext<Token> ctx, Token symbol) {
+			printMethodName(ctx);
+			System.out.println("visiting "+symbol);
 		}
 	}
+
+	public static void printMethodName(ParserRuleContext ctx) {
+		Throwable t = new Throwable();
+		StackTraceElement[] stack = t.getStackTrace();
+		String m = stack[1].getMethodName();
+		System.out.println(m+"("+ctx.getClass().getSimpleName()+")");
+	}
+
 	public static void main(String[] args) throws Exception {
-		ALexer lexer = new ALexer(new ANTLRFileStream(args[0]));
+		InputStream is = System.in;
+		if ( args.length>0 && args[0]!=null ) {
+			is = new FileInputStream(args[0]);
+		}
+		ALexer lexer = new ALexer(new ANTLRInputStream(is));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		AParser p = new AParser(tokens);
 		p.setBuildParseTree(true);
-		p.addParseListener(new Do());
+		p.addParseListener(new TraceDuringParse());
 		ParserRuleContext<Token> t = p.s();
 		System.out.println("tree = "+t.toStringTree(p));
 
-		ParseTreeWalker walker = new ParseTreeWalker();
-		Do doer = new Do();
-		walker.walk(doer, t);
-		System.out.println("result from tree walk = "+ doer.results.pop());
+//		ParseTreeWalker walker = new ParseTreeWalker();
+//		Do doer = new Do();
+//		walker.walk(doer, t);
+//		System.out.println("result from tree walk = "+ doer.results.pop());
 	}
 }
