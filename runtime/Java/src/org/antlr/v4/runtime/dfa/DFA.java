@@ -43,7 +43,8 @@ public class DFA {
 	public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
 	@Nullable
 	public DFAState s0;
-	public int decision;
+
+	public final int decision;
 
 	/** From which ATN state did we create this DFA? */
 	@NotNull
@@ -54,7 +55,14 @@ public class DFA {
 	 */
 //	public OrderedHashSet<ATNConfig> conflictSet;
 
-	public DFA(@NotNull DecisionState atnStartState) { this.atnStartState = atnStartState; }
+	public DFA(@NotNull DecisionState atnStartState) {
+		this(atnStartState, 0);
+	}
+
+	public DFA(@NotNull DecisionState atnStartState, int decision) {
+		this.atnStartState = atnStartState;
+		this.decision = decision;
+	}
 
 	/** Find the path in DFA from s0 to s, returning list of states encountered (inclusively) */
 //	public List<DFAState> getPathToState(DFAState finalState, TokenStream input, int start, int stop) {
