@@ -255,6 +255,27 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	@Test public void testPrefixOpWithActionAndLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s : e {System.out.println($e.result);} ;\n" +
+			"\n" +
+			"e returns [String result]\n" +
+			"    :   ID '=' e1=e    { $result = \"(\" + $ID.getText() + \"=\" + $e1.result + \")\"; }\n" +
+			"    |   ID             { $result = $ID.getText(); }\n" +
+			"    |   e1=e '+' e2=e  { $result = \"(\" + $e1.result + \"+\" + $e2.result + \")\"; }\n" +
+			"    ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		String[] tests = {
+			"a",			"a",
+			"a+b",			"(a+b)",
+			"a=b+c",		"((a=b)+c)",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	public void runTests(String grammar, String[] tests, String startRule) {
 		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
