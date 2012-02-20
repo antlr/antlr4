@@ -236,10 +236,10 @@ public class TestLeftRecursion extends BaseTest {
 			"e returns [int v]\n" +
 			"  : a=e op='*' b=e {$v = $a.v * $b.v;}  -> mult\n" +
 			"  | a=e '+' b=e {$v = $a.v + $b.v;}     -> add\n" +
-			"  | INT         {$v = $INT.int;}\n" +
-			"  | '(' x=e ')' {$v = $x.v;}\n" +
+			"  | INT         {$v = $INT.int;}        -> anInt\n" +
+			"  | '(' x=e ')' {$v = $x.v;}            -> parens\n" +
 			"  | x=e '++'    {$v = $x.v+1;}          -> inc\n" +
-			"  | e '--'\n" +
+			"  | e '--'                              -> dec\n" +
 			"  | ID          {$v = 3;}               -> anID\n" +
 			"  ; \n" +
 			"\n" +
