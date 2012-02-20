@@ -92,6 +92,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return localContext;
 	}
 
+	public boolean isReadOnly() {
+		return mergedConfigs == null;
+	}
+
 	public Set<ATNState> getStates() {
 		Set<ATNState> states = new HashSet<ATNState>();
 		for (ATNConfig c : this.configs) {
@@ -448,8 +452,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	protected final void ensureWritable() {
-		boolean readonly = mergedConfigs == null;
-		if (readonly) {
+		if (isReadOnly()) {
 			throw new IllegalStateException("This ATNConfigSet is read only.");
 		}
 	}
