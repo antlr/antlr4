@@ -134,6 +134,9 @@ public class <parser.name> extends <superclass> {
 	<funcs; separator="\n">
 
 	@Override
+	public String getGrammarFileName() { return "<parser.grammarFileName>"; }
+
+	@Override
 	public String[] getTokenNames() { return tokenNames; }
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -720,7 +723,7 @@ public class <lexer.name> extends Lexer {
 		_interp = new LexerATNSimulator(this,_ATN);
 	}
 
-	public String getGrammarFileName() { return "<lexerFile.fileName>"; }
+	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
 
 	@Override
 	public String[] getTokenNames() { return tokenNames; }
