@@ -53,15 +53,16 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 *  error reporting.  The generated parsers implement a method
 	 *  that overrides this to point to their String[] tokenNames.
 	 */
-	public String[] getTokenNames() {
-		return null;
-	}
+	public abstract String[] getTokenNames();
 
-	public String[] getRuleNames() {
-		return null;
-	}
+	public abstract String[] getRuleNames();
 
-	public ATN getATN() { return null; }
+	/** For debugging and other purposes, might want the grammar name.
+	 *  Have ANTLR generate an implementation for this method.
+	 */
+	public abstract String getGrammarFileName();
+
+	public abstract ATN getATN();
 
 	public ATNInterpreter getInterpreter() { return _interp; }
 

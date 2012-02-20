@@ -58,13 +58,6 @@ public class AltLabelStructDecl extends StructDecl {
 		if ( factory.getGrammar().tool.gen_visitor ) {
 			dispatchMethods.add(new VisitorDispatchMethod(factory));
 		}
-		if ( factory.getGrammar().tool.gen_parse_listener ) {
-			if ( !(r instanceof LeftRecursiveRule) ) {
-				dispatchMethods.add(new ParseListenerDispatchMethod(factory, true));
-			}
-			dispatchMethods.add(new ParseListenerDispatchMethod(factory, false));
-		}
-
 	}
 
 	@Override

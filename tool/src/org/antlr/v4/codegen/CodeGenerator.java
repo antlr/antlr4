@@ -139,8 +139,6 @@ public class CodeGenerator {
 	public ST generateParser() { return generateModelST("buildParserOutputModel"); }
 	public ST generateListener() { return generateModelST("buildListenerOutputModel"); }
 	public ST generateBaseListener() { return generateModelST("buildBaseListenerOutputModel"); }
-	public ST generateParseListener() { return generateModelST("buildParseListenerOutputModel"); }
-	public ST generateBaseParseListener() { return generateModelST("buildBaseParseListenerOutputModel"); }
 	public ST generateVisitor() { return generateModelST("buildVisitorOutputModel"); }
 	public ST generateBaseVisitor() { return generateModelST("buildBaseVisitorOutputModel"); }
 
@@ -186,14 +184,6 @@ public class CodeGenerator {
 
 	public void writeBaseListener(ST outputFileST) {
 		target.genFile(g,outputFileST, getBaseListenerFileName());
-	}
-
-	public void writeParseListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getParseListenerFileName());
-	}
-
-	public void writeBaseParseListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getBaseParseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
@@ -300,20 +290,6 @@ public class CodeGenerator {
 		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
-		return listenerName+extST.render();
-	}
-
-	public String getParseListenerFileName() {
-		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
-		String listenerName = g.name + "ParseListener";
-		return listenerName+extST.render();
-	}
-
-	public String getBaseParseListenerFileName() {
-		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
-		String listenerName = g.name + "BaseParseListener";
 		return listenerName+extST.render();
 	}
 

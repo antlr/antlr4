@@ -476,8 +476,7 @@ public class TestPerformance extends BaseTest {
                             sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-								// TJP commented out for now; changed interface
-//                                sharedParser.addParseListener(sharedListener);
+                                sharedParser.addParseListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
                                 sharedParser.setErrorHandler(new BailErrorStrategy());

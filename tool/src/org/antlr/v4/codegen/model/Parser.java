@@ -33,11 +33,13 @@ import org.antlr.v4.codegen.*;
 import org.antlr.v4.codegen.model.chunk.*;
 import org.antlr.v4.tool.*;
 
+import java.io.File;
 import java.util.*;
 
 /** */
 public class Parser extends OutputModelObject {
 	public String name;
+	public String grammarFileName;
 	public String grammarName;
 	@ModelElement public ActionChunk superclass;
 	public Map<String,Integer> tokens;
@@ -55,6 +57,7 @@ public class Parser extends OutputModelObject {
 		this.factory = factory;
 		this.file = file; // who contains us?
 		Grammar g = factory.getGrammar();
+		grammarFileName = new File(g.fileName).getName();
 		grammarName = g.name;
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
