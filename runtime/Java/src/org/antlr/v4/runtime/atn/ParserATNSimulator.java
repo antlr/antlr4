@@ -891,6 +891,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// gotten that context AFTER having falling off a rule.
 				// Make sure we track that we are now out of context.
 				c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+				assert depth > Integer.MIN_VALUE;
 				closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
 				return;
 			}
@@ -946,10 +947,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// preds if this is > 0.
 					c.reachesIntoOuterContext++;
 					configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
+					assert newDepth > Integer.MIN_VALUE;
 					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
+					// latch when newDepth goes negative - once we step out of the entry context we can't return
 					if (newDepth >= 0) {
 						newDepth++;
 					}
