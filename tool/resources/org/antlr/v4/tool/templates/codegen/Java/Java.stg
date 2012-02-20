@@ -723,6 +723,7 @@ public class <lexer.name> extends Lexer {
 		_interp = new LexerATNSimulator(this,_ATN);
 	}
 
+	@Override
 	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
 
 	@Override

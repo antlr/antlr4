@@ -476,13 +476,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		return stack;
 	}
 
-	/** For debugging and other purposes, might want the grammar name.
-	 *  Have ANTLR generate an implementation for this method.
-	 */
-	public String getGrammarFileName() {
-		return null;
-	}
-
     /** For debugging and other purposes */
     public List<String> getDFAStrings() {
         List<String> s = new ArrayList<String>();
