@@ -128,20 +128,23 @@ public class <parser.name> extends <superclass> {
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
-	<namedActions.members>
-	<extras>
-	<parser:(ctor)()>
-	<funcs; separator="\n">
 
 	@Override
 	public String getGrammarFileName() { return "<parser.grammarFileName>"; }
 
 	@Override
 	public String[] getTokenNames() { return tokenNames; }
+
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
 	@Override
 	public ATN getATN() { return _ATN; }
+
+	<namedActions.members>
+	<extras>
+	<parser:(ctor)()>
+	<funcs; separator="\n">
 
 <if(sempredFuncs)>
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
