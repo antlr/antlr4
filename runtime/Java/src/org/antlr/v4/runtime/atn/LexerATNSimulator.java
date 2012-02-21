@@ -201,7 +201,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNConfigSet s0_closure = computeStartState(input, startState);
 		int old_mode = mode;
 		dfa[mode].s0 = addDFAState(s0_closure);
-		int predict = exec(input, s0_closure);
+		int predict = exec(input, s0_closure, dfa[mode].s0);
 
 		if ( debug ) {
 			System.out.format("DFA after matchATN: %s\n", dfa[old_mode].toLexerString());
@@ -282,7 +282,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		return dfaPrevAccept.state.prediction;
 	}
 
-	protected int exec(@NotNull CharStream input, @NotNull ATNConfigSet s0) {
+	protected int exec(@NotNull CharStream input, @NotNull ATNConfigSet s0, @Nullable DFAState ds0) {
 		//System.out.println("enter exec index "+input.index()+" from "+s0);
 		@NotNull
 		ATNConfigSet closure = new ATNConfigSet();
@@ -297,23 +297,37 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		traceLookahead1();
 		int t = input.LA(1);
+		DFAState s = ds0;
 
 		while ( true ) { // while more work
 			if ( debug ) {
 				System.out.format("in reach starting closure: %s\n", closure);
 			}
 
-			for (ATNConfig c : closure) {
-				if ( debug ) {
-					System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
+			DFAState next = null;
+			if (s != null) {
+				if ( s.edges != null && t < s.edges.length && t > CharStream.EOF ) {
+					closure = s.configset;
+					next = s.edges[t];
+					if (next != null) {
+						reach = next.configset;
+					}
 				}
+			}
 
-				int n = c.state.getNumberOfTransitions();
-				for (int ti=0; ti<n; ti++) {               // for each transition
-					Transition trans = c.state.transition(ti);
-					ATNState target = getReachableTarget(trans, t);
-					if ( target!=null ) {
-						closure(new ATNConfig(c, target), reach);
+			if (next == null) {
+				for (ATNConfig c : closure) {
+					if ( debug ) {
+						System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
+					}
+
+					int n = c.state.getNumberOfTransitions();
+					for (int ti=0; ti<n; ti++) {               // for each transition
+						Transition trans = c.state.transition(ti);
+						ATNState target = getReachableTarget(trans, t);
+						if ( target!=null ) {
+							closure(new ATNConfig(c, target), reach);
+						}
 					}
 				}
 			}
@@ -322,7 +336,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				// we reached state associated with closure for sure, so
 				// make sure it's defined. worst case, we define s0 from
 				// start state configs.
-				DFAState from = addDFAState(closure);
+				DFAState from = s != null ? s : addDFAState(closure);
 				// we got nowhere on t, don't throw out this knowledge; it'd
 				// cause a failover from DFA later.
 				if (from != null) {
@@ -335,17 +349,16 @@ public class LexerATNSimulator extends ATNSimulator {
 			processAcceptStates(input, reach);
 
 			consume(input);
-			addDFAEdge(closure, t, reach);
+			if (next == null) {
+				next = addDFAEdge(s, t, reach);
+			}
+
 			traceLookahead1();
 			t = input.LA(1);
 
-			// swap to avoid reallocating space
-			// TODO: faster to reallocate?
-			@NotNull
-			ATNConfigSet tmp = reach;
-			reach = closure;
-			closure = tmp;
-			reach.clear();
+			closure = reach;
+			reach = new ATNConfigSet();
+			s = next;
 		}
 
 
@@ -565,7 +578,7 @@ public class LexerATNSimulator extends ATNSimulator {
 							  input.substring(startIndex, input.index()), s.stateNumber, s.configset);
 		}
 
-		int ttype = exec(input, s.configset);
+		int ttype = exec(input, s.configset, s);
 
 		if ( dfa_debug ) {
 			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",
@@ -584,27 +597,24 @@ public class LexerATNSimulator extends ATNSimulator {
 		state.charPos = charPositionInLine;
 	}
 
-	protected void addDFAEdge(@NotNull ATNConfigSet p,
-							  int t,
-							  @NotNull ATNConfigSet q)
+	protected DFAState addDFAEdge(@NotNull DFAState from,
+								  int t,
+								  @NotNull ATNConfigSet q)
 	{
+		DFAState to = addDFAState(q);
+
 		// even if we can add the states, we can't add an edge for labels out of range
 		if (t < 0 || t > MAX_DFA_EDGE) {
-			return;
+			return to;
 		}
 
 //		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
-		DFAState from = addDFAState(p);
-		if (from == null) {
-			return;
-		}
-
-		DFAState to = addDFAState(q);
-		if (to == null) {
-			return;
+		if (from == null || to == null) {
+			return to;
 		}
 
 		addDFAEdge(from, t, to);
+		return to;
 	}
 
 	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
