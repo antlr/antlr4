@@ -501,6 +501,7 @@ public class TestPerformance extends BaseTest {
                         } else {
                             sharedParser = parserCtor.newInstance(tokens);
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+                            sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
