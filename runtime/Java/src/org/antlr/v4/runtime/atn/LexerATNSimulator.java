@@ -114,7 +114,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected int charPositionInLine = 0;
 
 	@NotNull
-	protected DFA[] dfa;
+	public final DFA[] dfa;
 	protected int mode = Lexer.DEFAULT_MODE;
 
 	/** Used during DFA/ATN exec to record the most recent accept configuration info */
