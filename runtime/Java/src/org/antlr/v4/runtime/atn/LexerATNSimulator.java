@@ -306,12 +306,10 @@ public class LexerATNSimulator extends ATNSimulator {
 
 			DFAState next = null;
 			if (s != null) {
-				if ( s.edges != null && t < s.edges.length && t > CharStream.EOF ) {
-					closure = s.configset;
-					next = s.edges[t];
-					if (next != null) {
-						reach = next.configset;
-					}
+				closure = s.configset;
+				next = s.getTarget(t);
+				if (next != null) {
+					reach = next.configset;
 				}
 			}
 
@@ -357,7 +355,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 
 			closure = reach;
-			reach = new ATNConfigSet();
+			reach = new ATNConfigSet(false);
 			s = next;
 		}
 
