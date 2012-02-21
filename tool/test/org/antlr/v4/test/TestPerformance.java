@@ -441,10 +441,8 @@ public class TestPerformance extends BaseTest {
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends Lexer> lexerClass = (Class<? extends Lexer>)loader.loadClass(lexerName);
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass(parserName);
+            final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
             @SuppressWarnings({"unchecked"})
             final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName);
             TestPerformance.sharedListener = listenerClass.newInstance();
