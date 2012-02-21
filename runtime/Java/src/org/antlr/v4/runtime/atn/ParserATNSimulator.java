@@ -1212,22 +1212,23 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				!(t instanceof ActionTransition) && collectPredicates;
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
 			if ( c!=null ) {
-				if (t instanceof RuleTransition) {
-					if (intermediate != null && !collectPredicates) {
-						intermediate.add(c, contextCache);
-						continue;
-					}
-				}
-
 				if (loopsSimulateTailRecursion) {
 					if ( config.state instanceof StarLoopbackState || config.state instanceof PlusLoopbackState ) {
 						c.context = contextCache.getChild(c.context, config.state.stateNumber);
 						if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+c.context);
 					}
-					else if (config.state instanceof LoopEndState) {
-						if ( debug ) System.out.println("Loop end; pop, stack="+c.context);
-						LoopEndState end = (LoopEndState)config.state;
-						c.context = c.context.popAll(end.loopBackStateNumber, contextCache);
+				}
+
+				if (config.state instanceof LoopEndState) {
+					if ( debug ) System.out.println("Loop end; pop, stack="+c.context);
+					LoopEndState end = (LoopEndState)config.state;
+					c.context = c.context.popAll(end.loopBackStateNumber, contextCache);
+				}
+
+				if (t instanceof RuleTransition) {
+					if (intermediate != null && !collectPredicates) {
+						intermediate.add(c, contextCache);
+						continue;
 					}
 				}
 
