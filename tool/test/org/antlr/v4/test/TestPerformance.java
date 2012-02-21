@@ -291,6 +291,29 @@ public class TestPerformance extends BaseTest {
                           tokenCount,
                           System.currentTimeMillis() - startTime);
 
+		final LexerATNSimulator lexerInterpreter = sharedLexer.getInterpreter();
+		final DFA[] modeToDFA = lexerInterpreter.dfa;
+		if (SHOW_DFA_STATE_STATS) {
+			int states = 0;
+			int configs = 0;
+			Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+
+			for (int i = 0; i < modeToDFA.length; i++) {
+				DFA dfa = modeToDFA[i];
+				if (dfa == null || dfa.states == null) {
+					continue;
+				}
+
+				states += dfa.states.size();
+				for (DFAState state : dfa.states.values()) {
+					configs += state.configset.size();
+					uniqueConfigs.addAll(state.configset);
+				}
+			}
+
+			System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+		}
+
         if (RUN_PARSER) {
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
             final ParserATNSimulator<?> interpreter = sharedParser.getInterpreter();
@@ -314,7 +337,7 @@ public class TestPerformance extends BaseTest {
 					}
                 }
 
-                System.out.format("There are %d DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+                System.out.format("There are %d parser DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
             }
 
             int localDfaCount = 0;
