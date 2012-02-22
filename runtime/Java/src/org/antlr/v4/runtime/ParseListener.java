@@ -8,7 +8,7 @@ package org.antlr.v4.runtime;
  *  make the interface clear these semantics up. If you need the ctx,
  *  use Parser.getRuleContext().
  */
-public interface ParseListener<Symbol> {
+public interface ParseListener<Symbol extends Token> {
 	void visitTerminal(ParserRuleContext<Symbol> ctx, Symbol symbol);
 
 	/** Enter all but left-recursive rules */

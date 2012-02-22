@@ -29,14 +29,37 @@
 
 package org.antlr.v4.analysis;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.TokenStream;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.*;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.misc.Pair;
+import org.antlr.v4.parse.ANTLRLexer;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.ScopeParser;
+import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarTransformPipeline;
+import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /** Remove left-recursive rule refs, add precedence args to recursive rule refs.
  *  Rewrite rule so we can create ATN.
@@ -201,12 +224,16 @@ public class LeftRecursiveRuleTransformer {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			altInfo.altAST = (AltAST)primaryBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
+			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
+			altInfo.originalAltAST.parent = altInfo.altAST.parent;
 //			System.out.println(altInfo.altAST.toStringTree());
 		}
 		for (int i = 0; i < r.recOpAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
 			altInfo.altAST = (AltAST)opsBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
+			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
+			altInfo.originalAltAST.parent = altInfo.altAST.parent;
 //			System.out.println(altInfo.altAST.toStringTree());
 		}
 	}

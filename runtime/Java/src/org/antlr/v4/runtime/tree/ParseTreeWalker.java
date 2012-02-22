@@ -30,12 +30,13 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
     @SuppressWarnings("unchecked")
-    public <Symbol> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
+    public <Symbol extends Token> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
 		if ( t instanceof ParseTree.TerminalNode) {
 			visitTerminal(listener, (ParseTree.TerminalNode<Symbol>) t);
 			return;
@@ -50,7 +51,7 @@ public class ParseTreeWalker {
     }
 
     @SuppressWarnings("unchecked")
-    protected <Symbol> void visitTerminal(ParseTreeListener<Symbol> listener,
+    protected <Symbol extends Token> void visitTerminal(ParseTreeListener<Symbol> listener,
 										  ParseTree.TerminalNode<Symbol> t)
 	{
 		ParseTree.RuleNode r = (ParseTree.RuleNode)t.getParent();
@@ -66,14 +67,14 @@ public class ParseTreeWalker {
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected <Symbol> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+    protected <Symbol extends Token> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
 		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
     }
 
-    protected <Symbol> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+    protected <Symbol extends Token> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
 		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);

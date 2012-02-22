@@ -1,19 +1,27 @@
 grammar T;
-/* This is ambig too.
-s_ : s EOF ;
-s : a s
-  |
-  ;
+@members {
+public static class LeafListener extends TBaseListener {
+    public void exitA(TParser.EContext ctx) {
+/*
+      if (ctx.getChildCount()==3) {
+        System.out.printf("%s %s %s",ctx.e(0).start.getText(),
+                          ctx.e(1).start.getText(),ctx.e().get(0).start.getText());
+      }
+      else System.out.println(ctx.INT(0).start.getText());
 */
-
-s : (a)* EOF ; // ambig; can match A B in alt 3 or alt 2 then alt 1
-a : e '!'
-  | e
+    }
+  }}
+s
+@init {setBuildParseTree(true);}
+@after {  System.out.println($r.ctx.toStringTree(this));  ParseTreeWalker walker = new ParseTreeWalker();
+  walker.walk(new LeafListener(), $r.ctx);}
+  : r=e ;
+e : e op='*' e
+  | e op='+' e
+  | e '++'
+  | INT
   ;
-e : B
-  | A		// both alts 2,3 can reach end of s upon abEOF
-  | A B
-  ;
-A : 'a' ;
-B : 'b' ;
-WS : (' '|'\n')+ {skip();} ;
+MULT: '*' ;
+ADD : '+' ;
+INT : [0-9]+ ;
+WS : [ \t\n]+ -> skip ;
