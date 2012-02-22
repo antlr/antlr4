@@ -45,11 +45,11 @@ public interface ParseTree extends SyntaxTree {
 		RuleContext getRuleContext();
 	}
 
-	public interface TerminalNode<Symbol> extends ParseTree {
+	public interface TerminalNode<Symbol extends Token> extends ParseTree {
 		Symbol getSymbol();
 	}
 
-	public static class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
+	public static class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symbol> {
 		public Symbol symbol;
 		public ParseTree parent;
 		/** Which ATN node matched this token? */
@@ -72,13 +72,7 @@ public interface ParseTree extends SyntaxTree {
 		public Interval getSourceInterval() {
 			if ( symbol ==null ) return Interval.INVALID;
 
-			if (symbol instanceof Token) {
-				return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
-			} else if (symbol instanceof SyntaxTree) {
-				return ((SyntaxTree)symbol).getSourceInterval();
-			} else {
-				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
-			}
+			return new Interval(symbol.getStartIndex(), symbol.getStopIndex());
 		}
 
 		@Override
@@ -86,13 +80,8 @@ public interface ParseTree extends SyntaxTree {
 
 		@Override
 		public String toString() {
-			if (symbol instanceof Token) {
-				if ( ((Token)symbol).getType() == Token.EOF ) return "<EOF>";
-				return ((Token)symbol).getText();
-			}
-			else {
-				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
-			}
+				if ( symbol.getType() == Token.EOF ) return "<EOF>";
+				return symbol.getText();
 		}
 
 		@Override
@@ -107,12 +96,10 @@ public interface ParseTree extends SyntaxTree {
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<Symbol> extends TerminalNodeImpl<Symbol> {
+	public static class ErrorNodeImpl<Symbol extends Token> extends TerminalNodeImpl<Symbol> {
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
 		}
-//		@Override
-//		public String toString() { return "<ERROR:"+super.toString()+">"; }
 	}
 
 	// the following methods narrow the return type; they are not additional methods

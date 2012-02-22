@@ -29,17 +29,28 @@
 
 package org.antlr.v4.analysis;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Pair;
-import org.antlr.v4.parse.*;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.LeftRecursiveRuleWalker;
 import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.*;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Using a tree walker on the rules, determine if a rule is directly left-recursive and if it follows
  *  our pattern.
@@ -124,8 +135,8 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	}
 
 	@Override
-	public void binaryAlt(AltAST altTree, int alt) {
-		altTree = (AltAST)altTree.dupTree();
+	public void binaryAlt(AltAST originalAltTree, int alt) {
+		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
@@ -143,7 +154,8 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		stripAltLabel(altTree);
 		String altText = text(altTree);
 		altText = altText.trim();
-		LeftRecursiveRuleAltInfo a = new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel);
+		LeftRecursiveRuleAltInfo a =
+			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, originalAltTree);
 		a.nextPrec = nextPrec;
 		binaryAlts.put(alt, a);
 		//System.out.println("binaryAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
@@ -151,8 +163,8 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	/** Convert e ? e : e  ->  ? e : e_[nextPrec] */
 	@Override
-	public void ternaryAlt(AltAST altTree, int alt) {
-		altTree = (AltAST)altTree.dupTree();
+	public void ternaryAlt(AltAST originalAltTree, int alt) {
+		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
@@ -168,15 +180,16 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		String altText = text(altTree);
 		altText = altText.trim();
-		LeftRecursiveRuleAltInfo a = new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel);
+		LeftRecursiveRuleAltInfo a =
+			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, originalAltTree);
 		a.nextPrec = nextPrec;
 		ternaryAlts.put(alt, a);
 		//System.out.println("ternaryAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
 	}
 
 	@Override
-	public void prefixAlt(AltAST altTree, int alt) {
-		altTree = (AltAST)altTree.dupTree();
+	public void prefixAlt(AltAST originalAltTree, int alt) {
+		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		stripAltLabel(altTree);
 
 		int nextPrec = precedence(alt);
@@ -185,15 +198,16 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		String altText = text(altTree);
 		altText = altText.trim();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
-		LeftRecursiveRuleAltInfo a = new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel);
+		LeftRecursiveRuleAltInfo a =
+			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, originalAltTree);
 		a.nextPrec = nextPrec;
 		prefixAlts.add(a);
 		//System.out.println("prefixAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
 	}
 
 	@Override
-	public void suffixAlt(AltAST altTree, int alt) {
-		altTree = (AltAST)altTree.dupTree();
+	public void suffixAlt(AltAST originalAltTree, int alt) {
+		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
@@ -204,18 +218,20 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		stripAltLabel(altTree);
 		String altText = text(altTree);
 		altText = altText.trim();
-		LeftRecursiveRuleAltInfo a = new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel);
+		LeftRecursiveRuleAltInfo a =
+			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, originalAltTree);
 		suffixAlts.put(alt, a);
 //		System.out.println("suffixAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
 	}
 
 	@Override
-	public void otherAlt(AltAST altTree, int alt) {
-		altTree = (AltAST)altTree.dupTree();
+	public void otherAlt(AltAST originalAltTree, int alt) {
+		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		stripAltLabel(altTree);
 		String altText = text(altTree);
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
-		LeftRecursiveRuleAltInfo a = new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel);
+		LeftRecursiveRuleAltInfo a =
+			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, originalAltTree);
 		otherAlts.add(a);
 //		System.out.println("otherAlt " + alt + ": " + altText);
 	}

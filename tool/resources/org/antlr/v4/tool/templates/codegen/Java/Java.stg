@@ -47,12 +47,12 @@ import org.antlr.v4.runtime.Token;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
-public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
-public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
 }
 >>
 
@@ -76,13 +76,13 @@ import org.antlr.v4.runtime.*;
 
 public class <file.grammarName>BaseParseListener implements <file.grammarName>ParseListener {
 	<file.listenerEnterNames:{lname |
-public void enter<lname; format="cap">(ParserRuleContext\<<InputSymbolType()>\> ctx) { \}}; separator="\n">
+@Override public void enter<lname; format="cap">(ParserRuleContext\<<InputSymbolType()>\> ctx) { \}}; separator="\n">
 	<file.listenerExitNames:{lname |
-public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	public void enterNonLRRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	@Override public void enterNonLRRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
 }
 >>
 
@@ -101,10 +101,12 @@ BaseVisitorFile(file, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
-public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { visitChildren(ctx); return null; \}}; separator="\n">
+@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+	@Override public T visitTerminal(ParserRuleContext\<? extends Token> ctx, Token symbol) { return null; }
 }
 >>
 
@@ -128,17 +130,23 @@ public class <parser.name> extends <superclass> {
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+
+	@Override
+	public String getGrammarFileName() { return "<parser.grammarFileName>"; }
+
+	@Override
+	public String[] getTokenNames() { return tokenNames; }
+
+	@Override
+	public String[] getRuleNames() { return ruleNames; }
+
+	@Override
+	public ATN getATN() { return _ATN; }
+
 	<namedActions.members>
 	<extras>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
-
-	@Override
-	public String[] getTokenNames() { return tokenNames; }
-	@Override
-	public String[] getRuleNames() { return ruleNames; }
-	@Override
-	public ATN getATN() { return _ATN; }
 
 <if(sempredFuncs)>
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
@@ -617,19 +625,22 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 >>
 
 ListenerDispatchMethod(method) ::= <<
+@Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
+@Override
 public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) { 
-    if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit<struct.derivedFromName; format="cap">(this);
-    else return null;
+	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit<struct.derivedFromName; format="cap">(this);
+	else return null;
 }
 >>
 
 ParseListenerDispatchMethod(method) ::= <<
+@Override
 public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseListener\<<InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>ParseListener ) ((<parser.grammarName>ParseListener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
@@ -720,7 +731,8 @@ public class <lexer.name> extends Lexer {
 		_interp = new LexerATNSimulator(this,_ATN);
 	}
 
-	public String getGrammarFileName() { return "<lexerFile.fileName>"; }
+	@Override
+	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
 
 	@Override
 	public String[] getTokenNames() { return tokenNames; }

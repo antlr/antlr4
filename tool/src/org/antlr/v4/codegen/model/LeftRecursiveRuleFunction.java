@@ -29,11 +29,14 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.*;
-import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.decl.RuleContextDecl;
+import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.Pair;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 public class LeftRecursiveRuleFunction extends RuleFunction {

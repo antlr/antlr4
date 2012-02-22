@@ -274,7 +274,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 1\n";
 		assertEquals(expecting, found);
 
-		expecting = "";
+		expecting = null;
 		assertEquals(expecting, stderrDuringParse);
 	}
 

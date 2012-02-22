@@ -35,6 +35,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,6 +43,7 @@ import java.util.Set;
 
 public class Lexer extends OutputModelObject {
 	public String name;
+	public String grammarFileName;
 	public Map<String,Integer> tokens;
 	public LexerFile file;
 	public String[] tokenNames;
@@ -58,6 +60,7 @@ public class Lexer extends OutputModelObject {
 		this.factory = factory;
 		this.file = file; // who contains us?
 		Grammar g = factory.getGrammar();
+		grammarFileName = new File(g.fileName).getName();
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
 		LexerGrammar lg = (LexerGrammar)g;
