@@ -148,7 +148,7 @@ ternary
 prefix
 	:	^(	ALT {setTokenPrec((GrammarAST)input.LT(1), currentOuterAltNumber);}
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
-			recurse
+			recurse ACTION?
 		 )
 	;
 

@@ -30,8 +30,9 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
-public interface ParseTreeListener<Symbol> {
+public interface ParseTreeListener<Symbol extends Token> {
     void visitTerminal(ParserRuleContext<Symbol> ctx, Symbol symbol);
     void enterEveryRule(ParserRuleContext<Symbol> ctx);
     void exitEveryRule(ParserRuleContext<Symbol> ctx);

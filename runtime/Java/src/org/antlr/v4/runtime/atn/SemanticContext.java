@@ -189,14 +189,19 @@ public abstract class SemanticContext {
     }
 
 	public static SemanticContext and(SemanticContext a, SemanticContext b) {
-		if ( a == NONE ) return b;
-		if ( b == NONE ) return a;
+		if ( a == null || a == NONE ) return b;
+		if ( b == null || b == NONE ) return a;
 		return new AND(a, b);
 	}
 
+	/**
+	 *
+	 *  @see ParserATNSimulator#getPredsForAmbigAlts
+	 */
 	public static SemanticContext or(SemanticContext a, SemanticContext b) {
-		if ( a == NONE ) return b;
-		if ( b == NONE ) return a;
+		if ( a == null ) return b;
+		if ( b == null ) return a;
+		if ( a == NONE || b == NONE ) return NONE;
 		return new OR(a, b);
 	}
 }

@@ -46,6 +46,11 @@ public class ParserInterpreter {
 		}
 
 		@Override
+		public String getGrammarFileName() {
+			return null;
+		}
+
+		@Override
 		public String[] getRuleNames() {
 			return g.rules.keySet().toArray(new String[g.rules.size()]);
 		}
@@ -53,6 +58,11 @@ public class ParserInterpreter {
 		@Override
 		public String[] getTokenNames() {
 			return g.getTokenNames();
+		}
+
+		@Override
+		public ATN getATN() {
+			return null;
 		}
 	}
 

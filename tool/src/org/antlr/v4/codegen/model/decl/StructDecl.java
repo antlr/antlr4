@@ -30,11 +30,20 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.DispatchMethod;
+import org.antlr.v4.codegen.model.ListenerDispatchMethod;
+import org.antlr.v4.codegen.model.ModelElement;
+import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.model.ParseListenerDispatchMethod;
+import org.antlr.v4.codegen.model.VisitorDispatchMethod;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /** This object models the structure holding all of the parameters,
  *  return values, local variables, and labels associated with a rule.
@@ -60,8 +69,10 @@ public class StructDecl extends Decl {
 		dispatchMethods = new ArrayList<DispatchMethod>();
 		if ( !r.hasAltSpecificContexts() ) {
 			// no enter/exit for this ruleContext if rule has labels
-			dispatchMethods.add(new ListenerDispatchMethod(factory, true));
-			dispatchMethods.add(new ListenerDispatchMethod(factory, false));
+			if ( factory.getGrammar().tool.gen_listener ) {
+				dispatchMethods.add(new ListenerDispatchMethod(factory, true));
+				dispatchMethods.add(new ListenerDispatchMethod(factory, false));
+			}
 			if ( factory.getGrammar().tool.gen_visitor ) {
 				dispatchMethods.add(new VisitorDispatchMethod(factory));
 			}

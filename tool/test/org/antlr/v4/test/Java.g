@@ -181,7 +181,9 @@ compilationUnit
         (   packageDeclaration importDeclaration* typeDeclaration*
         |   classOrInterfaceDeclaration typeDeclaration*
         )
+        EOF
     |   packageDeclaration? importDeclaration* typeDeclaration*
+        EOF
     ;
 
 packageDeclaration
