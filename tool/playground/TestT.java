@@ -40,8 +40,8 @@ public class TestT {
 		}
 		TParser p = new TParser(tokens);
 		p.setBuildParseTree(true);
-		final TParser.sContext tree = p.s();
-		System.out.println(tree.toStringTree(p));
+//		final TParser.sContext tree = p.s();
+//		System.out.println(tree.toStringTree(p));
 //		TreeViewer v = new TreeViewer(p, tree);
 //		v.setHighlightedBoxColor(TreeViewer.LIGHT_RED);
 //		v.addHighlightedNodes(new ArrayList<Tree>() {{

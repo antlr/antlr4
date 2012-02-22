@@ -28,11 +28,17 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /** A rule invocation record for parsing and tree parsing.
  *
@@ -57,8 +63,8 @@ import java.util.*;
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-public class ParserRuleContext<Symbol> extends RuleContext {
-	public static final ParserRuleContext<?> EMPTY = new ParserRuleContext<Object>();
+public class ParserRuleContext<Symbol extends Token> extends RuleContext {
+	public static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
 
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
@@ -137,7 +143,7 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
 	// visitor
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { visitor.visitChildren(this); return null; }
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 
 	/** Does not set parent link; other add methods do */
@@ -209,13 +215,11 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		for (ParseTree o : children) {
 			if ( o instanceof TerminalNode<?> ) {
 				TerminalNode<?> tnode = (TerminalNode<?>)o;
-				if ( tnode.getSymbol() instanceof Token ) {
-					Token symbol = (Token)tnode.getSymbol();
-					if ( symbol.getType()==ttype ) {
-						j++;
-						if ( j == i ) {
-							return symbol;
-						}
+				Token symbol = tnode.getSymbol();
+				if ( symbol.getType()==ttype ) {
+					j++;
+					if ( j == i ) {
+						return symbol;
 					}
 				}
 			}
@@ -233,13 +237,11 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 		for (ParseTree o : children) {
 			if ( o instanceof TerminalNode<?> ) {
 				TerminalNode<?> tnode = (TerminalNode<?>)o;
-				if ( tnode.getSymbol() instanceof Token ) {
-					Token symbol = (Token)tnode.getSymbol();
-					if ( tokens==null ) {
-						tokens = new ArrayList<Token>();
-					}
-					tokens.add(symbol);
+				Token symbol = tnode.getSymbol();
+				if ( tokens==null ) {
+					tokens = new ArrayList<Token>();
 				}
+				tokens.add(symbol);
 			}
 		}
 
@@ -298,9 +300,6 @@ public class ParserRuleContext<Symbol> extends RuleContext {
 			String ruleName = recog.getRuleNames()[s.ruleIndex];
 			buf.append(ruleName);
 			if ( p.parent != null ) buf.append(" ");
-//				ATNState invoker = atn.states.get(ctx.invokingState);
-//				RuleTransition rt = (RuleTransition)invoker.transition(0);
-//				buf.append(recog.getRuleNames()[rt.target.ruleIndex]);
 			p = (ParserRuleContext<?>)p.parent;
 		}
 		buf.append("]");

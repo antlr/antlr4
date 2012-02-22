@@ -101,10 +101,12 @@ BaseVisitorFile(file, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
-@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { visitChildren(ctx); return null; \}}; separator="\n">
+@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+	@Override public T visitTerminal(ParserRuleContext\<? extends Token> ctx, Token symbol) { return null; }
 }
 >>
 
