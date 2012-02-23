@@ -209,6 +209,11 @@ public class TestCommonTokenStream extends BaseTest {
 				}
 
 				@Override
+				public TokenFactory<?> getTokenFactory() {
+					return CommonTokenFactory.DEFAULT;
+				}
+
+				@Override
 				public void setTokenFactory(TokenFactory<?> factory) {
 				}
 			};

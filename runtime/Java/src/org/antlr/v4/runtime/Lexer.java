@@ -197,6 +197,11 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	@Override
+	public TokenFactory<?> getTokenFactory() {
+		return _factory;
+	}
+
+	@Override
 	public void setTokenFactory(TokenFactory<?> factory) {
 		this._factory = factory;
 	}

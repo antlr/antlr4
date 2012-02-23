@@ -63,6 +63,9 @@ public interface TokenSource {
 	 */
 	public String getSourceName();
 
+	/** Gets the factory used for constructing tokens. */
+	public TokenFactory<?> getTokenFactory();
+
 	/** Optional method that lets users set factory in lexer or other source */
 	public void setTokenFactory(TokenFactory<?> factory);
 }
