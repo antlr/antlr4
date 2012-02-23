@@ -290,14 +290,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<? extends Symbol> input,
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
-		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
+		if ( outerContext==null ) outerContext = ParserRuleContext.emptyContext();
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+
 										" exec LA(1)=="+ getLookaheadName(input) +
 										", outerContext="+outerContext.toString(parser));
 		DecisionState decState = atn.getDecisionState(dfa.decision);
 		boolean greedy = decState.isGreedy;
 		boolean loopsSimulateTailRecursion = false;
-		ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, ParserRuleContext.EMPTY, greedy, loopsSimulateTailRecursion);
+		ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, ParserRuleContext.emptyContext(), greedy, loopsSimulateTailRecursion);
 		dfa.s0 = addDFAState(dfa, s0_closure);
 
 		int alt = 0;
@@ -322,7 +322,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
                        @Nullable ParserRuleContext<?> outerContext)
     {
-		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
+		if ( outerContext==null ) outerContext = ParserRuleContext.emptyContext();
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
 											" exec LA(1)=="+ getLookaheadName(input) +
 											", outerContext="+outerContext.toString(parser));

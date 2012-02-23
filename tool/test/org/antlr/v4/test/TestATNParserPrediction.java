@@ -506,7 +506,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState, decision);
-		int alt = interp.predictATN(dfa, input, ParserRuleContext.EMPTY, false);
+		int alt = interp.predictATN(dfa, input, ParserRuleContext.emptyContext(), false);
 
 		System.out.println(dot.getDOT(dfa, false));
 
@@ -576,7 +576,7 @@ public class TestATNParserPrediction extends BaseTest {
 			System.out.println(types);
 			TokenStream input = new IntTokenStream(types);
 			try {
-				interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
+				interp.adaptivePredict(input, decision, ParserRuleContext.emptyContext());
 			}
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);

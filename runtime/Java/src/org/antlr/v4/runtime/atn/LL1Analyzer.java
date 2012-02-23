@@ -63,7 +63,7 @@ public class LL1Analyzer {
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
 			_LOOK(s.transition(alt - 1).target,
-				  ParserRuleContext.EMPTY,
+				  ParserRuleContext.emptyContext(),
 				  look[alt], lookBusy, seeThruPreds);
 			if ( look[alt].size()==0 ) look[alt] = null;
 		}

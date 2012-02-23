@@ -58,7 +58,7 @@ import java.util.*;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext<Symbol extends Token> extends RuleContext {
-	public static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
+	private static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
 
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
@@ -104,6 +104,12 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	public int altNum;
 
 	public ParserRuleContext() { }
+
+	public static <T extends Token> ParserRuleContext<T> emptyContext() {
+		@SuppressWarnings("unchecked")
+		ParserRuleContext<T> context = (ParserRuleContext<T>)EMPTY;
+		return context;
+	}
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) */
 	public void copyFrom(ParserRuleContext<Symbol> ctx) {

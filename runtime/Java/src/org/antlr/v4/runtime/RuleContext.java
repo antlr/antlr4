@@ -271,7 +271,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	}
 
 	public String toString(@Nullable Recognizer<?,?> recog) {
-		return toString(recog, ParserRuleContext.EMPTY);
+		return toString(recog, ParserRuleContext.emptyContext());
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
