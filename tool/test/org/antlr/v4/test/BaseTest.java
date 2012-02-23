@@ -431,7 +431,9 @@ public abstract class BaseTest {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  parserName,
-									  lexerName);
+									  lexerName,
+									  "-parse-listener",
+									  "-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
@@ -456,7 +458,16 @@ public abstract class BaseTest {
 		}
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
-			files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			if (!optionsSet.contains("-no-listener")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+			}
+			if (optionsSet.contains("-visitor")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
+			}
+			if (optionsSet.contains("-parse-listener")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
+			}
 		}
 		ok = compile(files.toArray(new String[files.size()]));
 		if ( !ok ) { allIsWell = false; }
