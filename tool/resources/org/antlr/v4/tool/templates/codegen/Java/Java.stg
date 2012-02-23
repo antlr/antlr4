@@ -50,9 +50,9 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 @Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	@Override public \<T extends <InputSymbolType()>\> void enterEveryRule(ParserRuleContext\<T> ctx) { }
+	@Override public \<T extends <InputSymbolType()>\> void exitEveryRule(ParserRuleContext\<T> ctx) { }
+	@Override public \<T extends <InputSymbolType()>\> void visitTerminal(ParserRuleContext\<T> ctx, T symbol) { }
 }
 >>
 
@@ -80,9 +80,9 @@ public class <file.grammarName>BaseParseListener implements <file.grammarName>Pa
 	<file.listenerExitNames:{lname |
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterNonLRRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	@Override public \<T extends <InputSymbolType()>\> void enterNonLRRule(ParserRuleContext\<T> ctx) { }
+	@Override public \<T extends <InputSymbolType()>\> void exitEveryRule(ParserRuleContext\<T> ctx) { }
+	@Override public \<T extends <InputSymbolType()>\> void visitTerminal(ParserRuleContext\<T> ctx, T symbol) { }
 }
 >>
 
@@ -625,14 +625,14 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 
 ListenerDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<? super <InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public \<Result> Result accept(ParseTreeVisitor\<<InputSymbolType()>, ? extends Result> visitor) {
+public \<Result> Result accept(ParseTreeVisitor\<? super <InputSymbolType()>, ? extends Result> visitor) {
 	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return null;
 }
@@ -640,7 +640,7 @@ public \<Result> Result accept(ParseTreeVisitor\<<InputSymbolType()>, ? extends 
 
 ParseListenerDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseListener\<<InputSymbolType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseListener\<? super <InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>ParseListener ) ((<parser.grammarName>ParseListener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>

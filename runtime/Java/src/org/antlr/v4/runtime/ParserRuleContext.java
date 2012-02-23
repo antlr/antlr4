@@ -135,15 +135,15 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	// Double dispatch methods for listeners and visitors
 
 	// parse listener
-	public void enterRule(ParseListener<Symbol> listener) { }
-	public void exitRule(ParseListener<Symbol> listener) { }
+	public void enterRule(ParseListener<? super Symbol> listener) { }
+	public void exitRule(ParseListener<? super Symbol> listener) { }
 
 	// parse tree listener
-	public void enterRule(ParseTreeListener<Symbol> listener) { }
-	public void exitRule(ParseTreeListener<Symbol> listener) { }
+	public void enterRule(ParseTreeListener<? super Symbol> listener) { }
+	public void exitRule(ParseTreeListener<? super Symbol> listener) { }
 
 	// visitor
-	public <Result> Result accept(ParseTreeVisitor<Symbol, ? extends Result> visitor) { return visitor.visitChildren(this); }
+	public <Result> Result accept(ParseTreeVisitor<? super Symbol, ? extends Result> visitor) { return visitor.visitChildren(this); }
 
 
 	/** Does not set parent link; other add methods do */
