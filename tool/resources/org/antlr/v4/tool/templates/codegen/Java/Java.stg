@@ -91,9 +91,9 @@ VisitorFile(file, header) ::= <<
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<<InputSymbolType()>, T> {
+public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<<InputSymbolType()>, Result> {
 	<file.visitorNames:{lname |
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -103,10 +103,10 @@ import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<<InputSymbolType()>, T> implements <file.grammarName>Visitor\<T> {
+public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
-@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
-	@Override public T visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { return null; }
+@Override public Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+	@Override public Result visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { return null; }
 }
 >>
 
@@ -633,8 +633,8 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<I
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public \<T> T accept(ParseTreeVisitor\<<InputSymbolType()>, ? extends T> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit<struct.derivedFromName; format="cap">(this);
+public \<Result> Result accept(ParseTreeVisitor\<<InputSymbolType()>, ? extends Result> visitor) {
+	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return null;
 }
 >>

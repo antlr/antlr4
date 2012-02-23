@@ -143,7 +143,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
 	// visitor
-	public <T> T accept(ParseTreeVisitor<Symbol, ? extends T> visitor) { return visitor.visitChildren(this); }
+	public <Result> Result accept(ParseTreeVisitor<Symbol, ? extends Result> visitor) { return visitor.visitChildren(this); }
 
 
 	/** Does not set parent link; other add methods do */
