@@ -255,12 +255,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			line = ((Token) offendingToken).getLine();
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
-		List<? extends ANTLRErrorListener<Token>> listeners = getErrorListeners();
+		List<? extends ANTLRErrorListener<? super Token>> listeners = getErrorListeners();
 		if ( listeners.isEmpty() ) {
 			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
 			return;
 		}
-		for (ANTLRErrorListener<Token> pl : listeners) {
+		for (ANTLRErrorListener<? super Token> pl : listeners) {
 			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}

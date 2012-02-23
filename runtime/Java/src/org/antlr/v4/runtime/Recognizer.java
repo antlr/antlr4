@@ -43,7 +43,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
-	private List<ANTLRErrorListener<Symbol>> _listeners;
+	private List<ANTLRErrorListener<? super Symbol>> _listeners;
 
 	protected ATNInterpreter _interp;
 
@@ -96,26 +96,26 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return "'"+s+"'";
 	}
 
-	public void addErrorListener(ANTLRErrorListener<Symbol> pl) {
+	public void addErrorListener(ANTLRErrorListener<? super Symbol> pl) {
 		if ( _listeners ==null ) {
 			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<Symbol>>(2));
+				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<? super Symbol>>(2));
 		}
 		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeErrorListener(ANTLRErrorListener<Symbol> pl) {
+	public void removeErrorListener(ANTLRErrorListener<? super Symbol> pl) {
 		if ( _listeners!=null ) _listeners.remove(pl);
 	}
 
 	public void removeErrorListeners() { if ( _listeners!=null ) _listeners.clear(); }
 
-	public @NotNull List<? extends ANTLRErrorListener<Symbol>> getErrorListeners() {
+	public @NotNull List<? extends ANTLRErrorListener<? super Symbol>> getErrorListeners() {
 		if (_listeners == null) {
-			return Collections.<ANTLRErrorListener<Symbol>>emptyList();
+			return Collections.emptyList();
 		}
 
-		return new ArrayList<ANTLRErrorListener<Symbol>>(_listeners);
+		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
 	}
 
 	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }

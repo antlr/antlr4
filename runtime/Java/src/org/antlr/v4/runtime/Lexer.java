@@ -309,14 +309,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
 			_input.substring(_tokenStartCharIndex, _input.index())+"'";
-		List<? extends ANTLRErrorListener<Integer>> listeners = getErrorListeners();
+		List<? extends ANTLRErrorListener<? super Integer>> listeners = getErrorListeners();
 		if ( listeners.isEmpty() ) {
 			System.err.println("line "+ _tokenStartLine +":"+
 							   _tokenStartCharPositionInLine +" "+
 							   msg);
 			return;
 		}
-		for (ANTLRErrorListener<Integer> pl : listeners) {
+		for (ANTLRErrorListener<? super Integer> pl : listeners) {
 			pl.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 		}
 	}
