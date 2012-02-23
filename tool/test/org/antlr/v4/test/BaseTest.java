@@ -1027,7 +1027,7 @@ public abstract class BaseTest {
     public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
     public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-	public static class IntTokenStream implements TokenStream {
+	public static class IntTokenStream implements TokenStream<Token> {
 		List<Integer> types;
 		int p=0;
 		public IntTokenStream(List<Integer> types) { this.types = types; }

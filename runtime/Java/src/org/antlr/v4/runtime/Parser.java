@@ -55,7 +55,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
-	protected TokenStream _input;
+	protected TokenStream<Token> _input;
 
 	/** The RuleContext object for the currently executing rule. This
 	 *  must be non-null during parsing, but is initially null.
@@ -79,7 +79,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int _syntaxErrors = 0;
 
-	public Parser(TokenStream input) {
+	public Parser(TokenStream<Token> input) {
 		setInputStream(input);
 	}
 
@@ -208,19 +208,19 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
 	@Override
-	public TokenStream getInputStream() { return getTokenStream(); }
+	public TokenStream<Token> getInputStream() { return getTokenStream(); }
 
 	@Override
 	public final void setInputStream(IntStream<Token> input) {
-		setTokenStream((TokenStream)input);
+		setTokenStream((TokenStream<Token>)input);
 	}
 
-	public TokenStream getTokenStream() {
+	public TokenStream<Token> getTokenStream() {
 		return _input;
 	}
 
 	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream input) {
+	public void setTokenStream(TokenStream<Token> input) {
 		this._input = null;
 		reset();
 		this._input = input;
@@ -232,8 +232,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 
     public String getInputString(int start, int stop) {
         SymbolStream<Token> input = getInputStream();
-        if ( input instanceof TokenStream ) {
-            return ((TokenStream)input).toString(start,stop);
+        if ( input instanceof TokenStream<?> ) {
+            return ((TokenStream<Token>)input).toString(start,stop);
         }
         return "n/a";
     }

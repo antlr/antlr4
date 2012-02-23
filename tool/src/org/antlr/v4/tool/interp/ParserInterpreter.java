@@ -40,7 +40,7 @@ import org.antlr.v4.tool.Grammar;
 public class ParserInterpreter {
 	class DummyParser extends Parser {
 		public Grammar g;
-		public DummyParser(Grammar g, TokenStream input) {
+		public DummyParser(Grammar g, TokenStream<Token> input) {
 			super(input);
 			this.g = g;
 		}
@@ -68,13 +68,13 @@ public class ParserInterpreter {
 
 	protected Grammar g;
 	protected ParserATNSimulator<Token> atnSimulator;
-	protected TokenStream input;
+	protected TokenStream<?> input;
 
 	public ParserInterpreter(@NotNull Grammar g) {
 		this.g = g;
 	}
 
-	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream input) {
+	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream<Token> input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
 		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, input), g.atn);
@@ -93,7 +93,7 @@ public class ParserInterpreter {
 		return atnSimulator.adaptivePredict(input, decision, outerContext);
 	}
 
-	public int matchATN(@NotNull TokenStream input,
+	public int matchATN(@NotNull TokenStream<? extends Token> input,
 						@NotNull ATNState startState)
 	{
 		if (startState.getNumberOfTransitions() == 1) {

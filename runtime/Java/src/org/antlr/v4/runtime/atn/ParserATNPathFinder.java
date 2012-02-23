@@ -62,7 +62,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 	 *  TODO: preds. unless i create rule specific ctxs, i can't eval preds. also must eval args!
 	 */
 	public TraceTree trace(@NotNull ATNState s, @Nullable RuleContext ctx,
-								TokenStream input, int start, int stop)
+								TokenStream<? extends Token> input, int start, int stop)
 	{
 		System.out.println("REACHES "+s.stateNumber+" start state");
 		List<TraceTree> leaves = new ArrayList<TraceTree>();
@@ -77,7 +77,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 
 	/** Returns true if we found path */
 	public TraceTree _trace(@NotNull ATNState s, RuleContext initialContext, RuleContext ctx,
-							TokenStream input, int start, int i, int stop,
+							TokenStream<? extends Token> input, int start, int i, int stop,
 							List<TraceTree> leaves, @NotNull Set<ATNState>[] busy)
 	{
 		TraceTree root = new TraceTree(s);
@@ -160,7 +160,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 		return null;
 	}
 
-	public TraceTree predTransition(RuleContext initialContext, RuleContext ctx, TokenStream input, int start,
+	public TraceTree predTransition(RuleContext initialContext, RuleContext ctx, TokenStream<? extends Token> input, int start,
 									int i, int stop, List<TraceTree> leaves, Set<ATNState>[] busy,
 									TraceTree root, Transition t)
 	{

@@ -502,7 +502,7 @@ public class TestATNParserPrediction extends BaseTest {
 
 		// Check ATN prediction
 //		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
-		TokenStream input = new IntTokenStream(types);
+		TokenStream<Token> input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState, decision);
@@ -544,7 +544,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
 		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
-		TokenStream input = new IntTokenStream(types);
+		TokenStream<? extends Token> input = new IntTokenStream(types);
 		try {
 			DecisionState startState = atn.decisionToState.get(0);
 			DFA dfa = new DFA(startState);
@@ -574,7 +574,7 @@ public class TestATNParserPrediction extends BaseTest {
 			// Check DFA
 			List<Integer> types = getTokenTypesViaATN(inputString[i], lexInterp);
 			System.out.println(types);
-			TokenStream input = new IntTokenStream(types);
+			TokenStream<Token> input = new IntTokenStream(types);
 			try {
 				interp.adaptivePredict(input, decision, ParserRuleContext.emptyContext());
 			}

@@ -47,7 +47,7 @@ import org.antlr.v4.runtime.misc.LookaheadStream;
  */
 public class UnbufferedTokenStream<T extends Token>
         extends LookaheadStream<T>
-        implements TokenStream
+        implements TokenStream<T>
 {
 	protected TokenSource<T> tokenSource;
     protected int tokenIndex = 0; // simple counter to set token index in tokens

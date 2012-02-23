@@ -45,7 +45,7 @@ import java.util.*;
  *  This is not a subclass of UnbufferedTokenStream because I don't want
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
-public class BufferedTokenStream<T extends Token> implements TokenStream {
+public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     protected TokenSource<? extends T> tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
