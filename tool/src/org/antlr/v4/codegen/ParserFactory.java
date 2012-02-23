@@ -31,21 +31,12 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.codegen.model.decl.RuleContextDecl;
-import org.antlr.v4.codegen.model.decl.TokenDecl;
-import org.antlr.v4.codegen.model.decl.TokenListDecl;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.PlusBlockStartState;
-import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Alternative;
-import org.antlr.v4.tool.LeftRecursiveRule;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.BlockAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.TerminalAST;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 
@@ -71,7 +62,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		}
 	}
 
-	public CodeBlockForAlt epsilon() { return new CodeBlockForAlt(this); }
+	public CodeBlockForAlt epsilon(Alternative alt, boolean outerMost) {
+		return alternative(alt, outerMost);
+	}
 
 	public CodeBlockForAlt alternative(Alternative alt, boolean outerMost) {
 		if ( outerMost ) return new CodeBlockForOuterMostAlt(this, alt);

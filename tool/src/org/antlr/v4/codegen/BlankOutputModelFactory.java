@@ -31,10 +31,8 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Alternative;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.BlockAST;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 
@@ -57,7 +55,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 
 	public CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops) { return blk; }
 
-	public CodeBlockForAlt epsilon() { return null; }
+	public CodeBlockForAlt epsilon(Alternative alt, boolean outerMost) { return null; }
 
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) { return null; }
 

@@ -375,8 +375,8 @@ public class OutputModelController {
 		return ops;
 	}
 
-	public CodeBlockForAlt epsilon() {
-		CodeBlockForAlt blk = delegate.epsilon();
+	public CodeBlockForAlt epsilon(Alternative alt, boolean outerMost) {
+		CodeBlockForAlt blk = delegate.epsilon(alt, outerMost);
 		for (CodeGeneratorExtension ext : extensions) blk = ext.epsilon(blk);
 		return blk;
 	}

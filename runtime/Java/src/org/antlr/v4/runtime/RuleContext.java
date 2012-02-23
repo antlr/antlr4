@@ -28,10 +28,8 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
@@ -213,7 +211,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	public RuleContext getRuleContext() { return this; }
 
 	@Override
-	public ParseTree getParent() { return parent; }
+	public RuleContext getParent() { return parent; }
 
 	@Override
 	public RuleContext getPayload() { return this; }
