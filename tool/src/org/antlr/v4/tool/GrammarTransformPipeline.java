@@ -263,7 +263,7 @@ public class GrammarTransformPipeline {
 		GrammarRootAST combinedAST = combinedGrammar.ast;
 		//tool.log("grammar", "before="+combinedAST.toStringTree());
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
-		GrammarAST[] elements = combinedAST.getChildren().toArray(new GrammarAST[0]);
+		GrammarAST[] elements = ((List<?>)combinedAST.getChildren()).toArray(new GrammarAST[0]);
 
 		// MAKE A GRAMMAR ROOT and ID
 		String lexerName = combinedAST.getChild(0).getText()+"Lexer";
@@ -279,7 +279,7 @@ public class GrammarTransformPipeline {
 		if ( optionsRoot!=null ) {
 			GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
 			lexerAST.addChild(lexerOptionsRoot);
-			GrammarAST[] options = optionsRoot.getChildren().toArray(new GrammarAST[0]);
+			GrammarAST[] options = ((List<?>)optionsRoot.getChildren()).toArray(new GrammarAST[0]);
 			for (GrammarAST o : options) {
 				String optionName = o.getChild(0).getText();
 				if ( !Grammar.doNotCopyOptionsToLexer.contains(optionName) ) {
@@ -313,7 +313,7 @@ public class GrammarTransformPipeline {
 			(GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
 		lexerAST.addChild(lexerRulesRoot);
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
-		GrammarASTWithOptions[] rules = combinedRulesRoot.getChildren().toArray(new GrammarASTWithOptions[0]);
+		GrammarASTWithOptions[] rules = ((List<?>)combinedRulesRoot.getChildren()).toArray(new GrammarASTWithOptions[0]);
 		if ( rules!=null ) {
 			for (GrammarASTWithOptions r : rules) {
 				String ruleName = r.getChild(0).getText();
