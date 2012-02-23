@@ -58,7 +58,7 @@ import java.util.*;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext<Symbol extends Token> extends RuleContext {
-	private static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
+	private static final ParserRuleContext<?> EMPTY = new ParserRuleContext<Token>();
 
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
@@ -143,7 +143,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
 	// visitor
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
+	public <T> T accept(ParseTreeVisitor<Symbol, ? extends T> visitor) { return visitor.visitChildren(this); }
 
 
 	/** Does not set parent link; other add methods do */

@@ -35,12 +35,12 @@ import org.antlr.v4.runtime.Token;
  *
  * @author Sam Harwell
  */
-public interface ParseTreeVisitor<T> {
+public interface ParseTreeVisitor<Symbol extends Token, T> {
 
-	T visit(ParserRuleContext<?> ctx);
+	T visit(ParserRuleContext<Symbol> ctx);
 
-	T visitChildren(ParserRuleContext<? extends Token> ctx);
+	T visitChildren(ParserRuleContext<Symbol> ctx);
 
-	T visitTerminal(ParserRuleContext<? extends Token> ctx, Token symbol);
+	T visitTerminal(ParserRuleContext<Symbol> ctx, Symbol symbol);
 
 }

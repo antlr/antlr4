@@ -32,9 +32,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 /** T is return type of visit methods. Use T=Void for no return type. */
-public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T> {
+public abstract class AbstractParseTreeVisitor<Symbol extends Token, T> implements ParseTreeVisitor<Symbol, T> {
 	@Override
-	public T visit(ParserRuleContext<?> ctx) {
+	public T visit(ParserRuleContext<Symbol> ctx) {
 		return ctx.accept(this);
 	}
 
@@ -47,23 +47,23 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 *  walks all children by default; i.e., calls this method.
 	 */
 	@Override
-	public T visitChildren(ParserRuleContext<? extends Token> ctx) {
+	public T visitChildren(ParserRuleContext<Symbol> ctx) {
 		T result = null;
 		for (ParseTree c : ctx.children) {
 			if ( c instanceof ParseTree.RuleNode) {
 				ParseTree.RuleNode r = (ParseTree.RuleNode)c;
-				ParserRuleContext<?> rctx = (ParserRuleContext<? extends Token>)r.getRuleContext();
+				ParserRuleContext<Symbol> rctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 				result = visit(rctx);
 			}
 			else {
-				result = visitTerminal(ctx, ((ParseTree.TerminalNode<? extends Token>)c).getSymbol());
+				result = visitTerminal(ctx, ((ParseTree.TerminalNode<Symbol>)c).getSymbol());
 			}
 		}
 		return result;
 	}
 
 	@Override
-	public T visitTerminal(ParserRuleContext<? extends Token> ctx, Token symbol) {
+	public T visitTerminal(ParserRuleContext<Symbol> ctx, Symbol symbol) {
 		return null;
 	}
 }
