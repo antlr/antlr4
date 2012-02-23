@@ -43,7 +43,7 @@ public class LexerNoViableAltException extends RecognitionException {
 									 CharStream input,
 									 int startIndex,
 									 ATNConfigSet deadEndConfigs) {
-		super(lexer, input, null);
+		super(lexer, input);
 		this.startIndex = startIndex;
 		this.deadEndConfigs = deadEndConfigs;
 	}

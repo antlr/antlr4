@@ -81,19 +81,19 @@ public class ParserInterpreter {
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Token> input,
-						  @Nullable ParserRuleContext outerContext,
+						  @Nullable ParserRuleContext<Token> outerContext,
 						  boolean useContext)
 	{
 		return atnSimulator.predictATN(dfa, input, outerContext);
 	}
 
 	public int adaptivePredict(@NotNull SymbolStream<Token> input, int decision,
-							   @Nullable ParserRuleContext outerContext)
+							   @Nullable ParserRuleContext<Token> outerContext)
 	{
 		return atnSimulator.adaptivePredict(input, decision, outerContext);
 	}
 
-	public int matchATN(@NotNull TokenStream<? extends Token> input,
+	public int matchATN(@NotNull TokenStream<Token> input,
 						@NotNull ATNState startState)
 	{
 		if (startState.getNumberOfTransitions() == 1) {

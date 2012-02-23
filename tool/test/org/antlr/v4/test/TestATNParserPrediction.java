@@ -523,7 +523,7 @@ public class TestATNParserPrediction extends BaseTest {
 	}
 
 	public DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-					  String inputString, ParserRuleContext<?> ctx)
+					  String inputString, ParserRuleContext<Token> ctx)
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
@@ -544,7 +544,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
 		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
-		TokenStream<? extends Token> input = new IntTokenStream(types);
+		TokenStream<Token> input = new IntTokenStream(types);
 		try {
 			DecisionState startState = atn.decisionToState.get(0);
 			DFA dfa = new DFA(startState);

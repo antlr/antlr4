@@ -261,8 +261,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public void reset() {
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input, int decision,
-							   @Nullable ParserRuleContext<?> outerContext)
+	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision,
+							   @Nullable ParserRuleContext<Symbol> outerContext)
 	{
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
@@ -287,8 +287,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<? extends Symbol> input,
-						  @Nullable ParserRuleContext<?> outerContext)
+	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Symbol> input,
+						  @Nullable ParserRuleContext<Symbol> outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.emptyContext();
 		if ( debug ) System.out.println("ATN decision "+dfa.decision+
@@ -319,8 +319,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
-                       @Nullable ParserRuleContext<?> outerContext)
+					   @NotNull SymbolStream<Symbol> input, int startIndex,
+                       @Nullable ParserRuleContext<Symbol> outerContext)
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.emptyContext();
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
@@ -473,8 +473,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
-					   ParserRuleContext<?> outerContext)
+					   @NotNull SymbolStream<Symbol> input, int startIndex,
+					   ParserRuleContext<Symbol> outerContext)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
 		ATN_failover++;
@@ -601,8 +601,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ATNConfigSet execATNWithFullContext(DFA dfa,
 											   DFAState D, // how far we got before failing over
 											   @NotNull ATNConfigSet s0,
-											   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
-											   ParserRuleContext<?> outerContext,
+											   @NotNull SymbolStream<Symbol> input, int startIndex,
+											   ParserRuleContext<Symbol> outerContext,
 											   int nalts,
 											   boolean greedy)
 	{
@@ -1280,12 +1280,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<? extends Symbol> input,
-											@NotNull ParserRuleContext<?> outerContext,
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input,
+											@NotNull ParserRuleContext<Symbol> outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{
-		return new NoViableAltException(parser, input,
+		return new NoViableAltException((Recognizer<Symbol, ?>)parser, input,
 											input.get(startIndex),
 											input.LT(1),
 											configs, outerContext);

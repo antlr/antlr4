@@ -60,8 +60,16 @@ public class RecognitionException extends RuntimeException {
 
 	protected int offendingState;
 
-	public RecognitionException(@Nullable Recognizer<?, ?> recognizer, IntStream<?> input,
-								@Nullable ParserRuleContext ctx)
+	public RecognitionException(@Nullable Lexer lexer,
+								CharStream input)
+	{
+		this.recognizer = lexer;
+		this.input = input;
+	}
+
+	public <Symbol extends Token> RecognitionException(@Nullable Recognizer<Symbol, ?> recognizer,
+													   IntStream<Symbol> input,
+													   @Nullable ParserRuleContext<Symbol> ctx)
 	{
 		this.recognizer = recognizer;
 		this.input = input;
@@ -99,5 +107,15 @@ public class RecognitionException extends RuntimeException {
 
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> IntStream<T> getInputStream(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (IntStream<T>)input : null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Token> T getOffendingToken(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (T)offendingToken : null;
 	}
 }
