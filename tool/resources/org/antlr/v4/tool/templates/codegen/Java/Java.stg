@@ -106,7 +106,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 @Override public Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
-	@Override public Result visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { return null; }
 }
 >>
 
