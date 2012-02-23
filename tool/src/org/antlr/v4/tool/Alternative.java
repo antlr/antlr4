@@ -77,6 +77,7 @@ public class Alternative implements AttributeResolver {
 
     public Alternative(Rule r, int altNum) { this.rule = r; this.altNum = altNum; }
 
+	@Override
 	public boolean resolvesToToken(String x, ActionAST node) {
 		if ( tokenRefs.get(x)!=null ) return true;
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
@@ -84,6 +85,7 @@ public class Alternative implements AttributeResolver {
 		return false;
 	}
 
+	@Override
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
         if ( ruleRefs.get(x)!=null ) return true; // rule ref in this alt?
@@ -95,6 +97,7 @@ public class Alternative implements AttributeResolver {
 
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
+	@Override
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		return rule.resolveToAttribute(x, node); // reuse that code
 	}
@@ -102,6 +105,7 @@ public class Alternative implements AttributeResolver {
 	/** $x.y, x can be surrounding rule, token/rule/label ref. y is visible
 	 *  attr in that dictionary.  Can't see args on rule refs.
 	 */
+	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
 		if ( rule.name.equals(x) ) { // x is this rule?
 			return rule.resolveToAttribute(x, y, node);
@@ -123,6 +127,7 @@ public class Alternative implements AttributeResolver {
 		return null;
 	}
 
+	@Override
 	public boolean resolvesToLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&
@@ -130,6 +135,7 @@ public class Alternative implements AttributeResolver {
 				anyLabelDef.type==LabelType.RULE_LABEL);
 	}
 
+	@Override
 	public boolean resolvesToListLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&

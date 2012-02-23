@@ -179,6 +179,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
+	@Override
 	public void reset() {
 		dfaPrevAccept.reset();
 		atnPrevAccept.reset();

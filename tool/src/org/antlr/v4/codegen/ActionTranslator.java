@@ -130,6 +130,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		return translator.chunks;
 	}
 
+	@Override
 	public void attr(String expr, Token x) {
 		gen.g.tool.log("action-translator", "attr "+x);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), node);
@@ -160,6 +161,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	/** $x.y = expr; */
+	@Override
 	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
 		gen.g.tool.log("action-translator", "setQAttr "+x+"."+y+"="+rhs);
 		// x has to be current rule; just set y attr
@@ -167,6 +169,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(new SetAttr(nodeContext,y.getText(), rhsChunks));
 	}
 
+	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "qattr "+x+"."+y);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
@@ -197,6 +200,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		}
 	}
 
+	@Override
 	public void setAttr(String expr, Token x, Token rhs) {
 		gen.g.tool.log("action-translator", "setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
@@ -205,12 +209,14 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(s);
 	}
 
+	@Override
 	public void nonLocalAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "nonLocalAttr "+x+"::"+y);
 		Rule r = factory.getGrammar().getRule(x.getText());
 		chunks.add(new NonLocalAttrRef(nodeContext, x.getText(), y.getText(), r.index));
 	}
 
+	@Override
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
 		gen.g.tool.log("action-translator", "setNonLocalAttr "+x+"::"+y+"="+rhs);
 		Rule r = factory.getGrammar().getRule(x.getText());
@@ -219,9 +225,11 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(s);
 	}
 
+	@Override
 	public void unknownSyntax(Token t) {
 	}
 
+	@Override
 	public void text(String text) {
 		chunks.add(new ActionText(nodeContext,text));
 	}

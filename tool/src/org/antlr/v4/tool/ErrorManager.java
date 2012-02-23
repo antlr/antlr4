@@ -59,18 +59,22 @@ public class ErrorManager {
 
     STErrorListener theDefaultSTListener =
         new STErrorListener() {
+            @Override
             public void compileTimeError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
 
+            @Override
             public void runTimeError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
 
+            @Override
             public void IOError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
 
+            @Override
             public void internalError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }

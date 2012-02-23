@@ -189,16 +189,21 @@ public class TestCommonTokenStream extends BaseTest {
                     new CommonToken(1,"\n") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(Token.EOF,"")
                 };
+                @Override
                 public Token nextToken() {
                     return tokens[i++];
                 }
+                @Override
                 public String getSourceName() { return "test"; }
+				@Override
 				public int getCharPositionInLine() {
 					return 0;
 				}
+				@Override
 				public int getLine() {
 					return 0;
 				}
+				@Override
 				public CharStream getInputStream() {
 					return null;
 				}

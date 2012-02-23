@@ -101,12 +101,14 @@ public class AttributeChecks implements ActionSplitterListener {
 
     // LISTENER METHODS
 
+    @Override
     public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
 		qualifiedAttr(expr, x, y);
         new AttributeChecks(g, r, alt, node, rhs).examineAction();
     }
 
 	// $x.y
+	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
 			Rule rref = isolatedRuleRef(x.getText());
@@ -131,6 +133,7 @@ public class AttributeChecks implements ActionSplitterListener {
 		}
 	}
 
+	@Override
 	public void setAttr(String expr, Token x, Token rhs) {
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
             errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
@@ -139,6 +142,7 @@ public class AttributeChecks implements ActionSplitterListener {
         new AttributeChecks(g, r, alt, node, rhs).examineAction();
     }
 
+	@Override
     public void attr(String expr, Token x) {
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
 			if ( node.resolver.resolvesToToken(x.getText(), node) ) {
@@ -157,6 +161,7 @@ public class AttributeChecks implements ActionSplitterListener {
 		}
 	}
 
+	@Override
 	public void nonLocalAttr(String expr, Token x, Token y) {
 		Rule r = g.getRule(x.getText());
 		if ( r==null ) {
@@ -170,6 +175,7 @@ public class AttributeChecks implements ActionSplitterListener {
 		}
 	}
 
+	@Override
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
 		Rule r = g.getRule(x.getText());
 		if ( r==null ) {
@@ -183,11 +189,13 @@ public class AttributeChecks implements ActionSplitterListener {
 		}
 	}
 
+	@Override
 	public void unknownSyntax(Token t) {
 		errMgr.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,
 							g.fileName, t, t.getText());
 	}
 
+	@Override
 	public void text(String text) { }
 
 	// don't care

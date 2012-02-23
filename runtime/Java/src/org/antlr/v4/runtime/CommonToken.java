@@ -195,6 +195,7 @@ public class CommonToken implements WritableToken, Serializable {
 		return source != null ? source.getInputStream() : null;
 	}
 
+	@Override
 	public String toString() {
 		String channelStr = "";
 		if ( channel>0 ) {

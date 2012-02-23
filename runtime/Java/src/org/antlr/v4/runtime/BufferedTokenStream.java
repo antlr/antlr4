@@ -234,6 +234,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
     /** Grab *all* tokens from stream and return string */
+    @Override
     public String toString() {
         if ( p == -1 ) setup();
         fill();

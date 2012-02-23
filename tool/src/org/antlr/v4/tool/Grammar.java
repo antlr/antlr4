@@ -202,7 +202,9 @@ public class Grammar implements AttributeResolver {
 		final Grammar thiz = this;
 		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
 		v.visit(ast, new TreeVisitorAction() {
+			@Override
 			public Object pre(Object t) { ((GrammarAST)t).g = thiz; return t; }
+			@Override
 			public Object post(Object t) { return t; }
 		});
 		initTokenSymbolTables();
@@ -603,21 +605,27 @@ public class Grammar implements AttributeResolver {
 	}
 
 	// no isolated attr at grammar action level
+	@Override
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		return null;
 	}
 
 	// no $x.y makes sense here
+	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
 		return null;
 	}
 
+	@Override
 	public boolean resolvesToLabel(String x, ActionAST node) { return false; }
 
+	@Override
 	public boolean resolvesToListLabel(String x, ActionAST node) { return false; }
 
+	@Override
 	public boolean resolvesToToken(String x, ActionAST node) { return false; }
 
+	@Override
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		return false;
 	}

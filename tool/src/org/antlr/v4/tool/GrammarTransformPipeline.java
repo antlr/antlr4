@@ -84,12 +84,14 @@ public class GrammarTransformPipeline {
     public void expandParameterizedLoops(GrammarAST root) {
         TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
         v.visit(root, new TreeVisitorAction() {
+            @Override
             public Object pre(Object t) {
                 if ( ((GrammarAST)t).getType() == 3 ) {
                     return expandParameterizedLoop((GrammarAST)t);
                 }
                 return t;
             }
+            @Override
             public Object post(Object t) { return t; }
         });
     }
@@ -104,7 +106,9 @@ public class GrammarTransformPipeline {
 		// ensure each node has pointer to surrounding grammar
 		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
 		v.visit(tree, new TreeVisitorAction() {
+			@Override
 			public Object pre(Object t) { ((GrammarAST)t).g = g; return t; }
+			@Override
 			public Object post(Object t) { return t; }
 		});
 	}

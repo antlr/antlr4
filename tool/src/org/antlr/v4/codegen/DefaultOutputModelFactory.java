@@ -68,6 +68,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	// Convenience methods
 
 	@NotNull
+	@Override
 	public Grammar getGrammar() { return g; }
 
 	@Override

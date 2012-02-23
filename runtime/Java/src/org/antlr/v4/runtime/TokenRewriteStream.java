@@ -353,6 +353,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return buf.toString();
 	}
 
+	@Override
 	public String toString() {
         fill();
 		return toString(MIN_TOKEN_INDEX, size()-1);

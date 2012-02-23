@@ -58,6 +58,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		codegenTemplates = gen.templates;
 	}
 
+	@Override
 	public ATN createATN() {
 		// BUILD ALL START STATES (ONE PER MODE)
 		Set<String> modes = ((LexerGrammar) g).modes.keySet();

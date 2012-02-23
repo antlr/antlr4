@@ -66,6 +66,7 @@ public class LabelElementPair {
         }
     }
 
+    @Override
     public String toString() {
         return label.getText()+" "+type+" "+element.toString();
     }
