@@ -84,10 +84,8 @@ public class CommonToken implements WritableToken, Serializable {
 		charPositionInLine = oldToken.getCharPositionInLine();
 		channel = oldToken.getChannel();
         source = oldToken.getTokenSource();
-		if ( oldToken instanceof CommonToken ) {
-			start = ((CommonToken)oldToken).start;
-			stop = ((CommonToken)oldToken).stop;
-		}
+		start = oldToken.getStartIndex();
+		stop = oldToken.getStopIndex();
 	}
 
 	@Override
