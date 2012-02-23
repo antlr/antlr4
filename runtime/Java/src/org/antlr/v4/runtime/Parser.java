@@ -199,13 +199,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		return _syntaxErrors;
 	}
 
-	/** Tell our token source and error strategy about a new way to create tokens */
-	@Override
-	public void setTokenFactory(TokenFactory<?> factory) {
-		_input.getTokenSource().setTokenFactory(factory);
-		_errHandler.setTokenFactory(factory);
-	}
-
 	public ANTLRErrorStrategy getErrorHandler() {
 		return _errHandler;
 	}

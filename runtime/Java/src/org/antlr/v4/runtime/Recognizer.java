@@ -128,6 +128,4 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public abstract IntStream getInputStream();
 
 	public abstract void setInputStream(IntStream input);
-
-	public abstract void setTokenFactory(TokenFactory<?> input);
 }
