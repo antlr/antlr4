@@ -91,7 +91,7 @@ VisitorFile(file, header) ::= <<
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Visitor\<T> {
+public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
 T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
@@ -103,7 +103,7 @@ import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
 @Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 	@Override public T visitTerminal(ParserRuleContext\<? extends Token> ctx, Token symbol) { return null; }
