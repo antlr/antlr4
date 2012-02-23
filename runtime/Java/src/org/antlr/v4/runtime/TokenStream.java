@@ -59,7 +59,7 @@ public interface TokenStream extends SymbolStream<Token> {
 	/** Where is this stream pulling tokens from?  This is not the name, but
 	 *  the object that provides Token objects.
 	 */
-	public TokenSource getTokenSource();
+	public TokenSource<? extends Token> getTokenSource();
 
 	/** Return the text of all tokens from start to stop, inclusive.
 	 *  If the stream does not buffer all the tokens then it can just

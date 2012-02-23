@@ -183,12 +183,12 @@ public class TokenRewriteStream extends CommonTokenStream {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public TokenRewriteStream(TokenSource tokenSource) {
+	public TokenRewriteStream(TokenSource<? extends Token> tokenSource) {
 	    super(tokenSource);
 		init();
 	}
 
-	public TokenRewriteStream(TokenSource tokenSource, int channel) {
+	public TokenRewriteStream(TokenSource<? extends Token> tokenSource, int channel) {
 		super(tokenSource, channel);
 		init();
 	}

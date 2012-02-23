@@ -49,19 +49,19 @@ public class UnbufferedTokenStream<T extends Token>
         extends LookaheadStream<T>
         implements TokenStream
 {
-	protected TokenSource tokenSource;
+	protected TokenSource<T> tokenSource;
     protected int tokenIndex = 0; // simple counter to set token index in tokens
 
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
 
-	public UnbufferedTokenStream(TokenSource tokenSource) {
+	public UnbufferedTokenStream(TokenSource<T> tokenSource) {
 		this.tokenSource = tokenSource;
 	}
 
     @Override
 	public T nextElement() {
-		T t = (T)tokenSource.nextToken();
+		T t = tokenSource.nextToken();
         if ( t instanceof WritableToken ) {
             ((WritableToken)t).setTokenIndex(tokenIndex);
         }
@@ -75,7 +75,7 @@ public class UnbufferedTokenStream<T extends Token>
     }
 
     @Override
-	public TokenSource getTokenSource() { return tokenSource; }
+	public TokenSource<T> getTokenSource() { return tokenSource; }
 
     @Override
 	public String toString(int start, int stop) {

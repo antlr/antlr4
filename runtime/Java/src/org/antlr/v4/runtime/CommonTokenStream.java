@@ -52,11 +52,11 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
 
     public CommonTokenStream() { ; }
 
-    public CommonTokenStream(TokenSource tokenSource) {
+    public CommonTokenStream(TokenSource<? extends Token> tokenSource) {
         super(tokenSource);
     }
 
-    public CommonTokenStream(TokenSource tokenSource, int channel) {
+    public CommonTokenStream(TokenSource<? extends Token> tokenSource, int channel) {
         this(tokenSource);
         this.channel = channel;
     }
@@ -172,7 +172,7 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
 
     /** Reset this token stream by setting its token source. */
     @Override
-    public void setTokenSource(TokenSource tokenSource) {
+    public void setTokenSource(TokenSource<? extends Token> tokenSource) {
         super.setTokenSource(tokenSource);
         channel = Token.DEFAULT_CHANNEL;
     }

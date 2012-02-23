@@ -40,7 +40,7 @@ import java.util.List;
  *  of speed.
  */
 public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
-	implements TokenSource
+	implements TokenSource<Token>
 {
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
@@ -202,7 +202,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	@Override
-	public void setTokenFactory(TokenFactory<?> factory) {
+	public void setTokenFactory(TokenFactory<? extends Token> factory) {
 		this._factory = factory;
 	}
 

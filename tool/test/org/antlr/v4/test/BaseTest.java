@@ -835,7 +835,7 @@ public abstract class BaseTest {
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {
-        public FilteringTokenStream(TokenSource src) { super(src); }
+        public FilteringTokenStream(TokenSource<? extends Token> src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();
         @Override
         protected void sync(int i) {
@@ -1082,7 +1082,7 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public TokenSource getTokenSource() {
+		public TokenSource<? extends Token> getTokenSource() {
 			return null;
 		}
 

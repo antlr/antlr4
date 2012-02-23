@@ -363,9 +363,13 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			current = recognizer.getInputStream().LT(-1);
 		}
 
-		TokenFactory<?> factory = current.getTokenSource().getTokenFactory();
+		return constructToken(recognizer.getTokenStream().getTokenSource(), expectedTokenType, tokenText, current);
+	}
+
+	protected <T extends Token> T constructToken(TokenSource<T> tokenSource, int expectedTokenType, String tokenText, Token current) {
+		TokenFactory<? extends T> factory = tokenSource.getTokenFactory();
 		return
-			factory.create(current.getTokenSource(), expectedTokenType, tokenText,
+			factory.create(tokenSource, expectedTokenType, tokenText,
 							Token.DEFAULT_CHANNEL,
 							-1, -1,
 							current.getLine(), current.getCharPositionInLine());

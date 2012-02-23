@@ -34,11 +34,11 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.tool.LexerGrammar;
 
-public class LexerInterpreter implements TokenSource {
+public class LexerInterpreter implements TokenSource<Token> {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
 	protected CharStream input;
-	protected TokenFactory<?> tokenFactory = CommonTokenFactory.DEFAULT;
+	protected TokenFactory<? extends Token> tokenFactory = CommonTokenFactory.DEFAULT;
 
 	public LexerInterpreter(LexerGrammar g, String inputString) {
 		this(g);
@@ -63,12 +63,12 @@ public class LexerInterpreter implements TokenSource {
 	public String getSourceName() {	return g.name; }
 
 	@Override
-	public TokenFactory<?> getTokenFactory() {
+	public TokenFactory<? extends Token> getTokenFactory() {
 		return tokenFactory;
 	}
 
 	@Override
-	public void setTokenFactory(TokenFactory<?> factory) {
+	public void setTokenFactory(TokenFactory<? extends Token> factory) {
 		tokenFactory = factory != null ? factory : CommonTokenFactory.DEFAULT;
 	}
 

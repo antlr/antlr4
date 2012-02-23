@@ -33,7 +33,7 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 	public static final TokenFactory<CommonToken> DEFAULT = new CommonTokenFactory();
 
 	@Override
-	public CommonToken create(TokenSource source, int type, String text,
+	public CommonToken create(TokenSource<? super CommonToken> source, int type, String text,
 							  int channel, int start, int stop,
 							  int line, int charPositionInLine)
 	{
