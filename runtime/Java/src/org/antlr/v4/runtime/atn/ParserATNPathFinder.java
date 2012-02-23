@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ParserATNPathFinder extends ParserATNSimulator<Token> {
-	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn) {
+	public ParserATNPathFinder(@Nullable Parser<Token> parser, @NotNull ATN atn) {
 		super(parser, atn);
 	}
 

@@ -72,11 +72,11 @@ public class TreePostScriptGenerator {
 
 	protected PostScriptDocument doc;
 
-	public TreePostScriptGenerator(Parser parser, Tree root) {
+	public TreePostScriptGenerator(Parser<?> parser, Tree root) {
 		this(parser, root, "CourierNew", 11);
 	}
 
-	public TreePostScriptGenerator(Parser parser, Tree root,
+	public TreePostScriptGenerator(Parser<?> parser, Tree root,
 								   String fontName, int fontSize)
 	{
 		this.root = root;

@@ -90,7 +90,7 @@ public class DFA {
 //		return states;
 //	}
 
-	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator atn,
+	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator<?> atn,
 													 List<DFAState> dfaStates,
 													 TokenStream<? extends Token> input, int start, int stop)
 	{

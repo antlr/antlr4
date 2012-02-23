@@ -112,9 +112,9 @@ public class TestPerformance extends BaseTest {
     private static final int PASSES = 4;
 
     private static Lexer sharedLexer;
-    private static Parser sharedParser;
+    private static Parser<Token> sharedParser;
     @SuppressWarnings({"FieldCanBeLocal"})
-    private static ParseTreeListener<Token> sharedListener;
+    private static ParseTreeListener<?> sharedListener;
 
     private int tokenCount;
     private int currentPass;
@@ -442,12 +442,14 @@ public class TestPerformance extends BaseTest {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+			@SuppressWarnings("rawtypes")
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName);
+            @SuppressWarnings({"rawtypes"})
+            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
             TestPerformance.sharedListener = listenerClass.newInstance();
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+			@SuppressWarnings("rawtypes")
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
@@ -476,7 +478,9 @@ public class TestPerformance extends BaseTest {
                         if (REUSE_PARSER && sharedParser != null) {
                             sharedParser.setInputStream(tokens);
                         } else {
-                            sharedParser = parserCtor.newInstance(tokens);
+							@SuppressWarnings("unchecked")
+							Parser<Token> parser = parserCtor.newInstance(tokens);
+                            sharedParser = parser;
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
@@ -484,7 +488,7 @@ public class TestPerformance extends BaseTest {
 //                                sharedParser.addParseListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
-                                sharedParser.setErrorHandler(new BailErrorStrategy());
+                                sharedParser.setErrorHandler(new BailErrorStrategy<Token>());
                             }
                         }
 

@@ -145,9 +145,9 @@ public class TestRig {
 			}
 
 			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-			Parser parser = parserCtor.newInstance(tokens);
+			Parser<?> parser = parserCtor.newInstance(tokens);
 
-			parser.setErrorHandler(new DiagnosticErrorStrategy());
+			parser.setErrorHandler(new DiagnosticErrorStrategy<Token>());
 
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);
@@ -157,7 +157,7 @@ public class TestRig {
 
 			try {
 				Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-				ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
+				ParserRuleContext<? extends Token> tree = (ParserRuleContext<? extends Token>)startRule.invoke(parser, (Object[])null);
 
 				if ( printTree ) {
 					System.out.println(tree.toStringTree(parser));

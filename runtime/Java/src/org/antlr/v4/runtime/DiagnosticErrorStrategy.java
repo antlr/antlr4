@@ -38,9 +38,9 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Arrays;
 
-public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
+public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
     @Override
-    public void reportAmbiguity(@NotNull Parser recognizer,
+    public <T extends Symbol> void reportAmbiguity(@NotNull Parser<T> recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
@@ -49,7 +49,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     }
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
+	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
 											@NotNull ATNConfigSet configs)
@@ -59,7 +59,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
+	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
@@ -67,7 +67,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     }
 
     @Override
-    public void reportInsufficientPredicates(@NotNull Parser recognizer,
+    public <T extends Symbol> void reportInsufficientPredicates(@NotNull Parser<T> recognizer,
 											 @NotNull DFA dfa,
 											 int startIndex, int stopIndex,
 											 @NotNull IntervalSet ambigAlts,
