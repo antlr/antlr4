@@ -65,7 +65,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		for (String modeName : modes) {
 			// create s0, start state; implied Tokens rule node
 			TokensStartState startState =
-				(TokensStartState)newState(TokensStartState.class, null);
+				newState(TokensStartState.class, null);
 			atn.modeNameToStartState.put(modeName, startState);
 			atn.modeToStartState.add(startState);
 			atn.defineDecisionState(startState);

@@ -73,7 +73,7 @@ public class AttributeDict {
     public LinkedHashMap<String, Attribute> attributes =
         new LinkedHashMap<String, Attribute>();
 
-	public AttributeDict() {;}
+	public AttributeDict() {}
 	public AttributeDict(DictType type) { this.type = type; }
 
 	public Attribute add(Attribute a) { a.dict = this; return attributes.put(a.name, a); }
@@ -88,19 +88,19 @@ public class AttributeDict {
     /** Return the set of keys that collide from
      *  this and other.
      */
-    public Set intersection(AttributeDict other) {
+    public Set<String> intersection(AttributeDict other) {
         if ( other==null || other.size()==0 || size()==0 ) {
             return null;
         }
         Set<String> inter = new HashSet<String>();
-        Set thisKeys = attributes.keySet();
-        for (Iterator it = thisKeys.iterator(); it.hasNext();) {
-            String key = (String) it.next();
+        Set<String> thisKeys = attributes.keySet();
+        for (Iterator<String> it = thisKeys.iterator(); it.hasNext();) {
+            String key = it.next();
             if ( other.attributes.get(key)!=null ) {
                 inter.add(key);
             }
         }
-        if ( inter.size()==0 ) {
+        if ( inter.isEmpty() ) {
             return null;
         }
         return inter;

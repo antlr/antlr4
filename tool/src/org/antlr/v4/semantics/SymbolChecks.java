@@ -252,10 +252,10 @@ public class SymbolChecks {
 
     public void checkForRuleArgumentAndReturnValueConflicts(Rule r) {
         if ( r.retvals!=null ) {
-            Set conflictingKeys = r.retvals.intersection(r.args);
+            Set<String> conflictingKeys = r.retvals.intersection(r.args);
             if (conflictingKeys!=null) {
-                for (Iterator it = conflictingKeys.iterator(); it.hasNext();) {
-                    String key = (String) it.next();
+                for (Iterator<String> it = conflictingKeys.iterator(); it.hasNext();) {
+                    String key = it.next();
                     errMgr.grammarError(
                         ErrorType.ARG_RETVAL_CONFLICT,
                         g.fileName,

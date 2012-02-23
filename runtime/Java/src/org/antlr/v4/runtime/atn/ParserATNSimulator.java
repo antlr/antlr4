@@ -508,7 +508,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( greedy ) {
 						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
-						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
+						if ( outerContext.isEmpty() || // in grammar start rule
 							 !D.configset.dipsIntoOuterContext ||
 							 k == 1 ) // SLL(1) == LL(1)
 						{

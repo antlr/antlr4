@@ -284,7 +284,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		Alternative currentOuterMostAlt = getCurrentOuterMostAlt();
 		boolean actionRefsAsToken = currentOuterMostAlt.tokenRefsInActions.containsKey(ID.getText());
 		boolean actionRefsAsRule = currentOuterMostAlt.ruleRefsInActions.containsKey(ID.getText());
-		return	op.getLabels().size()==0 &&	(actionRefsAsToken || actionRefsAsRule);
+		return	op.getLabels().isEmpty() &&	(actionRefsAsToken || actionRefsAsRule);
 	}
 
 	// support

@@ -218,7 +218,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
                 filteredTokens.add(t);
             }
         }
-        if ( filteredTokens.size()==0 ) {
+        if ( filteredTokens.isEmpty() ) {
             filteredTokens = null;
         }
         return filteredTokens;
