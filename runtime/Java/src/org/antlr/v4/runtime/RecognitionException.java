@@ -47,7 +47,7 @@ public class RecognitionException extends RuntimeException {
 
 	protected RuleContext ctx;
 
-	protected IntStream input;
+	protected IntStream<?> input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
 //	public int offendingTokenIndex;
@@ -60,7 +60,7 @@ public class RecognitionException extends RuntimeException {
 
 	protected int offendingState;
 
-	public RecognitionException(@Nullable Recognizer<?, ?> recognizer, IntStream input,
+	public RecognitionException(@Nullable Recognizer<?, ?> recognizer, IntStream<?> input,
 								@Nullable ParserRuleContext ctx)
 	{
 		this.recognizer = recognizer;
@@ -89,7 +89,7 @@ public class RecognitionException extends RuntimeException {
 		return ctx;
 	}
 
-	public IntStream getInputStream() {
+	public IntStream<?> getInputStream() {
 		return input;
 	}
 

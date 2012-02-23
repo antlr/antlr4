@@ -125,7 +125,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 
-	public abstract IntStream getInputStream();
+	public abstract IntStream<Symbol> getInputStream();
 
-	public abstract void setInputStream(IntStream input);
+	public abstract void setInputStream(IntStream<Symbol> input);
 }

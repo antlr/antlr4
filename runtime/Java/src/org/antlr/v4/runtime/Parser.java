@@ -211,7 +211,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public TokenStream getInputStream() { return getTokenStream(); }
 
 	@Override
-	public final void setInputStream(IntStream input) {
+	public final void setInputStream(IntStream<Token> input) {
 		setTokenStream((TokenStream)input);
 	}
 

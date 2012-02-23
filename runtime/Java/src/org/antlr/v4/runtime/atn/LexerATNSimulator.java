@@ -515,7 +515,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected ATNConfigSet computeStartState(@NotNull IntStream input,
+	protected ATNConfigSet computeStartState(@NotNull IntStream<Integer> input,
 											 @NotNull ATNState p)
 	{
 		RuleContext initialContext = EMPTY_LEXER_RULE_CONTEXT;
