@@ -106,7 +106,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 	public ParserRuleContext() { }
 
 	public static <T extends Token> ParserRuleContext<T> emptyContext() {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked") // safe
 		ParserRuleContext<T> context = (ParserRuleContext<T>)EMPTY;
 		return context;
 	}

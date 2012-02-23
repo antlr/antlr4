@@ -65,7 +65,7 @@ public class NoViableAltException extends RecognitionException {
 		this.offendingToken = offendingToken;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") // safe
 	public <T extends Token> T getStartToken(Recognizer<T, ?> recognizer) {
 		return this.recognizer == recognizer ? (T)startToken : null;
 	}

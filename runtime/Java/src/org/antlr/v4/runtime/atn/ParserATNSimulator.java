@@ -828,7 +828,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 *  prediction for disambiguating predicates.
 	 */
 	public int evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-								   ParserRuleContext<?> outerContext)
+								   ParserRuleContext<Symbol> outerContext)
 	{
 		int predictedAlt = ATN.INVALID_ALT_NUMBER;
 //		List<DFAState.PredPrediction> predPredictions = D.predicates;

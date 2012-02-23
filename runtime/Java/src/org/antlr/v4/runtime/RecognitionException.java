@@ -45,7 +45,7 @@ public class RecognitionException extends RuntimeException {
 	// Next two (ctx,input) should be what is in recognizer, but
 	// won't work when interpreting
 
-	protected RuleContext ctx;
+	protected RuleContext<?> ctx;
 
 	protected IntStream<?> input;
 
@@ -93,7 +93,7 @@ public class RecognitionException extends RuntimeException {
 		return null;
 	}
 
-	public RuleContext getCtx() {
+	public RuleContext<?> getCtx() {
 		return ctx;
 	}
 
@@ -109,12 +109,17 @@ public class RecognitionException extends RuntimeException {
 		return recognizer;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") // safe
 	public <T> IntStream<T> getInputStream(Recognizer<T, ?> recognizer) {
 		return this.recognizer == recognizer ? (IntStream<T>)input : null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") // safe
+	public <T> RuleContext<T> getContext(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (RuleContext<T>)ctx : null;
+	}
+
+	@SuppressWarnings("unchecked") // safe
 	public <T extends Token> T getOffendingToken(Recognizer<T, ?> recognizer) {
 		return this.recognizer == recognizer ? (T)offendingToken : null;
 	}

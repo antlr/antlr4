@@ -114,7 +114,7 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 
     @Override
     public Object clone() {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") // safe
         OrderedHashSet<T> dup = (OrderedHashSet<T>)super.clone();
         dup.elements = new ArrayList<T>(this.elements);
         return dup;

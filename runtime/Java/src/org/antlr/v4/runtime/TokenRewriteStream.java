@@ -580,7 +580,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			RewriteOperation op = rewrites.get(i);
 			if ( op==null ) continue; // ignore deleted
 			if ( kind.isInstance(op) ) {
-				ops.add((T)op);
+				ops.add(kind.cast(op));
 			}
 		}
 		return ops;

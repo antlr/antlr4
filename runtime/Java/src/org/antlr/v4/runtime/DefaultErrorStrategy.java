@@ -511,7 +511,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 */
 	protected <T extends Symbol> IntervalSet getErrorRecoverySet(Parser<T> recognizer) {
 		ATN atn = recognizer.getInterpreter().atn;
-		RuleContext ctx = recognizer._ctx;
+		RuleContext<?> ctx = recognizer._ctx;
 		IntervalSet recoverSet = new IntervalSet();
 		while ( ctx!=null && ctx.invokingState>=0 ) {
 			// compute what follows who invoked us

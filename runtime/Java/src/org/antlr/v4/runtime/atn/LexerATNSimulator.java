@@ -40,7 +40,7 @@ import java.io.OutputStream;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static final RuleContext EMPTY_LEXER_RULE_CONTEXT = new RuleContext();
+	public static final RuleContext<Integer> EMPTY_LEXER_RULE_CONTEXT = new RuleContext<Integer>();
 
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;

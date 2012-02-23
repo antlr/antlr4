@@ -34,7 +34,7 @@ import java.util.Iterator;
 
 public class Utils {
     // Seriously: why isn't this built in to java? ugh!
-    public static String join(Iterator iter, String separator) {
+    public static String join(Iterator<?> iter, String separator) {
         StringBuilder buf = new StringBuilder();
         while ( iter.hasNext() ) {
             buf.append(iter.next());

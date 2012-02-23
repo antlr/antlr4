@@ -35,13 +35,12 @@ import org.antlr.v4.runtime.Token;
 public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
-    @SuppressWarnings("unchecked")
-    public <Symbol extends Token> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
+    public <Symbol extends Token> void walk(ParseTreeListener<? super Symbol> listener, ParseTree<Symbol> t) {
 		if ( t instanceof ParseTree.TerminalNode) {
 			visitTerminal(listener, (ParseTree.TerminalNode<Symbol>) t);
 			return;
 		}
-		ParseTree.RuleNode r = (ParseTree.RuleNode)t;
+		ParseTree.RuleNode<Symbol> r = (ParseTree.RuleNode<Symbol>)t;
         enterRule(listener, r);
         int n = r.getChildCount();
         for (int i = 0; i<n; i++) {
@@ -50,11 +49,10 @@ public class ParseTreeWalker {
 		exitRule(listener, r);
     }
 
-    @SuppressWarnings("unchecked")
-    protected <Symbol extends Token> void visitTerminal(ParseTreeListener<Symbol> listener,
+    protected <Symbol extends Token> void visitTerminal(ParseTreeListener<? super Symbol> listener,
 										  ParseTree.TerminalNode<Symbol> t)
 	{
-		ParseTree.RuleNode r = (ParseTree.RuleNode)t.getParent();
+		ParseTree.RuleNode<Symbol> r = (ParseTree.RuleNode<Symbol>)t.getParent();
 		ParserRuleContext<Symbol> ctx = null;
 		if ( r != null && r.getRuleContext() instanceof ParserRuleContext<?> ) {
 			ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
@@ -67,15 +65,13 @@ public class ParseTreeWalker {
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected <Symbol extends Token> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
-		@SuppressWarnings("unchecked")
+    protected <Symbol extends Token> void enterRule(ParseTreeListener<? super Symbol> listener, ParseTree.RuleNode<Symbol> r) {
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
     }
 
-    protected <Symbol extends Token> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
-		@SuppressWarnings("unchecked")
+    protected <Symbol extends Token> void exitRule(ParseTreeListener<? super Symbol> listener, ParseTree.RuleNode<Symbol> r) {
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);
 		listener.exitEveryRule(ctx);
