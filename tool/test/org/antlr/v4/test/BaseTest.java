@@ -438,62 +438,6 @@ public abstract class BaseTest {
 								 debug);
 	}
 
-	protected String execTreeParser(String parserGrammarFileName,
-									String parserGrammarStr,
-									String parserName,
-									String treeParserGrammarFileName,
-									String treeParserGrammarStr,
-									String treeParserName,
-									String lexerName,
-									String parserStartRuleName,
-									String treeParserStartRuleName,
-									String input)
-	{
-		return execTreeParser(parserGrammarFileName,
-							  parserGrammarStr,
-							  parserName,
-							  treeParserGrammarFileName,
-							  treeParserGrammarStr,
-							  treeParserName,
-							  lexerName,
-							  parserStartRuleName,
-							  treeParserStartRuleName,
-							  input,
-							  false);
-	}
-
-	protected String execTreeParser(String parserGrammarFileName,
-									String parserGrammarStr,
-									String parserName,
-									String treeParserGrammarFileName,
-									String treeParserGrammarStr,
-									String treeParserName,
-									String lexerName,
-									String parserStartRuleName,
-									String treeParserStartRuleName,
-									String input,
-									boolean debug)
-	{
-		// build the parser
-		rawGenerateAndBuildRecognizer(parserGrammarFileName,
-									  parserGrammarStr,
-									  parserName,
-									  lexerName);
-
-		// build the tree parser
-		rawGenerateAndBuildRecognizer(treeParserGrammarFileName,
-									  treeParserGrammarStr,
-									  treeParserName,
-									  lexerName);
-
-		writeFile(tmpdir, "input", input);
-
-		return rawExecRecognizer(parserName,
-								 lexerName,
-								 parserStartRuleName,
-								 debug);
-	}
-
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
