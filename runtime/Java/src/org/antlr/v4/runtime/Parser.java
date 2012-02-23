@@ -53,6 +53,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		}
 	}
 
+	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
+
 	protected TokenStream _input;
 
 	/** The RuleContext object for the currently executing rule. This
@@ -202,6 +204,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public void setTokenFactory(TokenFactory<?> factory) {
 		_input.getTokenSource().setTokenFactory(factory);
 		_errHandler.setTokenFactory(factory);
+	}
+
+	public ANTLRErrorStrategy getErrorHandler() {
+		return _errHandler;
+	}
+
+	public void setErrorHandler(ANTLRErrorStrategy handler) {
+		this._errHandler = handler;
 	}
 
 	@Override

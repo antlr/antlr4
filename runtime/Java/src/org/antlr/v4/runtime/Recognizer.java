@@ -41,8 +41,6 @@ import java.util.List;
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
-
 	private List<ANTLRErrorListener<? super Symbol>> _listeners;
 
 	protected ATNInterpreter _interp;
@@ -117,10 +115,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
 	}
-
-	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }
-
-	public void setErrorHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
