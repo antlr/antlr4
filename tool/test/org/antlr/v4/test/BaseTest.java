@@ -406,10 +406,11 @@ public abstract class BaseTest {
 							   String input,
 							   boolean showDFA)
 	{
-		rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  null,
 									  lexerName);
+		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		compile("Test.java");
@@ -427,10 +428,11 @@ public abstract class BaseTest {
 								String startRuleName,
 								String input, boolean debug)
 	{
-		rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  parserName,
 									  lexerName);
+		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
 								 lexerName,
