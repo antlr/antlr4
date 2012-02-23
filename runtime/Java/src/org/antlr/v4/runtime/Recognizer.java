@@ -45,8 +45,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	private List<ANTLRErrorListener<Symbol>> _listeners;
 
-	private static final ANTLRErrorListener[] EMPTY_LISTENERS = new ANTLRErrorListener[0];
-
 	protected ATNInterpreter _interp;
 
 	/** Used to print out token names like ID during debugging and
@@ -112,12 +110,12 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public void removeErrorListeners() { if ( _listeners!=null ) _listeners.clear(); }
 
-	public @NotNull ANTLRErrorListener<Symbol>[] getErrorListeners() {
+	public @NotNull List<? extends ANTLRErrorListener<Symbol>> getErrorListeners() {
 		if (_listeners == null) {
-			return EMPTY_LISTENERS;
+			return Collections.<ANTLRErrorListener<Symbol>>emptyList();
 		}
 
-		return _listeners.toArray(EMPTY_LISTENERS);
+		return new ArrayList<ANTLRErrorListener<Symbol>>(_listeners);
 	}
 
 	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }

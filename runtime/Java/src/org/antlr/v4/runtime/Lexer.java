@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 
 import java.util.ArrayDeque;
 import java.util.EmptyStackException;
+import java.util.List;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -308,8 +309,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
 			_input.substring(_tokenStartCharIndex, _input.index())+"'";
-		ANTLRErrorListener<Integer>[] listeners = getErrorListeners();
-		if ( listeners.length == 0 ) {
+		List<? extends ANTLRErrorListener<Integer>> listeners = getErrorListeners();
+		if ( listeners.isEmpty() ) {
 			System.err.println("line "+ _tokenStartLine +":"+
 							   _tokenStartCharPositionInLine +" "+
 							   msg);
