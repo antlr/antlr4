@@ -38,7 +38,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreter {
-	class DummyParser extends Parser {
+	class DummyParser extends Parser<Token> {
 		public Grammar g;
 		public DummyParser(Grammar g, TokenStream<Token> input) {
 			super(input);

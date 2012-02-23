@@ -74,7 +74,7 @@ public class LL1Analyzer {
      *  If ctx is null, EPSILON is in set if we can reach end of rule.
      */
     @NotNull
-   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
+   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext<?> ctx) {
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
    		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds);
@@ -88,7 +88,7 @@ public class LL1Analyzer {
      *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
      *  to match a token.
      */
-    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx,
+    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext<?> ctx,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
 						 boolean seeThruPreds)
@@ -116,8 +116,7 @@ public class LL1Analyzer {
         for (int i=0; i<n; i++) {
             Transition t = s.transition(i);
             if ( t.getClass() == RuleTransition.class ) {
-                RuleContext newContext =
-                    new RuleContext(ctx, s.stateNumber);
+                RuleContext<?> newContext = RuleContext.getChildContext(ctx, s.stateNumber);
                 _LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
             }
             else if ( t.isEpsilon() && seeThruPreds ) {

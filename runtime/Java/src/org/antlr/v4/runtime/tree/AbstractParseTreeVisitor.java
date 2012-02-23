@@ -49,9 +49,9 @@ public abstract class AbstractParseTreeVisitor<Symbol extends Token, Result> imp
 	@Override
 	public <T extends Symbol> Result visitChildren(ParserRuleContext<T> ctx) {
 		Result result = null;
-		for (ParseTree c : ctx.children) {
+		for (ParseTree<T> c : ctx.children) {
 			if ( c instanceof ParseTree.RuleNode) {
-				ParseTree.RuleNode r = (ParseTree.RuleNode)c;
+				ParseTree.RuleNode<T> r = (ParseTree.RuleNode<T>)c;
 				ParserRuleContext<T> rctx = (ParserRuleContext<T>)r.getRuleContext();
 				result = visit(rctx);
 			}

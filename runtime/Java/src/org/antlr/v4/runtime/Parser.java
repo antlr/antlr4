@@ -299,7 +299,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	protected void addContextToParseTree() {
-		ParserRuleContext<?> parent = (ParserRuleContext<?>)_ctx.parent;
+		ParserRuleContext<Symbol> parent = (ParserRuleContext<Symbol>)_ctx.parent;
 		// add current context to parent if we have a parent
 		if ( parent!=null )	{
 			parent.addChild(_ctx);
@@ -331,7 +331,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( _buildParseTrees && _ctx != localctx ) {
-			ParserRuleContext<?> parent = (ParserRuleContext<?>)_ctx.parent;
+			ParserRuleContext<Symbol> parent = (ParserRuleContext<Symbol>)_ctx.parent;
 			parent.removeLastChild();
 			if ( parent!=null )	parent.addChild(localctx);
 		}
@@ -468,7 +468,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		return getRuleInvocationStack(_ctx);
 	}
 
-	public List<String> getRuleInvocationStack(RuleContext p) {
+	public List<String> getRuleInvocationStack(RuleContext<?> p) {
 		String[] ruleNames = getRuleNames();
 		List<String> stack = new ArrayList<String>();
 		while ( p!=null ) {

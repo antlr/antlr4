@@ -40,39 +40,39 @@ import org.antlr.v4.runtime.misc.Interval;
  *
  *  The payload is either a token or a context object.
  */
-public interface ParseTree extends SyntaxTree {
-	public interface RuleNode extends ParseTree {
-		RuleContext getRuleContext();
+public interface ParseTree<Symbol> extends SyntaxTree {
+	public interface RuleNode<Symbol> extends ParseTree<Symbol> {
+		RuleContext<Symbol> getRuleContext();
 	}
 
-	public interface TerminalNode<Symbol extends Token> extends ParseTree {
+	public interface TerminalNode<Symbol> extends ParseTree<Symbol> {
 		Symbol getSymbol();
 	}
 
-	public static class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symbol> {
+	public static class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 		public Symbol symbol;
-		public ParseTree parent;
+		public ParseTree<Symbol> parent;
 		/** Which ATN node matched this token? */
 		public int s;
 		public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
 
 		@Override
-		public ParseTree getChild(int i) {return null;}
+		public ParseTree<Symbol> getChild(int i) {return null;}
 
 		@Override
 		public Symbol getSymbol() {return symbol;}
 
 		@Override
-		public ParseTree getParent() { return parent; }
+		public ParseTree<Symbol> getParent() { return parent; }
 
 		@Override
 		public Symbol getPayload() { return symbol; }
 
 		@Override
 		public Interval getSourceInterval() {
-			if ( symbol ==null ) return Interval.INVALID;
+			if ( !(symbol instanceof Token) ) return Interval.INVALID;
 
-			return new Interval(symbol.getStartIndex(), symbol.getStopIndex());
+			return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
 		}
 
 		@Override
@@ -80,8 +80,13 @@ public interface ParseTree extends SyntaxTree {
 
 		@Override
 		public String toString() {
-				if ( symbol.getType() == Token.EOF ) return "<EOF>";
-				return symbol.getText();
+			if (symbol instanceof Token) {
+				if ( ((Token)symbol).getType() == Token.EOF ) return "<EOF>";
+				return ((Token)symbol).getText();
+			}
+			else {
+				return symbol != null ? symbol.toString() : "<null>";
+			}
 		}
 
 		@Override
@@ -96,7 +101,7 @@ public interface ParseTree extends SyntaxTree {
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<Symbol extends Token> extends TerminalNodeImpl<Symbol> {
+	public static class ErrorNodeImpl<Symbol> extends TerminalNodeImpl<Symbol> {
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
 		}
@@ -104,7 +109,7 @@ public interface ParseTree extends SyntaxTree {
 
 	// the following methods narrow the return type; they are not additional methods
 	@Override
-	ParseTree getParent();
+	ParseTree<Symbol> getParent();
 	@Override
-	ParseTree getChild(int i);
+	ParseTree<Symbol> getChild(int i);
 }

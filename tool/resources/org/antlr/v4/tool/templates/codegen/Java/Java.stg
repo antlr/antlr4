@@ -148,7 +148,7 @@ public class <parser.name> extends <superclass> {
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+	public boolean sempred(RuleContext\<<InputSymbolType()>\> _localctx, int ruleIndex, int predIndex) {
 		switch ( ruleIndex ) {
 			<parser.sempredFuncs.values:{f|
 	case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
@@ -165,7 +165,7 @@ public class <parser.name> extends <superclass> {
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 @Override
-public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+public void action(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int actionIndex) {
 	switch ( ruleIndex ) {
 		<recog.actionFuncs.values:{f|
 case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
@@ -175,7 +175,7 @@ case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break
 <endif>
 <if(sempredFuncs)>
 @Override
-public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+public boolean sempred(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int predIndex) {
 	switch ( ruleIndex ) {
 		<recog.sempredFuncs.values:{f|
 case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
@@ -187,9 +187,9 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 >>
 
 parser_ctor(p) ::= <<
-public <p.name>(TokenStream input) {
+public <p.name>(TokenStream\<<InputSymbolType()>\> input) {
 	super(input);
-	_interp = new ParserATNSimulator\<Token>(this,_ATN);
+	_interp = new ParserATNSimulator\<<InputSymbolType()>\>(this,_ATN);
 }
 >>
 
@@ -577,7 +577,7 @@ public <r.ctxName> <r.name>(int i) {
 }
 >>
 
-LexerRuleContext() ::= "RuleContext"
+LexerRuleContext() ::= "RuleContext\<Integer>"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
  *	r becomes rContext.
@@ -690,8 +690,8 @@ _prevctx.stop = _input.LT(-1);
 >>
 
 
-LexerFile(lexerFile, lexer, namedActions) ::= <<
-// $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>
+LexerFile(file, lexer, namedActions) ::= <<
+// $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
 <namedActions.header>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

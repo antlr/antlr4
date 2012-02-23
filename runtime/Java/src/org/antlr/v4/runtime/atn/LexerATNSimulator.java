@@ -518,7 +518,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeStartState(@NotNull IntStream<Integer> input,
 											 @NotNull ATNState p)
 	{
-		RuleContext initialContext = EMPTY_LEXER_RULE_CONTEXT;
+		RuleContext<?> initialContext = EMPTY_LEXER_RULE_CONTEXT;
 		ATNConfigSet configs = new ATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -549,7 +549,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				configs.add(config);
 				return;
 			}
-			RuleContext newContext = config.context.parent; // "pop" invoking state
+			RuleContext<?> newContext = config.context.parent; // "pop" invoking state
 			ATNState invokingState = atn.states.get(config.context.invokingState);
 			RuleTransition rt = (RuleTransition)invokingState.transition(0);
 			ATNState retState = rt.followState;
@@ -576,8 +576,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		ATNConfig c = null;
 		if ( t.getClass() == RuleTransition.class ) {
-			RuleContext newContext =
-				new RuleContext(config.context, p.stateNumber);
+			RuleContext<?> newContext =
+				RuleContext.getChildContext(config.context, p.stateNumber);
 			c = new ATNConfig(config, t.target, newContext);
 		}
 		else if ( t.getClass() == PredicateTransition.class ) {

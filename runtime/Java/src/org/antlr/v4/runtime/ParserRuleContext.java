@@ -57,7 +57,7 @@ import java.util.*;
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-public class ParserRuleContext<Symbol extends Token> extends RuleContext {
+public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol> {
 	private static final ParserRuleContext<?> EMPTY = new ParserRuleContext<Token>();
 
 	/** If we are debugging or building a parse tree for a visitor,
@@ -66,7 +66,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	 *  operation because we don't the need to track the details about
 	 *  how we parse this rule.
 	 */
-	public List<ParseTree> children;
+	public List<ParseTree<Symbol>> children;
 
 	/** For debugging/tracing purposes, we want to track all of the nodes in
 	 *  the ATN traversed by the parser for a particular rule.
@@ -148,12 +148,12 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	/** Does not set parent link; other add methods do */
 	public void addChild(TerminalNode<Symbol> t) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
+		if ( children==null ) children = new ArrayList<ParseTree<Symbol>>();
 		children.add(t);
 	}
 
-	public void addChild(RuleContext ruleInvocation) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
+	public void addChild(RuleContext<Symbol> ruleInvocation) {
+		if ( children==null ) children = new ArrayList<ParseTree<Symbol>>();
 		children.add(ruleInvocation);
 	}
 
@@ -191,17 +191,17 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	}
 
 	@Override
-	public ParseTree getChild(int i) {
+	public ParseTree<Symbol> getChild(int i) {
 		return children!=null && i>=0 && i<children.size() ? children.get(i) : null;
 	}
 
-	public <T extends ParseTree> T getChild(Class<? extends T> ctxType, int i) {
+	public <T extends ParseTree<Symbol>> T getChild(Class<? extends T> ctxType, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;
 		}
 
 		int j = -1; // what element have we found with ctxType?
-		for (ParseTree o : children) {
+		for (ParseTree<Symbol> o : children) {
 			if ( ctxType.isInstance(o) ) {
 				j++;
 				if ( j == i ) {
@@ -212,16 +212,16 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return null;
 	}
 
-	public Token getToken(int ttype, int i) {
+	public Symbol getToken(int ttype, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;
 		}
 
 		int j = -1; // what token with ttype have we found?
-		for (ParseTree o : children) {
+		for (ParseTree<Symbol> o : children) {
 			if ( o instanceof TerminalNode<?> ) {
-				TerminalNode<?> tnode = (TerminalNode<?>)o;
-				Token symbol = tnode.getSymbol();
+				TerminalNode<Symbol> tnode = (TerminalNode<Symbol>)o;
+				Symbol symbol = tnode.getSymbol();
 				if ( symbol.getType()==ttype ) {
 					j++;
 					if ( j == i ) {
@@ -234,18 +234,18 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return null;
 	}
 
-	public List<? extends Token> getTokens(int ttype) {
+	public List<? extends Symbol> getTokens(int ttype) {
 		if ( children==null ) {
 			return Collections.emptyList();
 		}
 
-		List<Token> tokens = null;
-		for (ParseTree o : children) {
+		List<Symbol> tokens = null;
+		for (ParseTree<Symbol> o : children) {
 			if ( o instanceof TerminalNode<?> ) {
-				TerminalNode<?> tnode = (TerminalNode<?>)o;
-				Token symbol = tnode.getSymbol();
+				TerminalNode<Symbol> tnode = (TerminalNode<Symbol>)o;
+				Symbol symbol = tnode.getSymbol();
 				if ( tokens==null ) {
-					tokens = new ArrayList<Token>();
+					tokens = new ArrayList<Symbol>();
 				}
 				tokens.add(symbol);
 			}
@@ -258,7 +258,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return tokens;
 	}
 
-	public <T extends ParserRuleContext<?>> T getRuleContext(Class<? extends T> ctxType, int i) {
+	public <T extends ParserRuleContext<Symbol>> T getRuleContext(Class<? extends T> ctxType, int i) {
 		return getChild(ctxType, i);
 	}
 
@@ -268,7 +268,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		}
 
 		List<T> contexts = null;
-		for (ParseTree o : children) {
+		for (ParseTree<Symbol> o : children) {
 			if ( ctxType.isInstance(o) ) {
 				if ( contexts==null ) {
 					contexts = new ArrayList<T>();
@@ -295,7 +295,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	public Symbol getStop() { return stop; }
 
 	@Override
-	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
+	public String toString(@NotNull Recognizer<?, ?> recog, RuleContext<?> stop) {
 		if ( recog==null ) return super.toString(recog, stop);
 		StringBuilder buf = new StringBuilder();
 		ParserRuleContext<?> p = this;
