@@ -105,6 +105,10 @@ public class SingletonPredictionContext extends PredictionContext {
 		}
 
 		SingletonPredictionContext other = (SingletonPredictionContext)o;
+		if (this.hashCode() != other.hashCode()) {
+			return false;
+		}
+
 		return invokingState == other.invokingState
 			&& parent.equals(other.parent);
 	}
