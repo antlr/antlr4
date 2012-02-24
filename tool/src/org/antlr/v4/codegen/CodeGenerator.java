@@ -39,6 +39,7 @@ import org.stringtemplate.v4.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import org.antlr.v4.misc.Utils.Func1;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -73,9 +74,9 @@ public class CodeGenerator {
 	void loadLanguageTarget(String language) {
 		String targetName = "org.antlr.v4.codegen."+language+"Target";
 		try {
-			Class c = Class.forName(targetName);
-			Constructor ctor = c.getConstructor(CodeGenerator.class);
-			target = (Target)ctor.newInstance(this);
+			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
+			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
+			target = ctor.newInstance(this);
 		}
 		catch (ClassNotFoundException cnfe) {
 			target = new Target(this); // use default
@@ -115,32 +116,71 @@ public class CodeGenerator {
 
 	// CREATE TEMPLATES BY WALKING MODEL
 
-	public ST generateModelST(String factoryMethod) {
+	public ST generateModelST(Func1<OutputModelController, OutputModelObject> factoryMethod) {
 		OutputModelFactory factory = new ParserFactory(this);
 
 		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 		OutputModelController controller = new OutputModelController(factory);
 		factory.setController(controller);
 
-		OutputModelObject outputModel = null;
-		try {
-			Method m = OutputModelController.class.getDeclaredMethod(factoryMethod);
-			outputModel = (OutputModelObject)m.invoke(controller);
-		}
-		catch (Exception e) {
-			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "can't exec factory method", e);
-		}
-
+		OutputModelObject outputModel = factoryMethod.exec(controller);
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		return walker.walk(outputModel);
 	}
 
-	public ST generateLexer() { return generateModelST("buildLexerOutputModel"); }
-	public ST generateParser() { return generateModelST("buildParserOutputModel"); }
-	public ST generateListener() { return generateModelST("buildListenerOutputModel"); }
-	public ST generateBaseListener() { return generateModelST("buildBaseListenerOutputModel"); }
-	public ST generateVisitor() { return generateModelST("buildVisitorOutputModel"); }
-	public ST generateBaseVisitor() { return generateModelST("buildBaseVisitorOutputModel"); }
+	public ST generateLexer() {
+		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
+			@Override
+			public OutputModelObject exec(OutputModelController controller) {
+				return controller.buildLexerOutputModel();
+			}
+		});
+	}
+
+	public ST generateParser() {
+		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
+			@Override
+			public OutputModelObject exec(OutputModelController controller) {
+				return controller.buildParserOutputModel();
+			}
+		});
+	}
+
+	public ST generateListener() {
+		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
+			@Override
+			public OutputModelObject exec(OutputModelController controller) {
+				return controller.buildListenerOutputModel();
+			}
+		});
+	}
+
+	public ST generateBaseListener() {
+		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
+			@Override
+			public OutputModelObject exec(OutputModelController controller) {
+				return controller.buildBaseListenerOutputModel();
+			}
+		});
+	}
+
+	public ST generateVisitor() {
+		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
+			@Override
+			public OutputModelObject exec(OutputModelController controller) {
+				return controller.buildVisitorOutputModel();
+			}
+		});
+	}
+
+	public ST generateBaseVisitor() {
+		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
+			@Override
+			public OutputModelObject exec(OutputModelController controller) {
+				return controller.buildBaseVisitorOutputModel();
+			}
+		});
+	}
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7

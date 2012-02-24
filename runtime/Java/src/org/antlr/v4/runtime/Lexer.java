@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 
 import java.util.ArrayDeque;
 import java.util.EmptyStackException;
+import java.util.List;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -39,7 +40,7 @@ import java.util.EmptyStackException;
  *  of speed.
  */
 public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
-	implements TokenSource
+	implements TokenSource<Token>
 {
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
@@ -196,13 +197,18 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	@Override
-	public void setTokenFactory(TokenFactory<?> factory) {
+	public TokenFactory<?> getTokenFactory() {
+		return _factory;
+	}
+
+	@Override
+	public void setTokenFactory(TokenFactory<? extends Token> factory) {
 		this._factory = factory;
 	}
 
 	/** Set the char stream and reset the lexer */
 	@Override
-	public void setInputStream(IntStream input) {
+	public void setInputStream(IntStream<Integer> input) {
 		this._input = null;
 		reset();
 		this._input = (CharStream)input;
@@ -308,14 +314,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
 			_input.substring(_tokenStartCharIndex, _input.index())+"'";
-		ANTLRErrorListener<Integer>[] listeners = getErrorListeners();
-		if ( listeners.length == 0 ) {
+		List<? extends ANTLRErrorListener<? super Integer>> listeners = getErrorListeners();
+		if ( listeners.isEmpty() ) {
 			System.err.println("line "+ _tokenStartLine +":"+
 							   _tokenStartCharPositionInLine +" "+
 							   msg);
 			return;
 		}
-		for (ANTLRErrorListener<Integer> pl : listeners) {
+		for (ANTLRErrorListener<? super Integer> pl : listeners) {
 			pl.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 		}
 	}

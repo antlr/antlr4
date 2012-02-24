@@ -502,11 +502,11 @@ public class TestATNParserPrediction extends BaseTest {
 
 		// Check ATN prediction
 //		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
-		TokenStream input = new IntTokenStream(types);
+		TokenStream<Token> input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState, decision);
-		int alt = interp.predictATN(dfa, input, ParserRuleContext.EMPTY, false);
+		int alt = interp.predictATN(dfa, input, ParserRuleContext.emptyContext(), false);
 
 		System.out.println(dot.getDOT(dfa, false));
 
@@ -523,7 +523,7 @@ public class TestATNParserPrediction extends BaseTest {
 	}
 
 	public DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-					  String inputString, ParserRuleContext<?> ctx)
+					  String inputString, ParserRuleContext<Token> ctx)
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
@@ -544,7 +544,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
 		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
-		TokenStream input = new IntTokenStream(types);
+		TokenStream<Token> input = new IntTokenStream(types);
 		try {
 			DecisionState startState = atn.decisionToState.get(0);
 			DFA dfa = new DFA(startState);
@@ -574,9 +574,9 @@ public class TestATNParserPrediction extends BaseTest {
 			// Check DFA
 			List<Integer> types = getTokenTypesViaATN(inputString[i], lexInterp);
 			System.out.println(types);
-			TokenStream input = new IntTokenStream(types);
+			TokenStream<Token> input = new IntTokenStream(types);
 			try {
-				interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
+				interp.adaptivePredict(input, decision, ParserRuleContext.emptyContext());
 			}
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);

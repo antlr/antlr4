@@ -28,6 +28,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -35,16 +36,16 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * @author Sam Harwell
  */
-public class SimulatorState {
-	public final ParserRuleContext<?> outerContext;
+public class SimulatorState<Symbol extends Token> {
+	public final ParserRuleContext<Symbol> outerContext;
 
 	public final DFAState s0;
 
 	public final boolean useContext;
-	public final ParserRuleContext<?> remainingOuterContext;
+	public final ParserRuleContext<Symbol> remainingOuterContext;
 
-	public SimulatorState(ParserRuleContext<?> outerContext, @NotNull DFAState s0, boolean useContext, ParserRuleContext<?> remainingOuterContext) {
-		this.outerContext = outerContext != null ? outerContext : ParserRuleContext.EMPTY;
+	public SimulatorState(ParserRuleContext<Symbol> outerContext, @NotNull DFAState s0, boolean useContext, ParserRuleContext<Symbol> remainingOuterContext) {
+		this.outerContext = outerContext != null ? outerContext : ParserRuleContext.<Symbol>emptyContext();
 		this.s0 = s0;
 		this.useContext = useContext;
 		this.remainingOuterContext = remainingOuterContext;

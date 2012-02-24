@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.SemanticContext;
@@ -9,7 +8,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** The interface for defining strategies to deal with syntax errors
  *  encountered during a parse by ANTLR-generated parsers and tree parsers.
@@ -32,10 +30,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
  *
  *  TODO: what to do about lexers
  */
-public interface ANTLRErrorStrategy {
-	/** To create missing tokens, we need a factory */
-	public void setTokenFactory(TokenFactory<?> factory);
-
+public interface ANTLRErrorStrategy<Symbol extends Token> {
 	/** When matching elements within alternative, use this method
 	 *  to recover. The default implementation uses single token
 	 *  insertion and deletion. If you want to change the way ANTLR
@@ -52,7 +47,7 @@ public interface ANTLRErrorStrategy {
 	 *  "inserting" tokens, we need to specify what that implicitly created
 	 *  token is. We use object, because it could be a tree node.
 	 */
-	Token recoverInline(@NotNull Parser recognizer)
+	<T extends Symbol> T recoverInline(@NotNull Parser<T> recognizer)
 		throws RecognitionException;
 
 	/** Resynchronize the parser by consuming tokens until we find one
@@ -60,7 +55,7 @@ public interface ANTLRErrorStrategy {
 	 *  the current rule. The exception contains info you might want to
 	 *  use to recover better.
 	 */
-	void recover(@NotNull Parser recognizer,
+	<T extends Symbol> void recover(@NotNull Parser<T> recognizer,
                  @Nullable RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
@@ -90,14 +85,14 @@ public interface ANTLRErrorStrategy {
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
 	 */
-	void sync(@NotNull Parser recognizer);
+	<T extends Symbol> void sync(@NotNull Parser<T> recognizer);
 
 	/** Notify handler that parser has entered an error state.  The
 	 *  parser currently doesn't call this--the handler itself calls this
 	 *  in report error methods.  But, for symmetry with endErrorCondition,
 	 *  this method is in the interface.
 	 */
-	void beginErrorCondition(@NotNull Parser recognizer);
+	<T extends Symbol> void beginErrorCondition(@NotNull Parser<T> recognizer);
 
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
@@ -105,16 +100,16 @@ public interface ANTLRErrorStrategy {
 	 *  avoid sending out spurious error messages. We only want one error
 	 *  message per syntax error
 	 */
-	boolean inErrorRecoveryMode(@NotNull Parser recognizer);
+	<T extends Symbol> boolean inErrorRecoveryMode(@NotNull Parser<T> recognizer);
 
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
 	 *  and from its own reset method.
 	 */
-	void endErrorCondition(@NotNull Parser recognizer);
+	<T extends Symbol> void endErrorCondition(@NotNull Parser<T> recognizer);
 
 	/** Report any kind of RecognitionException. */
-	void reportError(@NotNull Parser recognizer,
+	<T extends Symbol> void reportError(@NotNull Parser<T> recognizer,
 					 @Nullable RecognitionException e)
 	throws RecognitionException;
 
@@ -125,31 +120,31 @@ public interface ANTLRErrorStrategy {
      * that can match the input sequence. This method is only called when we are parsing with
      * full context.
      */
-    void reportAmbiguity(@NotNull Parser recognizer,
+    <T extends Symbol> void reportAmbiguity(@NotNull Parser<T> recognizer,
 						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
-	void reportAttemptingFullContext(@NotNull Parser recognizer,
+	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
 									 @NotNull DFA dfa,
 									 int startIndex, int stopIndex,
-									 @NotNull SimulatorState initialState);
+									 @NotNull SimulatorState<T> initialState);
 
 	/** Called by the parser when it find a conflict that is resolved by retrying the parse
      *  with full context. This is not a warning; it simply notifies you that your grammar
      *  is more complicated than Strong LL can handle. The parser moved up to full context
      *  parsing for that input sequence.
      */
-    void reportContextSensitivity(@NotNull Parser recognizer,
+    <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
                                   @NotNull DFA dfa,
                                   int startIndex, int stopIndex,
-                                  @NotNull SimulatorState acceptState);
+                                  @NotNull SimulatorState<T> acceptState);
 
     /** Called by the parser when it finds less than n-1 predicates for n ambiguous alternatives.
      *  If there are n-1, we assume that the missing predicate is !(the "or" of the other predicates).
      *  If there are fewer than n-1, then we don't know which make it alternative to protect
      *  if the predicates fail.
      */
-    void reportInsufficientPredicates(@NotNull Parser recognizer,
+    <T extends Symbol> void reportInsufficientPredicates(@NotNull Parser<T> recognizer,
 									  @NotNull DFA dfa,
 									  int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 									  DecisionState decState,

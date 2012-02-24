@@ -406,10 +406,11 @@ public abstract class BaseTest {
 							   String input,
 							   boolean showDFA)
 	{
-		rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  null,
 									  lexerName);
+		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		compile("Test.java");
@@ -427,70 +428,16 @@ public abstract class BaseTest {
 								String startRuleName,
 								String input, boolean debug)
 	{
-		rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  parserName,
-									  lexerName);
+									  lexerName,
+									  "-visitor");
+		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
 								 lexerName,
 								 startRuleName,
-								 debug);
-	}
-
-	protected String execTreeParser(String parserGrammarFileName,
-									String parserGrammarStr,
-									String parserName,
-									String treeParserGrammarFileName,
-									String treeParserGrammarStr,
-									String treeParserName,
-									String lexerName,
-									String parserStartRuleName,
-									String treeParserStartRuleName,
-									String input)
-	{
-		return execTreeParser(parserGrammarFileName,
-							  parserGrammarStr,
-							  parserName,
-							  treeParserGrammarFileName,
-							  treeParserGrammarStr,
-							  treeParserName,
-							  lexerName,
-							  parserStartRuleName,
-							  treeParserStartRuleName,
-							  input,
-							  false);
-	}
-
-	protected String execTreeParser(String parserGrammarFileName,
-									String parserGrammarStr,
-									String parserName,
-									String treeParserGrammarFileName,
-									String treeParserGrammarStr,
-									String treeParserName,
-									String lexerName,
-									String parserStartRuleName,
-									String treeParserStartRuleName,
-									String input,
-									boolean debug)
-	{
-		// build the parser
-		rawGenerateAndBuildRecognizer(parserGrammarFileName,
-									  parserGrammarStr,
-									  parserName,
-									  lexerName);
-
-		// build the tree parser
-		rawGenerateAndBuildRecognizer(treeParserGrammarFileName,
-									  treeParserGrammarStr,
-									  treeParserName,
-									  lexerName);
-
-		writeFile(tmpdir, "input", input);
-
-		return rawExecRecognizer(parserName,
-								 lexerName,
-								 parserStartRuleName,
 								 debug);
 	}
 
@@ -510,7 +457,13 @@ public abstract class BaseTest {
 		}
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
-			files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			if (!optionsSet.contains("-no-listener")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+			}
+			if (optionsSet.contains("-visitor")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
+			}
 		}
 		ok = compile(files.toArray(new String[files.size()]));
 		if ( !ok ) { allIsWell = false; }
@@ -747,41 +700,36 @@ public abstract class BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testActions(String templates, String actionName, String action, String expected) {
+	public void testActions(String templates, String actionName, String action, String expected) throws org.antlr.runtime.RecognitionException {
 		int lp = templates.indexOf('(');
 		String name = templates.substring(0, lp);
 		STGroup group = new STGroupString(templates);
 		ST st = group.getInstanceOf(name);
 		st.add(actionName, action);
 		String grammar = st.render();
-		try {
-			ErrorQueue equeue = new ErrorQueue();
-			Grammar g = new Grammar(grammar);
-			if ( g.ast!=null && !g.ast.hasErrors ) {
-				SemanticPipeline sem = new SemanticPipeline(g);
-				sem.process();
+		ErrorQueue equeue = new ErrorQueue();
+		Grammar g = new Grammar(grammar);
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
 
-				ATNFactory factory = new ParserATNFactory(g);
-				if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
-				g.atn = factory.createATN();
+			ATNFactory factory = new ParserATNFactory(g);
+			if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+			g.atn = factory.createATN();
 
-				CodeGenerator gen = new CodeGenerator(g);
-				ST outputFileST = gen.generateParser();
-				String output = outputFileST.render();
-				//System.out.println(output);
-				String b = "#" + actionName + "#";
-				int start = output.indexOf(b);
-				String e = "#end-" + actionName + "#";
-				int end = output.indexOf(e);
-				String snippet = output.substring(start+b.length(),end);
-				assertEquals(expected, snippet);
-			}
-			if ( equeue.size()>0 ) {
-				System.err.println(equeue.toString(g.tool));
-			}
+			CodeGenerator gen = new CodeGenerator(g);
+			ST outputFileST = gen.generateParser();
+			String output = outputFileST.render();
+			//System.out.println(output);
+			String b = "#" + actionName + "#";
+			int start = output.indexOf(b);
+			String e = "#end-" + actionName + "#";
+			int end = output.indexOf(e);
+			String snippet = output.substring(start+b.length(),end);
+			assertEquals(expected, snippet);
 		}
-		catch (org.antlr.runtime.RecognitionException re) {
-			re.printStackTrace(System.err);
+		if ( equeue.size()>0 ) {
+			System.err.println(equeue.toString(g.tool));
 		}
 	}
 
@@ -883,7 +831,7 @@ public abstract class BaseTest {
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {
-        public FilteringTokenStream(TokenSource src) { super(src); }
+        public FilteringTokenStream(TokenSource<? extends Token> src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();
         @Override
         protected void sync(int i) {
@@ -943,7 +891,7 @@ public abstract class BaseTest {
 			createParserST =
 				new ST(
 				"        <parserName> parser = new <parserName>(tokens);\n" +
-                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
+                "        parser.setErrorHandler(new DiagnosticErrorStrategy\\<Token>());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -1075,7 +1023,7 @@ public abstract class BaseTest {
     public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
     public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
-	public static class IntTokenStream implements TokenStream {
+	public static class IntTokenStream implements TokenStream<Token> {
 		List<Integer> types;
 		int p=0;
 		public IntTokenStream(List<Integer> types) { this.types = types; }
@@ -1130,7 +1078,7 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public TokenSource getTokenSource() {
+		public TokenSource<? extends Token> getTokenSource() {
 			return null;
 		}
 

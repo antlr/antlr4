@@ -31,16 +31,39 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-/**
- *
- * @author Sam Harwell
- */
-public interface ParseTreeVisitor<Symbol extends Token, Result> {
+/** Result is return type of visit methods. Use Result=Void for no return type. */
+public abstract class AbstractParseTreeVisitor<Symbol extends Token, Result> implements ParseTreeVisitor<Symbol, Result> {
+	@Override
+	public <T extends Symbol> Result visit(ParserRuleContext<T> ctx) {
+		return ctx.accept(this);
+	}
 
-	<T extends Symbol> Result visit(ParserRuleContext<T> ctx);
+	/** Visit all rule, nonleaf children. Not that useful if you are using T as
+	 *  non-Void.  This returns value returned from last child visited,
+	 *  losing all computations from first n-1 children.  Works fine for
+	 *  ctxs with one child then.
+	 *  Handy if you are just walking the tree with a visitor and only
+	 *  care about some nodes.  The ParserRuleContext.accept() method
+	 *  walks all children by default; i.e., calls this method.
+	 */
+	@Override
+	public <T extends Symbol> Result visitChildren(ParserRuleContext<T> ctx) {
+		Result result = null;
+		for (ParseTree<T> c : ctx.children) {
+			if ( c instanceof ParseTree.RuleNode) {
+				ParseTree.RuleNode<T> r = (ParseTree.RuleNode<T>)c;
+				ParserRuleContext<T> rctx = (ParserRuleContext<T>)r.getRuleContext();
+				result = visit(rctx);
+			}
+			else {
+				result = visitTerminal(ctx, ((ParseTree.TerminalNode<T>)c).getSymbol());
+			}
+		}
+		return result;
+	}
 
-	<T extends Symbol> Result visitChildren(ParserRuleContext<T> ctx);
-
-	<T extends Symbol> Result visitTerminal(ParserRuleContext<T> ctx, T symbol);
-
+	@Override
+	public <T extends Symbol> Result visitTerminal(ParserRuleContext<T> ctx, T symbol) {
+		return null;
+	}
 }

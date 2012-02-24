@@ -28,10 +28,8 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.Trees;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
@@ -57,9 +55,9 @@ import java.io.IOException;
  *
  *  @see ParserRuleContext
  */
-public class RuleContext implements ParseTree.RuleNode {
+public class RuleContext<Symbol> implements ParseTree.RuleNode<Symbol> {
 	/** What context invoked this rule? */
-	public RuleContext parent;
+	public RuleContext<Symbol> parent;
 
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
@@ -69,15 +67,19 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	public RuleContext() {}
 
-	public RuleContext(RuleContext parent, int invokingState) {
+	public RuleContext(RuleContext<Symbol> parent, int invokingState) {
 		this.parent = parent;
 		//if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
 		this.invokingState = invokingState;
 	}
 
+	public static <T> RuleContext<T> getChildContext(RuleContext<T> parent, int invokingState) {
+		return new RuleContext<T>(parent, invokingState);
+	}
+
 	public int depth() {
 		int n = 0;
-		RuleContext p = this;
+		RuleContext<?> p = this;
 		while ( p!=null ) {
 			p = p.parent;
 			n++;
@@ -95,18 +97,18 @@ public class RuleContext implements ParseTree.RuleNode {
 	// satisfy the ParseTree interface
 
 	@Override
-	public RuleContext getRuleContext() { return this; }
+	public RuleContext<Symbol> getRuleContext() { return this; }
 
 	@Override
-	public ParseTree getParent() { return parent; }
+	public ParseTree<Symbol> getParent() { return parent; }
 
 	@Override
-	public RuleContext getPayload() { return this; }
+	public RuleContext<Symbol> getPayload() { return this; }
 
 	public int getRuleIndex() { return -1; }
 
 	@Override
-	public ParseTree getChild(int i) {
+	public ParseTree<Symbol> getChild(int i) {
 		return null;
 	}
 
@@ -123,18 +125,18 @@ public class RuleContext implements ParseTree.RuleNode {
 		return new Interval(start, stop);
 	}
 
-	public void inspect(Parser parser) {
+	public void inspect(Parser<?> parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
 	}
 
-	public void save(Parser parser, String fileName)
+	public void save(Parser<?> parser, String fileName)
 		throws IOException, PrintException
 	{
 		Trees.writePS(this, parser, fileName);
 	}
 
-	public void save(Parser parser, String fileName,
+	public void save(Parser<?> parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{
@@ -145,7 +147,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 *  We have to know the recognizer so we can get rule names.
 	 */
-	public String toStringTree(Parser recog) {
+	public String toStringTree(Parser<?> recog) {
 		return Trees.toStringTree(this, recog);
 	}
 
@@ -157,14 +159,14 @@ public class RuleContext implements ParseTree.RuleNode {
 		return toString(null);
 	}
 
-	public String toString(@Nullable Recognizer<?,?> recog) {
-		return toString(recog, ParserRuleContext.EMPTY);
+	public String toString(@Nullable Recognizer<?, ?> recog) {
+		return toString(recog, ParserRuleContext.emptyContext());
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
+	public String toString(@Nullable Recognizer<?,?> recog, RuleContext<?> stop) {
 		StringBuilder buf = new StringBuilder();
-		RuleContext p = this;
+		RuleContext<?> p = this;
 		buf.append("[");
 		while ( p != null && p != stop ) {
 			if ( !p.isEmpty() ) buf.append(p.invokingState);

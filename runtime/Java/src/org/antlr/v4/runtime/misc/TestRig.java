@@ -109,14 +109,9 @@ public class TestRig {
 		String lexerName = grammarName+"Lexer";
 		String parserName = grammarName+"Parser";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Class lexerClass = cl.loadClass(lexerName);
-		if ( lexerClass==null ) {
-			System.err.println("Can't load "+lexerName);
-		}
-		Class parserClass = cl.loadClass(parserName);
-		if ( parserClass==null ) {
-			System.err.println("Can't load "+parserName);
-		}
+		Class<? extends Lexer> lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+		@SuppressWarnings("rawtypes") // safe
+		Class<? extends Parser> parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
 
 		InputStream is = System.in;
 		if ( inputFile!=null ) {
@@ -133,7 +128,7 @@ public class TestRig {
 		try {
 			ANTLRInputStream input = new ANTLRInputStream(r);
 
-			Constructor<Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+			Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
 			Lexer lexer = lexerCtor.newInstance(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 
@@ -144,10 +139,11 @@ public class TestRig {
 				}
 			}
 
-			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-			Parser parser = parserCtor.newInstance(tokens);
+			@SuppressWarnings("rawtypes") // safe
+			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+			Parser<?> parser = parserCtor.newInstance(tokens);
 
-			parser.setErrorHandler(new DiagnosticErrorStrategy());
+			parser.setErrorHandler(new DiagnosticErrorStrategy<Token>());
 
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);
@@ -157,7 +153,7 @@ public class TestRig {
 
 			try {
 				Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-				ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
+				ParserRuleContext<? extends Token> tree = (ParserRuleContext<? extends Token>)startRule.invoke(parser, (Object[])null);
 
 				if ( printTree ) {
 					System.out.println(tree.toStringTree(parser));

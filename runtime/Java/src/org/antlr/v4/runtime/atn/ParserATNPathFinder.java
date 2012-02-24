@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ParserATNPathFinder extends ParserATNSimulator<Token> {
-	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn) {
+	public ParserATNPathFinder(@Nullable Parser<Token> parser, @NotNull ATN atn) {
 		super(parser, atn);
 	}
 
@@ -61,12 +61,13 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 	 *  TODO: I haven't figured out what to do with nongreedy decisions yet
 	 *  TODO: preds. unless i create rule specific ctxs, i can't eval preds. also must eval args!
 	 */
-	public TraceTree trace(@NotNull ATNState s, @Nullable RuleContext ctx,
-								TokenStream input, int start, int stop)
+	public TraceTree trace(@NotNull ATNState s, @Nullable RuleContext<Token> ctx,
+								TokenStream<? extends Token> input, int start, int stop)
 	{
 		System.out.println("REACHES "+s.stateNumber+" start state");
 		List<TraceTree> leaves = new ArrayList<TraceTree>();
-		HashSet<ATNState>[] busy = new HashSet[stop-start+1];
+		@SuppressWarnings("unchecked") // safe
+		HashSet<ATNState>[] busy = (HashSet<ATNState>[])new HashSet<?>[stop-start+1];
 		for (int i = 0; i < busy.length; i++) {
 			busy[i] = new HashSet<ATNState>();
 		}
@@ -76,8 +77,8 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 	}
 
 	/** Returns true if we found path */
-	public TraceTree _trace(@NotNull ATNState s, RuleContext initialContext, RuleContext ctx,
-							TokenStream input, int start, int i, int stop,
+	public TraceTree _trace(@NotNull ATNState s, RuleContext<Token> initialContext, RuleContext<Token> ctx,
+							TokenStream<? extends Token> input, int start, int i, int stop,
 							List<TraceTree> leaves, @NotNull Set<ATNState>[] busy)
 	{
 		TraceTree root = new TraceTree(s);
@@ -116,8 +117,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 		for (int j=0; j<n; j++) {
 			Transition t = s.transition(j);
 			if ( t.getClass() == RuleTransition.class ) {
-				RuleContext newContext =
-				new RuleContext(ctx, s.stateNumber);
+				RuleContext<Token> newContext = RuleContext.getChildContext(ctx, s.stateNumber);
 				found = _trace(t.target, initialContext, newContext, input, start, i, stop, leaves, busy);
 				if ( found!=null ) {aGoodPath=true; root.addChild(found);}
 				continue;
@@ -160,7 +160,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 		return null;
 	}
 
-	public TraceTree predTransition(RuleContext initialContext, RuleContext ctx, TokenStream input, int start,
+	public TraceTree predTransition(RuleContext<Token> initialContext, RuleContext<Token> ctx, TokenStream<? extends Token> input, int start,
 									int i, int stop, List<TraceTree> leaves, Set<ATNState>[] busy,
 									TraceTree root, Transition t)
 	{

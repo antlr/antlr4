@@ -36,17 +36,23 @@ public class LeftRecursiveRuleAltInfo {
 	public String leftRecursiveRuleRefLabel;
 	public String altLabel;
 	public String altText;
-	public AltAST altAST;
+	public AltAST altAST; // transformed ALT
+	public AltAST originalAltAST;
 	public int nextPrec;
 
 	public LeftRecursiveRuleAltInfo(int altNum, String altText) {
-		this(altNum, altText, null, null);
+		this(altNum, altText, null, null, null);
 	}
 
-	public LeftRecursiveRuleAltInfo(int altNum, String altText, String leftRecursiveRuleRefLabel, String altLabel) {
+	public LeftRecursiveRuleAltInfo(int altNum, String altText,
+									String leftRecursiveRuleRefLabel,
+									String altLabel,
+									AltAST originalAltAST)
+	{
 		this.altNum = altNum;
 		this.altText = altText;
 		this.leftRecursiveRuleRefLabel = leftRecursiveRuleRefLabel;
 		this.altLabel = altLabel;
+		this.originalAltAST = originalAltAST;
 	}
 }

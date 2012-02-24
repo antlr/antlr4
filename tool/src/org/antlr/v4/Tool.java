@@ -29,20 +29,50 @@
 
 package org.antlr.v4;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.automata.*;
+import org.antlr.v4.automata.ATNFactory;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.parse.ANTLRLexer;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.runtime.misc.LogManager;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.ANTLRToolListener;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.DefaultToolListener;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarTransformPipeline;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTErrorNode;
+import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.stringtemplate.v4.STGroup;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
@@ -83,7 +113,6 @@ public class Tool {
     public boolean force_atn = false;
     public boolean log = false;
 	public boolean verbose_dfa = false;
-	public boolean no_auto_element_labels = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 
@@ -185,7 +214,7 @@ public class Tool {
 						i++;
 					}
 					// use reflection to set field
-					Class c = this.getClass();
+					Class<? extends Tool> c = this.getClass();
 					try {
 						Field f = c.getField(o.fieldName);
 						if ( argValue==null ) {
@@ -385,7 +414,7 @@ public class Tool {
 		}
 		catch (RecognitionException re) {
 			// TODO: do we gen errors now?
-			errMgr.internalError("can't generate this message at moment; antlr recovers");
+			ErrorManager.internalError("can't generate this message at moment; antlr recovers");
 		}
 		return null;
 	}
@@ -479,7 +508,7 @@ public class Tool {
 	 * @return
 	 */
 	public File getOutputDirectory(String fileNameWithPath) {
-		File outputDir = new File(outputDirectory);
+		File outputDir;
 		String fileDirectory;
 
 		// Some files are given to us without a PATH but should should
@@ -560,21 +589,21 @@ public class Tool {
 	public List<ANTLRToolListener> getListeners() { return listeners; }
 
 	public void info(String msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.info(msg);
 			return;
 		}
 		for (ANTLRToolListener l : listeners) l.info(msg);
 	}
 	public void error(ANTLRMessage msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.error(msg);
 			return;
 		}
 		for (ANTLRToolListener l : listeners) l.error(msg);
 	}
 	public void warning(ANTLRMessage msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.warning(msg);
 			return;
 		}

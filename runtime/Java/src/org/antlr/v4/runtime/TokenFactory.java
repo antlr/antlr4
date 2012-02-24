@@ -38,7 +38,7 @@ public interface TokenFactory<Symbol extends Token> {
 	 *  error handling strategy. If text!=null, than the start and stop positions
 	 *  are wiped to -1 in the text override is set in the CommonToken.
 	 */
-	Symbol create(TokenSource source, int type, String text,
+	Symbol create(TokenSource<? super Symbol> source, int type, String text,
 				  int channel, int start, int stop,
 				  int line, int charPositionInLine);
 

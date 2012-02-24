@@ -32,14 +32,14 @@ package org.antlr.v4.runtime;
 /** Bail out of parser at first syntax error. Do this to use it:
  *      myparser.setErrorHandler(new BailErrorStrategy<Token>());
  */
-public class BailErrorStrategy extends DefaultErrorStrategy {
+public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
     /** Instead of recovering from exception e, Re-throw wrote it wrapped
      *  in a generic RuntimeException so it is not caught by the
      *  rule function catches.  Exception e is the "cause" of the
      *  RuntimeException.
      */
     @Override
-    public void recover(Parser recognizer, RecognitionException e) {
+    public <T extends Symbol> void recover(Parser<T> recognizer, RecognitionException e) {
         throw new RuntimeException(e);
     }
 
@@ -47,7 +47,7 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
      *  successfully recovers, it won't throw an exception.
      */
     @Override
-    public Token recoverInline(Parser recognizer)
+    public <T extends Symbol> T recoverInline(Parser<T> recognizer)
         throws RecognitionException
     {
         throw new RuntimeException(new InputMismatchException(recognizer));
@@ -55,5 +55,5 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
 
     /** Make sure we don't attempt to recover from problems in subrules. */
     @Override
-    public void sync(Parser recognizer) { }
+    public <T extends Symbol> void sync(Parser<T> recognizer) { }
 }

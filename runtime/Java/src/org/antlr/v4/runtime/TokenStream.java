@@ -30,16 +30,16 @@
 package org.antlr.v4.runtime;
 
 /** A stream of tokens accessing tokens from a TokenSource */
-public interface TokenStream extends SymbolStream<Token> {
+public interface TokenStream<Symbol> extends SymbolStream<Symbol> {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
-	 *  i<0 indicates tokens in the past.  So -1 is previous token and -2 is
+	 *  i&lt;0 indicates tokens in the past.  So -1 is previous token and -2 is
 	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
 	 *  Return null for LT(0) and any index that results in an absolute address
 	 *  that is negative.
      *  TODO (Sam): Throw exception for invalid k?
 	 */
     @Override
-    public Token LT(int k);
+    public Symbol LT(int k);
 
 	/** How far ahead has the stream been asked to look?  The return
 	 *  value is a valid index from 0..n-1.
@@ -54,12 +54,12 @@ public interface TokenStream extends SymbolStream<Token> {
 	 *  this method, removing the dependency.
 	 */
 	@Override
-	public Token get(int i);
+	public Symbol get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but
 	 *  the object that provides Token objects.
 	 */
-	public TokenSource getTokenSource();
+	public TokenSource<? extends Symbol> getTokenSource();
 
 	/** Return the text of all tokens from start to stop, inclusive.
 	 *  If the stream does not buffer all the tokens then it can just
@@ -74,5 +74,5 @@ public interface TokenStream extends SymbolStream<Token> {
 	 *  to the other toString(int,int).  This is also parallel with
 	 *  the TreeNodeStream.toString(Object,Object).
 	 */
-	public String toString(Token start, Token stop);
+	public String toString(Symbol start, Symbol stop);
 }

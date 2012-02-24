@@ -119,7 +119,7 @@ public class TestPerformance extends BaseTest {
     private static final int PASSES = 4;
 
     private static Lexer sharedLexer;
-    private static Parser sharedParser;
+    private static Parser<Token> sharedParser;
     @SuppressWarnings({"FieldCanBeLocal"})
     private static ParseTreeListener<Token> sharedListener;
 
@@ -462,15 +462,15 @@ public class TestPerformance extends BaseTest {
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends Lexer> lexerClass = (Class<? extends Lexer>)loader.loadClass(lexerName);
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass(parserName);
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName);
+            final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+			@SuppressWarnings("rawtypes")
+            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
+            @SuppressWarnings({"rawtypes"})
+            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
             TestPerformance.sharedListener = listenerClass.newInstance();
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+			@SuppressWarnings("rawtypes")
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
@@ -499,7 +499,9 @@ public class TestPerformance extends BaseTest {
                         if (REUSE_PARSER && sharedParser != null) {
                             sharedParser.setInputStream(tokens);
                         } else {
-                            sharedParser = parserCtor.newInstance(tokens);
+							@SuppressWarnings("unchecked")
+							Parser<Token> parser = parserCtor.newInstance(tokens);
+                            sharedParser = parser;
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
                             sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
@@ -509,7 +511,7 @@ public class TestPerformance extends BaseTest {
                                 sharedParser.addParseListener(sharedListener);
                             }
                             if (BAIL_ON_ERROR) {
-                                sharedParser.setErrorHandler(new BailErrorStrategy());
+                                sharedParser.setErrorHandler(new BailErrorStrategy<Token>());
                             }
                         }
 
@@ -542,7 +544,7 @@ public class TestPerformance extends BaseTest {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override
-		public void error(Recognizer<Token, ?> recognizer, Token offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+		public <T extends Token> void error(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
 			String sourceName = recognizer.getInputStream().getSourceName();
 			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
 			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);

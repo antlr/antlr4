@@ -2,6 +2,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -285,7 +286,7 @@ public class TestATNInterpreter extends BaseTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		TokenStream input = new IntTokenStream(types);
+		TokenStream<Token> input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {

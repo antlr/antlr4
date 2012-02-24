@@ -66,8 +66,8 @@ public interface ANTLRErrorListener<Symbol> {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void error(Recognizer<Symbol, ?> recognizer,
-					  @Nullable Symbol offendingSymbol,
+	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
+					  @Nullable T offendingSymbol,
 					  int line,
 					  int charPositionInLine,
 					  String msg,

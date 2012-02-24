@@ -50,7 +50,7 @@ public class TestCommonTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-        BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
+        BufferedTokenStream<Token> tokens = new BufferedTokenStream<Token>(lexEngine);
 
         String result = tokens.LT(1).getText();
         String expecting = "x";
@@ -72,7 +72,7 @@ public class TestCommonTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
+        BufferedTokenStream<Token> tokens = new BufferedTokenStream<Token>(lexEngine);
 
         String result = tokens.LT(2).getText();
         String expecting = " ";
@@ -94,7 +94,7 @@ public class TestCommonTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
+        BufferedTokenStream<Token> tokens = new BufferedTokenStream<Token>(lexEngine);
 
         int i = 1;
         Token t = tokens.LT(i);
@@ -125,7 +125,7 @@ public class TestCommonTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
+        BufferedTokenStream<Token> tokens = new BufferedTokenStream<Token>(lexEngine);
 
         Token t = tokens.LT(1);
         while ( t.getType()!=Token.EOF ) {
@@ -157,7 +157,7 @@ public class TestCommonTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        BufferedTokenStream tokens = new BufferedTokenStream(lexEngine);
+        BufferedTokenStream<Token> tokens = new BufferedTokenStream<Token>(lexEngine);
 
         tokens.consume(); // get x into buffer
         Token t = tokens.LT(-1);
@@ -174,8 +174,8 @@ public class TestCommonTokenStream extends BaseTest {
     }
 
     @Test public void testOffChannel() throws Exception {
-        TokenSource lexer = // simulate input " x =34  ;\n"
-            new TokenSource() {
+        TokenSource<Token> lexer = // simulate input " x =34  ;\n"
+            new TokenSource<Token>() {
                 int i = 0;
                 WritableToken[] tokens = {
                     new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
@@ -189,18 +189,28 @@ public class TestCommonTokenStream extends BaseTest {
                     new CommonToken(1,"\n") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(Token.EOF,"")
                 };
+                @Override
                 public Token nextToken() {
                     return tokens[i++];
                 }
+                @Override
                 public String getSourceName() { return "test"; }
+				@Override
 				public int getCharPositionInLine() {
 					return 0;
 				}
+				@Override
 				public int getLine() {
 					return 0;
 				}
+				@Override
 				public CharStream getInputStream() {
 					return null;
+				}
+
+				@Override
+				public TokenFactory<? extends Token> getTokenFactory() {
+					return CommonTokenFactory.DEFAULT;
 				}
 
 				@Override

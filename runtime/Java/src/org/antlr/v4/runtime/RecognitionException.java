@@ -45,9 +45,9 @@ public class RecognitionException extends RuntimeException {
 	// Next two (ctx,input) should be what is in recognizer, but
 	// won't work when interpreting
 
-	protected RuleContext ctx;
+	protected RuleContext<?> ctx;
 
-	protected IntStream input;
+	protected IntStream<?> input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
 //	public int offendingTokenIndex;
@@ -60,8 +60,16 @@ public class RecognitionException extends RuntimeException {
 
 	protected int offendingState;
 
-	public RecognitionException(@Nullable Recognizer<?, ?> recognizer, IntStream input,
-								@Nullable ParserRuleContext ctx)
+	public RecognitionException(@Nullable Lexer lexer,
+								CharStream input)
+	{
+		this.recognizer = lexer;
+		this.input = input;
+	}
+
+	public <Symbol extends Token> RecognitionException(@Nullable Recognizer<Symbol, ?> recognizer,
+													   IntStream<Symbol> input,
+													   @Nullable ParserRuleContext<Symbol> ctx)
 	{
 		this.recognizer = recognizer;
 		this.input = input;
@@ -85,11 +93,11 @@ public class RecognitionException extends RuntimeException {
 		return null;
 	}
 
-	public RuleContext getCtx() {
+	public RuleContext<?> getCtx() {
 		return ctx;
 	}
 
-	public IntStream getInputStream() {
+	public IntStream<?> getInputStream() {
 		return input;
 	}
 
@@ -99,5 +107,20 @@ public class RecognitionException extends RuntimeException {
 
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
+	}
+
+	@SuppressWarnings("unchecked") // safe
+	public <T> IntStream<T> getInputStream(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (IntStream<T>)input : null;
+	}
+
+	@SuppressWarnings("unchecked") // safe
+	public <T> RuleContext<T> getContext(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (RuleContext<T>)ctx : null;
+	}
+
+	@SuppressWarnings("unchecked") // safe
+	public <T extends Token> T getOffendingToken(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (T)offendingToken : null;
 	}
 }

@@ -87,6 +87,7 @@ public class FastQueue<T> {
     }
 
     /** Return string of current buffer contents; non-destructive */
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         int n = size();

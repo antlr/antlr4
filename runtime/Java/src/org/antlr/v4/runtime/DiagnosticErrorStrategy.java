@@ -39,13 +39,12 @@ import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.Arrays;
 
-public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
+public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
     @Override
-    public void reportAmbiguity(@NotNull Parser recognizer,
+    public <T extends Symbol> void reportAmbiguity(@NotNull Parser<T> recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
@@ -54,25 +53,25 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     }
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
+	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
-											@NotNull SimulatorState initialState)
+											@NotNull SimulatorState<T> initialState)
 	{
 		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + getFullContextConfigs(initialState).toString(true) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull SimulatorState acceptState)
+	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer, @NotNull DFA dfa,
+                                         int startIndex, int stopIndex, @NotNull SimulatorState<T> acceptState)
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + getFullContextConfigs(acceptState).toString(true) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
     @Override
-    public void reportInsufficientPredicates(@NotNull Parser recognizer,
+    public <T extends Symbol> void reportInsufficientPredicates(@NotNull Parser<T> recognizer,
 											 @NotNull DFA dfa,
 											 int startIndex, int stopIndex,
 											 @NotNull IntervalSet ambigAlts,
@@ -85,7 +84,7 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 										", " + configs.toString(true) + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
-	protected static ATNConfigSet getFullContextConfigs(SimulatorState state) {
+	protected static ATNConfigSet getFullContextConfigs(SimulatorState<?> state) {
 		ATNConfigSet configs = new ATNConfigSet(false);
 		PredictionContext suffix = PredictionContext.fromRuleContext(state.remainingOuterContext);
 		for (ATNConfig config : state.s0.configset) {

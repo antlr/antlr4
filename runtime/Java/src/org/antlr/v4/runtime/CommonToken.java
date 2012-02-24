@@ -35,7 +35,7 @@ public class CommonToken implements WritableToken, Serializable {
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
-	protected TokenSource source;
+	protected TokenSource<?> source;
 	// TODO: rm protected transient CharStream input;
 
 	/** We need to be able to change the text once in a while.  If
@@ -58,7 +58,7 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(TokenSource source, int type, int channel, int start, int stop) {
+	public CommonToken(TokenSource<?> source, int type, int channel, int start, int stop) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
@@ -84,10 +84,8 @@ public class CommonToken implements WritableToken, Serializable {
 		charPositionInLine = oldToken.getCharPositionInLine();
 		channel = oldToken.getChannel();
         source = oldToken.getTokenSource();
-		if ( oldToken instanceof CommonToken ) {
-			start = ((CommonToken)oldToken).start;
-			stop = ((CommonToken)oldToken).stop;
-		}
+		start = oldToken.getStartIndex();
+		stop = oldToken.getStopIndex();
 	}
 
 	@Override
@@ -105,7 +103,7 @@ public class CommonToken implements WritableToken, Serializable {
 		if ( text!=null ) {
 			return text;
 		}
-		TokenSource tokens = getTokenSource();
+		TokenSource<?> tokens = getTokenSource();
 		if ( tokens==null ) return null;
 		CharStream input = tokens.getInputStream();
 		if ( input==null ) return null;
@@ -187,7 +185,7 @@ public class CommonToken implements WritableToken, Serializable {
 	}
 
 	@Override
-	public TokenSource getTokenSource() {
+	public TokenSource<?> getTokenSource() {
 		return source;
 	}
 
@@ -195,6 +193,7 @@ public class CommonToken implements WritableToken, Serializable {
 		return source != null ? source.getInputStream() : null;
 	}
 
+	@Override
 	public String toString() {
 		String channelStr = "";
 		if ( channel>0 ) {

@@ -178,6 +178,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
+	@Override
 	public void reset() {
 		dfaPrevAccept.reset();
 		atnPrevAccept.reset();
@@ -297,40 +298,45 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		traceLookahead1();
 		int t = input.LA(1);
-		DFAState s = ds0;
+		DFAState s = ds0; // s is current/from DFA state
 
 		while ( true ) { // while more work
 			if ( debug ) {
 				System.out.format("in reach starting closure: %s\n", closure);
 			}
 
-			DFAState next = null;
+			// As we move src->trg, src->trg, we keep track of the previous trg to
+			// avoid looking up the DFA state again, which is expensive.
+			// If the previous target was already part of the DFA, we might
+			// be able to avoid doing a reach operation upon t. If s!=null,
+			// it means that semantic predicates didn't prevent us from
+			// creating a DFA state. Once we know s!=null, we check to see if
+			// the DFA state has an edge already for t. If so, we can just reuse
+			// it's configuration set; there's no point in re-computing it.
+			// This is kind of like doing DFA simulation within the ATN
+			// simulation because DFA simulation is really just a way to avoid
+			// computing reach/closure sets. Technically, once we know that
+			// we have a previously added DFA state, we could jump over to
+			// the DFA simulator. But, that would mean popping back and forth
+			// a lot and making things more complicated algorithmically.
+			// This optimization makes a lot of sense for loops within DFA.
+			// A character will take us back to an existing DFA state
+			// that already has lots of edges out of it. e.g., .* in comments.
+			DFAState target = null;
 			if (s != null) {
 				closure = s.configset;
-				next = s.getTarget(t);
-				if (next != null) {
-					reach = next.configset;
+				target = s.getTarget(t);
+				if (target != null) {
+					reach = target.configset;
 				}
 			}
 
-			if (next == null) {
-				for (ATNConfig c : closure) {
-					if ( debug ) {
-						System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
-					}
-
-					int n = c.state.getNumberOfTransitions();
-					for (int ti=0; ti<n; ti++) {               // for each transition
-						Transition trans = c.state.transition(ti);
-						ATNState target = getReachableTarget(trans, t);
-						if ( target!=null ) {
-							closure(new ATNConfig(c, target), reach);
-						}
-					}
-				}
+			if (target == null) { // if we don't find an existing DFA state
+				// Fill reach starting from closure, following t transitions
+				getReachableConfigSet(closure, reach, t);
 			}
 
-			if ( reach.isEmpty() ) {
+			if ( reach.isEmpty() ) { // we got nowhere on t from s
 				// we reached state associated with closure for sure, so
 				// make sure it's defined. worst case, we define s0 from
 				// start state configs.
@@ -347,8 +353,9 @@ public class LexerATNSimulator extends ATNSimulator {
 			processAcceptStates(input, reach);
 
 			consume(input);
-			if (next == null) {
-				next = addDFAEdge(s, t, reach);
+			if (target == null) {
+				// Add an edge from s to target DFA found/created for reach
+				target = addDFAEdge(s, t, reach);
 			}
 
 			traceLookahead1();
@@ -356,10 +363,15 @@ public class LexerATNSimulator extends ATNSimulator {
 
 			closure = reach;
 			reach = new ATNConfigSet(false);
-			s = next;
+			s = target; // flip; current DFA target becomes new src/from state
 		}
 
+		return failOrAccept(atnPrevAccept, input, reach, t);
+	}
 
+	protected int failOrAccept(ATNExecState atnPrevAccept, CharStream input,
+							   ATNConfigSet reach, int t)
+	{
 		if ( atnPrevAccept.config==null ) {
 			// if no accept and EOF is first char, return EOF
 			if ( t==CharStream.EOF && input.index()==startIndex ) {
@@ -372,6 +384,26 @@ public class LexerATNSimulator extends ATNSimulator {
 		accept(input, ruleIndex, atnPrevAccept.config.lexerActionIndex,
 			   atnPrevAccept.index, atnPrevAccept.line, atnPrevAccept.charPos);
 		return atn.ruleToTokenType[ruleIndex];
+	}
+
+	/** Given a starting configuration set, figure out all ATN configurations
+	 *  we can reach upon input t. Parameter reach is a return parameter.
+	 */
+	protected void getReachableConfigSet(ATNConfigSet closure, ATNConfigSet reach, int t) {
+		for (ATNConfig c : closure) {
+			if ( debug ) {
+				System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
+			}
+
+			int n = c.state.getNumberOfTransitions();
+			for (int ti=0; ti<n; ti++) {               // for each transition
+				Transition trans = c.state.transition(ti);
+				ATNState target = getReachableTarget(trans, t);
+				if ( target!=null ) {
+					closure(new ATNConfig(c, target), reach);
+				}
+			}
+		}
 	}
 
 	protected void processAcceptStates(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
@@ -481,7 +513,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected ATNConfigSet computeStartState(@NotNull IntStream input,
+	protected ATNConfigSet computeStartState(@NotNull IntStream<Integer> input,
 											 @NotNull ATNState p)
 	{
 		PredictionContext initialContext = PredictionContext.EMPTY;

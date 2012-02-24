@@ -108,5 +108,5 @@ public interface Token {
 	/** Where does this token come from? You can get the
 	 *  character input stream from the token source.
 	 */
-	TokenSource getTokenSource();
+	TokenSource<?> getTokenSource();
 }

@@ -40,45 +40,39 @@ import org.antlr.v4.runtime.misc.Interval;
  *
  *  The payload is either a token or a context object.
  */
-public interface ParseTree extends SyntaxTree {
-	public interface RuleNode extends ParseTree {
-		RuleContext getRuleContext();
+public interface ParseTree<Symbol> extends SyntaxTree {
+	public interface RuleNode<Symbol> extends ParseTree<Symbol> {
+		RuleContext<Symbol> getRuleContext();
 	}
 
-	public interface TerminalNode<Symbol> extends ParseTree {
+	public interface TerminalNode<Symbol> extends ParseTree<Symbol> {
 		Symbol getSymbol();
 	}
 
 	public static class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 		public Symbol symbol;
-		public ParseTree parent;
+		public ParseTree<Symbol> parent;
 		/** Which ATN node matched this token? */
 		public int s;
 		public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
 
 		@Override
-		public ParseTree getChild(int i) {return null;}
+		public ParseTree<Symbol> getChild(int i) {return null;}
 
 		@Override
 		public Symbol getSymbol() {return symbol;}
 
 		@Override
-		public ParseTree getParent() { return parent; }
+		public ParseTree<Symbol> getParent() { return parent; }
 
 		@Override
 		public Symbol getPayload() { return symbol; }
 
 		@Override
 		public Interval getSourceInterval() {
-			if ( symbol ==null ) return Interval.INVALID;
+			if ( !(symbol instanceof Token) ) return Interval.INVALID;
 
-			if (symbol instanceof Token) {
-				return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
-			} else if (symbol instanceof SyntaxTree) {
-				return ((SyntaxTree)symbol).getSourceInterval();
-			} else {
-				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
-			}
+			return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
 		}
 
 		@Override
@@ -91,7 +85,7 @@ public interface ParseTree extends SyntaxTree {
 				return ((Token)symbol).getText();
 			}
 			else {
-				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
+				return symbol != null ? symbol.toString() : "<null>";
 			}
 		}
 
@@ -111,13 +105,11 @@ public interface ParseTree extends SyntaxTree {
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
 		}
-//		@Override
-//		public String toString() { return "<ERROR:"+super.toString()+">"; }
 	}
 
 	// the following methods narrow the return type; they are not additional methods
 	@Override
-	ParseTree getParent();
+	ParseTree<Symbol> getParent();
 	@Override
-	ParseTree getChild(int i);
+	ParseTree<Symbol> getChild(int i);
 }

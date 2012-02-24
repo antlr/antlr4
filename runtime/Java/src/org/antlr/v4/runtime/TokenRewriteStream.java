@@ -90,7 +90,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 
 	// Define the rewrite operation hierarchy
 
-	class RewriteOperation {
+	public class RewriteOperation {
         /** What index into rewrites List are we? */
         protected int instructionIndex;
         /** Token buffer index. */
@@ -183,12 +183,12 @@ public class TokenRewriteStream extends CommonTokenStream {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public TokenRewriteStream(TokenSource tokenSource) {
+	public TokenRewriteStream(TokenSource<? extends Token> tokenSource) {
 	    super(tokenSource);
 		init();
 	}
 
-	public TokenRewriteStream(TokenSource tokenSource, int channel) {
+	public TokenRewriteStream(TokenSource<? extends Token> tokenSource, int channel) {
 		super(tokenSource, channel);
 		init();
 	}
@@ -353,6 +353,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return buf.toString();
 	}
 
+	@Override
 	public String toString() {
         fill();
 		return toString(MIN_TOKEN_INDEX, size()-1);
@@ -375,7 +376,7 @@ public class TokenRewriteStream extends CommonTokenStream {
         if ( end>tokens.size()-1 ) end = tokens.size()-1;
         if ( start<0 ) start = 0;
 
-        if ( rewrites==null || rewrites.size()==0 ) {
+        if ( rewrites==null || rewrites.isEmpty() ) {
 			return toOriginalString(start,end); // no instructions to execute
 		}
 		StringBuilder buf = new StringBuilder();
@@ -473,9 +474,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 			if ( !(op instanceof ReplaceOp) ) continue;
 			ReplaceOp rop = (ReplaceOp)rewrites.get(i);
 			// Wipe prior inserts within range
-			List<InsertBeforeOp> inserts = getKindOfOps(rewrites, InsertBeforeOp.class, i);
-			for (int j = 0; j < inserts.size(); j++) {
-				InsertBeforeOp iop = inserts.get(j);
+			List<? extends InsertBeforeOp> inserts = getKindOfOps(rewrites, InsertBeforeOp.class, i);
+			for (InsertBeforeOp iop : inserts) {
 				if ( iop.index == rop.index ) {
 					// E.g., insert before 2, delete 2..2; update replace
 					// text to include insert before, kill insert
@@ -488,9 +488,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 				}
 			}
 			// Drop any prior replaces contained within
-			List<ReplaceOp> prevReplaces = getKindOfOps(rewrites, ReplaceOp.class, i);
-			for (int j = 0; j < prevReplaces.size(); j++) {
-				ReplaceOp prevRop = prevReplaces.get(j);
+			List<? extends ReplaceOp> prevReplaces = getKindOfOps(rewrites, ReplaceOp.class, i);
+			for (ReplaceOp prevRop : prevReplaces) {
 				if ( prevRop.index>=rop.index && prevRop.lastIndex <= rop.lastIndex ) {
                     // delete replace as it's a no-op.
                     rewrites.set(prevRop.instructionIndex, null);
@@ -524,9 +523,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 			if ( !(op instanceof InsertBeforeOp) ) continue;
 			InsertBeforeOp iop = (InsertBeforeOp)rewrites.get(i);
 			// combine current insert with prior if any at same index
-			List<InsertBeforeOp> prevInserts = getKindOfOps(rewrites, InsertBeforeOp.class, i);
-			for (int j = 0; j < prevInserts.size(); j++) {
-				InsertBeforeOp prevIop = prevInserts.get(j);
+			List<? extends InsertBeforeOp> prevInserts = getKindOfOps(rewrites, InsertBeforeOp.class, i);
+			for (InsertBeforeOp prevIop : prevInserts) {
 				if ( prevIop.index == iop.index ) { // combine objects
 					// convert to strings...we're in process of toString'ing
 					// whole token buffer so no lazy eval issue with any templates
@@ -536,9 +534,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 				}
 			}
 			// look for replaces where iop.index is in range; error
-			List<ReplaceOp> prevReplaces = getKindOfOps(rewrites, ReplaceOp.class, i);
-			for (int j = 0; j < prevReplaces.size(); j++) {
-				ReplaceOp rop = prevReplaces.get(j);
+			List<? extends ReplaceOp> prevReplaces = getKindOfOps(rewrites, ReplaceOp.class, i);
+			for (ReplaceOp rop : prevReplaces) {
 				if ( iop.index == rop.index ) {
 					rop.text = catOpText(iop.text,rop.text);
 					rewrites.set(i, null);  // delete current insert
@@ -572,19 +569,18 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return x+y;
 	}
 
-	protected <T extends RewriteOperation> List<T> getKindOfOps(List<? extends RewriteOperation> rewrites, Class<T> kind) {
+	protected <T extends RewriteOperation> List<? extends T> getKindOfOps(List<? extends RewriteOperation> rewrites, Class<T> kind) {
 		return getKindOfOps(rewrites, kind, rewrites.size());
 	}
 
     /** Get all operations before an index of a particular kind */
-    protected <T extends RewriteOperation> List<T> getKindOfOps(List<? extends RewriteOperation> rewrites, Class<T> kind, int before) {
+    protected <T extends RewriteOperation> List<? extends T> getKindOfOps(List<? extends RewriteOperation> rewrites, Class<T> kind, int before) {
 		List<T> ops = new ArrayList<T>();
 		for (int i=0; i<before && i<rewrites.size(); i++) {
 			RewriteOperation op = rewrites.get(i);
 			if ( op==null ) continue; // ignore deleted
-			if ( op.getClass() == kind ) {
-				//noinspection unchecked
-				ops.add((T)op);
+			if ( kind.isInstance(op) ) {
+				ops.add(kind.cast(op));
 			}
 		}
 		return ops;

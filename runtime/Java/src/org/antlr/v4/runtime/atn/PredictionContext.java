@@ -76,7 +76,7 @@ public abstract class PredictionContext {
 
 	protected abstract PredictionContext addEmptyContext();
 
-	public static PredictionContext fromRuleContext(@NotNull RuleContext outerContext) {
+	public static PredictionContext fromRuleContext(@NotNull RuleContext<?> outerContext) {
 		if (outerContext.isEmpty()) {
 			return PredictionContext.EMPTY;
 		}

@@ -44,6 +44,7 @@ public class ToolANTLRParser extends ANTLRParser {
 		this.tool = tool;
 	}
 
+	@Override
 	public void displayRecognitionError(String[] tokenNames,
 										RecognitionException e)
 	{

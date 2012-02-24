@@ -50,9 +50,9 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 @Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	@Override public \<T extends <InputSymbolType()>\> void enterEveryRule(ParserRuleContext\<T> ctx) { }
+	@Override public \<T extends <InputSymbolType()>\> void exitEveryRule(ParserRuleContext\<T> ctx) { }
+	@Override public \<T extends <InputSymbolType()>\> void visitTerminal(ParserRuleContext\<T> ctx, T symbol) { }
 }
 >>
 
@@ -61,9 +61,9 @@ VisitorFile(file, header) ::= <<
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Visitor\<T> {
+public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<<InputSymbolType()>, Result> {
 	<file.visitorNames:{lname |
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -71,10 +71,11 @@ BaseVisitorFile(file, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
-@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { visitChildren(ctx); return null; \}}; separator="\n">
+@Override public Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 
@@ -117,7 +118,7 @@ public class <parser.name> extends <superclass> {
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+	public boolean sempred(RuleContext\<<InputSymbolType()>\> _localctx, int ruleIndex, int predIndex) {
 		switch ( ruleIndex ) {
 			<parser.sempredFuncs.values:{f|
 	case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
@@ -134,7 +135,7 @@ public class <parser.name> extends <superclass> {
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 @Override
-public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+public void action(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int actionIndex) {
 	switch ( ruleIndex ) {
 		<recog.actionFuncs.values:{f|
 case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
@@ -144,7 +145,7 @@ case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break
 <endif>
 <if(sempredFuncs)>
 @Override
-public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+public boolean sempred(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int predIndex) {
 	switch ( ruleIndex ) {
 		<recog.sempredFuncs.values:{f|
 case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
@@ -156,9 +157,9 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 >>
 
 parser_ctor(p) ::= <<
-public <p.name>(TokenStream input) {
+public <p.name>(TokenStream\<<InputSymbolType()>\> input) {
 	super(input);
-	_interp = new ParserATNSimulator\<Token>(this,_ATN);
+	_interp = new ParserATNSimulator\<<InputSymbolType()>\>(this,_ATN);
 }
 >>
 
@@ -473,7 +474,7 @@ LexerChannelCommand(arg)   ::= "_channel = <arg>;"
 LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
-DefaultParserSuperClass(s) ::= "Parser"
+DefaultParserSuperClass(s) ::= "Parser\<<InputSymbolType()>>"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -546,7 +547,7 @@ public <r.ctxName> <r.name>(int i) {
 }
 >>
 
-LexerRuleContext() ::= "RuleContext"
+LexerRuleContext() ::= "RuleContext\<Integer>"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
  *	r becomes rContext.
@@ -594,15 +595,15 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 
 ListenerDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<? super <InputSymbolType()>\> listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) { 
-	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<T>)visitor).visit<struct.derivedFromName; format="cap">(this);
+public \<Result> Result accept(ParseTreeVisitor\<? super <InputSymbolType()>, ? extends Result> visitor) {
+	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return null;
 }
 >>
@@ -652,8 +653,8 @@ _prevctx.stop = _input.LT(-1);
 >>
 
 
-LexerFile(lexerFile, lexer, namedActions) ::= <<
-// $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>
+LexerFile(file, lexer, namedActions) ::= <<
+// $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
 <namedActions.header>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

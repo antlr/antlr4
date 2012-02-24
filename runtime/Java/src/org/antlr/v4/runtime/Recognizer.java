@@ -41,11 +41,7 @@ import java.util.List;
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
-
-	private List<ANTLRErrorListener<Symbol>> _listeners;
-
-	private static final ANTLRErrorListener[] EMPTY_LISTENERS = new ANTLRErrorListener[0];
+	private List<ANTLRErrorListener<? super Symbol>> _listeners;
 
 	protected ATNInterpreter _interp;
 
@@ -98,44 +94,38 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return "'"+s+"'";
 	}
 
-	public void addErrorListener(ANTLRErrorListener<Symbol> pl) {
+	public void addErrorListener(ANTLRErrorListener<? super Symbol> pl) {
 		if ( _listeners ==null ) {
 			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<Symbol>>(2));
+				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<? super Symbol>>(2));
 		}
 		if ( pl!=null ) _listeners.add(pl);
 	}
 
-	public void removeErrorListener(ANTLRErrorListener<Symbol> pl) {
+	public void removeErrorListener(ANTLRErrorListener<? super Symbol> pl) {
 		if ( _listeners!=null ) _listeners.remove(pl);
 	}
 
 	public void removeErrorListeners() { if ( _listeners!=null ) _listeners.clear(); }
 
-	public @NotNull ANTLRErrorListener<Symbol>[] getErrorListeners() {
+	public @NotNull List<? extends ANTLRErrorListener<? super Symbol>> getErrorListeners() {
 		if (_listeners == null) {
-			return EMPTY_LISTENERS;
+			return Collections.emptyList();
 		}
 
-		return _listeners.toArray(EMPTY_LISTENERS);
+		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
 	}
-
-	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }
-
-	public void setErrorHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
-	public boolean sempred(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
+	public boolean sempred(@Nullable RuleContext<Symbol> _localctx, int ruleIndex, int actionIndex) {
 		return true;
 	}
 
-	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
+	public void action(@Nullable RuleContext<Symbol> _localctx, int ruleIndex, int actionIndex) {
 	}
 
-	public abstract IntStream getInputStream();
+	public abstract IntStream<Symbol> getInputStream();
 
-	public abstract void setInputStream(IntStream input);
-
-	public abstract void setTokenFactory(TokenFactory<?> input);
+	public abstract void setInputStream(IntStream<Symbol> input);
 }

@@ -40,6 +40,7 @@ import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.*;
 
 import java.util.*;
+import org.antlr.runtime.RecognitionException;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -264,7 +265,7 @@ public class OutputModelController {
 			// walk AST of rule alts/elements
 			function.code = DefaultOutputModelFactory.list(walker.block(null, null));
 		}
-		catch (Exception e){
+		catch (org.antlr.runtime.RecognitionException e){
 			e.printStackTrace(System.err);
 		}
 
@@ -365,8 +366,8 @@ public class OutputModelController {
 		return ops;
 	}
 
-	public CodeBlockForAlt epsilon() {
-		CodeBlockForAlt blk = delegate.epsilon();
+	public CodeBlockForAlt epsilon(Alternative alt, boolean outerMost) {
+		CodeBlockForAlt blk = delegate.epsilon(alt, outerMost);
 		for (CodeGeneratorExtension ext : extensions) blk = ext.epsilon(blk);
 		return blk;
 	}

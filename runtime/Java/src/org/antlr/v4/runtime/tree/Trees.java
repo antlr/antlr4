@@ -45,7 +45,7 @@ import java.util.List;
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
 
-	public static String getPS(Tree t, Parser recog,
+	public static String getPS(Tree t, Parser<?> recog,
 							   String fontName, int fontSize)
 	{
 		TreePostScriptGenerator psgen =
@@ -53,11 +53,11 @@ public class Trees {
 		return psgen.getPS();
 	}
 
-	public static String getPS(Tree t, Parser recog) {
+	public static String getPS(Tree t, Parser<?> recog) {
 		return getPS(t, recog, "Helvetica", 11);
 	}
 
-	public static void writePS(Tree t, Parser recog,
+	public static void writePS(Tree t, Parser<?> recog,
 							   String fileName,
 							   String fontName, int fontSize)
 		throws IOException
@@ -69,7 +69,7 @@ public class Trees {
 		bw.close();
 	}
 
-	public static void writePS(Tree t, Parser recog, String fileName)
+	public static void writePS(Tree t, Parser<?> recog, String fileName)
 		throws IOException
 	{
 		writePS(t, recog, fileName, "Helvetica", 11);
@@ -79,7 +79,7 @@ public class Trees {
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(Tree t, Parser recog) {
+	public static String toStringTree(Tree t, Parser<?> recog) {
 		String s = Utils.escapeWhitespace(getNodeText(t, recog), false);
 		if ( t.getChildCount()==0 ) return s;
 		StringBuilder buf = new StringBuilder();
@@ -95,7 +95,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static <Symbol> String getNodeText(Tree t, Parser recog) {
+	public static String getNodeText(Tree t, Parser<?> recog) {
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
 				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
