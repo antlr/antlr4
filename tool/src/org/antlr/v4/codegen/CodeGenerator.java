@@ -116,89 +116,26 @@ public class CodeGenerator {
 
 	// CREATE TEMPLATES BY WALKING MODEL
 
-	public ST generateModelST(Func1<OutputModelController, OutputModelObject> factoryMethod) {
+	private OutputModelController createController() {
 		OutputModelFactory factory = new ParserFactory(this);
-
-		// CREATE OUTPUT MODEL FROM GRAMMAR OBJ AND AST WITHIN RULES
 		OutputModelController controller = new OutputModelController(factory);
 		factory.setController(controller);
+		return controller;
+	}
 
-		OutputModelObject outputModel = factoryMethod.exec(controller);
+	private ST walk(OutputModelObject outputModel) {
 		OutputModelWalker walker = new OutputModelWalker(tool, templates);
 		return walker.walk(outputModel);
 	}
 
-	public ST generateLexer() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildLexerOutputModel();
-			}
-		});
-	}
-
-	public ST generateParser() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildParserOutputModel();
-			}
-		});
-	}
-
-	public ST generateListener() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildListenerOutputModel();
-			}
-		});
-	}
-
-	public ST generateBaseListener() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildBaseListenerOutputModel();
-			}
-		});
-	}
-
-	public ST generateParseListener() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildParseListenerOutputModel();
-			}
-		});
-	}
-
-	public ST generateBaseParseListener() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildBaseParseListenerOutputModel();
-			}
-		});
-	}
-
-	public ST generateVisitor() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildVisitorOutputModel();
-			}
-		});
-	}
-
-	public ST generateBaseVisitor() {
-		return generateModelST(new Func1<OutputModelController, OutputModelObject>() {
-			@Override
-			public OutputModelObject exec(OutputModelController controller) {
-				return controller.buildBaseVisitorOutputModel();
-			}
-		});
-	}
+	public ST generateLexer() { return walk(createController().buildLexerOutputModel()); }
+	public ST generateParser() { return walk(createController().buildParserOutputModel()); }
+	public ST generateListener() { return walk(createController().buildListenerOutputModel()); }
+	public ST generateBaseListener() { return walk(createController().buildBaseListenerOutputModel()); }
+	public ST generateParseListener() { return walk(createController().buildParseListenerOutputModel()); }
+	public ST generateBaseParseListener() { return walk(createController().buildBaseParseListenerOutputModel()); }
+	public ST generateVisitor() { return walk(createController().buildVisitorOutputModel()); }
+	public ST generateBaseVisitor() { return walk(createController().buildBaseVisitorOutputModel()); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
