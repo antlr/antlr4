@@ -28,11 +28,17 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>> {
@@ -48,8 +54,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		}
 
 		@Override
-		public void visitTerminal(ParserRuleContext<Token> ctx, Token token) {
-			System.out.println("consume "+token+" rule "+getRuleNames()[ctx.ruleIndex]+" alt="+ctx.altNum);
+		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
+			System.out.println("consume "+token+" rule "+
+							   getRuleNames()[parent.ruleIndex]+
+							   " alt="+parent.altNum);
 		}
 	}
 
@@ -295,9 +303,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
 //				System.out.println("consume in error recovery mode for "+o);
-				_ctx.addErrorNode((Token) o);
+				_ctx.addErrorNode(o);
 			}
-			else _ctx.addChild((Token)o);
+			else _ctx.addChild(o);
 		}
 		if ( _parseListeners != null) {
 			for (ParseListener<Token> l : _parseListeners) l.visitTerminal(_ctx, o);

@@ -20,19 +20,23 @@ public class ParseTreeVisitor<T> {
 	public T visitChildren(ParserRuleContext<? extends Token> ctx) {
 		T result = null;
 		for (ParseTree c : ctx.children) {
-			if ( c instanceof ParseTree.RuleNode) {
+			if ( c instanceof ParseTree.RuleNode ) {
 				ParseTree.RuleNode r = (ParseTree.RuleNode)c;
 				ParserRuleContext<?> rctx = (ParserRuleContext<? extends Token>)r.getRuleContext();
 				result = visit(rctx);
 			}
 			else {
-				result = visitTerminal(ctx, ((ParseTree.TerminalNode<? extends Token>)c).getSymbol());
+				if ( c instanceof ParseTree.ErrorNode ) {
+					result = visitErrorNode((ParseTree.ErrorNode<? extends Token>)c);
+				}
+				else {
+					result = visitTerminal((ParseTree.TerminalNode<? extends Token>)c);
+				}
 			}
 		}
 		return result;
 	}
 
-	public T visitTerminal(ParserRuleContext<? extends Token> ctx, Token symbol) {
-		return null;
-	}
+	public T visitTerminal(ParseTree.TerminalNode<? extends Token> node) { return null; }
+	public T visitErrorNode(ParseTree.ErrorNode<? extends Token> node) { return null; }
 }

@@ -44,6 +44,7 @@ BaseListenerFile(file, header) ::= <<
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
@@ -52,7 +53,8 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 
 	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
+	@Override public void visitTerminal(ParseTree.TerminalNode\<<InputSymbolType()>\> node) { }
+	@Override public void visitErrorNode(ParseTree.ErrorNode\<<InputSymbolType()>\> node) { }
 }
 >>
 
@@ -106,7 +108,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
 @Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
-	@Override public T visitTerminal(ParserRuleContext\<? extends Token> ctx, Token symbol) { return null; }
 }
 >>
 

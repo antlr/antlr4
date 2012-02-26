@@ -96,8 +96,8 @@ public interface ParseTree extends SyntaxTree {
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<Symbol extends Token> extends TerminalNodeImpl<Symbol> {
-		public ErrorNodeImpl(Symbol token) {
+	public static class ErrorNode<Symbol extends Token> extends TerminalNodeImpl<Symbol> {
+		public ErrorNode(Symbol token) {
 			super(token);
 		}
 	}

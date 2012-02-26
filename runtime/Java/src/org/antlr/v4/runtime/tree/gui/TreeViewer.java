@@ -183,10 +183,10 @@ public class TreeViewer extends JComponent {
 		Rectangle2D.Double box = getBoundsOfNode(tree);
 		// draw the box in the background
 		if ( isHighlighted(tree) || boxColor!=null ||
-			 tree instanceof ParseTree.ErrorNodeImpl )
+			 tree instanceof ParseTree.ErrorNode)
 		{
 			if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
-			else if ( tree instanceof ParseTree.ErrorNodeImpl ) g.setColor(LIGHT_RED);
+			else if ( tree instanceof ParseTree.ErrorNode) g.setColor(LIGHT_RED);
 			else g.setColor(boxColor);
 			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 							(int) box.height - 1, arcSize, arcSize);
