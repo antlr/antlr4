@@ -195,7 +195,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		String input;
 		if (tokens instanceof TokenStream<?>) {
 			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream<? extends Symbol>)tokens).toString(e.getStartToken(recognizer), e.getOffendingToken(recognizer));
+			else input = ((TokenStream<?>)tokens).toString(e.getStartToken(recognizer), e.getOffendingToken(recognizer));
 		}
 		else {
 			input = "<unknown input>";

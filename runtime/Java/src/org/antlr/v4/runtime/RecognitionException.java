@@ -120,7 +120,7 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	@SuppressWarnings("unchecked") // safe
-	public <T extends Token> T getOffendingToken(Recognizer<T, ?> recognizer) {
+	public <T> T getOffendingToken(Recognizer<T, ?> recognizer) {
 		return this.recognizer == recognizer ? (T)offendingToken : null;
 	}
 }

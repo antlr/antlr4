@@ -49,7 +49,7 @@ public class ParseTreeWalker {
 		exitRule(listener, r);
     }
 
-    protected <Symbol extends Token> void visitTerminal(ParseTreeListener<? super Symbol> listener,
+    protected <Symbol> void visitTerminal(ParseTreeListener<? super Symbol> listener,
 										  ParseTree.TerminalNode<Symbol> t)
 	{
 		listener.visitTerminal(t);
