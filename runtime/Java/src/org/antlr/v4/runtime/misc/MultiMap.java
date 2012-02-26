@@ -27,7 +27,7 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.misc;
+package org.antlr.v4.runtime.misc;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
