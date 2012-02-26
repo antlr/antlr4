@@ -172,16 +172,18 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 //		states.add(s);
 //	}
 
-	public void addChild(Symbol matchedToken) {
+	public TerminalNode<Symbol> addChild(Symbol matchedToken) {
 		TerminalNodeImpl<Symbol> t = new TerminalNodeImpl<Symbol>(matchedToken);
 		addChild(t);
 		t.parent = this;
+		return t;
 	}
 
-	public void addErrorNode(Symbol badToken) {
+	public TerminalNode<Symbol> addErrorNode(Symbol badToken) {
 		TerminalNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
 		addChild(t);
 		t.parent = this;
+		return t;
 	}
 
 	@Override
