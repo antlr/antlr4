@@ -99,7 +99,29 @@ public class RuleFunction extends OutputModelObject {
 
 		ruleCtx = new StructDecl(factory, r);
 		altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
+		addContextGetters(factory, r);
 
+		if ( r.args!=null ) {
+			ruleCtx.addDecls(r.args.attributes.values());
+			args = r.args.attributes.values();
+			ruleCtx.ctorAttrs = args;
+		}
+		if ( r.retvals!=null ) {
+			ruleCtx.addDecls(r.retvals.attributes.values());
+		}
+		if ( r.locals!=null ) {
+			ruleCtx.addDecls(r.locals.attributes.values());
+		}
+
+		ruleLabels = r.getElementLabelNames();
+		tokenLabels = r.getTokenRefs();
+		exceptions = Utils.nodesToStrings(r.exceptionActions);
+		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
+
+		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+	}
+
+	public void addContextGetters(OutputModelFactory factory, Rule r) {
 		// Add ctx labels for elements in alts with no -> label
 		List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
 		if ( altsNoLabels!=null ) {
@@ -123,25 +145,6 @@ public class RuleFunction extends OutputModelObject {
 				for (Decl d : decls) altToContext[altNum].addDecl(d);
 			}
 		}
-
-		if ( r.args!=null ) {
-			ruleCtx.addDecls(r.args.attributes.values());
-			args = r.args.attributes.values();
-			ruleCtx.ctorAttrs = args;
-		}
-		if ( r.retvals!=null ) {
-			ruleCtx.addDecls(r.retvals.attributes.values());
-		}
-		if ( r.locals!=null ) {
-			ruleCtx.addDecls(r.locals.attributes.values());
-		}
-
-		ruleLabels = r.getElementLabelNames();
-		tokenLabels = r.getTokenRefs();
-		exceptions = Utils.nodesToStrings(r.exceptionActions);
-		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
-
-		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 
 	public void fillNamedActions(OutputModelFactory factory, Rule r) {

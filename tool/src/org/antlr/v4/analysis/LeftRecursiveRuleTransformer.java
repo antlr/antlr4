@@ -225,7 +225,7 @@ public class LeftRecursiveRuleTransformer {
 			altInfo.altAST = (AltAST)primaryBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
 			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
-			altInfo.originalAltAST.parent = altInfo.altAST.parent;
+//			altInfo.originalAltAST.parent = altInfo.altAST.parent;
 //			System.out.println(altInfo.altAST.toStringTree());
 		}
 		for (int i = 0; i < r.recOpAlts.size(); i++) {
@@ -233,7 +233,7 @@ public class LeftRecursiveRuleTransformer {
 			altInfo.altAST = (AltAST)opsBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
 			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
-			altInfo.originalAltAST.parent = altInfo.altAST.parent;
+//			altInfo.originalAltAST.parent = altInfo.altAST.parent;
 //			System.out.println(altInfo.altAST.toStringTree());
 		}
 	}
