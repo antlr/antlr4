@@ -55,7 +55,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 
 	protected ANTLRErrorStrategy<? super Symbol> _errHandler = new DefaultErrorStrategy<Symbol>();
 
-	protected TokenStream<Symbol> _input;
+	protected TokenStream<? extends Symbol> _input;
 
 	/** The RuleContext object for the currently executing rule. This
 	 *  must be non-null during parsing, but is initially null.
@@ -208,19 +208,19 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	@Override
-	public TokenStream<Symbol> getInputStream() { return getTokenStream(); }
+	public TokenStream<? extends Symbol> getInputStream() { return getTokenStream(); }
 
 	@Override
-	public final void setInputStream(IntStream<Symbol> input) {
-		setTokenStream((TokenStream<Symbol>)input);
+	public final void setInputStream(IntStream<? extends Symbol> input) {
+		setTokenStream((TokenStream<? extends Symbol>)input);
 	}
 
-	public TokenStream<Symbol> getTokenStream() {
+	public TokenStream<? extends Symbol> getTokenStream() {
 		return _input;
 	}
 
 	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream<Symbol> input) {
+	public void setTokenStream(TokenStream<? extends Symbol> input) {
 		this._input = null;
 		reset();
 		this._input = input;
@@ -231,9 +231,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
     }
 
     public String getInputString(int start, int stop) {
-        SymbolStream<Symbol> input = getInputStream();
+        SymbolStream<? extends Symbol> input = getInputStream();
         if ( input instanceof TokenStream<?> ) {
-            return ((TokenStream<Symbol>)input).toString(start,stop);
+            return ((TokenStream<? extends Symbol>)input).toString(start,stop);
         }
         return "n/a";
     }

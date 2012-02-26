@@ -151,7 +151,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		// If already recovering, don't try to sync
         if ( errorRecoveryMode ) return;
 
-        SymbolStream<T> tokens = recognizer.getInputStream();
+        SymbolStream<? extends T> tokens = recognizer.getInputStream();
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
@@ -187,11 +187,11 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 										  NoViableAltException e)
 	throws RecognitionException
 	{
-		SymbolStream<T> tokens = recognizer.getInputStream();
+		SymbolStream<? extends T> tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream<?>) {
 			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream<T>)tokens).toString(e.getStartToken(recognizer), e.getOffendingToken(recognizer));
+			else input = ((TokenStream<? extends T>)tokens).toString(e.getStartToken(recognizer), e.getOffendingToken(recognizer));
 		}
 		else {
 			input = "<unknown input>";

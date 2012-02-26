@@ -53,7 +53,7 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	public <Symbol extends Token> NoViableAltException(Recognizer<Symbol, ?> recognizer,
-													   SymbolStream<Symbol> input,
+													   SymbolStream<? extends Symbol> input,
 													   Symbol startToken,
 													   Symbol offendingToken,
 													   ATNConfigSet deadEndConfigs,
