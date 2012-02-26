@@ -175,10 +175,17 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 
 	public void removeParseListener(ParseListener<Token> l) {
 		if ( l==null ) return;
-		if ( _parseListeners!=null ) _parseListeners.remove(l);
+		if ( _parseListeners!=null ) {
+			_parseListeners.remove(l);
+			if (_parseListeners.isEmpty()) {
+				_parseListeners = null;
+			}
+		}
 	}
 
-	public void removeParseListeners() { if ( _parseListeners!=null ) _parseListeners.clear(); }
+	public void removeParseListeners() {
+		_parseListeners = null;
+	}
 
 	public void triggerEnterRuleEvent() {
 		for (ParseListener<Token> l : _parseListeners) {
