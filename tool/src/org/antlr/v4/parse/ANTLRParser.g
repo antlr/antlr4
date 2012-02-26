@@ -128,10 +128,12 @@ package org.antlr.v4.parse;
 
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 }
 
 @members {
-Stack paraphrases = new Stack();
+Deque<String> paraphrases = new ArrayDeque<String>();
 /** Affects tree construction; no SET collapsing if AST (ID|INT) would hide them from rewrite.
  *  Could use for just AST ops, but we can't see -> until after building sets.
 boolean buildAST;
