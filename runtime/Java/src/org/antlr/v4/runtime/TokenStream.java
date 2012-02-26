@@ -74,5 +74,5 @@ public interface TokenStream<Symbol> extends SymbolStream<Symbol> {
 	 *  to the other toString(int,int).  This is also parallel with
 	 *  the TreeNodeStream.toString(Object,Object).
 	 */
-	public String toString(Symbol start, Symbol stop);
+	public String toString(Object start, Object stop);
 }

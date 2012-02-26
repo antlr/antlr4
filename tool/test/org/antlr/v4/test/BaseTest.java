@@ -1092,7 +1092,7 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public String toString(Token start, Token stop) {
+		public String toString(Object start, Object stop) {
 			return null;
 		}
 	}

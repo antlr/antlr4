@@ -83,7 +83,7 @@ public class UnbufferedTokenStream<T extends Token>
     }
 
     @Override
-	public String toString(Token start, Token stop) {
+	public String toString(Object start, Object stop) {
         throw new UnsupportedOperationException("unbuffered stream can't give strings");
     }
 
