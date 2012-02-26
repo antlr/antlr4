@@ -58,8 +58,8 @@ import java.util.*;
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
 
-	public static final Set doNotCopyOptionsToLexer =
-        new HashSet() {
+	public static final Set<String> doNotCopyOptionsToLexer =
+        new HashSet<String>() {
             {
                 add("TokenLabelType"); add("superClass");
             }
@@ -733,7 +733,7 @@ public class Grammar implements AttributeResolver {
 			//tool.log("grammar", r.toStringTree());
 			Tree name = r.getChild(0);
             if ( name.getType()==ANTLRParser.TOKEN_REF ) {
-				Map nodes = new HashMap();
+				Map<String, Object> nodes = new HashMap<String, Object>();
 				boolean isLitRule =
 					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL)))", nodes);
 				if ( isLitRule ) {
@@ -743,7 +743,7 @@ public class Grammar implements AttributeResolver {
 					continue;
 				}
 				// TODO: allow doc comment in there
-				nodes = new HashMap();
+				nodes = new HashMap<String, Object>();
 				// try with action in there
 				isLitRule =
 					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL ACTION)))", nodes);
