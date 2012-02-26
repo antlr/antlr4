@@ -39,7 +39,7 @@ public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrateg
      *  RuntimeException.
      */
     @Override
-    public <T extends Symbol> void recover(Parser<T> recognizer, RecognitionException e) {
+    public void recover(Parser<? extends Symbol> recognizer, RecognitionException e) {
         throw new RuntimeException(e);
     }
 
@@ -55,5 +55,5 @@ public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrateg
 
     /** Make sure we don't attempt to recover from problems in subrules. */
     @Override
-    public <T extends Symbol> void sync(Parser<T> recognizer) { }
+    public void sync(Parser<? extends Symbol> recognizer) { }
 }
