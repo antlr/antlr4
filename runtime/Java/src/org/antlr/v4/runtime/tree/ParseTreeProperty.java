@@ -20,5 +20,5 @@ public class ParseTreeProperty<V> {
 
 	public V get(ParseTree node) { return annotations.get(node); }
 	public void put(ParseTree node, V value) { annotations.put(node, value); }
-	public V removeFrom(ParseTree node) { return annotations.get(node); }
+	public V removeFrom(ParseTree node) { return annotations.remove(node); }
 }
