@@ -12,7 +12,7 @@ public interface ParseListener<Symbol extends Token> {
 	<T extends Symbol> void visitTerminal(ParserRuleContext<T> ctx, T symbol);
 
 	/** Enter all but left-recursive rules */
-	<T extends Symbol> void enterNonLRRule(ParserRuleContext<T> ctx);
+	void enterNonLRRule(ParserRuleContext<? extends Symbol> ctx);
 
-	<T extends Symbol> void exitEveryRule(ParserRuleContext<T> ctx);
+	void exitEveryRule(ParserRuleContext<? extends Symbol> ctx);
 }

@@ -52,12 +52,7 @@ public class ParseTreeWalker {
     protected <Symbol extends Token> void visitTerminal(ParseTreeListener<? super Symbol> listener,
 										  ParseTree.TerminalNode<Symbol> t)
 	{
-		ParseTree.RuleNode<Symbol> r = (ParseTree.RuleNode<Symbol>)t.getParent();
-		ParserRuleContext<Symbol> ctx = null;
-		if ( r != null && r.getRuleContext() instanceof ParserRuleContext<?> ) {
-			ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
-		}
-        listener.visitTerminal(ctx, t.getSymbol());
+		listener.visitTerminal(t);
     }
 
 	/** The discovery of a rule node, involves sending two events:

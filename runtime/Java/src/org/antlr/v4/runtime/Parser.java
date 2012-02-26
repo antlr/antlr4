@@ -38,12 +38,12 @@ import java.util.*;
 public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
 	public class TraceListener implements ParseListener<Token> {
 		@Override
-		public <T extends Token> void enterNonLRRule(ParserRuleContext<T> ctx) {
+		public void enterNonLRRule(ParserRuleContext<? extends Token> ctx) {
 			System.out.println("enter   " + getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + _input.LT(1).getText());
 		}
 
 		@Override
-		public <T extends Token> void exitEveryRule(ParserRuleContext<T> ctx) {
+		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
 			System.out.println("exit    "+getRuleNames()[ctx.ruleIndex]+", LT(1)="+_input.LT(1).getText());
 		}
 

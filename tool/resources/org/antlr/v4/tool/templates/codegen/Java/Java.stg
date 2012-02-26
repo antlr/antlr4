@@ -44,15 +44,16 @@ BaseListenerFile(file, header) ::= <<
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 @Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public \<T extends <InputSymbolType()>\> void enterEveryRule(ParserRuleContext\<T> ctx) { }
-	@Override public \<T extends <InputSymbolType()>\> void exitEveryRule(ParserRuleContext\<T> ctx) { }
-	@Override public \<T extends <InputSymbolType()>\> void visitTerminal(ParserRuleContext\<T> ctx, T symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParseTree.TerminalNode\<? extends <InputSymbolType()>\> node) { }
 }
 >>
 
@@ -73,6 +74,7 @@ BaseParseListenerFile(file, header) ::= <<
 <header>
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class <file.grammarName>BaseParseListener implements <file.grammarName>ParseListener {
 	<file.listenerEnterNames:{lname |
@@ -80,8 +82,8 @@ public class <file.grammarName>BaseParseListener implements <file.grammarName>Pa
 	<file.listenerExitNames:{lname |
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public \<T extends <InputSymbolType()>\> void enterNonLRRule(ParserRuleContext\<T> ctx) { }
-	@Override public \<T extends <InputSymbolType()>\> void exitEveryRule(ParserRuleContext\<T> ctx) { }
+	@Override public void enterNonLRRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
 	@Override public \<T extends <InputSymbolType()>\> void visitTerminal(ParserRuleContext\<T> ctx, T symbol) { }
 }
 >>

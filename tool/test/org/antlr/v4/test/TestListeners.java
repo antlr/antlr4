@@ -8,8 +8,8 @@ public class TestListeners extends BaseTest {
 			"grammar T;\n" +
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public <T extends Token> void visitTerminal(ParserRuleContext<T> ctx, T symbol) {\n" +
-			"      System.out.println(symbol.getText());\n" +
+			"    public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {\n" +
+			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +

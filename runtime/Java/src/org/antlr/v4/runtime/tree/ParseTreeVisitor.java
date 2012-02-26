@@ -37,10 +37,10 @@ import org.antlr.v4.runtime.Token;
  */
 public interface ParseTreeVisitor<Symbol extends Token, Result> {
 
-	<T extends Symbol> Result visit(ParserRuleContext<T> ctx);
+	Result visit(ParserRuleContext<? extends Symbol> ctx);
 
-	<T extends Symbol> Result visitChildren(ParserRuleContext<T> ctx);
+	Result visitChildren(ParserRuleContext<? extends Symbol> ctx);
 
-	<T extends Symbol> Result visitTerminal(ParserRuleContext<T> ctx, T symbol);
+	Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node);
 
 }
