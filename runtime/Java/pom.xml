@@ -42,6 +42,12 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgument>-Xlint:-serial</compilerArgument>
+                    <compilerArguments>
+                        <Xlint/>
+                    </compilerArguments>
                 </configuration>
             </plugin>
         </plugins>
