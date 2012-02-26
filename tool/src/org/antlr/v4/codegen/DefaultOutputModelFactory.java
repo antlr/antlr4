@@ -98,15 +98,14 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	// MISC
 
 	@NotNull
-	public static List<SrcOp> list(Object... values) {
-		List<SrcOp> x = new ArrayList<SrcOp>(values.length);
-		for (Object v : values) {
-			if ( v!=null ) {
-				if ( v instanceof List<?> ) x.addAll((List) v);
-				else x.add((SrcOp)v);
-			}
-		}
-		return x;
+	public static List<SrcOp> list(SrcOp... values) {
+		return Arrays.asList(values);
+	}
+
+	@NotNull
+	public static List<SrcOp> list(List<? extends SrcOp> values) {
+		assert Collections.checkedList(new ArrayList<SrcOp>(values), SrcOp.class) != null;
+		return new ArrayList<SrcOp>(values);
 	}
 
 	@Nullable
