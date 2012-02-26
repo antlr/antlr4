@@ -26,7 +26,7 @@ public class ParseTreeVisitor<T> {
 				result = visit(rctx);
 			}
 			else {
-				if ( c instanceof ParseTree.ErrorNode ) {
+				if ( c instanceof ParseTree.ErrorNodeImpl) {
 					result = visitErrorNode((ParseTree.ErrorNode<? extends Token>)c);
 				}
 				else {

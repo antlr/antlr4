@@ -37,7 +37,7 @@ public class ParseTreeWalker {
 
     @SuppressWarnings("unchecked")
     public <Symbol extends Token> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
-		if ( t instanceof ParseTree.ErrorNode ) {
+		if ( t instanceof ParseTree.ErrorNodeImpl) {
 			listener.visitErrorNode((ParseTree.ErrorNode<Symbol>)t);
 			return;
 		}

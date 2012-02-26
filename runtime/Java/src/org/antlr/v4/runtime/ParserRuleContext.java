@@ -178,10 +178,11 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		t.parent = this;
 	}
 
-	public void addErrorNode(Symbol badToken) {
-		TerminalNodeImpl<Symbol> t = new ErrorNode<Symbol>(badToken);
+	public ErrorNode<Symbol> addErrorNode(Symbol badToken) {
+		ErrorNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
 		addChild(t);
 		t.parent = this;
+		return t;
 	}
 
 	@Override
