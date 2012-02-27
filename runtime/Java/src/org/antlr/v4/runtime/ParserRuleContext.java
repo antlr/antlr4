@@ -248,6 +248,10 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 			if ( o instanceof TerminalNode<?> ) {
 				TerminalNode<Symbol> tnode = (TerminalNode<Symbol>)o;
 				Symbol symbol = tnode.getSymbol();
+				if (symbol.getType() != ttype) {
+					continue;
+				}
+
 				if ( tokens==null ) {
 					tokens = new ArrayList<Symbol>();
 				}
