@@ -29,8 +29,6 @@
 
 package org.antlr.v4.runtime.misc;
 
-import com.sun.tools.javac.util.Pair;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

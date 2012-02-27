@@ -29,11 +29,20 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.misc.Triple;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.runtime.misc.Triple;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Rule implements AttributeResolver {
 	/** Rule refs have a predefined set of attributes as well as
