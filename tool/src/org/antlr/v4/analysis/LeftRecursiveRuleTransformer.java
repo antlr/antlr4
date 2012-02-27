@@ -37,12 +37,12 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.misc.Pair;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -165,8 +165,8 @@ public class LeftRecursiveRuleTransformer {
 
 		// define labels on recursive rule refs we delete; they don't point to nodes of course
 		// these are so $label in action translation works
-		for (Pair<GrammarAST,String> pair : leftRecursiveRuleWalker.leftRecursiveRuleRefLabels) {
-			GrammarAST labelNode = pair.a;
+		for (Tuple2<GrammarAST,String> pair : leftRecursiveRuleWalker.leftRecursiveRuleRefLabels) {
+			GrammarAST labelNode = pair.getItem1();
 			GrammarAST labelOpNode = (GrammarAST)labelNode.getParent();
 			GrammarAST elementNode = (GrammarAST)labelOpNode.getChild(1);
 			LabelElementPair lp = new LabelElementPair(g, labelNode, elementNode, labelOpNode.getType());

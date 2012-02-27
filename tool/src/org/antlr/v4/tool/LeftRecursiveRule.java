@@ -31,8 +31,9 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.misc.Pair;
-import org.antlr.v4.misc.Triple;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
+import org.antlr.v4.runtime.misc.Tuple3;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;
@@ -45,8 +46,8 @@ public class LeftRecursiveRule extends Rule {
 	public OrderedHashMap<Integer, LeftRecursiveRuleAltInfo> recOpAlts;
 
 	/** Did we delete any labels on direct left-recur refs? Points at ID of ^(= ID el) */
-	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
-		new ArrayList<Pair<GrammarAST,String>>();
+	public List<Tuple2<GrammarAST,String>> leftRecursiveRuleRefLabels =
+		new ArrayList<Tuple2<GrammarAST,String>>();
 
 	public LeftRecursiveRule(Grammar g, String name, RuleAST ast) {
 		super(g, name, ast, 1);
@@ -84,14 +85,14 @@ public class LeftRecursiveRule extends Rule {
 
 	/** Get -> labels from those alts we deleted for left-recursive rules. */
 	@Override
-	public List<Triple<Integer,AltAST,String>> getAltLabels() {
-		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
-		List<Triple<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
+	public List<Tuple3<Integer,AltAST,String>> getAltLabels() {
+		List<Tuple3<Integer,AltAST,String>> labels = new ArrayList<Tuple3<Integer,AltAST,String>>();
+		List<Tuple3<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
 		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
 		for (int i = 0; i < recPrimaryAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = recPrimaryAlts.get(i);
 			if ( altInfo.altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(altInfo.altNum,
+				labels.add(Tuple.create(altInfo.altNum,
 															 altInfo.originalAltAST,
 															 altInfo.altLabel));
 			}
@@ -99,7 +100,7 @@ public class LeftRecursiveRule extends Rule {
 		for (int i = 0; i < recOpAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
 			if ( altInfo.altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(altInfo.altNum,
+				labels.add(Tuple.create(altInfo.altNum,
 															 altInfo.originalAltAST,
 															 altInfo.altLabel));
 			}

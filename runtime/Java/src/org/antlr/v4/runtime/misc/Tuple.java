@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
+  Copyright (c) 2012 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -29,27 +29,25 @@
 
 package org.antlr.v4.runtime.misc;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+/**
+ *
+ * @author Sam Harwell
+ */
+public final class Tuple {
 
-public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
-	public void map(K key, V value) {
-		List<V> elementsForKey = get(key);
-		if ( elementsForKey==null ) {
-			elementsForKey = new ArrayList<V>();
-			super.put(key, elementsForKey);
-		}
-		elementsForKey.add(value);
+	public static <T1, T2> Tuple2<T1, T2> create(T1 item1, T2 item2) {
+		return new Tuple2<T1, T2>(item1, item2);
 	}
 
-	public List<Tuple2<K, V>> getPairs() {
-		List<Tuple2<K, V>> pairs = new ArrayList<Tuple2<K, V>>();
-		for (K key : keySet()) {
-			for (V value : get(key)) {
-				pairs.add(Tuple.create(key, value));
-			}
-		}
-		return pairs;
+	public static <T1, T2, T3> Tuple3<T1, T2, T3> create(T1 item1, T2 item2, T3 item3) {
+		return new Tuple3<T1, T2, T3>(item1, item2, item3);
 	}
+
+	/*package*/ static boolean equals(Object x, Object y) {
+		return x == y || (x != null && x.equals(y));
+	}
+
+	// static utility class
+	private Tuple() {}
+
 }
