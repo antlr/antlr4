@@ -443,7 +443,7 @@ setState(<m.stateNumber>);
 <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_input.LT(1);
 <capture>
 if ( <if(!invert)>!<endif>(<expr>) ) {
-	<if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler.recoverInline(this);
+	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_errHandler.recoverInline(this);
 }
 consume();
 >>
