@@ -189,7 +189,7 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(p) ::= <<
-public <p.name>(TokenStream\<<InputSymbolType()>\> input) {
+public <p.name>(TokenStream\<? extends <InputSymbolType()>\> input) {
 	super(input);
 	_interp = new ParserATNSimulator\<<InputSymbolType()>\>(this,_ATN);
 }
