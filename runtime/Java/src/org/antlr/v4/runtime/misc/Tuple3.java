@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
+  Copyright (c) 2012 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -27,43 +27,58 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.runtime.misc;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.tool.ast.GrammarRootAST;
+/**
+ *
+ * @author Sam Harwell
+ */
+public class Tuple3<T1, T2, T3> {
 
-/** */
-public class LexerGrammar extends Grammar {
-	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
+	private final T1 item1;
+	private final T2 item2;
+	private final T3 item3;
 
-	/** The grammar from which this lexer grammar was derived (if implicit) */
-    public Grammar implicitLexerOwner;
-
-	/** DEFAULT_MODE rules are added first due to grammar syntax order */
-	public MultiMap<String, Rule> modes;
-
-	public LexerGrammar(Tool tool, GrammarRootAST ast) {
-		super(tool, ast);
+	public Tuple3(T1 item1, T2 item2, T3 item3) {
+		this.item1 = item1;
+		this.item2 = item2;
+		this.item3 = item3;
 	}
 
-	public LexerGrammar(String grammarText) throws RecognitionException {
-		super(grammarText);
+	public final T1 getItem1() {
+		return item1;
 	}
 
-	public LexerGrammar(String grammarText, ANTLRToolListener listener) throws RecognitionException {
-		super(grammarText, listener);
+	public final T2 getItem2() {
+		return item2;
 	}
 
-	public LexerGrammar(String fileName, String grammarText, ANTLRToolListener listener) throws RecognitionException {
-		super(fileName, grammarText, listener);
+	public final T3 getItem3() {
+		return item3;
 	}
 
 	@Override
-	public void defineRule(Rule r) {
-		super.defineRule(r);
-		if ( modes==null ) modes = new MultiMap<String, Rule>();
-		modes.map(r.mode, r);
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		else if (!(obj instanceof Tuple3<?, ?, ?>)) {
+			return false;
+		}
+
+		Tuple3<?, ?, ?> other = (Tuple3<?, ?, ?>)obj;
+		return Tuple.equals(this.item1, other.item1)
+			&& Tuple.equals(this.item2, other.item2)
+			&& Tuple.equals(this.item3, other.item3);
 	}
+
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		hash = 79 * hash + (this.item1 != null ? this.item1.hashCode() : 0);
+		hash = 79 * hash + (this.item2 != null ? this.item2.hashCode() : 0);
+		hash = 79 * hash + (this.item3 != null ? this.item3.hashCode() : 0);
+		return hash;
+	}
+
 }

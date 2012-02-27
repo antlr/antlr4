@@ -9,7 +9,7 @@ package org.antlr.v4.runtime;
  *  use Parser.getRuleContext().
  */
 public interface ParseListener<Symbol extends Token> {
-	<T extends Symbol> void visitTerminal(ParserRuleContext<T> ctx, T symbol);
+	<T extends Symbol> void visitTerminal(ParserRuleContext<T> parent, T token);
 
 	/** Enter all but left-recursive rules */
 	void enterNonLRRule(ParserRuleContext<? extends Symbol> ctx);

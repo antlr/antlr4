@@ -28,11 +28,17 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
@@ -48,8 +54,10 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 
 		@Override
-		public <T extends Token> void visitTerminal(ParserRuleContext<T> ctx, T token) {
-			System.out.println("consume "+token+" rule "+getRuleNames()[ctx.ruleIndex]+" alt="+ctx.altNum);
+		public <T extends Token> void visitTerminal(ParserRuleContext<T> parent, T token) {
+			System.out.println("consume "+token+" rule "+
+							   getRuleNames()[parent.ruleIndex]+
+							   " alt="+parent.altNum);
 		}
 	}
 
@@ -167,10 +175,17 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 
 	public void removeParseListener(ParseListener<? super Symbol> l) {
 		if ( l==null ) return;
-		if ( _parseListeners!=null ) _parseListeners.remove(l);
+		if ( _parseListeners!=null ) {
+			_parseListeners.remove(l);
+			if (_parseListeners.isEmpty()) {
+				_parseListeners = null;
+			}
+		}
 	}
 
-	public void removeParseListeners() { if ( _parseListeners!=null ) _parseListeners.clear(); }
+	public void removeParseListeners() {
+		_parseListeners = null;
+	}
 
 	public void triggerEnterRuleEvent() {
 		for (ParseListener<? super Symbol> l : _parseListeners) {

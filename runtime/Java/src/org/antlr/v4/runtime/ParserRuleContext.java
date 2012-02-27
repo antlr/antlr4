@@ -28,11 +28,17 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /** A rule invocation record for parsing and tree parsing.
  *
@@ -179,8 +185,8 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 		return t;
 	}
 
-	public TerminalNode<Symbol> addErrorNode(Symbol badToken) {
-		TerminalNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
+	public ErrorNode<Symbol> addErrorNode(Symbol badToken) {
+		ErrorNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
 		addChild(t);
 		t.parent = this;
 		return t;

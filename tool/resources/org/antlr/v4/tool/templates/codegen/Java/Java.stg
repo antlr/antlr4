@@ -54,6 +54,7 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 	@Override public void enterEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
 	@Override public void visitTerminal(ParseTree.TerminalNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitErrorNode(ParseTree.ErrorNode\<? extends <InputSymbolType()>\> node) { }
 }
 >>
 

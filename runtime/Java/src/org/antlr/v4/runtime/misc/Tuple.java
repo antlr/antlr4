@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
+  Copyright (c) 2012 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -27,43 +27,27 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.runtime.misc;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.tool.ast.GrammarRootAST;
+/**
+ *
+ * @author Sam Harwell
+ */
+public final class Tuple {
 
-/** */
-public class LexerGrammar extends Grammar {
-	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
-
-	/** The grammar from which this lexer grammar was derived (if implicit) */
-    public Grammar implicitLexerOwner;
-
-	/** DEFAULT_MODE rules are added first due to grammar syntax order */
-	public MultiMap<String, Rule> modes;
-
-	public LexerGrammar(Tool tool, GrammarRootAST ast) {
-		super(tool, ast);
+	public static <T1, T2> Tuple2<T1, T2> create(T1 item1, T2 item2) {
+		return new Tuple2<T1, T2>(item1, item2);
 	}
 
-	public LexerGrammar(String grammarText) throws RecognitionException {
-		super(grammarText);
+	public static <T1, T2, T3> Tuple3<T1, T2, T3> create(T1 item1, T2 item2, T3 item3) {
+		return new Tuple3<T1, T2, T3>(item1, item2, item3);
 	}
 
-	public LexerGrammar(String grammarText, ANTLRToolListener listener) throws RecognitionException {
-		super(grammarText, listener);
+	/*package*/ static boolean equals(Object x, Object y) {
+		return x == y || (x != null && x.equals(y));
 	}
 
-	public LexerGrammar(String fileName, String grammarText, ANTLRToolListener listener) throws RecognitionException {
-		super(fileName, grammarText, listener);
-	}
+	// static utility class
+	private Tuple() {}
 
-	@Override
-	public void defineRule(Rule r) {
-		super.defineRule(r);
-		if ( modes==null ) modes = new MultiMap<String, Rule>();
-		modes.map(r.mode, r);
-	}
 }
