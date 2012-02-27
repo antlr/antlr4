@@ -29,10 +29,10 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple3;
 import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
