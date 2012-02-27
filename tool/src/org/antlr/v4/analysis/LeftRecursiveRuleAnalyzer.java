@@ -35,9 +35,10 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.Pair;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.LeftRecursiveRuleWalker;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -67,8 +68,8 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public List<LeftRecursiveRuleAltInfo> otherAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
 
 	/** Pointer to ID node of ^(= ID element) */
-	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
-		new ArrayList<Pair<GrammarAST,String>>();
+	public List<Tuple2<GrammarAST,String>> leftRecursiveRuleRefLabels =
+		new ArrayList<Tuple2<GrammarAST,String>>();
 
 	public GrammarAST retvals;
 
@@ -142,7 +143,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
 		String label = lrlabel != null ? lrlabel.getText() : null;
 		if ( lrlabel!=null ) {
-			leftRecursiveRuleRefLabels.add(new Pair<GrammarAST,String>(lrlabel,altLabel));
+			leftRecursiveRuleRefLabels.add(Tuple.create(lrlabel,altLabel));
 		}
 		stripAssocOptions(altTree);
 		stripAltLabel(altTree);
@@ -170,7 +171,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
 		String label = lrlabel != null ? lrlabel.getText() : null;
 		if ( lrlabel!=null ) {
-			leftRecursiveRuleRefLabels.add(new Pair<GrammarAST,String>(lrlabel,altLabel));
+			leftRecursiveRuleRefLabels.add(Tuple.create(lrlabel,altLabel));
 		}
 		stripAssocOptions(altTree);
 		stripAltLabel(altTree);
@@ -213,7 +214,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
 		String label = lrlabel != null ? lrlabel.getText() : null;
 		if ( lrlabel!=null ) {
-			leftRecursiveRuleRefLabels.add(new Pair<GrammarAST,String>(lrlabel,altLabel));
+			leftRecursiveRuleRefLabels.add(Tuple.create(lrlabel,altLabel));
 		}
 		stripAltLabel(altTree);
 		String altText = text(altTree);

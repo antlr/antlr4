@@ -957,7 +957,7 @@ public class TestATNConstruction extends BaseTest {
 			return;
 		}
 
-		ParserATNFactory f = new LexerATNFactory((LexerGrammar)g);
+		ParserATNFactory f = new LexerATNFactory(g);
 		ATN nfa = f.createATN();
 		ATNState startState = nfa.modeNameToStartState.get(modeName);
 		ATNPrinter serializer = new ATNPrinter(g, startState);

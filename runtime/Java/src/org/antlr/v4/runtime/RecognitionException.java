@@ -68,7 +68,7 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	public <Symbol extends Token> RecognitionException(@Nullable Recognizer<Symbol, ?> recognizer,
-													   IntStream<Symbol> input,
+													   IntStream<? extends Symbol> input,
 													   @Nullable ParserRuleContext<Symbol> ctx)
 	{
 		this.recognizer = recognizer;
@@ -110,8 +110,8 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	@SuppressWarnings("unchecked") // safe
-	public <T> IntStream<T> getInputStream(Recognizer<T, ?> recognizer) {
-		return this.recognizer == recognizer ? (IntStream<T>)input : null;
+	public <T> IntStream<? extends T> getInputStream(Recognizer<T, ?> recognizer) {
+		return this.recognizer == recognizer ? (IntStream<? extends T>)input : null;
 	}
 
 	@SuppressWarnings("unchecked") // safe
@@ -120,7 +120,7 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	@SuppressWarnings("unchecked") // safe
-	public <T extends Token> T getOffendingToken(Recognizer<T, ?> recognizer) {
+	public <T> T getOffendingToken(Recognizer<T, ?> recognizer) {
 		return this.recognizer == recognizer ? (T)offendingToken : null;
 	}
 }

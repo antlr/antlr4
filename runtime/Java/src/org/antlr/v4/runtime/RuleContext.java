@@ -100,7 +100,7 @@ public class RuleContext<Symbol> implements ParseTree.RuleNode<Symbol> {
 	public RuleContext<Symbol> getRuleContext() { return this; }
 
 	@Override
-	public ParseTree<Symbol> getParent() { return parent; }
+	public RuleContext<Symbol> getParent() { return parent; }
 
 	@Override
 	public RuleContext<Symbol> getPayload() { return this; }

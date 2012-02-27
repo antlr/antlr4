@@ -44,7 +44,7 @@ import java.util.Arrays;
 
 public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
     @Override
-    public <T extends Symbol> void reportAmbiguity(@NotNull Parser<T> recognizer,
+    public void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
@@ -71,7 +71,7 @@ public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorS
     }
 
     @Override
-    public <T extends Symbol> void reportInsufficientPredicates(@NotNull Parser<T> recognizer,
+    public void reportInsufficientPredicates(@NotNull Parser<? extends Symbol> recognizer,
 											 @NotNull DFA dfa,
 											 int startIndex, int stopIndex,
 											 @NotNull IntervalSet ambigAlts,

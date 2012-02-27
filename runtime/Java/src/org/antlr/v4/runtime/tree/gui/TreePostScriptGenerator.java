@@ -129,7 +129,7 @@ public class TreePostScriptGenerator {
 		// for debugging, turn this on to see boundingbox of nodes
 		//doc.rect(box.x, box.y, box.width, box.height);
 		// make error nodes from parse tree red by default
-		if ( t instanceof ParseTree.ErrorNodeImpl ) {
+		if ( t instanceof ParseTree.ErrorNode ) {
 			doc.highlight(box.x, box.y, box.width, box.height);
 		}
 		double x = box.x+nodeWidthPadding;

@@ -33,10 +33,10 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -280,13 +280,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public void reset() {
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<Symbol> input, int decision,
+	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input, int decision,
 							   @Nullable ParserRuleContext<Symbol> outerContext)
 	{
 		return adaptivePredict(input, decision, outerContext, false);
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<Symbol> input,
+	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input,
 							   int decision,
 							   @Nullable ParserRuleContext<Symbol> outerContext,
 							   boolean useContext)
@@ -346,7 +346,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public SimulatorState<Symbol> getStartState(@NotNull DFA dfa,
-										@NotNull SymbolStream<Symbol> input,
+										@NotNull SymbolStream<? extends Symbol> input,
 										@NotNull ParserRuleContext<Symbol> outerContext,
 										boolean useContext) {
 
@@ -373,7 +373,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return new SimulatorState<Symbol>(outerContext, s0, useContext, (ParserRuleContext<Symbol>)remainingContext);
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Symbol> input,
+	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<? extends Symbol> input,
 						  @Nullable ParserRuleContext<Symbol> outerContext,
 						  boolean useContext)
 	{
@@ -402,7 +402,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public int execDFA(@NotNull DFA dfa,
-					   @NotNull SymbolStream<Symbol> input, int startIndex,
+					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
 					   @NotNull SimulatorState<Symbol> state)
     {
 		ParserRuleContext<Symbol> outerContext = state.outerContext;
@@ -591,7 +591,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	 */
 	public int execATN(@NotNull DFA dfa,
-					   @NotNull SymbolStream<Symbol> input, int startIndex,
+					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
 					   @NotNull SimulatorState<Symbol> initialState)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
@@ -1573,7 +1573,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<Symbol> input,
+	public NoViableAltException noViableAlt(@NotNull SymbolStream<? extends Symbol> input,
 											@NotNull ParserRuleContext<Symbol> outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)

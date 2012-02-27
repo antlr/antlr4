@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2012 Terence Parr
+  Copyright (c) 2011 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,21 +26,30 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+package org.antlr.v4.runtime.misc;
 
-/**
- *
- * @author Sam Harwell
- */
-public interface ParseTreeVisitor<Symbol extends Token, Result> {
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
-	Result visit(ParserRuleContext<? extends Symbol> ctx);
+public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
+	public void map(K key, V value) {
+		List<V> elementsForKey = get(key);
+		if ( elementsForKey==null ) {
+			elementsForKey = new ArrayList<V>();
+			super.put(key, elementsForKey);
+		}
+		elementsForKey.add(value);
+	}
 
-	Result visitChildren(ParserRuleContext<? extends Symbol> ctx);
-
-	Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node);
-
+	public List<Tuple2<K, V>> getPairs() {
+		List<Tuple2<K, V>> pairs = new ArrayList<Tuple2<K, V>>();
+		for (K key : keySet()) {
+			for (V value : get(key)) {
+				pairs.add(Tuple.create(key, value));
+			}
+		}
+		return pairs;
+	}
 }

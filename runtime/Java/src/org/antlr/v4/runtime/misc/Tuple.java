@@ -26,21 +26,28 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+package org.antlr.v4.runtime.misc;
 
 /**
  *
  * @author Sam Harwell
  */
-public interface ParseTreeVisitor<Symbol extends Token, Result> {
+public final class Tuple {
 
-	Result visit(ParserRuleContext<? extends Symbol> ctx);
+	public static <T1, T2> Tuple2<T1, T2> create(T1 item1, T2 item2) {
+		return new Tuple2<T1, T2>(item1, item2);
+	}
 
-	Result visitChildren(ParserRuleContext<? extends Symbol> ctx);
+	public static <T1, T2, T3> Tuple3<T1, T2, T3> create(T1 item1, T2 item2, T3 item3) {
+		return new Tuple3<T1, T2, T3>(item1, item2, item3);
+	}
 
-	Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node);
+	/*package*/ static boolean equals(Object x, Object y) {
+		return x == y || (x != null && x.equals(y));
+	}
+
+	// static utility class
+	private Tuple() {}
 
 }

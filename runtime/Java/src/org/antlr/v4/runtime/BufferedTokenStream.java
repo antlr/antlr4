@@ -256,9 +256,9 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     }
 
     @Override
-    public String toString(Token start, Token stop) {
-        if ( start!=null && stop!=null ) {
-            return toString(start.getTokenIndex(), stop.getTokenIndex());
+    public String toString(Object start, Object stop) {
+        if ( start instanceof Token && stop instanceof Token ) {
+            return toString(((Token)start).getTokenIndex(), ((Token)stop).getTokenIndex());
         }
         return null;
     }

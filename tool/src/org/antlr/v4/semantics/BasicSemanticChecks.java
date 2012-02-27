@@ -32,9 +32,9 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.*;
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.io.File;
 import java.util.*;

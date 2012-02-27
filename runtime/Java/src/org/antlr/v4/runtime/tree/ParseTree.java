@@ -43,15 +43,21 @@ import org.antlr.v4.runtime.misc.Interval;
 public interface ParseTree<Symbol> extends SyntaxTree {
 	public interface RuleNode<Symbol> extends ParseTree<Symbol> {
 		RuleContext<Symbol> getRuleContext();
+
+		@Override
+		RuleNode<Symbol> getParent();
 	}
 
 	public interface TerminalNode<Symbol> extends ParseTree<Symbol> {
 		Symbol getSymbol();
+
+		@Override
+		RuleNode<Symbol> getParent();
 	}
 
 	public static class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 		public Symbol symbol;
-		public ParseTree<Symbol> parent;
+		public RuleNode<Symbol> parent;
 		/** Which ATN node matched this token? */
 		public int s;
 		public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
@@ -63,7 +69,7 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 		public Symbol getSymbol() {return symbol;}
 
 		@Override
-		public ParseTree<Symbol> getParent() { return parent; }
+		public RuleNode<Symbol> getParent() { return parent; }
 
 		@Override
 		public Symbol getPayload() { return symbol; }
@@ -77,6 +83,8 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 
 		@Override
 		public int getChildCount() { return 0; }
+
+		public boolean isErrorNode() { return this instanceof ErrorNodeImpl; }
 
 		@Override
 		public String toString() {
@@ -95,13 +103,19 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 		}
 	}
 
+	public interface ErrorNode<Symbol> extends TerminalNode<Symbol> {
+	}
+
 	/** Represents a token that was consumed during resynchronization
 	 *  rather than during a valid match operation. For example,
 	 *  we will create this kind of a node during single token insertion
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<Symbol> extends TerminalNodeImpl<Symbol> {
+	public static class ErrorNodeImpl<Symbol> extends
+		TerminalNodeImpl<Symbol>
+		implements ErrorNode<Symbol>
+	{
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
 		}

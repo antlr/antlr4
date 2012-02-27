@@ -55,7 +55,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 *  the current rule. The exception contains info you might want to
 	 *  use to recover better.
 	 */
-	<T extends Symbol> void recover(@NotNull Parser<T> recognizer,
+	void recover(@NotNull Parser<? extends Symbol> recognizer,
                  @Nullable RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
@@ -85,14 +85,14 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
 	 */
-	<T extends Symbol> void sync(@NotNull Parser<T> recognizer);
+	void sync(@NotNull Parser<? extends Symbol> recognizer);
 
 	/** Notify handler that parser has entered an error state.  The
 	 *  parser currently doesn't call this--the handler itself calls this
 	 *  in report error methods.  But, for symmetry with endErrorCondition,
 	 *  this method is in the interface.
 	 */
-	<T extends Symbol> void beginErrorCondition(@NotNull Parser<T> recognizer);
+	void beginErrorCondition(@NotNull Parser<? extends Symbol> recognizer);
 
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
@@ -100,16 +100,16 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 *  avoid sending out spurious error messages. We only want one error
 	 *  message per syntax error
 	 */
-	<T extends Symbol> boolean inErrorRecoveryMode(@NotNull Parser<T> recognizer);
+	boolean inErrorRecoveryMode(@NotNull Parser<? extends Symbol> recognizer);
 
 	/** Reset the error handler. Call this when the parser
 	 *  matches a valid token (indicating no longer in recovery mode)
 	 *  and from its own reset method.
 	 */
-	<T extends Symbol> void endErrorCondition(@NotNull Parser<T> recognizer);
+	void endErrorCondition(@NotNull Parser<? extends Symbol> recognizer);
 
 	/** Report any kind of RecognitionException. */
-	<T extends Symbol> void reportError(@NotNull Parser<T> recognizer,
+	void reportError(@NotNull Parser<? extends Symbol> recognizer,
 					 @Nullable RecognitionException e)
 	throws RecognitionException;
 
@@ -120,7 +120,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
      * that can match the input sequence. This method is only called when we are parsing with
      * full context.
      */
-    <T extends Symbol> void reportAmbiguity(@NotNull Parser<T> recognizer,
+    void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
 						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
@@ -144,7 +144,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
      *  If there are fewer than n-1, then we don't know which make it alternative to protect
      *  if the predicates fail.
      */
-    <T extends Symbol> void reportInsufficientPredicates(@NotNull Parser<T> recognizer,
+    void reportInsufficientPredicates(@NotNull Parser<? extends Symbol> recognizer,
 									  @NotNull DFA dfa,
 									  int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 									  DecisionState decState,

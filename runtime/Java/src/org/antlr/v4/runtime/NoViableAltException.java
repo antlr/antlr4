@@ -53,7 +53,7 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	public <Symbol extends Token> NoViableAltException(Recognizer<Symbol, ?> recognizer,
-													   SymbolStream<Symbol> input,
+													   SymbolStream<? extends Symbol> input,
 													   Symbol startToken,
 													   Symbol offendingToken,
 													   ATNConfigSet deadEndConfigs,
@@ -66,7 +66,7 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	@SuppressWarnings("unchecked") // safe
-	public <T extends Token> T getStartToken(Recognizer<T, ?> recognizer) {
+	public <T> T getStartToken(Recognizer<T, ?> recognizer) {
 		return this.recognizer == recognizer ? (T)startToken : null;
 	}
 }

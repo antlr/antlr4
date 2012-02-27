@@ -44,15 +44,17 @@ BaseListenerFile(file, header) ::= <<
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 @Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public \<T extends <InputSymbolType()>\> void enterEveryRule(ParserRuleContext\<T> ctx) { }
-	@Override public \<T extends <InputSymbolType()>\> void exitEveryRule(ParserRuleContext\<T> ctx) { }
-	@Override public \<T extends <InputSymbolType()>\> void visitTerminal(ParserRuleContext\<T> ctx, T symbol) { }
+	@Override public void enterEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void visitTerminal(ParseTree.TerminalNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitErrorNode(ParseTree.ErrorNode\<? extends <InputSymbolType()>\> node) { }
 }
 >>
 
@@ -61,7 +63,7 @@ VisitorFile(file, header) ::= <<
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<<InputSymbolType()>, Result> {
+public interface <file.grammarName>Visitor\<Symbol extends <InputSymbolType()>, Result> extends ParseTreeVisitor\<Symbol, Result> {
 	<file.visitorNames:{lname |
 Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
@@ -73,7 +75,7 @@ import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<Result> {
+public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<<InputSymbolType()>, Result> {
 	<file.visitorNames:{lname |
 @Override public Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
@@ -84,7 +86,6 @@ Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superclass> {
 	<if(parser.tokens)>
 	public static final int
@@ -138,7 +139,7 @@ dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 public void action(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int actionIndex) {
 	switch ( ruleIndex ) {
 		<recog.actionFuncs.values:{f|
-case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
+case <f.ruleIndex> : <f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, actionIndex); break;}; separator="\n">
 	}
 }
 <actionFuncs.values; separator="\n">
@@ -148,7 +149,7 @@ case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break
 public boolean sempred(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int predIndex) {
 	switch ( ruleIndex ) {
 		<recog.sempredFuncs.values:{f|
-case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -603,7 +604,7 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<? 
 VisitorDispatchMethod(method) ::= <<
 @Override
 public \<Result> Result accept(ParseTreeVisitor\<? super <InputSymbolType()>, ? extends Result> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
+	if ( visitor instanceof <parser.grammarName>Visitor\<?, ?> ) return ((<parser.grammarName>Visitor\<? super <InputSymbolType()>, ? extends Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return null;
 }
 >>
@@ -611,10 +612,13 @@ public \<Result> Result accept(ParseTreeVisitor\<? super <InputSymbolType()>, ? 
 AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
+ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
+
+// only casts _localctx to the type when the cast isn't redundant (i.e. to a sub-context for a labeled alt)
+typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>((<ctx.name>)_localctx)<else>_localctx<endif>"
 
 // used for left-recursive rules
 recRuleDefArg()						  ::= "int _p"
@@ -669,7 +673,6 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;

@@ -28,35 +28,55 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
-		public <T extends Token> void enterEveryRule(ParserRuleContext<T> ctx) {
+		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
 			System.out.println("enter   " + getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + _input.LT(1).getText());
 		}
 
 		@Override
-		public <T extends Token> void exitEveryRule(ParserRuleContext<T> ctx) {
+		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
 			System.out.println("exit    "+getRuleNames()[ctx.ruleIndex]+", LT(1)="+_input.LT(1).getText());
 		}
 
 		@Override
-		public <T extends Token> void visitTerminal(ParserRuleContext<T> ctx, T token) {
-			System.out.println("consume "+token+" rule "+getRuleNames()[ctx.ruleIndex]+" alt="+ctx.altNum);
+		public void visitErrorNode(ParseTree.ErrorNode<? extends Token> node) {
+			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
+			Token token = node.getSymbol();
+			System.out.println("consume "+token+" rule "+
+							   getRuleNames()[parent.ruleIndex]+
+							   " alt="+parent.altNum);
+		}
+
+		@Override
+		public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {
+			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
+			Token token = node.getSymbol();
+			System.out.println("consume "+token+" rule "+
+							   getRuleNames()[parent.ruleIndex]+
+							   " alt="+parent.altNum);
 		}
 	}
 
 	protected ANTLRErrorStrategy<? super Symbol> _errHandler = new DefaultErrorStrategy<Symbol>();
 
-	protected TokenStream<Symbol> _input;
+	protected TokenStream<? extends Symbol> _input;
 
 	/** The RuleContext object for the currently executing rule. This
 	 *  must be non-null during parsing, but is initially null.
@@ -168,10 +188,17 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 
 	public void removeParseListener(ParseTreeListener<? super Symbol> l) {
 		if ( l==null ) return;
-		if ( _parseListeners!=null ) _parseListeners.remove(l);
+		if ( _parseListeners!=null ) {
+			_parseListeners.remove(l);
+			if (_parseListeners.isEmpty()) {
+				_parseListeners = null;
+			}
+		}
 	}
 
-	public void removeParseListeners() { if ( _parseListeners!=null ) _parseListeners.clear(); }
+	public void removeParseListeners() {
+		_parseListeners = null;
+	}
 
 	public void triggerEnterRuleEvent() {
 		for (ParseTreeListener<? super Symbol> l : _parseListeners) {
@@ -209,19 +236,19 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	@Override
-	public TokenStream<Symbol> getInputStream() { return getTokenStream(); }
+	public TokenStream<? extends Symbol> getInputStream() { return getTokenStream(); }
 
 	@Override
-	public final void setInputStream(IntStream<Symbol> input) {
-		setTokenStream((TokenStream<Symbol>)input);
+	public final void setInputStream(IntStream<? extends Symbol> input) {
+		setTokenStream((TokenStream<? extends Symbol>)input);
 	}
 
-	public TokenStream<Symbol> getTokenStream() {
+	public TokenStream<? extends Symbol> getTokenStream() {
 		return _input;
 	}
 
 	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream<Symbol> input) {
+	public void setTokenStream(TokenStream<? extends Symbol> input) {
 		this._input = null;
 		reset();
 		this._input = input;
@@ -232,9 +259,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
     }
 
     public String getInputString(int start, int stop) {
-        SymbolStream<Symbol> input = getInputStream();
+        SymbolStream<? extends Symbol> input = getInputStream();
         if ( input instanceof TokenStream<?> ) {
-            return ((TokenStream<Symbol>)input).toString(start,stop);
+            return ((TokenStream<? extends Symbol>)input).toString(start,stop);
         }
         return "n/a";
     }
@@ -285,16 +312,26 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	public Symbol consume() {
 		Symbol o = getCurrentToken();
 		getInputStream().consume();
-		if (_buildParseTrees) {
+		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
+		if (_buildParseTrees || hasListener) {
 			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
 //				System.out.println("consume in error recovery mode for "+o);
-				_ctx.addErrorNode(o);
+				ParseTree.ErrorNode<Symbol> node = _ctx.addErrorNode(o);
+				if (_parseListeners != null) {
+					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
+						listener.visitErrorNode(node);
+					}
+				}
 			}
-			else _ctx.addChild(o);
-		}
-		if ( _parseListeners != null) {
-			for (ParseTreeListener<? super Symbol> l : _parseListeners) l.visitTerminal(_ctx, o);
+			else {
+				ParseTree.TerminalNode<Symbol> node = _ctx.addChild(o);
+				if (_parseListeners != null) {
+					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
+						listener.visitTerminal(node);
+					}
+				}
+			}
 		}
 		return o;
 	}

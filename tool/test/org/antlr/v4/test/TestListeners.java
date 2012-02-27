@@ -8,8 +8,8 @@ public class TestListeners extends BaseTest {
 			"grammar T;\n" +
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public <T extends Token> void visitTerminal(ParserRuleContext<T> ctx, T symbol) {\n" +
-			"      System.out.println(symbol.getText());\n" +
+			"    public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {\n" +
+			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
@@ -118,14 +118,16 @@ public class TestListeners extends BaseTest {
 			"grammar T;\n" +
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public void exitA(TParser.EContext ctx) {\n" +
+			"    public void exitE(TParser.EContext ctx) {\n" +
 			"      if (ctx.getChildCount()==3) {\n" +
-			"        System.out.printf(\"%s %s %s\",ctx.e(0).start.getText(),\n" +
-			"                          ctx.e(1).start.getText(),ctx.e().get(0).start.getText());\n" +
+			"        System.out.printf(\"%s %s %s\\n\",ctx.e(0).start.getText(),\n" +
+			"                          ctx.e(1).start.getText()," +
+			"                          ctx.e().get(0).start.getText());\n" +
 			"      }\n" +
 			"      else System.out.println(ctx.INT().getText());\n" +
 			"    }\n" +
-			"  }}\n" +
+			"  }" +
+			"}\n" +
 			"s\n" +
 			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
@@ -143,7 +145,53 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1+2*3", false);
-		String expecting = "(e (e 1) + (e (e 2) * (e 3)))\n";
+		String expecting =
+			"(e (e 1) + (e (e 2) * (e 3)))\n" +
+			"1\n" +
+			"2\n" +
+			"3\n" +
+			"2 3 2\n" +
+			"1 2 1\n";
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLRWithLabels() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"@members {\n" +
+			"  public static class LeafListener extends TBaseListener {\n" +
+			"    public void exitCall(TParser.CallContext ctx) {\n" +
+			"      System.out.printf(\"%s %s\",ctx.e().start.getText(),\n" +
+			"                ctx.eList());\n" +
+			"    }\n" +
+			"    public void exitInt(TParser.IntContext ctx) {\n" +
+			"      System.out.println(ctx.INT().getText());\n" +
+			"    }\n" +
+			"  }\n" +
+			"}\n" +
+			"s\n" +
+			"@init {setBuildParseTree(true);}\n" +
+			"@after {" +
+			"  System.out.println($r.ctx.toStringTree(this));" +
+			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
+			"  walker.walk(new LeafListener(), $r.ctx);" +
+			"}\n" +
+			"  : r=e ;\n" +
+			"e : e '(' eList ')' -> Call\n" +
+			"  | INT             -> Int\n" +
+			"  ;     \n" +
+			"eList : e (',' e)* ;\n" +
+			"MULT: '*' ;\n" +
+			"ADD : '+' ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\t\\n]+ -> skip ;\n";
+		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1(2,3)", false);
+		String expecting =
+			"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
+			"1\n" +
+			"2\n" +
+			"3\n" +
+			"1 [14 6]\n";
 		assertEquals(expecting, result);
 	}
 }

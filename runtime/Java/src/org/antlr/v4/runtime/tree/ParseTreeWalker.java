@@ -36,8 +36,12 @@ public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
     public <Symbol extends Token> void walk(ParseTreeListener<? super Symbol> listener, ParseTree<Symbol> t) {
-		if ( t instanceof ParseTree.TerminalNode) {
-			visitTerminal(listener, (ParseTree.TerminalNode<Symbol>) t);
+		if ( t instanceof ParseTree.ErrorNode ) {
+			listener.visitErrorNode((ParseTree.ErrorNode<Symbol>)t);
+			return;
+		}
+		else if ( t instanceof ParseTree.TerminalNode ) {
+			listener.visitTerminal((ParseTree.TerminalNode<Symbol>)t);
 			return;
 		}
 		ParseTree.RuleNode<Symbol> r = (ParseTree.RuleNode<Symbol>)t;
@@ -47,17 +51,6 @@ public class ParseTreeWalker {
             walk(listener, r.getChild(i));
         }
 		exitRule(listener, r);
-    }
-
-    protected <Symbol extends Token> void visitTerminal(ParseTreeListener<? super Symbol> listener,
-										  ParseTree.TerminalNode<Symbol> t)
-	{
-		ParseTree.RuleNode<Symbol> r = (ParseTree.RuleNode<Symbol>)t.getParent();
-		ParserRuleContext<Symbol> ctx = null;
-		if ( r != null && r.getRuleContext() instanceof ParserRuleContext<?> ) {
-			ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
-		}
-        listener.visitTerminal(ctx, t.getSymbol());
     }
 
 	/** The discovery of a rule node, involves sending two events:

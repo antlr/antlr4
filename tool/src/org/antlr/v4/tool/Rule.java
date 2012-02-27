@@ -29,9 +29,10 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.misc.Triple;
+import org.antlr.v4.runtime.misc.MultiMap;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple3;
 import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.*;
 
@@ -209,12 +210,12 @@ public class Rule implements AttributeResolver {
 	}
 
 	/** Get -> labels. */
-	public List<Triple<Integer,AltAST,String>> getAltLabels() {
-		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
+	public List<Tuple3<Integer,AltAST,String>> getAltLabels() {
+		List<Tuple3<Integer,AltAST,String>> labels = new ArrayList<Tuple3<Integer,AltAST,String>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
+				labels.add(Tuple.create(i,alt[i].ast,altLabel.getText()));
 			}
 		}
 		if ( labels.size()==0 ) return null;

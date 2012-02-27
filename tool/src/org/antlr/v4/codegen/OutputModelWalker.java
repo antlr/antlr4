@@ -109,12 +109,15 @@ public class OutputModelWalker {
 //					System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 					st.add(fieldName, nestedST);
 				}
-				else if ( o instanceof Collection || o instanceof OutputModelObject[] ) {
+				else if ( o instanceof Collection<?> || o instanceof OutputModelObject[] ) {
 					// LIST OF MODEL OBJECTS?
+					OutputModelObject[] nestedOmos;
 					if ( o instanceof OutputModelObject[] ) {
-						o = Arrays.asList((OutputModelObject[])o);
+						nestedOmos = (OutputModelObject[])o;
 					}
-					Collection<? extends OutputModelObject> nestedOmos = (Collection)o;
+					else {
+						nestedOmos = ((Collection<?>)o).toArray(new OutputModelObject[0]);
+					}
 					for (OutputModelObject nestedOmo : nestedOmos) {
 						if ( nestedOmo==null ) continue;
 						ST nestedST = walk(nestedOmo);
@@ -122,11 +125,13 @@ public class OutputModelWalker {
 						st.add(fieldName, nestedST);
 					}
 				}
-				else if ( o instanceof Map ) {
-					Map<Object, OutputModelObject> nestedOmoMap = (Map<Object, OutputModelObject>)o;
+				else if ( o instanceof Map<?, ?> ) {
+					Map<?, ?> nestedOmoMap = (Map<?, ?>)o;
 					Map<Object, ST> m = new HashMap<Object, ST>();
-					for (Object key : nestedOmoMap.keySet()) {
-						ST nestedST = walk(nestedOmoMap.get(key));
+					for (Map.Entry<?, ?> entry : nestedOmoMap.entrySet()) {
+						Object key = entry.getKey();
+						OutputModelObject value = (OutputModelObject)entry.getValue();
+						ST nestedST = walk(value);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						m.put(key, nestedST);
 					}

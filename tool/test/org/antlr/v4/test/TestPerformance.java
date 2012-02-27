@@ -427,6 +427,8 @@ public class TestPerformance extends BaseTest {
         if (EXPORT_ATN_GRAPHS) {
             extraOptions.add("-atn");
         }
+		extraOptions.add("-parse-listener");
+		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
         boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", extraOptionsArray);
         assertTrue(success);
@@ -465,8 +467,8 @@ public class TestPerformance extends BaseTest {
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
 			@SuppressWarnings("rawtypes")
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            @SuppressWarnings({"rawtypes"})
-            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
             TestPerformance.sharedListener = listenerClass.newInstance();
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
@@ -520,7 +522,7 @@ public class TestPerformance extends BaseTest {
                         Assert.assertTrue(parseResult instanceof ParseTree);
 
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                            ParseTreeWalker.DEFAULT.walk(sharedListener, (ParseTree)parseResult);
+                            ParseTreeWalker.DEFAULT.walk(sharedListener, (ParserRuleContext<?>)parseResult);
                         }
                     } catch (Exception e) {
                         e.printStackTrace(System.out);

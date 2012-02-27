@@ -216,7 +216,7 @@ public class ErrorManager {
 
 	}
 
-	public void leftRecursionCycles(String fileName, Collection cycles) {
+	public void leftRecursionCycles(String fileName, Collection<? extends Collection<? extends Rule>> cycles) {
 		errors++;
 		ANTLRMessage msg = new LeftRecursionCyclesMessage(fileName, cycles);
 		tool.error(msg);
