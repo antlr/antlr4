@@ -218,7 +218,6 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-@SuppressWarnings("cast")
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
 	enterRule(_localctx, RULE_<currentRule.name>);
@@ -249,7 +248,6 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-@SuppressWarnings("cast")
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	ParserRuleContext\<Token> _parentctx = _ctx;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
@@ -651,10 +649,13 @@ public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseListener\<? supe
 AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
+ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
+
+// only casts _localctx to the type when the cast isn't redundant (i.e. to a sub-context for a labeled alt)
+typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>((<ctx.name>)_localctx)<else>_localctx<endif>"
 
 // used for left-recursive rules
 recRuleDefArg()						  ::= "int _p"

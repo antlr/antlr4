@@ -69,8 +69,8 @@ public class TestActionTranslation extends BaseTest {
 		String action = "x, $ID.text+\"3242\", (*$ID).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		String expected =
-			"x, (((AContext)_localctx).ID!=null?((AContext)_localctx).ID.getText():null)+\"3242\", " +
-			"(*((AContext)_localctx).ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
+			"x, (_localctx.ID!=null?_localctx.ID.getText():null)+\"3242\", " +
+			"(*_localctx.ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
@@ -100,25 +100,25 @@ public class TestActionTranslation extends BaseTest {
 
 	@Test public void testReturnValues() throws Exception {
 		String action = "$lab.e; $b.e;";
-		String expected = "((AContext)_localctx).lab.e; ((AContext)_localctx).b.e;";
+		String expected = "_localctx.lab.e; _localctx.b.e;";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
     @Test public void testReturnWithMultipleRuleRefs() throws Exception {
 		String action = "$c.x; $c.y;";
-		String expected = "((AContext)_localctx).c.x; ((AContext)_localctx).c.y;";
+		String expected = "_localctx.c.x; _localctx.c.y;";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testTokenRefs() throws Exception {
 		String action = "$id; $ID; $id.text; $id.getText(); $id.line;";
-		String expected = "((AContext)_localctx).id; ((AContext)_localctx).ID; (((AContext)_localctx).id!=null?((AContext)_localctx).id.getText():null); ((AContext)_localctx).id.getText(); (((AContext)_localctx).id!=null?((AContext)_localctx).id.getLine():0);";
+		String expected = "_localctx.id; _localctx.ID; (_localctx.id!=null?_localctx.id.getText():null); _localctx.id.getText(); (_localctx.id!=null?_localctx.id.getLine():0);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testRuleRefs() throws Exception {
         String action = "$lab.start; $c.text;";
-		String expected = "(((AContext)_localctx).lab!=null?(((AContext)_localctx).lab.start):null); (((AContext)_localctx).c!=null?_input.toString(((AContext)_localctx).c.start,((AContext)_localctx).c.stop):null);";
+		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx.c!=null?_input.toString(_localctx.c.start,_localctx.c.stop):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
