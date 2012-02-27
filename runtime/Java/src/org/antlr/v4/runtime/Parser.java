@@ -100,7 +100,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int _syntaxErrors = 0;
 
-	public Parser(TokenStream<Symbol> input) {
+	public Parser(TokenStream<? extends Symbol> input) {
 		setInputStream(input);
 	}
 
