@@ -32,9 +32,16 @@ package org.antlr.v4.tool;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple3;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Rule implements AttributeResolver {
 	/** Rule refs have a predefined set of attributes as well as
