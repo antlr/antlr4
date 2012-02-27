@@ -1,26 +1,23 @@
 grammar T;
 @members {
 public static class LeafListener extends TBaseListener {
-    public void exitA(TParser.EContext ctx) {
-/*
-      if (ctx.getChildCount()==3) {
-        System.out.printf("%s %s %s",ctx.e(0).start.getText(),
-                          ctx.e(1).start.getText(),ctx.e().get(0).start.getText());
-      }
-      else System.out.println(ctx.INT(0).start.getText());
-*/
+    public void exitCall(TParser.CallContext ctx) {
+        System.out.printf("%s %s",ctx.e().start.getText(),
+                          ctx.eList());
     }
-  }}
+  }    public void exitInt(TParser.IntContext ctx) {
+      System.out.println(ctx.INT().getText());
+    }
+}
 s
 @init {setBuildParseTree(true);}
 @after {  System.out.println($r.ctx.toStringTree(this));  ParseTreeWalker walker = new ParseTreeWalker();
   walker.walk(new LeafListener(), $r.ctx);}
   : r=e ;
-e : e op='*' e
-  | e op='+' e
-  | e '++'
-  | INT
-  ;
+e : e '(' eList ')' -> Call
+  | INT             -> Int
+  ;     
+eList : e (',' e)* ;
 MULT: '*' ;
 ADD : '+' ;
 INT : [0-9]+ ;
