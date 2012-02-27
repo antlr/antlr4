@@ -72,6 +72,7 @@ public abstract class BaseTest {
 	public static final String pathSep = System.getProperty("path.separator");
 
 	public static final boolean TEST_IN_SAME_PROCESS = Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
+	public static final boolean STRICT_COMPILE_CHECKS = Boolean.parseBoolean(System.getProperty("antlr.strictcompile"));
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -291,8 +292,15 @@ public abstract class BaseTest {
 		Iterable<? extends JavaFileObject> compilationUnits =
 			fileManager.getJavaFileObjectsFromFiles(files);
 
-		Iterable<String> compileOptions =
-			Arrays.asList("-g", "-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
+		List<String> compileOptions = new ArrayList<String>();
+		compileOptions.add("-g");
+		if (STRICT_COMPILE_CHECKS) {
+			compileOptions.add("-Xlint");
+			compileOptions.add("-Xlint:-serial");
+			compileOptions.add("-Werror");
+		}
+
+		compileOptions.addAll(Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH));
 
 		JavaCompiler.CompilationTask task =
 			compiler.getTask(null, fileManager, null, compileOptions, null,
