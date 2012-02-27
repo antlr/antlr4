@@ -406,6 +406,8 @@ public class TestPerformance extends BaseTest {
         if (EXPORT_ATN_GRAPHS) {
             extraOptions.add("-atn");
         }
+		extraOptions.add("-parse-listener");
+		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
         boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", extraOptionsArray);
         assertTrue(success);
