@@ -67,9 +67,9 @@ public interface ANTLRErrorListener<Symbol> {
 	 *        surrounding rule.
 	 */
 	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-					  @Nullable T offendingSymbol,
-					  int line,
-					  int charPositionInLine,
-					  String msg,
-					  @Nullable RecognitionException e);
+										 @Nullable T offendingSymbol,
+										 int line,
+										 int charPositionInLine,
+										 String msg,
+										 @Nullable RecognitionException e);
 }
