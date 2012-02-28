@@ -220,7 +220,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 		return null;
 	}
 
-	public Symbol getToken(int ttype, int i) {
+	public TerminalNode<Symbol> getToken(int ttype, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;
 		}
@@ -233,7 +233,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 				if ( symbol.getType()==ttype ) {
 					j++;
 					if ( j == i ) {
-						return symbol;
+						return tnode;
 					}
 				}
 			}
@@ -242,20 +242,22 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 		return null;
 	}
 
-	public List<? extends Symbol> getTokens(int ttype) {
+	public List<? extends TerminalNode<Symbol>> getTokens(int ttype) {
 		if ( children==null ) {
 			return Collections.emptyList();
 		}
 
-		List<Symbol> tokens = null;
+		List<TerminalNode<Symbol>> tokens = null;
 		for (ParseTree<Symbol> o : children) {
 			if ( o instanceof TerminalNode<?> ) {
 				TerminalNode<Symbol> tnode = (TerminalNode<Symbol>)o;
-				Symbol symbol = tnode.getSymbol();
-				if ( tokens==null ) {
-					tokens = new ArrayList<Symbol>();
+				Token symbol = tnode.getSymbol();
+				if ( symbol.getType()==ttype ) {
+					if ( tokens==null ) {
+						tokens = new ArrayList<TerminalNode<Symbol>>();
+					}
+					tokens.add(tnode);
 				}
-				tokens.add(symbol);
 			}
 		}
 

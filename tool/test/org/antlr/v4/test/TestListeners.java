@@ -41,8 +41,8 @@ public class TestListeners extends BaseTest {
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void exitA(TParser.AContext ctx) {\n" +
-			"      if (ctx.getChildCount()==2) System.out.printf(\"%s %s %s\",ctx.INT(0).getText(),ctx.INT(1).getText(),ctx.INT());\n" +
-			"      else System.out.println(ctx.ID());\n" +
+			"      if (ctx.getChildCount()==2) System.out.printf(\"%s %s %s\",ctx.INT(0).getSymbol().getText(),ctx.INT(1).getSymbol().getText(),ctx.INT());\n" +
+			"      else System.out.println(ctx.ID().getSymbol());\n" +
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
@@ -62,8 +62,9 @@ public class TestListeners extends BaseTest {
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
-		String expecting = "(a 1 2)\n" +
-						   "1 2 [[@0,0:0='1',<5>,1:0], [@1,2:2='2',<5>,1:2]]\n";
+		String expecting =
+			"(a 1 2)\n" +
+			"1 2 [1, 2]\n";
 		assertEquals(expecting, result);
 
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abc", false);
@@ -124,7 +125,7 @@ public class TestListeners extends BaseTest {
 			"                          ctx.e(1).start.getText()," +
 			"                          ctx.e().get(0).start.getText());\n" +
 			"      }\n" +
-			"      else System.out.println(ctx.INT().getText());\n" +
+			"      else System.out.println(ctx.INT().getSymbol().getText());\n" +
 			"    }\n" +
 			"  }" +
 			"}\n" +
@@ -165,7 +166,7 @@ public class TestListeners extends BaseTest {
 			"                ctx.eList());\n" +
 			"    }\n" +
 			"    public void exitInt(TParser.IntContext ctx) {\n" +
-			"      System.out.println(ctx.INT().getText());\n" +
+			"      System.out.println(ctx.INT().getSymbol().getText());\n" +
 			"    }\n" +
 			"  }\n" +
 			"}\n" +
