@@ -154,6 +154,8 @@ public class DFAState {
 	}
 
 	public void setContextSensitive(ATN atn) {
+		assert !configset.isOutermostConfigSet();
+
 		if (!isCtxSensitive) {
 			isCtxSensitive = true;
 			contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);

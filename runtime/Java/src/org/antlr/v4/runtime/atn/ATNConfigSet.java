@@ -59,6 +59,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private IntervalSet conflictingAlts;
 	private boolean hasSemanticContext;
 	private boolean dipsIntoOuterContext;
+	private boolean outermostConfigSet;
 
 	public ATNConfigSet(boolean localContext) {
 		this.localContext = localContext;
@@ -86,6 +87,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.hasSemanticContext = set.hasSemanticContext;
 		this.uniqueAlt = set.uniqueAlt;
 		this.conflictingAlts = set.conflictingAlts;
+		this.outermostConfigSet = set.outermostConfigSet;
 	}
 
 	public boolean isLocalContext() {
@@ -94,6 +96,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public boolean isReadOnly() {
 		return mergedConfigs == null;
+	}
+
+	public boolean isOutermostConfigSet() {
+		return outermostConfigSet;
+	}
+
+	public void setOutermostConfigSet(boolean outermostConfigSet) {
+		if (this.outermostConfigSet && !outermostConfigSet) {
+			throw new IllegalStateException();
+		}
+
+		assert !outermostConfigSet || !dipsIntoOuterContext;
+		this.outermostConfigSet = outermostConfigSet;
 	}
 
 	public Set<ATNState> getStates() {
@@ -173,6 +188,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public boolean add(ATNConfig e, @Nullable PredictionContextCache contextCache) {
 		ensureWritable();
+		assert !outermostConfigSet || e.reachesIntoOuterContext == 0;
+
 		boolean added;
 		boolean addKey;
 		long key = getKey(e);
@@ -359,14 +376,16 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		ATNConfigSet other = (ATNConfigSet)obj;
 		return this.localContext == other.localContext
+			&& this.outermostConfigSet == other.outermostConfigSet
 			&& configs.equals(other.configs);
 	}
 
 	@Override
 	public int hashCode() {
 		int hashCode = 1;
-		hashCode = 5 * hashCode + (localContext ? 1 : 0);
-		hashCode = 5 * hashCode + configs.hashCode();
+		hashCode = 5 * hashCode ^ (localContext ? 1 : 0);
+		hashCode = 5 * hashCode ^ (outermostConfigSet ? 1 : 0);
+		hashCode = 5 * hashCode ^ configs.hashCode();
 		return hashCode;
 	}
 

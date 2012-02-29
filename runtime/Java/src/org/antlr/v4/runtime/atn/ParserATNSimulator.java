@@ -325,6 +325,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( dfa==null ) {
 				DecisionState startState = atn.decisionToState.get(decision);
 				decisionToDFA[decision] = dfa = new DFA(startState, decision);
+				if (useContext) {
+					dfa.setContextSensitive(true);
+				}
 			}
 
 			return predictATN(dfa, input, outerContext, useContext);
@@ -358,12 +361,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return new SimulatorState<Symbol>(outerContext, dfa.s0, false, outerContext);
 		}
 
+		dfa.setContextSensitive(true);
+
 		RuleContext<Symbol> remainingContext = outerContext;
 		assert outerContext != null;
 		DFAState s0 = dfa.s0;
 		while (remainingContext != null && s0 != null && s0.isCtxSensitive) {
-			s0 = s0.getContextTarget(remainingContext.invokingState);
-			remainingContext = remainingContext.parent;
+			s0 = s0.getContextTarget(getInvokingState(remainingContext));
+			if (remainingContext.isEmpty()) {
+				assert s0 == null || !s0.isCtxSensitive;
+			}
+			else {
+				remainingContext = remainingContext.parent;
+			}
 		}
 
 		if (s0 == null) {
@@ -421,7 +431,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( state.useContext ) {
 				while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
-					DFAState next = s.getContextTarget(remainingOuterContext.invokingState);
+					DFAState next = null;
+					if (remainingOuterContext != null) {
+						next = s.getContextTarget(getInvokingState(remainingOuterContext));
+					}
+
 					if ( next == null ) {
 						// fail over to ATN
 						SimulatorState<Symbol> initialState = new SimulatorState<Symbol>(state.outerContext, s, state.useContext, remainingOuterContext);
@@ -759,6 +773,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		boolean stepIntoGlobal;
 		do {
 			boolean hasMoreContext = !useContext || remainingGlobalContext != null;
+			if (!hasMoreContext) {
+				reach.setOutermostConfigSet(true);
+			}
 
 			ATNConfigSet reachIntermediate = new ATNConfigSet(!useContext);
 			int ncl = closureConfigs.size();
@@ -781,7 +798,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if (previous.useContext && stepIntoGlobal) {
 				reach.clear();
 
-				int nextContextElement = remainingGlobalContext.isEmpty() ? PredictionContext.EMPTY_STATE_KEY : remainingGlobalContext.invokingState;
+				int nextContextElement = getInvokingState(remainingGlobalContext);
 				if (contextElements == null) {
 					contextElements = new ArrayList<Integer>();
 				}
@@ -844,9 +861,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					remainingGlobalContext = null;
 				}
 				else {
-					next = s0.getContextTarget(remainingGlobalContext.invokingState);
-					previousContext = remainingGlobalContext.invokingState;
-					initialContext = initialContext.appendContext(remainingGlobalContext.invokingState, contextCache);
+					next = s0.getContextTarget(getInvokingState(remainingGlobalContext));
+					previousContext = getInvokingState(remainingGlobalContext);
+					initialContext = initialContext.appendContext(getInvokingState(remainingGlobalContext), contextCache);
 					remainingGlobalContext = remainingGlobalContext.parent;
 				}
 
@@ -880,6 +897,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			boolean hasMoreContext = remainingGlobalContext != null;
+			if (!hasMoreContext) {
+				configs.setOutermostConfigSet(true);
+			}
+
 			final boolean collectPredicates = true;
 			boolean stepIntoGlobal = closure(reachIntermediate, configs, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
 
@@ -900,7 +921,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			next.setContextSensitive(atn);
 
 			configs.clear();
-			int nextContextElement = remainingGlobalContext.isEmpty() ? PredictionContext.EMPTY_STATE_KEY : remainingGlobalContext.invokingState;
+			int nextContextElement = getInvokingState(remainingGlobalContext);
 
 			if (remainingGlobalContext.isEmpty()) {
 				remainingGlobalContext = null;
@@ -1623,6 +1644,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if (contextTransitions != null) {
 			for (int context : contextTransitions) {
+				if (context == PredictionContext.EMPTY_STATE_KEY) {
+					if (from.configset.isOutermostConfigSet()) {
+						continue;
+					}
+				}
+
 				if (!from.isCtxSensitive) {
 					from.setContextSensitive(atn);
 				}
@@ -1635,6 +1662,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				next = addDFAContextState(dfa, from.configset, context, contextCache);
+				assert context != PredictionContext.EMPTY_STATE_KEY || next.configset.isOutermostConfigSet();
 				from.setContextTarget(context, next);
 				from = next;
 			}
@@ -1664,6 +1692,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return addDFAState(dfa, contextConfigs);
 		}
 		else {
+			assert !configs.isOutermostConfigSet() : "Shouldn't be adding a duplicate edge.";
+			configs = configs.clone(true);
+			configs.setOutermostConfigSet(true);
 			return addDFAState(dfa, configs);
 		}
 	}
@@ -1759,5 +1790,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 																  decState, altToPred, configs, fullContextParse);
         }
     }
+
+	protected int getInvokingState(RuleContext<?> context) {
+		if (context.isEmpty()) {
+			return PredictionContext.EMPTY_STATE_KEY;
+		}
+		
+		return context.invokingState;
+	}
 
 }
