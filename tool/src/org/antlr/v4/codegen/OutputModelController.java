@@ -264,6 +264,7 @@ public class OutputModelController {
 		try {
 			// walk AST of rule alts/elements
 			function.code = DefaultOutputModelFactory.list(walker.block(null, null));
+			function.hasLookaheadBlock = walker.hasLookaheadBlock;
 		}
 		catch (org.antlr.runtime.RecognitionException e){
 			e.printStackTrace(System.err);

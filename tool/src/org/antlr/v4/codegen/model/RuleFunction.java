@@ -76,6 +76,7 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<Attribute> args = null;
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
+	public boolean hasLookaheadBlock;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
