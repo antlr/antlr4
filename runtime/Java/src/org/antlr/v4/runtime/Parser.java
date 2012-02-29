@@ -74,6 +74,30 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 	}
 
+	public static class TrimToSizeListener implements ParseTreeListener<Token> {
+		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
+
+		@Override
+		public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {
+		}
+
+		@Override
+		public void visitErrorNode(ParseTree.ErrorNode<? extends Token> node) {
+		}
+
+		@Override
+		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
+			if (ctx.children instanceof ArrayList) {
+				((ArrayList<?>)ctx.children).trimToSize();
+			}
+		}
+
+	}
+
 	protected ANTLRErrorStrategy<? super Symbol> _errHandler = new DefaultErrorStrategy<Symbol>();
 
 	protected TokenStream<? extends Symbol> _input;
@@ -164,6 +188,39 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 
 	public boolean getBuildParseTree() {
 		return _buildParseTrees;
+	}
+
+	/**
+	 * Trim the internal lists of the parse tree during parsing to conserve memory.
+	 * This property is set to {@code false} by default for a newly constructed parser.
+	 *
+	 * @param trimParseTrees {@code true} to trim the capacity of the {@link ParserRuleContext#children}
+	 * list to its size after a rule is parsed.
+	 */
+	public void setTrimParseTrees(boolean trimParseTrees) {
+		if (trimParseTrees) {
+			if (getTrimParseTrees()) {
+				return;
+			}
+
+			addParseListener(TrimToSizeListener.INSTANCE);
+		}
+		else {
+			removeParseListener(TrimToSizeListener.INSTANCE);
+		}
+	}
+
+	/**
+	 *
+	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
+	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
+	 */
+	public boolean getTrimParseTrees() {
+		if (_parseListeners == null) {
+			return false;
+		}
+
+		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
 	}
 
 //	public void setTraceATNStates(boolean traceATNStates) {
