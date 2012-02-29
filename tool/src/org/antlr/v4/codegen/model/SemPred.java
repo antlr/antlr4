@@ -50,7 +50,10 @@ public class SemPred extends Action {
 		GrammarAST failNode = ((PredAST)ast).getOption("fail");
 		CodeGenerator gen = factory.getGenerator();
 		if ( failNode==null ) {
-			msg = "failed predicate: "+ast.getText();
+			msg = ast.getText();
+			if (msg.startsWith("{") && msg.endsWith("}?")) {
+				msg = msg.substring(1, msg.length() - 2);
+			}
 			msg = gen.target.getTargetStringLiteralFromString(msg);
 			return;
 		}
