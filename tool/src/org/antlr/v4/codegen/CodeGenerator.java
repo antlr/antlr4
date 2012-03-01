@@ -39,7 +39,6 @@ import org.stringtemplate.v4.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import org.antlr.v4.misc.Utils.Func1;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
