@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.misc;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class Utils {
 	public static String join(Iterable<?> iter, String separator) {
@@ -79,4 +80,37 @@ public class Utils {
 		}
 		return buf.toString();
 	}
+
+	public static <T> void removeAll(@NotNull List<T> list, @NotNull Predicate<? super T> predicate) {
+		int j = 0;
+		for (int i = 0; i < list.size(); i++) {
+			T item = list.get(i);
+			if (!predicate.eval(item)) {
+				if (j != i) {
+					list.set(j, item);
+				}
+
+				j++;
+			}
+		}
+
+		if (j < list.size()) {
+			list.subList(j, list.size()).clear();
+		}
+	}
+
+	public static <T> void removeAll(@NotNull Iterable<T> iterable, @NotNull Predicate<? super T> predicate) {
+		if (iterable instanceof List<?>) {
+			removeAll((List<T>)iterable, predicate);
+			return;
+		}
+
+		for (Iterator<T> iterator = iterable.iterator(); iterator.hasNext(); ) {
+			T item = iterator.next();
+			if (predicate.eval(item)) {
+				iterator.remove();
+			}
+		}
+	}
+
 }

@@ -1028,6 +1028,9 @@ public abstract class BaseTest {
     public void assertNotNull(String message, Object object) { try {Assert.assertNotNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
     public void assertNotNull(Object object) { try {Assert.assertNotNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
+    public void assertNotNullOrEmpty(String message, String text) { assertNotNull(message, text); assertFalse(message, text.isEmpty()); }
+    public void assertNotNullOrEmpty(String text) { assertNotNull(text); assertFalse(text.isEmpty()); }
+
     public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
     public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
