@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.Token;
 
 /** T is return type of visit methods. Use T=Void for no return type. */
 public class ParseTreeVisitor<T> {
-	public T visit(ParserRuleContext<?> ctx) {
+	public T visit(ParseTree ctx) {
 		return ctx.accept(this);
 	}
 
@@ -17,9 +17,11 @@ public class ParseTreeVisitor<T> {
 	 *  care about some nodes.  The ParserRuleContext.accept() method
 	 *  walks all children by default; i.e., calls this method.
 	 */
-	public T visitChildren(ParserRuleContext<? extends Token> ctx) {
+	public T visitChildren(ParseTree ctx) {
 		T result = null;
-		for (ParseTree c : ctx.children) {
+		int n = ctx.getChildCount();
+		for (int i=0; i<n; i++) {
+			ParseTree c = ctx.getChild(i);
 			if ( c instanceof ParseTree.RuleNode ) {
 				ParseTree.RuleNode r = (ParseTree.RuleNode)c;
 				ParserRuleContext<?> rctx = (ParserRuleContext<? extends Token>)r.getRuleContext();

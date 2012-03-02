@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
@@ -78,6 +79,14 @@ public interface ParseTree extends SyntaxTree {
 		@Override
 		public int getChildCount() { return 0; }
 
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return null; }
+
+		@Override
+		public String toStringTree(Parser parser) {
+			return toString();
+		}
+
 		public boolean isErrorNode() { return this instanceof ErrorNodeImpl; }
 
 		@Override
@@ -115,4 +124,12 @@ public interface ParseTree extends SyntaxTree {
 	ParseTree getParent();
 	@Override
 	ParseTree getChild(int i);
+
+	/** The ParseTreeVisitor needs a double dispatch method */
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+
+	/** Specialize toStringTree so that it can print out more information
+	 * 	based upon the parser.
+	 */
+	public String toStringTree(Parser parser);
 }

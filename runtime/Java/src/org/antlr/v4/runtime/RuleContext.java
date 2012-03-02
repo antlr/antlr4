@@ -28,8 +28,11 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
@@ -235,6 +238,9 @@ public class RuleContext implements ParseTree.RuleNode {
 		int stop = getChild(getChildCount()-1).getSourceInterval().b;
 		return new Interval(start, stop);
 	}
+
+	@Override
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 	public void inspect(Parser parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
