@@ -17,11 +17,11 @@ public class ParseTreeVisitor<T> {
 	 *  care about some nodes.  The ParserRuleContext.accept() method
 	 *  walks all children by default; i.e., calls this method.
 	 */
-	public T visitChildren(ParseTree ctx) {
+	public T visitChildren(ParseTree tree) {
 		T result = null;
-		int n = ctx.getChildCount();
+		int n = tree.getChildCount();
 		for (int i=0; i<n; i++) {
-			ParseTree c = ctx.getChild(i);
+			ParseTree c = tree.getChild(i);
 			if ( c instanceof ParseTree.RuleNode ) {
 				ParseTree.RuleNode r = (ParseTree.RuleNode)c;
 				ParserRuleContext<?> rctx = (ParserRuleContext<? extends Token>)r.getRuleContext();
