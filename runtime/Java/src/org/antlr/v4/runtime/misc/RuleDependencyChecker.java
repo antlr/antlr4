@@ -43,7 +43,7 @@ import org.antlr.v4.runtime.RuleVersion;
  *
  * @author Sam Harwell
  */
-public class RuleDependencyChecker<T> {
+public class RuleDependencyChecker {
 	private static final Logger LOGGER = Logger.getLogger(RuleDependencyChecker.class.getName());
 
 	private static final Set<Class<?>> checkedTypes = new HashSet<Class<?>>();
