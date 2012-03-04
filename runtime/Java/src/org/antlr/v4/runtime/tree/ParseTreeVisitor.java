@@ -29,18 +29,26 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 
-/**
+/** {@code T} is return type of {@code visit} methods. Use {@link Void} for no return type.
  *
  * @author Sam Harwell
  */
-public interface ParseTreeVisitor<Symbol extends Token, Result> {
+public interface ParseTreeVisitor<Symbol, Result> {
 
-	Result visit(ParserRuleContext<? extends Symbol> ctx);
+	Result visit(ParseTree.RuleNode<? extends Symbol> ctx);
 
-	Result visitChildren(ParserRuleContext<? extends Symbol> ctx);
+	/** Visit all rule, non-leaf children. This returns value returned from last
+	 *  child visited, losing all computations from first n-1 children.  Works
+	 *  fine for contexts with one child then.
+	 *  Handy if you are just walking the tree with a visitor and only
+	 *  care about some nodes.  The {@link ParserRuleContext#accept} method
+	 *  walks all children by default; i.e., calls this method.
+	 */
+	Result visitChildren(ParseTree.RuleNode<? extends Symbol> ctx);
 
 	Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node);
+
+	Result visitErrorNode(ParseTree.ErrorNode<? extends Symbol> node);
 
 }

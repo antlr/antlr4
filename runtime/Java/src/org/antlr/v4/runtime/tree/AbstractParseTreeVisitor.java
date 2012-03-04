@@ -28,42 +28,30 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-
-/** Result is return type of visit methods. Use Result=Void for no return type. */
-public abstract class AbstractParseTreeVisitor<Symbol extends Token, Result> implements ParseTreeVisitor<Symbol, Result> {
+public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseTreeVisitor<Symbol, Result> {
 	@Override
-	public Result visit(ParserRuleContext<? extends Symbol> ctx) {
-		return ctx.accept(this);
+	public Result visit(ParseTree.RuleNode<? extends Symbol> node) {
+		return node.accept(this);
 	}
 
-	/** Visit all rule, nonleaf children. Not that useful if you are using T as
-	 *  non-Void.  This returns value returned from last child visited,
-	 *  losing all computations from first n-1 children.  Works fine for
-	 *  ctxs with one child then.
-	 *  Handy if you are just walking the tree with a visitor and only
-	 *  care about some nodes.  The ParserRuleContext.accept() method
-	 *  walks all children by default; i.e., calls this method.
-	 */
 	@Override
-	public Result visitChildren(ParserRuleContext<? extends Symbol> ctx) {
+	public Result visitChildren(ParseTree.RuleNode<? extends Symbol> node) {
 		Result result = null;
-		for (ParseTree<? extends Symbol> c : ctx.children) {
-			if ( c instanceof ParseTree.RuleNode<?> ) {
-				ParseTree.RuleNode<? extends Symbol> r = (ParseTree.RuleNode<? extends Symbol>)c;
-				ParserRuleContext<? extends Symbol> rctx = (ParserRuleContext<? extends Symbol>)r.getRuleContext();
-				result = visit(rctx);
-			}
-			else {
-				result = visitTerminal((ParseTree.TerminalNode<? extends Symbol>)c);
-			}
+		int n = node.getChildCount();
+		for (int i=0; i<n; i++) {
+			ParseTree<? extends Symbol> c = node.getChild(i);
+			result = c.accept(this);
 		}
 		return result;
 	}
 
 	@Override
 	public Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node) {
+		return null;
+	}
+
+	@Override
+	public Result visitErrorNode(ParseTree.ErrorNode<? extends Symbol> node) {
 		return null;
 	}
 }
