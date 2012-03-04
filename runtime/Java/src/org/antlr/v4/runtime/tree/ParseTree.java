@@ -89,7 +89,7 @@ public interface ParseTree extends SyntaxTree {
 			return toString();
 		}
 
-		public boolean isErrorNode() { return this instanceof ErrorNodeImpl; }
+		public boolean isErrorNode() { return this instanceof ErrorNode; }
 
 		@Override
 		public String toString() {
