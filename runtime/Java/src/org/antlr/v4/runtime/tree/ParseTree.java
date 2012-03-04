@@ -80,7 +80,9 @@ public interface ParseTree extends SyntaxTree {
 		public int getChildCount() { return 0; }
 
 		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return null; }
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			return visitor.visitTerminal(this);
+		}
 
 		@Override
 		public String toStringTree(Parser parser) {
@@ -116,6 +118,11 @@ public interface ParseTree extends SyntaxTree {
 	{
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
+		}
+
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			return visitor.visitErrorNode(this);
 		}
 	}
 
