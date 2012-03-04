@@ -6,8 +6,8 @@ import org.antlr.v4.runtime.Token;
 /** {@code T} is return type of {@code visit} methods. Use {@link Void} for no return type.
  */
 public class ParseTreeVisitor<T> {
-	public T visit(ParseTree.RuleNode node) {
-		return node.accept(this);
+	public T visit(ParseTree tree) {
+		return tree.accept(this);
 	}
 
 	/** Visit all rule, non-leaf children. This returns value returned from last
