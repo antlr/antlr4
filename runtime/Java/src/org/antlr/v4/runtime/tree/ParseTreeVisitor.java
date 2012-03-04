@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public interface ParseTreeVisitor<Symbol, Result> {
 
-	Result visit(ParseTree.RuleNode<? extends Symbol> ctx);
+	Result visit(ParseTree<? extends Symbol> ctx);
 
 	/** Visit all rule, non-leaf children. This returns value returned from last
 	 *  child visited, losing all computations from first n-1 children.  Works
@@ -45,7 +45,7 @@ public interface ParseTreeVisitor<Symbol, Result> {
 	 *  care about some nodes.  The {@link ParserRuleContext#accept} method
 	 *  walks all children by default; i.e., calls this method.
 	 */
-	Result visitChildren(ParseTree.RuleNode<? extends Symbol> ctx);
+	Result visitChildren(ParseTree.RuleNode<? extends Symbol> node);
 
 	Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node);
 

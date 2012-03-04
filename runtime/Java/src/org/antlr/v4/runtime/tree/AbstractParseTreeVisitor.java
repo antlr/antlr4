@@ -30,8 +30,8 @@ package org.antlr.v4.runtime.tree;
 
 public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseTreeVisitor<Symbol, Result> {
 	@Override
-	public Result visit(ParseTree.RuleNode<? extends Symbol> node) {
-		return node.accept(this);
+	public Result visit(ParseTree<? extends Symbol> tree) {
+		return tree.accept(this);
 	}
 
 	@Override
