@@ -310,14 +310,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		String msg = "token recognition error at: '"+
 			_input.substring(_tokenStartCharIndex, _input.index())+"'";
 		List<? extends ANTLRErrorListener<? super Integer>> listeners = getErrorListeners();
-		if ( listeners.isEmpty() ) {
-			System.err.println("line "+ _tokenStartLine +":"+
-							   _tokenStartCharPositionInLine +" "+
-							   msg);
-			return;
-		}
-		for (ANTLRErrorListener<? super Integer> pl : listeners) {
-			pl.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+		for (ANTLRErrorListener<? super Integer> listener : listeners) {
+			listener.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 		}
 	}
 
