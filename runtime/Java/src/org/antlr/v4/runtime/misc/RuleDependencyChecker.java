@@ -129,14 +129,14 @@ public class RuleDependencyChecker {
 					String name = field.getName().substring("RULE_".length());
 					if (index < 0 || index >= versions.length) {
 						Object[] params = { index, field.getName(), recognizerClass.getSimpleName() };
-						LOGGER.log(Level.WARNING, "Rule index {0} for rule '{1}' out of bounds for recognizer {2}.", params);
+						LOGGER.log(Level.WARNING, "Rule index {0} for rule ''{1}'' out of bounds for recognizer {2}.", params);
 						continue;
 					}
 
 					Method ruleMethod = getRuleMethod(recognizerClass, name);
 					if (ruleMethod == null) {
 						Object[] params = { name, recognizerClass.getSimpleName() };
-						LOGGER.log(Level.WARNING, "Could not file rule method for rule '{0}' in recognizer {1}.", params);
+						LOGGER.log(Level.WARNING, "Could not file rule method for rule ''{0}'' in recognizer {1}.", params);
 						continue;
 					}
 
