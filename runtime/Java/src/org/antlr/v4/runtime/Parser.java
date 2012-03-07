@@ -344,12 +344,8 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			charPositionInLine = offendingToken.getCharPositionInLine();
 		}
 		List<? extends ANTLRErrorListener<? super Symbol>> listeners = getErrorListeners();
-		if ( listeners.isEmpty() ) {
-			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
-			return;
-		}
-		for (ANTLRErrorListener<? super Symbol> pl : listeners) {
-			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
+		for (ANTLRErrorListener<? super Symbol> listener : listeners) {
+			listener.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
