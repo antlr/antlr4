@@ -281,12 +281,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
 		List<? extends ANTLRErrorListener<? super Token>> listeners = getErrorListeners();
-		if ( listeners.isEmpty() ) {
-			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
-			return;
-		}
-		for (ANTLRErrorListener<? super Token> pl : listeners) {
-			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
+		for (ANTLRErrorListener<? super Token> listener : listeners) {
+			listener.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 

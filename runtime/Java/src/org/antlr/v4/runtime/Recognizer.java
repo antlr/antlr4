@@ -35,13 +35,15 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	private List<ANTLRErrorListener<? super Symbol>> _listeners;
+	@NotNull
+	private List<ANTLRErrorListener<? super Symbol>> _listeners =
+		new CopyOnWriteArrayList<ANTLRErrorListener<? super Symbol>>() {{ add(ConsoleErrorListener.INSTANCE); }};
 
 	protected ATNInterpreter _interp;
 
@@ -94,25 +96,27 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return "'"+s+"'";
 	}
 
-	public void addErrorListener(ANTLRErrorListener<? super Symbol> pl) {
-		if ( _listeners ==null ) {
-			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<? super Symbol>>(2));
-		}
-		if ( pl!=null ) _listeners.add(pl);
-	}
-
-	public void removeErrorListener(ANTLRErrorListener<? super Symbol> pl) {
-		if ( _listeners!=null ) _listeners.remove(pl);
-	}
-
-	public void removeErrorListeners() { if ( _listeners!=null ) _listeners.clear(); }
-
-	public @NotNull List<? extends ANTLRErrorListener<? super Symbol>> getErrorListeners() {
-		if (_listeners == null) {
-			return Collections.emptyList();
+	/**
+	 * @throws NullPointerException if {@code listener} is {@code null}.
+	 */
+	public void addErrorListener(@NotNull ANTLRErrorListener<? super Symbol> listener) {
+		if (listener == null) {
+			throw new NullPointerException("listener cannot be null.");
 		}
 
+		_listeners.add(listener);
+	}
+
+	public void removeErrorListener(@NotNull ANTLRErrorListener<? super Symbol> listener) {
+		_listeners.remove(listener);
+	}
+
+	public void removeErrorListeners() {
+		_listeners.clear();
+	}
+
+	@NotNull
+	public List<? extends ANTLRErrorListener<? super Symbol>> getErrorListeners() {
 		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
 	}
 
