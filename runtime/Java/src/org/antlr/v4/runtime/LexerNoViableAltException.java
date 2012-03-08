@@ -33,6 +33,8 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.misc.Utils;
 
 public class LexerNoViableAltException extends RecognitionException {
+	private static final long serialVersionUID = -730999203913001726L;
+
 	/** Matching attempted at what input index? */
 	public int startIndex;
 

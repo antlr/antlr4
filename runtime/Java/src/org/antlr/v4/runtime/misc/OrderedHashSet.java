@@ -40,6 +40,8 @@ import java.util.List;
  *  LinkedHashSet.
  */
 public class OrderedHashSet<T> extends LinkedHashSet<T> {
+	private static final long serialVersionUID = 5281944403755906761L;
+
     /** Track the elements as they are added to the set */
     protected ArrayList<T> elements = new ArrayList<T>();
 

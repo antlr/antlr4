@@ -50,6 +50,7 @@ import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
+	@SuppressWarnings("serial")
 	public static final Map<String, Class<? extends RulePropertyRef>> thisRulePropToModelMap = new HashMap<String, Class<? extends RulePropertyRef>>() {{
 		put("start", ThisRulePropertyRef_start.class);
 		put("stop",  ThisRulePropertyRef_stop.class);
@@ -57,6 +58,7 @@ public class ActionTranslator implements ActionSplitterListener {
         put("ctx",   ThisRulePropertyRef_ctx.class);
 	}};
 
+	@SuppressWarnings("serial")
 	public static final Map<String, Class<? extends RulePropertyRef>> rulePropToModelMap = new HashMap<String, Class<? extends RulePropertyRef>>() {{
 		put("start", RulePropertyRef_start.class);
 		put("stop",  RulePropertyRef_stop.class);
@@ -64,6 +66,7 @@ public class ActionTranslator implements ActionSplitterListener {
         put("ctx",   RulePropertyRef_ctx.class);
 	}};
 
+	@SuppressWarnings("serial")
 	public static final Map<String, Class<? extends TokenPropertyRef>> tokenPropToModelMap = new HashMap<String, Class<? extends TokenPropertyRef>>() {{
 		put("text",  TokenPropertyRef_text.class);
 		put("type",  TokenPropertyRef_type.class);

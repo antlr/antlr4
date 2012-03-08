@@ -177,6 +177,7 @@ public class TestCommonTokenStream extends BaseTest {
         TokenSource lexer = // simulate input " x =34  ;\n"
             new TokenSource() {
                 int i = 0;
+                @SuppressWarnings("serial")
                 WritableToken[] tokens = {
                     new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(1,"x"),

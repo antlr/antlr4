@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GrammarRootAST extends GrammarASTWithOptions {
+    @SuppressWarnings("serial")
     public static final Map<String, String> defaultOptions =
             new HashMap<String, String>() {
                 {

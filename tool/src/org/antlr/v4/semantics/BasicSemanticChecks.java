@@ -67,6 +67,7 @@ import java.util.*;
  * TODO: 1 action per lex rule
  */
 public class BasicSemanticChecks extends GrammarTreeVisitor {
+	@SuppressWarnings("serial")
 	public static final Set<String> legalLexerOptions =
 		new HashSet<String>() {
 			{
@@ -77,6 +78,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
+	@SuppressWarnings("serial")
 	public static final Set<String> legalParserOptions =
 		new HashSet<String>() {
 			{
@@ -86,6 +88,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
+	@SuppressWarnings("serial")
 	public static final Set<String> legalRuleOptions =
 		new HashSet<String>() {
 			{
@@ -94,6 +97,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
+	@SuppressWarnings("serial")
 	public static final Set<String> legalBlockOptions =
 		new HashSet<String>() {
 			{
@@ -103,6 +107,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		};
 
 	/** Legal options for terminal refs like ID<node=MyVarNode> */
+	@SuppressWarnings("serial")
 	public static final Set<String> legalTokenOptions =
 		new HashSet<String>() {
 			{
@@ -110,6 +115,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		};
 
+	@SuppressWarnings("serial")
 	public static final Set<String> legalSemPredOptions =
 		new HashSet<String>() {
 			{
@@ -122,6 +128,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 *  validDelegations.get(LEXER) gives list of the kinds of delegators
 	 *  that can import lexers.
 	 */
+	@SuppressWarnings("serial")
 	public static MultiMap<Integer,Integer> validImportTypes =
 		new MultiMap<Integer,Integer>() {
 			{
@@ -220,6 +227,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
+		@SuppressWarnings("unused")
 		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
 	}
@@ -227,6 +235,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
 		String v = null;
+		@SuppressWarnings("unused")
 		boolean ok = checkElementOptions(elem, ID, valueAST);
 //		if ( ok ) {
 //			if ( v!=null ) {

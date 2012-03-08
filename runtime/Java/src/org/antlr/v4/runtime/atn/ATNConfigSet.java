@@ -39,6 +39,8 @@ import java.util.Set;
  *  Might be able to optimize later w/o affecting code that uses this set.
  */
 public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
+	private static final long serialVersionUID = 1654459870978010809L;
+
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;

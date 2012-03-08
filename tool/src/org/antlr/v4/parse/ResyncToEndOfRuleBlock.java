@@ -33,4 +33,5 @@ package org.antlr.v4.parse;
  *  alt list. Note it's not under RecognitionException.
  */
 public class ResyncToEndOfRuleBlock extends RuntimeException {
+	private static final long serialVersionUID = 6104510295480069276L;
 }

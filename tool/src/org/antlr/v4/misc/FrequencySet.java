@@ -4,6 +4,8 @@ import java.util.Hashtable;
 
 /** Count how many of each key we have; not thread safe */
 public class FrequencySet<T> extends Hashtable<T, MutableInt> {
+	private static final long serialVersionUID = -134984205245480177L;
+
 	public int count(T key) {
 		MutableInt value = get(key);
 		if (value == null) return 0;
