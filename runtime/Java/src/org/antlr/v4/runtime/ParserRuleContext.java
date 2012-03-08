@@ -208,7 +208,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return null;
 	}
 
-	@SuppressWarnings("checked")
+	@SuppressWarnings("unchecked")
 	public TerminalNode<Symbol> getToken(int ttype, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;
@@ -231,7 +231,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return null;
 	}
 
-	@SuppressWarnings("checked")
+	@SuppressWarnings("unchecked")
 	public List<TerminalNode<Symbol>> getTokens(int ttype) {
 		if ( children==null ) {
 			return Collections.emptyList();
