@@ -38,7 +38,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Arrays;
 
-public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
+public class DiagnosticErrorListener extends BaseErrorListener<Token> {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,

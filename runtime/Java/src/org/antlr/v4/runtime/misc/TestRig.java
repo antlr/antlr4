@@ -147,7 +147,7 @@ public class TestRig {
 			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			Parser parser = parserCtor.newInstance(tokens);
 
-			parser.setErrorHandler(new DiagnosticErrorStrategy());
+			parser.addErrorListener(new DiagnosticErrorListener());
 
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);

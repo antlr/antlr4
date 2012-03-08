@@ -32,7 +32,7 @@ package org.antlr.v4.runtime;
  *
  * @author Sam Harwell
  */
-public class ConsoleErrorListener implements ANTLRErrorListener<Object> {
+public class ConsoleErrorListener extends BaseErrorListener<Object> {
 	public static final ConsoleErrorListener INSTANCE = new ConsoleErrorListener();
 
 	@Override
