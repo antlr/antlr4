@@ -798,6 +798,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
 		int firstUnpredicated = ATN.INVALID_ALT_NUMBER;
+		// keep track of the position in pairs where the unpredicated choice should go
+		int firstUnpredicatedIndex = -1;
 		for (int i = 1; i < altToPred.length; i++) {
 			SemanticContext pred = altToPred[i];
 			// find first unpredicated but ambig alternative, if any.
@@ -809,6 +811,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				 pred==SemanticContext.NONE && firstUnpredicated==ATN.INVALID_ALT_NUMBER )
 			{
 				firstUnpredicated = i;
+				firstUnpredicatedIndex = pairs.size();
 			}
 			if ( pred!=null && pred!=SemanticContext.NONE ) {
 				pairs.add(new DFAState.PredPrediction(pred, i));
@@ -817,7 +820,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( pairs.isEmpty() ) pairs = null;
 		else if ( firstUnpredicated!=ATN.INVALID_ALT_NUMBER ) {
 			// add default prediction if we found null predicate
-			pairs.add(new DFAState.PredPrediction(null, firstUnpredicated));
+			pairs.add(firstUnpredicatedIndex, new DFAState.PredPrediction(null, firstUnpredicated));
 		}
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
 		return pairs;

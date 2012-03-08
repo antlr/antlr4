@@ -105,11 +105,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	}
 
 	@Test public void testOrder() throws Exception {
-		// Predicates disambiguate and so we don't arbitrarily choose the first alt
-		// Here, there are n-1 predicates for n=2 alts and so we simulate
-		// the nth predicate as !(others). We do that by testing the
-		// predicates first and then try the on predicated alternatives.
-		// Since the 2nd alternative has a true predicate, we always choose that one
+		// Under new predicate ordering rules (see antlr/antlr4#29), the first
+		// alt with an acceptable config (unpredicated, or predicated and evaluates
+		// to true) is chosen.
 		String grammar =
 			"grammar T;\n" +
 				"s : a {} a;\n" + // do 2x: once in ATN, next in DFA;
@@ -125,8 +123,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "x y", false);
 		String expecting =
-			"alt 2\n" +
-			"alt 2\n";
+			"alt 1\n" +
+			"alt 1\n";
 		assertEquals(expecting, found);
 	}
 
