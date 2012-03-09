@@ -36,7 +36,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
@@ -120,14 +119,13 @@ public class TestPerformance extends BaseTest {
 
     private static Lexer sharedLexer;
     private static Parser<Token> sharedParser;
-    @SuppressWarnings({"FieldCanBeLocal"})
     private static ParseTreeListener<Token> sharedListener;
 
     private int tokenCount;
     private int currentPass;
 
     @Test
-    //@Ignore
+    //@org.junit.Ignore
     public void compileJdk() throws IOException {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
@@ -274,7 +272,8 @@ public class TestPerformance extends BaseTest {
 
     int configOutputSize = 0;
 
-    protected void parseSources(ParserFactory factory, Collection<CharStream> sources) {
+    @SuppressWarnings("unused")
+	protected void parseSources(ParserFactory factory, Collection<CharStream> sources) {
         long startTime = System.currentTimeMillis();
         tokenCount = 0;
         int inputSize = 0;
@@ -419,7 +418,6 @@ public class TestPerformance extends BaseTest {
         String grammarFileName = "Java.g";
         String sourceName = leftRecursive ? "Java-LR.g" : "Java.g";
         String body = load(sourceName, null);
-        @SuppressWarnings({"ConstantConditions"})
         List<String> extraOptions = new ArrayList<String>();
         if (FORCE_ATN) {
             extraOptions.add("-Xforce-atn");
@@ -466,7 +464,7 @@ public class TestPerformance extends BaseTest {
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
 			@SuppressWarnings("rawtypes")
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            @SuppressWarnings({"unchecked", "rawtypes"})
+            @SuppressWarnings("unchecked")
             final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
             TestPerformance.sharedListener = listenerClass.newInstance();
 
@@ -479,8 +477,8 @@ public class TestPerformance extends BaseTest {
             parserCtor.newInstance(new CommonTokenStream());
 
             return new ParserFactory() {
-                @SuppressWarnings({"PointlessBooleanExpression"})
-                @Override
+                @SuppressWarnings("unused")
+				@Override
                 public void parseFile(CharStream input) {
                     try {
                         if (REUSE_LEXER && sharedLexer != null) {

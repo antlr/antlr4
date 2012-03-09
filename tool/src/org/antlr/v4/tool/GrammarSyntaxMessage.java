@@ -54,7 +54,6 @@ public class GrammarSyntaxMessage extends ANTLRMessage {
 		}
 	}
 
-    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
     @Override
     public RecognitionException getCause() {
         return (RecognitionException)super.getCause();
