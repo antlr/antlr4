@@ -40,7 +40,6 @@ import org.antlr.v4.tool.ast.*;
 import org.stringtemplate.v4.*;
 
 import java.util.*;
-import org.antlr.runtime.RecognitionException;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.

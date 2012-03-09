@@ -327,7 +327,7 @@ public class GrammarTransformPipeline {
 				}
 			}
 		}
-		int nLexicalRules = rulesWeMoved.size();
+
 		for (GrammarAST r : rulesWeMoved) {
 			combinedRulesRoot.deleteChild( r );
 		}

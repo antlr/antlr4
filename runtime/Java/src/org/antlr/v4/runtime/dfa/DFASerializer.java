@@ -78,7 +78,6 @@ public class DFASerializer {
 			for (DFAState s : states.values()) {
 				Map<Integer, DFAState> edges = s.getEdgeMap();
 				Map<Integer, DFAState> contextEdges = s.getContextEdgeMap();
-				int n = edges.size();
 				for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
 					if ((entry.getValue() == null || entry.getValue() == ATNSimulator.ERROR) && (!s.isCtxSensitive || !s.contextSymbols.contains(entry.getKey()))) {
 						continue;

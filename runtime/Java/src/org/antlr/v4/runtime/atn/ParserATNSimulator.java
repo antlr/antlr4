@@ -426,7 +426,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		int t = input.LA(1);
 		ParserRuleContext<Symbol> remainingOuterContext = state.remainingOuterContext;
 
-	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( state.useContext ) {

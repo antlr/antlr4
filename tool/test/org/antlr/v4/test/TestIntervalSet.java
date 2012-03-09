@@ -33,9 +33,6 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TestIntervalSet extends BaseTest {
 
     /** Public default constructor used by TestRig */
