@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.stringtemplate.v4.ST;
 
 /** */
+@SuppressWarnings("unused")
 public class TestAttributeChecks extends BaseTest {
     String attributeTemplate =
         "parser grammar A;\n"+

@@ -267,6 +267,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"s : x INT ;\n";
 		writeFile(tmpdir, "M.g", master);
+		@SuppressWarnings("unused")
 		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
@@ -318,6 +319,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : x ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		writeFile(tmpdir, "M.g", master);
+		@SuppressWarnings("unused")
 		Grammar g = new Grammar(tmpdir+"/M.g", master, equeue);
 
 		assertEquals(ErrorType.SYNTAX_ERROR, equeue.errors.get(0).errorType);

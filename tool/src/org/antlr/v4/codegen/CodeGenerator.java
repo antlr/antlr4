@@ -231,12 +231,14 @@ public class CodeGenerator {
 
 	public void write(ST code, String fileName) {
 		try {
+			@SuppressWarnings("unused")
 			long start = System.currentTimeMillis();
 			Writer w = tool.getOutputFileWriter(g, fileName);
 			STWriter wr = new AutoIndentWriter(w);
 			wr.setLineWidth(lineWidth);
 			code.write(wr);
 			w.close();
+			@SuppressWarnings("unused")
 			long stop = System.currentTimeMillis();
 		}
 		catch (IOException ioe) {

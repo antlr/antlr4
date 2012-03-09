@@ -51,6 +51,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 	public InvokeRule(ParserFactory factory, GrammarAST ast, GrammarAST labelAST) {
 		super(factory, ast);
 		if ( ast.atnState!=null ) {
+			@SuppressWarnings("unused")
 			RuleTransition ruleTrans = (RuleTransition)ast.atnState.transition(0);
 			stateNumber = ast.atnState.stateNumber;
 		}

@@ -3,6 +3,7 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 /** */
+@SuppressWarnings("unused")
 public class TestActionTranslation extends BaseTest {
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +

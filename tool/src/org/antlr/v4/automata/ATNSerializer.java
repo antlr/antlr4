@@ -193,6 +193,7 @@ public class ATNSerializer {
 	public String decode(char[] data) {
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
+		@SuppressWarnings("unused")
 		int grammarType = ATNSimulator.toInt(data[p++]);
 		int maxType = ATNSimulator.toInt(data[p++]);
 		buf.append("max type "+maxType+"\n");

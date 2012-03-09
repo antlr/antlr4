@@ -31,6 +31,7 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 /** test runtime parse errors */
+@SuppressWarnings("unused")
 public class TestParseErrors extends BaseTest {
 	@Test public void testTokenMismatch() throws Exception {
 		String grammar =
