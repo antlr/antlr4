@@ -68,6 +68,7 @@ public class ATNState {
 			"LOOP_END"
 		));
 
+	@SuppressWarnings("serial")
 	public static final Map<Class<? extends ATNState>, Integer> serializationTypes =
 		Collections.unmodifiableMap(new HashMap<Class<? extends ATNState>, Integer>() {{
             put(ATNState.class, BASIC);

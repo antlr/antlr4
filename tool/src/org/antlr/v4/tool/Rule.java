@@ -74,6 +74,7 @@ public class Rule implements AttributeResolver {
             add(new Attribute("int"));
         }};
 
+	@SuppressWarnings("serial")
 	public static Set<String> validLexerCommands = new HashSet<String>() {{
 		// CALLS
 		add("mode");

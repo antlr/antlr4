@@ -58,6 +58,7 @@ import java.util.*;
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
 
+	@SuppressWarnings("serial")
 	public static final Set<String> doNotCopyOptionsToLexer =
         new HashSet<String>() {
             {
@@ -65,6 +66,7 @@ public class Grammar implements AttributeResolver {
             }
         };
 
+    @SuppressWarnings("serial")
     public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
         new HashMap<String, AttributeDict>() {{
             put("lexer:RULE_LABEL", Rule.predefinedLexerRulePropertiesDict);

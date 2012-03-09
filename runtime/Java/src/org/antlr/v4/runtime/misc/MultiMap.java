@@ -34,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
+	private static final long serialVersionUID = -4956746660057462312L;
+
 	public void map(K key, V value) {
 		List<V> elementsForKey = get(key);
 		if ( elementsForKey==null ) {

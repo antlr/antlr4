@@ -74,6 +74,7 @@ public abstract class Transition {
 			"WILDCARD"
 		));
 
+	@SuppressWarnings("serial")
 	public static final Map<Class<? extends Transition>, Integer> serializationTypes =
 		Collections.unmodifiableMap(new HashMap<Class<? extends Transition>, Integer>() {{
 			put(EpsilonTransition.class, EPSILON);

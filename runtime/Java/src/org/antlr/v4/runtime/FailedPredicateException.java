@@ -38,6 +38,8 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  prediction.
  */
 public class FailedPredicateException extends RecognitionException {
+	private static final long serialVersionUID = 5379330841495778709L;
+
 	public int ruleIndex;
 	public int predIndex;
 	public String msg;

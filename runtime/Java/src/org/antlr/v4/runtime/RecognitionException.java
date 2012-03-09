@@ -38,6 +38,8 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  and what kind of problem occurred.
  */
 public class RecognitionException extends RuntimeException {
+	private static final long serialVersionUID = -3861826954750022374L;
+
 	/** Who threw the exception? */
 	protected Recognizer<?, ?> recognizer;
 

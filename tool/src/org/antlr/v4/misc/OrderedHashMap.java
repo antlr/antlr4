@@ -37,6 +37,8 @@ import java.util.List;
  *  LinkedHashMap.
  */
 public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
+	private static final long serialVersionUID = -4127551298268351889L;
+
 	/** Track the elements as they are added to the set */
 	protected List<K> elements = new ArrayList<K>();
 
