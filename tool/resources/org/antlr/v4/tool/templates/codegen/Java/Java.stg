@@ -226,6 +226,9 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
+<if(currentRule.hasLookaheadBlock)>
+		int _alt;
+<endif>
 		<code>
 		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
@@ -260,6 +263,9 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
+<if(currentRule.hasLookaheadBlock)>
+		int _alt;
+<endif>
 		<code>
 		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
@@ -411,29 +417,27 @@ case <i>:
 }
 >>
 
-// TODO: we we need uniqueID? a single _alt might work
-
 StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
-int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
-while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 ) {
-	if ( _alt<choice.uniqueID>==1 ) {
+_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
+while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
+	if ( _alt==1 ) {
 		<iteration>
 		<alts> <! should only be one !>
 	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
-	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
+	_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
-int _alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
+_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 do {
-	switch ( _alt<choice.uniqueID> ) {
+	switch ( _alt ) {
 		<alts:{alt|
 case <i>:
 	<alt>
@@ -443,8 +447,8 @@ case <i>:
 	}
 	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
-	_alt<choice.uniqueID> = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
-} while ( _alt<choice.uniqueID>!=<choice.exitAlt> && _alt<choice.uniqueID>!=-1 );
+	_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
+} while ( _alt!=<choice.exitAlt> && _alt!=-1 );
 >>
 
 Sync(s) ::= "sync(<s.expecting.name>);"

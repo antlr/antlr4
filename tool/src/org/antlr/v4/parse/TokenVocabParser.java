@@ -47,7 +47,7 @@ public class TokenVocabParser {
 		this.vocabName = vocabName;
 	}
 
-	/** Load a vocab file <vocabName>.tokens and return mapping. */
+	/** Load a vocab file {@code <vocabName>.tokens} and return mapping. */
 	public Map<String,Integer> load() {
 		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
 		int maxTokenType = -1;
