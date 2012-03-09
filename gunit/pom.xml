@@ -52,7 +52,7 @@
            <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.4</version>
+                <version>3.4.1-SNAPSHOT</version>
                 <configuration>
                     <sourceDirectory>src</sourceDirectory>
                     <verbose>true</verbose>
@@ -72,6 +72,11 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArguments>
+                        <Xlint/>
+                    </compilerArguments>
                 </configuration>
             </plugin>
         </plugins>
