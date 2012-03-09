@@ -203,8 +203,8 @@ public class TestRuleVersioning extends BaseTest {
 		}
 
 		String lexerName = resolveProperty(properties, group, name, "lexer");
-		if (parserName == null) {
-			parserName = grammarName + "Lexer";
+		if (lexerName == null) {
+			lexerName = grammarName + "Lexer";
 		}
 
 		String startRuleName = "a";
