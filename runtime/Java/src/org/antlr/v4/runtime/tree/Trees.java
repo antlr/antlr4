@@ -98,7 +98,7 @@ public class Trees {
 	public static String getNodeText(Tree t, Parser<?> recog) {
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
-				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
+				int ruleIndex = ((ParseTree.RuleNode<?>)t).getRuleContext().getRuleIndex();
 				String ruleName = recog.getRuleNames()[ruleIndex];
 				return ruleName;
 			}

@@ -153,7 +153,7 @@ public class TestRig {
 
 			try {
 				Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-				ParserRuleContext<? extends Token> tree = (ParserRuleContext<? extends Token>)startRule.invoke(parser, (Object[])null);
+				ParserRuleContext<?> tree = (ParserRuleContext<?>)startRule.invoke(parser, (Object[])null);
 
 				if ( printTree ) {
 					System.out.println(tree.toStringTree(parser));
