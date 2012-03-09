@@ -44,7 +44,6 @@
                     <target>1.6</target>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
-                    <compilerArgument>-Xlint:-serial</compilerArgument>
                     <compilerArguments>
                         <Xlint/>
                     </compilerArguments>
