@@ -29,9 +29,12 @@ package org.antlr.v4.runtime.dfa;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  *
@@ -94,32 +97,27 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	@Override
 	public ArrayEdgeMap<T> putAll(EdgeMap<? extends T> m) {
+		if (m.isEmpty()) {
+			return this;
+		}
+
 		if (m instanceof ArrayEdgeMap<?>) {
 			ArrayEdgeMap<? extends T> other = (ArrayEdgeMap<? extends T>)m;
 			int minOverlap = Math.max(minIndex, other.minIndex);
 			int maxOverlap = Math.min(maxIndex, other.maxIndex);
-			if (minOverlap > maxIndex || maxOverlap < minIndex) {
-				int removed = 0;
-				for (int i = minOverlap - this.minIndex; i <= maxOverlap - this.minIndex; i++) {
-					if (arrayData[i] != null) {
-						removed++;
-					}
+			for (int i = minOverlap; i <= maxOverlap; i++) {
+				T target = other.arrayData[i - other.minIndex];
+				if (target != null) {
+					T current = this.arrayData[i - this.minIndex];
+					this.arrayData[i - this.minIndex] = target;
+					size += (current != null ? 0 : 1);
 				}
-
-				int added = 0;
-				for (int i = minOverlap - other.minIndex; i <= maxOverlap - other.minIndex; i++) {
-					if (other.arrayData[i] != null) {
-						added++;
-					}
-				}
-
-				System.arraycopy(other.arrayData, minOverlap - other.minIndex, this.arrayData, minOverlap - this.minIndex, maxOverlap - minOverlap + 1);
-				size = size + added - removed;
 			}
 
 			return this;
 		} else if (m instanceof SingletonEdgeMap<?>) {
 			SingletonEdgeMap<? extends T> other = (SingletonEdgeMap<? extends T>)m;
+			assert !other.isEmpty();
 			return put(other.getKey(), other.getValue());
 		} else if (m instanceof SparseEdgeMap<?>) {
 			SparseEdgeMap<? extends T> other = (SparseEdgeMap<? extends T>)m;
@@ -159,4 +157,63 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 		return result;
 	}
 
+	@Override
+	public Set<Map.Entry<Integer, T>> entrySet() {
+		return new EntrySet();
+	}
+
+	private class EntrySet extends AbstractEntrySet {
+		@Override
+		public Iterator<Map.Entry<Integer, T>> iterator() {
+			return new EntryIterator();
+		}
+	}
+
+	private class EntryIterator implements Iterator<Map.Entry<Integer, T>> {
+		private int current;
+		private int currentIndex;
+
+		@Override
+		public boolean hasNext() {
+			return current < size();
+		}
+
+		@Override
+		public Map.Entry<Integer, T> next() {
+			if (current >= size()) {
+				throw new NoSuchElementException();
+			}
+
+			while (arrayData[currentIndex] == null) {
+				currentIndex++;
+			}
+
+			current++;
+			currentIndex++;
+			return new Map.Entry<Integer, T>() {
+				private final int key = minIndex + currentIndex - 1;
+				private final T value = arrayData[currentIndex - 1];
+
+				@Override
+				public Integer getKey() {
+					return key;
+				}
+
+				@Override
+				public T getValue() {
+					return value;
+				}
+
+				@Override
+				public T setValue(T value) {
+					throw new UnsupportedOperationException("Not supported yet.");
+				}
+			};
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("Not supported yet.");
+		}
+	}
 }

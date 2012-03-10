@@ -27,6 +27,9 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import java.util.AbstractSet;
+import java.util.Map;
+
 /**
  *
  * @author Sam Harwell
@@ -39,6 +42,40 @@ public abstract class AbstractEdgeMap<T> implements EdgeMap<T> {
 	public AbstractEdgeMap(int minIndex, int maxIndex) {
 		this.minIndex = minIndex;
 		this.maxIndex = maxIndex;
+	}
+
+	@Override
+	public EdgeMap<T> putAll(EdgeMap<? extends T> m) {
+		EdgeMap<T> result = this;
+		for (Map.Entry<Integer, ? extends T> entry : m.entrySet()) {
+			result = result.put(entry.getKey(), entry.getValue());
+		}
+
+		return result;
+	}
+
+	protected abstract class AbstractEntrySet extends AbstractSet<Map.Entry<Integer, T>> {
+		@Override
+		public boolean contains(Object o) {
+			if (!(o instanceof Map.Entry)) {
+				return false;
+			}
+
+			Map.Entry<?, ?> entry = (Map.Entry<?, ?>)o;
+			if (entry.getKey() instanceof Integer) {
+				int key = (Integer)entry.getKey();
+				Object value = entry.getValue();
+				T existing = get(key);
+				return value == existing || (existing != null && existing.equals(value));
+			}
+
+			return false;
+		}
+
+		@Override
+		public int size() {
+			return AbstractEdgeMap.this.size();
+		}
 	}
 
 }

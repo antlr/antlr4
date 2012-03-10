@@ -30,9 +30,12 @@ package org.antlr.v4.runtime.dfa;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  *
@@ -137,11 +140,6 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public EdgeMap<T> putAll(EdgeMap<? extends T> m) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
 	public SparseEdgeMap<T> clear() {
 		values.clear();
 		return this;
@@ -161,4 +159,57 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 		return result;
 	}
 
+	@Override
+	public Set<Map.Entry<Integer, T>> entrySet() {
+		return new EntrySet();
+	}
+
+	private class EntrySet extends AbstractEntrySet {
+		@Override
+		public Iterator<Map.Entry<Integer, T>> iterator() {
+			return new EntryIterator();
+		}
+	}
+
+	private class EntryIterator implements Iterator<Map.Entry<Integer, T>> {
+		private int current;
+
+		@Override
+		public boolean hasNext() {
+			return current < size();
+		}
+
+		@Override
+		public Map.Entry<Integer, T> next() {
+			if (current >= size()) {
+				throw new NoSuchElementException();
+			}
+
+			current++;
+			return new Map.Entry<Integer, T>() {
+				private final int key = keys[current - 1];
+				private final T value = values.get(current - 1);
+
+				@Override
+				public Integer getKey() {
+					return key;
+				}
+
+				@Override
+				public T getValue() {
+					return value;
+				}
+
+				@Override
+				public T setValue(T value) {
+					throw new UnsupportedOperationException("Not supported yet.");
+				}
+			};
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("Not supported yet.");
+		}
+	}
 }
