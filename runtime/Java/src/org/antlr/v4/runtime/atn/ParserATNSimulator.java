@@ -417,7 +417,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( s.predicates!=null ) {
 			// rewind input so pred's LT(i) calls make sense
 			input.seek(startIndex);
-			IntervalSet alts = evalSemanticContext(s.predicates, outerContext);
+			// since we don't report ambiguities in execDFA, we never need to use complete predicate evaluation here
+			IntervalSet alts = evalSemanticContext(s.predicates, outerContext, false);
 			if (alts.isNil()) {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
@@ -569,7 +570,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					IntervalSet alts = evalSemanticContext(predPredictions, outerContext);
+					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.size()) {
 					case 0:
@@ -641,7 +642,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// we have a validating predicate; test it
 				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
 				input.seek(startIndex);
-				IntervalSet alts = evalSemanticContext(predPredictions, outerContext);
+				IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
 				reach.uniqueAlt = ATN.INVALID_ALT_NUMBER;
 				switch (alts.size()) {
 				case 0:
@@ -831,12 +832,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 *  unpredicated config which behaves as "always true."
 	 */
 	public IntervalSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-										   ParserRuleContext<?> outerContext)
+										   ParserRuleContext<?> outerContext,
+										   boolean complete)
 	{
 		IntervalSet predictions = new IntervalSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
 			if ( pair.pred==null ) {
 				predictions.add(pair.alt);
+				if (!complete) {
+					break;
+				}
+
 				continue;
 			}
 
@@ -848,7 +854,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( evaluatedResult ) {
 				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
 				predictions.add(pair.alt);
-				continue;
+				if (!complete) {
+					break;
+				}
 			}
 		}
 
