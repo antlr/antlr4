@@ -241,6 +241,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@NotNull
 	public final DFA[] decisionToDFA;
 
+	/**
+	 * When {@code true}, ambiguous alternatives are reported when they are
+	 * encountered within {@link #execATN}. When {@code false}, these messages
+	 * are suppressed. The default is {@code true}.
+	 * <p>
+	 * When messages about ambiguous alternatives are not required, setting this
+	 * to {@code false} enables additional internal optimizations which may lose
+	 * this information.
+	 */
+	public boolean reportAmbiguities = true;
+
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
@@ -514,7 +525,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							 !D.configset.dipsIntoOuterContext ||
 							 k == 1 ) // SLL(1) == LL(1)
 						{
-							if ( !D.configset.hasSemanticContext ) {
+							if ( reportAmbiguities && !D.configset.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.conflictingAlts, D.configset);
 							}
 							D.isAcceptState = true;
@@ -570,7 +581,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
+					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.size()) {
 					case 0:
@@ -582,7 +593,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					default:
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
-						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
+						if (reportAmbiguities) {
+							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
+						}
+
 						return alts.getMinElement();
 					}
 				}
@@ -642,7 +656,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// we have a validating predicate; test it
 				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
 				input.seek(startIndex);
-				IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
+				IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
 				reach.uniqueAlt = ATN.INVALID_ALT_NUMBER;
 				switch (alts.size()) {
 				case 0:
@@ -661,7 +675,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		// must have conflict
-		reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
+		if (reportAmbiguities) {
+			reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
+		}
+
 		reach.uniqueAlt = reach.conflictingAlts.getMinElement();
 
 		return reach;
