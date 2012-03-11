@@ -31,16 +31,12 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-
-import java.util.Arrays;
 
 public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
     @Override
@@ -68,20 +64,6 @@ public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorS
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + getFullContextConfigs(acceptState).toString(true) + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
-    }
-
-    @Override
-    public void reportInsufficientPredicates(@NotNull Parser<? extends Symbol> recognizer,
-											 @NotNull DFA dfa,
-											 int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 DecisionState decState,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull ATNConfigSet configs, boolean fullContextParse)
-    {
-        recognizer.notifyErrorListeners("reportInsufficientPredicates d=" + dfa.decision + ", decState=" + decState +
-										", ambigAlts=" + ambigAlts + ":" + Arrays.toString(altToPred) +
-										", " + configs.toString(true) + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
 	protected static ATNConfigSet getFullContextConfigs(SimulatorState<?> state) {

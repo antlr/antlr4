@@ -562,15 +562,4 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
                                          int startIndex, int stopIndex, @NotNull SimulatorState<T> acceptState)
     {
     }
-
-    @Override
-    public void reportInsufficientPredicates(@NotNull Parser<? extends Symbol> recognizer,
-											 @NotNull DFA dfa,
-											 int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 DecisionState decState,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull ATNConfigSet configs, boolean fullContextParse)
-    {
-    }
 }

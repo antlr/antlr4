@@ -138,16 +138,4 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
                                   @NotNull DFA dfa,
                                   int startIndex, int stopIndex,
                                   @NotNull SimulatorState<T> acceptState);
-
-    /** Called by the parser when it finds less than n-1 predicates for n ambiguous alternatives.
-     *  If there are n-1, we assume that the missing predicate is !(the "or" of the other predicates).
-     *  If there are fewer than n-1, then we don't know which make it alternative to protect
-     *  if the predicates fail.
-     */
-    void reportInsufficientPredicates(@NotNull Parser<? extends Symbol> recognizer,
-									  @NotNull DFA dfa,
-									  int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-									  DecisionState decState,
-									  @NotNull SemanticContext[] altToPred,
-									  @NotNull ATNConfigSet configs, boolean fullContextParse);
 }
