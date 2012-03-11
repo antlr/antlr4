@@ -27,13 +27,11 @@
  */
 package org.antlr.v4.runtime.dfa;
 
-//import java.util.Collection;
-
-import java.util.Map;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-//import java.util.Set;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -46,8 +44,6 @@ public interface EdgeMap<T> {
 	boolean isEmpty();
 
 	boolean containsKey(int key);
-
-//	boolean containsValue(T value);
 
 	@Nullable
 	T get(int key);
@@ -67,10 +63,7 @@ public interface EdgeMap<T> {
 	@NotNull
 	Map<Integer, T> toMap();
 
-//	Set<Integer> keySet();
-//
-//	Collection<T> values();
-//
-//	Set<Entry<Integer, DFAState>> entrySet();
+	@NotNull
+	Set<Map.Entry<Integer, T>> entrySet();
 
 }

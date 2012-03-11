@@ -28,7 +28,10 @@
 package org.antlr.v4.runtime.dfa;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  *
@@ -113,11 +116,6 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public EdgeMap<T> putAll(EdgeMap<? extends T> m) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
 	public SingletonEdgeMap<T> clear() {
 		this.value = null;
 		return this;
@@ -132,4 +130,57 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 		return Collections.singletonMap(key, value);
 	}
 
+	@Override
+	public Set<Map.Entry<Integer, T>> entrySet() {
+		return new EntrySet();
+	}
+
+	private class EntrySet extends AbstractEntrySet {
+		@Override
+		public Iterator<Map.Entry<Integer, T>> iterator() {
+			return new EntryIterator();
+		}
+	}
+
+	private class EntryIterator implements Iterator<Map.Entry<Integer, T>> {
+		private int current;
+
+		@Override
+		public boolean hasNext() {
+			return current < size();
+		}
+
+		@Override
+		public Map.Entry<Integer, T> next() {
+			if (current >= size()) {
+				throw new NoSuchElementException();
+			}
+
+			current++;
+			return new Map.Entry<Integer, T>() {
+				private final int key = SingletonEdgeMap.this.key;
+				private final T value = SingletonEdgeMap.this.value;
+
+				@Override
+				public Integer getKey() {
+					return key;
+				}
+
+				@Override
+				public T getValue() {
+					return value;
+				}
+
+				@Override
+				public T setValue(T value) {
+					throw new UnsupportedOperationException("Not supported yet.");
+				}
+			};
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("Not supported yet.");
+		}
+	}
 }
