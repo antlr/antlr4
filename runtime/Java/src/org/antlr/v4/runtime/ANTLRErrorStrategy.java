@@ -1,11 +1,6 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.atn.SimulatorState;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -112,30 +107,4 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	void reportError(@NotNull Parser<? extends Symbol> recognizer,
 					 @Nullable RecognitionException e)
 	throws RecognitionException;
-
-	/** Called when the parser detects a true ambiguity: an input sequence can be matched
-	 * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
-	 * favor of the alternative appearing first in the grammar. The start and stop index are
-     * zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
-     * that can match the input sequence. This method is only called when we are parsing with
-     * full context.
-     */
-    void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
-						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-						 @NotNull ATNConfigSet configs);
-
-	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
-									 @NotNull DFA dfa,
-									 int startIndex, int stopIndex,
-									 @NotNull SimulatorState<T> initialState);
-
-	/** Called by the parser when it find a conflict that is resolved by retrying the parse
-     *  with full context. This is not a warning; it simply notifies you that your grammar
-     *  is more complicated than Strong LL can handle. The parser moved up to full context
-     *  parsing for that input sequence.
-     */
-    <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
-                                  @NotNull DFA dfa,
-                                  int startIndex, int stopIndex,
-                                  @NotNull SimulatorState<T> acceptState);
 }

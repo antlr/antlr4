@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -540,26 +539,5 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
             recognizer.consume();
             ttype = recognizer.getInputStream().LA(1);
         }
-    }
-
-    @Override
-    public void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull ATNConfigSet configs)
-    {
-    }
-
-	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
-											@NotNull DFA dfa,
-											int startIndex, int stopIndex,
-											@NotNull SimulatorState<T> initialState)
-	{
-	}
-
-	@Override
-    public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull SimulatorState<T> acceptState)
-    {
     }
 }

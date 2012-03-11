@@ -539,7 +539,7 @@ public class TestPerformance extends BaseTest {
         void parseFile(CharStream input);
     }
 
-	private static class DescriptiveErrorListener implements ANTLRErrorListener<Token> {
+	private static class DescriptiveErrorListener extends BaseErrorListener<Token> {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override

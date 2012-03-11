@@ -343,10 +343,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			line = offendingToken.getLine();
 			charPositionInLine = offendingToken.getCharPositionInLine();
 		}
-		List<? extends ANTLRErrorListener<? super Symbol>> listeners = getErrorListeners();
-		for (ANTLRErrorListener<? super Symbol> listener : listeners) {
-			listener.error(this, offendingToken, line, charPositionInLine, msg, e);
-		}
+
+		ANTLRErrorListener<? super Symbol> listener = getErrorListenerDispatch();
+		listener.error(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
 	/** Consume the current symbol and return it. E.g., given the following
@@ -466,6 +465,11 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 
 	public ParserRuleContext<Symbol> getContext() {
 		return _ctx;
+	}
+
+	@Override
+	public ParserErrorListener<? super Symbol> getErrorListenerDispatch() {
+		return new ProxyParserErrorListener<Symbol>(getErrorListeners());
 	}
 
 	public boolean inContext(String context) {

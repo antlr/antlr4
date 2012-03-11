@@ -1724,7 +1724,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+initialState.s0.configset+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, initialState);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, initialState);
     }
 
 	public void reportContextSensitivity(DFA dfa, SimulatorState<Symbol> acceptState, int startIndex, int stopIndex) {
@@ -1732,7 +1732,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+acceptState.s0.configset+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportContextSensitivity(parser, dfa, startIndex, stopIndex, acceptState);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, acceptState);
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
@@ -1761,7 +1761,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							   ambigAlts+":"+configs+
                                ", input="+parser.getInputString(startIndex, stopIndex));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, dfa, startIndex, stopIndex,
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);
     }
 

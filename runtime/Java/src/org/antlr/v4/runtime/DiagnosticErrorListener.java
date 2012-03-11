@@ -38,7 +38,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
-public class DiagnosticErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
+public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorListener<Symbol> {
     @Override
     public void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
