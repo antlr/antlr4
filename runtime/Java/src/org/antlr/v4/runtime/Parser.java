@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
@@ -59,6 +60,26 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 							   getRuleNames()[parent.ruleIndex]+
 							   " alt="+parent.altNum);
 		}
+	}
+
+	public static class TrimToSizeListener implements ParseListener<Token> {
+		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
+
+		@Override
+		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
+		}
+
+		@Override
+		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+			if (ctx.children instanceof ArrayList) {
+				((ArrayList<?>)ctx.children).trimToSize();
+			}
+		}
+
 	}
 
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
@@ -151,6 +172,39 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 
 	public boolean getBuildParseTree() {
 		return _buildParseTrees;
+	}
+
+	/**
+	 * Trim the internal lists of the parse tree during parsing to conserve memory.
+	 * This property is set to {@code false} by default for a newly constructed parser.
+	 *
+	 * @param trimParseTrees {@code true} to trim the capacity of the {@link ParserRuleContext#children}
+	 * list to its size after a rule is parsed.
+	 */
+	public void setTrimParseTrees(boolean trimParseTrees) {
+		if (trimParseTrees) {
+			if (getTrimParseTrees()) {
+				return;
+			}
+
+			addParseListener(TrimToSizeListener.INSTANCE);
+		}
+		else {
+			removeParseListener(TrimToSizeListener.INSTANCE);
+		}
+	}
+
+	/**
+	 *
+	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
+	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
+	 */
+	public boolean getTrimParseTrees() {
+		if (_parseListeners == null) {
+			return false;
+		}
+
+		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
 	}
 
 //	public void setTraceATNStates(boolean traceATNStates) {
