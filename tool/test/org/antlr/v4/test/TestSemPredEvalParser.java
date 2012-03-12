@@ -105,11 +105,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	}
 
 	@Test public void testOrder() throws Exception {
-		// Predicates disambiguate and so we don't arbitrarily choose the first alt
-		// Here, there are n-1 predicates for n=2 alts and so we simulate
-		// the nth predicate as !(others). We do that by testing the
-		// predicates first and then try the on predicated alternatives.
-		// Since the 2nd alternative has a true predicate, we always choose that one
+		// Under new predicate ordering rules (see antlr/antlr4#29), the first
+		// alt with an acceptable config (unpredicated, or predicated and evaluates
+		// to true) is chosen.
 		String grammar =
 			"grammar T;\n" +
 				"s : a {} a;\n" + // do 2x: once in ATN, next in DFA;
@@ -125,8 +123,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "x y", false);
 		String expecting =
-			"alt 2\n" +
-			"alt 2\n";
+			"alt 1\n" +
+			"alt 1\n";
 		assertEquals(expecting, found);
 	}
 
@@ -155,7 +153,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 1\n" +
 			"alt 1\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:0 reportInsufficientPredicates d=0, decState=24, ambigAlts={1..3}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [(6,1,[],up=1), (1,1,[],up=1), (6,2,[],up=1), (1,2,[],up=1), (6,3,[],{1:0}?,up=1), (1,3,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={1..3},dipsIntoOuterContext, input='x'\n",
+        assertEquals("line 1:0 reportAmbiguity d=0: ambigAlts={1..2}:[(6,1,[],up=1), (1,1,[],up=1), (6,2,[],up=1), (1,2,[],up=1), (6,3,[],{1:0}?,up=1), (1,3,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={1..3},dipsIntoOuterContext, input='x'\n",
                      this.stderrDuringParse);
 	}
 
@@ -186,8 +184,8 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 2\n" +
 			"alt 2\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:4 reportInsufficientPredicates d=0, decState=32, ambigAlts={2..4}:[{-1:-1}?, {-1:-1}?, {-1:-1}?, {-1:-1}?, {1:0}?], [(6,2,[],up=1), (10,2,[],up=1), (1,2,[],up=1), (6,3,[],up=1), (10,3,[],up=1), (1,3,[],up=1), (6,4,[],{1:0}?,up=1), (10,4,[],{1:0}?,up=1), (1,4,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={2..4},dipsIntoOuterContext, input='x'\n",
-                     this.stderrDuringParse);
+        assertEquals("line 1:4 reportAmbiguity d=0: ambigAlts={2..3}:[(6,2,[],up=1), (10,2,[],up=1), (1,2,[],up=1), (6,3,[],up=1), (10,3,[],up=1), (1,3,[],up=1), (6,4,[],{1:0}?,up=1), (10,4,[],{1:0}?,up=1), (1,4,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={2..4},dipsIntoOuterContext, input='x'\n",
+					 this.stderrDuringParse);
 	}
 
 	@Test public void testRewindBeforePredEval() throws Exception {
