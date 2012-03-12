@@ -33,22 +33,14 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.Alternative;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LeftRecursiveRule;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.BlockAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.*;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
+import org.stringtemplate.v4.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
+import org.antlr.runtime.RecognitionException;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -72,8 +64,7 @@ public class OutputModelController {
 	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
 	public Alternative currentOuterMostAlt;
 	public CodeBlock currentBlock;
-	public CodeBlock currentOuterMostAlternativeBlock;
-
+	public CodeBlockForOuterMostAlt currentOuterMostAlternativeBlock;
 
 	public OutputModelController(OutputModelFactory factory) {
 		this.delegate = factory;
@@ -119,9 +110,29 @@ public class OutputModelController {
 		return new ListenerFile(delegate, gen.getListenerFileName());
 	}
 
-	public OutputModelObject buildBlankListenerOutputModel() {
+	public OutputModelObject buildBaseListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BlankListenerFile(delegate, gen.getBlankListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
+	}
+
+	public OutputModelObject buildParseListenerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new ParseListenerFile(delegate, gen.getParseListenerFileName());
+	}
+
+	public OutputModelObject buildBaseParseListenerOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseParseListenerFile(delegate, gen.getBaseParseListenerFileName());
+	}
+
+	public OutputModelObject buildVisitorOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new VisitorFile(delegate, gen.getVisitorFileName());
+	}
+
+	public OutputModelObject buildBaseVisitorOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName());
 	}
 
 	public ParserFile parserFile(String fileName) {
@@ -151,6 +162,7 @@ public class OutputModelController {
 		RuleFunction function = rule(r);
 		parser.funcs.add(function);
 		pushCurrentRule(function);
+		function.fillNamedActions(delegate, r);
 
 		if ( r instanceof LeftRecursiveRule ) {
 			buildLeftRecursiveRuleFunction((LeftRecursiveRule)r,
@@ -213,37 +225,40 @@ public class OutputModelController {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			if ( altInfo.altLabel==null ) continue;
 			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
-			altActionST.add("ctxName", altInfo.altLabel);
-			Action altAction = new Action(delegate, altActionST.render());
+			altActionST.add("ctxName", Utils.capitalize(altInfo.altLabel));
+			Action altAction =
+				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = primaryAltsCode.get(i);
 			alt.insertOp(0, altAction);
 		}
 
 		// Insert code to set ctx.stop after primary block and before op * loop
 		ST setStopTokenAST = codegenTemplates.getInstanceOf("recRuleSetStopToken");
-		Action setStopTokenAction = new Action(delegate, setStopTokenAST.render());
+		Action setStopTokenAction = new Action(delegate, function.ruleCtx, setStopTokenAST);
 		outerAlt.insertOp(1, setStopTokenAction);
 
 		// Insert code to set _prevctx at start of * loop
 		ST setPrevCtx = codegenTemplates.getInstanceOf("recRuleSetPrevCtx");
-		Action setPrevCtxAction = new Action(delegate, setPrevCtx.render());
+		Action setPrevCtxAction = new Action(delegate, function.ruleCtx, setPrevCtx);
 		opAltStarBlock.addIterationOp(setPrevCtxAction);
 
-		// Insert code in front of each op alt to create specialized ctx if there was a label
+		// Insert code in front of each op alt to create specialized ctx if there was an alt label
 		for (int i = 0; i < opAltsCode.size(); i++) {
 			ST altActionST;
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
 			if ( altInfo.altLabel!=null ) {
 				altActionST = codegenTemplates.getInstanceOf("recRuleLabeledAltStartAction");
-				altActionST.add("ctxName", altInfo.altLabel);
+				altActionST.add("currentAltLabel", altInfo.altLabel);
 			}
 			else {
 				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
-				altActionST.add("ctxName", r.name);
+				altActionST.add("ctxName", Utils.capitalize(r.name));
 			}
 			altActionST.add("ruleName", r.name);
+			// add label of any lr ref we deleted
 			altActionST.add("label", altInfo.leftRecursiveRuleRefLabel);
-			Action altAction = new Action(delegate, altActionST.render());
+			Action altAction =
+				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = opAltsCode.get(i);
 			alt.insertOp(0, altAction);
 		}
@@ -259,8 +274,9 @@ public class OutputModelController {
 		try {
 			// walk AST of rule alts/elements
 			function.code = DefaultOutputModelFactory.list(walker.block(null, null));
+			function.hasLookaheadBlock = walker.hasLookaheadBlock;
 		}
-		catch (Exception e){
+		catch (org.antlr.runtime.RecognitionException e){
 			e.printStackTrace(System.err);
 		}
 
@@ -312,7 +328,9 @@ public class OutputModelController {
 
 	public CodeBlockForAlt alternative(Alternative alt, boolean outerMost) {
 		CodeBlockForAlt blk = delegate.alternative(alt, outerMost);
-		if ( outerMost ) currentOuterMostAlternativeBlock = blk;
+		if ( outerMost ) {
+			currentOuterMostAlternativeBlock = (CodeBlockForOuterMostAlt)blk;
+		}
 		for (CodeGeneratorExtension ext : extensions) blk = ext.alternative(blk, outerMost);
 		return blk;
 	}
@@ -359,8 +377,8 @@ public class OutputModelController {
 		return ops;
 	}
 
-	public CodeBlockForAlt epsilon() {
-		CodeBlockForAlt blk = delegate.epsilon();
+	public CodeBlockForAlt epsilon(Alternative alt, boolean outerMost) {
+		CodeBlockForAlt blk = delegate.epsilon(alt, outerMost);
 		for (CodeGeneratorExtension ext : extensions) blk = ext.epsilon(blk);
 		return blk;
 	}
@@ -431,15 +449,13 @@ public class OutputModelController {
 		return currentBlock;
 	}
 
-	public void setCurrentOuterMostAlternativeBlock(CodeBlock currentOuterMostAlternativeBlock) {
+	public void setCurrentOuterMostAlternativeBlock(CodeBlockForOuterMostAlt currentOuterMostAlternativeBlock) {
 		this.currentOuterMostAlternativeBlock = currentOuterMostAlternativeBlock;
 	}
 
-	public CodeBlock getCurrentOuterMostAlternativeBlock() {
+	public CodeBlockForOuterMostAlt getCurrentOuterMostAlternativeBlock() {
 		return currentOuterMostAlternativeBlock;
 	}
 
 	public int getCodeBlockLevel() { return codeBlockLevel; }
-
-	public int getTreeLevel() { return treeLevel; }
 }

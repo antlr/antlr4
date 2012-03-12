@@ -47,6 +47,7 @@ import java.util.HashMap;
 
 @members {
 	public OutputModelController controller;
+    public boolean hasLookaheadBlock;
     public SourceGenTriggers(TreeNodeStream input, OutputModelController controller) {
     	this(input);
     	this.controller = controller;
@@ -66,7 +67,9 @@ block[GrammarAST label, GrammarAST ebnfRoot] returns [List<? extends SrcOp> omos
     	    $omos = DefaultOutputModelFactory.list(controller.getChoiceBlock((BlockAST)$blk, alts, $label));
     	}
     	else {
-    	    $omos = DefaultOutputModelFactory.list(controller.getEBNFBlock($ebnfRoot, alts));
+            Choice choice = controller.getEBNFBlock($ebnfRoot, alts);
+            hasLookaheadBlock |= choice instanceof PlusBlock || choice instanceof StarBlock;
+    	    $omos = DefaultOutputModelFactory.list(choice);
     	}
     	}
     ;
@@ -82,17 +85,22 @@ alternative returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 	;
 
 alt[boolean outerMost] returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
+@init {
+	// set alt if outer ALT only (the only ones with alt field set to Alternative object)
+	AltAST altAST = (AltAST)retval.start;
+	if ( outerMost ) controller.setCurrentOuterMostAlt(altAST.alt);
+}
 	:	{
-		// set alt if outer ALT only (the only ones with alt field set to Alternative object)
-		if ( outerMost ) controller.setCurrentOuterMostAlt(((AltAST)$start).alt);
-    	List<SrcOp> elems = new ArrayList<SrcOp>();
+		List<SrcOp> elems = new ArrayList<SrcOp>();
+		// TODO: shouldn't we pass $start to controller.alternative()?
 		$altCodeBlock = controller.alternative(controller.getCurrentOuterMostAlt(), outerMost);
 		$altCodeBlock.ops = $ops = elems;
 		controller.setCurrentBlock($altCodeBlock);
 		}
 		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
 
-	|	^(ALT EPSILON) {$altCodeBlock = controller.epsilon();}
+	|	^(ALT EPSILON)
+        {$altCodeBlock = controller.epsilon(controller.getCurrentOuterMostAlt(), outerMost);}
     ;
 
 element returns [List<? extends SrcOp> omos]
@@ -127,6 +135,7 @@ subrule returns [List<? extends SrcOp> omos]
 		alt.addOp(blk);
 		alts.add(alt);
 		SrcOp loop = controller.getEBNFBlock($op, alts); // "star it"
+        hasLookaheadBlock |= loop instanceof PlusBlock || loop instanceof StarBlock;
    	    $omos = DefaultOutputModelFactory.list(loop);
 		}
 	| 	block[null, null]					{$omos = $block.omos;}

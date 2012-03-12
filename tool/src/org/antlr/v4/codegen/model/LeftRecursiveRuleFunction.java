@@ -32,31 +32,35 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
-import org.antlr.v4.tool.LabelElementPair;
-import org.antlr.v4.tool.LabelType;
+import org.antlr.v4.codegen.model.decl.StructDecl;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
-import org.stringtemplate.v4.misc.MultiMap;
-
-import java.util.Iterator;
-import java.util.Set;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 public class LeftRecursiveRuleFunction extends RuleFunction {
 	public LeftRecursiveRuleFunction(OutputModelFactory factory, LeftRecursiveRule r) {
 		super(factory, r);
 
-		// Since we delete x=lr, we have to manually add decls for all labels on left-recur refs
 		CodeGenerator gen = factory.getGenerator();
-		MultiMap<String,LabelElementPair> labelDefs = r.alt[1].labelDefs;
-		Set<String> labels = labelDefs.keySet();
-		for (Iterator<String> iterator = labels.iterator(); iterator.hasNext(); ) {
-			String label = iterator.next();
-			LabelElementPair l = r.getAnyLabelDef(label);
-			Rule targetRule = factory.getGrammar().getRule(l.element.getText());
-			if ( l.type == LabelType.RULE_LABEL ) {
+		// Since we delete x=lr, we have to manually add decls for all labels
+		// on left-recur refs to proper structs
+		for (Pair<GrammarAST,String> pair : r.leftRecursiveRuleRefLabels) {
+			GrammarAST idAST = pair.a;
+			String altLabel = pair.b;
+			String label = idAST.getText();
+			GrammarAST rrefAST = (GrammarAST)idAST.getParent().getChild(1);
+			if ( rrefAST.getType() == ANTLRParser.RULE_REF ) {
+				Rule targetRule = factory.getGrammar().getRule(rrefAST.getText());
 				String ctxName = gen.target.getRuleFunctionContextStructName(targetRule);
 				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
-				addContextDecl(d);
+				StructDecl struct = ruleCtx;
+				if ( altLabelCtxs!=null ) {
+					StructDecl s = altLabelCtxs.get(altLabel);
+					if ( s!=null ) struct = s; // if alt label, use subctx
+				}
+				struct.addDecl(d); // stick in overall rule's ctx
 			}
 		}
 	}

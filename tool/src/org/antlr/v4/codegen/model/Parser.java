@@ -29,19 +29,17 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.chunk.ActionChunk;
-import org.antlr.v4.codegen.model.chunk.ActionText;
-import org.antlr.v4.codegen.model.chunk.DefaultParserSuperClass;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.model.chunk.*;
+import org.antlr.v4.tool.*;
 
+import java.io.File;
 import java.util.*;
 
 /** */
 public class Parser extends OutputModelObject {
 	public String name;
+	public String grammarFileName;
 	public String grammarName;
 	@ModelElement public ActionChunk superclass;
 	public Map<String,Integer> tokens;
@@ -59,6 +57,7 @@ public class Parser extends OutputModelObject {
 		this.factory = factory;
 		this.file = file; // who contains us?
 		Grammar g = factory.getGrammar();
+		grammarFileName = new File(g.fileName).getName();
 		grammarName = g.name;
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
@@ -86,7 +85,7 @@ public class Parser extends OutputModelObject {
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
 		if (g.getOptionString("superClass") != null) {
-			superclass = new ActionText(g.getOptionString("superClass"));
+			superclass = new ActionText(null, g.getOptionString("superClass"));
 		} else {
 			superclass = new DefaultParserSuperClass();
 		}

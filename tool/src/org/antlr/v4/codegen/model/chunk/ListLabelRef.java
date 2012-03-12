@@ -29,6 +29,8 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 public class ListLabelRef extends LabelRef {
-	public ListLabelRef(String name) { super(name); }
+	public ListLabelRef(StructDecl ctx, String name) { super(ctx, name); }
 }

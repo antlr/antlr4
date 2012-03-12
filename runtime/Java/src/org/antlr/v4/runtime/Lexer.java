@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 
 import java.util.ArrayDeque;
 import java.util.EmptyStackException;
+import java.util.List;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -88,7 +89,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** The token type for the current token */
 	public int _type;
 
-	public ArrayDeque<Integer> _modeStack;
+	public ArrayDeque<Integer> _modeStack = new ArrayDeque<Integer>();
 	public int _mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in
@@ -115,9 +116,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 		_hitEOF = false;
 		_mode = Lexer.DEFAULT_MODE;
-		if (_modeStack != null) {
-			_modeStack.clear();
-		}
+		_modeStack.clear();
 
 		getInterpreter().reset();
 	}
@@ -184,14 +183,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public void pushMode(int m) {
 		if ( LexerATNSimulator.debug ) System.out.println("pushMode "+m);
-		if ( _modeStack ==null ) _modeStack = new ArrayDeque<Integer>();
 		getInterpreter().tracePushMode(m);
 		_modeStack.push(_mode);
 		mode(m);
 	}
 
 	public int popMode() {
-		if ( _modeStack ==null ) throw new EmptyStackException();
+		if ( _modeStack.isEmpty() ) throw new EmptyStackException();
 		if ( LexerATNSimulator.debug ) System.out.println("popMode back to "+ _modeStack.peek());
 		getInterpreter().tracePopMode();
 		mode( _modeStack.pop() );
@@ -311,15 +309,9 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void notifyListeners(LexerNoViableAltException e) {
 		String msg = "token recognition error at: '"+
 			_input.substring(_tokenStartCharIndex, _input.index())+"'";
-		ANTLRErrorListener<Integer>[] listeners = getErrorListeners();
-		if ( listeners.length == 0 ) {
-			System.err.println("line "+ _tokenStartLine +":"+
-							   _tokenStartCharPositionInLine +" "+
-							   msg);
-			return;
-		}
-		for (ANTLRErrorListener<Integer> pl : listeners) {
-			pl.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+		List<? extends ANTLRErrorListener<? super Integer>> listeners = getErrorListeners();
+		for (ANTLRErrorListener<? super Integer> listener : listeners) {
+			listener.error(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 		}
 	}
 

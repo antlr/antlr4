@@ -68,8 +68,9 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testComplicatedArgParsingWithTranslation() throws Exception {
 		String action = "x, $ID.text+\"3242\", (*$ID).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
-		String expected = "x, (_localctx._tID!=null?_localctx._tID.getText():null)+\"3242\"," +
-						  " (*_localctx._tID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expected =
+			"x, (((AContext)_localctx).ID!=null?((AContext)_localctx).ID.getText():null)+\"3242\", " +
+			"(*((AContext)_localctx).ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
@@ -99,39 +100,39 @@ public class TestActionTranslation extends BaseTest {
 
 	@Test public void testReturnValues() throws Exception {
 		String action = "$lab.e; $b.e;";
-		String expected = "_localctx.lab.e; _localctx._rb.e;";
+		String expected = "((AContext)_localctx).lab.e; ((AContext)_localctx).b.e;";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
     @Test public void testReturnWithMultipleRuleRefs() throws Exception {
 		String action = "$c.x; $c.y;";
-		String expected = "_localctx._rc.x; _localctx._rc.y;";
+		String expected = "((AContext)_localctx).c.x; ((AContext)_localctx).c.y;";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testTokenRefs() throws Exception {
 		String action = "$id; $ID; $id.text; $id.getText(); $id.line;";
-		String expected = "_localctx.id; _localctx._tID; (_localctx.id!=null?_localctx.id.getText():null); _localctx.id.getText(); (_localctx.id!=null?_localctx.id.getLine():0);";
+		String expected = "((AContext)_localctx).id; ((AContext)_localctx).ID; (((AContext)_localctx).id!=null?((AContext)_localctx).id.getText():null); ((AContext)_localctx).id.getText(); (((AContext)_localctx).id!=null?((AContext)_localctx).id.getLine():0);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testRuleRefs() throws Exception {
-        String action = "$lab.start; $c.tree;";
-		String expected = "(_localctx.lab!=null?((Token)_localctx.lab.start):null); (_localctx._rc!=null?((CommonAST)_localctx._rc.tree):null);";
+        String action = "$lab.start; $c.text;";
+		String expected = "(((AContext)_localctx).lab!=null?(((AContext)_localctx).lab.start):null); (((AContext)_localctx).c!=null?_input.toString(((AContext)_localctx).c.start,((AContext)_localctx).c.stop):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
-			"(_localctx._ra!=null?_input.toString(_localctx._ra.start,_localctx._ra.stop):" +
+			"(_localctx.a!=null?_input.toString(_localctx.a.start,_localctx.a.stop):" +
 			"null); _input.toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "init", action, expected);
 		expected =
 			"_input.toString(_localctx.start, _input.LT(-1)); _input.toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "inline", action, expected);
 		expected =
-			"(_localctx._ra!=null?_input.toString(_localctx._ra.start,_localctx._ra.stop):null);" +
+			"(_localctx.a!=null?_input.toString(_localctx.a.start,_localctx.a.stop):null);" +
 			" _input.toString(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "finally", action, expected);
     }
@@ -234,10 +235,6 @@ public class TestActionTranslation extends BaseTest {
     }
 
     @Test public void testRuleLabelWithoutOutputOption() throws Exception {
-    }
-    @Test public void testRuleLabelOnTwoDifferentRulesAST() throws Exception {
-    }
-    @Test public void testRuleLabelOnTwoDifferentRulesTemplate() throws Exception {
     }
     @Test public void testMissingArgs() throws Exception {
     }

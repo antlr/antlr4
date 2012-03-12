@@ -34,14 +34,23 @@ import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.ANTLRParser;
 
 public class RuleAST extends GrammarASTWithOptions {
-
-
 	public RuleAST(GrammarAST node) {
 		super(node);
 	}
 
 	public RuleAST(Token t) { super(t); }
     public RuleAST(int type) { super(type); }
+
+	public boolean isLexerRule() {
+		String name = getRuleName();
+		return name!=null && Character.isUpperCase(name.charAt(0));
+	}
+
+	public String getRuleName() {
+		GrammarAST nameNode = (GrammarAST)getChild(0);
+		if ( nameNode!=null ) return nameNode.getText();
+		return null;
+	}
 
 	@Override
 	public Tree dupNode() { return new RuleAST(this); }

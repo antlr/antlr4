@@ -31,6 +31,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
@@ -80,16 +81,6 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	public RuleContext() {}
 
-//	public RuleContext(RuleContext parent) {
-//		this(parent, -1);
-//	}
-//
-//	public RuleContext(RuleContext parent, int stateNumber) {
-//		// capture state that called us as we create this context; use later for
-//		// return state in closure
-//		this(parent, parent != null ? parent.s : -1, stateNumber);
-//	}
-
 	public RuleContext(RuleContext parent, int invokingState) {
 		this.parent = parent;
 		//if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
@@ -103,13 +94,6 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	@Override
 	public int hashCode() {
-//		int h = 0;
-//		RuleContext p = this;
-//		while ( p!=null ) {
-//			h += p.stateNumber;
-//			p = p.parent;
-//		}
-//		return h;
 		return cachedHashCode; // works with tests; don't recompute.
 	}
 
@@ -230,7 +214,7 @@ public class RuleContext implements ParseTree.RuleNode {
 	public RuleContext getRuleContext() { return this; }
 
 	@Override
-	public ParseTree getParent() { return parent; }
+	public RuleContext getParent() { return parent; }
 
 	@Override
 	public RuleContext getPayload() { return this; }
@@ -254,6 +238,9 @@ public class RuleContext implements ParseTree.RuleNode {
 		int stop = getChild(getChildCount()-1).getSourceInterval().b;
 		return new Interval(start, stop);
 	}
+
+	@Override
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 	public void inspect(Parser parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);

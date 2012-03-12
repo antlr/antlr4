@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
@@ -45,11 +46,11 @@ public interface ParseTree extends SyntaxTree {
 		RuleContext getRuleContext();
 	}
 
-	public interface TerminalNode<Symbol> extends ParseTree {
+	public interface TerminalNode<Symbol extends Token> extends ParseTree {
 		Symbol getSymbol();
 	}
 
-	public static class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
+	public static class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symbol> {
 		public Symbol symbol;
 		public ParseTree parent;
 		/** Which ATN node matched this token? */
@@ -72,27 +73,28 @@ public interface ParseTree extends SyntaxTree {
 		public Interval getSourceInterval() {
 			if ( symbol ==null ) return Interval.INVALID;
 
-			if (symbol instanceof Token) {
-				return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
-			} else if (symbol instanceof SyntaxTree) {
-				return ((SyntaxTree)symbol).getSourceInterval();
-			} else {
-				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
-			}
+			return new Interval(symbol.getStartIndex(), symbol.getStopIndex());
 		}
 
 		@Override
 		public int getChildCount() { return 0; }
 
 		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			return visitor.visitTerminal(this);
+		}
+
+		@Override
+		public String toStringTree(Parser parser) {
+			return toString();
+		}
+
+		public boolean isErrorNode() { return this instanceof ErrorNode; }
+
+		@Override
 		public String toString() {
-			if (symbol instanceof Token) {
-				if ( ((Token)symbol).getType() == Token.EOF ) return "<EOF>";
-				return ((Token)symbol).getText();
-			}
-			else {
-				throw new UnsupportedOperationException("This symbol type is not supported by the default implementation.");
-			}
+				if ( symbol.getType() == Token.EOF ) return "<EOF>";
+				return symbol.getText();
 		}
 
 		@Override
@@ -101,18 +103,27 @@ public interface ParseTree extends SyntaxTree {
 		}
 	}
 
+	public interface ErrorNode<Symbol extends Token> extends TerminalNode<Symbol> {
+	}
+
 	/** Represents a token that was consumed during resynchronization
 	 *  rather than during a valid match operation. For example,
 	 *  we will create this kind of a node during single token insertion
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<Symbol> extends TerminalNodeImpl<Symbol> {
+	public static class ErrorNodeImpl<Symbol extends Token> extends
+		TerminalNodeImpl<Symbol>
+		implements ErrorNode<Symbol>
+	{
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
 		}
-//		@Override
-//		public String toString() { return "<ERROR:"+super.toString()+">"; }
+
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			return visitor.visitErrorNode(this);
+		}
 	}
 
 	// the following methods narrow the return type; they are not additional methods
@@ -120,4 +131,12 @@ public interface ParseTree extends SyntaxTree {
 	ParseTree getParent();
 	@Override
 	ParseTree getChild(int i);
+
+	/** The ParseTreeVisitor needs a double dispatch method */
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+
+	/** Specialize toStringTree so that it can print out more information
+	 * 	based upon the parser.
+	 */
+	public String toStringTree(Parser parser);
 }

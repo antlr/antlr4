@@ -29,13 +29,20 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.PredAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Rule implements AttributeResolver {
 	/** Rule refs have a predefined set of attributes as well as
@@ -205,20 +212,37 @@ public class Rule implements AttributeResolver {
 		return getAltLabels()!=null;
 	}
 
+	/** Used for recursive rules (subclass), which have 1 alt, but many original alts */
+	public int getOriginalNumberOfAlts() {
+		return numberOfAlts;
+	}
+
 	/** Get -> labels. */
-	public List<String> getAltLabels() {
-		List<String> labels = new ArrayList<String>();
+	public List<Triple<Integer,AltAST,String>> getAltLabels() {
+		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
-			if ( altLabel==null ) break; // all or none
-			labels.add(altLabel.getText());
+			if ( altLabel!=null ) {
+				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
+			}
 		}
 		if ( labels.size()==0 ) return null;
 		return labels;
 	}
 
+	public List<AltAST> getUnlabeledAltASTs() {
+		List<AltAST> alts = new ArrayList<AltAST>();
+		for (int i=1; i<=numberOfAlts; i++) {
+			GrammarAST altLabel = alt[i].ast.altLabel;
+			if ( altLabel==null ) alts.add(alt[i].ast);
+		}
+		if ( alts.size()==0 ) return null;
+		return alts;
+	}
+
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
+	@Override
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		if ( args!=null ) {
 			Attribute a = args.get(x);   	if ( a!=null ) return a;
@@ -234,6 +258,7 @@ public class Rule implements AttributeResolver {
 	}
 
 	/** $x.y	Attribute: x is surrounding rule, label ref (in any alts) */
+	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
 		if ( this.name.equals(x) ) { // x is this rule?
 			return resolveToAttribute(y, node);
@@ -251,6 +276,7 @@ public class Rule implements AttributeResolver {
 
 	}
 
+	@Override
 	public boolean resolvesToLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&
@@ -258,6 +284,7 @@ public class Rule implements AttributeResolver {
 				anyLabelDef.type==LabelType.TOKEN_LABEL);
 	}
 
+	@Override
 	public boolean resolvesToListLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&
@@ -265,12 +292,14 @@ public class Rule implements AttributeResolver {
 				anyLabelDef.type==LabelType.TOKEN_LIST_LABEL);
 	}
 
+	@Override
 	public boolean resolvesToToken(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
 		return false;
 	}
 
+	@Override
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
 		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict

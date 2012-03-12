@@ -29,19 +29,14 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.ActionTranslator;
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.*;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.codegen.model.decl.RuleContextDecl;
-import org.antlr.v4.codegen.model.decl.RuleContextListDecl;
+import org.antlr.v4.codegen.model.decl.*;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.List;
 
@@ -53,7 +48,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 
 	@ModelElement public List<ActionChunk> argExprsChunks;
 
-	public InvokeRule(OutputModelFactory factory, GrammarAST ast, GrammarAST labelAST) {
+	public InvokeRule(ParserFactory factory, GrammarAST ast, GrammarAST labelAST) {
 		super(factory, ast);
 		if ( ast.atnState!=null ) {
 			RuleTransition ruleTrans = (RuleTransition)ast.atnState.transition(0);
@@ -70,13 +65,16 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		if ( labelAST!=null ) {
 			// for x=r, define <rule-context-type> x and list_x
 			String label = labelAST.getText();
-			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
-			labels.add(d);
-			rf.addContextDecl(d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
+				factory.defineImplicitLabel(ast, this);
 				String listLabel = gen.target.getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, ctxName);
-				rf.addContextDecl(l);
+				rf.addContextDecl(ast.getAltLabel(), l);
+			}
+			else {
+				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+				labels.add(d);
+				rf.addContextDecl(ast.getAltLabel(), d);
 			}
 		}
 		if ( ast.getChildCount()>0 ) {
@@ -89,17 +87,11 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			String label = gen.target.getImplicitRuleLabel(ast.getText());
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
-			rf.addContextDecl(d);
+			rf.addContextDecl(ast.getAltLabel(), d);
 		}
-
-//		LinearApproximator approx = new LinearApproximator(factory.g, ATN.INVALID_DECISION_NUMBER);
-//		RuleTransition call = (RuleTransition)ast.atnState.transition(0);
-//		IntervalSet fset = approx.FIRST(call.followState);
-//		System.out.println("follow rule ref "+name+"="+fset);
-//		follow = factory.createFollowBitSet(ast, fset);
-//		factory.defineBitSet(follow);
 	}
 
+	@Override
 	public List<Decl> getLabels() {
 		return labels.elements();
 	}

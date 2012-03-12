@@ -29,11 +29,14 @@
 
 package org.antlr.v4.codegen.model.chunk;
 
+import org.antlr.v4.codegen.model.decl.StructDecl;
+
 /** */
 public class TokenRef extends ActionChunk {
 	public String name;
 
-	public TokenRef(String name) {
+	public TokenRef(StructDecl ctx, String name) {
+		super(ctx);
 		this.name = name;
 	}
 }

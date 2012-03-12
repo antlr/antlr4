@@ -31,9 +31,7 @@ package org.antlr.v4.misc;
 
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /** */
 public class Utils {
@@ -146,6 +144,14 @@ public class Utils {
 		return a;
 	}
 
+	public static String capitalize(String s) {
+		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
+
+	public static String decapitalize(String s) {
+		return Character.toLowerCase(s.charAt(0)) + s.substring(1);
+	}
+
 	public static char[] toCharArray(List<Integer> data) {
 		if ( data==null ) return null;
 		char[] cdata = new char[data.size()];
@@ -168,9 +174,9 @@ public class Utils {
 	}
 
 	/** Find exact object type or sublass of cl in list */
-	public static Object find(List<?> ops, Class cl) {
+	public static <T> T find(List<?> ops, Class<T> cl) {
 		for (Object o : ops) {
-			if ( cl.isInstance(o) ) return o;
+			if ( cl.isInstance(o) ) return cl.cast(o);
 //			if ( o.getClass() == cl ) return o;
 		}
 		return null;

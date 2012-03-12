@@ -33,7 +33,6 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 /** This is the default error handling mechanism for ANTLR parsers
  *  and tree parsers.
@@ -569,17 +568,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	@Override
     public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
-    {
-    }
-
-    @Override
-    public void reportInsufficientPredicates(@NotNull Parser recognizer,
-											 @NotNull DFA dfa,
-											 int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 DecisionState decState,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull ATNConfigSet configs, boolean fullContextParse)
     {
     }
 }

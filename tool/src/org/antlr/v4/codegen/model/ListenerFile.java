@@ -1,9 +1,11 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
 
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +18,6 @@ public class ListenerFile extends OutputFile {
 	public String grammarName;
 	public String parserName;
 	public Set<String> listenerNames = new HashSet<String>();
-//	public List<String> ruleNames = new ArrayList<String>();
 
 	@ModelElement public Action header;
 
@@ -26,12 +27,15 @@ public class ListenerFile extends OutputFile {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
-			List<String> labels = r.getAltLabels();
-			listenerNames.add(r.name);
+			List<Triple<Integer,AltAST,String>> labels = r.getAltLabels();
 			if ( labels!=null ) {
-				for (String label : labels) {
-					listenerNames.add(label);
+				for (Triple<Integer,AltAST,String> pair : labels) {
+					listenerNames.add(pair.c);
 				}
+			}
+			else {
+				// only add rule context if no labels
+				listenerNames.add(r.name);
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");

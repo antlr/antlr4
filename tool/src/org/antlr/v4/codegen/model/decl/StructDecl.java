@@ -30,11 +30,15 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.DispatchMethod;
+import org.antlr.v4.codegen.model.ListenerDispatchMethod;
 import org.antlr.v4.codegen.model.ModelElement;
 import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.model.ParseListenerDispatchMethod;
 import org.antlr.v4.codegen.model.VisitorDispatchMethod;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -45,27 +49,47 @@ import java.util.List;
  *  return values, local variables, and labels associated with a rule.
  */
 public class StructDecl extends Decl {
-	public String superClass;
+	public String derivedFromName; // rule name or label name
 	public boolean provideCopyFrom;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<Attribute> ctorAttrs;
-	@ModelElement public List<VisitorDispatchMethod> visitorDispatchMethods;
+	@ModelElement public List<? super DispatchMethod> dispatchMethods;
 	@ModelElement public List<OutputModelObject> interfaces;
 	@ModelElement public List<OutputModelObject> extensionMembers;
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
-		addVisitorDispatchMethods(r);
+		addDispatchMethods(r);
+		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
 	}
 
-	public void addVisitorDispatchMethods(Rule r) {
-		visitorDispatchMethods = new ArrayList<VisitorDispatchMethod>();
-		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, true));
-		visitorDispatchMethods.add(new VisitorDispatchMethod(factory, r, false));
+	public void addDispatchMethods(Rule r) {
+		dispatchMethods = new ArrayList<DispatchMethod>();
+		if ( !r.hasAltSpecificContexts() ) {
+			// no enter/exit for this ruleContext if rule has labels
+			if ( factory.getGrammar().tool.gen_listener ) {
+				dispatchMethods.add(new ListenerDispatchMethod(factory, true));
+				dispatchMethods.add(new ListenerDispatchMethod(factory, false));
+			}
+			if ( factory.getGrammar().tool.gen_visitor ) {
+				dispatchMethods.add(new VisitorDispatchMethod(factory));
+			}
+			if ( factory.getGrammar().tool.gen_parse_listener ) {
+				if ( !(r instanceof LeftRecursiveRule) ) {
+					dispatchMethods.add(new ParseListenerDispatchMethod(factory, true));
+				}
+				dispatchMethods.add(new ParseListenerDispatchMethod(factory, false));
+			}
+		}
 	}
 
-	public void addDecl(Decl d) { attrs.add(d); }
+	public void addDecl(Decl d) {
+		d.ctx = this;
+		if ( d instanceof ContextGetterDecl ) getters.add(d);
+		else attrs.add(d);
+	}
 
 	public void addDecl(Attribute a) {
 		addDecl(new AttributeDecl(factory, a.name, a.decl));

@@ -30,19 +30,46 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.tool.*;
+
+import java.util.ArrayList;
 
 /** A StructDecl to handle a -> label on alt */
 public class AltLabelStructDecl extends StructDecl {
-	public String label;
-	public AltLabelStructDecl(OutputModelFactory factory, Rule r, String label) {
+	public int altNum;
+	public AltLabelStructDecl(OutputModelFactory factory, Rule r,
+							  int altNum, String label)
+	{
 		super(factory, r);
-		this.label = label;
+		this.altNum = altNum;
+		this.name = // override name set in super to the label ctx
+			factory.getGenerator().target.getAltLabelContextStructName(label);
+		derivedFromName = label;
+	}
+
+	@Override
+	public void addDispatchMethods(Rule r) {
+		dispatchMethods = new ArrayList<DispatchMethod>();
+		if ( factory.getGrammar().tool.gen_listener ) {
+			dispatchMethods.add(new ListenerDispatchMethod(factory, true));
+			dispatchMethods.add(new ListenerDispatchMethod(factory, false));
+		}
+		if ( factory.getGrammar().tool.gen_visitor ) {
+			dispatchMethods.add(new VisitorDispatchMethod(factory));
+		}
+		if ( factory.getGrammar().tool.gen_parse_listener ) {
+			if ( !(r instanceof LeftRecursiveRule) ) {
+				dispatchMethods.add(new ParseListenerDispatchMethod(factory, true));
+			}
+			dispatchMethods.add(new ParseListenerDispatchMethod(factory, false));
+		}
+
 	}
 
 	@Override
 	public int hashCode() {
-		return label.hashCode();
+		return name.hashCode();
 	}
 
 	@Override
@@ -50,7 +77,7 @@ public class AltLabelStructDecl extends StructDecl {
 		if ( obj == this ) return true;
 		if ( obj.hashCode() != this.hashCode() ) return false;
 		if ( obj instanceof AltLabelStructDecl ) {
-			return label.equals(((AltLabelStructDecl)obj).label);
+			return name.equals(((AltLabelStructDecl)obj).name);
 		}
 		return false;
 	}

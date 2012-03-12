@@ -30,14 +30,19 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
     @SuppressWarnings("unchecked")
-    public <Symbol> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
-		if ( t instanceof ParseTree.TerminalNode) {
-			visitTerminal(listener, (ParseTree.TerminalNode<Symbol>) t);
+    public <Symbol extends Token> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
+		if ( t instanceof ParseTree.ErrorNodeImpl) {
+			listener.visitErrorNode((ParseTree.ErrorNode<Symbol>)t);
+			return;
+		}
+		else if ( t instanceof ParseTree.TerminalNode) {
+			listener.visitTerminal((ParseTree.TerminalNode<Symbol>)t);
 			return;
 		}
 		ParseTree.RuleNode r = (ParseTree.RuleNode)t;
@@ -49,31 +54,19 @@ public class ParseTreeWalker {
 		exitRule(listener, r);
     }
 
-    @SuppressWarnings("unchecked")
-    protected <Symbol> void visitTerminal(ParseTreeListener<Symbol> listener,
-										  ParseTree.TerminalNode<Symbol> t)
-	{
-		ParseTree.RuleNode r = (ParseTree.RuleNode)t.getParent();
-		ParserRuleContext<Symbol> ctx = null;
-		if ( r != null && r.getRuleContext() instanceof ParserRuleContext<?> ) {
-			ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
-		}
-        listener.visitTerminal(ctx, t.getSymbol());
-    }
-
 	/** The discovery of a rule node, involves sending two events:
 	 *  the generic discoverRule and a RuleContext-specific event.
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected <Symbol> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+    protected <Symbol extends Token> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
 		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
     }
 
-    protected <Symbol> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+    protected <Symbol extends Token> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
 		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);

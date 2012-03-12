@@ -29,7 +29,7 @@
 
 package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.Tree;
 
 public class RuleRefAST extends GrammarASTWithOptions implements RuleElementAST {
@@ -41,8 +41,18 @@ public class RuleRefAST extends GrammarASTWithOptions implements RuleElementAST 
     public RuleRefAST(int type) { super(type); }
     public RuleRefAST(int type, Token t) { super(type, t); }
 
+	/** Dup token too since we overwrite during LR rule transform */
 	@Override
-	public Tree dupNode() { return new TerminalAST(this); }
+	public Tree dupNode() {
+		RuleRefAST r = new RuleRefAST(this);
+		// In LR transform, we alter original token stream to make e -> e[n]
+		// Since we will be altering the dup, we need dup to have the
+		// original token.  We can set this tree (the original) to have
+		// a new token.
+		r.token = this.token;
+		this.token = new CommonToken(r.token);
+		return r;
+	}
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }

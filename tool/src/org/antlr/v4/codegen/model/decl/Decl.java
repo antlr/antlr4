@@ -37,6 +37,7 @@ public class Decl extends SrcOp {
 	public String name;
 	public String decl; 	// whole thing if copied from action
 	public boolean isLocal; // if local var (not in RuleContext struct)
+	public StructDecl ctx;  // which context contains us? set by addDecl
 
 	public Decl(OutputModelFactory factory, String name, String decl) {
 		this(factory, name);
@@ -53,8 +54,14 @@ public class Decl extends SrcOp {
 		return name.hashCode();
 	}
 
+	/** If same name, can't redefine, unless it's a getter */
 	@Override
 	public boolean equals(Object obj) {
-		return name.equals(((Decl)obj).name);
+		if ( obj==null ) return false;
+		// A() and label A are different
+		if ( obj instanceof ContextGetterDecl ) return false;
+		if ( this==obj ) return true;
+		if ( this.hashCode() != obj.hashCode() ) return false;
+		return name.equals(((Decl) obj).name);
 	}
 }

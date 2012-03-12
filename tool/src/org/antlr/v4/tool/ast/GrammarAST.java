@@ -29,14 +29,22 @@
 
 package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-import org.antlr.v4.parse.*;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GrammarAST extends CommonTree {
 	/** For error msgs, nice to know which grammar this AST lives in */
@@ -48,7 +56,7 @@ public class GrammarAST extends CommonTree {
 
 	public String textOverride;
 
-    public GrammarAST() {;}
+    public GrammarAST() {}
     public GrammarAST(Token t) { super(t); }
     public GrammarAST(GrammarAST node) {
 		super(node);
@@ -91,7 +99,7 @@ public class GrammarAST extends CommonTree {
 		List<GrammarAST> nodes = new ArrayList<GrammarAST>();
 		List<GrammarAST> work = new LinkedList<GrammarAST>();
 		work.add(this);
-		GrammarAST t = null;
+		GrammarAST t;
 		while ( work.size()>0 ) {
 			t = work.remove(0);
 			if ( types.contains(t.getType()) ) nodes.add(t);
@@ -105,6 +113,26 @@ public class GrammarAST extends CommonTree {
 			return (AltAST)this;
 		}
 		if ( parent!=null ) return ((GrammarAST)parent).getOutermostAltNode();
+		return null;
+	}
+
+	/** Walk ancestors of this node until we find ALT with
+	 *  alt!=null or leftRecursiveAltInfo!=null. Then grab label if any.
+	 *  If not a rule element, just returns null.
+	 */
+	public String getAltLabel() {
+		List<? extends Tree> ancestors = this.getAncestors();
+		if ( ancestors==null ) return null;
+		for (int i=ancestors.size()-1; i>=0; i--) {
+			GrammarAST p = (GrammarAST)ancestors.get(i);
+			if ( p.getType()== ANTLRParser.ALT ) {
+				AltAST a = (AltAST)p;
+				if ( a.altLabel!=null ) return a.altLabel.getText();
+				if ( a.leftRecursiveAltInfo!=null ) {
+					return a.leftRecursiveAltInfo.altLabel;
+				}
+			}
+		}
 		return null;
 	}
 
@@ -200,7 +228,7 @@ public class GrammarAST extends CommonTree {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(input);
 		CommonTreeNodeStream nodes =
 			new CommonTreeNodeStream(adaptor, this);
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		GrammarAST o = (GrammarAST)nodes.LT(1);
 		int type = adaptor.getType(o);
 		while ( type!=Token.EOF ) {

@@ -57,5 +57,6 @@ public class MatchToken extends RuleElement implements LabeledOp {
 		super(factory, ast);
 	}
 
+	@Override
 	public List<Decl> getLabels() { return labels; }
 }

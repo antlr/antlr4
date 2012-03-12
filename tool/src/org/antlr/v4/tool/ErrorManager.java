@@ -30,11 +30,16 @@
 package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
-import org.stringtemplate.v4.*;
-import org.stringtemplate.v4.misc.*;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.misc.ErrorBuffer;
+import org.stringtemplate.v4.misc.STMessage;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Collection;
+import java.util.Locale;
 
 public class ErrorManager {
 	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
@@ -54,18 +59,22 @@ public class ErrorManager {
 
     STErrorListener theDefaultSTListener =
         new STErrorListener() {
+            @Override
             public void compileTimeError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
 
+            @Override
             public void runTimeError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
 
+            @Override
             public void IOError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
 
+            @Override
             public void internalError(STMessage msg) {
                 ErrorManager.internalError(msg.toString());
             }
@@ -190,7 +199,6 @@ public class ErrorManager {
 	public void toolError(ErrorType errorType, Object... args) {
 		ToolMessage msg = new ToolMessage(errorType, args);
 		emit(errorType, msg);
-		tool.error(msg);
 	}
 
 	public void toolError(ErrorType errorType, Throwable e, Object... args) {

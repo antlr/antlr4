@@ -228,6 +228,54 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	@Test public void testReturnValueAndActionsAndLabels() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s : q=e {System.out.println($e.v);} ;\n" +
+			"\n" +
+			"e returns [int v]\n" +
+			"  : a=e op='*' b=e {$v = $a.v * $b.v;}  -> mult\n" +
+			"  | a=e '+' b=e {$v = $a.v + $b.v;}     -> add\n" +
+			"  | INT         {$v = $INT.int;}        -> anInt\n" +
+			"  | '(' x=e ')' {$v = $x.v;}            -> parens\n" +
+			"  | x=e '++'    {$v = $x.v+1;}          -> inc\n" +
+			"  | e '--'                              -> dec\n" +
+			"  | ID          {$v = 3;}               -> anID\n" +
+			"  ; \n" +
+			"\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		String[] tests = {
+			"4",			"4",
+			"1+2",			"3",
+			"1+2*3",		"7",
+			"i++*3",		"12",
+		};
+		runTests(grammar, tests, "s");
+	}
+
+	@Test public void testPrefixOpWithActionAndLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s : e {System.out.println($e.result);} ;\n" +
+			"\n" +
+			"e returns [String result]\n" +
+			"    :   ID '=' e1=e    { $result = \"(\" + $ID.getText() + \"=\" + $e1.result + \")\"; }\n" +
+			"    |   ID             { $result = $ID.getText(); }\n" +
+			"    |   e1=e '+' e2=e  { $result = \"(\" + $e1.result + \"+\" + $e2.result + \")\"; }\n" +
+			"    ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		String[] tests = {
+			"a",			"a",
+			"a+b",			"(a+b)",
+			"a=b+c",		"((a=b)+c)",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	public void runTests(String grammar, String[] tests, String startRule) {
 		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",

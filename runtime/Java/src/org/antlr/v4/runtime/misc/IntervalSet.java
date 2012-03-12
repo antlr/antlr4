@@ -28,8 +28,7 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
@@ -56,11 +55,6 @@ public class IntervalSet implements IntSet {
 
     protected boolean readonly;
 
-	/** Create a set with no elements */
-    public IntervalSet() {
-        intervals = new ArrayList<Interval>(2); // most sets are 1 or 2 elements
-    }
-
 	public IntervalSet(List<Interval> intervals) {
 		this.intervals = intervals;
 	}
@@ -68,6 +62,16 @@ public class IntervalSet implements IntSet {
 	public IntervalSet(IntervalSet set) {
 		this();
 		addAll(set);
+	}
+
+	public IntervalSet(int... els) {
+		if ( els==null ) {
+			intervals = new ArrayList<Interval>(2); // most sets are 1 or 2 elements
+		}
+		else {
+			intervals = new ArrayList<Interval>(els.length);
+			for (int e : els) add(e);
+		}
 	}
 
 	/** Create a set with a single element, el. */

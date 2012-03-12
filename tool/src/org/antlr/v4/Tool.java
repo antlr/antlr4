@@ -29,7 +29,12 @@
 
 package org.antlr.v4;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
@@ -42,13 +47,27 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.runtime.misc.LogManager;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.ANTLRToolListener;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.DefaultToolListener;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarTransformPipeline;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTErrorNode;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.stringtemplate.v4.STGroup;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +77,7 @@ import java.util.List;
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
 
-	public static enum OptionArgType { NONE, STRING }
+	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
 		String fieldName;
 		String name;
@@ -90,11 +109,13 @@ public class Tool {
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean saveLexer = false;
-	public boolean genListener = true;
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
 	public boolean verbose_dfa = false;
+	public boolean gen_listener = true;
+	public boolean gen_parse_listener = false;
+	public boolean gen_visitor = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -103,10 +124,16 @@ public class Tool {
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition networks"),
+        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
-        new Option("genListener",		"-walker", "generate parse tree walker and listener"),
+		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
+		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
+		new Option("gen_parse_listener",  "-parse-listener", "generate parse listener"),
+		new Option("gen_parse_listener",  "-no-parse-listener", "don't generate parse listener (default)"),
+		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
+		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
+
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
@@ -180,24 +207,32 @@ public class Tool {
 				grammarFiles.add(arg);
 				continue;
 			}
+			boolean found = false;
 			for (Option o : optionDefs) {
 				if ( arg.equals(o.name) ) {
-					String value = null;
+					found = true;
+					String argValue = null;
 					if ( o.argType==OptionArgType.STRING ) {
-						value = args[i];
+						argValue = args[i];
 						i++;
 					}
 					// use reflection to set field
-					Class c = this.getClass();
+					Class<? extends Tool> c = this.getClass();
 					try {
 						Field f = c.getField(o.fieldName);
-						if ( value==null ) f.setBoolean(this, true);
-						else f.set(this, value);
+						if ( argValue==null ) {
+							if ( arg.startsWith("-no-") ) f.setBoolean(this, false);
+							else f.setBoolean(this, true);
+						}
+						else f.set(this, argValue);
 					}
 					catch (Exception e) {
 						errMgr.toolError(ErrorType.INTERNAL_ERROR, "can't access field "+o.fieldName);
 					}
 				}
+			}
+			if ( !found ) {
+				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, arg);
 			}
 		}
 		if ( outputDirectory!=null ) {
@@ -382,7 +417,7 @@ public class Tool {
 		}
 		catch (RecognitionException re) {
 			// TODO: do we gen errors now?
-			errMgr.internalError("can't generate this message at moment; antlr recovers");
+			ErrorManager.internalError("can't generate this message at moment; antlr recovers");
 		}
 		return null;
 	}
@@ -476,7 +511,7 @@ public class Tool {
 	 * @return
 	 */
 	public File getOutputDirectory(String fileNameWithPath) {
-		File outputDir = new File(outputDirectory);
+		File outputDir;
 		String fileDirectory;
 
 		// Some files are given to us without a PATH but should should
@@ -557,21 +592,21 @@ public class Tool {
 	public List<ANTLRToolListener> getListeners() { return listeners; }
 
 	public void info(String msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.info(msg);
 			return;
 		}
 		for (ANTLRToolListener l : listeners) l.info(msg);
 	}
 	public void error(ANTLRMessage msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.error(msg);
 			return;
 		}
 		for (ANTLRToolListener l : listeners) l.error(msg);
 	}
 	public void warning(ANTLRMessage msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.warning(msg);
 			return;
 		}

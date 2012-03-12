@@ -28,20 +28,24 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>> {
-	public class TraceListener implements ParseTreeListener<Token> {
+	public class TraceListener implements ParseListener<Token> {
 		@Override
-		public void enterEveryRule(ParserRuleContext<Token> ctx) {
+		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
 			System.out.println("enter   " + getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + _input.LT(1).getText());
 		}
 
@@ -51,10 +55,34 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		}
 
 		@Override
-		public void visitTerminal(ParserRuleContext<Token> ctx, Token token) {
-			System.out.println("consume "+token+" rule "+getRuleNames()[ctx.ruleIndex]+" alt="+ctx.altNum);
+		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
+			System.out.println("consume "+token+" rule "+
+							   getRuleNames()[parent.ruleIndex]+
+							   " alt="+parent.altNum);
 		}
 	}
+
+	public static class TrimToSizeListener implements ParseListener<Token> {
+		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
+
+		@Override
+		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
+		}
+
+		@Override
+		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+			if (ctx.children instanceof ArrayList) {
+				((ArrayList<?>)ctx.children).trimToSize();
+			}
+		}
+
+	}
+
+	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
 	protected TokenStream _input;
 
@@ -75,7 +103,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
      *  the parse or during tree walks later. Both could be done.
      *  Not intended for tree parsing but would work.
      */
-    protected List<ParseTreeListener<Token>> _parseListeners;
+    protected List<ParseListener<Token>> _parseListeners;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int _syntaxErrors = 0;
@@ -146,6 +174,39 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		return _buildParseTrees;
 	}
 
+	/**
+	 * Trim the internal lists of the parse tree during parsing to conserve memory.
+	 * This property is set to {@code false} by default for a newly constructed parser.
+	 *
+	 * @param trimParseTrees {@code true} to trim the capacity of the {@link ParserRuleContext#children}
+	 * list to its size after a rule is parsed.
+	 */
+	public void setTrimParseTrees(boolean trimParseTrees) {
+		if (trimParseTrees) {
+			if (getTrimParseTrees()) {
+				return;
+			}
+
+			addParseListener(TrimToSizeListener.INSTANCE);
+		}
+		else {
+			removeParseListener(TrimToSizeListener.INSTANCE);
+		}
+	}
+
+	/**
+	 *
+	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
+	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
+	 */
+	public boolean getTrimParseTrees() {
+		if (_parseListeners == null) {
+			return false;
+		}
+
+		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
+	}
+
 //	public void setTraceATNStates(boolean traceATNStates) {
 //		this.traceATNStates = traceATNStates;
 //	}
@@ -154,28 +215,35 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 //		return traceATNStates;
 //	}
 
-    public List<ParseTreeListener<Token>> getParseListeners() {
+    public List<ParseListener<Token>> getParseListeners() {
         return _parseListeners;
     }
 
-    public void addParseListener(ParseTreeListener<Token> listener) {
+    public void addParseListener(ParseListener<Token> listener) {
 		if ( listener==null ) return;
 		if ( _parseListeners==null ) {
-			_parseListeners = new ArrayList<ParseTreeListener<Token>>();
+			_parseListeners = new ArrayList<ParseListener<Token>>();
 		}
         this._parseListeners.add(listener);
     }
 
-	public void removeParseListener(ParseTreeListener<Token> l) {
+	public void removeParseListener(ParseListener<Token> l) {
 		if ( l==null ) return;
-		if ( _parseListeners!=null ) _parseListeners.remove(l);
+		if ( _parseListeners!=null ) {
+			_parseListeners.remove(l);
+			if (_parseListeners.isEmpty()) {
+				_parseListeners = null;
+			}
+		}
 	}
 
-	public void removeParseListeners() { if ( _parseListeners!=null ) _parseListeners.clear(); }
+	public void removeParseListeners() {
+		_parseListeners = null;
+	}
 
 	public void triggerEnterRuleEvent() {
-		for (ParseTreeListener<Token> l : _parseListeners) {
-			l.enterEveryRule(_ctx);
+		for (ParseListener<Token> l : _parseListeners) {
+			l.enterNonLRRule(_ctx);
 			_ctx.enterRule(l);
 		}
 	}
@@ -183,7 +251,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
-			ParseTreeListener<Token> l = _parseListeners.get(i);
+			ParseListener<Token> l = _parseListeners.get(i);
 			_ctx.exitRule(l);
 			l.exitEveryRule(_ctx);
 		}
@@ -205,6 +273,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public void setTokenFactory(TokenFactory<?> factory) {
 		_input.getTokenSource().setTokenFactory(factory);
 		_errHandler.setTokenFactory(factory);
+	}
+
+	public ANTLRErrorStrategy getErrorHandler() {
+		return _errHandler;
+	}
+
+	public void setErrorHandler(ANTLRErrorStrategy handler) {
+		this._errHandler = handler;
 	}
 
 	@Override
@@ -258,13 +334,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			line = ((Token) offendingToken).getLine();
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
-		ANTLRErrorListener<Token>[] listeners = getErrorListeners();
-		if ( listeners.length == 0 ) {
-			System.err.println("line "+line+":"+charPositionInLine+" "+msg);
-			return;
-		}
-		for (ANTLRErrorListener<Token> pl : listeners) {
-			pl.error(this, offendingToken, line, charPositionInLine, msg, e);
+		List<? extends ANTLRErrorListener<? super Token>> listeners = getErrorListeners();
+		for (ANTLRErrorListener<? super Token> listener : listeners) {
+			listener.error(this, offendingToken, line, charPositionInLine, msg, e);
 		}
 	}
 
@@ -288,12 +360,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
 //				System.out.println("consume in error recovery mode for "+o);
-				_ctx.addErrorNode((Token) o);
+				_ctx.addErrorNode(o);
 			}
-			else _ctx.addChild((Token)o);
+			else _ctx.addChild(o);
 		}
 		if ( _parseListeners != null) {
-			for (ParseTreeListener<Token> l : _parseListeners) l.visitTerminal(_ctx, o);
+			for (ParseListener<Token> l : _parseListeners) l.visitTerminal(_ctx, o);
 		}
 		return o;
 	}
@@ -455,6 +527,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 //		return atn.nextTokens(s, ctx);
 //	}
 
+	public ParserRuleContext<Token> getRuleContext() { return _ctx; }
+
 	/** Return List<String> of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if
 	 *  you want more details such as the file/line info of where
@@ -475,13 +549,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			p = p.parent;
 		}
 		return stack;
-	}
-
-	/** For debugging and other purposes, might want the grammar name.
-	 *  Have ANTLR generate an implementation for this method.
-	 */
-	public String getGrammarFileName() {
-		return null;
 	}
 
     /** For debugging and other purposes */
@@ -548,7 +615,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		else {
 			if ( _tracer!=null ) removeParseListener(_tracer);
 			else _tracer = new TraceListener();
-			addParseListener( _tracer );
+			addParseListener(_tracer);
 		}
 	}
 }
