@@ -1,0 +1,361 @@
+<!--
+
+ [The "BSD license"]
+
+ ANTLR        - Copyright (c) 2005-2010 Terence Parr
+ Maven Plugin - Copyright (c) 2009      Jim Idle
+
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  -->
+
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- Maven model we are inheriting from
+      -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+
+     Now that the ANTLR project has adopted Maven with a vengence,
+     all ANTLR tools will be grouped under org.antlr and will be
+     controlled by a project member.
+     -->
+    <groupId>org.antlr</groupId>
+
+
+    <!--
+
+     This is the ANTLR plugin for ANTLR version 3.1.3 and above. It might
+     have been best to change the name of the plugin as the 3.1.2 plugins
+     behave a little differently, however for the sake of one transitional
+     phase to a much better plugin, it was decided that the name should
+     remain the same.
+      -->
+    <artifactId>antlr4-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <!-- Note that as this plugin depends on the ANTLR tool itself
+         we cannot use the paren pom to control the version number
+         and MUST update <version> in this pom manually!
+         -->
+    <version>4.0-SNAPSHOT</version>
+    <name>Maven plugin for ANTLR V4</name>
+    <prerequisites>
+        <maven>2.0</maven>
+    </prerequisites>
+
+    <!--
+     Where does our actual project live on the interwebs.
+      -->
+    <url>http://antlr.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <description>
+
+This is the brand new, re-written from scratch plugin for ANTLR v4.
+
+Previous valiant efforts all suffered from being unable to modify the ANTLR Tool
+itself to provide support not just for Maven oriented things but any other tool
+that might wish to invoke ANTLR without resorting to the command line interface.
+
+Rather than try to shoe-horn new code into the existing Mojo (in fact I think that
+by incorporating a patch supplied by someone I ended up with tow versions of the
+Mojo, I elected to rewrite everything from scratch, including the documentation, so
+that we might end up with a perfect Mojo that can do everything that ANTLR v3 supports
+such as imported grammar processing, proper support for library directories and
+locating token files from generated sources, and so on.
+
+In the end I decided to also change the the ANTLR Tool.java code so that it
+would be the provider of all the things that a build tool needs, rather than
+delegating things to 5 different tools. So, things like dependencies, dependency
+sorting, option tracking, generating sources and so on are all folded back
+in to ANTLR's Tool.java code, where they belong, and they now provide a
+public interface to anyone that might want to interface with them.
+
+One other goal of this rewrite was to completely document the whole thing
+to death. Hence even this pom has more comments than funcitonal elements,
+in case I get run over by a bus or fall off a cliff while skiing.
+
+Jim Idle - March 2009
+
+    </description>
+
+    <developers>
+
+        <developer>
+            <name>Jim Idle</name>
+            <url>http://www.temporal-wave.com</url>
+            <roles>
+                <role>Originator, version 3.1.3</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Terence Parr</name>
+            <url>http://antlr.org/wiki/display/~admin/Home</url>
+            <roles>
+                <role>Project lead - ANTLR</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>David Holroyd</name>
+            <url>http://david.holroyd.me.uk/</url>
+            <roles>
+                <role>Originator - prior version</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Kenny MacDermid</name>
+            <url>mailto:kenny "at" kmdconsulting.ca</url>
+            <roles>
+                <role>Contributor - prior versions</role>
+            </roles>
+        </developer>
+
+    </developers>
+
+    <!-- Where do we track bugs for this project?
+      -->
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://antlr.org/jira/browse/ANTLR</url>
+    </issueManagement>
+
+    <!-- Location of the license description for this project
+      -->
+    <licenses>
+        <license>
+            <distribution>repo</distribution>
+            <name>The BSD License</name>
+            <url>http://www.antlr.org/LICENSE.txt </url>
+        </license>
+    </licenses>
+
+    <distributionManagement>
+
+        <repository>
+            <id>antlr-repo</id>
+            <name>ANTLR Testing repository</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-repo</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>antlr-snapshot</id>
+            <name>ANTLR Testing Snapshot Repository</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-snapshot</url>
+        </snapshotRepository>
+
+        <site>
+            <id>antlr-repo</id>
+            <name>ANTLR Maven Plugin Web Site</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-maven-webs/antlr3-maven-plugin</url>
+        </site>
+    </distributionManagement>
+
+    <!--
+
+    Inform Maven of the ANTLR snapshot repository, which it will
+    need to consult to get the latest snapshot build of the runtime and tool
+    if it was not built and installed locally.
+    -->
+    <repositories>
+
+      <!--
+        This is the ANTLR repository.
+        -->
+        <repository>
+            <id>antlr-snapshot</id>
+            <name>ANTLR Testing Snapshot Repository</name>
+            <url>http://antlr.org/antlr-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            
+        </repository>
+
+    </repositories>
+    
+    <!-- Ancilliary information for completeness
+      -->
+    <inceptionYear>2009</inceptionYear>
+
+    <mailingLists>
+        <mailingList>
+            <archive>http://antlr.markmail.org/</archive>
+            <otherArchives>
+                <otherArchive>http://www.antlr.org/pipermail/antlr-interest/</otherArchive>
+            </otherArchives>
+            <name>ANTLR Users</name>
+            <subscribe>http://www.antlr.org/mailman/listinfo/antlr-interest/</subscribe>
+            <unsubscribe>http://www.antlr.org/mailman/options/antlr-interest/</unsubscribe>
+            <post>antlr-interest@antlr.org</post>
+        </mailingList>
+    </mailingLists>
+
+    <organization>
+        <name>ANTLR.org</name>
+        <url>http://www.antlr.org</url>
+    </organization>
+    <!-- ============================================================================= -->
+
+    <!--
+
+     What are we depedent on for the Mojos to execute? We need the
+     plugin API itself and of course we need the ANTLR Tool and runtime
+     and any of their dependencies, which we inherit. The Tool itself provides
+     us with all the dependencies, so we need only name it here.
+      -->
+    <dependencies>
+
+        <!--
+          The things we need to build the target language recognizer
+          -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-project</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-api</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <!--
+         The version of ANTLR tool that this version of the plugin controls.
+         We have decided that this should be in lockstep with ANTLR itself, other
+         than -1 -2 -3 etc patch releases.
+          -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>4.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--
+          Testing requirements...
+          -->
+        <dependency>
+
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-plugin-testing-harness</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+    </dependencies>
+    
+    <build>
+
+        <defaultGoal>install</defaultGoal>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArguments>
+                        <Xlint/>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>

@@ -1,0 +1,40 @@
+Simple configuration
+
+ If your grammar files are organized into the default locations as described in the {{{../index.html}introduction}},
+ then configuring the pom.xml file for your project is as simple as adding this to it
+
++--
+<plugins>
+<plugin>
+    <groupId>org.antlr</groupId>
+    <artifactId>antlr3-maven-plugin</artifactId>
+    <version>3.1.3-1</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>antlr</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+...
+</plugins>
++--
+
+ When the mvn command is executed all grammar files under <<<src/main/antlr3>>>, except any
+ import grammars under <<<src/main/antlr3/imports>>> will be analyzed and converted to
+ java source code in the output directory <<<target/generated-sources/antlr3>>>.
+
+ Your input files under <<<antlr3>>> should be stored in sub directories that
+ reflect the package structure of your java parsers. If your grammar file parser.g contains:
+
++---
+@header {
+package org.jimi.themuss;
+}
++---
+
+ Then the .g file should be stored in: <<<src/main/antlr3/org/jimi/themuss/parser.g>>>. THis way
+ the generated .java files will correctly reflect the package structure in which they will
+ finally rest as classes.
+

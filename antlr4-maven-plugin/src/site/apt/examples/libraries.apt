@@ -1,0 +1,47 @@
+Libraries
+
+ The introduction of the import directive in a grammar allows reuse of common grammar files
+ as well as the ability to divide up functional components of large grammars. However it has
+ caused some confusion in regard to the fact that generated vocab files (<<<xxx.tokens>>>) can also
+ be searched for with the <<<<libDirectory>>>> directive.
+
+ This has confused two separate functions and imposes a structure upon the layout of
+ your grammar files in certain cases. If you have grammars that both use the import
+ directive and also require the use of a vocab file then you will need to locate
+ the grammar that generates the .tokens file alongside the grammar that uses it. This
+ is because you will need to use the <<<<libDirectory>>>> directive to specify the
+ location of your imported grammars and ANTLR will not find any vocab files in
+ this directory.
+
+ The .tokens files for any grammars are generated within the same output directory structure
+ as the .java files. So, whereever the .java files are generated, you will also find the .tokens
+ files. ANTLR looks for .tokens files in both the <<<<libDirectory>>>> and the output directory
+ where it is placing the geenrated .java files. Hence when you locate the grammars that generate
+ .tokens files in the same source directory as the ones that use the .tokens files, then
+ the Maven plugin will find the expected .tokens files.
+
+ The <<<<libDirectory>>>> is specified like any other directory parameter in Maven. Here is an
+ example:
+
++--
+<plugin>
+    <groupId>org.antlr</groupId>
+    <artifactId>antlr3-maven-plugin</artifactId>
+    <version>3.1.3-1</version>
+
+    <executions>
+
+        <execution>
+            <configuration>
+                <goals>
+                    <goal>antlr</goal>
+                </goals>
+                <libDirectory>src/main/antlr_imports</libDirectory>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
++--
+
+
+
