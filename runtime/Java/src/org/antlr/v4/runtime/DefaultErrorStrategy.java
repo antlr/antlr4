@@ -570,15 +570,4 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
                                          int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
     }
-
-    @Override
-    public void reportInsufficientPredicates(@NotNull Parser recognizer,
-											 @NotNull DFA dfa,
-											 int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 DecisionState decState,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull ATNConfigSet configs, boolean fullContextParse)
-    {
-    }
 }
