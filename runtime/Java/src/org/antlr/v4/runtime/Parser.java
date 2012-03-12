@@ -38,7 +38,6 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
@@ -181,12 +180,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	 * @param trimParseTrees {@code true} to trim the capacity of the {@link ParserRuleContext#children}
 	 * list to its size after a rule is parsed.
 	 */
-	public void setTrimParseTrees(boolean trimParseTrees) {
+	public void setTrimParseTree(boolean trimParseTrees) {
 		if (trimParseTrees) {
-			if (getTrimParseTrees()) {
-				return;
-			}
-
+			if (getTrimParseTree()) return;
 			addParseListener(TrimToSizeListener.INSTANCE);
 		}
 		else {
@@ -199,11 +195,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
 	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
 	 */
-	public boolean getTrimParseTrees() {
-		if (_parseListeners == null) {
-			return false;
-		}
-
+	public boolean getTrimParseTree() {
+		if (_parseListeners == null) return false;
 		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
 	}
 
