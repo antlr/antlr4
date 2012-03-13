@@ -869,7 +869,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		int previousContext = 0;
 		RuleContext<Symbol> remainingGlobalContext = globalContext;
-		PredictionContext initialContext = PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
+		PredictionContext initialContext = useContext ? PredictionContext.EMPTY_FULL : PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
 		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
 			while (s0 != null && s0.isCtxSensitive && remainingGlobalContext != null) {

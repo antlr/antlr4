@@ -285,7 +285,7 @@ public abstract class PredictionContext {
 	}
 
 	public PredictionContext appendContext(int invokingContext, PredictionContextCache contextCache) {
-		return appendContext(PredictionContext.EMPTY_LOCAL.getChild(invokingContext), contextCache);
+		return appendContext(PredictionContext.EMPTY_FULL.getChild(invokingContext), contextCache);
 	}
 
 	public abstract PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache);
