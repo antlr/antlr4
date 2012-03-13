@@ -253,8 +253,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.format("start state closure=%s\n", closure);
 		}
 
-		@NotNull
-		ATNConfigSet reach = new ATNConfigSet();
+		ATNConfigSet reach = null;
 
 		traceLookahead1();
 		int t = input.LA(1);
@@ -297,6 +296,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			if (target == null) {
+				reach = new ATNConfigSet();
+
 				// if we don't find an existing DFA state
 				// Fill reach starting from closure, following t transitions
 				getReachableConfigSet(closure, reach, t);
@@ -330,7 +331,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 
 			closure = reach;
-			reach = new ATNConfigSet();
+			reach = null;
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
