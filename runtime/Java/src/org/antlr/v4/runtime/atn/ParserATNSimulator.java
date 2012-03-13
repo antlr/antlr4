@@ -645,7 +645,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		boolean greedy = decState.isGreedy;
 		SimulatorState<Symbol> previous = initialState;
 
-		PredictionContextCache contextCache = new PredictionContextCache(dfa.isContextSensitive());
+		PredictionContextCache contextCache = new PredictionContextCache();
 		while (true) { // while more work
 			SimulatorState<Symbol> nextState = computeReachSet(dfa, previous, t, greedy, contextCache);
 			if (nextState == null) throw noViableAlt(input, outerContext, previous.s0.configset, startIndex);
@@ -693,6 +693,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							}
 						}
 						else {
+							assert !useContext;
+
 							int ambigIndex = input.index();
 
 							if ( D.isAcceptState && D.configset.hasSemanticContext() ) {
@@ -786,7 +788,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		RuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
 		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(previous.s0.configset);
 		List<Integer> contextElements = null;
-		ATNConfigSet reach = new ATNConfigSet(!useContext);
+		ATNConfigSet reach = new ATNConfigSet();
 		boolean stepIntoGlobal;
 		do {
 			boolean hasMoreContext = !useContext || remainingGlobalContext != null;
@@ -794,7 +796,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				reach.setOutermostConfigSet(true);
 			}
 
-			ATNConfigSet reachIntermediate = new ATNConfigSet(!useContext);
+			ATNConfigSet reachIntermediate = new ATNConfigSet();
 			int ncl = closureConfigs.size();
 			for (int ci=0; ci<ncl; ci++) { // TODO: foreach
 				ATNConfig c = closureConfigs.get(ci);
@@ -810,7 +812,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = false;
-			stepIntoGlobal = closure(reachIntermediate, reach, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
+			stepIntoGlobal = closure(reachIntermediate, reach, collectPredicates, greedy, previous.useContext, hasMoreContext, contextCache);
 
 			if (previous.useContext && stepIntoGlobal) {
 				reach.clear();
@@ -827,7 +829,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				contextElements.add(nextContextElement);
-				if (nextContextElement != PredictionContext.EMPTY_STATE_KEY) {
+				if (nextContextElement != PredictionContext.EMPTY_FULL_STATE_KEY) {
 					for (int i = 0; i < closureConfigs.size(); i++) {
 						closureConfigs.set(i, closureConfigs.get(i).appendContext(nextContextElement, contextCache));
 					}
@@ -867,14 +869,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		int previousContext = 0;
 		RuleContext<Symbol> remainingGlobalContext = globalContext;
-		PredictionContext initialContext = PredictionContext.EMPTY; // always at least the implicit call to start rule
-		PredictionContextCache contextCache = new PredictionContextCache(dfa.isContextSensitive());
+		PredictionContext initialContext = PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
+		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
 			while (s0 != null && s0.isCtxSensitive && remainingGlobalContext != null) {
 				DFAState next;
 				if (remainingGlobalContext.isEmpty()) {
-					next = s0.getContextTarget(PredictionContext.EMPTY_STATE_KEY);
-					previousContext = PredictionContext.EMPTY_STATE_KEY;
+					next = s0.getContextTarget(PredictionContext.EMPTY_FULL_STATE_KEY);
+					previousContext = PredictionContext.EMPTY_FULL_STATE_KEY;
 					remainingGlobalContext = null;
 				}
 				else {
@@ -896,7 +898,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return new SimulatorState<Symbol>(globalContext, s0, useContext, (ParserRuleContext<Symbol>)remainingGlobalContext);
 		}
 
-		ATNConfigSet configs = new ATNConfigSet(!useContext);
+		ATNConfigSet configs = new ATNConfigSet();
 
 		DecisionState decState = null;
 		if ( atn.decisionToState.size()>0 ) {
@@ -905,7 +907,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		boolean greedy = decState == null || decState.isGreedy;
 		while (true) {
-			ATNConfigSet reachIntermediate = new ATNConfigSet(!useContext);
+			ATNConfigSet reachIntermediate = new ATNConfigSet();
 			int n = p.getNumberOfTransitions();
 			for (int ti=0; ti<n; ti++) {
 				// for each transition
@@ -919,7 +921,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = true;
-			boolean stepIntoGlobal = closure(reachIntermediate, configs, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
+			boolean stepIntoGlobal = closure(reachIntermediate, configs, collectPredicates, greedy, useContext, hasMoreContext, contextCache);
 
 			DFAState next = addDFAState(dfa, configs);
 			if (s0 == null) {
@@ -946,7 +948,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				remainingGlobalContext = remainingGlobalContext.parent;
 			}
 
-			if (nextContextElement != PredictionContext.EMPTY_STATE_KEY) {
+			if (nextContextElement != PredictionContext.EMPTY_FULL_STATE_KEY) {
 				initialContext = initialContext.appendContext(nextContextElement, contextCache);
 			}
 
@@ -1129,20 +1131,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected boolean closure(ATNConfigSet sourceConfigs,
 						   @NotNull ATNConfigSet configs,
 						   boolean collectPredicates,
-						   boolean contextSensitiveDfa,
 						   boolean greedy, boolean loopsSimulateTailRecursion,
 						   boolean hasMoreContext,
 						   @Nullable PredictionContextCache contextCache)
 	{
 		if (contextCache == null) {
-			contextCache = contextSensitiveDfa ? PredictionContextCache.UNCACHED_FULL : PredictionContextCache.UNCACHED_LOCAL;
+			contextCache = PredictionContextCache.UNCACHED;
 		}
 
 		boolean stepIntoGlobal = false;
 		ATNConfigSet currentConfigs = sourceConfigs;
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		while (currentConfigs.size() > 0) {
-			ATNConfigSet intermediate = new ATNConfigSet(!contextSensitiveDfa);
+			ATNConfigSet intermediate = new ATNConfigSet();
 			for (ATNConfig config : currentConfigs) {
 				if (optimize_closure_busy && !closureBusy.add(config)) {
 					continue;
@@ -1174,7 +1175,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		boolean stepIntoGlobal = false;
-		boolean hasEmpty = config.context == null || config.context.isEmpty();
+		boolean hasEmpty = config.context.hasEmpty();
 		if ( config.state instanceof RuleStopState ) {
 			if ( !greedy ) {
 				// don't see past end of a rule for any nongreedy decision
@@ -1185,12 +1186,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			// We hit rule end. If we have context info, use it
 			if ( config.context!=null && !config.context.isEmpty() ) {
-				for (int i = 0; i < config.context.size(); i++) {
-					if (config.context.getInvokingState(i) == PredictionContext.EMPTY_STATE_KEY) {
-						hasEmpty = true;
-						continue;
-					}
-
+				int nonEmptySize = config.context.size() - (hasEmpty ? 1 : 0);
+				for (int i = 0; i < nonEmptySize; i++) {
 					PredictionContext newContext = config.context.getParent(i); // "pop" invoking state
 					ATNState invokingState = atn.states.get(config.context.getInvokingState(i));
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
@@ -1212,7 +1209,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					return stepIntoGlobal;
 				}
 
-				config = new ATNConfig(config, config.state, PredictionContext.EMPTY);
+				config = new ATNConfig(config, config.state, PredictionContext.EMPTY_LOCAL);
 			}
 			else if (!hasMoreContexts) {
 				configs.add(config, contextCache);
@@ -1649,7 +1646,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if (contextTransitions != null) {
 			for (int context : contextTransitions) {
-				if (context == PredictionContext.EMPTY_STATE_KEY) {
+				if (context == PredictionContext.EMPTY_FULL_STATE_KEY) {
 					if (from.configset.isOutermostConfigSet()) {
 						continue;
 					}
@@ -1667,7 +1664,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				next = addDFAContextState(dfa, from.configset, context, contextCache);
-				assert context != PredictionContext.EMPTY_STATE_KEY || next.configset.isOutermostConfigSet();
+				assert context != PredictionContext.EMPTY_FULL_STATE_KEY || next.configset.isOutermostConfigSet();
 				from.setContextTarget(context, next);
 				from = next;
 			}
@@ -1688,8 +1685,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
 	protected DFAState addDFAContextState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, int invokingContext, PredictionContextCache contextCache) {
-		if (invokingContext != PredictionContext.EMPTY_STATE_KEY) {
-			ATNConfigSet contextConfigs = new ATNConfigSet(false);
+		if (invokingContext != PredictionContext.EMPTY_FULL_STATE_KEY) {
+			ATNConfigSet contextConfigs = new ATNConfigSet();
 			for (ATNConfig config : configs) {
 				contextConfigs.add(config.appendContext(invokingContext, contextCache));
 			}
@@ -1780,7 +1777,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	protected int getInvokingState(RuleContext<?> context) {
 		if (context.isEmpty()) {
-			return PredictionContext.EMPTY_STATE_KEY;
+			return PredictionContext.EMPTY_FULL_STATE_KEY;
 		}
 		
 		return context.invokingState;

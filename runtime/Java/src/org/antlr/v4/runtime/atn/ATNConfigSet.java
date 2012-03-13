@@ -48,7 +48,6 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class ATNConfigSet implements Set<ATNConfig> {
 
-	private final boolean localContext;
 	private final Map<Long, ATNConfig> mergedConfigs;
 	private final List<ATNConfig> unmerged;
 	private final List<ATNConfig> configs;
@@ -61,8 +60,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private boolean dipsIntoOuterContext;
 	private boolean outermostConfigSet;
 
-	public ATNConfigSet(boolean localContext) {
-		this.localContext = localContext;
+	public ATNConfigSet() {
 		this.mergedConfigs = new HashMap<Long, ATNConfig>();
 		this.unmerged = new ArrayList<ATNConfig>();
 		this.configs = new ArrayList<ATNConfig>();
@@ -71,7 +69,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	private ATNConfigSet(ATNConfigSet set, boolean readonly) {
-		this.localContext = set.localContext;
 		if (readonly) {
 			this.mergedConfigs = null;
 			this.unmerged = null;
@@ -88,10 +85,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.uniqueAlt = set.uniqueAlt;
 		this.conflictingAlts = set.conflictingAlts;
 		this.outermostConfigSet = set.outermostConfigSet;
-	}
-
-	public boolean isLocalContext() {
-		return localContext;
 	}
 
 	public boolean isReadOnly() {
@@ -190,6 +183,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		ensureWritable();
 		assert !outermostConfigSet || e.reachesIntoOuterContext == 0;
 
+		if (contextCache == null) {
+			contextCache = PredictionContextCache.UNCACHED;
+		}
+
 		boolean added;
 		boolean addKey;
 		long key = getKey(e);
@@ -197,10 +194,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		addKey = (mergedConfig == null);
 		if (mergedConfig != null && canMerge(e, key, mergedConfig)) {
 			mergedConfig.reachesIntoOuterContext = Math.max(mergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
-			if (contextCache == null) {
-				boolean localJoin = localContext || dipsIntoOuterContext || mergedConfig.reachesIntoOuterContext > 0;
-				contextCache = localJoin ? PredictionContextCache.UNCACHED_LOCAL : PredictionContextCache.UNCACHED_FULL;
-			}
 
 			PredictionContext joined = PredictionContext.join(mergedConfig.context, e.context, contextCache);
 			if (mergedConfig.context == joined) {
@@ -216,10 +209,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			ATNConfig unmergedConfig = unmerged.get(i);
 			if (canMerge(e, key, unmergedConfig)) {
 				unmergedConfig.reachesIntoOuterContext = Math.max(unmergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
-				if (contextCache == null) {
-					boolean localJoin = localContext || dipsIntoOuterContext || unmergedConfig.reachesIntoOuterContext > 0;
-					contextCache = localJoin ? PredictionContextCache.UNCACHED_LOCAL : PredictionContextCache.UNCACHED_FULL;
-				}
 
 				PredictionContext joined = PredictionContext.join(unmergedConfig.context, e.context, contextCache);
 				if (unmergedConfig.context == joined) {
@@ -375,15 +364,13 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 
 		ATNConfigSet other = (ATNConfigSet)obj;
-		return this.localContext == other.localContext
-			&& this.outermostConfigSet == other.outermostConfigSet
+		return this.outermostConfigSet == other.outermostConfigSet
 			&& configs.equals(other.configs);
 	}
 
 	@Override
 	public int hashCode() {
 		int hashCode = 1;
-		hashCode = 5 * hashCode ^ (localContext ? 1 : 0);
 		hashCode = 5 * hashCode ^ (outermostConfigSet ? 1 : 0);
 		hashCode = 5 * hashCode ^ configs.hashCode();
 		return hashCode;

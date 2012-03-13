@@ -196,6 +196,7 @@ public class ATNConfig {
 
 		return this.state.stateNumber==other.state.stateNumber
 			&& this.alt==other.alt
+			&& (this.reachesIntoOuterContext != 0) == (other.reachesIntoOuterContext != 0)
 			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
 			&& this.semanticContext.equals(other.semanticContext);
 	}
@@ -205,6 +206,7 @@ public class ATNConfig {
 		int hashCode = 7;
 		hashCode = 5 * hashCode + state.stateNumber;
 		hashCode = 5 * hashCode + alt;
+		hashCode = 5 * hashCode + (reachesIntoOuterContext != 0 ? 1 : 0);
 		hashCode = 5 * hashCode + (context != null ? context.hashCode() : 0);
 		hashCode = 5 * hashCode + semanticContext.hashCode();
         return hashCode;

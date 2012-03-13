@@ -35,8 +35,7 @@ import java.util.Map;
  * @author Sam Harwell
  */
 public class PredictionContextCache {
-    public static final PredictionContextCache UNCACHED_LOCAL = new PredictionContextCache(false, false);
-    public static final PredictionContextCache UNCACHED_FULL = new PredictionContextCache(true, false);
+    public static final PredictionContextCache UNCACHED = new PredictionContextCache(false);
 
     private final Map<PredictionContext, PredictionContext> contexts =
         new HashMap<PredictionContext, PredictionContext>();
@@ -45,20 +44,14 @@ public class PredictionContextCache {
     private final Map<IdentityCommutativeOperands<PredictionContext>, PredictionContext> joinContexts =
         new HashMap<IdentityCommutativeOperands<PredictionContext>, PredictionContext>();
 
-    private final boolean contextSensitive;
     private final boolean enableCache;
 
-    public PredictionContextCache(boolean contextSensitive) {
-        this(contextSensitive, true);
+    public PredictionContextCache() {
+        this(true);
     }
 
-    private PredictionContextCache(boolean contextSensitive, boolean enableCache) {
-        this.contextSensitive = contextSensitive;
+    private PredictionContextCache(boolean enableCache) {
         this.enableCache = enableCache;
-    }
-
-    public boolean isContextSensitive() {
-        return contextSensitive;
     }
 
     public PredictionContext getAsCached(PredictionContext context) {

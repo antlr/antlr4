@@ -117,8 +117,11 @@ public class DFASerializer {
 	}
 
 	protected String getContextLabel(int i) {
-		if (i == PredictionContext.EMPTY_STATE_KEY) {
-			return "ctx:EMPTY";
+		if (i == PredictionContext.EMPTY_FULL_STATE_KEY) {
+			return "ctx:EMPTY_FULL";
+		}
+		else if (i == PredictionContext.EMPTY_LOCAL_STATE_KEY) {
+			return "ctx:EMPTY_LOCAL";
 		}
 
 		if (atn != null && i > 0 && i <= atn.states.size()) {

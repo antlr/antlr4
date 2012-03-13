@@ -286,14 +286,14 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected int exec(@NotNull CharStream input, @NotNull ATNConfigSet s0, @Nullable DFAState ds0) {
 		//System.out.println("enter exec index "+input.index()+" from "+s0);
 		@NotNull
-		ATNConfigSet closure = new ATNConfigSet(false);
+		ATNConfigSet closure = new ATNConfigSet();
 		closure.addAll(s0);
 		if ( debug ) {
 			System.out.format("start state closure=%s\n", closure);
 		}
 
 		@NotNull
-		ATNConfigSet reach = new ATNConfigSet(false);
+		ATNConfigSet reach = new ATNConfigSet();
 		atnPrevAccept.reset();
 
 		traceLookahead1();
@@ -362,7 +362,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 
 			closure = reach;
-			reach = new ATNConfigSet(false);
+			reach = new ATNConfigSet();
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
@@ -516,8 +516,8 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeStartState(@NotNull IntStream<Integer> input,
 											 @NotNull ATNState p)
 	{
-		PredictionContext initialContext = PredictionContext.EMPTY;
-		ATNConfigSet configs = new ATNConfigSet(false);
+		PredictionContext initialContext = PredictionContext.EMPTY_FULL;
+		ATNConfigSet configs = new ATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);

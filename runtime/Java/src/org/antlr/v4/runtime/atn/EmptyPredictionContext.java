@@ -30,9 +30,18 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Recognizer;
 
 public final class EmptyPredictionContext extends PredictionContext {
+	public static final EmptyPredictionContext LOCAL_CONTEXT = new EmptyPredictionContext(false);
+	public static final EmptyPredictionContext FULL_CONTEXT = new EmptyPredictionContext(true);
 
-	/*package*/ EmptyPredictionContext() {
+	private final boolean fullContext;
+
+	private EmptyPredictionContext(boolean fullContext) {
 		super(calculateHashCode(1, 1));
+		this.fullContext = fullContext;
+	}
+
+	public boolean isFullContext() {
+		return fullContext;
 	}
 
 	@Override
@@ -88,6 +97,11 @@ public final class EmptyPredictionContext extends PredictionContext {
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	@Override

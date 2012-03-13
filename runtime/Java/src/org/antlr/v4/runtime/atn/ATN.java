@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.Args;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -80,11 +81,12 @@ public class ATN {
 	public ATN() { }
 
 	/** Compute the set of valid tokens that can occur starting in s.
-	 *  If ctx is null, the set of tokens will not include what can follow
+	 *  If ctx is {@link PredictionContext#EMPTY_LOCAL}, the set of tokens will not include what can follow
 	 *  the rule surrounding s. In other words, the set will be
 	 *  restricted to tokens reachable staying within s's rule.
 	 */
-	public IntervalSet nextTokens(ATNState s, PredictionContext ctx) {
+	public IntervalSet nextTokens(ATNState s, @NotNull PredictionContext ctx) {
+		Args.notNull("ctx", ctx);
 		LL1Analyzer anal = new LL1Analyzer(this);
 		IntervalSet next = anal.LOOK(s, ctx);
 		return next;
@@ -95,7 +97,7 @@ public class ATN {
      */
     public IntervalSet nextTokens(ATNState s) {
         if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
-        s.nextTokenWithinRule = nextTokens(s, null);
+        s.nextTokenWithinRule = nextTokens(s, PredictionContext.EMPTY_LOCAL);
         s.nextTokenWithinRule.setReadonly(true);
         return s.nextTokenWithinRule;
     }

@@ -46,7 +46,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int parentHashCode, int invokingStateHashCode) {
 		super(calculateHashCode(parentHashCode, invokingStateHashCode));
 		assert parents.length == invokingStates.length;
-		assert invokingStates.length > 1 && invokingStates[0] != EMPTY_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
 		this.parents = parents;
 		this.invokingStates = invokingStates;
@@ -55,7 +55,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int hashCode) {
 		super(hashCode);
 		assert parents.length == invokingStates.length;
-		assert invokingStates.length > 1 && invokingStates[0] != EMPTY_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
 		this.parents = parents;
 		this.invokingStates = invokingStates;
@@ -88,7 +88,7 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public boolean hasEmpty() {
-		return invokingStates[invokingStates.length - 1] == EMPTY_STATE_KEY;
+		return invokingStates[invokingStates.length - 1] == EMPTY_FULL_STATE_KEY;
 	}
 
 	@Override
@@ -104,8 +104,8 @@ public class ArrayPredictionContext extends PredictionContext {
 
 		PredictionContext[] parents2 = Arrays.copyOf(parents, parents.length + 1);
 		int[] invokingStates2 = Arrays.copyOf(invokingStates, invokingStates.length + 1);
-		parents2[parents2.length - 1] = PredictionContext.EMPTY;
-		invokingStates2[invokingStates2.length - 1] = PredictionContext.EMPTY_STATE_KEY;
+		parents2[parents2.length - 1] = PredictionContext.EMPTY_FULL;
+		invokingStates2[invokingStates2.length - 1] = PredictionContext.EMPTY_FULL_STATE_KEY;
 		int newParentHashCode = calculateParentHashCode(parents2);
 		int newInvokingStateHashCode = calculateInvokingStatesHashCode(invokingStates2);
 		return new ArrayPredictionContext(parents2, invokingStates2, newParentHashCode, newInvokingStateHashCode);
@@ -113,18 +113,26 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache) {
+		return appendContext(this, suffix, new IdentityHashMap<PredictionContext, PredictionContext>());
+	}
+
+	private static PredictionContext appendContext(PredictionContext context, PredictionContext suffix, IdentityHashMap<PredictionContext, PredictionContext> visited) {
 		if (suffix.isEmpty()) {
-			return this;
+			if (isEmptyLocal(suffix)) {
+				if (context.hasEmpty()) {
+					return EMPTY_LOCAL;
+				}
+				
+				throw new UnsupportedOperationException("what to do here?");
+			}
+
+			return context;
 		}
 
 		if (suffix.size() != 1) {
 			throw new UnsupportedOperationException("Appending a tree suffix is not yet supported.");
 		}
 
-		return appendContext(this, suffix, new IdentityHashMap<PredictionContext, PredictionContext>());
-	}
-
-	private static PredictionContext appendContext(PredictionContext context, PredictionContext suffix, IdentityHashMap<PredictionContext, PredictionContext> visited) {
 		PredictionContext result = visited.get(context);
 		if (result == null) {
 			if (context.isEmpty()) {
@@ -159,7 +167,7 @@ public class ArrayPredictionContext extends PredictionContext {
 				}
 
 				if (context.hasEmpty()) {
-					result = PredictionContext.join(result, suffix, false);
+					result = PredictionContext.join(result, suffix);
 				}
 			}
 
@@ -183,8 +191,8 @@ public class ArrayPredictionContext extends PredictionContext {
 			}
 
 			PredictionContext next;
-			if (this.invokingStates[i] == EMPTY_STATE_KEY) {
-				next = PredictionContext.EMPTY;
+			if (this.invokingStates[i] == EMPTY_FULL_STATE_KEY) {
+				next = PredictionContext.EMPTY_FULL;
 			}
 			else {
 				next = contextCache.getChild(this.parents[i], this.invokingStates[i]);

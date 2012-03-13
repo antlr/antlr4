@@ -195,7 +195,7 @@ public class DFAState {
 			return null;
 		}
 
-		if (invokingState == PredictionContext.EMPTY_STATE_KEY) {
+		if (invokingState == PredictionContext.EMPTY_FULL_STATE_KEY) {
 			invokingState = -1;
 		}
 
@@ -207,7 +207,7 @@ public class DFAState {
 			throw new IllegalStateException("The state is not context sensitive.");
 		}
 
-		if (invokingState == PredictionContext.EMPTY_STATE_KEY) {
+		if (invokingState == PredictionContext.EMPTY_FULL_STATE_KEY) {
 			invokingState = -1;
 		}
 
@@ -222,15 +222,15 @@ public class DFAState {
 		Map<Integer, DFAState> map = contextEdges.toMap();
 		if (map.containsKey(-1)) {
 			if (map.size() == 1) {
-				return Collections.singletonMap(PredictionContext.EMPTY_STATE_KEY, map.get(-1));
+				return Collections.singletonMap(PredictionContext.EMPTY_FULL_STATE_KEY, map.get(-1));
 			}
 			else {
 				try {
-					map.put(PredictionContext.EMPTY_STATE_KEY, map.remove(-1));
+					map.put(PredictionContext.EMPTY_FULL_STATE_KEY, map.remove(-1));
 				} catch (UnsupportedOperationException ex) {
 					// handles read only, non-singleton maps
 					map = new LinkedHashMap<Integer, DFAState>(map);
-					map.put(PredictionContext.EMPTY_STATE_KEY, map.remove(-1));
+					map.put(PredictionContext.EMPTY_FULL_STATE_KEY, map.remove(-1));
 				}
 			}
 		}

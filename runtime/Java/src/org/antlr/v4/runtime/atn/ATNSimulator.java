@@ -50,7 +50,7 @@ public abstract class ATNSimulator {
 		new HashMap<PredictionContext, PredictionContext>();
 
 	static {
-		ERROR = new DFAState(new ATNConfigSet(false), 0, 0);
+		ERROR = new DFAState(new ATNConfigSet(), 0, 0);
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 

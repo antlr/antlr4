@@ -67,10 +67,10 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
     }
 
 	protected static ATNConfigSet getFullContextConfigs(SimulatorState<?> state) {
-		ATNConfigSet configs = new ATNConfigSet(false);
-		PredictionContext suffix = PredictionContext.fromRuleContext(state.remainingOuterContext);
+		ATNConfigSet configs = new ATNConfigSet();
+		PredictionContext suffix = PredictionContext.fromRuleContext(state.remainingOuterContext, true);
 		for (ATNConfig config : state.s0.configset) {
-			configs.add(config.appendContext(suffix, PredictionContextCache.UNCACHED_FULL));
+			configs.add(config.appendContext(suffix, PredictionContextCache.UNCACHED));
 		}
 
 		return configs;

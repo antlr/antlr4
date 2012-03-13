@@ -519,19 +519,19 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0*-'<'->!s8\n" +
 					 "s0*-ID->:s7=>2\n" +
 					 "s0*-ctx:6(s)->s2\n" +
-					 "s1-'/'->s13\n" +
+					 "s1-'/'->s12\n" +
 					 "s1-ID->s3\n" +
 					 "s2-'<'->s1\n" +
 					 "s3-'>'->s4\n" +
 					 "s4-ID->s5\n" +
 					 "s5-'<'->:s6=>1\n" +
 					 "s8-'/'->s9\n" +
-					 "s9-ID->s10\n" +
-					 "s10-'>'->s11\n" +
-					 "s11-EOF->:s12=>1\n" +
-					 "s13-ID->s14\n" +
-					 "s14-'>'->s15\n" +
-					 "s15-EOF->:s16=>1\n" +
+					 "s9-'>'->s10\n" +
+					 "s9-ID->s9\n" +
+					 "s10-EOF->:s11=>1\n" +
+					 "s12-ID->s13\n" +
+					 "s13-'>'->s14\n" +
+					 "s14-EOF->:s15=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'/'->:s2=>1\n" +
@@ -541,7 +541,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
 		assertEquals("line 1:6 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='<a>foo<'\n" +
-					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(1,1,[]), (16,1,[6 10 10 10]), (20,1,[14 6 10 10 10]), (22,1,[14 6 10 10]), (26,1,[14 6 10 10]), (26,1,[32 32 32 32 14 6]), (33,1,[14 6 10 10]), (33,1,[14 6]), (1,2,[]), (16,2,[6 10 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10])],conflictingAlts={1..2}, input='<a>foo<'\n" +
+					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(1,1,[]), (16,1,[6 10 10 10]), (20,1,[14 6 10 10 10]), (22,1,[14 6 10 10]), (26,1,[14 6 10 10]), (26,1,[32 32 32 32 14 6]), (33,1,[14 6]), (1,2,[]), (16,2,[6 10 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10])],conflictingAlts={1..2}, input='<a>foo<'\n" +
 					 "line 1:10 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='</a>'\n" +
 					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}:[(35,1,[]), (35,2,[])],conflictingAlts={1..2}, input='</a>'\n" +
 					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}:[(26,1,[]), (33,1,[]), (26,2,[]), (33,2,[])],conflictingAlts={1..2}, input='/'\n",
@@ -557,18 +557,18 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "Decision 1:\n" +
 					 "s0*-'<'->!s6\n" +
 					 "s0*-ctx:6(s)->s2\n" +
-					 "s1-'/'->s11\n" +
+					 "s1-'/'->s10\n" +
 					 "s1-ID->s3\n" +
 					 "s2-'<'->s1\n" +
 					 "s3-'>'->s4\n" +
 					 "s4-'<'->:s5=>1\n" +
 					 "s6-'/'->s7\n" +
-					 "s7-ID->s8\n" +
-					 "s8-'>'->s9\n" +
-					 "s9-EOF->:s10=>1\n" +
-					 "s11-ID->s12\n" +
-					 "s12-'>'->s13\n" +
-					 "s13-EOF->:s14=>1\n" +
+					 "s7-'>'->s8\n" +
+					 "s7-ID->s7\n" +
+					 "s8-EOF->:s9=>1\n" +
+					 "s10-ID->s11\n" +
+					 "s11-'>'->s12\n" +
+					 "s12-EOF->:s13=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'/'->:s2=>1\n" +
@@ -588,30 +588,28 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0*-'<'->!s7\n" +
 					 "s0*-ctx:6(s)->s2\n" +
 					 "s1-'/'->s3\n" +
-					 "s1-ID->s18\n" +
+					 "s1-ID->s11\n" +
 					 "s2-'<'->s1\n" +
 					 "s3-ID->s4\n" +
 					 "s4-'>'->s5\n" +
 					 "s5-'<'->:s6=>1\n" +
 					 "s7-ID->s8\n" +
-					 "s8-ID->s9\n" +
-					 "s9-'='->s10\n" +
-					 "s10-STR->s11\n" +
-					 "s11-','->s12\n" +
-					 "s12-ID->s13\n" +
-					 "s13-'='->s14\n" +
-					 "s14-INT->s15\n" +
-					 "s15-'>'->s16\n" +
-					 "s16-EOF->:s17=>1\n" +
-					 "s18-ID->s19\n" +
-					 "s19-'='->s20\n" +
-					 "s20-STR->s21\n" +
-					 "s21-','->s22\n" +
-					 "s22-ID->s23\n" +
-					 "s23-'='->s24\n" +
-					 "s24-INT->s25\n" +
-					 "s25-'>'->s26\n" +
-					 "s26-EOF->:s27=>1\n" +
+					 "s8-'>'->s9\n" +
+					 "s8-'='->s8\n" +
+					 "s8-','->s8\n" +
+					 "s8-ID->s8\n" +
+					 "s8-STR->s8\n" +
+					 "s8-INT->s8\n" +
+					 "s9-EOF->:s10=>1\n" +
+					 "s11-ID->s12\n" +
+					 "s12-'='->s13\n" +
+					 "s13-STR->s14\n" +
+					 "s14-','->s15\n" +
+					 "s15-ID->s16\n" +
+					 "s16-'='->s17\n" +
+					 "s17-INT->s18\n" +
+					 "s18-'>'->s19\n" +
+					 "s19-EOF->:s20=>1\n" +
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'/'->:s1=>1\n" +
