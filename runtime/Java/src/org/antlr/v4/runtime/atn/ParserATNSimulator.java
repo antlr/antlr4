@@ -29,7 +29,13 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.SymbolStream;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -37,7 +43,14 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  The embodiment of the adaptive LL(*) parsing strategy.
@@ -241,6 +254,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@NotNull
 	public final DFA[] decisionToDFA;
 
+	/**
+	 * When {@code true}, ambiguous alternatives are reported when they are
+	 * encountered within {@link #execATN}. When {@code false}, these messages
+	 * are suppressed. The default is {@code true}.
+	 * <p>
+	 * When messages about ambiguous alternatives are not required, setting this
+	 * to {@code false} enables additional internal optimizations which may lose
+	 * this information.
+	 */
+	public boolean reportAmbiguities = true;
+
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
@@ -417,11 +441,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( s.predicates!=null ) {
 			// rewind input so pred's LT(i) calls make sense
 			input.seek(startIndex);
-			int predictedAlt = evalSemanticContext(s.predicates, outerContext);
-			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				return predictedAlt;
+			// since we don't report ambiguities in execDFA, we never need to use complete predicate evaluation here
+			IntervalSet alts = evalSemanticContext(s.predicates, outerContext, false);
+			if (alts.isNil()) {
+				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
-			throw noViableAlt(input, outerContext, s.configset, startIndex);
+
+			return alts.getMinElement();
 		}
 
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
@@ -512,7 +538,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							 !D.configset.dipsIntoOuterContext ||
 							 k == 1 ) // SLL(1) == LL(1)
 						{
-							if ( !D.configset.hasSemanticContext ) {
+							if ( reportAmbiguities && !D.configset.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.conflictingAlts, D.configset);
 							}
 							D.isAcceptState = true;
@@ -566,26 +592,26 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				List<DFAState.PredPrediction> predPredictions =
 					predicateDFAState(D, D.configset, outerContext, nalts);
 				if ( predPredictions!=null ) {
-					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configset);
-					if ( D.predicates.size() < conflictingAlts.size() ) {
-						reportInsufficientPredicates(dfa, startIndex, input.index(),
-													conflictingAlts,
-													decState,
-													getPredsForAmbigAlts(conflictingAlts, D.configset, nalts),
-													D.configset,
-													false);
-					}
+					int stopIndex = input.index();
 					input.seek(startIndex);
-					predictedAlt = evalSemanticContext(predPredictions, outerContext);
-					if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-						return predictedAlt;
+					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
+					D.prediction = ATN.INVALID_ALT_NUMBER;
+					switch (alts.size()) {
+					case 0:
+						throw noViableAlt(input, outerContext, D.configset, startIndex);
+
+					case 1:
+						return alts.getMinElement();
+
+					default:
+						// report ambiguity after predicate evaluation to make sure the correct
+						// set of ambig alts is reported.
+						if (reportAmbiguities) {
+							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
+						}
+
+						return alts.getMinElement();
 					}
-
-					// Consistency check - the DFAState should not have a "fallback"
-					// prediction specified for the case where no predicates succeed.
-					assert D.prediction == ATN.INVALID_ALT_NUMBER;
-
-					throw noViableAlt(input, outerContext, D.configset, startIndex);
 				}
 			}
 
@@ -642,25 +668,30 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( altToPred!=null ) {
 				// we have a validating predicate; test it
 				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
-				if ( predPredictions.size() < nalts ) {
-					IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(reach);
-					DecisionState decState = atn.getDecisionState(dfa.decision);
-					reportInsufficientPredicates(dfa, startIndex, input.index(),
-												 conflictingAlts,
-												 decState, altToPred,
-												 reach, true);
-				}
 				input.seek(startIndex);
-				reach.uniqueAlt = evalSemanticContext(predPredictions, outerContext);
-				if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
+				IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
+				reach.uniqueAlt = ATN.INVALID_ALT_NUMBER;
+				switch (alts.size()) {
+				case 0:
+					throw noViableAlt(input, outerContext, reach, startIndex);
+
+				case 1:
+					reach.uniqueAlt = alts.getMinElement();
 					return reach;
+
+				default:
+					// reach.conflictingAlts holds the post-evaluation set of ambig alts
+					reach.conflictingAlts = alts;
+					break;
 				}
-				throw noViableAlt(input, outerContext, reach, startIndex);
 			}
 		}
 
-		// must have conflict and no semantic preds
-		reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
+		// must have conflict
+		if (reportAmbiguities) {
+			reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
+		}
+
 		reach.uniqueAlt = reach.conflictingAlts.getMinElement();
 
 		return reach;
@@ -669,6 +700,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t, boolean greedy, boolean loopsSimulateTailRecursion) {
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
 		ATNConfigSet reach = new ATNConfigSet();
+		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
 			int n = c.state.getNumberOfTransitions();
@@ -676,7 +708,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 					closure(new ATNConfig(c, target), reach, closureBusy, false, greedy, loopsSimulateTailRecursion);
 				}
 			}
@@ -786,7 +817,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		// Optimize away p||p and p&&p
 		for (int i = 0; i < altToPred.length; i++) {
-			if ( altToPred[i]!=null ) altToPred[i] = altToPred[i].optimize();
+			altToPred[i] = altToPred[i].optimize();
 		}
 
 		// nonambig alts are null in altToPred
@@ -797,61 +828,69 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
-		int firstUnpredicated = ATN.INVALID_ALT_NUMBER;
+		boolean containsPredicate = false;
 		for (int i = 1; i < altToPred.length; i++) {
 			SemanticContext pred = altToPred[i];
+
+			// unpredicated is indicated by SemanticContext.NONE
+			assert pred != null;
+
 			// find first unpredicated but ambig alternative, if any.
 			// Only ambiguous alternatives will have SemanticContext.NONE.
 			// Any unambig alts or ambig naked alts after first ambig naked are ignored
 			// (null, i) means alt i is the default prediction
 			// if no (null, i), then no default prediction.
-			if ( ambigAlts!=null && ambigAlts.contains(i) &&
-				 pred==SemanticContext.NONE && firstUnpredicated==ATN.INVALID_ALT_NUMBER )
-			{
-				firstUnpredicated = i;
+			if (ambigAlts!=null && ambigAlts.contains(i) && pred==SemanticContext.NONE) {
+				pairs.add(new DFAState.PredPrediction(null, i));
 			}
-			if ( pred!=null && pred!=SemanticContext.NONE ) {
+			else if ( pred!=SemanticContext.NONE ) {
+				containsPredicate = true;
 				pairs.add(new DFAState.PredPrediction(pred, i));
 			}
 		}
-		if ( pairs.isEmpty() ) pairs = null;
-		else if ( firstUnpredicated!=ATN.INVALID_ALT_NUMBER ) {
-			// add default prediction if we found null predicate
-			pairs.add(new DFAState.PredPrediction(null, firstUnpredicated));
+
+		if ( !containsPredicate ) {
+			pairs = null;
 		}
+
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
 		return pairs;
 	}
 
-	/** Look through a list of predicate/alt pairs, returning alt for the
-	 *  first pair that wins. A null predicate indicates the default
-	 *  prediction for disambiguating predicates.
+	/** Look through a list of predicate/alt pairs, returning alts for the
+	 *  pairs that win. A {@code null} predicate indicates an alt containing an
+	 *  unpredicated config which behaves as "always true."
 	 */
-	public int evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-								   ParserRuleContext<?> outerContext)
+	public IntervalSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
+										   ParserRuleContext<?> outerContext,
+										   boolean complete)
 	{
-		int predictedAlt = ATN.INVALID_ALT_NUMBER;
-//		List<DFAState.PredPrediction> predPredictions = D.predicates;
-//		if ( D.isCtxSensitive ) predPredictions = D.ctxToPredicates.get(outerContext);
+		IntervalSet predictions = new IntervalSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
 			if ( pair.pred==null ) {
-				predictedAlt = pair.alt; // default prediction
-				break;
+				predictions.add(pair.alt);
+				if (!complete) {
+					break;
+				}
+
+				continue;
 			}
 
 			boolean evaluatedResult = pair.pred.eval(parser, outerContext);
 			if ( debug || dfa_debug ) {
 				System.out.println("eval pred "+pair+"="+evaluatedResult);
 			}
+
 			if ( evaluatedResult ) {
 				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
-				predictedAlt = pair.alt;
-				break;
+				predictions.add(pair.alt);
+				if (!complete) {
+					break;
+				}
 			}
 		}
-		// if no prediction: either all predicates are false and
-		// all alternatives were guarded, or a validating predicate failed.
-		return predictedAlt;
+
+		return predictions;
 	}
 
 
@@ -1410,23 +1449,4 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);
     }
-
-    public void reportInsufficientPredicates(@NotNull DFA dfa, int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 DecisionState decState,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull ATNConfigSet configs,
-											 boolean fullContextParse)
-    {
-        if ( debug || retry_debug ) {
-            System.out.println("reportInsufficientPredicates "+
-                               ambigAlts+", decState="+decState+": "+Arrays.toString(altToPred)+
-                               parser.getInputString(startIndex, stopIndex));
-        }
-        if ( parser!=null ) {
-            parser.getErrorListenerDispatch().reportInsufficientPredicates(parser, dfa, startIndex, stopIndex, ambigAlts,
-																  decState, altToPred, configs, fullContextParse);
-        }
-    }
-
 }

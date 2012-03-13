@@ -61,6 +61,26 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		}
 	}
 
+	public static class TrimToSizeListener implements ParseListener<Token> {
+		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
+
+		@Override
+		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
+		}
+
+		@Override
+		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+			if (ctx.children instanceof ArrayList) {
+				((ArrayList<?>)ctx.children).trimToSize();
+			}
+		}
+
+	}
+
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
 	protected TokenStream _input;
@@ -151,6 +171,33 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 
 	public boolean getBuildParseTree() {
 		return _buildParseTrees;
+	}
+
+	/**
+	 * Trim the internal lists of the parse tree during parsing to conserve memory.
+	 * This property is set to {@code false} by default for a newly constructed parser.
+	 *
+	 * @param trimParseTrees {@code true} to trim the capacity of the {@link ParserRuleContext#children}
+	 * list to its size after a rule is parsed.
+	 */
+	public void setTrimParseTree(boolean trimParseTrees) {
+		if (trimParseTrees) {
+			if (getTrimParseTree()) return;
+			addParseListener(TrimToSizeListener.INSTANCE);
+		}
+		else {
+			removeParseListener(TrimToSizeListener.INSTANCE);
+		}
+	}
+
+	/**
+	 *
+	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
+	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
+	 */
+	public boolean getTrimParseTree() {
+		if (_parseListeners == null) return false;
+		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
 	}
 
 //	public void setTraceATNStates(boolean traceATNStates) {
