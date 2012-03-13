@@ -335,7 +335,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
-		return failOrAccept(prevAccept, input, reach, t);
+		return failOrAccept(prevAccept, input, closure, t);
 	}
 
 	protected int failOrAccept(ExecState prevAccept, CharStream input,
