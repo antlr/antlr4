@@ -287,7 +287,10 @@ public class LexerATNSimulator extends ATNSimulator {
 				if ( s.edges != null && t < s.edges.length && t > CharStream.EOF ) {
 					closure = s.configset;
 					target = s.edges[t];
-					if (target != null) {
+					if (target == ERROR) {
+						break;
+					}
+					else if (target != null) {
 						reach = target.configset;
 					}
 				}
