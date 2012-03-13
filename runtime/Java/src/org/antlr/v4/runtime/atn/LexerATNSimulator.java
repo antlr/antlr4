@@ -296,33 +296,36 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if (target == null) { // if we don't find an existing DFA state
+			if (target == null) {
+				// if we don't find an existing DFA state
 				// Fill reach starting from closure, following t transitions
 				getReachableConfigSet(closure, reach, t);
-			}
 
-			if ( reach.isEmpty() ) { // we got nowhere on t from s
-				// we reached state associated with closure for sure, so
-				// make sure it's defined. worst case, we define s0 from
-				// start state configs.
-				DFAState from = s != null ? s : addDFAState(closure);
-				// we got nowhere on t, don't throw out this knowledge; it'd
-				// cause a failover from DFA later.
-				if (from != null) {
-					addDFAEdge(from, t, ERROR);
+				if ( reach.isEmpty() ) { // we got nowhere on t from s
+					// we reached state associated with closure for sure, so
+					// make sure it's defined. worst case, we define s0 from
+					// start state configs.
+					DFAState from = s != null ? s : addDFAState(closure);
+					// we got nowhere on t, don't throw out this knowledge; it'd
+					// cause a failover from DFA later.
+					if (from != null) {
+						addDFAEdge(from, t, ERROR);
+					}
+					break;
 				}
-				break;
-			}
 
-			// Did we hit a stop state during reach op?
-			processAcceptStates(input, reach);
+				// Did we hit a stop state during reach op?
+				processAcceptStates(input, reach);
 
-			consume(input);
-			if (target == null) {
 				// Add an edge from s to target DFA found/created for reach
 				target = addDFAEdge(s, t, reach);
 			}
+			else if (target.isAcceptState) {
+				traceAcceptState(target.prediction);
+				markAcceptState(prevAccept, input, target);
+			}
 
+			consume(input);
 			traceLookahead1();
 			t = input.LA(1);
 
