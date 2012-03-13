@@ -36,11 +36,11 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
@@ -197,9 +197,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * @param trimParseTrees {@code true} to trim the capacity of the {@link ParserRuleContext#children}
 	 * list to its size after a rule is parsed.
 	 */
-	public void setTrimParseTrees(boolean trimParseTrees) {
+	public void setTrimParseTree(boolean trimParseTrees) {
 		if (trimParseTrees) {
-			if (getTrimParseTrees()) {
+			if (getTrimParseTree()) {
 				return;
 			}
 
@@ -215,7 +215,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
 	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
 	 */
-	public boolean getTrimParseTrees() {
+	public boolean getTrimParseTree() {
 		if (_parseListeners == null) {
 			return false;
 		}
