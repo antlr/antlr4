@@ -162,6 +162,7 @@ public class TestParserExec extends BaseTest {
 		assertEquals("a34c\n", found);
 	}
 
+
 	/**
 	 * This test is meant to detect regressions of bug antlr/antlr4#41.
 	 * https://github.com/antlr/antlr4/issues/41
@@ -211,6 +212,42 @@ public class TestParserExec extends BaseTest {
 		String expecting = "";
 		assertEquals(expecting, found);
 		assertNull(this.stderrDuringParse);
+	}
+
+	/**
+	 *  Tests predictions for the following case involving closures.
+	 *  http://www.antlr.org/wiki/display/~admin/2011/12/29/Flaw+in+ANTLR+v3+LL(*)+analysis+algorithm
+	 */
+	@Test
+	public void testLoopsSimulateTailRecursion() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"prog: expr_or_assign*;\n" +
+			"expr_or_assign\n" +
+			"    :   expr '++'\n" +
+			"    |   expr\n" +
+			"    ;\n" +
+			"expr: expr_primary ('<-' ID)? ;\n" +
+			"expr_primary\n" +
+			"    : '(' ID ')'\n" +
+			"    | ID '(' ID ')'\n" +
+			"    | ID\n" +
+			"    ;\n" +
+			"ID  : [a-z]+ ;\n" +
+			"\n" +
+			"\n" +
+			"\n" +
+			"";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "prog", "a(i)<-x", true);
+		assertEquals("", found);
+
+		String expecting =
+				"line 1:4 reportAttemptingFullContext d=1: [(31,1,[23 15 8]), (37,1,[23 15 8]), (45,1,[23 15 8]), (31,2,[23 19 8]), (37,2,[23 19 8]), (45,2,[23 19 8])], input='a(i)<-'\n" +
+				"line 1:7 reportContextSensitivity d=1: [(49,2,[])],uniqueAlt=2, input='a(i)<-x'\n" +
+				"line 1:3 reportAttemptingFullContext d=3: [(31,1,[23 19 8]), (37,2,[23 19 8]), (45,3,[23 19 8])], input='a(i)'\n" +
+				"line 1:7 reportAmbiguity d=3: ambigAlts={2..3}:[(49,2,[]), (49,3,[])],conflictingAlts={2..3}, input='a(i)<-x'\n";
+		assertEquals(expecting, this.stderrDuringParse);
 	}
 
 }
