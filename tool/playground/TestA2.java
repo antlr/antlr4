@@ -27,7 +27,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class TestA2 {
@@ -50,7 +53,7 @@ public class TestA2 {
 
 		@Override
 		public void exitInt(A2Parser.IntContext ctx) {
-			ctx.v = Integer.valueOf(ctx.INT().getText());
+			ctx.v = Integer.valueOf(ctx.INT().getSymbol().getText());
 			System.out.println("Int: "+ctx.v);
 		}
 
