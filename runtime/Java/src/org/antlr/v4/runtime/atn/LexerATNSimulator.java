@@ -247,13 +247,10 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected int exec(@NotNull CharStream input, @NotNull ATNConfigSet s0, @Nullable DFAState ds0) {
 		//System.out.println("enter exec index "+input.index()+" from "+s0);
 		@NotNull
-		ATNConfigSet closure = new ATNConfigSet();
-		closure.addAll(s0);
+		ATNConfigSet closure = s0;
 		if ( debug ) {
 			System.out.format("start state closure=%s\n", closure);
 		}
-
-		ATNConfigSet reach = null;
 
 		traceLookahead1();
 		int t = input.LA(1);
@@ -282,6 +279,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			// A character will take us back to an existing DFA state
 			// that already has lots of edges out of it. e.g., .* in comments.
 			DFAState target = null;
+			ATNConfigSet reach = null;
 			if (s != null) {
 				if ( s.edges != null && t < s.edges.length && t > CharStream.EOF ) {
 					closure = s.configset;
@@ -331,7 +329,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 
 			closure = reach;
-			reach = null;
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
