@@ -64,7 +64,13 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public abstract ATN getATN();
 
-	public ATNInterpreter getInterpreter() { return _interp; }
+	public ATNInterpreter getInterpreter() {
+		return _interp;
+	}
+
+	public void setInterpreter(ATNInterpreter interpreter) {
+		_interp = interpreter;
+	}
 
 	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {

@@ -42,11 +42,14 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -118,9 +121,14 @@ public class TestPerformance extends BaseTest {
 
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
+	private static final boolean ENABLE_LEXER_DFA = true;
+
+	private static final boolean ENABLE_PARSER_DFA = true;
+
     private static final boolean DISABLE_GLOBAL_CONTEXT = false;
     private static final boolean FORCE_GLOBAL_CONTEXT = false;
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
+	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
 
@@ -227,6 +235,8 @@ public class TestPerformance extends BaseTest {
 
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
         builder.append(", ForceAtn=").append(FORCE_ATN);
+		builder.append(", Lexer:").append(ENABLE_LEXER_DFA ? "DFA" : "ATN");
+		builder.append(", Parser:").append(ENABLE_PARSER_DFA ? "DFA" : "ATN");
 
         builder.append('\n');
 
@@ -242,6 +252,10 @@ public class TestPerformance extends BaseTest {
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
         builder.append('\n');
+
+		builder.append("UniqueClosure=").append(OPTIMIZE_UNIQUE_CLOSURE ? "optimize" : "complete");
+
+		builder.append('\n');
 
         return builder.toString();
     }
@@ -512,6 +526,9 @@ public class TestPerformance extends BaseTest {
                             sharedLexer.setInputStream(input);
                         } else {
                             sharedLexer = lexerCtor.newInstance(input);
+							if (!ENABLE_LEXER_DFA) {
+								sharedLexer.setInterpreter(new NonCachingLexerATNSimulator(sharedLexer, sharedLexer.getATN()));
+							}
                         }
 
                         CommonTokenStream tokens = new CommonTokenStream(sharedLexer);
@@ -529,9 +546,13 @@ public class TestPerformance extends BaseTest {
 							Parser<Token> parser = parserCtor.newInstance(tokens);
                             sharedParser = parser;
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+							if (!ENABLE_PARSER_DFA) {
+								sharedParser.setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParser, sharedParser.getATN()));
+							}
                             sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+							sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
                                 sharedParser.addParseListener(sharedListener);
@@ -596,4 +617,43 @@ public class TestPerformance extends BaseTest {
 		}
 
 	}
+
+	protected static class NonCachingLexerATNSimulator extends LexerATNSimulator {
+
+		public NonCachingLexerATNSimulator(Lexer recog, ATN atn) {
+			super(recog, atn);
+		}
+
+		@Override
+		protected DFAState addDFAState(ATNConfigSet configs) {
+			return null;
+		}
+
+	}
+
+	protected static class NonCachingParserATNSimulator<Symbol extends Token> extends ParserATNSimulator<Symbol> {
+
+		public NonCachingParserATNSimulator(Parser<Symbol> parser, ATN atn) {
+			super(parser, atn);
+		}
+
+		@NotNull
+		@Override
+		protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
+			DFAState proposed = new DFAState(configs, -1, -1);
+			DFAState existing = dfa.states.get(proposed);
+			if ( existing!=null ) return existing;
+
+			DFAState newState = proposed;
+
+			newState.stateNumber = dfa.states.size();
+			configs.optimizeConfigs(this);
+			newState.configset = configs.clone(true);
+			dfa.states.put(newState, newState);
+			if ( debug ) System.out.println("adding new DFA state: "+newState);
+			return newState;
+		}
+
+	}
+
 }
