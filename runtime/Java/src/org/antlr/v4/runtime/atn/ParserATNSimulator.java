@@ -810,7 +810,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = false;
-			stepIntoGlobal = closure(reachIntermediate, reach, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
+			closure(reachIntermediate, reach, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
+			stepIntoGlobal = reach.getDipsIntoOuterContext();
 
 			if (previous.useContext && stepIntoGlobal) {
 				reach.clear();
@@ -844,6 +845,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			dfaState = addDFAEdge(dfa, previous.s0.configset, t, contextElements, reach, contextCache);
 		}
 
+		assert !useContext || !dfaState.configset.getDipsIntoOuterContext();
 		return new SimulatorState<Symbol>(previous.outerContext, dfaState, useContext, (ParserRuleContext<Symbol>)remainingGlobalContext);
 	}
 
@@ -919,7 +921,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = true;
-			boolean stepIntoGlobal = closure(reachIntermediate, configs, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
+			closure(reachIntermediate, configs, collectPredicates, dfa.isContextSensitive(), greedy, contextCache.isContextSensitive(), hasMoreContext, contextCache);
+			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
 			DFAState next = addDFAState(dfa, configs);
 			if (s0 == null) {
@@ -1126,7 +1129,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		 ambig detection thought :(
 		  */
 
-	protected boolean closure(ATNConfigSet sourceConfigs,
+	protected void closure(ATNConfigSet sourceConfigs,
 						   @NotNull ATNConfigSet configs,
 						   boolean collectPredicates,
 						   boolean contextSensitiveDfa,
@@ -1138,7 +1141,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			contextCache = contextSensitiveDfa ? PredictionContextCache.UNCACHED_FULL : PredictionContextCache.UNCACHED_LOCAL;
 		}
 
-		boolean stepIntoGlobal = false;
 		ATNConfigSet currentConfigs = sourceConfigs;
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		while (currentConfigs.size() > 0) {
@@ -1148,16 +1150,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					continue;
 				}
 
-				stepIntoGlobal |= closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache, 0);
+				closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache, 0);
 			}
 
 			currentConfigs = intermediate;
 		}
-
-		return stepIntoGlobal;
 	}
 
-	protected boolean closure(@NotNull ATNConfig config,
+	protected void closure(@NotNull ATNConfig config,
 						   @NotNull ATNConfigSet configs,
 						   @Nullable ATNConfigSet intermediate,
 						   @NotNull Set<ATNConfig> closureBusy,
@@ -1170,10 +1170,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( !optimize_closure_busy && !closureBusy.add(config) ) {
-			return false; // avoid infinite recursion
+			return; // avoid infinite recursion
 		}
 
-		boolean stepIntoGlobal = false;
 		boolean hasEmpty = config.context == null || config.context.isEmpty();
 		if ( config.state instanceof RuleStopState ) {
 			if ( !greedy ) {
@@ -1181,7 +1180,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.println("NONGREEDY at stop state of "+
 												getRuleName(config.state.ruleIndex));
 				configs.add(config, contextCache);
-				return stepIntoGlobal;
+				return;
 			}
 			// We hit rule end. If we have context info, use it
 			if ( config.context!=null && !config.context.isEmpty() ) {
@@ -1205,18 +1204,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						continue;
 					}
 
-					stepIntoGlobal |= closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
+					closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
 				}
 
 				if (!hasEmpty || !hasMoreContexts) {
-					return stepIntoGlobal;
+					return;
 				}
 
 				config = new ATNConfig(config, config.state, PredictionContext.EMPTY);
 			}
 			else if (!hasMoreContexts) {
 				configs.add(config, contextCache);
-				return stepIntoGlobal;
+				return;
 			}
 			else {
 				// else if we have no context info, just chase follow links (if greedy)
@@ -1283,7 +1282,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
 					c.reachesIntoOuterContext++;
-					stepIntoGlobal = true;
 					assert newDepth > Integer.MIN_VALUE;
 					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
@@ -1295,11 +1293,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				stepIntoGlobal |= closure(c, configs, intermediate, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, newDepth);
+				closure(c, configs, intermediate, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, newDepth);
 			}
 		}
-
-		return stepIntoGlobal;
 	}
 
 	@NotNull
