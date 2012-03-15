@@ -248,6 +248,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public boolean force_global_context = false;
 	public boolean always_try_local_context = true;
 
+	public boolean optimize_unique_closure = true;
 	public boolean optimize_ll1 = true;
 
 	public static boolean optimize_closure_busy = true;
@@ -807,6 +808,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						reachIntermediate.add(new ATNConfig(c, target));
 					}
 				}
+			}
+
+			if (optimize_unique_closure && greedy && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
+				reachIntermediate.setOutermostConfigSet(reach.isOutermostConfigSet());
+				reach = reachIntermediate;
+				break;
 			}
 
 			final boolean collectPredicates = false;

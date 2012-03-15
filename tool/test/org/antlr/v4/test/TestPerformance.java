@@ -128,6 +128,7 @@ public class TestPerformance extends BaseTest {
     private static final boolean DISABLE_GLOBAL_CONTEXT = false;
     private static final boolean FORCE_GLOBAL_CONTEXT = false;
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
+	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
 
@@ -251,6 +252,10 @@ public class TestPerformance extends BaseTest {
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
         builder.append('\n');
+
+		builder.append("UniqueClosure=").append(OPTIMIZE_UNIQUE_CLOSURE ? "optimize" : "complete");
+
+		builder.append('\n');
 
         return builder.toString();
     }
@@ -547,6 +552,7 @@ public class TestPerformance extends BaseTest {
                             sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+							sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
                                 sharedParser.addParseListener(sharedListener);

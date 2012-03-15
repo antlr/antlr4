@@ -78,7 +78,7 @@ public class TestFullContextParsing extends BaseTest {
 			"s1-INT->:s2=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=1: [(28,1,[18 10]), (20,2,[10])], input='34abc'\n" +
-					 "line 1:2 reportContextSensitivity d=1: [(20,1,[10])],uniqueAlt=1, input='34'\n",
+					 "line 1:2 reportContextSensitivity d=1: [(33,1,[18 10])],uniqueAlt=1, input='34'\n",
 					 this.stderrDuringParse);
 
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -86,12 +86,11 @@ public class TestFullContextParsing extends BaseTest {
 		expecting =
 			"Decision 1:\n" +
 			"s0**-ctx:22(b)->s1\n" +
-			"s1-INT->s2*\n" +
-			"s2*-ctx:14(s)->s4\n" +
-			"s4-ID->:s3=>2\n";
+			"s1-INT->s2\n" +
+			"s2-ID->:s3=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=1: [(28,1,[22 14]), (24,2,[14])], input='34abc'\n" +
-					 "line 1:5 reportContextSensitivity d=1: [(1,2,[])],uniqueAlt=2, input='34abc'\n",
+					 "line 1:5 reportContextSensitivity d=1: [(27,2,[14])],uniqueAlt=2, input='34abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -120,14 +119,13 @@ public class TestFullContextParsing extends BaseTest {
 			"s0**-ctx:24(b)->s5\n" +
 			"s1-INT->:s2=>1\n" +
 			"s3-ID->:s4=>1\n" +
-			"s5-INT->s6*\n" +
-			"s6*-ctx:14(s)->s8\n" +
-			"s8-ID->:s7=>2\n";
+			"s5-INT->s6\n" +
+			"s6-ID->:s7=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=2: [(30,1,[20 10]), (22,2,[10])], input='34abc'\n" +
-					 "line 1:2 reportContextSensitivity d=2: [(22,1,[10])],uniqueAlt=1, input='34'\n" +
+					 "line 1:2 reportContextSensitivity d=2: [(35,1,[20 10])],uniqueAlt=1, input='34'\n" +
 					 "line 1:14 reportAttemptingFullContext d=2: [(30,1,[24 14]), (26,2,[14])], input='34abc'\n" +
-					 "line 1:14 reportContextSensitivity d=2: [(1,2,[]), (8,2,[18]), (12,2,[18])],uniqueAlt=2, input='34abc'\n",
+					 "line 1:14 reportContextSensitivity d=2: [(29,2,[14])],uniqueAlt=2, input='34abc'\n",
 					 this.stderrDuringParse);
 	}
 
