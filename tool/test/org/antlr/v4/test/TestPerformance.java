@@ -31,6 +31,7 @@ package org.antlr.v4.test;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -88,6 +89,10 @@ public class TestPerformance extends BaseTest {
     private static final boolean BLANK_LISTENER = false;
 
     private static final boolean SHOW_DFA_STATE_STATS = true;
+
+	private static final boolean ENABLE_LEXER_DFA = true;
+
+	private static final boolean ENABLE_PARSER_DFA = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
 
@@ -195,6 +200,8 @@ public class TestPerformance extends BaseTest {
 
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
         builder.append(", ForceAtn=").append(FORCE_ATN);
+		builder.append(", Lexer:").append(ENABLE_LEXER_DFA ? "DFA" : "ATN");
+		builder.append(", Parser:").append(ENABLE_PARSER_DFA ? "DFA" : "ATN");
 
         builder.append('\n');
 
@@ -463,6 +470,9 @@ public class TestPerformance extends BaseTest {
                             sharedLexer.setInputStream(input);
                         } else {
                             sharedLexer = lexerCtor.newInstance(input);
+							if (!ENABLE_LEXER_DFA) {
+								sharedLexer.setInterpreter(new NonCachingLexerATNSimulator(sharedLexer, sharedLexer.getATN()));
+							}
                         }
 
                         CommonTokenStream tokens = new CommonTokenStream(sharedLexer);
@@ -478,6 +488,9 @@ public class TestPerformance extends BaseTest {
                         } else {
                             sharedParser = parserCtor.newInstance(tokens);
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+							if (!ENABLE_PARSER_DFA) {
+								sharedParser.setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParser, sharedParser.getATN()));
+							}
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								// TJP commented out for now; changed interface
@@ -543,4 +556,31 @@ public class TestPerformance extends BaseTest {
 		}
 
 	}
+
+	protected static class NonCachingLexerATNSimulator extends LexerATNSimulator {
+
+		public NonCachingLexerATNSimulator(Lexer recog, ATN atn) {
+			super(recog, atn);
+		}
+
+		@Override
+		protected DFAState addDFAState(ATNConfigSet configs) {
+			return null;
+		}
+
+	}
+
+	protected static class NonCachingParserATNSimulator<Symbol extends Token> extends ParserATNSimulator<Symbol> {
+
+		public NonCachingParserATNSimulator(Parser parser, ATN atn) {
+			super(parser, atn);
+		}
+
+		@Override
+		protected void addDFAEdge(DFAState p, int t, DFAState q) {
+			// do nothing - prevents adding edges to DFA
+		}
+
+	}
+
 }
