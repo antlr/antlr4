@@ -132,11 +132,4 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
 		}
 		return n;
 	}
-
-    /** Reset this token stream by setting its token source. */
-    @Override
-    public void setTokenSource(TokenSource tokenSource) {
-        super.setTokenSource(tokenSource);
-        channel = Token.DEFAULT_CHANNEL;
-    }
 }
