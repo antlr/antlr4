@@ -100,7 +100,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	}
 
     public void reset() {
-        p = 0;
+        seek(0);
     }
 
     @Override
