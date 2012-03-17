@@ -58,9 +58,6 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      */
     protected List<T> tokens = new ArrayList<T>(100);
 
-    /** Track the last mark() call result value for use in rewind(). */
-    protected int lastMarker;
-
     /** The index into the tokens list of the current token (next token
      *  to consume).  tokens[p] should be LT(1).  p=-1 indicates need
      *  to initialize with first token.  The ctor doesn't get a token.
@@ -95,7 +92,6 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     public void reset() {
         p = 0;
-        lastMarker = 0;
     }
 
     @Override
