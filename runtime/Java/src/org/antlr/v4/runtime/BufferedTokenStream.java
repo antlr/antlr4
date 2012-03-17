@@ -126,7 +126,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     /** add n elements to buffer */
     protected void fetch(int n) {
-        for (int i=1; i<=n; i++) {
+        for (int i = 0; i < n; i++) {
             T t = (T)tokenSource.nextToken();
             if ( t instanceof WritableToken ) {
                 ((WritableToken)t).setTokenIndex(tokens.size());
