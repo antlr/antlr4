@@ -173,10 +173,6 @@ public class TokenRewriteStream extends CommonTokenStream {
 	/** Map String (program name) -> Integer index */
 	protected Map<String, Integer> lastRewriteTokenIndexes = null;
 
-	public TokenRewriteStream() {
-		init();
-	}
-
 	protected void init() {
 		programs = new HashMap<String, List<RewriteOperation>>();
 		programs.put(DEFAULT_PROGRAM_NAME, new ArrayList<RewriteOperation>(PROGRAM_INIT_SIZE));

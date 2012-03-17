@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.util.*;
 
 /** Buffer all input tokens but do on-demand fetching of new tokens from
@@ -46,6 +48,7 @@ import java.util.*;
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
 public class BufferedTokenStream<T extends Token> implements TokenStream {
+	@NotNull
     protected TokenSource tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
@@ -65,9 +68,10 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      */
     protected int p = -1;
 
-    public BufferedTokenStream() { }
-
     public BufferedTokenStream(TokenSource tokenSource) {
+		if (tokenSource == null) {
+			throw new NullPointerException("tokenSource cannot be null");
+		}
         this.tokenSource = tokenSource;
     }
 

@@ -451,8 +451,8 @@ public class TestPerformance extends BaseTest {
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-            lexerCtor.newInstance(new ANTLRInputStream(""));
-            parserCtor.newInstance(new CommonTokenStream());
+            TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
+            parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
             return new ParserFactory() {
                 @SuppressWarnings({"PointlessBooleanExpression"})
