@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.util.*;
 
 /** Buffer all input tokens but do on-demand fetching of new tokens from
@@ -46,6 +48,7 @@ import java.util.*;
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
 public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
+	@NotNull
     protected TokenSource<? extends T> tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
@@ -55,9 +58,6 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
      */
     protected List<T> tokens = new ArrayList<T>(100);
 
-    /** Track the last mark() call result value for use in rewind(). */
-    protected int lastMarker;
-
     /** The index into the tokens list of the current token (next token
      *  to consume).  tokens[p] should be LT(1).  p=-1 indicates need
      *  to initialize with first token.  The ctor doesn't get a token.
@@ -65,9 +65,19 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
      */
     protected int p = -1;
 
-    public BufferedTokenStream() { }
+	/**
+	 * Set to {@code true} when the EOF token is fetched. Do not continue fetching
+	 * tokens after that point, or multiple EOF tokens could end up in the
+	 * {@link #tokens} array.
+	 *
+	 * @see #fetch
+	 */
+	protected boolean fetchedEOF;
 
     public BufferedTokenStream(TokenSource<? extends T> tokenSource) {
+		if (tokenSource == null) {
+			throw new NullPointerException("tokenSource cannot be null");
+		}
         this.tokenSource = tokenSource;
     }
 
@@ -90,17 +100,13 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
     public void reset() {
-        p = 0;
-        lastMarker = 0;
+        seek(0);
     }
 
     @Override
     public void seek(int index) {
-        if (p == -1) {
-            setup();
-        }
-
-        p = index;
+        lazyInit();
+        p = adjustSeekIndex(index);
     }
 
     @Override
@@ -109,34 +115,56 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     /** Move the input pointer to the next incoming token.  The stream
      *  must become active with LT(1) available.  consume() simply
      *  moves the input pointer so that LT(1) points at the next
-     *  input symbol. Consume at least one token.
-     *
-     *  Walk past any token not on the channel the parser is listening to.
+     *  input symbol. Consume at least one token, unless EOF has been reached.
      */
     @Override
     public void consume() {
-        if ( p == -1 ) setup();
-        p++;
-        sync(p);
+        lazyInit();
+		if (sync(p + 1)) {
+			p = adjustSeekIndex(p + 1);
+		}
     }
 
-    /** Make sure index i in tokens has a token. */
-    protected void sync(int i) {
+    /** Make sure index {@code i} in tokens has a token.
+	 *
+	 * @return {@code true} if a token is located at index {@code i}, otherwise
+	 *    {@code false}.
+	 * @see #get(int i)
+	 */
+    protected boolean sync(int i) {
+		assert i >= 0;
         int n = i - tokens.size() + 1; // how many more elements we need?
         //System.out.println("sync("+i+") needs "+n);
-        if ( n > 0 ) fetch(n);
+        if ( n > 0 ) {
+			int fetched = fetch(n);
+			return fetched >= n;
+		}
+
+		return true;
     }
 
-    /** add n elements to buffer */
-    protected void fetch(int n) {
-        for (int i=1; i<=n; i++) {
+    /** Add {@code n} elements to buffer.
+	 *
+	 * @return The actual number of elements added to the buffer.
+	 */
+    protected int fetch(int n) {
+		if (fetchedEOF) {
+			return 0;
+		}
+
+        for (int i = 0; i < n; i++) {
             T t = (T)tokenSource.nextToken();
             if ( t instanceof WritableToken ) {
                 ((WritableToken)t).setTokenIndex(tokens.size());
             }
             tokens.add(t);
-            if ( t.getType()==Token.EOF ) break;
+            if ( t.getType()==Token.EOF ) {
+				fetchedEOF = true;
+				return i + 1;
+			}
         }
+
+		return n;
     }
 
     @Override
@@ -150,7 +178,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	/** Get all tokens from start..stop inclusively */
 	public List<T> get(int start, int stop) {
 		if ( start<0 || stop<0 ) return null;
-		if ( p == -1 ) setup();
+		lazyInit();
 		List<T> subset = new ArrayList<T>();
 		if ( stop>=tokens.size() ) stop = tokens.size()-1;
 		for (int i = start; i <= stop; i++) {
@@ -171,7 +199,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 
     @Override
     public T LT(int k) {
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( k==0 ) return null;
         if ( k < 0 ) return LB(-k);
 
@@ -185,7 +213,33 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
         return tokens.get(i);
     }
 
-    protected void setup() { sync(0); p = 0; }
+	/**
+	 * Allowed derived classes to modify the behavior of operations which change
+	 * the current stream position by adjusting the target token index of a seek
+	 * operation. The default implementation simply returns {@code i}. If an
+	 * exception is thrown in this method, the current stream index should not be
+	 * changed.
+	 * <p>
+	 * For example, {@link CommonTokenStream} overrides this method to ensure that
+	 * the seek target is always an on-channel token.
+	 *
+	 * @param i The target token index.
+	 * @return The adjusted target token index.
+	 */
+	protected int adjustSeekIndex(int i) {
+		return i;
+	}
+
+	protected final void lazyInit() {
+		if (p == -1) {
+			setup();
+		}
+	}
+
+    protected void setup() {
+		sync(0);
+		p = adjustSeekIndex(0);
+	}
 
     /** Reset this token stream by setting its token source. */
     public void setTokenSource(TokenSource<? extends T> tokenSource) {
@@ -205,7 +259,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
      *  method looks at both on and off channel tokens.
      */
     public List<T> getTokens(int start, int stop, Set<Integer> types) {
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( stop>=tokens.size() ) stop=tokens.size()-1;
         if ( start<0 ) start=0;
         if ( start>stop ) return null;
@@ -236,7 +290,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     /** Grab *all* tokens from stream and return string */
     @Override
     public String toString() {
-        if ( p == -1 ) setup();
+        lazyInit();
         fill();
         return toString(0, tokens.size()-1);
     }
@@ -244,7 +298,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     @Override
     public String toString(int start, int stop) {
         if ( start<0 || stop<0 ) return "";
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
         StringBuilder buf = new StringBuilder();
         for (int i = start; i <= stop; i++) {
@@ -265,14 +319,13 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 
     /** Get all tokens from lexer until EOF */
     public void fill() {
-        if ( p == -1 ) setup();
-        if ( tokens.get(p).getType()==Token.EOF ) return;
-
-        int i = p+1;
-        sync(i);
-        while ( tokens.get(i).getType()!=Token.EOF ) {
-            i++;
-            sync(i);
-        }
+        lazyInit();
+		final int blockSize = 1000;
+		while (true) {
+			int fetched = fetch(blockSize);
+			if (fetched < blockSize) {
+				return;
+			}
+		}
     }
 }

@@ -844,12 +844,17 @@ public abstract class BaseTest {
         public FilteringTokenStream(TokenSource<? extends Token> src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();
         @Override
-        protected void sync(int i) {
-            super.sync(i);
+        protected boolean sync(int i) {
+            if (!super.sync(i)) {
+				return false;
+			}
+
 			Token t = get(i);
 			if ( hide.contains(t.getType()) ) {
 				((WritableToken)t).setChannel(Token.HIDDEN_CHANNEL);
 			}
+
+			return true;
         }
         public void setTokenTypeChannel(int ttype, int channel) {
             hide.add(ttype);

@@ -41,6 +41,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
@@ -514,8 +515,8 @@ public class TestPerformance extends BaseTest {
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-            lexerCtor.newInstance(new ANTLRInputStream(""));
-            parserCtor.newInstance(new CommonTokenStream());
+            TokenSource<Token> tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
+            parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
             return new ParserFactory() {
                 @SuppressWarnings("unused")
