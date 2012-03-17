@@ -59,27 +59,9 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
         this.channel = channel;
     }
 
-    /**
-	 * {@inheritDoc}
-	 * <p>
-	 * Always leave {@code p} on an on-channel token.
-	 */
-    @Override
-    public void consume() {
-		super.consume();
-		p = skipOffTokenChannels(p);
-    }
-
-    @Override
-    public void seek(int index) {
-        super.seek(index);
-        p = skipOffTokenChannels(p);
-    }
-
 	@Override
-	public void reset() {
-		super.reset();
-		p = skipOffTokenChannels(p);
+	protected int adjustSeekIndex(int i) {
+		return skipOffTokenChannels(i);
 	}
 
     @Override
@@ -137,12 +119,6 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
             i--;
         }
         return i;
-    }
-
-    @Override
-    protected void setup() {
-        super.setup();
-        p = skipOffTokenChannels(p);
     }
 
 	/** Count EOF just once. */

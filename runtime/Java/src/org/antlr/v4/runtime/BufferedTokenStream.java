@@ -106,7 +106,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     @Override
     public void seek(int index) {
         lazyInit();
-        p = index;
+        p = adjustSeekIndex(index);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     public void consume() {
         lazyInit();
 		if (sync(p + 1)) {
-			p++;
+			p = adjustSeekIndex(p + 1);
 		}
     }
 
@@ -213,13 +213,33 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
         return tokens.get(i);
     }
 
+	/**
+	 * Allowed derived classes to modify the behavior of operations which change
+	 * the current stream position by adjusting the target token index of a seek
+	 * operation. The default implementation simply returns {@code i}. If an
+	 * exception is thrown in this method, the current stream index should not be
+	 * changed.
+	 * <p>
+	 * For example, {@link CommonTokenStream} overrides this method to ensure that
+	 * the seek target is always an on-channel token.
+	 *
+	 * @param i The target token index.
+	 * @return The adjusted target token index.
+	 */
+	protected int adjustSeekIndex(int i) {
+		return i;
+	}
+
 	protected final void lazyInit() {
 		if (p == -1) {
 			setup();
 		}
 	}
 
-    protected void setup() { sync(0); p = 0; }
+    protected void setup() {
+		sync(0);
+		p = adjustSeekIndex(0);
+	}
 
     /** Reset this token stream by setting its token source. */
     public void setTokenSource(TokenSource tokenSource) {
