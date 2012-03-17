@@ -62,23 +62,14 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
     /** Always leave p on an on-channel token. */
     @Override
     public void consume() {
-        if ( p == -1 ) setup();
-        p++;
-        sync(p);
-		Token t = tokens.get(p);
-		while ( t.getType()!=Token.EOF && t.getChannel()!=channel ) {
-            p++;
-            sync(p);
-			t = tokens.get(p);
-        }
+		super.consume();
+		p = skipOffTokenChannels(p);
     }
 
     @Override
     public void seek(int index) {
         super.seek(index);
-        while (p < index) {
-            consume();
-        }
+        p = skipOffTokenChannels(p);
     }
 
 	@Override
@@ -144,16 +135,8 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
 
     @Override
     protected void setup() {
-        p = 0;
-        sync(0);
-        int i = 0;
-        Token token = tokens.get(i);
-        while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
-            i++;
-            sync(i);
-            token = tokens.get(i);
-        }
-        p = i;
+        super.setup();
+        p = skipOffTokenChannels(p);
     }
 
 	/** Count EOF just once. */
