@@ -96,10 +96,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     @Override
     public void seek(int index) {
-        if (p == -1) {
-            setup();
-        }
-
+        lazyInit();
         p = index;
     }
 
@@ -115,7 +112,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      */
     @Override
     public void consume() {
-        if ( p == -1 ) setup();
+        lazyInit();
         p++;
         sync(p);
     }
@@ -150,7 +147,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	/** Get all tokens from start..stop inclusively */
 	public List<T> get(int start, int stop) {
 		if ( start<0 || stop<0 ) return null;
-		if ( p == -1 ) setup();
+		lazyInit();
 		List<T> subset = new ArrayList<T>();
 		if ( stop>=tokens.size() ) stop = tokens.size()-1;
 		for (int i = start; i <= stop; i++) {
@@ -171,7 +168,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     @Override
     public T LT(int k) {
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( k==0 ) return null;
         if ( k < 0 ) return LB(-k);
 
@@ -184,6 +181,12 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 //		if ( i>range ) range = i;
         return tokens.get(i);
     }
+
+	protected final void lazyInit() {
+		if (p == -1) {
+			setup();
+		}
+	}
 
     protected void setup() { sync(0); p = 0; }
 
@@ -205,7 +208,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      *  method looks at both on and off channel tokens.
      */
     public List<T> getTokens(int start, int stop, Set<Integer> types) {
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( stop>=tokens.size() ) stop=tokens.size()-1;
         if ( start<0 ) start=0;
         if ( start>stop ) return null;
@@ -236,7 +239,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     /** Grab *all* tokens from stream and return string */
     @Override
     public String toString() {
-        if ( p == -1 ) setup();
+        lazyInit();
         fill();
         return toString(0, tokens.size()-1);
     }
@@ -244,7 +247,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     @Override
     public String toString(int start, int stop) {
         if ( start<0 || stop<0 ) return "";
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
         StringBuilder buf = new StringBuilder();
         for (int i = start; i <= stop; i++) {
@@ -265,7 +268,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     /** Get all tokens from lexer until EOF */
     public void fill() {
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( tokens.get(p).getType()==Token.EOF ) return;
 
         int i = p+1;

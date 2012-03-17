@@ -97,7 +97,7 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
     @Override
     public Token LT(int k) {
         //System.out.println("enter LT("+k+")");
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( k == 0 ) return null;
         if ( k < 0 ) return LB(-k);
         int i = p;
