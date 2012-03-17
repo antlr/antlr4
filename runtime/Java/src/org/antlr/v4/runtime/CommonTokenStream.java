@@ -59,7 +59,11 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
         this.channel = channel;
     }
 
-    /** Always leave p on an on-channel token. */
+    /**
+	 * {@inheritDoc}
+	 * <p>
+	 * Always leave {@code p} on an on-channel token.
+	 */
     @Override
     public void consume() {
 		super.consume();
