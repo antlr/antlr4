@@ -253,4 +253,27 @@ public class TestParseErrors extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
+	/**
+	 * Regression test for "Ambiguity at k=1 prevents full context parsing".
+	 * https://github.com/antlr/antlr4/issues/44
+	 */
+	@Test
+	public void testConflictingAltAnalysis() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"ss : s s EOF;\n" +
+			"s : | x;\n" +
+			"x : 'a' 'b';\n" +
+			"";
+		String result = execParser("T.g", grammar, "TParser", "TLexer", "ss", "abab", true);
+		String expecting = "";
+		assertEquals(expecting, result);
+		assertEquals(
+			"line 1:0 reportAttemptingFullContext d=0: [(10,1,[]), (18,1,[14 8]), (18,2,[14 6])], input='a'\n" +
+			"line 1:2 reportContextSensitivity d=0: [(20,2,[14 8])],uniqueAlt=2, input='aba'\n" +
+			"line 1:2 reportAttemptingFullContext d=0: [(10,1,[]), (18,2,[14 8])], input='a'\n" +
+			"line 1:2 reportContextSensitivity d=0: [(20,2,[14 8])],uniqueAlt=2, input='a'\n",
+			this.stderrDuringParse);
+	}
+
 }
