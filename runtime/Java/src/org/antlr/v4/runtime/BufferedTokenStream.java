@@ -65,6 +65,15 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      */
     protected int p = -1;
 
+	/**
+	 * Set to {@code true} when the EOF token is fetched. Do not continue fetching
+	 * tokens after that point, or multiple EOF tokens could end up in the
+	 * {@link #tokens} array.
+	 *
+	 * @see #fetch
+	 */
+	protected boolean fetchedEOF;
+
     public BufferedTokenStream(TokenSource tokenSource) {
 		if (tokenSource == null) {
 			throw new NullPointerException("tokenSource cannot be null");
@@ -106,34 +115,56 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     /** Move the input pointer to the next incoming token.  The stream
      *  must become active with LT(1) available.  consume() simply
      *  moves the input pointer so that LT(1) points at the next
-     *  input symbol. Consume at least one token.
-     *
-     *  Walk past any token not on the channel the parser is listening to.
+     *  input symbol. Consume at least one token, unless EOF has been reached.
      */
     @Override
     public void consume() {
         lazyInit();
-        p++;
-        sync(p);
+		if (sync(p + 1)) {
+			p++;
+		}
     }
 
-    /** Make sure index i in tokens has a token. */
-    protected void sync(int i) {
+    /** Make sure index {@code i} in tokens has a token.
+	 *
+	 * @return {@code true} if a token is located at index {@code i}, otherwise
+	 *    {@code false}.
+	 * @see #get(int i)
+	 */
+    protected boolean sync(int i) {
+		assert i >= 0;
         int n = i - tokens.size() + 1; // how many more elements we need?
         //System.out.println("sync("+i+") needs "+n);
-        if ( n > 0 ) fetch(n);
+        if ( n > 0 ) {
+			int fetched = fetch(n);
+			return fetched >= n;
+		}
+
+		return true;
     }
 
-    /** add n elements to buffer */
-    protected void fetch(int n) {
+    /** Add {@code n} elements to buffer.
+	 *
+	 * @return The actual number of elements added to the buffer.
+	 */
+    protected int fetch(int n) {
+		if (fetchedEOF) {
+			return 0;
+		}
+
         for (int i = 0; i < n; i++) {
             T t = (T)tokenSource.nextToken();
             if ( t instanceof WritableToken ) {
                 ((WritableToken)t).setTokenIndex(tokens.size());
             }
             tokens.add(t);
-            if ( t.getType()==Token.EOF ) break;
+            if ( t.getType()==Token.EOF ) {
+				fetchedEOF = true;
+				return i + 1;
+			}
         }
+
+		return n;
     }
 
     @Override

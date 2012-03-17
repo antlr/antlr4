@@ -104,8 +104,10 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
         int n = 1; // we know tokens[p] is a good one
         // find k good tokens
         while ( n<k ) {
-            // skip off-channel tokens
-            i = skipOffTokenChannels(i+1);
+            // skip off-channel tokens, but make sure to not look past EOF
+			if (sync(i + 1)) {
+				i = skipOffTokenChannels(i+1);
+			}
             n++;
         }
 //		if ( i>range ) range = i;
