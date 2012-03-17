@@ -320,13 +320,12 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     /** Get all tokens from lexer until EOF */
     public void fill() {
         lazyInit();
-        if ( tokens.get(p).getType()==Token.EOF ) return;
-
-        int i = p+1;
-        sync(i);
-        while ( tokens.get(i).getType()!=Token.EOF ) {
-            i++;
-            sync(i);
-        }
+		final int blockSize = 1000;
+		while (true) {
+			int fetched = fetch(blockSize);
+			if (fetched < blockSize) {
+				return;
+			}
+		}
     }
 }
