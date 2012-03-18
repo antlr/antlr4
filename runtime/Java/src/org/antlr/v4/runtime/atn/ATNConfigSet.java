@@ -30,21 +30,28 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.misc.Triple;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /** Specialized OrderedHashSet that can track info about the set.
  *  Might be able to optimize later w/o affecting code that uses this set.
  */
-public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
+public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
 	public IntervalSet conflictingAlts;
 	public boolean hasSemanticContext;
 	public boolean dipsIntoOuterContext;
+
+	Map<Triple<ATNState,Integer,SemanticContext>, PredictionContext> m =
+		new HashMap<Triple<ATNState, Integer, SemanticContext>, PredictionContext>();
 
 	public ATNConfigSet() { }
 
@@ -54,6 +61,23 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 		this.conflictingAlts = old.conflictingAlts;
 		this.hasSemanticContext = old.hasSemanticContext;
 		this.dipsIntoOuterContext = old.dipsIntoOuterContext;
+	}
+
+	/** Adding a new config means merging contexts with existing configs for
+	 *  (s, i, pi, _)
+	 *  We use (s,i,pi) as key
+	 */
+	@Override
+	public boolean add(ATNConfig value) {
+		Triple<ATNState, Integer, SemanticContext> key =
+			new Triple<ATNState, Integer, SemanticContext>(
+				value.state,value.alt,value.semanticContext
+			);
+		PredictionContext existing = m.get(key);
+		if ( existing==null ) return false;
+		PredictionContext merged = PredictionContext.merge(existing, value.context, true);
+		m.put(key, merged);
+		return true;
 	}
 
 	public Set<ATNState> getStates() {
@@ -73,5 +97,72 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
 		if ( dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
 		return buf.toString();
+	}
+
+	private static long getKey(ATNConfig e) {
+		long key = ((long) e.state.stateNumber << 32) + (e.alt << 3);
+		//key |= e.reachesIntoOuterContext != 0 ? 1 : 0;
+		//key |= e.resolveWithPredicate ? 1 << 1 : 0;
+		//key |= e.traversedPredicate ? 1 << 2 : 0;
+		return key;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends ATNConfig> c) {
+		return false;
+	}
+
+	@Override
+	public int size() {
+		return 0;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		return false;
+	}
+
+	@Override
+	public Iterator<ATNConfig> iterator() {
+		return null;
+	}
+
+	@Override
+	public Object[] toArray() {
+		return new Object[0];
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return null;
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return false;
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return false;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return false;
+	}
+
+	@Override
+	public void clear() {
 	}
 }
