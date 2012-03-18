@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -55,7 +54,7 @@ public class ATNConfig {
 	 *  execution of the ATN simulator.
 	 */
 	@Nullable
-	public RuleContext context;
+	public PredictionContext context;
 
 	/**
 	 * We cannot execute predicates dependent upon local context unless
@@ -78,14 +77,14 @@ public class ATNConfig {
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
-					 @Nullable RuleContext context)
+					 @Nullable PredictionContext context)
 	{
 		this(state, alt, context, SemanticContext.NONE);
 	}
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
-					 @Nullable RuleContext context,
+					 @Nullable PredictionContext context,
 					 @NotNull SemanticContext semanticContext)
 	{
 		this.state = state;
@@ -102,11 +101,11 @@ public class ATNConfig {
    		this(c, state, c.context, semanticContext);
    	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context) {
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
         this(c, state, context, c.semanticContext);
     }
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context,
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
                      @NotNull SemanticContext semanticContext)
     {
 		this.state = state;

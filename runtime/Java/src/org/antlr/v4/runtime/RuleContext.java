@@ -59,6 +59,8 @@ import java.io.IOException;
  *  @see ParserRuleContext
  */
 public class RuleContext implements ParseTree.RuleNode {
+	public static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
+
 	/** What context invoked this rule? */
 	public RuleContext parent;
 

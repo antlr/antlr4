@@ -1,34 +1,55 @@
 package org.antlr.v4.runtime.atn;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class ArrayPredictionContext extends PredictionContext {
 	public final PredictionContext[] parents;
 	// sorted for merge sort, no duplicates
-	public final String[] payloads;
+	public final int[] invokingStates;
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
 		this.parents = new PredictionContext[] {a.parent};
-		this.payloads = new String[] {a.payload};
+		this.invokingStates = new int[] {a.invokingState};
 	}
 
-	public ArrayPredictionContext(PredictionContext[] parents, String[] payloads) {
+	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
 		this.parents = parents;
-		this.payloads = payloads;
+		this.invokingStates = invokingStates;
 	}
 
 	public ArrayPredictionContext(SingletonPredictionContext... nodes) {
 		parents = new PredictionContext[nodes.length];
-		payloads = new String[nodes.length];
+		invokingStates = new int[nodes.length];
 		for (int i=0; i<nodes.length; i++) {
 			parents[i] = nodes[i].parent;
-			payloads[i] = nodes[i].payload;
+			invokingStates[i] = nodes[i].invokingState;
 		}
 	}
 
 	@Override
+	public Iterator<SingletonPredictionContext> iterator() {
+		return new Iterator<SingletonPredictionContext>() {
+			int i = 0;
+			@Override
+			public boolean hasNext() { return i < parents.length; }
+
+			@Override
+			public SingletonPredictionContext next() {
+				SingletonPredictionContext ctx =
+					new SingletonPredictionContext(parents[i], invokingStates[i]);
+				i++;
+				return ctx;
+			}
+
+			@Override
+			public void remove() { throw new UnsupportedOperationException(); }
+		};
+	}
+
+	@Override
 	public int size() {
-		return payloads.length;
+		return invokingStates.length;
 	}
 
 	@Override
@@ -37,13 +58,13 @@ public class ArrayPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public String getPayload(int index) {
-		return payloads[index];
+	public int getInvokingState(int index) {
+		return invokingStates[index];
 	}
 
 	@Override
-	public int findPayload(String payload) {
-		return Arrays.binarySearch(payloads, payload);
+	public int findInvokingState(int invokingState) {
+		return Arrays.binarySearch(invokingStates, invokingState);
 	}
 
 	public ArrayPredictionContext trim() {
@@ -54,7 +75,7 @@ public class ArrayPredictionContext extends PredictionContext {
 			int n = i+1;
 			return new ArrayPredictionContext(
 				Arrays.copyOf(parents, n),
-				Arrays.copyOf(payloads, n)
+				Arrays.copyOf(invokingStates, n)
 			);
 		}
 		return this;
@@ -74,12 +95,12 @@ public class ArrayPredictionContext extends PredictionContext {
 		}
 
 		ArrayPredictionContext a = (ArrayPredictionContext)o;
-		if ( payloads.length != a.payloads.length ) {
+		if ( invokingStates.length != a.invokingStates.length ) {
 			return false;
 		}
 
-		for (int i=0; i<payloads.length; i++) {
-			if ( !payloads[i].equals(a.payloads[i]) ) return false;
+		for (int i=0; i< invokingStates.length; i++) {
+			if ( invokingStates[i]!=a.invokingStates[i] ) return false;
 			if ( !parents[i].equals(a.parents[i]) ) return false;
 		}
 		return true;
@@ -92,6 +113,6 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return Arrays.toString(payloads)+":"+id;
+		return Arrays.toString(invokingStates)+":"+id;
 	}
 }

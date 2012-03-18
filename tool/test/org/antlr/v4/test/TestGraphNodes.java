@@ -364,7 +364,8 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	public SingletonPredictionContext createSingleton(PredictionContext parent, String payload) {
-		SingletonPredictionContext a = new SingletonPredictionContext(parent, payload);
-		return a;
+//		SingletonPredictionContext a = new SingletonPredictionContext(parent, payload);
+//		return a;
+		return null;
 	}
 }

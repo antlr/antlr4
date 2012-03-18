@@ -2,11 +2,13 @@ package org.antlr.v4.runtime.atn;
 
 public class EmptyPredictionContext extends SingletonPredictionContext {
 	public EmptyPredictionContext() {
-		super(null,"$");
+		super(null,-1);
 	}
 
+	public boolean isEmpty() { return true; }
+
 	@Override
-	public int findPayload(String payload) {
+	public int findInvokingState(int invokingState) {
 		return 1;
 	}
 
@@ -21,7 +23,12 @@ public class EmptyPredictionContext extends SingletonPredictionContext {
 	}
 
 	@Override
-	public String getPayload(int index) {
-		return payload;
+	public int getInvokingState(int index) {
+		return invokingState;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return this == o;
 	}
 }

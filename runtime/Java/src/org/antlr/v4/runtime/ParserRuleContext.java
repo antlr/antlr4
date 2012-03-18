@@ -63,8 +63,6 @@ import java.util.List;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext<Symbol extends Token> extends RuleContext {
-	public static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
-
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
 	 *  with this rule's context. This is empty for normal parsing

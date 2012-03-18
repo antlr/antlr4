@@ -321,7 +321,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DecisionState decState = atn.getDecisionState(dfa.decision);
 		boolean greedy = decState.isGreedy;
 		boolean loopsSimulateTailRecursion = false;
-		ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, ParserRuleContext.EMPTY, greedy, loopsSimulateTailRecursion);
+		boolean fullCtx = false;
+		ATNConfigSet s0_closure =
+			computeStartState(dfa.atnStartState,
+							  ParserRuleContext.EMPTY,
+							  greedy, loopsSimulateTailRecursion,
+							  fullCtx);
 		dfa.s0 = addDFAState(dfa, s0_closure);
 
 		int alt = 0;
@@ -364,7 +369,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( s.isCtxSensitive ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean loopsSimulateTailRecursion = true;
-				ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, outerContext, greedy, loopsSimulateTailRecursion);
+				boolean fullCtx = false;
+				ATNConfigSet s0_closure =
+					computeStartState(dfa.atnStartState, outerContext,
+									  greedy, loopsSimulateTailRecursion,
+									  fullCtx);
 				ATNConfigSet fullCtxSet =
 					execATNWithFullContext(dfa, s, s0_closure,
 										   input, startIndex,
@@ -546,7 +555,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
 							loopsSimulateTailRecursion = true;
-							ATNConfigSet s0_closure = computeStartState(dfa.atnStartState, outerContext, greedy, loopsSimulateTailRecursion);
+							ATNConfigSet s0_closure =
+								computeStartState(dfa.atnStartState,
+												  outerContext,
+												  greedy,
+												  loopsSimulateTailRecursion,
+												  fullCtx);
 							fullCtxSet = execATNWithFullContext(dfa, D, s0_closure,
 																input, startIndex,
 																outerContext,
@@ -718,9 +732,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@NotNull
 	public ATNConfigSet computeStartState(@NotNull ATNState p,
 										  @Nullable RuleContext ctx,
-										  boolean greedy, boolean loopsSimulateTailRecursion)
+										  boolean greedy,
+										  boolean loopsSimulateTailRecursion,
+										  boolean fullCtx)
 	{
-		RuleContext initialContext = ctx; // always at least the implicit call to start rule
+		// always at least the implicit call to start rule
+		PredictionContext initialContext = PredictionContext.fromRuleContext(ctx);
 		ATNConfigSet configs = new ATNConfigSet();
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
@@ -932,17 +949,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			// We hit rule end. If we have context info, use it
 			if ( config.context!=null && !config.context.isEmpty() ) {
-				RuleContext newContext = config.context.parent; // "pop" invoking state
-				ATNState invokingState = atn.states.get(config.context.invokingState);
-				RuleTransition rt = (RuleTransition)invokingState.transition(0);
-				ATNState retState = rt.followState;
-				ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
-				// While we have context to pop back from, we may have
-				// gotten that context AFTER having falling off a rule.
-				// Make sure we track that we are now out of context.
-				c.reachesIntoOuterContext = config.reachesIntoOuterContext;
-				assert depth > Integer.MIN_VALUE;
-				closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
+				// run thru all possible stack tops in ctx
+				for (SingletonPredictionContext ctx : config.context) {
+					PredictionContext newContext = ctx.parent; // "pop" invoking state
+					ATNState invokingState = atn.states.get(ctx.invokingState);
+					RuleTransition rt = (RuleTransition)invokingState.transition(0);
+					ATNState retState = rt.followState;
+					ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
+					// While we have context to pop back from, we may have
+					// gotten that context AFTER having falling off a rule.
+					// Make sure we track that we are now out of context.
+					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+					assert depth > Integer.MIN_VALUE;
+					closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
+				}
 				return;
 			}
 			else {
@@ -953,18 +973,24 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 		else if ( loopsSimulateTailRecursion ) {
 			if ( config.state.getClass()==StarLoopbackState.class ||
-			config.state.getClass()==PlusLoopbackState.class )
+				 config.state.getClass()==PlusLoopbackState.class )
 			{
-				config.context = new RuleContext(config.context, config.state.stateNumber);
+				config.context =
+					new SingletonPredictionContext(config.context, config.state.stateNumber);
 				// alter config; it's ok, since all calls to closure pass in a fresh config for us to chase
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
 			else if ( config.state.getClass()==LoopEndState.class ) {
 				if ( debug ) System.out.println("Loop end; pop, stack="+config.context);
-				RuleContext p = config.context;
-				LoopEndState end = (LoopEndState) config.state;
-				while ( !p.isEmpty() && p.invokingState == end.loopBackStateNumber ) {
-					p = config.context = config.context.parent; // "pop"
+				// run thru all possible stack tops in ctx
+				for (SingletonPredictionContext ctx : config.context) {
+					SingletonPredictionContext p = ctx;
+					LoopEndState end = (LoopEndState) config.state;
+					// pop all the way back until we don't see the loopback state anymore
+					while ( !p.isEmpty() && p.invokingState == end.loopBackStateNumber ) {
+						// TODO: BROKEN. can't figure out how to leave config.context
+//						p = config.context = config.context.parent; // "pop"
+					}
 				}
 			}
 		}
@@ -1080,8 +1106,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							   ", ctx="+config.context);
 		}
 		ATNState p = config.state;
-		RuleContext newContext =
-			new RuleContext(config.context, p.stateNumber);
+		PredictionContext newContext =
+			new SingletonPredictionContext(config.context, p.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 

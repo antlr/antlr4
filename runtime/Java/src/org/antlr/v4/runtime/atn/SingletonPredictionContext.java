@@ -1,12 +1,30 @@
 package org.antlr.v4.runtime.atn;
 
+import java.util.Iterator;
+
 public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
-	public final String payload;
+	public final int invokingState;
 
-	public SingletonPredictionContext(PredictionContext parent, String payload) {
+	public SingletonPredictionContext(PredictionContext parent, int invokingState) {
 		this.parent = parent;
-		this.payload = payload;
+		this.invokingState = invokingState;
+	}
+
+	@Override
+	public Iterator<SingletonPredictionContext> iterator() {
+		final SingletonPredictionContext self = this;
+		return new Iterator<SingletonPredictionContext>() {
+			int i = 0;
+			@Override
+			public boolean hasNext() { return i>0; }
+
+			@Override
+			public SingletonPredictionContext next() { i++; return self; }
+
+			@Override
+			public void remove() { throw new UnsupportedOperationException(); }
+		};
 	}
 
 	@Override
@@ -21,14 +39,14 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public String getPayload(int index) {
+	public int getInvokingState(int index) {
 		assert index == 0;
-		return payload;
+		return invokingState;
 	}
 
 	@Override
-	public int findPayload(String payload) {
-		return this.payload.equals(payload) ? 0 : -1;
+	public int findInvokingState(int invokingState) {
+		return this.invokingState == invokingState ? 0 : -1;
 	}
 
 	@Override
@@ -45,7 +63,7 @@ public class SingletonPredictionContext extends PredictionContext {
 		}
 
 		SingletonPredictionContext s = (SingletonPredictionContext)o;
-		return payload.equals(s.payload) && parent.equals(s.parent);
+		return invokingState == s.invokingState && parent.equals(s.parent);
 	}
 
 	@Override
@@ -55,6 +73,6 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return payload+":"+id;
+		return invokingState +":"+id;
 	}
 }
