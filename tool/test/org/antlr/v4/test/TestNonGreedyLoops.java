@@ -306,9 +306,9 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'{'->:s1=>1\n" +
-					 "s0-'}'->:s3=>2\n" +
-					 "s0-INT->:s2=>1\n" +
-					 "s0-ID->:s2=>1\n", found);
+					 "s0-'}'->:s2=>2\n" +
+					 "s0-INT->:s1=>1\n" +
+					 "s0-ID->:s1=>1\n", found);
 
 		input =
 			"if ( ()) ) { {return a} b 34 } ;";
@@ -334,9 +334,9 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "\n" +
 					 "Decision 2:\n" +
 					 "s0-'{'->:s1=>1\n" +
-					 "s0-'}'->:s3=>2\n" +
-					 "s0-INT->:s2=>1\n" +
-					 "s0-ID->:s2=>1\n", found);
+					 "s0-'}'->:s2=>2\n" +
+					 "s0-INT->:s1=>1\n" +
+					 "s0-ID->:s1=>1\n", found);
 	}
 
 	@Test public void testStatLoopNongreedyNotNecessary() throws Exception {

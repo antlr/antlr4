@@ -153,7 +153,10 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 1\n" +
 			"alt 1\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:0 reportAmbiguity d=0: ambigAlts={1..2}:[(1,1,[],up=1), (6,1,[],up=1), (1,2,[],up=1), (6,2,[],up=1), (1,3,[],{1:0}?,up=1), (6,3,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={1..3},dipsIntoOuterContext, input='x'\n",
+        assertEquals("line 1:0 reportAttemptingFullContext d=0: [(10,1,[4]), (14,2,[4]), (20,3,[4],{1:0}?)],hasSemanticContext=true, input='x'\n" +
+					 "line 1:0 reportAmbiguity d=0: ambigAlts={1..2}:[(6,1,[]), (6,2,[]), (6,3,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={1..3}, input='x'\n" +
+					 "line 1:3 reportAttemptingFullContext d=0: [(10,1,[8]), (14,2,[8]), (20,3,[8],{1:0}?)],hasSemanticContext=true, input='y'\n" +
+					 "line 1:3 reportAmbiguity d=0: ambigAlts={1..2}:[(1,1,[]), (1,2,[]), (1,3,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={1..3}, input='y'\n",
                      this.stderrDuringParse);
 	}
 
@@ -184,7 +187,10 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 2\n" +
 			"alt 2\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:4 reportAmbiguity d=0: ambigAlts={2..3}:[(1,2,[],up=1), (6,2,[],up=1), (10,2,[],up=1), (1,3,[],up=1), (6,3,[],up=1), (10,3,[],up=1), (1,4,[],{1:0}?,up=1), (6,4,[],{1:0}?,up=1), (10,4,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={2..4},dipsIntoOuterContext, input='x'\n",
+        assertEquals("line 1:4 reportAttemptingFullContext d=0: [(14,1,[8]), (18,2,[8]), (22,3,[8]), (28,4,[8],{1:0}?)],hasSemanticContext=true, input='x'\n" +
+					 "line 1:4 reportAmbiguity d=0: ambigAlts={2..3}:[(10,2,[]), (10,3,[]), (10,4,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={2..4}, input='x'\n" +
+					 "line 1:7 reportAttemptingFullContext d=0: [(14,1,[12]), (18,2,[12]), (22,3,[12]), (28,4,[12],{1:0}?)],hasSemanticContext=true, input='y'\n" +
+					 "line 1:7 reportAmbiguity d=0: ambigAlts={2..3}:[(1,2,[]), (1,3,[]), (1,4,[],{1:0}?)],hasSemanticContext=true,conflictingAlts={2..4}, input='y'\n",
 					 this.stderrDuringParse);
 	}
 

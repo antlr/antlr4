@@ -270,9 +270,7 @@ public class TestParseErrors extends BaseTest {
 		String expecting = "";
 		assertEquals(expecting, result);
 		assertEquals(
-			"line 1:0 reportAttemptingFullContext d=0: [(10,1,[]), (18,1,[14 8]), (18,2,[14 6])], input='a'\n" +
-			"line 1:2 reportContextSensitivity d=0: [(20,2,[14 8])],uniqueAlt=2, input='aba'\n" +
-			"line 1:2 reportAttemptingFullContext d=0: [(10,1,[]), (18,2,[14 8])], input='a'\n" +
+			"line 1:4 reportAttemptingFullContext d=0: [(10,1,[]), (18,2,[14 8])], input='ab'\n" +
 			"line 1:2 reportContextSensitivity d=0: [(20,2,[14 8])],uniqueAlt=2, input='a'\n",
 			this.stderrDuringParse);
 	}
