@@ -215,6 +215,25 @@ public class TestGraphNodes extends TestCase {
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
 
+	@Test public void test_Aa_Aa() {
+		SingletonPredictionContext a1 = createSingleton(PredictionContext.EMPTY, "a");
+		SingletonPredictionContext a2 = createSingleton(PredictionContext.EMPTY, "a");
+		ArrayPredictionContext A1 = new ArrayPredictionContext(a1);
+		ArrayPredictionContext A2 = new ArrayPredictionContext(a2);
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s6 [label=\"[a, b, c]\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s6->s0;\n" +
+			"  s6->s0;\n" +
+			"  s6->s0;\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
 	@Test public void test_Aa_Abc() {
 		SingletonPredictionContext a = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext b = createSingleton(PredictionContext.EMPTY, "b");
@@ -289,6 +308,52 @@ public class TestGraphNodes extends TestCase {
 			"  s0 [label=\"$\"];\n" +
 			"  s9->s0;\n" +
 			"  s9->s0;\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
+	@Test public void test_Aax_Aay() { // ax + ay -> merged a, array parent
+		SingletonPredictionContext x = createSingleton(PredictionContext.EMPTY, "x");
+		SingletonPredictionContext a1 = createSingleton(x, "a");
+		SingletonPredictionContext y = createSingleton(PredictionContext.EMPTY, "y");
+		SingletonPredictionContext a2 = createSingleton(y, "a");
+		ArrayPredictionContext A1 = new ArrayPredictionContext(a1);
+		ArrayPredictionContext A2 = new ArrayPredictionContext(a2);
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s12 [label=\"[a]\"];\n" +
+			"  s10 [label=\"[x, y]\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s12->s10;\n" +
+			"  s10->s0;\n" +
+			"  s10->s0;\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
+	@Test public void test_Aaxc_Aayd() { // ax,c + ay,d -> merged a, array parent
+		SingletonPredictionContext x = createSingleton(PredictionContext.EMPTY, "x");
+		SingletonPredictionContext a1 = createSingleton(x, "a");
+		SingletonPredictionContext c = createSingleton(PredictionContext.EMPTY, "c");
+		SingletonPredictionContext y = createSingleton(PredictionContext.EMPTY, "y");
+		SingletonPredictionContext a2 = createSingleton(y, "a");
+		SingletonPredictionContext d = createSingleton(PredictionContext.EMPTY, "d");
+		ArrayPredictionContext A1 = new ArrayPredictionContext(a1,c);
+		ArrayPredictionContext A2 = new ArrayPredictionContext(a2,d);
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s12 [label=\"[a]\"];\n" +
+			"  s10 [label=\"[x, y]\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s12->s10;\n" +
+			"  s10->s0;\n" +
+			"  s10->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
