@@ -1,3 +1,5 @@
+package org.antlr.v4.runtime.atn;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,3 +1,5 @@
+package org.antlr.v4.runtime.atn;
+
 import java.util.Arrays;
 
 public class ArrayPredictionContext extends PredictionContext {

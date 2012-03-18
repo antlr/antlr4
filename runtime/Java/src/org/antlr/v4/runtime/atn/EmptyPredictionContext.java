@@ -1,3 +1,5 @@
+package org.antlr.v4.runtime.atn;
+
 public class EmptyPredictionContext extends SingletonPredictionContext {
 	public EmptyPredictionContext() {
 		super(null,"$");

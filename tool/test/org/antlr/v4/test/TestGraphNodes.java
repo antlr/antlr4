@@ -1,4 +1,9 @@
+package org.antlr.v4.test;
+
 import junit.framework.TestCase;
+import org.antlr.v4.runtime.atn.ArrayPredictionContext;
+import org.antlr.v4.runtime.atn.PredictionContext;
+import org.antlr.v4.runtime.atn.SingletonPredictionContext;
 import org.junit.Test;
 
 import java.util.List;
@@ -225,11 +230,9 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s6 [label=\"[a, b, c]\"];\n" +
+			"  s8 [label=\"[a]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s6->s0;\n" +
-			"  s6->s0;\n" +
-			"  s6->s0;\n" +
+			"  s8->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -348,12 +351,14 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s12 [label=\"[a]\"];\n" +
-			"  s10 [label=\"[x, y]\"];\n" +
+			"  s14 [label=\"[a, c, d]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s12->s10;\n" +
-			"  s10->s0;\n" +
-			"  s10->s0;\n" +
+			"  s12 [label=\"[x, y]\"];\n" +
+			"  s14->s12;\n" +
+			"  s14->s0;\n" +
+			"  s14->s0;\n" +
+			"  s12->s0;\n" +
+			"  s12->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}

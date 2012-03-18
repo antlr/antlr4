@@ -1,3 +1,5 @@
+package org.antlr.v4.runtime.atn;
+
 public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
 	public final String payload;
