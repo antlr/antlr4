@@ -140,7 +140,11 @@ public abstract class PredictionContext {
 		if ( k < M.size() ) { // write index < last position; trim
 			M = M.trim();
 		}
-		// if we created same array as a or b, return that instead
+
+		// TODO: if we created same array as a or b, return that instead
+
+		// TODO: make pass over all M parents; merge any equal() ones
+
 		return M;
 	}
 
