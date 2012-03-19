@@ -32,10 +32,13 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Triple;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +46,44 @@ import java.util.Set;
  *  Might be able to optimize later w/o affecting code that uses this set.
  */
 public class ATNConfigSet implements Set<ATNConfig> {
+	public static class Key {
+		ATNState state;
+		int alt;
+		SemanticContext semanticContext;
+
+		public Key(ATNState state, int alt, SemanticContext semanticContext) {
+			this.state = state;
+			this.alt = alt;
+			this.semanticContext = semanticContext;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( obj==this ) return true;
+			if ( this.hashCode() != obj.hashCode() ) return false;
+			if ( !(obj instanceof Key) ) return false;
+			Key key = (Key)obj;
+			return this.state.stateNumber==key.state.stateNumber
+				&& this.alt==key.alt
+				&& this.semanticContext.equals(key.semanticContext);
+		}
+
+		@Override
+		public int hashCode() {
+			int hashCode = 7;
+			hashCode = 5 * hashCode + state.stateNumber;
+			hashCode = 5 * hashCode + alt;
+			hashCode = 5 * hashCode + semanticContext.hashCode();
+	        return hashCode;
+		}
+	}
+
+	/** Track every config we add */
+	protected LinkedHashMap<Key,PredictionContext> configToContext;
+
+	/** Track the elements as they are added to the set */
+	protected ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
+
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
@@ -80,13 +121,36 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return true;
 	}
 
+	/** Return the List holding list of table elements.  Note that you are
+     *  NOT getting a copy so don't write to the list.
+     */
+    public List<ATNConfig> elements() {
+        return configs;
+    }
+
 	public Set<ATNState> getStates() {
 		Set<ATNState> states = new HashSet<ATNState>();
-		for (ATNConfig c : this.elements) {
+		for (ATNConfig c : this.configs) {
 			states.add(c.state);
 		}
 		return states;
 	}
+
+	public ATNConfig get(int i) {
+		return configs.get(i);
+	}
+
+	/** Replace an existing value with a new value; updates the element
+	 *  list and the hash table, but not the key as that has not changed.
+	 */
+	public ATNConfig set(int i, ATNConfig value) {
+		ATNConfig oldElement = configs.get(i);
+		elements.set(i,value); // update list
+		super.remove(oldElement); // now update the set: remove/add
+		super.add(value);
+		return oldElement;
+	}
+
 
 	@Override
 	public String toString() {
