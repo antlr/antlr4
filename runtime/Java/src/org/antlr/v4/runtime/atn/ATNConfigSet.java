@@ -78,6 +78,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private IntervalSet conflictingAlts;
 	private boolean hasSemanticContext;
 	private boolean dipsIntoOuterContext;
+	/**
+	 * When {@code true}, this config set represents configurations where the entire
+	 * outer context has been consumed by the ATN interpreter. This prevents the
+	 * {@link ParserATNSimulator#closure} from pursuing the global FOLLOW when a
+	 * rule stop state is reached with an empty prediction context.
+	 * <p>
+	 * Note: {@code outermostConfigSet} and {@link #dipsIntoOuterContext} should never
+	 * be true at the same time.
+	 */
 	private boolean outermostConfigSet;
 
 	public ATNConfigSet() {
@@ -265,6 +274,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private void updatePropertiesForMergedConfig(ATNConfig config) {
 		// merged configs can't change the alt or semantic context
 		dipsIntoOuterContext |= config.reachesIntoOuterContext > 0;
+		assert !outermostConfigSet || !dipsIntoOuterContext;
 	}
 
 	private void updatePropertiesForAddedConfig(ATNConfig config) {
@@ -276,6 +286,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		hasSemanticContext |= !SemanticContext.NONE.equals(config.semanticContext);
 		dipsIntoOuterContext |= config.reachesIntoOuterContext > 0;
+		assert !outermostConfigSet || !dipsIntoOuterContext;
 	}
 
 	private static boolean canMerge(ATNConfig left, ATNConfig right) {
