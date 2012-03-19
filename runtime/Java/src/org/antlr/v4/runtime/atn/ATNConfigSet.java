@@ -74,8 +74,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	private final List<ATNConfig> configs;
 
-	public int outerContextDepth;
-
 	private int uniqueAlt;
 	private IntervalSet conflictingAlts;
 	private boolean hasSemanticContext;
@@ -101,7 +99,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		this.configs = new ArrayList<ATNConfig>(set.configs);
 
-		this.outerContextDepth = set.outerContextDepth;
 		this.dipsIntoOuterContext = set.dipsIntoOuterContext;
 		this.hasSemanticContext = set.hasSemanticContext;
 		this.uniqueAlt = set.uniqueAlt;
@@ -366,8 +363,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		mergedConfigs.clear();
 		unmerged.clear();
 		configs.clear();
-
-		outerContextDepth = 0;
 
 		dipsIntoOuterContext = false;
 		hasSemanticContext = false;
