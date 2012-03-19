@@ -48,8 +48,30 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class ATNConfigSet implements Set<ATNConfig> {
 
+	/**
+	 * This maps (state, alt) -> merged {@link ATNConfig}. The key does not account for
+	 * the {@link ATNConfig#semanticContext} of the value, which is only a problem if a single
+	 * {@code ATNConfigSet} contains two configs with the same state and alternative
+	 * but different semantic contexts. When this case arises, the first config
+	 * added to this map stays, and the remaining configs are placed in {@link #unmerged}.
+	 * <p>
+	 * This map is only used for optimizing the process of adding configs to the set,
+	 * and is {@code null} for read-only sets stored in the DFA.
+	 */
 	private final Map<Long, ATNConfig> mergedConfigs;
+	/**
+	 * This is an "overflow" list holding configs which cannot be merged with one
+	 * of the configs in {@link #mergedConfigs} but have a colliding key. This
+	 * occurs when two configs in the set have the same state and alternative but
+	 * different semantic contexts.
+	 * <p>
+	 * This list is only used for optimizing the process of adding configs to the set,
+	 * and is {@code null} for read-only sets stored in the DFA.
+	 */
 	private final List<ATNConfig> unmerged;
+	/**
+	 * This is a list of all configs in this set.
+	 */
 	private final List<ATNConfig> configs;
 
 	public int outerContextDepth;
