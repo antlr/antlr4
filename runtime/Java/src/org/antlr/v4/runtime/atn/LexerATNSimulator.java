@@ -493,7 +493,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeStartState(@NotNull IntStream input,
 											 @NotNull ATNState p)
 	{
-		PredictionContext initialContext = PredictionContext.EMPTY;
+		PredictionContext initialContext = EmptyPredictionContext.EMPTY;
 		ATNConfigSet configs = new ATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
@@ -524,14 +524,17 @@ public class LexerATNSimulator extends ATNSimulator {
 				configs.add(config);
 				return;
 			}
-			// run thru all possible stack tops in ctx
-			for (SingletonPredictionContext ctx : config.context) {
-				PredictionContext newContext = ctx.parent; // "pop" invoking state
-				ATNState invokingState = atn.states.get(ctx.invokingState);
-				RuleTransition rt = (RuleTransition)invokingState.transition(0);
-				ATNState retState = rt.followState;
-				ATNConfig c = new ATNConfig(retState, config.alt, newContext);
-				closure(c, configs);
+			if ( config.context!=null && !config.context.isEmpty() ) {
+				for (SingletonPredictionContext ctx : config.context) {
+					if ( !ctx.isEmpty() ) {
+						PredictionContext newContext = ctx.parent; // "pop" invoking state
+						ATNState invokingState = atn.states.get(ctx.invokingState);
+						RuleTransition rt = (RuleTransition)invokingState.transition(0);
+						ATNState retState = rt.followState;
+						ATNConfig c = new ATNConfig(retState, config.alt, newContext);
+						closure(c, configs);
+					}
+				}
 			}
 			return;
 		}

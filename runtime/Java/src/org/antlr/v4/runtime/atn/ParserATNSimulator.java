@@ -239,7 +239,7 @@ import java.util.Set;
  	 *  holds the decision were evaluating
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
@@ -527,7 +527,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		while (true) { // while more work
 			boolean loopsSimulateTailRecursion = false;
-			ATNConfigSet reach = computeReachSet(previous, t, greedy, loopsSimulateTailRecursion);
+			ATNConfigSet reach = computeReachSet(previous, t, greedy,
+												 loopsSimulateTailRecursion,
+												 false);
 			if ( reach==null ) throw noViableAlt(input, outerContext, previous, startIndex);
 			D = addDFAEdge(dfa, previous, t, reach); // always adding edge even if to a conflict state
 			int predictedAlt = getUniqueAlt(reach);
@@ -537,8 +539,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				D.prediction = predictedAlt;
 			}
 			else {
-				boolean fullCtx = false;
-				D.configset.conflictingAlts = getConflictingAlts(reach, fullCtx);
+				D.configset.conflictingAlts = getConflictingAlts(reach, false);
 				if ( D.configset.conflictingAlts!=null ) {
 					if ( greedy ) {
 						int k = input.index() - startIndex + 1; // how much input we used
@@ -547,7 +548,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							 !D.configset.dipsIntoOuterContext )
 						{
 							if ( reportAmbiguities && !D.configset.hasSemanticContext ) {
-								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.conflictingAlts, D.configset);
+								reportAmbiguity(dfa, D, startIndex, input.index(),
+												D.configset.conflictingAlts, D.configset);
 							}
 							D.isAcceptState = true;
 							predictedAlt = resolveToMinAlt(D, D.configset.conflictingAlts);
@@ -560,7 +562,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												  outerContext,
 												  greedy,
 												  loopsSimulateTailRecursion,
-												  fullCtx);
+												  true);
 							fullCtxSet = execATNWithFullContext(dfa, D, s0_closure,
 																input, startIndex,
 																outerContext,
@@ -654,7 +656,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		input.seek(startIndex);
 		int t = input.LA(1);
 		while (true) { // while more work
-			reach = computeReachSet(previous, t, greedy, true);
+			reach = computeReachSet(previous, t, greedy, true, true);
 			if ( reach==null ) {
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
@@ -710,9 +712,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return reach;
 	}
 
-	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t, boolean greedy, boolean loopsSimulateTailRecursion) {
+	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
+										   boolean greedy,
+										   boolean loopsSimulateTailRecursion,
+										   boolean fullCtx) {
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
-		ATNConfigSet reach = new ATNConfigSet();
+		ATNConfigSet reach = new ATNConfigSet(fullCtx);
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
@@ -738,7 +743,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		// always at least the implicit call to start rule
 		PredictionContext initialContext = PredictionContext.fromRuleContext(ctx);
-		ATNConfigSet configs = new ATNConfigSet();
+		ATNConfigSet configs = new ATNConfigSet(fullCtx);
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;

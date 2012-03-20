@@ -111,8 +111,8 @@ public class ATNConfig {
 		this.state = state;
 		this.alt = c.alt;
 		this.context = context;
+		this.semanticContext = semanticContext;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
-        this.semanticContext = semanticContext;
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 

@@ -7,8 +7,9 @@ public class TestT {
 		CharStream input = new ANTLRFileStream(args[0]);
 		TLexer lex = new TLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lex);
+//		tokens.fill();
+//		System.out.println(tokens);
 		TParser parser = new TParser(tokens);
-
 		parser.setBuildParseTree(true);
 		parser.s();
 	}

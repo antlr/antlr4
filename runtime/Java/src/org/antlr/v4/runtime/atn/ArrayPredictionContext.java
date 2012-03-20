@@ -3,11 +3,13 @@ package org.antlr.v4.runtime.atn;
 import java.util.Arrays;
 import java.util.Iterator;
 
-// TODO: deal with EMPTY_FULL_INVOKING_STATE
-
 public class ArrayPredictionContext extends PredictionContext {
+	// parent can be null only if full ctx mode and we make an array
+	// from EMPTY and non-empty. We merge EMPTY by null parent and
+	// invokingState = EMPTY_FULL_INVOKING_STATE
 	public final PredictionContext[] parents;
-	// sorted for merge sort, no duplicates
+	// sorted for merge sort, no duplicates; if present,
+	// EMPTY_FULL_INVOKING_STATE is always first
 	public final int[] invokingStates;
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
@@ -18,7 +20,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
 		super(calculateHashCode(parents, invokingStates));
 		assert parents!=null && parents.length>0;
-		System.out.println("CREATE ARRAY");
+//		System.out.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(invokingStates));
 		this.parents = parents;
 		this.invokingStates = invokingStates;
 	}
@@ -117,11 +119,12 @@ public class ArrayPredictionContext extends PredictionContext {
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("[");
-		for (int i=0; i< invokingStates.length; i++) {
+		for (int i=0; i<invokingStates.length; i++) {
+			if ( i>0 ) buf.append(",");
 			buf.append(invokingStates[i]);
 			buf.append(parents[i].toString());
 		}
-		buf.append("[");
+		buf.append("]");
 		return buf.toString();
 	}
 }

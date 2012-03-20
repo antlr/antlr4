@@ -79,28 +79,13 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
-	public class SetIterator implements Iterator<ATNConfig> {
-		int i = 0;
-		@Override
-		public boolean hasNext() { return i < configs.size(); }
-
-		@Override
-		public ATNConfig next() {
-			ATNConfig c = configs.get(i);
-			i++;
-			return c;
-		}
-
-		@Override
-		public void remove() { throw new UnsupportedOperationException(); }
-	}
-
 	/** Track every config we add */
-	protected final LinkedHashMap<Key,PredictionContext> configToContext =
-		new LinkedHashMap<Key, PredictionContext>();
+	public final LinkedHashMap<Key,ATNConfig> configToContext =
+		new LinkedHashMap<Key, ATNConfig>();
 
 	/** Track the elements as they are added to the set; supports get(i) */
-	protected final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
+	// too hard to keep in sync
+//	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
@@ -109,10 +94,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean hasSemanticContext;
 	public boolean dipsIntoOuterContext;
 
-	public ATNConfigSet() { }
+	public final boolean fullCtx;
+
+	public ATNConfigSet(boolean fullCtx) { this.fullCtx = fullCtx; }
+	public ATNConfigSet() { this.fullCtx = true; }
 
 	public ATNConfigSet(ATNConfigSet old) {
 		addAll(old);
+		this.fullCtx = old.fullCtx;
 		this.uniqueAlt = old.uniqueAlt;
 		this.conflictingAlts = old.conflictingAlts;
 		this.hasSemanticContext = old.hasSemanticContext;
@@ -126,24 +115,26 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public boolean add(ATNConfig value) {
 		Key key = new Key(value);
-		PredictionContext existing = configToContext.get(key);
+		ATNConfig existing = configToContext.get(key);
 		if ( existing==null ) { // nothing there yet; easy, just add
-			configs.add(value);
-			configToContext.put(key, value.context);
+			configToContext.put(key, value);
 			return true;
 		}
 		// a previous (s,i,pi,_), merge with it and save result
-		PredictionContext merged = PredictionContext.merge(existing, value.context, true);
-		configToContext.put(key, merged); // replace
-		// if already there, must be in configs already
+		boolean rootIsWildcard = !fullCtx;
+		PredictionContext merged =
+			PredictionContext.merge(existing.context, value.context, rootIsWildcard);
+		existing.reachesIntoOuterContext =
+			Math.max(existing.reachesIntoOuterContext, value.reachesIntoOuterContext);
+		existing.context = merged; // replace context; no need to alt mapping
 		return true;
 	}
 
-	/** Return the List holding list of table elements.  Note that you are
-     *  NOT getting a copy so don't write to the list.
-     */
+	/** Return a List holding list of configs */
     public List<ATNConfig> elements() {
-        return configs;
+		List<ATNConfig> configs = new ArrayList<ATNConfig>();
+		configs.addAll(configToContext.values());
+		return configs;
     }
 
 	public Set<ATNState> getStates() {
@@ -155,18 +146,18 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	public ATNConfig get(int i) {
-		return configs.get(i);
+		return elements().get(i);
 	}
 
 	public void remove(int i) {
-		ATNConfig c = configs.remove(i);
+		ATNConfig c = elements().get(i);
 		configToContext.remove(new Key(c));
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append(configs.toString());
+		buf.append(elements().toString());
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
@@ -185,24 +176,25 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public boolean equals(Object o) {
 //		System.out.print("equals " + this + ", " + o+" = ");
-		boolean same = configs!=null && configs.equals(((ATNConfigSet)o).configs);
+		boolean same = configToContext!=null &&
+			           configToContext.equals(((ATNConfigSet)o).configToContext);
 //		System.out.println(same);
 		return same;
 	}
 
 	@Override
 	public int hashCode() {
-		return configs.hashCode();
+		return configToContext.hashCode();
 	}
 
 	@Override
 	public int size() {
-		return configs.size();
+		return configToContext.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return configs.isEmpty();
+		return configToContext.isEmpty();
 	}
 
 	@Override
@@ -215,13 +207,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public Iterator<ATNConfig> iterator() {
-		return new SetIterator();
+		return configToContext.values().iterator();
 	}
 
 	@Override
 	public void clear() {
 		configToContext.clear();
-		configs.clear();
 	}
 
 	// satisfy interface

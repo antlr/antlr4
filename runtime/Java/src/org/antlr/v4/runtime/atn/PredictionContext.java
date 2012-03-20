@@ -26,10 +26,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		this.cachedHashCode = cachedHashCode;
 	}
 
-//	public PredictionContext() {
-//		id = globalNodeCount++;
-//	}
-
 	public static PredictionContext fromRuleContext(RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 		if ( outerContext==RuleContext.EMPTY ) {
@@ -55,7 +51,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int findInvokingState(int invokingState);
 
-	/** This means just the EMPTY context */
+	/** This means only the EMPTY context is in set */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}
@@ -208,7 +204,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	}
 
 	// dispatch
-	public static PredictionContext merge(PredictionContext a, PredictionContext b, boolean rootIsWildcard) {
+	public static PredictionContext merge(PredictionContext a, PredictionContext b,
+										  boolean rootIsWildcard)
+	{
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a, (SingletonPredictionContext)b, rootIsWildcard);
 		}
@@ -221,13 +219,13 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return mergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b, rootIsWildcard);
 	}
 
-	public static PredictionContext mergeSingletons(SingletonPredictionContext a, SingletonPredictionContext b,
-											boolean rootIsWildcard)
+	public static PredictionContext mergeSingletons(SingletonPredictionContext a,
+													SingletonPredictionContext b,
+													boolean rootIsWildcard)
 	{
-		if ( rootIsWildcard ) {
-			if ( a == EMPTY ) return a;
-			if ( b == EMPTY ) return b;
-		}
+		PredictionContext rootMerge = mergeRoot(a, b, rootIsWildcard);
+		if ( rootMerge!=null ) return rootMerge;
+
 		if ( a.invokingState==b.invokingState ) { // a == b
 			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard);
 			if ( parent == a.parent ) return a;
@@ -236,30 +234,64 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			return new SingletonPredictionContext(parent, a.invokingState);
 		}
 		else { // a != b payloads differ
-			// parents differ, join them; nothing to reuse
-			// sort payloads
-			int[] payloads = {a.invokingState, b.invokingState};
-			if ( a.invokingState > b.invokingState ) {
-				payloads = new int[] {b.invokingState, a.invokingState};
-			}
 			if ( a.parent.equals(b.parent) ) {
 				// parents are equal, pick left one as parent to reuse
 				PredictionContext parent = a.parent;
+				// sort payloads and use same parent
+				int[] payloads = {a.invokingState, b.invokingState};
+				if ( a.invokingState > b.invokingState ) {
+					payloads = new int[] {b.invokingState, a.invokingState};
+				}
+				PredictionContext[] parents = {parent, parent};
 				ArrayPredictionContext joined =
-					new ArrayPredictionContext(new PredictionContext[]{parent, parent},
-								  payloads);
+					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
 			// parents differ, just pack together into array; can't merge.
+			// sort though by payload
+			int[] payloads = {a.invokingState, b.invokingState};
+			PredictionContext[] parents = {a.parent, b.parent};
+			if ( a.invokingState > b.invokingState ) {
+				payloads = new int[] {b.invokingState, a.invokingState};
+				parents = new PredictionContext[] {b.parent, a.parent};
+			}
 			ArrayPredictionContext joined =
-				new ArrayPredictionContext(new PredictionContext[]{a.parent, b.parent},
-							  payloads);
+				new ArrayPredictionContext(parents, payloads);
 			return joined;
 		}
 	}
 
-	public static PredictionContext mergeArrays(ArrayPredictionContext a, ArrayPredictionContext b,
-										boolean rootIsWildcard)
+	public static PredictionContext mergeRoot(SingletonPredictionContext a,
+											  SingletonPredictionContext b,
+											  boolean rootIsWildcard)
+	{
+		if ( rootIsWildcard ) {
+			if ( a == EMPTY ) return a;
+			if ( b == EMPTY ) return b;
+		}
+		else {
+			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
+			if ( a == EMPTY ) { // $ + x = [$,x]
+				int[] payloads = {EMPTY_FULL_INVOKING_STATE, b.invokingState};
+				PredictionContext[] parents = {null, b.parent};
+				ArrayPredictionContext joined =
+					new ArrayPredictionContext(parents, payloads);
+				return joined;
+			}
+			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
+				int[] payloads = {EMPTY_FULL_INVOKING_STATE, a.invokingState};
+				PredictionContext[] parents = {null, a.parent};
+				ArrayPredictionContext joined =
+					new ArrayPredictionContext(parents, payloads);
+				return joined;
+			}
+		}
+		return null;
+	}
+
+	public static PredictionContext mergeArrays(ArrayPredictionContext a,
+												ArrayPredictionContext b,
+												boolean rootIsWildcard)
 	{
 		// merge sorted payloads a + b => M
 		int i = 0; // walks a
