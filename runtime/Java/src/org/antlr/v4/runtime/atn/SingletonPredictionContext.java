@@ -7,6 +7,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	public final int invokingState;
 
 	public SingletonPredictionContext(PredictionContext parent, int invokingState) {
+		super(calculateHashCode(parent!=null?31^parent.hashCode():0, 31 ^ invokingState));
 		this.parent = parent;
 		this.invokingState = invokingState;
 	}

@@ -54,7 +54,7 @@ public class LL1Analyzer {
 	 */
 	@Nullable
 	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
-		System.out.println("LOOK("+s.stateNumber+")");
+//		System.out.println("LOOK("+s.stateNumber+")");
 		if ( s==null ) return null;
 		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()+1];
 		for (int alt=1; alt<=s.getNumberOfTransitions(); alt++) {

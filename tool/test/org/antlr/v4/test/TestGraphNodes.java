@@ -204,8 +204,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext b = createSingleton(PredictionContext.EMPTY, "b");
 		SingletonPredictionContext c = createSingleton(PredictionContext.EMPTY, "c");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a,b);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(c);
+		ArrayPredictionContext A1 = create(a,b);
+		ArrayPredictionContext A2 = create(c);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -223,8 +223,8 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_Aa_Aa() {
 		SingletonPredictionContext a1 = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext a2 = createSingleton(PredictionContext.EMPTY, "a");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a1);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(a2);
+		ArrayPredictionContext A1 = create(a1);
+		ArrayPredictionContext A2 = create(a2);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -241,8 +241,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext b = createSingleton(PredictionContext.EMPTY, "b");
 		SingletonPredictionContext c = createSingleton(PredictionContext.EMPTY, "c");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(b,c);
+		ArrayPredictionContext A1 = create(a);
+		ArrayPredictionContext A2 = create(b,c);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -261,8 +261,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext b = createSingleton(PredictionContext.EMPTY, "b");
 		SingletonPredictionContext c = createSingleton(PredictionContext.EMPTY, "c");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a,c);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(b);
+		ArrayPredictionContext A1 = create(a,c);
+		ArrayPredictionContext A2 = create(b);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -281,8 +281,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a1 = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext b = createSingleton(PredictionContext.EMPTY, "b");
 		SingletonPredictionContext a2 = createSingleton(PredictionContext.EMPTY, "a");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a1,b);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(a2);
+		ArrayPredictionContext A1 = create(a1,b);
+		ArrayPredictionContext A2 = create(a2);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -300,8 +300,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a = createSingleton(PredictionContext.EMPTY, "a");
 		SingletonPredictionContext b1 = createSingleton(PredictionContext.EMPTY, "b");
 		SingletonPredictionContext b2 = createSingleton(PredictionContext.EMPTY, "b");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a,b1);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(b2);
+		ArrayPredictionContext A1 = create(a,b1);
+		ArrayPredictionContext A2 = create(b2);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -320,8 +320,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a1 = createSingleton(x, "a");
 		SingletonPredictionContext y = createSingleton(PredictionContext.EMPTY, "y");
 		SingletonPredictionContext a2 = createSingleton(y, "a");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a1);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(a2);
+		ArrayPredictionContext A1 = create(a1);
+		ArrayPredictionContext A2 = create(a2);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -344,8 +344,8 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext y = createSingleton(PredictionContext.EMPTY, "y");
 		SingletonPredictionContext a2 = createSingleton(y, "a");
 		SingletonPredictionContext d = createSingleton(PredictionContext.EMPTY, "d");
-		ArrayPredictionContext A1 = new ArrayPredictionContext(a1,c);
-		ArrayPredictionContext A2 = new ArrayPredictionContext(a2,d);
+		ArrayPredictionContext A1 = create(a1,c);
+		ArrayPredictionContext A2 = create(a2,d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
 		String expecting =
@@ -367,5 +367,15 @@ public class TestGraphNodes extends TestCase {
 //		SingletonPredictionContext a = new SingletonPredictionContext(parent, payload);
 //		return a;
 		return null;
+	}
+
+	public ArrayPredictionContext create(SingletonPredictionContext... nodes) {
+		PredictionContext[] parents = new PredictionContext[nodes.length];
+		int[] invokingStates = new int[nodes.length];
+		for (int i=0; i<nodes.length; i++) {
+			parents[i] = nodes[i].parent;
+			invokingStates[i] = nodes[i].invokingState;
+		}
+		return new ArrayPredictionContext(parents, invokingStates);
 	}
 }

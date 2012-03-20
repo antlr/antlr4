@@ -1,6 +1,6 @@
 grammar T;
-s : ID | b ;
-b : INT | VOID ;
+s : a | 'x';
+a : 'a' s ('b' s)?;
 
 VOID : 'void';
 ID : 'a'..'z'+;

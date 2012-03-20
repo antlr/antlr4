@@ -18,11 +18,17 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public static final int EMPTY_FULL_INVOKING_STATE = Integer.MAX_VALUE;
 
 	public static int globalNodeCount = 0;
-	public final int id;
+	public final int id = globalNodeCount++;
 
-	public PredictionContext() {
-		id = globalNodeCount++;
+	public final int cachedHashCode;
+
+	protected PredictionContext(int cachedHashCode) {
+		this.cachedHashCode = cachedHashCode;
 	}
+
+//	public PredictionContext() {
+//		id = globalNodeCount++;
+//	}
 
 	public static PredictionContext fromRuleContext(RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
@@ -49,7 +55,37 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int findInvokingState(int invokingState);
 
-	public boolean isEmpty() { return false; }
+	/** This means just the EMPTY context */
+	public boolean isEmpty() {
+		return this == EMPTY;
+	}
+
+	protected static int calculateParentHashCode(PredictionContext[] parents) {
+		int hashCode = 1;
+		for (PredictionContext context : parents) {
+			hashCode = hashCode * 31 ^ context.hashCode();
+		}
+
+		return hashCode;
+	}
+
+	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
+		int hashCode = 1;
+		for (int state : invokingStates) {
+			hashCode = hashCode * 31 ^ state;
+		}
+
+		return hashCode;
+	}
+
+	protected static int calculateHashCode(PredictionContext[] parents, int[] invokingStates) {
+		return calculateHashCode(calculateParentHashCode(parents),
+								 calculateInvokingStatesHashCode(invokingStates));
+	}
+
+	protected static int calculateHashCode(int parentHashCode, int invokingStateHashCode) {
+		return 5 * 5 * 7 + 5 * parentHashCode + invokingStateHashCode;
+	}
 
 	/** Two contexts conflict() if they are equals() or one is a stack suffix
 	 *  of the other.  For example, contexts [21 12 $] and [21 9 $] do not
@@ -75,9 +111,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	 *
 	 *  UPDATE FOR GRAPH STACK; no suffix
 	 */
-	public boolean conflictsWith(PredictionContext other) {
-		return this.equals(other);
-	}
+//	public boolean conflictsWith(PredictionContext other) {
+//		return this.equals(other);
+//	}
 
 	@Override
 	public String toString() {

@@ -3,28 +3,24 @@ package org.antlr.v4.runtime.atn;
 import java.util.Arrays;
 import java.util.Iterator;
 
+// TODO: deal with EMPTY_FULL_INVOKING_STATE
+
 public class ArrayPredictionContext extends PredictionContext {
 	public final PredictionContext[] parents;
 	// sorted for merge sort, no duplicates
 	public final int[] invokingStates;
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
-		this.parents = new PredictionContext[] {a.parent};
-		this.invokingStates = new int[] {a.invokingState};
+		this(new PredictionContext[] {a.parent},
+			 new int[] {a.invokingState});
 	}
 
 	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
+		super(calculateHashCode(parents, invokingStates));
+		assert parents!=null && parents.length>0;
+		System.out.println("CREATE ARRAY");
 		this.parents = parents;
 		this.invokingStates = invokingStates;
-	}
-
-	public ArrayPredictionContext(SingletonPredictionContext... nodes) {
-		parents = new PredictionContext[nodes.length];
-		invokingStates = new int[nodes.length];
-		for (int i=0; i<nodes.length; i++) {
-			parents[i] = nodes[i].parent;
-			invokingStates[i] = nodes[i].invokingState;
-		}
 	}
 
 	@Override
@@ -45,6 +41,12 @@ public class ArrayPredictionContext extends PredictionContext {
 			@Override
 			public void remove() { throw new UnsupportedOperationException(); }
 		};
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return size()==1 &&
+			   invokingStates[0]==EmptyPredictionContext.EMPTY_INVOKING_STATE;
 	}
 
 	@Override

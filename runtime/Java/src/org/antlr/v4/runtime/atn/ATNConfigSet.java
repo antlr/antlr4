@@ -163,19 +163,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		configToContext.remove(new Key(c));
 	}
 
-	/** Replace an existing value with a new value; updates the element
-	 *  list and the hash table, but not the key as that has not changed.
-	public ATNConfig set(int i, ATNConfig value) {
-		ATNConfig oldElement = configs.get(i);
-		configs.set(i,value); // update list
-		Key key = new Key(value);
-		configToContext.remove(key); // now update the set: remove/add
-		configToContext.put(key, value.context);
-		return oldElement;
-	}
-	 */
-
-
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
@@ -187,20 +174,25 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return buf.toString();
 	}
 
-	private static long getKey(ATNConfig e) {
-		long key = ((long) e.state.stateNumber << 32) + (e.alt << 3);
-		//key |= e.reachesIntoOuterContext != 0 ? 1 : 0;
-		//key |= e.resolveWithPredicate ? 1 << 1 : 0;
-		//key |= e.traversedPredicate ? 1 << 2 : 0;
-		return key;
-	}
-
 	@Override
 	public boolean addAll(Collection<? extends ATNConfig> coll) {
 		for (ATNConfig c : coll) {
 			add(c);
 		}
 		return false;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+//		System.out.print("equals " + this + ", " + o+" = ");
+		boolean same = configs!=null && configs.equals(((ATNConfigSet)o).configs);
+//		System.out.println(same);
+		return same;
+	}
+
+	@Override
+	public int hashCode() {
+		return configs.hashCode();
 	}
 
 	@Override
@@ -215,6 +207,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean contains(Object o) {
+		if ( o instanceof ATNConfig ) {
+			return configToContext.containsKey(new Key((ATNConfig)o));
+		}
 		return false;
 	}
 
@@ -222,6 +217,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public Iterator<ATNConfig> iterator() {
 		return new SetIterator();
 	}
+
+	@Override
+	public void clear() {
+		configToContext.clear();
+		configs.clear();
+	}
+
+	// satisfy interface
 
 	@Override
 	public Object[] toArray() {
@@ -251,11 +254,5 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void clear() {
-		configToContext.clear();
-		configs.clear();
 	}
 }

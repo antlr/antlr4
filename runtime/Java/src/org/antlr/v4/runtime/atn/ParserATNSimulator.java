@@ -948,22 +948,24 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				return;
 			}
 			// We hit rule end. If we have context info, use it
+			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
-				// run thru all possible stack tops in ctx
 				for (SingletonPredictionContext ctx : config.context) {
-					PredictionContext newContext = ctx.parent; // "pop" invoking state
-					ATNState invokingState = atn.states.get(ctx.invokingState);
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
-					ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
-					// While we have context to pop back from, we may have
-					// gotten that context AFTER having falling off a rule.
-					// Make sure we track that we are now out of context.
-					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
-					assert depth > Integer.MIN_VALUE;
-					closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
+					if ( !ctx.isEmpty() ) {
+						ATNState invokingState = atn.states.get(ctx.invokingState);
+						RuleTransition rt = (RuleTransition)invokingState.transition(0);
+						ATNState retState = rt.followState;
+						PredictionContext newContext = ctx.parent; // "pop" invoking state
+						ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
+						// While we have context to pop back from, we may have
+						// gotten that context AFTER having falling off a rule.
+						// Make sure we track that we are now out of context.
+						c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+						assert depth > Integer.MIN_VALUE;
+						closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
+					}
+					return;
 				}
-				return;
 			}
 			else {
 				// else if we have no context info, just chase follow links (if greedy)
@@ -1245,9 +1247,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				for (int j = i+1; j < size; j++) {
 					ATNConfig d = configsPerState.get(j);
 					if ( c.alt != d.alt ) {
-						boolean conflicting =
-							(fullCtx && c.context.equals(d.context)) ||
-							(!fullCtx && c.context.conflictsWith(d.context));
+						boolean conflicting = c.context.equals(d.context);
 						if ( conflicting ) {
 							if ( debug ) {
 								System.out.println("we reach state "+c.state.stateNumber+
