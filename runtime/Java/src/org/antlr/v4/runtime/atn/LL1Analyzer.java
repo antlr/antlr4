@@ -93,7 +93,7 @@ public class LL1Analyzer {
                          @NotNull Set<ATNConfig> lookBusy,
 						 boolean seeThruPreds)
 	{
-		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
+//		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
         ATNConfig c = new ATNConfig(s, 0, ctx);
         if ( !lookBusy.add(c) ) return;
 
@@ -108,7 +108,7 @@ public class LL1Analyzer {
 					ATNState invokingState = atn.states.get(p.invokingState);
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
 					ATNState retState = rt.followState;
-					System.out.println("popping back to "+retState);
+//					System.out.println("popping back to "+retState);
 					_LOOK(retState, p.parent, look, lookBusy, seeThruPreds);
 				}
 				return;
@@ -135,7 +135,7 @@ public class LL1Analyzer {
 				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
 			}
 			else {
-				System.out.println("adding "+ t);
+//				System.out.println("adding "+ t);
 				IntervalSet set = t.label();
 				if (set != null) {
 					if (t instanceof NotSetTransition) {

@@ -17,7 +17,7 @@ public class SingletonPredictionContext extends PredictionContext {
 		return new Iterator<SingletonPredictionContext>() {
 			int i = 0;
 			@Override
-			public boolean hasNext() { return i>0; }
+			public boolean hasNext() { return i==0; }
 
 			@Override
 			public SingletonPredictionContext next() { i++; return self; }
@@ -73,6 +73,6 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return String.valueOf(invokingState);
+		return String.valueOf(invokingState)+" "+parent.toString();
 	}
 }

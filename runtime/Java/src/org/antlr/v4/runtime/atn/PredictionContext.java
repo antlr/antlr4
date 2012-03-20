@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -86,7 +85,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	}
 
 	public String toString(@Nullable Recognizer<?,?> recog) {
-		return toString(recog, ParserRuleContext.EMPTY);
+		return toString();
+//		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)

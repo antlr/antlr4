@@ -127,9 +127,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean add(ATNConfig value) {
 		Key key = new Key(value);
 		PredictionContext existing = configToContext.get(key);
-		if ( existing==null ) return false;
+		if ( existing==null ) { // nothing there yet; easy, just add
+			configs.add(value);
+			configToContext.put(key, value.context);
+			return true;
+		}
+		// a previous (s,i,pi,_), merge with it and save result
 		PredictionContext merged = PredictionContext.merge(existing, value.context, true);
-		configToContext.put(key, merged);
+		configToContext.put(key, merged); // replace
+		// if already there, must be in configs already
 		return true;
 	}
 
@@ -173,7 +179,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append(super.toString());
+		buf.append(configs.toString());
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
@@ -190,7 +196,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends ATNConfig> c) {
+	public boolean addAll(Collection<? extends ATNConfig> coll) {
+		for (ATNConfig c : coll) {
+			add(c);
+		}
 		return false;
 	}
 

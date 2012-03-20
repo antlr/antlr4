@@ -170,8 +170,9 @@ public class ATNConfig {
             buf.append(alt);
         }
         if ( context!=null ) {
-            buf.append(",");
+            buf.append(",[");
             buf.append(context.toString(recog));
+			buf.append("]");
         }
         if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
             buf.append(",");

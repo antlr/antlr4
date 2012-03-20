@@ -113,6 +113,13 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return Arrays.toString(invokingStates);
+		StringBuilder buf = new StringBuilder();
+		buf.append("[");
+		for (int i=0; i< invokingStates.length; i++) {
+			buf.append(invokingStates[i]);
+			buf.append(parents[i].toString());
+		}
+		buf.append("[");
+		return buf.toString();
 	}
 }
