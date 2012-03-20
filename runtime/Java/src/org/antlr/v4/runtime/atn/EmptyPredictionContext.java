@@ -31,4 +31,9 @@ public class EmptyPredictionContext extends SingletonPredictionContext {
 	public boolean equals(Object o) {
 		return this == o;
 	}
+
+	@Override
+	public String toString() {
+		return "$";
+	}
 }

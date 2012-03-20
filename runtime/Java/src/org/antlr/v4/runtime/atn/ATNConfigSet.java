@@ -30,16 +30,13 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Triple;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /** Specialized OrderedHashSet that can track info about the set.
@@ -55,6 +52,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			this.state = state;
 			this.alt = alt;
 			this.semanticContext = semanticContext;
+		}
+
+		public Key(ATNConfig c) {
+			this(c.state, c.alt, c.semanticContext);
 		}
 
 		@Override
@@ -78,11 +79,28 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
-	/** Track every config we add */
-	protected LinkedHashMap<Key,PredictionContext> configToContext;
+	public class SetIterator implements Iterator<ATNConfig> {
+		int i = 0;
+		@Override
+		public boolean hasNext() { return i < configs.size(); }
 
-	/** Track the elements as they are added to the set */
-	protected ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
+		@Override
+		public ATNConfig next() {
+			ATNConfig c = configs.get(i);
+			i++;
+			return c;
+		}
+
+		@Override
+		public void remove() { throw new UnsupportedOperationException(); }
+	}
+
+	/** Track every config we add */
+	protected final LinkedHashMap<Key,PredictionContext> configToContext =
+		new LinkedHashMap<Key, PredictionContext>();
+
+	/** Track the elements as they are added to the set; supports get(i) */
+	protected final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
@@ -90,9 +108,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public IntervalSet conflictingAlts;
 	public boolean hasSemanticContext;
 	public boolean dipsIntoOuterContext;
-
-	Map<Triple<ATNState,Integer,SemanticContext>, PredictionContext> m =
-		new HashMap<Triple<ATNState, Integer, SemanticContext>, PredictionContext>();
 
 	public ATNConfigSet() { }
 
@@ -110,14 +125,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	@Override
 	public boolean add(ATNConfig value) {
-		Triple<ATNState, Integer, SemanticContext> key =
-			new Triple<ATNState, Integer, SemanticContext>(
-				value.state,value.alt,value.semanticContext
-			);
-		PredictionContext existing = m.get(key);
+		Key key = new Key(value);
+		PredictionContext existing = configToContext.get(key);
 		if ( existing==null ) return false;
 		PredictionContext merged = PredictionContext.merge(existing, value.context, true);
-		m.put(key, merged);
+		configToContext.put(key, merged);
 		return true;
 	}
 
@@ -130,8 +142,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public Set<ATNState> getStates() {
 		Set<ATNState> states = new HashSet<ATNState>();
-		for (ATNConfig c : this.configs) {
-			states.add(c.state);
+		for (Key key : this.configToContext.keySet()) {
+			states.add(key.state);
 		}
 		return states;
 	}
@@ -140,16 +152,22 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return configs.get(i);
 	}
 
+	public void remove(int i) {
+		ATNConfig c = configs.remove(i);
+		configToContext.remove(new Key(c));
+	}
+
 	/** Replace an existing value with a new value; updates the element
 	 *  list and the hash table, but not the key as that has not changed.
-	 */
 	public ATNConfig set(int i, ATNConfig value) {
 		ATNConfig oldElement = configs.get(i);
-		elements.set(i,value); // update list
-		super.remove(oldElement); // now update the set: remove/add
-		super.add(value);
+		configs.set(i,value); // update list
+		Key key = new Key(value);
+		configToContext.remove(key); // now update the set: remove/add
+		configToContext.put(key, value.context);
 		return oldElement;
 	}
+	 */
 
 
 	@Override
@@ -178,12 +196,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public int size() {
-		return 0;
+		return configs.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return false;
+		return configs.isEmpty();
 	}
 
 	@Override
@@ -193,40 +211,42 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public Iterator<ATNConfig> iterator() {
-		return null;
+		return new SetIterator();
 	}
 
 	@Override
 	public Object[] toArray() {
-		return new Object[0];
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean remove(Object o) {
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void clear() {
+		configToContext.clear();
+		configs.clear();
 	}
 }

@@ -1,6 +1,8 @@
 grammar T;
-s : f f EOF;
-f : | x;
-x : 'a' 'b';
+s : ID | b ;
+b : INT | VOID ;
+
+VOID : 'void';
+ID : 'a'..'z'+;
 INT : '0'..'9'+;
 WS : (' '|'\n') {skip();} ;

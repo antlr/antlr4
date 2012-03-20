@@ -113,6 +113,6 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return Arrays.toString(invokingStates)+":"+id;
+		return Arrays.toString(invokingStates);
 	}
 }

@@ -73,6 +73,6 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return invokingState +":"+id;
+		return String.valueOf(invokingState);
 	}
 }
