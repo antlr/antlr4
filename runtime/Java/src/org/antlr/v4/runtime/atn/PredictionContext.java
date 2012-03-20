@@ -32,8 +32,13 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			return PredictionContext.EMPTY;
 		}
 
+		// if s calls a and outercontext is implied [a s $], then we want a prediction
+		// context of just [s $].
+
 		PredictionContext parent = EMPTY;
-		if ( outerContext.parent != null ) {
+		if ( outerContext.parent != null &&
+			 outerContext.parent.invokingState!=EmptyPredictionContext.EMPTY_INVOKING_STATE )
+		{
 			parent = PredictionContext.fromRuleContext(outerContext.parent);
 		}
 
