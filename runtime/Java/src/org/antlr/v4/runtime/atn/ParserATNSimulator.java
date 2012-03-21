@@ -956,19 +956,21 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
-					if ( !ctx.isEmpty() ) {
+//					if ( !ctx.isEmpty() ) {
 						ATNState invokingState = atn.states.get(ctx.invokingState);
 						RuleTransition rt = (RuleTransition)invokingState.transition(0);
 						ATNState retState = rt.followState;
 						PredictionContext newContext = ctx.parent; // "pop" invoking state
-						ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
+						ATNConfig c = new ATNConfig(retState, config.alt, newContext,
+													config.semanticContext);
 						// While we have context to pop back from, we may have
 						// gotten that context AFTER having falling off a rule.
 						// Make sure we track that we are now out of context.
 						c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 						assert depth > Integer.MIN_VALUE;
-						closure(c, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth - 1);
-					}
+						closure(c, configs, closureBusy, collectPredicates, greedy,
+								loopsSimulateTailRecursion, depth - 1);
+//					}
 					return;
 				}
 			}
@@ -989,16 +991,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			else if ( config.state.getClass()==LoopEndState.class ) {
 				if ( debug ) System.out.println("Loop end; pop, stack="+config.context);
-				// run thru all possible stack tops in ctx
-				for (SingletonPredictionContext ctx : config.context) {
-					SingletonPredictionContext p = ctx;
-					LoopEndState end = (LoopEndState) config.state;
-					// pop all the way back until we don't see the loopback state anymore
-					while ( !p.isEmpty() && p.invokingState == end.loopBackStateNumber ) {
-						// TODO: BROKEN. can't figure out how to leave config.context
-//						p = config.context = config.context.parent; // "pop"
-					}
-				}
+				LoopEndState end = (LoopEndState)config.state;
+				// pop all the way back until we don't see the loopback state anymore
+				config.context = config.context.popAll(end.loopBackStateNumber, configs.fullCtx);
 			}
 		}
 

@@ -15,7 +15,7 @@ import java.util.Map;
 
 public abstract class PredictionContext implements Iterable<SingletonPredictionContext> {
 	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
-	public static final int EMPTY_FULL_INVOKING_STATE = Integer.MAX_VALUE;
+	public static final int EMPTY_FULL_CTX_INVOKING_STATE = Integer.MAX_VALUE;
 
 	public static int globalNodeCount = 0;
 	public final int id = globalNodeCount++;
@@ -61,9 +61,14 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return this == EMPTY;
 	}
 
+	public abstract PredictionContext popAll(int invokingState, boolean fullCtx);
+
 	protected static int calculateParentHashCode(PredictionContext[] parents) {
 		int hashCode = 1;
 		for (PredictionContext context : parents) {
+			if ( context==null ) {
+				System.out.println("WHAT!? "+parents.toString());
+			}
 			hashCode = hashCode * 31 ^ context.hashCode();
 		}
 
@@ -184,7 +189,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
 					localBuffer.append(ruleName);
 				}
-				else if ( p.getInvokingState(index)!=EMPTY_FULL_INVOKING_STATE ) {
+				else if ( p.getInvokingState(index)!= EMPTY_FULL_CTX_INVOKING_STATE) {
 					if ( !p.isEmpty() ) {
 						if (localBuffer.length() > 1) {
 							// first char is '[', if more than that this isn't the first rule
@@ -277,14 +282,14 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		else {
 			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
 			if ( a == EMPTY ) { // $ + x = [$,x]
-				int[] payloads = {EMPTY_FULL_INVOKING_STATE, b.invokingState};
+				int[] payloads = {EMPTY_FULL_CTX_INVOKING_STATE, b.invokingState};
 				PredictionContext[] parents = {null, b.parent};
 				ArrayPredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
 			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
-				int[] payloads = {EMPTY_FULL_INVOKING_STATE, a.invokingState};
+				int[] payloads = {EMPTY_FULL_CTX_INVOKING_STATE, a.invokingState};
 				PredictionContext[] parents = {null, a.parent};
 				ArrayPredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
@@ -302,9 +307,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		int i = 0; // walks a
 		int j = 0; // walks b
 		int k = 0; // walks M target array
-		int[] mergedPayloads = new int[a.invokingStates.length + b.invokingStates.length];
+
+		int[] mergedInvokingStates = new int[a.invokingStates.length + b.invokingStates.length];
 		PredictionContext[] mergedParents = new PredictionContext[a.invokingStates.length + b.invokingStates.length];
-		ArrayPredictionContext M = new ArrayPredictionContext(mergedParents, mergedPayloads);
 		while ( i<a.invokingStates.length && j<b.invokingStates.length ) {
 			if ( a.invokingStates[i]==b.invokingStates[j] ) {
 				// same payload; stack tops are equal
@@ -315,28 +320,28 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				SingletonPredictionContext r = (SingletonPredictionContext)mergeSingletons(a_, b_, rootIsWildcard);
 				// if r is same as a_ or b_, we get to keep existing, else new
 				if ( r==a_ ) {
-					M.parents[k] = a.parents[i];
-					M.invokingStates[k] = a.invokingStates[i];
+					mergedParents[k] = a.parents[i];
+					mergedInvokingStates[k] = a.invokingStates[i];
 				}
 				else if ( r==b_ ) {
-					M.parents[k] = b.parents[j];
-					M.invokingStates[k] = b.invokingStates[j];
+					mergedParents[k] = b.parents[j];
+					mergedInvokingStates[k] = b.invokingStates[j];
 				}
 				else {
-					M.parents[k] = r.parent;
-					M.invokingStates[k] = r.invokingState;
+					mergedParents[k] = r.parent;
+					mergedInvokingStates[k] = r.invokingState;
 				}
 				i++; // hop over left one as usual
 				j++; // but also skip one in right side since we merge
 			}
 			else if ( a.invokingStates[i]<b.invokingStates[j] ) {
-				M.parents[k] = a.parents[i];
-				M.invokingStates[k] = a.invokingStates[i];
+				mergedParents[k] = a.parents[i];
+				mergedInvokingStates[k] = a.invokingStates[i];
 				i++;
 			}
 			else {
-				M.parents[k] = a.parents[j];
-				M.invokingStates[k] = b.invokingStates[j];
+				mergedParents[k] = a.parents[j];
+				mergedInvokingStates[k] = b.invokingStates[j];
 				j++;
 			}
 			k++;
@@ -344,22 +349,33 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		// copy over any payloads remaining in either array
 		if (i < a.invokingStates.length) {
 			for (int p = i; p < a.invokingStates.length; p++) {
-				M.parents[k] = a.parents[p];
-				M.invokingStates[k] = a.invokingStates[p];
+				mergedParents[k] = a.parents[p];
+				mergedInvokingStates[k] = a.invokingStates[p];
 				k++;
 			}
 		}
 		else {
 			for (int p = j; p < b.invokingStates.length; p++) {
-				M.parents[k] = b.parents[p];
-				M.invokingStates[k] = b.invokingStates[p];
+				mergedParents[k] = b.parents[p];
+				mergedInvokingStates[k] = b.invokingStates[p];
 				k++;
 			}
 		}
+
 		// trim merged
-		if ( k < M.size() ) { // write index < last position; trim
-			M = M.trim();
+		if ( k < mergedParents.length ) { // write index < last position; trim
+			int p = mergedParents.length-1;
+			while ( p>=0 && mergedParents[p]==null ) { p--; }
+			// p is now last non-null index
+			if ( p < mergedParents.length-1 ) {
+				int n = p+1;
+				mergedParents = Arrays.copyOf(mergedParents, n);
+				mergedInvokingStates = Arrays.copyOf(mergedInvokingStates, n);
+			}
 		}
+
+		ArrayPredictionContext M =
+			new ArrayPredictionContext(mergedParents, mergedInvokingStates);
 
 		// TODO: if we created same array as a or b, return that instead
 

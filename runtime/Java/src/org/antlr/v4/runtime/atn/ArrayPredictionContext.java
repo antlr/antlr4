@@ -71,18 +71,33 @@ public class ArrayPredictionContext extends PredictionContext {
 		return Arrays.binarySearch(invokingStates, invokingState);
 	}
 
-	public ArrayPredictionContext trim() {
-		int i = parents.length-1;
-		while ( i>=0 && parents[i]==null ) { i--; }
-		// i is last non-null index
-		if ( i < parents.length-1 ) {
-			int n = i+1;
-			return new ArrayPredictionContext(
-				Arrays.copyOf(parents, n),
-				Arrays.copyOf(invokingStates, n)
-			);
+	/** Find invokingState parameter (call it x) in this.invokingStates,
+	 *  if present.  Call pop on all x's parent(s) and then pull other
+	 *  elements from this context and merge into new context.
+	 */
+	@Override
+	public PredictionContext popAll(int invokingState, boolean fullCtx) {
+		int index = Arrays.binarySearch(this.invokingStates, invokingState);
+		if ( index < 0 ) {
+			return this;
 		}
-		return this;
+
+		PredictionContext newCtx = this.parents[index].popAll(invokingState, fullCtx);
+		for (int i = 0; i < this.invokingStates.length; i++) {
+			if (i == index) continue;
+			PredictionContext next;
+			if ( this.invokingStates[i] == EMPTY_FULL_CTX_INVOKING_STATE ) {
+				next = PredictionContext.EMPTY;
+			}
+			else {
+				next = new SingletonPredictionContext(this.parents[i],
+													  this.invokingStates[i]);
+			}
+			boolean rootIsWildcard = fullCtx;
+			newCtx = merge(newCtx, next, rootIsWildcard);
+		}
+
+		return newCtx;
 	}
 
 	@Override

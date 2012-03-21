@@ -51,6 +51,14 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
+	public PredictionContext popAll(int invokingState, boolean fullCtx) {
+		if ( invokingState == this.invokingState ) {
+			return parent.popAll(invokingState, fullCtx);
+		}
+		return this;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
