@@ -225,5 +225,6 @@ public class ANTLRInputStream implements CharStream {
 		return name;
 	}
 
+    @Override
     public String toString() { return new String(data); }
 }

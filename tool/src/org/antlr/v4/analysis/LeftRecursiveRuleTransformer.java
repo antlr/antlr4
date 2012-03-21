@@ -37,12 +37,12 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.misc.Pair;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -225,7 +225,7 @@ public class LeftRecursiveRuleTransformer {
 			altInfo.altAST = (AltAST)primaryBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
 			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
-			altInfo.originalAltAST.parent = altInfo.altAST.parent;
+//			altInfo.originalAltAST.parent = altInfo.altAST.parent;
 //			System.out.println(altInfo.altAST.toStringTree());
 		}
 		for (int i = 0; i < r.recOpAlts.size(); i++) {
@@ -233,7 +233,7 @@ public class LeftRecursiveRuleTransformer {
 			altInfo.altAST = (AltAST)opsBlk.getChild(i);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
 			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
-			altInfo.originalAltAST.parent = altInfo.altAST.parent;
+//			altInfo.originalAltAST.parent = altInfo.altAST.parent;
 //			System.out.println(altInfo.altAST.toStringTree());
 		}
 	}

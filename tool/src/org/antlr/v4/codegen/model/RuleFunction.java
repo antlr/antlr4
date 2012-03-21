@@ -40,11 +40,11 @@ import org.antlr.v4.codegen.model.decl.ContextTokenListIndexedGetterDecl;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.FrequencySet;
-import org.antlr.v4.misc.Triple;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
+import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.AltAST;
@@ -76,6 +76,7 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<Attribute> args = null;
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
+	public boolean hasLookaheadBlock;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -99,7 +100,29 @@ public class RuleFunction extends OutputModelObject {
 
 		ruleCtx = new StructDecl(factory, r);
 		altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
+		addContextGetters(factory, r);
 
+		if ( r.args!=null ) {
+			ruleCtx.addDecls(r.args.attributes.values());
+			args = r.args.attributes.values();
+			ruleCtx.ctorAttrs = args;
+		}
+		if ( r.retvals!=null ) {
+			ruleCtx.addDecls(r.retvals.attributes.values());
+		}
+		if ( r.locals!=null ) {
+			ruleCtx.addDecls(r.locals.attributes.values());
+		}
+
+		ruleLabels = r.getElementLabelNames();
+		tokenLabels = r.getTokenRefs();
+		exceptions = Utils.nodesToStrings(r.exceptionActions);
+		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
+
+		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+	}
+
+	public void addContextGetters(OutputModelFactory factory, Rule r) {
 		// Add ctx labels for elements in alts with no -> label
 		List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
 		if ( altsNoLabels!=null ) {
@@ -123,25 +146,6 @@ public class RuleFunction extends OutputModelObject {
 				for (Decl d : decls) altToContext[altNum].addDecl(d);
 			}
 		}
-
-		if ( r.args!=null ) {
-			ruleCtx.addDecls(r.args.attributes.values());
-			args = r.args.attributes.values();
-			ruleCtx.ctorAttrs = args;
-		}
-		if ( r.retvals!=null ) {
-			ruleCtx.addDecls(r.retvals.attributes.values());
-		}
-		if ( r.locals!=null ) {
-			ruleCtx.addDecls(r.locals.attributes.values());
-		}
-
-		ruleLabels = r.getElementLabelNames();
-		tokenLabels = r.getTokenRefs();
-		exceptions = Utils.nodesToStrings(r.exceptionActions);
-		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
-
-		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 
 	public void fillNamedActions(OutputModelFactory factory, Rule r) {

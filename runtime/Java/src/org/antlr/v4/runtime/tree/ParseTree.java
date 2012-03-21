@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
@@ -79,6 +80,18 @@ public interface ParseTree extends SyntaxTree {
 		public int getChildCount() { return 0; }
 
 		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			return visitor.visitTerminal(this);
+		}
+
+		@Override
+		public String toStringTree(Parser parser) {
+			return toString();
+		}
+
+		public boolean isErrorNode() { return this instanceof ErrorNode; }
+
+		@Override
 		public String toString() {
 				if ( symbol.getType() == Token.EOF ) return "<EOF>";
 				return symbol.getText();
@@ -90,15 +103,26 @@ public interface ParseTree extends SyntaxTree {
 		}
 	}
 
+	public interface ErrorNode<Symbol extends Token> extends TerminalNode<Symbol> {
+	}
+
 	/** Represents a token that was consumed during resynchronization
 	 *  rather than during a valid match operation. For example,
 	 *  we will create this kind of a node during single token insertion
 	 *  and deletion as well as during "consume until error recovery set"
 	 *  upon no viable alternative exceptions.
 	 */
-	public static class ErrorNodeImpl<Symbol extends Token> extends TerminalNodeImpl<Symbol> {
+	public static class ErrorNodeImpl<Symbol extends Token> extends
+		TerminalNodeImpl<Symbol>
+		implements ErrorNode<Symbol>
+	{
 		public ErrorNodeImpl(Symbol token) {
 			super(token);
+		}
+
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			return visitor.visitErrorNode(this);
 		}
 	}
 
@@ -107,4 +131,12 @@ public interface ParseTree extends SyntaxTree {
 	ParseTree getParent();
 	@Override
 	ParseTree getChild(int i);
+
+	/** The ParseTreeVisitor needs a double dispatch method */
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+
+	/** Specialize toStringTree so that it can print out more information
+	 * 	based upon the parser.
+	 */
+	public String toStringTree(Parser parser);
 }

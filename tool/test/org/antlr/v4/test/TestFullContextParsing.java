@@ -233,4 +233,37 @@ public class TestFullContextParsing extends BaseTest {
 					 this.stderrDuringParse);
 	}
 
+	/**
+	 *  Tests predictions for the following case involving closures.
+	 *  http://www.antlr.org/wiki/display/~admin/2011/12/29/Flaw+in+ANTLR+v3+LL(*)+analysis+algorithm
+	 */
+	@Test
+	public void testLoopsSimulateTailRecursion() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"prog: expr_or_assign*;\n" +
+			"expr_or_assign\n" +
+			"    :   expr '++' {System.out.println(\"fail.\");}\n" +
+			"    |   expr {System.out.println(\"pass.\");}\n" +
+			"    ;\n" +
+			"expr: expr_primary ('<-' ID)? ;\n" +
+			"expr_primary\n" +
+			"    : '(' ID ')'\n" +
+			"    | ID '(' ID ')'\n" +
+			"    | ID\n" +
+			"    ;\n" +
+			"ID  : [a-z]+ ;\n" +
+			"";
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "prog", "a(i)<-x", true);
+		assertEquals("pass.\n", found);
+
+		String expecting =
+			"line 1:4 reportAttemptingFullContext d=1: [(35,1,[27 15 8]), (41,1,[27 15 8]), (49,1,[27 15 8]), (35,2,[27 21 8]), (41,2,[27 21 8]), (49,2,[27 21 8])], input='a(i)<-'\n" +
+			"line 1:7 reportContextSensitivity d=1: [(53,2,[])],uniqueAlt=2, input='a(i)<-x'\n" +
+			"line 1:3 reportAttemptingFullContext d=3: [(35,1,[27 21 8]), (41,2,[27 21 8]), (49,3,[27 21 8])], input='a(i)'\n" +
+			"line 1:7 reportAmbiguity d=3: ambigAlts={2..3}:[(53,2,[]), (53,3,[])],conflictingAlts={2..3}, input='a(i)<-x'\n";
+		assertEquals(expecting, this.stderrDuringParse);
+	}
+
 }

@@ -29,11 +29,20 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.misc.Triple;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.runtime.misc.Triple;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Rule implements AttributeResolver {
 	/** Rule refs have a predefined set of attributes as well as
@@ -233,6 +242,7 @@ public class Rule implements AttributeResolver {
 
 	/**  $x		Attribute: rule arguments, return values, predefined rule prop.
 	 */
+	@Override
 	public Attribute resolveToAttribute(String x, ActionAST node) {
 		if ( args!=null ) {
 			Attribute a = args.get(x);   	if ( a!=null ) return a;
@@ -248,6 +258,7 @@ public class Rule implements AttributeResolver {
 	}
 
 	/** $x.y	Attribute: x is surrounding rule, label ref (in any alts) */
+	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
 		if ( this.name.equals(x) ) { // x is this rule?
 			return resolveToAttribute(y, node);
@@ -265,6 +276,7 @@ public class Rule implements AttributeResolver {
 
 	}
 
+	@Override
 	public boolean resolvesToLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&
@@ -272,6 +284,7 @@ public class Rule implements AttributeResolver {
 				anyLabelDef.type==LabelType.TOKEN_LABEL);
 	}
 
+	@Override
 	public boolean resolvesToListLabel(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		return anyLabelDef!=null &&
@@ -279,12 +292,14 @@ public class Rule implements AttributeResolver {
 				anyLabelDef.type==LabelType.TOKEN_LIST_LABEL);
 	}
 
+	@Override
 	public boolean resolvesToToken(String x, ActionAST node) {
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.TOKEN_LABEL ) return true;
 		return false;
 	}
 
+	@Override
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
 		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict

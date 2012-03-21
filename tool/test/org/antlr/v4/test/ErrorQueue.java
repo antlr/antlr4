@@ -43,15 +43,18 @@ public class ErrorQueue implements ANTLRToolListener {
 	public List<ANTLRMessage> warnings = new ArrayList<ANTLRMessage>();
     public List<ANTLRMessage> all = new ArrayList<ANTLRMessage>();
 
+	@Override
 	public void info(String msg) {
 		infos.add(msg);
 	}
 
+	@Override
 	public void error(ANTLRMessage msg) {
 		errors.add(msg);
         all.add(msg);
 	}
 
+	@Override
 	public void warning(ANTLRMessage msg) {
 		warnings.add(msg);
         all.add(msg);
@@ -66,6 +69,7 @@ public class ErrorQueue implements ANTLRToolListener {
 		return all.size() + infos.size();
 	}
 
+	@Override
 	public String toString() { return Utils.join(all.iterator(), "\n"); }
 
 	public String toString(Tool tool) {

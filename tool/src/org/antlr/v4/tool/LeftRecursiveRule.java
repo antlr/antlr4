@@ -31,8 +31,8 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.misc.Pair;
-import org.antlr.v4.misc.Triple;
+import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;

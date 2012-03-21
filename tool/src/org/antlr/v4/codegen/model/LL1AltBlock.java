@@ -43,7 +43,6 @@ public class LL1AltBlock extends LL1Choice {
 		this.decision = ((DecisionState)blkAST.atnState).decision;
 
 		/** Lookahead for each alt 1..n */
-//		IntervalSet[] altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
 		altLook = getAltLookaheadAsStringLists(altLookSets);
 

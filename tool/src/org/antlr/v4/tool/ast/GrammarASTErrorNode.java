@@ -42,10 +42,14 @@ public class GrammarASTErrorNode extends GrammarAST {
         delegate = new CommonErrorNode(input,start,stop,e);
     }
 
+    @Override
     public boolean isNil() { return delegate.isNil(); }
 
+    @Override
     public int getType() { return delegate.getType(); }
 
+    @Override
     public String getText() { return delegate.getText(); }
+    @Override
     public String toString() { return delegate.toString(); }
 }

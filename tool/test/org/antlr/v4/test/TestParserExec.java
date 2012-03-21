@@ -162,4 +162,56 @@ public class TestParserExec extends BaseTest {
 		assertEquals("a34c\n", found);
 	}
 
+
+	/**
+	 * This test is meant to detect regressions of bug antlr/antlr4#41.
+	 * https://github.com/antlr/antlr4/issues/41
+	 */
+	@Test
+	public void testOptional() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s : a | 'x';\n" +
+			"a : 'a' s ('b' s)?;\n"
+			;
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "s", "x", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+
+		found = execParser("T.g", grammar, "TParser", "TLexer", "s", "axbx", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+
+		found = execParser("T.g", grammar, "TParser", "TLexer", "s", "ax", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+
+		found = execParser("T.g", grammar, "TParser", "TLexer", "s", "aaxbx", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	/**
+	 * This test is meant to test the expected solution to antlr/antlr4#42.
+	 * https://github.com/antlr/antlr4/issues/42
+	 */
+	@Test
+	public void testIfIfElse() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"stmt : ifStmt | ID;\n" +
+			"ifStmt : 'if' ID stmt ('else' stmt | {_input.LA(1) != ELSE}?);\n" +
+			"ELSE : 'else';\n" +
+			"ID : [a-zA-Z]+;\n" +
+			"WS : (' ' | '\\t')+ -> skip;\n"
+			;
+
+		String found = execParser("T.g", grammar, "TParser", "TLexer", "stmt",
+								  "if x if x a else b", true);
+		String expecting = "";
+		assertEquals(expecting, found);
+		assertNull(this.stderrDuringParse);
+	}
+
 }

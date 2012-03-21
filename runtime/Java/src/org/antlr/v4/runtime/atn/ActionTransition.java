@@ -52,6 +52,7 @@ public class ActionTransition extends Transition {
 		return true; // we are to be ignored by analysis 'cept for predicates
 	}
 
+	@Override
 	public String toString() {
 		return "action_"+ruleIndex+":"+actionIndex;
 	}

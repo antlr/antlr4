@@ -50,21 +50,21 @@ import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
-	public static final Map<String, Class> thisRulePropToModelMap = new HashMap<String, Class>() {{
+	public static final Map<String, Class<? extends RulePropertyRef>> thisRulePropToModelMap = new HashMap<String, Class<? extends RulePropertyRef>>() {{
 		put("start", ThisRulePropertyRef_start.class);
 		put("stop",  ThisRulePropertyRef_stop.class);
 		put("text",  ThisRulePropertyRef_text.class);
         put("ctx",   ThisRulePropertyRef_ctx.class);
 	}};
 
-	public static final Map<String, Class> rulePropToModelMap = new HashMap<String, Class>() {{
+	public static final Map<String, Class<? extends RulePropertyRef>> rulePropToModelMap = new HashMap<String, Class<? extends RulePropertyRef>>() {{
 		put("start", RulePropertyRef_start.class);
 		put("stop",  RulePropertyRef_stop.class);
 		put("text",  RulePropertyRef_text.class);
         put("ctx",   RulePropertyRef_ctx.class);
 	}};
 
-	public static final Map<String, Class> tokenPropToModelMap = new HashMap<String, Class>() {{
+	public static final Map<String, Class<? extends TokenPropertyRef>> tokenPropToModelMap = new HashMap<String, Class<? extends TokenPropertyRef>>() {{
 		put("text",  TokenPropertyRef_text.class);
 		put("type",  TokenPropertyRef_type.class);
 		put("line",  TokenPropertyRef_line.class);
@@ -130,6 +130,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		return translator.chunks;
 	}
 
+	@Override
 	public void attr(String expr, Token x) {
 		gen.g.tool.log("action-translator", "attr "+x);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), node);
@@ -160,6 +161,7 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	/** $x.y = expr; */
+	@Override
 	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
 		gen.g.tool.log("action-translator", "setQAttr "+x+"."+y+"="+rhs);
 		// x has to be current rule; just set y attr
@@ -167,6 +169,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(new SetAttr(nodeContext,y.getText(), rhsChunks));
 	}
 
+	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "qattr "+x+"."+y);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
@@ -197,6 +200,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		}
 	}
 
+	@Override
 	public void setAttr(String expr, Token x, Token rhs) {
 		gen.g.tool.log("action-translator", "setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
@@ -205,12 +209,14 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(s);
 	}
 
+	@Override
 	public void nonLocalAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "nonLocalAttr "+x+"::"+y);
 		Rule r = factory.getGrammar().getRule(x.getText());
 		chunks.add(new NonLocalAttrRef(nodeContext, x.getText(), y.getText(), r.index));
 	}
 
+	@Override
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
 		gen.g.tool.log("action-translator", "setNonLocalAttr "+x+"::"+y+"="+rhs);
 		Rule r = factory.getGrammar().getRule(x.getText());
@@ -219,19 +225,21 @@ public class ActionTranslator implements ActionSplitterListener {
 		chunks.add(s);
 	}
 
+	@Override
 	public void unknownSyntax(Token t) {
 	}
 
+	@Override
 	public void text(String text) {
 		chunks.add(new ActionText(nodeContext,text));
 	}
 
 	TokenPropertyRef getTokenPropertyRef(Token x, Token y) {
 		try {
-			Class c = tokenPropToModelMap.get(y.getText());
-			Constructor ctor = c.getConstructor(new Class[] {StructDecl.class, String.class});
+			Class<? extends TokenPropertyRef> c = tokenPropToModelMap.get(y.getText());
+			Constructor<? extends TokenPropertyRef> ctor = c.getConstructor(StructDecl.class, String.class);
 			TokenPropertyRef ref =
-				(TokenPropertyRef)ctor.newInstance(nodeContext, getTokenLabel(x.getText()));
+				ctor.newInstance(nodeContext, getTokenLabel(x.getText()));
 			return ref;
 		}
 		catch (Exception e) {
@@ -243,10 +251,10 @@ public class ActionTranslator implements ActionSplitterListener {
 	// $text
 	RulePropertyRef getRulePropertyRef(Token prop) {
 		try {
-			Class c = thisRulePropToModelMap.get(prop.getText());
-			Constructor ctor = c.getConstructor(new Class[] {StructDecl.class, String.class});
+			Class<? extends RulePropertyRef> c = thisRulePropToModelMap.get(prop.getText());
+			Constructor<? extends RulePropertyRef> ctor = c.getConstructor(StructDecl.class, String.class);
 			RulePropertyRef ref =
-				(RulePropertyRef)ctor.newInstance(nodeContext, getRuleLabel(prop.getText()));
+				ctor.newInstance(nodeContext, getRuleLabel(prop.getText()));
 			return ref;
 		}
 		catch (Exception e) {
@@ -258,10 +266,10 @@ public class ActionTranslator implements ActionSplitterListener {
 	RulePropertyRef getRulePropertyRef(Token x, Token prop) {
 		Grammar g = factory.getGrammar();
 		try {
-			Class c = rulePropToModelMap.get(prop.getText());
-			Constructor ctor = c.getConstructor(new Class[] {StructDecl.class, String.class});
+			Class<? extends RulePropertyRef> c = rulePropToModelMap.get(prop.getText());
+			Constructor<? extends RulePropertyRef> ctor = c.getConstructor(StructDecl.class, String.class);
 			RulePropertyRef ref =
-				(RulePropertyRef)ctor.newInstance(nodeContext, getRuleLabel(x.getText()));
+				ctor.newInstance(nodeContext, getRuleLabel(x.getText()));
 			return ref;
 		}
 		catch (Exception e) {

@@ -46,13 +46,13 @@ public class FailedPredicateException extends RecognitionException {
 		this(recognizer, null);
 	}
 
-	public FailedPredicateException(Parser recognizer, @Nullable String msg) {
+	public FailedPredicateException(Parser recognizer, @Nullable String predicate) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;
-		this.msg = msg;
+		this.msg = String.format("failed predicate: {%s}?", predicate);
 		Token la = recognizer.getCurrentToken();
 		this.offendingToken = la;
 	}
