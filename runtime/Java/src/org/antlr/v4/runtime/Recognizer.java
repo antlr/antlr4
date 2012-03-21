@@ -35,17 +35,15 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
-
-	private List<ANTLRErrorListener<Symbol>> _listeners;
-
-	private static final ANTLRErrorListener[] EMPTY_LISTENERS = new ANTLRErrorListener[0];
+	@NotNull
+	private List<ANTLRErrorListener<? super Symbol>> _listeners =
+		new CopyOnWriteArrayList<ANTLRErrorListener<? super Symbol>>() {{ add(ConsoleErrorListener.INSTANCE); }};
 
 	protected ATNInterpreter _interp;
 
@@ -98,31 +96,29 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return "'"+s+"'";
 	}
 
-	public void addErrorListener(ANTLRErrorListener<Symbol> pl) {
-		if ( _listeners ==null ) {
-			_listeners =
-				Collections.synchronizedList(new ArrayList<ANTLRErrorListener<Symbol>>(2));
-		}
-		if ( pl!=null ) _listeners.add(pl);
-	}
-
-	public void removeErrorListener(ANTLRErrorListener<Symbol> pl) {
-		if ( _listeners!=null ) _listeners.remove(pl);
-	}
-
-	public void removeErrorListeners() { if ( _listeners!=null ) _listeners.clear(); }
-
-	public @NotNull ANTLRErrorListener<Symbol>[] getErrorListeners() {
-		if (_listeners == null) {
-			return EMPTY_LISTENERS;
+	/**
+	 * @throws NullPointerException if {@code listener} is {@code null}.
+	 */
+	public void addErrorListener(@NotNull ANTLRErrorListener<? super Symbol> listener) {
+		if (listener == null) {
+			throw new NullPointerException("listener cannot be null.");
 		}
 
-		return _listeners.toArray(EMPTY_LISTENERS);
+		_listeners.add(listener);
 	}
 
-	public ANTLRErrorStrategy getErrorHandler() { return _errHandler; }
+	public void removeErrorListener(@NotNull ANTLRErrorListener<? super Symbol> listener) {
+		_listeners.remove(listener);
+	}
 
-	public void setErrorHandler(ANTLRErrorStrategy h) { this._errHandler = h; }
+	public void removeErrorListeners() {
+		_listeners.clear();
+	}
+
+	@NotNull
+	public List<? extends ANTLRErrorListener<? super Symbol>> getErrorListeners() {
+		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
+	}
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute

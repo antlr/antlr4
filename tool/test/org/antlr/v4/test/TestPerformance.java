@@ -122,17 +122,15 @@ public class TestPerformance extends BaseTest {
     @Test
     //@Ignore
     public void compileJdk() throws IOException {
-        String jdkSourceRoot = System.getenv("JDK_SOURCE_ROOT");
-        if (jdkSourceRoot == null) {
-            jdkSourceRoot = System.getProperty("JDK_SOURCE_ROOT");
-        }
-        if (jdkSourceRoot == null) {
-            System.err.println("The JDK_SOURCE_ROOT environment variable must be set for performance testing.");
-            return;
-        }
+        String jdkSourceRoot = getSourceRoot("JDK");
+		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
-        compileParser(USE_LR_GRAMMAR);
-        JavaParserFactory factory = getParserFactory();
+        compileJavaParser(USE_LR_GRAMMAR);
+		final String lexerName = "JavaLexer";
+		final String parserName = "JavaParser";
+		final String listenerName = "JavaBaseListener";
+		final String entryPoint = "compilationUnit";
+        ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
 		if (!TOP_PACKAGE.isEmpty()) {
             jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.replace('.', '/');
@@ -141,9 +139,9 @@ public class TestPerformance extends BaseTest {
         File directory = new File(jdkSourceRoot);
         assertTrue(directory.isDirectory());
 
-        Collection<CharStream> sources = loadSources(directory, RECURSIVE);
+        Collection<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
 
-		System.out.print(getOptionsDescription());
+		System.out.print(getOptionsDescription(TOP_PACKAGE));
 
         currentPass = 0;
         parse1(factory, sources);
@@ -169,6 +167,15 @@ public class TestPerformance extends BaseTest {
 		}
     }
 
+	private String getSourceRoot(String prefix) {
+		String sourceRoot = System.getenv(prefix+"_SOURCE_ROOT");
+		if (sourceRoot == null) {
+			sourceRoot = System.getProperty(prefix+"_SOURCE_ROOT");
+		}
+
+		return sourceRoot;
+	}
+
     @Override
     protected void eraseTempDir() {
         if (DELETE_TEMP_FILES) {
@@ -176,14 +183,14 @@ public class TestPerformance extends BaseTest {
         }
     }
 
-    public static String getOptionsDescription() {
+    public static String getOptionsDescription(String topPackage) {
         StringBuilder builder = new StringBuilder();
         builder.append("Input=");
-        if (TestPerformance.TOP_PACKAGE.isEmpty()) {
+        if (topPackage.isEmpty()) {
             builder.append("*");
         }
         else {
-            builder.append(TOP_PACKAGE).append(".*");
+            builder.append(topPackage).append(".*");
         }
 
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
@@ -211,7 +218,7 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse1(JavaParserFactory factory, Collection<CharStream> sources) {
+    protected void parse1(ParserFactory factory, Collection<CharStream> sources) {
         System.gc();
         parseSources(factory, sources);
     }
@@ -220,29 +227,28 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse2(JavaParserFactory factory, Collection<CharStream> sources) {
+    protected void parse2(ParserFactory factory, Collection<CharStream> sources) {
         System.gc();
         parseSources(factory, sources);
     }
 
-    protected Collection<CharStream> loadSources(File directory, boolean recursive) {
+    protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
+		return loadSources(directory, filter, null, recursive);
+	}
+
+    protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive) {
         Collection<CharStream> result = new ArrayList<CharStream>();
-        loadSources(directory, recursive, result);
+        loadSources(directory, filter, encoding, recursive, result);
         return result;
     }
 
-    protected void loadSources(File directory, boolean recursive, Collection<CharStream> result) {
+    protected void loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive, Collection<CharStream> result) {
         assert directory.isDirectory();
 
-        File[] sources = directory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".java");
-            }
-        });
+        File[] sources = directory.listFiles(filter);
         for (File file : sources) {
             try {
-                CharStream input = new ANTLRFileStream(file.getAbsolutePath());
+                CharStream input = new ANTLRFileStream(file.getAbsolutePath(), encoding);
                 result.add(input);
             } catch (IOException ex) {
 
@@ -253,7 +259,7 @@ public class TestPerformance extends BaseTest {
             File[] children = directory.listFiles();
             for (File child : children) {
                 if (child.isDirectory()) {
-                    loadSources(child, true, result);
+                    loadSources(child, filter, encoding, true, result);
                 }
             }
         }
@@ -261,7 +267,7 @@ public class TestPerformance extends BaseTest {
 
     int configOutputSize = 0;
 
-    protected void parseSources(JavaParserFactory factory, Collection<CharStream> sources) {
+    protected void parseSources(ParserFactory factory, Collection<CharStream> sources) {
         long startTime = System.currentTimeMillis();
         tokenCount = 0;
         int inputSize = 0;
@@ -388,7 +394,7 @@ public class TestPerformance extends BaseTest {
         }
     }
 
-    protected void compileParser(boolean leftRecursive) throws IOException {
+    protected void compileJavaParser(boolean leftRecursive) throws IOException {
         String grammarFileName = "Java.g";
         String sourceName = leftRecursive ? "Java-LR.g" : "Java.g";
         String body = load(sourceName, null);
@@ -432,15 +438,13 @@ public class TestPerformance extends BaseTest {
         }
     }
 
-    protected JavaParserFactory getParserFactory() {
+    protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+            final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
             @SuppressWarnings({"unchecked"})
-            final Class<? extends Lexer> lexerClass = (Class<? extends Lexer>)loader.loadClass("JavaLexer");
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass("JavaParser");
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass("JavaBaseListener");
+            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName);
             TestPerformance.sharedListener = listenerClass.newInstance();
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
@@ -450,7 +454,7 @@ public class TestPerformance extends BaseTest {
             lexerCtor.newInstance(new ANTLRInputStream(""));
             parserCtor.newInstance(new CommonTokenStream());
 
-            return new JavaParserFactory() {
+            return new ParserFactory() {
                 @SuppressWarnings({"PointlessBooleanExpression"})
                 @Override
                 public void parseFile(CharStream input) {
@@ -473,6 +477,7 @@ public class TestPerformance extends BaseTest {
                             sharedParser.setInputStream(tokens);
                         } else {
                             sharedParser = parserCtor.newInstance(tokens);
+							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								// TJP commented out for now; changed interface
@@ -483,7 +488,7 @@ public class TestPerformance extends BaseTest {
                             }
                         }
 
-                        Method parseMethod = parserClass.getMethod("compilationUnit");
+                        Method parseMethod = parserClass.getMethod(entryPoint);
                         Object parseResult = parseMethod.invoke(sharedParser);
                         Assert.assertTrue(parseResult instanceof ParseTree);
 
@@ -504,7 +509,38 @@ public class TestPerformance extends BaseTest {
         }
     }
 
-    protected interface JavaParserFactory {
+    protected interface ParserFactory {
         void parseFile(CharStream input);
     }
+
+	private static class DescriptiveErrorListener implements ANTLRErrorListener<Token> {
+		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
+
+		@Override
+		public <T extends Token> void error(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+			String sourceName = recognizer.getInputStream().getSourceName();
+			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+		}
+
+	}
+
+	protected static class FileExtensionFilenameFilter implements FilenameFilter {
+
+		private final String extension;
+
+		public FileExtensionFilenameFilter(String extension) {
+			if (!extension.startsWith(".")) {
+				extension = '.' + extension;
+			}
+
+			this.extension = extension;
+		}
+
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.toLowerCase().endsWith(extension);
+		}
+
+	}
 }

@@ -64,7 +64,7 @@ public interface OutputModelFactory {
 
 	CodeBlockForAlt finishAlternative(CodeBlockForAlt blk, List<SrcOp> ops);
 
-	CodeBlockForAlt epsilon();
+	CodeBlockForAlt epsilon(Alternative alt, boolean outerMost);
 
 	List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args);
 

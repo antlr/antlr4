@@ -30,10 +30,8 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 

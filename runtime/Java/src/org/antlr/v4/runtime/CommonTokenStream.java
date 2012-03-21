@@ -46,7 +46,7 @@ package org.antlr.v4.runtime;
  *  @see UnbufferedTokenStream
  *  @see BufferedTokenStream
  */
-public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
+public class CommonTokenStream extends BufferedTokenStream<Token> {
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
 
@@ -67,7 +67,7 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
         if ( p == -1 ) setup();
         p++;
         sync(p);
-		CommonToken t = tokens.get(p);
+		Token t = tokens.get(p);
 		while ( t.getType()!=Token.EOF && t.getChannel()!=channel ) {
             p++;
             sync(p);
@@ -90,7 +90,7 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
 	}
 
     @Override
-    protected CommonToken LB(int k) {
+    protected Token LB(int k) {
         if ( k==0 || (p-k)<0 ) return null;
 
         int i = p;
@@ -106,7 +106,7 @@ public class CommonTokenStream extends BufferedTokenStream<CommonToken> {
     }
 
     @Override
-    public CommonToken LT(int k) {
+    public Token LT(int k) {
         //System.out.println("enter LT("+k+")");
         if ( p == -1 ) setup();
         if ( k == 0 ) return null;

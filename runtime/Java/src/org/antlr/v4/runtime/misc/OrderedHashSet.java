@@ -114,8 +114,9 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 
     @Override
     public Object clone() {
+        @SuppressWarnings("unchecked")
         OrderedHashSet<T> dup = (OrderedHashSet<T>)super.clone();
-        dup.elements = (ArrayList<T>)this.elements.clone();
+        dup.elements = new ArrayList<T>(this.elements);
         return dup;
     }
 
@@ -124,6 +125,7 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 		return elements.toArray();
 	}
 
+	@Override
 	public String toString() {
         return elements.toString();
     }

@@ -57,6 +57,7 @@ public class Attribute {
         this.decl = decl;
     }
 
+    @Override
     public String toString() {
         if ( initValue!=null ) {
             return type+" "+name+"="+initValue;

@@ -42,6 +42,7 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
     public GrammarASTAdaptor() { ; }
     public GrammarASTAdaptor(org.antlr.runtime.CharStream input) { this.input = input; }
 
+    @Override
     public Object create(Token token) {
         return new GrammarAST(token);
     }
@@ -66,11 +67,13 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
         return t;
     }
 
+    @Override
     public Object dupNode(Object t) {
         if ( t==null ) return null;
         return ((GrammarAST)t).dupNode(); //create(((GrammarAST)t).token);
     }
 
+    @Override
     public Object errorNode(org.antlr.runtime.TokenStream input, org.antlr.runtime.Token start, org.antlr.runtime.Token stop,
                             org.antlr.runtime.RecognitionException e)
     {

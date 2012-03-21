@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
+  Copyright (c) 2012 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,20 +26,24 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.antlr.v4.runtime;
 
-package org.antlr.v4.misc;
+/**
+ *
+ * @author Sam Harwell
+ */
+public class ConsoleErrorListener implements ANTLRErrorListener<Object> {
+	public static final ConsoleErrorListener INSTANCE = new ConsoleErrorListener();
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
-	public void map(K key, V value) {
-		List<V> elementsForKey = get(key);
-		if ( elementsForKey==null ) {
-			elementsForKey = new ArrayList<V>();
-			super.put(key, elementsForKey);
-		}
-		elementsForKey.add(value);
+	@Override
+	public <T extends Object> void error(Recognizer<T, ?> recognizer,
+										T offendingSymbol,
+										int line,
+										int charPositionInLine,
+										String msg,
+										RecognitionException e)
+	{
+		System.err.println("line " + line + ":" + charPositionInLine + " " + msg);
 	}
+
 }

@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,7 +131,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
-	// Double dispatch methods for listeners and visitors
+	// Double dispatch methods for listeners
 
 	// parse listener
 	public void enterRule(ParseListener<Symbol> listener) { }
@@ -141,10 +140,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	// parse tree listener
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
-
-	// visitor
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
-
 
 	/** Does not set parent link; other add methods do */
 	public void addChild(TerminalNode<Symbol> t) {
@@ -178,10 +173,17 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		t.parent = this;
 	}
 
-	public void addErrorNode(Symbol badToken) {
-		TerminalNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
+	public ErrorNode<Symbol> addErrorNode(Symbol badToken) {
+		ErrorNodeImpl<Symbol> t = new ErrorNodeImpl<Symbol>(badToken);
 		addChild(t);
 		t.parent = this;
+		return t;
+	}
+
+	@Override
+	/** Override to make type more specific */
+	public ParserRuleContext<Symbol> getParent() {
+		return (ParserRuleContext<Symbol>)super.getParent();
 	}
 
 	@Override
@@ -206,7 +208,8 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return null;
 	}
 
-	public Token getToken(int ttype, int i) {
+	@SuppressWarnings("checked")
+	public TerminalNode<Symbol> getToken(int ttype, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;
 		}
@@ -214,12 +217,12 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		int j = -1; // what token with ttype have we found?
 		for (ParseTree o : children) {
 			if ( o instanceof TerminalNode<?> ) {
-				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				TerminalNode<Symbol> tnode = (TerminalNode<Symbol>)o;
 				Token symbol = tnode.getSymbol();
 				if ( symbol.getType()==ttype ) {
 					j++;
 					if ( j == i ) {
-						return symbol;
+						return tnode;
 					}
 				}
 			}
@@ -228,20 +231,23 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return null;
 	}
 
-	public List<? extends Token> getTokens(int ttype) {
+	@SuppressWarnings("checked")
+	public List<TerminalNode<Symbol>> getTokens(int ttype) {
 		if ( children==null ) {
 			return Collections.emptyList();
 		}
 
-		List<Token> tokens = null;
+		List<TerminalNode<Symbol>> tokens = null;
 		for (ParseTree o : children) {
 			if ( o instanceof TerminalNode<?> ) {
-				TerminalNode<?> tnode = (TerminalNode<?>)o;
+				TerminalNode<Symbol> tnode = (TerminalNode<Symbol>)o;
 				Token symbol = tnode.getSymbol();
-				if ( tokens==null ) {
-					tokens = new ArrayList<Token>();
+				if ( symbol.getType()==ttype ) {
+					if ( tokens==null ) {
+						tokens = new ArrayList<TerminalNode<Symbol>>();
+					}
+					tokens.add(tnode);
 				}
-				tokens.add(symbol);
 			}
 		}
 

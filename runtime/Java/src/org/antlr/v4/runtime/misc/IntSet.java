@@ -62,6 +62,7 @@ public interface IntSet {
 
     boolean isNil();
 
+    @Override
     boolean equals(Object obj);
 
     int getSingleElement();
@@ -73,5 +74,6 @@ public interface IntSet {
 
     List<Integer> toList();
 
+    @Override
     String toString();
 }

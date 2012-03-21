@@ -1,4 +1,4 @@
-package org.antlr.v4.misc;
+package org.antlr.v4.runtime.misc;
 
 public class Triple<A,B,C> extends Pair<A,B> {
 	public C c;

@@ -102,7 +102,7 @@ public class Trees {
 				String ruleName = recog.getRuleNames()[ruleIndex];
 				return ruleName;
 			}
-			else if ( t instanceof ParseTree.ErrorNodeImpl ) {
+			else if ( t instanceof ParseTree.ErrorNodeImpl) {
 				return t.toString();
 			}
 			else if ( t instanceof ParseTree.TerminalNode) {

@@ -174,9 +174,9 @@ public class Utils {
 	}
 
 	/** Find exact object type or sublass of cl in list */
-	public static Object find(List<?> ops, Class cl) {
+	public static <T> T find(List<?> ops, Class<T> cl) {
 		for (Object o : ops) {
-			if ( cl.isInstance(o) ) return o;
+			if ( cl.isInstance(o) ) return cl.cast(o);
 //			if ( o.getClass() == cl ) return o;
 		}
 		return null;

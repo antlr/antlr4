@@ -29,16 +29,10 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.OrderedHashSet;
-
-import java.util.Arrays;
 
 public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     @Override
@@ -66,19 +60,5 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
-    }
-
-    @Override
-    public void reportInsufficientPredicates(@NotNull Parser recognizer,
-											 @NotNull DFA dfa,
-											 int startIndex, int stopIndex,
-											 @NotNull IntervalSet ambigAlts,
-											 DecisionState decState,
-											 @NotNull SemanticContext[] altToPred,
-											 @NotNull ATNConfigSet configs, boolean fullContextParse)
-    {
-        recognizer.notifyErrorListeners("reportInsufficientPredicates d=" + dfa.decision + ", decState=" + decState +
-										", ambigAlts=" + ambigAlts + ":" + Arrays.toString(altToPred) +
-										", " + configs + ", input='" + recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 }

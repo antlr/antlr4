@@ -406,10 +406,11 @@ public abstract class BaseTest {
 							   String input,
 							   boolean showDFA)
 	{
-		rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  null,
 									  lexerName);
+		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		compile("Test.java");
@@ -427,70 +428,17 @@ public abstract class BaseTest {
 								String startRuleName,
 								String input, boolean debug)
 	{
-		rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  parserName,
-									  lexerName);
+									  lexerName,
+									  "-parse-listener",
+									  "-visitor");
+		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
 								 lexerName,
 								 startRuleName,
-								 debug);
-	}
-
-	protected String execTreeParser(String parserGrammarFileName,
-									String parserGrammarStr,
-									String parserName,
-									String treeParserGrammarFileName,
-									String treeParserGrammarStr,
-									String treeParserName,
-									String lexerName,
-									String parserStartRuleName,
-									String treeParserStartRuleName,
-									String input)
-	{
-		return execTreeParser(parserGrammarFileName,
-							  parserGrammarStr,
-							  parserName,
-							  treeParserGrammarFileName,
-							  treeParserGrammarStr,
-							  treeParserName,
-							  lexerName,
-							  parserStartRuleName,
-							  treeParserStartRuleName,
-							  input,
-							  false);
-	}
-
-	protected String execTreeParser(String parserGrammarFileName,
-									String parserGrammarStr,
-									String parserName,
-									String treeParserGrammarFileName,
-									String treeParserGrammarStr,
-									String treeParserName,
-									String lexerName,
-									String parserStartRuleName,
-									String treeParserStartRuleName,
-									String input,
-									boolean debug)
-	{
-		// build the parser
-		rawGenerateAndBuildRecognizer(parserGrammarFileName,
-									  parserGrammarStr,
-									  parserName,
-									  lexerName);
-
-		// build the tree parser
-		rawGenerateAndBuildRecognizer(treeParserGrammarFileName,
-									  treeParserGrammarStr,
-									  treeParserName,
-									  lexerName);
-
-		writeFile(tmpdir, "input", input);
-
-		return rawExecRecognizer(parserName,
-								 lexerName,
-								 parserStartRuleName,
 								 debug);
 	}
 
@@ -510,7 +458,16 @@ public abstract class BaseTest {
 		}
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
-			files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			if (!optionsSet.contains("-no-listener")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+			}
+			if (optionsSet.contains("-visitor")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
+			}
+			if (optionsSet.contains("-parse-listener")) {
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
+			}
 		}
 		ok = compile(files.toArray(new String[files.size()]));
 		if ( !ok ) { allIsWell = false; }
@@ -747,41 +704,36 @@ public abstract class BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testActions(String templates, String actionName, String action, String expected) {
+	public void testActions(String templates, String actionName, String action, String expected) throws org.antlr.runtime.RecognitionException {
 		int lp = templates.indexOf('(');
 		String name = templates.substring(0, lp);
 		STGroup group = new STGroupString(templates);
 		ST st = group.getInstanceOf(name);
 		st.add(actionName, action);
 		String grammar = st.render();
-		try {
-			ErrorQueue equeue = new ErrorQueue();
-			Grammar g = new Grammar(grammar);
-			if ( g.ast!=null && !g.ast.hasErrors ) {
-				SemanticPipeline sem = new SemanticPipeline(g);
-				sem.process();
+		ErrorQueue equeue = new ErrorQueue();
+		Grammar g = new Grammar(grammar);
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
 
-				ATNFactory factory = new ParserATNFactory(g);
-				if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
-				g.atn = factory.createATN();
+			ATNFactory factory = new ParserATNFactory(g);
+			if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+			g.atn = factory.createATN();
 
-				CodeGenerator gen = new CodeGenerator(g);
-				ST outputFileST = gen.generateParser();
-				String output = outputFileST.render();
-				//System.out.println(output);
-				String b = "#" + actionName + "#";
-				int start = output.indexOf(b);
-				String e = "#end-" + actionName + "#";
-				int end = output.indexOf(e);
-				String snippet = output.substring(start+b.length(),end);
-				assertEquals(expected, snippet);
-			}
-			if ( equeue.size()>0 ) {
-				System.err.println(equeue.toString(g.tool));
-			}
+			CodeGenerator gen = new CodeGenerator(g);
+			ST outputFileST = gen.generateParser();
+			String output = outputFileST.render();
+			//System.out.println(output);
+			String b = "#" + actionName + "#";
+			int start = output.indexOf(b);
+			String e = "#end-" + actionName + "#";
+			int end = output.indexOf(e);
+			String snippet = output.substring(start+b.length(),end);
+			assertEquals(expected, snippet);
 		}
-		catch (org.antlr.runtime.RecognitionException re) {
-			re.printStackTrace(System.err);
+		if ( equeue.size()>0 ) {
+			System.err.println(equeue.toString(g.tool));
 		}
 	}
 

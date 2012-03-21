@@ -217,7 +217,7 @@ public class Tool {
 						i++;
 					}
 					// use reflection to set field
-					Class c = this.getClass();
+					Class<? extends Tool> c = this.getClass();
 					try {
 						Field f = c.getField(o.fieldName);
 						if ( argValue==null ) {
@@ -417,7 +417,7 @@ public class Tool {
 		}
 		catch (RecognitionException re) {
 			// TODO: do we gen errors now?
-			errMgr.internalError("can't generate this message at moment; antlr recovers");
+			ErrorManager.internalError("can't generate this message at moment; antlr recovers");
 		}
 		return null;
 	}
@@ -511,7 +511,7 @@ public class Tool {
 	 * @return
 	 */
 	public File getOutputDirectory(String fileNameWithPath) {
-		File outputDir = new File(outputDirectory);
+		File outputDir;
 		String fileDirectory;
 
 		// Some files are given to us without a PATH but should should
@@ -592,21 +592,21 @@ public class Tool {
 	public List<ANTLRToolListener> getListeners() { return listeners; }
 
 	public void info(String msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.info(msg);
 			return;
 		}
 		for (ANTLRToolListener l : listeners) l.info(msg);
 	}
 	public void error(ANTLRMessage msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.error(msg);
 			return;
 		}
 		for (ANTLRToolListener l : listeners) l.error(msg);
 	}
 	public void warning(ANTLRMessage msg) {
-		if ( listeners.size()==0 ) {
+		if ( listeners.isEmpty() ) {
 			defaultListener.warning(msg);
 			return;
 		}

@@ -27,43 +27,29 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool;
+package org.antlr.v4.runtime.misc;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.tool.ast.GrammarRootAST;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
-/** */
-public class LexerGrammar extends Grammar {
-	public static final String DEFAULT_MODE_NAME = "DEFAULT_MODE";
-
-	/** The grammar from which this lexer grammar was derived (if implicit) */
-    public Grammar implicitLexerOwner;
-
-	/** DEFAULT_MODE rules are added first due to grammar syntax order */
-	public MultiMap<String, Rule> modes;
-
-	public LexerGrammar(Tool tool, GrammarRootAST ast) {
-		super(tool, ast);
+public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
+	public void map(K key, V value) {
+		List<V> elementsForKey = get(key);
+		if ( elementsForKey==null ) {
+			elementsForKey = new ArrayList<V>();
+			super.put(key, elementsForKey);
+		}
+		elementsForKey.add(value);
 	}
 
-	public LexerGrammar(String grammarText) throws RecognitionException {
-		super(grammarText);
-	}
-
-	public LexerGrammar(String grammarText, ANTLRToolListener listener) throws RecognitionException {
-		super(grammarText, listener);
-	}
-
-	public LexerGrammar(String fileName, String grammarText, ANTLRToolListener listener) throws RecognitionException {
-		super(fileName, grammarText, listener);
-	}
-
-	@Override
-	public void defineRule(Rule r) {
-		super.defineRule(r);
-		if ( modes==null ) modes = new MultiMap<String, Rule>();
-		modes.map(r.mode, r);
+	public List<Pair<K,V>> getPairs() {
+		List<Pair<K,V>> pairs = new ArrayList<Pair<K,V>>();
+		for (K key : keySet()) {
+			for (V value : get(key)) {
+				pairs.add(new Pair<K,V>(key, value));
+			}
+		}
+		return pairs;
 	}
 }

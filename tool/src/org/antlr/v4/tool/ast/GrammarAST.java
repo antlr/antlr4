@@ -56,7 +56,7 @@ public class GrammarAST extends CommonTree {
 
 	public String textOverride;
 
-    public GrammarAST() {;}
+    public GrammarAST() {}
     public GrammarAST(Token t) { super(t); }
     public GrammarAST(GrammarAST node) {
 		super(node);
@@ -99,7 +99,7 @@ public class GrammarAST extends CommonTree {
 		List<GrammarAST> nodes = new ArrayList<GrammarAST>();
 		List<GrammarAST> work = new LinkedList<GrammarAST>();
 		work.add(this);
-		GrammarAST t = null;
+		GrammarAST t;
 		while ( work.size()>0 ) {
 			t = work.remove(0);
 			if ( types.contains(t.getType()) ) nodes.add(t);
@@ -121,7 +121,7 @@ public class GrammarAST extends CommonTree {
 	 *  If not a rule element, just returns null.
 	 */
 	public String getAltLabel() {
-		List ancestors = this.getAncestors();
+		List<? extends Tree> ancestors = this.getAncestors();
 		if ( ancestors==null ) return null;
 		for (int i=ancestors.size()-1; i>=0; i--) {
 			GrammarAST p = (GrammarAST)ancestors.get(i);
@@ -228,7 +228,7 @@ public class GrammarAST extends CommonTree {
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(input);
 		CommonTreeNodeStream nodes =
 			new CommonTreeNodeStream(adaptor, this);
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		GrammarAST o = (GrammarAST)nodes.LT(1);
 		int type = adaptor.getType(o);
 		while ( type!=Token.EOF ) {

@@ -58,6 +58,7 @@ public class LexerInterpreter implements TokenSource {
 		this.input = input;
 	}
 
+	@Override
 	public String getSourceName() {	return g.name; }
 
 	@Override
@@ -65,18 +66,22 @@ public class LexerInterpreter implements TokenSource {
 			// TODO: use TokenFactory
 	}
 
+	@Override
 	public int getCharPositionInLine() {
 		return 0;
 	}
 
+	@Override
 	public int getLine() {
 		return 0;
 	}
 
+	@Override
 	public CharStream getInputStream() {
 		return input;
 	}
 
+	@Override
 	public Token nextToken() {
 		// TODO: Deal with off channel tokens
 		int start = input.index();

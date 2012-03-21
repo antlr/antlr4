@@ -129,7 +129,7 @@ public class Target {
 	 *  TODO: unused and should call CharSupport.getANTLRCharLiteralForChar anyway
 	 */
 	public String getTargetCharLiteralCharValue(int c) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		buf.append('\'');
 		if ( c< Lexer.MIN_CHAR_VALUE ) return "'\u0000'";
 		if ( c<targetCharValueEscape.length &&
@@ -162,7 +162,7 @@ public class Target {
 	 */
 	public String getTarget64BitStringFromValue(long word) {
 		int numHexDigits = 8*2;
-		StringBuffer buf = new StringBuffer(numHexDigits+2);
+		StringBuilder buf = new StringBuilder(numHexDigits+2);
 		buf.append("0x");
 		String digits = Long.toHexString(word);
 		digits = digits.toUpperCase();
@@ -199,7 +199,7 @@ public class Target {
 			return null;
 		}
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		if ( quoted ) {
 			buf.append('"');
 		}
@@ -241,7 +241,7 @@ public class Target {
 		String literal, boolean addQuotes)
 	{
 		StringBuilder sb = new StringBuilder();
-		StringBuffer is = new StringBuffer(literal);
+		StringBuilder is = new StringBuilder(literal);
 
         if ( addQuotes ) sb.append('"');
 
