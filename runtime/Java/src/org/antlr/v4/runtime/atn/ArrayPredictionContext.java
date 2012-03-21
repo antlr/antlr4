@@ -132,12 +132,18 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
+		if ( isEmpty() ) return "[]";
 		StringBuilder buf = new StringBuilder();
 		buf.append("[");
 		for (int i=0; i<invokingStates.length; i++) {
 			if ( i>0 ) buf.append(",");
 			buf.append(invokingStates[i]);
-			buf.append(parents[i].toString());
+			if ( parents[i]!=null ) {
+				buf.append(parents[i].toString());
+			}
+			else {
+				buf.append("null");
+			}
 		}
 		buf.append("]");
 		return buf.toString();

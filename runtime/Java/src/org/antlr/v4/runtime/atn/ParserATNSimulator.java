@@ -930,15 +930,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean greedy, boolean loopsSimulateTailRecursion)
 	{
 		final int initialDepth = 0;
-		closure(config, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, initialDepth);
+		closure_(config, configs, closureBusy, collectPredicates, greedy,
+				 loopsSimulateTailRecursion, initialDepth);
 	}
 
-	protected void closure(@NotNull ATNConfig config,
-						   @NotNull ATNConfigSet configs,
-						   @NotNull Set<ATNConfig> closureBusy,
-						   boolean collectPredicates,
-						   boolean greedy, boolean loopsSimulateTailRecursion,
-						   int depth)
+	protected void closure_(@NotNull ATNConfig config,
+							@NotNull ATNConfigSet configs,
+							@NotNull Set<ATNConfig> closureBusy,
+							boolean collectPredicates,
+							boolean greedy, boolean loopsSimulateTailRecursion,
+							int depth)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
@@ -968,11 +969,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						// Make sure we track that we are now out of context.
 						c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 						assert depth > Integer.MIN_VALUE;
-						closure(c, configs, closureBusy, collectPredicates, greedy,
-								loopsSimulateTailRecursion, depth - 1);
+						closure_(c, configs, closureBusy, collectPredicates, greedy,
+								 loopsSimulateTailRecursion, depth - 1);
 //					}
-					return;
 				}
+				return;
 			}
 			else {
 				// else if we have no context info, just chase follow links (if greedy)
@@ -990,10 +991,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
 			else if ( config.state.getClass()==LoopEndState.class ) {
-				if ( debug ) System.out.println("Loop end; pop, stack="+config.context);
+				if ( debug ) System.out.print("Loop end; pop, stack="+config.context);
 				LoopEndState end = (LoopEndState)config.state;
 				// pop all the way back until we don't see the loopback state anymore
 				config.context = config.context.popAll(end.loopBackStateNumber, configs.fullCtx);
+				if ( debug ) System.out.println(" becomes "+config.context);
 			}
 		}
 
@@ -1036,7 +1038,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				closure(c, configs, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, newDepth);
+				closure_(c, configs, closureBusy, continueCollecting, greedy,
+						 loopsSimulateTailRecursion, newDepth);
 			}
 		}
 	}

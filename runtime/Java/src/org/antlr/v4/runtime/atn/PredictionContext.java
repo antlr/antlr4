@@ -28,7 +28,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public static PredictionContext fromRuleContext(RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
-		if ( outerContext==RuleContext.EMPTY ) {
+
+		// if we are in RuleContext of start rule, s, then PredictionContext
+		// is EMPTY. Nobody called us. (if we are empty, return empty)
+		if ( outerContext.parent==null || outerContext==RuleContext.EMPTY ) {
 			return PredictionContext.EMPTY;
 		}
 
@@ -36,9 +39,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		// context of just [s $].
 
 		PredictionContext parent = EMPTY;
-		if ( outerContext.parent != null &&
-			 outerContext.parent.invokingState!=EmptyPredictionContext.EMPTY_INVOKING_STATE )
-		{
+		if ( outerContext.parent != null ) {
 			parent = PredictionContext.fromRuleContext(outerContext.parent);
 		}
 
@@ -65,11 +66,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	protected static int calculateParentHashCode(PredictionContext[] parents) {
 		int hashCode = 1;
-		for (PredictionContext context : parents) {
-			if ( context==null ) {
-				System.out.println("WHAT!? "+parents.toString());
+		for (PredictionContext p : parents) {
+			if ( p!=null ) { // can be null for full ctx stack in ArrayPredictionContext
+				hashCode = hashCode * 31 ^ p.hashCode();
 			}
-			hashCode = hashCode * 31 ^ context.hashCode();
 		}
 
 		return hashCode;
@@ -339,8 +339,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				mergedInvokingStates[k] = a.invokingStates[i];
 				i++;
 			}
-			else {
-				mergedParents[k] = a.parents[j];
+			else { // b > a
+				mergedParents[k] = b.parents[j];
 				mergedInvokingStates[k] = b.invokingStates[j];
 				j++;
 			}

@@ -82,6 +82,8 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public String toString() {
-		return String.valueOf(invokingState)+" "+parent.toString();
+		String up = parent.toString();
+		if ( up.length()==0 ) return String.valueOf(invokingState);
+		return String.valueOf(invokingState)+" "+up;
 	}
 }

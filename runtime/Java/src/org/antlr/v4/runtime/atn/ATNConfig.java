@@ -171,7 +171,7 @@ public class ATNConfig {
         }
         if ( context!=null ) {
             buf.append(",[");
-            buf.append(context.toString(recog));
+            buf.append(context.toString());
 			buf.append("]");
         }
         if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {

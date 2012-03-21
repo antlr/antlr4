@@ -35,6 +35,6 @@ public class EmptyPredictionContext extends SingletonPredictionContext {
 
 	@Override
 	public String toString() {
-		return "$";
+		return "";
 	}
 }
