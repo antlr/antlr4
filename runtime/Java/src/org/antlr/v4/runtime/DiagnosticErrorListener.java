@@ -40,8 +40,13 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		String format = "reportAmbiguity d=%s: ambigAlts=%s:%s, input='%s'";
+		recognizer.notifyErrorListeners(
+			String.format(format,
+						  getDecisionDescription(recognizer, dfa.decision),
+						  ambigAlts,
+						  getConfigSetDescription(configs),
+						  recognizer.getInputString(startIndex, stopIndex)));
     }
 
 	@Override
@@ -50,15 +55,31 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
 											int startIndex, int stopIndex,
 											@NotNull ATNConfigSet configs)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		String format = "reportAttemptingFullContext d=%d: %s, input='%s'";
+		recognizer.notifyErrorListeners(
+			String.format(format,
+						  getDecisionDescription(recognizer, dfa.decision),
+						  getConfigSetDescription(configs),
+						  recognizer.getInputString(startIndex, stopIndex)));
 	}
 
 	@Override
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		String format = "reportContextSensitivity d=%d: %s, input='%s'";
+		recognizer.notifyErrorListeners(
+			String.format(format,
+						  getDecisionDescription(recognizer, dfa.decision),
+						  getConfigSetDescription(configs),
+						  recognizer.getInputString(startIndex, stopIndex)));
     }
+
+	protected String getDecisionDescription(Parser recognizer, int decision) {
+		return Integer.toString(decision);
+	}
+
+	protected String getConfigSetDescription(ATNConfigSet configs) {
+		return configs.toString();
+	}
 }

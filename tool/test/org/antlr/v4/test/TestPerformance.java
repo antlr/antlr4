@@ -31,6 +31,7 @@ package org.antlr.v4.test;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -90,6 +91,10 @@ public class TestPerformance extends BaseTest {
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
+
+	private static final boolean REPORT_AMBIGUITIES = false;
+	private static final boolean REPORT_FULL_CONTEXT = false;
+	private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
 
     /**
      *  If true, a single JavaLexer will be used, and {@link Lexer#setInputStream} will be called to initialize it
@@ -477,7 +482,9 @@ public class TestPerformance extends BaseTest {
                             sharedParser.setInputStream(tokens);
                         } else {
                             sharedParser = parserCtor.newInstance(tokens);
+							sharedParser.removeErrorListeners();
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+							sharedParser.addErrorListener(new SummarizingDiagnosticErrorListener());
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								// TJP commented out for now; changed interface
@@ -521,6 +528,78 @@ public class TestPerformance extends BaseTest {
 			String sourceName = recognizer.getInputStream().getSourceName();
 			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
 			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+		}
+
+	}
+
+	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
+
+		@Override
+		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, IntervalSet ambigAlts, ATNConfigSet configs) {
+			if (!REPORT_AMBIGUITIES) {
+				return;
+			}
+
+			super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+		}
+
+		@Override
+		public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, ATNConfigSet configs) {
+			if (!REPORT_FULL_CONTEXT) {
+				return;
+			}
+
+			super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, configs);
+		}
+
+		@Override
+		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, ATNConfigSet configs) {
+			if (!REPORT_CONTEXT_SENSITIVITY) {
+				return;
+			}
+
+			super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, configs);
+		}
+
+		@Override
+		protected String getDecisionDescription(Parser recognizer, int decision) {
+			String format = "%d(%s)";
+			String ruleName = recognizer.getRuleNames()[recognizer.getATN().decisionToState.get(decision).ruleIndex];
+			return String.format(format, decision, ruleName);
+		}
+
+		@Override
+		protected String getConfigSetDescription(ATNConfigSet configs) {
+			StringBuilder buf = new StringBuilder();
+			buf.append('[');
+			boolean first = false;
+			for (ATNConfig config : configs) {
+				if (!first) {
+					buf.append(',');
+				}
+				first = false;
+				buf.append('(');
+				buf.append(config.state);
+				buf.append(",");
+				buf.append(config.alt);
+
+				// do not show context here!
+
+				if ( config.semanticContext!=null && config.semanticContext != SemanticContext.NONE ) {
+					buf.append(",");
+					buf.append(config.semanticContext);
+				}
+				if ( config.reachesIntoOuterContext>0 ) {
+					buf.append(",up=").append(config.reachesIntoOuterContext);
+				}
+				buf.append(')');
+			}
+			buf.append(']');
+			if ( configs.hasSemanticContext ) buf.append(",hasSemanticContext="+configs.hasSemanticContext);
+			if ( configs.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+configs.uniqueAlt);
+			if ( configs.conflictingAlts!=null ) buf.append(",conflictingAlts="+configs.conflictingAlts);
+			if ( configs.dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
+			return buf.toString();
 		}
 
 	}
