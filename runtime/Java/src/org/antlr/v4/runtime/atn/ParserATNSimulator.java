@@ -804,7 +804,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				int n = c.state.getNumberOfTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each transition
 					Transition trans = c.state.transition(ti);
-					ATNState target = getReachableTarget(trans, t);
+					ATNState target = getReachableTarget(c, trans, t);
 					if ( target!=null ) {
 						reachIntermediate.add(new ATNConfig(c, target));
 					}
@@ -968,7 +968,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
+	public ATNState getReachableTarget(@NotNull ATNConfig source, @NotNull Transition trans, int ttype) {
 		if ( trans instanceof AtomTransition ) {
 			AtomTransition at = (AtomTransition)trans;
 			if ( at.label == ttype ) {

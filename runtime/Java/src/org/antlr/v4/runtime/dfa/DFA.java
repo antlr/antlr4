@@ -120,19 +120,20 @@ public class DFA {
 		List<Set<ATNState>> atnStates = new ArrayList<Set<ATNState>>();
 		int i = start;
 		for (DFAState D : dfaStates) {
-			Set<ATNState> fullSet = D.configset.getStates();
 			Set<ATNState> statesInvolved = new HashSet<ATNState>();
-			for (ATNState astate : fullSet) {
-				Transition t = astate.transition(0);
-				ATNState target = atn.getReachableTarget(t, input.get(i).getType());
-				if ( target!=null ) {
-					statesInvolved.add(astate);
+			for (ATNConfig c : D.configset) {
+				Transition t = c.state.transition(0);
+				ATNState target = atn.getReachableTarget(c, t, input.get(i).getType());
+				if (target != null) {
+					statesInvolved.add(c.state);
 				}
 			}
+
 			System.out.println("statesInvolved upon "+input.get(i).getText()+"="+statesInvolved);
 			i++;
 			atnStates.add(statesInvolved);
 		}
+
 		return atnStates;
 	}
 
