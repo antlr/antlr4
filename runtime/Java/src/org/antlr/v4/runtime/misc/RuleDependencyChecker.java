@@ -125,8 +125,12 @@ public class RuleDependencyChecker {
 			boolean isInteger = field.getType() == Integer.TYPE;
 			if (isStatic && isInteger && field.getName().startsWith("RULE_")) {
 				try {
-					int index = field.getInt(null);
 					String name = field.getName().substring("RULE_".length());
+					if (name.isEmpty() || !Character.isLowerCase(name.charAt(0))) {
+						continue;
+					}
+
+					int index = field.getInt(null);
 					if (index < 0 || index >= versions.length) {
 						Object[] params = { index, field.getName(), recognizerClass.getSimpleName() };
 						LOGGER.log(Level.WARNING, "Rule index {0} for rule ''{1}'' out of bounds for recognizer {2}.", params);
@@ -136,7 +140,7 @@ public class RuleDependencyChecker {
 					Method ruleMethod = getRuleMethod(recognizerClass, name);
 					if (ruleMethod == null) {
 						Object[] params = { name, recognizerClass.getSimpleName() };
-						LOGGER.log(Level.WARNING, "Could not file rule method for rule ''{0}'' in recognizer {1}.", params);
+						LOGGER.log(Level.WARNING, "Could not find rule method for rule ''{0}'' in recognizer {1}.", params);
 						continue;
 					}
 
