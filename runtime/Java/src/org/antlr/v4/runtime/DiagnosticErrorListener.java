@@ -44,8 +44,13 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs.toString(true) + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		String format = "reportAmbiguity d=%s: ambigAlts=%s:%s, input='%s'";
+		recognizer.notifyErrorListeners(
+			String.format(format,
+						  getDecisionDescription(recognizer, dfa.decision),
+						  ambigAlts,
+						  getConfigSetDescription(configs),
+						  recognizer.getInputString(startIndex, stopIndex)));
     }
 
 	@Override
@@ -54,17 +59,33 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 											int startIndex, int stopIndex,
 											@NotNull SimulatorState<T> initialState)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + getFullContextConfigs(initialState).toString(true) + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		String format = "reportAttemptingFullContext d=%d: %s, input='%s'";
+		recognizer.notifyErrorListeners(
+			String.format(format,
+						  getDecisionDescription(recognizer, dfa.decision),
+						  getConfigSetDescription(getFullContextConfigs(initialState)),
+						  recognizer.getInputString(startIndex, stopIndex)));
 	}
 
 	@Override
 	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull SimulatorState<T> acceptState)
     {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + getFullContextConfigs(acceptState).toString(true) + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		String format = "reportContextSensitivity d=%d: %s, input='%s'";
+		recognizer.notifyErrorListeners(
+			String.format(format,
+						  getDecisionDescription(recognizer, dfa.decision),
+						  getConfigSetDescription(getFullContextConfigs(acceptState)),
+						  recognizer.getInputString(startIndex, stopIndex)));
     }
+
+	protected <T extends Symbol> String getDecisionDescription(Parser<T> recognizer, int decision) {
+		return Integer.toString(decision);
+	}
+
+	protected String getConfigSetDescription(ATNConfigSet configs) {
+		return configs.toString(true);
+	}
 
 	protected static ATNConfigSet getFullContextConfigs(SimulatorState<?> state) {
 		ATNConfigSet configs = new ATNConfigSet();

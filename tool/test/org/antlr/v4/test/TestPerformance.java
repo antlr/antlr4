@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -48,8 +49,10 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -132,6 +135,10 @@ public class TestPerformance extends BaseTest {
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
+
+	private static final boolean REPORT_AMBIGUITIES = false;
+	private static final boolean REPORT_FULL_CONTEXT = false;
+	private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
 
     /**
      *  If true, a single JavaLexer will be used, and {@link Lexer#setInputStream} will be called to initialize it
@@ -546,7 +553,9 @@ public class TestPerformance extends BaseTest {
 							@SuppressWarnings("unchecked")
 							Parser<Token> parser = parserCtor.newInstance(tokens);
                             sharedParser = parser;
+							sharedParser.removeErrorListeners();
 							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+							sharedParser.addErrorListener(new SummarizingDiagnosticErrorListener());
 							if (!ENABLE_PARSER_DFA) {
 								sharedParser.setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParser, sharedParser.getATN()));
 							}
@@ -596,6 +605,49 @@ public class TestPerformance extends BaseTest {
 			String sourceName = recognizer.getInputStream().getSourceName();
 			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
 			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+		}
+
+	}
+
+	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener<Token> {
+
+		@Override
+		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, IntervalSet ambigAlts, ATNConfigSet configs) {
+			if (!REPORT_AMBIGUITIES) {
+				return;
+			}
+
+			super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+		}
+
+		@Override
+		public <T extends Token> void reportAttemptingFullContext(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState<T> initialState) {
+			if (!REPORT_FULL_CONTEXT) {
+				return;
+			}
+
+			super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
+		}
+
+		@Override
+		public <T extends Token> void reportContextSensitivity(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState<T> acceptState) {
+			if (!REPORT_CONTEXT_SENSITIVITY) {
+				return;
+			}
+
+			super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
+		}
+
+		@Override
+		protected <T extends Token> String getDecisionDescription(Parser<T> recognizer, int decision) {
+			String format = "%d(%s)";
+			String ruleName = recognizer.getRuleNames()[recognizer.getATN().decisionToState.get(decision).ruleIndex];
+			return String.format(format, decision, ruleName);
+		}
+
+		@Override
+		protected String getConfigSetDescription(ATNConfigSet configs) {
+			return configs.toString(false);
 		}
 
 	}
