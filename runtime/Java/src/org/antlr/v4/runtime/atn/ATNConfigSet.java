@@ -432,7 +432,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			if (i > 0) {
 				buf.append(", ");
 			}
-			buf.append(sortedConfigs.get(i).toString(null, true, true));
+			buf.append(sortedConfigs.get(i).toString(null, true, showContext));
 		}
 		buf.append("]");
 
