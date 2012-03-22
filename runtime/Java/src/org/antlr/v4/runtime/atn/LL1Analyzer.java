@@ -114,29 +114,34 @@ public class LL1Analyzer {
 
         int n = s.getNumberOfTransitions();
         for (int i=0; i<n; i++) {
-            Transition t = s.transition(i);
-            if ( t.getClass() == RuleTransition.class ) {
-                RuleContext newContext =
-                    new RuleContext(ctx, s.stateNumber);
-                _LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
-            }
-            else if ( t.isEpsilon() && seeThruPreds ) {
-                _LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
-            }
-            else if ( t.getClass() == WildcardTransition.class ) {
-                look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
-            }
-            else {
+			Transition t = s.transition(i);
+			if ( t.getClass() == RuleTransition.class ) {
+				RuleContext newContext =
+				new RuleContext(ctx, s.stateNumber);
+				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
+			}
+			else if ( t instanceof PredicateTransition ) {
+				if ( seeThruPreds ) {
+					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
+				}
+			}
+			else if ( t.isEpsilon() ) {
+				_LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
+			}
+			else if ( t.getClass() == WildcardTransition.class ) {
+				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
+			}
+			else {
 //				System.out.println("adding "+ t);
-                IntervalSet set = t.label();
-                if (set != null) {
-                    if (t instanceof NotSetTransition) {
-                        set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
-                    }
-                    look.addAll(set);
-                }
-            }
-        }
-    }
+				IntervalSet set = t.label();
+				if (set != null) {
+					if (t instanceof NotSetTransition) {
+						set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
+					}
+					look.addAll(set);
+				}
+			}
+		}
+	}
 
 }

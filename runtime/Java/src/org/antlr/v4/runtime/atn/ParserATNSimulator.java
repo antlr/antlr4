@@ -535,8 +535,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-							 !D.configset.dipsIntoOuterContext ||
-							 k == 1 ) // SLL(1) == LL(1)
+							 !D.configset.dipsIntoOuterContext )
 						{
 							if ( reportAmbiguities && !D.configset.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(), D.configset.conflictingAlts, D.configset);

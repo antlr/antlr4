@@ -162,6 +162,7 @@ public class TestParserExec extends BaseTest {
 		assertEquals("a34c\n", found);
 	}
 
+
 	/**
 	 * This test is meant to detect regressions of bug antlr/antlr4#41.
 	 * https://github.com/antlr/antlr4/issues/41
