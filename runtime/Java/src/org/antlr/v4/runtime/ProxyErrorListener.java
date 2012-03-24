@@ -28,12 +28,11 @@
  */
 package org.antlr.v4.runtime;
 
-import java.util.Collection;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.Collection;
 
 /**
  *
@@ -95,21 +94,4 @@ public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 			listener.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, configs);
 		}
 	}
-
-	@Override
-	public void reportInsufficientPredicates(Parser recognizer,
-											 DFA dfa,
-											 int startIndex,
-											 int stopIndex,
-											 IntervalSet ambigAlts,
-											 DecisionState decState,
-											 SemanticContext[] altToPred,
-											 ATNConfigSet configs,
-											 boolean fullContextParse)
-	{
-		for (ANTLRErrorListener<? super Symbol> listener : delegates) {
-			listener.reportInsufficientPredicates(recognizer, dfa, startIndex, stopIndex, ambigAlts, decState, altToPred, configs, fullContextParse);
-		}
-	}
-
 }
