@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,39 +26,68 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 
-public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
-    @Override
-    public void reportAmbiguity(@NotNull Parser recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull ATNConfigSet configs)
-    {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
-    }
+/**
+ *
+ * @author Sam Harwell
+ */
+public class BaseErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
-											@NotNull DFA dfa,
-											int startIndex, int stopIndex,
-											@NotNull ATNConfigSet configs)
+	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
+										 T offendingSymbol,
+										 int line,
+										 int charPositionInLine,
+										 String msg,
+										 RecognitionException e)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
-    {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
-    }
+	public void reportAmbiguity(Parser recognizer,
+								DFA dfa,
+								int startIndex,
+								int stopIndex,
+								IntervalSet ambigAlts,
+								ATNConfigSet configs)
+	{
+	}
+
+	@Override
+	public void reportAttemptingFullContext(Parser recognizer,
+											DFA dfa,
+											int startIndex,
+											int stopIndex,
+											ATNConfigSet configs)
+	{
+	}
+
+	@Override
+	public void reportContextSensitivity(Parser recognizer,
+										 DFA dfa,
+										 int startIndex,
+										 int stopIndex,
+										 ATNConfigSet configs)
+	{
+	}
+
+	@Override
+	public void reportInsufficientPredicates(Parser recognizer,
+											 DFA dfa,
+											 int startIndex,
+											 int stopIndex,
+											 IntervalSet ambigAlts,
+											 DecisionState decState,
+											 SemanticContext[] altToPred,
+											 ATNConfigSet configs,
+											 boolean fullContextParse)
+	{
+	}
 }
