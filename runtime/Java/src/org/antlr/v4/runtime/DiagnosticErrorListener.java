@@ -40,7 +40,8 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
+        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
+										": ambigAlts=" + ambigAlts + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 
@@ -50,7 +51,8 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
 											int startIndex, int stopIndex,
 											@NotNull ATNConfigSet configs)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
+		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
+										dfa.decision + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
 	}
 
@@ -58,7 +60,8 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
+        recognizer.notifyErrorListeners("reportContextSensitivity d=" +
+										dfa.decision + ", input='" +
 										recognizer.getInputString(startIndex, stopIndex) + "'");
     }
 }
