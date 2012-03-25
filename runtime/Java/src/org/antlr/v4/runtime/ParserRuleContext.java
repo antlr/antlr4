@@ -103,9 +103,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	public Symbol start, stop;
 
-	/** Set during parsing to identify which rule parser is in. */
-	public int ruleIndex;
-
 	/** Set during parsing to identify which alt of rule parser is in. */
 	public int altNum;
 
@@ -120,7 +117,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 		this.start = ctx.start;
 		this.stop = ctx.stop;
-		this.ruleIndex = ctx.ruleIndex;
 	}
 
 	public ParserRuleContext(@Nullable ParserRuleContext<Symbol> parent, int invokingStateNumber, int stateNumber) {
@@ -288,9 +284,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	@Override
 	public int getChildCount() { return children!=null ? children.size() : 0; }
-
-	@Override
-	public int getRuleIndex() { return ruleIndex; }
 
 	@Override
 	public Interval getSourceInterval() {
