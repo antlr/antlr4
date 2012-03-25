@@ -30,6 +30,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -290,6 +291,12 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	@Override
 	public int getRuleIndex() { return ruleIndex; }
+
+	@Override
+	public Interval getSourceInterval() {
+		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
+	}
+
 
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }

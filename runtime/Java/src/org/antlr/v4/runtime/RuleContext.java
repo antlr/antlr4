@@ -208,7 +208,12 @@ public class RuleContext implements ParseTree.RuleNode {
 		return invokingState == -1;
 	}
 
-	// satisfy the ParseTree interface
+	// satisfy the ParseTree / SyntaxTree interface
+
+	@Override
+	public Interval getSourceInterval() {
+		return Interval.EMPTY;
+	}
 
 	@Override
 	public RuleContext getRuleContext() { return this; }
@@ -229,14 +234,6 @@ public class RuleContext implements ParseTree.RuleNode {
 	@Override
 	public int getChildCount() {
 		return 0;
-	}
-
-	@Override
-	public Interval getSourceInterval() {
-		if ( getChildCount()==0 ) return Interval.INVALID;
-		int start = getChild(0).getSourceInterval().a;
-		int stop = getChild(getChildCount()-1).getSourceInterval().b;
-		return new Interval(start, stop);
 	}
 
 	@Override
