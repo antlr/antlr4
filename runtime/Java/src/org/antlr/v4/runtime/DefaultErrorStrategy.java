@@ -29,8 +29,14 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -548,26 +554,5 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
             recognizer.consume();
             ttype = recognizer.getInputStream().LA(1);
         }
-    }
-
-    @Override
-    public void reportAmbiguity(@NotNull Parser recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull ATNConfigSet configs)
-    {
-    }
-
-	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
-											@NotNull DFA dfa,
-											int startIndex, int stopIndex,
-											@NotNull ATNConfigSet configs)
-	{
-	}
-
-	@Override
-    public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
-    {
     }
 }

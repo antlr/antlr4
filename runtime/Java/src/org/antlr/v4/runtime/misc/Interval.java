@@ -33,6 +33,7 @@ public class Interval {
 	public static final int INTERVAL_POOL_MAX_VALUE = 1000;
 
 	public static final Interval INVALID = new Interval(-1,-2);
+	public static final Interval EMPTY = new Interval(0,-1); // len 0
 
 	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
@@ -52,8 +53,7 @@ public class Interval {
 	 *  Interval object with a..a in it.  On Java.g, 218623 IntervalSets
 	 *  have a..a (set with 1 element).
 	 */
-	public static Interval create(int a, int b) {
-		//return new Interval(a,b);
+	public static Interval of(int a, int b) {
 		// cache just a..a
 		if ( a!=b || a<0 || a>INTERVAL_POOL_MAX_VALUE ) {
 			return new Interval(a,b);
@@ -62,6 +62,14 @@ public class Interval {
 			cache[a] = new Interval(a,a);
 		}
 		return cache[a];
+	}
+
+	/** return number of elements between a and b inclusively. x..x is length 1.
+	 *  if b < a, then length is 0.  9..10 has length 2.
+	 */
+	public int length() {
+		if ( b<a ) return 0;
+		return b-a+1;
 	}
 
 	@Override
@@ -112,12 +120,12 @@ public class Interval {
 
 	/** Return the interval computed from combining this and other */
 	public Interval union(Interval other) {
-		return Interval.create(Math.min(a,other.a), Math.max(b,other.b));
+		return Interval.of(Math.min(a, other.a), Math.max(b, other.b));
 	}
 
 	/** Return the interval in common between this and o */
 	public Interval intersection(Interval other) {
-		return Interval.create(Math.max(a,other.a), Math.min(b,other.b));
+		return Interval.of(Math.max(a, other.a), Math.min(b, other.b));
 	}
 
 	/** Return the interval with elements from this not in other;
@@ -129,13 +137,13 @@ public class Interval {
 		Interval diff = null;
 		// other.a to left of this.a (or same)
 		if ( other.startsBeforeNonDisjoint(this) ) {
-			diff = Interval.create(Math.max(this.a,other.b+1),
-								   this.b);
+			diff = Interval.of(Math.max(this.a, other.b + 1),
+							   this.b);
 		}
 
 		// other.a to right of this.a
 		else if ( other.startsAfterNonDisjoint(this) ) {
-			diff = Interval.create(this.a, other.a-1);
+			diff = Interval.of(this.a, other.a - 1);
 		}
 		return diff;
 	}
