@@ -109,6 +109,12 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	/** Set during parsing to identify which alt of rule parser is in. */
 	public int altNum;
 
+	/**
+	 * The exception which forced this rule to return. If the rule successfully
+	 * completed, this is {@code null}.
+	 */
+	public RecognitionException exception;
+
 	public ParserRuleContext() { }
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) */

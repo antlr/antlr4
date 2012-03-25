@@ -386,6 +386,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
     public void exitRule() {
+		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		_ctx = (ParserRuleContext<Token>)_ctx.parent;
@@ -411,6 +412,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
+		_ctx.stop = _input.LT(-1);
 		ParserRuleContext<Token> retctx = _ctx; // save current ctx (return value)
 
 		// unroll so _ctx is as it was before call to recursive method
