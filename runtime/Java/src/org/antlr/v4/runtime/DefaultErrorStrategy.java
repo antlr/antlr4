@@ -126,7 +126,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 //						   lastErrorIndex+
 //						   ", states="+lastErrorStates);
 		if ( lastErrorIndex==recognizer.getInputStream().index() &&
-		lastErrorStates.contains(recognizer._ctx.s) ) {
+		lastErrorStates.contains(recognizer.getState()) ) {
 			// uh oh, another error at same token index and previously-visited
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token
@@ -138,7 +138,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		}
 		lastErrorIndex = recognizer.getInputStream().index();
 		if ( lastErrorStates==null ) lastErrorStates = new IntervalSet();
-		lastErrorStates.add(recognizer._ctx.s);
+		lastErrorStates.add(recognizer.getState());
 		IntervalSet followSet = getErrorRecoverySet(recognizer);
 		consumeUntil(recognizer, followSet);
 	}
@@ -160,7 +160,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
  	 */
 	@Override
 	public void sync(Parser recognizer) {
-		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
         if ( errorRecoveryMode ) return;
@@ -315,7 +315,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		// if current token is consistent with what could come after current
 		// ATN state, then we know we're missing a token; error recovery
 		// is free to conjure up and insert the missing token
-		ATNState currentState = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
+		ATNState currentState = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 		ATNState next = currentState.transition(0).target;
 		IntervalSet expectingAtLL2 = recognizer.getInterpreter().atn.nextTokens(next, recognizer._ctx);
 //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));

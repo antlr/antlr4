@@ -66,7 +66,7 @@ public class RecognitionException extends RuntimeException {
 		this.recognizer = recognizer;
 		this.input = input;
 		this.ctx = ctx;
-		if ( ctx!=null ) this.offendingState = ctx.s;
+		if ( recognizer!=null ) this.offendingState = recognizer.getState();
 	}
 
 	/** Where was the parser in the ATN when the error occurred?
