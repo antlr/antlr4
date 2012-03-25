@@ -55,7 +55,7 @@ public class TestFullContextParsing extends BaseTest {
 			"Decision 0:\n" +
 			"s0-ID->:s1=>1\n"; // not ctx sensitive
 		assertEquals(expecting, result);
-		assertEquals("line 1:0 reportAmbiguity d=0: ambigAlts={1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input='abc'\n",
+		assertEquals("line 1:0 reportAmbiguity d=0: ambigAlts={1..2}, input='abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -77,8 +77,8 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-INT->s1\n" +
 			"s1-ID->s2^\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:5 reportAttemptingFullContext d=1: [(28,1,[18 10]), (20,2,[10])], input='34abc'\n" +
-					 "line 1:2 reportContextSensitivity d=1: [(20,1,[10])],uniqueAlt=1, input='34'\n",
+		assertEquals("line 1:5 reportAttemptingFullContext d=1, input='34abc'\n" +
+					 "line 1:2 reportContextSensitivity d=1, input='34'\n",
 					 this.stderrDuringParse);
 
 		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -88,8 +88,8 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-INT->s1\n" +
 			"s1-ID->s2^\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:5 reportAttemptingFullContext d=1: [(28,1,[22 14]), (24,2,[14])], input='34abc'\n" +
-					 "line 1:5 reportContextSensitivity d=1: [(1,2,[])],uniqueAlt=2, input='34abc'\n",
+		assertEquals("line 1:5 reportAttemptingFullContext d=1, input='34abc'\n" +
+					 "line 1:5 reportContextSensitivity d=1, input='34abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -116,10 +116,10 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-INT->s1\n" +
 			"s1-ID->s2^\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:5 reportAttemptingFullContext d=2: [(30,1,[20 10]), (22,2,[10])], input='34abc'\n" +
-					 "line 1:2 reportContextSensitivity d=2: [(22,1,[10])],uniqueAlt=1, input='34'\n" +
-					 "line 1:14 reportAttemptingFullContext d=2: [(30,1,[24 14]), (26,2,[14])], input='34abc'\n" +
-					 "line 1:14 reportContextSensitivity d=2: [(8,2,[18]), (12,2,[18]), (1,2,[])],uniqueAlt=2, input='34abc'\n",
+		assertEquals("line 1:5 reportAttemptingFullContext d=2, input='34abc'\n" +
+					 "line 1:2 reportContextSensitivity d=2, input='34'\n" +
+					 "line 1:14 reportAttemptingFullContext d=2, input='34abc'\n" +
+					 "line 1:14 reportContextSensitivity d=2, input='34abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -161,7 +161,7 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'else'->:s1=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:29 reportAmbiguity d=1: ambigAlts={1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2},dipsIntoOuterContext, input='else'\n",
+		assertEquals("line 1:29 reportAmbiguity d=1: ambigAlts={1..2}, input='else'\n",
 					 this.stderrDuringParse);
 
 		input = "{ if x then return else foo }";
@@ -181,7 +181,7 @@ public class TestFullContextParsing extends BaseTest {
 		// the start of a stat. But, we are using the theory that
 		// SLL(1)=LL(1) and so we are avoiding full context parsing
 		// by declaring all else clause parsing to be ambiguous.
-		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2},dipsIntoOuterContext, input='else'\n",
+		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}, input='else'\n",
 					 this.stderrDuringParse);
 
 		input = "{ if x then return else foo }";
@@ -195,7 +195,7 @@ public class TestFullContextParsing extends BaseTest {
 			"Decision 1:\n" +
 			"s0-'else'->:s1=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2},dipsIntoOuterContext, input='else'\n",
+		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}, input='else'\n",
 					 this.stderrDuringParse);
 
 		input =
@@ -212,7 +212,7 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'else'->:s1=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2},dipsIntoOuterContext, input='else'\n",
+		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}, input='else'\n",
 					 this.stderrDuringParse);
 
 		input =
@@ -229,7 +229,7 @@ public class TestFullContextParsing extends BaseTest {
 				"s0-'else'->:s1=>1\n" +
 				"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}:[(25,1,[]), (25,2,[],up=1)],conflictingAlts={1..2},dipsIntoOuterContext, input='else'\n",
+		assertEquals("line 1:19 reportAmbiguity d=1: ambigAlts={1..2}, input='else'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -259,10 +259,10 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("pass.\n", found);
 
 		String expecting =
-			"line 1:4 reportAttemptingFullContext d=1: [(35,1,[27 15 8]), (41,1,[27 15 8]), (49,1,[27 15 8]), (35,2,[27 21 8]), (41,2,[27 21 8]), (49,2,[27 21 8])], input='a(i)<-'\n" +
-			"line 1:7 reportContextSensitivity d=1: [(53,2,[])],uniqueAlt=2, input='a(i)<-x'\n" +
-			"line 1:3 reportAttemptingFullContext d=3: [(35,1,[27 21 8]), (41,2,[27 21 8]), (49,3,[27 21 8])], input='a(i)'\n" +
-			"line 1:7 reportAmbiguity d=3: ambigAlts={2..3}:[(53,2,[]), (53,3,[])],conflictingAlts={2..3}, input='a(i)<-x'\n";
+			"line 1:4 reportAttemptingFullContext d=1, input='a(i)<-'\n" +
+			"line 1:7 reportContextSensitivity d=1, input='a(i)<-x'\n" +
+			"line 1:3 reportAttemptingFullContext d=3, input='a(i)'\n" +
+			"line 1:7 reportAmbiguity d=3: ambigAlts={2..3}, input='a(i)<-x'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
 

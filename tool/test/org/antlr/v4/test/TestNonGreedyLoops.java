@@ -195,7 +195,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "\n" +
 					 "Decision 1:\n" +
 					 "s0-INT->:s1=>2\n", found);  // resolves INT EOF to alt 1 from s since ambig 'tween a and b
-		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input='34'\n" +
+		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}, input='34'\n" +
 					 "line 1:0 extraneous input '34' expecting <EOF>\n",
 					 this.stderrDuringParse);
 	}
@@ -527,11 +527,11 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "Decision 3:\n" +
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
-		assertEquals("line 1:6 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='<a>foo<'\n" +
-					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(26,1,[32 32 32 32 14 6]), (33,1,[14 6]), (22,1,[14 6 10 10]), (26,1,[14 6 10 10]), (33,1,[14 6 10 10]), (20,1,[14 6 10 10 10]), (16,1,[6 10 10 10]), (1,1,[]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (16,2,[6 10 10 10 10 10]), (1,2,[])],conflictingAlts={1..2}, input='<a>foo<'\n" +
-					 "line 1:10 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='</a>'\n" +
-					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}:[(35,1,[]), (35,2,[])],conflictingAlts={1..2}, input='</a>'\n" +
-					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}:[(26,1,[]), (33,1,[]), (26,2,[]), (33,2,[])],conflictingAlts={1..2}, input='/'\n",
+		assertEquals("line 1:6 reportAttemptingFullContext d=1, input='<a>foo<'\n" +
+					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}, input='<a>foo<'\n" +
+					 "line 1:10 reportAttemptingFullContext d=1, input='</a>'\n" +
+					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}, input='</a>'\n" +
+					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}, input='/'\n",
 					 this.stderrDuringParse);
 
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
