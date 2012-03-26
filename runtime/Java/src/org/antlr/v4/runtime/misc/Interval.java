@@ -33,7 +33,6 @@ public class Interval {
 	public static final int INTERVAL_POOL_MAX_VALUE = 1000;
 
 	public static final Interval INVALID = new Interval(-1,-2);
-	public static final Interval EMPTY = new Interval(0,-1); // len 0
 
 	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 

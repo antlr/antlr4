@@ -294,7 +294,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	@Override
 	public Interval getSourceInterval() {
-		if ( start==null || stop==null ) return Interval.EMPTY;
+		if ( start==null || stop==null ) return Interval.INVALID;
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
@@ -305,7 +305,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	 */
 	public String getText(TokenStream tokens) {
 		Interval range = getSourceInterval();
-		return range==Interval.EMPTY ? null : tokens.toString(range.a, range.b);
+		return range==Interval.INVALID ? null : tokens.toString(range.a, range.b);
 	}
 
 	public Symbol getStart() { return start; }

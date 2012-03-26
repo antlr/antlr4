@@ -212,7 +212,7 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	@Override
 	public Interval getSourceInterval() {
-		return Interval.EMPTY;
+		return Interval.INVALID;
 	}
 
 	@Override
