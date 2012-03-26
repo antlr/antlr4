@@ -412,6 +412,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
     public void exitRule() {
+		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		_ctx = (ParserRuleContext<Symbol>)_ctx.parent;
@@ -437,6 +438,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext<Symbol> _parentctx) {
+		_ctx.stop = _input.LT(-1);
 		ParserRuleContext<Symbol> retctx = _ctx; // save current ctx (return value)
 
 		// unroll so _ctx is as it was before call to recursive method

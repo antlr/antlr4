@@ -199,11 +199,11 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		int _alt;
 <endif>
 		<code>
-		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
 	catch (RecognitionException re) {
+		_localctx.exception = re;
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
 	}
@@ -236,11 +236,11 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 		int _alt;
 <endif>
 		<code>
-		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
 	catch (RecognitionException re) {
+		_localctx.exception = re;
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
 	}
