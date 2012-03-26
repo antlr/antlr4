@@ -75,6 +75,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				add("TokenLabelType");
 				add("superClass");
 				add("filter");
+				add("abstract");
 			}
 		};
 
@@ -85,6 +86,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				add("tokenVocab");
 				add("TokenLabelType");
 				add("superClass");
+				add("abstract");
 			}
 		};
 
