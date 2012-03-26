@@ -30,8 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -104,16 +102,4 @@ public interface ANTLRErrorListener<Symbol> {
                                   @NotNull DFA dfa,
                                   int startIndex, int stopIndex,
                                   @NotNull ATNConfigSet configs);
-
-    /** Called by the parser when it finds less than n-1 predicates for n ambiguous alternatives.
-     *  If there are n-1, we assume that the missing predicate is !(the "or" of the other predicates).
-     *  If there are fewer than n-1, then we don't know which make it alternative to protect
-     *  if the predicates fail.
-     */
-    void reportInsufficientPredicates(@NotNull Parser recognizer,
-									  @NotNull DFA dfa,
-									  int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-									  DecisionState decState,
-									  @NotNull SemanticContext[] altToPred,
-									  @NotNull ATNConfigSet configs, boolean fullContextParse);
 }

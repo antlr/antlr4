@@ -29,8 +29,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
@@ -75,19 +73,6 @@ public class BaseErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 										 int startIndex,
 										 int stopIndex,
 										 ATNConfigSet configs)
-	{
-	}
-
-	@Override
-	public void reportInsufficientPredicates(Parser recognizer,
-											 DFA dfa,
-											 int startIndex,
-											 int stopIndex,
-											 IntervalSet ambigAlts,
-											 DecisionState decState,
-											 SemanticContext[] altToPred,
-											 ATNConfigSet configs,
-											 boolean fullContextParse)
 	{
 	}
 }
