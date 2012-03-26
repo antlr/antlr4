@@ -612,18 +612,18 @@ public class IntervalSet implements IntSet {
             }
             // if on left edge x..b, adjust left
             if ( el==a ) {
-                I.a++;
+                intervals.set(i, Interval.of(I.a + 1, I.b));
                 break;
             }
             // if on right edge a..x, adjust right
             if ( el==b ) {
-                I.b--;
+                intervals.set(i, Interval.of(I.a, I.b - 1));
                 break;
             }
             // if in middle a..x..b, split interval
             if ( el>a && el<b ) { // found in this interval
                 int oldb = I.b;
-                I.b = el-1;      // [a..x-1]
+                intervals.set(i, Interval.of(I.a, el - 1)); // [a..x-1]
                 add(el+1, oldb); // add [x+1..b]
             }
         }

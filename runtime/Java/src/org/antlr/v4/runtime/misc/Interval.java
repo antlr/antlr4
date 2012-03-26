@@ -36,8 +36,8 @@ public class Interval {
 
 	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
-	public int a;
-	public int b;
+	public final int a;
+	public final int b;
 
 	public static int creates = 0;
 	public static int misses = 0;
