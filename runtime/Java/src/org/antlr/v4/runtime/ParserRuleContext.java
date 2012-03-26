@@ -290,7 +290,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 	 *  It includes hidden channel tokens between start, stop.  The
 	 *  edge tokens are always on-channel tokens.
 	 */
-	public String getText(TokenStream tokens) {
+	public String getText(TokenStream<?> tokens) {
 		Interval range = getSourceInterval();
 		return range==Interval.INVALID ? null : tokens.toString(range.a, range.b);
 	}
