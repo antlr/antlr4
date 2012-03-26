@@ -94,13 +94,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 	 */
 //	public List<Integer> states;
 
-	/** Current ATN state number we are executing.
-	 *
-	 *  Not used during ATN simulation/prediction; only used during parse that updates
-	 *  current location in ATN.
-	 */
-	public int s = -1;
-
 	public Symbol start, stop;
 
 	/** Set during parsing to identify which alt of rule parser is in. */
@@ -124,20 +117,14 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 	public void copyFrom(ParserRuleContext<Symbol> ctx) {
 		// from RuleContext
 		this.parent = ctx.parent;
-		this.s = ctx.s;
 		this.invokingState = ctx.invokingState;
 
 		this.start = ctx.start;
 		this.stop = ctx.stop;
 	}
 
-	public ParserRuleContext(@Nullable ParserRuleContext<Symbol> parent, int invokingStateNumber, int stateNumber) {
+	public ParserRuleContext(@Nullable ParserRuleContext<Symbol> parent, int invokingStateNumber) {
 		super(parent, invokingStateNumber);
-		this.s = stateNumber;
-	}
-
-	public ParserRuleContext(@Nullable ParserRuleContext<Symbol> parent, int stateNumber) {
-		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
 	// Double dispatch methods for listeners
@@ -317,12 +304,14 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 		StringBuilder buf = new StringBuilder();
 		ParserRuleContext<?> p = this;
 		buf.append("[");
+		int state = recog.getState();
 		while ( p != null && p != stop ) {
 			ATN atn = recog.getATN();
-			ATNState s = atn.states.get(p.s);
+			ATNState s = atn.states.get(state);
 			String ruleName = recog.getRuleNames()[s.ruleIndex];
 			buf.append(ruleName);
 			if ( p.parent != null ) buf.append(" ");
+			state = p.invokingState;
 			p = (ParserRuleContext<?>)p.parent;
 		}
 		buf.append("]");

@@ -50,7 +50,7 @@ public class FailedPredicateException extends RecognitionException {
 
 	public <Symbol extends Token> FailedPredicateException(Parser<Symbol> recognizer, @Nullable String predicate) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;
