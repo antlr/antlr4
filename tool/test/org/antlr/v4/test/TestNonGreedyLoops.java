@@ -180,23 +180,16 @@ public class TestNonGreedyLoops extends BaseTest {
 								  "x", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
-					 "s0-ID->:s1=>1\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>2\n", found);
-		assertEquals("line 1:0 extraneous input 'x' expecting <EOF>\n", this.stderrDuringParse);
+					 "s0-ID->:s1=>1\n", found);
+		assertNull(this.stderrDuringParse);
 
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 						   "34", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
 					 "s0-INT->s1\n" +
-					 "s1-EOF->:s2=>1\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-INT->:s1=>2\n", found);  // resolves INT EOF to alt 1 from s since ambig 'tween a and b
-		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input='34'\n" +
-					 "line 1:0 extraneous input '34' expecting <EOF>\n",
+					 "s1-EOF->:s2=>1\n", found);  // resolves INT EOF to alt 1 from s since ambig 'tween a and b
+		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}, input='34'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -366,10 +359,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s2-INT->:s3=>1\n" +
 					 "s2-ID->s4\n" +
 					 "s4-';'->s5\n" +
-					 "s5-EOF->:s6=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>3\n", found);
+					 "s5-EOF->:s6=>2\n", found);
 		input =
 			"if ( 1 ) { x=3; { return 4; } } return 99; abc=def;";
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -382,19 +372,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-'='->s4\n" +
 					 "s4-ID->s5\n" +
 					 "s5-';'->s6\n" +
-					 "s6-EOF->:s7=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'{'->:s2=>4\n" +
-					 "s0-'if'->:s1=>1\n" +
-					 "s0-'return'->:s4=>2\n" +
-					 "s0-ID->:s3=>3\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-'{'->:s2=>1\n" +
-					 "s0-'return'->:s3=>1\n" +
-					 "s0-'}'->:s4=>2\n" +
-					 "s0-ID->:s1=>1\n", found);
+					 "s6-EOF->:s7=>2\n", found);
 		input =
 		"x=1; a=3;"; // FAILS to match since it can't match last element
 		execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -442,10 +420,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s1-'='->s2\n" +
 					 "s2-INT->:s3=>1\n" +
 					 "s2-ID->s4\n" +
-					 "s4-';'->:s5=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>3\n", found); // ignores x=1 that follows first a=b assignment
+					 "s4-';'->:s5=>2\n", found); // ignores x=1 that follows first a=b assignment
 		input =
 			"if ( 1 ) { x=3; { return 4; } } return 99; abc=def;";
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -457,19 +432,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-ID->s3\n" +
 					 "s3-'='->s4\n" +
 					 "s4-ID->s5\n" +
-					 "s5-';'->:s6=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'{'->:s2=>4\n" +
-					 "s0-'if'->:s1=>1\n" +
-					 "s0-'return'->:s4=>2\n" +
-					 "s0-ID->:s3=>3\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-'{'->:s2=>1\n" +
-					 "s0-'return'->:s3=>1\n" +
-					 "s0-'}'->:s4=>2\n" +
-					 "s0-ID->:s1=>1\n", found);
+					 "s5-';'->:s6=>2\n", found);
 		input =
 			"x=1; a=3;"; // FAILS to match since it can't match either stat
 		execParser("T.g", grammar, "TParser", "TLexer", "s",
@@ -487,10 +450,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s1-'='->s2\n" +
 					 "s2-INT->:s3=>1\n" +
 					 "s2-ID->s4\n" +
-					 "s4-';'->:s5=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>3\n", found); // should not finish all input
+					 "s4-';'->:s5=>2\n", found); // should not finish all input
 	}
 
 	@Test public void testHTMLTags() throws Exception {
@@ -510,11 +470,6 @@ public class TestNonGreedyLoops extends BaseTest {
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "<a>foo</a>", true);
 		assertEquals("<a>foo</a>\n" +
-					 "Decision 0:\n" +
-					 "s0-EOF->:s3=>2\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "s0-ID->:s2=>1\n" +
-					 "\n" +
 					 "Decision 1:\n" +
 					 "s0*-'<'->!s8\n" +
 					 "s0*-ID->:s7=>2\n" +
@@ -540,20 +495,16 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "Decision 3:\n" +
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
-		assertEquals("line 1:6 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='<a>foo<'\n" +
-					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(1,1,[]), (16,1,[6 10 10 10]), (20,1,[14 6 10 10 10]), (22,1,[14 6 10 10]), (26,1,[14 6 10 10]), (26,1,[32 32 32 32 14 6]), (33,1,[14 6 10 10]), (33,1,[14 6]), (1,2,[]), (16,2,[6 10 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10])],conflictingAlts={1..2}, input='<a>foo<'\n" +
-					 "line 1:10 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='</a>'\n" +
-					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}:[(35,1,[]), (35,2,[])],conflictingAlts={1..2}, input='</a>'\n" +
-					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}:[(26,1,[]), (33,1,[]), (26,2,[]), (33,2,[])],conflictingAlts={1..2}, input='/'\n",
+		assertEquals("line 1:6 reportAttemptingFullContext d=1, input='<a>foo<'\n" +
+					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}, input='<a>foo<'\n" +
+					 "line 1:10 reportAttemptingFullContext d=1, input='</a>'\n" +
+					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}, input='</a>'\n" +
+					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}, input='/'\n",
 					 this.stderrDuringParse);
 
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "<a></a>", true);
 		assertEquals("<a></a>\n" +
-					 "Decision 0:\n" +
-					 "s0-EOF->:s2=>2\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
 					 "Decision 1:\n" +
 					 "s0*-'<'->!s6\n" +
 					 "s0*-ctx:6(s)->s2\n" +
@@ -581,10 +532,6 @@ public class TestNonGreedyLoops extends BaseTest {
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "</b><a src=\"abc\", width=32>", true);
 		assertEquals("</b><asrc=\"abc\",width=32>\n" +
-					 "Decision 0:\n" +
-					 "s0-EOF->:s2=>2\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
 					 "Decision 1:\n" +
 					 "s0*-'<'->!s7\n" +
 					 "s0*-ctx:6(s)->s2\n" +
@@ -661,15 +608,6 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-INT->s3\n" +
 					 "s4-'='->s3\n" +
 					 "\n" +
-					 "Decision 1:\n" +		// (tag|header)
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
-					 "Decision 2:\n" +		// (...)*
-					 "s0-EOF->:s3=>2\n" +
-					 "s0-'<'->:s2=>1\n" +
-					 "s0-','->:s1=>1\n" +
-					 "s0-INT->:s1=>1\n" +
-					 "\n" +
 					 "Decision 3:\n" +		// .+
 					 "s0-'x'->:s1=>1\n" +
 					 "s0-'>'->:s2=>2\n" +
@@ -690,13 +628,6 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s4-ID->s5\n" +
 					 "s5-'>'->:s6=>2\n" +
 					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-EOF->:s2=>2\n" +
-					 "s0-'x'->:s1=>1\n" +
-					 "\n" +
 					 "Decision 3:\n" +
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
@@ -716,14 +647,6 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-ID->s4\n" +
 					 "s4-'>'->:s7=>2\n" +
 					 "s4-'<'->:s5=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-EOF->:s3=>2\n" +
-					 "s0-'x'->:s1=>1\n" +
-					 "s0-'>'->:s2=>1\n" +
 					 "\n" +
 					 "Decision 3:\n" +
 					 "s0-'>'->:s1=>2\n" +
