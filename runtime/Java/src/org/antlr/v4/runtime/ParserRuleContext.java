@@ -30,6 +30,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -291,6 +292,22 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 
 	@Override
 	public int getRuleIndex() { return ruleIndex; }
+
+	@Override
+	public Interval getSourceInterval() {
+		if ( start==null || stop==null ) return Interval.INVALID;
+		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
+	}
+
+	/** Return the text matched by this context and below in the parse
+	 *  tree. It includes tokens from this.start .. this.stop inclusive.
+	 *  It includes hidden channel tokens between start, stop.  The
+	 *  edge tokens are always on-channel tokens.
+	 */
+	public String getText(TokenStream tokens) {
+		Interval range = getSourceInterval();
+		return range==Interval.INVALID ? null : tokens.toString(range.a, range.b);
+	}
 
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }

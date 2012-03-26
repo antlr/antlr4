@@ -44,12 +44,11 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-		String format = "reportAmbiguity d=%s: ambigAlts=%s:%s, input='%s'";
+		String format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
 						  ambigAlts,
-						  getConfigSetDescription(configs),
 						  recognizer.getInputString(startIndex, stopIndex)));
     }
 
@@ -59,11 +58,10 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 											int startIndex, int stopIndex,
 											@NotNull SimulatorState<T> initialState)
 	{
-		String format = "reportAttemptingFullContext d=%d: %s, input='%s'";
+		String format = "reportAttemptingFullContext d=%s, input='%s'";
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
-						  getConfigSetDescription(getFullContextConfigs(initialState)),
 						  recognizer.getInputString(startIndex, stopIndex)));
 	}
 
@@ -71,30 +69,14 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull SimulatorState<T> acceptState)
     {
-		String format = "reportContextSensitivity d=%d: %s, input='%s'";
+		String format = "reportContextSensitivity d=%s, input='%s'";
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
-						  getConfigSetDescription(getFullContextConfigs(acceptState)),
 						  recognizer.getInputString(startIndex, stopIndex)));
     }
 
 	protected <T extends Symbol> String getDecisionDescription(Parser<T> recognizer, int decision) {
 		return Integer.toString(decision);
 	}
-
-	protected String getConfigSetDescription(ATNConfigSet configs) {
-		return configs.toString(true);
-	}
-
-	protected static ATNConfigSet getFullContextConfigs(SimulatorState<?> state) {
-		ATNConfigSet configs = new ATNConfigSet();
-		PredictionContext suffix = PredictionContext.fromRuleContext(state.remainingOuterContext, true);
-		for (ATNConfig config : state.s0.configset) {
-			configs.add(config.appendContext(suffix, PredictionContextCache.UNCACHED));
-		}
-
-		return configs;
-	}
-
 }

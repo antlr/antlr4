@@ -645,11 +645,6 @@ public class TestPerformance extends BaseTest {
 			return String.format(format, decision, ruleName);
 		}
 
-		@Override
-		protected String getConfigSetDescription(ATNConfigSet configs) {
-			return configs.toString(false);
-		}
-
 	}
 
 	protected static class FileExtensionFilenameFilter implements FilenameFilter {
