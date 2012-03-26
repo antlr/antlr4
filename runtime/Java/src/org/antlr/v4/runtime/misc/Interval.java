@@ -34,15 +34,12 @@ public class Interval {
 
 	public static final Interval INVALID = new Interval(-1,-2);
 
-	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
+	private static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
-	public int a;
-	public int b;
-
-	public static int creates = 0;
-	public static int misses = 0;
-	public static int hits = 0;
-	public static int outOfRange = 0;
+	/** The start of the interval. */
+	public final int a;
+	/** The end of the interval (inclusive). */
+	public final int b;
 
 	public Interval(int a, int b) { this.a=a; this.b=b; }
 
@@ -64,7 +61,7 @@ public class Interval {
 	}
 
 	/** return number of elements between a and b inclusively. x..x is length 1.
-	 *  if b < a, then length is 0.  9..10 has length 2.
+	 *  if b &lt; a, then length is 0.  9..10 has length 2.
 	 */
 	public int length() {
 		if ( b<a ) return 0;
@@ -73,11 +70,23 @@ public class Interval {
 
 	@Override
 	public boolean equals(Object o) {
-		if ( o==null ) {
+		if (o == this) {
+			return true;
+		}
+		else if (!(o instanceof Interval)) {
 			return false;
 		}
+
 		Interval other = (Interval)o;
 		return this.a==other.a && this.b==other.b;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		hash = 37 * hash ^ this.a;
+		hash = 37 * hash ^ this.b;
+		return hash;
 	}
 
 	/** Does this start completely before other? Disjoint */
@@ -127,9 +136,9 @@ public class Interval {
 		return Interval.of(Math.max(a, other.a), Math.min(b, other.b));
 	}
 
-	/** Return the interval with elements from this not in other;
-	 *  other must not be totally enclosed (properly contained)
-	 *  within this, which would result in two disjoint intervals
+	/** Return the interval with elements from {@code this} not in {@code other};
+	 *  {@code other} must not be totally enclosed (properly contained)
+	 *  within {@code this}, which would result in two disjoint intervals
 	 *  instead of the single one returned by this method.
 	 */
 	public Interval differenceNotProperlyContained(Interval other) {
