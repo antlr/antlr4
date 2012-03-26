@@ -47,12 +47,12 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
 		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
-			System.out.println("enter   " + getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + _input.LT(1).getText());
+			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + _input.LT(1).getText());
 		}
 
 		@Override
 		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
-			System.out.println("exit    "+getRuleNames()[ctx.ruleIndex]+", LT(1)="+_input.LT(1).getText());
+			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+", LT(1)="+_input.LT(1).getText());
 		}
 
 		@Override
@@ -60,7 +60,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
-							   getRuleNames()[parent.ruleIndex]+
+							   getRuleNames()[parent.getRuleIndex()]+
 							   " alt="+parent.altNum);
 		}
 
@@ -69,7 +69,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
-							   getRuleNames()[parent.ruleIndex]+
+							   getRuleNames()[parent.getRuleIndex()]+
 							   " alt="+parent.altNum);
 		}
 	}
@@ -406,7 +406,6 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	public void enterRule(ParserRuleContext<Symbol> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
-		_ctx.ruleIndex = ruleIndex;
 		if (_buildParseTrees) addContextToParseTree();
         if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
@@ -434,7 +433,6 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	public void pushNewRecursionContext(ParserRuleContext<Symbol> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
-		_ctx.ruleIndex = ruleIndex;
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext<Symbol> _parentctx) {
