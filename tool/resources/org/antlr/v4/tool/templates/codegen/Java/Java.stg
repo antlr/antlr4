@@ -190,8 +190,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 
 @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
-	enterRule(_localctx, RULE_<currentRule.name>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -225,10 +225,11 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	ParserRuleContext\<Token> _parentctx = _ctx;
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
+	int _parentState = getState();
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	pushNewRecursionContext(_localctx, RULE_<currentRule.name>);
+	pushNewRecursionContext(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -246,7 +247,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 	}
 	finally {
 		<finallyAction>
-		unrollRecursionContexts(_parentctx);
+		unrollRecursionContexts(_parentctx, _parentState);
 	}
 	return _localctx;
 }
@@ -574,9 +575,9 @@ StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
 public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
-	public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<struct.ctorAttrs:{a | , <a>}>) {
-		super(parent, state);
+	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int invokingState) { super(parent, invokingState); }<endif>
+	public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
+		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
 	@Override public int getRuleIndex() { return RULE_<struct.derivedFromName>; }
@@ -636,18 +637,18 @@ recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-_localctx = new <ctxName>Context(_parentctx, _startState, _p);
+_localctx = new <ctxName>Context(_parentctx, _parentState, _p);
 _localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
-pushNewRecursionContext(_localctx, RULE_<ruleName>);
+pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 _localctx.start = _prevctx.start;
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _startState, _p));
+_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState, _p));
 _localctx.addChild(_prevctx);
 <if(label)>((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;<endif>
-pushNewRecursionContext(_localctx, RULE_<ruleName>);
+pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 _localctx.start = _prevctx.start;
 >>
 
