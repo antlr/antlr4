@@ -377,7 +377,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
 	 */
-	public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
+	public void enterRule(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
+		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
@@ -388,6 +389,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
     public void exitRule() {
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
+		setState(_ctx.invokingState);
 		_ctx = (ParserRuleContext<Token>)_ctx.parent;
     }
 
@@ -404,26 +406,30 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
 	/* like enterRule but for recursive rules; no enter events for recursive rules. */
-	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
+	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
+		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		_ctx.ruleIndex = ruleIndex;
 	}
 
-	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
+	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx, int _parentState) {
 		ParserRuleContext<Token> retctx = _ctx; // save current ctx (return value)
 
 		// unroll so _ctx is as it was before call to recursive method
 		if ( _parseListeners != null ) {
 			while ( _ctx != _parentctx ) {
 				triggerExitRuleEvent();
+				setState(_ctx.invokingState);
 				_ctx = (ParserRuleContext<Token>)_ctx.parent;
 			}
 		}
 		else {
+			setState(_parentState);
 			_ctx = _parentctx;
 		}
 		// hook into tree
+		retctx.invokingState = _parentState;
 		retctx.parent = _parentctx;
 		if (_buildParseTrees) _parentctx.addChild(retctx); // add return ctx into invoking rule's tree
 	}

@@ -47,7 +47,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	protected ATNInterpreter _interp;
 
-	private int _stateNumber;
+	private int _stateNumber = -1;
 
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method
