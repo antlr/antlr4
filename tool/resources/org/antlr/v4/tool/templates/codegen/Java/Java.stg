@@ -608,6 +608,7 @@ public static class <struct.name> extends <superClass><if(interfaces)> implement
 		super(parent, state);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
+	@Override public int getRuleIndex() { return RULE_<struct.derivedFromName>; }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
 	public void copyFrom(<struct.name> ctx) {
