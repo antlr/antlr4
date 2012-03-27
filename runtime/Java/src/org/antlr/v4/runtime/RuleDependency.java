@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  * @author Sam Harwell
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD })
+@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD })
 public @interface RuleDependency {
 
 	Class<? extends Recognizer<?, ?>> recognizer();
