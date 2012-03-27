@@ -119,7 +119,7 @@ public class RuleDependencyChecker {
 	private static int[] getRuleVersions(Class<? extends Recognizer<?, ?>> recognizerClass, String[] ruleNames) {
 		int[] versions = new int[ruleNames.length];
 
-		Field[] fields = recognizerClass.getDeclaredFields();
+		Field[] fields = recognizerClass.getFields();
 		for (Field field : fields) {
 			boolean isStatic = (field.getModifiers() & Modifier.STATIC) != 0;
 			boolean isInteger = field.getType() == Integer.TYPE;
@@ -159,7 +159,7 @@ public class RuleDependencyChecker {
 	}
 
 	private static Method getRuleMethod(Class<? extends Recognizer<?, ?>> recognizerClass, String name) {
-		Method[] declaredMethods = recognizerClass.getDeclaredMethods();
+		Method[] declaredMethods = recognizerClass.getMethods();
 		for (Method method : declaredMethods) {
 			if (method.getName().equals(name) && method.isAnnotationPresent(RuleVersion.class)) {
 				return method;
@@ -171,7 +171,7 @@ public class RuleDependencyChecker {
 
 	private static String[] getRuleNames(Class<? extends Recognizer<?, ?>> recognizerClass) {
 		try {
-			Field ruleNames = recognizerClass.getDeclaredField("ruleNames");
+			Field ruleNames = recognizerClass.getField("ruleNames");
 			return (String[])ruleNames.get(null);
 		} catch (NoSuchFieldException ex) {
 			LOGGER.log(Level.WARNING, null, ex);
