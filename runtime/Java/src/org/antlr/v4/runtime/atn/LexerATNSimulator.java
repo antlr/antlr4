@@ -243,7 +243,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 
-		return failOrAccept(prevAccept, input, prevAccept.state.configset, t);
+		ATNConfigSet reach = prevAccept.state != null ? prevAccept.state.configset : null;
+		return failOrAccept(prevAccept, input, reach, t);
 	}
 
 	protected int execATN(@NotNull CharStream input, @NotNull ATNConfigSet s0, @Nullable DFAState ds0) {

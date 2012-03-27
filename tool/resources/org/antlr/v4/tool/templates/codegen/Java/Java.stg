@@ -117,7 +117,7 @@ Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <parser.name> extends <superclass> {
+public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superclass> {
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -229,11 +229,11 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		int _alt;
 <endif>
 		<code>
-		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
 	catch (RecognitionException re) {
+		_localctx.exception = re;
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
 	}
@@ -265,11 +265,11 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 		int _alt;
 <endif>
 		<code>
-		_localctx.stop = _input.LT(-1);
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
 	catch (RecognitionException re) {
+		_localctx.exception = re;
 		_errHandler.reportError(this, re);
 		_errHandler.recover(this, re);
 	}
@@ -608,6 +608,7 @@ public static class <struct.name> extends <superClass><if(interfaces)> implement
 		super(parent, state);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
+	@Override public int getRuleIndex() { return RULE_<struct.derivedFromName>; }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
 	public void copyFrom(<struct.name> ctx) {
@@ -713,7 +714,7 @@ import org.antlr.v4.runtime.misc.*;
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <lexer.name> extends Lexer {
+public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends Lexer {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
