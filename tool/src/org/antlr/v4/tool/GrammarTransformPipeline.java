@@ -317,7 +317,14 @@ public class GrammarTransformPipeline {
 			(GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
 		lexerAST.addChild(lexerRulesRoot);
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
-		GrammarASTWithOptions[] rules = ((List<?>)combinedRulesRoot.getChildren()).toArray(new GrammarASTWithOptions[0]);
+		GrammarASTWithOptions[] rules;
+		if (combinedRulesRoot.getChildCount() > 0) {
+			rules = ((List<?>)combinedRulesRoot.getChildren()).toArray(new GrammarASTWithOptions[0]);
+		}
+		else {
+			rules = new GrammarASTWithOptions[0];
+		}
+
 		if ( rules!=null ) {
 			for (GrammarASTWithOptions r : rules) {
 				String ruleName = r.getChild(0).getText();
