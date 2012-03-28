@@ -28,6 +28,7 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.automata.ATNSerializer;
 import org.junit.Test;
 
 /** test runtime parse errors */
@@ -275,4 +276,26 @@ public class TestParseErrors extends BaseTest {
 			this.stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
+	 * https://github.com/antlr/antlr4/issues/45
+	 *
+	 * The original cause of this issue was an error in the tool's ATN state optimization,
+	 * which is now detected early in {@link ATNSerializer} by ensuring that all
+	 * serialized transitions point to states which were not removed.
+	 */
+	@Test
+	public void testInvalidATNStateRemoval() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : ID ':' expr;\n" +
+			"expr : primary expr? {} | expr '->' ID;\n" +
+			"primary : ID;\n" +
+			"ID : [a-z]+;\n" +
+			"\n";
+		String result = execParser("T.g", grammar, "TParser", "TLexer", "start", "x:x", true);
+		String expecting = "";
+		assertEquals(expecting, result);
+		assertNull(this.stderrDuringParse);
+	}
 }

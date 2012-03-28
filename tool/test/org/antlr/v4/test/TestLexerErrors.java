@@ -142,4 +142,29 @@ public class TestLexerErrors extends BaseTest {
 
 	// TEST RECOVERY
 
+	/**
+	 * This is a regression test for #45 "NullPointerException in LexerATNSimulator.execDFA".
+	 * https://github.com/antlr/antlr4/issues/46
+	 */
+	@Test
+	public void testLexerExecDFA() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : ID ':' expr;\n" +
+			"expr : primary expr? {} | expr '->' ID;\n" +
+			"primary : ID;\n" +
+			"ID : [a-z]+;\n" +
+			"\n";
+		String result = execLexer("T.g", grammar, "TLexer", "x : x", false);
+		String expecting =
+			"[@0,0:0='x',<5>,1:0]\n" +
+			"[@1,2:2=':',<4>,1:2]\n" +
+			"[@2,4:4='x',<5>,1:4]\n" +
+			"[@3,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, result);
+		assertEquals("line 1:1 token recognition error at: ' '\n" +
+					 "line 1:3 token recognition error at: ' '\n",
+					 this.stderrDuringParse);
+	}
+
 }

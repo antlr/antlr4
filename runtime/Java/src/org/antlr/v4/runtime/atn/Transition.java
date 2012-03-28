@@ -92,7 +92,13 @@ public abstract class Transition {
 	@NotNull
 	public ATNState target;
 
-	protected Transition(@NotNull ATNState target) { this.target = target; }
+	protected Transition(@NotNull ATNState target) {
+		if (target == null) {
+			throw new NullPointerException("target cannot be null.");
+		}
+
+		this.target = target;
+	}
 
 	public int getSerializationType() { return 0; }
 

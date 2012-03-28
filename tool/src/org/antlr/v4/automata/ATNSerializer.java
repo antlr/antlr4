@@ -133,6 +133,11 @@ public class ATNSerializer {
 			if ( s==null ) continue; // might be optimized away
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
+
+				if (atn.states.get(t.target.stateNumber) == null) {
+					throw new IllegalStateException("Cannot serialize a transition to a removed state.");
+				}
+
 				int src = s.stateNumber;
 				int trg = t.target.stateNumber;
 				int edgeType = Transition.serializationTypes.get(t.getClass());
