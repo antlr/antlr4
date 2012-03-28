@@ -120,6 +120,10 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
 	}
 
+	public ANTLRErrorListener<? super Symbol> getErrorListenerDispatch() {
+		return new ProxyErrorListener<Symbol>(getErrorListeners());
+	}
+
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
 	public boolean sempred(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {

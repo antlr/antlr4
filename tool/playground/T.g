@@ -1,6 +1,8 @@
 grammar T;
-s : f f EOF;
-f : | x;
-x : 'a' 'b';
+s : e ';' ;
+e : e '*' e
+  | ID
+  | INT
+  ;
 INT : '0'..'9'+;
 WS : (' '|'\n') {skip();} ;

@@ -60,6 +60,10 @@ public abstract class ATNSimulator {
 		int p = 0;
 		atn.grammarType = toInt(data[p++]);
 		atn.maxTokenType = toInt(data[p++]);
+
+		//
+		// STATES
+		//
 		int nstates = toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
 			int stype = toInt(data[p++]);
@@ -75,6 +79,10 @@ public abstract class ATNSimulator {
 			}
 			atn.addState(s);
 		}
+
+		//
+		// RULES
+		//
 		int nrules = toInt(data[p++]);
 		if ( atn.grammarType == ATN.LEXER ) {
 			atn.ruleToTokenType = new int[nrules];
@@ -92,11 +100,19 @@ public abstract class ATNSimulator {
 				atn.ruleToActionIndex[i] = actionIndex;
 			}
 		}
+
+		//
+		// MODES
+		//
 		int nmodes = toInt(data[p++]);
 		for (int i=0; i<nmodes; i++) {
 			int s = toInt(data[p++]);
 			atn.modeToStartState.add((TokensStartState)atn.states.get(s));
 		}
+
+		//
+		// SETS
+		//
 		int nsets = toInt(data[p++]);
 		for (int i=1; i<=nsets; i++) {
 			int nintervals = toInt(data[p]);
@@ -108,6 +124,10 @@ public abstract class ATNSimulator {
 				p += 2;
 			}
 		}
+
+		//
+		// EDGES
+		//
 		int nedges = toInt(data[p++]);
 		for (int i=1; i<=nedges; i++) {
 			int src = toInt(data[p]);
@@ -125,6 +145,10 @@ public abstract class ATNSimulator {
 			srcState.addTransition(trans);
 			p += 6;
 		}
+
+		//
+		// DECISIONS
+		//
 		int ndecisions = toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {
 			int s = toInt(data[p++]);
@@ -134,6 +158,7 @@ public abstract class ATNSimulator {
 			decState.decision = i-1;
 			decState.isGreedy = isGreedy==1;
 		}
+
 		return atn;
 	}
 

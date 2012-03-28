@@ -116,6 +116,7 @@ public class Tool {
 	public boolean gen_listener = true;
 	public boolean gen_parse_listener = false;
 	public boolean gen_visitor = false;
+	public boolean abstract_recognizer = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -133,6 +134,7 @@ public class Tool {
 		new Option("gen_parse_listener",  "-no-parse-listener", "don't generate parse listener (default)"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
+		new Option("abstract_recognizer", "-abstract", "generate abstract recognizer classes"),
 
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),

@@ -36,7 +36,15 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
@@ -44,7 +52,12 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarSemanticsMessage;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,13 +69,29 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -610,28 +639,9 @@ public abstract class BaseTest {
 			msg = msg.replaceAll("\r","\\\\r");
 			msg = msg.replaceAll("\t","\\\\t");
 
-			// ignore error number
-			if ( expect!=null ) expect = stripErrorNum(expect);
-			actual = stripErrorNum(actual);
             assertEquals("error in: "+msg,expect,actual);
         }
     }
-
-	// can be multi-line
-	//error(29): A.g:2:11: unknown attribute reference a in $a
-	//error(29): A.g:2:11: unknown attribute reference a in $a
-	String stripErrorNum(String errs) {
-		String[] lines = errs.split("\n");
-		for (int i=0; i<lines.length; i++) {
-			String s = lines[i];
-			int lp = s.indexOf("error(");
-			int rp = s.indexOf(')', lp);
-			if ( lp>=0 && rp>=0 ) {
-				lines[i] = s.substring(0, lp) + s.substring(rp+1, s.length());
-			}
-		}
-		return Utils.join(lines, "\n");
-	}
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "<string>";
@@ -895,7 +905,7 @@ public abstract class BaseTest {
 			createParserST =
 				new ST(
 				"        <parserName> parser = new <parserName>(tokens);\n" +
-                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
+                "        parser.addErrorListener(new DiagnosticErrorListener());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
