@@ -636,7 +636,7 @@ public class TestNonGreedyLoops extends BaseTest {
 		// Seeing '.' in a lookahead prediction can be misleading!!
 		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
 								  "x <><a>", true);
-		assertEquals("null\n" +
+		assertEquals("<\n" +
 					 "<a>\n" +
 					 "Decision 0:\n" +
 					 "s0-'x'->s1\n" +

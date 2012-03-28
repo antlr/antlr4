@@ -192,7 +192,7 @@ public class TestListeners extends BaseTest {
 			"1\n" +
 			"2\n" +
 			"3\n" +
-			"1 [14 6]\n";
+			"1 [16 6]\n";
 		assertEquals(expecting, result);
 	}
 }

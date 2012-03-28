@@ -50,18 +50,18 @@ public class TestBasicSemanticErrors extends BaseTest {
         "b : ( options { ick=bar; greedy=true; } : ID )+ ;\n" +
         "c : ID<blue> ID<x=y> ;",
         // YIELDS
-		"warning(47): U.g:2:10: illegal option foo\n" +
-		"warning(47): U.g:2:19: illegal option k\n" +
-		": U.g:4:8: token names must start with an uppercase letter: f\n" +
-		": U.g:4:8: can't assign string value to token name f in non-combined grammar\n" +
-		": U.g:5:8: can't assign string value to token name S in non-combined grammar\n" +
-		"warning(47): U.g:8:10: illegal option x\n" +
-		": U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		": U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"warning(47): U.g:11:10: illegal option blech\n" +
-		"warning(47): U.g:11:21: illegal option greedy\n" +
-		"warning(47): U.g:14:16: illegal option ick\n" +
-		"warning(47): U.g:15:16: illegal option x\n",
+		"warning(48): U.g:2:10: illegal option foo\n" +
+		"warning(48): U.g:2:19: illegal option k\n" +
+		"error(26): U.g:4:8: token names must start with an uppercase letter: f\n" +
+		"error(25): U.g:4:8: can't assign string value to token name f in non-combined grammar\n" +
+		"error(25): U.g:5:8: can't assign string value to token name S in non-combined grammar\n" +
+		"warning(48): U.g:8:10: illegal option x\n" +
+		"error(20): U.g:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
+		"error(20): U.g:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
+		"warning(48): U.g:11:10: illegal option blech\n" +
+		"warning(48): U.g:11:21: illegal option greedy\n" +
+		"warning(48): U.g:14:16: illegal option ick\n" +
+		"warning(48): U.g:15:16: illegal option x\n",
     };
 
 	@Test public void testU() { super.testErrors(U, false); }
