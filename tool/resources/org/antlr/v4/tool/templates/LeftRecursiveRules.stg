@@ -37,7 +37,7 @@ recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
         userRetvals, leftRecursiveRuleRefLabels) ::=
 <<
 <ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
-    :   ( <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
+    :   ( {} <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
         )
         ( <opAlts; separator="\n        | ">
         )*

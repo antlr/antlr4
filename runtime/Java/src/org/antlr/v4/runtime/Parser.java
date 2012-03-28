@@ -45,18 +45,18 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public class TraceListener implements ParseListener<Token> {
 		@Override
 		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
-			System.out.println("enter   " + getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + _input.LT(1).getText());
+			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + _input.LT(1).getText());
 		}
 
 		@Override
 		public void exitEveryRule(ParserRuleContext<Token> ctx) {
-			System.out.println("exit    "+getRuleNames()[ctx.ruleIndex]+", LT(1)="+_input.LT(1).getText());
+			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+", LT(1)="+_input.LT(1).getText());
 		}
 
 		@Override
 		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
 			System.out.println("consume "+token+" rule "+
-							   getRuleNames()[parent.ruleIndex]+
+							   getRuleNames()[parent.getRuleIndex()]+
 							   " alt="+parent.altNum);
 		}
 	}
@@ -327,10 +327,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			line = ((Token) offendingToken).getLine();
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
-		List<? extends ANTLRErrorListener<? super Token>> listeners = getErrorListeners();
-		for (ANTLRErrorListener<? super Token> listener : listeners) {
-			listener.error(this, offendingToken, line, charPositionInLine, msg, e);
-		}
+
+		ANTLRErrorListener<? super Token> listener = getErrorListenerDispatch();
+		listener.error(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
 	/** Consume the current symbol and return it. E.g., given the following
@@ -381,12 +380,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
-		_ctx.ruleIndex = ruleIndex;
 		if (_buildParseTrees) addContextToParseTree();
         if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
     public void exitRule() {
+		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		_ctx = (ParserRuleContext<Token>)_ctx.parent;
@@ -408,10 +407,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
-		_ctx.ruleIndex = ruleIndex;
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
+		_ctx.stop = _input.LT(-1);
 		ParserRuleContext<Token> retctx = _ctx; // save current ctx (return value)
 
 		// unroll so _ctx is as it was before call to recursive method

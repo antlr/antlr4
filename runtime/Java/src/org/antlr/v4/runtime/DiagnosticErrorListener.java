@@ -27,21 +27,41 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.tree;
+package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 
-/** A tree that knows about an interval in a token stream
- *  is some kind of syntax tree. Subinterfaces distinguish
- *  between parse trees and other kinds of syntax trees we might want to create.
- */
-public interface SyntaxTree extends Tree {
-	/** Return an interval indicating the index in the TokenStream of
-	 *  the 1st and last token associated with this subtree. If this
-	 *  node is a leaf, then the interval represents a single token.
-	 *
-	 *  If source interval is unknown, this does not return null.
-	 *  It returns Interval.INVALID.
-	 */
-	Interval getSourceInterval();
+public class DiagnosticErrorListener extends BaseErrorListener<Token> {
+    @Override
+    public void reportAmbiguity(@NotNull Parser recognizer,
+								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+								@NotNull ATNConfigSet configs)
+    {
+        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
+										": ambigAlts=" + ambigAlts + ", input='" +
+										recognizer.getInputString(startIndex, stopIndex) + "'");
+    }
+
+	@Override
+	public void reportAttemptingFullContext(@NotNull Parser recognizer,
+											@NotNull DFA dfa,
+											int startIndex, int stopIndex,
+											@NotNull ATNConfigSet configs)
+	{
+		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
+										dfa.decision + ", input='" +
+										recognizer.getInputString(startIndex, stopIndex) + "'");
+	}
+
+	@Override
+	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
+                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
+    {
+        recognizer.notifyErrorListeners("reportContextSensitivity d=" +
+										dfa.decision + ", input='" +
+										recognizer.getInputString(startIndex, stopIndex) + "'");
+    }
 }
