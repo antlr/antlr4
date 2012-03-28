@@ -323,10 +323,18 @@ public class TestLeftRecursion extends BaseTest {
 		assertNull(stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
-		assertNull(stderrDuringParse);
+		assertEquals("line 1:1 reportAttemptingFullContext d=3, input='+'\n" +
+					 "line 1:1 reportContextSensitivity d=3, input='+'\n" +
+					 "line 1:3 reportAttemptingFullContext d=3, input='*'\n" +
+					 "line 1:3 reportAmbiguity d=3: ambigAlts={1..2}, input='*'\n",
+					 stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
-		assertNull(stderrDuringParse);
+		assertEquals("line 1:2 reportAttemptingFullContext d=3, input='+'\n" +
+					 "line 1:2 reportContextSensitivity d=3, input='+'\n" +
+					 "line 1:5 reportAttemptingFullContext d=3, input='*'\n" +
+					 "line 1:5 reportContextSensitivity d=3, input='*'\n",
+					 stderrDuringParse);
 	}
 
 	public void runTests(String grammar, String[] tests, String startRule) {
