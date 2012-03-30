@@ -11,7 +11,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"E2 : {true}? 'enum' ;\n" +  // winner not E1 or ID
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
-		String found = execLexer("L.g", grammar, "L", "enum abc", true);
+		String found = execLexer("L.g4", grammar, "L", "enum abc", true);
 		String expecting =
 			"[@0,0:3='enum',<4>,1:0]\n" +
 			"[@1,5:7='abc',<5>,1:5]\n" +
@@ -26,7 +26,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"E2 : 'enum' {true}? ;\n" +  // winner not E1 or ID
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
-		String found = execLexer("L.g", grammar, "L", "enum abc enum", true);
+		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		String expecting =
 			"[@0,0:3='enum',<4>,1:0]\n" +
 			"[@1,5:7='abc',<5>,1:5]\n" +
@@ -50,7 +50,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"B : {int n=0;} ({n<=2}? DIGIT {n++})+ ;\n" +
 			"fragment DIGIT : '0'..'9' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
-		String found = execLexer("L.g", grammar, "L", "1234 56", true);
+		String found = execLexer("L.g4", grammar, "L", "1234 56", true);
 		String expecting =
 			"[@0,0:3='enum',<4>,1:0]\n" +
 			"[@1,5:7='abc',<5>,1:5]\n" +
