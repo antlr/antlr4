@@ -137,7 +137,7 @@ public class TokenVocabParser {
 	}
 
 	/** Return a File descriptor for vocab file.  Look in library or
-	 *  in -o output path.  antlr -o foo T.g U.g where U needs T.tokens
+	 *  in -o output path.  antlr -o foo T.g4 U.g4 where U needs T.tokens
 	 *  won't work unless we look in foo too. If we do not find the
 	 *  file in the lib directory then must assume that the .tokens file
 	 *  is going to be generated as part of this build and we have defined
