@@ -229,21 +229,19 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	@Test public void testLabelsOnOpSubrule() throws Exception {
-		// FAILS
 		String grammar =
 			"grammar T;\n" +
-			"s : e {System.out.println($e.v);} ;\n" +
-			"e returns [int v, List<String> ignored]\n" +
-			"  : a=e op=('*'|'/') b=e {$v = $a.v * $b.v;}\n" +
-			"  | INT {$v = $INT.int;}\n" +
-			"  | '(' x=e ')' {$v = $x.v;}\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e ;\n" +
+			"e : a=e op=('*'|'/') b=e  {}\n" +
+			"  | INT {}\n" +
+			"  | '(' x=e ')' {}\n" +
 			"  ;\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 		String[] tests = {
-			"4",			"4",
-		"1*2/3",		"7",
-		"(1/2)*3",		"9",
+			"4",		"(s (e 4))",
+		"1*2/3",		"(s (e (e (e 1) * (e 2)) / (e 3)))",
+		"(1/2)*3",		"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))",
 		};
 		runTests(grammar, tests, "s");
 	}
