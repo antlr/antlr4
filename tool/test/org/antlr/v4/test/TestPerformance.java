@@ -86,8 +86,8 @@ public class TestPerformance extends BaseTest {
     private static final boolean RECURSIVE = true;
 
     /**
-     *  True to use the Java grammar with expressions in the v4 left-recursive syntax (Java-LR.g). False to use
-     *  the standard grammar (Java.g). In either case, the grammar is renamed in the temporary directory to Java.g
+     *  True to use the Java grammar with expressions in the v4 left-recursive syntax (Java-LR.g4). False to use
+     *  the standard grammar (Java.g4). In either case, the grammar is renamed in the temporary directory to Java.g4
      *  before compiling.
      */
     private static final boolean USE_LR_GRAMMAR = true;
@@ -464,8 +464,8 @@ public class TestPerformance extends BaseTest {
     }
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
-        String grammarFileName = "Java.g";
-        String sourceName = leftRecursive ? "Java-LR.g" : "Java.g";
+        String grammarFileName = "Java.g4";
+        String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
         String body = load(sourceName, null);
         List<String> extraOptions = new ArrayList<String>();
         if (FORCE_ATN) {

@@ -53,6 +53,7 @@ import java.lang.reflect.Method;
  *        [-print]
  *        [-tokens] [-gui] [-ps file.ps]
  *        [-trace]
+ *        [-diagnostics]
  *        [input-filename]
  */
 public class TestRig {
@@ -65,10 +66,12 @@ public class TestRig {
 		String psFile = null;
 		boolean showTokens = false;
 		boolean trace = false;
+		boolean diagnostics = false;
 		String encoding = null;
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName" +
-							   " [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname] [-trace]"+
+							   " [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname]" +
+							   " [-trace] [-diagnostics]"+
 							   " [input-filename]");
 			return;
 		}
@@ -95,6 +98,9 @@ public class TestRig {
 			}
 			else if ( arg.equals("-trace") ) {
 				trace = true;
+			}
+			else if ( arg.equals("-diagnostics") ) {
+				diagnostics = true;
 			}
 			else if ( arg.equals("-encoding") ) {
 				if ( i>=args.length ) {
@@ -151,7 +157,7 @@ public class TestRig {
 			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			Parser<?> parser = parserCtor.newInstance(tokens);
 
-			parser.addErrorListener(new DiagnosticErrorListener<Token>());
+			if ( diagnostics ) parser.addErrorListener(new DiagnosticErrorListener<Token>());
 
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);

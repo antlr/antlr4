@@ -136,7 +136,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 			"A : 'a' ;\n" +
 			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
-		String found = execParser("P.g", grammar, "PParser", "PLexer",
+		String found = execParser("P.g4", grammar, "PParser", "PLexer",
 								  "a", "a}", false);
 		assertEquals("a}\n", found);
 	}
@@ -151,7 +151,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 			"A : 'a' ;\n" +
 			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
-		String found = execParser("P.g", grammar, "PParser", "PLexer",
+		String found = execParser("P.g4", grammar, "PParser", "PLexer",
 								  "a", "a}", false);
 		assertEquals("a}\n", found);
 	}

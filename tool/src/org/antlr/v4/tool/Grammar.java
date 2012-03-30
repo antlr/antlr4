@@ -49,11 +49,24 @@ import org.antlr.v4.runtime.misc.IntSet;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTErrorNode;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
@@ -234,20 +247,17 @@ public class Grammar implements AttributeResolver {
                 importedGrammarName = t.getText();
                 tool.log("grammar", "import " + t.getText());
 			}
-			GrammarAST grammarAST = null;
+			Grammar g;
 			try {
-				grammarAST = tool.loadImportedGrammar(this, importedGrammarName + ".g");
+				g = tool.loadImportedGrammar(this, importedGrammarName);
 			}
 			catch (IOException ioe) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, ioe, importedGrammarName+".g");
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, ioe,
+									  importedGrammarName);
 				continue;
 			}
 			// did it come back as error node or missing?
-			if ( grammarAST==null || grammarAST instanceof GrammarASTErrorNode) return;
-			GrammarRootAST ast = (GrammarRootAST)grammarAST;
-			Grammar g = tool.createGrammar(ast);
-			File f = tool.getImportedGrammarFile(this, importedGrammarName+".g");
-			g.fileName = f.getAbsolutePath();
+			if ( g == null ) continue;
 			g.parent = this;
 			importedGrammars.add(g);
 			g.loadImportedGrammars(); // recursively pursue any imports in this import

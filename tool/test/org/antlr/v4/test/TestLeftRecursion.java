@@ -15,17 +15,17 @@ public class TestLeftRecursion extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "s", "x", debug);
 		String expecting = "(s (a x))\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer",
+		found = execParser("T.g4", grammar, "TParser", "TLexer",
 						   "s", "x y", debug);
 		expecting = "(s (a (a x) y))\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer",
+		found = execParser("T.g4", grammar, "TParser", "TLexer",
 						   "s", "x y z", debug);
 		expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
@@ -40,7 +40,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "s", "x y z", debug);
 		String expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
@@ -228,6 +228,26 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	@Test public void testLabelsOnOpSubrule() throws Exception {
+		// FAILS
+		String grammar =
+			"grammar T;\n" +
+			"s : e {System.out.println($e.v);} ;\n" +
+			"e returns [int v, List<String> ignored]\n" +
+			"  : a=e op=('*'|'/') b=e {$v = $a.v * $b.v;}\n" +
+			"  | INT {$v = $INT.int;}\n" +
+			"  | '(' x=e ')' {$v = $x.v;}\n" +
+			"  ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		String[] tests = {
+			"4",			"4",
+		"1*2/3",		"7",
+		"(1/2)*3",		"9",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	@Test public void testReturnValueAndActionsAndLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -338,7 +358,7 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	public void runTests(String grammar, String[] tests, String startRule) {
-		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer");
+		rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
 								  "TLexer",
 								  startRule,
