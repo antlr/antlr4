@@ -245,21 +245,17 @@ public class Grammar implements AttributeResolver {
                 importedGrammarName = t.getText();
                 tool.log("grammar", "import " + t.getText());
 			}
-			GrammarAST grammarAST = null;
+			Grammar g;
 			try {
-				grammarAST = tool.loadImportedGrammar(this, importedGrammarName + ".g4");
+				g = tool.loadImportedGrammar(this, importedGrammarName);
 			}
 			catch (IOException ioe) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, ioe,
-									  importedGrammarName+".g");
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, ioe,
+									  importedGrammarName);
 				continue;
 			}
 			// did it come back as error node or missing?
-			if ( grammarAST==null || grammarAST instanceof GrammarASTErrorNode) return;
-			GrammarRootAST ast = (GrammarRootAST)grammarAST;
-			Grammar g = tool.createGrammar(ast);
-			File f = tool.getImportedGrammarFile(this, importedGrammarName+".g4");
-			g.fileName = f.getAbsolutePath();
+			if ( g == null ) continue;
 			g.parent = this;
 			importedGrammars.add(g);
 			g.loadImportedGrammars(); // recursively pursue any imports in this import

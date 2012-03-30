@@ -129,7 +129,7 @@ public enum ErrorType {
 	//TOKEN_VOCAB_IN_DELEGATE(, "tokenVocab option ignored in imported grammar <arg>", ErrorSeverity.ERROR),
 	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
 //	TOKEN_ALIAS_IN_DELEGATE(, "can't assign string to token name <arg> to string in imported grammar <arg2>", ErrorSeverity.ERROR),
-	CANNOT_FIND_IMPORTED_FILE(110, "can't find or load grammar <arg> from <arg2>", ErrorSeverity.ERROR),
+	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar <arg> from <arg2>", ErrorSeverity.ERROR),
 	INVALID_IMPORT(111, "<arg.typeString> grammar <arg.name> cannot import <arg2.typeString> grammar <arg2.name>", ErrorSeverity.ERROR),
 	IMPORTED_TOKENS_RULE_EMPTY(112, "", ErrorSeverity.ERROR),
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),

@@ -70,12 +70,19 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
+
+	public static final String GRAMMAR_EXTENSION = ".g4";
+	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
+
+	public static final List<String> ALL_GRAMMAR_EXTENSIONS =
+		Collections.unmodifiableList(Arrays.asList(GRAMMAR_EXTENSION, LEGACY_GRAMMAR_EXTENSION));
 
 	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
@@ -384,16 +391,31 @@ public class Tool {
 		return null;
 	}
 
-	/** Try current dir then dir of g then lib dir */
-	public GrammarRootAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
-		g.tool.log("grammar", "load "+fileName + " from " + g.fileName);
-		File importedFile = getImportedGrammarFile(g, fileName);
+	/**
+	 * Try current dir then dir of g then lib dir
+	 * @param g
+	 * @param name The imported grammar name.
+	 */
+	public Grammar loadImportedGrammar(Grammar g, String name) throws IOException {
+		g.tool.log("grammar", "load " + name + " from " + g.fileName);
+		File importedFile = null;
+		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
+			importedFile = getImportedGrammarFile(g, name + extension);
+			if (importedFile != null) {
+				break;
+			}
+		}
+
 		if ( importedFile==null ) {
-			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, fileName, g.fileName);
+			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, name, g.fileName);
 			return null;
 		}
+
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		return load(in);
+		GrammarRootAST root = load(in);
+		Grammar imported = createGrammar(root);
+		imported.fileName = importedFile.getAbsolutePath();
+		return imported;
 	}
 
 	public GrammarRootAST loadFromString(String grammar) {
