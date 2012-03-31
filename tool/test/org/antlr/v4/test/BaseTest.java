@@ -649,9 +649,9 @@ public abstract class BaseTest {
 		int semi = line.lastIndexOf(';');
 		if ( grIndex>=0 && semi>=0 ) {
 			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+".g";
+			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
 		}
-		if ( fileName.length()==".g".length() ) fileName = "<string>";
+		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "<string>";
 		return fileName;
 	}
 
