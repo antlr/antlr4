@@ -49,7 +49,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    : ID | ID {;} ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "abc", true);
 		String expecting =
 			"Decision 0:\n" +
@@ -70,7 +70,7 @@ public class TestFullContextParsing extends BaseTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc", true);
 		String expecting =
 			"Decision 1:\n" +
@@ -81,7 +81,7 @@ public class TestFullContextParsing extends BaseTest {
 					 "line 1:2 reportContextSensitivity d=1, input='34'\n",
 					 this.stderrDuringParse);
 
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							"@ 34 abc", true);
 		expecting =
 			"Decision 1:\n" +
@@ -104,7 +104,7 @@ public class TestFullContextParsing extends BaseTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc @ 34 abc", true);
 		String expecting =
 			"Decision 2:\n" +
@@ -131,7 +131,7 @@ public class TestFullContextParsing extends BaseTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
 		String input = "{ if x then return }";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   input, true);
 		String expecting =
 			"Decision 1:\n" +
@@ -141,7 +141,7 @@ public class TestFullContextParsing extends BaseTest {
 
 		input =
 			"{ if x then if y then return else foo }";
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
 			"Decision 1:\n" +
@@ -153,7 +153,7 @@ public class TestFullContextParsing extends BaseTest {
 					 this.stderrDuringParse);
 
 		input = "{ if x then return else foo }";
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
 			"Decision 1:\n" +
@@ -170,7 +170,7 @@ public class TestFullContextParsing extends BaseTest {
 					 this.stderrDuringParse);
 
 		input = "{ if x then return else foo }";
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
 			"Decision 1:\n" +
@@ -183,7 +183,7 @@ public class TestFullContextParsing extends BaseTest {
 		input =
 			"{ if x then return else foo\n" +
 			"if x then if y then return else foo }";
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
 			"Decision 1:\n" +
@@ -199,7 +199,7 @@ public class TestFullContextParsing extends BaseTest {
 		input =
 			"{ if x then return else foo\n" +
 			"if x then if y then return else foo }";
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
 				"Decision 1:\n" +
@@ -235,7 +235,7 @@ public class TestFullContextParsing extends BaseTest {
 			"ID  : [a-z]+ ;\n" +
 			"";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "prog", "a(i)<-x", true);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "a(i)<-x", true);
 		assertEquals("pass.\n", found);
 
 		String expecting =

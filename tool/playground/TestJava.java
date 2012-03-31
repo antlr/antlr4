@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import java.io.File;
 
 /** Parse a java file or directory of java files using the generated parser
- *  ANTLR builds from java.g
+ *  ANTLR builds from java.g4
  */
 class TestJava {
 	public static long lexerTime = 0;
