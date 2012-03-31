@@ -49,7 +49,7 @@ public class Interval {
 	/** Interval objects are used readonly so share all with the
 	 *  same single value a==b up to some max size.  Use an array as a perfect hash.
 	 *  Return shared object for 0..INTERVAL_POOL_MAX_VALUE or a new
-	 *  Interval object with a..a in it.  On Java.g, 218623 IntervalSets
+	 *  Interval object with a..a in it.  On Java.g4, 218623 IntervalSets
 	 *  have a..a (set with 1 element).
 	 */
 	public static Interval of(int a, int b) {

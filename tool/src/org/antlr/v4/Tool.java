@@ -70,12 +70,19 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
+
+	public static final String GRAMMAR_EXTENSION = ".g4";
+	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
+
+	public static final List<String> ALL_GRAMMAR_EXTENSIONS =
+		Collections.unmodifiableList(Arrays.asList(GRAMMAR_EXTENSION, LEGACY_GRAMMAR_EXTENSION));
 
 	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
@@ -384,16 +391,31 @@ public class Tool {
 		return null;
 	}
 
-	/** Try current dir then dir of g then lib dir */
-	public GrammarRootAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
-		g.tool.log("grammar", "load "+fileName + " from " + g.fileName);
-		File importedFile = getImportedGrammarFile(g, fileName);
+	/**
+	 * Try current dir then dir of g then lib dir
+	 * @param g
+	 * @param name The imported grammar name.
+	 */
+	public Grammar loadImportedGrammar(Grammar g, String name) throws IOException {
+		g.tool.log("grammar", "load " + name + " from " + g.fileName);
+		File importedFile = null;
+		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
+			importedFile = getImportedGrammarFile(g, name + extension);
+			if (importedFile != null) {
+				break;
+			}
+		}
+
 		if ( importedFile==null ) {
-			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, fileName, g.fileName);
+			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, name, g.fileName);
 			return null;
 		}
+
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		return load(in);
+		GrammarRootAST root = load(in);
+		Grammar imported = createGrammar(root);
+		imported.fileName = importedFile.getAbsolutePath();
+		return imported;
 	}
 
 	public GrammarRootAST loadFromString(String grammar) {
@@ -449,13 +471,13 @@ public class Tool {
 	 *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and
 	 *  the directory where the grammar file was found.  If -o is /tmp
-	 *  and the original grammar file was foo/t.g then output files
+	 *  and the original grammar file was foo/t.g4 then output files
 	 *  go in /tmp/foo.
 	 *
 	 *  The output dir -o spec takes precedence if it's absolute.
 	 *  E.g., if the grammar file dir is absolute the output dir is given
-	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
-	 *  output (assuming t.g holds T.java).
+	 *  precendence. "-o /tmp /usr/lib/t.g4" results in "/tmp/T.java" as
+	 *  output (assuming t.g4 holds T.java).
 	 *
 	 *  If no -o is specified, then just write to the directory where the
 	 *  grammar file was found.
@@ -467,7 +489,7 @@ public class Tool {
 			return new StringWriter();
 		}
 		// output directory is a function of where the grammar file lives
-		// for subdir/T.g, you get subdir here.  Well, depends on -o etc...
+		// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
 		// But, if this is a .tokens file, then we force the output to
 		// be the base output directory (or current directory if there is not a -o)
 		//
@@ -533,9 +555,9 @@ public class Tool {
 			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
 		}
 		if ( haveOutputDir ) {
-			// -o /tmp /var/lib/t.g => /tmp/T.java
-			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
-			// -o . /usr/lib/t.g => ./T.java
+			// -o /tmp /var/lib/t.g4 => /tmp/T.java
+			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
+			// -o . /usr/lib/t.g4 => ./T.java
 			if (fileDirectory != null &&
 				(new File(fileDirectory).isAbsolute() ||
 				 fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
@@ -543,7 +565,7 @@ public class Tool {
 				outputDir = new File(outputDirectory);
 			}
 			else {
-				// -o /tmp subdir/t.g => /tmp/subdir/t.g
+				// -o /tmp subdir/t.g4 => /tmp/subdir/t.g4
 				if (fileDirectory != null) {
 					outputDir = new File(outputDirectory, fileDirectory);
 				}

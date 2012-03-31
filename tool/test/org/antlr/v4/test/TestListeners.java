@@ -28,7 +28,7 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		String expecting = "(a 1 2)\n" +
 						   "1\n" +
 						   "2\n";
@@ -61,13 +61,13 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		String expecting =
 			"(a 1 2)\n" +
 			"1 2 [1, 2]\n";
 		assertEquals(expecting, result);
 
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abc", false);
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abc", false);
 		expecting = "(a abc)\n" +
 					"[@0,0:2='abc',<6>,1:0]\n";
 		assertEquals(expecting, result);
@@ -103,12 +103,12 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		String expecting = "(a (b 1) (b 2))\n" +
 						   "1 2 1\n";
 		assertEquals(expecting, result);
 
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abc", false);
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abc", false);
 		expecting = "(a (b abc))\n" +
 					"abc\n";
 		assertEquals(expecting, result);
@@ -145,7 +145,7 @@ public class TestListeners extends BaseTest {
 			"ADD : '+' ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1+2*3", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1+2*3", false);
 		String expecting =
 			"(e (e 1) + (e (e 2) * (e 3)))\n" +
 			"1\n" +
@@ -186,13 +186,13 @@ public class TestListeners extends BaseTest {
 			"ADD : '+' ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1(2,3)", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1(2,3)", false);
 		String expecting =
 			"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
 			"1\n" +
 			"2\n" +
 			"3\n" +
-			"1 [14 6]\n";
+			"1 [16 6]\n";
 		assertEquals(expecting, result);
 	}
 }

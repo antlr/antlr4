@@ -1,6 +1,8 @@
 package org.antlr.v4.gunit;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RuleReturnScope;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
@@ -8,17 +10,19 @@ import org.antlr.stringtemplate.AutoIndentWriter;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Gen {
     // TODO: don't hardcode
     public static final String TEMPLATE_FILE =
-        "/Users/parrt/antlr/code/antlr4/main/gunit/resources/org/antlr/v4/gunit/jUnit.stg";
+        "/Users/parrt/antlr/code/antlr4/gunit/resources/org/antlr/v4/gunit/jUnit.stg";
 
     public static void main(String[] args) throws Exception {
-        if ( args.length==0 ) System.exit(0);
+        if ( args.length==0 ) {help(); System.exit(0);}
         String outputDirName = ".";
         String fileName = args[0];
         if ( args[0].equals("-o") ) {

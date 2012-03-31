@@ -128,17 +128,18 @@ outerAlternative returns [boolean isLeftRec]
                              {otherAlt((AltAST)$start, currentOuterAltNumber);}
     ;
 
-binary
-	:	^( ALT recurse (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse ACTION? )
+// (ALT (= a e) (= op (SET '*' '/')) (= b e) {}) (ALT INT {}) (ALT '(' (= x e) ')' {})
+binaryMultipleOp
+	:	^( ALT recurse bops recurse ACTION? )
 	;
 
-binaryMultipleOp
-	:	^( ALT recurse
-            (   ^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ )
-            |   ^(SET (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);})
-            )
-            recurse ACTION?
-         )
+bops:   ^(ASSIGN ID bops)
+	|	^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ )
+    |   ^(SET (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);})
+    ;
+
+binary
+	:	^( ALT recurse (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse ACTION? )
 	;
 
 ternary

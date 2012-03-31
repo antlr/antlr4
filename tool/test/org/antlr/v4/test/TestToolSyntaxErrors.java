@@ -8,37 +8,37 @@ public class TestToolSyntaxErrors extends BaseTest {
         "grammar A;\n" +
         "",
         // YIELDS
-        "error(63): A.g::: grammar A has no rules\n",
+        "error(64): A.g4::: grammar A has no rules\n",
 
 		"A;",
-		"error(17): <string>:1:0: 'A' came as a complete surprise to me\n",
+		"error(16): <string>:1:0: 'A' came as a complete surprise to me\n",
 
 		"grammar ;",
-		"error(17): <string>:1:8: ';' came as a complete surprise to me while looking for an identifier\n",
+		"error(16): <string>:1:8: ';' came as a complete surprise to me while looking for an identifier\n",
 
 		"grammar A\n" +
 		"a : ID ;\n",
-		"error(17): <string>:2:0: missing SEMI at 'a'\n",
+		"error(16): <string>:2:0: missing SEMI at 'a'\n",
 
 		"grammar A;\n" +
 		"a : ID ;;\n"+
 		"b : B ;",
-		"error(17): A.g:2:8: ';' came as a complete surprise to me\n",
+		"error(16): A.g4:2:8: ';' came as a complete surprise to me\n",
 
 		"grammar A;;\n" +
 		"a : ID ;\n",
-		"error(17): A;.g:1:10: ';' came as a complete surprise to me\n",
+		"error(16): A;.g4:1:10: ';' came as a complete surprise to me\n",
 
 		"grammar A;\n" +
 		"a @init : ID ;\n",
-		"error(17): A.g:2:8: mismatched input ':' expecting ACTION while matching rule preamble\n",
+		"error(16): A.g4:2:8: mismatched input ':' expecting ACTION while matching rule preamble\n",
 
 		"grammar A;\n" +
 		"a  ( A | B ) D ;\n" +
 		"b : B ;",
-		": A.g:2:3: '(' came as a complete surprise to me while matching rule preamble\n" +
-		": A.g:2:11: mismatched input ')' expecting SEMI while matching a rule\n" +
-		": A.g:2:15: mismatched input ';' expecting COLON while matching a lexer rule\n",
+		"error(16): A.g4:2:3: '(' came as a complete surprise to me while matching rule preamble\n" +
+		"error(16): A.g4:2:11: mismatched input ')' expecting SEMI while matching a rule\n" +
+		"error(16): A.g4:2:15: mismatched input ';' expecting COLON while matching a lexer rule\n",
     };
 
 	@Test public void testA() { super.testErrors(A, true); }
@@ -48,7 +48,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"grammar A;\n" +
 			"a : : A ;\n" +
 			"b : B ;",
-			"error(17): A.g:2:4: ':' came as a complete surprise to me while matching alternative\n",
+			"error(16): A.g4:2:4: ':' came as a complete surprise to me while matching alternative\n",
 		};
 		super.testErrors(pair, true);
 	}
@@ -58,7 +58,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"grammar A;\n" +
 			"a : A \n" +
 			"b : B ;",
-			"error(17): A.g:3:0: unterminated rule (missing ';') detected at 'b :' while looking for rule element\n",
+			"error(16): A.g4:3:0: unterminated rule (missing ';') detected at 'b :' while looking for rule element\n",
 		};
 		super.testErrors(pair, true);
 	}
@@ -68,7 +68,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"lexer grammar A;\n" +
 			"A : 'a' \n" +
 			"B : 'b' ;",
-			"error(17): A.g:3:0: unterminated rule (missing ';') detected at 'B :' while looking for lexer rule element\n",
+			"error(16): A.g4:3:0: unterminated rule (missing ';') detected at 'B :' while looking for lexer rule element\n",
 		};
 		super.testErrors(pair, true);
 	}
@@ -78,7 +78,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"grammar A;\n" +
 			"a : A \n" +
 			"b[int i] returns [int y] : B ;",
-			"error(17): A.g:3:9: unterminated rule (missing ';') detected at 'returns int y' while looking for rule element\n"
+			"error(16): A.g4:3:9: unterminated rule (missing ';') detected at 'returns int y' while looking for rule element\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -90,7 +90,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"  catch [Exception e] {...}\n" +
 			"b : B ;\n",
 
-			"error(17): A.g:2:4: unterminated rule (missing ';') detected at 'b catch' while looking for rule element\n"
+			"error(16): A.g4:2:4: unterminated rule (missing ';') detected at 'b catch' while looking for rule element\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -101,7 +101,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"a : A \n" +
 			"  catch [Exception e] {...}\n",
 
-			"error(17): A.g:2:4: unterminated rule (missing ';') detected at 'A catch' while looking for rule element\n"
+			"error(16): A.g4:2:4: unterminated rule (missing ';') detected at 'A catch' while looking for rule element\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -112,7 +112,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"a @ options {k=1;} : A ;\n" +
 			"b : B ;",
 
-			"error(17): A.g:2:4: 'options {' came as a complete surprise to me while looking for an identifier\n"
+			"error(16): A.g4:2:4: 'options {' came as a complete surprise to me while looking for an identifier\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -123,7 +123,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"a } : A ;\n" +
 			"b : B ;",
 
-			"error(17): A.g:2:2: '}' came as a complete surprise to me while matching rule preamble\n"
+			"error(16): A.g4:2:2: '}' came as a complete surprise to me while matching rule preamble\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -135,8 +135,8 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"mode foo;\n" +
 			"b : B ;",
 
-			": A.g:4:0: 'b' came as a complete surprise to me\n" +
-			": A.g:4:6: mismatched input ';' expecting COLON while matching a lexer rule\n"
+			"error(16): A.g4:4:0: 'b' came as a complete surprise to me\n" +
+			"error(16): A.g4:4:6: mismatched input ';' expecting COLON while matching a lexer rule\n"
 		};
 		super.testErrors(pair, true);
 	}
