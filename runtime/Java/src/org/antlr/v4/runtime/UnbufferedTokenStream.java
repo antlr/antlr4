@@ -116,7 +116,13 @@ public class UnbufferedTokenStream<T extends Token>
 
     @Override
     public T get(int i) {
-        throw new UnsupportedOperationException("Absolute token indexes are meaningless in an unbuffered stream");
+		int bufferStartIndex = currentElementIndex - p;
+		int bufferStopIndex = bufferStartIndex + data.size() - 1;
+		if (i < bufferStartIndex || i > bufferStopIndex) {
+			throw new UnsupportedOperationException();
+		}
+
+		return data.get(i - bufferStartIndex);
     }
 
     @Override
