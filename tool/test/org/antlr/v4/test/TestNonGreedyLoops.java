@@ -35,7 +35,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoopOnEndIsNop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"any : .* ;\n"+
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -58,7 +58,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyPlusLoopOnEndIsNop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"any : .+ ;\n"+ // .+ on end of rule always gives no viable alt. can't bypass but can't match
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -196,7 +196,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoopCantSeeEOF() throws Exception {
 		String grammar =
 		"grammar T;\n" +
-		"s @after {dumpDFA();} : block EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+		"s @after {dumpDFA();} : block EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 		"block : '{' .* '}' ;\n"+
 		"EQ : '=' ;\n" +
 		"INT : '0'..'9'+ ;\n" +
@@ -228,7 +228,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ifstat : 'if' '(' .* ')' block ;\n" +
 			"block : '{' '}' ;\n"+
 			"EQ : '=' ;\n" +
@@ -267,7 +267,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoopPassingThroughAnotherNongreedy() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ifstat : 'if' '(' .* ')' block ;\n" +
 			"block : '{' (block|.)* '}' ;\n"+
 			"EQ : '=' ;\n" +
@@ -330,7 +330,7 @@ public class TestNonGreedyLoops extends BaseTest {
 		// EOF on end means LL(*) can identify when to stop the loop.
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : stat* ID '=' ID ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : stat* ID '=' ID ';' EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"stat : 'if' '(' INT ')' stat\n" +
 			"     | 'return' INT ';'\n" +
 			"     | ID '=' (INT|ID) ';'\n" +
@@ -392,7 +392,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"grammar T;\n" +
 			"random : s ;" + // call s so s isn't followed by EOF directly
 			"s @after {dumpDFA();} : (options {greedy=false;} : stat)* ID '=' ID ';'\n" +
-			"    {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"    {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"stat : 'if' '(' INT ')' stat\n" +
 			"     | 'return' INT ';'\n" +
 			"     | ID '=' (INT|ID) ';'\n" +
@@ -450,7 +450,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testHTMLTags() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : (item)+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : (item)+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"item : tag | . ;\n" +
 			"tag : '<' '/'? .* '>'  ;\n" +
 			"EQ : '=' ;\n" +
