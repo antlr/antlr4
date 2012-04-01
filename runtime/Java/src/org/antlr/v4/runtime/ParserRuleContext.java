@@ -297,6 +297,31 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
+	/** Return the combined text of all leaf nodes. Does not get any
+	 *  off-channel tokens (if any) so won't return whitespace and
+	 *  comments if they are sent to parser on hidden channel.
+	 *
+	 *  This just recursively collects all leaf nodes and combines text.
+	 */
+	@Override
+	public String getText() {
+		StringBuilder buf = new StringBuilder();
+		getText_(this, buf);
+		return buf.toString();
+	}
+
+	protected void getText_(ParseTree p, StringBuilder buf) {
+		if ( p instanceof TerminalNode ) {
+			buf.append(((TerminalNode)p).getSymbol().getText());
+			return;
+		}
+		int n = p.getChildCount();
+		for (int i=0; i<n; i++) {
+			ParseTree c = p.getChild(i);
+			getText_(c, buf);
+		}
+	}
+
 	/** Return the text matched by this context and below in the parse
 	 *  tree. It includes tokens from this.start .. this.stop inclusive.
 	 *  It includes hidden channel tokens between start, stop.  The

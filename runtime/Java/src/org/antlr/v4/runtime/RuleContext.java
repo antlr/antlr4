@@ -224,6 +224,12 @@ public class RuleContext implements ParseTree.RuleNode {
 	@Override
 	public RuleContext getPayload() { return this; }
 
+	/** We don't know our children, can't implement */
+	@Override
+	public String getText() {
+		throw new UnsupportedOperationException("RuleContexts don't know their children");
+	}
+
 	public int getRuleIndex() { return -1; }
 
 	@Override
