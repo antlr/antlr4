@@ -397,7 +397,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt;
 				if ( dfa_debug ) {
-					Interval interval = Interval.of(startIndex, parser.getTokenStream().size()-1);
+					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
 					System.out.println("ATN exec upon "+
 									   parser.getTokenStream().getText(interval) +
 									   " at DFA state "+s.stateNumber);
