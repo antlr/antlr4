@@ -88,7 +88,12 @@ public class UnbufferedTokenStream<T extends Token>
         throw new UnsupportedOperationException("unbuffered stream can't give strings");
     }
 
-    @Override
+	@Override
+	public String getText(RuleContext ctx) {
+		throw new UnsupportedOperationException("unbuffered stream can't give strings");
+	}
+
+	@Override
     public int LA(int i) { return LT(i).getType(); }
 
     @Override

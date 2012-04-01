@@ -43,11 +43,6 @@ public interface TokenStream extends SymbolStream<Token> {
     @Override
     public Token LT(int k);
 
-	/** How far ahead has the stream been asked to look?  The return
-	 *  value is a valid index from 0..n-1.
-	 */
-//	int range();
-
 	/** Get a token at an absolute index i; 0..n-1.  This is really only
 	 *  needed for profiling and debugging and token stream rewriting.
 	 *  If you don't want to buffer up tokens, then this method makes no
@@ -71,6 +66,8 @@ public interface TokenStream extends SymbolStream<Token> {
 	 * @param interval
 	 */
 	public String getText(Interval interval);
+
+	public String getText(RuleContext ctx);
 
 	/** Because the user is not required to use a token with an index stored
 	 *  in it, we must provide a means for two token objects themselves to

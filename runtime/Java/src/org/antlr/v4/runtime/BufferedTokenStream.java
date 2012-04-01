@@ -267,6 +267,9 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 		return buf.toString();
     }
 
+	@Override
+	public String getText(RuleContext ctx) { return getText(ctx.getSourceInterval()); }
+
     @Override
     public String getText(Token start, Token stop) {
         if ( start!=null && stop!=null ) {

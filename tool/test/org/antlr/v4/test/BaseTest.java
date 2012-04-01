@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
@@ -1098,7 +1099,12 @@ public abstract class BaseTest {
 
 		@Override
 		public String getText(Interval interval) {
-			return null;
+			throw new UnsupportedOperationException("can't give strings");
+		}
+
+		@Override
+		public String getText(RuleContext ctx) {
+			throw new UnsupportedOperationException("can't give strings");
 		}
 
 		@Override
