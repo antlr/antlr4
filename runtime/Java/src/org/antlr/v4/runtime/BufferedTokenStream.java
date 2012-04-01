@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -239,27 +241,36 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
     /** Grab *all* tokens from stream and return string */
     @Override
-    public String toString() {
-        if ( p == -1 ) setup();
-        fill();
-        return toString(0, tokens.size()-1);
-    }
+    public String toString() { return getText(); }
+
+	/** Get the text of all tokens in this buffer. */
+	public String getText() {
+		if ( p == -1 ) setup();
+		fill();
+		return getText(Interval.of(0,size()-1));
+	}
 
     @Override
-    public String toString(int start, int stop) {
+    public String getText(Interval interval) {
+		int start = interval.a;
+		int stop = interval.b;
         if ( start<0 || stop<0 ) return "";
         if ( p == -1 ) setup();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
 
-		int a = tokens.get(start).getStartIndex();
-		int b = tokens.get(stop).getStopIndex();
-		return tokenSource.getInputStream().substring(a, b);
+		StringBuilder buf = new StringBuilder();
+		for (int i = start; i <= stop; i++) {
+			T t = tokens.get(i);
+			if ( t.getType()==Token.EOF ) break;
+			buf.append(t.getText());
+		}
+		return buf.toString();
     }
 
     @Override
-    public String toString(Token start, Token stop) {
+    public String getText(Token start, Token stop) {
         if ( start!=null && stop!=null ) {
-            return toString(start.getTokenIndex(), stop.getTokenIndex());
+            return getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()));
         }
         return null;
     }

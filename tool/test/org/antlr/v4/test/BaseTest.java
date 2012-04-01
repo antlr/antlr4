@@ -35,7 +35,6 @@ import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
@@ -50,6 +49,7 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -458,11 +458,11 @@ public abstract class BaseTest {
 								String input, boolean debug)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-									  grammarStr,
-									  parserName,
-									  lexerName,
-									  "-parse-listener",
-									  "-visitor");
+														grammarStr,
+														parserName,
+														lexerName,
+														"-parse-listener",
+														"-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
@@ -1097,12 +1097,12 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public String toString(int start, int stop) {
+		public String getText(Interval interval) {
 			return null;
 		}
 
 		@Override
-		public String toString(Token start, Token stop) {
+		public String getText(Token start, Token stop) {
 			return null;
 		}
 	}

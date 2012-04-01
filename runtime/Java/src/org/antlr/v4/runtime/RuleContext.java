@@ -224,10 +224,25 @@ public class RuleContext implements ParseTree.RuleNode {
 	@Override
 	public RuleContext getPayload() { return this; }
 
-	/** We don't know our children, can't implement */
+	/** Return the combined text of all child nodes. This method only considers
+	 *  tokens which have been added to the parse tree.
+	 *  <p>
+	 *  Since tokens on hidden channels (e.g. whitespace or comments) are not
+	 *  added to the parse trees, they will not appear in the output of this
+	 *  method.
+	 */
 	@Override
 	public String getText() {
-		throw new UnsupportedOperationException("RuleContexts don't know their children");
+		if (getChildCount() == 0) {
+			return "";
+		}
+
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < getChildCount(); i++) {
+			builder.append(getChild(i).getText());
+		}
+
+		return builder.toString();
 	}
 
 	public int getRuleIndex() { return -1; }

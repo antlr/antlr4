@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.LookaheadStream;
 
 /** A token stream that pulls tokens from the source on-demand and
@@ -78,12 +79,12 @@ public class UnbufferedTokenStream<T extends Token>
 	public TokenSource getTokenSource() { return tokenSource; }
 
     @Override
-	public String toString(int start, int stop) {
+	public String getText(Interval interval) {
         throw new UnsupportedOperationException("unbuffered stream can't give strings");
     }
 
     @Override
-	public String toString(Token start, Token stop) {
+	public String getText(Token start, Token stop) {
         throw new UnsupportedOperationException("unbuffered stream can't give strings");
     }
 
