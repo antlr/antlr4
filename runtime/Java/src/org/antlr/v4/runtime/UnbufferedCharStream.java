@@ -198,6 +198,10 @@ public class UnbufferedCharStream implements CharStream {
 
     @Override
     public String getText(Interval interval) {
-        throw new UnsupportedOperationException("unbuffered char stream");
+		if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n) {
+			throw new UnsupportedOperationException();
+		}
+
+		return new String(data, interval.a, interval.length());
     }
 }

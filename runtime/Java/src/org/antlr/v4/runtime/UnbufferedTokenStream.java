@@ -78,19 +78,37 @@ public class UnbufferedTokenStream<T extends Token>
     @Override
 	public TokenSource getTokenSource() { return tokenSource; }
 
-    @Override
+	@Override
 	public String getText(Interval interval) {
-        throw new UnsupportedOperationException("unbuffered stream can't give strings");
-    }
+		int bufferStartIndex = currentElementIndex - p;
+		int bufferStopIndex = bufferStartIndex + data.size() - 1;
 
-    @Override
-	public String getText(Token start, Token stop) {
-        throw new UnsupportedOperationException("unbuffered stream can't give strings");
-    }
+		int start = interval.a;
+		int stop = interval.b;
+		if (start < bufferStartIndex || stop > bufferStopIndex) {
+			throw new UnsupportedOperationException();
+		}
+
+		StringBuilder buf = new StringBuilder();
+		for (int i = start; i <= stop; i++) {
+			T t = data.get(i - bufferStartIndex);
+			buf.append(t.getText());
+		}
+
+		return buf.toString();
+	}
 
 	@Override
 	public String getText(RuleContext ctx) {
-		throw new UnsupportedOperationException("unbuffered stream can't give strings");
+		return getText(ctx.getSourceInterval());
+	}
+
+	@Override
+	public String getText(Token start, Token stop) {
+		if ( start!=null && stop!=null ) {
+			return getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()));
+		}
+		return null;
 	}
 
 	@Override
