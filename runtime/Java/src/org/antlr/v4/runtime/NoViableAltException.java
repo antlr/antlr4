@@ -41,10 +41,10 @@ public class NoViableAltException extends RecognitionException {
 	 * 	not be buffering tokens so get a reference to it. (At the
 	 *  time the error occurred, of course the stream needs to keep a
 	 *  buffer all of the tokens but later we might not have access to those.)
- 	 */
+	 */
 	public Token startToken;
 
-	public <Symbol extends Token> NoViableAltException(Parser recognizer) { // LL(1) error
+	public NoViableAltException(Parser recognizer) { // LL(1) error
 		this(recognizer,recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),
 			 recognizer.getCurrentToken(),
@@ -52,12 +52,12 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public <Symbol> NoViableAltException(Parser recognizer,
-										 SymbolStream<Symbol> input,
-										 Token startToken,
-										 Token offendingToken,
-										 ATNConfigSet deadEndConfigs,
-										 ParserRuleContext<?> ctx)
+	public NoViableAltException(Parser recognizer,
+								TokenStream input,
+								Token startToken,
+								Token offendingToken,
+								ATNConfigSet deadEndConfigs,
+								ParserRuleContext<?> ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;

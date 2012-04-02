@@ -32,7 +32,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** A stream of tokens accessing tokens from a TokenSource */
-public interface TokenStream extends SymbolStream<Token> {
+public interface TokenStream extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
 	 *  i&lt;0 indicates tokens in the past.  So -1 is previous token and -2 is
 	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
@@ -40,7 +40,6 @@ public interface TokenStream extends SymbolStream<Token> {
 	 *  that is negative.
      *  TODO (Sam): Throw exception for invalid k?
 	 */
-    @Override
     public Token LT(int k);
 
 	/** Get a token at an absolute index i; 0..n-1.  This is really only
@@ -50,7 +49,6 @@ public interface TokenStream extends SymbolStream<Token> {
 	 *  I believe DebugTokenStream can easily be altered to not use
 	 *  this method, removing the dependency.
 	 */
-	@Override
 	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but
