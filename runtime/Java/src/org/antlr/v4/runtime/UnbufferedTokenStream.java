@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.LookaheadStream;
 
 /** A token stream that pulls tokens from the source on-demand and
@@ -77,22 +78,51 @@ public class UnbufferedTokenStream<T extends Token>
     @Override
 	public TokenSource getTokenSource() { return tokenSource; }
 
-    @Override
-	public String toString(int start, int stop) {
-        throw new UnsupportedOperationException("unbuffered stream can't give strings");
-    }
+	@Override
+	public String getText(Interval interval) {
+		int bufferStartIndex = currentElementIndex - p;
+		int bufferStopIndex = bufferStartIndex + data.size() - 1;
 
-    @Override
-	public String toString(Token start, Token stop) {
-        throw new UnsupportedOperationException("unbuffered stream can't give strings");
-    }
+		int start = interval.a;
+		int stop = interval.b;
+		if (start < bufferStartIndex || stop > bufferStopIndex) {
+			throw new UnsupportedOperationException();
+		}
 
-    @Override
+		StringBuilder buf = new StringBuilder();
+		for (int i = start; i <= stop; i++) {
+			T t = data.get(i - bufferStartIndex);
+			buf.append(t.getText());
+		}
+
+		return buf.toString();
+	}
+
+	@Override
+	public String getText(RuleContext ctx) {
+		return getText(ctx.getSourceInterval());
+	}
+
+	@Override
+	public String getText(Token start, Token stop) {
+		if ( start!=null && stop!=null ) {
+			return getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()));
+		}
+		return null;
+	}
+
+	@Override
     public int LA(int i) { return LT(i).getType(); }
 
     @Override
     public T get(int i) {
-        throw new UnsupportedOperationException("Absolute token indexes are meaningless in an unbuffered stream");
+		int bufferStartIndex = currentElementIndex - p;
+		int bufferStopIndex = bufferStartIndex + data.size() - 1;
+		if (i < bufferStartIndex || i > bufferStopIndex) {
+			throw new UnsupportedOperationException();
+		}
+
+		return data.get(i - bufferStartIndex);
     }
 
     @Override

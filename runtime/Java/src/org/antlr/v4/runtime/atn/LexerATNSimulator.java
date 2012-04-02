@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.LexerNoViableAltException;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -589,7 +590,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) {
 			System.out.format("no edge for %s\n", getTokenName(input.LA(1)));
 			System.out.format("ATN exec upon %s at DFA state %d = %s\n",
-							  input.substring(startIndex, input.index()), s.stateNumber, s.configset);
+							  input.getText(Interval.of(startIndex, input.index())), s.stateNumber, s.configset);
 		}
 
 		int ttype = execATN(input, s.configset, s);
@@ -721,7 +722,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	/** Get the text of the current token */
 	@NotNull
 	public String getText(@NotNull CharStream input) {
-		return input.substring(this.startIndex, input.index());
+		return input.getText(Interval.of(startIndex, input.index()));
 	}
 
 	public int getLine() {

@@ -205,7 +205,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		String input;
 		if (tokens instanceof TokenStream) {
 			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);
+			else input = ((TokenStream)tokens).getText(e.startToken, e.offendingToken);
 		}
 		else {
 			input = "<unknown input>";

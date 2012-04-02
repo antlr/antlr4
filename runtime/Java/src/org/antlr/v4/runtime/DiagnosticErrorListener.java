@@ -31,6 +31,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -42,7 +43,7 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
     {
         recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
 										": ambigAlts=" + ambigAlts + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 
 	@Override
@@ -53,7 +54,7 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
 	{
 		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
 										dfa.decision + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
 	}
 
 	@Override
@@ -62,6 +63,6 @@ public class DiagnosticErrorListener extends BaseErrorListener<Token> {
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" +
 										dfa.decision + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 }
