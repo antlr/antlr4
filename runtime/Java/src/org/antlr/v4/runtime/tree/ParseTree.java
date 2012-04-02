@@ -91,6 +91,14 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 		}
 
 		@Override
+		public String getText() {
+			if (symbol instanceof Token) {
+				return ((Token)symbol).getText();
+			}
+			return null;
+		}
+
+		@Override
 		public String toStringTree(Parser<?> parser) {
 			return toString();
 		}
@@ -145,6 +153,12 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 
 	/** The ParseTreeVisitor needs a double dispatch method */
 	public <T> T accept(ParseTreeVisitor<? super Symbol, ? extends T> visitor);
+
+	/** Return the combined text of all leaf nodes. Does not get any
+	 *  off-channel tokens (if any) so won't return whitespace and
+	 *  comments if they are sent to parser on hidden channel.
+	 */
+	public String getText();
 
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.

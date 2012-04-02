@@ -29,12 +29,10 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.PredictionContext;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -49,7 +47,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
 						  ambigAlts,
-						  recognizer.getInputString(startIndex, stopIndex)));
+						  recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))));
     }
 
 	@Override
@@ -62,7 +60,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
-						  recognizer.getInputString(startIndex, stopIndex)));
+						  recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))));
 	}
 
 	@Override
@@ -73,7 +71,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
-						  recognizer.getInputString(startIndex, stopIndex)));
+						  recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))));
     }
 
 	protected <T extends Symbol> String getDecisionDescription(Parser<T> recognizer, int decision) {

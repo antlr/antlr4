@@ -311,18 +311,6 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		this._input = input;
 	}
 
-    public String getInputString(int start) {
-        return getInputString(start, getInputStream().index());
-    }
-
-    public String getInputString(int start, int stop) {
-        SymbolStream<? extends Symbol> input = getInputStream();
-        if ( input instanceof TokenStream<?> ) {
-            return ((TokenStream<? extends Symbol>)input).toString(start,stop);
-        }
-        return "n/a";
-    }
-
     /** Match needs to return the current input symbol, which gets put
      *  into the label for the associated token ref; e.g., x=ID.
      */

@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.SymbolStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -494,8 +495,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt;
 				if ( dfa_debug ) {
+					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
 					System.out.println("ATN exec upon "+
-                                       parser.getInputString(startIndex) +
+									   parser.getTokenStream().getText(interval) +
 									   " at DFA state "+s.stateNumber);
 				}
 
@@ -1733,16 +1735,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public void reportAttemptingFullContext(DFA dfa, SimulatorState<Symbol> initialState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
+			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+initialState.s0.configset+
-                               ", input="+parser.getInputString(startIndex, stopIndex));
+                               ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, initialState);
     }
 
 	public void reportContextSensitivity(DFA dfa, SimulatorState<Symbol> acceptState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
+			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+acceptState.s0.configset+
-                               ", input="+parser.getInputString(startIndex, stopIndex));
+                               ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, acceptState);
     }
@@ -1769,9 +1773,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //				}
 //				i++;
 //			}
+			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAmbiguity "+
 							   ambigAlts+":"+configs+
-                               ", input="+parser.getInputString(startIndex, stopIndex));
+                               ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);

@@ -28,6 +28,8 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 /** A source of characters for an ANTLR lexer */
 public interface CharStream extends IntStream<Integer> {
 	public static final int EOF = -1;
@@ -37,6 +39,7 @@ public interface CharStream extends IntStream<Integer> {
 	/** For unbuffered streams, you can't use this; primarily I'm providing
 	 *  a useful interface for action code.  Just make sure actions don't
 	 *  use this on streams that don't support it.
+	 * @param interval
 	 */
-	public String substring(int start, int stop);
+	public String getText(Interval interval);
 }

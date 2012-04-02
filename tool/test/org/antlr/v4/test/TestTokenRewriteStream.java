@@ -29,6 +29,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.TokenRewriteStream;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
@@ -158,11 +159,11 @@ public class TestTokenRewriteStream extends BaseTest {
         expecting = "x = 0;";
         assertEquals(expecting, result);
 
-        result = tokens.toString(0,9);
+        result = tokens.getText(Interval.of(0, 9));
         expecting = "x = 0;";
         assertEquals(expecting, result);
 
-        result = tokens.toString(4,8);
+        result = tokens.getText(Interval.of(4, 8));
         expecting = "0";
         assertEquals(expecting, result);
     }
@@ -193,28 +194,28 @@ public class TestTokenRewriteStream extends BaseTest {
         expecting = "x = 0 + 2 * 0;";
         assertEquals(expecting, result);
 
-        result = tokens.toString(0,17);
+        result = tokens.getText(Interval.of(0, 17));
         expecting = "x = 0 + 2 * 0;";
         assertEquals(expecting, result);
 
-        result = tokens.toString(4,8);
+        result = tokens.getText(Interval.of(4, 8));
         expecting = "0";
         assertEquals(expecting, result);
 
-        result = tokens.toString(0,8);
+        result = tokens.getText(Interval.of(0, 8));
         expecting = "x = 0";
         assertEquals(expecting, result);
 
-        result = tokens.toString(12,16);
+        result = tokens.getText(Interval.of(12, 16));
         expecting = "2 * 0";
         assertEquals(expecting, result);
 
         tokens.insertAfter(17, "// comment");
-        result = tokens.toString(12,18);
+        result = tokens.getText(Interval.of(12, 18));
         expecting = "2 * 0;// comment";
         assertEquals(expecting, result);
 
-        result = tokens.toString(0,8); // try again after insert at end
+        result = tokens.getText(Interval.of(0, 8)); // try again after insert at end
         expecting = "x = 0";
         assertEquals(expecting, result);
     }
@@ -484,7 +485,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.fill();
 		tokens.replace(2, 4, "xyz");
-		String result = tokens.toString(0,6);
+		String result = tokens.getText(Interval.of(0, 6));
 		String expecting = "abxyzba";
 		assertEquals(expecting, result);
 	}

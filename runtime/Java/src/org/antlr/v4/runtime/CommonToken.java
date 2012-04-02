@@ -28,6 +28,8 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 import java.io.Serializable;
 
 public class CommonToken implements WritableToken, Serializable {
@@ -111,7 +113,7 @@ public class CommonToken implements WritableToken, Serializable {
 		if ( input==null ) return null;
 		int n = input.size();
 		if ( start<n && stop<n) {
-			return input.substring(start,stop);
+			return input.getText(Interval.of(start,stop));
 		}
 		else {
 			return "<EOF>";

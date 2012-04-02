@@ -119,22 +119,22 @@ public class TestActionTranslation extends BaseTest {
 
     @Test public void testRuleRefs() throws Exception {
         String action = "$lab.start; $c.text;";
-		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx.c!=null?_input.toString(_localctx.c.start,_localctx.c.stop):null);";
+		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx.c!=null?_input.getText(_localctx.c.start,_localctx.c.stop):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
-			"(_localctx.a!=null?_input.toString(_localctx.a.start,_localctx.a.stop):" +
-			"null); _input.toString(_localctx.start, _input.LT(-1))";
+			"(_localctx.a!=null?_input.getText(_localctx.a.start,_localctx.a.stop):" +
+			"null); _input.getText(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "init", action, expected);
 		expected =
-			"_input.toString(_localctx.start, _input.LT(-1)); _input.toString(_localctx.start, _input.LT(-1))";
+			"_input.getText(_localctx.start, _input.LT(-1)); _input.getText(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "inline", action, expected);
 		expected =
-			"(_localctx.a!=null?_input.toString(_localctx.a.start,_localctx.a.stop):null);" +
-			" _input.toString(_localctx.start, _input.LT(-1))";
+			"(_localctx.a!=null?_input.getText(_localctx.a.start,_localctx.a.stop):null);" +
+			" _input.getText(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "finally", action, expected);
     }
 
