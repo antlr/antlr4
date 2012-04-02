@@ -1,8 +1,8 @@
 grammar T;
-s : e ';' ;
-e : e '*' e
-  | ID
-  | INT
+s : e ;
+e : a=e op=('*'|'/') b=e  {}
+  | INT {}
+  | '(' x=e ')' {}
   ;
-INT : '0'..'9'+;
+INT : '0'..'9'+ ;
 WS : (' '|'\n') {skip();} ;
