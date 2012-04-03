@@ -65,6 +65,8 @@ public interface TokenStream extends IntStream {
 	 */
 	public String getText(Interval interval);
 
+	public String getText();
+
 	public String getText(RuleContext ctx);
 
 	/** Because the user is not required to use a token with an index stored
