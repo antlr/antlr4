@@ -37,6 +37,7 @@ public class TestBasicSemanticErrors extends BaseTest {
         "parser grammar U;\n" +
         "options { foo=bar; k=\"3\";}\n" +
         "tokens {\n" +
+		"        ID;\n" +
         "        f='fkj';\n" +
         "        S = 'a';\n" +
         "}\n" +
@@ -52,16 +53,16 @@ public class TestBasicSemanticErrors extends BaseTest {
         // YIELDS
 		"warning(83): U.g4:2:10: illegal option foo\n" +
 		"warning(83): U.g4:2:19: illegal option k\n" +
-		"error(60): U.g4:4:8: token names must start with an uppercase letter: f\n" +
-		"error(59): U.g4:4:8: can't assign string value to token name f in non-combined grammar\n" +
-		"error(59): U.g4:5:8: can't assign string value to token name S in non-combined grammar\n" +
-		"warning(83): U.g4:8:10: illegal option x\n" +
+		"error(60): U.g4:5:8: token names must start with an uppercase letter: f\n" +
+		"error(59): U.g4:5:8: can't assign string value to token name f in non-combined grammar\n" +
+		"error(59): U.g4:6:8: can't assign string value to token name S in non-combined grammar\n" +
+		"warning(83): U.g4:9:10: illegal option x\n" +
+		"error(54): U.g4:9:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
 		"error(54): U.g4:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"error(54): U.g4:7:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"warning(83): U.g4:11:10: illegal option blech\n" +
-		"warning(83): U.g4:11:21: illegal option greedy\n" +
-		"warning(83): U.g4:14:16: illegal option ick\n" +
-		"warning(83): U.g4:15:16: illegal option x\n",
+		"warning(83): U.g4:12:10: illegal option blech\n" +
+		"warning(83): U.g4:12:21: illegal option greedy\n" +
+		"warning(83): U.g4:15:16: illegal option ick\n" +
+		"warning(83): U.g4:16:16: illegal option x\n",
     };
 
 	@Test public void testU() { super.testErrors(U, false); }

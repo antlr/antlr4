@@ -9,6 +9,7 @@ public class TestAttributeChecks extends BaseTest {
     String attributeTemplate =
         "parser grammar A;\n"+
         "@members {<members>}\n" +
+		"tokens{ID;}\n" +
         "a[int x] returns [int y]\n" +
         "@init {<init>}\n" +
         "    :   id=ID ids+=ID lab=b[34] {\n" +
@@ -36,8 +37,8 @@ public class TestAttributeChecks extends BaseTest {
 		"$lab.e",		"",
 		"$ids",			"",
 
-		"$c",			"error(63): A.g4:4:8: unknown attribute reference c in $c\n",
-		"$a.q",			"error(65): A.g4:4:10: unknown attribute q for rule a in $a.q\n",
+		"$c",			"error(63): A.g4:5:8: unknown attribute reference c in $c\n",
+		"$a.q",			"error(65): A.g4:5:10: unknown attribute q for rule a in $a.q\n",
     };
 
 	String[] inlineChecks = {
@@ -58,19 +59,19 @@ public class TestAttributeChecks extends BaseTest {
 	};
 
 	String[] bad_inlineChecks = {
-		"$lab",			"error(67): A.g4:6:4: missing attribute access on rule reference lab in $lab\n",
-		"$q",           "error(63): A.g4:6:4: unknown attribute reference q in $q\n",
-		"$q.y",         "error(63): A.g4:6:4: unknown attribute reference q in $q.y\n",
-		"$q = 3",       "error(63): A.g4:6:4: unknown attribute reference q in $q\n",
-		"$q = 3;",      "error(63): A.g4:6:4: unknown attribute reference q in $q = 3;\n",
-		"$q.y = 3;",    "error(63): A.g4:6:4: unknown attribute reference q in $q.y = 3;\n",
-		"$q = $blort;", "error(63): A.g4:6:4: unknown attribute reference q in $q = $blort;\n" +
-						"error(63): A.g4:6:9: unknown attribute reference blort in $blort\n",
-		"$a.ick",       "error(65): A.g4:6:6: unknown attribute ick for rule a in $a.ick\n",
-		"$a.ick = 3;",  "error(65): A.g4:6:6: unknown attribute ick for rule a in $a.ick = 3;\n",
-		"$b.d",         "error(64): A.g4:6:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
-		"$d.text",      "error(63): A.g4:6:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
-		"$lab.d",		"error(64): A.g4:6:8: cannot access rule d's parameter: $lab.d\n",
+		"$lab",			"error(67): A.g4:7:4: missing attribute access on rule reference lab in $lab\n",
+		"$q",           "error(63): A.g4:7:4: unknown attribute reference q in $q\n",
+		"$q.y",         "error(63): A.g4:7:4: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(63): A.g4:7:4: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(63): A.g4:7:4: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(63): A.g4:7:4: unknown attribute reference q in $q.y = 3;\n",
+		"$q = $blort;", "error(63): A.g4:7:4: unknown attribute reference q in $q = $blort;\n" +
+						"error(63): A.g4:7:9: unknown attribute reference blort in $blort\n",
+		"$a.ick",       "error(65): A.g4:7:6: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(65): A.g4:7:6: unknown attribute ick for rule a in $a.ick = 3;\n",
+		"$b.d",         "error(64): A.g4:7:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
+		"$d.text",      "error(63): A.g4:7:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
+		"$lab.d",		"error(64): A.g4:7:8: cannot access rule d's parameter: $lab.d\n",
 	};
 
 	String[] finallyChecks = {
@@ -84,20 +85,20 @@ public class TestAttributeChecks extends BaseTest {
 		"$id.text",		"",
 		"$ids",			"",
 
-		"$lab",			"error(67): A.g4:9:14: missing attribute access on rule reference lab in $lab\n",
-		"$q",           "error(63): A.g4:9:14: unknown attribute reference q in $q\n",
-		"$q.y",         "error(63): A.g4:9:14: unknown attribute reference q in $q.y\n",
-		"$q = 3",       "error(63): A.g4:9:14: unknown attribute reference q in $q\n",
-		"$q = 3;",      "error(63): A.g4:9:14: unknown attribute reference q in $q = 3;\n",
-		"$q.y = 3;",    "error(63): A.g4:9:14: unknown attribute reference q in $q.y = 3;\n",
-		"$q = $blort;", "error(63): A.g4:9:14: unknown attribute reference q in $q = $blort;\n" +
-						"error(63): A.g4:9:19: unknown attribute reference blort in $blort\n",
-		"$a.ick",       "error(65): A.g4:9:16: unknown attribute ick for rule a in $a.ick\n",
-		"$a.ick = 3;",  "error(65): A.g4:9:16: unknown attribute ick for rule a in $a.ick = 3;\n",
-		"$b.e",			"error(63): A.g4:9:14: unknown attribute reference b in $b.e\n", // can't see rule refs outside alts
-		"$b.d",         "error(63): A.g4:9:14: unknown attribute reference b in $b.d\n",
-		"$c.text",      "error(63): A.g4:9:14: unknown attribute reference c in $c.text\n",
-		"$lab.d",		"error(64): A.g4:9:18: cannot access rule d's parameter: $lab.d\n",
+		"$lab",			"error(67): A.g4:10:14: missing attribute access on rule reference lab in $lab\n",
+		"$q",           "error(63): A.g4:10:14: unknown attribute reference q in $q\n",
+		"$q.y",         "error(63): A.g4:10:14: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(63): A.g4:10:14: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(63): A.g4:10:14: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(63): A.g4:10:14: unknown attribute reference q in $q.y = 3;\n",
+		"$q = $blort;", "error(63): A.g4:10:14: unknown attribute reference q in $q = $blort;\n" +
+						"error(63): A.g4:10:19: unknown attribute reference blort in $blort\n",
+		"$a.ick",       "error(65): A.g4:10:16: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(65): A.g4:10:16: unknown attribute ick for rule a in $a.ick = 3;\n",
+		"$b.e",			"error(63): A.g4:10:14: unknown attribute reference b in $b.e\n", // can't see rule refs outside alts
+		"$b.d",         "error(63): A.g4:10:14: unknown attribute reference b in $b.d\n",
+		"$c.text",      "error(63): A.g4:10:14: unknown attribute reference c in $c.text\n",
+		"$lab.d",		"error(64): A.g4:10:18: cannot access rule d's parameter: $lab.d\n",
 	};
 
 	String[] dynMembersChecks = {
@@ -200,6 +201,7 @@ public class TestAttributeChecks extends BaseTest {
 	@Test public void testTokenRef() throws RecognitionException {
 		String grammar =
 			"parser grammar S;\n" +
+			"tokens{ID;}\n" +
 			"a : x=ID {Token t = $x; t = $ID;} ;\n";
 		String expected =
 			"";
