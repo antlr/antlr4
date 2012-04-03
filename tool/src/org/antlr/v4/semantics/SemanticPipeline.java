@@ -31,6 +31,7 @@ package org.antlr.v4.semantics;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -174,6 +175,9 @@ public class SemanticPipeline {
 				String lit = alias.getChild(1).getText();
 				g.defineTokenAlias(name, lit);
 			}
+			else {
+				g.defineTokenName(alias.getText());
+			}
 		}
 
 		// DEFINE TOKEN TYPES FOR X : 'x' ; RULES
@@ -187,7 +191,13 @@ public class SemanticPipeline {
 		   */
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
-		for (GrammarAST idAST : tokenIDs) { g.defineTokenName(idAST.getText()); }
+		for (GrammarAST idAST : tokenIDs) {
+			if (g.getTokenType(idAST.getText()) == Token.INVALID_TYPE) {
+				g.tool.errMgr.grammarError(ErrorType.IMPLICIT_TOKEN_DEFINITION, g.fileName, idAST.token, idAST.getText());
+			}
+
+			g.defineTokenName(idAST.getText());
+		}
 
 		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
 		for (String s : strings) { g.defineStringLiteral(s); }
