@@ -145,6 +145,7 @@ public enum ErrorType {
 	ALT_LABEL_REDEF(123, "rule alt label <arg> redefined in rule <arg2>, originally in <arg3>", ErrorSeverity.ERROR),
 	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
 	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
+	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
 
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),

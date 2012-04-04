@@ -117,7 +117,7 @@ public class SemanticPipeline {
 		}
 		else {
 			assignTokenTypes(g, collector.tokensDefs,
-							 collector.tokenIDRefs, collector.strings);
+							 collector.tokenIDRefs, collector.terminals);
 		}
 
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
@@ -164,7 +164,7 @@ public class SemanticPipeline {
 	}
 
 	void assignTokenTypes(Grammar g, List<GrammarAST> tokensDefs,
-						  List<GrammarAST> tokenIDs, Set<String> strings)
+						  List<GrammarAST> tokenIDs, List<GrammarAST> terminals)
 	{
 		//Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
@@ -199,8 +199,17 @@ public class SemanticPipeline {
 			g.defineTokenName(idAST.getText());
 		}
 
-		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
-		for (String s : strings) { g.defineStringLiteral(s); }
+		// VERIFY TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
+		for (GrammarAST termAST : terminals) {
+			if (termAST.getType() != ANTLRParser.STRING_LITERAL) {
+				continue;
+			}
+
+			if (g.getTokenType(termAST.getText()) == Token.INVALID_TYPE) {
+				g.tool.errMgr.grammarError(ErrorType.IMPLICIT_STRING_DEFINITION, g.fileName, termAST.token, termAST.getText());
+			}
+		}
+
 		g.tool.log("semantics", "tokens="+g.tokenNameToTypeMap);
         g.tool.log("semantics", "strings="+g.stringLiteralToTypeMap);
 	}
