@@ -124,6 +124,7 @@ public class Tool {
 	public boolean gen_parse_listener = false;
 	public boolean gen_visitor = false;
 	public boolean abstract_recognizer = false;
+	public boolean warnings_are_errors = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -142,6 +143,7 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("abstract_recognizer", "-abstract", "generate abstract recognizer classes"),
+		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
 
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
@@ -632,9 +634,14 @@ public class Tool {
 	public void warning(ANTLRMessage msg) {
 		if ( listeners.isEmpty() ) {
 			defaultListener.warning(msg);
-			return;
 		}
-		for (ANTLRToolListener l : listeners) l.warning(msg);
+		else {
+			for (ANTLRToolListener l : listeners) l.warning(msg);
+		}
+
+		if (warnings_are_errors) {
+			errMgr.emit(ErrorType.WARNING_TREATED_AS_ERROR, new ANTLRMessage(ErrorType.WARNING_TREATED_AS_ERROR));
+		}
 	}
 
 	public void version() {
