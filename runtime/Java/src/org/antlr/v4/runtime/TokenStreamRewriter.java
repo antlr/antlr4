@@ -77,19 +77,19 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	// Define the rewrite operation hierarchy
 
 	public static class RewriteOperation {
-		protected final BufferedTokenStream<?> tokens;
+		protected final TokenStream<? extends Token> tokens;
         /** What index into rewrites List are we? */
         protected int instructionIndex;
         /** Token buffer index. */
         protected int index;
 		protected Object text;
 
-		protected RewriteOperation(BufferedTokenStream<?> tokens, int index) {
+		protected RewriteOperation(TokenStream<? extends Token> tokens, int index) {
 			this.tokens = tokens;
 			this.index = index;
 		}
 
-		protected RewriteOperation(BufferedTokenStream<?> tokens, int index, Object text) {
+		protected RewriteOperation(TokenStream<? extends Token> tokens, int index, Object text) {
 			this.tokens = tokens;
 			this.index = index;
 			this.text = text;
@@ -112,7 +112,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	}
 
 	static class InsertBeforeOp extends RewriteOperation {
-		public InsertBeforeOp(BufferedTokenStream<?> tokens, int index, Object text) {
+		public InsertBeforeOp(TokenStream<? extends Token> tokens, int index, Object text) {
 			super(tokens,index,text);
 		}
 
@@ -131,7 +131,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	 */
 	static class ReplaceOp extends RewriteOperation {
 		protected int lastIndex;
-		public ReplaceOp(BufferedTokenStream<?> tokens, int from, int to, Object text) {
+		public ReplaceOp(TokenStream<? extends Token> tokens, int from, int to, Object text) {
 			super(tokens, from,text);
 			lastIndex = to;
 		}
@@ -173,7 +173,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public final TokenStream getTokenStream() {
+	public final TokenStream<? extends Symbol> getTokenStream() {
 		return tokens;
 	}
 
