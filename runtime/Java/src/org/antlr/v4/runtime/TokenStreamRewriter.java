@@ -170,6 +170,10 @@ public class TokenStreamRewriter {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
+	public final TokenStream getSource() {
+		return tokens;
+	}
+
 	public void rollback(int instructionIndex) {
 		rollback(DEFAULT_PROGRAM_NAME, instructionIndex);
 	}
