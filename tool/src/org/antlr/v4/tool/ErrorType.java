@@ -185,16 +185,18 @@ public enum ErrorType {
 
     ;
 
-	public String msg;
-    public int code; // unique, deterministic unchanging error code once we release
-    public ErrorSeverity severity;
-    public Boolean abortsAnalysis;
-    public Boolean abortsCodegen;
+	public final String msg;
+    public final int code; // unique, deterministic unchanging error code once we release
+    public final ErrorSeverity severity;
+    public final Boolean abortsAnalysis;
+    public final Boolean abortsCodegen;
 
 	ErrorType(int code, String msg, ErrorSeverity severity) {
         this.code = code;
 		this.msg = msg;
         this.severity = severity;
+		this.abortsAnalysis = false;
+		this.abortsCodegen = false;
 	}
 
 //	ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis) {
