@@ -402,7 +402,7 @@ public abstract class BaseTest {
 			Tool antlr = newTool(optionsA);
 			antlr.addListener(equeue);
 			antlr.processGrammarsOnCommandLine();
-			if ( equeue.errors.size()>0 ) {
+			if ( !equeue.errors.isEmpty() ) {
 				allIsWell = false;
 				System.err.println("antlr reports errors from "+options);
 				for (int i = 0; i < equeue.errors.size(); i++) {
@@ -412,6 +412,13 @@ public abstract class BaseTest {
 				System.out.println("!!!\ngrammar:");
 				System.out.println(grammarStr);
 				System.out.println("###");
+			}
+			if ( !equeue.warnings.isEmpty() ) {
+				System.err.println("antlr reports warnings from "+options);
+				for (int i = 0; i < equeue.warnings.size(); i++) {
+					ANTLRMessage msg = equeue.warnings.get(i);
+					System.err.println(msg);
+				}
 			}
 		}
 		catch (Exception e) {
