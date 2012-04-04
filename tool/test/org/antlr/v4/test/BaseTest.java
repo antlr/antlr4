@@ -432,6 +432,13 @@ public abstract class BaseTest {
 			System.out.println(grammarStr);
 			System.out.println("###");
 		}
+		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
+			System.err.println("antlr reports warnings from "+options);
+			for (int i = 0; i < equeue.warnings.size(); i++) {
+				ANTLRMessage msg = equeue.warnings.get(i);
+				System.err.println(msg);
+			}
+		}
 
 		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
 			System.err.println("antlr reports warnings from "+options);
