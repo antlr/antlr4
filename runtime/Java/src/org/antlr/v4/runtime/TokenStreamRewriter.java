@@ -151,7 +151,7 @@ public class TokenStreamRewriter {
 	}
 
 	/** Our source stream */
-	protected final BufferedTokenStream tokens;
+	protected final TokenStream tokens;
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
@@ -162,7 +162,7 @@ public class TokenStreamRewriter {
 	/** Map String (program name) -> Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
-	public TokenStreamRewriter(BufferedTokenStream tokens) {
+	public TokenStreamRewriter(TokenStream tokens) {
 		this.tokens = tokens;
 		programs = new HashMap<String, List<RewriteOperation>>();
 		programs.put(DEFAULT_PROGRAM_NAME,
