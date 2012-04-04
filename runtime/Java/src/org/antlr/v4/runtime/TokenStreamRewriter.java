@@ -321,15 +321,6 @@ public class TokenStreamRewriter {
 		return is;
 	}
 
-	public String getOriginalText() {
-		return tokens.getText();
-	}
-
-	/** The text collected from all tokens in the input token stream */
-	public String getOriginalText(Interval interval) {
-		return tokens.getText(interval);
-	}
-
 	/** Return the text from the original tokens altered per the
 	 *  instructions given to this rewriter.
  	 */

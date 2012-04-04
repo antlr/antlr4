@@ -163,7 +163,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		stream.fill();
 // replace 3 * 0 with 0
 
-		String result = tokens.getOriginalText();
+		String result = tokens.getSource().getText();
 		String expecting = "x = 3 * 0;";
 		assertEquals(expecting, result);
 
@@ -198,7 +198,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
 
-		String result = tokens.getOriginalText();
+		String result = tokens.getSource().getText();
 		String expecting = "x = 3 * 0 + 2 * 0;";
 		assertEquals(expecting, result);
 
