@@ -389,47 +389,49 @@ public abstract class BaseTest {
 		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
+		ErrorQueue equeue = new ErrorQueue();
+		final List<String> options = new ArrayList<String>();
+		Collections.addAll(options, extraOptions);
+		options.add("-o");
+		options.add(tmpdir);
+		options.add("-lib");
+		options.add(tmpdir);
+		options.add(new File(tmpdir,grammarFileName).toString());
 		try {
-			final List<String> options = new ArrayList<String>();
-			Collections.addAll(options, extraOptions);
-			options.add("-o");
-			options.add(tmpdir);
-			options.add("-lib");
-			options.add(tmpdir);
-			options.add(new File(tmpdir,grammarFileName).toString());
 			final String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
-			ErrorQueue equeue = new ErrorQueue();
 			Tool antlr = newTool(optionsA);
 			antlr.addListener(equeue);
 			if (defaultListener) {
 				antlr.addListener(new DefaultToolListener(antlr));
 			}
 			antlr.processGrammarsOnCommandLine();
-			allIsWell = equeue.errors.isEmpty();
-			if ( !defaultListener && !equeue.errors.isEmpty() ) {
-				System.err.println("antlr reports errors from "+options);
-				for (int i = 0; i < equeue.errors.size(); i++) {
-					ANTLRMessage msg = equeue.errors.get(i);
-					System.err.println(msg);
-				}
-				System.out.println("!!!\ngrammar:");
-				System.out.println(grammarStr);
-				System.out.println("###");
-			}
-			if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-				System.err.println("antlr reports warnings from "+options);
-				for (int i = 0; i < equeue.warnings.size(); i++) {
-					ANTLRMessage msg = equeue.warnings.get(i);
-					System.err.println(msg);
-				}
-			}
 		}
 		catch (Exception e) {
 			allIsWell = false;
 			System.err.println("problems building grammar: "+e);
 			e.printStackTrace(System.err);
 		}
+
+		allIsWell = equeue.errors.isEmpty();
+		if ( !defaultListener && !equeue.errors.isEmpty() ) {
+			System.err.println("antlr reports errors from "+options);
+			for (int i = 0; i < equeue.errors.size(); i++) {
+				ANTLRMessage msg = equeue.errors.get(i);
+				System.err.println(msg);
+			}
+			System.out.println("!!!\ngrammar:");
+			System.out.println(grammarStr);
+			System.out.println("###");
+		}
+		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
+			System.err.println("antlr reports warnings from "+options);
+			for (int i = 0; i < equeue.warnings.size(); i++) {
+				ANTLRMessage msg = equeue.warnings.get(i);
+				System.err.println(msg);
+			}
+		}
+
 		return allIsWell;
 	}
 
