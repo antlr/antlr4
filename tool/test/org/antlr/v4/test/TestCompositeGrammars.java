@@ -501,29 +501,34 @@ public class TestCompositeGrammars extends BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"parser grammar T;\n" +
+			"tokens{T;}\n" +
 			"x : T ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave);
 		slave =
 			"parser grammar S;\n" +
 			"import T;\n" +
+			"tokens{S;}\n" +
 			"y : S ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 
 		slave =
 			"parser grammar C;\n" +
+			"tokens{C;}\n" +
 			"i : C ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "C.g4", slave);
 		slave =
 			"parser grammar B;\n" +
+			"tokens{B;}\n" +
 			"j : B ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "B.g4", slave);
 		slave =
 			"parser grammar A;\n" +
 			"import B,C;\n" +
+			"tokens{A;}\n" +
 			"k : A ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "A.g4", slave);
@@ -531,12 +536,13 @@ public class TestCompositeGrammars extends BaseTest {
 		String master =
 			"grammar M;\n" +
 			"import S,A;\n" +
+			"tokens{M;}\n" +
 			"a : M ;\n" ;
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
-		assertEquals(equeue.errors.toString(), "[]");
-		assertEquals(equeue.warnings.toString(), "[]");
+		assertEquals("[]", equeue.errors.toString());
+		assertEquals("[]", equeue.warnings.toString());
 		String expectedTokenIDToTypeMap = "{EOF=-1, M=3, S=4, T=5, A=6, B=7, C=8}";
 		String expectedStringLiteralToTypeMap = "{}";
 		String expectedTypeToTokenList = "[M, S, T, A, B, C]";
@@ -653,7 +659,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') {skip();} ;\n" ;
-		boolean ok = antlr("M.g4", "M.g4", master);
+		boolean ok = antlr("M.g4", "M.g4", master, false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}

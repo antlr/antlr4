@@ -99,6 +99,11 @@ public class UnbufferedTokenStream<T extends Token>
 	}
 
 	@Override
+	public String getText() {
+		return getText(Interval.of(0,index()));
+	}
+
+	@Override
 	public String getText(RuleContext ctx) {
 		return getText(ctx.getSourceInterval());
 	}

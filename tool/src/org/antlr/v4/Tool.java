@@ -74,6 +74,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
 	public String VERSION = "4.0-"+new Date();
@@ -166,8 +167,7 @@ public class Tool {
 	public ErrorManager errMgr = new ErrorManager(this);
     public LogManager logMgr = new LogManager();
 
-	List<ANTLRToolListener> listeners =
-	Collections.synchronizedList(new ArrayList<ANTLRToolListener>());
+	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<ANTLRToolListener>();
 
 	/** Track separately so if someone adds a listener, it's the only one
 	 *  instead of it and the default stderr listener.
