@@ -131,7 +131,7 @@ public class ErrorManager {
 			locationValid = true;
 		}
 
-		messageFormatST.add("id", msg.errorType.ordinal());
+		messageFormatST.add("id", msg.errorType.code);
 		messageFormatST.add("text", messageST);
 
 		if (locationValid) reportST.add("location", locationST);

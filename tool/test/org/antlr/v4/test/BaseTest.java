@@ -1112,6 +1112,11 @@ public abstract class BaseTest {
 		}
 
 		@Override
+		public String getText() {
+			throw new UnsupportedOperationException("can't give strings");
+		}
+
+		@Override
 		public String getText(Interval interval) {
 			throw new UnsupportedOperationException("can't give strings");
 		}

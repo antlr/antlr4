@@ -20,9 +20,9 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
-        "warning(48): A.g4:2:10: illegal option opt\n" +
-        "warning(48): A.g4:2:21: illegal option k\n" +
-		"error(59): A.g4:7:1: redefinition of header action\n" +
+        "warning(83): A.g4:2:10: illegal option opt\n" +
+        "warning(83): A.g4:2:21: illegal option k\n" +
+		"error(94): A.g4:7:1: redefinition of header action\n" +
 		"warning(51): A.g4:2:10: illegal option opt\n" +
 		"error(19): A.g4:11:0: rule a redefinition\n" +
 		"error(60): A.g4:5:1: redefinition of members action\n" +
@@ -42,11 +42,11 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "s : FOO ;",
         // YIELDS
-        "error(25): B.g4:2:9: can't assign string value to token name X in non-combined grammar\n" +
-		"error(35): B.g4:4:4: label s conflicts with rule with same name\n" +
-		"error(35): B.g4:4:9: label b conflicts with rule with same name\n" +
-		"error(36): B.g4:4:15: label X conflicts with token with same name\n" +
-		"error(40): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n"
+        "error(59): B.g4:2:9: can't assign string value to token name X in non-combined grammar\n" +
+		"error(69): B.g4:4:4: label s conflicts with rule with same name\n" +
+		"error(69): B.g4:4:9: label b conflicts with rule with same name\n" +
+		"error(70): B.g4:4:15: label X conflicts with token with same name\n" +
+		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n"
     };
 
     static String[] D = {
@@ -61,8 +61,8 @@ public class TestSymbolIssues extends BaseTest {
         "        :       ID ;",
 
         // YIELDS
-        "error(37): D.g4:3:21: label j conflicts with rule a's return value or parameter with same name\n" +
-		"error(41): D.g4:5:0: rule b's argument i conflicts a return value with same name\n"
+        "error(72): D.g4:3:21: label j conflicts with rule a's return value or parameter with same name\n" +
+		"error(76): D.g4:5:0: rule b's argument i conflicts a return value with same name\n"
     };
 
 	static String[] E = {
@@ -78,10 +78,10 @@ public class TestSymbolIssues extends BaseTest {
 		"a : A ;\n",
 
 		// YIELDS
-		"error(73): E.g4:4:8: cannot redefine B; token name already defined\n" +
-		"error(73): E.g4:5:4: cannot redefine C; token name already defined\n" +
-		"error(73): E.g4:6:8: cannot redefine D; token name already defined\n" +
-		"error(72): E.g4:7:8: cannot alias X='e'; string already assigned to E\n"
+		"error(108): E.g4:4:8: cannot redefine B; token name already defined\n" +
+		"error(108): E.g4:5:4: cannot redefine C; token name already defined\n" +
+		"error(108): E.g4:6:8: cannot redefine D; token name already defined\n" +
+		"error(107): E.g4:7:8: cannot alias X='e'; string already assigned to E\n"
 	};
 
     @Test public void testA() { super.testErrors(A, false); }

@@ -30,8 +30,14 @@
 package org.antlr.v4.tool.interp;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -80,14 +86,14 @@ public class ParserInterpreter {
 		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, input), g.atn);
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<Token> input,
+	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream<Token> input,
 						  @Nullable ParserRuleContext<Token> outerContext,
 						  boolean useContext)
 	{
 		return atnSimulator.predictATN(dfa, input, outerContext, useContext);
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<Token> input, int decision,
+	public int adaptivePredict(@NotNull TokenStream<Token> input, int decision,
 							   @Nullable ParserRuleContext<Token> outerContext)
 	{
 		return atnSimulator.adaptivePredict(input, decision, outerContext);
