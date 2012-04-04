@@ -28,9 +28,15 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 /** A set of integers that relies on ranges being common to do
  *  "run-length-encoded" like compression (if you view an IntSet like
@@ -111,7 +117,7 @@ public class IntervalSet implements IntSet {
      *  {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
      */
     public void add(int a, int b) {
-        add(Interval.create(a,b));
+        add(Interval.of(a, b));
     }
 
 	// copy on write so we can cache a..a intervals and sets of that

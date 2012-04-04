@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,26 +26,53 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.antlr.v4.runtime;
 
-/**  A stream of either tokens or tree nodes */
-public interface SymbolStream<T> extends IntStream {
-	/** Get the symbol at absolute index i; 0..n-1.
-	 *  This is only valid if the underlying stream implementation buffers
-	 *  all of the incoming objects.
-	 *
-	 *  @throws UnsupportedOperationException if the index {@code i} is outside
-	 *    the marked region and the stream does not support accessing symbols by
-	 *    index outside of marked regions.
-	 */
-	public T get(int i);
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
-	/** Get symbol at current input pointer + {@code k} ahead where {@code k=1}
-	 *  is next symbol. k&lt;0 indicates objects in the past.  So -1 is previous
-	 *  Object and -2 is two Objects ago. {@code LT(0)} is undefined.  For i>=n,
-	 *  return an object representing EOF. Return {@code null} for {@code LT(0)}
-	 *  and any index that results in an absolute index that is negative.
-	 */
-	T LT(int k);
+/**
+ *
+ * @author Sam Harwell
+ */
+public class BaseErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
+
+	@Override
+	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
+										 T offendingSymbol,
+										 int line,
+										 int charPositionInLine,
+										 String msg,
+										 RecognitionException e)
+	{
+	}
+
+	@Override
+	public void reportAmbiguity(Parser recognizer,
+								DFA dfa,
+								int startIndex,
+								int stopIndex,
+								IntervalSet ambigAlts,
+								ATNConfigSet configs)
+	{
+	}
+
+	@Override
+	public void reportAttemptingFullContext(Parser recognizer,
+											DFA dfa,
+											int startIndex,
+											int stopIndex,
+											ATNConfigSet configs)
+	{
+	}
+
+	@Override
+	public void reportContextSensitivity(Parser recognizer,
+										 DFA dfa,
+										 int startIndex,
+										 int stopIndex,
+										 ATNConfigSet configs)
+	{
+	}
 }

@@ -15,17 +15,17 @@ public class TestLeftRecursion extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "s", "x", debug);
 		String expecting = "(s (a x))\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer",
+		found = execParser("T.g4", grammar, "TParser", "TLexer",
 						   "s", "x y", debug);
 		expecting = "(s (a (a x) y))\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer",
+		found = execParser("T.g4", grammar, "TParser", "TLexer",
 						   "s", "x y z", debug);
 		expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
@@ -40,7 +40,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "s", "x y z", debug);
 		String expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
@@ -228,6 +228,24 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	@Test public void testLabelsOnOpSubrule() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e ;\n" +
+			"e : a=e op=('*'|'/') b=e  {}\n" +
+			"  | INT {}\n" +
+			"  | '(' x=e ')' {}\n" +
+			"  ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		String[] tests = {
+			"4",		"(s (e 4))",
+		"1*2/3",		"(s (e (e (e 1) * (e 2)) / (e 3)))",
+		"(1/2)*3",		"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	@Test public void testReturnValueAndActionsAndLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -276,8 +294,69 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	@Test
+	public void testAmbigLR() throws Exception {
+		String grammar =
+			"// START: g\n" +
+			"grammar Expr;\n" +
+			"// END: g\n" +
+			"\n" +
+			"// START:stat\n" +
+			"prog:   stat ;\n" +
+			"\n" +
+			"stat:   expr NEWLINE                -> printExpr\n" +
+			"    |   ID '=' expr NEWLINE         -> assign\n" +
+			"    |   NEWLINE                     -> blank\n" +
+			"    ;\n" +
+			"// END:stat\n" +
+			"\n" +
+			"// START:expr\n" +
+			"expr:   expr ('*'|'/') expr      -> MulDiv\n" +
+			"    |   expr ('+'|'-') expr      -> AddSub\n" +
+			"    |   INT                      -> int\n" +
+			"    |   ID                       -> id\n" +
+			"    |   '(' expr ')'             -> parens\n" +
+			"    ;\n" +
+			"// END:expr\n" +
+			"\n" +
+			"// show marginal cost of adding a clear/wipe command for memory\n" +
+			"\n" +
+			"// START:tokens\n" +
+			"MUL :   '*' ; // assigns token name to '*' used above in grammar\n" +
+			"DIV :   '/' ;\n" +
+			"ADD :   '+' ;\n" +
+			"SUB :   '-' ;\n" +
+			"ID  :   [a-zA-Z]+ ;      // match identifiers\n" +
+			"INT :   [0-9]+ ;         // match integers\n" +
+			"NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)\n" +
+			"WS  :   [ \\t]+ -> skip ; // toss out whitespace\n" +
+			"// END:tokens\n";
+		String result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "1\n", true);
+		assertNull(stderrDuringParse);
+
+		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a = 5\n", true);
+		assertNull(stderrDuringParse);
+
+		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "b = 6\n", true);
+		assertNull(stderrDuringParse);
+
+		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
+		assertEquals("line 1:1 reportAttemptingFullContext d=3, input='+'\n" +
+					 "line 1:1 reportContextSensitivity d=3, input='+'\n" +
+					 "line 1:3 reportAttemptingFullContext d=3, input='*'\n" +
+					 "line 1:3 reportAmbiguity d=3: ambigAlts={1..2}, input='*'\n",
+					 stderrDuringParse);
+
+		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
+		assertEquals("line 1:2 reportAttemptingFullContext d=3, input='+'\n" +
+					 "line 1:2 reportContextSensitivity d=3, input='+'\n" +
+					 "line 1:5 reportAttemptingFullContext d=3, input='*'\n" +
+					 "line 1:5 reportContextSensitivity d=3, input='*'\n",
+					 stderrDuringParse);
+	}
+
 	public void runTests(String grammar, String[] tests, String startRule) {
-		rawGenerateAndBuildRecognizer("T.g", grammar, "TParser", "TLexer");
+		rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
 								  "TLexer",
 								  startRule,

@@ -28,22 +28,48 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.util.*;
-import java.util.logging.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TestPerformance extends BaseTest {
     /** Parse all java files under this package within the JDK_SOURCE_ROOT. */
@@ -52,8 +78,8 @@ public class TestPerformance extends BaseTest {
     private static final boolean RECURSIVE = true;
 
     /**
-     *  True to use the Java grammar with expressions in the v4 left-recursive syntax (Java-LR.g). False to use
-     *  the standard grammar (Java.g). In either case, the grammar is renamed in the temporary directory to Java.g
+     *  True to use the Java grammar with expressions in the v4 left-recursive syntax (Java-LR.g4). False to use
+     *  the standard grammar (Java.g4). In either case, the grammar is renamed in the temporary directory to Java.g4
      *  before compiling.
      */
     private static final boolean USE_LR_GRAMMAR = true;
@@ -395,8 +421,8 @@ public class TestPerformance extends BaseTest {
     }
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
-        String grammarFileName = "Java.g";
-        String sourceName = leftRecursive ? "Java-LR.g" : "Java.g";
+        String grammarFileName = "Java.g4";
+        String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
         String body = load(sourceName, null);
         @SuppressWarnings({"ConstantConditions"})
         List<String> extraOptions = new ArrayList<String>();
@@ -407,7 +433,7 @@ public class TestPerformance extends BaseTest {
             extraOptions.add("-atn");
         }
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", extraOptionsArray);
+        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
         assertTrue(success);
     }
 
@@ -513,7 +539,7 @@ public class TestPerformance extends BaseTest {
         void parseFile(CharStream input);
     }
 
-	private static class DescriptiveErrorListener implements ANTLRErrorListener<Token> {
+	private static class DescriptiveErrorListener extends BaseErrorListener<Token> {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override

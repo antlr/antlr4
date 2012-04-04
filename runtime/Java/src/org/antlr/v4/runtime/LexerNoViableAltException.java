@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Utils;
 
 public class LexerNoViableAltException extends RecognitionException {
@@ -57,7 +58,7 @@ public class LexerNoViableAltException extends RecognitionException {
 	public String toString() {
 		String symbol = "";
 		if (startIndex >= 0 && startIndex < input.size()) {
-			symbol = getInputStream().substring(startIndex, startIndex);
+			symbol = getInputStream().getText(Interval.of(startIndex,startIndex));
 			symbol = Utils.escapeWhitespace(symbol, false);
 		}
 

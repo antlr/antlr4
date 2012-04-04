@@ -43,7 +43,7 @@ public class TestParserExec extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "abc 34", false);
 		assertEquals("", found);
 		assertEquals(null, stderrDuringParse);
@@ -52,12 +52,12 @@ public class TestParserExec extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID INT {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : ID INT {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "abc 34", false);
 		assertEquals("abc34\n", found);
 	}
@@ -72,7 +72,7 @@ public class TestParserExec extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "34", false);
 		assertEquals("alt 2\n", found);
 	}
@@ -80,11 +80,11 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : ID+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
 		assertEquals("abc\n", found);
 	}
@@ -93,11 +93,11 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|ID)+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
 		assertEquals("abc\n", found);
 	}
@@ -105,14 +105,14 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : ID* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "", false);
 		assertEquals("\n", found);
-		found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
 		assertEquals("abc\n", found);
 	}
@@ -121,14 +121,14 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|ID)* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "", false);
 		assertEquals("\n", found);
-		found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
 		assertEquals("abc\n", found);
 	}
@@ -136,12 +136,12 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|INT{;})+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a 34 c", false);
 		assertEquals("a34c\n", found);
 	}
@@ -149,15 +149,15 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|INT{;})* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "", false);
 		assertEquals("\n", found);
-		found = execParser("T.g", grammar, "TParser", "TLexer", "a",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a 34 c", false);
 		assertEquals("a34c\n", found);
 	}
@@ -175,19 +175,19 @@ public class TestParserExec extends BaseTest {
 			"a : 'a' s ('b' s)?;\n"
 			;
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s", "x", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s", "axbx", false);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "axbx", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s", "ax", false);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "ax", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s", "aaxbx", false);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "aaxbx", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -207,7 +207,7 @@ public class TestParserExec extends BaseTest {
 			"WS : (' ' | '\\t')+ -> skip;\n"
 			;
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "stmt",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stmt",
 								  "if x if x a else b", true);
 		String expecting = "";
 		assertEquals(expecting, found);

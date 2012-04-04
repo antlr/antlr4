@@ -49,6 +49,7 @@ public class Lexer extends OutputModelObject {
 	public String[] tokenNames;
 	public Set<String> ruleNames;
 	public Collection<String> modes;
+	public boolean abstractRecognizer;
 
 	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
@@ -89,6 +90,7 @@ public class Lexer extends OutputModelObject {
             }
         }
 		ruleNames = g.rules.keySet();
+		abstractRecognizer = g.isAbstract();
 	}
 
 }

@@ -29,7 +29,15 @@
 
 package org.antlr.v4.runtime.misc;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -45,9 +53,13 @@ import java.lang.reflect.Method;
  *        [-print]
  *        [-tokens] [-gui] [-ps file.ps]
  *        [-trace]
+ *        [-diagnostics]
  *        [input-filename]
  */
 public class TestRig {
+
+	public static final String LEXER_START_RULE_NAME = "tokens";
+
 	public static void main(String[] args) throws Exception {
 		String grammarName;
 		String startRuleName;
@@ -57,11 +69,15 @@ public class TestRig {
 		String psFile = null;
 		boolean showTokens = false;
 		boolean trace = false;
+		boolean diagnostics = false;
 		String encoding = null;
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName" +
-							   " [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname] [-trace]"+
-							   " [input-filename]");
+			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
+							   "  [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
+							   "  [-trace] [-diagnostics]\n"+
+							   "  [input-filename]");
+			System.err.println("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
+			System.err.println("Omitting input-filename makes rig read from stdin.");
 			return;
 		}
 		int i=0;
@@ -88,6 +104,9 @@ public class TestRig {
 			else if ( arg.equals("-trace") ) {
 				trace = true;
 			}
+			else if ( arg.equals("-diagnostics") ) {
+				diagnostics = true;
+			}
 			else if ( arg.equals("-encoding") ) {
 				if ( i>=args.length ) {
 					System.err.println("missing encoding on -encoding");
@@ -107,15 +126,10 @@ public class TestRig {
 		}
 //		System.out.println("exec "+grammarName+"."+startRuleName);
 		String lexerName = grammarName+"Lexer";
-		String parserName = grammarName+"Parser";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class lexerClass = cl.loadClass(lexerName);
 		if ( lexerClass==null ) {
 			System.err.println("Can't load "+lexerName);
-		}
-		Class parserClass = cl.loadClass(parserName);
-		if ( parserClass==null ) {
-			System.err.println("Can't load "+parserName);
 		}
 
 		InputStream is = System.in;
@@ -144,10 +158,17 @@ public class TestRig {
 				}
 			}
 
+			if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
+
+			String parserName = grammarName+"Parser";
+			Class parserClass = cl.loadClass(parserName);
+			if ( parserClass==null ) {
+				System.err.println("Can't load "+parserName);
+			}
 			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			Parser parser = parserCtor.newInstance(tokens);
 
-			parser.setErrorHandler(new DiagnosticErrorStrategy());
+			if ( diagnostics ) parser.addErrorListener(new DiagnosticErrorListener());
 
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);

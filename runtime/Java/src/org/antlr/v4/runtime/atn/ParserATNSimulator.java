@@ -34,10 +34,11 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.SymbolStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -285,7 +286,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public void reset() {
 	}
 
-	public int adaptivePredict(@NotNull SymbolStream<? extends Symbol> input, int decision,
+	public int adaptivePredict(@NotNull TokenStream input, int decision,
 							   @Nullable ParserRuleContext<?> outerContext)
 	{
 		predict_calls++;
@@ -311,7 +312,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull SymbolStream<? extends Symbol> input,
+	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -343,7 +344,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
+					   @NotNull TokenStream input, int startIndex,
                        @Nullable ParserRuleContext<?> outerContext)
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -396,8 +397,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt;
 				if ( dfa_debug ) {
+					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
 					System.out.println("ATN exec upon "+
-                                       parser.getInputString(startIndex) +
+									   parser.getTokenStream().getText(interval) +
 									   " at DFA state "+s.stateNumber);
 				}
 
@@ -499,7 +501,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
+					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext<?> outerContext)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
@@ -626,7 +628,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ATNConfigSet execATNWithFullContext(DFA dfa,
 											   DFAState D, // how far we got before failing over
 											   @NotNull ATNConfigSet s0,
-											   @NotNull SymbolStream<? extends Symbol> input, int startIndex,
+											   @NotNull TokenStream input, int startIndex,
 											   ParserRuleContext<?> outerContext,
 											   int nalts,
 											   boolean greedy)
@@ -960,7 +962,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
 			else if ( config.state.getClass()==LoopEndState.class ) {
-				if ( debug ) System.out.println("Loop end; pop, stack="+config.context);
+				if ( debug ) System.out.println("Loop end; pop, stack=" + config.context);
 				RuleContext p = config.context;
 				LoopEndState end = (LoopEndState) config.state;
 				while ( !p.isEmpty() && p.invokingState == end.loopBackStateNumber ) {
@@ -1293,7 +1295,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return String.valueOf(t);
 	}
 
-	public String getLookaheadName(SymbolStream<? extends Symbol> input) {
+	public String getLookaheadName(TokenStream input) {
 		return getTokenName(input.LA(1));
 	}
 
@@ -1318,7 +1320,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull SymbolStream<? extends Symbol> input,
+	public NoViableAltException noViableAlt(@NotNull TokenStream input,
 											@NotNull ParserRuleContext<?> outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
@@ -1405,18 +1407,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
-            System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
-                               ", input="+parser.getInputString(startIndex, stopIndex));
+			Interval interval = Interval.of(startIndex, stopIndex);
+			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
+                               ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
     }
 
 	public void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
+			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
-                               ", input="+parser.getInputString(startIndex, stopIndex));
+                               ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
@@ -1441,11 +1445,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //				}
 //				i++;
 //			}
+			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAmbiguity "+
 							   ambigAlts+":"+configs+
-                               ", input="+parser.getInputString(startIndex, stopIndex));
+                               ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorHandler().reportAmbiguity(parser, dfa, startIndex, stopIndex,
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);
     }
 }

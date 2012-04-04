@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -195,7 +197,11 @@ public class UnbufferedCharStream implements CharStream {
     }
 
     @Override
-    public String substring(int start, int stop) {
-        return null; // map to buffer indexes
+    public String getText(Interval interval) {
+		if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n) {
+			throw new UnsupportedOperationException();
+		}
+
+		return new String(data, interval.a, interval.length());
     }
 }

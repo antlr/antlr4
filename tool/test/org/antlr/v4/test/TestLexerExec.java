@@ -7,7 +7,7 @@ public class TestLexerExec extends BaseTest {
    		String grammar =
    			"lexer grammar L;\n"+
    			"QUOTE : '\"' ;\n"; // make sure this compiles
-   		String found = execLexer("L.g", grammar, "L", "\"");
+   		String found = execLexer("L.g4", grammar, "L", "\"");
    		String expecting =
    			"[@0,0:0='\"',<3>,1:0]\n" +
             "[@1,1:0='<EOF>',<-1>,1:1]\n";
@@ -20,7 +20,7 @@ public class TestLexerExec extends BaseTest {
    			"A : '-' I ;\n" +
    			"I : '0'..'9'+ ;\n"+
    			"WS : (' '|'\\n') {skip();} ;";
-   		String found = execLexer("L.g", grammar, "L", "34 -21 3");
+   		String found = execLexer("L.g4", grammar, "L", "34 -21 3");
    		String expecting =
    			"[@0,0:1='34',<4>,1:0]\n" +
    			"[@1,3:5='-21',<3>,1:3]\n" +
@@ -34,7 +34,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
-		String found = execLexer("L.g", grammar, "L", "34 34");
+		String found = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -49,7 +49,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "34 34");
+		String found = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -64,7 +64,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : '#' -> more ;";
-		String found = execLexer("L.g", grammar, "L", "34#10");
+		String found = execLexer("L.g4", grammar, "L", "34#10");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -79,7 +79,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"HASH : '#' -> type(HASH) ;";
-		String found = execLexer("L.g", grammar, "L", "34#");
+		String found = execLexer("L.g4", grammar, "L", "34#");
 		String expecting =
 			"I\n" +
 			"[@0,0:1='34',<3>,1:0]\n" +
@@ -93,7 +93,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"HASH : '#' -> type(HASH), skip, more  ;";
-		String found = execLexer("L.g", grammar, "L", "34#11");
+		String found = execLexer("L.g4", grammar, "L", "34#11");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -111,7 +111,7 @@ public class TestLexerExec extends BaseTest {
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' {popMode();} ;\n"+
 			"ANY : . {more();} ;\n";
-		String found = execLexer("L.g", grammar, "L", "\"abc\" \"ab\"");
+		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
 			"[@0,0:4='\"abc\"',<5>,1:0]\n" +
 			"[@1,6:9='\"ab\"',<5>,1:6]\n" +
@@ -127,7 +127,7 @@ public class TestLexerExec extends BaseTest {
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> popMode ;\n"+
 			"ANY : . -> more ;\n";
-		String found = execLexer("L.g", grammar, "L", "\"abc\" \"ab\"");
+		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
 			"[@0,0:4='\"abc\"',<5>,1:0]\n" +
 			"[@1,6:9='\"ab\"',<5>,1:6]\n" +
@@ -143,7 +143,7 @@ public class TestLexerExec extends BaseTest {
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+
 			"ANY : . -> more ;\n";
-		String found = execLexer("L.g", grammar, "L", "\"abc\" \"ab\"");
+		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
 			"[@0,0:4='\"abc\"',<5>,1:0]\n" +
 			"[@1,6:9='\"ab\"',<5>,1:6]\n" +
@@ -157,7 +157,7 @@ public class TestLexerExec extends BaseTest {
 			"KEND : 'end' ;\n" + // has priority
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\n')+ ;";
-		String found = execLexer("L.g", grammar, "L", "end eend ending a");
+		String found = execLexer("L.g4", grammar, "L", "end eend ending a");
 		String expecting =
 			"[@0,0:2='end',<3>,1:0]\n" +
 			"[@1,3:3=' ',<5>,1:3]\n" +
@@ -180,7 +180,7 @@ public class TestLexerExec extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;\n" +
 			"WS : (' '|'\n')+ ;";
-		String found = execLexer("L.g", grammar, "L", "x 0 1 a.b a.l");
+		String found = execLexer("L.g4", grammar, "L", "x 0 1 a.b a.l");
 		String expecting =
 			"[@0,0:0='x',<7>,1:0]\n" +
 			"[@1,1:1=' ',<8>,1:1]\n" +
@@ -205,7 +205,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n" +
 			"DONE : EOF ;\n" +
 			"A : 'a';\n";
-		String found = execLexer("L.g", grammar, "L", "");
+		String found = execLexer("L.g4", grammar, "L", "");
 		String expecting =
 			"[@0,0:-1='<EOF>',<3>,1:0]\n" +
 			"[@1,0:-1='<EOF>',<-1>,1:0]\n";
@@ -218,12 +218,12 @@ public class TestLexerExec extends BaseTest {
 			"A : 'a' EOF ;\n"+
 			"B : 'a';\n"+
 			"C : 'c';\n";
-		String found = execLexer("L.g", grammar, "L", "");
+		String found = execLexer("L.g4", grammar, "L", "");
 		String expecting =
 			"[@0,0:-1='<EOF>',<-1>,1:0]\n";
 		assertEquals(expecting, found);
 
-		found = execLexer("L.g", grammar, "L", "a");
+		found = execLexer("L.g4", grammar, "L", "a");
 		expecting =
 			"[@0,0:0='a',<3>,1:0]\n" +
 			"[@1,1:0='<EOF>',<-1>,1:1]\n";
@@ -235,7 +235,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D] -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "34\r\n 34");
+		String found = execLexer("L.g4", grammar, "L", "34\r\n 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -250,7 +250,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "34\r\n 34");
+		String found = execLexer("L.g4", grammar, "L", "34\r\n 34");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -265,7 +265,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : ~[ab \n] ~[ \ncd]* {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "xaf");
+		String found = execLexer("L.g4", grammar, "L", "xaf");
 		String expecting =
 			"I\n" +
 			"[@0,0:2='xaf',<3>,1:0]\n" +
@@ -278,7 +278,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : (~[ab \n]|'a') {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "a x");
+		String found = execLexer("L.g4", grammar, "L", "a x");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -294,7 +294,7 @@ public class TestLexerExec extends BaseTest {
 			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
 			"ID : [a-zA-Z] [a-zA-Z0-9]* {System.out.println(\"ID\");} ;\n"+
 			"WS : [ \\n\\u0009\r]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "34\r 34 a2 abc \n   ");
+		String found = execLexer("L.g4", grammar, "L", "34\r 34 a2 abc \n   ");
 		String expecting =
 			"I\n" +
 			"I\n" +
@@ -313,7 +313,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : [0-]+ {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "00\r\n");
+		String found = execLexer("L.g4", grammar, "L", "00\r\n");
 		String expecting =
 			"I\n" +
 			"[@0,0:1='00',<3>,1:0]\n" +
@@ -326,7 +326,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\u]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "34 ");
+		String found = execLexer("L.g4", grammar, "L", "34 ");
 		String expecting =
 			"I\n" +
 			"[@0,0:1='34',<3>,1:0]\n" +
@@ -339,7 +339,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"DASHBRACK : [\\-\\]]+ {System.out.println(\"DASHBRACK\");} ;\n"+
 			"WS : [ \\u]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "- ] ");
+		String found = execLexer("L.g4", grammar, "L", "- ] ");
 		String expecting =
 			"DASHBRACK\n" +
 			"DASHBRACK\n" +
@@ -354,7 +354,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"A : [z-a9]+ {System.out.println(\"A\");} ;\n"+
 			"WS : [ \\u]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "9");
+		String found = execLexer("L.g4", grammar, "L", "9");
 		String expecting =
 			"A\n" +
 			"[@0,0:0='9',<3>,1:0]\n" +
@@ -367,7 +367,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"A : [\"a-z]+ {System.out.println(\"A\");} ;\n"+
 			"WS : [ \n\t]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "b\"a");
+		String found = execLexer("L.g4", grammar, "L", "b\"a");
 		String expecting =
 			"A\n" +
 			"[@0,0:2='b\"a',<3>,1:0]\n" +
@@ -380,7 +380,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"A : [\"\\\\ab]+ {System.out.println(\"A\");} ;\n"+
 			"WS : [ \n\t]+ -> skip ;";
-		String found = execLexer("L.g", grammar, "L", "b\"\\a");
+		String found = execLexer("L.g4", grammar, "L", "b\"\\a");
 		String expecting =
 			"A\n" +
 			"[@0,0:3='b\"\\a',<3>,1:0]\n" +

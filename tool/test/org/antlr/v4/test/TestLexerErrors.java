@@ -37,7 +37,7 @@ public class TestLexerErrors extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"A : 'a' 'b' ;\n";
-		String tokens = execLexer("L.g", grammar, "L", "x");
+		String tokens = execLexer("L.g4", grammar, "L", "x");
 		String expectingTokens =
 			"[@0,1:0='<EOF>',<-1>,1:1]\n";
 		assertEquals(expectingTokens, tokens);
@@ -50,7 +50,7 @@ public class TestLexerErrors extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"A : 'a' 'b' ;\n";
-		String tokens = execLexer("L.g", grammar, "L", "abx");
+		String tokens = execLexer("L.g4", grammar, "L", "abx");
 		String expectingTokens =
 			"[@0,0:1='ab',<3>,1:0]\n" +
 			"[@1,3:2='<EOF>',<-1>,1:3]\n";
@@ -64,7 +64,7 @@ public class TestLexerErrors extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"A : 'a' 'b' ;\n";
-		String tokens = execLexer("L.g", grammar, "L", "ax");
+		String tokens = execLexer("L.g4", grammar, "L", "ax");
 		String expectingTokens =
 			"[@0,2:1='<EOF>',<-1>,1:2]\n";
 		assertEquals(expectingTokens, tokens);
@@ -77,7 +77,7 @@ public class TestLexerErrors extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"A : 'a' 'b' ;\n";
-		String tokens = execLexer("L.g", grammar, "L", "abax");
+		String tokens = execLexer("L.g4", grammar, "L", "abax");
 		String expectingTokens =
 			"[@0,0:1='ab',<3>,1:0]\n" +
 			"[@1,4:3='<EOF>',<-1>,1:4]\n";
@@ -95,7 +95,7 @@ public class TestLexerErrors extends BaseTest {
 		// The first ab caches the DFA then abx goes through the DFA but
 		// into the ATN for the x, which fails. Must go back into DFA
 		// and return to previous dfa accept state
-		String tokens = execLexer("L.g", grammar, "L", "ababx");
+		String tokens = execLexer("L.g4", grammar, "L", "ababx");
 		String expectingTokens =
 			"[@0,0:1='ab',<3>,1:0]\n" +
 			"[@1,2:3='ab',<3>,1:2]\n" +
@@ -116,7 +116,7 @@ public class TestLexerErrors extends BaseTest {
 		// into the ATN for the c.  It marks that hasn't except state
 		// and then keeps going in the ATN. It fails on the x, but
 		// uses the previous accepted in the ATN not DFA
-		String tokens = execLexer("L.g", grammar, "L", "ababcx");
+		String tokens = execLexer("L.g4", grammar, "L", "ababcx");
 		String expectingTokens =
 			"[@0,0:1='ab',<3>,1:0]\n" +
 			"[@1,2:4='abc',<4>,1:2]\n" +
@@ -131,7 +131,7 @@ public class TestLexerErrors extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"A : 'abc' ;\n";
-		String tokens = execLexer("L.g", grammar, "L", "abx");
+		String tokens = execLexer("L.g4", grammar, "L", "abx");
 		String expectingTokens =
 			"[@0,3:2='<EOF>',<-1>,1:3]\n";
 		assertEquals(expectingTokens, tokens);
@@ -141,5 +141,30 @@ public class TestLexerErrors extends BaseTest {
 	}
 
 	// TEST RECOVERY
+
+	/**
+	 * This is a regression test for #45 "NullPointerException in LexerATNSimulator.execDFA".
+	 * https://github.com/antlr/antlr4/issues/46
+	 */
+	@Test
+	public void testLexerExecDFA() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : ID ':' expr;\n" +
+			"expr : primary expr? {} | expr '->' ID;\n" +
+			"primary : ID;\n" +
+			"ID : [a-z]+;\n" +
+			"\n";
+		String result = execLexer("T.g4", grammar, "TLexer", "x : x", false);
+		String expecting =
+			"[@0,0:0='x',<5>,1:0]\n" +
+			"[@1,2:2=':',<4>,1:2]\n" +
+			"[@2,4:4='x',<5>,1:4]\n" +
+			"[@3,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, result);
+		assertEquals("line 1:1 token recognition error at: ' '\n" +
+					 "line 1:3 token recognition error at: ' '\n",
+					 this.stderrDuringParse);
+	}
 
 }
