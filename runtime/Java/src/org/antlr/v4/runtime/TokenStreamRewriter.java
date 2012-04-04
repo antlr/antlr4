@@ -69,25 +69,28 @@ import java.util.Map;
  *  If you don't use named rewrite streams, a "default" stream is used as
  *  the first example shows.
  */
-public class TokenStreamRewriter {
+public class TokenStreamRewriter<Symbol extends Token> {
 	public static final String DEFAULT_PROGRAM_NAME = "default";
     public static final int PROGRAM_INIT_SIZE = 100;
 	public static final int MIN_TOKEN_INDEX = 0;
 
 	// Define the rewrite operation hierarchy
 
-	public class RewriteOperation {
+	public static class RewriteOperation {
+		protected final BufferedTokenStream<?> tokens;
         /** What index into rewrites List are we? */
         protected int instructionIndex;
         /** Token buffer index. */
         protected int index;
 		protected Object text;
 
-		protected RewriteOperation(int index) {
+		protected RewriteOperation(BufferedTokenStream<?> tokens, int index) {
+			this.tokens = tokens;
 			this.index = index;
 		}
 
-		protected RewriteOperation(int index, Object text) {
+		protected RewriteOperation(BufferedTokenStream<?> tokens, int index, Object text) {
+			this.tokens = tokens;
 			this.index = index;
 			this.text = text;
 		}
@@ -108,9 +111,9 @@ public class TokenStreamRewriter {
 		}
 	}
 
-	class InsertBeforeOp extends RewriteOperation {
-		public InsertBeforeOp(int index, Object text) {
-			super(index,text);
+	static class InsertBeforeOp extends RewriteOperation {
+		public InsertBeforeOp(BufferedTokenStream<?> tokens, int index, Object text) {
+			super(tokens,index,text);
 		}
 
 		@Override
@@ -126,10 +129,10 @@ public class TokenStreamRewriter {
 	/** I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
 	 *  instructions.
 	 */
-	class ReplaceOp extends RewriteOperation {
+	static class ReplaceOp extends RewriteOperation {
 		protected int lastIndex;
-		public ReplaceOp(int from, int to, Object text) {
-			super(from,text);
+		public ReplaceOp(BufferedTokenStream<?> tokens, int from, int to, Object text) {
+			super(tokens, from,text);
 			lastIndex = to;
 		}
 		@Override
@@ -151,7 +154,7 @@ public class TokenStreamRewriter {
 	}
 
 	/** Our source stream */
-	protected final BufferedTokenStream tokens;
+	protected final BufferedTokenStream<? extends Symbol> tokens;
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
@@ -162,7 +165,7 @@ public class TokenStreamRewriter {
 	/** Map String (program name) -> Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
-	public TokenStreamRewriter(BufferedTokenStream tokens) {
+	public TokenStreamRewriter(BufferedTokenStream<? extends Symbol> tokens) {
 		this.tokens = tokens;
 		programs = new HashMap<String, List<RewriteOperation>>();
 		programs.put(DEFAULT_PROGRAM_NAME,
@@ -224,7 +227,7 @@ public class TokenStreamRewriter {
 	}
 
 	public void insertBefore(String programName, int index, Object text) {
-		RewriteOperation op = new InsertBeforeOp(index,text);
+		RewriteOperation op = new InsertBeforeOp(tokens,index,text);
 		List<RewriteOperation> rewrites = getProgram(programName);
         op.instructionIndex = rewrites.size();
         rewrites.add(op);
@@ -250,7 +253,7 @@ public class TokenStreamRewriter {
 		if ( from > to || from<0 || to<0 || to >= tokens.size() ) {
 			throw new IllegalArgumentException("replace: range invalid: "+from+".."+to+"(size="+tokens.size()+")");
 		}
-		RewriteOperation op = new ReplaceOp(from, to, text);
+		RewriteOperation op = new ReplaceOp(tokens, from, to, text);
 		List<RewriteOperation> rewrites = getProgram(programName);
         op.instructionIndex = rewrites.size();
         rewrites.add(op);
@@ -553,7 +556,7 @@ public class TokenStreamRewriter {
 			RewriteOperation op = rewrites.get(i);
 			if ( op==null ) continue; // ignore deleted
 			if ( kind.isInstance(op) ) {
-				ops.add((T)op);
+				ops.add(kind.cast(op));
 			}
 		}
 		return ops;
