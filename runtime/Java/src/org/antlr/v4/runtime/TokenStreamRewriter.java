@@ -154,7 +154,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	}
 
 	/** Our source stream */
-	protected final BufferedTokenStream<? extends Symbol> tokens;
+	protected final TokenStream<? extends Symbol> tokens;
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
@@ -165,12 +165,16 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	/** Map String (program name) -> Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
-	public TokenStreamRewriter(BufferedTokenStream<? extends Symbol> tokens) {
+	public TokenStreamRewriter(TokenStream<? extends Symbol> tokens) {
 		this.tokens = tokens;
 		programs = new HashMap<String, List<RewriteOperation>>();
 		programs.put(DEFAULT_PROGRAM_NAME,
 					 new ArrayList<RewriteOperation>(PROGRAM_INIT_SIZE));
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
+	}
+
+	public final TokenStream getTokenStream() {
+		return tokens;
 	}
 
 	public void rollback(int instructionIndex) {
@@ -318,15 +322,6 @@ public class TokenStreamRewriter<Symbol extends Token> {
 		List<RewriteOperation> is = new ArrayList<RewriteOperation>(PROGRAM_INIT_SIZE);
 		programs.put(name, is);
 		return is;
-	}
-
-	public String getOriginalText() {
-		return tokens.getText();
-	}
-
-	/** The text collected from all tokens in the input token stream */
-	public String getOriginalText(Interval interval) {
-		return tokens.getText(interval);
 	}
 
 	/** Return the text from the original tokens altered per the
