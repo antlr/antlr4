@@ -170,7 +170,7 @@ public class TokenStreamRewriter {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public final TokenStream getSource() {
+	public final TokenStream getTokenStream() {
 		return tokens;
 	}
 
