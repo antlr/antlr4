@@ -503,7 +503,10 @@ public abstract class BaseTest {
 	{
 		boolean allIsWell =
 			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
-		boolean ok;
+		if (!allIsWell) {
+			return false;
+		}
+
 		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
 			files.add(lexerName+".java");
@@ -521,8 +524,7 @@ public abstract class BaseTest {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
 			}
 		}
-		ok = compile(files.toArray(new String[files.size()]));
-		if ( !ok ) { allIsWell = false; }
+		allIsWell = compile(files.toArray(new String[files.size()]));
 		return allIsWell;
 	}
 
