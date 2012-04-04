@@ -34,7 +34,7 @@ public class TestSymbolIssues extends BaseTest {
     static String[] B = {
         // INPUT
         "parser grammar B;\n" +
-        "tokens { X='x'; Y; }\n" +
+        "tokens { ID; FOO; X='x'; Y; }\n" +
         "\n" +
         "a : s=ID b+=ID X=ID '.' ;\n" +
         "\n" +
@@ -42,16 +42,18 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "s : FOO ;",
         // YIELDS
-        "error(59): B.g4:2:9: can't assign string value to token name X in non-combined grammar\n" +
+        "error(59): B.g4:2:18: can't assign string value to token name X in non-combined grammar\n" +
 		"error(69): B.g4:4:4: label s conflicts with rule with same name\n" +
 		"error(69): B.g4:4:9: label b conflicts with rule with same name\n" +
 		"error(70): B.g4:4:15: label X conflicts with token with same name\n" +
-		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n"
+		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n" +
+		"error(126): B.g4:4:20: cannot create implicit token for string literal '.' in non-combined grammar\n"
     };
 
     static String[] D = {
         // INPUT
         "parser grammar D;\n" +
+		"tokens{ID;}\n" +
         "a[int j] \n" +
         "        :       i=ID j=ID ;\n" +
         "\n" +
@@ -61,8 +63,8 @@ public class TestSymbolIssues extends BaseTest {
         "        :       ID ;",
 
         // YIELDS
-        "error(72): D.g4:3:21: label j conflicts with rule a's return value or parameter with same name\n" +
-		"error(76): D.g4:5:0: rule b's argument i conflicts a return value with same name\n"
+        "error(72): D.g4:4:21: label j conflicts with rule a's return value or parameter with same name\n" +
+		"error(76): D.g4:6:0: rule b's argument i conflicts a return value with same name\n"
     };
 
 	static String[] E = {
