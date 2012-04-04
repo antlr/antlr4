@@ -35,19 +35,19 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoopOnEndIsNop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"any : .* ;\n"+
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n')+ {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", true);
 		assertEquals("x\n" +
 					 "Decision 0:\n" +
 					 "s0-ID->:s1=>2\n", found);
 		assertEquals(null, this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "34 x", true);
 		assertEquals("34x\n" +
 					 "Decision 0:\n" +
@@ -58,12 +58,12 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyPlusLoopOnEndIsNop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : any ID EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"any : .+ ;\n"+ // .+ on end of rule always gives no viable alt. can't bypass but can't match
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n')+ {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", true);
 		assertEquals("x\n" +
 					 "Decision 0:\n" +
@@ -80,7 +80,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n')+ {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
@@ -91,7 +91,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-ID->:s1=>2\n", found);
 		assertEquals(null, this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   "34", true);
 		assertEquals("alt 2\n" +
 					 "Decision 0:\n" +
@@ -102,7 +102,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-INT->:s1=>2\n", found);
 		assertEquals(null, this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   "34 x", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
@@ -125,7 +125,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n')+ {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "2 3 x", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
@@ -139,7 +139,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-ID->:s2=>2\n", found);
 		assertEquals(null, this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   "2 3", true);
 		assertEquals("alt 2\n" +
 					 "Decision 0:\n" +
@@ -151,7 +151,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-INT->:s1=>2\n", found);
 		assertEquals("line 1:0 no viable alternative at input '2'\n", this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   "a b c 3", true);
 		assertEquals("alt 2\n" +
 					 "Decision 0:\n" +
@@ -176,34 +176,27 @@ public class TestNonGreedyLoops extends BaseTest {
 			"INT : '0'..'9'+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n')+ {skip();} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
-					 "s0-ID->:s1=>1\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>2\n", found);
-		assertEquals("line 1:0 extraneous input 'x' expecting <EOF>\n", this.stderrDuringParse);
+					 "s0-ID->:s1=>1\n", found);
+		assertNull(this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   "34", true);
 		assertEquals("alt 1\n" +
 					 "Decision 0:\n" +
 					 "s0-INT->s1\n" +
-					 "s1-EOF->:s2=>1\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-INT->:s1=>2\n", found);  // resolves INT EOF to alt 1 from s since ambig 'tween a and b
-		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}:[(1,1,[]), (1,2,[])],conflictingAlts={1..2}, input='34'\n" +
-					 "line 1:0 extraneous input '34' expecting <EOF>\n",
+					 "s1-EOF->:s2=>1\n", found);  // resolves INT EOF to alt 1 from s since ambig 'tween a and b
+		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}, input='34'\n",
 					 this.stderrDuringParse);
 	}
 
 	@Test public void testNongreedyLoopCantSeeEOF() throws Exception {
 		String grammar =
 		"grammar T;\n" +
-		"s @after {dumpDFA();} : block EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+		"s @after {dumpDFA();} : block EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 		"block : '{' .* '}' ;\n"+
 		"EQ : '=' ;\n" +
 		"INT : '0'..'9'+ ;\n" +
@@ -211,14 +204,14 @@ public class TestNonGreedyLoops extends BaseTest {
 		"WS : (' '|'\\n')+ {skip();} ;\n";
 		String input =
 			"{ }";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("{}\n" +
 					 "Decision 0:\n" +
 					 "s0-'}'->:s1=>2\n", found);
 		input =
 			"{a b { }";
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("{ab{}\n" +
 					 "Decision 0:\n" +
@@ -227,7 +220,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-ID->:s1=>1\n", found);
 		input =
 			"{ } a 2 { }"; // FAILS to match since it terminates loop at first { }
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("", found); // should not print output; resync kills rest of input til '}' then returns normally
 	}
@@ -235,7 +228,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ifstat : 'if' '(' .* ')' block ;\n" +
 			"block : '{' '}' ;\n"+
 			"EQ : '=' ;\n" +
@@ -244,7 +237,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"WS : (' '|'\\n')+ {skip();} ;\n";
 		String input =
 			"if ( x=34 ) { } ;";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("if(x=34){};\n" +
 					 "Decision 0:\n" +
@@ -256,7 +249,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-'}'->:s4=>2\n", found);
 		input =
 			"if ( ))) ) { } ;";
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("if()))){};\n" +
 					 "Decision 0:\n" +
@@ -266,7 +259,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-'}'->:s4=>2\n", found);
 		input =
 			"if (() { } a 2) { } ;";  // The first { } should match block so should stop
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("", found); // should not finish to print output
 	}
@@ -274,7 +267,7 @@ public class TestNonGreedyLoops extends BaseTest {
 	@Test public void testNongreedyLoopPassingThroughAnotherNongreedy() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : ifstat ';' EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ifstat : 'if' '(' .* ')' block ;\n" +
 			"block : '{' (block|.)* '}' ;\n"+
 			"EQ : '=' ;\n" +
@@ -283,7 +276,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"WS : (' '|'\\n')+ {skip();} ;\n";
 		String input =
 			"if ( x=34 ) { {return a} b 34 } ;";
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("if(x=34){{returna}b34};\n" +
 					 "Decision 0:\n" +
@@ -309,7 +302,7 @@ public class TestNonGreedyLoops extends BaseTest {
 
 		input =
 			"if ( ()) ) { {return a} b 34 } ;";
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("if(())){{returna}b34};\n" +
 					 "Decision 0:\n" +
@@ -337,7 +330,7 @@ public class TestNonGreedyLoops extends BaseTest {
 		// EOF on end means LL(*) can identify when to stop the loop.
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : stat* ID '=' ID ';' EOF {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : stat* ID '=' ID ';' EOF {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"stat : 'if' '(' INT ')' stat\n" +
 			"     | 'return' INT ';'\n" +
 			"     | ID '=' (INT|ID) ';'\n" +
@@ -351,7 +344,7 @@ public class TestNonGreedyLoops extends BaseTest {
 		String input =
 			"x=1; a=b;";
 		String found = null;
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("x=1;a=b;\n" +
 					 "Decision 0:\n" +
@@ -360,13 +353,10 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s2-INT->:s3=>1\n" +
 					 "s2-ID->s4\n" +
 					 "s4-';'->s5\n" +
-					 "s5-EOF->:s6=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>3\n", found);
+					 "s5-EOF->:s6=>2\n", found);
 		input =
 			"if ( 1 ) { x=3; { return 4; } } return 99; abc=def;";
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   input, true);
 		assertEquals("if(1){x=3;{return4;}}return99;abc=def;\n" +
 					 "Decision 0:\n" +
@@ -376,22 +366,10 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-'='->s4\n" +
 					 "s4-ID->s5\n" +
 					 "s5-';'->s6\n" +
-					 "s6-EOF->:s7=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'{'->:s2=>4\n" +
-					 "s0-'if'->:s1=>1\n" +
-					 "s0-'return'->:s4=>2\n" +
-					 "s0-ID->:s3=>3\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-'{'->:s2=>1\n" +
-					 "s0-'return'->:s3=>1\n" +
-					 "s0-'}'->:s4=>2\n" +
-					 "s0-ID->:s1=>1\n", found);
+					 "s6-EOF->:s7=>2\n", found);
 		input =
 		"x=1; a=3;"; // FAILS to match since it can't match last element
-		execParser("T.g", grammar, "TParser", "TLexer", "s",
+		execParser("T.g4", grammar, "TParser", "TLexer", "s",
 				   input, true);
 		// can't match EOF to ID '=' '3' ';'
 		assertEquals("line 1:9 no viable alternative at input '<EOF>'\n",
@@ -399,7 +377,7 @@ public class TestNonGreedyLoops extends BaseTest {
 
 		input =
 		"x=1; a=b; z=3;"; // FAILS to match since it can't match last element
-		execParser("T.g", grammar, "TParser", "TLexer", "s",
+		execParser("T.g4", grammar, "TParser", "TLexer", "s",
 				   input, true);
 		assertEquals("line 1:14 no viable alternative at input '<EOF>'\n",
 					 this.stderrDuringParse);
@@ -414,7 +392,7 @@ public class TestNonGreedyLoops extends BaseTest {
 			"grammar T;\n" +
 			"random : s ;" + // call s so s isn't followed by EOF directly
 			"s @after {dumpDFA();} : (options {greedy=false;} : stat)* ID '=' ID ';'\n" +
-			"    {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"    {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"stat : 'if' '(' INT ')' stat\n" +
 			"     | 'return' INT ';'\n" +
 			"     | ID '=' (INT|ID) ';'\n" +
@@ -428,7 +406,7 @@ public class TestNonGreedyLoops extends BaseTest {
 		String input =
 			"x=1; a=b; x=y;";
 		String found = null;
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("x=1;a=b;\n" +
 					 "Decision 0:\n" +
@@ -436,13 +414,10 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s1-'='->s2\n" +
 					 "s2-INT->:s3=>1\n" +
 					 "s2-ID->s4\n" +
-					 "s4-';'->:s5=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>3\n", found); // ignores x=1 that follows first a=b assignment
+					 "s4-';'->:s5=>2\n", found); // ignores x=1 that follows first a=b assignment
 		input =
 			"if ( 1 ) { x=3; { return 4; } } return 99; abc=def;";
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("if(1){x=3;{return4;}}return99;abc=def;\n" +
 					 "Decision 0:\n" +
@@ -451,29 +426,17 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-ID->s3\n" +
 					 "s3-'='->s4\n" +
 					 "s4-ID->s5\n" +
-					 "s5-';'->:s6=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'{'->:s2=>4\n" +
-					 "s0-'if'->:s1=>1\n" +
-					 "s0-'return'->:s4=>2\n" +
-					 "s0-ID->:s3=>3\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-'{'->:s2=>1\n" +
-					 "s0-'return'->:s3=>1\n" +
-					 "s0-'}'->:s4=>2\n" +
-					 "s0-ID->:s1=>1\n", found);
+					 "s5-';'->:s6=>2\n", found);
 		input =
 			"x=1; a=3;"; // FAILS to match since it can't match either stat
-		execParser("T.g", grammar, "TParser", "TLexer", "s",
+		execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		// can't match EOF to ID '=' '0' ';'
 		assertEquals("line 1:9 no viable alternative at input '<EOF>'\n",
 					 this.stderrDuringParse);
 		input =
 			"x=1; a=b; z=3;"; // stops at a=b; ignores z=3;
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  input, true);
 		assertEquals("x=1;a=b;\n" +
 					 "Decision 0:\n" +
@@ -481,16 +444,13 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s1-'='->s2\n" +
 					 "s2-INT->:s3=>1\n" +
 					 "s2-ID->s4\n" +
-					 "s4-';'->:s5=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-ID->:s1=>3\n", found); // should not finish all input
+					 "s4-';'->:s5=>2\n", found); // should not finish all input
 	}
 
 	@Test public void testHTMLTags() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {dumpDFA();} : (item)+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"s @after {dumpDFA();} : (item)+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"item : tag | . ;\n" +
 			"tag : '<' '/'? .* '>'  ;\n" +
 			"EQ : '=' ;\n" +
@@ -501,14 +461,9 @@ public class TestNonGreedyLoops extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n";
 
 		String found = null;
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "<a>foo</a>", true);
 		assertEquals("<a>foo</a>\n" +
-					 "Decision 0:\n" +
-					 "s0-EOF->:s3=>2\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "s0-ID->:s2=>1\n" +
-					 "\n" +
 					 "Decision 1:\n" +
 					 "s0-'<'->s1\n" +
 					 "s0-ID->:s5=>2\n" +
@@ -527,20 +482,16 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "Decision 3:\n" +
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
-		assertEquals("line 1:6 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='<a>foo<'\n" +
-					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}:[(26,1,[32 32 32 32 14 6]), (33,1,[14 6]), (22,1,[14 6 10 10]), (26,1,[14 6 10 10]), (33,1,[14 6 10 10]), (20,1,[14 6 10 10 10]), (16,1,[6 10 10 10]), (1,1,[]), (22,2,[14 6 10 10 10 10]), (26,2,[14 6 10 10 10 10]), (33,2,[14 6 10 10 10 10]), (20,2,[14 6 10 10 10 10 10]), (16,2,[6 10 10 10 10 10]), (1,2,[])],conflictingAlts={1..2}, input='<a>foo<'\n" +
-					 "line 1:10 reportAttemptingFullContext d=1: [(20,1,[14 6]), (16,2,[6])], input='</a>'\n" +
-					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}:[(35,1,[]), (35,2,[])],conflictingAlts={1..2}, input='</a>'\n" +
-					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}:[(26,1,[]), (33,1,[]), (26,2,[]), (33,2,[])],conflictingAlts={1..2}, input='/'\n",
+		assertEquals("line 1:6 reportAttemptingFullContext d=1, input='<a>foo<'\n" +
+					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}, input='<a>foo<'\n" +
+					 "line 1:10 reportAttemptingFullContext d=1, input='</a>'\n" +
+					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}, input='</a>'\n" +
+					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}, input='/'\n",
 					 this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "<a></a>", true);
 		assertEquals("<a></a>\n" +
-					 "Decision 0:\n" +
-					 "s0-EOF->:s2=>2\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
 					 "Decision 1:\n" +
 					 "s0-'<'->s1\n" +
 					 "s1-'/'->s2\n" +
@@ -557,13 +508,9 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "Decision 3:\n" +
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "</b><a src=\"abc\", width=32>", true);
 		assertEquals("</b><asrc=\"abc\",width=32>\n" +
-					 "Decision 0:\n" +
-					 "s0-EOF->:s2=>2\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
 					 "Decision 1:\n" +
 					 "s0-'<'->s1\n" +
 					 "s1-'/'->s2\n" +
@@ -609,7 +556,7 @@ public class TestNonGreedyLoops extends BaseTest {
 
 		String found = null;
 		System.out.println(grammar);
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 						   ",=foo <a x= 3>32skidoo<a><img>", true);
 		assertEquals("<ax=3>\n" +
 					 "<a>\n" +
@@ -626,15 +573,6 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-INT->s3\n" +
 					 "s4-'='->s3\n" +
 					 "\n" +
-					 "Decision 1:\n" +		// (tag|header)
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
-					 "Decision 2:\n" +		// (...)*
-					 "s0-EOF->:s3=>2\n" +
-					 "s0-'<'->:s2=>1\n" +
-					 "s0-','->:s1=>1\n" +
-					 "s0-INT->:s1=>1\n" +
-					 "\n" +
 					 "Decision 3:\n" +		// .+
 					 "s0-'x'->:s1=>1\n" +
 					 "s0-'>'->:s2=>2\n" +
@@ -644,7 +582,7 @@ public class TestNonGreedyLoops extends BaseTest {
 		assertEquals(null,
 					 this.stderrDuringParse);
 
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x x<a>", true);
 		assertEquals("<a>\n" +
 					 "Decision 0:\n" +
@@ -655,22 +593,15 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s4-ID->s5\n" +
 					 "s5-'>'->:s6=>2\n" +
 					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-EOF->:s2=>2\n" +
-					 "s0-'x'->:s1=>1\n" +
-					 "\n" +
 					 "Decision 3:\n" +
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
 		// gets line 1:3 no viable alternative at input '>'. Why??
 		// oH! it sees .+ and figures it matches > so <> predicts tag CORRECT!
 		// Seeing '.' in a lookahead prediction can be misleading!!
-		found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x <><a>", true);
-		assertEquals("null\n" +
+		assertEquals("<\n" +
 					 "<a>\n" +
 					 "Decision 0:\n" +
 					 "s0-'x'->s1\n" +
@@ -681,14 +612,6 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s3-ID->s4\n" +
 					 "s4-'>'->:s7=>2\n" +
 					 "s4-'<'->:s5=>2\n" +
-					 "\n" +
-					 "Decision 1:\n" +
-					 "s0-'<'->:s1=>1\n" +
-					 "\n" +
-					 "Decision 2:\n" +
-					 "s0-EOF->:s3=>2\n" +
-					 "s0-'x'->:s1=>1\n" +
-					 "s0-'>'->:s2=>1\n" +
 					 "\n" +
 					 "Decision 3:\n" +
 					 "s0-'>'->:s1=>2\n" +

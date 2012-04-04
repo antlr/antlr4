@@ -29,8 +29,14 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -159,7 +165,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		// If already recovering, don't try to sync
         if ( errorRecoveryMode ) return;
 
-        SymbolStream<Token> tokens = recognizer.getInputStream();
+        TokenStream tokens = recognizer.getInputStream();
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
@@ -195,11 +201,11 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 										  NoViableAltException e)
 	throws RecognitionException
 	{
-		SymbolStream<Token> tokens = recognizer.getInputStream();
+		TokenStream tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream) {
 			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);
+			else input = ((TokenStream)tokens).getText(e.startToken, e.offendingToken);
 		}
 		else {
 			input = "<unknown input>";
@@ -548,26 +554,5 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
             recognizer.consume();
             ttype = recognizer.getInputStream().LA(1);
         }
-    }
-
-    @Override
-    public void reportAmbiguity(@NotNull Parser recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull ATNConfigSet configs)
-    {
-    }
-
-	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
-											@NotNull DFA dfa,
-											int startIndex, int stopIndex,
-											@NotNull ATNConfigSet configs)
-	{
-	}
-
-	@Override
-    public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
-    {
     }
 }

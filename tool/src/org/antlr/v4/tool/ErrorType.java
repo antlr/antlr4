@@ -129,7 +129,7 @@ public enum ErrorType {
 	//TOKEN_VOCAB_IN_DELEGATE(, "tokenVocab option ignored in imported grammar <arg>", ErrorSeverity.ERROR),
 	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
 //	TOKEN_ALIAS_IN_DELEGATE(, "can't assign string to token name <arg> to string in imported grammar <arg2>", ErrorSeverity.ERROR),
-	CANNOT_FIND_IMPORTED_FILE(110, "can't find or load grammar <arg> from <arg2>", ErrorSeverity.ERROR),
+	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar <arg> from <arg2>", ErrorSeverity.ERROR),
 	INVALID_IMPORT(111, "<arg.typeString> grammar <arg.name> cannot import <arg2.typeString> grammar <arg2.name>", ErrorSeverity.ERROR),
 	IMPORTED_TOKENS_RULE_EMPTY(112, "", ErrorSeverity.ERROR),
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),
@@ -144,12 +144,15 @@ public enum ErrorType {
 	RULE_WITH_TOO_FEW_ALT_LABELS(122, "rule <arg>: must label all alternatives or none", ErrorSeverity.ERROR),
 	ALT_LABEL_REDEF(123, "rule alt label <arg> redefined in rule <arg2>, originally in <arg3>", ErrorSeverity.ERROR),
 	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
+	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
+	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
+
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
 
     // Dependency sorting errors
     //
-    /** t1.g -> t2.g -> t3.g ->t1.g */
+    /** t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
     CIRCULAR_DEPENDENCY(130, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
 
     // Simple informational messages
@@ -185,16 +188,18 @@ public enum ErrorType {
 
     ;
 
-	public String msg;
-    public int code; // unique, deterministic unchanging error code once we release
-    public ErrorSeverity severity;
-    public Boolean abortsAnalysis;
-    public Boolean abortsCodegen;
+	public final String msg;
+    public final int code; // unique, deterministic unchanging error code once we release
+    public final ErrorSeverity severity;
+    public final Boolean abortsAnalysis;
+    public final Boolean abortsCodegen;
 
 	ErrorType(int code, String msg, ErrorSeverity severity) {
         this.code = code;
 		this.msg = msg;
         this.severity = severity;
+		this.abortsAnalysis = false;
+		this.abortsCodegen = false;
 	}
 
 //	ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis) {

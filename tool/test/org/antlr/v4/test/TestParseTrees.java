@@ -11,7 +11,7 @@ public class TestParseTrees extends BaseTest {
 			"@after {System.out.println($r.ctx.toStringTree(this));}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' {System.out.println(getRuleInvocationStack());} ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "x", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x", false);
 		String expecting = "[a, s]\n(a x)\n";
 		assertEquals(expecting, result);
 	}
@@ -25,7 +25,7 @@ public class TestParseTrees extends BaseTest {
 			"  :r=a ;\n" +
 			"a : 'x' 'y'\n" +
 			"  ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xy", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xy", false);
 		String expecting = "(a x y)\n";
 		assertEquals(expecting, result);
 	}
@@ -39,7 +39,7 @@ public class TestParseTrees extends BaseTest {
 			"  :r=a ;\n" +
 			"a : 'x' | 'y'\n" +
 			"  ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "y", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "y", false);
 		String expecting = "(a y)\n";
 		assertEquals(expecting, result);
 	}
@@ -53,7 +53,7 @@ public class TestParseTrees extends BaseTest {
 			"  :r=a ;\n" +
 			"a : ('x' | 'y')* 'z'\n" +
 			"  ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xyyxyxz", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xyyxyxz", false);
 		String expecting = "(a x y y x y x z)\n";
 		assertEquals(expecting, result);
 	}
@@ -68,7 +68,7 @@ public class TestParseTrees extends BaseTest {
 			"a : b 'x'\n" +
 			"  ;\n" +
 			"b : 'y' ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "yx", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "yx", false);
 		String expecting = "(a (b y) x)\n";
 		assertEquals(expecting, result);
 	}
@@ -85,7 +85,7 @@ public class TestParseTrees extends BaseTest {
 			"a : 'x' 'y'\n" +
 			"  ;\n" +
 			"Z : 'z'; \n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xzy", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xzy", false);
 		String expecting = "(a x z y)\n"; // ERRORs not shown. z is colored red in tree view
 		assertEquals(expecting, result);
 	}
@@ -100,7 +100,7 @@ public class TestParseTrees extends BaseTest {
 			"a : 'x' | 'y'\n" +
 			"  ;\n" +
 			"Z : 'z'; \n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "z", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "z", false);
 		String expecting = "(a z)\n";
 		assertEquals(expecting, result);
 	}
@@ -115,7 +115,7 @@ public class TestParseTrees extends BaseTest {
 			"a : 'x' 'y'* '!'\n" +
 			"  ;\n" +
 			"Z : 'z'; \n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "xzyy!", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xzyy!", false);
 		String expecting = "(a x z y y !)\n";
 		assertEquals(expecting, result);
 	}

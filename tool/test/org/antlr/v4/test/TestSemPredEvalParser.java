@@ -45,7 +45,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "3 4 x", false);
 		String expecting =
 			"alt 2\n" +
@@ -70,7 +70,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x ; y", false);
 		String expecting = "";
 		assertEquals(expecting, found);
@@ -95,7 +95,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x y 3", false);
 		String expecting =
 			"alt 2\n" +
@@ -120,7 +120,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x y", false);
 		String expecting =
 			"alt 1\n" +
@@ -147,13 +147,16 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x; y", true);
 		String expecting =
 			"alt 1\n" +
 			"alt 1\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:0 reportAmbiguity d=0: ambigAlts={1..2}:[(6,1,[],up=1), (1,1,[],up=1), (6,2,[],up=1), (1,2,[],up=1), (6,3,[],{1:0}?,up=1), (1,3,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={1..3},dipsIntoOuterContext, input='x'\n",
+		assertEquals("line 1:0 reportAttemptingFullContext d=0, input='x'\n" +
+					 "line 1:0 reportAmbiguity d=0: ambigAlts={1..2}, input='x'\n" +
+					 "line 1:3 reportAttemptingFullContext d=0, input='y'\n" +
+					 "line 1:3 reportAmbiguity d=0: ambigAlts={1..2}, input='y'\n",
                      this.stderrDuringParse);
 	}
 
@@ -177,14 +180,17 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "34; x; y", true);
 		String expecting =
 			"alt 1\n" +
 			"alt 2\n" +
 			"alt 2\n";
 		assertEquals(expecting, found);
-        assertEquals("line 1:4 reportAmbiguity d=0: ambigAlts={2..3}:[(6,2,[],up=1), (10,2,[],up=1), (1,2,[],up=1), (6,3,[],up=1), (10,3,[],up=1), (1,3,[],up=1), (6,4,[],{1:0}?,up=1), (10,4,[],{1:0}?,up=1), (1,4,[],{1:0}?,up=1)],hasSemanticContext=true,conflictingAlts={2..4},dipsIntoOuterContext, input='x'\n",
+		assertEquals("line 1:4 reportAttemptingFullContext d=0, input='x'\n" +
+					 "line 1:4 reportAmbiguity d=0: ambigAlts={2..3}, input='x'\n" +
+					 "line 1:7 reportAttemptingFullContext d=0, input='y'\n" +
+					 "line 1:7 reportAmbiguity d=0: ambigAlts={2..3}, input='y'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -202,7 +208,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "y 3 x 4", false);
 		String expecting =
 			"alt 2\n" +
@@ -223,7 +229,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		execParser("T.g", grammar, "TParser", "TLexer", "s",
+		execParser("T.g4", grammar, "TParser", "TLexer", "s",
 				   "y 3 x 4", false);
 		String expecting = "line 1:0 no viable alternative at input 'y'\n";
 		String result = stderrDuringParse;
@@ -241,7 +247,7 @@ public class TestSemPredEvalParser extends BaseTest {
    			"INT : '0'..'9'+;\n" +
    			"WS : (' '|'\\n') {skip();} ;\n";
 
-   		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+   		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "x x y", false);
    		String expecting =
    			"alt 2\n" +
@@ -266,7 +272,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x 4", false);
 		String expecting =
 			"alt 1\n";
@@ -289,7 +295,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x x y", false);
 		String expecting =
 			"alt 1\n" +
@@ -315,7 +321,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x x y", false);
 		String expecting =
 			"i=1\n" +
@@ -346,7 +352,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "a b", false);
 		String expecting =
 			"alt 2\n" +
@@ -376,7 +382,7 @@ public class TestSemPredEvalParser extends BaseTest {
             "INT : '0'..'9'+;\n" +
             "WS : (' '|'\\n') {skip();} ;\n";
 
-        String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+        String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
                                   "a b", false);
         String expecting =
         "";
@@ -397,7 +403,7 @@ public class TestSemPredEvalParser extends BaseTest {
             "INT : '0'..'9'+;\n" +
             "WS : (' '|'\\n') {skip();} ;\n";
 
-        String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+        String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
                                   "a;", false);
         String expecting =
             "alt 2\n";
@@ -417,7 +423,7 @@ public class TestSemPredEvalParser extends BaseTest {
             "INT : '0'..'9'+;\n" +
             "WS : (' '|'\\n') {skip();} ;\n";
 
-        String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+        String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
                                   "a;", false);
         String expecting =
             "alt 2\n";
@@ -441,7 +447,7 @@ public class TestSemPredEvalParser extends BaseTest {
         "INT : '0'..'9'+;\n" +
         "WS : (' '|'\\n') {skip();} ;\n";
 
-   		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+   		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "a!", false);
    		String expecting =
    			"eval=true\n" + // now we are parsing
@@ -467,7 +473,7 @@ public class TestSemPredEvalParser extends BaseTest {
    			"INT : '0'..'9'+;\n" +
    			"WS : (' '|'\\n') {skip();} ;\n";
 
-   		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+   		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "a!", false);
    		String expecting =
    			"eval=true\n" +
@@ -494,7 +500,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
-		String found = execParser("T.g", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "a!", false);
 		String expecting =
 			"eval=true\n" +

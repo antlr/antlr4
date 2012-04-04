@@ -31,17 +31,19 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
-public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
+public class DiagnosticErrorListener extends BaseErrorListener<Token> {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision + ": ambigAlts=" + ambigAlts + ":" + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
+										": ambigAlts=" + ambigAlts + ", input='" +
+										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 
 	@Override
@@ -50,15 +52,17 @@ public class DiagnosticErrorStrategy extends DefaultErrorStrategy {
 											int startIndex, int stopIndex,
 											@NotNull ATNConfigSet configs)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" + dfa.decision + ": " + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
+										dfa.decision + ", input='" +
+										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
 	}
 
 	@Override
 	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
                                          int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" + dfa.decision + ": " + configs + ", input='" +
-										recognizer.getInputString(startIndex, stopIndex) + "'");
+        recognizer.notifyErrorListeners("reportContextSensitivity d=" +
+										dfa.decision + ", input='" +
+										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 }

@@ -41,7 +41,7 @@ public interface SyntaxTree extends Tree {
 	 *  node is a leaf, then the interval represents a single token.
 	 *
 	 *  If source interval is unknown, this does not return null.
-	 *  It returns an interval of length 0.
+	 *  It returns Interval.INVALID.
 	 */
 	Interval getSourceInterval();
 }
