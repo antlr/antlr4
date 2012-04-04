@@ -54,6 +54,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
@@ -383,7 +384,7 @@ public abstract class BaseTest {
 
 
 	/** Return true if all is ok, no errors */
-	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, String... extraOptions) {
+	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
 		boolean allIsWell = true;
 		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
@@ -401,9 +402,12 @@ public abstract class BaseTest {
 			ErrorQueue equeue = new ErrorQueue();
 			Tool antlr = newTool(optionsA);
 			antlr.addListener(equeue);
+			if (defaultListener) {
+				antlr.addListener(new DefaultToolListener(antlr));
+			}
 			antlr.processGrammarsOnCommandLine();
-			if ( equeue.errors.size()>0 ) {
-				allIsWell = false;
+			allIsWell = equeue.errors.isEmpty();
+			if ( !defaultListener && !equeue.errors.isEmpty() ) {
 				System.err.println("antlr reports errors from "+options);
 				for (int i = 0; i < equeue.errors.size(); i++) {
 					ANTLRMessage msg = equeue.errors.get(i);
@@ -412,6 +416,13 @@ public abstract class BaseTest {
 				System.out.println("!!!\ngrammar:");
 				System.out.println(grammarStr);
 				System.out.println("###");
+			}
+			if ( !defaultListener && !equeue.warnings.isEmpty() ) {
+				System.err.println("antlr reports warnings from "+options);
+				for (int i = 0; i < equeue.warnings.size(); i++) {
+					ANTLRMessage msg = equeue.warnings.get(i);
+					System.err.println(msg);
+				}
 			}
 		}
 		catch (Exception e) {
@@ -479,9 +490,23 @@ public abstract class BaseTest {
 													String lexerName,
 													String... extraOptions)
 	{
+		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
+	}
+
+	/** Return true if all is well */
+	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
+													String grammarStr,
+													@Nullable String parserName,
+													String lexerName,
+													boolean defaultListener,
+													String... extraOptions)
+	{
 		boolean allIsWell =
-			antlr(grammarFileName, grammarFileName, grammarStr, extraOptions);
-		boolean ok;
+			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
+		if (!allIsWell) {
+			return false;
+		}
+
 		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
 			files.add(lexerName+".java");
@@ -499,8 +524,7 @@ public abstract class BaseTest {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
 			}
 		}
-		ok = compile(files.toArray(new String[files.size()]));
-		if ( !ok ) { allIsWell = false; }
+		allIsWell = compile(files.toArray(new String[files.size()]));
 		return allIsWell;
 	}
 

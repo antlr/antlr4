@@ -653,7 +653,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') {skip();} ;\n" ;
-		boolean ok = antlr("M.g4", "M.g4", master);
+		boolean ok = antlr("M.g4", "M.g4", master, false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
