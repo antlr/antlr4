@@ -46,7 +46,8 @@ public class TestSymbolIssues extends BaseTest {
 		"error(69): B.g4:4:4: label s conflicts with rule with same name\n" +
 		"error(69): B.g4:4:9: label b conflicts with rule with same name\n" +
 		"error(70): B.g4:4:15: label X conflicts with token with same name\n" +
-		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n"
+		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n" +
+		"error(126): B.g4:4:20: cannot create implicit token for string literal '.' in non-combined grammar\n"
     };
 
     static String[] D = {
