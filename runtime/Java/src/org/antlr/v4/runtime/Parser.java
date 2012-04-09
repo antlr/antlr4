@@ -92,7 +92,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	 */
 	protected ParserRuleContext<Token> _ctx;
 
-	protected boolean _buildParseTrees;
+	protected boolean _buildParseTrees = true;
 
 	protected TraceListener _tracer;
 
