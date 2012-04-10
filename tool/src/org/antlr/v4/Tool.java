@@ -106,6 +106,7 @@ public class Tool {
 
 	// fields set by option manager
 
+	public File inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean report = false;
@@ -378,7 +379,12 @@ public class Tool {
 
 	public GrammarRootAST loadGrammar(String fileName) {
 		try {
-			ANTLRFileStream in = new ANTLRFileStream(fileName, grammarEncoding);
+			File file = new File(fileName);
+			if (!file.isAbsolute()) {
+				file = new File(inputDirectory, fileName);
+			}
+
+			ANTLRFileStream in = new ANTLRFileStream(file.getAbsolutePath(), grammarEncoding);
 			GrammarRootAST t = load(in);
 			return t;
 		}
@@ -507,7 +513,7 @@ public class Tool {
 	}
 
 	public File getImportedGrammarFile(Grammar g, String fileName) {
-		File importedFile = new File(fileName);
+		File importedFile = new File(inputDirectory, fileName);
 		if ( !importedFile.exists() ) {
 			File gfile = new File(g.fileName);
 			String parentDir = gfile.getParent();
