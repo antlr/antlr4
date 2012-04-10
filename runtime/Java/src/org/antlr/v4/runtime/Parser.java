@@ -109,7 +109,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 */
 	protected ParserRuleContext<Symbol> _ctx;
 
-	protected boolean _buildParseTrees;
+	protected boolean _buildParseTrees = true;
 
 	protected TraceListener _tracer;
 
