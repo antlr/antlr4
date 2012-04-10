@@ -30,34 +30,36 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* ========================================================================
- * This is the definitive ANTLR3 Mojo set. All other sets are belong to us.
+ * This is the definitive ANTLR4 Mojo set. All other sets are belong to us.
  */
 package org.antlr.mojo.antlr4;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
+import org.antlr.v4.Tool;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import org.antlr.v4.Tool;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Goal that picks up all the ANTLR grammars in a project and moves those that
  * are required for generation of the compilable sources into the location
- * that we use to compile them, such as target/generated-sources/antlr3 ...
+ * that we use to compile them, such as target/generated-sources/antlr4 ...
  *
  * @goal antlr
  * 
@@ -104,19 +106,12 @@ public class Antlr4Mojo
      */
     protected boolean profile;
     /**
-     * If set to true then the ANTLR tool will generate a description of the nfa
+     * If set to true then the ANTLR tool will generate a description of the atn
      * for each rule in <a href="http://www.graphviz.org">Dot format</a>
      * 
      * @parameter default-value="false"
      */
-    protected boolean nfa;
-    /**
-     * If set to true then the ANTLR tool will generate a description of the DFA
-     * for each decision in the grammar in <a href="http://www.graphviz.org">Dot format</a>
-     * 
-     * @parameter default-value="false"
-     */
-    protected boolean dfa;
+    protected boolean atn;
     /**
      * If set to true, the generated parser code will log rule entry and exit points
      * to stdout as an aid to debugging.
@@ -139,6 +134,12 @@ public class Antlr4Mojo
      * @parameter default-value="true"
      */
     protected boolean verbose;
+
+	protected boolean verbose_dfa;
+
+	protected boolean force_atn;
+
+	protected boolean abstract_recognizer;
 
     /**
      * The number of alts, beyond which ANTLR will not generate a switch statement
@@ -165,9 +166,9 @@ public class Antlr4Mojo
      * not acted upon directly by the ANTLR Tool.
      *
      * Unless otherwise specified, the include list scans for and includes all
-     * files that end in ".g" in any directory beneath src/main/antlr3. Note that
-     * this version of the plugin looks for the directory antlr3 and not the directory
-     * antlr, so as to avoid clashes and confusion for projects that use both v2 and v3 grammars
+     * files that end in ".g" in any directory beneath src/main/antlr4. Note that
+     * this version of the plugin looks for the directory antlr4 and not the directory
+     * antlr, so as to avoid clashes and confusion for projects that use both v3 and v4 grammars
      * such as ANTLR itself.
      *
      * @parameter
@@ -189,20 +190,20 @@ public class Antlr4Mojo
     protected MavenProject project;
     /**
      * Specifies the Antlr directory containing grammar files. For
-     * antlr version 3.x we default this to a directory in the tree
-     * called antlr3 because the antlr directory is occupied by version
-     * 2.x grammars.
+     * antlr version 4.x we default this to a directory in the tree
+     * called antlr4 because the antlr3 directory is occupied by version
+     * 3.x grammars.
      *
-     * @parameter default-value="${basedir}/src/main/antlr3"
+     * @parameter default-value="${basedir}/src/main/antlr4"
      * @required
      */
     private File sourceDirectory;
     /**
-     * Location for generated Java files. For antlr version 3.x we default
-     * this to a directory in the tree called antlr3 because the antlr
+     * Location for generated Java files. For antlr version 4.x we default
+     * this to a directory in the tree called antlr4 because the antlr
      * directory is occupied by version 2.x grammars.
      *
-     * @parameter default-value="${project.build.directory}/generated-sources/antlr3"
+     * @parameter default-value="${project.build.directory}/generated-sources/antlr4"
      * @required
      */
     private File outputDirectory;
@@ -211,7 +212,7 @@ public class Antlr4Mojo
      * Note that ANTLR will not try to process grammars that it finds to be imported
      * into other grammars (in the same processing session).
      *
-     * @parameter default-value="${basedir}/src/main/antlr3/imports"
+     * @parameter default-value="${basedir}/src/main/antlr4/imports"
      */
     private File libDirectory;
 
@@ -237,7 +238,7 @@ public class Antlr4Mojo
 
     /**
      * The main entry point for this Mojo, it is responsible for converting
-     * ANTLR 3.x grammars into the target language specified by the grammar.
+     * ANTLR 4.x grammars into the target language specified by the grammar.
      * 
      * @throws org.apache.maven.plugin.MojoExecutionException When something is disvocered such as a missing source
      * @throws org.apache.maven.plugin.MojoFailureException When something really bad happesn such as not being able to create the ANTLR Tool
@@ -279,8 +280,7 @@ public class Antlr4Mojo
             log.debug("ANTLR: printGrammar        : " + printGrammar);
             log.debug("ANTLR: debug               : " + debug);
             log.debug("ANTLR: profile             : " + profile);
-            log.debug("ANTLR: nfa                 : " + nfa);
-            log.debug("ANTLR: dfa                 : " + dfa);
+            log.debug("ANTLR: atn                 : " + atn);
             log.debug("ANTLR: trace               : " + trace);
             log.debug("ANTLR: messageFormat       : " + messageFormat);
             log.debug("ANTLR: maxSwitchCaseLabels : " + maxSwitchCaseLabels);
@@ -297,69 +297,57 @@ public class Antlr4Mojo
             outputDir.mkdirs();
         }
 
-        // First thing we need is an instance of the ANTLR 3.1 build tool
-        //
-        try {
-            // ANTLR Tool buld interface
-            //
-            tool = new Tool();
-        } catch (Exception e) {
-            log.error("The attempt to create the ANTLR build tool failed, see exception report for details");
+		List<String> args = new ArrayList<String>();
 
-            throw new MojoFailureException("Jim failed you!");
-        }
+		if (getOutputDirectory() != null) {
+			args.add("-o");
+			args.add(outputDir.getAbsolutePath());
+		}
+
+		// Where do we want ANTLR to look for .tokens and import grammars?
+		//
+		if (getLibDirectory() != null && getLibDirectory().exists()) {
+			args.add("-lib");
+			args.add(libDirectory.getAbsolutePath());
+		}
 
         // Next we need to set the options given to us in the pom into the
         // tool instance we have created.
         //
-        tool.debug = debug;
-        tool.generate_ATN_dot = atn;
-        tool.profile = profile;
-        tool.report = report;
-        tool.printGrammar = printGrammar;
-        tool.trace = trace;
-        tool.verbose_dfa = verbose_dfa;
-        tool.msgFormat = messageFormat;
-        tool.force_atn = force_atn;
-
-        // Where do we want ANTLR to produce its output? (Base directory)
-        //
-        if (log.isDebugEnabled())
-        {
-            log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
-        }
-
-        tool.outputDirectory = outputDirectory.getAbsolutePath();
-
-        // Tell ANTLR that we always want the output files to be produced in the output directory
-        // using the same relative path as the input file was to the input directory.
-        //
-        tool.setForceRelativeOutput(true);
-
-        // Where do we want ANTLR to look for .tokens and import grammars?
-        //
-        tool.setLibDirectory(libDirectory.getAbsolutePath());
-
-        if (!sourceDirectory.exists()) {
-            if (log.isInfoEnabled()) {
-                log.info("No ANTLR grammars to compile in " + sourceDirectory.getAbsolutePath());
-            }
-            return;
-        } else {
-            if (log.isInfoEnabled()) {
-                log.info("ANTLR: Processing source directory " + sourceDirectory.getAbsolutePath());
-            }
-        }
-
-        // Set working directory for ANTLR to be the base source directory
-        //
-        //tool.setInputDirectory(sourceDirectory.getAbsolutePath());
+		if (debug) {
+			args.add("-debug");
+		}
+		if (atn) {
+			args.add("-atn");
+		}
+		if (profile) {
+			args.add("-profile");
+		}
+		if (report) {
+			args.add("-report");
+		}
+		if (printGrammar) {
+			args.add("-print");
+		}
+		if (verbose_dfa) {
+			args.add("-Xverbose-dfa");
+		}
+		if (messageFormat != null && !"".equals(messageFormat)) {
+			args.add("-message-format");
+			args.add(messageFormat);
+		}
+		if (force_atn) {
+			args.add("-Xforce-atn");
+		}
+		if (abstract_recognizer) {
+			args.add("-abstract");
+		}
 
         try {
 
             // Now pick up all the files and process them with the Tool
             //
-            processGrammarFiles(sourceDirectory, outputDirectory);
+            processGrammarFiles(args, sourceDirectory, outputDirectory);
 
         } catch (InclusionScanException ie) {
 
@@ -372,7 +360,48 @@ public class Antlr4Mojo
             throw new MojoExecutionException(e.getMessage());
         }
 
-        tool.process();
+        // Create an instance of the ANTLR 4 build tool
+        //
+        try {
+            tool = new Tool(args.toArray(new String[args.size()]));
+
+			// we set some options directly
+			tool.trace = trace;
+
+			// Where do we want ANTLR to produce its output? (Base directory)
+			//
+			if (log.isDebugEnabled())
+			{
+				log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
+			}
+
+			// Tell ANTLR that we always want the output files to be produced in the output directory
+			// using the same relative path as the input file was to the input directory.
+			//
+//			tool.setForceRelativeOutput(true);
+
+			// Set working directory for ANTLR to be the base source directory
+			//
+			tool.inputDirectory = sourceDirectory;
+
+			if (!sourceDirectory.exists()) {
+				if (log.isInfoEnabled()) {
+					log.info("No ANTLR grammars to compile in " + sourceDirectory.getAbsolutePath());
+				}
+				return;
+			} else {
+				if (log.isInfoEnabled()) {
+					log.info("ANTLR: Processing source directory " + sourceDirectory.getAbsolutePath());
+				}
+			}
+
+        } catch (Exception e) {
+            log.error("The attempt to create the ANTLR build tool failed, see exception report for details", e);
+
+            throw new MojoFailureException("Jim failed you!");
+        }
+
+		tool.processGrammarsOnCommandLine();
 
         // If any of the grammar files caused errors but did nto throw exceptions
         // then we should have accumulated errors in the counts
@@ -403,11 +432,11 @@ public class Antlr4Mojo
      * @throws java.io.IOException
      * @throws org.codehaus.plexus.compiler.util.scan.InclusionScanException
      */
-    private void processGrammarFiles(File sourceDirectory, File outputDirectory)
+    private void processGrammarFiles(List<String> args, File sourceDirectory, File outputDirectory)
             throws TokenStreamException, RecognitionException, IOException, InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         //
-        SourceMapping mapping = new SuffixMapping("g", Collections.EMPTY_SET);
+        SourceMapping mapping = new SuffixMapping("g4", Collections.EMPTY_SET);
 
         // What are the sets of includes (defaulted or otherwise).
         //
@@ -433,8 +462,8 @@ public class Antlr4Mojo
 
             // Tell the ANTLR tool that we want sorted build mode
             //
-            tool.setMake(true);
-            
+//            tool.setMake(true);
+
             // Iterate each grammar file we were given and add it into the tool's list of
             // grammars to process.
             //
@@ -450,7 +479,8 @@ public class Antlr4Mojo
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("  ... relative path is: " + relPath);
                 }
-                tool.addGrammarFile(relPath);
+
+				args.add(relPath);
 
             }
 
@@ -461,7 +491,7 @@ public class Antlr4Mojo
 
     public Set<String> getIncludesPatterns() {
         if (includes == null || includes.isEmpty()) {
-            return Collections.singleton("**/*.g");
+            return Collections.singleton("**/*.g4");
         }
         return includes;
     }

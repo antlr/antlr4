@@ -6,9 +6,9 @@ Usage
 +--
  src/main/
       |
-      +--- antlr3/... .g files organized in the required package structure
+      +--- antlr4/... .g4 files organized in the required package structure
              |
-             +--- imports/  .g files that are imported by other grammars.
+             +--- imports/  .g4 files that are imported by other grammars.
 +--
 
  However, if you are not able to use this structure for whatever reason, you
@@ -25,8 +25,8 @@ Usage
 +--
 <plugin>
     <groupId>org.antlr</groupId>
-    <artifactId>antlr3-maven-plugin</artifactId>
-    <version>3.1.3-1</version>
+    <artifactId>antlr4-maven-plugin</artifactId>
+    <version>4.0-SNAPSHOT</version>
 
     <executions>
         
@@ -41,13 +41,13 @@ Usage
                 <nfa>false</nfa>
                 <excludes><exclude/></excludes>
                 <includes><include/></includes>
-                <libDirectory>src/main/antlr3/imports</libDirectory>
+                <libDirectory>src/main/antlr4/imports</libDirectory>
                 <messageFormat>antlr</messageFormat>
-                <outputDirectory>target/generated-sources/antlr3</outputDirectory>
+                <outputDirectory>target/generated-sources/antlr4</outputDirectory>
                 <printGrammar>false</printGrammar>
                 <profile>false</profile>
                 <report>false</report>
-                <sourceDirectory>src/main/antlr3</sourceDirectory>
+                <sourceDirectory>src/main/antlr4</sourceDirectory>
                 <trace>false</trace>
                 <verbose>true</verbose>
             </configuration>
@@ -148,9 +148,9 @@ Usage
      not acted upon directly by the ANTLR Tool.
      
      Unless otherwise specified, the include list scans for and includes all
-     files that end in ".g" in any directory beneath src/main/antlr3. Note that
-     this version of the plugin looks for the directory antlr3 and not the directory
-     antlr, so as to avoid clashes and confusion for projects that use both v2 and v3 grammars
+     files that end in ".g4" in any directory beneath src/main/antlr4. Note that
+     this version of the plugin looks for the directory antlr4 and not the directory
+     antlr, so as to avoid clashes and confusion for projects that use both v3 and v4 grammars
      such as ANTLR itself.
      
 *** excludes
@@ -162,22 +162,22 @@ Usage
 *** sourceDirectory
 
      Specifies the Antlr directory containing grammar files. For
-     antlr version 3.x we default this to a directory in the tree
-     called antlr3 because the antlr directory is occupied by version
+     antlr version 4.x we default this to a directory in the tree
+     called antlr4 because the antlr directory is occupied by version
      2.x grammars.
 
      <<NB>> Take careful note that the default location for antlr grammars
-     is now <<antlr3>> and NOT <<antlr>>
+     is now <<antlr4>> and NOT <<antlr>>
 
-     default-value="<<<${basedir}/src/main/antlr3>>>"
+     default-value="<<<${basedir}/src/main/antlr4>>>"
      
 *** outputDirectory
 
-     Location for generated Java files. For antlr version 3.x we default
-     this to a directory in the tree called antlr3 because the antlr
+     Location for generated Java files. For antlr version 4.x we default
+     this to a directory in the tree called antlr4 because the antlr
      directory is occupied by version 2.x grammars.
      
-     default-value="<<<${project.build.directory}/generated-sources/antlr3>>>"
+     default-value="<<<${project.build.directory}/generated-sources/antlr4>>>"
      
 *** libDirectory
 
@@ -186,8 +186,8 @@ Usage
      will include this directory in the search for .tokens files and import grammars.
 
      <<NB>> If you change the lib directory from the default but the directory is
-     still under<<<${basedir}/src/main/antlr3>>>, then you will need to exclude
+     still under<<<${basedir}/src/main/antlr4>>>, then you will need to exclude
      the grammars from processing specifically, using the <<<<excludes>>>> option.
 
-     default-value="<<<${basedir}/src/main/antlr3/imports>>>"
+     default-value="<<<${basedir}/src/main/antlr4/imports>>>"
 

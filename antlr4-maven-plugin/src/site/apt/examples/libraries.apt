@@ -26,8 +26,8 @@ Libraries
 +--
 <plugin>
     <groupId>org.antlr</groupId>
-    <artifactId>antlr3-maven-plugin</artifactId>
-    <version>3.1.3-1</version>
+    <artifactId>antlr4-maven-plugin</artifactId>
+    <version>4.0-SNAPSHOT</version>
 
     <executions>
 
@@ -36,7 +36,7 @@ Libraries
                 <goals>
                     <goal>antlr</goal>
                 </goals>
-                <libDirectory>src/main/antlr_imports</libDirectory>
+                <libDirectory>src/main/antlr4_imports</libDirectory>
             </configuration>
         </execution>
     </executions>
