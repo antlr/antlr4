@@ -37,6 +37,8 @@ package org.antlr.mojo.antlr4;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import org.antlr.v4.Tool;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.tool.Grammar;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -48,8 +50,13 @@ import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -360,10 +367,48 @@ public class Antlr4Mojo
             throw new MojoExecutionException(e.getMessage());
         }
 
-        // Create an instance of the ANTLR 4 build tool
-        //
-        try {
-            tool = new Tool(args.toArray(new String[args.size()]));
+		// Create an instance of the ANTLR 4 build tool
+		//
+		try {
+			tool = new Tool(args.toArray(new String[args.size()])) {
+
+				@Override
+				public void process(Grammar g, boolean gencode) {
+					getLog().info("Processing grammar: " + g.fileName);
+					super.process(g, gencode);
+				}
+
+				@Override
+				public Writer getOutputFileWriter(Grammar g, String fileName) throws IOException {
+					if (outputDirectory == null) {
+						return new StringWriter();
+					}
+					// output directory is a function of where the grammar file lives
+					// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
+					// But, if this is a .tokens file, then we force the output to
+					// be the base output directory (or current directory if there is not a -o)
+					//
+					File outputDir;
+					if ( fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION) ) {
+						outputDir = new File(outputDirectory);
+					}
+					else {
+						outputDir = getOutputDirectory(g.fileName);
+					}
+
+					File outputFile = new File(outputDir, fileName);
+					if (!outputDir.exists()) {
+						outputDir.mkdirs();
+					}
+
+					URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
+					getLog().info("  Writing file: " + relativePath);
+					FileWriter fw = new FileWriter(outputFile);
+					return new BufferedWriter(fw);
+				}
+
+			};
+			tool.addListener(new Antlr4ErrorLog(log));
 
 			// we set some options directly
 			tool.trace = trace;
@@ -386,17 +431,17 @@ public class Antlr4Mojo
 
 			if (!sourceDirectory.exists()) {
 				if (log.isInfoEnabled()) {
-					log.info("No ANTLR grammars to compile in " + sourceDirectory.getAbsolutePath());
+					log.info("No ANTLR 4 grammars to compile in " + sourceDirectory.getAbsolutePath());
 				}
 				return;
 			} else {
 				if (log.isInfoEnabled()) {
-					log.info("ANTLR: Processing source directory " + sourceDirectory.getAbsolutePath());
+					log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
 				}
 			}
 
         } catch (Exception e) {
-            log.error("The attempt to create the ANTLR build tool failed, see exception report for details", e);
+            log.error("The attempt to create the ANTLR 4 build tool failed, see exception report for details", e);
 
             throw new MojoFailureException("Jim failed you!");
         }
@@ -407,7 +452,7 @@ public class Antlr4Mojo
         // then we should have accumulated errors in the counts
         //
         if (tool.getNumErrors() > 0) {
-            throw new MojoExecutionException("ANTLR caught " + tool.getNumErrors() + " build errors.");
+            throw new MojoExecutionException("ANTLR 4 caught " + tool.getNumErrors() + " build errors.");
         }
 
         // All looks good, so we need to tel Maven about the sources that
