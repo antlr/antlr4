@@ -29,8 +29,10 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 /** A stream of tokens accessing tokens from a TokenSource */
-public interface TokenStream extends SymbolStream<Token> {
+public interface TokenStream extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
 	 *  i&lt;0 indicates tokens in the past.  So -1 is previous token and -2 is
 	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
@@ -38,13 +40,7 @@ public interface TokenStream extends SymbolStream<Token> {
 	 *  that is negative.
      *  TODO (Sam): Throw exception for invalid k?
 	 */
-    @Override
     public Token LT(int k);
-
-	/** How far ahead has the stream been asked to look?  The return
-	 *  value is a valid index from 0..n-1.
-	 */
-//	int range();
 
 	/** Get a token at an absolute index i; 0..n-1.  This is really only
 	 *  needed for profiling and debugging and token stream rewriting.
@@ -53,7 +49,6 @@ public interface TokenStream extends SymbolStream<Token> {
 	 *  I believe DebugTokenStream can easily be altered to not use
 	 *  this method, removing the dependency.
 	 */
-	@Override
 	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but
@@ -61,18 +56,25 @@ public interface TokenStream extends SymbolStream<Token> {
 	 */
 	public TokenSource getTokenSource();
 
-	/** Return the text of all tokens from start to stop, inclusive.
-	 *  If the stream does not buffer all the tokens then it can just
-	 *  return "" or null;  Users should not access $ruleLabel.text in
-	 *  an action of course in that case.
+	/** Return the text of all tokens from within the interval.
+	 *  If the stream does not buffer all the tokens then it must
+	 *  throw UnsupportedOperationException;
+	 *  Users should not access $ruleLabel.text in an action of course in
+	 *  that case.
+	 * @param interval
 	 */
-	public String toString(int start, int stop);
+	public String getText(Interval interval);
+
+	public String getText();
+
+	public String getText(RuleContext ctx);
 
 	/** Because the user is not required to use a token with an index stored
 	 *  in it, we must provide a means for two token objects themselves to
 	 *  indicate the start/end location.  Most often this will just delegate
-	 *  to the other toString(int,int).  This is also parallel with
-	 *  the TreeNodeStream.toString(Object,Object).
+	 *  to the other getText(Interval).
+	 *  If the stream does not buffer all the tokens then it must
+	 *  throw UnsupportedOperationException;
 	 */
-	public String toString(Token start, Token stop);
+	public String getText(Token start, Token stop);
 }

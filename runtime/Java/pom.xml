@@ -23,17 +23,17 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.abego</groupId>
-            <artifactId>treelayout.core</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/org.abego.treelayout.core.jar</systemPath>
+            <groupId>org.abego.treelayout</groupId>
+            <artifactId>org.abego.treelayout.core</artifactId>
+            <version>1.0.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
     <build>
 
         <sourceDirectory>src</sourceDirectory>
+        <resources/>
 
         <plugins>
             <plugin>

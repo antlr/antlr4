@@ -57,6 +57,9 @@ import java.lang.reflect.Method;
  *        [input-filename]
  */
 public class TestRig {
+
+	public static final String LEXER_START_RULE_NAME = "tokens";
+
 	public static void main(String[] args) throws Exception {
 		String grammarName;
 		String startRuleName;
@@ -69,10 +72,12 @@ public class TestRig {
 		boolean diagnostics = false;
 		String encoding = null;
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName" +
-							   " [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname]" +
-							   " [-trace] [-diagnostics]"+
-							   " [input-filename]");
+			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
+							   "  [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
+							   "  [-trace] [-diagnostics]\n"+
+							   "  [input-filename]");
+			System.err.println("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
+			System.err.println("Omitting input-filename makes rig read from stdin.");
 			return;
 		}
 		int i=0;
@@ -121,15 +126,10 @@ public class TestRig {
 		}
 //		System.out.println("exec "+grammarName+"."+startRuleName);
 		String lexerName = grammarName+"Lexer";
-		String parserName = grammarName+"Parser";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class lexerClass = cl.loadClass(lexerName);
 		if ( lexerClass==null ) {
 			System.err.println("Can't load "+lexerName);
-		}
-		Class parserClass = cl.loadClass(parserName);
-		if ( parserClass==null ) {
-			System.err.println("Can't load "+parserName);
 		}
 
 		InputStream is = System.in;
@@ -158,6 +158,13 @@ public class TestRig {
 				}
 			}
 
+			if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
+
+			String parserName = grammarName+"Parser";
+			Class parserClass = cl.loadClass(parserName);
+			if ( parserClass==null ) {
+				System.err.println("Can't load "+parserName);
+			}
 			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			Parser parser = parserCtor.newInstance(tokens);
 

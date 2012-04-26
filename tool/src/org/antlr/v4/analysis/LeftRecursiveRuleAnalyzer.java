@@ -359,7 +359,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		TokenStream tokens = input.getTokenStream();
 		// find =>
 		for (int i=stop; i>=start; i--) {
-			if ( tokens.get(i).getType()==RARROW ) {
+			if ( tokens.get(i).getType()==POUND ) {
 				altAST.setTokenStopIndex(i-1);
 				return;
 			}

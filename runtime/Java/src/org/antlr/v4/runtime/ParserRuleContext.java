@@ -297,16 +297,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
-	/** Return the text matched by this context and below in the parse
-	 *  tree. It includes tokens from this.start .. this.stop inclusive.
-	 *  It includes hidden channel tokens between start, stop.  The
-	 *  edge tokens are always on-channel tokens.
-	 */
-	public String getText(TokenStream tokens) {
-		Interval range = getSourceInterval();
-		return range==Interval.INVALID ? null : tokens.toString(range.a, range.b);
-	}
-
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }
 
