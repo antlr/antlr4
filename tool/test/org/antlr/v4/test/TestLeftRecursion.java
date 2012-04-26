@@ -252,13 +252,13 @@ public class TestLeftRecursion extends BaseTest {
 			"s : q=e {System.out.println($e.v);} ;\n" +
 			"\n" +
 			"e returns [int v]\n" +
-			"  : a=e op='*' b=e {$v = $a.v * $b.v;}  -> mult\n" +
-			"  | a=e '+' b=e {$v = $a.v + $b.v;}     -> add\n" +
-			"  | INT         {$v = $INT.int;}        -> anInt\n" +
-			"  | '(' x=e ')' {$v = $x.v;}            -> parens\n" +
-			"  | x=e '++'    {$v = $x.v+1;}          -> inc\n" +
-			"  | e '--'                              -> dec\n" +
-			"  | ID          {$v = 3;}               -> anID\n" +
+			"  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n" +
+			"  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n" +
+			"  | INT         {$v = $INT.int;}        # anInt\n" +
+			"  | '(' x=e ')' {$v = $x.v;}            # parens\n" +
+			"  | x=e '++'    {$v = $x.v+1;}          # inc\n" +
+			"  | e '--'                              # dec\n" +
+			"  | ID          {$v = 3;}               # anID\n" +
 			"  ; \n" +
 			"\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -304,18 +304,18 @@ public class TestLeftRecursion extends BaseTest {
 			"// START:stat\n" +
 			"prog:   stat ;\n" +
 			"\n" +
-			"stat:   expr NEWLINE                -> printExpr\n" +
-			"    |   ID '=' expr NEWLINE         -> assign\n" +
-			"    |   NEWLINE                     -> blank\n" +
+			"stat:   expr NEWLINE                # printExpr\n" +
+			"    |   ID '=' expr NEWLINE         # assign\n" +
+			"    |   NEWLINE                     # blank\n" +
 			"    ;\n" +
 			"// END:stat\n" +
 			"\n" +
 			"// START:expr\n" +
-			"expr:   expr ('*'|'/') expr      -> MulDiv\n" +
-			"    |   expr ('+'|'-') expr      -> AddSub\n" +
-			"    |   INT                      -> int\n" +
-			"    |   ID                       -> id\n" +
-			"    |   '(' expr ')'             -> parens\n" +
+			"expr:   expr ('*'|'/') expr      # MulDiv\n" +
+			"    |   expr ('+'|'-') expr      # AddSub\n" +
+			"    |   INT                      # int\n" +
+			"    |   ID                       # id\n" +
+			"    |   '(' expr ')'             # parens\n" +
 			"    ;\n" +
 			"// END:expr\n" +
 			"\n" +
