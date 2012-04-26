@@ -178,8 +178,8 @@ public class TestListeners extends BaseTest {
 			"  walker.walk(new LeafListener(), $r.ctx);" +
 			"}\n" +
 			"  : r=e ;\n" +
-			"e : e '(' eList ')' -> Call\n" +
-			"  | INT             -> Int\n" +
+			"e : e '(' eList ')' # Call\n" +
+			"  | INT             # Int\n" +
 			"  ;     \n" +
 			"eList : e (',' e)* ;\n" +
 			"MULT: '*' ;\n" +
