@@ -535,7 +535,7 @@ ruleAltList
 
 labeledAlt
 	:	alternative
-		(	RARROW! id! {((AltAST)$alternative.tree).altLabel=$id.tree;}
+		(	POUND! id! {((AltAST)$alternative.tree).altLabel=$id.tree;}
 		)?
 	;
 
@@ -655,7 +655,7 @@ lexerCommandName
         :       id
         |       MODE    ->ID[$MODE]
         ;
-        
+
 altList
     :	alternative (OR alternative)* -> alternative+
     ;

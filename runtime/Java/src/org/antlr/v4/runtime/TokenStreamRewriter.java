@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -28,23 +28,38 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/** Useful for dumping out the input stream after doing some
- *  augmentation or other manipulations.
+/** Useful for rewriting out a buffered input token stream after doing some
+ *  augmentation or other manipulations on it.
  *
  *  You can insert stuff, replace, and delete chunks.  Note that the
  *  operations are done lazily--only if you convert the buffer to a
- *  String.  This is very efficient because you are not moving data around
- *  all the time.  As the buffer of tokens is converted to strings, the
- *  toString() method(s) check to see if there is an operation at the
- *  current index.  If so, the operation is done and then normal String
+ *  String with getText(). This is very efficient because you are not moving
+ *  data around all the time.  As the buffer of tokens is converted to strings,
+ *  the getText() method(s) scan the input token stream and check
+ *  to see if there is an operation at the current index.
+ *  If so, the operation is done and then normal String
  *  rendering continues on the buffer.  This is like having multiple Turing
  *  machine instruction streams (programs) operating on a single input tape. :)
  *
- *  Since the operations are done lazily at toString-time, operations do not
+ *  This rewriter makes no modifications to the token stream. It does not
+ *  ask the stream to fill itself up nor does it advance the input cursor.
+ *  The token stream index() will return the same value before and after
+ *  any getText() call.
+ *
+ *  The rewriter only works on tokens that you have in the buffer and
+ *  ignores the current input cursor. If you are buffering tokens on-demand,
+ *  calling getText() halfway through the input will only do rewrites
+ *  for those tokens in the first half of the file.
+ *
+ *  Since the operations are done lazily at getText-time, operations do not
  *  screw up the token index values.  That is, an insert operation at token
  *  index i does not change the index values for tokens i+1..n-1.
  *
@@ -56,18 +71,17 @@ import java.util.*;
  *
  *   CharStream input = new ANTLRFileStream("input");
  *   TLexer lex = new TLexer(input);
- *   TokenRewriteStream tokens = new TokenRewriteStream(lex);
+ *   CommonTokenStream tokens = new CommonTokenStream(lex);
  *   T parser = new T(tokens);
+ *   TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
  *   parser.startRule();
  *
- * 	 Then in the rules, you can execute
+ * 	 Then in the rules, you can execute (assuming rewriter is visible):
  *      Token t,u;
  *      ...
- *      input.insertAfter(t, "text to put after t");}
- * 		input.insertAfter(u, "text after u");}
+ *      rewriter.insertAfter(t, "text to put after t");}
+ * 		rewriter.insertAfter(u, "text after u");}
  * 		System.out.println(tokens.toString());
- *
- *  Actually, you have to cast the 'input' to a TokenRewriteStream. :(
  *
  *  You can also have multiple "instruction streams" and get multiple
  *  rewrites from a single pass over the input.  Just name the instruction
@@ -83,7 +97,7 @@ import java.util.*;
  *  If you don't use named rewrite streams, a "default" stream is used as
  *  the first example shows.
  */
-public class TokenRewriteStream extends CommonTokenStream {
+public class TokenStreamRewriter {
 	public static final String DEFAULT_PROGRAM_NAME = "default";
     public static final int PROGRAM_INIT_SIZE = 100;
 	public static final int MIN_TOKEN_INDEX = 0;
@@ -164,33 +178,28 @@ public class TokenRewriteStream extends CommonTokenStream {
 		}
 	}
 
+	/** Our source stream */
+	protected final TokenStream tokens;
+
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
 	 *  Maps String (name) -> rewrite (List)
 	 */
-	protected Map<String, List<RewriteOperation>> programs = null;
+	protected final Map<String, List<RewriteOperation>> programs;
 
 	/** Map String (program name) -> Integer index */
-	protected Map<String, Integer> lastRewriteTokenIndexes = null;
+	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
-	public TokenRewriteStream() {
-		init();
-	}
-
-	protected void init() {
+	public TokenStreamRewriter(TokenStream tokens) {
+		this.tokens = tokens;
 		programs = new HashMap<String, List<RewriteOperation>>();
-		programs.put(DEFAULT_PROGRAM_NAME, new ArrayList<RewriteOperation>(PROGRAM_INIT_SIZE));
+		programs.put(DEFAULT_PROGRAM_NAME,
+					 new ArrayList<RewriteOperation>(PROGRAM_INIT_SIZE));
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public TokenRewriteStream(TokenSource tokenSource) {
-	    super(tokenSource);
-		init();
-	}
-
-	public TokenRewriteStream(TokenSource tokenSource, int channel) {
-		super(tokenSource, channel);
-		init();
+	public final TokenStream getTokenStream() {
+		return tokens;
 	}
 
 	public void rollback(int instructionIndex) {
@@ -340,44 +349,37 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return is;
 	}
 
-	public String toOriginalString() {
-        fill();
-		return toOriginalString(MIN_TOKEN_INDEX, size()-1);
+	/** Return the text from the original tokens altered per the
+	 *  instructions given to this rewriter.
+ 	 */
+	public String getText() {
+		return getText(DEFAULT_PROGRAM_NAME, Interval.of(0,tokens.size()-1));
 	}
 
-	public String toOriginalString(int start, int end) {
-		StringBuilder buf = new StringBuilder();
-		for (int i=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.size(); i++) {
-			if ( get(i).getType()!=Token.EOF ) buf.append(get(i).getText());
-		}
-		return buf.toString();
+	/** Return the text associated with the tokens in the interval from the
+	 *  original token stream but with the alterations given to this rewriter.
+	 *  The interval refers to the indexes in the original token stream.
+	 *  We do not alter the token stream in any way, so the indexes
+	 *  and intervals are still consistent. Includes any operations done
+	 *  to the first and last token in the interval. So, if you did an
+	 *  insertBefore on the first token, you would get that insertion.
+	 *  The same is true if you do an insertAfter the stop token.
+ 	 */
+	public String getText(Interval interval) {
+		return getText(DEFAULT_PROGRAM_NAME, interval);
 	}
 
-	@Override
-	public String toString() {
-        fill();
-		return toString(MIN_TOKEN_INDEX, size()-1);
-	}
-
-	public String toString(String programName) {
-        fill();
-		return toString(programName, MIN_TOKEN_INDEX, size()-1);
-	}
-
-	@Override
-	public String toString(int start, int end) {
-		return toString(DEFAULT_PROGRAM_NAME, start, end);
-	}
-
-	public String toString(String programName, int start, int end) {
+	public String getText(String programName, Interval interval) {
 		List<RewriteOperation> rewrites = programs.get(programName);
+		int start = interval.a;
+		int stop = interval.b;
 
         // ensure start/end are in range
-        if ( end>tokens.size()-1 ) end = tokens.size()-1;
+        if ( stop>tokens.size()-1 ) stop = tokens.size()-1;
         if ( start<0 ) start = 0;
 
         if ( rewrites==null || rewrites.isEmpty() ) {
-			return toOriginalString(start,end); // no instructions to execute
+			return tokens.getText(interval); // no instructions to execute
 		}
 		StringBuilder buf = new StringBuilder();
 
@@ -386,7 +388,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 
         // Walk buffer, executing instructions and emitting tokens
         int i = start;
-        while ( i <= end && i < tokens.size() ) {
+        while ( i <= stop && i < tokens.size() ) {
 			RewriteOperation op = indexToOp.get(i);
 			indexToOp.remove(i); // remove so any left have index size-1
 			Token t = tokens.get(i);
@@ -403,12 +405,10 @@ public class TokenRewriteStream extends CommonTokenStream {
         // include stuff after end if it's last index in buffer
         // So, if they did an insertAfter(lastValidIndex, "foo"), include
         // foo if end==lastValidIndex.
-        if ( end==tokens.size()-1 ) {
+        if ( stop==tokens.size()-1 ) {
             // Scan any remaining operations after last token
             // should be included (they will be inserts).
-            Iterator<RewriteOperation> it = indexToOp.values().iterator();
-            while (it.hasNext()) {
-                RewriteOperation op = it.next();
+			for (RewriteOperation op : indexToOp.values()) {
                 if ( op.index >= tokens.size()-1 ) buf.append(op.text);
             }
         }
@@ -569,10 +569,6 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return x+y;
 	}
 
-	protected <T extends RewriteOperation> List<? extends T> getKindOfOps(List<? extends RewriteOperation> rewrites, Class<T> kind) {
-		return getKindOfOps(rewrites, kind, rewrites.size());
-	}
-
     /** Get all operations before an index of a particular kind */
     protected <T extends RewriteOperation> List<? extends T> getKindOfOps(List<? extends RewriteOperation> rewrites, Class<T> kind, int before) {
 		List<T> ops = new ArrayList<T>();
@@ -586,15 +582,4 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return ops;
 	}
 
-	public String toDebugString() {
-		return toDebugString(MIN_TOKEN_INDEX, size()-1);
-	}
-
-	public String toDebugString(int start, int end) {
-		StringBuilder buf = new StringBuilder();
-		for (int i=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.size(); i++) {
-			buf.append(get(i));
-		}
-		return buf.toString();
-	}
 }

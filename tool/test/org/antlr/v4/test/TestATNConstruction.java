@@ -360,14 +360,14 @@ public class TestATNConstruction extends BaseTest {
 	@Test public void testNestedAstar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
-			"a : (',' ID*)*;");
+			"a : (COMMA ID*)*;");
 		String expecting =
 			"RuleStart_a_0->StarLoopEntry_13\n" +
 			"StarLoopEntry_13->StarBlockStart_11\n" +
 			"StarLoopEntry_13->s14\n" +
 			"StarBlockStart_11->s2\n" +
 			"s14->RuleStop_a_1\n" +
-			"s2-','->StarLoopEntry_8\n" +
+			"s2-COMMA->StarLoopEntry_8\n" +
 			"RuleStop_a_1-EOF->s16\n" +
 			"StarLoopEntry_8->StarBlockStart_6\n" +
 			"StarLoopEntry_8->s9\n" +

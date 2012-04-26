@@ -52,7 +52,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID INT {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : ID INT {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
@@ -80,7 +80,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : ID+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -93,7 +93,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|ID)+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -105,7 +105,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : ID* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -121,7 +121,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|ID)* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
 
@@ -136,7 +136,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})+ {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|INT{;})+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
@@ -149,7 +149,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})* {System.out.println(_input.toString(0,_input.index()-1));} ;\n" +
+			"a : (ID|INT{;})* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";

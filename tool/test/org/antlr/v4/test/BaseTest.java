@@ -35,12 +35,12 @@ import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
@@ -50,9 +50,11 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
@@ -382,42 +384,54 @@ public abstract class BaseTest {
 
 
 	/** Return true if all is ok, no errors */
-	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, String... extraOptions) {
+	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
 		boolean allIsWell = true;
 		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
+		ErrorQueue equeue = new ErrorQueue();
+		final List<String> options = new ArrayList<String>();
+		Collections.addAll(options, extraOptions);
+		options.add("-o");
+		options.add(tmpdir);
+		options.add("-lib");
+		options.add(tmpdir);
+		options.add(new File(tmpdir,grammarFileName).toString());
 		try {
-			final List<String> options = new ArrayList<String>();
-			Collections.addAll(options, extraOptions);
-			options.add("-o");
-			options.add(tmpdir);
-			options.add("-lib");
-			options.add(tmpdir);
-			options.add(new File(tmpdir,grammarFileName).toString());
 			final String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
-			ErrorQueue equeue = new ErrorQueue();
 			Tool antlr = newTool(optionsA);
 			antlr.addListener(equeue);
-			antlr.processGrammarsOnCommandLine();
-			if ( equeue.errors.size()>0 ) {
-				allIsWell = false;
-				System.err.println("antlr reports errors from "+options);
-				for (int i = 0; i < equeue.errors.size(); i++) {
-					ANTLRMessage msg = equeue.errors.get(i);
-					System.err.println(msg);
-				}
-				System.out.println("!!!\ngrammar:");
-				System.out.println(grammarStr);
-				System.out.println("###");
+			if (defaultListener) {
+				antlr.addListener(new DefaultToolListener(antlr));
 			}
+			antlr.processGrammarsOnCommandLine();
 		}
 		catch (Exception e) {
 			allIsWell = false;
 			System.err.println("problems building grammar: "+e);
 			e.printStackTrace(System.err);
 		}
+
+		allIsWell = equeue.errors.isEmpty();
+		if ( !defaultListener && !equeue.errors.isEmpty() ) {
+			System.err.println("antlr reports errors from "+options);
+			for (int i = 0; i < equeue.errors.size(); i++) {
+				ANTLRMessage msg = equeue.errors.get(i);
+				System.err.println(msg);
+			}
+			System.out.println("!!!\ngrammar:");
+			System.out.println(grammarStr);
+			System.out.println("###");
+		}
+		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
+			System.err.println("antlr reports warnings from "+options);
+			for (int i = 0; i < equeue.warnings.size(); i++) {
+				ANTLRMessage msg = equeue.warnings.get(i);
+				System.err.println(msg);
+			}
+		}
+
 		return allIsWell;
 	}
 
@@ -458,11 +472,11 @@ public abstract class BaseTest {
 								String input, boolean debug)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-									  grammarStr,
-									  parserName,
-									  lexerName,
-									  "-parse-listener",
-									  "-visitor");
+														grammarStr,
+														parserName,
+														lexerName,
+														"-parse-listener",
+														"-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
@@ -478,9 +492,23 @@ public abstract class BaseTest {
 													String lexerName,
 													String... extraOptions)
 	{
+		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
+	}
+
+	/** Return true if all is well */
+	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
+													String grammarStr,
+													@Nullable String parserName,
+													String lexerName,
+													boolean defaultListener,
+													String... extraOptions)
+	{
 		boolean allIsWell =
-			antlr(grammarFileName, grammarFileName, grammarStr, extraOptions);
-		boolean ok;
+			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
+		if (!allIsWell) {
+			return false;
+		}
+
 		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
 			files.add(lexerName+".java");
@@ -498,8 +526,7 @@ public abstract class BaseTest {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
 			}
 		}
-		ok = compile(files.toArray(new String[files.size()]));
-		if ( !ok ) { allIsWell = false; }
+		allIsWell = compile(files.toArray(new String[files.size()]));
 		return allIsWell;
 	}
 
@@ -1097,12 +1124,22 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public String toString(int start, int stop) {
-			return null;
+		public String getText() {
+			throw new UnsupportedOperationException("can't give strings");
 		}
 
 		@Override
-		public String toString(Token start, Token stop) {
+		public String getText(Interval interval) {
+			throw new UnsupportedOperationException("can't give strings");
+		}
+
+		@Override
+		public String getText(RuleContext ctx) {
+			throw new UnsupportedOperationException("can't give strings");
+		}
+
+		@Override
+		public String getText(Token start, Token stop) {
 			return null;
 		}
 	}

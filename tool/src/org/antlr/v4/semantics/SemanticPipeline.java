@@ -31,6 +31,7 @@ package org.antlr.v4.semantics;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -116,7 +117,7 @@ public class SemanticPipeline {
 		}
 		else {
 			assignTokenTypes(g, collector.tokensDefs,
-							 collector.tokenIDRefs, collector.strings);
+							 collector.tokenIDRefs, collector.terminals);
 		}
 
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
@@ -163,7 +164,7 @@ public class SemanticPipeline {
 	}
 
 	void assignTokenTypes(Grammar g, List<GrammarAST> tokensDefs,
-						  List<GrammarAST> tokenIDs, Set<String> strings)
+						  List<GrammarAST> tokenIDs, List<GrammarAST> terminals)
 	{
 		//Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
@@ -173,6 +174,9 @@ public class SemanticPipeline {
 				String name = alias.getChild(0).getText();
 				String lit = alias.getChild(1).getText();
 				g.defineTokenAlias(name, lit);
+			}
+			else {
+				g.defineTokenName(alias.getText());
 			}
 		}
 
@@ -187,10 +191,25 @@ public class SemanticPipeline {
 		   */
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
-		for (GrammarAST idAST : tokenIDs) { g.defineTokenName(idAST.getText()); }
+		for (GrammarAST idAST : tokenIDs) {
+			if (g.getTokenType(idAST.getText()) == Token.INVALID_TYPE) {
+				g.tool.errMgr.grammarError(ErrorType.IMPLICIT_TOKEN_DEFINITION, g.fileName, idAST.token, idAST.getText());
+			}
 
-		// DEFINE TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
-		for (String s : strings) { g.defineStringLiteral(s); }
+			g.defineTokenName(idAST.getText());
+		}
+
+		// VERIFY TOKEN TYPES FOR STRING LITERAL REFS LIKE 'while', ';'
+		for (GrammarAST termAST : terminals) {
+			if (termAST.getType() != ANTLRParser.STRING_LITERAL) {
+				continue;
+			}
+
+			if (g.getTokenType(termAST.getText()) == Token.INVALID_TYPE) {
+				g.tool.errMgr.grammarError(ErrorType.IMPLICIT_STRING_DEFINITION, g.fileName, termAST.token, termAST.getText());
+			}
+		}
+
 		g.tool.log("semantics", "tokens="+g.tokenNameToTypeMap);
         g.tool.log("semantics", "strings="+g.stringLiteralToTypeMap);
 	}

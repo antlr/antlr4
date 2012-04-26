@@ -144,6 +144,9 @@ public enum ErrorType {
 	RULE_WITH_TOO_FEW_ALT_LABELS(122, "rule <arg>: must label all alternatives or none", ErrorSeverity.ERROR),
 	ALT_LABEL_REDEF(123, "rule alt label <arg> redefined in rule <arg2>, originally in <arg3>", ErrorSeverity.ERROR),
 	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
+	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
+	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
+
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
 
@@ -185,16 +188,18 @@ public enum ErrorType {
 
     ;
 
-	public String msg;
-    public int code; // unique, deterministic unchanging error code once we release
-    public ErrorSeverity severity;
-    public Boolean abortsAnalysis;
-    public Boolean abortsCodegen;
+	public final String msg;
+    public final int code; // unique, deterministic unchanging error code once we release
+    public final ErrorSeverity severity;
+    public final Boolean abortsAnalysis;
+    public final Boolean abortsCodegen;
 
 	ErrorType(int code, String msg, ErrorSeverity severity) {
         this.code = code;
 		this.msg = msg;
         this.severity = severity;
+		this.abortsAnalysis = false;
+		this.abortsCodegen = false;
 	}
 
 //	ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis) {
