@@ -525,7 +525,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		List<String> stack = new ArrayList<String>();
 		while ( p!=null ) {
 			// compute what follows who invoked us
-			stack.add(ruleNames[p.getRuleIndex()]);
+			int ruleIndex = p.getRuleIndex();
+			if ( ruleIndex<0 ) stack.add("n/a");
+			else stack.add(ruleNames[ruleIndex]);
 			p = p.parent;
 		}
 		return stack;
