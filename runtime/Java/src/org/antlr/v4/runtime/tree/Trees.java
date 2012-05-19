@@ -95,7 +95,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static <Symbol> String getNodeText(Tree t, Parser recog) {
+	public static String getNodeText(Tree t, Parser recog) {
 		if ( recog!=null ) {
 			if ( t instanceof ParseTree.RuleNode ) {
 				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
