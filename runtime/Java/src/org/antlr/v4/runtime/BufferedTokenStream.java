@@ -310,10 +310,6 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	@Override
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
-    /** Grab *all* tokens from stream and return string */
-    @Override
-    public String toString() { return getText(); }
-
 	/** Get the text of all tokens in this buffer. */
 	public String getText() {
 		if ( p == -1 ) setup();
