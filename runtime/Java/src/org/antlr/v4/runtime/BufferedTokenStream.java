@@ -299,6 +299,14 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 		return tokens.subList(prevOnChannel+1, tokenIndex);
 	}
 
+	public List<T> getHiddenTokensToRight(int tokenIndex) {
+		return getOffChannelTokensToRight(tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+	}
+
+	public List<T> getHiddenTokensToLeft(int tokenIndex) {
+		return getOffChannelTokensToLeft(tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+	}
+
 	@Override
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
