@@ -82,25 +82,29 @@ public class ANTLRInputStream implements CharStream {
         load(r, size, readChunkSize);
     }
 
-    public ANTLRInputStream(InputStream input) throws IOException {
-        this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
-    }
+	public ANTLRInputStream(InputStream input) throws IOException {
+		this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
+	}
 
-    public ANTLRInputStream(InputStream input, int size) throws IOException {
-        this(new InputStreamReader(input), size);
-    }
+	public ANTLRInputStream(InputStream input, int size) throws IOException {
+		this(new InputStreamReader(input), size);
+	}
 
-    public void load(Reader r, int size, int readChunkSize)
-   		throws IOException
-   	{
-   		if ( r==null ) {
-   			return;
-   		}
-   		if ( size<=0 ) {
-   			size = INITIAL_BUFFER_SIZE;
-   		}
-   		if ( readChunkSize<=0 ) {
-   			readChunkSize = READ_BUFFER_SIZE;
+	public ANTLRInputStream(InputStream input, int size, int readChunkSize) throws IOException {
+		this(new InputStreamReader(input), size, readChunkSize);
+	}
+
+	public void load(Reader r, int size, int readChunkSize)
+	throws IOException
+	{
+		if ( r==null ) {
+			return;
+		}
+		if ( size<=0 ) {
+			size = INITIAL_BUFFER_SIZE;
+		}
+		if ( readChunkSize<=0 ) {
+			readChunkSize = READ_BUFFER_SIZE;
    		}
    		// System.out.println("load "+size+" in chunks of "+readChunkSize);
    		try {
