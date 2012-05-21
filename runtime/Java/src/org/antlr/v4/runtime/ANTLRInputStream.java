@@ -74,28 +74,28 @@ public class ANTLRInputStream implements CharStream {
         this(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
     }
 
-    public ANTLRInputStream(Reader r, int size) throws IOException {
-        this(r, size, READ_BUFFER_SIZE);
+    public ANTLRInputStream(Reader r, int initialSize) throws IOException {
+        this(r, initialSize, READ_BUFFER_SIZE);
     }
 
-    public ANTLRInputStream(Reader r, int size, int readChunkSize) throws IOException {
-        load(r, size, readChunkSize);
+    public ANTLRInputStream(Reader r, int initialSize, int readChunkSize) throws IOException {
+        load(r, initialSize, readChunkSize);
     }
 
 	public ANTLRInputStream(InputStream input) throws IOException {
 		this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
 	}
 
-	public ANTLRInputStream(InputStream input, int size) throws IOException {
-		this(new InputStreamReader(input), size);
+	public ANTLRInputStream(InputStream input, int initialSize) throws IOException {
+		this(new InputStreamReader(input), initialSize);
 	}
 
-	public ANTLRInputStream(InputStream input, int size, int readChunkSize) throws IOException {
-		this(new InputStreamReader(input), size, readChunkSize);
+	public ANTLRInputStream(InputStream input, int initialSize, int readChunkSize) throws IOException {
+		this(new InputStreamReader(input), initialSize, readChunkSize);
 	}
 
 	public void load(Reader r, int size, int readChunkSize)
-	throws IOException
+		throws IOException
 	{
 		if ( r==null ) {
 			return;
