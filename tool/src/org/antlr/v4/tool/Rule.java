@@ -55,7 +55,6 @@ public class Rule implements AttributeResolver {
             add(new Attribute("text"));
             add(new Attribute("start"));
             add(new Attribute("stop"));
-            add(new Attribute("tree"));
             add(new Attribute("ctx"));
         }};
 
