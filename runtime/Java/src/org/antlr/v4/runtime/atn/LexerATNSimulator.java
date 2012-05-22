@@ -726,8 +726,16 @@ public class LexerATNSimulator extends ATNSimulator {
 		return line;
 	}
 
+	public void setLine(int line) {
+		this.line = line;
+	}
+
 	public int getCharPositionInLine() {
 		return charPositionInLine;
+	}
+
+	public void setCharPositionInLine(int charPositionInLine) {
+		this.charPositionInLine = charPositionInLine;
 	}
 
 	public void consume(@NotNull CharStream input) {

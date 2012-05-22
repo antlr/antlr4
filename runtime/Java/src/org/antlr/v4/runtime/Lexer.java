@@ -266,6 +266,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return getInterpreter().getCharPositionInLine();
 	}
 
+	public void setLine(int line) {
+		getInterpreter().setLine(line);
+	}
+
+	public void setCharPositionInLine(int charPositionInLine) {
+		getInterpreter().setCharPositionInLine(charPositionInLine);
+	}
+
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
 		return _input.index();
