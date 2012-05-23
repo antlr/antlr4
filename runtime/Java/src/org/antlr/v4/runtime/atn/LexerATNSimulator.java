@@ -716,10 +716,11 @@ public class LexerATNSimulator extends ATNSimulator {
 		return dfa[mode];
 	}
 
-	/** Get the text of the current token */
+	/** Get the text of the current token. */
 	@NotNull
 	public String getText(@NotNull CharStream input) {
-		return input.getText(Interval.of(startIndex, input.index()));
+		// index is first lookahead char, don't include.
+		return input.getText(Interval.of(startIndex, input.index()-1));
 	}
 
 	public int getLine() {
