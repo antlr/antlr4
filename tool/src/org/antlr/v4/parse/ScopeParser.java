@@ -29,19 +29,19 @@
 
 package org.antlr.v4.parse;
 
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/** Parse args, return values, and dynamic scopes.
+/** Parse args, return values, locals
  *
  *  rule[arg1, arg2, ..., argN] returns [ret1, ..., retN]
- *  scope { decl1; decl2; ... declN; }
  *
- *  The ',' and ';' are significant.  Use \, and \; to use within
- *  types if necessary like [Map<String\,String> foo, int y].
- *
- *  arg, ret, and decl are target language dependent.  Java/C#/C/C++ would
+ *  text is target language dependent.  Java/C#/C/C++ would
  *  use "int i" but ruby/python would use "i".
  */
 public class ScopeParser {
@@ -58,32 +58,15 @@ public class ScopeParser {
     public static AttributeDict parseTypedArgList(String s, ErrorManager errMgr) { return parse(s, ',', errMgr); }
 
     public static AttributeDict parse(String s, char separator, ErrorManager errMgr) {
-        int i = 0;
-        int n = s.length();
         AttributeDict dict = new AttributeDict();
-        while ( i<n ) {
-            StringBuilder buf = new StringBuilder();
-            while ( i<n && s.charAt(i)!=separator ) {
-                if ( s.charAt(i)=='\\' ) {
-                    i++;
-                    if ( i<n && s.charAt(i)==separator ) {
-                        buf.append(s.charAt(i));
-                        i++;
-                        continue;
-                    }
-                    buf.append('\\');
-                }
-                buf.append(s.charAt(i));
-                i++;
-            }
-            i++; // skip separator
-            String def = buf.toString();
-            //System.out.println("def="+ def);
-            if ( def.trim().length()>0 ) {
-                Attribute a = parseAttributeDef(def, errMgr);
+		List<String> decls = splitDecls(s, separator);
+		for (String decl : decls) {
+//            System.out.println("decl="+decl);
+            if ( decl.trim().length()>0 ) {
+                Attribute a = parseAttributeDef(decl, errMgr);
                 dict.add(a);
             }
-        }
+		}
         return dict;
     }
 
@@ -163,12 +146,11 @@ public class ScopeParser {
      *  convert to a list of attributes.  Allow nested square brackets etc...
      *  Set separatorChar to ';' or ',' or whatever you want.
      */
-    public static List<String> splitArgumentList(String s, int separatorChar) {
+    public static List<String> splitDecls(String s, int separatorChar) {
         List<String> args = new ArrayList<String>();
         _splitArgumentList(s, 0, -1, separatorChar, args);
         return args;
     }
-
 
     public static int _splitArgumentList(String actionText,
                                          int start,
