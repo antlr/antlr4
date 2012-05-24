@@ -114,7 +114,7 @@ public class TestCommonTokenStream extends BaseTest {
         tokens.LT(i++); // push it past end
         tokens.LT(i++);
 
-        String result = tokens.toString();
+        String result = tokens.getText();
         String expecting = "x = 3 * 0 + 2 * 0;";
         assertEquals(expecting, result);
     }
@@ -146,7 +146,7 @@ public class TestCommonTokenStream extends BaseTest {
         tokens.consume();
         tokens.LT(1);
 
-        String result = tokens.toString();
+        String result = tokens.getText();
         String expecting = "x = 3 * 0 + 2 * 0;";
         assertEquals(expecting, result);
     }
