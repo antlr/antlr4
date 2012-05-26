@@ -297,6 +297,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		this._text = text;
 	}
 
+	public void setToken(Token _token) {
+		this._token = _token;
+	}
+
 	public String[] getModeNames() {
 		return null;
 	}
