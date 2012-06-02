@@ -32,10 +32,13 @@ package org.antlr.v4.semantics;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /** Do as much semantic checking as we can and fill in grammar
  *  with rules, actions, and token definitions.
@@ -179,16 +182,6 @@ public class SemanticPipeline {
 				g.defineTokenName(alias.getText());
 			}
 		}
-
-		// DEFINE TOKEN TYPES FOR X : 'x' ; RULES
-		/* done by previous import
-		   Map<String,String> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
-		   if ( litAliases!=null ) {
-			   for (String lit : litAliases.keySet()) {
-				   G.defineTokenAlias(litAliases.get(lit), lit);
-			   }
-		   }
-		   */
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
 		for (GrammarAST idAST : tokenIDs) {
