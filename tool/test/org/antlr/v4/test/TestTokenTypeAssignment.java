@@ -98,6 +98,21 @@ public class TestTokenTypeAssignment extends BaseTest {
 		assertEquals("[E, 'x']", tokens.toString());
 	}
 
+	@Test public void testPredDoesNotHideNameToLiteralMapInLexer() throws Exception {
+		// 'x' is token and char in lexer rule
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"a : 'x' X ; \n" +
+				"X: 'x' {true}?;\n"); // must match as alias even with pred
+
+		assertEquals("{'x'=1}", g.stringLiteralToTypeMap.toString());
+		assertEquals("{EOF=-1, X=1}", g.tokenNameToTypeMap.toString());
+
+		// pushed in lexer from parser
+		assertEquals("{'x'=1}", g.implicitLexer.stringLiteralToTypeMap.toString());
+		assertEquals("{EOF=-1, X=1}", g.implicitLexer.tokenNameToTypeMap.toString());
+	}
+
 	@Test public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
