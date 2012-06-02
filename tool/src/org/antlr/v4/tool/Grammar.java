@@ -51,13 +51,11 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTErrorNode;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.PredAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -450,7 +448,7 @@ public class Grammar implements AttributeResolver {
 			tokenName = "EOF";
 		}
 		else {
-			if ( ttype<typeToTokenList.size() ) {
+			if ( ttype>0 && ttype<typeToTokenList.size() ) {
 				tokenName = typeToTokenList.get(ttype);
 				if ( tokenName!=null &&
 					 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) &&
