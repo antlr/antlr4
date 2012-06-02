@@ -40,7 +40,29 @@ public class TestSemPredEvalLexer extends BaseTest {
 			":s2=>3-'u'->:s3=>3\n" +
 			":s5=>3-'b'->:s5=>3\n" +
 			":s5=>3-'c'->:s5=>3\n";
-		// didn't even created DFA 2nd time; old target of 'u' has "pred" flag set
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testIDvsEnum() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"ENUM : 'enum' {false}? ;\n" +
+			"ID : 'a'..'z'+ ;\n"+
+			"WS : (' '|'\\n') {skip();} ;";
+		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
+		String expecting =
+			"[@0,0:3='enum',<2>,1:0]\n" +
+			"[@1,5:7='abc',<2>,1:5]\n" +
+			"[@2,9:12='enum',<2>,1:9]\n" +
+			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
+			"s0-' '->:s5=>3\n" +
+			"s0-'a'->:s4=>2\n" +
+			"s0-'e'->:s1=>2\n" +
+			":s1=>2-'n'->:s2=>2\n" +
+			":s2=>2-'u'->:s3=>2\n" +
+			":s3=>2-'m'->:s4=>2\n" +
+			":s4=>2-'b'->:s4=>2\n" +
+			":s4=>2-'c'->:s4=>2\n\n";
 		assertEquals(expecting, found);
 	}
 
