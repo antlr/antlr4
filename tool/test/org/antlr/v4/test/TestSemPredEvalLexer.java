@@ -1,6 +1,7 @@
 package org.antlr.v4.test;
 
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class TestSemPredEvalLexer extends BaseTest {
 
@@ -13,8 +14,8 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc", true);
 		String expecting =
-			"[@0,0:3='enum',<4>,1:0]\n" +
-			"[@1,5:7='abc',<5>,1:5]\n" +
+			"[@0,0:3='enum',<2>,1:0]\n" +
+			"[@1,5:7='abc',<3>,1:5]\n" +
 			"[@2,8:7='<EOF>',<-1>,1:8]\n"; // no dfa since preds on left edge
 		assertEquals(expecting, found);
 	}
@@ -28,17 +29,17 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		String expecting =
-			"[@0,0:3='enum',<4>,1:0]\n" +
-			"[@1,5:7='abc',<5>,1:5]\n" +
-			"[@2,9:12='enum',<4>,1:9]\n" +
+			"[@0,0:3='enum',<2>,1:0]\n" +
+			"[@1,5:7='abc',<3>,1:5]\n" +
+			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s4=>6\n" +
-			"s0-'a'->:s5=>5\n" +
-			"s0-'e'->:s1=>5\n" +
-			":s1=>5-'n'->:s2=>5\n" +
-			":s2=>5-'u'->:s3=>5\n" +
-			":s5=>5-'b'->:s5=>5\n" +
-			":s5=>5-'c'->:s5=>5\n";
+			"s0-' '->:s4=>4\n" +
+			"s0-'a'->:s5=>3\n" +
+			"s0-'e'->:s1=>3\n" +
+			":s1=>3-'n'->:s2=>3\n" +
+			":s2=>3-'u'->:s3=>3\n" +
+			":s5=>3-'b'->:s5=>3\n" +
+			":s5=>3-'c'->:s5=>3\n";
 		// didn't even created DFA 2nd time; old target of 'u' has "pred" flag set
 		assertEquals(expecting, found);
 	}

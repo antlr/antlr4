@@ -234,8 +234,8 @@ public class TestCompositeGrammars extends BaseTest {
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
-		String expectedTokenIDToTypeMap = "{EOF=-1, B=3, A=4, C=5, WS=6}";
-		String expectedStringLiteralToTypeMap = "{'c'=5, 'a'=4, 'b'=3}";
+		String expectedTokenIDToTypeMap = "{EOF=-1, B=1, A=2, C=3, WS=4}";
+		String expectedStringLiteralToTypeMap = "{'c'=3, 'a'=2, 'b'=1}";
 		String expectedTypeToTokenList = "[B, A, C, WS]";
 
 		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
@@ -369,14 +369,14 @@ public class TestCompositeGrammars extends BaseTest {
         String slave =
             "parser grammar S;\n" +
             "a : b {System.out.println(\"S.a\");} ;\n" +
-            "b : B ;\n" ;
+            "b : 'b' ;\n" ;
         mkdir(tmpdir);
         writeFile(tmpdir, "S.g4", slave);
 
         String slave2 =
             "parser grammar T;\n" +
             "tokens { A='x'; }\n" +
-            "b : B {System.out.println(\"T.b\");} ;\n";
+            "b : 'b' {System.out.println(\"T.b\");} ;\n";
         writeFile(tmpdir, "T.g4", slave2);
 
         String master =
@@ -405,9 +405,9 @@ public class TestCompositeGrammars extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String expecting =
 			"S.A\n" +
-			"[@0,0:0='a',<5>,1:0]\n" +
-			"[@1,1:1='b',<3>,1:1]\n" +
-			"[@2,2:2='c',<6>,1:2]\n" +
+			"[@0,0:0='a',<3>,1:0]\n" +
+			"[@1,1:1='b',<1>,1:1]\n" +
+			"[@2,2:2='c',<4>,1:2]\n" +
 			"[@3,3:2='<EOF>',<-1>,1:3]\n";
 		String found = execLexer("M.g4", master, "M", "abc", debug);
 		assertEquals(expecting, found);
@@ -427,7 +427,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execLexer("M.g4", master, "M", "ab", debug);
 		assertEquals("M.A\n" +
-					 "[@0,0:1='ab',<3>,1:0]\n" +
+					 "[@0,0:1='ab',<1>,1:0]\n" +
 					 "[@1,2:1='<EOF>',<-1>,1:2]\n", found);
 	}
 
@@ -454,7 +454,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected warnings: "+equeue, 0, equeue.warnings.size());
 
 		assertEquals("M.A\n" +
-					 "M.a: [@0,0:2='abc',<3>,1:0]\n", found);
+					 "M.a: [@0,0:2='abc',<1>,1:0]\n", found);
 	}
 
 	// Make sure that M can import S that imports T.
@@ -479,7 +479,7 @@ public class TestCompositeGrammars extends BaseTest {
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
-		String expectedTokenIDToTypeMap = "{EOF=-1, M=3}"; // S and T aren't imported; overridden
+		String expectedTokenIDToTypeMap = "{EOF=-1, M=1}"; // S and T aren't imported; overridden
 		String expectedStringLiteralToTypeMap = "{}";
 		String expectedTypeToTokenList = "[M]";
 
@@ -543,7 +543,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 		assertEquals("[]", equeue.errors.toString());
 		assertEquals("[]", equeue.warnings.toString());
-		String expectedTokenIDToTypeMap = "{EOF=-1, M=3, S=4, T=5, A=6, B=7, C=8}";
+		String expectedTokenIDToTypeMap = "{EOF=-1, M=1, S=2, T=3, A=4, B=5, C=6}";
 		String expectedStringLiteralToTypeMap = "{}";
 		String expectedTypeToTokenList = "[M, S, T, A, B, C]";
 
@@ -580,7 +580,7 @@ public class TestCompositeGrammars extends BaseTest {
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
-		String expectedTokenIDToTypeMap = "{EOF=-1, M=3, T=4}";
+		String expectedTokenIDToTypeMap = "{EOF=-1, M=1, T=2}";
 		String expectedStringLiteralToTypeMap = "{}";
 		String expectedTypeToTokenList = "[M, T]";
 
@@ -627,7 +627,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 		Grammar g = new Grammar(tmpdir+"/G3.g4", G3str, equeue);
 
-		String expectedTokenIDToTypeMap = "{EOF=-1, T4=3, T3=4}";
+		String expectedTokenIDToTypeMap = "{EOF=-1, T4=1, T3=2}";
 		String expectedStringLiteralToTypeMap = "{}";
 		String expectedTypeToTokenList = "[T4, T3]";
 
@@ -655,7 +655,6 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +
 			"import S;\n" +
 			"@header{package mypackage;}\n" +
-			"@lexer::header{package mypackage;}\n" +
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') {skip();} ;\n" ;

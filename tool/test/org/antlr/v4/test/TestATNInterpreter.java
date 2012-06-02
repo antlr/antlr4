@@ -198,7 +198,7 @@ public class TestATNInterpreter extends BaseTest {
 			errorTokenType = re.getOffendingToken().getType();
 		}
 		assertEquals(2, errorIndex);
-		assertEquals(6, errorTokenType);
+		assertEquals(4, errorTokenType);
 
 		checkMatchedAlt(lg, g, "abcd", 3); // ignores d on end
 	}
