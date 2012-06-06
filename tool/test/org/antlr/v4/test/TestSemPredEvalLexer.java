@@ -62,7 +62,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			":s2=>2-'u'->:s3=>2\n" +
 			":s3=>2-'m'->:s4=>2\n" +
 			":s4=>2-'b'->:s4=>2\n" +
-			":s4=>2-'c'->:s4=>2\n\n";
+			":s4=>2-'c'->:s4=>2\n";
 		assertEquals(expecting, found);
 	}
 
