@@ -35,7 +35,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 
-public class TestUnbufferedInputStream extends BaseTest {
+public class TestUnbufferedCharStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
 		CharStream input = new UnbufferedCharStream(
 				new StringReader("")

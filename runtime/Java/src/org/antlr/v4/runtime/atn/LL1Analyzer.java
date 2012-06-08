@@ -39,10 +39,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LL1Analyzer {
-	/** Used during LOOK to detect computation cycles. E.g., ()* causes
-	 *  infinite loop without it.  If we get to same state would be infinite
-	 *  loop.
+	/** Special value added to the lookahead sets to indicate that we hit
+	 *  a predicate during analysis if seeThruPreds==false.
 	 */
+	public static final int HIT_PRED = Token.INVALID_TYPE;
 
 	@NotNull
 	public final ATN atn;
@@ -64,7 +64,11 @@ public class LL1Analyzer {
 			_LOOK(s.transition(alt - 1).target,
 				  PredictionContext.EMPTY,
 				  look[alt], lookBusy, seeThruPreds);
-			if ( look[alt].size()==0 ) look[alt] = null;
+			// Wipe out lookahead for this alternative if we found nothing
+			// or we had a predicate when we !seeThruPreds
+			if ( look[alt].size()==0 || look[alt].contains(HIT_PRED) ) {
+				look[alt] = null;
+			}
 		}
 		return look;
 	}
@@ -126,6 +130,9 @@ public class LL1Analyzer {
 			else if ( t instanceof PredicateTransition ) {
 				if ( seeThruPreds ) {
 					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
+				}
+				else {
+					look.add(HIT_PRED);
 				}
 			}
 			else if ( t.isEpsilon() ) {

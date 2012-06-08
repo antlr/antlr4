@@ -38,9 +38,20 @@ import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Handle left-recursion and block-set transforms */
 public class GrammarTransformPipeline {
@@ -257,7 +268,7 @@ public class GrammarTransformPipeline {
 	 *
 	 *  Move rules and actions to new tree, don't dup. Split AST apart.
 	 *  We'll have this Grammar share token symbols later; don't generate
-	 *  tokenVocab or tokens{} section.
+	 *  tokenVocab or tokens{} section.  Copy over named actions.
 	 *
 	 *  Side-effects: it removes children from GRAMMAR & RULES nodes
 	 *                in combined AST.  Anything cut out is dup'd before
@@ -277,7 +288,7 @@ public class GrammarTransformPipeline {
 		lexerAST.token.setInputStream(combinedAST.token.getInputStream());
 		lexerAST.addChild((GrammarAST)adaptor.create(ANTLRParser.ID, lexerName));
 
-		// MOVE OPTIONS
+		// COPY OPTIONS
 		GrammarAST optionsRoot =
 			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
 		if ( optionsRoot!=null ) {
@@ -292,12 +303,12 @@ public class GrammarTransformPipeline {
 			}
 		}
 
-		// MOVE lexer:: actions
+		// COPY all named actions, but only move those with lexer:: scope
 		List<GrammarAST> actionsWeMoved = new ArrayList<GrammarAST>();
 		for (GrammarAST e : elements) {
 			if ( e.getType()==ANTLRParser.AT ) {
+				lexerAST.addChild((Tree)adaptor.dupTree(e));
 				if ( e.getChild(0).getText().equals("lexer") ) {
-					lexerAST.addChild((Tree)adaptor.dupTree(e));
 					actionsWeMoved.add(e);
 				}
 			}

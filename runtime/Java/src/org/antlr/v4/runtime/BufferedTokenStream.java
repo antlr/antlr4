@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.misc.Interval;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /** Buffer all input tokens but do on-demand fetching of new tokens from
@@ -148,7 +147,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     @Override
     public T get(int i) {
         if ( i < 0 || i >= tokens.size() ) {
-            throw new NoSuchElementException("token index "+i+" out of range 0.."+(tokens.size()-1));
+            throw new IndexOutOfBoundsException("token index "+i+" out of range 0.."+(tokens.size()-1));
         }
         return tokens.get(i);
     }
@@ -212,8 +211,12 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      */
     public List<T> getTokens(int start, int stop, Set<Integer> types) {
         if ( p == -1 ) setup();
-        if ( stop>=tokens.size() ) stop=tokens.size()-1;
-        if ( start<0 ) start=0;
+		if ( start<0 || stop>=tokens.size() ||
+			 stop<0  || start>=tokens.size() )
+		{
+			throw new IndexOutOfBoundsException("start "+start+" or stop "+stop+
+												" not in 0.."+(tokens.size()-1));
+		}
         if ( start>stop ) return null;
 
         // list = tokens[start:stop]:{T t, t.getType() in types}
@@ -236,12 +239,76 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 		return getTokens(start,stop, s);
     }
 
-    @Override
-    public String getSourceName() {	return tokenSource.getSourceName();	}
+	/** Given a starting index, return the index of the next on-channel
+	 *  token. Return i if tokens[i] is on channel.
+	 */
+	protected int nextTokenOnChannel(int i, int channel) {
+		sync(i);
+		Token token = tokens.get(i);
+		while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
+			i++;
+			sync(i);
+			token = tokens.get(i);
+		}
+		return i;
+	}
 
-    /** Grab *all* tokens from stream and return string */
-    @Override
-    public String toString() { return getText(); }
+	/** Given a starting index, return the index of the previous on-channel
+	 *  token. Return i if tokens[i] is on channel.
+	 */
+	protected int previousTokenOnChannel(int i, int channel) {
+		while ( i>=0 && tokens.get(i).getChannel()!=channel ) {
+			i--;
+		}
+		return i;
+	}
+
+	/** Return a list of all tokens on channel to right of tokenIndex
+	 *  until token not on channel found.  Current token not considered.
+	 *  channel is typically Lexer.DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getOffChannelTokensToRight(int tokenIndex, int channel) {
+		if ( p == -1 ) setup();
+		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
+			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
+		}
+
+		int nextOnChannel = nextTokenOnChannel(tokenIndex + 1, channel);
+
+		if ( nextOnChannel == tokenIndex + 1 ) return null;
+
+		// get tokens to right up to next on channel
+		return tokens.subList(tokenIndex+1, nextOnChannel);
+	}
+
+	/** Return a list of all tokens on channel to left of tokenIndex
+	 *  until token not on channel found.  Current token not considered.
+	 *  channel is typically Lexer.DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getOffChannelTokensToLeft(int tokenIndex, int channel) {
+		if ( p == -1 ) setup();
+		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
+			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
+		}
+
+		int prevOnChannel = previousTokenOnChannel(tokenIndex - 1, channel);
+
+		if ( prevOnChannel == tokenIndex - 1 ) return null;
+
+		// get tokens to left up starting at prev on channel + 1 to just before tokenIndex
+		return tokens.subList(prevOnChannel+1, tokenIndex);
+	}
+
+	public List<T> getHiddenTokensToRight(int tokenIndex) {
+		return getOffChannelTokensToRight(tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+	}
+
+	public List<T> getHiddenTokensToLeft(int tokenIndex) {
+		return getOffChannelTokensToLeft(tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+	}
+
+	@Override
+    public String getSourceName() {	return tokenSource.getSourceName();	}
 
 	/** Get the text of all tokens in this buffer. */
 	public String getText() {

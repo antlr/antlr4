@@ -91,6 +91,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
 	public IntervalSet conflictingAlts;
+	// Used in parser and lexer. In lexer, it indicates we hit a pred
+	// while computing a closure operation.  Don't make a DFA state from this.
 	public boolean hasSemanticContext;
 	public boolean dipsIntoOuterContext;
 
