@@ -287,7 +287,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			return _text;
 		}
 		return getInterpreter().getText(_input);
-//		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
+	}
+
+	/** Get the text from start of token to current lookahead char.
+	 *  Use this in predicates to test text matched so far in a lexer rule.
+	 */
+	public String getSpeculativeText() {
+		return getInterpreter().getSpeculativeText(_input);
 	}
 
 	/** Set the complete text of this token; it wipes any previous

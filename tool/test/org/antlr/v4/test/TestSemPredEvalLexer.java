@@ -64,15 +64,33 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test public void testEnumNotID() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"ENUM : [a-z]+ {getSpeculativeText().equals(\"enum\")}? ;\n" +
+			"ID   : [a-z]+ ;\n"+
+			"WS : (' '|'\\n') {skip();} ;";
+		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
+		String expecting =
+			"[@0,0:3='enum',<1>,1:0]\n" +
+			"[@1,5:7='abc',<2>,1:5]\n" +
+			"[@2,9:12='enum',<1>,1:9]\n" +
+			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
+			"s0-' '->:s1=>3\n"; // no DFA for enum/id. all paths lead to pred.
+		assertEquals(expecting, found);
+	}
+
 	@Test public void testIndent() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
 			"ID : [a-z]+ ;\n"+
-			"INDENT : [ \\t]+ {_tokenStartCharPositionInLine==0}? ;"+
+			"INDENT : [ \\t]+ {_tokenStartCharPositionInLine==0}? \n" +
+			"         {System.out.println(\"INDENT\");}  ;"+
 			"NL     : '\\n' ;"+
 			"WS     : [ \\t]+ ;";
 		String found = execLexer("L.g4", grammar, "L", "abc\n  def  \n", true);
 		String expecting =
+			"INDENT\n" +                        // action output
 			"[@0,0:2='abc',<1>,1:0]\n" +		// ID
 			"[@1,3:3='\\n',<3>,1:3]\n" +  		// NL
 			"[@2,4:5='  ',<2>,2:0]\n" +			// INDENT

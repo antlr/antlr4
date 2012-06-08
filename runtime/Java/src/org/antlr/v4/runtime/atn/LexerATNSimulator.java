@@ -739,11 +739,22 @@ public class LexerATNSimulator extends ATNSimulator {
 		return dfa[mode];
 	}
 
-	/** Get the text of the current token. */
+	/** Get the text of the current token from an *action* in lexer not
+	 *  predicate.
+	 */
 	@NotNull
 	public String getText(@NotNull CharStream input) {
 		// index is first lookahead char, don't include.
 		return input.getText(Interval.of(startIndex, input.index()-1));
+	}
+
+	/** Get the text from start of token to current lookahead char.
+	 *  Use this in predicates to test text matched so far in a lexer rule.
+	 */
+	@NotNull
+	public String getSpeculativeText(@NotNull CharStream input) {
+		// index is first lookahead char, don't include.
+		return input.getText(Interval.of(startIndex, input.index()));
 	}
 
 	public int getLine() {
