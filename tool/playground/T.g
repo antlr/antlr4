@@ -1,5 +1,7 @@
-lexer grammar T;
+grammar T;
 
-A : 'a' {false}? ;
-B : 'a' ;
-WS : [ \n] ;
+s : ( INT {System.out.println("-> "+$INT.text);})+ ;
+
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : [ \n]+ -> skip ;
