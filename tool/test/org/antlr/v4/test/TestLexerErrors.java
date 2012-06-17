@@ -52,7 +52,7 @@ public class TestLexerErrors extends BaseTest {
 			"A : 'a' 'b' ;\n";
 		String tokens = execLexer("L.g4", grammar, "L", "abx");
 		String expectingTokens =
-			"[@0,0:1='ab',<3>,1:0]\n" +
+			"[@0,0:1='ab',<1>,1:0]\n" +
 			"[@1,3:2='<EOF>',<-1>,1:3]\n";
 		assertEquals(expectingTokens, tokens);
 		String expectingError = "line 1:2 token recognition error at: 'x'\n";
@@ -79,7 +79,7 @@ public class TestLexerErrors extends BaseTest {
 			"A : 'a' 'b' ;\n";
 		String tokens = execLexer("L.g4", grammar, "L", "abax");
 		String expectingTokens =
-			"[@0,0:1='ab',<3>,1:0]\n" +
+			"[@0,0:1='ab',<1>,1:0]\n" +
 			"[@1,4:3='<EOF>',<-1>,1:4]\n";
 		assertEquals(expectingTokens, tokens);
 		String expectingError = "line 1:2 token recognition error at: 'ax'\n";
@@ -97,8 +97,8 @@ public class TestLexerErrors extends BaseTest {
 		// and return to previous dfa accept state
 		String tokens = execLexer("L.g4", grammar, "L", "ababx");
 		String expectingTokens =
-			"[@0,0:1='ab',<3>,1:0]\n" +
-			"[@1,2:3='ab',<3>,1:2]\n" +
+			"[@0,0:1='ab',<1>,1:0]\n" +
+			"[@1,2:3='ab',<1>,1:2]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expectingTokens, tokens);
 		String expectingError = "line 1:4 token recognition error at: 'x'\n";
@@ -118,8 +118,8 @@ public class TestLexerErrors extends BaseTest {
 		// uses the previous accepted in the ATN not DFA
 		String tokens = execLexer("L.g4", grammar, "L", "ababcx");
 		String expectingTokens =
-			"[@0,0:1='ab',<3>,1:0]\n" +
-			"[@1,2:4='abc',<4>,1:2]\n" +
+			"[@0,0:1='ab',<1>,1:0]\n" +
+			"[@1,2:4='abc',<2>,1:2]\n" +
 			"[@2,6:5='<EOF>',<-1>,1:6]\n";
 		assertEquals(expectingTokens, tokens);
 		String expectingError = "line 1:5 token recognition error at: 'x'\n";
@@ -157,9 +157,9 @@ public class TestLexerErrors extends BaseTest {
 			"\n";
 		String result = execLexer("T.g4", grammar, "TLexer", "x : x", false);
 		String expecting =
-			"[@0,0:0='x',<5>,1:0]\n" +
-			"[@1,2:2=':',<4>,1:2]\n" +
-			"[@2,4:4='x',<5>,1:4]\n" +
+			"[@0,0:0='x',<3>,1:0]\n" +
+			"[@1,2:2=':',<2>,1:2]\n" +
+			"[@2,4:4='x',<3>,1:4]\n" +
 			"[@3,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:1 token recognition error at: ' '\n" +

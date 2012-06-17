@@ -243,7 +243,14 @@ COMMENT
 ARG_OR_CHARSET
 options {k=1;}
     :   {isLexerRule}?=> LEXER_CHAR_SET {$type=LEXER_CHAR_SET;}
-    |   {!isLexerRule}?=> ARG_ACTION    {$type=ARG_ACTION;}
+    |   {!isLexerRule}?=> ARG_ACTION
+        {
+        $type=ARG_ACTION;
+        // Set the token text to our gathered string minus outer [ ]
+        String t = $text;
+        t = t.substring(1,t.length()-1);
+        setText(t);
+        }
     ;
 
 fragment
@@ -261,57 +268,18 @@ LEXER_CHAR_SET
 //
 fragment
 ARG_ACTION
-@init
-{
-	StringBuffer theText = new StringBuffer();
-}
-	: '['
+	: '[' 
          (
-             ('\\')=>'\\'
-                 (
-                     (']')=>']'
-                       {
-                           // We do not include the \ character itself when picking up an escaped ]
-                           //
-                           theText.append(']');
-                       }
-                   | c=.
-                       {
-                           // We DO include the \ character when finding any other escape
-                           //
-                           theText.append('\\');
-                           theText.append((char)$c);
-                       }
-                 )
+             ARG_ACTION
 
-           | ('"')=>as=ACTION_STRING_LITERAL
-                {
-                    // Append the embedded string literal test
-                    //
-                    theText.append($as.text);
-                }
+           | ('"')=>ACTION_STRING_LITERAL
 
-           | ('\'')=>ac=ACTION_CHAR_LITERAL
-                {
-                    // Append the embedded chracter literal text
-                    //
-                    theText.append($ac.text);
-                }
+           | ('\'')=>ACTION_CHAR_LITERAL
 
-           | c=~']'
-                {
-                    // Whatever else we found in the scan
-                    //
-                    theText.append((char)$c);
-                }
+           | ~('['|']')
 	     )*
 
        ']'
-       {
-           // Set the token text to our gathered string
-           //
-           setText(theText.toString());
-       }
 	;
 
 // -------

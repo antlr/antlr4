@@ -128,7 +128,7 @@ public class Tool {
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
+        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
         new Option("report",			"-report", "print out a report about the grammar(s) processed"),
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),

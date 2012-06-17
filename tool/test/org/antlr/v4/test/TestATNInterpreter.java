@@ -80,7 +80,7 @@ public class TestATNInterpreter extends BaseTest {
 			errorTokenType = re.getOffendingToken().getType();
 		}
 		assertEquals(1, errorIndex);
-		assertEquals(errorTokenType, 5);
+		assertEquals(3, errorTokenType);
 	}
 
 	@Test public void testMustTrackPreviousGoodAlt2() throws Exception {
@@ -106,7 +106,7 @@ public class TestATNInterpreter extends BaseTest {
 			errorTokenType = re.getOffendingToken().getType();
 		}
 		assertEquals(2, errorIndex);
-		assertEquals(errorTokenType, 6);
+		assertEquals(4, errorTokenType);
 	}
 
 	@Test public void testMustTrackPreviousGoodAlt3() throws Exception {
@@ -129,7 +129,7 @@ public class TestATNInterpreter extends BaseTest {
 			errorTokenType = re.getOffendingToken().getType();
 		}
 		assertEquals(2, errorIndex);
-		assertEquals(errorTokenType, 6);
+		assertEquals(4, errorTokenType);
 	}
 
 	@Test public void testAmbigAltChooseFirst() throws Exception {
@@ -198,7 +198,7 @@ public class TestATNInterpreter extends BaseTest {
 			errorTokenType = re.getOffendingToken().getType();
 		}
 		assertEquals(2, errorIndex);
-		assertEquals(6, errorTokenType);
+		assertEquals(4, errorTokenType);
 
 		checkMatchedAlt(lg, g, "abcd", 3); // ignores d on end
 	}

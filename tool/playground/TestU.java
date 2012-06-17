@@ -1,6 +1,5 @@
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 public class TestU {
 	public static void main(String[] args) throws Exception {
@@ -8,7 +7,7 @@ public class TestU {
 		CommonTokenStream tokens = new CommonTokenStream(t);
 		UParser p = new UParser(tokens);
 		p.setBuildParseTree(true);
-		ParserRuleContext r = p.s();
-		System.out.println(r.toStringTree(p));
+//		ParserRuleContext r = p.s();
+//		System.out.println(r.toStringTree(p));
 	}
 }

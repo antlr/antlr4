@@ -266,6 +266,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return getInterpreter().getCharPositionInLine();
 	}
 
+	public void setLine(int line) {
+		getInterpreter().setLine(line);
+	}
+
+	public void setCharPositionInLine(int charPositionInLine) {
+		getInterpreter().setCharPositionInLine(charPositionInLine);
+	}
+
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
 		return _input.index();
@@ -279,7 +287,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			return _text;
 		}
 		return getInterpreter().getText(_input);
-//		return ((CharStream)input).substring(tokenStartCharIndex,getCharIndex()-1);
+	}
+
+	/** Get the text from start of token to current lookahead char.
+	 *  Use this in predicates to test text matched so far in a lexer rule.
+	 */
+	public String getSpeculativeText() {
+		return getInterpreter().getSpeculativeText(_input);
 	}
 
 	/** Set the complete text of this token; it wipes any previous
@@ -287,6 +301,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	public void setText(String text) {
 		this._text = text;
+	}
+
+	public void setToken(Token _token) {
+		this._token = _token;
 	}
 
 	public String[] getModeNames() {

@@ -508,16 +508,28 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	/** if you call a rule as part of FOLLOW with $i, can't execute, but
-	 *  what if there is a forced action in that called rule?  We should
-	 *  NOT execute any actions after
-	 *
-	 *  a[int i] : e x[$i] ;
-	 *  b[int i] : e x[$i] ;
-	 *  e : ID | ;
-	 *  x[int i] : {{$i=3;}} ID ;
-	 *
-	 *  use global context?
-	 */
+	@Test public void testPredTestedEvenWhenUnAmbig() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"\n" +
+			"@members {boolean enumKeyword = true;}\n" +
+			"\n" +
+			"primary\n" +
+			"    :   ID                       {System.out.println(\"ID \"+$ID.text);}\n" +
+			"    |   {!enumKeyword}? 'enum'   {System.out.println(\"enum\");}\n" +
+			"    ;\n" +
+			"\n" +
+			"ID : [a-z]+ ;\n" +
+			"\n" +
+			"WS : [ \\t\\n\\r]+ -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "primary",
+								  "abc", false);
+		assertEquals("ID abc\n", found);
+
+		execParser("T.g4", grammar, "TParser", "TLexer", "primary",
+				   "enum", false);
+		assertEquals("line 1:0 no viable alternative at input 'enum'\n", stderrDuringParse);
+	}
 
 }

@@ -1,9 +1,5 @@
-grammar T;
-s : r=e ;
-e : e '(' INT ')'
-  | INT 
-  ;     
-MULT: '*' ;
-ADD : '+' ;
-INT : [0-9]+ ;
-WS : [ \t\n]+ -> skip ;
+lexer grammar T;
+
+A : 'a' {false}? ;
+B : 'a' ;
+WS : [ \n] ;

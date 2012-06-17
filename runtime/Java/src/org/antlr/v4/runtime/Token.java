@@ -35,21 +35,13 @@ package org.antlr.v4.runtime;
  */
 public interface Token {
 	public static final int INVALID_TYPE = 0;
-//	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TYPE);
-	public static final int MIN_TOKEN_TYPE = 1;
 
     /** During lookahead operations, this "token" signifies we hit rule end ATN state
      *  and did not follow it despite needing to.
      */
     public static final int EPSILON = -2;
 
-	/** imaginary tree navigation type; traverse "get child" link */
-	public static final int DOWN = 1;
-
-	/** imaginary tree navigation type; finish with a child list */
-	public static final int UP = 2;
-
-	public static final int MIN_USER_TOKEN_TYPE = UP+1;
+	public static final int MIN_USER_TOKEN_TYPE = 1;
 
     public static final int EOF = CharStream.EOF;
 
