@@ -46,15 +46,15 @@ public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 	}
 
 	@Override
-	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-										 T offendingSymbol,
-										 int line,
-										 int charPositionInLine,
-										 String msg,
-										 RecognitionException e)
+	public <T extends Symbol> void syntaxError(Recognizer<T, ?> recognizer,
+											   T offendingSymbol,
+											   int line,
+											   int charPositionInLine,
+											   String msg,
+											   RecognitionException e)
 	{
 		for (ANTLRErrorListener<? super Symbol> listener : delegates) {
-			listener.error(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+			listener.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
 		}
 	}
 

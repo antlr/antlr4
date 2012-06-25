@@ -70,12 +70,12 @@ public interface ANTLRErrorListener<Symbol> {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-										 @Nullable T offendingSymbol,
-										 int line,
-										 int charPositionInLine,
-										 String msg,
-										 @Nullable RecognitionException e);
+	public <T extends Symbol> void syntaxError(Recognizer<T, ?> recognizer,
+											   @Nullable T offendingSymbol,
+											   int line,
+											   int charPositionInLine,
+											   String msg,
+											   @Nullable RecognitionException e);
 
 	/** Called when the parser detects a true ambiguity: an input sequence can be matched
 	 * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in

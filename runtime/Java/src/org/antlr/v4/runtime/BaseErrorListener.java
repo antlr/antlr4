@@ -39,12 +39,12 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 public class BaseErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 
 	@Override
-	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-										 T offendingSymbol,
-										 int line,
-										 int charPositionInLine,
-										 String msg,
-										 RecognitionException e)
+	public <T extends Symbol> void syntaxError(Recognizer<T, ?> recognizer,
+											   T offendingSymbol,
+											   int line,
+											   int charPositionInLine,
+											   String msg,
+											   RecognitionException e)
 	{
 	}
 
