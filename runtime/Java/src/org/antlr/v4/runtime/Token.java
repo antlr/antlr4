@@ -54,7 +54,7 @@ public interface Token {
 	/** Anything on different channel than DEFAULT_CHANNEL is not parsed
 	 *  by parser.
 	 */
-	public static final int HIDDEN_CHANNEL = 99;
+	public static final int HIDDEN_CHANNEL = 1;
 
 	/** Get the text of the token */
 	String getText();
