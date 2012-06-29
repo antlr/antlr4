@@ -263,11 +263,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 		return i;
 	}
 
-	/** Return a list of all tokens on channel to right of tokenIndex
-	 *  until token not on channel found.  Current token not considered.
-	 *  channel is typically Lexer.DEFAULT_TOKEN_CHANNEL.
-	 */
-	public List<T> getOffChannelTokensToRight(int tokenIndex, int channel) {
+	public List<T> getOffChannelTokensToRight(int direction, int tokenIndex, int channel) {
 		if ( p == -1 ) setup();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
@@ -281,30 +277,67 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 		return tokens.subList(tokenIndex+1, nextOnChannel);
 	}
 
-	/** Return a list of all tokens on channel to left of tokenIndex
-	 *  until token not on channel found.  Current token not considered.
-	 *  channel is typically Lexer.DEFAULT_TOKEN_CHANNEL.
+	/** Collect all tokens on or off specified channel to the right or left of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 *  @param direction	-1 means to the left, 1 means to the right.
+	 *  @param onchannel	if true, get all tokens on the channel, else off channel
 	 */
-	public List<T> getOffChannelTokensToLeft(int tokenIndex, int channel) {
+	public List<T> getHiddenTokens(int direction, boolean onchannel, int tokenIndex, int channel) {
 		if ( p == -1 ) setup();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
 		}
 
-		int prevOnChannel = previousTokenOnChannel(tokenIndex - 1, channel);
+		int from;
+		int to;
+		if ( direction == -1 ) {
+			int prevOnChannel = previousTokenOnChannel(tokenIndex - 1, channel);
+			if ( prevOnChannel == tokenIndex - 1 ) return null;
+			from = prevOnChannel+1;
+			to = tokenIndex-1;
+		}
+		else {
+			int nextOnChannel = nextTokenOnChannel(tokenIndex + 1, channel);
+			if ( nextOnChannel == tokenIndex + 1 ) return null;
+			from = tokenIndex+1;
+			to = nextOnChannel;
+		}
 
-		if ( prevOnChannel == tokenIndex - 1 ) return null;
-
-		// get tokens to left up starting at prev on channel + 1 to just before tokenIndex
-		return tokens.subList(prevOnChannel+1, tokenIndex);
+		List<T> hidden = new ArrayList<T>();
+		for (int i=from; i<=to; i++) {
+			T t = tokens.get(i);
+			if ( t.getChannel()==channel && onchannel) hidden.add(t);
+			else if ( t.getChannel()!=channel && !onchannel) hidden.add(t);
+		}
+		return hidden;
 	}
 
+	/** Collect all tokens on specified channel to the right of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getHiddenTokensToRight(int tokenIndex, int channel) {
+		return getHiddenTokens(1, true, tokenIndex, channel);
+	}
+
+	/** Collect all tokens on specified channel to the left of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getHiddenTokensToLeft(int tokenIndex, int channel) {
+		return getHiddenTokens(-1, true, tokenIndex, channel);
+	}
+
+	/** Collect all hidden tokens (any off-default channel) to the right of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
 	public List<T> getHiddenTokensToRight(int tokenIndex) {
-		return getOffChannelTokensToRight(tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+		return getHiddenTokens(1, false, tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
 	}
 
+	/** Collect all hidden tokens (any off-default channel) to the left of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
 	public List<T> getHiddenTokensToLeft(int tokenIndex) {
-		return getOffChannelTokensToLeft(tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+		return getHiddenTokens(-1, false, tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
 	}
 
 	@Override

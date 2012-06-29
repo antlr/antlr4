@@ -293,40 +293,40 @@ public class TestCommonTokenStream extends BaseTest {
 		assertEquals(null, tokens.getHiddenTokensToLeft(0));
 		assertEquals(null, tokens.getHiddenTokensToRight(0));
 
-		assertEquals("[[@0,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@0,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToLeft(1).toString());
-		assertEquals("[[@2,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@2,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToRight(1).toString());
 
 		assertEquals(null, tokens.getHiddenTokensToLeft(2));
 		assertEquals(null, tokens.getHiddenTokensToRight(2));
 
-		assertEquals("[[@2,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@2,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToLeft(3).toString());
 		assertEquals(null, tokens.getHiddenTokensToRight(3));
 
 		assertEquals(null, tokens.getHiddenTokensToLeft(4));
-		assertEquals("[[@5,0:0=' ',<1>,channel=99,0:-1], [@6,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@5,0:0=' ',<1>,channel=1,0:-1], [@6,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToRight(4).toString());
 
 		assertEquals(null, tokens.getHiddenTokensToLeft(5));
-		assertEquals("[[@6,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@6,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToRight(5).toString());
 
-		assertEquals("[[@5,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@5,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToLeft(6).toString());
 		assertEquals(null, tokens.getHiddenTokensToRight(6));
 
-		assertEquals("[[@5,0:0=' ',<1>,channel=99,0:-1], [@6,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@5,0:0=' ',<1>,channel=1,0:-1], [@6,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToLeft(7).toString());
-		assertEquals("[[@8,0:0=' ',<1>,channel=99,0:-1], [@9,0:0='\\n',<1>,channel=99,0:-1]]",
+		assertEquals("[[@8,0:0=' ',<1>,channel=1,0:-1], [@9,0:0='\\n',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToRight(7).toString());
 
 		assertEquals(null, tokens.getHiddenTokensToLeft(8));
-		assertEquals("[[@9,0:0='\\n',<1>,channel=99,0:-1]]",
+		assertEquals("[[@9,0:0='\\n',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToRight(8).toString());
 
-		assertEquals("[[@8,0:0=' ',<1>,channel=99,0:-1]]",
+		assertEquals("[[@8,0:0=' ',<1>,channel=1,0:-1]]",
 					 tokens.getHiddenTokensToLeft(9).toString());
 		assertEquals(null, tokens.getHiddenTokensToRight(9));
 	}
