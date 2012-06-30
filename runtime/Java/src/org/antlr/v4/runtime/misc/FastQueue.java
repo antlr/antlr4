@@ -28,7 +28,9 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /** A queue that can dequeue and get(i) in O(1) and grow arbitrarily large.
  *  A linked list is fast at dequeue but slow at get(i).  An array is
@@ -45,7 +47,6 @@ public class FastQueue<T> {
     protected List<T> data = new ArrayList<T>();
     /** index of next element to fill */
     protected int p = 0;
-	protected int range = -1; // how deep have we gone?
 
     public void reset() { clear(); }
     public void clear() { p = 0; data.clear(); }
@@ -66,8 +67,6 @@ public class FastQueue<T> {
 
     public int size() { return data.size() - p; }
 
-	public int range() { return range; }
-
     public T head() { return elementAt(0); }
 
     /** Return element i elements ahead of current element.  i==0 gets
@@ -82,7 +81,6 @@ public class FastQueue<T> {
         if ( absIndex < 0 ) {
             throw new NoSuchElementException("queue index "+ absIndex +" < 0");
         }
-		if ( absIndex>range ) range = absIndex;
         return data.get(absIndex);
     }
 

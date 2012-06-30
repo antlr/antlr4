@@ -172,4 +172,9 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 
         throw new NoSuchElementException("can't look backwards more than one token in this stream");
     }
+
+	@Override
+	public String toString() {
+		return "a LookaheadStream";
+	}
 }
