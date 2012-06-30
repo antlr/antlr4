@@ -30,7 +30,14 @@
 package org.antlr.v4.tool.interp;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenFactory;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenFactory;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.tool.LexerGrammar;
 
@@ -38,6 +45,9 @@ public class LexerInterpreter implements TokenSource {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
 	protected CharStream input;
+
+	/** How to create token objects */
+	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
 
 	public LexerInterpreter(LexerGrammar g, String inputString) {
 		this(g);
@@ -63,7 +73,7 @@ public class LexerInterpreter implements TokenSource {
 
 	@Override
 	public void setTokenFactory(TokenFactory<?> factory) {
-			// TODO: use TokenFactory
+		this._factory = factory;
 	}
 
 	@Override
@@ -89,8 +99,11 @@ public class LexerInterpreter implements TokenSource {
 		int tokenStartLine = interp.getLine();
 		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
 		int stop = input.index()-1;
-		// TODO: use TokenFactory
-		WritableToken t = new CommonToken(this, ttype, Token.DEFAULT_CHANNEL, start, stop);
+
+		WritableToken t = (WritableToken)
+			_factory.create(this, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
+						    tokenStartLine, tokenStartCharPositionInLine);
+
 		t.setLine(tokenStartLine);
 		t.setCharPositionInLine(tokenStartCharPositionInLine);
 		return t;

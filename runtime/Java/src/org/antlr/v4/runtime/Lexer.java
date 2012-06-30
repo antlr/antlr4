@@ -128,38 +128,48 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public Token nextToken() {
 		if (_hitEOF) return anEOF();
 
-		outer:
-		while (true) {
-			_token = null;
-			_channel = Token.DEFAULT_CHANNEL;
-			_tokenStartCharIndex = _input.index();
-			_tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
-			_tokenStartLine = getInterpreter().getLine();
-			_text = null;
-			do {
-				_type = Token.INVALID_TYPE;
+		// Mark start location in char stream so unbuffered streams are
+		// guaranteed at least have text of current token
+		int tokenStartMarker = _input.mark();
+		try{
+			outer:
+			while (true) {
+				_token = null;
+				_channel = Token.DEFAULT_CHANNEL;
+				_tokenStartCharIndex = _input.index();
+				_tokenStartCharPositionInLine = getInterpreter().getCharPositionInLine();
+				_tokenStartLine = getInterpreter().getLine();
+				_text = null;
+				do {
+					_type = Token.INVALID_TYPE;
 //				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
 //								   " in mode "+mode+
 //								   " at index "+input.index());
-				int ttype;
-				try {
-					ttype = getInterpreter().match(_input, _mode);
-				}
-				catch (LexerNoViableAltException e) {
-					notifyListeners(e);		// report error
-					recover(e);
-					ttype = SKIP;
-				}
-				if ( _input.LA(1)==CharStream.EOF ) {
-					_hitEOF = true;
-				}
-				if ( _type == Token.INVALID_TYPE ) _type = ttype;
-				if ( _type ==SKIP ) {
-					continue outer;
-				}
-			} while ( _type ==MORE );
-			if ( _token ==null ) emit();
-			return _token;
+					int ttype;
+					try {
+						ttype = getInterpreter().match(_input, _mode);
+					}
+					catch (LexerNoViableAltException e) {
+						notifyListeners(e);		// report error
+						recover(e);
+						ttype = SKIP;
+					}
+					if ( _input.LA(1)==CharStream.EOF ) {
+						_hitEOF = true;
+					}
+					if ( _type == Token.INVALID_TYPE ) _type = ttype;
+					if ( _type ==SKIP ) {
+						continue outer;
+					}
+				} while ( _type ==MORE );
+				if ( _token ==null ) emit();
+				return _token;
+			}
+		}
+		finally {
+			// make sure we release marker after match or
+			// unbuffered char stream will keep buffering
+			_input.release(tokenStartMarker);
 		}
 	}
 
