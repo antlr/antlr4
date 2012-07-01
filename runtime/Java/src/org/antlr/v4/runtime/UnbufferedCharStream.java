@@ -84,20 +84,14 @@ public class UnbufferedCharStream implements CharStream {
     public UnbufferedCharStream(InputStream input, int bufferSize) {
    		this.input = new InputStreamReader(input);
         data = new char[bufferSize];
+		fill(1); // prime
    	}
 
    	public UnbufferedCharStream(Reader input, int bufferSize) {
    		this.input = input;
         data = new char[bufferSize];
+		fill(1); // prime
    	}
-
-	public void reset() {
-		p = 0;
-		earliestMarker = -1;
-		currentCharIndex = 0;
-        bufferStartIndex = 0;
-		n = 0;
-	}
 
 	@Override
 	public void consume() {
@@ -111,6 +105,7 @@ public class UnbufferedCharStream implements CharStream {
 			n = 0;
             bufferStartIndex = currentCharIndex;
         }
+		sync(1);
     }
 
 	/** Make sure we have 'need' elements from current position p. Last valid
