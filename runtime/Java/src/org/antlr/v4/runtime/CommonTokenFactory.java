@@ -52,15 +52,17 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 							  int channel, int start, int stop,
 							  int line, int charPositionInLine)
 	{
-		if ( copyText && text==null ) {
-			CharStream input = source.getInputStream();
-			text = input.getText(Interval.of(start,stop));
-		}
 		CommonToken t = new CommonToken(source, type, channel, start, stop);
 		t.setLine(line);
 		t.setCharPositionInLine(charPositionInLine);
 		if ( text!=null ) {
 			t.setText(text);
+		}
+		else {
+			if ( copyText ) {
+				CharStream input = source.getInputStream();
+				t.setText(input.getText(Interval.of(start,stop)));
+			}
 		}
 		return t;
 	}
