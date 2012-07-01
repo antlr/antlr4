@@ -231,8 +231,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	/** Currently does not support multiple emits per nextToken invocation
 	 *  for efficiency reasons.  Subclass and override this method and
-	 *  nextToken (to push tokens into a list and pull from that list rather
-	 *  than a single variable as this implementation does).
+	 *  nextToken (to push tokens into a list and pull from that list,
+	 *  respectively, rather than a single variable as this implementation does).
 	 */
 	public void emit(Token token) {
 		getInterpreter().traceEmit(token);
