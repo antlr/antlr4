@@ -92,7 +92,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         assertEquals('2', input.LA(3));
         assertEquals('3', input.LA(4));
         assertEquals('4', input.LA(5));
-		assertEquals("4", input.getBuffer()); // shouldn't include x
+		assertEquals("01234", input.getBuffer());
    		assertEquals(CharStream.EOF, input.LA(6));
    	}
 
@@ -132,18 +132,31 @@ public class TestUnbufferedCharStream extends BaseTest {
    		assertEquals(CharStream.EOF, input.LA(1));
    	}
 
-    @Test public void test1Mark() throws Exception {
+	@Test public void test1Mark() throws Exception {
 		UnbufferedCharStream input = new UnbufferedCharStream(
-   				new StringReader("xyz")
-   		);
-   		int m = input.mark();
-   		assertEquals('x', input.LA(1));
-   		assertEquals('y', input.LA(2));
-   		assertEquals('z', input.LA(3));
-   		input.release(m);
+			new StringReader("xyz")
+		);
+		int m = input.mark();
+		assertEquals('x', input.LA(1));
+		assertEquals('y', input.LA(2));
+		assertEquals('z', input.LA(3));
+		input.release(m);
 		assertEquals(CharStream.EOF, input.LA(4));
 		assertEquals("xyz\uFFFF", input.getBuffer());
-   	}
+	}
+
+	@Test public void test1MarkWithConsumesInSequence() throws Exception {
+		UnbufferedCharStream input = new UnbufferedCharStream(
+			new StringReader("xyz")
+		);
+		int m = input.mark();
+		input.consume(); // x, moves to y
+		input.consume(); // y
+		input.consume(); // z, moves to EOF
+		assertEquals(CharStream.EOF, input.LA(1));
+		input.release(m);
+		assertEquals("xyz\uFFFF", input.getBuffer());
+	}
 
     @Test public void test2Mark() throws Exception {
 		UnbufferedCharStream input = new UnbufferedCharStream(
@@ -158,7 +171,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         input.consume();
         int m2 = input.mark();
 		assertEquals(1, m2); // 2nd marker dropped at buffer index 1
-		assertEquals("y", input.getBuffer());
+		assertEquals("yz", input.getBuffer());
    		assertEquals('z', input.LA(1)); // forces load
 		assertEquals("yz", input.getBuffer());
         input.release(m2); // noop since not earliest in buf
