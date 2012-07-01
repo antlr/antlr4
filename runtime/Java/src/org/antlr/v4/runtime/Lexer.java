@@ -126,7 +126,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	@Override
 	public Token nextToken() {
-		if (_hitEOF) return anEOF();
+		if (_hitEOF) {
+			emitEOF();
+			return _token;
+		}
 
 		// Mark start location in char stream so unbuffered streams are
 		// guaranteed at least have text of current token
@@ -162,7 +165,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 						continue outer;
 					}
 				} while ( _type ==MORE );
-				if ( _token ==null ) emit();
+				if ( _token == null ) emit();
 				return _token;
 			}
 		}
@@ -229,10 +232,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return _input;
 	}
 
-	/** Currently does not support multiple emits per nextToken invocation
-	 *  for efficiency reasons.  Subclass and override this method and
-	 *  nextToken (to push tokens into a list and pull from that list,
-	 *  respectively, rather than a single variable as this implementation does).
+	/** By default does not support multiple emits per nextToken invocation
+	 *  for efficiency reasons.  Subclass and override this method, nextToken,
+	 *  and getToken (to push tokens into a list and pull from that list
+	 *  rather than a single variable as this implementation does).
 	 */
 	public void emit(Token token) {
 		getInterpreter().traceEmit(token);
@@ -253,7 +256,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return t;
 	}
 
-	public Token anEOF() {
+	public Token emitEOF() {
 		int cpos = getCharPositionInLine();
 		// The character position for EOF is one beyond the position of
 		// the previous token's last character
@@ -263,6 +266,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		}
 		Token eof = _factory.create(this, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
 									getLine(), cpos);
+		emit(eof);
 		return eof;
 	}
 
@@ -312,6 +316,9 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public void setText(String text) {
 		this._text = text;
 	}
+
+	/** Override if emitting multiple tokens. */
+	public Token getToken() { return _token; }
 
 	public void setToken(Token _token) {
 		this._token = _token;
