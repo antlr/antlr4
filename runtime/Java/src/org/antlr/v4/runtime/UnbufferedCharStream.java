@@ -73,25 +73,36 @@ public class UnbufferedCharStream implements CharStream {
 	/** What is name or source of this char stream? */
 	public String name;
 
-    public UnbufferedCharStream(InputStream input) {
-   		this(input, 256);
-   	}
+	/** Useful for sublasses that pull char from other than this.input. */
+	public UnbufferedCharStream() {
+		this(256);
+	}
 
-   	public UnbufferedCharStream(Reader input) {
-        this(input, 256);
-   	}
+	/** Useful for sublasses that pull char from other than this.input. */
+	public UnbufferedCharStream(int bufferSize) {
+		n = 0;
+		data = new char[bufferSize];
+	}
 
-    public UnbufferedCharStream(InputStream input, int bufferSize) {
-   		this.input = new InputStreamReader(input);
-        data = new char[bufferSize];
+	public UnbufferedCharStream(InputStream input) {
+		this(input, 256);
+	}
+
+	public UnbufferedCharStream(Reader input) {
+		this(input, 256);
+	}
+
+	public UnbufferedCharStream(InputStream input, int bufferSize) {
+		this(bufferSize);
+		this.input = new InputStreamReader(input);
 		fill(1); // prime
-   	}
+	}
 
-   	public UnbufferedCharStream(Reader input, int bufferSize) {
-   		this.input = input;
-        data = new char[bufferSize];
+	public UnbufferedCharStream(Reader input, int bufferSize) {
+		this(bufferSize);
+		this.input = input;
 		fill(1); // prime
-   	}
+	}
 
 	@Override
 	public void consume() {
@@ -121,7 +132,7 @@ public class UnbufferedCharStream implements CharStream {
 	public void fill(int n) {
 		for (int i=1; i<=n; i++) {
             try {
-                int c = input.read();
+                int c = nextChar();
                 add(c);
             }
             catch (IOException ioe) {
@@ -130,7 +141,12 @@ public class UnbufferedCharStream implements CharStream {
 		}
 	}
 
-    protected void add(int c) {
+	/** Override to provide different source of characters than this.input */
+	protected int nextChar() throws IOException {
+		return input.read();
+	}
+
+	protected void add(int c) {
         if ( n>=data.length ) {
 			char[] newdata = new char[data.length*2]; // resize
             System.arraycopy(data, 0, newdata, 0, data.length);
