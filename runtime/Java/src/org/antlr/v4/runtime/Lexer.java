@@ -99,6 +99,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	public String _text;
 
+	public Lexer() { }
+
 	public Lexer(CharStream input) {
 		this._input = input;
 	}
