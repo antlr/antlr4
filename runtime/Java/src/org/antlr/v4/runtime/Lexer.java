@@ -360,7 +360,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		String msg = "token recognition error at: '"+
 			_input.getText(Interval.of(_tokenStartCharIndex, _input.index()))+"'";
 
-		ANTLRErrorListener<? super Integer> listener = getErrorListenerDispatch();
+		ANTLRErrorListener listener = getErrorListenerDispatch();
 		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 	}
 

@@ -32,16 +32,16 @@ package org.antlr.v4.runtime;
  *
  * @author Sam Harwell
  */
-public class ConsoleErrorListener extends BaseErrorListener<Object> {
+public class ConsoleErrorListener extends BaseErrorListener {
 	public static final ConsoleErrorListener INSTANCE = new ConsoleErrorListener();
 
 	@Override
-	public <T extends Object> void syntaxError(Recognizer<T, ?> recognizer,
-											   T offendingSymbol,
-											   int line,
-											   int charPositionInLine,
-											   String msg,
-											   RecognitionException e)
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							Object offendingSymbol,
+							int line,
+							int charPositionInLine,
+							String msg,
+							RecognitionException e)
 	{
 		System.err.println("line " + line + ":" + charPositionInLine + " " + msg);
 	}

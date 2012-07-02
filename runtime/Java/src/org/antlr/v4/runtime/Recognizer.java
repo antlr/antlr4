@@ -42,8 +42,10 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
 	@NotNull
-	private List<ANTLRErrorListener<? super Symbol>> _listeners =
-		new CopyOnWriteArrayList<ANTLRErrorListener<? super Symbol>>() {{ add(ConsoleErrorListener.INSTANCE); }};
+	private List<ANTLRErrorListener> _listeners =
+		new CopyOnWriteArrayList<ANTLRErrorListener>() {{
+			add(ConsoleErrorListener.INSTANCE);
+		}};
 
 	protected ATNInterpreter _interp;
 
@@ -99,7 +101,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	/**
 	 * @throws NullPointerException if {@code listener} is {@code null}.
 	 */
-	public void addErrorListener(@NotNull ANTLRErrorListener<? super Symbol> listener) {
+	public void addErrorListener(@NotNull ANTLRErrorListener listener) {
 		if (listener == null) {
 			throw new NullPointerException("listener cannot be null.");
 		}
@@ -107,7 +109,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		_listeners.add(listener);
 	}
 
-	public void removeErrorListener(@NotNull ANTLRErrorListener<? super Symbol> listener) {
+	public void removeErrorListener(@NotNull ANTLRErrorListener listener) {
 		_listeners.remove(listener);
 	}
 
@@ -116,12 +118,12 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	}
 
 	@NotNull
-	public List<? extends ANTLRErrorListener<? super Symbol>> getErrorListeners() {
-		return new ArrayList<ANTLRErrorListener<? super Symbol>>(_listeners);
+	public List<? extends ANTLRErrorListener> getErrorListeners() {
+		return new ArrayList<ANTLRErrorListener>(_listeners);
 	}
 
-	public ANTLRErrorListener<? super Symbol> getErrorListenerDispatch() {
-		return new ProxyErrorListener<Symbol>(getErrorListeners());
+	public ANTLRErrorListener getErrorListenerDispatch() {
+		return new ProxyErrorListener(getErrorListeners());
 	}
 
 	// subclass needs to override these if there are sempreds or actions

@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 /** How to emit recognition errors */
-public interface ANTLRErrorListener<Symbol> {
+public interface ANTLRErrorListener {
 	/** Upon syntax error, notify any interested parties. This is not how to
 	 *  recover from errors or compute error messages. The parser
 	 *  ANTLRErrorStrategy specifies how to recover from syntax errors
@@ -70,12 +70,12 @@ public interface ANTLRErrorListener<Symbol> {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public <T extends Symbol> void syntaxError(Recognizer<T, ?> recognizer,
-											   @Nullable T offendingSymbol,
-											   int line,
-											   int charPositionInLine,
-											   String msg,
-											   @Nullable RecognitionException e);
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							@Nullable Object offendingSymbol,
+							int line,
+							int charPositionInLine,
+							String msg,
+							@Nullable RecognitionException e);
 
 	/** Called when the parser detects a true ambiguity: an input sequence can be matched
 	 * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in

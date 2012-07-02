@@ -316,7 +316,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
 		}
 
-		ANTLRErrorListener<? super Token> listener = getErrorListenerDispatch();
+		ANTLRErrorListener listener = getErrorListenerDispatch();
 		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
