@@ -125,6 +125,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		getInterpreter().reset();
 	}
 
+	public LexerATNSimulator getInterpreter() { return _interp; }
+
 	/** Return a token from this source; i.e., match a token on the char
 	 *  stream.
 	 */

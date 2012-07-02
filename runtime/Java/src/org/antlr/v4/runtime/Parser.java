@@ -124,6 +124,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		}
 	}
 
+	public ParserATNSimulator getInterpreter() { return _interp; }
+
 	/** Match current input symbol against ttype.  Attempt
 	 *  single token insertion or deletion error recovery.  If
 	 *  that fails, throw MismatchedTokenException.
