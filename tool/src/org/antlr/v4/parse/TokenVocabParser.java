@@ -59,7 +59,7 @@ public class TokenVocabParser {
 		int maxTokenType = -1;
 		File fullFile = getImportedVocabFile();
 		try {
-			Pattern tokenDefPattern = Pattern.compile("([^ ]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
+			Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
 			FileReader fr = new FileReader(fullFile);
 			BufferedReader br = new BufferedReader(fr);
 			String tokenDef = br.readLine();
