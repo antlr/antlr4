@@ -123,8 +123,7 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
 	public static final String[] tokenNames = {
-		"\<INVALID>",
-        <parser.tokenNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+        <parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
 	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
