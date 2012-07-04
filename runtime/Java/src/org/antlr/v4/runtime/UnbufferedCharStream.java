@@ -177,19 +177,24 @@ public class UnbufferedCharStream implements CharStream {
             throw new IllegalArgumentException("can't set marker earlier than previous existing marker: "+p+"<"+ earliestMarker);
         }
         if ( earliestMarker < 0 ) earliestMarker = m; // set first marker
+//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//		System.out.println(stackTrace[2].getMethodName()+": mark " + m);
         return m;
     }
 
+	/** Release can get markers in weird order since we reset p to beginning
+	 *  of buffer. Might mark at 1 and then at release p = 0 etc... Don't
+	 *  look for errors. Just reset earliestMarker if needed.
+	 * @param marker
+	 */
     @Override
     public void release(int marker) {
+//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//		System.out.println(stackTrace[2].getMethodName()+": release " + marker);
         // release is noop unless we remove earliest. then we don't need to
         // keep anything in buffer. We only care about earliest. Releasing
         // marker other than earliest does nothing as we can just keep in
         // buffer.
-        if ( marker < earliestMarker || marker >= n ) {
-            throw new IllegalArgumentException("invalid marker: "+
-                    marker+" not in "+0+".."+n);
-        }
         if ( marker == earliestMarker) earliestMarker = -1;
     }
 
