@@ -43,7 +43,7 @@ package org.antlr.v4.runtime;
  *  whitespace and comments etc. to the parser on a hidden channel (i.e.,
  *  you set $channel instead of calling skip() in lexer rules.)
  *
- *  @see OldUnbufferedTokenStream
+ *  @see UnbufferedTokenStream
  *  @see BufferedTokenStream
  */
 public class CommonTokenStream extends BufferedTokenStream<Token> {
