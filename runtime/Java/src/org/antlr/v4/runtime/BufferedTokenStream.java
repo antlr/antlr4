@@ -325,7 +325,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	 *  EOF. If channel is -1, find any non default channel token.
 	 */
 	public List<T> getHiddenTokensToRight(int tokenIndex, int channel) {
-		if ( p == -1 ) setup();
+		lazyInit();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
 		}
@@ -354,7 +354,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	 *  If channel is -1, find any non default channel token.
 	 */
 	public List<T> getHiddenTokensToLeft(int tokenIndex, int channel) {
-		if ( p == -1 ) setup();
+		lazyInit();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
 		}
@@ -387,7 +387,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 				if ( t.getChannel()==channel ) hidden.add(t);
 			}
 		}
-		if ( hidden.size()==0 ) return null;
+		if ( hidden.isEmpty() ) return null;
 		return hidden;
 	}
 
@@ -395,8 +395,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
 	/** Get the text of all tokens in this buffer. */
+	@Override
 	public String getText() {
-        lazyInit();
 		fill();
 		return getText(Interval.of(0,size()-1));
 	}
