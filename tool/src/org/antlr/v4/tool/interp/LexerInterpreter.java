@@ -73,7 +73,7 @@ public class LexerInterpreter implements TokenSource<Token> {
 
 	@Override
 	public TokenFactory<? extends Token> getTokenFactory() {
-		return tokenFactory;
+		return _factory;
 	}
 
 	@Override

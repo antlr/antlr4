@@ -9,6 +9,7 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.v4.runtime.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,26 +32,26 @@ public class TestASTStructure {
 	throws Exception
 	{
 		ANTLRStringStream is = new ANTLRStringStream(input);
-		Class lexerClass = Class.forName(lexerClassName);
-		Class[] lexArgTypes = new Class[]{CharStream.class};
-		Constructor lexConstructor = lexerClass.getConstructor(lexArgTypes);
+		Class<? extends Lexer> lexerClass = Class.forName(lexerClassName).asSubclass(Lexer.class);
+		Class[] lexArgTypes = new Class<?>[]{CharStream.class};
+		Constructor<? extends Lexer> lexConstructor = lexerClass.getConstructor(lexArgTypes);
 		Object[] lexArgs = new Object[]{is};
 		TokenSource lexer = (TokenSource)lexConstructor.newInstance(lexArgs);
 		is.setLine(scriptLine);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		Class parserClass = Class.forName(parserClassName);
-		Class[] parArgTypes = new Class[]{TokenStream.class};
-		Constructor parConstructor = parserClass.getConstructor(parArgTypes);
+		Class<? extends Parser> parserClass = Class.forName(parserClassName).asSubclass(Parser.class);
+		Class[] parArgTypes = new Class<?>[]{TokenStream.class};
+		Constructor<? extends Parser> parConstructor = parserClass.getConstructor(parArgTypes);
 		Object[] parArgs = new Object[]{tokens};
 		Parser parser = (Parser)parConstructor.newInstance(parArgs);
 
 		// set up customized tree adaptor if necessary
 		if ( adaptorClassName!=null ) {
-			parArgTypes = new Class[]{TreeAdaptor.class};
+			parArgTypes = new Class<?>[]{TreeAdaptor.class};
 			Method m = parserClass.getMethod("setTreeAdaptor", parArgTypes);
-			Class adaptorClass = Class.forName(adaptorClassName);
+			Class<? extends TreeAdaptor> adaptorClass = Class.forName(adaptorClassName).asSubclass(TreeAdaptor.class);
 			m.invoke(parser, adaptorClass.newInstance());
 		}
 

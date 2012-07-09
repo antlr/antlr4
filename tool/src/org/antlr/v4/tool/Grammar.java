@@ -775,7 +775,7 @@ public class Grammar implements AttributeResolver {
 					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
 					continue;
 				}
-				nodes = new HashMap();
+				nodes = new HashMap<String, Object>();
 				// try with pred in there
 				isLitRule =
 					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL SEMPRED)))", nodes);

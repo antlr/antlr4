@@ -5,14 +5,14 @@ import org.antlr.v4.runtime.misc.Interval;
 import java.util.Arrays;
 import java.util.List;
 
-public class UnbufferedTokenStream<T extends Token> implements TokenStream {
-	protected TokenSource tokenSource;
+public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
+	protected TokenSource<T> tokenSource;
 
 	/** A moving window buffer of the data being scanned. While there's a
 	 *  marker, we keep adding to buffer.  Otherwise, consume() resets
 	 *  so we start filling at index 0 again.
 	 */
-	protected Token[] tokens;
+	protected T[] tokens;
 
 	/** How many tokens are actually in the buffer; this is not
 	 *  the buffer size, that's tokens.length.
@@ -38,23 +38,25 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	//  TODO: skip off-channel tokens!!!
     protected int channel = Token.DEFAULT_CHANNEL;
 
-	public UnbufferedTokenStream(TokenSource tokenSource) {
+	public UnbufferedTokenStream(TokenSource<T> tokenSource) {
 		this(tokenSource, 256);
 	}
 
-	public UnbufferedTokenStream(TokenSource tokenSource, int bufferSize) {
+	public UnbufferedTokenStream(TokenSource<T> tokenSource, int bufferSize) {
 		this.tokenSource = tokenSource;
-		tokens = new Token[bufferSize];
+		@SuppressWarnings("unchecked")
+		T[] tokens = (T[])new Object[bufferSize];
+		this.tokens = tokens;
 		fill(1); // prime the pump
 	}
 
 	@Override
-	public Token get(int i) {
+	public T get(int i) {
 		return null;
 	}
 
 	@Override
-	public Token LT(int i) {
+	public T LT(int i) {
 		sync(i);
 		int index = p + i - 1;
 		if ( index < 0 || index > n ) throw new IndexOutOfBoundsException();
@@ -65,7 +67,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	public int LA(int i) { return LT(i).getType(); }
 
 	@Override
-	public TokenSource getTokenSource() {
+	public TokenSource<T> getTokenSource() {
 		return null;
 	}
 
@@ -75,12 +77,12 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	}
 
 	@Override
-	public String getText(RuleContext ctx) {
+	public String getText(RuleContext<?> ctx) {
 		return null;
 	}
 
 	@Override
-	public String getText(Token start, Token stop) {
+	public String getText(Object start, Object stop) {
 		return null;
 	}
 
@@ -111,7 +113,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	/** add n elements to buffer */
 	public void fill(int n) {
 		for (int i=1; i<=n; i++) {
-			Token t = tokenSource.nextToken();
+			T t = tokenSource.nextToken();
 			if ( t instanceof WritableToken ) {
 				((WritableToken)t).setTokenIndex(currentTokenIndex);
 			}
@@ -119,9 +121,10 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 		}
 	}
 
-	protected void add(Token t) {
+	protected void add(T t) {
 		if ( n>=tokens.length ) {
-			Token[] newtokens = new Token[tokens.length*2]; // resize
+			@SuppressWarnings("unchecked")
+			T[] newtokens = (T[])new Object[tokens.length*2]; // resize
 			System.arraycopy(tokens, 0, newtokens, 0, tokens.length);
 			tokens = newtokens;
 		}
@@ -206,7 +209,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	/** For testing.  What's in moving window into tokens stream? */
 	public List<T> getBuffer() {
 		if ( n==0 ) return null;
-		return (List<T>)Arrays.asList(Arrays.copyOfRange(tokens, 0, n));
+		return Arrays.asList(Arrays.copyOfRange(tokens, 0, n));
 	}
 
 }

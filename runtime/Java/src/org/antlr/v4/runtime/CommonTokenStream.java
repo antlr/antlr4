@@ -61,7 +61,7 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
 
 	@Override
 	protected int adjustSeekIndex(int i) {
-		p = nextTokenOnChannel(p, channel);
+		return nextTokenOnChannel(p, channel);
 	}
 
     @Override

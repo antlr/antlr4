@@ -29,7 +29,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-        TokenStream tokens = new UnbufferedTokenStream<Token>(lexEngine);
+        TokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
 
 		assertEquals("x", tokens.LT(1).getText());
 		assertEquals(" ", tokens.LT(2).getText());

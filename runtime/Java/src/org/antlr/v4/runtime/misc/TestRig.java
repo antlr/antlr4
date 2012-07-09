@@ -134,7 +134,7 @@ public class TestRig {
 		catch (java.lang.ClassNotFoundException cnfe) {
 			// might be pure lexer grammar; no Lexer suffix then
 			lexerName = grammarName;
-			lexerClass = cl.loadClass(lexerName);
+			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
 		}
 		if ( lexerClass==null ) {
 			System.err.println("Can't load "+lexerName);

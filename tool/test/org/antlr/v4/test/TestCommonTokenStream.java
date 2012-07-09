@@ -2,6 +2,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
@@ -14,14 +15,15 @@ import org.junit.Test;
 public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 	@Override
-	protected TokenStream createTokenStream(TokenSource src) {
+	protected TokenStream<Token> createTokenStream(TokenSource<? extends Token> src) {
 		return new CommonTokenStream(src);
 	}
 
 	@Test public void testOffChannel() throws Exception {
-        TokenSource lexer = // simulate input " x =34  ;\n"
-            new TokenSource() {
+        TokenSource<Token> lexer = // simulate input " x =34  ;\n"
+            new TokenSource<Token>() {
                 int i = 0;
+                @SuppressWarnings("serial")
                 WritableToken[] tokens = {
                     new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(1,"x"),
@@ -54,6 +56,11 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 				}
 
 				@Override
+				public TokenFactory<? extends Token> getTokenFactory() {
+					return CommonTokenFactory.DEFAULT;
+				}
+
+				@Override
 				public void setTokenFactory(TokenFactory<?> factory) {
 				}
 			};
@@ -83,10 +90,11 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
     }
 
 	@Test public void testFetchOffChannel() throws Exception {
-		TokenSource lexer = // simulate input " x =34  ; \n"
+		TokenSource<Token> lexer = // simulate input " x =34  ; \n"
 		                    // token indexes   01234 56789
-			new TokenSource() {
+			new TokenSource<Token>() {
 				int i = 0;
+				@SuppressWarnings("serial")
 				WritableToken[] tokens = {
 				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
 				new CommonToken(1,"x"),
@@ -117,6 +125,11 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 				@Override
 				public CharStream getInputStream() {
 					return null;
+				}
+
+				@Override
+				public TokenFactory<? extends Token> getTokenFactory() {
+					return CommonTokenFactory.DEFAULT;
 				}
 
 				@Override

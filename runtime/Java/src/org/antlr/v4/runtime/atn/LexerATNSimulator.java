@@ -607,7 +607,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( debug ) {
 				System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
 			}
-			configs.hasSemanticContext = true;
+			assert configs.hasSemanticContext();
 			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = new ATNConfig(config, t.target, pt.getPredicate());
 			}
@@ -703,7 +703,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	@Nullable
 	protected DFAState addDFAState(@NotNull ATNConfigSet configs) {
 		// If we eval'd a predicate while filling configs, mustn't create DFA state
-		if ( configs.hasSemanticContext ) return null;
+		if ( configs.hasSemanticContext() ) return null;
 
 		DFAState proposed = new DFAState(configs, 0, MAX_DFA_EDGE);
 		DFAState existing = dfa[mode].states.get(proposed);
