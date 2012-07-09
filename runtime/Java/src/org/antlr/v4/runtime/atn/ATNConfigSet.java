@@ -453,6 +453,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return hasSemanticContext;
 	}
 
+	public void markExplicitSemanticContext() {
+		hasSemanticContext = true;
+	}
+
 	public IntervalSet getConflictingAlts() {
 		return conflictingAlts;
 	}

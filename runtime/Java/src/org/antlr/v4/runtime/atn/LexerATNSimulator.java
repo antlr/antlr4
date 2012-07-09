@@ -607,7 +607,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( debug ) {
 				System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
 			}
-			assert configs.hasSemanticContext();
+			configs.markExplicitSemanticContext();
 			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = new ATNConfig(config, t.target, pt.getPredicate());
 			}
