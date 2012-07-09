@@ -50,7 +50,7 @@ import java.lang.reflect.Method;
  *  postscript file. Optionally taking input file.
  *
  *  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName
- *        [-print]
+ *        [-tree]
  *        [-tokens] [-gui] [-ps file.ps]
  *        [-trace]
  *        [-diagnostics]
@@ -73,7 +73,7 @@ public class TestRig {
 		String encoding = null;
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
-							   "  [-tokens] [-print] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
+							   "  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
 							   "  [-trace] [-diagnostics]\n"+
 							   "  [input-filename]");
 			System.err.println("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
@@ -92,7 +92,7 @@ public class TestRig {
 				inputFile = arg;
 				continue;
 			}
-			if ( arg.equals("-print") ) {
+			if ( arg.equals("-tree") ) {
 				printTree = true;
 			}
 			if ( arg.equals("-gui") ) {

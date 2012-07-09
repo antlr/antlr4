@@ -38,13 +38,13 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s5=>3\n" +
-			"s0-'a'->:s4=>2\n" +
+			"s0-' '->:s4=>3\n" +
+			"s0-'a'->:s5=>2\n" +
 			"s0-'e'->:s1=>2\n" +
 			":s1=>2-'n'->:s2=>2\n" +
 			":s2=>2-'u'->:s3=>2\n" +
-			":s4=>2-'b'->:s4=>2\n" +
-			":s4=>2-'c'->:s4=>2\n"; // no 'm'-> transition...conflicts with pred
+			":s5=>2-'b'->:s5=>2\n" +
+			":s5=>2-'c'->:s5=>2\n"; // no 'm'-> transition...conflicts with pred
 		assertEquals(expecting, found);
 	}
 
@@ -60,7 +60,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s2=>3\n"; // no DFA for enum/id. all paths lead to pred.
+			"s0-' '->:s1=>3\n"; // no DFA for enum/id. all paths lead to pred.
 		assertEquals(expecting, found);
 	}
 

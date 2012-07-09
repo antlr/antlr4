@@ -96,17 +96,17 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 				int i = 0;
 				@SuppressWarnings("serial")
 				WritableToken[] tokens = {
-				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
-				new CommonToken(1,"x"),
-				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
-				new CommonToken(1,"="),
-				new CommonToken(1,"34"),
-				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
-				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
-				new CommonToken(1,";"),
-				new CommonToken(1," ")  {{channel = Lexer.HIDDEN;}},
-				new CommonToken(1,"\n") {{channel = Lexer.HIDDEN;}},
-				new CommonToken(Token.EOF,"")
+				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}}, // 0
+				new CommonToken(1,"x"),								// 1
+				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},	// 2
+				new CommonToken(1,"="),								// 3
+				new CommonToken(1,"34"),							// 4
+				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},	// 5
+				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}}, // 6
+				new CommonToken(1,";"),								// 7
+				new CommonToken(1," ")  {{channel = Lexer.HIDDEN;}},// 8
+				new CommonToken(1,"\n") {{channel = Lexer.HIDDEN;}},// 9
+				new CommonToken(Token.EOF,"")						// 10
 				};
 				@Override
 				public Token nextToken() {
