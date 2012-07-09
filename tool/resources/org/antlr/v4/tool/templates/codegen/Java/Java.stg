@@ -92,8 +92,8 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
 	public static final String[] tokenNames = {
-		"\<INVALID>", "\<INVALID>", "\<INVALID>",
-		<parser.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
+		"\<INVALID>",
+        <parser.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
 	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
@@ -690,7 +690,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 	};
 
 	public static final String[] tokenNames = {
-		"\<INVALID>", "\<INVALID>", "\<INVALID>",
+		"\<INVALID>",
 		<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
 	};
 	public static final String[] ruleNames = {

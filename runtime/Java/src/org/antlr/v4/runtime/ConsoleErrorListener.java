@@ -36,12 +36,12 @@ public class ConsoleErrorListener implements ANTLRErrorListener<Object> {
 	public static final ConsoleErrorListener INSTANCE = new ConsoleErrorListener();
 
 	@Override
-	public <T extends Object> void error(Recognizer<T, ?> recognizer,
-										T offendingSymbol,
-										int line,
-										int charPositionInLine,
-										String msg,
-										RecognitionException e)
+	public <T extends Object> void syntaxError(Recognizer<T, ?> recognizer,
+											   T offendingSymbol,
+											   int line,
+											   int charPositionInLine,
+											   String msg,
+											   RecognitionException e)
 	{
 		System.err.println("line " + line + ":" + charPositionInLine + " " + msg);
 	}

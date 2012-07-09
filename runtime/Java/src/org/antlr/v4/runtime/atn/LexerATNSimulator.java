@@ -57,11 +57,11 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	/** When we hit an accept state in either the DFA or the ATN, we
 	 *  have to notify the character stream to start buffering characters
-	 *  via mark() and record the current state. The current state includes
-	 *  the current index into the input, the current line, and current
-	 *  character position in that line. Note that the Lexer is tracking
-	 *  the starting line and characterization of the token. These
-	 *  variables track the state of the simulator when it hits an accept state.
+	 *  via mark() and record the current state. The current sim state
+	 *  includes the current index into the input, the current line,
+	 *  and current character position in that line. Note that the Lexer is
+	 *  tracking the starting line and characterization of the token. These
+	 *  variables track the "state" of the simulator when it hits an accept state.
 	 *
 	 *  We track these variables separately for the DFA and ATN simulation
 	 *  because the DFA simulation often has to fail over to the ATN
@@ -70,18 +70,18 @@ public class LexerATNSimulator extends ATNSimulator {
 	 *  then the ATN does the accept and the DFA simulator that invoked it
 	 *  can simply return the predicted token type.
 	 */
-	protected static class ExecState {
+	protected static class SimState {
 		protected int index = -1;
 		protected int line = 0;
 		protected int charPos = -1;
-		protected DFAState state;
+		protected DFAState dfaState;
 		protected ATNConfig config;
 
 		protected void reset() {
 			index = -1;
 			line = 0;
 			charPos = -1;
-			state = null;
+			dfaState = null;
 			config = null;
 		}
 	}
@@ -108,7 +108,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	/** Used during DFA/ATN exec to record the most recent accept configuration info */
 	@NotNull
-	protected final ExecState prevAccept = new ExecState();
+	protected final SimState prevAccept = new SimState();
 
 	public static int ATN_failover = 0;
 	public static int match_calls = 0;
@@ -183,7 +183,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState startState = atn.modeToStartState.get(mode);
 
 		if ( debug ) {
-			System.out.format("mode %d start: %s\n", mode, startState);
+			System.out.format("matchATN mode %d start: %s\n", mode, startState);
 		}
 
 		ATNConfigSet s0_closure = computeStartState(input, startState);
@@ -236,7 +236,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					System.out.format("accept; predict %d in state %d\n", s.prediction, s.stateNumber);
 				}
 
-				markAcceptState(prevAccept, input, s);
+				captureSimState(prevAccept, input, s);
 				// keep going unless we're at EOF; check if something else could match
 				// EOF never in DFA
 				if ( t==CharStream.EOF ) break;
@@ -247,7 +247,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 
-		ATNConfigSet reach = prevAccept.state != null ? prevAccept.state.configset : null;
+		ATNConfigSet reach = prevAccept.dfaState != null ? prevAccept.dfaState.configset : null;
 		return failOrAccept(prevAccept, input, reach, t);
 	}
 
@@ -265,7 +265,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		while ( true ) { // while more work
 			if ( debug ) {
-				System.out.format("in reach starting closure: %s\n", closure);
+				System.out.format("execATN loop starting closure: %s\n", closure);
 			}
 
 			// As we move src->trg, src->trg, we keep track of the previous trg to
@@ -294,6 +294,10 @@ public class LexerATNSimulator extends ATNSimulator {
 					break;
 				}
 				else if (target != null) {
+					if ( debug ) {
+						System.out.println("reuse state "+s.stateNumber+
+										   " edge to "+target.stateNumber);
+					}
 					reach = target.configset;
 				}
 			}
@@ -315,18 +319,18 @@ public class LexerATNSimulator extends ATNSimulator {
 					if (from != null) {
 						addDFAEdge(from, t, ERROR);
 					}
-					break;
+					break; // stop when we can't match any more char
 				}
 
 				// Did we hit a stop state during reach op?
-				processAcceptStates(input, reach);
+				processAcceptConfigs(input, reach);
 
 				// Add an edge from s to target DFA found/created for reach
 				target = addDFAEdge(s, t, reach);
 			}
 			else if (target.isAcceptState) {
 				traceAcceptState(target.prediction);
-				markAcceptState(prevAccept, input, target);
+				captureSimState(prevAccept, input, target);
 			}
 
 			consume(input);
@@ -340,16 +344,16 @@ public class LexerATNSimulator extends ATNSimulator {
 		return failOrAccept(prevAccept, input, closure, t);
 	}
 
-	protected int failOrAccept(ExecState prevAccept, CharStream input,
+	protected int failOrAccept(SimState prevAccept, CharStream input,
 							   ATNConfigSet reach, int t)
 	{
-		if (prevAccept.state != null) {
-			int ruleIndex = prevAccept.state.lexerRuleIndex;
-			int actionIndex = prevAccept.state.lexerActionIndex;
+		if (prevAccept.dfaState != null) {
+			int ruleIndex = prevAccept.dfaState.lexerRuleIndex;
+			int actionIndex = prevAccept.dfaState.lexerActionIndex;
 			accept(input, ruleIndex, actionIndex,
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
-			tracePredict(prevAccept.state.prediction);
-			return prevAccept.state.prediction;
+			tracePredict(prevAccept.dfaState.prediction);
+			return prevAccept.dfaState.prediction;
 		}
 		else if (prevAccept.config != null) {
 			int ruleIndex = prevAccept.config.state.ruleIndex;
@@ -387,23 +391,33 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void processAcceptStates(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
+	protected void processAcceptConfigs(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
+		if ( debug ) {
+			System.out.format("processAcceptConfigs: reach=%s, prevAccept=%s, prevIndex=%d\n",
+						 	  reach, prevAccept.config, prevAccept.index);
+		}
 		for (int ci=0; ci<reach.size(); ci++) {
 			ATNConfig c = reach.get(ci);
 			if ( c.state instanceof RuleStopState) {
 				if ( debug ) {
-					System.out.format("in reach we hit accept state %s index %d, reach=%s, prevAccept=%s, prevIndex=%d\n",
-						c, input.index(), reach, prevAccept.config, prevAccept.index);
+					System.out.format("processAcceptConfigs: hit accept config %s index %d\n",
+									  c, input.index());
 				}
 
 				int index = input.index();
 				if ( index > prevAccept.index ) {
-					traceAcceptState(c.alt);
-					// will favor prev accept at same index so "int" is keyword not ID
-					markAcceptState(prevAccept, input, c);
 					if ( debug ) {
-						System.out.format("mark %s @ index=%d, %d:%d\n", c, index, prevAccept.line, prevAccept.charPos);
+						if ( prevAccept.index>=0 ) {
+							System.out.println("processAcceptConfigs: found longer token");
+						}
 					}
+					// condition > not >= will favor prev accept at same index.
+					// This way, "int" is keyword not ID if listed first.
+					traceAcceptState(c.alt);
+					if ( debug ) {
+						System.out.format("markExecSettings for %s @ index=%d, line %d:%d\n", c, index, prevAccept.line, prevAccept.charPos);
+					}
+					captureSimState(prevAccept, input, reach, c);
 				}
 
 				// if we reach lexer accept state, toss out any configs in rest
@@ -548,13 +562,17 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
-			ATNConfig c = getEpsilonTarget(config, t);
+			ATNConfig c = getEpsilonTarget(config, t, configs);
 			if ( c!=null ) closure(c, configs);
 		}
 	}
 
+	// side-effect: can alter configs.hasSemanticContext
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t) {
+	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
+									  @NotNull Transition t,
+									  @NotNull ATNConfigSet configs)
+	{
 		ATNState p = config.state;
 		ATNConfig c = null;
 		if ( t.getClass() == RuleTransition.class ) {
@@ -567,7 +585,29 @@ public class LexerATNSimulator extends ATNSimulator {
 				System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
 			}
 
+			/*  Track traversing semantic predicates. If we traverse,
+			    we cannot add a DFA state for this "reach" computation
+				because the DFA would not test the predicate again in the
+				future. Rather than creating collections of semantic predicates
+				like v3 and testing them on prediction, v4 will test them on the
+				fly all the time using the ATN not the DFA. This is slower but
+				semantically it's not used that often. One of the key elements to
+				this predicate mechanism is not adding DFA states that see
+				predicates immediately afterwards in the ATN. For example,
+
+				a : ID {p1}? | ID {p2}? ;
+
+				should create the start state for rule 'a' (to save start state
+				competition), but should not create target of ID state. The
+				collection of ATN states the following ID references includes
+				states reached by traversing predicates. Since this is when we
+				test them, we cannot cash the DFA state target of ID.
+			*/
 			PredicateTransition pt = (PredicateTransition)t;
+			if ( debug ) {
+				System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
+			}
+			configs.hasSemanticContext = true;
 			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = new ATNConfig(config, t.target, pt.getPredicate());
 			}
@@ -605,20 +645,27 @@ public class LexerATNSimulator extends ATNSimulator {
 		return ttype;
 	}
 
-	protected void markAcceptState(@NotNull ExecState state, @NotNull CharStream input, @NotNull DFAState dfaState) {
-		state.index = input.index();
-		state.line = line;
-		state.charPos = charPositionInLine;
-		state.config = null;
-		state.state = dfaState;
+	protected void captureSimState(@NotNull SimState settings,
+								   @NotNull CharStream input,
+								   @NotNull DFAState dfaState)
+	{
+		settings.index = input.index();
+		settings.line = line;
+		settings.charPos = charPositionInLine;
+		settings.config = null;
+		settings.dfaState = dfaState;
 	}
 
-	protected void markAcceptState(@NotNull ExecState state, @NotNull CharStream input, @NotNull ATNConfig config) {
-		state.index = input.index();
-		state.line = line;
-		state.charPos = charPositionInLine;
-		state.config = config;
-		state.state = null;
+	protected void captureSimState(@NotNull SimState settings,
+								   @NotNull CharStream input,
+								   @NotNull ATNConfigSet ATNConfigs,
+								   @NotNull ATNConfig config)
+	{
+		settings.index = input.index();
+		settings.line = line;
+		settings.charPos = charPositionInLine;
+		settings.config = config;
+		settings.dfaState = null;
 	}
 
 	protected DFAState addDFAEdge(@NotNull DFAState from,
@@ -632,12 +679,13 @@ public class LexerATNSimulator extends ATNSimulator {
 			return to;
 		}
 
-//		System.out.println("MOVE "+p+" -> "+q+" upon "+getTokenName(t));
 		if (from == null || to == null) {
 			return to;
 		}
 
+		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+((char)t));
 		addDFAEdge(from, t, to);
+
 		return to;
 	}
 
@@ -650,27 +698,13 @@ public class LexerATNSimulator extends ATNSimulator {
 	/** Add a new DFA state if there isn't one with this set of
 		configurations already. This method also detects the first
 		configuration containing an ATN rule stop state. Later, when
-		traversing the DFA, we will know which rule to accept. Also, we
-		detect if any of the configurations derived from traversing a
-		semantic predicate. If so, we cannot add a DFA state for this
-		because the DFA would not test the predicate again in the
-		future. Rather than creating collections of semantic predicates
-		like v3 and testing them on prediction, v4 will test them on the
-		fly all the time using the ATN not the DFA. This is slower but
-		semantically it's not used that often. One of the key elements to
-		this predicate mechanism is not adding DFA states that see
-		predicates immediately afterwards in the ATN. For example,
-
-		a : ID {p1}? | ID {p2}? ;
-
-		should create the start state for rule 'a' (to save start state
-		competition), but should not create target of ID state. The
-		collection of ATN states the following ID references includes
-		states reached by traversing predicates. Since this is when we
-		test them, we cannot cash the DFA state target of ID.
+		traversing the DFA, we will know which rule to accept.
 	 */
 	@Nullable
 	protected DFAState addDFAState(@NotNull ATNConfigSet configs) {
+		// If we eval'd a predicate while filling configs, mustn't create DFA state
+		if ( configs.hasSemanticContext ) return null;
+
 		DFAState proposed = new DFAState(configs, 0, MAX_DFA_EDGE);
 		DFAState existing = dfa[mode].states.get(proposed);
 		if ( existing!=null ) return existing;
@@ -678,15 +712,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		DFAState newState = proposed;
 
 		ATNConfig firstConfigWithRuleStopState = null;
-		boolean traversedPredicate = false;
 		for (ATNConfig c : configs) {
-			if ( firstConfigWithRuleStopState==null &&
-				 c.state instanceof RuleStopState )
-			{
+			if ( c.state instanceof RuleStopState )	{
 				firstConfigWithRuleStopState = c;
-			}
-			if ( c.semanticContext!=null && c.semanticContext!=SemanticContext.NONE ) {
-				traversedPredicate = true;
+				break;
 			}
 		}
 
@@ -696,8 +725,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			newState.lexerActionIndex = firstConfigWithRuleStopState.lexerActionIndex;
 			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
 		}
-
-		if ( traversedPredicate ) return null; // cannot cache
 
 		newState.stateNumber = dfa[mode].states.size();
 		configs.optimizeConfigs(this);
@@ -711,9 +738,21 @@ public class LexerATNSimulator extends ATNSimulator {
 		return dfa[mode];
 	}
 
-	/** Get the text of the current token */
+	/** Get the text of the current token from an *action* in lexer not
+	 *  predicate.
+	 */
 	@NotNull
 	public String getText(@NotNull CharStream input) {
+		// index is first lookahead char, don't include.
+		return input.getText(Interval.of(startIndex, input.index()-1));
+	}
+
+	/** Get the text from start of token to current lookahead char.
+	 *  Use this in predicates to test text matched so far in a lexer rule.
+	 */
+	@NotNull
+	public String getSpeculativeText(@NotNull CharStream input) {
+		// index is first lookahead char, don't include.
 		return input.getText(Interval.of(startIndex, input.index()));
 	}
 
@@ -721,8 +760,16 @@ public class LexerATNSimulator extends ATNSimulator {
 		return line;
 	}
 
+	public void setLine(int line) {
+		this.line = line;
+	}
+
 	public int getCharPositionInLine() {
 		return charPositionInLine;
+	}
+
+	public void setCharPositionInLine(int charPositionInLine) {
+		this.charPositionInLine = charPositionInLine;
 	}
 
 	public void consume(@NotNull CharStream input) {

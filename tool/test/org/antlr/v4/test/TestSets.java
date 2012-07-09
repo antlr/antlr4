@@ -42,7 +42,7 @@ public class TestSets extends BaseTest {
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
 			"grammar P;\n" +
-			"a : C {System.out.println(_input);} ;\n" +
+			"a : C {System.out.println(_input.getText());} ;\n" +
 			"fragment A : '1' | '2';\n" +
 			"fragment B : '3' '4';\n" +
 			"C : A | B;\n";
@@ -72,7 +72,7 @@ public class TestSets extends BaseTest {
 	@Test public void testParserNotToken() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ~'x' 'z' {System.out.println(_input);} ;\n";
+			"a : ~'x' 'z' {System.out.println(_input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "zz", debug);
 		assertEquals("zz\n", found);
@@ -90,7 +90,7 @@ public class TestSets extends BaseTest {
 	@Test public void testRuleAsSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a @after {System.out.println(_input);} : 'a' | 'b' |'c' ;\n";
+			"a @after {System.out.println(_input.getText());} : 'a' | 'b' |'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "b", debug);
 		assertEquals("b\n", found);
@@ -109,7 +109,7 @@ public class TestSets extends BaseTest {
 	@Test public void testOptionalSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A? 'c' {System.out.println(_input);} ;\n" +
+			"a : A? 'c' {System.out.println(_input.getText());} ;\n" +
 			"A : 'b' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "bc", debug);
@@ -119,7 +119,7 @@ public class TestSets extends BaseTest {
 	@Test public void testOptionalLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {System.out.println(_input);} ;\n" +
+			"a : A {System.out.println(_input.getText());} ;\n" +
 			"A : 'b'? 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "bc", debug);
@@ -129,7 +129,7 @@ public class TestSets extends BaseTest {
 	@Test public void testStarLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {System.out.println(_input);} ;\n" +
+			"a : A {System.out.println(_input.getText());} ;\n" +
 			"A : 'b'* 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "bbbbc", debug);
@@ -142,7 +142,7 @@ public class TestSets extends BaseTest {
 	@Test public void testPlusLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {System.out.println(_input);} ;\n" +
+			"a : A {System.out.println(_input.getText());} ;\n" +
 			"A : 'b'+ 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "bbbbc", debug);
@@ -152,7 +152,7 @@ public class TestSets extends BaseTest {
 	@Test public void testOptionalSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ('a'|'b')? 'c' {System.out.println(_input);} ;\n";
+			"a : ('a'|'b')? 'c' {System.out.println(_input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "ac", debug);
 		assertEquals("ac\n", found);
@@ -161,7 +161,7 @@ public class TestSets extends BaseTest {
 	@Test public void testStarSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ('a'|'b')* 'c' {System.out.println(_input);} ;\n";
+			"a : ('a'|'b')* 'c' {System.out.println(_input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "abaac", debug);
 		assertEquals("abaac\n", found);
@@ -170,7 +170,7 @@ public class TestSets extends BaseTest {
 	@Test public void testPlusSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ('a'|'b')+ 'c' {System.out.println(_input);} ;\n";
+			"a : ('a'|'b')+ 'c' {System.out.println(_input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "abaac", debug);
 		assertEquals("abaac\n", found);
@@ -179,7 +179,7 @@ public class TestSets extends BaseTest {
 	@Test public void testLexerOptionalSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {System.out.println(_input);} ;\n" +
+			"a : A {System.out.println(_input.getText());} ;\n" +
 			"A : ('a'|'b')? 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "ac", debug);
@@ -189,7 +189,7 @@ public class TestSets extends BaseTest {
 	@Test public void testLexerStarSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {System.out.println(_input);} ;\n" +
+			"a : A {System.out.println(_input.getText());} ;\n" +
 			"A : ('a'|'b')* 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "abaac", debug);
@@ -199,7 +199,7 @@ public class TestSets extends BaseTest {
 	@Test public void testLexerPlusSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {System.out.println(_input);} ;\n" +
+			"a : A {System.out.println(_input.getText());} ;\n" +
 			"A : ('a'|'b')+ 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "abaac", debug);

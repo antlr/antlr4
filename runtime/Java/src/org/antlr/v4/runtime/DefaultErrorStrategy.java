@@ -370,8 +370,9 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+recognizer.getTokenNames()[expectedTokenType]+">";
 		Symbol current = currentSymbol;
-		if ( current.getType() == Token.EOF ) {
-			current = recognizer.getInputStream().LT(-1);
+		Symbol lookback = recognizer.getInputStream().LT(-1);
+		if ( current.getType() == Token.EOF && lookback!=null ) {
+			current = lookback;
 		}
 
 		return constructToken(recognizer.getTokenStream().getTokenSource(), expectedTokenType, tokenText, current);

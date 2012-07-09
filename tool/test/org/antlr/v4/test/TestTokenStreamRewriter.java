@@ -314,7 +314,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		catch (IllegalArgumentException iae) {
 			exc = iae;
 		}
-		String expecting = "insert op <InsertBeforeOp@[@1,1:1='b',<4>,1:1]:\"0\"> within boundaries of previous <ReplaceOp@[@0,0:0='a',<3>,1:0]..[@2,2:2='c',<5>,1:2]:\"x\">";
+		String expecting = "insert op <InsertBeforeOp@[@1,1:1='b',<2>,1:1]:\"0\"> within boundaries of previous <ReplaceOp@[@0,0:0='a',<1>,1:0]..[@2,2:2='c',<3>,1:2]:\"x\">";
 		assertNotNull(exc);
 		assertEquals(expecting, exc.getMessage());
 	}
@@ -469,7 +469,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		catch (IllegalArgumentException iae) {
 			exc = iae;
 		}
-		String expecting = "insert op <InsertBeforeOp@[@4,4:4='c',<5>,1:4]:\"y\"> within boundaries of previous <ReplaceOp@[@2,2:2='c',<5>,1:2]..[@4,4:4='c',<5>,1:4]:\"x\">";
+		String expecting = "insert op <InsertBeforeOp@[@4,4:4='c',<3>,1:4]:\"y\"> within boundaries of previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"x\">";
 		assertNotNull(exc);
 		assertEquals(expecting, exc.getMessage());
 	}
@@ -548,7 +548,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		catch (IllegalArgumentException iae) {
 			exc = iae;
 		}
-		String expecting = "replace op boundaries of <ReplaceOp@[@3,3:3='c',<5>,1:3]..[@5,5:5='b',<4>,1:5]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<5>,1:2]..[@4,4:4='c',<5>,1:4]:\"xyz\">";
+		String expecting = "replace op boundaries of <ReplaceOp@[@3,3:3='c',<3>,1:3]..[@5,5:5='b',<2>,1:5]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"xyz\">";
 		assertNotNull(exc);
 		assertEquals(expecting, exc.getMessage());
 	}
@@ -575,7 +575,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		catch (IllegalArgumentException iae) {
 			exc = iae;
 		}
-		String expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<4>,1:1]..[@3,3:3='c',<5>,1:3]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<5>,1:2]..[@4,4:4='c',<5>,1:4]:\"xyz\">";
+		String expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<2>,1:1]..[@3,3:3='c',<3>,1:3]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"xyz\">";
 		assertNotNull(exc);
 		assertEquals(expecting, exc.getMessage());
 	}
@@ -738,7 +738,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		catch (IllegalArgumentException iae) {
 			exc = iae;
 		}
-		String expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<4>,1:1]..[@2,2:2='c',<5>,1:2]:\"foo\"> overlap with previous <ReplaceOp@[@0,0:0='a',<3>,1:0]..[@3,3:3='c',<5>,1:3]:\"bar\">";
+		String expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<2>,1:1]..[@2,2:2='c',<3>,1:2]:\"foo\"> overlap with previous <ReplaceOp@[@0,0:0='a',<1>,1:0]..[@3,3:3='c',<3>,1:3]:\"bar\">";
 		assertNotNull(exc);
 		assertEquals(expecting, exc.getMessage());
 	}

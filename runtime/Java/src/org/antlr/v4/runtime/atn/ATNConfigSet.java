@@ -76,6 +76,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	private int uniqueAlt;
 	private IntervalSet conflictingAlts;
+	// Used in parser and lexer. In lexer, it indicates we hit a pred
+	// while computing a closure operation.  Don't make a DFA state from this.
 	private boolean hasSemanticContext;
 	private boolean dipsIntoOuterContext;
 	/**

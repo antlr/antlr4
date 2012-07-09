@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger early access
 
+[sorry...haven't been keeping this up to date]
+
+Apr 26, 2012
+
+* -> for parser labels becomes #
+
 Feb 17, 2012
 
 * added -parse-listener option and differentiated between parse and parse

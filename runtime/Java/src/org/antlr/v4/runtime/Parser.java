@@ -333,7 +333,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 
 		ANTLRErrorListener<? super Symbol> listener = getErrorListenerDispatch();
-		listener.error(this, offendingToken, line, charPositionInLine, msg, e);
+		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
 	/** Consume the current symbol and return it. E.g., given the following
@@ -562,7 +562,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		List<String> stack = new ArrayList<String>();
 		while ( p!=null ) {
 			// compute what follows who invoked us
-			stack.add(ruleNames[p.getRuleIndex()]);
+			int ruleIndex = p.getRuleIndex();
+			if ( ruleIndex<0 ) stack.add("n/a");
+			else stack.add(ruleNames[ruleIndex]);
 			p = p.parent;
 		}
 		return stack;

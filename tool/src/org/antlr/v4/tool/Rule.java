@@ -56,8 +56,6 @@ public class Rule implements AttributeResolver {
             add(new Attribute("text"));
             add(new Attribute("start"));
             add(new Attribute("stop"));
-            add(new Attribute("tree"));
-            add(new Attribute("st"));
             add(new Attribute("ctx"));
         }};
 
@@ -65,13 +63,8 @@ public class Rule implements AttributeResolver {
         new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
             add(new Attribute("text"));
             add(new Attribute("type"));
-            add(new Attribute("line"));
-            add(new Attribute("index"));
-            add(new Attribute("pos"));
-            add(new Attribute("channel"));
-            add(new Attribute("start"));
-            add(new Attribute("stop"));
-            add(new Attribute("int"));
+			add(new Attribute("channel"));
+			add(new Attribute("mode"));
         }};
 
 	@SuppressWarnings("serial")

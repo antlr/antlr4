@@ -1,10 +1,14 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 public class TestTokenTypeAssignment extends BaseTest {
 
@@ -94,6 +98,21 @@ public class TestTokenTypeAssignment extends BaseTest {
 		assertEquals("[E, 'x']", tokens.toString());
 	}
 
+	@Test public void testPredDoesNotHideNameToLiteralMapInLexer() throws Exception {
+		// 'x' is token and char in lexer rule
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"a : 'x' X ; \n" +
+				"X: 'x' {true}?;\n"); // must match as alias even with pred
+
+		assertEquals("{'x'=1}", g.stringLiteralToTypeMap.toString());
+		assertEquals("{EOF=-1, X=1}", g.tokenNameToTypeMap.toString());
+
+		// pushed in lexer from parser
+		assertEquals("{'x'=1}", g.implicitLexer.stringLiteralToTypeMap.toString());
+		assertEquals("{EOF=-1, X=1}", g.implicitLexer.tokenNameToTypeMap.toString());
+	}
+
 	@Test public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
@@ -132,7 +151,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		String grammar =
 			"grammar P;\n" +
 			"tokens { B='}'; }\n"+
-			"a : A B {System.out.println(_input);} ;\n"+
+			"a : A B {System.out.println(_input.getText());} ;\n"+
 			"A : 'a' ;\n" +
 			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
@@ -147,7 +166,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		String grammar =
 			"grammar P;\n" +
 			"tokens { B='}'; }\n"+
-			"a : A '}' {System.out.println(_input);} ;\n"+
+			"a : A '}' {System.out.println(_input.getText());} ;\n"+
 			"A : 'a' ;\n" +
 			"B : '}' ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";

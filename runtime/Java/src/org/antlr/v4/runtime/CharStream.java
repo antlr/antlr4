@@ -36,10 +36,11 @@ public interface CharStream extends IntStream<Integer> {
 	public static final int MIN_CHAR = Character.MIN_VALUE;
 	public static final int MAX_CHAR = Character.MAX_VALUE-1; // FFFE is max
 
-	/** For unbuffered streams, you can't use this; primarily I'm providing
-	 *  a useful interface for action code.  Just make sure actions don't
-	 *  use this on streams that don't support it.
-	 * @param interval
+	/** This is primaril a useful interface for action code.
+	 *  Just make sure actions don't use this on streams that don't support it.
+	 *  For unbuffered streams, you can't use this except in case
+	 *  where interval is in current buffer window. Lexer guarantees
+	 *  text of current token at emit() time will be available.
 	 */
 	public String getText(Interval interval);
 }

@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.misc.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /** Buffer all input tokens but do on-demand fetching of new tokens from
@@ -175,7 +174,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     @Override
     public T get(int i) {
         if ( i < 0 || i >= tokens.size() ) {
-            throw new NoSuchElementException("token index "+i+" out of range 0.."+(tokens.size()-1));
+            throw new IndexOutOfBoundsException("token index "+i+" out of range 0.."+(tokens.size()-1));
         }
         return tokens.get(i);
     }
@@ -265,8 +264,12 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
      */
     public List<T> getTokens(int start, int stop, Set<Integer> types) {
         lazyInit();
-        if ( stop>=tokens.size() ) stop=tokens.size()-1;
-        if ( start<0 ) start=0;
+		if ( start<0 || stop>=tokens.size() ||
+			 stop<0  || start>=tokens.size() )
+		{
+			throw new IndexOutOfBoundsException("start "+start+" or stop "+stop+
+												" not in 0.."+(tokens.size()-1));
+		}
         if ( start>stop ) return null;
 
         // list = tokens[start:stop]:{T t, t.getType() in types}
@@ -289,12 +292,109 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 		return getTokens(start,stop, s);
     }
 
-    @Override
-    public String getSourceName() {	return tokenSource.getSourceName();	}
+	/** Given a starting index, return the index of the next on-channel
+	 *  token. Return i if tokens[i] is on channel.
+	 */
+	protected int nextTokenOnChannel(int i, int channel) {
+		sync(i);
+		Token token = tokens.get(i);
+		while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
+			i++;
+			sync(i);
+			token = tokens.get(i);
+		}
+		return i;
+	}
 
-    /** Grab *all* tokens from stream and return string */
-    @Override
-    public String toString() { return getText(); }
+	/** Given a starting index, return the index of the previous on-channel
+	 *  token. Return i if tokens[i] is on channel.
+	 */
+	protected int previousTokenOnChannel(int i, int channel) {
+		while ( i>=0 && tokens.get(i).getChannel()!=channel ) {
+			i--;
+		}
+		return i;
+	}
+
+	public List<T> getOffChannelTokensToRight(int direction, int tokenIndex, int channel) {
+		if ( p == -1 ) setup();
+		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
+			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
+		}
+
+		int nextOnChannel = nextTokenOnChannel(tokenIndex + 1, channel);
+
+		if ( nextOnChannel == tokenIndex + 1 ) return null;
+
+		// get tokens to right up to next on channel
+		return tokens.subList(tokenIndex+1, nextOnChannel);
+	}
+
+	/** Collect all tokens on or off specified channel to the right or left of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 *  @param direction	-1 means to the left, 1 means to the right.
+	 *  @param onchannel	if true, get all tokens on the channel, else off channel
+	 */
+	public List<T> getHiddenTokens(int direction, boolean onchannel, int tokenIndex, int channel) {
+		if ( p == -1 ) setup();
+		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
+			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
+		}
+
+		int from;
+		int to;
+		if ( direction == -1 ) {
+			int prevOnChannel = previousTokenOnChannel(tokenIndex - 1, channel);
+			if ( prevOnChannel == tokenIndex - 1 ) return null;
+			from = prevOnChannel+1;
+			to = tokenIndex-1;
+		}
+		else {
+			int nextOnChannel = nextTokenOnChannel(tokenIndex + 1, channel);
+			if ( nextOnChannel == tokenIndex + 1 ) return null;
+			from = tokenIndex+1;
+			to = nextOnChannel;
+		}
+
+		List<T> hidden = new ArrayList<T>();
+		for (int i=from; i<=to; i++) {
+			T t = tokens.get(i);
+			if ( t.getChannel()==channel && onchannel) hidden.add(t);
+			else if ( t.getChannel()!=channel && !onchannel) hidden.add(t);
+		}
+		return hidden;
+	}
+
+	/** Collect all tokens on specified channel to the right of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getHiddenTokensToRight(int tokenIndex, int channel) {
+		return getHiddenTokens(1, true, tokenIndex, channel);
+	}
+
+	/** Collect all tokens on specified channel to the left of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getHiddenTokensToLeft(int tokenIndex, int channel) {
+		return getHiddenTokens(-1, true, tokenIndex, channel);
+	}
+
+	/** Collect all hidden tokens (any off-default channel) to the right of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getHiddenTokensToRight(int tokenIndex) {
+		return getHiddenTokens(1, false, tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+	}
+
+	/** Collect all hidden tokens (any off-default channel) to the left of
+	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 */
+	public List<T> getHiddenTokensToLeft(int tokenIndex) {
+		return getHiddenTokens(-1, false, tokenIndex, Lexer.DEFAULT_TOKEN_CHANNEL);
+	}
+
+	@Override
+    public String getSourceName() {	return tokenSource.getSourceName();	}
 
 	/** Get the text of all tokens in this buffer. */
 	public String getText() {

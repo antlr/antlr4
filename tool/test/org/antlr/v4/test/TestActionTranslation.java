@@ -126,8 +126,7 @@ public class TestActionTranslation extends BaseTest {
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$a.text; $text";
 		String expected =
-			"(_localctx.a!=null?_input.getText(_localctx.a.start,_localctx.a.stop):" +
-			"null); _input.getText(_localctx.start, _input.LT(-1))";
+			"_input.getText(_localctx.start, _input.LT(-1)); _input.getText(_localctx.start, _input.LT(-1))";
 		testActions(attributeTemplate, "init", action, expected);
 		expected =
 			"_input.getText(_localctx.start, _input.LT(-1)); _input.getText(_localctx.start, _input.LT(-1))";

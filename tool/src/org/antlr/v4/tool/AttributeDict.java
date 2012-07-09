@@ -59,7 +59,6 @@ public class AttributeDict {
         add(new Attribute("index"));
         add(new Attribute("pos"));
         add(new Attribute("channel"));
-        add(new Attribute("tree"));
         add(new Attribute("int"));
     }};
 

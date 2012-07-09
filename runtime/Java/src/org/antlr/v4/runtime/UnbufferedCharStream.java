@@ -36,24 +36,36 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+/** Do not buffer up the entire char stream. It does keep a small buffer
+ *  for efficiency and also buffers while a mark exists (set by the
+ *  lookahead prediction in parser). "Unbuffered" here refers to fact
+ *  that it doesn't buffer all data, not that's it's on demand loading of char.
+ */
 public class UnbufferedCharStream implements CharStream {
-    /** A buffer of the data being scanned */
+    /** A moving window buffer of the data being scanned. While there's a
+	 *  marker, we keep adding to buffer.  Otherwise, consume() resets
+	 *  so we start filling at index 0 again.
+	 */
    	protected char[] data;
 
-   	/** How many characters are actually in the buffer */
+   	/** How many characters are actually in the buffer; this is not
+		the buffer size, that's data.length.
+ 	 */
    	protected int n;
 
-    /** 0..n-1 index into string of next char */
+    /** 0..n-1 index into data of next char; data[p] is LA(1). */
    	protected int p=0;
 
     protected int earliestMarker = -1;
 
 	/** Absolute char index. It's the index of the char about to be
-	 *  read via LA(1). Goes from 0 to numchar-1.
+	 *  read via LA(1). Goes from 0 to numchar-1 in entire stream.
 	 */
     protected int currentCharIndex = 0;
 
-    /** Buf is window into stream. This is absolute index of data[0] */
+    /** Buf is window into stream. This is absolute char index into entire
+	 *  stream of data[0]
+	 */
     protected int bufferStartIndex = 0;
 
     protected Reader input;
@@ -72,20 +84,14 @@ public class UnbufferedCharStream implements CharStream {
     public UnbufferedCharStream(InputStream input, int bufferSize) {
    		this.input = new InputStreamReader(input);
         data = new char[bufferSize];
+		fill(1); // prime
    	}
 
    	public UnbufferedCharStream(Reader input, int bufferSize) {
    		this.input = input;
         data = new char[bufferSize];
+		fill(1); // prime
    	}
-
-	public void reset() {
-		p = 0;
-		earliestMarker = -1;
-		currentCharIndex = 0;
-        bufferStartIndex = 0;
-		n = 0;
-	}
 
 	@Override
 	public void consume() {
@@ -99,6 +105,7 @@ public class UnbufferedCharStream implements CharStream {
 			n = 0;
             bufferStartIndex = currentCharIndex;
         }
+		sync(1);
     }
 
 	/** Make sure we have 'need' elements from current position p. Last valid
@@ -193,15 +200,30 @@ public class UnbufferedCharStream implements CharStream {
 
     @Override
     public String getSourceName() {
-        return name;
-    }
+		return name;
+	}
 
-    @Override
-    public String getText(Interval interval) {
+	@Override
+	public String getText(Interval interval) {
 		if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n) {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("interval "+interval+" outside buffer: "+
+			                    bufferStartIndex+".."+(bufferStartIndex+n));
 		}
 
 		return new String(data, interval.a, interval.length());
-    }
+	}
+
+	/** For testing.  What's in moving window into data stream? */
+	public String getBuffer() {
+		if ( n==0 ) return null;
+		return new String(data,0,n);
+	}
+
+	public int getBufferStartIndex() {
+		return bufferStartIndex;
+	}
+
+	public int getCurrentCharIndex() {
+		return currentCharIndex;
+	}
 }

@@ -1,8 +1,17 @@
 grammar T;
-s : e ';' ;
-e : e '*' e
-  | ID
-  | INT
-  ;
+
+s : a+ ';' ;
+
+a
+@after {
+	System.out.println($start);
+}
+ : ID|INT ;
+
+ID : 'a'..'z'+;
 INT : '0'..'9'+;
-WS : (' '|'\n') {skip();} ;
+SEMI : ';';
+ASSIGN : '=';
+PLUS : '+';
+MULT : '*';
+WS : [ \n\t]+ -> skip;

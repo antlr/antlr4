@@ -6,6 +6,7 @@ public class TestListeners extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
+			"@header {import org.antlr.v4.runtime.tree.ParseTree;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {\n" +
@@ -69,7 +70,7 @@ public class TestListeners extends BaseTest {
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abc", false);
 		expecting = "(a abc)\n" +
-					"[@0,0:2='abc',<6>,1:0]\n";
+					"[@0,0:2='abc',<4>,1:0]\n";
 		assertEquals(expecting, result);
 	}
 
@@ -178,8 +179,8 @@ public class TestListeners extends BaseTest {
 			"  walker.walk(new LeafListener(), $r.ctx);" +
 			"}\n" +
 			"  : r=e ;\n" +
-			"e : e '(' eList ')' -> Call\n" +
-			"  | INT             -> Int\n" +
+			"e : e '(' eList ')' # Call\n" +
+			"  | INT             # Int\n" +
 			"  ;     \n" +
 			"eList : e (',' e)* ;\n" +
 			"MULT: '*' ;\n" +
