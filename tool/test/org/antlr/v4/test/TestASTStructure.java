@@ -3,13 +3,13 @@ package org.antlr.v4.test;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Lexer;
 import org.antlr.runtime.Parser;
 import org.antlr.runtime.RuleReturnScope;
 import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
-import org.antlr.v4.runtime.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
