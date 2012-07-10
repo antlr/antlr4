@@ -37,7 +37,6 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenFactory;
 import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.tool.LexerGrammar;
 
@@ -100,12 +99,9 @@ public class LexerInterpreter implements TokenSource {
 		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
 		int stop = input.index()-1;
 
-		WritableToken t = (WritableToken)
+		Token t =
 			_factory.create(this, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
-						    tokenStartLine, tokenStartCharPositionInLine);
-
-		t.setLine(tokenStartLine);
-		t.setCharPositionInLine(tokenStartCharPositionInLine);
+							tokenStartLine, tokenStartCharPositionInLine);
 		return t;
 
 		/*
