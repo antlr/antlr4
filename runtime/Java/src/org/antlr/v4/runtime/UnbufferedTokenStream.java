@@ -45,7 +45,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 	public UnbufferedTokenStream(TokenSource<T> tokenSource, int bufferSize) {
 		this.tokenSource = tokenSource;
 		@SuppressWarnings("unchecked")
-		T[] tokens = (T[])new Object[bufferSize];
+		T[] tokens = (T[])new Token[bufferSize];
 		this.tokens = tokens;
 		fill(1); // prime the pump
 	}
