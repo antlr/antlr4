@@ -782,6 +782,15 @@ public class Grammar implements AttributeResolver {
 					GrammarAST nameNode = (GrammarAST)nodes.get("name");
 					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
 				}
+				nodes = new HashMap();
+				// try with -> lexercommand in there
+				isLitRule =
+					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (LEXER_ALT_ACTION (ALT %lit:STRING_LITERAL) ID)))", nodes);
+				if ( isLitRule ) {
+					GrammarAST litNode = (GrammarAST)nodes.get("lit");
+					GrammarAST nameNode = (GrammarAST)nodes.get("name");
+					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
+				}
             }
         }
 		return lexerRuleToStringLiteral;
