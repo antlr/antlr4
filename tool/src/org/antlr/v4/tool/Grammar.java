@@ -762,7 +762,7 @@ public class Grammar implements AttributeResolver {
 
 		for (GrammarAST r : ruleNodes) {
 			//tool.log("grammar", r.toStringTree());
-			System.out.println("chk: "+r.toStringTree());
+//			System.out.println("chk: "+r.toStringTree());
 			Tree name = r.getChild(0);
 			if ( name.getType()==ANTLRParser.TOKEN_REF ) {
 				// check rule against patterns
@@ -772,7 +772,7 @@ public class Grammar implements AttributeResolver {
 						defAlias(r, pattern, wiz, lexerRuleToStringLiteral);
 					if ( isLitRule ) break;
 				}
-				if ( !isLitRule ) System.out.println("no pattern matched");
+//				if ( !isLitRule ) System.out.println("no pattern matched");
 			}
 		}
 		return lexerRuleToStringLiteral;
