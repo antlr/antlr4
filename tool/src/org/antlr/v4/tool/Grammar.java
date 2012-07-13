@@ -758,7 +758,7 @@ public class Grammar implements AttributeResolver {
 		Map<String,String> lexerRuleToStringLiteral = new HashMap<String,String>();
 
 		List<GrammarAST> ruleNodes = ast.getNodesWithType(ANTLRParser.RULE);
-		if ( ruleNodes==null || ruleNodes.size()==0 ) return null;
+		if ( ruleNodes==null || ruleNodes.isEmpty() ) return null;
 
 		for (GrammarAST r : ruleNodes) {
 			//tool.log("grammar", r.toStringTree());
@@ -782,7 +782,7 @@ public class Grammar implements AttributeResolver {
 									  TreeWizard wiz,
 									  Map<String, String> lexerRuleToStringLiteral)
 	{
-		HashMap nodes = new HashMap();
+		HashMap<String, Object> nodes = new HashMap<String, Object>();
 		if ( wiz.parse(r, pattern, nodes) ) {
 			GrammarAST litNode = (GrammarAST)nodes.get("lit");
 			GrammarAST nameNode = (GrammarAST)nodes.get("name");
