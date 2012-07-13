@@ -744,6 +744,17 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public static Map<String,String> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
+		String[] patterns = {
+			"(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL)))",
+			"(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL ACTION)))",
+			"(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL SEMPRED)))",
+			"(RULE %name:TOKEN_REF (BLOCK (LEXER_ALT_ACTION (ALT %lit:STRING_LITERAL) .)))",
+			"(RULE %name:TOKEN_REF (BLOCK (LEXER_ALT_ACTION (ALT %lit:STRING_LITERAL) . .)))",
+			"(RULE %name:TOKEN_REF (BLOCK (LEXER_ALT_ACTION (ALT %lit:STRING_LITERAL) (LEXER_ACTION_CALL . .))))",
+			"(RULE %name:TOKEN_REF (BLOCK (LEXER_ALT_ACTION (ALT %lit:STRING_LITERAL) . (LEXER_ACTION_CALL . .))))",
+			"(RULE %name:TOKEN_REF (BLOCK (LEXER_ALT_ACTION (ALT %lit:STRING_LITERAL) (LEXER_ACTION_CALL . .) .)))",
+			// TODO: allow doc comment in there
+		};
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(ast.token.getInputStream());
 		TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
 		Map<String,String> lexerRuleToStringLiteral = new HashMap<String,String>();
@@ -751,42 +762,36 @@ public class Grammar implements AttributeResolver {
 		List<GrammarAST> ruleNodes = ast.getNodesWithType(ANTLRParser.RULE);
 		if ( ruleNodes==null || ruleNodes.size()==0 ) return null;
 
-        for (GrammarAST r : ruleNodes) {
+		for (GrammarAST r : ruleNodes) {
 			//tool.log("grammar", r.toStringTree());
+//			System.out.println("chk: "+r.toStringTree());
 			Tree name = r.getChild(0);
-            if ( name.getType()==ANTLRParser.TOKEN_REF ) {
-				Map<String, Object> nodes = new HashMap<String, Object>();
-				boolean isLitRule =
-					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL)))", nodes);
-				if ( isLitRule ) {
-					GrammarAST litNode = (GrammarAST)nodes.get("lit");
-					GrammarAST nameNode = (GrammarAST)nodes.get("name");
-					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
-					continue;
+			if ( name.getType()==ANTLRParser.TOKEN_REF ) {
+				// check rule against patterns
+				boolean isLitRule = false;
+				for (String pattern : patterns) {
+					isLitRule =
+						defAlias(r, pattern, wiz, lexerRuleToStringLiteral);
+					if ( isLitRule ) break;
 				}
-				// TODO: allow doc comment in there
-				nodes = new HashMap<String, Object>();
-				// try with action in there
-				isLitRule =
-					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL ACTION)))", nodes);
-				if ( isLitRule ) {
-					GrammarAST litNode = (GrammarAST)nodes.get("lit");
-					GrammarAST nameNode = (GrammarAST)nodes.get("name");
-					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
-					continue;
-				}
-				nodes = new HashMap<String, Object>();
-				// try with pred in there
-				isLitRule =
-					wiz.parse(r, "(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL SEMPRED)))", nodes);
-				if ( isLitRule ) {
-					GrammarAST litNode = (GrammarAST)nodes.get("lit");
-					GrammarAST nameNode = (GrammarAST)nodes.get("name");
-					lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
-				}
-            }
-        }
+//				if ( !isLitRule ) System.out.println("no pattern matched");
+			}
+		}
 		return lexerRuleToStringLiteral;
+	}
+
+	protected static boolean defAlias(GrammarAST r, String pattern,
+									  TreeWizard wiz,
+									  Map<String, String> lexerRuleToStringLiteral)
+	{
+		HashMap nodes = new HashMap();
+		if ( wiz.parse(r, pattern, nodes) ) {
+			GrammarAST litNode = (GrammarAST)nodes.get("lit");
+			GrammarAST nameNode = (GrammarAST)nodes.get("name");
+			lexerRuleToStringLiteral.put(litNode.getText(), nameNode.getText());
+			return true;
+		}
+		return false;
 	}
 
 	public Set<String> getStringLiterals() {
