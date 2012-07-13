@@ -292,17 +292,15 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 	public String toString(@NotNull Recognizer<?, ?> recog, RuleContext<?> stop) {
 		if ( recog==null ) return super.toString(recog, stop);
 		StringBuilder buf = new StringBuilder();
-		ParserRuleContext<?> p = this;
+		RuleContext<?> p = this;
 		buf.append("[");
-		int state = recog.getState();
+		String[] ruleNames = recog.getRuleNames();
 		while ( p != null && p != stop ) {
-			ATN atn = recog.getATN();
-			ATNState s = atn.states.get(state);
-			String ruleName = recog.getRuleNames()[s.ruleIndex];
+			int ruleIndex = p.getRuleIndex();
+			String ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.length ? ruleNames[ruleIndex] : Integer.toString(ruleIndex);
 			buf.append(ruleName);
 			if ( p.parent != null ) buf.append(" ");
-			state = p.invokingState;
-			p = (ParserRuleContext<?>)p.parent;
+			p = p.parent;
 		}
 		buf.append("]");
 		return buf.toString();
