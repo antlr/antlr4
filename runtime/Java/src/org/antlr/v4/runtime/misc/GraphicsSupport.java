@@ -30,7 +30,12 @@
 package org.antlr.v4.runtime.misc;
 
 import javax.imageio.ImageIO;
-import javax.print.*;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.SimpleDoc;
+import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
@@ -105,6 +110,7 @@ public class GraphicsSupport {
 				job.print(doc, attributes);
 			}
 		} else {
+			// parrt: doesn't seem to do .pdf. 0-length file generated
 			Rectangle rect = comp.getBounds();
 			BufferedImage image = new BufferedImage(rect.width, rect.height,
 													BufferedImage.TYPE_INT_RGB);

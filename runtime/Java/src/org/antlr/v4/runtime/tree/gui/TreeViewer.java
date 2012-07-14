@@ -34,11 +34,13 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.misc.GraphicsSupport;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
+import javax.print.PrintException;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -47,6 +49,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -324,7 +327,6 @@ public class TreeViewer extends JComponent {
         });
 	}
 
-	/** This does not always seem to render the postscript properly
 	public void save(String fileName) throws IOException, PrintException {
 		JDialog dialog = new JDialog();
 		Container contentPane = dialog.getContentPane();
@@ -335,10 +337,8 @@ public class TreeViewer extends JComponent {
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.dispose();
-//		dialog.setVisible(true);
 		GraphicsSupport.saveImage(this, fileName);
 	}
-	 */
 
 	// ---------------------------------------------------
 
