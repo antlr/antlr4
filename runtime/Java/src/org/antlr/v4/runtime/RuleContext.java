@@ -159,7 +159,9 @@ public class RuleContext<Symbol> implements ParseTree.RuleNode<Symbol> {
 	public void save(Parser<?> parser, String fileName)
 		throws IOException, PrintException
 	{
-		Trees.writePS(this, parser, fileName);
+//		TreeViewer viewer = new TreeViewer(parser, this);
+//		viewer.save(fileName);
+		Trees.writePS(this, parser, fileName); // parrt routine
 	}
 
 	public void save(Parser<?> parser, String fileName,
