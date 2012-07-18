@@ -187,7 +187,7 @@ public class DOTGenerator {
 		List<ATNState> work = new LinkedList<ATNState>();
 
 		work.add(startState);
-		while ( work.size()>0 ) {
+		while ( !work.isEmpty() ) {
 			ATNState s = work.get(0);
 			if ( markedStates.contains(s) ) { work.remove(0); continue; }
 			markedStates.add(s);

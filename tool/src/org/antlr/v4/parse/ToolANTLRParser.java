@@ -49,7 +49,7 @@ public class ToolANTLRParser extends ANTLRParser {
 										RecognitionException e)
 	{
 		String msg = getParserErrorMessage(this, e);
-		if ( paraphrases.size()>0 ) {
+		if ( !paraphrases.isEmpty() ) {
 			String paraphrase = (String)paraphrases.peek();
 			msg = msg+" while "+paraphrase;
 		}

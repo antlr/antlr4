@@ -63,7 +63,7 @@ public class LeftRecursionDetector {
 			check(g.getRule(start.ruleIndex), start, new HashSet<ATNState>());
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
-		if ( listOfRecursiveCycles.size()>0 ) {
+		if ( !listOfRecursiveCycles.isEmpty() ) {
 			g.tool.errMgr.leftRecursionCycles(g.fileName, listOfRecursiveCycles);
 		}
 	}

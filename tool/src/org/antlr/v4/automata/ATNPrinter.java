@@ -59,7 +59,7 @@ public class ATNPrinter {
 		StringBuilder buf = new StringBuilder();
 		ATNState s = null;
 
-		while ( work.size()>0 ) {
+		while ( !work.isEmpty() ) {
 			s = work.remove(0);
 			if ( marked.contains(s) ) continue;
 			int n = s.getNumberOfTransitions();

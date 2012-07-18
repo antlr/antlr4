@@ -184,7 +184,7 @@ public class Rule implements AttributeResolver {
         for (int i=1; i<=numberOfAlts; i++) {
             refs.addAll(alt[i].labelDefs.keySet());
         }
-		if ( refs.size()==0 ) return null;
+		if ( refs.isEmpty() ) return null;
         return refs;
     }
 
@@ -219,7 +219,7 @@ public class Rule implements AttributeResolver {
 				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
 			}
 		}
-		if ( labels.size()==0 ) return null;
+		if ( labels.isEmpty() ) return null;
 		return labels;
 	}
 
@@ -229,7 +229,7 @@ public class Rule implements AttributeResolver {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel==null ) alts.add(alt[i].ast);
 		}
-		if ( alts.size()==0 ) return null;
+		if ( alts.isEmpty() ) return null;
 		return alts;
 	}
 

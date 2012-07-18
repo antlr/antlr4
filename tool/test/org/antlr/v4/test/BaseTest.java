@@ -861,7 +861,7 @@ public abstract class BaseTest {
 				foundMsg = m;
 			}
 		}
-		assertTrue("no error; "+expectedMessage.errorType+" expected", equeue.errors.size()>0);
+		assertTrue("no error; "+expectedMessage.errorType+" expected", !equeue.errors.isEmpty());
 		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
 		assertNotNull("couldn't find expected error: "+expectedMessage.errorType, foundMsg);
 		/*
