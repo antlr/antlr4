@@ -39,7 +39,7 @@ import org.antlr.v4.tool.ast.TerminalAST;
 
 public class GrammarASTAdaptor extends CommonTreeAdaptor {
     org.antlr.runtime.CharStream input; // where we can find chars ref'd by tokens in tree
-    public GrammarASTAdaptor() { ; }
+    public GrammarASTAdaptor() { }
     public GrammarASTAdaptor(org.antlr.runtime.CharStream input) { this.input = input; }
 
     @Override
