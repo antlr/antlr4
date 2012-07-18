@@ -115,7 +115,7 @@ public class LeftRecursiveRuleTransformer {
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
 			new LeftRecursiveRuleAnalyzer(tokens, prevRuleAST, tool, ruleName, language);
-		boolean isLeftRec = false;
+		boolean isLeftRec;
 		try {
 //			System.out.println("TESTING ---------------\n"+
 //							   leftRecursiveRuleWalker.text(ruleAST));

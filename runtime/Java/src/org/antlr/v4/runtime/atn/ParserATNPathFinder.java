@@ -112,7 +112,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 
 		int n = s.getNumberOfTransitions();
 		boolean aGoodPath = false;
-		TraceTree found = null;
+		TraceTree found;
 		for (int j=0; j<n; j++) {
 			Transition t = s.transition(j);
 			if ( t.getClass() == RuleTransition.class ) {
@@ -165,7 +165,7 @@ public class ParserATNPathFinder extends ParserATNSimulator<Token> {
 									TraceTree root, Transition t)
 	{
 		SemanticContext.Predicate pred = ((PredicateTransition) t).getPredicate();
-		boolean pass = false;
+		boolean pass;
 		if ( pred.isCtxDependent ) {
 			if ( ctx instanceof ParserRuleContext && ctx==initialContext ) {
 				System.out.println("eval pred "+pred+"="+pred.eval(parser, ctx));

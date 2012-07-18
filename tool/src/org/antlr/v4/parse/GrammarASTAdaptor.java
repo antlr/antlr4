@@ -50,7 +50,7 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
     @Override
     /** Make sure even imaginary nodes know the input stream */
     public Object create(int tokenType, String text) {
-		GrammarAST t = null;
+		GrammarAST t;
 		if ( tokenType==ANTLRParser.RULE ) {
 			// needed by TreeWizard to make RULE tree
         	t = new RuleAST(new CommonToken(tokenType, text));

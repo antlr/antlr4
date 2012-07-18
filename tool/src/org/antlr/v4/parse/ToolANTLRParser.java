@@ -59,7 +59,7 @@ public class ToolANTLRParser extends ANTLRParser {
 	}
 
 	public String getParserErrorMessage(Parser parser, RecognitionException e) {
-		String msg = null;
+		String msg;
 		if ( e instanceof NoViableAltException) {
 			String name = parser.getTokenErrorDisplay(e.token);
 			msg = name+" came as a complete surprise to me";

@@ -62,7 +62,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 							 GrammarAST block)
 	{
 		int numAlts = block.getChildCount();
-		Rule r = null;
+		Rule r;
 		if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(rule, ID.getText()) ) {
 			r = new LeftRecursiveRule(g, ID.getText(), rule);
 		}

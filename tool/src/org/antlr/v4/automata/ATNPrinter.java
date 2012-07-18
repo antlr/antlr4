@@ -57,7 +57,7 @@ public class ATNPrinter {
 		work.add(start);
 
 		StringBuilder buf = new StringBuilder();
-		ATNState s = null;
+		ATNState s;
 
 		while ( !work.isEmpty() ) {
 			s = work.remove(0);
