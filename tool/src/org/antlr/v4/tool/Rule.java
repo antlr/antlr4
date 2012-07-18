@@ -346,9 +346,9 @@ public class Rule implements AttributeResolver {
 	@Override
     public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append("Rule{name="+name);
-		if ( args!=null ) buf.append(", args=" + args);
-		if ( retvals!=null ) buf.append(", retvals=" + retvals);
+		buf.append("Rule{name=").append(name);
+		if ( args!=null ) buf.append(", args=").append(args);
+		if ( retvals!=null ) buf.append(", retvals=").append(retvals);
 		buf.append("}");
 		return buf.toString();
     }

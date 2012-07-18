@@ -70,9 +70,9 @@ public class ATNConfigSet extends OrderedHashSet<ATNConfig> {
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append(super.toString());
-		if ( hasSemanticContext ) buf.append(",hasSemanticContext="+hasSemanticContext);
-		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt="+uniqueAlt);
-		if ( conflictingAlts!=null ) buf.append(",conflictingAlts="+conflictingAlts);
+		if ( hasSemanticContext ) buf.append(",hasSemanticContext=").append(hasSemanticContext);
+		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt=").append(uniqueAlt);
+		if ( conflictingAlts!=null ) buf.append(",conflictingAlts=").append(conflictingAlts);
 		if ( dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
 		return buf.toString();
 	}

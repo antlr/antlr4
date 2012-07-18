@@ -205,7 +205,7 @@ public class DFAState {
 	@Override
 	public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(stateNumber + ":" + configset);
+        buf.append(stateNumber).append(":").append(configset);
         if ( isAcceptState ) {
             buf.append("=>");
             if ( predicates!=null ) {

@@ -60,7 +60,7 @@ public class DFASerializer {
 					if ( t!=null && t.stateNumber != Integer.MAX_VALUE ) {
 						buf.append(getStateString(s));
 						String label = getEdgeLabel(i);
-						buf.append("-"+label+"->"+ getStateString(t)+'\n');
+						buf.append("-").append(label).append("->").append(getStateString(t)).append('\n');
 					}
 				}
 			}
