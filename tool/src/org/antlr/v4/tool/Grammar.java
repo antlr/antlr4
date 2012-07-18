@@ -385,7 +385,7 @@ public class Grammar implements AttributeResolver {
         List<Grammar> grammarsFromRootToMe = getOutermostGrammar().getGrammarAncestors();
         String qualifiedName = name;
         if ( grammarsFromRootToMe!=null ) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (Grammar g : grammarsFromRootToMe) {
                 buf.append(g.name);
                 buf.append('_');

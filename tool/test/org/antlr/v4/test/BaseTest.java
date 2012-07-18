@@ -775,7 +775,7 @@ public abstract class BaseTest {
 	}
 
 	public static class StreamVacuum implements Runnable {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		BufferedReader in;
 		Thread sucker;
 		public StreamVacuum(InputStream in) {
