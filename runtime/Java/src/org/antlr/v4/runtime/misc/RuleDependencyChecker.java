@@ -28,16 +28,26 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleDependencies;
 import org.antlr.v4.runtime.RuleDependency;
 import org.antlr.v4.runtime.RuleVersion;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

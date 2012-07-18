@@ -27,14 +27,15 @@
  */
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.atn.PredictionContextCache.IdentityCommutativeOperands;
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Set;
-import org.antlr.v4.runtime.atn.PredictionContextCache.IdentityCommutativeOperands;
-import org.antlr.v4.runtime.misc.NotNull;
 
 public class ArrayPredictionContext extends PredictionContext {
 

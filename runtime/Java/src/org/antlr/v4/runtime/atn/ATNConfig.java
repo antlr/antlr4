@@ -29,13 +29,14 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** An ATN state, predicted alt, and syntactic/semantic context.
  *  The syntactic context is a pointer into the rule invocation
