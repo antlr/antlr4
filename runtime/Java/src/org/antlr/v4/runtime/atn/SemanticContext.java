@@ -125,7 +125,7 @@ public abstract class SemanticContext {
         }
 
 		@Override
-		public boolean equals(@NotNull Object obj) {
+		public boolean equals(Object obj) {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof AND) ) return false;
 			AND other = (AND)obj;
@@ -162,7 +162,7 @@ public abstract class SemanticContext {
         }
 
 		@Override
-		public boolean equals(@NotNull Object obj) {
+		public boolean equals(Object obj) {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof OR) ) return false;
 			OR other = (OR)obj;
