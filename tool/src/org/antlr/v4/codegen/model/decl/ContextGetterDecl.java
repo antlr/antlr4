@@ -52,11 +52,9 @@ public abstract class ContextGetterDecl extends Decl {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if ( obj==null ) return false;
+		if ( this==obj ) return true;
 		// A() and label A are different
 		if ( !(obj instanceof ContextGetterDecl) ) return false;
-		if ( this==obj ) return true;
-		if ( this.hashCode() != obj.hashCode() ) return false;
 		return
 			name.equals(((Decl) obj).name) &&
 				getArgType().equals(((ContextGetterDecl) obj).getArgType());
