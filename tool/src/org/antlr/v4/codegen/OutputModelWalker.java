@@ -95,6 +95,7 @@ public class OutputModelWalker {
 		st.add(modelArgName, omo);
 
 		// COMPUTE STs FOR EACH NESTED MODEL OBJECT MARKED WITH @ModelElement AND MAKE ST ATTRIBUTE
+		Set<String> usedFieldNames = new HashSet<String>();
 		Field fields[] = cl.getFields();
 		for (Field fi : fields) {
 			ModelElement annotation = fi.getAnnotation(ModelElement.class);
@@ -103,8 +104,15 @@ public class OutputModelWalker {
 			}
 
 			String fieldName = fi.getName();
+
+			if (!usedFieldNames.add(fieldName)) {
+				tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Model object " + omo.getClass().getSimpleName() + " has multiple fields named '" + fieldName + "'");
+				continue;
+			}
+
 			// Just don't set @ModelElement fields w/o formal arg in target ST
 			if ( formalArgs.get(fieldName)==null ) continue;
+
 			try {
 				Object o = fi.get(omo);
 				if ( o instanceof OutputModelObject ) {  // SINGLE MODEL OBJECT?

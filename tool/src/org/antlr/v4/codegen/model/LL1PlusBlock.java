@@ -46,7 +46,6 @@ public class LL1PlusBlock extends LL1Loop {
 	public String loopCounterVar;
 	public String[] exitLook;
 
-	@ModelElement public SrcOp loopExpr;
 	@ModelElement public ThrowNoViableAlt error;
 
 	public LL1PlusBlock(OutputModelFactory factory, GrammarAST plusRoot, List<CodeBlockForAlt> alts) {
