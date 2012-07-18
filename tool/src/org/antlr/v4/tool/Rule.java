@@ -332,7 +332,15 @@ public class Rule implements AttributeResolver {
 
 	@Override
 	public boolean equals(Object obj) {
-		return this==obj || name.equals(((Rule)obj).name);
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Rule)) {
+			return false;
+		}
+
+		return name.equals(((Rule)obj).name);
 	}
 
 	@Override

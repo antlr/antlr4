@@ -190,6 +190,11 @@ public class DFAState {
 	public boolean equals(Object o) {
 		// compare set of ATN configurations in this set with other
 		if ( this==o ) return true;
+
+		if (!(o instanceof DFAState)) {
+			return false;
+		}
+
 		DFAState other = (DFAState)o;
 		// TODO (sam): what to do when configs==null?
 		boolean sameSet = this.configset.equals(other.configset);

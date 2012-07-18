@@ -94,6 +94,10 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 
 	@Override
 	public boolean equals(Object o) {
+		if (!(o instanceof OrderedHashSet<?>)) {
+			return false;
+		}
+
 //		System.out.print("equals " + this + ", " + o+" = ");
 		boolean same = elements!=null && elements.equals(((OrderedHashSet<?>)o).elements);
 //		System.out.println(same);
