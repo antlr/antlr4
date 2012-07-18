@@ -138,6 +138,7 @@ public class TestRig {
 		}
 		if ( lexerClass==null ) {
 			System.err.println("Can't load "+lexerName);
+			return;
 		}
 
 		InputStream is = System.in;
