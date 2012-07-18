@@ -280,7 +280,7 @@ public class SymbolChecks {
 										  g.fileName, ref.token, ruleName);
 			}
 			GrammarAST arg = (GrammarAST)ref.getChild(0);
-			if ( arg!=null && r.args==null ) {
+			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 										  g.fileName, ref.token, ruleName);
 
