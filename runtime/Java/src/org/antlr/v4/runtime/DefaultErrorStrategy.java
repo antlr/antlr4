@@ -126,7 +126,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 //						   lastErrorIndex+
 //						   ", states="+lastErrorStates);
 		if ( lastErrorIndex==recognizer.getInputStream().index() &&
-		lastErrorStates.contains(recognizer._ctx.s) ) {
+			lastErrorStates != null &&
+			lastErrorStates.contains(recognizer._ctx.s) ) {
 			// uh oh, another error at same token index and previously-visited
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token
