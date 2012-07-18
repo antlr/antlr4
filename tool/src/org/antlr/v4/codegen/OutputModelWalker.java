@@ -30,6 +30,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.codegen.model.ModelElement;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.tool.ErrorType;
 import org.stringtemplate.v4.*;
@@ -96,8 +97,11 @@ public class OutputModelWalker {
 		// COMPUTE STs FOR EACH NESTED MODEL OBJECT MARKED WITH @ModelElement AND MAKE ST ATTRIBUTE
 		Field fields[] = cl.getFields();
 		for (Field fi : fields) {
-			Annotation[] annotations = fi.getAnnotations();
-			if ( annotations.length==0 ) continue;
+			ModelElement annotation = fi.getAnnotation(ModelElement.class);
+			if (annotation == null) {
+				continue;
+			}
+
 			String fieldName = fi.getName();
 			// Just don't set @ModelElement fields w/o formal arg in target ST
 			if ( formalArgs.get(fieldName)==null ) continue;
