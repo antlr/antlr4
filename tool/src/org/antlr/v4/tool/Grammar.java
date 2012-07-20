@@ -387,7 +387,7 @@ public class Grammar implements AttributeResolver {
         List<Grammar> grammarsFromRootToMe = getOutermostGrammar().getGrammarAncestors();
         String qualifiedName = name;
         if ( grammarsFromRootToMe!=null ) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (Grammar g : grammarsFromRootToMe) {
                 buf.append(g.name);
                 buf.append('_');
@@ -422,7 +422,7 @@ public class Grammar implements AttributeResolver {
     }
 
 	public int getTokenType(String token) {
-		Integer I = null;
+		Integer I;
 		if ( token.charAt(0)=='\'') {
 			I = stringLiteralToTypeMap.get(token);
 		}
@@ -439,7 +439,7 @@ public class Grammar implements AttributeResolver {
 	 *  char vocabulary, compute an ANTLR-valid (possibly escaped) char literal.
 	 */
 	public String getTokenDisplayName(int ttype) {
-		String tokenName = null;
+		String tokenName;
 		// inside any target's char range and is lexer grammar?
 		if ( isLexer() &&
 			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
@@ -768,7 +768,7 @@ public class Grammar implements AttributeResolver {
 			Tree name = r.getChild(0);
 			if ( name.getType()==ANTLRParser.TOKEN_REF ) {
 				// check rule against patterns
-				boolean isLitRule = false;
+				boolean isLitRule;
 				for (String pattern : patterns) {
 					isLitRule =
 						defAlias(r, pattern, wiz, lexerRuleToStringLiteral);

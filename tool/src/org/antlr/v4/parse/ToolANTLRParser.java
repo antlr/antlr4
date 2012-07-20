@@ -49,7 +49,7 @@ public class ToolANTLRParser extends ANTLRParser {
 										RecognitionException e)
 	{
 		String msg = getParserErrorMessage(this, e);
-		if ( paraphrases.size()>0 ) {
+		if ( !paraphrases.isEmpty() ) {
 			String paraphrase = paraphrases.peek();
 			msg = msg+" while "+paraphrase;
 		}
@@ -59,7 +59,7 @@ public class ToolANTLRParser extends ANTLRParser {
 	}
 
 	public String getParserErrorMessage(Parser parser, RecognitionException e) {
-		String msg = null;
+		String msg;
 		if ( e instanceof NoViableAltException) {
 			String name = parser.getTokenErrorDisplay(e.token);
 			msg = name+" came as a complete surprise to me";

@@ -73,12 +73,12 @@ public class UnbufferedCharStream implements CharStream {
 	/** What is name or source of this char stream? */
 	public String name;
 
-	/** Useful for sublasses that pull char from other than this.input. */
+	/** Useful for subclasses that pull char from other than this.input. */
 	public UnbufferedCharStream() {
 		this(256);
 	}
 
-	/** Useful for sublasses that pull char from other than this.input. */
+	/** Useful for subclasses that pull char from other than this.input. */
 	public UnbufferedCharStream(int bufferSize) {
 		n = 0;
 		data = new char[bufferSize];

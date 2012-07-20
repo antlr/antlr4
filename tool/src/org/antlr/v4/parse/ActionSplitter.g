@@ -82,7 +82,7 @@ TEXT
 @after {delegate.text(buf.toString());}
 	:	(	c=~('\\'| '$') {buf.append((char)$c);}
 		|	'\\$' {buf.append("$");}
-		|	'\\' c=~('$') {buf.append("\\"+(char)$c);}
+		|	'\\' c=~('$') {buf.append('\\').append((char)$c);}
 		)+
 	;
 

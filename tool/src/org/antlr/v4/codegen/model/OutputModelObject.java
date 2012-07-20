@@ -37,7 +37,7 @@ public abstract class OutputModelObject {
 	public OutputModelFactory factory;
 	public GrammarAST ast;
 
-	public OutputModelObject() {;}
+	public OutputModelObject() {}
 
 	public OutputModelObject(OutputModelFactory factory) { this(factory, null); }
 

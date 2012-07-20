@@ -120,7 +120,7 @@ public class ATN {
 	}
 
     public DecisionState getDecisionState(int decision) {
-        if ( decisionToState.size()>0 ) {
+        if ( !decisionToState.isEmpty() ) {
             return decisionToState.get(decision);
         }
         return null;

@@ -415,14 +415,14 @@ public class OutputModelController {
 	public void setRoot(OutputModelObject root) { this.root = root; }
 
 	public RuleFunction getCurrentRuleFunction() {
-		if ( currentRule.size()>0 )	return currentRule.peek();
+		if ( !currentRule.isEmpty() )	return currentRule.peek();
 		return null;
 	}
 
 	public void pushCurrentRule(RuleFunction r) { currentRule.push(r); }
 
 	public RuleFunction popCurrentRule() {
-		if ( currentRule.size()>0 ) return currentRule.pop();
+		if ( !currentRule.isEmpty() ) return currentRule.pop();
 		return null;
 	}
 

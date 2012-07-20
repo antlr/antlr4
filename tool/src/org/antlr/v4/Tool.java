@@ -304,8 +304,8 @@ public class Tool {
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
 
-		LexerGrammar lexerg = null;
-		GrammarRootAST lexerAST = null;
+		LexerGrammar lexerg;
+		GrammarRootAST lexerAST;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
 			 !g.ast.hasErrors )
 		{

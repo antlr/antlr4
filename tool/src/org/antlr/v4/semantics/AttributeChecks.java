@@ -168,7 +168,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
 							 x.getText(), y.getText());
 		}
-		if ( r.resolveToAttribute(y.getText(), null)==null ) {
+		else if ( r.resolveToAttribute(y.getText(), null)==null ) {
 			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
 								g.fileName, y, y.getText(), x.getText(), expr);
 
@@ -182,7 +182,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
 							 x.getText(), y.getText());
 		}
-		if ( r.resolveToAttribute(y.getText(), null)==null ) {
+		else if ( r.resolveToAttribute(y.getText(), null)==null ) {
 			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
 								g.fileName, y, y.getText(), x.getText(), expr);
 

@@ -79,7 +79,7 @@ public class LeftRecursiveRule extends Rule {
 			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
 			if ( altInfo.altLabel==null ) alts.add(altInfo.originalAltAST);
 		}
-		if ( alts.size()==0 ) return null;
+		if ( alts.isEmpty() ) return null;
 		return alts;
 	}
 
@@ -105,7 +105,7 @@ public class LeftRecursiveRule extends Rule {
 															 altInfo.altLabel));
 			}
 		}
-		if ( labels.size()==0 ) return null;
+		if ( labels.isEmpty() ) return null;
 		return labels;
 	}
 }

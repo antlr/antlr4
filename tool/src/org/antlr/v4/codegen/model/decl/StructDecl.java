@@ -107,5 +107,5 @@ public class StructDecl extends Decl {
 		extensionMembers.add(member);
 	}
 
-	public boolean isEmpty() { return attrs.size()==0; }
+	public boolean isEmpty() { return attrs.isEmpty(); }
 }

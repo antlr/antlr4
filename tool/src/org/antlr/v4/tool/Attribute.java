@@ -48,7 +48,7 @@ public class Attribute {
 	/** Who contains us? */
 	public AttributeDict dict;
 
-    public Attribute() {;}
+    public Attribute() {}
 
     public Attribute(String name) { this(name,null); }
 

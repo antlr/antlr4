@@ -90,7 +90,7 @@ public class RuleFunction extends OutputModelObject {
 		super(factory);
 		this.name = r.name;
 		this.rule = r;
-		if ( r.modifiers!=null && r.modifiers.size()>0 ) {
+		if ( r.modifiers!=null && !r.modifiers.isEmpty() ) {
 			this.modifiers = new ArrayList<String>();
 			for (GrammarAST t : r.modifiers) modifiers.add(t.getText());
 		}

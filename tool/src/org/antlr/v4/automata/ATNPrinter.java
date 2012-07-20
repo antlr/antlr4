@@ -57,9 +57,9 @@ public class ATNPrinter {
 		work.add(start);
 
 		StringBuilder buf = new StringBuilder();
-		ATNState s = null;
+		ATNState s;
 
-		while ( work.size()>0 ) {
+		while ( !work.isEmpty() ) {
 			s = work.remove(0);
 			if ( marked.contains(s) ) continue;
 			int n = s.getNumberOfTransitions();
@@ -73,33 +73,33 @@ public class ATNPrinter {
 				}
 				buf.append(getStateString(s));
 				if ( t instanceof EpsilonTransition ) {
-					buf.append("->"+ getStateString(t.target)+'\n');
+					buf.append("->").append(getStateString(t.target)).append('\n');
 				}
 				else if ( t instanceof RuleTransition ) {
-					buf.append("-"+g.getRule(((RuleTransition)t).ruleIndex).name+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(g.getRule(((RuleTransition)t).ruleIndex).name).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else if ( t instanceof ActionTransition ) {
 					ActionTransition a = (ActionTransition)t;
-					buf.append("-"+a.toString()+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(a.toString()).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else if ( t instanceof SetTransition ) {
 					SetTransition st = (SetTransition)t;
 					boolean not = st instanceof NotSetTransition;
 					if ( g.isLexer() ) {
-						buf.append("-"+(not?"~":"")+st.toString()+"->"+ getStateString(t.target)+'\n');
+						buf.append("-").append(not?"~":"").append(st.toString()).append("->").append(getStateString(t.target)).append('\n');
 					}
 					else {
-						buf.append("-"+(not?"~":"")+st.label().toString(g.getTokenNames())+"->"+ getStateString(t.target)+'\n');
+						buf.append("-").append(not?"~":"").append(st.label().toString(g.getTokenNames())).append("->").append(getStateString(t.target)).append('\n');
 					}
 				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
 					String label = a.toString();
 					if ( g!=null ) label = g.getTokenDisplayName(a.label);
-					buf.append("-"+label+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(label).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else {
-					buf.append("-"+t.toString()+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(t.toString()).append("->").append(getStateString(t.target)).append('\n');
 				}
 			}
 		}

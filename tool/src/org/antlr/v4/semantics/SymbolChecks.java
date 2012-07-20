@@ -103,8 +103,8 @@ public class SymbolChecks {
 	  public void checkActionRedefinitions(List<GrammarAST> actions) {
         if ( actions==null ) return;
         String scope = g.getDefaultActionScope();
-        String name = null;
-        GrammarAST nameNode = null;
+        String name;
+        GrammarAST nameNode;
         for (GrammarAST ampersandAST : actions) {
             nameNode = (GrammarAST)ampersandAST.getChild(0);
             if ( ampersandAST.getChildCount()==2 ) {
@@ -280,7 +280,7 @@ public class SymbolChecks {
 										  g.fileName, ref.token, ruleName);
 			}
 			GrammarAST arg = (GrammarAST)ref.getChild(0);
-			if ( arg!=null && r.args==null ) {
+			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 										  g.fileName, ref.token, ruleName);
 

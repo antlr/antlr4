@@ -128,6 +128,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	@Override
 	public Token nextToken() {
+		if (_input == null) {
+			throw new IllegalStateException("nextToken requires a non-null input stream.");
+		}
+
 		if (_hitEOF) {
 			emitEOF();
 			return _token;

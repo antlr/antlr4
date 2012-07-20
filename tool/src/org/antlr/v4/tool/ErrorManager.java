@@ -274,7 +274,7 @@ public class ErrorManager {
         format = new STGroupFile(fileName, "UTF-8");
         format.load();
 
-        if ( initSTListener.errors.size()>0 ) {
+        if ( !initSTListener.errors.isEmpty() ) {
             rawError("ANTLR installation corrupted; can't load messages format file:\n"+
                      initSTListener.toString());
             panic();

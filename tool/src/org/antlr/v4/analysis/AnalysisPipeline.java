@@ -49,7 +49,7 @@ public class AnalysisPipeline {
 		// LEFT-RECURSION CHECK
 		LeftRecursionDetector lr = new LeftRecursionDetector(g, g.atn);
 		lr.check();
-		if ( lr.listOfRecursiveCycles.size()>0 ) return; // bail out
+		if ( !lr.listOfRecursiveCycles.isEmpty() ) return; // bail out
 
 		// BUILD DFA FOR EACH DECISION
 		if ( !g.isLexer() ) processParser();

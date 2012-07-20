@@ -54,7 +54,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	/** The index into the input stream where the last error occurred.
 	 * 	This is used to prevent infinite loops where an error is found
 	 *  but no token is consumed during recovery...another error is found,
-	 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
+	 *  ad nauseum.  This is a failsafe mechanism to guarantee that at least
 	 *  one token/tree node is consumed for two errors.
 	 */
 	protected int lastErrorIndex = -1;
@@ -123,7 +123,8 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 //						   lastErrorIndex+
 //						   ", states="+lastErrorStates);
 		if ( lastErrorIndex==recognizer.getInputStream().index() &&
-		lastErrorStates.contains(recognizer.getState()) ) {
+			lastErrorStates != null &&
+			lastErrorStates.contains(recognizer.getState()) ) {
 			// uh oh, another error at same token index and previously-visited
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token

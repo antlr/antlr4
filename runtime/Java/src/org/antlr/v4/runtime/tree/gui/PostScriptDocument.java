@@ -74,7 +74,7 @@ public class PostScriptDocument {
 	protected StringBuilder header() {
 		StringBuilder b = new StringBuilder();
 		b.append("%!PS-Adobe-3.0 EPSF-3.0\n");
-		b.append(boundingBox+"\n");
+		b.append(boundingBox).append("\n");
 		b.append("0.3 setlinewidth\n");
 		b.append("%% x y w h highlight\n" +
 				 "/highlight {\n" +
@@ -116,7 +116,7 @@ public class PostScriptDocument {
 
 	public void lineWidth(double w) {
 		lineWidth = w;
-		ps.append(w+" setlinewidth\n");
+		ps.append(w).append(" setlinewidth\n");
 	}
 
 	public void move(double x, double y) {
