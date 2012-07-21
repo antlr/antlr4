@@ -36,24 +36,36 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+/** Do not buffer up the entire char stream. It does keep a small buffer
+ *  for efficiency and also buffers while a mark exists (set by the
+ *  lookahead prediction in parser). "Unbuffered" here refers to fact
+ *  that it doesn't buffer all data, not that's it's on demand loading of char.
+ */
 public class UnbufferedCharStream implements CharStream {
-    /** A buffer of the data being scanned */
+    /** A moving window buffer of the data being scanned. While there's a
+	 *  marker, we keep adding to buffer.  Otherwise, consume() resets
+	 *  so we start filling at index 0 again.
+	 */
    	protected char[] data;
 
-   	/** How many characters are actually in the buffer */
+   	/** How many characters are actually in the buffer; this is not
+		the buffer size, that's data.length.
+ 	 */
    	protected int n;
 
-    /** 0..n-1 index into string of next char */
+    /** 0..n-1 index into data of next char; data[p] is LA(1). */
    	protected int p=0;
 
     protected int earliestMarker = -1;
 
 	/** Absolute char index. It's the index of the char about to be
-	 *  read via LA(1). Goes from 0 to numchar-1.
+	 *  read via LA(1). Goes from 0 to numchar-1 in entire stream.
 	 */
     protected int currentCharIndex = 0;
 
-    /** Buf is window into stream. This is absolute index of data[0] */
+    /** Buf is window into stream. This is absolute char index into entire
+	 *  stream of data[0]
+	 */
     protected int bufferStartIndex = 0;
 
     protected Reader input;
@@ -61,30 +73,35 @@ public class UnbufferedCharStream implements CharStream {
 	/** What is name or source of this char stream? */
 	public String name;
 
-    public UnbufferedCharStream(InputStream input) {
-   		this(input, 256);
-   	}
+	/** Useful for subclasses that pull char from other than this.input. */
+	public UnbufferedCharStream() {
+		this(256);
+	}
 
-   	public UnbufferedCharStream(Reader input) {
-        this(input, 256);
-   	}
-
-    public UnbufferedCharStream(InputStream input, int bufferSize) {
-   		this.input = new InputStreamReader(input);
-        data = new char[bufferSize];
-   	}
-
-   	public UnbufferedCharStream(Reader input, int bufferSize) {
-   		this.input = input;
-        data = new char[bufferSize];
-   	}
-
-	public void reset() {
-		p = 0;
-		earliestMarker = -1;
-		currentCharIndex = 0;
-        bufferStartIndex = 0;
+	/** Useful for subclasses that pull char from other than this.input. */
+	public UnbufferedCharStream(int bufferSize) {
 		n = 0;
+		data = new char[bufferSize];
+	}
+
+	public UnbufferedCharStream(InputStream input) {
+		this(input, 256);
+	}
+
+	public UnbufferedCharStream(Reader input) {
+		this(input, 256);
+	}
+
+	public UnbufferedCharStream(InputStream input, int bufferSize) {
+		this(bufferSize);
+		this.input = new InputStreamReader(input);
+		fill(1); // prime
+	}
+
+	public UnbufferedCharStream(Reader input, int bufferSize) {
+		this(bufferSize);
+		this.input = input;
+		fill(1); // prime
 	}
 
 	@Override
@@ -99,6 +116,7 @@ public class UnbufferedCharStream implements CharStream {
 			n = 0;
             bufferStartIndex = currentCharIndex;
         }
+		sync(1);
     }
 
 	/** Make sure we have 'need' elements from current position p. Last valid
@@ -114,7 +132,7 @@ public class UnbufferedCharStream implements CharStream {
 	public void fill(int n) {
 		for (int i=1; i<=n; i++) {
             try {
-                int c = input.read();
+                int c = nextChar();
                 add(c);
             }
             catch (IOException ioe) {
@@ -123,7 +141,12 @@ public class UnbufferedCharStream implements CharStream {
 		}
 	}
 
-    protected void add(int c) {
+	/** Override to provide different source of characters than this.input */
+	protected int nextChar() throws IOException {
+		return input.read();
+	}
+
+	protected void add(int c) {
         if ( n>=data.length ) {
 			char[] newdata = new char[data.length*2]; // resize
             System.arraycopy(data, 0, newdata, 0, data.length);
@@ -154,19 +177,24 @@ public class UnbufferedCharStream implements CharStream {
             throw new IllegalArgumentException("can't set marker earlier than previous existing marker: "+p+"<"+ earliestMarker);
         }
         if ( earliestMarker < 0 ) earliestMarker = m; // set first marker
+//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//		System.out.println(stackTrace[2].getMethodName()+": mark " + m);
         return m;
     }
 
+	/** Release can get markers in weird order since we reset p to beginning
+	 *  of buffer. Might mark at 1 and then at release p = 0 etc... Don't
+	 *  look for errors. Just reset earliestMarker if needed.
+	 * @param marker
+	 */
     @Override
     public void release(int marker) {
+//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//		System.out.println(stackTrace[2].getMethodName()+": release " + marker);
         // release is noop unless we remove earliest. then we don't need to
         // keep anything in buffer. We only care about earliest. Releasing
         // marker other than earliest does nothing as we can just keep in
         // buffer.
-        if ( marker < earliestMarker || marker >= n ) {
-            throw new IllegalArgumentException("invalid marker: "+
-                    marker+" not in "+0+".."+n);
-        }
         if ( marker == earliestMarker) earliestMarker = -1;
     }
 
@@ -193,15 +221,30 @@ public class UnbufferedCharStream implements CharStream {
 
     @Override
     public String getSourceName() {
-        return name;
-    }
+		return name;
+	}
 
-    @Override
-    public String getText(Interval interval) {
+	@Override
+	public String getText(Interval interval) {
 		if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n) {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("interval "+interval+" outside buffer: "+
+			                    bufferStartIndex+".."+(bufferStartIndex+n));
 		}
 
 		return new String(data, interval.a, interval.length());
-    }
+	}
+
+	/** For testing.  What's in moving window into data stream? */
+	public String getBuffer() {
+		if ( n==0 ) return null;
+		return new String(data,0,n);
+	}
+
+	public int getBufferStartIndex() {
+		return bufferStartIndex;
+	}
+
+	public int getCurrentCharIndex() {
+		return currentCharIndex;
+	}
 }

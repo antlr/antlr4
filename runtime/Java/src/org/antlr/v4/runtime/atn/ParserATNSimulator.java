@@ -772,7 +772,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				return st.target;
 			}
 		}
-		else if ( trans instanceof RangeTransition ) {
+		else if ( trans instanceof RangeTransition ) { // TODO: can't happen in parser, right? remove
 			RangeTransition rt = (RangeTransition)trans;
 			if ( ttype>=rt.from && ttype<=rt.to ) return rt.target;
 		}

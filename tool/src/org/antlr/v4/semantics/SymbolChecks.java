@@ -30,10 +30,21 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Check for symbol problems; no side-effects.  Inefficient to walk rules
  *  and such multiple times, but I like isolating all error checking outside
@@ -103,8 +114,8 @@ public class SymbolChecks {
 	  public void checkActionRedefinitions(List<GrammarAST> actions) {
         if ( actions==null ) return;
         String scope = g.getDefaultActionScope();
-        String name = null;
-        GrammarAST nameNode = null;
+        String name;
+        GrammarAST nameNode;
         for (GrammarAST ampersandAST : actions) {
             nameNode = (GrammarAST)ampersandAST.getChild(0);
             if ( ampersandAST.getChildCount()==2 ) {
@@ -280,7 +291,7 @@ public class SymbolChecks {
 										  g.fileName, ref.token, ruleName);
 			}
 			GrammarAST arg = (GrammarAST)ref.getChild(0);
-			if ( arg!=null && r.args==null ) {
+			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 										  g.fileName, ref.token, ruleName);
 

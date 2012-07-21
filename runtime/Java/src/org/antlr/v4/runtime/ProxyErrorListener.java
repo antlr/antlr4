@@ -38,23 +38,23 @@ import java.util.Collection;
  *
  * @author Sam Harwell
  */
-public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
-	private final Collection<? extends ANTLRErrorListener<? super Symbol>> delegates;
+public class ProxyErrorListener implements ANTLRErrorListener {
+	private final Collection<? extends ANTLRErrorListener> delegates;
 
-	public ProxyErrorListener(Collection<? extends ANTLRErrorListener<? super Symbol>> delegates) {
+	public ProxyErrorListener(Collection<? extends ANTLRErrorListener> delegates) {
 		this.delegates = delegates;
 	}
 
 	@Override
-	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-										 T offendingSymbol,
-										 int line,
-										 int charPositionInLine,
-										 String msg,
-										 RecognitionException e)
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							Object offendingSymbol,
+							int line,
+							int charPositionInLine,
+							String msg,
+							RecognitionException e)
 	{
-		for (ANTLRErrorListener<? super Symbol> listener : delegates) {
-			listener.error(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+		for (ANTLRErrorListener listener : delegates) {
+			listener.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 								IntervalSet ambigAlts,
 								ATNConfigSet configs)
 	{
-		for (ANTLRErrorListener<? super Symbol> listener : delegates) {
+		for (ANTLRErrorListener listener : delegates) {
 			listener.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
 		}
 	}
@@ -78,7 +78,7 @@ public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 											int stopIndex,
 											ATNConfigSet configs)
 	{
-		for (ANTLRErrorListener<? super Symbol> listener : delegates) {
+		for (ANTLRErrorListener listener : delegates) {
 			listener.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, configs);
 		}
 	}
@@ -90,7 +90,7 @@ public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 										 int stopIndex,
 										 ATNConfigSet configs)
 	{
-		for (ANTLRErrorListener<? super Symbol> listener : delegates) {
+		for (ANTLRErrorListener listener : delegates) {
 			listener.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, configs);
 		}
 	}

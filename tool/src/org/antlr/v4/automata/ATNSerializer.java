@@ -31,7 +31,18 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.RangeTransition;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
@@ -200,7 +211,7 @@ public class ATNSerializer {
 		int p = 0;
 		int grammarType = ATNSimulator.toInt(data[p++]);
 		int maxType = ATNSimulator.toInt(data[p++]);
-		buf.append("max type "+maxType+"\n");
+		buf.append("max type ").append(maxType).append("\n");
 		int nstates = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
 			int stype = ATNSimulator.toInt(data[p++]);
@@ -211,9 +222,9 @@ public class ATNSerializer {
 				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+loopBackStateNumber;
 			}
-			buf.append((i - 1) + ":" +
-					   ATNState.serializationNames.get(stype) + " "+
-					   ruleIndex + arg + "\n");
+			buf.append(i - 1).append(":")
+				.append(ATNState.serializationNames.get(stype)).append(" ")
+				.append(ruleIndex).append(arg).append("\n");
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
@@ -221,24 +232,24 @@ public class ATNSerializer {
             if ( g.isLexer() ) {
                 int arg1 = ATNSimulator.toInt(data[p++]);
                 int arg2 = ATNSimulator.toInt(data[p++]);
-                buf.append("rule "+i+":"+s+" "+arg1+","+arg2+'\n');
+                buf.append("rule ").append(i).append(":").append(s).append(" ").append(arg1).append(",").append(arg2).append('\n');
             }
             else {
-                buf.append("rule "+i+":"+s+'\n');
+                buf.append("rule ").append(i).append(":").append(s).append('\n');
             }
 		}
 		int nmodes = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nmodes; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
-			buf.append("mode "+i+":"+s+'\n');
+			buf.append("mode ").append(i).append(":").append(s).append('\n');
 		}
 		int nsets = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=nsets; i++) {
 			int nintervals = ATNSimulator.toInt(data[p++]);
-			buf.append((i-1)+":");
+			buf.append(i-1).append(":");
 			for (int j=1; j<=nintervals; j++) {
 				if ( j>1 ) buf.append(", ");
-				buf.append(getTokenName(ATNSimulator.toInt(data[p]))+".."+getTokenName(ATNSimulator.toInt(data[p + 1])));
+				buf.append(getTokenName(ATNSimulator.toInt(data[p]))).append("..").append(getTokenName(ATNSimulator.toInt(data[p + 1])));
 				p += 2;
 			}
 			buf.append("\n");
@@ -251,17 +262,17 @@ public class ATNSerializer {
 			int arg1 = ATNSimulator.toInt(data[p + 3]);
 			int arg2 = ATNSimulator.toInt(data[p + 4]);
 			int arg3 = ATNSimulator.toInt(data[p + 5]);
-			buf.append(src+"->"+trg+
-					   " "+Transition.serializationNames.get(ttype)+
-					   " "+arg1+","+arg2+","+arg3+
-					   "\n");
+			buf.append(src).append("->").append(trg)
+				.append(" ").append(Transition.serializationNames.get(ttype))
+				.append(" ").append(arg1).append(",").append(arg2).append(",").append(arg3)
+				.append("\n");
 			p += 6;
 		}
 		int ndecisions = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
 			int isGreedy = ATNSimulator.toInt(data[p++]);
-			buf.append((i-1)+":"+s+" "+isGreedy+"\n");
+			buf.append(i-1).append(":").append(s).append(" ").append(isGreedy).append("\n");
 		}
 		return buf.toString();
 	}

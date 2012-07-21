@@ -31,16 +31,47 @@ package org.antlr.v4.codegen;
 
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.Action;
+import org.antlr.v4.codegen.model.AltBlock;
+import org.antlr.v4.codegen.model.BaseListenerFile;
+import org.antlr.v4.codegen.model.BaseParseListenerFile;
+import org.antlr.v4.codegen.model.BaseVisitorFile;
+import org.antlr.v4.codegen.model.Choice;
+import org.antlr.v4.codegen.model.CodeBlockForAlt;
+import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
+import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
+import org.antlr.v4.codegen.model.Lexer;
+import org.antlr.v4.codegen.model.LexerFile;
+import org.antlr.v4.codegen.model.ListenerFile;
+import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.model.ParseListenerFile;
+import org.antlr.v4.codegen.model.Parser;
+import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.RuleActionFunction;
+import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.RuleSempredFunction;
+import org.antlr.v4.codegen.model.SrcOp;
+import org.antlr.v4.codegen.model.StarBlock;
+import org.antlr.v4.codegen.model.VisitorFile;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
-import org.stringtemplate.v4.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
-import java.util.*;
-import org.antlr.runtime.RecognitionException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
  *  Then runs extensions in order on resulting SrcOps to get final list.
@@ -426,14 +457,14 @@ public class OutputModelController {
 	public void setRoot(OutputModelObject root) { this.root = root; }
 
 	public RuleFunction getCurrentRuleFunction() {
-		if ( currentRule.size()>0 )	return currentRule.peek();
+		if ( !currentRule.isEmpty() )	return currentRule.peek();
 		return null;
 	}
 
 	public void pushCurrentRule(RuleFunction r) { currentRule.push(r); }
 
 	public RuleFunction popCurrentRule() {
-		if ( currentRule.size()>0 ) return currentRule.pop();
+		if ( !currentRule.isEmpty() ) return currentRule.pop();
 		return null;
 	}
 

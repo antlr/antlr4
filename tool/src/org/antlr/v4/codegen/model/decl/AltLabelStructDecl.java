@@ -30,8 +30,12 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.codegen.model.DispatchMethod;
+import org.antlr.v4.codegen.model.ListenerDispatchMethod;
+import org.antlr.v4.codegen.model.ParseListenerDispatchMethod;
+import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
 
@@ -75,10 +79,8 @@ public class AltLabelStructDecl extends StructDecl {
 	@Override
 	public boolean equals(Object obj) {
 		if ( obj == this ) return true;
-		if ( obj.hashCode() != this.hashCode() ) return false;
-		if ( obj instanceof AltLabelStructDecl ) {
-			return name.equals(((AltLabelStructDecl)obj).name);
-		}
-		return false;
+		if (!(obj instanceof AltLabelStructDecl)) return false;
+
+		return name.equals(((AltLabelStructDecl)obj).name);
 	}
 }

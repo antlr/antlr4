@@ -54,8 +54,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
@@ -775,7 +775,7 @@ public abstract class BaseTest {
 	}
 
 	public static class StreamVacuum implements Runnable {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		BufferedReader in;
 		Thread sucker;
 		public StreamVacuum(InputStream in) {
@@ -861,7 +861,7 @@ public abstract class BaseTest {
 				foundMsg = m;
 			}
 		}
-		assertTrue("no error; "+expectedMessage.errorType+" expected", equeue.errors.size()>0);
+		assertTrue("no error; "+expectedMessage.errorType+" expected", !equeue.errors.isEmpty());
 		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
 		assertNotNull("couldn't find expected error: "+expectedMessage.errorType, foundMsg);
 		/*

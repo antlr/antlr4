@@ -36,15 +36,14 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  *
  * @author Sam Harwell
  */
-public class BaseErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
-
+public class BaseErrorListener implements ANTLRErrorListener {
 	@Override
-	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-										 T offendingSymbol,
-										 int line,
-										 int charPositionInLine,
-										 String msg,
-										 RecognitionException e)
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							Object offendingSymbol,
+							int line,
+							int charPositionInLine,
+							String msg,
+							RecognitionException e)
 	{
 	}
 

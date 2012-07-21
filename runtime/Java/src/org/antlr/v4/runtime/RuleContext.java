@@ -183,8 +183,8 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  that they are now going to track perfectly together.  Once they
 	 *  converged on state 21, there is no way they can separate.  In other
 	 *  words, the prior stack state is not consulted when computing where to
-	 *  go in the closure operation.  ?$ and ??$ are considered the same stack.
-	 *  If ? is popped off then $ and ?$ remain; they are now an empty and
+	 *  go in the closure operation.  x$ and xy$ are considered the same stack.
+	 *  If x is popped off then $ and y$ remain; they are now an empty and
 	 *  nonempty context comparison.  So, if one stack is a suffix of
 	 *  another, then it will still degenerate to the simple empty stack
 	 *  comparison case.
@@ -270,7 +270,9 @@ public class RuleContext implements ParseTree.RuleNode {
 	public void save(Parser parser, String fileName)
 		throws IOException, PrintException
 	{
-		Trees.writePS(this, parser, fileName);
+//		TreeViewer viewer = new TreeViewer(parser, this);
+//		viewer.save(fileName);
+		Trees.writePS(this, parser, fileName); // parrt routine
 	}
 
 	public void save(Parser parser, String fileName,

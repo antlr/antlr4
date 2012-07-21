@@ -87,7 +87,7 @@ public class TraceTree implements Tree {
 			states.add(0, p.state);
 			p = p.parent;
 		}
-		if ( states.size()==0 ) return null;
+		if ( states.isEmpty() ) return null;
 		return states;
 	}
 

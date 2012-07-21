@@ -82,7 +82,7 @@ public class SemanticPipeline {
 		basics.process();
 
 		// don't continue if we get errors in this basic check
-		if ( false ) return;
+		//if ( false ) return;
 
 		// TRANSFORM LEFT-RECURSIVE RULES
 		LeftRecursiveRuleTransformer lrtrans =

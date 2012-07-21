@@ -184,7 +184,7 @@ public class Rule implements AttributeResolver {
         for (int i=1; i<=numberOfAlts; i++) {
             refs.addAll(alt[i].labelDefs.keySet());
         }
-		if ( refs.size()==0 ) return null;
+		if ( refs.isEmpty() ) return null;
         return refs;
     }
 
@@ -219,7 +219,7 @@ public class Rule implements AttributeResolver {
 				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
 			}
 		}
-		if ( labels.size()==0 ) return null;
+		if ( labels.isEmpty() ) return null;
 		return labels;
 	}
 
@@ -229,7 +229,7 @@ public class Rule implements AttributeResolver {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel==null ) alts.add(alt[i].ast);
 		}
-		if ( alts.size()==0 ) return null;
+		if ( alts.isEmpty() ) return null;
 		return alts;
 	}
 
@@ -332,15 +332,23 @@ public class Rule implements AttributeResolver {
 
 	@Override
 	public boolean equals(Object obj) {
-		return this==obj || name.equals(((Rule)obj).name);
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof Rule)) {
+			return false;
+		}
+
+		return name.equals(((Rule)obj).name);
 	}
 
 	@Override
     public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append("Rule{name="+name);
-		if ( args!=null ) buf.append(", args=" + args);
-		if ( retvals!=null ) buf.append(", retvals=" + retvals);
+		buf.append("Rule{name=").append(name);
+		if ( args!=null ) buf.append(", args=").append(args);
+		if ( retvals!=null ) buf.append(", retvals=").append(retvals);
 		buf.append("}");
 		return buf.toString();
     }

@@ -1,17 +1,64 @@
 package org.antlr.v4.test;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Parser;
 import org.antlr.runtime.RuleReturnScope;
+import org.antlr.runtime.TokenSource;
+import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
-import org.junit.Before;
+import org.antlr.runtime.tree.TreeAdaptor;
 import org.junit.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestASTStructure extends org.antlr.v4.gunit.gUnitBase {
-	@Before public void setup() {
-	    lexerClassName = "org.antlr.v4.parse.ANTLRLexer";
-	    parserClassName = "org.antlr.v4.parse.ANTLRParser";
-	    adaptorClassName = "org.antlr.v4.parse.GrammarASTAdaptor";	}
+//  NO LONGER using gunit!!!
+
+public class TestASTStructure {
+	String lexerClassName = "org.antlr.v4.parse.ANTLRLexer";
+	String parserClassName = "org.antlr.v4.parse.ANTLRParser";
+	String  adaptorClassName = "org.antlr.v4.parse.GrammarASTAdaptor";
+
+	public Object execParser(
+	String ruleName,
+	String input,
+	int scriptLine)
+	throws Exception
+	{
+		ANTLRStringStream is = new ANTLRStringStream(input);
+		Class lexerClass = Class.forName(lexerClassName);
+		Class[] lexArgTypes = new Class[]{CharStream.class};
+		Constructor lexConstructor = lexerClass.getConstructor(lexArgTypes);
+		Object[] lexArgs = new Object[]{is};
+		TokenSource lexer = (TokenSource)lexConstructor.newInstance(lexArgs);
+		is.setLine(scriptLine);
+
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+		Class parserClass = Class.forName(parserClassName);
+		Class[] parArgTypes = new Class[]{TokenStream.class};
+		Constructor parConstructor = parserClass.getConstructor(parArgTypes);
+		Object[] parArgs = new Object[]{tokens};
+		Parser parser = (Parser)parConstructor.newInstance(parArgs);
+
+		// set up customized tree adaptor if necessary
+		if ( adaptorClassName!=null ) {
+			parArgTypes = new Class[]{TreeAdaptor.class};
+			Method m = parserClass.getMethod("setTreeAdaptor", parArgTypes);
+			Class adaptorClass = Class.forName(adaptorClassName);
+			m.invoke(parser, adaptorClass.newInstance());
+		}
+
+		Method ruleMethod = parserClass.getMethod(ruleName);
+
+		// INVOKE RULE
+		return ruleMethod.invoke(parser);
+	}
+
 	@Test public void test_grammarSpec1() throws Exception {
 		// gunit test on line 15
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "parser grammar P; a : A;", 15);

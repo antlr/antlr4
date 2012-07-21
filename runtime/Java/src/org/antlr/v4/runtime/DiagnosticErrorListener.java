@@ -35,7 +35,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
-public class DiagnosticErrorListener extends BaseErrorListener<Token> {
+public class DiagnosticErrorListener extends BaseErrorListener {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,

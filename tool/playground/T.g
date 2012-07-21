@@ -1,5 +1,8 @@
-lexer grammar T;
+grammar T;
 
-A : 'a' {false}? ;
-B : 'a' ;
-WS : [ \n] ;
+s : ID b ;
+b : INT ;
+
+ID  :   [a-zA-Z]+ ;
+INT :   [0-9]+ ;
+WS  :   [ \t\n\r]+ -> skip ;
