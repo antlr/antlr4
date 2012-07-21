@@ -509,7 +509,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeStartState(@NotNull IntStream input,
 											 @NotNull ATNState p)
 	{
-		PredictionContext initialContext = EmptyPredictionContext.EMPTY;
+		PredictionContext initialContext = PredictionContext.EMPTY;
 		ATNConfigSet configs = new ATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;

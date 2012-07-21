@@ -33,13 +33,12 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-/** An ATN state, predicted alt, and syntactic/semantic context.
- *  The syntactic context is a pointer into the rule invocation
+/** A tuple: (ATN state, predicted alt, syntactic, semantic context).
+ *  The syntactic context is a graph-structured stack node whose
+ *  path(s) to the root is the rule invocation(s)
  *  chain used to arrive at the state.  The semantic context is
- *  the unordered set semantic predicates encountered before reaching
+ *  the tree of semantic predicates encountered before reaching
  *  an ATN state.
- *
- *  (state, alt, rule context, semantic context)
  */
 public class ATNConfig {
 	/** The ATN state associated with this configuration */

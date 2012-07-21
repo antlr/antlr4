@@ -4,12 +4,15 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class ArrayPredictionContext extends PredictionContext {
-	// parent can be null only if full ctx mode and we make an array
-	// from EMPTY and non-empty. We merge EMPTY by null parent and
-	// invokingState = EMPTY_FULL_INVOKING_STATE
+	/** Parent can be null only if full ctx mode and we make an array
+	 *  from EMPTY and non-empty. We merge EMPTY by using null parent and
+	 *  invokingState == EMPTY_FULL_INVOKING_STATE
+	 */
 	public final PredictionContext[] parents;
-	// sorted for merge sort, no duplicates; if present,
-	// EMPTY_FULL_INVOKING_STATE is always first
+
+	/** Sorted for merge, no duplicates; if present,
+	 *  EMPTY_FULL_INVOKING_STATE is always first
+ 	 */
 	public final int[] invokingStates;
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
@@ -136,9 +139,10 @@ public class ArrayPredictionContext extends PredictionContext {
 		StringBuilder buf = new StringBuilder();
 		buf.append("[");
 		for (int i=0; i<invokingStates.length; i++) {
-			if ( i>0 ) buf.append(",");
+			if ( i>0 ) buf.append(", ");
 			buf.append(invokingStates[i]);
 			if ( parents[i]!=null ) {
+				buf.append(' ');
 				buf.append(parents[i].toString());
 			}
 			else {

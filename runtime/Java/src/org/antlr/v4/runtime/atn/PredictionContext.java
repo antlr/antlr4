@@ -14,7 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class PredictionContext implements Iterable<SingletonPredictionContext> {
+	/** Represents $ in local ctx prediction, which means wildcard. *+x = *. */
 	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
+
+	/** Represents $ in an array in full ctx mode, when $ doesn't mean wildcard:
+	 *  $ + x = [$,x]. Here, $ = EMPTY_FULL_CTX_INVOKING_STATE.
+	 */
 	public static final int EMPTY_FULL_CTX_INVOKING_STATE = Integer.MAX_VALUE;
 
 	public static int globalNodeCount = 0;
@@ -276,8 +281,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 											  boolean rootIsWildcard)
 	{
 		if ( rootIsWildcard ) {
-			if ( a == EMPTY ) return a;
-			if ( b == EMPTY ) return b;
+			if ( a == EMPTY ) return a;  // * + b = *
+			if ( b == EMPTY ) return b;  // a + * = *
 		}
 		else {
 			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
@@ -396,12 +401,14 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			if ( current instanceof SingletonPredictionContext ) {
 				String s = String.valueOf(current.id);
 				buf.append("  s").append(s);
-				buf.append(" [label=\"").append(current.getInvokingState(0)).append("\"];\n");
+				String invokingState = String.valueOf(current.getInvokingState(0));
+				if ( current instanceof EmptyPredictionContext ) invokingState = "$";
+				buf.append(" [label=\"").append(invokingState).append("\"];\n");
 				continue;
 			}
 			ArrayPredictionContext arr = (ArrayPredictionContext)current;
 			buf.append("  s").append(arr.id);
-			buf.append(" [label=\"");
+			buf.append(" [shape=box, label=\"");
 			buf.append(Arrays.toString(arr.invokingStates));
 			buf.append("\"];\n");
 		}
@@ -409,13 +416,12 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		for (PredictionContext current : nodes) {
 			if ( current==EMPTY ) continue;
 			for (int i = 0; i < current.size(); i++) {
-//				String s = String.valueOf(System.identityHashCode(current));
 				String s = String.valueOf(current.id);
 				buf.append("  s").append(s);
 				buf.append("->");
 				buf.append("s");
 				buf.append(current.getParent(i).id);
-				buf.append(";\n");
+				buf.append(" [label=\"parent["+i+"]\"];\n");
 			}
 		}
 
