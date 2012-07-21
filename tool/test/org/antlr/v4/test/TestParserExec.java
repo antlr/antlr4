@@ -201,6 +201,7 @@ public class TestParserExec extends BaseTest {
 	public void testIfIfElse() throws Exception {
 		String grammar =
 			"grammar T;\n" +
+			"s : stmt EOF ;\n" +
 			"stmt : ifStmt | ID;\n" +
 			"ifStmt : 'if' ID stmt ('else' stmt | {_input.LA(1) != ELSE}?);\n" +
 			"ELSE : 'else';\n" +
@@ -208,11 +209,12 @@ public class TestParserExec extends BaseTest {
 			"WS : (' ' | '\\t')+ -> skip;\n"
 			;
 
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stmt",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "if x if x a else b", true);
 		String expecting = "";
 		assertEquals(expecting, found);
-		assertNull(this.stderrDuringParse);
+		assertEquals("line 1:12 reportAttemptingFullContext d=1, input='else'\n",
+					 this.stderrDuringParse);
 	}
 
 }
