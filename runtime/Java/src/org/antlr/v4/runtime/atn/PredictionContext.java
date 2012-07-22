@@ -228,7 +228,13 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a, (SingletonPredictionContext)b, rootIsWildcard);
 		}
-		if ( a instanceof SingletonPredictionContext) {
+		// at least one of a or b is array; convert one so both are arrays
+		// unless one is $ and rootIsWildcard, which means we return $ as * wildcard
+		if ( rootIsWildcard ) {
+			if ( a instanceof EmptyPredictionContext ) return a;
+			if ( b instanceof EmptyPredictionContext ) return b;
+		}
+		if ( a instanceof SingletonPredictionContext ) {
 			a = new ArrayPredictionContext((SingletonPredictionContext)a);
 		}
 		if ( b instanceof SingletonPredictionContext) {
@@ -316,8 +322,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		int j = 0; // walks b
 		int k = 0; // walks M target array
 
-		int[] mergedInvokingStates = new int[a.invokingStates.length + b.invokingStates.length];
-		PredictionContext[] mergedParents = new PredictionContext[a.invokingStates.length + b.invokingStates.length];
+		int[] mergedInvokingStates =
+			new int[a.invokingStates.length + b.invokingStates.length];
+		PredictionContext[] mergedParents =
+			new PredictionContext[a.invokingStates.length + b.invokingStates.length];
 		while ( i<a.invokingStates.length && j<b.invokingStates.length ) {
 			if ( a.invokingStates[i]==b.invokingStates[j] ) {
 				// same payload; stack tops are equal
@@ -325,7 +333,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				SingletonPredictionContext a_ = new SingletonPredictionContext(a.parents[i], payload);
 				SingletonPredictionContext b_ = new SingletonPredictionContext(b.parents[j], payload);
 				// if same stack tops, must yield merged singleton
-				SingletonPredictionContext r = (SingletonPredictionContext)mergeSingletons(a_, b_, rootIsWildcard);
+				SingletonPredictionContext r =
+					(SingletonPredictionContext)mergeSingletons(a_, b_, rootIsWildcard);
 				// if r is same as a_ or b_, we get to keep existing, else new
 				if ( r==a_ ) {
 					mergedParents[k] = a.parents[i];

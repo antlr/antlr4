@@ -959,21 +959,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
-//					if ( !ctx.isEmpty() ) {
-						ATNState invokingState = atn.states.get(ctx.invokingState);
-						RuleTransition rt = (RuleTransition)invokingState.transition(0);
-						ATNState retState = rt.followState;
-						PredictionContext newContext = ctx.parent; // "pop" invoking state
-						ATNConfig c = new ATNConfig(retState, config.alt, newContext,
-													config.semanticContext);
-						// While we have context to pop back from, we may have
-						// gotten that context AFTER having falling off a rule.
-						// Make sure we track that we are now out of context.
-						c.reachesIntoOuterContext = config.reachesIntoOuterContext;
-						assert depth > Integer.MIN_VALUE;
-						closure_(c, configs, closureBusy, collectPredicates, greedy,
-								 loopsSimulateTailRecursion, depth - 1);
-//					}
+					ATNState invokingState = atn.states.get(ctx.invokingState);
+					RuleTransition rt = (RuleTransition)invokingState.transition(0);
+					ATNState retState = rt.followState;
+					PredictionContext newContext = ctx.parent; // "pop" invoking state
+					ATNConfig c = new ATNConfig(retState, config.alt, newContext,
+												config.semanticContext);
+					// While we have context to pop back from, we may have
+					// gotten that context AFTER having falling off a rule.
+					// Make sure we track that we are now out of context.
+					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+					assert depth > Integer.MIN_VALUE;
+					closure_(c, configs, closureBusy, collectPredicates, greedy,
+							 loopsSimulateTailRecursion, depth - 1);
 				}
 				return;
 			}
@@ -1252,9 +1250,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				for (int j = i+1; j < size; j++) {
 					ATNConfig d = configsPerState.get(j);
 					if ( c.alt != d.alt ) {
-//						if ( stateToConfigListMap.get(24)!=null && stateToConfigListMap.get(24).toString().equals("[(24,1,[46 $],{2:1}?), (24,2,[46 $],up=1)]") ) {
-//							System.out.println("foo");
-//						}
 						boolean conflicting = c.context.equals(d.context);
 						if ( conflicting ) {
 							if ( debug ) {

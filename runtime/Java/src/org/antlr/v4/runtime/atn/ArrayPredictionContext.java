@@ -17,13 +17,13 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
 		this(new PredictionContext[] {a.parent},
-			 new int[] {a.invokingState});
+			 new int[] {a==PredictionContext.EMPTY ? EMPTY_FULL_CTX_INVOKING_STATE : a.invokingState});
 	}
 
 	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
 		super(calculateHashCode(parents, invokingStates));
 		assert parents!=null && parents.length>0;
-//		System.out.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(invokingStates));
+//		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(invokingStates));
 		this.parents = parents;
 		this.invokingStates = invokingStates;
 	}
