@@ -266,22 +266,19 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 					payloads[1] = a.invokingState;
 				}
 				PredictionContext[] parents = {singleParent, singleParent};
-				ArrayPredictionContext joined =
-					new ArrayPredictionContext(parents, payloads);
-				return joined;
+				return new ArrayPredictionContext(parents, payloads);
 			}
 			// parents differ and can't merge them. Just pack together
-			// into array; can't merge. sort, though, by payload
+			// into array; can't merge.
 			// ax + by = [ax,by]
 			int[] payloads = {a.invokingState, b.invokingState};
 			PredictionContext[] parents = {a.parent, b.parent};
-			if ( a.invokingState > b.invokingState ) {
-				payloads = new int[] {b.invokingState, a.invokingState};
+			if ( a.invokingState > b.invokingState ) { // sort by payload
+				payloads[0] = b.invokingState;
+				payloads[1] = a.invokingState;
 				parents = new PredictionContext[] {b.parent, a.parent};
 			}
-			ArrayPredictionContext joined =
-				new ArrayPredictionContext(parents, payloads);
-			return joined;
+			return new ArrayPredictionContext(parents, payloads);
 		}
 	}
 
