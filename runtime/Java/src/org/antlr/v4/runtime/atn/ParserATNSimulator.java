@@ -965,7 +965,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						if ( debug ) System.out.println("FALLING off rule "+
 														getRuleName(config.state.ruleIndex));
 						closure_(config, configs, closureBusy, collectPredicates, greedy,
-								 loopsSimulateTailRecursion, depth - 1);
+								 loopsSimulateTailRecursion, depth);
 						continue;
 					}
 					ATNState invokingState = atn.states.get(ctx.invokingState);
