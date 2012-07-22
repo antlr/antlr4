@@ -96,8 +96,8 @@ public class TestGraphNodes extends TestCase {
 			"  s3 [label=\"1\"];\n" +
 			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s3->s1 [label=\"parent[0]\"];\n" +
-			"  s1->s0 [label=\"parent[0]\"];\n" +
+			"  s3->s1;\n" +
+			"  s1->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -118,9 +118,9 @@ public class TestGraphNodes extends TestCase {
 			"  s3 [label=\"2\"];\n" +
 			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s5->s3 [label=\"parent[0]\"];\n" +
-			"  s3->s1 [label=\"parent[0]\"];\n" +
-			"  s1->s0 [label=\"parent[0]\"];\n" +
+			"  s5->s3;\n" +
+			"  s3->s1;\n" +
+			"  s1->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -139,14 +139,12 @@ public class TestGraphNodes extends TestCase {
 			"rankdir=LR;\n" +
 			"  s8 [label=\"1\"];\n" +
 			"  s7 [shape=box, label=\"[2, 3]\"];\n" +
-			"  s2 [label=\"9\"];\n" +
-			"  s0 [label=\"$\"];\n" +
 			"  s1 [label=\"9\"];\n" +
-			"  s8->s7 [label=\"parent[0]\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s8->s7;\n" +
 			"  s7->s1 [label=\"parent[0]\"];\n" +
-			"  s7->s2 [label=\"parent[1]\"];\n" +
-			"  s2->s0 [label=\"parent[0]\"];\n" +
-			"  s1->s0 [label=\"parent[0]\"];\n" +
+			"  s7->s1 [label=\"parent[1]\"];\n" +
+			"  s1->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -165,7 +163,7 @@ public class TestGraphNodes extends TestCase {
 			"  s0 [label=\"$\"];\n" +
 			"  s4->s1 [label=\"parent[0]\"];\n" +
 			"  s4->s1 [label=\"parent[1]\"];\n" +
-			"  s1->s0 [label=\"parent[0]\"];\n" +
+			"  s1->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -190,10 +188,10 @@ public class TestGraphNodes extends TestCase {
 			"  s1 [label=\"9\"];\n" +
 			"  s7->s3 [label=\"parent[0]\"];\n" +
 			"  s7->s4 [label=\"parent[1]\"];\n" +
-			"  s4->s2 [label=\"parent[0]\"];\n" +
-			"  s2->s0 [label=\"parent[0]\"];\n" +
-			"  s3->s1 [label=\"parent[0]\"];\n" +
-			"  s1->s0 [label=\"parent[0]\"];\n" +
+			"  s4->s2;\n" +
+			"  s2->s0;\n" +
+			"  s3->s1;\n" +
+			"  s1->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -230,9 +228,9 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s7 [shape=box, label=\"[1]\"];\n" +
+			"  s3 [shape=box, label=\"[1]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s7->s0 [label=\"parent[0]\"];\n" +
+			"  s3->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -330,7 +328,7 @@ public class TestGraphNodes extends TestCase {
 			"  s11 [shape=box, label=\"[1]\"];\n" +
 			"  s9 [shape=box, label=\"[9, 10]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s11->s9 [label=\"parent[0]\"];\n" +
+			"  s11->s9;\n" +
 			"  s9->s0 [label=\"parent[0]\"];\n" +
 			"  s9->s0 [label=\"parent[1]\"];\n" +
 			"}\n";

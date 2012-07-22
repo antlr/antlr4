@@ -203,6 +203,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public static PredictionContext merge(PredictionContext a, PredictionContext b,
 										  boolean rootIsWildcard)
 	{
+		if ( a.equals(b) ) return a; // share same graph if both same
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
 								   (SingletonPredictionContext)b, rootIsWildcard);
@@ -222,6 +223,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return mergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b, rootIsWildcard);
 	}
 
+	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
 	public static PredictionContext mergeSingletons(SingletonPredictionContext a,
 													SingletonPredictionContext b,
 													boolean rootIsWildcard)
@@ -231,9 +233,13 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		if ( a.invokingState==b.invokingState ) { // a == b
 			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard);
-			if ( parent == a.parent ) return a;
-			if ( parent == b.parent ) return b;
-			// new joined parent so create new singleton pointing to it
+			// if parent is same as existing a or b parent, return it
+			if ( parent == a.parent ) return a; // ax + ax = ax
+			if ( parent == b.parent ) return b; // not sure can happen since merge(a,a) returns left a
+			// else: ax + ay = a'[x,y]
+			// merge parents x and y, giving array node with x,y then remainders
+			// of those graphs.  dup a, a' points at merged array
+			// new joined parent so create new singleton pointing to it, a'
 			return new SingletonPredictionContext(parent, a.invokingState);
 		}
 		else { // a != b payloads differ
@@ -264,6 +270,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 	}
 
+	// http://www.antlr.org/wiki/download/attachments/32014352/local-ctx-root-merge.png
+	// http://www.antlr.org/wiki/download/attachments/32014352/full-ctx-root-merge.png
+	/** Handle case where at least one of a or b is $ (EMPTY) */
 	public static PredictionContext mergeRoot(SingletonPredictionContext a,
 											  SingletonPredictionContext b,
 											  boolean rootIsWildcard)
@@ -292,6 +301,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return null;
 	}
 
+	// http://www.antlr.org/wiki/download/attachments/32014352/array-merge.png
 	public static PredictionContext mergeArrays(ArrayPredictionContext a,
 												ArrayPredictionContext b,
 												boolean rootIsWildcard)
@@ -412,7 +422,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				buf.append("->");
 				buf.append("s");
 				buf.append(current.getParent(i).id);
-				buf.append(" [label=\"parent["+i+"]\"];\n");
+				if ( current.size()>1 ) buf.append(" [label=\"parent["+i+"]\"];\n");
+				else buf.append(";\n");
 			}
 		}
 
