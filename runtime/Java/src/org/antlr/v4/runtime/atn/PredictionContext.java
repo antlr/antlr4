@@ -380,13 +380,15 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			}
 		}
 
-		// trim merged
+		// trim merged if we combined a few that had same stack tops
 		if ( k < mergedParents.length ) { // write index < last position; trim
-			int p = mergedParents.length-1;
+			int lastSlot = mergedParents.length - 1;
+			int p = lastSlot; // walk backwards from last index until we find non-null parent
 			while ( p>=0 && mergedParents[p]==null ) { p--; }
 			// p is now last non-null index
-			if ( p < mergedParents.length-1 ) {
-				int n = p+1;
+			assert p>0; // could only happen to be <0 if two arrays with $
+			if ( p < lastSlot ) {
+				int n = p+1; // how many slots we really used in merge
 				if ( n == 1 ) { // for just one merged element, return singleton top
 					return new SingletonPredictionContext(mergedParents[0],
 														  mergedInvokingStates[0]);
@@ -401,10 +403,21 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		// TODO: if we created same array as a or b, return that instead
 
-		// TODO: make pass over all M parents; merge any equal() ones
-//		combineCommonParents(mergedParents);
+		combineCommonParents(mergedParents);
 
 		return M;
+	}
+
+	/** make pass over all M parents; merge any equals() ones */
+	protected static void combineCommonParents(PredictionContext[] parents) {
+		// compare pairwise
+		for (int i = 0; i < parents.length; i++) {
+			for (int j = i+1; j < parents.length; j++) {
+				if ( parents[i].equals(parents[j]) ) {
+					parents[j] = parents[i]; // use left one if same
+				}
+			}
+		}
 	}
 
 	public static String toDotString(PredictionContext context) {

@@ -393,6 +393,19 @@ public class TestGraphNodes extends TestCase {
 
 	// Array merges
 
+	@Test public void test_A$_A$_fullctx() {
+		ArrayPredictionContext A1 = array(PredictionContext.EMPTY);
+		ArrayPredictionContext A2 = array(PredictionContext.EMPTY);
+		PredictionContext r = PredictionContext.merge(A1, A2, fullCtx());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s1 [shape=box, label=\"[-2]\"];\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
 	@Test public void test_Aab_Ac() { // a,b + c
 		SingletonPredictionContext a = a();
 		SingletonPredictionContext b = b();
@@ -660,9 +673,19 @@ public class TestGraphNodes extends TestCase {
 		ArrayPredictionContext A2 = array(b2, d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDotString(r));
-		// TODO: doesn't merge parents
 		String expecting =
-			"\n";
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s11 [shape=box, label=\"[1, 2, 4]\"];\n" +
+			"  s3 [label=\"7\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"6\"];\n" +
+			"  s11->s1 [label=\"parent[0]\"];\n" +
+			"  s11->s3 [label=\"parent[1]\"];\n" +
+			"  s11->s1 [label=\"parent[2]\"];\n" +
+			"  s3->s0;\n" +
+			"  s1->s0;\n" +
+			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
 
