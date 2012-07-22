@@ -160,15 +160,8 @@ public class ArrayPredictionContext extends PredictionContext {
 		}
 
 		ArrayPredictionContext a = (ArrayPredictionContext)o;
-		if ( invokingStates.length != a.invokingStates.length ) {
-			return false;
-		}
-
-		for (int i=0; i< invokingStates.length; i++) {
-			if ( invokingStates[i]!=a.invokingStates[i] ) return false;
-			if ( !parents[i].equals(a.parents[i]) ) return false;
-		}
-		return true;
+		return Arrays.equals(invokingStates, a.invokingStates) &&
+		       Arrays.equals(parents, a.parents);
 	}
 
 	@Override

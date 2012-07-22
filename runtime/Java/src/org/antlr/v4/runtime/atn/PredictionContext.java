@@ -204,23 +204,29 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 										  boolean rootIsWildcard)
 	{
 		if ( a.equals(b) ) return a; // share same graph if both same
+
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
-								   (SingletonPredictionContext)b, rootIsWildcard);
+								   (SingletonPredictionContext)b,
+								   rootIsWildcard);
 		}
-		// at least one of a or b is array; convert one so both are arrays
-		// unless one is $ and rootIsWildcard, which means we return $ as * wildcard
+
+		// At least one of a or b is array
+		// If one is $ and rootIsWildcard, return $ as * wildcard
 		if ( rootIsWildcard ) {
 			if ( a instanceof EmptyPredictionContext ) return a;
 			if ( b instanceof EmptyPredictionContext ) return b;
 		}
+
+		// convert singleton so both are arrays to normalize
 		if ( a instanceof SingletonPredictionContext ) {
 			a = new ArrayPredictionContext((SingletonPredictionContext)a);
 		}
 		if ( b instanceof SingletonPredictionContext) {
 			b = new ArrayPredictionContext((SingletonPredictionContext)b);
 		}
-		return mergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b, rootIsWildcard);
+		return mergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b,
+						   rootIsWildcard);
 	}
 
 	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
