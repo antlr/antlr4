@@ -77,7 +77,7 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode();
+		return invokingState;
 	}
 
 	@Override

@@ -159,8 +159,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-//		buf.append(elements().toString());
-		buf.append(super.toString());
+		buf.append(elements().toString());
+//		buf.append(super.toString());
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext=").append(hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt=").append(uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts=").append(conflictingAlts);

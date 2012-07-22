@@ -31,6 +31,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		this.cachedHashCode = cachedHashCode;
 	}
 
+	/** Get a PredictionContext with just start rule context or EMPTY if
+	 *  outerContext is empty or null
+	 */
 	public static PredictionContext fromRuleContext(RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 

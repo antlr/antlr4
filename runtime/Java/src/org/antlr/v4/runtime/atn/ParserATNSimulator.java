@@ -993,7 +993,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
 			else if ( config.state.getClass()==LoopEndState.class ) {
-				if ( debug ) System.out.print("Loop end; pop, stack="+config.context);
+				if ( debug ) System.out.print("Loop end; pop, stack=" + config.context);
 				LoopEndState end = (LoopEndState)config.state;
 				// pop all the way back until we don't see the loopback state anymore
 				config.context = config.context.popAll(end.loopBackStateNumber, configs.fullCtx);
@@ -1252,6 +1252,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				for (int j = i+1; j < size; j++) {
 					ATNConfig d = configsPerState.get(j);
 					if ( c.alt != d.alt ) {
+//						if ( stateToConfigListMap.get(24)!=null && stateToConfigListMap.get(24).toString().equals("[(24,1,[46 $],{2:1}?), (24,2,[46 $],up=1)]") ) {
+//							System.out.println("foo");
+//						}
 						boolean conflicting = c.context.equals(d.context);
 						if ( conflicting ) {
 							if ( debug ) {
