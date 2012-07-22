@@ -478,10 +478,10 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s8 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s6 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s8->s0 [label=\"parent[0]\"];\n" +
-			"  s8->s0 [label=\"parent[1]\"];\n" +
+			"  s6->s0 [label=\"parent[0]\"];\n" +
+			"  s6->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -494,10 +494,10 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s8 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s6 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s8->s0 [label=\"parent[0]\"];\n" +
-			"  s8->s0 [label=\"parent[1]\"];\n" +
+			"  s6->s0 [label=\"parent[0]\"];\n" +
+			"  s6->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -534,12 +534,12 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s11 [label=\"1\"];\n" +
-			"  s9 [shape=box, label=\"[9, 10]\"];\n" +
+			"  s8 [label=\"1\"];\n" +
+			"  s7 [shape=box, label=\"[9, 10]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s11->s9;\n" +
-			"  s9->s0 [label=\"parent[0]\"];\n" +
-			"  s9->s0 [label=\"parent[1]\"];\n" +
+			"  s8->s7;\n" +
+			"  s7->s0 [label=\"parent[0]\"];\n" +
+			"  s7->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -554,14 +554,14 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s13 [shape=box, label=\"[1, 3, 4]\"];\n" +
+			"  s10 [shape=box, label=\"[1, 3, 4]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s11 [shape=box, label=\"[9, 10]\"];\n" +
-			"  s13->s11 [label=\"parent[0]\"];\n" +
-			"  s13->s0 [label=\"parent[1]\"];\n" +
-			"  s13->s0 [label=\"parent[2]\"];\n" +
-			"  s11->s0 [label=\"parent[0]\"];\n" +
-			"  s11->s0 [label=\"parent[1]\"];\n" +
+			"  s9 [shape=box, label=\"[9, 10]\"];\n" +
+			"  s10->s9 [label=\"parent[0]\"];\n" +
+			"  s10->s0 [label=\"parent[1]\"];\n" +
+			"  s10->s0 [label=\"parent[2]\"];\n" +
+			"  s9->s0 [label=\"parent[0]\"];\n" +
+			"  s9->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -578,14 +578,17 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s13 [shape=box, label=\"[1, 2, 3]\"];\n" +
-			"  s5 [label=\"8\"];\n" +
+			"  s11 [shape=box, label=\"[1, 2, 3, 4]\"];\n" +
+			"  s7 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s5 [label=\"8\"];\n" +
 			"  s3 [label=\"7\"];\n" +
 			"  s1 [label=\"6\"];\n" +
-			"  s13->s1 [label=\"parent[0]\"];\n" +
-			"  s13->s3 [label=\"parent[1]\"];\n" +
-			"  s13->s5 [label=\"parent[2]\"];\n" +
+			"  s11->s1 [label=\"parent[0]\"];\n" +
+			"  s11->s3 [label=\"parent[1]\"];\n" +
+			"  s11->s5 [label=\"parent[2]\"];\n" +
+			"  s11->s7 [label=\"parent[3]\"];\n" +
+			"  s7->s0;\n" +
 			"  s5->s0;\n" +
 			"  s3->s0;\n" +
 			"  s1->s0;\n" +
@@ -605,15 +608,15 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s13 [shape=box, label=\"[1, 2, 3]\"];\n" +
-			"  s5 [label=\"8\"];\n" +
+			"  s11 [shape=box, label=\"[1, 2, 4]\"];\n" +
+			"  s7 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
 			"  s3 [label=\"7\"];\n" +
 			"  s1 [label=\"6\"];\n" +
-			"  s13->s1 [label=\"parent[0]\"];\n" +
-			"  s13->s3 [label=\"parent[1]\"];\n" +
-			"  s13->s5 [label=\"parent[2]\"];\n" +
-			"  s5->s0;\n" +
+			"  s11->s1 [label=\"parent[0]\"];\n" +
+			"  s11->s3 [label=\"parent[1]\"];\n" +
+			"  s11->s7 [label=\"parent[2]\"];\n" +
+			"  s7->s0;\n" +
 			"  s3->s0;\n" +
 			"  s1->s0;\n" +
 			"}\n";
@@ -632,16 +635,17 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s13 [shape=box, label=\"[1, 2, 3]\"];\n" +
-			"  s5 [label=\"8\"];\n" +
+			"  s12 [shape=box, label=\"[1, 2, 4]\"];\n" +
+			"  s7 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s3 [label=\"7\"];\n" +
+			"  s11 [shape=box, label=\"[7, 8]\"];\n" +
 			"  s1 [label=\"6\"];\n" +
-			"  s13->s1 [label=\"parent[0]\"];\n" +
-			"  s13->s3 [label=\"parent[1]\"];\n" +
-			"  s13->s5 [label=\"parent[2]\"];\n" +
-			"  s5->s0;\n" +
-			"  s3->s0;\n" +
+			"  s12->s1 [label=\"parent[0]\"];\n" +
+			"  s12->s11 [label=\"parent[1]\"];\n" +
+			"  s12->s7 [label=\"parent[2]\"];\n" +
+			"  s7->s0;\n" +
+			"  s11->s0 [label=\"parent[0]\"];\n" +
+			"  s11->s0 [label=\"parent[1]\"];\n" +
 			"  s1->s0;\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));

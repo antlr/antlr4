@@ -321,44 +321,43 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		// merge sorted payloads a + b => M
 		int i = 0; // walks a
 		int j = 0; // walks b
-		int k = 0; // walks M target array
+		int k = 0; // walks target M array
 
 		int[] mergedInvokingStates =
 			new int[a.invokingStates.length + b.invokingStates.length];
 		PredictionContext[] mergedParents =
 			new PredictionContext[a.invokingStates.length + b.invokingStates.length];
+		// walk and merge to yield mergedParents, mergedInvokingStates
 		while ( i<a.invokingStates.length && j<b.invokingStates.length ) {
+			PredictionContext a_parent = a.parents[i];
+			PredictionContext b_parent = b.parents[j];
 			if ( a.invokingStates[i]==b.invokingStates[j] ) {
-				// same payload; stack tops are equal
+				// same payload (stack tops are equal), must yield merged singleton
 				int payload = a.invokingStates[i];
-				SingletonPredictionContext a_ = new SingletonPredictionContext(a.parents[i], payload);
-				SingletonPredictionContext b_ = new SingletonPredictionContext(b.parents[j], payload);
-				// if same stack tops, must yield merged singleton
-				SingletonPredictionContext r =
-					(SingletonPredictionContext)mergeSingletons(a_, b_, rootIsWildcard);
-				// if r is same as a_ or b_, we get to keep existing, else new
-				if ( r==a_ ) {
-					mergedParents[k] = a.parents[i];
-					mergedInvokingStates[k] = a.invokingStates[i];
+				// $+$ = $
+				boolean both$ = payload == EMPTY_FULL_CTX_INVOKING_STATE &&
+								a_parent == null && b_parent == null;
+				boolean ax_ax = (a_parent!=null && b_parent!=null) &&
+								a_parent.equals(b_parent); // ax+ax -> ax
+				if ( both$ || ax_ax ) {
+					mergedParents[k] = a_parent; // choose left
+					mergedInvokingStates[k] = payload;
 				}
-				else if ( r==b_ ) {
-					mergedParents[k] = b.parents[j];
-					mergedInvokingStates[k] = b.invokingStates[j];
-				}
-				else {
-					mergedParents[k] = r.parent;
-					mergedInvokingStates[k] = r.invokingState;
+				else { // ax+ay -> a'[x,y]
+					PredictionContext mergedParent = merge(a_parent, b_parent, rootIsWildcard);
+					mergedParents[k] = mergedParent;
+					mergedInvokingStates[k] = payload;
 				}
 				i++; // hop over left one as usual
 				j++; // but also skip one in right side since we merge
 			}
-			else if ( a.invokingStates[i]<b.invokingStates[j] ) {
-				mergedParents[k] = a.parents[i];
+			else if ( a.invokingStates[i]<b.invokingStates[j] ) { // copy a[i] to M
+				mergedParents[k] = a_parent;
 				mergedInvokingStates[k] = a.invokingStates[i];
 				i++;
 			}
-			else { // b > a
-				mergedParents[k] = b.parents[j];
+			else { // b > a, copy b[j] to M
+				mergedParents[k] = b_parent;
 				mergedInvokingStates[k] = b.invokingStates[j];
 				j++;
 			}
@@ -380,7 +379,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				k++;
 			}
 		}
-
 
 		// trim merged
 		if ( k < mergedParents.length ) { // write index < last position; trim
@@ -404,6 +402,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		// TODO: if we created same array as a or b, return that instead
 
 		// TODO: make pass over all M parents; merge any equal() ones
+//		combineCommonParents(mergedParents);
 
 		return M;
 	}

@@ -932,16 +932,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean greedy, boolean loopsSimulateTailRecursion)
 	{
 		final int initialDepth = 0;
-		closure_(config, configs, closureBusy, collectPredicates, greedy,
-				 loopsSimulateTailRecursion, initialDepth);
+		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates, greedy,
+												 loopsSimulateTailRecursion, initialDepth);
 	}
 
-	protected void closure_(@NotNull ATNConfig config,
-							@NotNull ATNConfigSet configs,
-							@NotNull Set<ATNConfig> closureBusy,
-							boolean collectPredicates,
-							boolean greedy, boolean loopsSimulateTailRecursion,
-							int depth)
+	protected void closureCheckingStopStateAndLoopRecursion(@NotNull ATNConfig config,
+															@NotNull ATNConfigSet configs,
+															@NotNull Set<ATNConfig> closureBusy,
+															boolean collectPredicates,
+															boolean greedy,
+															boolean loopsSimulateTailRecursion,
+															int depth)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
@@ -959,6 +960,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
+					if ( ctx.invokingState==PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE ) {
+						// we have no context info, just chase follow links (if greedy)
+						if ( debug ) System.out.println("FALLING off rule "+
+														getRuleName(config.state.ruleIndex));
+						closure_(config, configs, closureBusy, collectPredicates, greedy,
+								 loopsSimulateTailRecursion, depth - 1);
+						continue;
+					}
 					ATNState invokingState = atn.states.get(ctx.invokingState);
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
 					ATNState retState = rt.followState;
@@ -970,8 +979,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// Make sure we track that we are now out of context.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
-					closure_(c, configs, closureBusy, collectPredicates, greedy,
-							 loopsSimulateTailRecursion, depth - 1);
+					closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, collectPredicates, greedy,
+															 loopsSimulateTailRecursion, depth - 1);
 				}
 				return;
 			}
@@ -999,11 +1008,22 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
+		closure_(config, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth);
+	}
+
+	/** Do the actual work of walking epsilon edges */
+	protected void closure_(@NotNull ATNConfig config,
+							@NotNull ATNConfigSet configs,
+							@NotNull Set<ATNConfig> closureBusy,
+							boolean collectPredicates,
+							boolean greedy, boolean loopsSimulateTailRecursion,
+							int depth)
+	{
 		ATNState p = config.state;
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config);
-			if ( config.semanticContext!=null && config.semanticContext!=SemanticContext.NONE ) {
+			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}
 			if ( config.reachesIntoOuterContext>0 ) {
@@ -1012,14 +1032,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             if ( debug ) System.out.println("added config "+configs);
         }
 
-        for (int i=0; i<p.getNumberOfTransitions(); i++) {
-            Transition t = p.transition(i);
-            boolean continueCollecting =
+		for (int i=0; i<p.getNumberOfTransitions(); i++) {
+			Transition t = p.transition(i);
+			boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
-            ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0);
+			ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0);
 			if ( c!=null ) {
 				int newDepth = depth;
-				if ( config.state instanceof RuleStopState ) {
+				if ( config.state instanceof RuleStopState) {
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
 					// track how far we dip into outer context.  Might
@@ -1038,8 +1058,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				closure_(c, configs, closureBusy, continueCollecting, greedy,
-						 loopsSimulateTailRecursion, newDepth);
+				closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, continueCollecting, greedy,
+														 loopsSimulateTailRecursion, newDepth);
 			}
 		}
 	}
