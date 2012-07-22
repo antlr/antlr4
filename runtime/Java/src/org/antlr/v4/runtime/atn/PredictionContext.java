@@ -249,21 +249,30 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			return new SingletonPredictionContext(parent, a.invokingState);
 		}
 		else { // a != b payloads differ
-			if ( a.parent.equals(b.parent) ) {
-				// parents are equal, pick left one as parent to reuse
-				PredictionContext parent = a.parent;
+			// see if we can collapse parents due to $+x parents if local ctx
+			PredictionContext singleParent = null;
+			if ( rootIsWildcard ) {
+				if ( a.parent == EMPTY ) singleParent = EMPTY;  // $ + b = $
+				if ( b.parent == EMPTY ) singleParent = EMPTY;  // a + $ = $
+			}
+			if ( a.parent.equals(b.parent) ) { // ax + bx = [a,b]x
+				singleParent = a.parent;
+			}
+			if ( singleParent!=null ) {	// parents are same
 				// sort payloads and use same parent
 				int[] payloads = {a.invokingState, b.invokingState};
 				if ( a.invokingState > b.invokingState ) {
-					payloads = new int[] {b.invokingState, a.invokingState};
+					payloads[0] = b.invokingState;
+					payloads[1] = a.invokingState;
 				}
-				PredictionContext[] parents = {parent, parent};
+				PredictionContext[] parents = {singleParent, singleParent};
 				ArrayPredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
-			// parents differ, just pack together into array; can't merge.
-			// sort though by payload
+			// parents differ and can't merge them. Just pack together
+			// into array; can't merge. sort, though, by payload
+			// ax + by = [ax,by]
 			int[] payloads = {a.invokingState, b.invokingState};
 			PredictionContext[] parents = {a.parent, b.parent};
 			if ( a.invokingState > b.invokingState ) {
@@ -284,8 +293,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 											  boolean rootIsWildcard)
 	{
 		if ( rootIsWildcard ) {
-			if ( a == EMPTY ) return a;  // * + b = *
-			if ( b == EMPTY ) return b;  // a + * = *
+			if ( a == EMPTY ) return EMPTY;  // * + b = *
+			if ( b == EMPTY ) return EMPTY;  // a + * = *
 		}
 		else {
 			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $

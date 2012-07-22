@@ -149,7 +149,7 @@ public class TestGraphNodes extends TestCase {
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
 
-	@Test public void test_ax_bx() {
+	@Test public void test_ax_bx_same_x() {
 		PredictionContext x = createSingleton(PredictionContext.EMPTY, 9);
 		PredictionContext a = createSingleton(x, 1);
 		PredictionContext b = createSingleton(x, 2);
@@ -164,6 +164,43 @@ public class TestGraphNodes extends TestCase {
 			"  s4->s1 [label=\"parent[0]\"];\n" +
 			"  s4->s1 [label=\"parent[1]\"];\n" +
 			"  s1->s0;\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
+	@Test public void test_ax_bx() {
+		PredictionContext x1 = createSingleton(PredictionContext.EMPTY, 9);
+		PredictionContext x2 = createSingleton(PredictionContext.EMPTY, 9);
+		PredictionContext a = createSingleton(x1, 1);
+		PredictionContext b = createSingleton(x2, 2);
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s5 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s5->s1 [label=\"parent[0]\"];\n" +
+			"  s5->s1 [label=\"parent[1]\"];\n" +
+			"  s1->s0;\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
+	@Test public void test_a$_bx() {
+		PredictionContext x2 = createSingleton(PredictionContext.EMPTY, 9);
+		PredictionContext a = createSingleton(PredictionContext.EMPTY, 1);
+		PredictionContext b = createSingleton(x2, 2);
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s4->s0 [label=\"parent[0]\"];\n" +
+			"  s4->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
