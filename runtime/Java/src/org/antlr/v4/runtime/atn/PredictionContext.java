@@ -239,9 +239,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		if ( a.invokingState==b.invokingState ) { // a == b
 			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard);
-			// if parent is same as existing a or b parent, return it
-			if ( parent == a.parent ) return a; // ax + ax = ax
-			if ( parent == b.parent ) return b; // not sure can happen since merge(a,a) returns left a
+			// if parent is same as existing a or b parent or reduced to a parent, return it
+			if ( parent == a.parent ) return a; // ax + bx = ax, if a=b
+			if ( parent == b.parent ) return b; // ax + bx = bx, if a=b
 			// else: ax + ay = a'[x,y]
 			// merge parents x and y, giving array node with x,y then remainders
 			// of those graphs.  dup a, a' points at merged array
@@ -364,6 +364,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			}
 			k++;
 		}
+
 		// copy over any payloads remaining in either array
 		if (i < a.invokingStates.length) {
 			for (int p = i; p < a.invokingStates.length; p++) {
@@ -380,6 +381,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			}
 		}
 
+
 		// trim merged
 		if ( k < mergedParents.length ) { // write index < last position; trim
 			int p = mergedParents.length-1;
@@ -387,6 +389,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			// p is now last non-null index
 			if ( p < mergedParents.length-1 ) {
 				int n = p+1;
+				if ( n == 1 ) { // for just one merged element, return singleton top
+					return new SingletonPredictionContext(mergedParents[0],
+														  mergedInvokingStates[0]);
+				}
 				mergedParents = Arrays.copyOf(mergedParents, n);
 				mergedInvokingStates = Arrays.copyOf(mergedInvokingStates, n);
 			}
@@ -422,13 +428,22 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			ArrayPredictionContext arr = (ArrayPredictionContext)current;
 			buf.append("  s").append(arr.id);
 			buf.append(" [shape=box, label=\"");
-			buf.append(Arrays.toString(arr.invokingStates));
+			buf.append("[");
+			boolean first = true;
+			for (int inv : arr.invokingStates) {
+				if ( !first ) buf.append(", ");
+				if ( inv == EMPTY_FULL_CTX_INVOKING_STATE ) buf.append("$");
+				else buf.append(inv);
+				first = false;
+			}
+			buf.append("]");
 			buf.append("\"];\n");
 		}
 
 		for (PredictionContext current : nodes) {
 			if ( current==EMPTY ) continue;
 			for (int i = 0; i < current.size(); i++) {
+				if ( current.getParent(i)==null ) continue;
 				String s = String.valueOf(current.id);
 				buf.append("  s").append(s);
 				buf.append("->");

@@ -23,6 +23,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
 		super(calculateHashCode(parents, invokingStates));
 		assert parents!=null && parents.length>0;
+		assert invokingStates!=null && invokingStates.length>0;
 //		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(invokingStates));
 		this.parents = parents;
 		this.invokingStates = invokingStates;
