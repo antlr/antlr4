@@ -28,6 +28,49 @@ public class ArrayPredictionContext extends PredictionContext {
 		this.invokingStates = invokingStates;
 	}
 
+//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int parentHashCode, int invokingStateHashCode) {
+//		super(calculateHashCode(parentHashCode, invokingStateHashCode));
+//		assert parents.length == invokingStates.length;
+//		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+//
+//		this.parents = parents;
+//		this.invokingStates = invokingStates;
+//	}
+//
+//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int hashCode) {
+//		super(hashCode);
+//		assert parents.length == invokingStates.length;
+//		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+//
+//		this.parents = parents;
+//		this.invokingStates = invokingStates;
+//	}
+
+	protected static int calculateHashCode(PredictionContext[] parents, int[] invokingStates) {
+		return calculateHashCode(calculateParentHashCode(parents),
+								 calculateInvokingStatesHashCode(invokingStates));
+	}
+
+	protected static int calculateParentHashCode(PredictionContext[] parents) {
+		int hashCode = 1;
+		for (PredictionContext p : parents) {
+			if ( p!=null ) { // can be null for full ctx stack in ArrayPredictionContext
+				hashCode = hashCode * 31 ^ p.hashCode();
+			}
+		}
+
+		return hashCode;
+	}
+
+	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
+		int hashCode = 1;
+		for (int state : invokingStates) {
+			hashCode = hashCode * 31 ^ state;
+		}
+
+		return hashCode;
+	}
+
 	@Override
 	public Iterator<SingletonPredictionContext> iterator() {
 		return new Iterator<SingletonPredictionContext>() {
@@ -69,10 +112,10 @@ public class ArrayPredictionContext extends PredictionContext {
 		return invokingStates[index];
 	}
 
-	@Override
-	public int findInvokingState(int invokingState) {
-		return Arrays.binarySearch(invokingStates, invokingState);
-	}
+//	@Override
+//	public int findInvokingState(int invokingState) {
+//		return Arrays.binarySearch(invokingStates, invokingState);
+//	}
 
 	/** Find invokingState parameter (call it x) in this.invokingStates,
 	 *  if present.  Call pop on all x's parent(s) and then pull other
@@ -126,11 +169,6 @@ public class ArrayPredictionContext extends PredictionContext {
 			if ( !parents[i].equals(a.parents[i]) ) return false;
 		}
 		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
 	}
 
 	@Override

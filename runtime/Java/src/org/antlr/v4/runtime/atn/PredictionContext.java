@@ -31,8 +31,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		this.cachedHashCode = cachedHashCode;
 	}
 
-	/** Get a PredictionContext with just start rule context or EMPTY if
-	 *  outerContext is empty or null
+	/** Convert a RuleContext tree to a PredictionContext graph.
+	 *  Return EMPTY if outerContext is empty or null.
 	 */
 	public static PredictionContext fromRuleContext(RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
@@ -43,9 +43,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			return PredictionContext.EMPTY;
 		}
 
-		// if s calls a and outercontext is implied [a s $], then we want a prediction
-		// context of just [s $].
-
+		// If we have a parent, convert it to a PredictionContext graph
 		PredictionContext parent = EMPTY;
 		if ( outerContext.parent != null ) {
 			parent = PredictionContext.fromRuleContext(outerContext.parent);
@@ -63,7 +61,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int getInvokingState(int index);
 
-	public abstract int findInvokingState(int invokingState);
+//	public abstract int findInvokingState(int invokingState);
 
 	/** This means only the EMPTY context is in set */
 	public boolean isEmpty() {
@@ -72,29 +70,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract PredictionContext popAll(int invokingState, boolean fullCtx);
 
-	protected static int calculateParentHashCode(PredictionContext[] parents) {
-		int hashCode = 1;
-		for (PredictionContext p : parents) {
-			if ( p!=null ) { // can be null for full ctx stack in ArrayPredictionContext
-				hashCode = hashCode * 31 ^ p.hashCode();
-			}
-		}
-
-		return hashCode;
-	}
-
-	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
-		int hashCode = 1;
-		for (int state : invokingStates) {
-			hashCode = hashCode * 31 ^ state;
-		}
-
-		return hashCode;
-	}
-
-	protected static int calculateHashCode(PredictionContext[] parents, int[] invokingStates) {
-		return calculateHashCode(calculateParentHashCode(parents),
-								 calculateInvokingStatesHashCode(invokingStates));
+	@Override
+	public int hashCode() {
+		return cachedHashCode;
 	}
 
 	protected static int calculateHashCode(int parentHashCode, int invokingStateHashCode) {
@@ -226,7 +204,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 										  boolean rootIsWildcard)
 	{
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
-			return mergeSingletons((SingletonPredictionContext)a, (SingletonPredictionContext)b, rootIsWildcard);
+			return mergeSingletons((SingletonPredictionContext)a,
+								   (SingletonPredictionContext)b, rootIsWildcard);
 		}
 		// at least one of a or b is array; convert one so both are arrays
 		// unless one is $ and rootIsWildcard, which means we return $ as * wildcard

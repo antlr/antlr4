@@ -7,7 +7,10 @@ public class SingletonPredictionContext extends PredictionContext {
 	public final int invokingState;
 
 	public SingletonPredictionContext(PredictionContext parent, int invokingState) {
-		super(calculateHashCode(parent!=null?31^parent.hashCode():0, 31 ^ invokingState));
+		super(calculateHashCode(parent!=null ? 31 ^ parent.hashCode() : 1,
+								31 ^ invokingState));
+		assert invokingState!=EMPTY_FULL_CTX_INVOKING_STATE &&
+		       invokingState!=ATNState.INVALID_STATE_NUMBER;
 		this.parent = parent;
 		this.invokingState = invokingState;
 	}
@@ -46,11 +49,6 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int findInvokingState(int invokingState) {
-		return this.invokingState == invokingState ? 0 : -1;
-	}
-
-	@Override
 	public PredictionContext popAll(int invokingState, boolean fullCtx) {
 		if ( invokingState == this.invokingState ) {
 			return parent.popAll(invokingState, fullCtx);
@@ -73,11 +71,6 @@ public class SingletonPredictionContext extends PredictionContext {
 
 		SingletonPredictionContext s = (SingletonPredictionContext)o;
 		return invokingState == s.invokingState && parent.equals(s.parent);
-	}
-
-	@Override
-	public int hashCode() {
-		return invokingState;
 	}
 
 	@Override
