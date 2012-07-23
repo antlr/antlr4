@@ -108,10 +108,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 //		return this.equals(other);
 //	}
 
-	@Override
-	public String toString() {
-		return toString(null);
-	}
+//	@Override
+//	public String toString() {
+//		return toString(null);
+//	}
 
 	public String toString(@Nullable Recognizer<?,?> recog) {
 		return toString();

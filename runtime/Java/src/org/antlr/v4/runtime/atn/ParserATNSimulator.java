@@ -513,7 +513,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext<?> outerContext)
 	{
-		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
+		if ( debug ) System.out.println("execATN decision "+dfa.decision+
+										" exec LA(1)=="+ getLookaheadName(input)+
+									    "line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		ATN_failover++;
 
 		ATNConfigSet previous = s0.configset;
@@ -931,6 +933,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion)
 	{
+//		System.out.println(PredictionContext.toDotString(config.context));
+
 		final int initialDepth = 0;
 		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates, greedy,
 												 loopsSimulateTailRecursion, initialDepth);
