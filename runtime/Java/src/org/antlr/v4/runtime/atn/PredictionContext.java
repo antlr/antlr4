@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -203,7 +204,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public static PredictionContext merge(PredictionContext a, PredictionContext b,
 										  boolean rootIsWildcard)
 	{
-		if ( a.equals(b) ) return a; // share same graph if both same
+		if ( (a==null&&b==null) || a.equals(b) ) return a; // share same graph if both same
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
@@ -401,7 +402,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		ArrayPredictionContext M =
 			new ArrayPredictionContext(mergedParents, mergedInvokingStates);
 
-		// TODO: if we created same array as a or b, return that instead
+		// if we created same array as a or b, return that instead
+		// TODO: track whether this is possible above during merge sort for speed
+		if ( M.equals(a) ) return a;
+		if ( M.equals(b) ) return b;
 
 		combineCommonParents(mergedParents);
 
@@ -410,13 +414,18 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	/** make pass over all M parents; merge any equals() ones */
 	protected static void combineCommonParents(PredictionContext[] parents) {
-		// compare pairwise
-		for (int i = 0; i < parents.length; i++) {
-			for (int j = i+1; j < parents.length; j++) {
-				if ( parents[i].equals(parents[j]) ) {
-					parents[j] = parents[i]; // use left one if same
-				}
+		Map<PredictionContext, PredictionContext> uniqueParents =
+			new HashMap<PredictionContext, PredictionContext>();
+
+		for (int p = 0; p < parents.length; p++) {
+			PredictionContext parent = parents[p];
+			if ( !uniqueParents.containsKey(parent) ) { // don't replace
+				uniqueParents.put(parent, parent);
 			}
+		}
+
+		for (int p = 0; p < parents.length; p++) {
+			parents[p] = uniqueParents.get(parents[p]);
 		}
 	}
 

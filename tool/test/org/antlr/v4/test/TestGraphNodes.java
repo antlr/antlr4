@@ -491,10 +491,10 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s6 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s6->s0 [label=\"parent[0]\"];\n" +
-			"  s6->s0 [label=\"parent[1]\"];\n" +
+			"  s3->s0 [label=\"parent[0]\"];\n" +
+			"  s3->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -507,10 +507,10 @@ public class TestGraphNodes extends TestCase {
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s6 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s6->s0 [label=\"parent[0]\"];\n" +
-			"  s6->s0 [label=\"parent[1]\"];\n" +
+			"  s3->s0 [label=\"parent[0]\"];\n" +
+			"  s3->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
@@ -688,6 +688,31 @@ public class TestGraphNodes extends TestCase {
 			"}\n";
 		assertEquals(expecting, PredictionContext.toDotString(r));
 	}
+
+	@Test public void test_Aaubu_Acudu() { // au,bu + cu,du -> [a,b,c,d]->[u,u,u,u]
+		SingletonPredictionContext a = createSingleton(u(), 1);
+		SingletonPredictionContext b = createSingleton(u(), 2);
+		SingletonPredictionContext c = createSingleton(u(), 3);
+		SingletonPredictionContext d = createSingleton(u(), 4);
+		ArrayPredictionContext A1 = array(a, b);
+		ArrayPredictionContext A2 = array(c, d);
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
+		System.out.println(PredictionContext.toDotString(r));
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s11 [shape=box, label=\"[1, 2, 3, 4]\"];\n" +
+			"  s1 [label=\"6\"];\n" +
+			"  s0 [label=\"$\"];\n" +
+			"  s11->s1 [label=\"parent[0]\"];\n" +
+			"  s11->s1 [label=\"parent[1]\"];\n" +
+			"  s11->s1 [label=\"parent[2]\"];\n" +
+			"  s11->s1 [label=\"parent[3]\"];\n" +
+			"  s1->s0;\n" +
+			"}\n";
+		assertEquals(expecting, PredictionContext.toDotString(r));
+	}
+
 
 	// ------------ SUPPORT -------------------------
 
