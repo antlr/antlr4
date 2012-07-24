@@ -389,7 +389,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	// From Sam
 	public static PredictionContext getCachedContext(
 		@NotNull PredictionContext context,
-		@NotNull Map<PredictionContext, PredictionContext> contextCache,
+		@NotNull PredictionContextCache contextCache,
 		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited)
 	{
 		if (context.isEmpty()) {
@@ -426,7 +426,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 
 		if (!changed) {
-			contextCache.put(context, context);
+			contextCache.add(context);
 			visited.put(context, context);
 			return context;
 		}
@@ -443,7 +443,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			updated = new ArrayPredictionContext(parents, arrayPredictionContext.invokingStates);
 		}
 
-		contextCache.put(updated, updated);
+		contextCache.add(updated);
 		visited.put(updated, updated);
 		visited.put(context, updated);
 

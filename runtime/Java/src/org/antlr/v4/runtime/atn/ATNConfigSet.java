@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,8 +103,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public ATNConfigSet(boolean fullCtx) { this.fullCtx = fullCtx; }
 	public ATNConfigSet() { this.fullCtx = true; }
 
-	public ATNConfigSet(ATNConfigSet old) {
-		addAll(old);
+	public ATNConfigSet(ATNConfigSet old, PredictionContextCache contextCache) {
+		addAll(old, contextCache);
 		this.fullCtx = old.fullCtx;
 		this.uniqueAlt = old.uniqueAlt;
 		this.conflictingAlts = old.conflictingAlts;
@@ -111,24 +112,32 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.dipsIntoOuterContext = old.dipsIntoOuterContext;
 	}
 
+	@Override
+	public boolean add(ATNConfig e) {
+		return add(e, null);
+	}
+
 	/** Adding a new config means merging contexts with existing configs for
 	 *  (s, i, pi, _)
 	 *  We use (s,i,pi) as key
 	 */
-	@Override
-	public boolean add(ATNConfig value) {
-		Key key = new Key(value);
+	public boolean add(ATNConfig config, @Nullable PredictionContextCache contextCache) {
+		Key key = new Key(config);
 		ATNConfig existing = configToContext.get(key);
 		if ( existing==null ) { // nothing there yet; easy, just add
-			configToContext.put(key, value);
+			configToContext.put(key, config);
 			return true;
 		}
 		// a previous (s,i,pi,_), merge with it and save result
 		boolean rootIsWildcard = !fullCtx;
 		PredictionContext merged =
-			PredictionContext.merge(existing.context, value.context, rootIsWildcard);
+			PredictionContext.merge(existing.context, config.context, rootIsWildcard);
+		// no need to check for existing.context, config.context in cache
+		// since only way to create new graphs is "call rule" and here. We
+		// cache at both places.
+		if ( contextCache!=null ) merged = contextCache.add(merged);
 		existing.reachesIntoOuterContext =
-			Math.max(existing.reachesIntoOuterContext, value.reachesIntoOuterContext);
+			Math.max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
 		existing.context = merged; // replace context; no need to alt mapping
 		return true;
 	}
@@ -161,17 +170,23 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( configToContext.isEmpty() ) return;
 
 		for (ATNConfig config : configToContext.values()) {
-			int before = PredictionContext.getAllContextNodes(config.context).size();
+//			int before = PredictionContext.getAllContextNodes(config.context).size();
 			config.context = interpreter.getCachedContext(config.context);
-			int after = PredictionContext.getAllContextNodes(config.context).size();
-			System.out.println("configs "+before+"->"+after);
+//			int after = PredictionContext.getAllContextNodes(config.context).size();
+//			System.out.println("configs "+before+"->"+after);
 		}
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends ATNConfig> coll) {
+	public boolean addAll(Collection<? extends ATNConfig> c) {
+		return addAll(c, null);
+	}
+
+	public boolean addAll(Collection<? extends ATNConfig> coll,
+						  PredictionContextCache contextCache)
+	{
 		for (ATNConfig c : coll) {
-			add(c);
+			add(c, contextCache);
 		}
 		return false;
 	}

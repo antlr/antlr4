@@ -240,8 +240,8 @@ import java.util.Set;
  	 *  holds the decision were evaluating
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
-	public static boolean debug = true;
-	public static boolean debug_list_atn_decisions = false;
+	public static boolean debug = false;
+	public static boolean debug_list_atn_decisions = true;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
@@ -316,6 +316,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
+		contextCache = new PredictionContextCache("predict ctx cache");
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("ATN decision "+dfa.decision+
@@ -344,6 +345,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			throw nvae;
 		}
 		finally {
+			contextCache = null; // wack the cache
 			input.seek(index);
 			input.release(m);
 		}
@@ -964,7 +966,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// don't see past end of a rule for any nongreedy decision
 				if ( debug ) System.out.println("NONGREEDY at stop state of "+
 												getRuleName(config.state.ruleIndex));
-				configs.add(config);
+				configs.add(config, contextCache);
 				return;
 			}
 			// We hit rule end. If we have context info, use it
@@ -1007,6 +1009,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			{
 				config.context =
 					new SingletonPredictionContext(config.context, config.state.stateNumber);
+				if ( contextCache!=null ) config.context = contextCache.add(config.context);
 				// alter config; it's ok, since all calls to closure pass in a fresh config for us to chase
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
@@ -1033,7 +1036,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.state;
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
-            configs.add(config);
+            configs.add(config, contextCache);
 			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}
@@ -1141,9 +1144,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
 		}
-		ATNState p = config.state;
 		PredictionContext newContext =
-			new SingletonPredictionContext(config.context, p.stateNumber);
+			new SingletonPredictionContext(config.context, config.state.stateNumber);
+		if ( contextCache!=null ) newContext = contextCache.add(newContext);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
@@ -1446,10 +1449,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFAState newState = proposed;
 
 		newState.stateNumber = dfa.states.size();
-		System.out.println("Before opt, cache size = "+contextCache.size());
+//		System.out.println("Before opt, cache size = "+ sharedContextCache.size());
 		configs.optimizeConfigs(this);
-		System.out.println("After opt, cache size = " + contextCache.size());
-		newState.configs = new ATNConfigSet(configs);
+//		System.out.println("After opt, cache size = " + sharedContextCache.size());
+		newState.configs = new ATNConfigSet(configs, contextCache);
 
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);

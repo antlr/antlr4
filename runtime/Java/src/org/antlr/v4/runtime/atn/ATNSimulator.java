@@ -34,10 +34,8 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -47,14 +45,32 @@ public abstract class ATNSimulator {
 	public final ATN atn;
 
 	/** The context cache maps all PredictionContext objects that are equals()
-	 *  to a single cached copy. This cache be shared across all contexts
+	 *  to a single cached copy. This cache is shared across all contexts
 	 *  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet
 	 *  to use only cached nodes/graphs in addDFAState(). We don't want to
 	 *  fill this during closure() since there are lots of contexts that
 	 *  pop up but are not used ever again. It also greatly slows down closure().
  	 */
-	protected final Map<PredictionContext, PredictionContext> contextCache =
-		new HashMap<PredictionContext, PredictionContext>();
+	protected final PredictionContextCache sharedContextCache =
+		new PredictionContextCache("shared DFA state context cache");
+
+	/** This context cache tracks all context graphs used during a single
+	 *  ATN-based prediction operation. There will be significant context graph
+	 *  sharing among ATNConfigSets because all sets are derived from the
+	 *  same starting context.
+	 *
+	 *  This cache is blown away after each adaptivePredict()
+	 *  because we cache everything within ATNConfigSets that become DFA
+	 *  states in sharedContextCache. (Sam thinks of this as an analogy to
+	 *  the nursery in a generational GC; then, sharedContextCache would be
+	 *  the mature generation.)
+	 *
+	 *  In Sam's version, this is a parameter passed down through all of
+	 *  the methods, but it gets pretty unwieldy as there are already
+	 *  a crapload of parameters. Consequently, I'm using a field as a
+	 *  "parameter" despite it being generally poor coding style.
+	 */
+	protected PredictionContextCache contextCache;
 
 	static {
 		ERROR = new DFAState(new ATNConfigSet());
@@ -71,7 +87,7 @@ public abstract class ATNSimulator {
 		IdentityHashMap<PredictionContext, PredictionContext> visited =
 			new IdentityHashMap<PredictionContext, PredictionContext>();
 		return PredictionContext.getCachedContext(context,
-												  contextCache,
+												  sharedContextCache,
 												  visited);
 	}
 
