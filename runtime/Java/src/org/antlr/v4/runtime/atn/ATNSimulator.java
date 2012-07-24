@@ -34,7 +34,10 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -42,6 +45,16 @@ public abstract class ATNSimulator {
 	public static final DFAState ERROR;
 	@NotNull
 	public final ATN atn;
+
+	/** The context cache maps all PredictionContext objects that are equals()
+	 *  to a single cached copy. This cache be shared across all contexts
+	 *  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet
+	 *  to use only cached nodes/graphs in addDFAState(). We don't want to
+	 *  fill this during closure() since there are lots of contexts that
+	 *  pop up but are not used ever again. It also greatly slows down closure().
+ 	 */
+	protected final Map<PredictionContext, PredictionContext> contextCache =
+		new HashMap<PredictionContext, PredictionContext>();
 
 	static {
 		ERROR = new DFAState(new ATNConfigSet());
@@ -53,6 +66,14 @@ public abstract class ATNSimulator {
 	}
 
 	public abstract void reset();
+
+	public PredictionContext getCachedContext(PredictionContext context) {
+		IdentityHashMap<PredictionContext, PredictionContext> visited =
+			new IdentityHashMap<PredictionContext, PredictionContext>();
+		return PredictionContext.getCachedContext(context,
+												  contextCache,
+												  visited);
+	}
 
 	public static ATN deserialize(@NotNull char[] data) {
 		ATN atn = new ATN();

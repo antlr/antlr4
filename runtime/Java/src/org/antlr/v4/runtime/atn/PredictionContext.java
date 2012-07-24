@@ -2,6 +2,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayDeque;
@@ -477,6 +478,69 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		buf.append("}\n");
 		return buf.toString();
+	}
+
+	// From Sam
+	public static PredictionContext getCachedContext(
+		@NotNull PredictionContext context,
+		@NotNull Map<PredictionContext, PredictionContext> contextCache,
+		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited) {
+		if (context.isEmpty()) {
+			return context;
+		}
+
+		PredictionContext existing = visited.get(context);
+		if (existing != null) {
+			return existing;
+		}
+
+		existing = contextCache.get(context);
+		if (existing != null) {
+			visited.put(context, existing);
+			return existing;
+		}
+
+		boolean changed = false;
+		PredictionContext[] parents = new PredictionContext[context.size()];
+		for (int i = 0; i < parents.length; i++) {
+			PredictionContext parent = getCachedContext(context.getParent(i), contextCache, visited);
+			if (changed || parent != context.getParent(i)) {
+				if (!changed) {
+					parents = new PredictionContext[context.size()];
+					for (int j = 0; j < context.size(); j++) {
+						parents[j] = context.getParent(j);
+					}
+
+					changed = true;
+				}
+
+				parents[i] = parent;
+			}
+		}
+
+		if (!changed) {
+			contextCache.put(context, context);
+			visited.put(context, context);
+			return context;
+		}
+
+		PredictionContext updated;
+		if (parents.length == 0) {
+			updated = isEmptyLocal(context) ? EMPTY_LOCAL : EMPTY_FULL;
+		}
+		else if (parents.length == 1) {
+			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
+		}
+		else {
+			ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
+			updated = new ArrayPredictionContext(parents, arrayPredictionContext.invokingStates);
+		}
+
+		contextCache.put(updated, updated);
+		visited.put(updated, updated);
+		visited.put(context, updated);
+
+		return updated;
 	}
 
 	// extra structures, but cut/paste/morphed works, so leave it.

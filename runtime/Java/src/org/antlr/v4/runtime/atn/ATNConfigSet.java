@@ -156,16 +156,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		configToContext.remove(new Key(c));
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder buf = new StringBuilder();
-		buf.append(elements().toString());
-//		buf.append(super.toString());
-		if ( hasSemanticContext ) buf.append(",hasSemanticContext=").append(hasSemanticContext);
-		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt=").append(uniqueAlt);
-		if ( conflictingAlts!=null ) buf.append(",conflictingAlts=").append(conflictingAlts);
-		if ( dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
-		return buf.toString();
+	public void optimizeConfigs(ATNSimulator interpreter) {
+		if (configs.isEmpty()) {
+			return;
+		}
+
+		for (int i = 0; i < configs.size(); i++) {
+			ATNConfig config = configs.get(i);
+			config.context = interpreter.getCachedContext(config.context);
+		}
 	}
 
 	@Override
@@ -216,6 +215,18 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public void clear() {
 		configToContext.clear();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append(elements().toString());
+//		buf.append(super.toString());
+		if ( hasSemanticContext ) buf.append(",hasSemanticContext=").append(hasSemanticContext);
+		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt=").append(uniqueAlt);
+		if ( conflictingAlts!=null ) buf.append(",conflictingAlts=").append(conflictingAlts);
+		if ( dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
+		return buf.toString();
 	}
 
 	// satisfy interface

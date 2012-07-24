@@ -1439,22 +1439,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFAState newState = proposed;
 
 		newState.stateNumber = dfa.states.size();
+		configs.optimizeConfigs(this);
 		newState.configset = new ATNConfigSet(configs);
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
 	}
-
-//	public void reportConflict(int startIndex, int stopIndex,
-//							   @NotNull IntervalSet alts,
-//							   @NotNull ATNConfigSet configs)
-//	{
-//		if ( debug || retry_debug ) {
-//			System.out.println("reportConflict "+alts+":"+configs+
-//							   ", input="+parser.getInputString(startIndex, stopIndex));
-//		}
-//		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
-//	}
 
 	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
