@@ -3,13 +3,17 @@ package org.antlr.v4.test;
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.atn.ArrayPredictionContext;
 import org.antlr.v4.runtime.atn.PredictionContext;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SingletonPredictionContext;
 import org.junit.Test;
 
 public class TestGraphNodes extends TestCase {
+	PredictionContextCache contextCache;
+
 	@Override
 	protected void setUp() throws Exception {
 		PredictionContext.globalNodeCount = 1;
+		contextCache = new PredictionContextCache("testing");
 	}
 
 	public boolean rootIsWildcard() { return true; }
@@ -18,188 +22,190 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_$_$() {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
 													  PredictionContext.EMPTY,
+													  contextCache,
 													  rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
 			"  s0 [label=\"$\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_$_$_fullctx() {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
 													  PredictionContext.EMPTY,
+													  contextCache,
 													  fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
 			"  s0 [label=\"$\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_x_$() {
-		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
 			"  s0 [label=\"$\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_x_$_fullctx() {
-		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, contextCache, fullCtx());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s2 [shape=box, label=\"[$, 9]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s2 [shape=box, label=\"[$, 9]\"];\n" +
 			"  s2->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_$_x() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
 			"  s0 [label=\"$\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_$_x_fullctx() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), contextCache, fullCtx());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s2 [shape=box, label=\"[$, 9]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s2 [shape=box, label=\"[$, 9]\"];\n" +
 			"  s2->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_a_a() {
-		PredictionContext r = PredictionContext.merge(a(), a(), rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a(), a(), contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s1 [label=\"1\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"1\"];\n" +
 			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_a$_ax() {
 		PredictionContext a1 = a();
 		PredictionContext x = x();
 		PredictionContext a2 = createSingleton(x, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s1 [label=\"1\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"1\"];\n" +
 			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_a$_ax_fullctx() {
 		PredictionContext a1 = a();
 		PredictionContext x = x();
 		PredictionContext a2 = createSingleton(x, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache, fullCtx());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s5 [label=\"1\"];\n" +
-			"  s4 [shape=box, label=\"[$, 9]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s5->s4;\n" +
+			"  s4 [shape=box, label=\"[$, 9]\"];\n" +
+			"  s5 [label=\"1\"];\n" +
 			"  s4->s0 [label=\"parent[1]\"];\n" +
+			"  s5->s4;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax$_a$() {
 		PredictionContext x = x();
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = a();
-		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s3 [label=\"1\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s3 [label=\"1\"];\n" +
 			"  s3->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax$_a$_fullctx() {
 		PredictionContext x = x();
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = a();
-		PredictionContext r = PredictionContext.merge(a1, a2, fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache, fullCtx());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s5 [label=\"1\"];\n" +
-			"  s4 [shape=box, label=\"[$, 9]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s5->s4;\n" +
+			"  s4 [shape=box, label=\"[$, 9]\"];\n" +
+			"  s5 [label=\"1\"];\n" +
 			"  s4->s0 [label=\"parent[1]\"];\n" +
+			"  s5->s4;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_a_b() {
-		PredictionContext r = PredictionContext.merge(a(), b(), rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a(), b(), contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s3->s0 [label=\"parent[0]\"];\n" +
 			"  s3->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax_ax_same() {
 		PredictionContext x = x();
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = createSingleton(x, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s2 [label=\"1\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s2->s1;\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s2 [label=\"1\"];\n" +
 			"  s1->s0;\n" +
+			"  s2->s1;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax_ax() {
@@ -207,18 +213,18 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x2 = x();
 		PredictionContext a1 = createSingleton(x1, 1);
 		PredictionContext a2 = createSingleton(x2, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s3 [label=\"1\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s3->s1;\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s3 [label=\"1\"];\n" +
 			"  s1->s0;\n" +
+			"  s3->s1;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_abx_abx() {
@@ -228,20 +234,20 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext b2 = createSingleton(x2, 2);
 		PredictionContext a1 = createSingleton(b1, 1);
 		PredictionContext a2 = createSingleton(b2, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s5 [label=\"1\"];\n" +
-			"  s3 [label=\"2\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s5->s3;\n" +
-			"  s3->s1;\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s3 [label=\"2\"];\n" +
+			"  s5 [label=\"1\"];\n" +
 			"  s1->s0;\n" +
+			"  s3->s1;\n" +
+			"  s5->s3;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_abx_acx() {
@@ -251,40 +257,40 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext c = createSingleton(x2, 3);
 		PredictionContext a1 = createSingleton(b, 1);
 		PredictionContext a2 = createSingleton(c, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s8 [label=\"1\"];\n" +
-			"  s7 [shape=box, label=\"[2, 3]\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s8->s7;\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s7 [shape=box, label=\"[2, 3]\"];\n" +
+			"  s8 [label=\"1\"];\n" +
+			"  s1->s0;\n" +
 			"  s7->s1 [label=\"parent[0]\"];\n" +
 			"  s7->s1 [label=\"parent[1]\"];\n" +
-			"  s1->s0;\n" +
+			"  s8->s7;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax_bx_same() {
 		PredictionContext x = x();
 		PredictionContext a = createSingleton(x, 1);
 		PredictionContext b = createSingleton(x, 2);
-		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1->s0;\n" +
 			"  s4->s1 [label=\"parent[0]\"];\n" +
 			"  s4->s1 [label=\"parent[1]\"];\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax_bx() {
@@ -292,75 +298,75 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x2 = x();
 		PredictionContext a = createSingleton(x1, 1);
 		PredictionContext b = createSingleton(x2, 2);
-		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s5 [shape=box, label=\"[1, 2]\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s5 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1->s0;\n" +
 			"  s5->s1 [label=\"parent[0]\"];\n" +
 			"  s5->s1 [label=\"parent[1]\"];\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_ax_by() {
 		PredictionContext a = createSingleton(x(), 1);
 		PredictionContext b = createSingleton(y(), 2);
-		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s5 [shape=box, label=\"[1, 2]\"];\n" +
-			"  s3 [label=\"10\"];\n" +
 			"  s0 [label=\"$\"];\n" +
 			"  s1 [label=\"9\"];\n" +
+			"  s3 [label=\"10\"];\n" +
+			"  s5 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1->s0;\n" +
+			"  s3->s0;\n" +
 			"  s5->s1 [label=\"parent[0]\"];\n" +
 			"  s5->s3 [label=\"parent[1]\"];\n" +
-			"  s3->s0;\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_a$_bx() {
 		PredictionContext x2 = x();
 		PredictionContext a = a();
 		PredictionContext b = createSingleton(x2, 2);
-		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s4->s0 [label=\"parent[0]\"];\n" +
 			"  s4->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_a$_bx_fullctx() {
 		PredictionContext x2 = x();
 		PredictionContext a = a();
 		PredictionContext b = createSingleton(x2, 2);
-		PredictionContext r = PredictionContext.merge(a, b, fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a, b, contextCache, fullCtx());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
-			"  s1 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"9\"];\n" +
+			"  s4 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1->s0;\n" +
 			"  s4->s0 [label=\"parent[0]\"];\n" +
 			"  s4->s1 [label=\"parent[1]\"];\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_aex_bfx() {
@@ -370,25 +376,25 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext f = createSingleton(x2, 6);
 		PredictionContext a = createSingleton(e, 1);
 		PredictionContext b = createSingleton(f, 2);
-		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(a, b, contextCache, rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s7 [shape=box, label=\"[1, 2]\"];\n" +
-			"  s4 [label=\"6\"];\n" +
-			"  s2 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s3 [label=\"5\"];\n" +
 			"  s1 [label=\"9\"];\n" +
-			"  s7->s3 [label=\"parent[0]\"];\n" +
-			"  s7->s4 [label=\"parent[1]\"];\n" +
-			"  s4->s2;\n" +
+			"  s2 [label=\"9\"];\n" +
+			"  s3 [label=\"5\"];\n" +
+			"  s4 [label=\"6\"];\n" +
+			"  s7 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1->s0;\n" +
 			"  s2->s0;\n" +
 			"  s3->s1;\n" +
-			"  s1->s0;\n" +
+			"  s4->s2;\n" +
+			"  s7->s3 [label=\"parent[0]\"];\n" +
+			"  s7->s4 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	// Array merges
@@ -396,14 +402,14 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_A$_A$_fullctx() {
 		ArrayPredictionContext A1 = array(PredictionContext.EMPTY);
 		ArrayPredictionContext A2 = array(PredictionContext.EMPTY);
-		PredictionContext r = PredictionContext.merge(A1, A2, fullCtx());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache, fullCtx());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
 			"  s1 [shape=box, label=\"[-2]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aab_Ac() { // a,b + c
@@ -412,18 +418,18 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext c = c();
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s6 [shape=box, label=\"[1, 2, 3]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s6 [shape=box, label=\"[1, 2, 3]\"];\n" +
 			"  s6->s0 [label=\"parent[0]\"];\n" +
 			"  s6->s0 [label=\"parent[1]\"];\n" +
 			"  s6->s0 [label=\"parent[2]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aa_Aa() {
@@ -431,16 +437,16 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a2 = a();
 		ArrayPredictionContext A1 = array(a1);
 		ArrayPredictionContext A2 = array(a2);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s3 [shape=box, label=\"[1]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s3 [shape=box, label=\"[1]\"];\n" +
 			"  s3->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aa_Abc() { // a + b,c
@@ -449,18 +455,18 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext c = c();
 		ArrayPredictionContext A1 = array(a);
 		ArrayPredictionContext A2 = array(b, c);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s6 [shape=box, label=\"[1, 2, 3]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s6 [shape=box, label=\"[1, 2, 3]\"];\n" +
 			"  s6->s0 [label=\"parent[0]\"];\n" +
 			"  s6->s0 [label=\"parent[1]\"];\n" +
 			"  s6->s0 [label=\"parent[2]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aac_Ab() { // a,c + b
@@ -469,50 +475,50 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext c = c();
 		ArrayPredictionContext A1 = array(a, c);
 		ArrayPredictionContext A2 = array(b);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s6 [shape=box, label=\"[1, 2, 3]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s6 [shape=box, label=\"[1, 2, 3]\"];\n" +
 			"  s6->s0 [label=\"parent[0]\"];\n" +
 			"  s6->s0 [label=\"parent[1]\"];\n" +
 			"  s6->s0 [label=\"parent[2]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aab_Aa() { // a,b + a
 		ArrayPredictionContext A1 = array(a(), b());
 		ArrayPredictionContext A2 = array(a());
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s3->s0 [label=\"parent[0]\"];\n" +
 			"  s3->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aab_Ab() { // a,b + b
 		ArrayPredictionContext A1 = array(a(), b());
 		ArrayPredictionContext A2 = array(b());
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s3 [shape=box, label=\"[1, 2]\"];\n" +
 			"  s3->s0 [label=\"parent[0]\"];\n" +
 			"  s3->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aax_Aby() { // ax + by but in arrays
@@ -520,21 +526,21 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext b = createSingleton(y(), 2);
 		ArrayPredictionContext A1 = array(a);
 		ArrayPredictionContext A2 = array(b);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s7 [shape=box, label=\"[1, 2]\"];\n" +
-			"  s3 [label=\"10\"];\n" +
 			"  s0 [label=\"$\"];\n" +
 			"  s1 [label=\"9\"];\n" +
+			"  s3 [label=\"10\"];\n" +
+			"  s7 [shape=box, label=\"[1, 2]\"];\n" +
+			"  s1->s0;\n" +
+			"  s3->s0;\n" +
 			"  s7->s1 [label=\"parent[0]\"];\n" +
 			"  s7->s3 [label=\"parent[1]\"];\n" +
-			"  s3->s0;\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aax_Aay() { // ax + ay -> merged singleton a, array parent
@@ -542,19 +548,19 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a2 = createSingleton(y(), 1);
 		ArrayPredictionContext A1 = array(a1);
 		ArrayPredictionContext A2 = array(a2);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s8 [label=\"1\"];\n" +
-			"  s7 [shape=box, label=\"[9, 10]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s8->s7;\n" +
+			"  s7 [shape=box, label=\"[9, 10]\"];\n" +
+			"  s8 [label=\"1\"];\n" +
 			"  s7->s0 [label=\"parent[0]\"];\n" +
 			"  s7->s0 [label=\"parent[1]\"];\n" +
+			"  s8->s7;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aaxc_Aayd() { // ax,c + ay,d -> merged a, array parent
@@ -562,21 +568,21 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a2 = createSingleton(y(), 1);
 		ArrayPredictionContext A1 = array(a1, c());
 		ArrayPredictionContext A2 = array(a2, d());
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s10 [shape=box, label=\"[1, 3, 4]\"];\n" +
 			"  s0 [label=\"$\"];\n" +
 			"  s9 [shape=box, label=\"[9, 10]\"];\n" +
+			"  s10 [shape=box, label=\"[1, 3, 4]\"];\n" +
+			"  s9->s0 [label=\"parent[0]\"];\n" +
+			"  s9->s0 [label=\"parent[1]\"];\n" +
 			"  s10->s9 [label=\"parent[0]\"];\n" +
 			"  s10->s0 [label=\"parent[1]\"];\n" +
 			"  s10->s0 [label=\"parent[2]\"];\n" +
-			"  s9->s0 [label=\"parent[0]\"];\n" +
-			"  s9->s0 [label=\"parent[1]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aaubv_Acwdx() { // au,bv + cw,dx -> [a,b,c,d]->[u,v,w,x]
@@ -586,27 +592,27 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(x(), 4);
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s11 [shape=box, label=\"[1, 2, 3, 4]\"];\n" +
-			"  s7 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s5 [label=\"8\"];\n" +
-			"  s3 [label=\"7\"];\n" +
 			"  s1 [label=\"6\"];\n" +
+			"  s3 [label=\"7\"];\n" +
+			"  s5 [label=\"8\"];\n" +
+			"  s7 [label=\"9\"];\n" +
+			"  s11 [shape=box, label=\"[1, 2, 3, 4]\"];\n" +
+			"  s1->s0;\n" +
+			"  s3->s0;\n" +
+			"  s5->s0;\n" +
+			"  s7->s0;\n" +
 			"  s11->s1 [label=\"parent[0]\"];\n" +
 			"  s11->s3 [label=\"parent[1]\"];\n" +
 			"  s11->s5 [label=\"parent[2]\"];\n" +
 			"  s11->s7 [label=\"parent[3]\"];\n" +
-			"  s7->s0;\n" +
-			"  s5->s0;\n" +
-			"  s3->s0;\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aaubv_Abvdx() { // au,bv + bv,dx -> [a,b,d]->[u,v,x]
@@ -616,24 +622,24 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(x(), 4);
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s11 [shape=box, label=\"[1, 2, 4]\"];\n" +
-			"  s7 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s3 [label=\"7\"];\n" +
 			"  s1 [label=\"6\"];\n" +
+			"  s3 [label=\"7\"];\n" +
+			"  s7 [label=\"9\"];\n" +
+			"  s11 [shape=box, label=\"[1, 2, 4]\"];\n" +
+			"  s1->s0;\n" +
+			"  s3->s0;\n" +
+			"  s7->s0;\n" +
 			"  s11->s1 [label=\"parent[0]\"];\n" +
 			"  s11->s3 [label=\"parent[1]\"];\n" +
 			"  s11->s7 [label=\"parent[2]\"];\n" +
-			"  s7->s0;\n" +
-			"  s3->s0;\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aaubv_Abwdx() { // au,bv + bw,dx -> [a,b,d]->[u,[v,w],x]
@@ -643,25 +649,25 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(x(), 4);
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s12 [shape=box, label=\"[1, 2, 4]\"];\n" +
-			"  s7 [label=\"9\"];\n" +
 			"  s0 [label=\"$\"];\n" +
-			"  s11 [shape=box, label=\"[7, 8]\"];\n" +
 			"  s1 [label=\"6\"];\n" +
-			"  s12->s1 [label=\"parent[0]\"];\n" +
-			"  s12->s11 [label=\"parent[1]\"];\n" +
-			"  s12->s7 [label=\"parent[2]\"];\n" +
+			"  s7 [label=\"9\"];\n" +
+			"  s11 [shape=box, label=\"[7, 8]\"];\n" +
+			"  s12 [shape=box, label=\"[1, 2, 4]\"];\n" +
+			"  s1->s0;\n" +
 			"  s7->s0;\n" +
 			"  s11->s0 [label=\"parent[0]\"];\n" +
 			"  s11->s0 [label=\"parent[1]\"];\n" +
-			"  s1->s0;\n" +
+			"  s12->s1 [label=\"parent[0]\"];\n" +
+			"  s12->s11 [label=\"parent[1]\"];\n" +
+			"  s12->s7 [label=\"parent[2]\"];\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aaubv_Abvdu() { // au,bv + bv,du -> [a,b,d]->[u,v,u]; u,v shared
@@ -671,22 +677,22 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(u(), 4);
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s11 [shape=box, label=\"[1, 2, 4]\"];\n" +
-			"  s3 [label=\"7\"];\n" +
 			"  s0 [label=\"$\"];\n" +
 			"  s1 [label=\"6\"];\n" +
+			"  s3 [label=\"7\"];\n" +
+			"  s11 [shape=box, label=\"[1, 2, 4]\"];\n" +
+			"  s1->s0;\n" +
+			"  s3->s0;\n" +
 			"  s11->s1 [label=\"parent[0]\"];\n" +
 			"  s11->s3 [label=\"parent[1]\"];\n" +
 			"  s11->s1 [label=\"parent[2]\"];\n" +
-			"  s3->s0;\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 	@Test public void test_Aaubu_Acudu() { // au,bu + cu,du -> [a,b,c,d]->[u,u,u,u]
@@ -696,21 +702,21 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(u(), 4);
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
-		System.out.println(PredictionContext.toDotString(r));
+		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
-			"  s11 [shape=box, label=\"[1, 2, 3, 4]\"];\n" +
-			"  s1 [label=\"6\"];\n" +
 			"  s0 [label=\"$\"];\n" +
+			"  s1 [label=\"6\"];\n" +
+			"  s11 [shape=box, label=\"[1, 2, 3, 4]\"];\n" +
+			"  s1->s0;\n" +
 			"  s11->s1 [label=\"parent[0]\"];\n" +
 			"  s11->s1 [label=\"parent[1]\"];\n" +
 			"  s11->s1 [label=\"parent[2]\"];\n" +
 			"  s11->s1 [label=\"parent[3]\"];\n" +
-			"  s1->s0;\n" +
 			"}\n";
-		assertEquals(expecting, PredictionContext.toDotString(r));
+		assertEquals(expecting, PredictionContext.toDOTString(r));
 	}
 
 

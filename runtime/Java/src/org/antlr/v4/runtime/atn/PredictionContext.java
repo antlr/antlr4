@@ -7,13 +7,16 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class PredictionContext implements Iterable<SingletonPredictionContext> {
+public abstract class PredictionContext implements Iterable<SingletonPredictionContext>,
+													   Comparable<PredictionContext> // to sort node lists by id
+{
 	/** Represents $ in local ctx prediction, which means wildcard. *+x = *. */
 	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
 
@@ -68,7 +71,14 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return this == EMPTY;
 	}
 
-	public abstract PredictionContext popAll(int invokingState, boolean fullCtx);
+	public abstract PredictionContext popAll(int invokingState,
+											 @NotNull PredictionContextCache contextCache,
+											 boolean fullCtx);
+
+	@Override
+	public int compareTo(PredictionContext o) { // used for toDotString to print nodes in order
+		return id - o.id;
+	}
 
 	@Override
 	public int hashCode() {
@@ -109,6 +119,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	// dispatch
 	public static PredictionContext merge(PredictionContext a, PredictionContext b,
+										  @NotNull PredictionContextCache contextCache,
 										  boolean rootIsWildcard)
 	{
 		if ( (a==null&&b==null) || a.equals(b) ) return a; // share same graph if both same
@@ -116,6 +127,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
 								   (SingletonPredictionContext)b,
+								   contextCache,
 								   rootIsWildcard);
 		}
 
@@ -134,19 +146,21 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			b = new ArrayPredictionContext((SingletonPredictionContext)b);
 		}
 		return mergeArrays((ArrayPredictionContext) a, (ArrayPredictionContext) b,
+						   contextCache,
 						   rootIsWildcard);
 	}
 
 	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
 	public static PredictionContext mergeSingletons(SingletonPredictionContext a,
 													SingletonPredictionContext b,
+													@NotNull PredictionContextCache contextCache,
 													boolean rootIsWildcard)
 	{
-		PredictionContext rootMerge = mergeRoot(a, b, rootIsWildcard);
+		PredictionContext rootMerge = mergeRoot(a, b, contextCache, rootIsWildcard);
 		if ( rootMerge!=null ) return rootMerge;
 
 		if ( a.invokingState==b.invokingState ) { // a == b
-			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard);
+			PredictionContext parent = merge(a.parent, b.parent, contextCache, rootIsWildcard);
 			// if parent is same as existing a or b parent or reduced to a parent, return it
 			if ( parent == a.parent ) return a; // ax + bx = ax, if a=b
 			if ( parent == b.parent ) return b; // ax + bx = bx, if a=b
@@ -154,7 +168,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			// merge parents x and y, giving array node with x,y then remainders
 			// of those graphs.  dup a, a' points at merged array
 			// new joined parent so create new singleton pointing to it, a'
-			return new SingletonPredictionContext(parent, a.invokingState);
+			PredictionContext a_ = new SingletonPredictionContext(parent, a.invokingState);
+			a_ = contextCache.add(a_);
+			return a_;
 		}
 		else { // a != b payloads differ
 			// see if we can collapse parents due to $+x parents if local ctx
@@ -174,7 +190,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 					payloads[1] = a.invokingState;
 				}
 				PredictionContext[] parents = {singleParent, singleParent};
-				return new ArrayPredictionContext(parents, payloads);
+				PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
+				a_ = contextCache.add(a_);
+				return a_;
 			}
 			// parents differ and can't merge them. Just pack together
 			// into array; can't merge.
@@ -186,7 +204,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				payloads[1] = a.invokingState;
 				parents = new PredictionContext[] {b.parent, a.parent};
 			}
-			return new ArrayPredictionContext(parents, payloads);
+			PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
+			a_ = contextCache.add(a_);
+			return a_;
 		}
 	}
 
@@ -195,6 +215,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	/** Handle case where at least one of a or b is $ (EMPTY) */
 	public static PredictionContext mergeRoot(SingletonPredictionContext a,
 											  SingletonPredictionContext b,
+											  @NotNull PredictionContextCache contextCache,
 											  boolean rootIsWildcard)
 	{
 		if ( rootIsWildcard ) {
@@ -206,15 +227,17 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			if ( a == EMPTY ) { // $ + x = [$,x]
 				int[] payloads = {EMPTY_FULL_CTX_INVOKING_STATE, b.invokingState};
 				PredictionContext[] parents = {null, b.parent};
-				ArrayPredictionContext joined =
+				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
+				joined = contextCache.add(joined);
 				return joined;
 			}
 			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
 				int[] payloads = {EMPTY_FULL_CTX_INVOKING_STATE, a.invokingState};
 				PredictionContext[] parents = {null, a.parent};
-				ArrayPredictionContext joined =
+				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
+				joined = contextCache.add(joined);
 				return joined;
 			}
 		}
@@ -224,6 +247,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	// http://www.antlr.org/wiki/download/attachments/32014352/array-merge.png
 	public static PredictionContext mergeArrays(ArrayPredictionContext a,
 												ArrayPredictionContext b,
+												@NotNull PredictionContextCache contextCache,
 												boolean rootIsWildcard)
 	{
 		// merge sorted payloads a + b => M
@@ -252,7 +276,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 					mergedInvokingStates[k] = payload;
 				}
 				else { // ax+ay -> a'[x,y]
-					PredictionContext mergedParent = merge(a_parent, b_parent, rootIsWildcard);
+					PredictionContext mergedParent =
+						merge(a_parent, b_parent, contextCache, rootIsWildcard);
 					mergedParents[k] = mergedParent;
 					mergedInvokingStates[k] = payload;
 				}
@@ -298,16 +323,19 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			if ( p < lastSlot ) {
 				int n = p+1; // how many slots we really used in merge
 				if ( n == 1 ) { // for just one merged element, return singleton top
-					return new SingletonPredictionContext(mergedParents[0],
-														  mergedInvokingStates[0]);
+					PredictionContext a_ = new SingletonPredictionContext(mergedParents[0],
+																		  mergedInvokingStates[0]);
+					a_ = contextCache.add(a_);
+					return a_;
 				}
 				mergedParents = Arrays.copyOf(mergedParents, n);
 				mergedInvokingStates = Arrays.copyOf(mergedInvokingStates, n);
 			}
 		}
 
-		ArrayPredictionContext M =
+		PredictionContext M =
 			new ArrayPredictionContext(mergedParents, mergedInvokingStates);
+		M = contextCache.add(M);
 
 		// if we created same array as a or b, return that instead
 		// TODO: track whether this is possible above during merge sort for speed
@@ -336,13 +364,14 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 	}
 
-	public static String toDotString(PredictionContext context) {
+	public static String toDOTString(PredictionContext context) {
 		if ( context==null ) return "";
 		StringBuilder buf = new StringBuilder();
 		buf.append("digraph G {\n");
 		buf.append("rankdir=LR;\n");
 
 		List<PredictionContext> nodes = getAllContextNodes(context);
+		Collections.sort(nodes);
 
 		for (PredictionContext current : nodes) {
 			if ( current instanceof SingletonPredictionContext ) {
@@ -476,7 +505,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public static List<PredictionContext> getAllContextNodes(PredictionContext context) {
 		List<PredictionContext> nodes = new ArrayList<PredictionContext>();
 		Map<PredictionContext, PredictionContext> visited =
-		new IdentityHashMap<PredictionContext, PredictionContext>();
+			new IdentityHashMap<PredictionContext, PredictionContext>();
 		getAllContextNodes_(context, nodes, visited);
 		return nodes;
 	}

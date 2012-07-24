@@ -24,7 +24,7 @@ public class PredictionContextCache {
 		if ( ctx==PredictionContext.EMPTY ) return PredictionContext.EMPTY;
 		PredictionContext existing = cache.get(ctx);
 		if ( existing!=null ) {
-			System.out.println(name+" reuses "+existing);
+//			System.out.println(name+" reuses "+existing);
 			return existing;
 		}
 		cache.put(ctx, ctx);

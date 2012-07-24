@@ -131,7 +131,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		// a previous (s,i,pi,_), merge with it and save result
 		boolean rootIsWildcard = !fullCtx;
 		PredictionContext merged =
-			PredictionContext.merge(existing.context, config.context, rootIsWildcard);
+			PredictionContext.merge(existing.context, config.context, contextCache, rootIsWildcard);
 		// no need to check for existing.context, config.context in cache
 		// since only way to create new graphs is "call rule" and here. We
 		// cache at both places.

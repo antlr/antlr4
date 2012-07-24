@@ -241,7 +241,7 @@ import java.util.Set;
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean debug = false;
-	public static boolean debug_list_atn_decisions = true;
+	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
@@ -378,6 +378,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean loopsSimulateTailRecursion = true;
 				boolean fullCtx = false;
+				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState, outerContext,
 									  greedy, loopsSimulateTailRecursion,
@@ -388,6 +389,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 										   outerContext,
 										   decState.getNumberOfTransitions(),
 										   greedy);
+				contextCache = null;
 				return fullCtxSet.uniqueAlt;
 			}
 			if ( s.isAcceptState ) {
@@ -419,7 +421,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 									   " at DFA state "+s.stateNumber);
 				}
 
+				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				alt = execATN(dfa, s, input, startIndex, outerContext);
+				contextCache = null;
 				// this adds edge even if next state is accept for
 				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 				// TODO: This next stuff kills edge, but extra states remain. :(
@@ -942,7 +946,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion)
 	{
-//		System.out.println(PredictionContext.toDotString(config.context));
+//		System.out.println(PredictionContext.toDOTString(config.context));
 
 		final int initialDepth = 0;
 		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates, greedy,
@@ -1017,7 +1021,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.print("Loop end; pop, stack=" + config.context);
 				LoopEndState end = (LoopEndState)config.state;
 				// pop all the way back until we don't see the loopback state anymore
-				config.context = config.context.popAll(end.loopBackStateNumber, configs.fullCtx);
+				config.context = config.context.popAll(end.loopBackStateNumber,
+													   contextCache,
+													   configs.fullCtx);
 				if ( debug ) System.out.println(" becomes "+config.context);
 			}
 		}
