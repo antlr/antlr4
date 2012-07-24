@@ -166,7 +166,6 @@
  *      Character.isJavaIdentifierPart(int) returns true."
  */
 grammar Java;
-options {backtrack=true; memoize=true;}
 
 @lexer::members {
   protected boolean enumIsKeyword = true;
@@ -622,7 +621,7 @@ variableModifiers
 statement
     : block
     |   ASSERT expression (':' expression)? ';'
-    |   'if' parExpression statement (options {k=1;}:'else' statement)?
+    |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
@@ -673,7 +672,6 @@ switchLabel
     ;
     
 forControl
-options {k=3;} // be efficient for common case: for (ID ID : ID) ...
     :   enhancedForControl
     |   forInit? ';' expression? ';' forUpdate?
     ;
