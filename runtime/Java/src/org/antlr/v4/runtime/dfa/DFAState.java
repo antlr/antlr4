@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -131,7 +132,7 @@ public class DFAState {
 	 *  This is used only when isCtxSensitive = false;
 	 */
 	@Nullable
-	public List<PredPrediction> predicates;
+	public PredPrediction[] predicates;
 
 	/** Map a predicate to a predicted alternative */
 	public static class PredPrediction {
@@ -305,7 +306,7 @@ public class DFAState {
         if ( isAcceptState ) {
             buf.append("=>");
             if ( predicates!=null ) {
-                buf.append(predicates);
+                buf.append(Arrays.toString(predicates));
             }
             else {
                 buf.append(prediction);

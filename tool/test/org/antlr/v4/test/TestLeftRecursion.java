@@ -297,31 +297,19 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testAmbigLR() throws Exception {
 		String grammar =
-			"// START: g\n" +
 			"grammar Expr;\n" +
-			"// END: g\n" +
-			"\n" +
-			"// START:stat\n" +
 			"prog:   stat ;\n" +
-			"\n" +
 			"stat:   expr NEWLINE                # printExpr\n" +
 			"    |   ID '=' expr NEWLINE         # assign\n" +
 			"    |   NEWLINE                     # blank\n" +
 			"    ;\n" +
-			"// END:stat\n" +
-			"\n" +
-			"// START:expr\n" +
 			"expr:   expr ('*'|'/') expr      # MulDiv\n" +
 			"    |   expr ('+'|'-') expr      # AddSub\n" +
 			"    |   INT                      # int\n" +
 			"    |   ID                       # id\n" +
 			"    |   '(' expr ')'             # parens\n" +
 			"    ;\n" +
-			"// END:expr\n" +
 			"\n" +
-			"// show marginal cost of adding a clear/wipe command for memory\n" +
-			"\n" +
-			"// START:tokens\n" +
 			"MUL :   '*' ; // assigns token name to '*' used above in grammar\n" +
 			"DIV :   '/' ;\n" +
 			"ADD :   '+' ;\n" +
@@ -329,8 +317,7 @@ public class TestLeftRecursion extends BaseTest {
 			"ID  :   [a-zA-Z]+ ;      // match identifiers\n" +
 			"INT :   [0-9]+ ;         // match integers\n" +
 			"NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)\n" +
-			"WS  :   [ \\t]+ -> skip ; // toss out whitespace\n" +
-			"// END:tokens\n";
+			"WS  :   [ \\t]+ -> skip ; // toss out whitespace\n";
 		String result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "1\n", true);
 		assertNull(stderrDuringParse);
 

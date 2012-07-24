@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /** A DFA walker that knows how to dump them to serialized strings. */
@@ -152,7 +153,7 @@ public class DFASerializer {
 		String stateStr = "s"+n;
 		if ( s.isAcceptState ) {
             if ( s.predicates!=null ) {
-                stateStr = ":s"+n+"=>"+s.predicates;
+                stateStr = ":s"+n+"=>"+Arrays.toString(s.predicates);
             }
             else {
                 stateStr = ":s"+n+"=>"+s.prediction;

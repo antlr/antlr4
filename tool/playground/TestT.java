@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.UnbufferedCharStream;
 
@@ -23,8 +24,9 @@ public class TestT {
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		TParser parser = new TParser(tokens);
 
-		ParserRuleContext tree = parser.s();
-		tree.save(parser, "/tmp/t.ps");
+		parser.addErrorListener(new DiagnosticErrorListener());
 
+		ParserRuleContext tree = parser.s();
+//		tree.save(parser, "/tmp/t.ps");
 	}
 }
