@@ -64,50 +64,45 @@ public class ATNConfig {
 	private int reachesIntoOuterContext;
 
 	/** Capture lexer action we traverse */
-	private int lexerActionIndex = -1; // TOOD: move to subclass
+	private final int lexerActionIndex; // TOOD: move to subclass
 
     @NotNull
     private final SemanticContext semanticContext;
 
-	public ATNConfig(@NotNull ATNState state,
-					 int alt,
-					 @Nullable PredictionContext context)
-	{
-		this(state, alt, context, SemanticContext.NONE);
-	}
-
-	public ATNConfig(@NotNull ATNState state,
+	private ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable PredictionContext context,
-					 @NotNull SemanticContext semanticContext)
+					 @NotNull SemanticContext semanticContext,
+					 int actionIndex)
 	{
 		this.state = state;
 		this.alt = alt;
 		this.context = context;
 		this.semanticContext = semanticContext;
+		this.lexerActionIndex = actionIndex;
 	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
-   		this(c, state, c.getContext(), c.semanticContext);
-   	}
-
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull SemanticContext semanticContext) {
-   		this(c, state, c.getContext(), semanticContext);
-   	}
-
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
-        this(c, state, context, c.semanticContext);
-    }
-
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
-                     @NotNull SemanticContext semanticContext)
+	private ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
+                     @NotNull SemanticContext semanticContext, int actionIndex)
     {
 		this.state = state;
 		this.alt = c.alt;
 		this.context = context;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
         this.semanticContext = semanticContext;
-		this.lexerActionIndex = c.lexerActionIndex;
+		this.lexerActionIndex = actionIndex;
+	}
+
+	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+		return create(state, alt, context, SemanticContext.NONE, -1);
+	}
+
+	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext) {
+		return create(state, alt, context, semanticContext, -1);
+	}
+
+	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
+		return new ATNConfig(state, alt, context, semanticContext, actionIndex);
 	}
 
 	/** Gets the ATN state associated with this configuration */
@@ -157,24 +152,45 @@ public class ATNConfig {
 		return lexerActionIndex;
 	}
 
-	public final void setActionIndex(int actionIndex) {
-		this.lexerActionIndex = actionIndex;
-	}
-
 	@NotNull
 	public final SemanticContext getSemanticContext() {
 		return semanticContext;
 	}
 
+	@Override
+	public final ATNConfig clone() {
+		return transform(this.getState());
+	}
+
+	public final ATNConfig transform(@NotNull ATNState state) {
+		return transform(state, this.context, this.getSemanticContext(), this.getActionIndex());
+	}
+
+	public final ATNConfig transform(@NotNull ATNState state, @NotNull SemanticContext semanticContext) {
+		return transform(state, this.context, semanticContext, this.getActionIndex());
+	}
+
+	public final ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context) {
+		return transform(state, context, this.getSemanticContext(), this.getActionIndex());
+	}
+
+	public final ATNConfig transform(@NotNull ATNState state, int actionIndex) {
+		return transform(state, context, this.getSemanticContext(), actionIndex);
+	}
+
+	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
+		return new ATNConfig(this, state, context, semanticContext, actionIndex);
+	}
+
 	public ATNConfig appendContext(int context, PredictionContextCache contextCache) {
-		ATNConfig result = new ATNConfig(this, getState());
-		result.setContext(result.getContext().appendContext(context, contextCache));
+		PredictionContext appendedContext = getContext().appendContext(context, contextCache);
+		ATNConfig result = transform(getState(), appendedContext);
 		return result;
 	}
 
 	public ATNConfig appendContext(PredictionContext context, PredictionContextCache contextCache) {
-		ATNConfig result = new ATNConfig(this, getState());
-		result.setContext(result.getContext().appendContext(context, contextCache));
+		PredictionContext appendedContext = getContext().appendContext(context, contextCache);
+		ATNConfig result = transform(getState(), appendedContext);
 		return result;
 	}
 

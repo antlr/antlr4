@@ -808,7 +808,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					Transition trans = c.getState().transition(ti);
 					ATNState target = getReachableTarget(c, trans, t);
 					if ( target!=null ) {
-						reachIntermediate.add(new ATNConfig(c, target));
+						reachIntermediate.add(c.transform(target));
 					}
 				}
 			}
@@ -922,7 +922,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			for (int ti=0; ti<n; ti++) {
 				// for each transition
 				ATNState target = p.transition(ti).target;
-				reachIntermediate.add(new ATNConfig(target, ti + 1, initialContext));
+				reachIntermediate.add(ATNConfig.create(target, ti + 1, initialContext));
 			}
 
 			boolean hasMoreContext = remainingGlobalContext != null;
@@ -1199,7 +1199,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					ATNState invokingState = atn.states.get(config.getContext().getInvokingState(i));
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
 					ATNState retState = rt.followState;
-					ATNConfig c = new ATNConfig(retState, config.getAlt(), newContext, config.getSemanticContext());
+					ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext, config.getSemanticContext());
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having fallen off a rule.
 					// Make sure we track that we are now out of context.
@@ -1216,7 +1216,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					return;
 				}
 
-				config = new ATNConfig(config, config.getState(), PredictionContext.EMPTY_LOCAL);
+				config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL);
 			}
 			else if (!hasMoreContexts) {
 				configs.add(config, contextCache);
@@ -1321,7 +1321,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return actionTransition(config, (ActionTransition)t);
 		}
 		else if ( t.isEpsilon() ) {
-			return new ATNConfig(config, t.target);
+			return config.transform(t.target);
 		}
 		return null;
 	}
@@ -1329,7 +1329,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@NotNull
 	public ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
-		return new ATNConfig(config, t.target);
+		return config.transform(t.target);
 	}
 
 	@Nullable
@@ -1353,10 +1353,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			 (!pt.isCtxDependent || (pt.isCtxDependent&&inContext)) )
 		{
             SemanticContext newSemCtx = SemanticContext.and(config.getSemanticContext(), pt.getPredicate());
-            c = new ATNConfig(config, pt.target, newSemCtx);
+            c = config.transform(pt.target, newSemCtx);
         }
 		else {
-			c = new ATNConfig(config, pt.target);
+			c = config.transform(pt.target);
 		}
 
 		if ( debug ) System.out.println("config from pred transition="+c);
@@ -1378,7 +1378,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			newContext = config.getContext().getChild(p.stateNumber);
 		}
 
-		return new ATNConfig(config, t.target, newContext);
+		return config.transform(t.target, newContext);
 	}
 
 	/**

@@ -100,7 +100,7 @@ public class LL1Analyzer {
 						 boolean seeThruPreds)
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
-        ATNConfig c = new ATNConfig(s, 0, ctx);
+        ATNConfig c = ATNConfig.create(s, 0, ctx);
         if ( !lookBusy.add(c) ) return;
 
         if ( s instanceof RuleStopState ) {
