@@ -5,10 +5,8 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -135,7 +133,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		if ( b instanceof SingletonPredictionContext) {
 			b = new ArrayPredictionContext((SingletonPredictionContext)b);
 		}
-		return mergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b,
+		return mergeArrays((ArrayPredictionContext) a, (ArrayPredictionContext) b,
 						   rootIsWildcard);
 	}
 
@@ -344,7 +342,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		buf.append("digraph G {\n");
 		buf.append("rankdir=LR;\n");
 
-		List<PredictionContext> nodes = getAllNodes(context);
+		List<PredictionContext> nodes = getAllContextNodes(context);
 
 		for (PredictionContext current : nodes) {
 			if ( current instanceof SingletonPredictionContext ) {
@@ -452,26 +450,47 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return updated;
 	}
 
-	// extra structures, but cut/paste/morphed works, so leave it.
-	// seems to do a breadth-first walk
-	public static List<PredictionContext> getAllNodes(PredictionContext context) {
-		Map<PredictionContext, PredictionContext> visited =
-			new IdentityHashMap<PredictionContext, PredictionContext>();
-		Deque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
-		workList.add(context);
-		visited.put(context, context);
+//	// extra structures, but cut/paste/morphed works, so leave it.
+//	// seems to do a breadth-first walk
+//	public static List<PredictionContext> getAllNodes(PredictionContext context) {
+//		Map<PredictionContext, PredictionContext> visited =
+//			new IdentityHashMap<PredictionContext, PredictionContext>();
+//		Deque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
+//		workList.add(context);
+//		visited.put(context, context);
+//		List<PredictionContext> nodes = new ArrayList<PredictionContext>();
+//		while (!workList.isEmpty()) {
+//			PredictionContext current = workList.pop();
+//			nodes.add(current);
+//			for (int i = 0; i < current.size(); i++) {
+//				PredictionContext parent = current.getParent(i);
+//				if ( parent!=null && visited.put(parent, parent) == null) {
+//					workList.push(parent);
+//				}
+//			}
+//		}
+//		return nodes;
+//	}
+
+	// ter's recursive version of Sam's getAllNodes()
+	public static List<PredictionContext> getAllContextNodes(PredictionContext context) {
 		List<PredictionContext> nodes = new ArrayList<PredictionContext>();
-		while (!workList.isEmpty()) {
-			PredictionContext current = workList.pop();
-			nodes.add(current);
-			for (int i = 0; i < current.size(); i++) {
-				PredictionContext parent = current.getParent(i);
-				if ( parent!=null && visited.put(parent, parent) == null) {
-					workList.push(parent);
-				}
-			}
-		}
+		Map<PredictionContext, PredictionContext> visited =
+		new IdentityHashMap<PredictionContext, PredictionContext>();
+		getAllContextNodes_(context, nodes, visited);
 		return nodes;
+	}
+
+	public static void getAllContextNodes_(PredictionContext context,
+										   List<PredictionContext> nodes,
+										   Map<PredictionContext, PredictionContext> visited)
+	{
+		if ( context==null || visited.containsKey(context) ) return;
+		visited.put(context, context);
+		nodes.add(context);
+		for (int i = 0; i < context.size(); i++) {
+			getAllContextNodes_(context.getParent(i), nodes, visited);
+		}
 	}
 
 	public String toString(@Nullable Recognizer<?,?> recog) {

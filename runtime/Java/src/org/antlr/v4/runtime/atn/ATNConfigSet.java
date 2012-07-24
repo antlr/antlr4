@@ -43,6 +43,7 @@ import java.util.Set;
  *  Might be able to optimize later w/o affecting code that uses this set.
  */
 public class ATNConfigSet implements Set<ATNConfig> {
+	// TODO: convert to long like Sam?
 	public static class Key {
 		ATNState state;
 		int alt;
@@ -160,7 +161,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( configToContext.isEmpty() ) return;
 
 		for (ATNConfig config : configToContext.values()) {
+			int before = PredictionContext.getAllContextNodes(config.context).size();
 			config.context = interpreter.getCachedContext(config.context);
+			int after = PredictionContext.getAllContextNodes(config.context).size();
+			System.out.println("configs "+before+"->"+after);
 		}
 	}
 

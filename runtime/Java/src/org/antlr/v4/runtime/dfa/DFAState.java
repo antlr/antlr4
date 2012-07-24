@@ -65,8 +65,7 @@ import java.util.Set;
 public class DFAState {
 	public int stateNumber = -1;
 
-	// TODO: rename to configs after flipping to new ATN sim
-	public ATNConfigSet configset = new ATNConfigSet();
+	public ATNConfigSet configs = new ATNConfigSet();
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable
@@ -135,7 +134,7 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(ATNConfigSet configs) { this.configset = configs; }
+	public DFAState(ATNConfigSet configs) { this.configs = configs; }
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
@@ -143,7 +142,7 @@ public class DFAState {
 	public Set<Integer> getAltSet() {
 		// TODO (sam): what to do when configs==null?
 		Set<Integer> alts = new HashSet<Integer>();
-		for (ATNConfig c : configset) {
+		for (ATNConfig c : configs) {
 			alts.add(c.alt);
 		}
 		if ( alts.isEmpty() ) return null;
@@ -165,7 +164,7 @@ public class DFAState {
 	public int hashCode() {
 		// TODO (sam): what to do when configs==null?
 		int h = 0;
-		for (ATNConfig c : configset) {
+		for (ATNConfig c : configs) {
 			h += c.alt;
 		}
 		return h;
@@ -193,7 +192,7 @@ public class DFAState {
 
 		DFAState other = (DFAState)o;
 		// TODO (sam): what to do when configs==null?
-		boolean sameSet = this.configset.equals(other.configset);
+		boolean sameSet = this.configs.equals(other.configs);
 //		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
 		return sameSet;
 	}
@@ -201,7 +200,7 @@ public class DFAState {
 	@Override
 	public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(stateNumber).append(":").append(configset);
+        buf.append(stateNumber).append(":").append(configs);
         if ( isAcceptState ) {
             buf.append("=>");
             if ( predicates!=null ) {

@@ -240,7 +240,7 @@ import java.util.Set;
  	 *  holds the decision were evaluating
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
-	public static boolean debug = false;
+	public static boolean debug = true;
 	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
@@ -439,7 +439,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) {
-				throw noViableAlt(input, outerContext, s.configset, startIndex);
+				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 			s = target;
 			if (!s.isCtxSensitive && !s.isAcceptState) {
@@ -460,7 +460,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// since we don't report ambiguities in execDFA, we never need to use complete predicate evaluation here
 			IntervalSet alts = evalSemanticContext(s.predicates, outerContext, false);
 			if (alts.isNil()) {
-				throw noViableAlt(input, outerContext, s.configset, startIndex);
+				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 
 			return alts.getMinElement();
@@ -525,7 +525,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 		ATN_failover++;
 
-		ATNConfigSet previous = s0.configset;
+		ATNConfigSet previous = s0.configs;
 		DFAState D;
 		ATNConfigSet fullCtxSet;
 
@@ -546,24 +546,24 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 				D.isAcceptState = true;
-				D.configset.uniqueAlt = predictedAlt;
+				D.configs.uniqueAlt = predictedAlt;
 				D.prediction = predictedAlt;
 			}
 			else {
-				D.configset.conflictingAlts = getConflictingAlts(reach, false);
-				if ( D.configset.conflictingAlts!=null ) {
+				D.configs.conflictingAlts = getConflictingAlts(reach, false);
+				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
 						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-							 !D.configset.dipsIntoOuterContext )
+							 !D.configs.dipsIntoOuterContext )
 						{
-							if ( reportAmbiguities && !D.configset.hasSemanticContext ) {
+							if ( reportAmbiguities && !D.configs.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(),
-												D.configset.conflictingAlts, D.configset);
+												D.configs.conflictingAlts, D.configs);
 							}
 							D.isAcceptState = true;
-							predictedAlt = resolveToMinAlt(D, D.configset.conflictingAlts);
+							predictedAlt = resolveToMinAlt(D, D.configs.conflictingAlts);
 						}
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
@@ -599,7 +599,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( !greedy ) {
 				int exitAlt = 2;
 				if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(reach, 1) ) {
-					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configset.uniqueAlt+" at "+reach);
+					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configs.uniqueAlt+" at "+reach);
 					// reaches end via .* means nothing after.
 					D.isAcceptState = true;
 					D.prediction = predictedAlt = exitAlt;
@@ -613,10 +613,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 			}
 
-			if ( D.isAcceptState && D.configset.hasSemanticContext ) {
+			if ( D.isAcceptState && D.configs.hasSemanticContext ) {
 				int nalts = decState.getNumberOfTransitions();
 				List<DFAState.PredPrediction> predPredictions =
-					predicateDFAState(D, D.configset, outerContext, nalts);
+					predicateDFAState(D, D.configs, outerContext, nalts);
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
@@ -624,7 +624,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.size()) {
 					case 0:
-						throw noViableAlt(input, outerContext, D.configset, startIndex);
+						throw noViableAlt(input, outerContext, D.configs, startIndex);
 
 					case 1:
 						return alts.getMinElement();
@@ -633,7 +633,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
 						if (reportAmbiguities) {
-							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
+							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
 						}
 
 						return alts.getMinElement();
@@ -1033,7 +1033,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.state;
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
-            configs.add(config);
+            configs.add(config, this);
 			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}
@@ -1449,7 +1449,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		System.out.println("Before opt, cache size = "+contextCache.size());
 		configs.optimizeConfigs(this);
 		System.out.println("After opt, cache size = " + contextCache.size());
-		newState.configset = new ATNConfigSet(configs);
+		newState.configs = new ATNConfigSet(configs);
 
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
