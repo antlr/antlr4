@@ -157,12 +157,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	public void optimizeConfigs(ATNSimulator interpreter) {
-		if (configs.isEmpty()) {
-			return;
-		}
+		if ( configToContext.isEmpty() ) return;
 
-		for (int i = 0; i < configs.size(); i++) {
-			ATNConfig config = configs.get(i);
+		for (ATNConfig config : configToContext.values()) {
 			config.context = interpreter.getCachedContext(config.context);
 		}
 	}

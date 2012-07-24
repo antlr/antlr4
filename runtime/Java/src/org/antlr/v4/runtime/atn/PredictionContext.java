@@ -109,98 +109,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 //		return this.equals(other);
 //	}
 
-//	@Override
-//	public String toString() {
-//		return toString(null);
-//	}
-
-	public String toString(@Nullable Recognizer<?,?> recog) {
-		return toString();
-//		return toString(recog, ParserRuleContext.EMPTY);
-	}
-
-	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
-		StringBuilder buf = new StringBuilder();
-		PredictionContext p = this;
-		buf.append("[");
-//		while ( p != null && p != stop ) {
-//			if ( !p.isEmpty() ) buf.append(p.invokingState);
-//			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
-//			p = p.parent;
-//		}
-		buf.append("]");
-		return buf.toString();
-	}
-
-	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
-		return toStrings(recognizer, EMPTY, currentState);
-	}
-
-	// FROM SAM
-	public String[] toStrings(Recognizer<?, ?> recognizer, PredictionContext stop, int currentState) {
-		List<String> result = new ArrayList<String>();
-
-		outer:
-		for (int perm = 0; ; perm++) {
-			int offset = 0;
-			boolean last = true;
-			PredictionContext p = this;
-			int stateNumber = currentState;
-			StringBuilder localBuffer = new StringBuilder();
-			localBuffer.append("[");
-			while ( !p.isEmpty() && p != stop ) {
-				int index = 0;
-				if (p.size() > 0) {
-					int bits = 1;
-					while ((1 << bits) < p.size()) {
-						bits++;
-					}
-
-					int mask = (1 << bits) - 1;
-					index = (perm >> offset) & mask;
-					last &= index >= p.size() - 1;
-					if (index >= p.size()) {
-						continue outer;
-					}
-					offset += bits;
-				}
-
-				if ( recognizer!=null ) {
-					if (localBuffer.length() > 1) {
-						// first char is '[', if more than that this isn't the first rule
-						localBuffer.append(' ');
-					}
-
-					ATN atn = recognizer.getATN();
-					ATNState s = atn.states.get(stateNumber);
-					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
-					localBuffer.append(ruleName);
-				}
-				else if ( p.getInvokingState(index)!= EMPTY_FULL_CTX_INVOKING_STATE) {
-					if ( !p.isEmpty() ) {
-						if (localBuffer.length() > 1) {
-							// first char is '[', if more than that this isn't the first rule
-							localBuffer.append(' ');
-						}
-
-						localBuffer.append(p.getInvokingState(index));
-					}
-				}
-				stateNumber = p.getInvokingState(index);
-				p = p.getParent(index);
-			}
-			localBuffer.append("]");
-			result.add(localBuffer.toString());
-
-			if (last) {
-				break;
-			}
-		}
-
-		return result.toArray(new String[result.size()]);
-	}
-
 	// dispatch
 	public static PredictionContext merge(PredictionContext a, PredictionContext b,
 										  boolean rootIsWildcard)
@@ -484,7 +392,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public static PredictionContext getCachedContext(
 		@NotNull PredictionContext context,
 		@NotNull Map<PredictionContext, PredictionContext> contextCache,
-		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited) {
+		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited)
+	{
 		if (context.isEmpty()) {
 			return context;
 		}
@@ -526,7 +435,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		PredictionContext updated;
 		if (parents.length == 0) {
-			updated = isEmptyLocal(context) ? EMPTY_LOCAL : EMPTY_FULL;
+			updated = EMPTY;
 		}
 		else if (parents.length == 1) {
 			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
@@ -563,5 +472,92 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			}
 		}
 		return nodes;
+	}
+
+	public String toString(@Nullable Recognizer<?,?> recog) {
+		return toString();
+//		return toString(recog, ParserRuleContext.EMPTY);
+	}
+
+	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
+	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
+		StringBuilder buf = new StringBuilder();
+		PredictionContext p = this;
+		buf.append("[");
+//		while ( p != null && p != stop ) {
+//			if ( !p.isEmpty() ) buf.append(p.invokingState);
+//			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
+//			p = p.parent;
+//		}
+		buf.append("]");
+		return buf.toString();
+	}
+
+	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
+		return toStrings(recognizer, EMPTY, currentState);
+	}
+
+	// FROM SAM
+	public String[] toStrings(Recognizer<?, ?> recognizer, PredictionContext stop, int currentState) {
+		List<String> result = new ArrayList<String>();
+
+		outer:
+		for (int perm = 0; ; perm++) {
+			int offset = 0;
+			boolean last = true;
+			PredictionContext p = this;
+			int stateNumber = currentState;
+			StringBuilder localBuffer = new StringBuilder();
+			localBuffer.append("[");
+			while ( !p.isEmpty() && p != stop ) {
+				int index = 0;
+				if (p.size() > 0) {
+					int bits = 1;
+					while ((1 << bits) < p.size()) {
+						bits++;
+					}
+
+					int mask = (1 << bits) - 1;
+					index = (perm >> offset) & mask;
+					last &= index >= p.size() - 1;
+					if (index >= p.size()) {
+						continue outer;
+					}
+					offset += bits;
+				}
+
+				if ( recognizer!=null ) {
+					if (localBuffer.length() > 1) {
+						// first char is '[', if more than that this isn't the first rule
+						localBuffer.append(' ');
+					}
+
+					ATN atn = recognizer.getATN();
+					ATNState s = atn.states.get(stateNumber);
+					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
+					localBuffer.append(ruleName);
+				}
+				else if ( p.getInvokingState(index)!= EMPTY_FULL_CTX_INVOKING_STATE) {
+					if ( !p.isEmpty() ) {
+						if (localBuffer.length() > 1) {
+							// first char is '[', if more than that this isn't the first rule
+							localBuffer.append(' ');
+						}
+
+						localBuffer.append(p.getInvokingState(index));
+					}
+				}
+				stateNumber = p.getInvokingState(index);
+				p = p.getParent(index);
+			}
+			localBuffer.append("]");
+			result.add(localBuffer.toString());
+
+			if (last) {
+				break;
+			}
+		}
+
+		return result.toArray(new String[result.size()]);
 	}
 }

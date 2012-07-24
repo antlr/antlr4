@@ -241,6 +241,7 @@ import java.util.Set;
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean debug = false;
+	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
@@ -316,9 +317,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
-		if ( debug ) System.out.println("ATN decision "+dfa.decision+
-										" exec LA(1)=="+ getLookaheadName(input) +
-										", outerContext="+outerContext.toString(parser));
+		if ( debug || debug_list_atn_decisions )  {
+			System.out.println("ATN decision "+dfa.decision+
+							   " exec LA(1)=="+ getLookaheadName(input) +
+							   ", outerContext="+outerContext.toString(parser));
+		}
 		DecisionState decState = atn.getDecisionState(dfa.decision);
 		boolean greedy = decState.isGreedy;
 		boolean loopsSimulateTailRecursion = false;
@@ -353,9 +356,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                        @Nullable ParserRuleContext<?> outerContext)
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
-		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" exec LA(1)=="+ getLookaheadName(input) +
-											", outerContext="+outerContext.toString(parser));
+		if ( dfa_debug ) {
+			System.out.println("DFA decision "+dfa.decision+
+							   " exec LA(1)=="+ getLookaheadName(input) +
+							   ", outerContext="+outerContext.toString(parser));
+		}
 		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames()));
 		DFAState acceptState = null;
 		DFAState s = s0;
@@ -513,9 +518,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext<?> outerContext)
 	{
-		if ( debug ) System.out.println("execATN decision "+dfa.decision+
-										" exec LA(1)=="+ getLookaheadName(input)+
-									    "line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+		if ( debug || debug_list_atn_decisions) {
+			System.out.println("execATN decision "+dfa.decision+
+							   " exec LA(1)=="+ getLookaheadName(input)+
+							   "line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+		}
 		ATN_failover++;
 
 		ATNConfigSet previous = s0.configset;
@@ -1439,8 +1446,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFAState newState = proposed;
 
 		newState.stateNumber = dfa.states.size();
+		System.out.println("Before opt, cache size = "+contextCache.size());
 		configs.optimizeConfigs(this);
+		System.out.println("After opt, cache size = " + contextCache.size());
 		newState.configset = new ATNConfigSet(configs);
+
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
