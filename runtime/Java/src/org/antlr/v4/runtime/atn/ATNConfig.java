@@ -51,8 +51,7 @@ public class ATNConfig {
 	@NotNull
 	private final ATNState state;
 
-	/** What alt (or lexer rule) is predicted by this configuration */
-	private final int alt;
+	private int altAndOuterContextDepth;
 
 	/** The stack of invoking states leading to the rule/states associated
 	 *  with this config.  We track only those contexts pushed during
@@ -61,36 +60,21 @@ public class ATNConfig {
 	@Nullable
 	private PredictionContext context;
 
-	private int reachesIntoOuterContext;
-
-	/** Capture lexer action we traverse */
-	private final int lexerActionIndex; // TOOD: move to subclass
-
-    @NotNull
-    private final SemanticContext semanticContext;
-
-	private ATNConfig(@NotNull ATNState state,
-					 int alt,
-					 @Nullable PredictionContext context,
-					 @NotNull SemanticContext semanticContext,
-					 int actionIndex)
+	protected ATNConfig(@NotNull ATNState state,
+						int alt,
+						@Nullable PredictionContext context)
 	{
+		assert (alt & 0xFFFFFF) == alt;
 		this.state = state;
-		this.alt = alt;
+		this.altAndOuterContextDepth = alt;
 		this.context = context;
-		this.semanticContext = semanticContext;
-		this.lexerActionIndex = actionIndex;
 	}
 
-	private ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
-                     @NotNull SemanticContext semanticContext, int actionIndex)
+	protected ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context)
     {
 		this.state = state;
-		this.alt = c.alt;
+		this.altAndOuterContextDepth = c.altAndOuterContextDepth;
 		this.context = context;
-		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
-        this.semanticContext = semanticContext;
-		this.lexerActionIndex = actionIndex;
 	}
 
 	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context) {
@@ -102,7 +86,20 @@ public class ATNConfig {
 	}
 
 	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
-		return new ATNConfig(state, alt, context, semanticContext, actionIndex);
+		if (semanticContext != SemanticContext.NONE) {
+			if (actionIndex != -1) {
+				return new ActionSemanticContextATNConfig(actionIndex, semanticContext, state, alt, context);
+			}
+			else {
+				return new SemanticContextATNConfig(semanticContext, state, alt, context);
+			}
+		}
+		else if (actionIndex != -1) {
+			return new ActionATNConfig(actionIndex, state, alt, context);
+		}
+		else {
+			return new ATNConfig(state, alt, context);
+		}
 	}
 
 	/** Gets the ATN state associated with this configuration */
@@ -113,7 +110,7 @@ public class ATNConfig {
 
 	/** What alt (or lexer rule) is predicted by this configuration */
 	public final int getAlt() {
-		return alt;
+		return altAndOuterContextDepth & 0x00FFFFFF;
 	}
 
 	@Nullable
@@ -141,20 +138,21 @@ public class ATNConfig {
 	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
 	 */
 	public final int getOuterContextDepth() {
-		return reachesIntoOuterContext;
+		return altAndOuterContextDepth >>> 24;
 	}
 
 	public final void setOuterContextDepth(int outerContextDepth) {
-		this.reachesIntoOuterContext = outerContextDepth;
+		assert outerContextDepth >= 0 && outerContextDepth <= 0xFF;
+		this.altAndOuterContextDepth = (outerContextDepth << 24) | getAlt();
 	}
 
-	public final int getActionIndex() {
-		return lexerActionIndex;
+	public int getActionIndex() {
+		return -1;
 	}
 
 	@NotNull
-	public final SemanticContext getSemanticContext() {
-		return semanticContext;
+	public SemanticContext getSemanticContext() {
+		return SemanticContext.NONE;
 	}
 
 	@Override
@@ -179,7 +177,20 @@ public class ATNConfig {
 	}
 
 	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
-		return new ATNConfig(this, state, context, semanticContext, actionIndex);
+		if (semanticContext != SemanticContext.NONE) {
+			if (actionIndex != -1) {
+				return new ActionSemanticContextATNConfig(actionIndex, semanticContext, this, state, context);
+			}
+			else {
+				return new SemanticContextATNConfig(semanticContext, this, state, context);
+			}
+		}
+		else if (actionIndex != -1) {
+			return new ActionATNConfig(actionIndex, this, state, context);
+		}
+		else {
+			return new ATNConfig(this, state, context);
+		}
 	}
 
 	public ATNConfig appendContext(int context, PredictionContextCache contextCache) {
@@ -353,4 +364,72 @@ public class ATNConfig {
 		}
 		return buf.toString();
     }
+
+	private static class SemanticContextATNConfig extends ATNConfig {
+
+		@NotNull
+		private final SemanticContext semanticContext;
+
+		public SemanticContextATNConfig(SemanticContext semanticContext, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+			super(state, alt, context);
+			this.semanticContext = semanticContext;
+		}
+
+		public SemanticContextATNConfig(SemanticContext semanticContext, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+			super(c, state, context);
+			this.semanticContext = semanticContext;
+		}
+
+		@Override
+		public SemanticContext getSemanticContext() {
+			return semanticContext;
+		}
+
+	}
+
+	private static class ActionATNConfig extends ATNConfig {
+
+		private final int actionIndex;
+
+		public ActionATNConfig(int actionIndex, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+			super(state, alt, context);
+			this.actionIndex = actionIndex;
+		}
+
+		protected ActionATNConfig(int actionIndex, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+			super(c, state, context);
+			if (c.getSemanticContext() != SemanticContext.NONE) {
+				throw new UnsupportedOperationException();
+			}
+
+			this.actionIndex = actionIndex;
+		}
+
+		@Override
+		public int getActionIndex() {
+			return actionIndex;
+		}
+
+	}
+
+	private static class ActionSemanticContextATNConfig extends SemanticContextATNConfig {
+
+		private final int actionIndex;
+
+		public ActionSemanticContextATNConfig(int actionIndex, @NotNull SemanticContext semanticContext, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+			super(semanticContext, state, alt, context);
+			this.actionIndex = actionIndex;
+		}
+
+		public ActionSemanticContextATNConfig(int actionIndex, @NotNull SemanticContext semanticContext, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+			super(semanticContext, c, state, context);
+			this.actionIndex = actionIndex;
+		}
+
+		@Override
+		public int getActionIndex() {
+			return actionIndex;
+		}
+
+	}
 }
