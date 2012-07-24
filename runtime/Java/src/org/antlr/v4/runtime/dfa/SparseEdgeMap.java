@@ -27,6 +27,8 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +57,17 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 		super(minIndex, maxIndex);
 		this.keys = new int[maxSparseSize];
 		this.values = new ArrayList<T>(maxSparseSize);
+	}
+
+	private SparseEdgeMap(@NotNull SparseEdgeMap<T> map, int maxSparseSize) {
+		super(map.minIndex, map.maxIndex);
+		if (maxSparseSize < map.values.size()) {
+			throw new IllegalArgumentException();
+		}
+
+		keys = Arrays.copyOf(map.keys, maxSparseSize);
+		values = new ArrayList<T>(maxSparseSize);
+		values.addAll(map.values);
 	}
 
 	public int[] getKeys() {
@@ -122,10 +135,21 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 		}
 
 		assert size() == getMaxSparseSize();
-		ArrayEdgeMap<T> arrayMap = new ArrayEdgeMap<T>(minIndex, maxIndex);
-		arrayMap = arrayMap.putAll(this);
-		arrayMap.put(key, value);
-		return arrayMap;
+
+		int desiredSize = getMaxSparseSize() * 2;
+		int space = maxIndex - minIndex + 1;
+		// SparseEdgeMap only uses less memory than ArrayEdgeMap up to half the size of the symbol space
+		if (desiredSize >= space / 2) {
+			ArrayEdgeMap<T> arrayMap = new ArrayEdgeMap<T>(minIndex, maxIndex);
+			arrayMap = arrayMap.putAll(this);
+			arrayMap.put(key, value);
+			return arrayMap;
+		}
+		else {
+			SparseEdgeMap<T> resized = new SparseEdgeMap<T>(this, desiredSize);
+			resized.put(key, value);
+			return resized;
+		}
 	}
 
 	@Override
