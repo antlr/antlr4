@@ -590,7 +590,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			if ( D.isAcceptState && D.configset.hasSemanticContext ) {
 				int nalts = decState.getNumberOfTransitions();
-				List<DFAState.PredPrediction> predPredictions =
+				DFAState.PredPrediction[] predPredictions =
 					predicateDFAState(D, D.configset, outerContext, nalts);
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
@@ -665,7 +665,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( reach.hasSemanticContext ) {
 			SemanticContext[] altToPred = getPredsForAmbigAlts(reach.conflictingAlts, reach, nalts);
 			// altToPred[uniqueAlt] is now our validating predicate (if any)
-			List<DFAState.PredPrediction> predPredictions;
+			DFAState.PredPrediction[] predPredictions;
 			if ( altToPred!=null ) {
 				// we have a validating predicate; test it
 				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
@@ -761,16 +761,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	/** collect and set D's semantic context */
-	public List<DFAState.PredPrediction> predicateDFAState(DFAState D,
-														   ATNConfigSet configs,
-														   RuleContext outerContext,
-														   int nalts)
+	public DFAState.PredPrediction[] predicateDFAState(DFAState D,
+													   ATNConfigSet configs,
+													   RuleContext outerContext,
+													   int nalts)
 	{
 		IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
 		if ( debug ) System.out.println("predicateDFAState "+D);
 		SemanticContext[] altToPred = getPredsForAmbigAlts(conflictingAlts, configs, nalts);
 		// altToPred[uniqueAlt] is now our validating predicate (if any)
-		List<DFAState.PredPrediction> predPredictions = null;
+		DFAState.PredPrediction[] predPredictions = null;
 		if ( altToPred!=null ) {
 			// we have a validating predicate; test it
 			// Update DFA so reach becomes accept state with predicate
@@ -827,7 +827,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return altToPred;
 	}
 
-	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
+	public DFAState.PredPrediction[] getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
 		boolean containsPredicate = false;
 		for (int i = 1; i < altToPred.length; i++) {
@@ -855,14 +855,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
-		return pairs;
+		return pairs.toArray(new DFAState.PredPrediction[pairs.size()]);
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
 	 *  pairs that win. A {@code null} predicate indicates an alt containing an
 	 *  unpredicated config which behaves as "always true."
 	 */
-	public IntervalSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
+	public IntervalSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
 										   ParserRuleContext<?> outerContext,
 										   boolean complete)
 	{
