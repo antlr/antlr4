@@ -415,7 +415,7 @@ public class TestPerformance extends BaseTest {
                         if (state.isAcceptState) {
                             boolean hasGlobal = false;
                             for (ATNConfig config : state.configset) {
-                                if (config.reachesIntoOuterContext > 0) {
+                                if (config.getReachesIntoOuterContext()) {
                                     globalConfigCount++;
                                     hasGlobal = true;
                                 } else {
@@ -443,7 +443,7 @@ public class TestPerformance extends BaseTest {
                             }
 
                             configOutputSize = configOutput.length();
-                            writeFile(tmpdir, "d" + dfa.decision + ".s" + state.stateNumber + ".a" + config.alt + ".config.dot", configOutput);
+                            writeFile(tmpdir, "d" + dfa.decision + ".s" + state.stateNumber + ".a" + config.getAlt() + ".config.dot", configOutput);
                         }
                     }
                 }

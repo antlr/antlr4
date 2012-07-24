@@ -122,10 +122,10 @@ public class DFA {
 		for (DFAState D : dfaStates) {
 			Set<ATNState> statesInvolved = new HashSet<ATNState>();
 			for (ATNConfig c : D.configset) {
-				Transition t = c.state.transition(0);
+				Transition t = c.getState().transition(0);
 				ATNState target = atn.getReachableTarget(c, t, input.get(i).getType());
 				if (target != null) {
-					statesInvolved.add(c.state);
+					statesInvolved.add(c.getState());
 				}
 			}
 

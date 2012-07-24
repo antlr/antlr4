@@ -136,7 +136,7 @@ public class DOTGenerator {
 					List<ATNConfig> configsInAlt = new ArrayList<ATNConfig>();
 					for (Iterator<ATNConfig> it = configurations.iterator(); it.hasNext();) {
 						ATNConfig c = it.next();
-						if ( c.alt!=alt ) continue;
+						if ( c.getAlt()!=alt ) continue;
 						configsInAlt.add(c);
 					}
 					int n = 0;

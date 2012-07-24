@@ -49,36 +49,25 @@ import java.util.Map;
 public class ATNConfig {
 	/** The ATN state associated with this configuration */
 	@NotNull
-	public final ATNState state;
+	private final ATNState state;
 
 	/** What alt (or lexer rule) is predicted by this configuration */
-	public final int alt;
+	private final int alt;
 
 	/** The stack of invoking states leading to the rule/states associated
 	 *  with this config.  We track only those contexts pushed during
 	 *  execution of the ATN simulator.
 	 */
 	@Nullable
-	public PredictionContext context;
+	private PredictionContext context;
 
-	/**
-	 * We cannot execute predicates dependent upon local context unless
-	 * we know for sure we are in the correct context. Because there is
-	 * no way to do this efficiently, we simply cannot evaluate
-	 * dependent predicates unless we are in the rule that initially
-	 * invokes the ATN simulator.
-	 *
-	 * closure() tracks the depth of how far we dip into the
-	 * outer context: depth > 0.  Note that it may not be totally
-	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
-	 */
-	public int reachesIntoOuterContext;
+	private int reachesIntoOuterContext;
 
 	/** Capture lexer action we traverse */
-	public int lexerActionIndex = -1; // TOOD: move to subclass
+	private int lexerActionIndex = -1; // TOOD: move to subclass
 
     @NotNull
-    public final SemanticContext semanticContext;
+    private final SemanticContext semanticContext;
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
@@ -99,11 +88,11 @@ public class ATNConfig {
 	}
 
     public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
-   		this(c, state, c.context, c.semanticContext);
+   		this(c, state, c.getContext(), c.semanticContext);
    	}
 
     public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull SemanticContext semanticContext) {
-   		this(c, state, c.context, semanticContext);
+   		this(c, state, c.getContext(), semanticContext);
    	}
 
     public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
@@ -121,29 +110,85 @@ public class ATNConfig {
 		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
+	/** Gets the ATN state associated with this configuration */
+	@NotNull
+	public final ATNState getState() {
+		return state;
+	}
+
+	/** What alt (or lexer rule) is predicted by this configuration */
+	public final int getAlt() {
+		return alt;
+	}
+
+	@Nullable
+	public final PredictionContext getContext() {
+		return context;
+	}
+
+	public final void setContext(@NotNull PredictionContext context) {
+		this.context = context;
+	}
+
+	public final boolean getReachesIntoOuterContext() {
+		return getOuterContextDepth() != 0;
+	}
+
+	/**
+	 * We cannot execute predicates dependent upon local context unless
+	 * we know for sure we are in the correct context. Because there is
+	 * no way to do this efficiently, we simply cannot evaluate
+	 * dependent predicates unless we are in the rule that initially
+	 * invokes the ATN simulator.
+	 *
+	 * closure() tracks the depth of how far we dip into the
+	 * outer context: depth > 0.  Note that it may not be totally
+	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
+	 */
+	public final int getOuterContextDepth() {
+		return reachesIntoOuterContext;
+	}
+
+	public final void setOuterContextDepth(int outerContextDepth) {
+		this.reachesIntoOuterContext = outerContextDepth;
+	}
+
+	public final int getActionIndex() {
+		return lexerActionIndex;
+	}
+
+	public final void setActionIndex(int actionIndex) {
+		this.lexerActionIndex = actionIndex;
+	}
+
+	@NotNull
+	public final SemanticContext getSemanticContext() {
+		return semanticContext;
+	}
+
 	public ATNConfig appendContext(int context, PredictionContextCache contextCache) {
-		ATNConfig result = new ATNConfig(this, state);
-		result.context = result.context.appendContext(context, contextCache);
+		ATNConfig result = new ATNConfig(this, getState());
+		result.setContext(result.getContext().appendContext(context, contextCache));
 		return result;
 	}
 
 	public ATNConfig appendContext(PredictionContext context, PredictionContextCache contextCache) {
-		ATNConfig result = new ATNConfig(this, state);
-		result.context = result.context.appendContext(context, contextCache);
+		ATNConfig result = new ATNConfig(this, getState());
+		result.setContext(result.getContext().appendContext(context, contextCache));
 		return result;
 	}
 
 	public boolean contains(ATNConfig subconfig) {
-		if (this.state.stateNumber != subconfig.state.stateNumber
-			|| this.alt != subconfig.alt
-			|| !this.semanticContext.equals(subconfig.semanticContext)) {
+		if (this.getState().stateNumber != subconfig.getState().stateNumber
+			|| this.getAlt() != subconfig.getAlt()
+			|| !this.getSemanticContext().equals(subconfig.getSemanticContext())) {
 			return false;
 		}
 
 		Deque<PredictionContext> leftWorkList = new ArrayDeque<PredictionContext>();
 		Deque<PredictionContext> rightWorkList = new ArrayDeque<PredictionContext>();
-		leftWorkList.add(context);
-		rightWorkList.add(subconfig.context);
+		leftWorkList.add(getContext());
+		rightWorkList.add(subconfig.getContext());
 		while (!leftWorkList.isEmpty()) {
 			PredictionContext left = leftWorkList.pop();
 			PredictionContext right = rightWorkList.pop();
@@ -195,21 +240,22 @@ public class ATNConfig {
 			return false;
 		}
 
-		return this.state.stateNumber==other.state.stateNumber
-			&& this.alt==other.alt
-			&& (this.reachesIntoOuterContext != 0) == (other.reachesIntoOuterContext != 0)
-			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
-			&& this.semanticContext.equals(other.semanticContext);
+		return this.getState().stateNumber==other.getState().stateNumber
+			&& this.getAlt()==other.getAlt()
+			&& this.getReachesIntoOuterContext() == other.getReachesIntoOuterContext()
+			&& (this.getContext()==other.getContext() || (this.getContext() != null && this.getContext().equals(other.getContext())))
+			&& this.getSemanticContext().equals(other.getSemanticContext())
+			&& this.getActionIndex() == other.getActionIndex();
 	}
 
 	@Override
 	public int hashCode() {
 		int hashCode = 7;
-		hashCode = 5 * hashCode + state.stateNumber;
-		hashCode = 5 * hashCode + alt;
-		hashCode = 5 * hashCode + (reachesIntoOuterContext != 0 ? 1 : 0);
-		hashCode = 5 * hashCode + (context != null ? context.hashCode() : 0);
-		hashCode = 5 * hashCode + semanticContext.hashCode();
+		hashCode = 5 * hashCode + getState().stateNumber;
+		hashCode = 5 * hashCode + getAlt();
+		hashCode = 5 * hashCode + (getReachesIntoOuterContext() ? 1 : 0);
+		hashCode = 5 * hashCode + (getContext() != null ? getContext().hashCode() : 0);
+		hashCode = 5 * hashCode + getSemanticContext().hashCode();
         return hashCode;
     }
 
@@ -220,8 +266,8 @@ public class ATNConfig {
 
 		Map<PredictionContext, PredictionContext> visited = new IdentityHashMap<PredictionContext, PredictionContext>();
 		Deque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
-		workList.add(context);
-		visited.put(context, context);
+		workList.add(getContext());
+		visited.put(getContext(), getContext());
 		while (!workList.isEmpty()) {
 			PredictionContext current = workList.pop();
 			for (int i = 0; i < current.size(); i++) {
@@ -256,7 +302,7 @@ public class ATNConfig {
 //		}
 		String[] contexts;
 		if (showContext) {
-			contexts = context.toStrings(recog, this.state.stateNumber);
+			contexts = getContext().toStrings(recog, this.getState().stateNumber);
 		}
 		else {
 			contexts = new String[] { "?" };
@@ -271,21 +317,21 @@ public class ATNConfig {
 			}
 
 			buf.append('(');
-			buf.append(state);
+			buf.append(getState());
 			if ( showAlt ) {
 				buf.append(",");
-				buf.append(alt);
+				buf.append(getAlt());
 			}
-			if ( context!=null ) {
+			if ( getContext()!=null ) {
 				buf.append(",");
 				buf.append(contextDesc);
 			}
-			if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
+			if ( getSemanticContext()!=null && getSemanticContext() != SemanticContext.NONE ) {
 				buf.append(",");
-				buf.append(semanticContext);
+				buf.append(getSemanticContext());
 			}
-			if ( reachesIntoOuterContext>0 ) {
-				buf.append(",up=").append(reachesIntoOuterContext);
+			if ( getReachesIntoOuterContext() ) {
+				buf.append(",up=").append(getOuterContextDepth());
 			}
 			buf.append(')');
 		}

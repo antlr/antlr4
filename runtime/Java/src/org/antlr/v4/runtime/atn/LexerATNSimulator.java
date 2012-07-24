@@ -355,8 +355,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			return prevAccept.dfaState.prediction;
 		}
 		else if (prevAccept.config != null) {
-			int ruleIndex = prevAccept.config.state.ruleIndex;
-			accept(input, ruleIndex, prevAccept.config.lexerActionIndex,
+			int ruleIndex = prevAccept.config.getState().ruleIndex;
+			accept(input, ruleIndex, prevAccept.config.getActionIndex(),
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
 			return atn.ruleToTokenType[ruleIndex];
 		}
@@ -379,9 +379,9 @@ public class LexerATNSimulator extends ATNSimulator {
 				System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
 			}
 
-			int n = c.state.getNumberOfTransitions();
+			int n = c.getState().getNumberOfTransitions();
 			for (int ti=0; ti<n; ti++) {               // for each transition
-				Transition trans = c.state.transition(ti);
+				Transition trans = c.getState().transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
 					closure(new ATNConfig(c, target), reach);
@@ -397,7 +397,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 		for (int ci=0; ci<reach.size(); ci++) {
 			ATNConfig c = reach.get(ci);
-			if ( c.state instanceof RuleStopState) {
+			if ( c.getState() instanceof RuleStopState) {
 				if ( debug ) {
 					System.out.format("processAcceptConfigs: hit accept config %s index %d\n",
 									  c, input.index());
@@ -412,7 +412,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					}
 					// condition > not >= will favor prev accept at same index.
 					// This way, "int" is keyword not ID if listed first.
-					traceAcceptState(c.alt);
+					traceAcceptState(c.getAlt());
 					if ( debug ) {
 						System.out.format("markExecSettings for %s @ index=%d, line %d:%d\n", c, index, prevAccept.line, prevAccept.charPos);
 					}
@@ -422,7 +422,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				// if we reach lexer accept state, toss out any configs in rest
 				// of configs work list associated with this rule (config.alt);
 				// that rule is done. this is how we cut off nongreedy .+ loops.
-				deleteWildcardConfigsForAlt(reach, ci, c.alt); // CAUSES INF LOOP if reach not closure
+				deleteWildcardConfigsForAlt(reach, ci, c.getAlt()); // CAUSES INF LOOP if reach not closure
 
 				 // move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
@@ -492,9 +492,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		int j=ci+1;
 		while ( j<closure.size() ) {
 			ATNConfig c = closure.get(j);
-			boolean isWildcard = c.state.getClass() == ATNState.class &&
-				c.state.transition(0).getClass() == WildcardTransition.class;
-			if ( c.alt == alt && isWildcard ) {
+			boolean isWildcard = c.getState().getClass() == ATNState.class &&
+				c.getState().transition(0).getClass() == WildcardTransition.class;
+			if ( c.getAlt() == alt && isWildcard ) {
 				if ( debug ) {
 					System.out.format("deleteWildcardConfigsForAlt %s\n", c);
 				}
@@ -526,27 +526,27 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		// TODO? if ( closure.contains(t) ) return;
 
-		if ( config.state instanceof RuleStopState ) {
+		if ( config.getState() instanceof RuleStopState ) {
 			if ( debug ) {
 				if ( recog!=null ) {
-					System.out.format("closure at %s rule stop %s\n", recog.getRuleNames()[config.state.ruleIndex], config);
+					System.out.format("closure at %s rule stop %s\n", recog.getRuleNames()[config.getState().ruleIndex], config);
 				}
 				else {
 					System.out.format("closure at rule stop %s\n", config);
 				}
 			}
 
-			if ( config.context == null || config.context.isEmpty() ) {
+			if ( config.getContext() == null || config.getContext().isEmpty() ) {
 				configs.add(config);
 				return;
 			}
 
-			for (int i = 0; i < config.context.size(); i++) {
-				PredictionContext newContext = config.context.getParent(i); // "pop" invoking state
-				ATNState invokingState = atn.states.get(config.context.getInvokingState(i));
+			for (int i = 0; i < config.getContext().size(); i++) {
+				PredictionContext newContext = config.getContext().getParent(i); // "pop" invoking state
+				ATNState invokingState = atn.states.get(config.getContext().getInvokingState(i));
 				RuleTransition rt = (RuleTransition)invokingState.transition(0);
 				ATNState retState = rt.followState;
-				ATNConfig c = new ATNConfig(retState, config.alt, newContext);
+				ATNConfig c = new ATNConfig(retState, config.getAlt(), newContext);
 				closure(c, configs);
 			}
 
@@ -554,11 +554,11 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		// optimization
-		if ( !config.state.onlyHasEpsilonTransitions() )	{
+		if ( !config.getState().onlyHasEpsilonTransitions() )	{
 			configs.add(config);
 		}
 
-		ATNState p = config.state;
+		ATNState p = config.getState();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
 			ATNConfig c = getEpsilonTarget(config, t, configs);
@@ -572,11 +572,11 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull Transition t,
 									  @NotNull ATNConfigSet configs)
 	{
-		ATNState p = config.state;
+		ATNState p = config.getState();
 		ATNConfig c = null;
 		if ( t.getClass() == RuleTransition.class ) {
 			PredictionContext newContext =
-				config.context.getChild(p.stateNumber);
+				config.getContext().getChild(p.stateNumber);
 			c = new ATNConfig(config, t.target, newContext);
 		}
 		else if ( t.getClass() == PredicateTransition.class ) {
@@ -614,7 +614,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		// ignore actions; just exec one per rule upon accept
 		else if ( t.getClass() == ActionTransition.class ) {
 			c = new ATNConfig(config, t.target);
-			c.lexerActionIndex = ((ActionTransition)t).actionIndex;
+			c.setActionIndex(((ActionTransition)t).actionIndex);
 		}
 		else if ( t.isEpsilon() ) {
 			c = new ATNConfig(config, t.target);
@@ -712,7 +712,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		ATNConfig firstConfigWithRuleStopState = null;
 		for (ATNConfig c : configs) {
-			if ( c.state instanceof RuleStopState )	{
+			if ( c.getState() instanceof RuleStopState )	{
 				firstConfigWithRuleStopState = c;
 				break;
 			}
@@ -720,8 +720,8 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( firstConfigWithRuleStopState!=null ) {
 			newState.isAcceptState = true;
-			newState.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
-			newState.lexerActionIndex = firstConfigWithRuleStopState.lexerActionIndex;
+			newState.lexerRuleIndex = firstConfigWithRuleStopState.getState().ruleIndex;
+			newState.lexerActionIndex = firstConfigWithRuleStopState.getActionIndex();
 			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
 		}
 

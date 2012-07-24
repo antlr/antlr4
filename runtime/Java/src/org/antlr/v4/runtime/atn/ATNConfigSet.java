@@ -138,7 +138,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public Set<ATNState> getStates() {
 		Set<ATNState> states = new HashSet<ATNState>();
 		for (ATNConfig c : this.configs) {
-			states.add(c.state);
+			states.add(c.getState());
 		}
 
 		return states;
@@ -151,7 +151,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		for (int i = 0; i < configs.size(); i++) {
 			ATNConfig config = configs.get(i);
-			config.context = interpreter.getCachedContext(config.context);
+			config.setContext(interpreter.getCachedContext(config.getContext()));
 		}
 	}
 
@@ -212,7 +212,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public boolean add(ATNConfig e, @Nullable PredictionContextCache contextCache) {
 		ensureWritable();
-		assert !outermostConfigSet || e.reachesIntoOuterContext == 0;
+		assert !outermostConfigSet || !e.getReachesIntoOuterContext();
 
 		if (contextCache == null) {
 			contextCache = PredictionContextCache.UNCACHED;
@@ -224,14 +224,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		ATNConfig mergedConfig = mergedConfigs.get(key);
 		addKey = (mergedConfig == null);
 		if (mergedConfig != null && canMerge(e, key, mergedConfig)) {
-			mergedConfig.reachesIntoOuterContext = Math.max(mergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
+			mergedConfig.setOuterContextDepth(Math.max(mergedConfig.getOuterContextDepth(), e.getOuterContextDepth()));
 
-			PredictionContext joined = PredictionContext.join(mergedConfig.context, e.context, contextCache);
-			if (mergedConfig.context == joined) {
+			PredictionContext joined = PredictionContext.join(mergedConfig.getContext(), e.getContext(), contextCache);
+			if (mergedConfig.getContext() == joined) {
 				return false;
 			}
 
-			mergedConfig.context = joined;
+			mergedConfig.setContext(joined);
 			updatePropertiesForMergedConfig(e);
 			return true;
 		}
@@ -239,14 +239,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		for (int i = 0; i < unmerged.size(); i++) {
 			ATNConfig unmergedConfig = unmerged.get(i);
 			if (canMerge(e, key, unmergedConfig)) {
-				unmergedConfig.reachesIntoOuterContext = Math.max(unmergedConfig.reachesIntoOuterContext, e.reachesIntoOuterContext);
+				unmergedConfig.setOuterContextDepth(Math.max(unmergedConfig.getOuterContextDepth(), e.getOuterContextDepth()));
 
-				PredictionContext joined = PredictionContext.join(unmergedConfig.context, e.context, contextCache);
-				if (unmergedConfig.context == joined) {
+				PredictionContext joined = PredictionContext.join(unmergedConfig.getContext(), e.getContext(), contextCache);
+				if (unmergedConfig.getContext() == joined) {
 					return false;
 				}
 
-				unmergedConfig.context = joined;
+				unmergedConfig.setContext(joined);
 
 				if (addKey) {
 					mergedConfigs.put(key, unmergedConfig);
@@ -276,19 +276,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	private void updatePropertiesForMergedConfig(ATNConfig config) {
 		// merged configs can't change the alt or semantic context
-		dipsIntoOuterContext |= config.reachesIntoOuterContext > 0;
+		dipsIntoOuterContext |= config.getReachesIntoOuterContext();
 		assert !outermostConfigSet || !dipsIntoOuterContext;
 	}
 
 	private void updatePropertiesForAddedConfig(ATNConfig config) {
 		if (configs.size() == 1) {
-			uniqueAlt = config.alt;
-		} else if (uniqueAlt != config.alt) {
+			uniqueAlt = config.getAlt();
+		} else if (uniqueAlt != config.getAlt()) {
 			uniqueAlt = ATN.INVALID_ALT_NUMBER;
 		}
 
-		hasSemanticContext |= !SemanticContext.NONE.equals(config.semanticContext);
-		dipsIntoOuterContext |= config.reachesIntoOuterContext > 0;
+		hasSemanticContext |= !SemanticContext.NONE.equals(config.getSemanticContext());
+		dipsIntoOuterContext |= config.getReachesIntoOuterContext();
 		assert !outermostConfigSet || !dipsIntoOuterContext;
 	}
 
@@ -297,11 +297,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			return false;
 		}
 
-		return left.semanticContext.equals(right.semanticContext);
+		return left.getSemanticContext().equals(right.getSemanticContext());
 	}
 
 	private static boolean canMerge(ATNConfig left, long leftKey, ATNConfig right) {
-		if (left.state.stateNumber != right.state.stateNumber) {
+		if (left.getState().stateNumber != right.getState().stateNumber) {
 			return false;
 		}
 
@@ -309,11 +309,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			return false;
 		}
 
-		return left.semanticContext.equals(right.semanticContext);
+		return left.getSemanticContext().equals(right.getSemanticContext());
 	}
 
 	private static long getKey(ATNConfig e) {
-		long key = ((long)e.state.stateNumber << 32) + (e.alt << 3);
+		long key = ((long)e.getState().stateNumber << 32) + (e.getAlt() << 3);
 		//key |= e.reachesIntoOuterContext != 0 ? 1 : 0;
 		//key |= e.resolveWithPredicate ? 1 << 1 : 0;
 		//key |= e.traversedPredicate ? 1 << 2 : 0;
@@ -418,14 +418,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		Collections.sort(sortedConfigs, new Comparator<ATNConfig>() {
 			@Override
 			public int compare(ATNConfig o1, ATNConfig o2) {
-				if (o1.alt != o2.alt) {
-					return o1.alt - o2.alt;
+				if (o1.getAlt() != o2.getAlt()) {
+					return o1.getAlt() - o2.getAlt();
 				}
-				else if (o1.state.stateNumber != o2.state.stateNumber) {
-					return o1.state.stateNumber - o2.state.stateNumber;
+				else if (o1.getState().stateNumber != o2.getState().stateNumber) {
+					return o1.getState().stateNumber - o2.getState().stateNumber;
 				}
 				else {
-					return o1.semanticContext.toString().compareTo(o2.semanticContext.toString());
+					return o1.getSemanticContext().toString().compareTo(o2.getSemanticContext().toString());
 				}
 			}
 		});

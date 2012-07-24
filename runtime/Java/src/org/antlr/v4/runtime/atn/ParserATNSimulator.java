@@ -803,9 +803,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			for (int ci=0; ci<ncl; ci++) { // TODO: foreach
 				ATNConfig c = closureConfigs.get(ci);
 				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
-				int n = c.state.getNumberOfTransitions();
+				int n = c.getState().getNumberOfTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each transition
-					Transition trans = c.state.transition(ti);
+					Transition trans = c.getState().transition(ti);
 					ATNState target = getReachableTarget(c, trans, t);
 					if ( target!=null ) {
 						reachIntermediate.add(new ATNConfig(c, target));
@@ -1035,8 +1035,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		SemanticContext[] altToPred = new SemanticContext[nalts +1];
 		int n = altToPred.length;
 		for (ATNConfig c : configs) {
-			if ( ambigAlts.contains(c.alt) ) {
-				altToPred[c.alt] = SemanticContext.or(altToPred[c.alt], c.semanticContext);
+			if ( ambigAlts.contains(c.getAlt()) ) {
+				altToPred[c.getAlt()] = SemanticContext.or(altToPred[c.getAlt()], c.getSemanticContext());
 			}
 		}
 
@@ -1182,30 +1182,30 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return; // avoid infinite recursion
 		}
 
-		boolean hasEmpty = config.context.hasEmpty();
-		if ( config.state instanceof RuleStopState ) {
+		boolean hasEmpty = config.getContext().hasEmpty();
+		if ( config.getState() instanceof RuleStopState ) {
 			if ( !greedy ) {
 				// don't see past end of a rule for any nongreedy decision
 				if ( debug ) System.out.println("NONGREEDY at stop state of "+
-												getRuleName(config.state.ruleIndex));
+												getRuleName(config.getState().ruleIndex));
 				configs.add(config, contextCache);
 				return;
 			}
 			// We hit rule end. If we have context info, use it
-			if ( config.context!=null && !config.context.isEmpty() ) {
-				int nonEmptySize = config.context.size() - (hasEmpty ? 1 : 0);
+			if ( config.getContext()!=null && !config.getContext().isEmpty() ) {
+				int nonEmptySize = config.getContext().size() - (hasEmpty ? 1 : 0);
 				for (int i = 0; i < nonEmptySize; i++) {
-					PredictionContext newContext = config.context.getParent(i); // "pop" invoking state
-					ATNState invokingState = atn.states.get(config.context.getInvokingState(i));
+					PredictionContext newContext = config.getContext().getParent(i); // "pop" invoking state
+					ATNState invokingState = atn.states.get(config.getContext().getInvokingState(i));
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
 					ATNState retState = rt.followState;
-					ATNConfig c = new ATNConfig(retState, config.alt, newContext, config.semanticContext);
+					ATNConfig c = new ATNConfig(retState, config.getAlt(), newContext, config.getSemanticContext());
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having fallen off a rule.
 					// Make sure we track that we are now out of context.
-					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
+					c.setOuterContextDepth(config.getOuterContextDepth());
 					assert depth > Integer.MIN_VALUE;
-					if (optimize_closure_busy && c.context.isEmpty() && !closureBusy.add(c)) {
+					if (optimize_closure_busy && c.getContext().isEmpty() && !closureBusy.add(c)) {
 						continue;
 					}
 
@@ -1216,7 +1216,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					return;
 				}
 
-				config = new ATNConfig(config, config.state, PredictionContext.EMPTY_LOCAL);
+				config = new ATNConfig(config, config.getState(), PredictionContext.EMPTY_LOCAL);
 			}
 			else if (!hasMoreContexts) {
 				configs.add(config, contextCache);
@@ -1225,11 +1225,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			else {
 				// else if we have no context info, just chase follow links (if greedy)
 				if ( debug ) System.out.println("FALLING off rule "+
-												getRuleName(config.state.ruleIndex));
+												getRuleName(config.getState().ruleIndex));
 			}
 		}
 
-		ATNState p = config.state;
+		ATNState p = config.getState();
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, contextCache);
@@ -1243,16 +1243,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
 			if ( c!=null ) {
 				if (loopsSimulateTailRecursion) {
-					if ( config.state instanceof StarLoopbackState || config.state instanceof PlusLoopbackState ) {
-						c.context = contextCache.getChild(c.context, config.state.stateNumber);
-						if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+c.context);
+					if ( config.getState() instanceof StarLoopbackState || config.getState() instanceof PlusLoopbackState ) {
+						c.setContext(contextCache.getChild(c.getContext(), config.getState().stateNumber));
+						if ( debug ) System.out.println("Loop back; push "+config.getState().stateNumber+", stack="+c.getContext());
 					}
 				}
 
-				if (config.state instanceof LoopEndState) {
-					if ( debug ) System.out.println("Loop end; pop, stack="+c.context);
-					LoopEndState end = (LoopEndState)config.state;
-					c.context = c.context.popAll(end.loopBackStateNumber, contextCache);
+				if (config.getState() instanceof LoopEndState) {
+					if ( debug ) System.out.println("Loop end; pop, stack="+c.getContext());
+					LoopEndState end = (LoopEndState)config.getState();
+					c.setContext(c.getContext().popAll(end.loopBackStateNumber, contextCache));
 				}
 
 				if (t instanceof RuleTransition) {
@@ -1264,13 +1264,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 				if (optimize_closure_busy) {
 					boolean checkClosure = false;
-					if (c.state instanceof StarLoopEntryState || c.state instanceof BlockEndState || c.state instanceof LoopEndState) {
+					if (c.getState() instanceof StarLoopEntryState || c.getState() instanceof BlockEndState || c.getState() instanceof LoopEndState) {
 						checkClosure = true;
 					}
-					else if (c.state instanceof PlusBlockStartState) {
+					else if (c.getState() instanceof PlusBlockStartState) {
 						checkClosure = true;
 					}
-					else if (config.state instanceof RuleStopState && c.context.isEmpty()) {
+					else if (config.getState() instanceof RuleStopState && c.getContext().isEmpty()) {
 						checkClosure = true;
 					}
 
@@ -1280,13 +1280,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				int newDepth = depth;
-				if ( config.state instanceof RuleStopState ) {
+				if ( config.getState() instanceof RuleStopState ) {
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
 					// track how far we dip into outer context.  Might
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
-					c.reachesIntoOuterContext++;
+					c.setOuterContextDepth(c.getOuterContextDepth() + 1);
 					assert newDepth > Integer.MIN_VALUE;
 					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
@@ -1352,7 +1352,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
         if ( collectPredicates &&
 			 (!pt.isCtxDependent || (pt.isCtxDependent&&inContext)) )
 		{
-            SemanticContext newSemCtx = SemanticContext.and(config.semanticContext, pt.getPredicate());
+            SemanticContext newSemCtx = SemanticContext.and(config.getSemanticContext(), pt.getPredicate());
             c = new ATNConfig(config, pt.target, newSemCtx);
         }
 		else {
@@ -1367,15 +1367,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull Transition t, @Nullable PredictionContextCache contextCache) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
-							   ", ctx="+config.context);
+							   ", ctx="+config.getContext());
 		}
-		ATNState p = config.state;
+		ATNState p = config.getState();
 		PredictionContext newContext;
 		if (contextCache != null) {
-			newContext = contextCache.getChild(config.context, p.stateNumber);
+			newContext = contextCache.getChild(config.getContext(), p.stateNumber);
 		}
 		else {
-			newContext = config.context.getChild(p.stateNumber);
+			newContext = config.getContext().getChild(p.stateNumber);
 		}
 
 		return new ATNConfig(config, t.target, newContext);
@@ -1458,13 +1458,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		Map<Integer, IntervalSet> stateToAltListMap = new HashMap<Integer, IntervalSet>();
 
 		for (ATNConfig c : configs) {
-			stateToConfigListMap.map(c.state.stateNumber, c);
-			IntervalSet alts = stateToAltListMap.get(c.state.stateNumber);
+			stateToConfigListMap.map(c.getState().stateNumber, c);
+			IntervalSet alts = stateToAltListMap.get(c.getState().stateNumber);
 			if ( alts==null ) {
 				alts = new IntervalSet();
-				stateToAltListMap.put(c.state.stateNumber, alts);
+				stateToAltListMap.put(c.getState().stateNumber, alts);
 			}
-			alts.add(c.alt);
+			alts.add(c.getAlt());
 		}
 		// potential conflicts are states, s, with > 1 configurations and diff alts
 		// find all alts with potential conflicts
@@ -1476,7 +1476,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( !atn.states.get(state).onlyHasEpsilonTransitions() ) {
 					List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
 					ATNConfig anyConfig = configsPerState.get(0);
-					altsToIgnore.add(anyConfig.alt);
+					altsToIgnore.add(anyConfig.getAlt());
 					if ( debug ) System.out.println("### one alt and all non-ep: "+configsPerState);
 				}
 				// remove state's configurations from further checking; no issues with them.
@@ -1514,19 +1514,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				ATNConfig c = configsPerState.get(i);
 				for (int j = i+1; j < size; j++) {
 					ATNConfig d = configsPerState.get(j);
-					if ( c.alt != d.alt ) {
+					if ( c.getAlt() != d.getAlt() ) {
 						boolean conflicting =
-							c.context.equals(d.context);
+							c.getContext().equals(d.getContext());
 						if ( conflicting ) {
 							if ( debug ) {
-								System.out.println("we reach state "+c.state.stateNumber+
+								System.out.println("we reach state "+c.getState().stateNumber+
 												   " in rule "+
-												   (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
-												   " alts "+c.alt+","+d.alt+" from ctx "+Utils.join(c.context.toStrings(parser, c.state.stateNumber), "")
-												   +" and "+ Utils.join(d.context.toStrings(parser, d.state.stateNumber), ""));
+												   (parser !=null ? getRuleName(c.getState().ruleIndex) :"n/a")+
+												   " alts "+c.getAlt()+","+d.getAlt()+" from ctx "+Utils.join(c.getContext().toStrings(parser, c.getState().stateNumber), "")
+												   +" and "+ Utils.join(d.getContext().toStrings(parser, d.getState().stateNumber), ""));
 							}
-							ambigAlts.add(c.alt);
-							ambigAlts.add(d.alt);
+							ambigAlts.add(c.getAlt());
+							ambigAlts.add(d.getAlt());
 						}
 					}
 				}
@@ -1583,8 +1583,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.deadEndConfigs) {
 			String trans = "no edges";
-			if ( c.state.getNumberOfTransitions()>0 ) {
-				Transition t = c.state.transition(0);
+			if ( c.getState().getNumberOfTransitions()>0 ) {
+				Transition t = c.getState().transition(0);
 				if ( t instanceof AtomTransition) {
 					AtomTransition at = (AtomTransition)t;
 					trans = "Atom "+getTokenName(at.label);
@@ -1615,9 +1615,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
-				alt = c.alt; // found first alt
+				alt = c.getAlt(); // found first alt
 			}
-			else if ( c.alt!=alt ) {
+			else if ( c.getAlt()!=alt ) {
 				return ATN.INVALID_ALT_NUMBER;
 			}
 		}
@@ -1626,8 +1626,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public boolean configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
 		for (ATNConfig c : configs) {
-			if ( c.alt == alt ) {
-				if ( c.state.getClass() == RuleStopState.class ) {
+			if ( c.getAlt() == alt ) {
+				if ( c.getState().getClass() == RuleStopState.class ) {
 					return true;
 				}
 			}
