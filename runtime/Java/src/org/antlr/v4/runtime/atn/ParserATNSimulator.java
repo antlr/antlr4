@@ -982,8 +982,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   boolean collectPredicates,
 						   boolean greedy, boolean loopsSimulateTailRecursion)
 	{
-//		System.out.println(PredictionContext.toDOTString(config.context));
-
 		final int initialDepth = 0;
 		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates, greedy,
 												 loopsSimulateTailRecursion, initialDepth);
@@ -1492,6 +1490,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		newState.stateNumber = dfa.states.size();
 //		System.out.println("Before opt, cache size = "+ sharedContextCache.size());
+
 		configs.optimizeConfigs(this);
 //		System.out.println("After opt, cache size = " + sharedContextCache.size());
 		newState.configs = new ATNConfigSet(configs, contextCache);

@@ -169,7 +169,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			// of those graphs.  dup a, a' points at merged array
 			// new joined parent so create new singleton pointing to it, a'
 			PredictionContext a_ = new SingletonPredictionContext(parent, a.invokingState);
-			a_ = contextCache.add(a_);
+			if ( contextCache!=null ) a_ = contextCache.add(a_);
 			return a_;
 		}
 		else { // a != b payloads differ
@@ -191,7 +191,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				}
 				PredictionContext[] parents = {singleParent, singleParent};
 				PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
-				a_ = contextCache.add(a_);
+				if ( contextCache!=null ) a_ = contextCache.add(a_);
 				return a_;
 			}
 			// parents differ and can't merge them. Just pack together
@@ -205,7 +205,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				parents = new PredictionContext[] {b.parent, a.parent};
 			}
 			PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
-			a_ = contextCache.add(a_);
+			if ( contextCache!=null ) a_ = contextCache.add(a_);
 			return a_;
 		}
 	}
@@ -229,7 +229,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				PredictionContext[] parents = {null, b.parent};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
-				joined = contextCache.add(joined);
+				if ( contextCache!=null ) joined = contextCache.add(joined);
 				return joined;
 			}
 			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
@@ -237,7 +237,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				PredictionContext[] parents = {null, a.parent};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
-				joined = contextCache.add(joined);
+				if ( contextCache!=null ) joined = contextCache.add(joined);
 				return joined;
 			}
 		}
@@ -335,10 +335,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		PredictionContext M =
 			new ArrayPredictionContext(mergedParents, mergedInvokingStates);
-		if ( contextCache==null ) {
-			System.err.println("foooooo");
-		}
-		M = contextCache.add(M);
+		if ( contextCache!=null ) M = contextCache.add(M);
 
 		// if we created same array as a or b, return that instead
 		// TODO: track whether this is possible above during merge sort for speed
