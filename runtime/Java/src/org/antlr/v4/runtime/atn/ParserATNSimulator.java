@@ -562,7 +562,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				D.configs.conflictingAlts = getConflictingAlts(reach, false);
 				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
-						int k = input.index() - startIndex + 1; // how much input we used
+//						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
 							 !D.configs.dipsIntoOuterContext || SLL )
@@ -735,10 +735,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean greedy,
 										   boolean loopsSimulateTailRecursion,
-										   boolean fullCtx) {
+										   boolean fullCtx)
+	{
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
 		ATNConfigSet reach = new ATNConfigSet(fullCtx);
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
+		ATNConfigSet intermediate = new ATNConfigSet();
+		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
 			int n = c.state.getNumberOfTransitions();
@@ -746,10 +749,30 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					closure(new ATNConfig(c, target), reach, closureBusy, false, greedy, loopsSimulateTailRecursion);
+					intermediate.add(new ATNConfig(c, target), contextCache);
 				}
 			}
 		}
+		// Now figure out where the closure can take us, but only if we'll
+		// need to continue looking for more input.
+		if ( intermediate.size()==1 || ParserATNSimulator.getUniqueAlt(intermediate)==1 ) {
+			// Don't pursue the closure if there is just one state.
+			// It can only have one alternative; just add to result
+			// Also don't pursue the closure if there is unique alternative
+			// among the configurations.
+			reach.add(intermediate.get(0));
+		}
+		else if ( ParserATNSimulator.getUniqueAlt(intermediate)==1 ) {
+			// Also don't pursue the closure if there is unique alternative
+			// among the configurations.
+			reach.addAll(intermediate);
+		}
+		else {
+			for (ATNConfig c : intermediate) {
+				closure(c, reach, closureBusy, false, greedy, loopsSimulateTailRecursion);
+			}
+		}
+
 		if ( reach.size()==0 ) return null;
 		return reach;
 	}
@@ -1401,7 +1424,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											configs, outerContext);
 	}
 
-	public int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
+	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {

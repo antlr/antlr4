@@ -335,6 +335,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		PredictionContext M =
 			new ArrayPredictionContext(mergedParents, mergedInvokingStates);
+		if ( contextCache==null ) {
+			System.err.println("foooooo");
+		}
 		M = contextCache.add(M);
 
 		// if we created same array as a or b, return that instead
