@@ -249,6 +249,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
+	public static int retry_with_context_predicts_same_as_alt = 0;
+	public static int retry_with_context_from_dfa = 0;
 
 	@Nullable
 	protected final Parser parser;
@@ -386,11 +388,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					computeStartState(dfa.atnStartState, outerContext,
 									  greedy, loopsSimulateTailRecursion,
 									  fullCtx);
+				retry_with_context_from_dfa++;
 				ATNConfigSet fullCtxSet =
 					execATNWithFullContext(dfa, s, s0_closure,
 										   input, startIndex,
 										   outerContext,
 										   decState.getNumberOfTransitions(),
+										   ATN.INVALID_ALT_NUMBER,
 										   greedy);
 				contextCache = null;
 				return fullCtxSet.uniqueAlt;
@@ -587,6 +591,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 																input, startIndex,
 																outerContext,
 																decState.getNumberOfTransitions(),
+																D.configs.conflictingAlts.getMinElement(),
 																greedy);
 							// not accept state: isCtxSensitive
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
@@ -665,6 +670,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											   @NotNull TokenStream input, int startIndex,
 											   ParserRuleContext<?> outerContext,
 											   int nalts,
+											   int SLL_min_alt, // todo: is this in D as min ambig alts?
 											   boolean greedy)
 	{
 		retry_with_context++;
@@ -693,8 +699,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
 			retry_with_context_indicates_no_conflict++;
 			reportContextSensitivity(dfa, reach, startIndex, input.index());
+			if ( reach.uniqueAlt == SLL_min_alt ) {
+				retry_with_context_predicts_same_as_alt++;
+			}
 			return reach;
 		}
+
 
 		if ( reach.hasSemanticContext ) {
 			SemanticContext[] altToPred = getPredsForAmbigAlts(reach.conflictingAlts, reach, nalts);
