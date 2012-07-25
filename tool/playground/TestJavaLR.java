@@ -27,9 +27,9 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.runtime.debug.BlankDebugEventListener;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -43,6 +43,9 @@ class TestJavaLR {
 	public static JavaLRLexer lexer;
 	public static JavaLRParser parser = null;
 	public static boolean showTree = false;
+	public static boolean printTree = false;
+	public static boolean SLL = false;
+	public static boolean diag = false;
 
 	public static void main(String[] args) {
 		doAll(args);
@@ -57,6 +60,9 @@ class TestJavaLR {
 				// for each directory/file specified on the command line
 				for(int i=0; i< args.length;i++) {
 					if ( args[i].equals("-tree") ) showTree = true;
+					else if ( args[i].equals("-ptree") ) printTree = true;
+					else if ( args[i].equals("-SLL") ) SLL = true;
+					else if ( args[i].equals("-diag") ) diag = true;
 					doFile(new File(args[i])); // parse it
 				}
 			}
@@ -75,9 +81,6 @@ class TestJavaLR {
 			System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 			System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
 			System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
-			if ( profile ) {
-				System.out.println("num decisions "+profiler.numDecisions);
-			}
 		}
 		catch(Exception e) {
 			System.err.println("exception: "+e);
@@ -106,14 +109,6 @@ class TestJavaLR {
 		}
 	}
 
-	static class CountDecisions extends BlankDebugEventListener {
-		public int numDecisions = 0;
-		public void enterDecision(int decisionNumber) {
-			numDecisions++;
-		}
-	}
-	static CountDecisions profiler = new CountDecisions();
-
 	// Here's where we do the real work...
 	public static void parseFile(String f)
 								 throws Exception {
@@ -135,15 +130,17 @@ class TestJavaLR {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
 					parser = new JavaLRParser(null);
-					if ( showTree ) parser.setBuildParseTree(true);
 //                    parser.setErrorHandler(new BailErrorStrategy<Token>());
 //					parser.getInterpreter().setContextSensitive(true);
 				}
 
 				parser.setTokenStream(tokens);
+				if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
+				if ( SLL ) parser.getInterpreter().SLL = true;
 				// start parsing at the compilationUnit rule
 				ParserRuleContext<Token> tree = parser.compilationUnit();
-                if ( showTree ) tree.inspect(parser);
+				if ( showTree ) tree.inspect(parser);
+				if ( printTree ) System.out.println(tree.toStringTree(parser));
 				//System.err.println("finished "+f);
 //                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
 			}

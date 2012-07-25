@@ -267,6 +267,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 */
 	public boolean reportAmbiguities = true;
 
+	/** Do only local context prediction (SLL(k) style). */
+	public boolean SLL = false;
+
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
@@ -374,7 +377,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
-			if ( s.isCtxSensitive ) {
+			if ( s.isCtxSensitive && !SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean loopsSimulateTailRecursion = true;
 				boolean fullCtx = false;
@@ -562,7 +565,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-							 !D.configs.dipsIntoOuterContext )
+							 !D.configs.dipsIntoOuterContext || SLL )
 						{
 							if ( reportAmbiguities && !D.configs.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(),
