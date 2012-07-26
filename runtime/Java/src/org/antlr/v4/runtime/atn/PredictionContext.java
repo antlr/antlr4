@@ -122,7 +122,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 										  @NotNull PredictionContextCache contextCache,
 										  boolean rootIsWildcard)
 	{
-		if ( (a==null&&b==null) || a.equals(b) ) return a; // share same graph if both same
+		if ( (a==null&&b==null) || a==b || a.equals(b) ) return a; // share same graph if both same
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
