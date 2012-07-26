@@ -91,6 +91,7 @@ class TestJavaLR {
 			System.err.println("exception: "+e);
 			e.printStackTrace(System.err);   // so we can get stack trace
 		}
+		System.gc();
 	}
 
 
