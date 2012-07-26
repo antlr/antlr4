@@ -122,7 +122,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 *  We use (s,i,pi) as key
 	 */
 	public boolean add(ATNConfig config, @Nullable PredictionContextCache contextCache) {
-		//contextCache = null; // TODO: costs time to cache and saves essentially no RAM
+		contextCache = null; // TODO: costs time to cache and saves essentially no RAM
 		Key key = new Key(config);
 		ATNConfig existing = configToContext.get(key);
 		if ( existing==null ) { // nothing there yet; easy, just add

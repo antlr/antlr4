@@ -311,10 +311,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	{
 		int line = -1;
 		int charPositionInLine = -1;
-		if (offendingToken instanceof Token) {
-			line = ((Token) offendingToken).getLine();
-			charPositionInLine = ((Token) offendingToken).getCharPositionInLine();
-		}
+		line = offendingToken.getLine();
+		charPositionInLine = offendingToken.getCharPositionInLine();
 
 		ANTLRErrorListener listener = getErrorListenerDispatch();
 		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
