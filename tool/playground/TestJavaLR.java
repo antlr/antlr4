@@ -28,6 +28,7 @@
  */
 
 import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -46,6 +47,7 @@ class TestJavaLR {
 	public static boolean printTree = false;
 	public static boolean SLL = false;
 	public static boolean diag = false;
+	public static boolean bail = false;
 
 	public static void main(String[] args) {
 		doAll(args);
@@ -62,6 +64,7 @@ class TestJavaLR {
 					if ( args[i].equals("-tree") ) showTree = true;
 					else if ( args[i].equals("-ptree") ) printTree = true;
 					else if ( args[i].equals("-SLL") ) SLL = true;
+					else if ( args[i].equals("-bail") ) bail = true;
 					else if ( args[i].equals("-diag") ) diag = true;
 					doFile(new File(args[i])); // parse it
 				}
@@ -132,13 +135,12 @@ class TestJavaLR {
 				// Create a parser that reads from the scanner
 				if ( parser==null ) {
 					parser = new JavaLRParser(null);
-//                    parser.setErrorHandler(new BailErrorStrategy<Token>());
-//					parser.getInterpreter().setContextSensitive(true);
+					if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
+					if ( bail ) parser.setErrorHandler(new BailErrorStrategy());
+					if ( SLL ) parser.getInterpreter().SLL = true;
 				}
 
 				parser.setTokenStream(tokens);
-				if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
-				if ( SLL ) parser.getInterpreter().SLL = true;
 				// start parsing at the compilationUnit rule
 				ParserRuleContext<Token> tree = parser.compilationUnit();
 				if ( showTree ) tree.inspect(parser);

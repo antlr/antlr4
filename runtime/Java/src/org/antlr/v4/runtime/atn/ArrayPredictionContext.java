@@ -145,6 +145,7 @@ public class ArrayPredictionContext extends PredictionContext {
 			else {
 				next = new SingletonPredictionContext(this.parents[i],
 													  this.invokingStates[i]);
+				if ( contextCache!=null ) next = contextCache.add(next);
 			}
 			boolean rootIsWildcard = fullCtx;
 			newCtx = merge(newCtx, next, contextCache, rootIsWildcard);

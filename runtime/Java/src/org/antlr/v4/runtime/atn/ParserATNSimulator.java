@@ -267,10 +267,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 * to {@code false} enables additional internal optimizations which may lose
 	 * this information.
 	 */
+	// TODO: not sure we need
 	public boolean reportAmbiguities = true;
 
 	/** Do only local context prediction (SLL(k) style). */
 	public boolean SLL = false;
+
+	// LAME globals to avoid parameter during experiment!!!!!
+	protected TokenStream _input;
+	protected int _startIndex;
+	protected ParserRuleContext<?> _outerContext;
 
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
@@ -295,6 +301,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public int adaptivePredict(@NotNull TokenStream input, int decision,
 							   @Nullable ParserRuleContext<?> outerContext)
 	{
+		if ( debug || debug_list_atn_decisions )  {
+			System.out.println("adaptivePredict decision "+decision+
+							   " exec LA(1)=="+ getLookaheadName(input)+
+							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+		}
+		_input = input;
+		_startIndex = input.index();
+		_outerContext = outerContext;
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 		if ( dfa==null || dfa.s0==null ) {
@@ -324,7 +338,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		contextCache = new PredictionContextCache("predict ctx cache");
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug || debug_list_atn_decisions )  {
-			System.out.println("ATN decision "+dfa.decision+
+			System.out.println("predictATN decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input) +
 							   ", outerContext="+outerContext.toString(parser));
 		}
@@ -364,7 +378,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
     {
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( dfa_debug ) {
-			System.out.println("DFA decision "+dfa.decision+
+			System.out.println("execDFA decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input) +
 							   ", outerContext="+outerContext.toString(parser));
 		}
@@ -534,7 +548,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( debug || debug_list_atn_decisions) {
 			System.out.println("execATN decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input)+
-							   "line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
 		ATN_failover++;
 
@@ -551,7 +565,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		while (true) { // while more work
 			boolean loopsSimulateTailRecursion = false;
-			ATNConfigSet reach = computeReachSet(previous, t, greedy,
+//			System.out.println("REACH "+getLookaheadName(input));
+			ATNConfigSet reach = computeReachSet(previous, t,
+												 input,
+												 startIndex,
+												 outerContext,
+												 greedy,
 												 loopsSimulateTailRecursion,
 												 false);
 			if ( reach==null ) throw noViableAlt(input, outerContext, previous, startIndex);
@@ -676,13 +695,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		retry_with_context++;
 		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
 
-		if ( debug ) System.out.println("execATNWithFullContext "+s0+", greedy="+greedy);
+		if ( debug || debug_list_atn_decisions ) {
+			System.out.println("execATNWithFullContext "+s0+", greedy="+greedy);
+		}
 		ATNConfigSet reach = null;
 		ATNConfigSet previous = s0;
 		input.seek(startIndex);
 		int t = input.LA(1);
 		while (true) { // while more work
-			reach = computeReachSet(previous, t, greedy, true, true);
+//			System.out.println("LL REACH "+getLookaheadName(input)+
+//							   " from configs.size="+previous.size()+
+//							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+			reach = computeReachSet(previous, t, input, startIndex, outerContext, greedy, true, true);
 			if ( reach==null ) {
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
@@ -743,6 +767,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
+										   @NotNull TokenStream input,
+										   int startIndex,
+										   ParserRuleContext<?> outerContext,
 										   boolean greedy,
 										   boolean loopsSimulateTailRecursion,
 										   boolean fullCtx)
@@ -778,8 +805,44 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			reach.addAll(intermediate);
 		}
 		else {
+			// Ok, no unique alt, but now strip out all false preds to
+			// reduce load. This helps a lot in predicated configs from
+			// left-recursive expression rules.
+
+			//-------------
+//			IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
+//			D.prediction = ATN.INVALID_ALT_NUMBER;
+//			switch (alts.size()) {
+//			case 0:
+//				throw noViableAlt(input, outerContext, D.configs, startIndex);
+//
+//			case 1:
+//				return alts.getMinElement();
+//
+//			default:
+//				// report ambiguity after predicate evaluation to make sure the correct
+//				// set of ambig alts is reported.
+//				if (reportAmbiguities) {
+//					reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
+//				}
+//
+//				return alts.getMinElement();
+//			}
+			//---------------
+
 			for (ATNConfig c : intermediate) {
+//				if ( c.semanticContext!=null && c.semanticContext!=SemanticContext.NONE ) {
+//					int currentPosition = input.index();
+//					input.seek(startIndex);
+//					boolean predSucceeds = c.semanticContext.eval(parser, outerContext);
+//					input.seek(currentPosition);
+//					if ( !predSucceeds ) continue;
+//				}
+				// pred evaluated to true, must compute closure (will eval 2nd time after this func)
+				long start = System.currentTimeMillis();
 				closure(c, reach, closureBusy, false, greedy, loopsSimulateTailRecursion);
+				long stop = System.currentTimeMillis();
+				//System.out.println("CLOSURE duration "+(stop-start)+": "+c);
 			}
 		}
 
@@ -950,12 +1013,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				continue;
 			}
 
-			boolean evaluatedResult = pair.pred.eval(parser, outerContext);
+			boolean predicateEvaluationResult = pair.pred.eval(parser, outerContext);
 			if ( debug || dfa_debug ) {
-				System.out.println("eval pred "+pair+"="+evaluatedResult);
+				System.out.println("eval pred "+pair+"="+predicateEvaluationResult);
 			}
 
-			if ( evaluatedResult ) {
+			if ( predicateEvaluationResult ) {
 				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
 				predictions.add(pair.alt);
 				if (!complete) {
@@ -1163,13 +1226,26 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             }
 		}
 
-        ATNConfig c;
-        if ( collectPredicates &&
+		ATNConfig c = null;
+		if ( collectPredicates &&
 			 (!pt.isCtxDependent || (pt.isCtxDependent&&inContext)) )
 		{
-            SemanticContext newSemCtx = SemanticContext.and(config.semanticContext, pt.getPredicate());
-            c = new ATNConfig(config, pt.target, newSemCtx);
-        }
+			SemanticContext newSemCtx = SemanticContext.and(config.semanticContext, pt.getPredicate());
+			if ( SLL ) {
+				c = new ATNConfig(config, pt.target, newSemCtx);
+			}
+			else {
+				int currentPosition = _input.index();
+				_input.seek(_startIndex);
+				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				_input.seek(currentPosition);
+				if ( predSucceeds ) {
+					// TODO: ignore semctx in config now? actually can only ignore in full LL mode
+					// REMOVE pred eval chk above?  Actually no preds so it's a no-op
+					c = new ATNConfig(config, pt.target); // no pred context
+				}
+			}
+		}
 		else {
 			c = new ATNConfig(config, pt.target);
 		}
@@ -1261,6 +1337,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@Nullable
 	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs, boolean fullCtx) {
 		if ( debug ) System.out.println("### check ambiguous  "+configs);
+//		System.out.println("getConflictingAlts; set size="+configs.size());
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
 		MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
