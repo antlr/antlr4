@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,7 +77,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private final List<ATNConfig> configs;
 
 	private int uniqueAlt;
-	private IntervalSet conflictingAlts;
+	private BitSet conflictingAlts;
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation.  Don't make a DFA state from this.
 	private boolean hasSemanticContext;
@@ -458,11 +459,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		hasSemanticContext = true;
 	}
 
-	public IntervalSet getConflictingAlts() {
+	public BitSet getConflictingAlts() {
 		return conflictingAlts;
 	}
 
-	public void setConflictingAlts(IntervalSet conflictingAlts) {
+	public void setConflictingAlts(BitSet conflictingAlts) {
 		//ensureWritable(); <-- these do end up set after the DFAState is created, but set to a distinct value
 		this.conflictingAlts = conflictingAlts;
 	}

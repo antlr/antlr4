@@ -33,6 +33,8 @@ import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
+import java.util.BitSet;
+
 /**
  *
  * @author Sam Harwell
@@ -53,7 +55,7 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
-								IntervalSet ambigAlts,
+								BitSet ambigAlts,
 								ATNConfigSet configs)
 	{
 	}

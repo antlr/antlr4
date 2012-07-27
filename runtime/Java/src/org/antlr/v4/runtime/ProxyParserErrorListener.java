@@ -33,6 +33,7 @@ import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
+import java.util.BitSet;
 import java.util.Collection;
 
 /**
@@ -45,7 +46,7 @@ public class ProxyParserErrorListener<Symbol extends Token> extends ProxyErrorLi
 	}
 
 	@Override
-	public void reportAmbiguity(Parser<? extends Symbol> recognizer, DFA dfa, int startIndex, int stopIndex, IntervalSet ambigAlts, ATNConfigSet configs) {
+	public void reportAmbiguity(Parser<? extends Symbol> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
 		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
 			if (!(listener instanceof ParserErrorListener<?>)) {
 				continue;

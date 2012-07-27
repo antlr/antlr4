@@ -72,6 +72,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -612,7 +613,7 @@ public class TestPerformance extends BaseTest {
 	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener<Token> {
 
 		@Override
-		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, IntervalSet ambigAlts, ATNConfigSet configs) {
+		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
 			if (!REPORT_AMBIGUITIES) {
 				return;
 			}

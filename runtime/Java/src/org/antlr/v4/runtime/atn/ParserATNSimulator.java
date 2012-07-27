@@ -47,6 +47,7 @@ import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -557,9 +558,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( acceptState.predicates!=null ) {
 						// rewind input so pred's LT(i) calls make sense
 						input.seek(startIndex);
-						IntervalSet predictions = evalSemanticContext(s.predicates, outerContext, true);
+						BitSet predictions = evalSemanticContext(s.predicates, outerContext, true);
 						if ( predictions.size() == 1 ) {
-							return predictions.getMinElement();
+							return predictions.nextSetBit(0);
 						}
 					}
 
@@ -576,12 +577,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// rewind input so pred's LT(i) calls make sense
 			input.seek(startIndex);
 			// since we don't report ambiguities in execDFA, we never need to use complete predicate evaluation here
-			IntervalSet alts = evalSemanticContext(s.predicates, outerContext, false);
-			if (alts.isNil()) {
+			BitSet alts = evalSemanticContext(s.predicates, outerContext, false);
+			if (alts.isEmpty()) {
 				throw noViableAlt(input, outerContext, s.configset, startIndex);
 			}
 
-			return alts.getMinElement();
+			return alts.nextSetBit(0);
 		}
 
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
@@ -706,9 +707,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 								if (predPredictions != null) {
 									input.seek(startIndex);
 									// always use complete evaluation here since we'll want to retry with full context if still ambiguous
-									IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
+									BitSet alts = evalSemanticContext(predPredictions, outerContext, true);
 									if (alts.size() == 1) {
-										return alts.getMinElement();
+										return alts.nextSetBit(0);
 									}
 								}
 							}
@@ -756,14 +757,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
+					BitSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.size()) {
 					case 0:
 						throw noViableAlt(input, outerContext, D.configset, startIndex);
 
 					case 1:
-						return alts.getMinElement();
+						return alts.nextSetBit(0);
 
 					default:
 						// report ambiguity after predicate evaluation to make sure the correct
@@ -772,7 +773,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
 						}
 
-						return alts.getMinElement();
+						return alts.nextSetBit(0);
 					}
 				}
 			}
@@ -1000,7 +1001,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 													   RuleContext<Symbol> outerContext,
 													   int nalts)
 	{
-		IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
+		BitSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
 		if ( debug ) System.out.println("predicateDFAState "+D);
 		SemanticContext[] altToPred = getPredsForAmbigAlts(conflictingAlts, configs, nalts);
 		// altToPred[uniqueAlt] is now our validating predicate (if any)
@@ -1015,7 +1016,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return predPredictions;
 	}
 
-	public SemanticContext[] getPredsForAmbigAlts(@NotNull IntervalSet ambigAlts,
+	public SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
 												  @NotNull ATNConfigSet configs,
 												  int nalts)
 	{
@@ -1035,7 +1036,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		SemanticContext[] altToPred = new SemanticContext[nalts +1];
 		int n = altToPred.length;
 		for (ATNConfig c : configs) {
-			if ( ambigAlts.contains(c.getAlt()) ) {
+			if ( ambigAlts.get(c.getAlt()) ) {
 				altToPred[c.getAlt()] = SemanticContext.or(altToPred[c.getAlt()], c.getSemanticContext());
 			}
 		}
@@ -1061,7 +1062,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return altToPred;
 	}
 
-	public DFAState.PredPrediction[] getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
+	public DFAState.PredPrediction[] getPredicatePredictions(BitSet ambigAlts, SemanticContext[] altToPred) {
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
 		boolean containsPredicate = false;
 		for (int i = 1; i < altToPred.length; i++) {
@@ -1075,7 +1076,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// Any unambig alts or ambig naked alts after first ambig naked are ignored
 			// (null, i) means alt i is the default prediction
 			// if no (null, i), then no default prediction.
-			if (ambigAlts!=null && ambigAlts.contains(i) && pred==SemanticContext.NONE) {
+			if (ambigAlts!=null && ambigAlts.get(i) && pred==SemanticContext.NONE) {
 				pairs.add(new DFAState.PredPrediction(null, i));
 			}
 			else if ( pred!=SemanticContext.NONE ) {
@@ -1099,14 +1100,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 * @param checkUniqueMatch If true, {@link ATN#INVALID_ALT_NUMBER} will be returned
 	 *      if the match in not unique.
 	 */
-	public IntervalSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
+	public BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
 										   ParserRuleContext<Symbol> outerContext,
 										   boolean complete)
 	{
-		IntervalSet predictions = new IntervalSet();
+		BitSet predictions = new BitSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
 			if ( pair.pred==null ) {
-				predictions.add(pair.alt);
+				predictions.set(pair.alt);
 				if (!complete) {
 					break;
 				}
@@ -1121,7 +1122,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			if ( evaluatedResult ) {
 				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
-				predictions.add(pair.alt);
+				predictions.set(pair.alt);
 				if (!complete) {
 					break;
 				}
@@ -1450,33 +1451,33 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 functions
 	 */
 	@Nullable
-	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs) {
+	public BitSet getConflictingAlts(@NotNull ATNConfigSet configs) {
 		if ( debug ) System.out.println("### check ambiguous  "+configs);
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
 		MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
-		Map<Integer, IntervalSet> stateToAltListMap = new HashMap<Integer, IntervalSet>();
+		Map<Integer, BitSet> stateToAltListMap = new HashMap<Integer, BitSet>();
 
 		for (ATNConfig c : configs) {
 			stateToConfigListMap.map(c.getState().stateNumber, c);
-			IntervalSet alts = stateToAltListMap.get(c.getState().stateNumber);
+			BitSet alts = stateToAltListMap.get(c.getState().stateNumber);
 			if ( alts==null ) {
-				alts = new IntervalSet();
+				alts = new BitSet();
 				stateToAltListMap.put(c.getState().stateNumber, alts);
 			}
-			alts.add(c.getAlt());
+			alts.set(c.getAlt());
 		}
 		// potential conflicts are states, s, with > 1 configurations and diff alts
 		// find all alts with potential conflicts
 		int numPotentialConflicts = 0;
-		IntervalSet altsToIgnore = new IntervalSet();
+		BitSet altsToIgnore = new BitSet();
 		for (int state : stateToConfigListMap.keySet()) { // for each state
-			IntervalSet alts = stateToAltListMap.get(state);
+			BitSet alts = stateToAltListMap.get(state);
 			if ( alts.size()==1 ) {
 				if ( !atn.states.get(state).onlyHasEpsilonTransitions() ) {
 					List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
 					ATNConfig anyConfig = configsPerState.get(0);
-					altsToIgnore.add(anyConfig.getAlt());
+					altsToIgnore.set(anyConfig.getAlt());
 					if ( debug ) System.out.println("### one alt and all non-ep: "+configsPerState);
 				}
 				// remove state's configurations from further checking; no issues with them.
@@ -1498,16 +1499,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		// compare each pair of configs in sets for states with > 1 alt in config list, looking for
 		// (s, i, ctx) and (s, j, ctx') where ctx==ctx' or one is suffix of the other.
-		IntervalSet ambigAlts = new IntervalSet();
+		BitSet ambigAlts = new BitSet();
 		for (int state : stateToConfigListMap.keySet()) {
 			List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
 			if (configsPerState == null) continue;
-			IntervalSet alts = stateToAltListMap.get(state);
+			BitSet alts = stateToAltListMap.get(state);
 // Sam's correction to ambig def is here:
-			if ( !altsToIgnore.isNil() && alts.and(altsToIgnore).size()<=1 ) {
-//				System.err.println("ignoring alt since "+alts+"&"+altsToIgnore+
-//								   ".size is "+alts.and(altsToIgnore).size());
-				continue;
+			if ( !altsToIgnore.isEmpty() ) {
+				BitSet combined = (BitSet)alts.clone();
+				combined.and(altsToIgnore);
+				if (combined.size() <= 1) {
+//					System.err.println("ignoring alt since "+alts+"&"+altsToIgnore+
+//									   ".size is "+alts.and(altsToIgnore).size());
+					continue;
+				}
 			}
 			int size = configsPerState.size();
 			for (int i = 0; i < size; i++) {
@@ -1525,8 +1530,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												   " alts "+c.getAlt()+","+d.getAlt()+" from ctx "+Utils.join(c.getContext().toStrings(parser, c.getState().stateNumber), "")
 												   +" and "+ Utils.join(d.getContext().toStrings(parser, d.getState().stateNumber), ""));
 							}
-							ambigAlts.add(c.getAlt());
-							ambigAlts.add(d.getAlt());
+							ambigAlts.set(c.getAlt());
+							ambigAlts.set(d.getAlt());
 						}
 					}
 				}
@@ -1535,15 +1540,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if ( debug ) System.out.println("### ambigAlts="+ambigAlts);
 
-		if ( ambigAlts.isNil() ) return null;
+		if ( ambigAlts.isEmpty() ) return null;
 
 		return ambigAlts;
 	}
 
-	protected IntervalSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
-		IntervalSet conflictingAlts;
+	protected BitSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
+		BitSet conflictingAlts;
 		if ( configs.getUniqueAlt()!= ATN.INVALID_ALT_NUMBER ) {
-			conflictingAlts = IntervalSet.of(configs.getUniqueAlt());
+			conflictingAlts = new BitSet();
+			conflictingAlts.set(configs.getUniqueAlt());
 		}
 		else {
 			conflictingAlts = configs.getConflictingAlts();
@@ -1551,10 +1557,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return conflictingAlts;
 	}
 
-	protected int resolveToMinAlt(@NotNull DFAState D, IntervalSet conflictingAlts) {
+	protected int resolveToMinAlt(@NotNull DFAState D, BitSet conflictingAlts) {
 		// kill dead alts so we don't chase them ever
 //		killAlts(conflictingAlts, D.configset);
-		D.prediction = conflictingAlts.getMinElement();
+		D.prediction = conflictingAlts.nextSetBit(0);
 		if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
 		return D.prediction;
 	}
@@ -1753,7 +1759,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     public void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
-								@NotNull IntervalSet ambigAlts,
+								@NotNull BitSet ambigAlts,
 								@NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {

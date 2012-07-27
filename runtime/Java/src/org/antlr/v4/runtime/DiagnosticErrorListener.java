@@ -36,10 +36,12 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.BitSet;
+
 public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorListener<Symbol> {
     @Override
     public void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+								DFA dfa, int startIndex, int stopIndex, @NotNull BitSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
 		String format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";

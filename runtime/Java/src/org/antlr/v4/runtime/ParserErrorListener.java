@@ -35,6 +35,8 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.BitSet;
+
 /** How to emit recognition errors */
 public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorListener<Symbol> {
 	/** Called when the parser detects a true ambiguity: an input sequence can be matched
@@ -45,7 +47,7 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
      * full context.
      */
     void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
-						 DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+						 DFA dfa, int startIndex, int stopIndex, @NotNull BitSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
 	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
