@@ -68,9 +68,6 @@ public class ATNConfig {
 	 */
 	public int reachesIntoOuterContext;
 
-	/** Capture lexer action we traverse */
-	public int lexerActionIndex = -1; // TOOD: move to subclass
-
     @NotNull
     public final SemanticContext semanticContext;
 
@@ -112,7 +109,6 @@ public class ATNConfig {
 		this.context = context;
 		this.semanticContext = semanticContext;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
-		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
 	/** An ATN configuration is equal to another if both have
