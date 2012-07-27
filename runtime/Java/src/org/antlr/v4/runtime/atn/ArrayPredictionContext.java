@@ -27,7 +27,7 @@
  */
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.atn.PredictionContextCache.IdentityCommutativeOperands;
+import org.antlr.v4.runtime.atn.PredictionContextCache.IdentityCommutativePredictionContextOperands;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayDeque;
@@ -219,16 +219,16 @@ public class ArrayPredictionContext extends PredictionContext {
 		}
 
 		ArrayPredictionContext other = (ArrayPredictionContext)o;
-		return equals(other, new HashSet<IdentityCommutativeOperands<PredictionContext>>());
+		return equals(other, new HashSet<IdentityCommutativePredictionContextOperands>());
 	}
 
-	private boolean equals(ArrayPredictionContext other, Set<IdentityCommutativeOperands<PredictionContext>> visited) {
+	private boolean equals(ArrayPredictionContext other, Set<IdentityCommutativePredictionContextOperands> visited) {
 		Deque<PredictionContext> selfWorkList = new ArrayDeque<PredictionContext>();
 		Deque<PredictionContext> otherWorkList = new ArrayDeque<PredictionContext>();
 		selfWorkList.push(this);
 		otherWorkList.push(other);
 		while (!selfWorkList.isEmpty()) {
-			IdentityCommutativeOperands<PredictionContext> operands = new IdentityCommutativeOperands<PredictionContext>(selfWorkList.pop(), otherWorkList.pop());
+			IdentityCommutativePredictionContextOperands operands = new IdentityCommutativePredictionContextOperands(selfWorkList.pop(), otherWorkList.pop());
 			if (!visited.add(operands)) {
 				continue;
 			}

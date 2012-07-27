@@ -41,8 +41,8 @@ public class PredictionContextCache {
         new HashMap<PredictionContext, PredictionContext>();
     private final Map<ObjectAndInt<PredictionContext>, PredictionContext> childContexts =
         new HashMap<ObjectAndInt<PredictionContext>, PredictionContext>();
-    private final Map<IdentityCommutativeOperands<PredictionContext>, PredictionContext> joinContexts =
-        new HashMap<IdentityCommutativeOperands<PredictionContext>, PredictionContext>();
+    private final Map<IdentityCommutativePredictionContextOperands, PredictionContext> joinContexts =
+        new HashMap<IdentityCommutativePredictionContextOperands, PredictionContext>();
 
     private final boolean enableCache;
 
@@ -89,7 +89,7 @@ public class PredictionContextCache {
             return PredictionContext.join(x, y, this);
         }
 
-        IdentityCommutativeOperands<PredictionContext> operands = new IdentityCommutativeOperands<PredictionContext>(x, y);
+        IdentityCommutativePredictionContextOperands operands = new IdentityCommutativePredictionContextOperands(x, y);
         PredictionContext result = joinContexts.get(operands);
         if (result != null) {
             return result;
@@ -132,44 +132,40 @@ public class PredictionContextCache {
         }
     }
 
-    protected static class IdentityCommutativeOperands<T> {
+    protected static final class IdentityCommutativePredictionContextOperands {
 
-        private final T x;
-        private final T y;
-		private final int xHashCode;
-		private final int yHashCode;
+        private final PredictionContext x;
+        private final PredictionContext y;
 
-        public IdentityCommutativeOperands(T x, T y) {
+        public IdentityCommutativePredictionContextOperands(PredictionContext x, PredictionContext y) {
             this.x = x;
             this.y = y;
-			this.xHashCode = System.identityHashCode(x);
-			this.yHashCode = System.identityHashCode(y);
         }
 
-        public T getX() {
+        public PredictionContext getX() {
             return x;
         }
 
-        public T getY() {
+        public PredictionContext getY() {
             return y;
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof IdentityCommutativeOperands<?>)) {
+            if (!(obj instanceof IdentityCommutativePredictionContextOperands)) {
                 return false;
             }
             else if (this == obj) {
                 return true;
             }
 
-            IdentityCommutativeOperands<?> other = (IdentityCommutativeOperands<?>)obj;
+            IdentityCommutativePredictionContextOperands other = (IdentityCommutativePredictionContextOperands)obj;
             return (this.x == other.x && this.y == other.y) || (this.x == other.y && this.y == other.x);
         }
 
         @Override
         public int hashCode() {
-            return xHashCode ^ yHashCode;
+            return x.hashCode() ^ y.hashCode();
         }
     }
 
