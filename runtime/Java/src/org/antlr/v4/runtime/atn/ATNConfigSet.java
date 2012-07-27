@@ -88,6 +88,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
+	/** Once we add to DFAState, set readonly so DFA never changes */
 	protected boolean readonly = false;
 
 	/** Track every config we add */
