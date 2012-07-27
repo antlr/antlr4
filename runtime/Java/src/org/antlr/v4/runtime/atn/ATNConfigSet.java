@@ -45,6 +45,12 @@ import java.util.Set;
  */
 public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: convert to long like Sam? use list and map from config to ctx?
+	/*
+	The reason that we need this is because we don't want the hash map to use
+	the standard hash code and equals. We need all configurations with the same
+	(s,i,_,semctx) to be equal. Unfortunately, this key effectively doubles
+	the number of objects associated with ATNConfigs.
+	 */
 	public static class Key {
 		ATNState state;
 		int alt;
