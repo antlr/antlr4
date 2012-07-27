@@ -322,7 +322,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 
 				// Did we hit a stop state during reach op?
-				processAcceptConfigs(input, reach);
+				reach = processAcceptConfigs(input, reach);
 
 				// Add an edge from s to target DFA found/created for reach
 				target = addDFAEdge(s, t, reach);
@@ -390,7 +390,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void processAcceptConfigs(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
+	protected ATNConfigSet processAcceptConfigs(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
 		if ( debug ) {
 			System.out.format("processAcceptConfigs: reach=%s, prevAccept=%s, prevIndex=%d\n",
 						 	  reach, prevAccept.config, prevAccept.index);
@@ -422,12 +422,13 @@ public class LexerATNSimulator extends ATNSimulator {
 				// if we reach lexer accept state, toss out any configs in rest
 				// of configs work list associated with this rule (config.alt);
 				// that rule is done. this is how we cut off nongreedy .+ loops.
-				deleteWildcardConfigsForAlt(reach, ci, c.alt); // CAUSES INF LOOP if reach not closure
+				reach = deleteWildcardConfigsForAlt(reach, ci, c.alt);
 
 				 // move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
 			}
 		}
+		return reach;
 	}
 
 	protected void accept(@NotNull CharStream input, int ruleIndex, int actionIndex,
@@ -488,21 +489,24 @@ public class LexerATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	public void deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
+	/** Delete configs for alt following ci. Closure is unmodified; copy returned. */
+	public ATNConfigSet deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
+		ATNConfigSet dup = new ATNConfigSet(closure, null);
 		int j=ci+1;
-		while ( j<closure.size() ) {
-			ATNConfig c = closure.get(j);
-			boolean isWildcard = c.state.getClass() == ATNState.class &&
-				c.state.transition(0).getClass() == WildcardTransition.class;
+		while ( j < dup.size() ) {
+			ATNConfig c = dup.get(j);
+			boolean isWildcard = c.state.getClass() == ATNState.class && // plain state only, not rulestop etc..
+				c.state.transition(0) instanceof WildcardTransition;
 			if ( c.alt == alt && isWildcard ) {
 				if ( debug ) {
 					System.out.format("deleteWildcardConfigsForAlt %s\n", c);
 				}
 
-				closure.remove(j);
+				dup.remove(j);
 			}
 			else j++;
 		}
+		return dup;
 	}
 
 	@NotNull
@@ -730,8 +734,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		newState.stateNumber = dfa[mode].states.size();
-		newState.configs = new ATNConfigSet();
-		newState.configs.addAll(configs);
+		configs.readonly = true;
+		newState.configs = configs;
 		dfa[mode].states.put(newState, newState);
 		return newState;
 	}

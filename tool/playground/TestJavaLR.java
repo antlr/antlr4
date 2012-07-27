@@ -43,7 +43,8 @@ class TestJavaLR {
 	public static boolean profile = false;
 	public static JavaLRLexer lexer;
 	public static JavaLRParser parser = null;
-	public static boolean showTree = false;
+	public static boolean notree = false;
+	public static boolean gui = false;
 	public static boolean printTree = false;
 	public static boolean SLL = false;
 	public static boolean diag = false;
@@ -61,7 +62,8 @@ class TestJavaLR {
 			if (args.length > 0 ) {
 				// for each directory/file specified on the command line
 				for(int i=0; i< args.length;i++) {
-					if ( args[i].equals("-tree") ) showTree = true;
+					if ( args[i].equals("-notree") ) notree = true;
+					else if ( args[i].equals("-gui") ) gui = true;
 					else if ( args[i].equals("-ptree") ) printTree = true;
 					else if ( args[i].equals("-SLL") ) SLL = true;
 					else if ( args[i].equals("-bail") ) bail = true;
@@ -143,9 +145,10 @@ class TestJavaLR {
 
 				parser.setTokenStream(tokens);
 				// start parsing at the compilationUnit rule
-				ParserRuleContext<Token> tree = parser.compilationUnit();
-				if ( showTree ) tree.inspect(parser);
-				if ( printTree ) System.out.println(tree.toStringTree(parser));
+				ParserRuleContext<Token> t = parser.compilationUnit();
+				if ( notree ) parser.setBuildParseTree(false);
+				if ( gui ) t.inspect(parser);
+				if ( printTree ) System.out.println(t.toStringTree(parser));
 				//System.err.println("finished "+f);
 //                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
 			}

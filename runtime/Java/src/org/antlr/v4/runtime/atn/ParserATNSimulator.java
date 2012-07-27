@@ -616,7 +616,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
 		ATNConfigSet reach = new ATNConfigSet(fullCtx);
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-		ATNConfigSet intermediate = new ATNConfigSet();
+		ATNConfigSet intermediate = new ATNConfigSet(fullCtx);
 		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
@@ -1394,8 +1394,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		configs.optimizeConfigs(this);
 //		System.out.println("After opt, cache size = " + sharedContextCache.size());
-		newState.configs = new ATNConfigSet(configs, contextCache);
-
+		configs.readonly = true;
+		newState.configs = configs;
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;

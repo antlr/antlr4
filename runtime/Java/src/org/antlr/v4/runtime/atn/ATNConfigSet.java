@@ -88,9 +88,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
+	protected boolean readonly = false;
+
 	/** Track every config we add */
-	public final LinkedHashMap<Key,ATNConfig> configToContext =
-		new LinkedHashMap<Key, ATNConfig>();
+	public final LinkedHashMap<Key,ATNConfig> configToContext;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	// too hard to keep in sync
@@ -111,11 +112,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	public final boolean fullCtx;
 
-	public ATNConfigSet(boolean fullCtx) { this.fullCtx = fullCtx; }
-	public ATNConfigSet() { this.fullCtx = true; }
+	public ATNConfigSet(boolean fullCtx) {
+		configToContext = new LinkedHashMap<Key, ATNConfig>();
+		this.fullCtx = fullCtx;
+	}
+	public ATNConfigSet() { this(true); }
 
 	public ATNConfigSet(ATNConfigSet old, PredictionContextCache contextCache) {
-		addAll(old, contextCache);
+		configToContext = new LinkedHashMap<Key, ATNConfig>(old.configToContext);
 		this.fullCtx = old.fullCtx;
 		this.uniqueAlt = old.uniqueAlt;
 		this.conflictingAlts = old.conflictingAlts;
@@ -133,6 +137,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 *  We use (s,i,pi) as key
 	 */
 	public boolean add(ATNConfig config, @Nullable PredictionContextCache contextCache) {
+		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		contextCache = null; // TODO: costs time to cache and saves essentially no RAM
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
@@ -172,21 +177,24 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return states;
 	}
 
+	// TODO: very expensive, used in lexer to kill after wildcard config
 	public ATNConfig get(int i) {
 		int j = 0;
 		for (ATNConfig c : configToContext.values()) {
 			if ( j == i ) return c;
 			j++;
 		}
-		throw new IndexOutOfBoundsException();
+		throw new IndexOutOfBoundsException("config set index "+i+" not in 0.."+size());
 	}
 
 	public void remove(int i) {
+		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		ATNConfig c = elements().get(i);
 		configToContext.remove(new Key(c));
 	}
 
 	public void optimizeConfigs(ATNSimulator interpreter) {
+		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( configToContext.isEmpty() ) return;
 
 		for (ATNConfig config : configToContext.values()) {
@@ -214,8 +222,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public boolean equals(Object o) {
 //		System.out.print("equals " + this + ", " + o+" = ");
+		ATNConfigSet other = (ATNConfigSet)o;
 		boolean same = configToContext!=null &&
-			           configToContext.equals(((ATNConfigSet)o).configToContext);
+			configToContext.equals(other.configToContext) &&
+			this.fullCtx == other.fullCtx &&
+			this.uniqueAlt == other.uniqueAlt &&
+			this.conflictingAlts == other.conflictingAlts &&
+			this.hasSemanticContext == other.hasSemanticContext &&
+			this.dipsIntoOuterContext == other.dipsIntoOuterContext;
+
 //		System.out.println(same);
 		return same;
 	}
@@ -250,6 +265,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public void clear() {
+		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		configToContext.clear();
 	}
 
