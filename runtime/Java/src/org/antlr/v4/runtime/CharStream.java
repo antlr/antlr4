@@ -31,7 +31,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 
 /** A source of characters for an ANTLR lexer */
-public interface CharStream extends IntStream<Integer> {
+public interface CharStream extends IntStream {
 	public static final int EOF = -1;
 	public static final int MIN_CHAR = Character.MIN_VALUE;
 	public static final int MAX_CHAR = Character.MAX_VALUE-1; // FFFE is max

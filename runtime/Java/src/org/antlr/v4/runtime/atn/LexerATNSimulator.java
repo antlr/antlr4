@@ -506,7 +506,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected ATNConfigSet computeStartState(@NotNull IntStream<Integer> input,
+	protected ATNConfigSet computeStartState(@NotNull IntStream input,
 											 @NotNull ATNState p)
 	{
 		PredictionContext initialContext = PredictionContext.EMPTY_FULL;

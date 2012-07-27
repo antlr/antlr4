@@ -157,5 +157,5 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 //		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 
-	public abstract IntStream<? extends Symbol> getInputStream();
+	public abstract IntStream getInputStream();
 }

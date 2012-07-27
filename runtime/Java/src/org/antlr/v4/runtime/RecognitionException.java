@@ -49,7 +49,7 @@ public class RecognitionException extends RuntimeException {
 
 	protected RuleContext<?> ctx;
 
-	protected IntStream<?> input;
+	protected IntStream input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
 //	public int offendingTokenIndex;
@@ -70,7 +70,7 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	public <Symbol extends Token> RecognitionException(@Nullable Recognizer<Symbol, ?> recognizer,
-													   IntStream<? extends Symbol> input,
+													   IntStream input,
 													   @Nullable ParserRuleContext<Symbol> ctx)
 	{
 		this.recognizer = recognizer;
@@ -99,7 +99,7 @@ public class RecognitionException extends RuntimeException {
 		return ctx;
 	}
 
-	public IntStream<?> getInputStream() {
+	public IntStream getInputStream() {
 		return input;
 	}
 
@@ -109,11 +109,6 @@ public class RecognitionException extends RuntimeException {
 
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
-	}
-
-	@SuppressWarnings("unchecked") // safe
-	public <T> IntStream<? extends T> getInputStream(Recognizer<T, ?> recognizer) {
-		return this.recognizer == recognizer ? (IntStream<? extends T>)input : null;
 	}
 
 	@SuppressWarnings("unchecked") // safe
