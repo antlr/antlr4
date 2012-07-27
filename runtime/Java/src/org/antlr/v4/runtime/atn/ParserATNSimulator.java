@@ -54,7 +54,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- The embodiment of the adaptive LL(*) parsing strategy.
+ The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
 
  The basic complexity of the adaptive strategy makes it harder to
  understand. We begin with ATN simulation to build paths in a
@@ -67,19 +67,18 @@ import java.util.Set;
  All of that is done without using the outer context because we
  want to create a DFA that is not dependent upon the rule
  invocation stack when we do a prediction.  One DFA works in all
- contexts. We avoid using context not necessarily because it
+ contexts. We avoid using context not necessarily because it's
  slower, although it can be, but because of the DFA caching
  problem.  The closure routine only considers the rule invocation
- stack created during prediction beginning in the entry rule.  For
+ stack created during prediction beginning in the decision rule.  For
  example, if prediction occurs without invoking another rule's
  ATN, there are no context stacks in the configurations. When this
  leads to a conflict, we don't know if it's an ambiguity or a
  weakness in the strong LL(*) parsing strategy (versus full
  LL(*)).
 
- So, we simply retry the ATN simulation again, this time
- using full outer context and filling a dummy DFA (to avoid
- polluting the context insensitive DFA). Configuration context
+ So, we simply rewind and retry the ATN simulation again, this time
+ using full outer context without adding to the DFA. Configuration context
  stacks will be the full invocation stack from the start rule. If
  we get a conflict using full context, then we can definitively
  say we have a true ambiguity for that input sequence. If we don't
@@ -87,157 +86,41 @@ import java.util.Set;
  outer context. (It is not context-sensitive in the sense of
  context sensitive grammars.) We create a special DFA accept state
  that maps rule context to a predicted alternative. That is the
- only modification needed to handle full LL(*) prediction. In
- general, full context prediction will use more lookahead than
- necessary, but it pays to share the same DFA. For a schedule
- proof that full context prediction uses that most the same amount
- of lookahead as a context insensitive prediction, see the comment
- on method retryWithContext().
+ only modification needed to handle full LL(*) vs SLL(*) prediction.
 
  So, the strategy is complex because we bounce back and forth from
  the ATN to the DFA, simultaneously performing predictions and
  extending the DFA according to previously unseen input
- sequences. The retry with full context is a recursive call to the
- same function naturally because it does the same thing, just with
- a different initial context. The problem is, that we need to pass
- in a "full context mode" parameter so that it knows to report
- conflicts differently. It also knows not to do a retry, to avoid
- infinite recursion, if it is already using full context.
+ sequences.
 
- Retry a simulation using full outer context.
-	 *
-	 *  One of the key assumptions here is that using full context
-	 *  can use at most the same amount of input as a simulation
-	 *  that is not useful context (i.e., it uses all possible contexts
-	 *  that could invoke our entry rule. I believe that this is true
-	 *  and the proof might go like this.
-	 *
-	 *  THEOREM:  The amount of input consumed during a full context
-	 *  simulation is at most the amount of input consumed during a
-	 *  non full context simulation.
-	 *
-	 *  PROOF: Let D be the DFA state at which non-context simulation
-	 *  terminated. That means that D does not have a configuration for
-	 *  which we can legally pursue more input. (It is legal to work only
-	 *  on configurations for which there is no conflict with another
-	 *  configuration.) Now we restrict ourselves to following ATN edges
-	 *  associated with a single context. Choose any DFA state D' along
-	 *  the path (same input) to D. That state has either the same number
-	 *  of configurations or fewer. (If the number of configurations is
-	 *  the same, then we have degenerated to the non-context case.) Now
-	 *  imagine that we restrict to following edges associated with
-	 *  another single context and that we reach DFA state D'' for the
-	 *  same amount of input as D'. The non-context simulation merges D'
-	 *  and D''. The union of the configuration sets either has the same
-	 *  number of configurations as both D' and D'' or it has more. If it
-	 *  has the same number, we are no worse off and the merge does not
-	 *  force us to look for more input than we would otherwise have to
-	 *  do. If the union has more configurations, it can introduce
-	 *  conflicts but not new alternatives--we cannot conjure up alternatives
-	 *  by computing closure on the DFA state.  Here are the cases for
-	 *  D' union D'':
-	 *
-	 *  1. No increase in configurations, D' = D''
-	 *  2. Add configuration that introduces a new alternative number.
-	 *     This cannot happen because no new alternatives are introduced
-	 *     while computing closure, even during start state computation.
-	 *  3. D'' adds a configuration that does not conflict with any
-	 *     configuration in D'.  Simulating without context would then have
-	 *     forced us to use more lookahead than D' (full context) alone.
-	 *  3. D'' adds a configuration that introduces a conflict with a
-	 *     configuration in D'. There are 2 cases:
-	 *     a. The conflict does not cause termination (D' union D''
-	 *        is added to the work list). Again no context simulation requires
-	 *        more input.
-	 *     b. The conflict does cause termination, but this cannot happen.
-	 *        By definition, we know that with ALL contexts merged we
-	 *        don't terminate until D and D' uses less input than D. Therefore
-	 *        no context simulation requires more input than full context
-	 *        simulation.
-	 *
-	 *  We have covered all the cases and there is never a situation where
-	 *  a single, full context simulation requires more input than a
-	 *  no context simulation.
+ We avoid doing full context retry when the outer context is empty,
+ we did not dip into the outer context by falling off the end of the
+ decision state rule, or when we force SLL mode.
 
-	 I spent a bunch of time thinking about this problem after finding
-	 a case where context-sensitive ATN simulation looks beyond what they
-	 no context simulation uses. the no context simulation for if then else
-	 stops at the else whereas full context scans through to the end of the
-	 statement to decide that the "else statement" clause is ambiguous. And
-	 sometimes it is not ambiguous! Ok, I made an untrue assumption in my
-	 proof which I won't bother going to. the important thing is what I'm
-	 going to do about it. I thought I had a simple answer, but nope. It
-	 turns out that the if then else case is perfect example of something
-	 that has the following characteristics:
+ As an example of the not dip into outer context case, consider
+ as super constructor calls versus function calls. One grammar
+ might look like this:
 
-	 * no context conflicts at k=1
-	 * full context at k=(1 + length of statement) can be both ambiguous and not
-	   ambiguous depending on the input, though I think from different contexts.
+ ctorBody : '{' superCall? stat* '}' ;
 
-	 But, the good news is that the k=1 case is a special case in that
-	 SLL(1) and LL(1) have exactly the same power so we can conclude that
-	 conflicts at k=1 are true ambiguities and we do not need to pursue
-	 context-sensitive parsing. That covers a huge number of cases
-	 including the if then else clause and the predicated precedence
-	 parsing mechanism. whew! because that could be extremely expensive if
-	 we had to do context.
+ Or, you might see something like
 
-	 Further, there is no point in doing full context if none of the
-	 configurations dip into the outer context. This nicely handles cases
-	 such as super constructor calls versus function calls. One grammar
-	 might look like this:
+ stat : superCall ';' | expression ';' | ... ;
 
-	 ctorBody : '{' superCall? stat* '}' ;
+ In both cases I believe that no closure operations will dip into the
+ outer context. In the first case ctorBody in the worst case will stop
+ at the '}'. In the 2nd case it should stop at the ';'. Both cases
+ should stay within the entry rule and not dip into the outer context.
 
-	 Or, you might see something like
+ When we are forced to do full context parsing, I mark the DFA state
+ with isCtxSensitive=true when we reach conflict in SLL prediction.
+ Any further DFA simulation that reaches that state will
+ launch an ATN simulation to get the prediction, without updating the
+ DFA or storing any context information.
 
-	 stat : superCall ';' | expression ';' | ... ;
-
-	 In both cases I believe that no closure operations will dip into the
-	 outer context. In the first case ctorBody in the worst case will stop
-	 at the '}'. In the 2nd case it should stop at the ';'. Both cases
-	 should stay within the entry rule and not dip into the outer context.
-
-	 So, we now cover what I hope is the vast majority of the cases (in
-	 particular the very important precedence parsing case). Anything that
-	 needs k>1 and dips into the outer context requires a full context
-	 retry. In this case, I'm going to start out with a brain-dead solution
-	 which is to mark the DFA state as context-sensitive when I get a
-	 conflict. Any further DFA simulation that reaches that state will
-	 launch an ATN simulation to get the prediction, without updating the
-	 DFA or storing any context information. Later, I can make this more
-	 efficient, but at least in this case I can guarantee that it will
-	 always do the right thing. We are not making any assumptions about
-	 lookahead depth.
-
-	 Ok, writing this up so I can put in a comment.
-
-	 Upon conflict in the no context simulation:
-
-	 * if k=1, report ambiguity and resolve to the minimum conflicting alternative
-
-	 * if k=1 and predicates, no report and include the predicate to
-	   predicted alternative map in the DFA state
-
-	 * if k=* and we did not dip into the outer context, report ambiguity
-	   and resolve to minimum conflicting alternative
-
-	 * if k>1 and we dip into outer context, retry with full context
-		 * if conflict, report ambiguity and resolve to minimum conflicting
-		   alternative, mark DFA as context-sensitive
-		 * If no conflict, report ctx sensitivity and mark DFA as context-sensitive
-		 * Technically, if full context k is less than no context k, we can
-			 reuse the conflicting DFA state so we don't have to create special
-			 DFA paths branching from context, but we can leave that for
-			 optimization later if necessary.
-
-	 * if non-greedy, no report and resolve to the exit alternative
- *
- * 	By default we do full context-sensitive LL(*) parsing not
- 	 *  Strong LL(*) parsing. If we fail with Strong LL(*) we
- 	 *  try full LL(*). That means we rewind and use context information
- 	 *  when closure operations fall off the end of the rule that
- 	 *  holds the decision were evaluating
+ Predicates can be tested during SLL mode when we are sure that
+ the conflicted state is a true ambiguity not an unknown conflict.
+ This only happens with the special context circumstances mentioned above.
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean debug = false;
@@ -258,22 +141,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@NotNull
 	public final DFA[] decisionToDFA;
 
-	/**
-	 * When {@code true}, ambiguous alternatives are reported when they are
-	 * encountered within {@link #execATN}. When {@code false}, these messages
-	 * are suppressed. The default is {@code true}.
-	 * <p>
-	 * When messages about ambiguous alternatives are not required, setting this
-	 * to {@code false} enables additional internal optimizations which may lose
-	 * this information.
-	 */
-	// TODO: not sure we need
-	public boolean reportAmbiguities = true;
-
 	/** Do only local context prediction (SLL(k) style). */
 	public boolean SLL = false;
 
-	// LAME globals to avoid parameter during experiment!!!!!
+	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
 	protected TokenStream _input;
 	protected int _startIndex;
 	protected ParserRuleContext<?> _outerContext;
@@ -396,7 +267,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( s.isCtxSensitive && !SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean loopsSimulateTailRecursion = true;
-				boolean fullCtx = false;
+				boolean fullCtx = true;
 				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState, outerContext,
@@ -407,7 +278,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					execATNWithFullContext(dfa, s, s0_closure,
 										   input, startIndex,
 										   outerContext,
-										   decState.getNumberOfTransitions(),
 										   ATN.INVALID_ALT_NUMBER,
 										   greedy);
 				contextCache = null;
@@ -480,11 +350,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //		}
 
 		// Before jumping to prediction, check to see if there are
-		// disambiguating or validating predicates to evaluate
+		// disambiguating predicates to evaluate
 		if ( s.predicates!=null ) {
 			// rewind input so pred's LT(i) calls make sense
 			input.seek(startIndex);
-			// since we don't report ambiguities in execDFA, we never need to use complete predicate evaluation here
+			// since we don't report ambiguities in execDFA, we never need to
+			// use complete predicate evaluation here
 			IntervalSet alts = evalSemanticContext(s.predicates, outerContext, false);
 			if (alts.isNil()) {
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
@@ -567,9 +438,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			boolean loopsSimulateTailRecursion = false;
 //			System.out.println("REACH "+getLookaheadName(input));
 			ATNConfigSet reach = computeReachSet(previous, t,
-												 input,
-												 startIndex,
-												 outerContext,
 												 greedy,
 												 loopsSimulateTailRecursion,
 												 false);
@@ -588,9 +456,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-							 !D.configs.dipsIntoOuterContext || SLL )
+							 !D.configs.dipsIntoOuterContext ||         // didn't fall out of rule
+							 SLL )                                      // not forcing SLL only
 						{
-							if ( reportAmbiguities && !D.configs.hasSemanticContext ) {
+							if ( !D.configs.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(),
 												D.configs.conflictingAlts, D.configs);
 							}
@@ -609,7 +478,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							fullCtxSet = execATNWithFullContext(dfa, D, s0_closure,
 																input, startIndex,
 																outerContext,
-																decState.getNumberOfTransitions(),
 																D.configs.conflictingAlts.getMinElement(),
 																greedy);
 							// not accept state: isCtxSensitive
@@ -647,13 +515,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			if ( D.isAcceptState && D.configs.hasSemanticContext ) {
+				// We need to test all predicates, even in DFA states that
+				// uniquely predict alternative. We can only get a conflict
+				// when we're sure that it's an ambiguity not conflict.
 				int nalts = decState.getNumberOfTransitions();
 				List<DFAState.PredPrediction> predPredictions =
 					predicateDFAState(D, D.configs, outerContext, nalts);
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
+					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.size()) {
 					case 0:
@@ -665,9 +536,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					default:
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
-						if (reportAmbiguities) {
-							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-						}
+						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
 
 						return alts.getMinElement();
 					}
@@ -688,7 +557,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											   @NotNull ATNConfigSet s0,
 											   @NotNull TokenStream input, int startIndex,
 											   ParserRuleContext<?> outerContext,
-											   int nalts,
 											   int SLL_min_alt, // todo: is this in D as min ambig alts?
 											   boolean greedy)
 	{
@@ -698,6 +566,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( debug || debug_list_atn_decisions ) {
 			System.out.println("execATNWithFullContext "+s0+", greedy="+greedy);
 		}
+		boolean fullCtx = true;
 		ATNConfigSet reach = null;
 		ATNConfigSet previous = s0;
 		input.seek(startIndex);
@@ -706,13 +575,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //			System.out.println("LL REACH "+getLookaheadName(input)+
 //							   " from configs.size="+previous.size()+
 //							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
-			reach = computeReachSet(previous, t, input, startIndex, outerContext, greedy, true, true);
+			reach = computeReachSet(previous, t, greedy, true, fullCtx);
 			if ( reach==null ) {
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
 			reach.uniqueAlt = getUniqueAlt(reach);
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
-			boolean fullCtx = true;
 			reach.conflictingAlts = getConflictingAlts(reach, fullCtx);
 			if ( reach.conflictingAlts!=null ) break;
 			previous = reach;
@@ -729,37 +597,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return reach;
 		}
 
-
-		if ( reach.hasSemanticContext ) {
-			SemanticContext[] altToPred = getPredsForAmbigAlts(reach.conflictingAlts, reach, nalts);
-			// altToPred[uniqueAlt] is now our validating predicate (if any)
-			List<DFAState.PredPrediction> predPredictions;
-			if ( altToPred!=null ) {
-				// we have a validating predicate; test it
-				predPredictions = getPredicatePredictions(reach.conflictingAlts, altToPred);
-				input.seek(startIndex);
-				IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
-				reach.uniqueAlt = ATN.INVALID_ALT_NUMBER;
-				switch (alts.size()) {
-				case 0:
-					throw noViableAlt(input, outerContext, reach, startIndex);
-
-				case 1:
-					reach.uniqueAlt = alts.getMinElement();
-					return reach;
-
-				default:
-					// reach.conflictingAlts holds the post-evaluation set of ambig alts
-					reach.conflictingAlts = alts;
-					break;
-				}
-			}
-		}
+		// We do not check predicates here because we have checked them
+		// on-the-fly when doing full context prediction.
 
 		// must have conflict
-		if (reportAmbiguities) {
-			reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
-		}
+		reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
 
 		reach.uniqueAlt = reach.conflictingAlts.getMinElement();
 
@@ -767,9 +609,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
-										   @NotNull TokenStream input,
-										   int startIndex,
-										   ParserRuleContext<?> outerContext,
 										   boolean greedy,
 										   boolean loopsSimulateTailRecursion,
 										   boolean fullCtx)
@@ -792,57 +631,22 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 		// Now figure out where the closure can take us, but only if we'll
 		// need to continue looking for more input.
-		if ( intermediate.size()==1 || ParserATNSimulator.getUniqueAlt(intermediate)==1 ) {
+		if ( intermediate.size()==1 ) {
 			// Don't pursue the closure if there is just one state.
 			// It can only have one alternative; just add to result
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
-			reach.add(intermediate.get(0));
+			reach = new ATNConfigSet(intermediate, null);
 		}
 		else if ( ParserATNSimulator.getUniqueAlt(intermediate)==1 ) {
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
-			reach.addAll(intermediate);
+			reach = new ATNConfigSet(intermediate, null);
 		}
 		else {
-			// Ok, no unique alt, but now strip out all false preds to
-			// reduce load. This helps a lot in predicated configs from
-			// left-recursive expression rules.
-
-			//-------------
-//			IntervalSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
-//			D.prediction = ATN.INVALID_ALT_NUMBER;
-//			switch (alts.size()) {
-//			case 0:
-//				throw noViableAlt(input, outerContext, D.configs, startIndex);
-//
-//			case 1:
-//				return alts.getMinElement();
-//
-//			default:
-//				// report ambiguity after predicate evaluation to make sure the correct
-//				// set of ambig alts is reported.
-//				if (reportAmbiguities) {
-//					reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-//				}
-//
-//				return alts.getMinElement();
-//			}
-			//---------------
-
 			for (ATNConfig c : intermediate) {
-//				if ( c.semanticContext!=null && c.semanticContext!=SemanticContext.NONE ) {
-//					int currentPosition = input.index();
-//					input.seek(startIndex);
-//					boolean predSucceeds = c.semanticContext.eval(parser, outerContext);
-//					input.seek(currentPosition);
-//					if ( !predSucceeds ) continue;
-//				}
-				// pred evaluated to true, must compute closure (will eval 2nd time after this func)
-				long start = System.currentTimeMillis();
-				closure(c, reach, closureBusy, false, greedy, loopsSimulateTailRecursion);
-				long stop = System.currentTimeMillis();
-				//System.out.println("CLOSURE duration "+(stop-start)+": "+c);
+				closure(c, reach, closureBusy, false, greedy,
+						loopsSimulateTailRecursion, fullCtx);
 			}
 		}
 
@@ -865,7 +669,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-			closure(c, configs, closureBusy, true, greedy, loopsSimulateTailRecursion);
+			closure(c, configs, closureBusy, true, greedy,
+					loopsSimulateTailRecursion, fullCtx);
 		}
 
 		return configs;
@@ -908,7 +713,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		// altToPred[uniqueAlt] is now our validating predicate (if any)
 		List<DFAState.PredPrediction> predPredictions = null;
 		if ( altToPred!=null ) {
-			// we have a validating predicate; test it
 			// Update DFA so reach becomes accept state with predicate
 			predPredictions = getPredicatePredictions(conflictingAlts, altToPred);
 			D.predicates = predPredictions;
@@ -952,10 +756,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
-		// Optimize away p||p and p&&p
-		for (int i = 0; i < altToPred.length; i++) {
-			altToPred[i] = altToPred[i].optimize();
-		}
+//		// Optimize away p||p and p&&p TODO: optimize() was a no-op
+//		for (int i = 0; i < altToPred.length; i++) {
+//			altToPred[i] = altToPred[i].optimize();
+//		}
 
 		// nonambig alts are null in altToPred
 		if ( nPredAlts==0 ) altToPred = null;
@@ -963,7 +767,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return altToPred;
 	}
 
-	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts, SemanticContext[] altToPred) {
+	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts,
+																 SemanticContext[] altToPred)
+	{
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
 		boolean containsPredicate = false;
 		for (int i = 1; i < altToPred.length; i++) {
@@ -972,18 +778,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// unpredicated is indicated by SemanticContext.NONE
 			assert pred != null;
 
-			// find first unpredicated but ambig alternative, if any.
-			// Only ambiguous alternatives will have SemanticContext.NONE.
-			// Any unambig alts or ambig naked alts after first ambig naked are ignored
-			// (null, i) means alt i is the default prediction
-			// if no (null, i), then no default prediction.
-			if (ambigAlts!=null && ambigAlts.contains(i) && pred==SemanticContext.NONE) {
-				pairs.add(new DFAState.PredPrediction(null, i));
-			}
-			else if ( pred!=SemanticContext.NONE ) {
-				containsPredicate = true;
+			if (ambigAlts!=null && ambigAlts.contains(i)) {
 				pairs.add(new DFAState.PredPrediction(pred, i));
 			}
+			if ( pred!=SemanticContext.NONE ) containsPredicate = true;
 		}
 
 		if ( !containsPredicate ) {
@@ -996,7 +794,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
 	 *  pairs that win. A {@code null} predicate indicates an alt containing an
-	 *  unpredicated config which behaves as "always true."
+	 *  unpredicated config which behaves as "always true." If !complete
+	 *  then we stop at the first predicate that evaluates to true. This
+	 *  includes pairs with null predicates.
 	 */
 	public IntervalSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
 										   ParserRuleContext<?> outerContext,
@@ -1005,6 +805,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		IntervalSet predictions = new IntervalSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
 			if ( pair.pred==null ) {
+				System.err.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
 				predictions.add(pair.alt);
 				if (!complete) {
 					break;
@@ -1043,11 +844,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   @NotNull ATNConfigSet configs,
 						   @NotNull Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
-						   boolean greedy, boolean loopsSimulateTailRecursion)
+						   boolean greedy,
+						   boolean loopsSimulateTailRecursion,
+						   boolean fullCtx)
 	{
 		final int initialDepth = 0;
 		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates, greedy,
-												 loopsSimulateTailRecursion, initialDepth);
+												 loopsSimulateTailRecursion,
+												 fullCtx,
+												 initialDepth);
 	}
 
 	protected void closureCheckingStopStateAndLoopRecursion(@NotNull ATNConfig config,
@@ -1056,6 +861,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 															boolean collectPredicates,
 															boolean greedy,
 															boolean loopsSimulateTailRecursion,
+															boolean fullCtx,
 															int depth)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
@@ -1079,7 +885,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						if ( debug ) System.out.println("FALLING off rule "+
 														getRuleName(config.state.ruleIndex));
 						closure_(config, configs, closureBusy, collectPredicates, greedy,
-								 loopsSimulateTailRecursion, depth);
+								 loopsSimulateTailRecursion, fullCtx, depth);
 						continue;
 					}
 					ATNState invokingState = atn.states.get(ctx.invokingState);
@@ -1094,7 +900,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
 					closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, collectPredicates, greedy,
-															 loopsSimulateTailRecursion, depth - 1);
+															 loopsSimulateTailRecursion,
+															 fullCtx, depth - 1);
 				}
 				return;
 			}
@@ -1125,7 +932,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
-		closure_(config, configs, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, depth);
+		closure_(config, configs, closureBusy, collectPredicates, greedy,
+				 loopsSimulateTailRecursion, fullCtx, depth);
 	}
 
 	/** Do the actual work of walking epsilon edges */
@@ -1133,7 +941,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							@NotNull ATNConfigSet configs,
 							@NotNull Set<ATNConfig> closureBusy,
 							boolean collectPredicates,
-							boolean greedy, boolean loopsSimulateTailRecursion,
+							boolean greedy,
+							boolean loopsSimulateTailRecursion,
+							boolean fullCtx,
 							int depth)
 	{
 		ATNState p = config.state;
@@ -1153,7 +963,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			Transition t = p.transition(i);
 			boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
-			ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0);
+			ATNConfig c = getEpsilonTarget(config, t, continueCollecting,
+										   depth == 0, fullCtx);
 			if ( c!=null ) {
 				int newDepth = depth;
 				if ( config.state instanceof RuleStopState) {
@@ -1176,7 +987,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, continueCollecting, greedy,
-														 loopsSimulateTailRecursion, newDepth);
+														 loopsSimulateTailRecursion,
+														 fullCtx, newDepth);
 			}
 		}
 	}
@@ -1188,12 +1000,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, boolean inContext) {
+	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
+									  @NotNull Transition t,
+									  boolean collectPredicates,
+									  boolean inContext,
+									  boolean fullCtx)
+	{
 		if ( t instanceof RuleTransition ) {
 			return ruleTransition(config, t);
 		}
 		else if ( t instanceof PredicateTransition ) {
-			return predTransition(config, (PredicateTransition)t, collectPredicates, inContext);
+			return predTransition(config, (PredicateTransition)t,
+								  collectPredicates,
+								  inContext,
+								  fullCtx);
 		}
 		else if ( t instanceof ActionTransition ) {
 			return actionTransition(config, (ActionTransition)t);
@@ -1214,7 +1034,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ATNConfig predTransition(@NotNull ATNConfig config,
 									@NotNull PredicateTransition pt,
 									boolean collectPredicates,
-									boolean inContext)
+									boolean inContext,
+									boolean fullCtx)
 	{
 		if ( debug ) {
 			System.out.println("PRED (collectPredicates="+collectPredicates+") "+
@@ -1230,20 +1051,23 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( collectPredicates &&
 			 (!pt.isCtxDependent || (pt.isCtxDependent&&inContext)) )
 		{
-			SemanticContext newSemCtx = SemanticContext.and(config.semanticContext, pt.getPredicate());
-			if ( SLL ) {
-				c = new ATNConfig(config, pt.target, newSemCtx);
-			}
-			else {
+			if ( fullCtx ) {
+				// In full context mode, we can evaluate predicates on-the-fly
+				// during closure, which dramatically reduces the size of
+				// the config sets. It also obviates the need to test predicates
+				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
 				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
-					// TODO: ignore semctx in config now? actually can only ignore in full LL mode
-					// REMOVE pred eval chk above?  Actually no preds so it's a no-op
 					c = new ATNConfig(config, pt.target); // no pred context
 				}
+			}
+			else {
+				SemanticContext newSemCtx =
+					SemanticContext.and(config.semanticContext, pt.getPredicate());
+				c = new ATNConfig(config, pt.target, newSemCtx);
 			}
 		}
 		else {
@@ -1625,4 +1449,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);
     }
+
+	public void setSLL(boolean SLL) {
+		this.SLL = SLL;
+	}
 }

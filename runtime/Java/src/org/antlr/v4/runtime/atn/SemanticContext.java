@@ -64,8 +64,6 @@ public abstract class SemanticContext {
     */
     public abstract boolean eval(Recognizer<?,?> parser, RuleContext outerContext);
 
-	public SemanticContext optimize() { return this; }
-
     public static class Predicate extends SemanticContext {
         public final int ruleIndex;
        	public final int predIndex;

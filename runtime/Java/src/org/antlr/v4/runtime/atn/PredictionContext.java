@@ -179,7 +179,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				if ( a.parent == EMPTY ) singleParent = EMPTY;  // $ + b = $
 				if ( b.parent == EMPTY ) singleParent = EMPTY;  // a + $ = $
 			}
-			if ( a.parent.equals(b.parent) ) { // ax + bx = [a,b]x
+			if ( a==b || a.parent.equals(b.parent) ) { // ax + bx = [a,b]x
 				singleParent = a.parent;
 			}
 			if ( singleParent!=null ) {	// parents are same

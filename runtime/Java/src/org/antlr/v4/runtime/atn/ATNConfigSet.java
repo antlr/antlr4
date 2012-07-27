@@ -44,7 +44,7 @@ import java.util.Set;
  *  Might be able to optimize later w/o affecting code that uses this set.
  */
 public class ATNConfigSet implements Set<ATNConfig> {
-	// TODO: convert to long like Sam?
+	// TODO: convert to long like Sam? use list and map from config to ctx?
 	public static class Key {
 		ATNState state;
 		int alt;
@@ -98,6 +98,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean hasSemanticContext;
 	public boolean dipsIntoOuterContext;
 
+	/** Indicates that this configuration set is part of a full context
+	 *  LL prediction. It will be used to determine how to merge $. With SLL
+	 *  it's a wildcard whereas it is not for LL context merge.
+	 */
 	public final boolean fullCtx;
 
 	public ATNConfigSet(boolean fullCtx) { this.fullCtx = fullCtx; }
@@ -123,6 +127,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	public boolean add(ATNConfig config, @Nullable PredictionContextCache contextCache) {
 		contextCache = null; // TODO: costs time to cache and saves essentially no RAM
+		if ( config.semanticContext!=SemanticContext.NONE ) {
+			hasSemanticContext = true;
+		}
 		Key key = new Key(config);
 		ATNConfig existing = configToContext.get(key);
 		if ( existing==null ) { // nothing there yet; easy, just add
@@ -159,7 +166,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	public ATNConfig get(int i) {
-		return elements().get(i);
+		int j = 0;
+		for (ATNConfig c : configToContext.values()) {
+			if ( j == i ) return c;
+			j++;
+		}
+		throw new IndexOutOfBoundsException();
 	}
 
 	public void remove(int i) {
@@ -250,12 +262,17 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public Object[] toArray() {
-		throw new UnsupportedOperationException();
+		ATNConfig[] configs = new ATNConfig[configToContext.size()];
+		int i = 0;
+		for (ATNConfig c : configToContext.values()) configs[i++] = c;
+		return configs;
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a) {
-		throw new UnsupportedOperationException();
+		int i = 0;
+		for (ATNConfig c : configToContext.values()) a[i++] = (T)c;
+		return a;
 	}
 
 	@Override
