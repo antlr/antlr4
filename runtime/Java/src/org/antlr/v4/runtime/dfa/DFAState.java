@@ -94,7 +94,7 @@ public class DFAState {
 
 	/** These keys for these edges are the top level element of the global context. */
 	@Nullable
-	private EdgeMap<DFAState> contextEdges;
+	private AbstractEdgeMap<DFAState> contextEdges;
 
 	/** Symbols in this set require a global context transition before matching an input symbol. */
 	@Nullable
