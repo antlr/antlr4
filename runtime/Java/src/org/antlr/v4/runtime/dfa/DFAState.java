@@ -76,7 +76,7 @@ public class DFAState {
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable
-	private EdgeMap<DFAState> edges;
+	private AbstractEdgeMap<DFAState> edges;
 	private final int minSymbol;
 	private final int maxSymbol;
 

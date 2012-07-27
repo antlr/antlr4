@@ -108,7 +108,7 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public EdgeMap<T> put(int key, T value) {
+	public AbstractEdgeMap<T> put(int key, T value) {
 		if (key < minIndex || key > maxIndex) {
 			return this;
 		}
