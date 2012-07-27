@@ -45,14 +45,23 @@ public abstract class AbstractEdgeMap<T> implements EdgeMap<T> {
 	}
 
 	@Override
-	public EdgeMap<T> putAll(EdgeMap<? extends T> m) {
-		EdgeMap<T> result = this;
+	public abstract AbstractEdgeMap<T> put(int key, T value);
+
+	@Override
+	public AbstractEdgeMap<T> putAll(EdgeMap<? extends T> m) {
+		AbstractEdgeMap<T> result = this;
 		for (Map.Entry<Integer, ? extends T> entry : m.entrySet()) {
 			result = result.put(entry.getKey(), entry.getValue());
 		}
 
 		return result;
 	}
+
+	@Override
+	public abstract AbstractEdgeMap<T> clear();
+
+	@Override
+	public abstract AbstractEdgeMap<T> remove(int key);
 
 	protected abstract class AbstractEntrySet extends AbstractSet<Map.Entry<Integer, T>> {
 		@Override

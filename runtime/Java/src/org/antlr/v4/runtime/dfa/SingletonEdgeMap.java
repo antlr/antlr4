@@ -87,7 +87,7 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public EdgeMap<T> put(int key, T value) {
+	public AbstractEdgeMap<T> put(int key, T value) {
 		if (key < minIndex || key > maxIndex) {
 			return this;
 		}
@@ -97,7 +97,7 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 			this.value = value;
 			return this;
 		} else if (value != null) {
-			EdgeMap<T> result = new SparseEdgeMap<T>(minIndex, maxIndex);
+			AbstractEdgeMap<T> result = new SparseEdgeMap<T>(minIndex, maxIndex);
 			result = result.put(this.key, this.value);
 			result = result.put(key, value);
 			return result;
