@@ -158,6 +158,4 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	}
 
 	public abstract IntStream<? extends Symbol> getInputStream();
-
-	public abstract void setInputStream(IntStream<? extends Symbol> input);
 }

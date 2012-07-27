@@ -293,19 +293,12 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	@Override
-	public TokenStream<? extends Symbol> getInputStream() { return getTokenStream(); }
-
-	@Override
-	public final void setInputStream(IntStream<? extends Symbol> input) {
-		setTokenStream((TokenStream<? extends Symbol>)input);
-	}
-
-	public TokenStream<? extends Symbol> getTokenStream() {
+	public TokenStream<? extends Symbol> getInputStream() {
 		return _input;
 	}
 
 	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream<? extends Symbol> input) {
+	public void setInputStream(TokenStream<? extends Symbol> input) {
 		this._input = null;
 		reset();
 		this._input = input;

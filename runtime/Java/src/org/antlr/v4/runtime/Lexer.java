@@ -226,11 +226,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	/** Set the char stream and reset the lexer */
-	@Override
-	public void setInputStream(IntStream<? extends Integer> input) {
+	public void setInputStream(CharStream input) {
 		this._input = null;
 		reset();
-		this._input = (CharStream)input;
+		this._input = input;
 	}
 
 	@Override

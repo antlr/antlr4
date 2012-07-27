@@ -376,7 +376,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 			current = lookback;
 		}
 
-		return constructToken(recognizer.getTokenStream().getTokenSource(), expectedTokenType, tokenText, current);
+		return constructToken(recognizer.getInputStream().getTokenSource(), expectedTokenType, tokenText, current);
 	}
 
 	protected <T extends Symbol> T constructToken(TokenSource<T> tokenSource, int expectedTokenType, String tokenText, Symbol current) {

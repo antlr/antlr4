@@ -49,7 +49,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
 						  ambigAlts,
-						  recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))));
+						  recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex))));
     }
 
 	@Override
@@ -62,7 +62,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
-						  recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))));
+						  recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex))));
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(
 			String.format(format,
 						  getDecisionDescription(recognizer, dfa.decision),
-						  recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))));
+						  recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex))));
     }
 
 	protected <T extends Symbol> String getDecisionDescription(Parser<T> recognizer, int decision) {
