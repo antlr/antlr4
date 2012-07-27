@@ -397,9 +397,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt;
 				if ( dfa_debug ) {
-					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
+					Interval interval = Interval.of(startIndex, parser.getInputStream().index());
 					System.out.println("ATN exec upon "+
-									   parser.getTokenStream().getText(interval) +
+									   parser.getInputStream().getText(interval) +
 									   " at DFA state "+s.stateNumber);
 				}
 
@@ -1409,7 +1409,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
-                               ", input="+parser.getTokenStream().getText(interval));
+                               ", input="+parser.getInputStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
     }
@@ -1418,7 +1418,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
-                               ", input="+parser.getTokenStream().getText(interval));
+                               ", input="+parser.getInputStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
     }
@@ -1448,7 +1448,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAmbiguity "+
 							   ambigAlts+":"+configs+
-                               ", input="+parser.getTokenStream().getText(interval));
+                               ", input="+parser.getInputStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
                                                                      ambigAlts, configs);

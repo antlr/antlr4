@@ -43,7 +43,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
     {
         recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
 										": ambigAlts=" + ambigAlts + ", input='" +
-										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+										recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 
 	@Override
@@ -54,7 +54,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	{
 		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
 										dfa.decision + ", input='" +
-										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+										recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex)) + "'");
 	}
 
 	@Override
@@ -63,6 +63,6 @@ public class DiagnosticErrorListener extends BaseErrorListener {
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" +
 										dfa.decision + ", input='" +
-										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+										recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 }
