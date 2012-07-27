@@ -651,6 +651,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		if ( reach.size()==0 ) return null;
+
+//		reach.setConflictingAlts(getConflictingAlts(reach, false));
+//
 		return reach;
 	}
 
@@ -1394,7 +1397,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		configs.optimizeConfigs(this);
 //		System.out.println("After opt, cache size = " + sharedContextCache.size());
-		configs.readonly = true;
+//		System.out.println(configs.size());
+//		if ( configs.hasSemanticContext ) System.out.println(configs.getPredicates().size());
+//		System.out.println(configs.getPredicates().size());
+		configs.setReadonly(true);
 		newState.configs = configs;
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
@@ -1447,7 +1453,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
-                                                                     ambigAlts, configs);
+																			  ambigAlts, configs);
     }
 
 	public void setSLL(boolean SLL) {

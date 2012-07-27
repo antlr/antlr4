@@ -734,7 +734,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		newState.stateNumber = dfa[mode].states.size();
-		configs.readonly = true;
+		configs.setReadonly(true);
 		newState.configs = configs;
 		dfa[mode].states.put(newState, newState);
 		return newState;

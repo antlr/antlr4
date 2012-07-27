@@ -42,6 +42,106 @@ import java.util.Set;
 
 /** Specialized OrderedHashSet that can track info about the set.
  *  Might be able to optimize later w/o affecting code that uses this set.
+
+ histogram of lexer DFA configset size:
+
+ 206 30  <- 206 sets with size 30
+  47 1
+  17 31
+  12 2
+  10 3
+   7 32
+   4 4
+   3 35
+   2 9
+   2 6
+   2 5
+   2 34
+   1 7
+   1 33
+   1 29
+   1 12
+   1 119 <- max size
+
+ 322 set size for SLL parser java.*
+
+ 888 1
+ 411 54
+ 365 88
+ 304 56
+ 206 80
+ 182 16
+ 167 86
+ 166 78
+ 158 84
+ 131 2
+ 121 20
+ 120 8
+ 119 112
+  82 10
+  73 6
+  53 174
+  47 90
+  45 4
+  39 12
+  38 122
+ 37 89
+ 37 62
+ 34 3
+ 34 18
+ 32 81
+ 31 87
+ 28 45
+ 27 144
+ 25 41
+ 24 132
+ 22 91
+ 22 7
+ 21 82
+ 21 28
+ 21 27
+ 17 9
+ 16 29
+ 16 155
+ 15 51
+ 15 118
+ 14 146
+ 14 114
+ 13 5
+ 13 38
+ 12 48
+ 11 64
+ 11 50
+ 11 22
+ 11 134
+ 11 131
+ 10 79
+ 10 76
+ 10 59
+ 10 58
+ 10 55
+ 10 39
+ 10 116
+  9 74
+  9 47
+  9 310
+   ...
+
+ javalr, java.* configs with # preds histogram:
+
+ 4569 0
+   57 1
+   27 27
+    5 76
+    4 28
+    3 72
+    3 38
+    3 30
+    2 6
+    2 32
+    1 9
+    1 2
+
  */
 public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: convert to long like Sam? use list and map from config to ctx?
@@ -88,7 +188,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
-	/** Once we add to DFAState, set readonly so DFA never changes */
+	/** Indicates that the set of configurations is read-only. Do not
+	 *  allow any code to manipulate the set; DFA states will point at
+	 *  the sets and they must not change. This does not protect the other
+	 *  fields; in particular, conflictingAlts is set after
+	 *  we've made this readonly.
+ 	 */
 	protected boolean readonly = false;
 
 	/** Track every config we add */
@@ -101,7 +206,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
-	public IntervalSet conflictingAlts;
+	protected IntervalSet conflictingAlts;
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation.  Don't make a DFA state from this.
 	public boolean hasSemanticContext;
@@ -176,6 +281,16 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			states.add(key.state);
 		}
 		return states;
+	}
+
+	public List<SemanticContext> getPredicates() {
+		List<SemanticContext> preds = new ArrayList<SemanticContext>();
+		for (ATNConfig c : configToContext.values()) {
+			if ( c.semanticContext!=SemanticContext.NONE ) {
+				preds.add(c.semanticContext);
+			}
+		}
+		return preds;
 	}
 
 	// TODO: very expensive, used in lexer to kill after wildcard config
@@ -268,6 +383,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public void clear() {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		configToContext.clear();
+	}
+
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
 	}
 
 	@Override
