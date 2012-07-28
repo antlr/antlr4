@@ -72,7 +72,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	}
 
 	public abstract PredictionContext popAll(int invokingState,
-											 @NotNull PredictionContextCache contextCache,
 											 boolean fullCtx);
 
 	@Override
@@ -119,7 +118,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	// dispatch
 	public static PredictionContext merge(PredictionContext a, PredictionContext b,
-										  @NotNull PredictionContextCache contextCache,
 										  boolean rootIsWildcard)
 	{
 		if ( (a==null&&b==null) || a==b || a.equals(b) ) return a; // share same graph if both same
@@ -127,7 +125,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
 								   (SingletonPredictionContext)b,
-								   contextCache,
 								   rootIsWildcard);
 		}
 
@@ -146,21 +143,19 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			b = new ArrayPredictionContext((SingletonPredictionContext)b);
 		}
 		return mergeArrays((ArrayPredictionContext) a, (ArrayPredictionContext) b,
-						   contextCache,
 						   rootIsWildcard);
 	}
 
 	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
 	public static PredictionContext mergeSingletons(SingletonPredictionContext a,
 													SingletonPredictionContext b,
-													@NotNull PredictionContextCache contextCache,
 													boolean rootIsWildcard)
 	{
-		PredictionContext rootMerge = mergeRoot(a, b, contextCache, rootIsWildcard);
+		PredictionContext rootMerge = mergeRoot(a, b, rootIsWildcard);
 		if ( rootMerge!=null ) return rootMerge;
 
 		if ( a.invokingState==b.invokingState ) { // a == b
-			PredictionContext parent = merge(a.parent, b.parent, contextCache, rootIsWildcard);
+			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard);
 			// if parent is same as existing a or b parent or reduced to a parent, return it
 			if ( parent == a.parent ) return a; // ax + bx = ax, if a=b
 			if ( parent == b.parent ) return b; // ax + bx = bx, if a=b
@@ -169,7 +164,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			// of those graphs.  dup a, a' points at merged array
 			// new joined parent so create new singleton pointing to it, a'
 			PredictionContext a_ = new SingletonPredictionContext(parent, a.invokingState);
-			if ( contextCache!=null ) a_ = contextCache.add(a_);
 			return a_;
 		}
 		else { // a != b payloads differ
@@ -191,7 +185,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				}
 				PredictionContext[] parents = {singleParent, singleParent};
 				PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
-				if ( contextCache!=null ) a_ = contextCache.add(a_);
 				return a_;
 			}
 			// parents differ and can't merge them. Just pack together
@@ -205,7 +198,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				parents = new PredictionContext[] {b.parent, a.parent};
 			}
 			PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
-			if ( contextCache!=null ) a_ = contextCache.add(a_);
 			return a_;
 		}
 	}
@@ -215,7 +207,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	/** Handle case where at least one of a or b is $ (EMPTY) */
 	public static PredictionContext mergeRoot(SingletonPredictionContext a,
 											  SingletonPredictionContext b,
-											  @NotNull PredictionContextCache contextCache,
 											  boolean rootIsWildcard)
 	{
 		if ( rootIsWildcard ) {
@@ -229,7 +220,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				PredictionContext[] parents = {null, b.parent};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
-				if ( contextCache!=null ) joined = contextCache.add(joined);
 				return joined;
 			}
 			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
@@ -237,7 +227,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				PredictionContext[] parents = {null, a.parent};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
-				if ( contextCache!=null ) joined = contextCache.add(joined);
 				return joined;
 			}
 		}
@@ -247,7 +236,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	// http://www.antlr.org/wiki/download/attachments/32014352/array-merge.png
 	public static PredictionContext mergeArrays(ArrayPredictionContext a,
 												ArrayPredictionContext b,
-												@NotNull PredictionContextCache contextCache,
 												boolean rootIsWildcard)
 	{
 		// merge sorted payloads a + b => M
@@ -277,7 +265,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				}
 				else { // ax+ay -> a'[x,y]
 					PredictionContext mergedParent =
-						merge(a_parent, b_parent, contextCache, rootIsWildcard);
+						merge(a_parent, b_parent, rootIsWildcard);
 					mergedParents[k] = mergedParent;
 					mergedInvokingStates[k] = payload;
 				}
@@ -325,7 +313,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				if ( n == 1 ) { // for just one merged element, return singleton top
 					PredictionContext a_ = new SingletonPredictionContext(mergedParents[0],
 																		  mergedInvokingStates[0]);
-					a_ = contextCache.add(a_);
 					return a_;
 				}
 				mergedParents = Arrays.copyOf(mergedParents, n);
@@ -335,7 +322,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		PredictionContext M =
 			new ArrayPredictionContext(mergedParents, mergedInvokingStates);
-		if ( contextCache!=null ) M = contextCache.add(M);
 
 		// if we created same array as a or b, return that instead
 		// TODO: track whether this is possible above during merge sort for speed

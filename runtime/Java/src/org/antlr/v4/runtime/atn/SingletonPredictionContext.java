@@ -1,7 +1,5 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 import java.util.Iterator;
 
 public class SingletonPredictionContext extends PredictionContext {
@@ -52,11 +50,10 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public PredictionContext popAll(int invokingState,
-									@NotNull PredictionContextCache contextCache,
 									boolean fullCtx)
 	{
 		if ( invokingState == this.invokingState ) {
-			return parent.popAll(invokingState, contextCache, fullCtx);
+			return parent.popAll(invokingState, fullCtx);
 		}
 		return this;
 	}

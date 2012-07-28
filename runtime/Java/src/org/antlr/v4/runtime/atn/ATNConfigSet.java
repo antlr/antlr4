@@ -31,7 +31,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -300,25 +299,20 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public ATNConfigSet(ATNConfigSet old, PredictionContextCache contextCache) {
 		this(old.fullCtx);
-		addAll(old, contextCache);
+		addAll(old);
 		this.uniqueAlt = old.uniqueAlt;
 		this.conflictingAlts = old.conflictingAlts;
 		this.hasSemanticContext = old.hasSemanticContext;
 		this.dipsIntoOuterContext = old.dipsIntoOuterContext;
 	}
 
-	@Override
-	public boolean add(ATNConfig e) {
-		return add(e, null);
-	}
-
 	/** Adding a new config means merging contexts with existing configs for
 	 *  (s, i, pi, _)
 	 *  We use (s,i,pi) as key
 	 */
-	public boolean add(ATNConfig config, @Nullable PredictionContextCache contextCache) {
+	@Override
+	public boolean add(ATNConfig config) {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
-		contextCache = null; // TODO: costs time to cache and saves essentially no RAM
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
@@ -330,11 +324,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		// a previous (s,i,pi,_), merge with it and save result
 		boolean rootIsWildcard = !fullCtx;
 		PredictionContext merged =
-			PredictionContext.merge(existing.context, config.context, contextCache, rootIsWildcard);
+			PredictionContext.merge(existing.context, config.context, rootIsWildcard);
 		// no need to check for existing.context, config.context in cache
 		// since only way to create new graphs is "call rule" and here. We
 		// cache at both places.
-		if ( contextCache!=null ) merged = contextCache.add(merged);
 		existing.reachesIntoOuterContext =
 			Math.max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
 		existing.context = merged; // replace context; no need to alt mapping
@@ -384,17 +377,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
-	@Override
-	public boolean addAll(Collection<? extends ATNConfig> c) {
-		return addAll(c, null);
-	}
-
-	public boolean addAll(Collection<? extends ATNConfig> coll,
-						  PredictionContextCache contextCache)
-	{
-		for (ATNConfig c : coll) {
-			add(c, contextCache);
-		}
+	public boolean addAll(Collection<? extends ATNConfig> coll) {
+		for (ATNConfig c : coll) add(c);
 		return false;
 	}
 

@@ -22,7 +22,6 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_$_$() {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
 													  PredictionContext.EMPTY,
-													  contextCache,
 													  rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
@@ -36,7 +35,6 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_$_$_fullctx() {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
 													  PredictionContext.EMPTY,
-													  contextCache,
 													  fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
@@ -48,7 +46,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_x_$() {
-		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -59,7 +57,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_x_$_fullctx() {
-		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, contextCache, fullCtx());
+		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -72,7 +70,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_$_x() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -83,7 +81,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_$_x_fullctx() {
-		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), contextCache, fullCtx());
+		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -96,7 +94,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_a_a() {
-		PredictionContext r = PredictionContext.merge(a(), a(), contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a(), a(), rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -112,7 +110,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext a1 = a();
 		PredictionContext x = x();
 		PredictionContext a2 = createSingleton(x, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -128,7 +126,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext a1 = a();
 		PredictionContext x = x();
 		PredictionContext a2 = createSingleton(x, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache, fullCtx());
+		PredictionContext r = PredictionContext.merge(a1, a2, fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -146,7 +144,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x = x();
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = a();
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -162,7 +160,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x = x();
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = a();
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache, fullCtx());
+		PredictionContext r = PredictionContext.merge(a1, a2, fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -177,7 +175,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_a_b() {
-		PredictionContext r = PredictionContext.merge(a(), b(), contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a(), b(), rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -194,7 +192,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x = x();
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = createSingleton(x, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -213,7 +211,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x2 = x();
 		PredictionContext a1 = createSingleton(x1, 1);
 		PredictionContext a2 = createSingleton(x2, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -234,7 +232,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext b2 = createSingleton(x2, 2);
 		PredictionContext a1 = createSingleton(b1, 1);
 		PredictionContext a2 = createSingleton(b2, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -257,7 +255,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext c = createSingleton(x2, 3);
 		PredictionContext a1 = createSingleton(b, 1);
 		PredictionContext a2 = createSingleton(c, 1);
-		PredictionContext r = PredictionContext.merge(a1, a2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -278,7 +276,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x = x();
 		PredictionContext a = createSingleton(x, 1);
 		PredictionContext b = createSingleton(x, 2);
-		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -298,7 +296,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x2 = x();
 		PredictionContext a = createSingleton(x1, 1);
 		PredictionContext b = createSingleton(x2, 2);
-		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -316,7 +314,7 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_ax_by() {
 		PredictionContext a = createSingleton(x(), 1);
 		PredictionContext b = createSingleton(y(), 2);
-		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -337,7 +335,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x2 = x();
 		PredictionContext a = a();
 		PredictionContext b = createSingleton(x2, 2);
-		PredictionContext r = PredictionContext.merge(a, b, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -354,7 +352,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext x2 = x();
 		PredictionContext a = a();
 		PredictionContext b = createSingleton(x2, 2);
-		PredictionContext r = PredictionContext.merge(a, b, contextCache, fullCtx());
+		PredictionContext r = PredictionContext.merge(a, b, fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -376,7 +374,7 @@ public class TestGraphNodes extends TestCase {
 		PredictionContext f = createSingleton(x2, 6);
 		PredictionContext a = createSingleton(e, 1);
 		PredictionContext b = createSingleton(f, 2);
-		PredictionContext r = PredictionContext.merge(a, b, contextCache, rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -402,7 +400,7 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_A$_A$_fullctx() {
 		ArrayPredictionContext A1 = array(PredictionContext.EMPTY);
 		ArrayPredictionContext A2 = array(PredictionContext.EMPTY);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache, fullCtx());
+		PredictionContext r = PredictionContext.merge(A1, A2, fullCtx());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -418,7 +416,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext c = c();
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -437,7 +435,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a2 = a();
 		ArrayPredictionContext A1 = array(a1);
 		ArrayPredictionContext A2 = array(a2);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -455,7 +453,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext c = c();
 		ArrayPredictionContext A1 = array(a);
 		ArrayPredictionContext A2 = array(b, c);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -475,7 +473,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext c = c();
 		ArrayPredictionContext A1 = array(a, c);
 		ArrayPredictionContext A2 = array(b);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -492,7 +490,7 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_Aab_Aa() { // a,b + a
 		ArrayPredictionContext A1 = array(a(), b());
 		ArrayPredictionContext A2 = array(a());
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -508,7 +506,7 @@ public class TestGraphNodes extends TestCase {
 	@Test public void test_Aab_Ab() { // a,b + b
 		ArrayPredictionContext A1 = array(a(), b());
 		ArrayPredictionContext A2 = array(b());
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -526,7 +524,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext b = createSingleton(y(), 2);
 		ArrayPredictionContext A1 = array(a);
 		ArrayPredictionContext A2 = array(b);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -548,7 +546,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a2 = createSingleton(y(), 1);
 		ArrayPredictionContext A1 = array(a1);
 		ArrayPredictionContext A2 = array(a2);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -568,7 +566,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext a2 = createSingleton(y(), 1);
 		ArrayPredictionContext A1 = array(a1, c());
 		ArrayPredictionContext A2 = array(a2, d());
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -592,7 +590,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(x(), 4);
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -622,7 +620,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(x(), 4);
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -649,7 +647,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(x(), 4);
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -677,7 +675,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(u(), 4);
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +
@@ -702,7 +700,7 @@ public class TestGraphNodes extends TestCase {
 		SingletonPredictionContext d = createSingleton(u(), 4);
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c, d);
-		PredictionContext r = PredictionContext.merge(A1, A2, contextCache,  rootIsWildcard());
+		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard());
 		System.out.println(PredictionContext.toDOTString(r));
 		String expecting =
 			"digraph G {\n" +

@@ -50,27 +50,22 @@ public abstract class ATNSimulator {
 	 *  to use only cached nodes/graphs in addDFAState(). We don't want to
 	 *  fill this during closure() since there are lots of contexts that
 	 *  pop up but are not used ever again. It also greatly slows down closure().
+	 *
+	 *  This cache makes a huge difference in memory and a little bit in speed.
+	 *  For the Java grammar on java.*, it dropped the memory requirements
+	 *  at the end from 25M to 16M. We don't store any of the full context
+	 *  graphs in the DFA because they are limited to local context only,
+	 *  but apparently there's a lot of repetition there as well. We optimize
+	 *  the config contexts before storing the config set in the DFA states
+	 *  by literally rebuilding them with cached subgraphs only.
+	 *
+	 *  I tried a cache for use during closure operations, that was
+	 *  whacked after each adaptivePredict(). It cost a little bit
+	 *  more time I think and doesn't save on the overall footprint
+	 *  so it's not worth the complexity.
  	 */
 	protected final PredictionContextCache sharedContextCache =
 		new PredictionContextCache("shared DFA state context cache");
-
-	/** This context cache tracks all context graphs used during a single
-	 *  ATN-based prediction operation. There will be significant context graph
-	 *  sharing among ATNConfigSets because all sets are derived from the
-	 *  same starting context.
-	 *
-	 *  This cache is blown away after each adaptivePredict()
-	 *  because we cache everything within ATNConfigSets that become DFA
-	 *  states in sharedContextCache. (Sam thinks of this as an analogy to
-	 *  the nursery in a generational GC; then, sharedContextCache would be
-	 *  the mature generation.)
-	 *
-	 *  In Sam's version, this is a parameter passed down through all of
-	 *  the methods, but it gets pretty unwieldy as there are already
-	 *  a crapload of parameters. Consequently, I'm using a field as a
-	 *  "parameter" despite it being generally poor coding style.
-	 */
-	protected PredictionContextCache contextCache;
 
 	static {
 		ERROR = new DFAState(new ATNConfigSet());

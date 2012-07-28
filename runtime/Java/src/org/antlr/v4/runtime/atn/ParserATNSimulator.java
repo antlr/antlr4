@@ -235,7 +235,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			throw nvae;
 		}
 		finally {
-			contextCache = null; // wack the cache
 			input.seek(index);
 			input.release(m);
 		}
@@ -268,7 +267,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean loopsSimulateTailRecursion = true;
 				boolean fullCtx = true;
-//				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState, outerContext,
 									  greedy, loopsSimulateTailRecursion,
@@ -280,7 +278,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 										   outerContext,
 										   ATN.INVALID_ALT_NUMBER,
 										   greedy);
-				contextCache = null;
 				return fullCtxSet.uniqueAlt;
 			}
 			if ( s.isAcceptState ) {
@@ -312,9 +309,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 									   " at DFA state "+s.stateNumber);
 				}
 
-//				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				alt = execATN(dfa, s, input, startIndex, outerContext);
-				contextCache = null;
 				// this adds edge even if next state is accept for
 				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 				// TODO: This next stuff kills edge, but extra states remain. :(
@@ -625,7 +620,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					intermediate.add(new ATNConfig(c, target), contextCache);
+					intermediate.add(new ATNConfig(c, target));
 				}
 			}
 		}
@@ -873,7 +868,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// don't see past end of a rule for any nongreedy decision
 				if ( debug ) System.out.println("NONGREEDY at stop state of "+
 												getRuleName(config.state.ruleIndex));
-				configs.add(config, contextCache);
+				configs.add(config);
 				return;
 			}
 			// We hit rule end. If we have context info, use it
@@ -917,7 +912,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			{
 				config.context =
 					new SingletonPredictionContext(config.context, config.state.stateNumber);
-				if ( contextCache!=null ) config.context = contextCache.add(config.context);
 				// alter config; it's ok, since all calls to closure pass in a fresh config for us to chase
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
@@ -926,7 +920,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				LoopEndState end = (LoopEndState)config.state;
 				// pop all the way back until we don't see the loopback state anymore
 				config.context = config.context.popAll(end.loopBackStateNumber,
-													   contextCache,
 													   configs.fullCtx);
 				if ( debug ) System.out.println(" becomes "+config.context);
 			}
@@ -949,7 +942,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.state;
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
-            configs.add(config, contextCache);
+            configs.add(config);
 			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}
@@ -1086,7 +1079,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 		PredictionContext newContext =
 			new SingletonPredictionContext(config.context, config.state.stateNumber);
-		if ( contextCache!=null ) newContext = contextCache.add(newContext);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
