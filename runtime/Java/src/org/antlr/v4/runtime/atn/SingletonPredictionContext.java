@@ -113,9 +113,4 @@ public class SingletonPredictionContext extends PredictionContext {
 			&& parent.equals(other.parent);
 	}
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-
 }

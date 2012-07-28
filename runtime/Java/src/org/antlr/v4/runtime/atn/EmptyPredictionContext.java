@@ -100,11 +100,6 @@ public final class EmptyPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-
-	@Override
 	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
 		return new String[] { "[]" };
 	}

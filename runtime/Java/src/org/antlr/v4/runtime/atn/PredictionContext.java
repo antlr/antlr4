@@ -419,7 +419,7 @@ public abstract class PredictionContext {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return cachedHashCode;
 	}
 

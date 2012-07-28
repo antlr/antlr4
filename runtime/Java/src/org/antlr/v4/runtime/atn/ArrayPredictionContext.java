@@ -93,11 +93,6 @@ public class ArrayPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-
-	@Override
 	protected PredictionContext addEmptyContext() {
 		if (hasEmpty()) {
 			return this;
