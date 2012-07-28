@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
+import org.antlr.v4.runtime.misc.EquivalenceSet;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.ArrayList;
@@ -271,7 +272,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
 	 *  when we go readonly as this set becomes a DFA state.
 	 */
-	public ConfigHashSet configLookup;
+	public EquivalenceSet<ATNConfig> configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
@@ -316,7 +317,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
-		ATNConfig existing = configLookup.put(config);
+		ATNConfig existing = configLookup.absorb(config);
 		if ( existing==config ) { // we added this new one
 			configs.add(config);  // track order here
 			return true;
@@ -400,17 +401,17 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public int hashCode() {
-		return configLookup.hashCode();
+		return configs.hashCode();
 	}
 
 	@Override
 	public int size() {
-		return configLookup.size();
+		return configs.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return configLookup.isEmpty();
+		return configs.isEmpty();
 	}
 
 	@Override
@@ -429,19 +430,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public void clear() {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
+		configs.clear();
 		configLookup.clear();
 	}
 
 	public void setReadonly(boolean readonly) {
 		this.readonly = readonly;
-		configLookup = null;
+		configLookup = null; // can't mod, no need for lookup cache
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append(elements().toString());
-//		buf.append(super.toString());
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext=").append(hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt=").append(uniqueAlt);
 		if ( conflictingAlts!=null ) buf.append(",conflictingAlts=").append(conflictingAlts);

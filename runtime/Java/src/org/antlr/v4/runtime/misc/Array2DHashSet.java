@@ -5,8 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /** Set impl with closed hashing (open addressing). */
-public class Array2DHashSet<T> implements Set<T> {
-
+public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	public static final int INITAL_CAPACITY = 16; // must be power of 2
 	public static final int INITAL_BUCKET_CAPACITY = 8;
 	public static final double LOAD_FACTOR = 0.75;
@@ -30,13 +29,16 @@ public class Array2DHashSet<T> implements Set<T> {
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
-	/** Add o to set if not there; return existing value if already there. */
-	public T put(T o) {
+	/** Add o to set if not there; return existing value if already there.
+	 *  Absorb is used as synonym for add.
+	 */
+	@Override
+	public T absorb(T o) {
 		if ( n > threshold ) expand();
-		return put_(o);
+		return absorb_(o);
 	}
 
-	protected T put_(T o) {
+	protected T absorb_(T o) {
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
 		// NEW BUCKET
@@ -54,7 +56,7 @@ public class Array2DHashSet<T> implements Set<T> {
 				n++;
 				return o;
 			}
-			if ( equals(existing,o) ) return existing; // found existing, quit
+			if ( equals(existing, o) ) return existing; // found existing, quit
 		}
 		// FULL BUCKET, expand and add to end
 		T[] old = bucket;
@@ -73,7 +75,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		if ( bucket==null ) return null; // no bucket
 		for (T e : bucket) {
 			if ( e==null ) return null; // empty slot; not there
-			if ( equals(e,o) ) return e;
+			if ( equals(e, o) ) return e;
 		}
 		return null;
 	}
@@ -103,7 +105,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		if ( !(o instanceof Array2DHashSet) || o==null ) return false;
 		Array2DHashSet<T> other = (Array2DHashSet<T>)o;
 		if ( other.size() != size() ) return false;
-		boolean same = this.containsAll(other) && other.containsAll(this);
+		boolean same = this.containsAll(other);
 		return same;
 	}
 
@@ -121,7 +123,7 @@ public class Array2DHashSet<T> implements Set<T> {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				put_(o);
+				absorb_(o);
 			}
 		}
 		n = oldSize;
@@ -132,15 +134,12 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	public boolean equals(T a, T b) {
-//		if ( a==b ) return true;
-//		if ( a==null || b==null ) return false;
-//		if ( hashCode(a) != hashCode(b) ) return false;
 		return a.equals(b);
 	}
 
 	@Override
 	public boolean add(T t) {
-		T existing = put(t);
+		T existing = absorb(t);
 		return existing==t;
 	}
 
@@ -217,7 +216,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		for (int i=0; i<bucket.length; i++) {
 			T e = bucket[i];
 			if ( e==null ) return false;  // empty slot; not there
-			if ( equals(e,(T)o) ) {          // found it
+			if ( equals(e, (T) o) ) {          // found it
 				// shift all elements to the right down one
 //				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
@@ -252,7 +251,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	public boolean addAll(Collection<? extends T> c) {
 		boolean changed = false;
 		for (T o : c) {
-			T existing = put(o);
+			T existing = absorb(o);
 			if ( existing!=o ) changed=true;
 		}
 		return changed;
