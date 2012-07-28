@@ -132,17 +132,16 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	public boolean equals(T a, T b) {
-		if ( a==null && b==null ) return true;
-		if ( a==null || b==null ) return false;
-		if ( a==b ) return true;
-		if ( hashCode(a) != hashCode(b) ) return false;
+//		if ( a==b ) return true;
+//		if ( a==null || b==null ) return false;
+//		if ( hashCode(a) != hashCode(b) ) return false;
 		return a.equals(b);
 	}
 
 	@Override
 	public boolean add(T t) {
 		T existing = put(t);
-		return existing!=t;
+		return existing==t;
 	}
 
 	@Override
