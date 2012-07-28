@@ -276,7 +276,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	// too hard to keep in sync
-	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
+	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
