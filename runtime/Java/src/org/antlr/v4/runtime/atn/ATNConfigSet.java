@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
-import org.antlr.v4.runtime.misc.EquivalenceSet;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.ArrayList;
@@ -272,7 +271,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
 	 *  when we go readonly as this set becomes a DFA state.
 	 */
-	public EquivalenceSet<ATNConfig> configLookup;
+	public ConfigHashSet configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);

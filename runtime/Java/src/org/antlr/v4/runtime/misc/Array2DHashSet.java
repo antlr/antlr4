@@ -32,7 +32,6 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	/** Add o to set if not there; return existing value if already there.
 	 *  Absorb is used as synonym for add.
 	 */
-	@Override
 	public T absorb(T o) {
 		if ( n > threshold ) expand();
 		return absorb_(o);
