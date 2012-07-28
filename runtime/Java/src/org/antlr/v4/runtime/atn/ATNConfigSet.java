@@ -272,7 +272,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	/** Track every config we add */
 //	public final LinkedHashMap<Key,ATNConfig> configToContext;
 	/** All configs but hashed by (s, i, _, pi) not incl context */
-	public final ConfigHashSet configLookup;
+	public ConfigHashSet configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	// too hard to keep in sync
@@ -451,7 +451,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public void setReadonly(boolean readonly) {
 		this.readonly = readonly;
-		configLookup.clear();
+		configLookup = null;
 	}
 
 	@Override
