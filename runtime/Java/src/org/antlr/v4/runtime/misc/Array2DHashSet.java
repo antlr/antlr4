@@ -270,7 +270,7 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public void clear() {
-		buckets = (T[][])new Object[buckets.length][];
+		buckets = (T[][])new Object[INITAL_CAPACITY][];
 		n = 0;
 	}
 

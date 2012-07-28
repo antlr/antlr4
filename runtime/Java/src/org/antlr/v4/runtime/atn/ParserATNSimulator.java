@@ -651,9 +651,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		if ( reach.size()==0 ) return null;
-
-//		reach.setConflictingAlts(getConflictingAlts(reach, false));
-//
 		return reach;
 	}
 
