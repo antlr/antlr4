@@ -206,7 +206,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
-		contextCache = new PredictionContextCache("predict ctx cache");
+		//contextCache = new PredictionContextCache("predict ctx cache");
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("predictATN decision "+dfa.decision+
@@ -268,7 +268,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean loopsSimulateTailRecursion = true;
 				boolean fullCtx = true;
-				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
+//				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState, outerContext,
 									  greedy, loopsSimulateTailRecursion,
@@ -312,7 +312,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 									   " at DFA state "+s.stateNumber);
 				}
 
-				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
+//				contextCache = new PredictionContextCache("predict ctx cache built in execDFA");
 				alt = execATN(dfa, s, input, startIndex, outerContext);
 				contextCache = null;
 				// this adds edge even if next state is accept for

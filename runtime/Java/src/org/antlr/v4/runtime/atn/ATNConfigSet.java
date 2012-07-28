@@ -144,7 +144,6 @@ import java.util.Set;
 
  */
 public class ATNConfigSet implements Set<ATNConfig> {
-	// TODO: convert to long like Sam? use list and map from config to ctx?
 	/*
 	The reason that we need this is because we don't want the hash map to use
 	the standard hash code and equals. We need all configurations with the same
@@ -152,53 +151,28 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	the number of objects associated with ATNConfigs. The other solution is to
 	use a hash table that lets us specify the equals/hashcode operation.
 	 */
-	public static class Key {
-		ATNState state;
-		int alt;
-		SemanticContext semanticContext;
-
-		public Key(ATNState state, int alt, SemanticContext semanticContext) {
-			this.state = state;
-			this.alt = alt;
-			this.semanticContext = semanticContext;
-		}
-
-		public Key(ATNConfig c) {
-			this(c.state, c.alt, c.semanticContext);
+	public static class ConfigHashSet extends Array2DHashSet<ATNConfig> {
+		public ConfigHashSet() {
+			super(16,2);
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if ( obj==this ) return true;
-			if ( this.hashCode() != obj.hashCode() ) return false;
-			if ( !(obj instanceof Key) ) return false;
-			Key key = (Key)obj;
-			return this.state.stateNumber==key.state.stateNumber
-				&& this.alt==key.alt
-				&& this.semanticContext.equals(key.semanticContext);
-		}
-
-		@Override
-		public int hashCode() {
+		public int hashCode(ATNConfig o) {
 			int hashCode = 7;
-			hashCode = 5 * hashCode + state.stateNumber;
-			hashCode = 5 * hashCode + alt;
-			hashCode = 5 * hashCode + semanticContext.hashCode();
+			hashCode = 31 * hashCode + o.state.stateNumber;
+			hashCode = 31 * hashCode + o.alt;
+			hashCode = 31 * hashCode + o.semanticContext.hashCode();
 	        return hashCode;
 		}
-	}
 
-	public static class ConfigHashSet extends Array2DHashSet<ATNConfig> {
-		public int hashCode(ATNConfig o) {
-			return o.hashCode();
-		}
-
+		@Override
 		public boolean equals(ATNConfig a, ATNConfig b) {
-			if ( a==null && b==null ) return true;
-			if ( a==null || b==null ) return false;
 			if ( a==b ) return true;
+			if ( a==null || b==null ) return false;
 			if ( hashCode(a) != hashCode(b) ) return false;
-			return a.equals(b);
+			return a.state.stateNumber==b.state.stateNumber
+				&& a.alt==b.alt
+				&& b.semanticContext.equals(b.semanticContext);
 		}
 	}
 
@@ -264,11 +238,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
-		Key key = new Key(config);
-		ATNConfig existing = configLookup.get(config);
-		if ( existing==null ) { // nothing there yet; easy, just add
-			configLookup.add(config);
-			configs.add(config); // track order here
+		ATNConfig existing = configLookup.put(config);
+		if ( existing==config ) { // we added this new one
+			configs.add(config);  // track order here
 			return true;
 		}
 		// a previous (s,i,pi,_), merge with it and save result
@@ -346,8 +318,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean equals(Object o) {
 //		System.out.print("equals " + this + ", " + o+" = ");
 		ATNConfigSet other = (ATNConfigSet)o;
-		boolean same = configLookup!=null &&
-			configLookup.equals(other.configLookup) &&
+		boolean same = configs!=null &&
+			configs.equals(other.configs) &&  // includes stack context
 			this.fullCtx == other.fullCtx &&
 			this.uniqueAlt == other.uniqueAlt &&
 			this.conflictingAlts == other.conflictingAlts &&

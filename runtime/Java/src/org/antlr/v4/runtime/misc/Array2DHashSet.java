@@ -7,9 +7,9 @@ import java.util.Set;
 /** Set impl with closed hashing (open addressing). */
 public class Array2DHashSet<T> implements Set<T> {
 
-	public static final int INITAL_CAPACITY = 4;
-	public static final int INITAL_BUCKET_CAPACITY = 2;
-	public static final double LOAD_FACTOR = 0.8;
+	public static final int INITAL_CAPACITY = 16; // must be power of 2
+	public static final int INITAL_BUCKET_CAPACITY = 8;
+	public static final double LOAD_FACTOR = 0.75;
 
 	protected T[][] buckets;
 
@@ -19,9 +19,15 @@ public class Array2DHashSet<T> implements Set<T> {
 	protected int threshold = (int)(INITAL_CAPACITY * LOAD_FACTOR); // when to expand
 
 	protected int currentPrime = 1; // jump by 4 primes each expand or whatever
+	protected int initialBucketCapacity = INITAL_BUCKET_CAPACITY;
 
 	public Array2DHashSet() {
-		buckets = (T[][])new Object[INITAL_CAPACITY][];
+		this(INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
+	}
+
+	public Array2DHashSet(int initialCapacity, int initialBucketCapacity) {
+		buckets = (T[][])new Object[initialCapacity][];
+		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
 	/** Add o to set if not there; return existing value if already there. */
@@ -33,12 +39,14 @@ public class Array2DHashSet<T> implements Set<T> {
 	protected T put_(T o) {
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
+		// NEW BUCKET
 		if ( bucket==null ) {
-			buckets[b] = (T[])new Object[INITAL_BUCKET_CAPACITY];
+			buckets[b] = (T[])new Object[initialBucketCapacity];
 			buckets[b][0] = o;
 			n++;
 			return o;
 		}
+		// LOOK FOR IT IN BUCKET
 		for (int i=0; i<bucket.length; i++) {
 			T existing = bucket[i];
 			if ( existing==null ) { // empty slot; not there, add.
@@ -46,14 +54,14 @@ public class Array2DHashSet<T> implements Set<T> {
 				n++;
 				return o;
 			}
-			if ( existing.equals(o) ) return existing;
+			if ( equals(existing,o) ) return existing; // found existing, quit
 		}
-		// full bucket, expand and add to end
+		// FULL BUCKET, expand and add to end
 		T[] old = bucket;
 		bucket = (T[])new Object[old.length * 2];
 		buckets[b] = bucket;
 		System.arraycopy(old, 0, bucket, 0, old.length);
-		bucket[old.length] = o;
+		bucket[old.length] = o; // add to end
 		n++;
 		return o;
 	}
@@ -65,7 +73,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		if ( bucket==null ) return null; // no bucket
 		for (T e : bucket) {
 			if ( e==null ) return null; // empty slot; not there
-			if ( e.equals(o) ) return e;
+			if ( equals(e,o) ) return e;
 		}
 		return null;
 	}
@@ -83,7 +91,7 @@ public class Array2DHashSet<T> implements Set<T> {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				h += o.hashCode();
+				h += hashCode(o);
 			}
 		}
 		return h;
@@ -95,7 +103,8 @@ public class Array2DHashSet<T> implements Set<T> {
 		if ( !(o instanceof Array2DHashSet) || o==null ) return false;
 		Array2DHashSet<T> other = (Array2DHashSet<T>)o;
 		if ( other.size() != size() ) return false;
-		return containsAll(other);
+		boolean same = this.containsAll(other) && other.containsAll(this);
+		return same;
 	}
 
 	protected void expand() {
@@ -209,7 +218,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		for (int i=0; i<bucket.length; i++) {
 			T e = bucket[i];
 			if ( e==null ) return false;  // empty slot; not there
-			if ( e.equals(o) ) {          // found it
+			if ( equals(e,(T)o) ) {          // found it
 				// shift all elements to the right down one
 //				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
