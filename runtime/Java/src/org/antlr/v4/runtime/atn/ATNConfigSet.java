@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -36,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -188,6 +188,20 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 	}
 
+	public static class ConfigHashSet extends Array2DHashSet<ATNConfig> {
+		public int hashCode(ATNConfig o) {
+			return o.hashCode();
+		}
+
+		public boolean equals(ATNConfig a, ATNConfig b) {
+			if ( a==null && b==null ) return true;
+			if ( a==null || b==null ) return false;
+			if ( a==b ) return true;
+			if ( hashCode(a) != hashCode(b) ) return false;
+			return a.equals(b);
+		}
+	}
+
 	/** Indicates that the set of configurations is read-only. Do not
 	 *  allow any code to manipulate the set; DFA states will point at
 	 *  the sets and they must not change. This does not protect the other
@@ -197,11 +211,13 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	protected boolean readonly = false;
 
 	/** Track every config we add */
-	public final LinkedHashMap<Key,ATNConfig> configToContext;
+//	public final LinkedHashMap<Key,ATNConfig> configToContext;
+	/** All configs but hashed by (s, i, _, pi) not incl context */
+	public final ConfigHashSet configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	// too hard to keep in sync
-//	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
+	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>();
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
@@ -219,14 +235,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public final boolean fullCtx;
 
 	public ATNConfigSet(boolean fullCtx) {
-		configToContext = new LinkedHashMap<Key, ATNConfig>();
+		configLookup = new ConfigHashSet();
 		this.fullCtx = fullCtx;
 	}
 	public ATNConfigSet() { this(true); }
 
 	public ATNConfigSet(ATNConfigSet old, PredictionContextCache contextCache) {
-		configToContext = new LinkedHashMap<Key, ATNConfig>(old.configToContext);
-		this.fullCtx = old.fullCtx;
+		this(old.fullCtx);
+		addAll(old, contextCache);
 		this.uniqueAlt = old.uniqueAlt;
 		this.conflictingAlts = old.conflictingAlts;
 		this.hasSemanticContext = old.hasSemanticContext;
@@ -249,9 +265,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			hasSemanticContext = true;
 		}
 		Key key = new Key(config);
-		ATNConfig existing = configToContext.get(key);
+		ATNConfig existing = configLookup.get(config);
 		if ( existing==null ) { // nothing there yet; easy, just add
-			configToContext.put(key, config);
+			configLookup.add(config);
+			configs.add(config); // track order here
 			return true;
 		}
 		// a previous (s,i,pi,_), merge with it and save result
@@ -269,23 +286,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	/** Return a List holding list of configs */
-    public List<ATNConfig> elements() {
-		List<ATNConfig> configs = new ArrayList<ATNConfig>();
-		configs.addAll(configToContext.values());
-		return configs;
-    }
+    public List<ATNConfig> elements() { return configs; }
 
 	public Set<ATNState> getStates() {
 		Set<ATNState> states = new HashSet<ATNState>();
-		for (Key key : this.configToContext.keySet()) {
-			states.add(key.state);
+		for (ATNConfig c : configs) {
+			states.add(c.state);
 		}
 		return states;
 	}
 
 	public List<SemanticContext> getPredicates() {
 		List<SemanticContext> preds = new ArrayList<SemanticContext>();
-		for (ATNConfig c : configToContext.values()) {
+		for (ATNConfig c : configs) {
 			if ( c.semanticContext!=SemanticContext.NONE ) {
 				preds.add(c.semanticContext);
 			}
@@ -293,27 +306,21 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return preds;
 	}
 
-	// TODO: very expensive, used in lexer to kill after wildcard config
-	public ATNConfig get(int i) {
-		int j = 0;
-		for (ATNConfig c : configToContext.values()) {
-			if ( j == i ) return c;
-			j++;
-		}
-		throw new IndexOutOfBoundsException("config set index "+i+" not in 0.."+size());
-	}
+	public ATNConfig get(int i) { return configs.get(i); }
 
+	// TODO: very expensive, used in lexer to kill after wildcard config
 	public void remove(int i) {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		ATNConfig c = elements().get(i);
-		configToContext.remove(new Key(c));
+		configLookup.remove(c);
+		configs.remove(c); // slow linear search. ugh but not worse than it was
 	}
 
 	public void optimizeConfigs(ATNSimulator interpreter) {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
-		if ( configToContext.isEmpty() ) return;
+		if ( configLookup.isEmpty() ) return;
 
-		for (ATNConfig config : configToContext.values()) {
+		for (ATNConfig config : configs) {
 //			int before = PredictionContext.getAllContextNodes(config.context).size();
 			config.context = interpreter.getCachedContext(config.context);
 //			int after = PredictionContext.getAllContextNodes(config.context).size();
@@ -339,8 +346,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean equals(Object o) {
 //		System.out.print("equals " + this + ", " + o+" = ");
 		ATNConfigSet other = (ATNConfigSet)o;
-		boolean same = configToContext!=null &&
-			configToContext.equals(other.configToContext) &&
+		boolean same = configLookup!=null &&
+			configLookup.equals(other.configLookup) &&
 			this.fullCtx == other.fullCtx &&
 			this.uniqueAlt == other.uniqueAlt &&
 			this.conflictingAlts == other.conflictingAlts &&
@@ -353,36 +360,36 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public int hashCode() {
-		return configToContext.hashCode();
+		return configLookup.hashCode();
 	}
 
 	@Override
 	public int size() {
-		return configToContext.size();
+		return configLookup.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return configToContext.isEmpty();
+		return configLookup.isEmpty();
 	}
 
 	@Override
 	public boolean contains(Object o) {
 		if ( o instanceof ATNConfig ) {
-			return configToContext.containsKey(new Key((ATNConfig)o));
+			return configLookup.contains(o);
 		}
 		return false;
 	}
 
 	@Override
 	public Iterator<ATNConfig> iterator() {
-		return configToContext.values().iterator();
+		return configs.iterator();
 	}
 
 	@Override
 	public void clear() {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
-		configToContext.clear();
+		configLookup.clear();
 	}
 
 	public void setReadonly(boolean readonly) {
@@ -405,16 +412,16 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public Object[] toArray() {
-		ATNConfig[] configs = new ATNConfig[configToContext.size()];
+		ATNConfig[] configs = new ATNConfig[configLookup.size()];
 		int i = 0;
-		for (ATNConfig c : configToContext.values()) configs[i++] = c;
+		for (ATNConfig c : configLookup) configs[i++] = c;
 		return configs;
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a) {
 		int i = 0;
-		for (ATNConfig c : configToContext.values()) a[i++] = (T)c;
+		for (ATNConfig c : configLookup) a[i++] = (T)c;
 		return a;
 	}
 

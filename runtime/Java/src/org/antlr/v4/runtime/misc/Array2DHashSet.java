@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /** Set impl with closed hashing (open addressing). */
-public class FlexHashingSet<T> implements Set<T> {
+public class Array2DHashSet<T> implements Set<T> {
 
 	public static final int INITAL_CAPACITY = 4;
 	public static final int INITAL_BUCKET_CAPACITY = 2;
@@ -20,7 +20,7 @@ public class FlexHashingSet<T> implements Set<T> {
 
 	protected int currentPrime = 1; // jump by 4 primes each expand or whatever
 
-	public FlexHashingSet() {
+	public Array2DHashSet() {
 		buckets = (T[][])new Object[INITAL_CAPACITY][];
 	}
 
@@ -92,8 +92,8 @@ public class FlexHashingSet<T> implements Set<T> {
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
-		if ( !(o instanceof FlexHashingSet) || o==null ) return false;
-		FlexHashingSet<T> other = (FlexHashingSet<T>)o;
+		if ( !(o instanceof Array2DHashSet) || o==null ) return false;
+		Array2DHashSet<T> other = (Array2DHashSet<T>)o;
 		if ( other.size() != size() ) return false;
 		return containsAll(other);
 	}
@@ -105,7 +105,7 @@ public class FlexHashingSet<T> implements Set<T> {
 		T[][] newTable = (T[][])new Object[newCapacity][];
 		buckets = newTable;
 		threshold = (int)(newCapacity * LOAD_FACTOR);
-		System.out.println("new size="+newCapacity+", thres="+threshold);
+//		System.out.println("new size="+newCapacity+", thres="+threshold);
 		// rehash all existing entries
 		int oldSize = size();
 		for (T[] bucket : old) {
@@ -126,6 +126,7 @@ public class FlexHashingSet<T> implements Set<T> {
 		if ( a==null && b==null ) return true;
 		if ( a==null || b==null ) return false;
 		if ( a==b ) return true;
+		if ( hashCode(a) != hashCode(b) ) return false;
 		return a.equals(b);
 	}
 
@@ -220,15 +221,20 @@ public class FlexHashingSet<T> implements Set<T> {
 	}
 
 	@Override
-	public boolean containsAll(Collection<?> c) {
-		if ( c instanceof FlexHashingSet) {
-			for (Object o : ((FlexHashingSet<?>)c).buckets) {
-				if ( o!=null && !contains(o) ) return false;
+	public boolean containsAll(Collection<?> collection) {
+		if ( collection instanceof Array2DHashSet ) {
+			Array2DHashSet<T> s = (Array2DHashSet<T>)collection;
+			for (T[] bucket : s.buckets) {
+				if ( bucket==null ) continue;
+				for (T o : bucket) {
+					if ( o==null ) break;
+					if ( !this.contains(o) ) return false;
+				}
 			}
 		}
 		else {
-			for (Object o : c) {
-				if ( !contains(o) ) return false;
+			for (Object o : collection) {
+				if ( !this.contains(o) ) return false;
 			}
 		}
 		return true;
@@ -300,7 +306,7 @@ public class FlexHashingSet<T> implements Set<T> {
 	}
 
 	public static void main(String[] args) {
-		FlexHashingSet<String> clset = new FlexHashingSet<String>();
+		Array2DHashSet<String> clset = new Array2DHashSet<String>();
 		Set<String> set = clset;
 		set.add("hi");
 		set.add("mom");
