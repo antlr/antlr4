@@ -51,8 +51,8 @@ public abstract class ATNSimulator {
 	 *  fill this during closure() since there are lots of contexts that
 	 *  pop up but are not used ever again. It also greatly slows down closure().
  	 */
-	protected final PredictionContextCache sharedContextCache = null;
-		//new PredictionContextCache("shared DFA state context cache");
+	protected final PredictionContextCache sharedContextCache =
+		new PredictionContextCache("shared DFA state context cache");
 
 	/** This context cache tracks all context graphs used during a single
 	 *  ATN-based prediction operation. There will be significant context graph

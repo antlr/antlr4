@@ -269,13 +269,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
  	 */
 	protected boolean readonly = false;
 
-	/** Track every config we add */
-//	public final LinkedHashMap<Key,ATNConfig> configToContext;
-	/** All configs but hashed by (s, i, _, pi) not incl context */
+	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
+	 *  when we go readonly as this set becomes a DFA state.
+	 */
 	public ConfigHashSet configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
-	// too hard to keep in sync
 	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
