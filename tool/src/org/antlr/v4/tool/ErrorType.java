@@ -104,7 +104,6 @@ public enum ErrorType {
 	LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(85, "", ErrorSeverity.ERROR),
 	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(86, "reference to rewrite element <arg> not found to left of ->", ErrorSeverity.ERROR),
     UNDEFINED_TOKEN_REF_IN_REWRITE(87, "token <arg> in rewrite is undefined", ErrorSeverity.ERROR),
-	///UNDEFINED_LABEL_REF_IN_REWRITE(, "", ErrorSeverity.ERROR), use previous
 	NO_GRAMMAR_START_RULE(88, "", ErrorSeverity.ERROR),
 	EMPTY_COMPLEMENT(89, "empty complement", ErrorSeverity.ERROR),
 	UNKNOWN_DYNAMIC_SCOPE(90, "unknown dynamic scope: <arg> in <arg2>", ErrorSeverity.ERROR),
@@ -124,7 +123,7 @@ public enum ErrorType {
 	HETERO_ILLEGAL_IN_REWRITE_ALT(104, "alts with rewrites can't use heterogeneous types left of ->", ErrorSeverity.ERROR),
 	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: <arg>.<arg2>", ErrorSeverity.ERROR),
 	NO_SUCH_RULE_IN_SCOPE(106, "rule <arg2> is not defined in grammar <arg>", ErrorSeverity.ERROR),
-	TOKEN_STRING_REASSIGNMENT(107, "cannot alias <arg>; string already assigned to <arg2>", ErrorSeverity.ERROR),
+	TOKEN_STRING_REASSIGNMENT(107, "cannot alias <arg> in tokens {}; string already assigned to <arg2>", ErrorSeverity.ERROR),
 	TOKEN_NAME_REASSIGNMENT(108, "cannot redefine <arg>; token name already <if(arg2)>assigned to <arg2><else>defined<endif>", ErrorSeverity.ERROR),
 	//TOKEN_VOCAB_IN_DELEGATE(, "tokenVocab option ignored in imported grammar <arg>", ErrorSeverity.ERROR),
 	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
@@ -146,6 +145,7 @@ public enum ErrorType {
 	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
 	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
 	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
+	ALIAS_REASSIGNMENT(127, "token literal <arg> aliased to new token name <arg2>", ErrorSeverity.WARNING),
 
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
