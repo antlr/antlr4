@@ -652,7 +652,23 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		PredictionContextCache contextCache = new PredictionContextCache();
 		while (true) { // while more work
 			SimulatorState<Symbol> nextState = computeReachSet(dfa, previous, t, greedy, contextCache);
-			if (nextState == null) throw noViableAlt(input, outerContext, previous.s0.configset, startIndex);
+			if (nextState == null) {
+				if (previous.s0 != null) {
+					BitSet alts = new BitSet();
+					for (ATNConfig config : previous.s0.configset) {
+						if (config.getReachesIntoOuterContext() || config.getState() instanceof RuleStopState) {
+							alts.set(config.getAlt());
+						}
+					}
+
+					if (!alts.isEmpty()) {
+						return alts.nextSetBit(0);
+					}
+				}
+
+				throw noViableAlt(input, outerContext, previous.s0.configset, startIndex);
+			}
+
 			DFAState D = nextState.s0;
 			ATNConfigSet reach = nextState.s0.configset;
 

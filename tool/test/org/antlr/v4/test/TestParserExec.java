@@ -186,11 +186,15 @@ public class TestParserExec extends BaseTest {
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
 		assertEquals("", found);
-		assertEquals("line 1:4 no viable alternative at input '<EOF>'\n", this.stderrDuringParse);
+		assertEquals(null, this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
 		assertEquals("", found);
-		assertEquals("line 1:14 no viable alternative at input '<EOF>'\n", this.stderrDuringParse);
+		assertEquals(null, this.stderrDuringParse);
+
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x if", false);
+		assertEquals("", found);
+		assertEquals(null, this.stderrDuringParse);
 	}
 
 	/**
