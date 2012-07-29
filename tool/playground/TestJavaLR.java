@@ -53,12 +53,26 @@ class TestJavaLR {
 	public static boolean x2 = false;
 	public static boolean threaded = false;
 
+	public static class Worker implements Runnable {
+		List<String> files;
+		public Worker(List<String> files) {
+			this.files = files;
+		}
+		@Override
+		public void run() {
+			for (String f : files) {
+				parseFile(f);
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		doAll(args);
 	}
 
 	public static void doAll(String[] args) {
 		List<String> inputFiles = new ArrayList<String>();
+		long start = System.currentTimeMillis();
 		try {
 			if (args.length > 0 ) {
 				// for each directory/file specified on the command line
@@ -75,13 +89,14 @@ class TestJavaLR {
 						inputFiles.add(args[i]);
 					}
 				}
+				List<String> javaFiles = new ArrayList<String>();
 				for (String fileName : inputFiles) {
-					doFile(new File(fileName)); // parse it
+					List<String> files = getFilenames(new File(fileName));
+					javaFiles.addAll(files);
 				}
+				doFiles(javaFiles);
 				if ( x2 ) {
-					for (String fileName : inputFiles) {
-						doFile(new File(fileName)); // parse again!
-					}
+					doFiles(javaFiles);
 				}
 			}
 			else {
@@ -92,13 +107,26 @@ class TestJavaLR {
 			System.err.println("exception: "+e);
 			e.printStackTrace(System.err);   // so we can get stack trace
 		}
+		long stop = System.currentTimeMillis();
+		System.out.println("Overall time " + (stop - start) + "ms.");
 		System.gc();
 	}
 
-	public static void doFile(File f) throws Exception {
+	public static void doFiles(List<String> files) throws Exception {
 		long parserStart = System.currentTimeMillis();
 		lexerTime = 0;
-		doFile_(f);
+		if ( threaded ) {
+			int midpoint = files.size() / 2;
+			Worker w1 = new Worker(files.subList(0,midpoint+1));
+			Worker w2 = new Worker(files.subList(midpoint+1,files.size()));
+			new Thread(w1).start();
+			new Thread(w2).start();
+		}
+		else {
+			for (String f : files) {
+				parseFile(f);
+			}
+		}
 		long parserStop = System.currentTimeMillis();
 		System.out.println("Lexer total time " + lexerTime + "ms.");
 		System.out.println("Total lexer+parser time " + (parserStop - parserStart) + "ms.");
@@ -112,32 +140,54 @@ class TestJavaLR {
 		System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_as_alt +" retry predicts same alt as resolving conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_from_dfa +" retry from DFA");
-
 	}
 
-	// This method decides what action to take based on the type of
-	//   file we are looking at
-	public static void doFile_(File f) throws Exception {
+	public static List<String> getFilenames(File f) throws Exception {
+		List<String> files = new ArrayList<String>();
+		getFilenames_(f, files);
+		return files;
+	}
+
+	public static void getFilenames_(File f, List<String> files) throws Exception {
 		// If this is a directory, walk each file/dir in that directory
 		if (f.isDirectory()) {
-			String files[] = f.list();
-			for(int i=0; i < files.length; i++)
-				doFile_(new File(f, files[i]));
+			String flist[] = f.list();
+			for(int i=0; i < flist.length; i++) {
+				getFilenames_(new File(f, flist[i]), files);
+			}
 		}
 
 		// otherwise, if this is a java file, parse it!
 		else if ( ((f.getName().length()>5) &&
-			f.getName().substring(f.getName().length()-5).equals(".java"))
-			|| f.getName().equals("input") )
+			f.getName().substring(f.getName().length()-5).equals(".java")) )
 		{
-			System.err.println(f.getAbsolutePath());
-			parseFile(f.getAbsolutePath());
+			files.add(f.getAbsolutePath());
 		}
 	}
 
-	// Here's where we do the real work...
-	public static void parseFile(String f) throws Exception {
+	// This method decides what action to take based on the type of
+	//   file we are looking at
+//	public static void doFile_(File f) throws Exception {
+//		// If this is a directory, walk each file/dir in that directory
+//		if (f.isDirectory()) {
+//			String files[] = f.list();
+//			for(int i=0; i < files.length; i++) {
+//				doFile_(new File(f, files[i]));
+//			}
+//		}
+//
+//		// otherwise, if this is a java file, parse it!
+//		else if ( ((f.getName().length()>5) &&
+//			f.getName().substring(f.getName().length()-5).equals(".java")) )
+//		{
+//			System.err.println(f.getAbsolutePath());
+//			parseFile(f.getAbsolutePath());
+//		}
+//	}
+
+	public static void parseFile(String f) {
 		try {
+			System.err.println(f);
 			// Create a scanner that reads from the input stream passed to us
 			Lexer lexer = new JavaLRLexer(new ANTLRFileStream(f));
 
@@ -164,6 +214,5 @@ class TestJavaLR {
 			e.printStackTrace();   // so we can get stack trace
 		}
 	}
-
 }
 
