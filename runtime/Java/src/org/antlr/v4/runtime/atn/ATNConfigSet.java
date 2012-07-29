@@ -228,12 +228,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			mergedConfig.setOuterContextDepth(Math.max(mergedConfig.getOuterContextDepth(), e.getOuterContextDepth()));
 
 			PredictionContext joined = PredictionContext.join(mergedConfig.getContext(), e.getContext(), contextCache);
+			updatePropertiesForMergedConfig(e);
 			if (mergedConfig.getContext() == joined) {
 				return false;
 			}
 
 			mergedConfig.setContext(joined);
-			updatePropertiesForMergedConfig(e);
 			return true;
 		}
 
@@ -243,6 +243,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 				unmergedConfig.setOuterContextDepth(Math.max(unmergedConfig.getOuterContextDepth(), e.getOuterContextDepth()));
 
 				PredictionContext joined = PredictionContext.join(unmergedConfig.getContext(), e.getContext(), contextCache);
+				updatePropertiesForMergedConfig(e);
 				if (unmergedConfig.getContext() == joined) {
 					return false;
 				}
@@ -254,7 +255,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 					unmerged.remove(i);
 				}
 
-				updatePropertiesForMergedConfig(e);
 				return true;
 			}
 		}
