@@ -31,6 +31,7 @@ import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -41,8 +42,6 @@ import java.io.File;
 class TestJavaLR {
 	public static long lexerTime = 0;
 	public static boolean profile = false;
-	public static JavaLRLexer lexer;
-	public static JavaLRParser parser = null;
 	public static boolean notree = false;
 	public static boolean gui = false;
 	public static boolean printTree = false;
@@ -126,37 +125,25 @@ class TestJavaLR {
 								 throws Exception {
 		try {
 			// Create a scanner that reads from the input stream passed to us
-			if ( lexer==null ) {
-				lexer = new JavaLRLexer(null);
-			}
-			lexer.setInputStream(new ANTLRFileStream(f));
+			Lexer lexer = new JavaLRLexer(new ANTLRFileStream(f));
 
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			long start = System.currentTimeMillis();
 			tokens.fill(); // load all and check time
-//			System.out.println(tokens.getTokens());
 			long stop = System.currentTimeMillis();
 			lexerTime += stop-start;
 
-			if ( true ) {
-				// Create a parser that reads from the scanner
-				if ( parser==null ) {
-					parser = new JavaLRParser(null);
-					if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
-					if ( bail ) parser.setErrorHandler(new BailErrorStrategy());
-					if ( SLL ) parser.getInterpreter().SLL = true;
-				}
+			// Create a parser that reads from the scanner
+			JavaLRParser parser = new JavaLRParser(tokens);
+			if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
+			if ( bail ) parser.setErrorHandler(new BailErrorStrategy());
+			if ( SLL ) parser.getInterpreter().SLL = true;
 
-				parser.setTokenStream(tokens);
-				// start parsing at the compilationUnit rule
-				ParserRuleContext<Token> t = parser.compilationUnit();
-				if ( notree ) parser.setBuildParseTree(false);
-				if ( gui ) t.inspect(parser);
-				if ( printTree ) System.out.println(t.toStringTree(parser));
-				//System.err.println("finished "+f);
-//                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
-				lexer=null; parser=null; // force rebuild
-			}
+			// start parsing at the compilationUnit rule
+			ParserRuleContext<Token> t = parser.compilationUnit();
+			if ( notree ) parser.setBuildParseTree(false);
+			if ( gui ) t.inspect(parser);
+			if ( printTree ) System.out.println(t.toStringTree(parser));
 		}
 		catch (Exception e) {
 			System.err.println("parser exception: "+e);
