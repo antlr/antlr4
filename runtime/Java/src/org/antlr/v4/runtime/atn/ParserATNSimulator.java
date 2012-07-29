@@ -290,6 +290,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					computeStartState(dfa.atnStartState, outerContext,
 									  greedy, loopsSimulateTailRecursion,
 									  fullCtx);
+				PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
+				predictionCtx = getCachedContext(predictionCtx);
+				Integer predI = s.contextToPredictedAlt.get(predictionCtx);
+				if ( predI!=null ) {
+					return predI;
+				}
 				retry_with_context_from_dfa++;
 				ATNConfigSet fullCtxSet =
 					execATNWithFullContext(dfa, s, s0_closure,
@@ -297,6 +303,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 										   outerContext,
 										   ATN.INVALID_ALT_NUMBER,
 										   greedy);
+				s.contextToPredictedAlt.put(predictionCtx, fullCtxSet.uniqueAlt);
 				return fullCtxSet.uniqueAlt;
 			}
 			if ( s.isAcceptState ) {
@@ -482,6 +489,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						}
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
+							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
+							predictionCtx = getCachedContext(predictionCtx);
+							Integer predI = D.contextToPredictedAlt.get(predictionCtx);
+							if ( predI!=null ) {
+								return predI;
+							}
 							loopsSimulateTailRecursion = true;
 							ATNConfigSet s0_closure =
 								computeStartState(dfa.atnStartState,
@@ -497,6 +510,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							// not accept state: isCtxSensitive
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
 							D.prediction = predictedAlt = fullCtxSet.uniqueAlt;
+							D.contextToPredictedAlt.put(predictionCtx, predictedAlt);
 							return predictedAlt; // all done with preds, etc...
 						}
 					}
