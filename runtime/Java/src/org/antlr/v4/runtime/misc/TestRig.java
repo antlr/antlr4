@@ -172,6 +172,9 @@ public class TestRig {
 				r = new InputStreamReader(is);
 			}
 
+			if ( inputFiles.size()>1 ) {
+				System.err.println(inputFile);
+			}
 			try {
 				ANTLRInputStream input = new ANTLRInputStream(r);
 				lexer.setInputStream(input);
