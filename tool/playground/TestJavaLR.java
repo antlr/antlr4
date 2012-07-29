@@ -54,21 +54,26 @@ class TestJavaLR {
 	public static boolean bail = false;
 	public static boolean x2 = false;
 	public static boolean threaded = false;
-	public static long parserStart;
-	public static long parserStop;
+//	public static long parserStart;
+//	public static long parserStop;
+	public static Worker[] workers = new Worker[3];
 
 	public static CyclicBarrier barrier;
 
 	public static class Worker implements Runnable {
+		public long parserStart;
+		public long parserStop;
 		List<String> files;
 		public Worker(List<String> files) {
 			this.files = files;
 		}
 		@Override
 		public void run() {
+			parserStart = System.currentTimeMillis();
 			for (String f : files) {
 				parseFile(f);
 			}
+			parserStop = System.currentTimeMillis();
 			try {
 				barrier.await();
 			}
@@ -128,7 +133,7 @@ class TestJavaLR {
 	}
 
 	public static void doFiles(List<String> files) throws Exception {
-		parserStart = System.currentTimeMillis();
+//		parserStart = System.currentTimeMillis();
 //		lexerTime = 0;
 		if ( threaded ) {
 			barrier = new CyclicBarrier(3,new Runnable() {
@@ -139,12 +144,12 @@ class TestJavaLR {
 			int chunkSize = files.size() / 3;  // 10/3 = 3
 			int p1 = chunkSize; // 0..3
 			int p2 = 2 * chunkSize; // 4..6, then 7..10
-			Worker w1 = new Worker(files.subList(0,p1+1));
-			Worker w2 = new Worker(files.subList(p1+1,p2+1));
-			Worker w3 = new Worker(files.subList(p2+1,files.size()));
-			new Thread(w1).start();
-			new Thread(w2).start();
-			new Thread(w3).start();
+			workers[0] = new Worker(files.subList(0,p1+1));
+			workers[1] = new Worker(files.subList(p1+1,p2+1));
+			workers[2] = new Worker(files.subList(p2+1,files.size()));
+			new Thread(workers[0]).start();
+			new Thread(workers[1]).start();
+			new Thread(workers[2]).start();
 		}
 		else {
 			for (String f : files) {
@@ -155,9 +160,15 @@ class TestJavaLR {
 	}
 
 	private static void report() {
-		parserStop = System.currentTimeMillis();
+//		parserStop = System.currentTimeMillis();
 //		System.out.println("Lexer total time " + lexerTime + "ms.");
-		System.out.println("Total lexer+parser time " + (parserStop - parserStart) + "ms.");
+		long time = 0;
+		for (Worker w : workers) {
+			long wtime = w.parserStop - w.parserStart;
+			time += wtime;
+			System.out.println("worker time " + wtime + "ms.");
+		}
+		System.out.println("Total lexer+parser time " + time + "ms.");
 
 		System.out.println("finished parsing OK");
 		System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
