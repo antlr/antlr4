@@ -38,6 +38,8 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 class TestJavaLR {
 	public static long lexerTime = 0;
@@ -53,13 +55,11 @@ class TestJavaLR {
 
 	public static void main(String[] args) {
 		doAll(args);
-//        doAll(args);
 	}
 
 	public static void doAll(String[] args) {
+		List<String> inputFiles = new ArrayList<String>();
 		try {
-            lexerTime = 0;
-			long start = System.currentTimeMillis();
 			if (args.length > 0 ) {
 				// for each directory/file specified on the command line
 				for(int i=0; i< args.length;i++) {
@@ -71,26 +71,22 @@ class TestJavaLR {
 					else if ( args[i].equals("-diag") ) diag = true;
 					else if ( args[i].equals("-2x") ) x2 = true;
 					else if ( args[i].equals("-threaded") ) threaded = true;
-					doFile(new File(args[i])); // parse it
+					if ( args[i].charAt(0)!='-' ) { // input file name
+						inputFiles.add(args[i]);
+					}
+				}
+				for (String fileName : inputFiles) {
+					doFile(new File(fileName)); // parse it
+				}
+				if ( x2 ) {
+					for (String fileName : inputFiles) {
+						doFile(new File(fileName)); // parse again!
+					}
 				}
 			}
 			else {
 				System.err.println("Usage: java Main <directory or file name>");
 			}
-
-			long stop = System.currentTimeMillis();
-			System.out.println("Lexer total time " + lexerTime + "ms.");
-			System.out.println("Total time " + (stop - start) + "ms.");
-
-			System.out.println("finished parsing OK");
-			System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
-			System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
-			System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
-			System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
-			System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
-			System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
-			System.out.println(ParserATNSimulator.retry_with_context_predicts_same_as_alt +" retry predicts same alt as resolving conflict");
-			System.out.println(ParserATNSimulator.retry_with_context_from_dfa +" retry from DFA");
 		}
 		catch(Exception e) {
 			System.err.println("exception: "+e);
@@ -99,20 +95,39 @@ class TestJavaLR {
 		System.gc();
 	}
 
+	public static void doFile(File f) throws Exception {
+		long parserStart = System.currentTimeMillis();
+		lexerTime = 0;
+		doFile_(f);
+		long parserStop = System.currentTimeMillis();
+		System.out.println("Lexer total time " + lexerTime + "ms.");
+		System.out.println("Total lexer+parser time " + (parserStop - parserStart) + "ms.");
+
+		System.out.println("finished parsing OK");
+		System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
+		System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
+		System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
+		System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
+		System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
+		System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
+		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_as_alt +" retry predicts same alt as resolving conflict");
+		System.out.println(ParserATNSimulator.retry_with_context_from_dfa +" retry from DFA");
+
+	}
 
 	// This method decides what action to take based on the type of
 	//   file we are looking at
-	public static void doFile(File f) throws Exception {
+	public static void doFile_(File f) throws Exception {
 		// If this is a directory, walk each file/dir in that directory
 		if (f.isDirectory()) {
 			String files[] = f.list();
 			for(int i=0; i < files.length; i++)
-				doFile(new File(f, files[i]));
+				doFile_(new File(f, files[i]));
 		}
 
 		// otherwise, if this is a java file, parse it!
 		else if ( ((f.getName().length()>5) &&
-				f.getName().substring(f.getName().length()-5).equals(".java"))
+			f.getName().substring(f.getName().length()-5).equals(".java"))
 			|| f.getName().equals("input") )
 		{
 			System.err.println(f.getAbsolutePath());
@@ -121,8 +136,7 @@ class TestJavaLR {
 	}
 
 	// Here's where we do the real work...
-	public static void parseFile(String f)
-								 throws Exception {
+	public static void parseFile(String f) throws Exception {
 		try {
 			// Create a scanner that reads from the input stream passed to us
 			Lexer lexer = new JavaLRLexer(new ANTLRFileStream(f));
