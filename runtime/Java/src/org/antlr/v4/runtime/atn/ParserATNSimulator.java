@@ -1238,6 +1238,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if ( ambigAlts.isNil() ) return null;
 
+		// are any configs not represented in ambig alt sets
+//		for (ATNConfig config : configs) {
+//			if (!ambigAlts.contains(config.alt)) {
+//				return null;
+//			}
+//		}
 		return ambigAlts;
 	}
 
