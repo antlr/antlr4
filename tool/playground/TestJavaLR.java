@@ -40,9 +40,11 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 class TestJavaLR {
-	public static long lexerTime = 0;
+//	public static long lexerTime = 0;
 	public static boolean profile = false;
 	public static boolean notree = false;
 	public static boolean gui = false;
@@ -52,6 +54,10 @@ class TestJavaLR {
 	public static boolean bail = false;
 	public static boolean x2 = false;
 	public static boolean threaded = false;
+	public static long parserStart;
+	public static long parserStop;
+
+	public static CyclicBarrier barrier;
 
 	public static class Worker implements Runnable {
 		List<String> files;
@@ -62,6 +68,15 @@ class TestJavaLR {
 		public void run() {
 			for (String f : files) {
 				parseFile(f);
+			}
+			try {
+				barrier.await();
+			}
+			catch (InterruptedException ex) {
+				return;
+			}
+			catch (BrokenBarrierException ex) {
+				return;
 			}
 		}
 	}
@@ -108,27 +123,40 @@ class TestJavaLR {
 			e.printStackTrace(System.err);   // so we can get stack trace
 		}
 		long stop = System.currentTimeMillis();
-		System.out.println("Overall time " + (stop - start) + "ms.");
+//		System.out.println("Overall time " + (stop - start) + "ms.");
 		System.gc();
 	}
 
 	public static void doFiles(List<String> files) throws Exception {
-		long parserStart = System.currentTimeMillis();
-		lexerTime = 0;
+		parserStart = System.currentTimeMillis();
+//		lexerTime = 0;
 		if ( threaded ) {
-			int midpoint = files.size() / 2;
-			Worker w1 = new Worker(files.subList(0,midpoint+1));
-			Worker w2 = new Worker(files.subList(midpoint+1,files.size()));
+			barrier = new CyclicBarrier(3,new Runnable() {
+				public void run() {
+					report();
+				}
+			});
+			int chunkSize = files.size() / 3;  // 10/3 = 3
+			int p1 = chunkSize; // 0..3
+			int p2 = 2 * chunkSize; // 4..6, then 7..10
+			Worker w1 = new Worker(files.subList(0,p1+1));
+			Worker w2 = new Worker(files.subList(p1+1,p2+1));
+			Worker w3 = new Worker(files.subList(p2+1,files.size()));
 			new Thread(w1).start();
 			new Thread(w2).start();
+			new Thread(w3).start();
 		}
 		else {
 			for (String f : files) {
 				parseFile(f);
 			}
+			report();
 		}
-		long parserStop = System.currentTimeMillis();
-		System.out.println("Lexer total time " + lexerTime + "ms.");
+	}
+
+	private static void report() {
+		parserStop = System.currentTimeMillis();
+//		System.out.println("Lexer total time " + lexerTime + "ms.");
 		System.out.println("Total lexer+parser time " + (parserStop - parserStart) + "ms.");
 
 		System.out.println("finished parsing OK");
@@ -195,7 +223,7 @@ class TestJavaLR {
 			long start = System.currentTimeMillis();
 			tokens.fill(); // load all and check time
 			long stop = System.currentTimeMillis();
-			lexerTime += stop-start;
+//			lexerTime += stop-start;
 
 			// Create a parser that reads from the scanner
 			JavaLRParser parser = new JavaLRParser(tokens);
