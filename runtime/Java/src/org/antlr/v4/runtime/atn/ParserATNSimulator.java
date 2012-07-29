@@ -559,7 +559,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						// rewind input so pred's LT(i) calls make sense
 						input.seek(startIndex);
 						BitSet predictions = evalSemanticContext(s.predicates, outerContext, true);
-						if ( predictions.size() == 1 ) {
+						if ( predictions.cardinality() == 1 ) {
 							return predictions.nextSetBit(0);
 						}
 					}
@@ -708,7 +708,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 									input.seek(startIndex);
 									// always use complete evaluation here since we'll want to retry with full context if still ambiguous
 									BitSet alts = evalSemanticContext(predPredictions, outerContext, true);
-									if (alts.size() == 1) {
+									if (alts.cardinality() == 1) {
 										return alts.nextSetBit(0);
 									}
 								}
@@ -759,7 +759,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					input.seek(startIndex);
 					BitSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
-					switch (alts.size()) {
+					switch (alts.cardinality()) {
 					case 0:
 						throw noViableAlt(input, outerContext, D.configset, startIndex);
 
@@ -1473,7 +1473,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		BitSet altsToIgnore = new BitSet();
 		for (int state : stateToConfigListMap.keySet()) { // for each state
 			BitSet alts = stateToAltListMap.get(state);
-			if ( alts.size()==1 ) {
+			if ( alts.cardinality()==1 ) {
 				if ( !atn.states.get(state).onlyHasEpsilonTransitions() ) {
 					List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
 					ATNConfig anyConfig = configsPerState.get(0);
@@ -1508,7 +1508,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( !altsToIgnore.isEmpty() ) {
 				BitSet combined = (BitSet)alts.clone();
 				combined.and(altsToIgnore);
-				if (combined.size() <= 1) {
+				if (combined.cardinality() <= 1) {
 //					System.err.println("ignoring alt since "+alts+"&"+altsToIgnore+
 //									   ".size is "+alts.and(altsToIgnore).size());
 					continue;
