@@ -118,6 +118,7 @@ Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superclass> {
+	protected static final DFA[] _decisionToDFA;
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -190,7 +191,7 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
-	_interp = new ParserATNSimulator\<Token>(this,_ATN);
+	_interp = new ParserATNSimulator\<Token>(this,_ATN,_decisionToDFA);
 }
 >>
 
@@ -714,6 +715,7 @@ import org.antlr.v4.runtime.misc.*;
 Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends Lexer {
+	protected static final DFA[] _decisionToDFA;
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
@@ -733,7 +735,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 
 	public <lexer.name>(CharStream input) {
 		super(input);
-		_interp = new LexerATNSimulator(this,_ATN);
+		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA);
 	}
 
 	@Override
@@ -765,6 +767,7 @@ public static final String _serializedATN =
 public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
+    _decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 	//org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
 	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));
 	//System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));

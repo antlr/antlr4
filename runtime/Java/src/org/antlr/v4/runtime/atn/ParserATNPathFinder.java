@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -45,8 +46,8 @@ import java.util.List;
 import java.util.Set;
 
 public class ParserATNPathFinder extends ParserATNSimulator<Token> {
-	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn) {
-		super(parser, atn);
+	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
+		super(parser, atn, decisionToDFA);
 	}
 
 	/** Given an input sequence, as a subset of the input stream, trace the path through the

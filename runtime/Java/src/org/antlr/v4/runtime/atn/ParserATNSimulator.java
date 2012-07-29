@@ -150,16 +150,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected ParserRuleContext<?> _outerContext;
 
 	/** Testing only! */
-	public ParserATNSimulator(@NotNull ATN atn) {
-		this(null, atn);
+	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
+		this(null, atn, decisionToDFA);
 	}
 
-	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn) {
+	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
 		super(atn);
 		this.parser = parser;
-//		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
-		// TODO (sam): why distinguish on parser != null?
-		decisionToDFA = new DFA[atn.getNumberOfDecisions() + (parser != null ? 1 : 0)];
+		this.decisionToDFA = decisionToDFA;
 		//		DOTGenerator dot = new DOTGenerator(null);
 		//		System.out.println(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
 		//		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
@@ -174,22 +172,37 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("adaptivePredict decision "+decision+
-							   " exec LA(1)=="+ getLookaheadName(input)+
-							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+								   " exec LA(1)=="+ getLookaheadName(input)+
+								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
 		_input = input;
 		_startIndex = input.index();
 		_outerContext = outerContext;
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
-		if ( dfa==null || dfa.s0==null ) {
-			DecisionState startState = atn.decisionToState.get(decision);
-			decisionToDFA[decision] = dfa = new DFA(startState, decision);
-			return predictATN(dfa, input, outerContext);
+		// First, synchronize on the array of DFA for this parser
+		// so that we can get the DFA for a decision or create and set one
+		if ( dfa==null || dfa.s0==null ) { // only create one if not there
+			synchronized (decisionToDFA) {
+				dfa = decisionToDFA[decision];
+				if ( dfa==null || dfa.s0==null ) { // the usual double-check
+					DecisionState startState = atn.decisionToState.get(decision);
+					decisionToDFA[decision] = dfa = new DFA(startState, decision);
+				}
+			}
+			// Now we are certain to have a specific decision's DFA
+			// Synchronize on the DFA so that nobody can read or write
+			// to it while we updated during ATN simulation
+			synchronized (decisionToDFA[decision]) {
+				return predictATN(dfa, input, outerContext);
+			}
 		}
-		else {
-			//dump(dfa);
-			// start with the DFA
+
+		// We can start with an existing DFA
+		synchronized (decisionToDFA[decision]) {
+			// Only enter the DFA simulation if nobody else is playing with it.
+			// This blocks multiple readonly simulations of the same DFA but that's
+			// unlikely to happen a lot
 			int m = input.mark();
 			int index = input.index();
 			try {
@@ -206,7 +219,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
-		//contextCache = new PredictionContextCache("predict ctx cache");
+		// caller must ensure current thread is sync'd on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("predictATN decision "+dfa.decision+
@@ -246,6 +259,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
                        @Nullable ParserRuleContext<?> outerContext)
     {
+		// caller must ensure current thread is sync'd on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( dfa_debug ) {
 			System.out.println("execDFA decision "+dfa.decision+
@@ -555,6 +569,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											   int SLL_min_alt, // todo: is this in D as min ambig alts?
 											   boolean greedy)
 	{
+		// caller must ensure current thread is sync'd on dfa
 		retry_with_context++;
 		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
 
@@ -1364,7 +1379,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		DFAState from = addDFAState(dfa, p);
 		DFAState to = addDFAState(dfa, q);
-        if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
+		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		addDFAEdge(from, t, to);
 		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
 		return to;
@@ -1386,19 +1401,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( existing!=null ) return existing;
 
 		DFAState newState = proposed;
-
 		newState.stateNumber = dfa.states.size();
-//		System.out.println("Before opt, cache size = "+ sharedContextCache.size());
-
 		configs.optimizeConfigs(this);
-//		System.out.println("After opt, cache size = " + sharedContextCache.size());
-//		System.out.println(configs.size());
-//		if ( configs.hasSemanticContext ) System.out.println(configs.getPredicates().size());
-//		System.out.println(configs.getPredicates().size());
 		configs.setReadonly(true);
 		newState.configs = configs;
 		dfa.states.put(newState, newState);
-        if ( debug ) System.out.println("adding new DFA state: "+newState);
+		if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
 	}
 

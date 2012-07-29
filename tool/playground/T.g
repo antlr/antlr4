@@ -1,10 +1,10 @@
-lexer grammar T;
+grammar T;
 
-RBRACE : '}' ;
+s : x B ;
+x : A B | A | A ;
+s2 : x B ;
 
-mode Action;
 
-END_ACTION
-    :   '}' -> popMode
-    ;
-
+A : 'a';
+B : 'b' ;
+WS : [ \t\n\r]+ -> channel(HIDDEN) ;

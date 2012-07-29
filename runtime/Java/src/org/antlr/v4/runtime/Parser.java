@@ -532,27 +532,31 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
     /** For debugging and other purposes */
-    public List<String> getDFAStrings() {
-        List<String> s = new ArrayList<String>();
-        for (int d = 0; d < _interp.decisionToDFA.length; d++) {
-            DFA dfa = _interp.decisionToDFA[d];
-            s.add( dfa.toString(getTokenNames()) );
-        }
-        return s;
+	public List<String> getDFAStrings() {
+		synchronized (_interp.decisionToDFA) {
+			List<String> s = new ArrayList<String>();
+			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
+				DFA dfa = _interp.decisionToDFA[d];
+				s.add( dfa.toString(getTokenNames()) );
+			}
+			return s;
+		}
     }
 
-    /** For debugging and other purposes */
-    public void dumpDFA() {
-        boolean seenOne = false;
-        for (int d = 0; d < _interp.decisionToDFA.length; d++) {
-            DFA dfa = _interp.decisionToDFA[d];
-            if ( dfa!=null ) {
-                if ( seenOne ) System.out.println();
-                System.out.println("Decision " + dfa.decision + ":");
-                System.out.print(dfa.toString(getTokenNames()));
-                seenOne = true;
-            }
-        }
+	/** For debugging and other purposes */
+	public void dumpDFA() {
+		synchronized (_interp.decisionToDFA) {
+			boolean seenOne = false;
+			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
+				DFA dfa = _interp.decisionToDFA[d];
+				if ( dfa!=null ) {
+					if ( seenOne ) System.out.println();
+					System.out.println("Decision " + dfa.decision + ":");
+					System.out.print(dfa.toString(getTokenNames()));
+					seenOne = true;
+				}
+			}
+		}
     }
 
 	public String getSourceName() {

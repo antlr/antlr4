@@ -111,11 +111,13 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static int ATN_failover = 0;
 	public static int match_calls = 0;
 
-	public LexerATNSimulator(@NotNull ATN atn) {
-		this(null, atn);
+	public LexerATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
+		this(null, atn, decisionToDFA);
 	}
 
-	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn) {
+	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn,
+							 @NotNull DFA[] decisionToDFA)
+	{
 		super(atn);
 		dfa = new DFA[atn.modeToStartState.size()];
 		for (int i=0; i<atn.modeToStartState.size(); i++) {

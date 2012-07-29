@@ -56,7 +56,7 @@ public class LexerInterpreter implements TokenSource {
 	public LexerInterpreter(LexerGrammar g) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		interp = new LexerATNSimulator(g.atn);
+		interp = new LexerATNSimulator(g.atn,null);
 	}
 
 	public void setInput(String inputString) {

@@ -27,6 +27,7 @@ public class TestT {
 		parser.addErrorListener(new DiagnosticErrorListener());
 
 		ParserRuleContext tree = parser.s();
+		System.out.println(tree.toStringTree(parser));
 //		tree.save(parser, "/tmp/t.ps");
 	}
 }
