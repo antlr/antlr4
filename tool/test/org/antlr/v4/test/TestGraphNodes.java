@@ -13,7 +13,7 @@ public class TestGraphNodes extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		PredictionContext.globalNodeCount = 1;
-		contextCache = new PredictionContextCache("testing");
+		contextCache = new PredictionContextCache();
 	}
 
 	public boolean rootIsWildcard() { return true; }

@@ -317,7 +317,7 @@ public class TestPerformance extends BaseTest {
                           System.currentTimeMillis() - startTime);
 
 		final LexerATNSimulator lexerInterpreter = sharedLexer.getInterpreter();
-		final DFA[] modeToDFA = lexerInterpreter.dfa;
+		final DFA[] modeToDFA = lexerInterpreter.decisionToDFA;
 		if (SHOW_DFA_STATE_STATS) {
 			int states = 0;
 			int configs = 0;

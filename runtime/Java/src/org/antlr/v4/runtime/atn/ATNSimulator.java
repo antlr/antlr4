@@ -64,16 +64,18 @@ public abstract class ATNSimulator {
 	 *  more time I think and doesn't save on the overall footprint
 	 *  so it's not worth the complexity.
  	 */
-	protected final PredictionContextCache sharedContextCache =
-		new PredictionContextCache("shared DFA state context cache");
+	protected final PredictionContextCache sharedContextCache;
 
 	static {
 		ERROR = new DFAState(new ATNConfigSet());
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 
-	public ATNSimulator(@NotNull ATN atn) {
+	public ATNSimulator(@NotNull ATN atn,
+						@NotNull PredictionContextCache sharedContextCache)
+	{
 		this.atn = atn;
+		this.sharedContextCache = sharedContextCache;
 	}
 
 	public abstract void reset();

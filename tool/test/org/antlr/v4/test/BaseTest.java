@@ -211,7 +211,7 @@ public abstract class BaseTest {
 									  CharStream input,
 									  boolean adaptive)
 	{
-		LexerATNSimulator interp = new LexerATNSimulator(atn,null);
+		LexerATNSimulator interp = new LexerATNSimulator(atn,null,null);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		boolean hitEOF = false;

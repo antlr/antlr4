@@ -49,6 +49,8 @@ class TestJavaLR {
 	public static boolean SLL = false;
 	public static boolean diag = false;
 	public static boolean bail = false;
+	public static boolean x2 = false;
+	public static boolean threaded = false;
 
 	public static void main(String[] args) {
 		doAll(args);
@@ -68,6 +70,8 @@ class TestJavaLR {
 					else if ( args[i].equals("-SLL") ) SLL = true;
 					else if ( args[i].equals("-bail") ) bail = true;
 					else if ( args[i].equals("-diag") ) diag = true;
+					else if ( args[i].equals("-2x") ) x2 = true;
+					else if ( args[i].equals("-threaded") ) threaded = true;
 					doFile(new File(args[i])); // parse it
 				}
 			}
@@ -151,6 +155,7 @@ class TestJavaLR {
 				if ( printTree ) System.out.println(t.toStringTree(parser));
 				//System.err.println("finished "+f);
 //                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
+				lexer=null; parser=null; // force rebuild
 			}
 		}
 		catch (Exception e) {

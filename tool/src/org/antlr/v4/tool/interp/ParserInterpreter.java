@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -46,6 +47,9 @@ import org.antlr.v4.tool.Grammar;
 public class ParserInterpreter {
 	public static class DummyParser extends Parser {
 		public final DFA[] decisionToDFA; // not shared for interp
+		public final PredictionContextCache sharedContextCache =
+			new PredictionContextCache();
+
 		public Grammar g;
 		public DummyParser(Grammar g, TokenStream input) {
 			super(input);
@@ -89,7 +93,9 @@ public class ParserInterpreter {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
 		parser = new DummyParser(g, input);
-		atnSimulator = new ParserATNSimulator<Token>(parser, g.atn, parser.decisionToDFA);
+		atnSimulator =
+			new ParserATNSimulator<Token>(parser, g.atn, parser.decisionToDFA,
+										  parser.sharedContextCache);
 	}
 
 	public synchronized int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,

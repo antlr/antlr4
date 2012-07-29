@@ -150,12 +150,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected ParserRuleContext<?> _outerContext;
 
 	/** Testing only! */
-	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
-		this(null, atn, decisionToDFA);
+	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
+							  @NotNull PredictionContextCache sharedContextCache)
+	{
+		this(null, atn, decisionToDFA, sharedContextCache);
 	}
 
-	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
-		super(atn);
+	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn,
+							  @NotNull DFA[] decisionToDFA,
+							  @NotNull PredictionContextCache sharedContextCache)
+	{
+		super(atn,sharedContextCache);
 		this.parser = parser;
 		this.decisionToDFA = decisionToDFA;
 		//		DOTGenerator dot = new DOTGenerator(null);
