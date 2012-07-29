@@ -837,10 +837,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = false;
-			closure(reachIntermediate, reach, collectPredicates, greedy, previous.useContext, hasMoreContext, contextCache);
+			closure(reachIntermediate, reach, collectPredicates, greedy, useContext, hasMoreContext, contextCache);
 			stepIntoGlobal = reach.getDipsIntoOuterContext();
 
-			if (previous.useContext && stepIntoGlobal) {
+			if (useContext && stepIntoGlobal) {
 				reach.clear();
 
 				int nextContextElement = getInvokingState(remainingGlobalContext);
