@@ -196,28 +196,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 			}
 			// Now we are certain to have a specific decision's DFA
-			// Synchronize on the DFA so that nobody can read or write
-			// to it while we updated during ATN simulation
-			synchronized (decisionToDFA[decision]) {
-				return predictATN(dfa, input, outerContext);
-			}
+			return predictATN(dfa, input, outerContext);
 		}
 
 		// We can start with an existing DFA
-		synchronized (decisionToDFA[decision]) {
-			// Only enter the DFA simulation if nobody else is playing with it.
-			// This blocks multiple readonly simulations of the same DFA but that's
-			// unlikely to happen a lot
-			int m = input.mark();
-			int index = input.index();
-			try {
-				int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
-				return alt;
-			}
-			finally {
-				input.seek(index);
-				input.release(m);
-			}
+		int m = input.mark();
+		int index = input.index();
+		try {
+			int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
+			return alt;
+		}
+		finally {
+			input.seek(index);
+			input.release(m);
 		}
 	}
 

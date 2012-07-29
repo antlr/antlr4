@@ -162,16 +162,11 @@ public class LexerATNSimulator extends ATNSimulator {
 		int mark = input.mark();
 		traceBeginMatch(input, mode);
 		try {
-			synchronized (decisionToDFA[mode]) {
-				// Synchronizing on the mode DFA causes a lot of contention
-				// between shared lexers in multiple threads, but is the
-				// simplest safety measure. We can start with it.
-				if ( decisionToDFA[mode].s0==null ) {
-					return matchATN(input);
-				}
-				else {
-					return execDFA(input, decisionToDFA[mode].s0);
-				}
+			if ( decisionToDFA[mode].s0==null ) {
+				return matchATN(input);
+			}
+			else {
+				return execDFA(input, decisionToDFA[mode].s0);
 			}
 		}
 		finally {
