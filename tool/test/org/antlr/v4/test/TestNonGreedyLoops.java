@@ -189,7 +189,7 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "Decision 0:\n" +
 					 "s0-INT->s1\n" +
 					 "s1-EOF->:s2=>1\n", found);  // resolves INT EOF to alt 1 from s since ambig 'tween a and b
-		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1..2}, input='34'\n",
+		assertEquals("line 1:2 reportAmbiguity d=0: ambigAlts={1, 2}, input='34'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -496,10 +496,10 @@ public class TestNonGreedyLoops extends BaseTest {
 					 "s0-'>'->:s2=>2\n" +
 					 "s0-ID->:s1=>1\n", found);
 		assertEquals("line 1:6 reportAttemptingFullContext d=1, input='<a>foo<'\n" +
-					 "line 1:6 reportAmbiguity d=1: ambigAlts={1..2}, input='<a>foo<'\n" +
+					 "line 1:6 reportAmbiguity d=1: ambigAlts={1, 2}, input='<a>foo<'\n" +
 					 "line 1:10 reportAttemptingFullContext d=1, input='</a>'\n" +
-					 "line 1:10 reportAmbiguity d=1: ambigAlts={1..2}, input='</a>'\n" +
-					 "line 1:7 reportAmbiguity d=2: ambigAlts={1..2}, input='/'\n",
+					 "line 1:10 reportAmbiguity d=1: ambigAlts={1, 2}, input='</a>'\n" +
+					 "line 1:7 reportAmbiguity d=2: ambigAlts={1, 2}, input='/'\n",
 					 this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
