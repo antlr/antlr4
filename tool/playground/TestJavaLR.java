@@ -116,6 +116,7 @@ class TestJavaLR {
 				}
 				doFiles(javaFiles);
 				if ( x2 ) {
+					System.gc();
 					doFiles(javaFiles);
 				}
 			}
@@ -133,7 +134,7 @@ class TestJavaLR {
 	}
 
 	public static void doFiles(List<String> files) throws Exception {
-//		parserStart = System.currentTimeMillis();
+		long parserStart = System.currentTimeMillis();
 //		lexerTime = 0;
 		if ( threaded ) {
 			barrier = new CyclicBarrier(3,new Runnable() {
@@ -155,7 +156,8 @@ class TestJavaLR {
 			for (String f : files) {
 				parseFile(f);
 			}
-			report();
+			long parserStop = System.currentTimeMillis();
+			System.out.println("Total lexer+parser time " + (parserStop-parserStart) + "ms.");
 		}
 	}
 
@@ -163,10 +165,13 @@ class TestJavaLR {
 //		parserStop = System.currentTimeMillis();
 //		System.out.println("Lexer total time " + lexerTime + "ms.");
 		long time = 0;
-		for (Worker w : workers) {
-			long wtime = w.parserStop - w.parserStart;
-			time += wtime;
-			System.out.println("worker time " + wtime + "ms.");
+		if ( workers!=null ) {
+			// compute max as it's overlapped time
+			for (Worker w : workers) {
+				long wtime = w.parserStop - w.parserStart;
+				time = Math.max(time,wtime);
+				System.out.println("worker time " + wtime + "ms.");
+			}
 		}
 		System.out.println("Total lexer+parser time " + time + "ms.");
 
