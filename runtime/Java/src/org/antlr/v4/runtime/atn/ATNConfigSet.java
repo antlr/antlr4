@@ -219,7 +219,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			contextCache = PredictionContextCache.UNCACHED;
 		}
 
-		boolean added;
 		boolean addKey;
 		long key = getKey(e);
 		ATNConfig mergedConfig = mergedConfigs.get(key);
@@ -259,20 +258,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			}
 		}
 
-		added = true;
-
-		if (added) {
-			configs.add(e);
-			if (addKey) {
-				mergedConfigs.put(key, e);
-			} else {
-				unmerged.add(e);
-			}
-
-			updatePropertiesForAddedConfig(e);
+		configs.add(e);
+		if (addKey) {
+			mergedConfigs.put(key, e);
+		} else {
+			unmerged.add(e);
 		}
 
-		return added;
+		updatePropertiesForAddedConfig(e);
+		return true;
 	}
 
 	private void updatePropertiesForMergedConfig(ATNConfig config) {
