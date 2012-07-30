@@ -187,24 +187,43 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFA dfa = decisionToDFA[decision];
 		// First, synchronize on the array of DFA for this parser
 		// so that we can get the DFA for a decision or create and set one
-		if ( dfa==null || dfa.s0==null ) { // only create one if not there
+		if ( dfa==null ) { // only create one if not there
 			synchronized (decisionToDFA) {
 				dfa = decisionToDFA[decision];
-				if ( dfa==null || dfa.s0==null ) { // the usual double-check
+				if ( dfa==null ) { // the usual double-check
 					DecisionState startState = atn.decisionToState.get(decision);
-					decisionToDFA[decision] = dfa = new DFA(startState, decision);
+					decisionToDFA[decision] = new DFA(startState, decision);
+					dfa = decisionToDFA[decision];
 				}
 			}
-			// Now we are certain to have a specific decision's DFA
-			return predictATN(dfa, input, outerContext);
+		}
+		// Now we are certain to have a specific decision's DFA
+		// But, do we still need an initial state?
+		if ( dfa.s0==null ) { // recheck
+			dfa.write.lock();
+			try {
+				if ( dfa.s0==null ) { // recheck
+					return predictATN(dfa, input, outerContext);
+				}
+				// fall through; another thread set dfa.s0 while we waited for lock
+			}
+			finally {
+				dfa.write.unlock();
+			}
 		}
 
 		// We can start with an existing DFA
 		int m = input.mark();
 		int index = input.index();
 		try {
-			int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
-			return alt;
+			dfa.read.lock();
+			try {
+				int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
+				return alt;
+			}
+			finally {
+				dfa.read.unlock();
+			}
 		}
 		finally {
 			input.seek(index);
@@ -215,7 +234,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext<?> outerContext)
 	{
-		// caller must ensure current thread is sync'd on dfa
+		// caller must have write lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("predictATN decision "+dfa.decision+
@@ -255,7 +274,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
                        @Nullable ParserRuleContext<?> outerContext)
     {
-		// caller must ensure current thread is sync'd on dfa
+		// caller must have read lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( dfa_debug ) {
 			System.out.println("execDFA decision "+dfa.decision+
@@ -275,27 +294,35 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( s.isCtxSensitive && !SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
-				boolean loopsSimulateTailRecursion = true;
-				boolean fullCtx = true;
-				ATNConfigSet s0_closure =
-					computeStartState(dfa.atnStartState, outerContext,
-									  greedy, loopsSimulateTailRecursion,
-									  fullCtx);
-				PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-				predictionCtx = getCachedContext(predictionCtx);
-				Integer predI = s.contextToPredictedAlt.get(predictionCtx);
-				if ( predI!=null ) {
-					return predI;
+				dfa.read.unlock();
+				dfa.write.lock();
+				try {
+					PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
+					predictionCtx = getCachedContext(predictionCtx);
+					Integer predI = s.contextToPredictedAlt.get(predictionCtx);
+					if ( predI!=null ) {
+						return predI; // ha! quick exit :)
+					}
+					boolean loopsSimulateTailRecursion = true;
+					boolean fullCtx = true;
+					ATNConfigSet s0_closure =
+						computeStartState(dfa.atnStartState, outerContext,
+										  greedy, loopsSimulateTailRecursion,
+										  fullCtx);
+					retry_with_context_from_dfa++;
+					ATNConfigSet fullCtxSet =
+						execATNWithFullContext(dfa, s, s0_closure,
+											   input, startIndex,
+											   outerContext,
+											   ATN.INVALID_ALT_NUMBER,
+											   greedy);
+					s.contextToPredictedAlt.put(predictionCtx, fullCtxSet.uniqueAlt);
+					return fullCtxSet.uniqueAlt;
 				}
-				retry_with_context_from_dfa++;
-				ATNConfigSet fullCtxSet =
-					execATNWithFullContext(dfa, s, s0_closure,
-										   input, startIndex,
-										   outerContext,
-										   ATN.INVALID_ALT_NUMBER,
-										   greedy);
-				s.contextToPredictedAlt.put(predictionCtx, fullCtxSet.uniqueAlt);
-				return fullCtxSet.uniqueAlt;
+				finally {
+					dfa.read.lock();    // get read lock again
+					dfa.write.unlock(); // now release write lock
+				}
 			}
 			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
@@ -322,29 +349,41 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( dfa_debug ) {
 					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
 					System.out.println("ATN exec upon "+
-									   parser.getTokenStream().getText(interval) +
-									   " at DFA state "+s.stateNumber);
+										   parser.getTokenStream().getText(interval) +
+										   " at DFA state "+s.stateNumber);
 				}
 
-				alt = execATN(dfa, s, input, startIndex, outerContext);
-				// this adds edge even if next state is accept for
-				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-				// TODO: This next stuff kills edge, but extra states remain. :(
-				if ( s.isAcceptState && alt!=-1 ) {
-					DFAState d = s.edges[input.LA(1)+1];
-					if ( d.isAcceptState && d.prediction==s.prediction ) {
-						// we can carve it out.
-						s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
+				dfa.read.unlock();
+				dfa.write.lock();
+				// recheck; another thread might have added edge
+				if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
+					try {
+						alt = execATN(dfa, s, input, startIndex, outerContext);
+						// this adds edge even if next state is accept for
+						// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
+						// TODO: This next stuff kills edge, but extra states remain. :(
+						if ( s.isAcceptState && alt!=-1 ) {
+							DFAState d = s.edges[input.LA(1)+1];
+							if ( d.isAcceptState && d.prediction==s.prediction ) {
+								// we can carve it out.
+								s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
+							}
+						}
 					}
+					finally {
+						dfa.read.lock();    // get read lock again
+						dfa.write.unlock(); // now release write lock
+					}
+					if ( dfa_debug ) {
+						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
+						//dump(dfa);
+					}
+					// action already executed
+					if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+															" predicts "+alt);
+					return alt; // we've updated DFA, exec'd action, and have our deepest answer
 				}
-				if ( dfa_debug ) {
-					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
-					//dump(dfa);
-				}
-				// action already executed
-				if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-													" predicts "+alt);
-				return alt; // we've updated DFA, exec'd action, and have our deepest answer
+				// fall through; another thread gave us the edge
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) {
@@ -428,6 +467,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext<?> outerContext)
 	{
+		// caller is expected to have write lock on dfa
 		if ( debug || debug_list_atn_decisions) {
 			System.out.println("execATN decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input)+
@@ -453,7 +493,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												 greedy,
 												 loopsSimulateTailRecursion,
 												 false);
-			if ( reach==null ) throw noViableAlt(input, outerContext, previous, startIndex);
+			if ( reach==null ) {
+				// TODO: if any configs in previous dipped into outer context, that
+				// means that input up to t actually finished entry rule
+				// at least for LL decision. Full LL doesn't dip into outer
+				// so don't need special case.
+				// We will get an error no matter what so delay until after
+				// decision; better error message. Also, no reachable target
+				// ATN states in SLL implies LL will also get nowhere.
+				// If conflict in states that dip out, choose min since we
+				// will get error no matter what.
+				throw noViableAlt(input, outerContext, previous, startIndex);
+			}
 			D = addDFAEdge(dfa, previous, t, reach); // always adding edge even if to a conflict state
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
@@ -493,6 +544,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												  greedy,
 												  loopsSimulateTailRecursion,
 												  true);
+							// we have write lock already, no need to relock
 							fullCtxSet = execATNWithFullContext(dfa, D, s0_closure,
 																input, startIndex,
 																outerContext,
@@ -579,7 +631,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											   int SLL_min_alt, // todo: is this in D as min ambig alts?
 											   boolean greedy)
 	{
-		// caller must ensure current thread is sync'd on dfa
+		// caller must have write lock on dfa
 		retry_with_context++;
 		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
 
@@ -597,6 +649,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 			reach = computeReachSet(previous, t, greedy, true, fullCtx);
 			if ( reach==null ) {
+				// TODO: if any configs in previous dipped into outer context, that
+				// means that input up to t actually finished entry rule
+				// at least for LL decision. Full LL doesn't dip into outer
+				// so don't need special case.
+				// We will get an error no matter what so delay until after
+				// decision; better error message. Also, no reachable target
+				// ATN states in SLL implies LL will also get nowhere.
+				// If conflict in states that dip out, choose min since we
+				// will get error no matter what.
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
 			reach.uniqueAlt = getUniqueAlt(reach);

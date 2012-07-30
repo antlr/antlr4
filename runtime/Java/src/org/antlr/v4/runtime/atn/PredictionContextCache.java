@@ -36,7 +36,7 @@ public class PredictionContextCache {
 		return cache.get(ctx);
 	}
 
-	public int size() {
+	public synchronized int size() {
 		return cache.size();
 	}
 }

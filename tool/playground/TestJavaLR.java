@@ -54,11 +54,15 @@ class TestJavaLR {
 	public static boolean bail = false;
 	public static boolean x2 = false;
 	public static boolean threaded = false;
+	public static boolean quiet = false;
 //	public static long parserStart;
 //	public static long parserStop;
 	public static Worker[] workers = new Worker[3];
+	static int windex = 0;
 
 	public static CyclicBarrier barrier;
+
+	public static volatile boolean firstPassDone = false;
 
 	public static class Worker implements Runnable {
 		public long parserStart;
@@ -105,6 +109,7 @@ class TestJavaLR {
 					else if ( args[i].equals("-diag") ) diag = true;
 					else if ( args[i].equals("-2x") ) x2 = true;
 					else if ( args[i].equals("-threaded") ) threaded = true;
+					else if ( args[i].equals("-quiet") ) quiet = true;
 					if ( args[i].charAt(0)!='-' ) { // input file name
 						inputFiles.add(args[i]);
 					}
@@ -117,6 +122,9 @@ class TestJavaLR {
 				doFiles(javaFiles);
 				if ( x2 ) {
 					System.gc();
+					System.out.println("waiting for 1st pass");
+					while ( !firstPassDone ) { } // spin
+					System.out.println("2nd pass");
 					doFiles(javaFiles);
 				}
 			}
@@ -139,7 +147,7 @@ class TestJavaLR {
 		if ( threaded ) {
 			barrier = new CyclicBarrier(3,new Runnable() {
 				public void run() {
-					report();
+					report(); firstPassDone = true;
 				}
 			});
 			int chunkSize = files.size() / 3;  // 10/3 = 3
@@ -148,16 +156,16 @@ class TestJavaLR {
 			workers[0] = new Worker(files.subList(0,p1+1));
 			workers[1] = new Worker(files.subList(p1+1,p2+1));
 			workers[2] = new Worker(files.subList(p2+1,files.size()));
-			new Thread(workers[0]).start();
-			new Thread(workers[1]).start();
-			new Thread(workers[2]).start();
+			new Thread(workers[0], "worker-"+windex++).start();
+			new Thread(workers[1], "worker-"+windex++).start();
+			new Thread(workers[2], "worker-"+windex++).start();
 		}
 		else {
 			for (String f : files) {
 				parseFile(f);
 			}
 			long parserStop = System.currentTimeMillis();
-			System.out.println("Total lexer+parser time " + (parserStop-parserStart) + "ms.");
+			System.out.println("Total lexer+parser time " + (parserStop - parserStart) + "ms.");
 		}
 	}
 
@@ -231,14 +239,14 @@ class TestJavaLR {
 
 	public static void parseFile(String f) {
 		try {
-			System.err.println(f);
+			if ( !quiet ) System.err.println(f);
 			// Create a scanner that reads from the input stream passed to us
 			Lexer lexer = new JavaLRLexer(new ANTLRFileStream(f));
 
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			long start = System.currentTimeMillis();
-			tokens.fill(); // load all and check time
-			long stop = System.currentTimeMillis();
+//			long start = System.currentTimeMillis();
+//			tokens.fill(); // load all and check time
+//			long stop = System.currentTimeMillis();
 //			lexerTime += stop-start;
 
 			// Create a parser that reads from the scanner
