@@ -39,8 +39,8 @@ public class PredictionContextCache {
 
     private final Map<PredictionContext, PredictionContext> contexts =
         new HashMap<PredictionContext, PredictionContext>();
-    private final Map<ObjectAndInt<PredictionContext>, PredictionContext> childContexts =
-        new HashMap<ObjectAndInt<PredictionContext>, PredictionContext>();
+    private final Map<PredictionContextAndInt, PredictionContext> childContexts =
+        new HashMap<PredictionContextAndInt, PredictionContext>();
     private final Map<IdentityCommutativePredictionContextOperands, PredictionContext> joinContexts =
         new HashMap<IdentityCommutativePredictionContextOperands, PredictionContext>();
 
@@ -73,7 +73,7 @@ public class PredictionContextCache {
             return context.getChild(invokingState);
         }
 
-        ObjectAndInt<PredictionContext> operands = new ObjectAndInt<PredictionContext>(context, invokingState);
+        PredictionContextAndInt operands = new PredictionContextAndInt(context, invokingState);
         PredictionContext result = childContexts.get(operands);
         if (result == null) {
             result = context.getChild(invokingState);
@@ -101,24 +101,24 @@ public class PredictionContextCache {
         return result;
     }
 
-    protected static class ObjectAndInt<T> {
-        private final T obj;
+    protected static final class PredictionContextAndInt {
+        private final PredictionContext obj;
         private final int value;
 
-        public ObjectAndInt(T obj, int value) {
+        public PredictionContextAndInt(PredictionContext obj, int value) {
             this.obj = obj;
             this.value = value;
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof ObjectAndInt<?>)) {
+            if (!(obj instanceof PredictionContextAndInt)) {
                 return false;
             } else if (obj == this) {
                 return true;
             }
 
-            ObjectAndInt<?> other = (ObjectAndInt<?>)obj;
+            PredictionContextAndInt other = (PredictionContextAndInt)obj;
             return this.value == other.value
                 && (this.obj == other.obj || (this.obj != null && this.obj.equals(other.obj)));
         }
