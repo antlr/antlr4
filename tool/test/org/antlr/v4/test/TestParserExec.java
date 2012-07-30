@@ -164,8 +164,7 @@ public class TestParserExec extends BaseTest {
 
 
 	/**
-	 * Related to https://github.com/antlr/antlr4/issues/41.  EOF is
-	 * not viable after "if x" since EOF not viable after stat.
+	 * Related to https://github.com/antlr/antlr4/issues/41.
 	 */
 	@Test
 	public void testOptional() throws Exception {
@@ -186,15 +185,15 @@ public class TestParserExec extends BaseTest {
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
 		assertEquals("", found);
-		assertEquals(null, this.stderrDuringParse);
+		assertNull(null, this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
 		assertEquals("", found);
-		assertEquals(null, this.stderrDuringParse);
+		assertNull(null, this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x if", false);
 		assertEquals("", found);
-		assertEquals(null, this.stderrDuringParse);
+		assertNull(null, this.stderrDuringParse);
 	}
 
 	/**
@@ -205,7 +204,6 @@ public class TestParserExec extends BaseTest {
 	public void testIfIfElse() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : stmt EOF ;\n" +
 			"stmt : ifStmt | ID;\n" +
 			"ifStmt : 'if' ID stmt ('else' stmt | {_input.LA(1) != ELSE}?);\n" +
 			"ELSE : 'else';\n" +
@@ -213,12 +211,11 @@ public class TestParserExec extends BaseTest {
 			"WS : (' ' | '\\t')+ -> skip;\n"
 			;
 
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stmt",
 								  "if x if x a else b", true);
 		String expecting = "";
 		assertEquals(expecting, found);
-		assertEquals("line 1:12 reportAttemptingFullContext d=1, input='else'\n",
-					 this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 	}
 
 }

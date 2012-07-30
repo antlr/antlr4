@@ -71,17 +71,8 @@ public class TestATNInterpreter extends BaseTest {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
 			"a : A | A B ;");
-		int errorIndex = 0;
-		int errorTokenType = 0;
-		try {
-			checkMatchedAlt(lg, g, "ac", 1);
-		}
-		catch (NoViableAltException re) {
-			errorIndex = re.getOffendingToken().getTokenIndex();
-			errorTokenType = re.getOffendingToken().getType();
-		}
-		assertEquals(1, errorIndex);
-		assertEquals(3, errorTokenType);
+
+		checkMatchedAlt(lg, g, "ac", 1);
 	}
 
 	@Test public void testMustTrackPreviousGoodAlt2() throws Exception {
@@ -97,17 +88,7 @@ public class TestATNInterpreter extends BaseTest {
 		checkMatchedAlt(lg, g, "a", 1	);
 		checkMatchedAlt(lg, g, "ab", 2);
 		checkMatchedAlt(lg, g, "abc", 3);
-		int errorIndex = 0;
-		int errorTokenType = 0;
-		try {
-			checkMatchedAlt(lg, g, "abd", 1);
-		}
-		catch (NoViableAltException re) {
-			errorIndex = re.getOffendingToken().getTokenIndex();
-			errorTokenType = re.getOffendingToken().getType();
-		}
-		assertEquals(2, errorIndex);
-		assertEquals(4, errorTokenType);
+		checkMatchedAlt(lg, g, "abd", 2); // matched ab, ignores d on end
 	}
 
 	@Test public void testMustTrackPreviousGoodAlt3() throws Exception {
@@ -120,17 +101,8 @@ public class TestATNInterpreter extends BaseTest {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
 			"a : A B | A | A B C ;");
-		int errorIndex = 0;
-		int errorTokenType = 0;
-		try {
-			checkMatchedAlt(lg, g, "abd", 1);
-		}
-		catch (NoViableAltException re) {
-			errorIndex = re.getOffendingToken().getTokenIndex();
-			errorTokenType = re.getOffendingToken().getType();
-		}
-		assertEquals(2, errorIndex);
-		assertEquals(4, errorTokenType);
+
+		checkMatchedAlt(lg, g, "abd", 1);
 	}
 
 	@Test public void testAmbigAltChooseFirst() throws Exception {
@@ -188,19 +160,7 @@ public class TestATNInterpreter extends BaseTest {
 			"a : A B | A B | A B C ;");
 		checkMatchedAlt(lg, g, "ab", 1);
 		checkMatchedAlt(lg, g, "abc", 3);
-
-		int errorIndex = 0;
-		int errorTokenType = 0;
-		try {
-			checkMatchedAlt(lg, g, "abd", 1);
-		}
-		catch (NoViableAltException re) {
-			errorIndex = re.getOffendingToken().getTokenIndex();
-			errorTokenType = re.getOffendingToken().getType();
-		}
-		assertEquals(2, errorIndex);
-		assertEquals(4, errorTokenType);
-
+		checkMatchedAlt(lg, g, "abd", 1); // ignores d on end
 		checkMatchedAlt(lg, g, "abcd", 3); // ignores d on end
 	}
 
