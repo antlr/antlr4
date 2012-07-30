@@ -530,6 +530,20 @@ public class IntervalSet implements IntSet {
 		return n;
     }
 
+	public IntegerList toIntegerList() {
+		IntegerList values = new IntegerList(size());
+		int n = intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = intervals.get(i);
+			int a = I.a;
+			int b = I.b;
+			for (int v=a; v<=b; v++) {
+				values.add(v);
+			}
+		}
+		return values;
+	}
+
     @Override
     public List<Integer> toList() {
 		List<Integer> values = new ArrayList<Integer>();
@@ -579,19 +593,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	public int[] toArray() {
-		int[] values = new int[size()];
-		int n = intervals.size();
-		int j = 0;
-		for (int i = 0; i < n; i++) {
-			Interval I = intervals.get(i);
-			int a = I.a;
-			int b = I.b;
-			for (int v=a; v<=b; v++) {
-				values[j] = v;
-				j++;
-			}
-		}
-		return values;
+		return toIntegerList().toArray();
 	}
 
 	@Override
