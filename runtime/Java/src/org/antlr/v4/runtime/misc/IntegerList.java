@@ -85,16 +85,26 @@ public class IntegerList {
 		_size++;
 	}
 
+	public final void addAll(int[] array) {
+		ensureCapacity(_size + array.length);
+		System.arraycopy(array, 0, _data, _size, array.length);
+		_size += array.length;
+	}
+
 	public final void addAll(IntegerList list) {
 		ensureCapacity(_size + list._size);
 		System.arraycopy(list._data, 0, _data, _size, list._size);
 		_size += list._size;
 	}
 
-	public final void addAll(int[] array) {
-		ensureCapacity(_size + array.length);
-		System.arraycopy(array, 0, _data, _size, array.length);
-		_size += array.length;
+	public final void addAll(Collection<Integer> list) {
+		ensureCapacity(_size + list.size());
+		int current = 0;
+		for (int x : list) {
+			_data[_size + current] = x;
+		}
+
+		_size += list.size();
 	}
 
 	public final int get(int index) {
@@ -103,6 +113,16 @@ public class IntegerList {
 		}
 
 		return _data[index];
+	}
+
+	public final boolean contains(int value) {
+		for (int i = 0; i < _size; i++) {
+			if (_data[i] == value) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public final int set(int index, int value) {
@@ -163,6 +183,79 @@ public class IntegerList {
 		}
 
 		return Arrays.copyOf(_data, _size);
+	}
+
+	public final void sort() {
+		Arrays.sort(_data, 0, _size);
+	}
+
+	/**
+	 * Compares the specified object with this list for equality.  Returns
+	 * {@code true} if and only if the specified object is also an {@code IntegerList},
+	 * both lists have the same size, and all corresponding pairs of elements in
+	 * the two lists are equal.  In other words, two lists are defined to be
+	 * equal if they contain the same elements in the same order.
+	 * <p>
+	 * This implementation first checks if the specified object is this
+	 * list. If so, it returns {@code true}; if not, it checks if the
+	 * specified object is an {@code IntegerList}. If not, it returns {@code false};
+	 * if so, it checks the size of both lists. If the lists are not the same size,
+	 * it returns {@code false}; otherwise it iterates over both lists, comparing
+	 * corresponding pairs of elements.  If any comparison returns {@code false},
+	 * this method returns {@code false}.
+	 *
+	 * @param o the object to be compared for equality with this list
+	 * @return {@code true} if the specified object is equal to this list
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof IntegerList)) {
+			return false;
+		}
+
+		IntegerList other = (IntegerList)o;
+		if (_size != other._size) {
+			return false;
+		}
+
+		for (int i = 0; i < _size; i++) {
+			if (_data[i] != other._data[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the hash code value for this list.
+	 *
+	 * <p>This implementation uses exactly the code that is used to define the
+	 * list hash function in the documentation for the {@link List#hashCode}
+	 * method.
+	 *
+	 * @return the hash code value for this list
+	 */
+	@Override
+	public int hashCode() {
+		int hashCode = 1;
+		for (int i = 0; i < _size; i++) {
+			hashCode = 31*hashCode + _data[i];
+		}
+
+		return hashCode;
+	}
+
+	/**
+	 * Returns a string representation of this list.
+	 */
+	@Override
+	public String toString() {
+		return Arrays.toString(toArray());
 	}
 
 	public final int binarySearch(int key) {
