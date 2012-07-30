@@ -741,7 +741,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						// upon ambiguity for nongreedy, default to exit branch to avoid inf loop
 						// this handles case where we find ambiguity that stops DFA construction
 						// before a config hits rule stop state. Was leaving prediction blank.
-						int exitAlt = 2;
+						final int exitAlt = 2;
 						D.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
 						D.prediction = predictedAlt = exitAlt;
 					}
@@ -749,7 +749,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			if ( !greedy ) {
-				int exitAlt = 2;
+				final int exitAlt = 2;
 				if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(reach, 1) ) {
 					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configset.getUniqueAlt()+" at "+reach);
 					// reaches end via .* means nothing after.
