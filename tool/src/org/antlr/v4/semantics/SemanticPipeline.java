@@ -32,7 +32,7 @@ package org.antlr.v4.semantics;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -157,11 +157,11 @@ public class SemanticPipeline {
 		}
 
 		// FOR ALL X : 'xxx'; RULES, DEFINE 'xxx' AS TYPE X
-		List<Pair<GrammarAST,GrammarAST>> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
+		List<Tuple2<GrammarAST,GrammarAST>> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
 		if ( litAliases!=null ) {
-			for (Pair<GrammarAST,GrammarAST> pair : litAliases) {
-				GrammarAST nameAST = pair.a;
-				GrammarAST litAST = pair.b;
+			for (Tuple2<GrammarAST,GrammarAST> pair : litAliases) {
+				GrammarAST nameAST = pair.getItem1();
+				GrammarAST litAST = pair.getItem2();
 				if ( !G.stringLiteralToTypeMap.containsKey(litAST.getText()) ) {
 					G.defineTokenAlias(nameAST.getText(), litAST.getText());
 				}

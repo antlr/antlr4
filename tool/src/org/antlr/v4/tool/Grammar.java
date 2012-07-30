@@ -50,7 +50,8 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
@@ -745,7 +746,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/** Return list of (TOKEN_NAME node, 'literal' node) pairs */
-	public static List<Pair<GrammarAST,GrammarAST>> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
+	public static List<Tuple2<GrammarAST,GrammarAST>> getStringLiteralAliasesFromLexerRules(GrammarRootAST ast) {
 		String[] patterns = {
 			"(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL)))",
 			"(RULE %name:TOKEN_REF (BLOCK (ALT %lit:STRING_LITERAL ACTION)))",
@@ -759,8 +760,8 @@ public class Grammar implements AttributeResolver {
 		};
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(ast.token.getInputStream());
 		TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
-		List<Pair<GrammarAST,GrammarAST>> lexerRuleToStringLiteral =
-			new ArrayList<Pair<GrammarAST,GrammarAST>>();
+		List<Tuple2<GrammarAST,GrammarAST>> lexerRuleToStringLiteral =
+			new ArrayList<Tuple2<GrammarAST,GrammarAST>>();
 
 		List<GrammarAST> ruleNodes = ast.getNodesWithType(ANTLRParser.RULE);
 		if ( ruleNodes==null || ruleNodes.isEmpty() ) return null;
@@ -785,14 +786,13 @@ public class Grammar implements AttributeResolver {
 
 	protected static boolean defAlias(GrammarAST r, String pattern,
 									  TreeWizard wiz,
-									  List<Pair<GrammarAST,GrammarAST>> lexerRuleToStringLiteral)
+									  List<Tuple2<GrammarAST,GrammarAST>> lexerRuleToStringLiteral)
 	{
 		HashMap<String, Object> nodes = new HashMap<String, Object>();
 		if ( wiz.parse(r, pattern, nodes) ) {
 			GrammarAST litNode = (GrammarAST)nodes.get("lit");
 			GrammarAST nameNode = (GrammarAST)nodes.get("name");
-			Pair<GrammarAST, GrammarAST> pair =
-				new Pair<GrammarAST, GrammarAST>(nameNode, litNode);
+			Tuple2<GrammarAST, GrammarAST> pair = Tuple.create(nameNode, litNode);
 			lexerRuleToStringLiteral.add(pair);
 			return true;
 		}
