@@ -38,8 +38,8 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -805,7 +805,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		final boolean useContext = previous.useContext;
 		RuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
 		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(previous.s0.configset);
-		List<Integer> contextElements = null;
+		IntegerList contextElements = null;
 		ATNConfigSet reach = new ATNConfigSet();
 		boolean stepIntoGlobal;
 		do {
@@ -844,7 +844,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 				int nextContextElement = getInvokingState(remainingGlobalContext);
 				if (contextElements == null) {
-					contextElements = new ArrayList<Integer>();
+					contextElements = new IntegerList();
 				}
 
 				if (remainingGlobalContext.isEmpty()) {
@@ -1665,7 +1665,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected DFAState addDFAEdge(@NotNull DFA dfa,
 								  @NotNull DFAState fromState,
 								  int t,
-								  List<Integer> contextTransitions,
+								  IntegerList contextTransitions,
 								  @NotNull ATNConfigSet toConfigs,
 								  PredictionContextCache contextCache)
 	{
@@ -1675,7 +1675,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFAState to = addDFAState(dfa, toConfigs);
 
 		if (contextTransitions != null) {
-			for (int context : contextTransitions) {
+			for (int context : contextTransitions.toArray()) {
 				if (context == PredictionContext.EMPTY_FULL_STATE_KEY) {
 					if (from.configset.isOutermostConfigSet()) {
 						continue;
