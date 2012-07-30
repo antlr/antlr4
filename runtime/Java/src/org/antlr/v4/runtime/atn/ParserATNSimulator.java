@@ -1468,6 +1468,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@Nullable
 	public BitSet getConflictingAlts(@NotNull ATNConfigSet configs) {
 		if ( debug ) System.out.println("### check ambiguous  "+configs);
+
+		if (configs.size() <= 1) {
+			return null;
+		}
+
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
 		MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
