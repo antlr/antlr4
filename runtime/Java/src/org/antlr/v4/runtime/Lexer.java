@@ -29,9 +29,9 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -91,7 +91,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** The token type for the current token */
 	public int _type;
 
-	public ArrayDeque<Integer> _modeStack = new ArrayDeque<Integer>();
+	public final IntegerStack _modeStack = new IntegerStack();
 	public int _mode = Lexer.DEFAULT_MODE;
 
 	/** You can set the text for the current token to override what is in

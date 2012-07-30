@@ -1,6 +1,7 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
+ Copyright (c) 2012 Sam Harwell
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,28 +27,35 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.antlr.v4.runtime.misc;
 
-package org.antlr.v4.codegen.model;
+/**
+ *
+ * @author Sam Harwell
+ */
+public class IntegerStack extends IntegerList {
 
-import org.antlr.v4.automata.ATNSerializer;
-import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.misc.IntegerList;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class SerializedATN extends OutputModelObject {
-	// TODO: make this into a kind of decl or multiple?
-	public List<String> serialized;
-	public SerializedATN(OutputModelFactory factory, ATN atn) {
-		super(factory);
-		IntegerList data = ATNSerializer.getSerialized(factory.getGrammar(), atn);
-		serialized = new ArrayList<String>(data.size());
-		for (int c : data.toArray()) {
-			String encoded = factory.getGenerator().target.encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c);
-			serialized.add(encoded);
-		}
-//		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));
+	public IntegerStack() {
 	}
+
+	public IntegerStack(int capacity) {
+		super(capacity);
+	}
+
+	public IntegerStack(@NotNull IntegerStack list) {
+		super(list);
+	}
+
+	public final void push(int value) {
+		add(value);
+	}
+
+	public final int pop() {
+		return removeAt(size() - 1);
+	}
+
+	public final int peek() {
+		return get(size() - 1);
+	}
+
 }

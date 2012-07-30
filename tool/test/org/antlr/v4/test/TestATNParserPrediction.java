@@ -40,14 +40,13 @@ import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
-
-import java.util.List;
 
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
@@ -480,7 +479,7 @@ public class TestATNParserPrediction extends BaseTest {
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,null,null);
-		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
+		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
 		semanticProcess(lg);
@@ -547,7 +546,7 @@ public class TestATNParserPrediction extends BaseTest {
 
 		ParserATNSimulator<Token> interp =
 			new ParserATNSimulator<Token>(atn, new DFA[atn.getNumberOfDecisions()],null);
-		List<Integer> types = getTokenTypesViaATN(inputString, lexInterp);
+		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
 		try {
@@ -577,7 +576,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserInterpreter interp = new ParserInterpreter(g, null);
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
-			List<Integer> types = getTokenTypesViaATN(inputString[i], lexInterp);
+			IntegerList types = getTokenTypesViaATN(inputString[i], lexInterp);
 			System.out.println(types);
 			TokenStream input = new IntTokenStream(types);
 			try {

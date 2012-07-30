@@ -46,6 +46,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -59,7 +60,6 @@ import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -467,9 +467,9 @@ public class Grammar implements AttributeResolver {
 		return tokenName;
 	}
 
-	public List<String> getTokenDisplayNames(Collection<Integer> types) {
+	public List<String> getTokenDisplayNames(IntegerList types) {
 		List<String> names = new ArrayList<String>();
-		for (int t : types) names.add(getTokenDisplayName(t));
+		for (int t : types.toArray()) names.add(getTokenDisplayName(t));
 		return names;
 	}
 

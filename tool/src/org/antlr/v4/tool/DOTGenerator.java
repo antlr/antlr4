@@ -51,12 +51,12 @@ import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupDir;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -144,9 +144,9 @@ public class DOTGenerator {
 			if ( alts!=null ) {
 				buf.append("\\n");
 				// separate alts
-				List<Integer> altList = new ArrayList<Integer>();
+				IntegerList altList = new IntegerList();
 				altList.addAll(alts);
-				Collections.sort(altList);
+				altList.sort();
 				Set<ATNConfig> configurations = s.configs;
 				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
 					int alt = altList.get(altIndex);

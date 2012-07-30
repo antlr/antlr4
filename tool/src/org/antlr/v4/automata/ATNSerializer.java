@@ -43,6 +43,7 @@ import org.antlr.v4.runtime.atn.RangeTransition;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.SetTransition;
 import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
@@ -82,8 +83,8 @@ public class ATNSerializer {
 	 *
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
-	public List<Integer> serialize() {
-		List<Integer> data = new ArrayList<Integer>();
+	public IntegerList serialize() {
+		IntegerList data = new IntegerList();
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		if ( g.getType()== ANTLRParser.LEXER ) data.add(ATN.LEXER);
 		else if ( g.getType()== ANTLRParser.PARSER ) data.add(ATN.PARSER);
@@ -288,7 +289,7 @@ public class ATNSerializer {
 		return new String(Utils.toCharArray(getSerialized(g, atn)));
 	}
 
-	public static List<Integer> getSerialized(Grammar g, ATN atn) {
+	public static IntegerList getSerialized(Grammar g, ATN atn) {
 		return new ATNSerializer(g, atn).serialize();
 	}
 
@@ -297,7 +298,7 @@ public class ATNSerializer {
 	}
 
 	public static String getDecoded(Grammar g, ATN atn) {
-		List<Integer> serialized = getSerialized(g, atn);
+		IntegerList serialized = getSerialized(g, atn);
 		char[] data = Utils.toCharArray(serialized);
 		return new ATNSerializer(g, atn).decode(data);
 	}
