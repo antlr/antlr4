@@ -50,6 +50,7 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -185,8 +186,8 @@ public abstract class BaseTest {
 //		dfa.minimized = dmin.minimize();
 //	}
 
-	List<Integer> getTypesFromString(Grammar g, String expecting) {
-		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
+	IntegerList getTypesFromString(Grammar g, String expecting) {
+		IntegerList expectingTokenTypes = new IntegerList();
 		if ( expecting!=null && !expecting.trim().isEmpty() ) {
 			for (String tname : expecting.replace(" ", "").split(",")) {
 				int ttype = g.getTokenType(tname);
@@ -196,9 +197,9 @@ public abstract class BaseTest {
 		return expectingTokenTypes;
 	}
 
-	public List<Integer> getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
+	public IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
 		ANTLRInputStream in = new ANTLRInputStream(input);
-		List<Integer> tokenTypes = new ArrayList<Integer>();
+		IntegerList tokenTypes = new IntegerList();
 		int ttype;
 		do {
 			ttype = lexerATN.matchATN(in);
@@ -1087,9 +1088,9 @@ public abstract class BaseTest {
     public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
 	public static class IntTokenStream implements TokenStream<Token> {
-		List<Integer> types;
+		IntegerList types;
 		int p=0;
-		public IntTokenStream(List<Integer> types) { this.types = types; }
+		public IntTokenStream(IntegerList types) { this.types = types; }
 
 		@Override
 		public void consume() { p++; }

@@ -30,6 +30,7 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.runtime.misc.Func1;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Predicate;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -127,13 +128,6 @@ public class Utils {
 //		return x;
 //	}
 
-	public static int[] toIntArray(List<Integer> list) {
-		if ( list==null ) return null;
-		int[] a = new int[list.size()];
-		for (int i=0; i<list.size(); i++) a[i] = list.get(i);
-		return a;
-	}
-
 	public static String capitalize(String s) {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
@@ -142,11 +136,11 @@ public class Utils {
 		return Character.toLowerCase(s.charAt(0)) + s.substring(1);
 	}
 
-	public static char[] toCharArray(List<Integer> data) {
+	public static char[] toCharArray(IntegerList data) {
 		if ( data==null ) return null;
 		char[] cdata = new char[data.size()];
 		for (int i=0; i<data.size(); i++) {
-			cdata[i] = (char)(int)data.get(i);
+			cdata[i] = (char)data.get(i);
 		}
 		return cdata;
 	}
