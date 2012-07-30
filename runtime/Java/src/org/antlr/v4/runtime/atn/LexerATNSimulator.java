@@ -162,11 +162,24 @@ public class LexerATNSimulator extends ATNSimulator {
 		int mark = input.mark();
 		traceBeginMatch(input, mode);
 		try {
-			if ( decisionToDFA[mode].s0==null ) {
-				return matchATN(input);
+			DFA dfa = decisionToDFA[mode];
+			if ( dfa.s0==null ) {
+				dfa.write.lock();
+				try {
+					return matchATN(input);
+				}
+				finally {
+					dfa.write.unlock();
+				}
 			}
 			else {
-				return execDFA(input, decisionToDFA[mode].s0);
+				dfa.read.lock();
+				try {
+					return execDFA(input, dfa.s0);
+				}
+				finally {
+					dfa.read.unlock();
+				}
 			}
 		}
 		finally {
@@ -875,7 +888,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public final void tracePushMode(int mode) {
 		if (trace) {
-			traceByteSlow(LexerOpCode.PushMode, (byte)mode);
+			traceByteSlow(LexerOpCode.PushMode, (byte) mode);
 		}
 	}
 
