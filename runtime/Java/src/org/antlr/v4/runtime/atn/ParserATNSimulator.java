@@ -868,7 +868,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		DFAState dfaState = null;
 		if (previous.s0 != null) {
-			dfaState = addDFAEdge(dfa, previous.s0.configset, t, contextElements, reach, contextCache);
+			dfaState = addDFAEdge(dfa, previous.s0, t, contextElements, reach, contextCache);
 		}
 
 		assert !useContext || !dfaState.configset.getDipsIntoOuterContext();
@@ -1658,16 +1658,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	@NotNull
 	protected DFAState addDFAEdge(@NotNull DFA dfa,
-								  @NotNull ATNConfigSet p,
+								  @NotNull DFAState fromState,
 								  int t,
 								  List<Integer> contextTransitions,
-								  @NotNull ATNConfigSet q,
+								  @NotNull ATNConfigSet toConfigs,
 								  PredictionContextCache contextCache)
 	{
 		assert dfa.isContextSensitive() || contextTransitions == null || contextTransitions.isEmpty();
 
-		DFAState from = addDFAState(dfa, p);
-		DFAState to = addDFAState(dfa, q);
+		DFAState from = fromState;
+		DFAState to = addDFAState(dfa, toConfigs);
 
 		if (contextTransitions != null) {
 			for (int context : contextTransitions) {
