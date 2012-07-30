@@ -32,6 +32,7 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.misc.IntegerList;
 
 import java.util.*;
 
@@ -40,9 +41,9 @@ public class SerializedATN extends OutputModelObject {
 	public List<String> serialized;
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
 		super(factory);
-		List<Integer> data = ATNSerializer.getSerialized(factory.getGrammar(), atn);
+		IntegerList data = ATNSerializer.getSerialized(factory.getGrammar(), atn);
 		serialized = new ArrayList<String>(data.size());
-		for (int c : data) {
+		for (int c : data.toArray()) {
 			String encoded = factory.getGenerator().target.encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c);
 			serialized.add(encoded);
 		}
