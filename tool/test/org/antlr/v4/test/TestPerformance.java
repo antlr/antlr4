@@ -52,7 +52,6 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -67,6 +66,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -135,6 +135,8 @@ public class TestPerformance extends BaseTest {
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 
+	private static final boolean TWO_STAGE_PARSING = true;
+
     private static final boolean SHOW_CONFIG_STATS = false;
 
 	private static final boolean REPORT_AMBIGUITIES = false;
@@ -163,6 +165,7 @@ public class TestPerformance extends BaseTest {
 
     private static Lexer sharedLexer;
     private static Parser<Token> sharedParser;
+	private static Parser<Token> sharedFullContextParser;
     private static ParseTreeListener<Token> sharedListener;
 
     private int tokenCount;
@@ -555,12 +558,14 @@ public class TestPerformance extends BaseTest {
 							Parser<Token> parser = parserCtor.newInstance(tokens);
                             sharedParser = parser;
 							sharedParser.removeErrorListeners();
-							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-							sharedParser.addErrorListener(new SummarizingDiagnosticErrorListener());
+							if (!TWO_STAGE_PARSING) {
+								sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+								sharedParser.addErrorListener(new SummarizingDiagnosticErrorListener());
+							}
 							if (!ENABLE_PARSER_DFA) {
 								sharedParser.setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParser, sharedParser.getATN()));
 							}
-                            sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT;
+                            sharedParser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT || TWO_STAGE_PARSING;
                             sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
 							sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
@@ -568,13 +573,58 @@ public class TestPerformance extends BaseTest {
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
                                 sharedParser.addParseListener(sharedListener);
                             }
-                            if (BAIL_ON_ERROR) {
+                            if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
                                 sharedParser.setErrorHandler(new BailErrorStrategy<Token>());
                             }
                         }
 
                         Method parseMethod = parserClass.getMethod(entryPoint);
-                        Object parseResult = parseMethod.invoke(sharedParser);
+                        Object parseResult;
+
+						try {
+							parseResult = parseMethod.invoke(sharedParser);
+						} catch (InvocationTargetException ex) {
+							if (!TWO_STAGE_PARSING) {
+								throw ex;
+							}
+
+							String sourceName = tokens.getSourceName();
+							sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+							System.err.println(sourceName+"Forced to retry with full context.");
+
+							if (!(ex.getCause() instanceof RuntimeException) || !(ex.getCause().getCause() instanceof RecognitionException)) {
+								throw ex;
+							}
+
+							tokens.reset();
+							if (REUSE_PARSER && sharedFullContextParser != null) {
+								sharedFullContextParser.setInputStream(tokens);
+							} else {
+								@SuppressWarnings("unchecked")
+								Parser<Token> parser = parserCtor.newInstance(tokens);
+								sharedFullContextParser = parser;
+								sharedFullContextParser.removeErrorListeners();
+								sharedFullContextParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+								sharedFullContextParser.addErrorListener(new SummarizingDiagnosticErrorListener());
+								if (!ENABLE_PARSER_DFA) {
+									sharedFullContextParser.setInterpreter(new NonCachingParserATNSimulator<Token>(sharedFullContextParser, sharedFullContextParser.getATN()));
+								}
+								sharedFullContextParser.getInterpreter().disable_global_context = false;
+								sharedFullContextParser.getInterpreter().force_global_context = false;
+								sharedFullContextParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+								sharedFullContextParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+								sharedFullContextParser.setBuildParseTree(BUILD_PARSE_TREES);
+								if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+									sharedFullContextParser.addParseListener(sharedListener);
+								}
+								if (BAIL_ON_ERROR) {
+									sharedFullContextParser.setErrorHandler(new BailErrorStrategy<Token>());
+								}
+							}
+
+							parseResult = parseMethod.invoke(sharedFullContextParser);
+						}
+
                         Assert.assertTrue(parseResult instanceof ParseTree);
 
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
