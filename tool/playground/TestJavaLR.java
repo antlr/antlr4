@@ -123,7 +123,7 @@ class TestJavaLR {
 				if ( x2 ) {
 					System.gc();
 					System.out.println("waiting for 1st pass");
-					while ( !firstPassDone ) { } // spin
+					if ( threaded ) while ( !firstPassDone ) { } // spin
 					System.out.println("2nd pass");
 					doFiles(javaFiles);
 				}
