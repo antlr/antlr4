@@ -533,9 +533,11 @@ public abstract class BaseTest {
 			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
 			if (!optionsSet.contains("-no-listener")) {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
 			}
 			if (optionsSet.contains("-visitor")) {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.java");
 			}
 		}
 		allIsWell = compile(files.toArray(new String[files.size()]));
