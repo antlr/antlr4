@@ -34,13 +34,13 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,8 +72,8 @@ public class DFAState {
 	public int stateNumber = -1;
 
 	/** The set of ATN configurations (state,alt,context) for this DFA state */
-	@Nullable
-	public ATNConfigSet configset;
+	@NotNull
+	public final ATNConfigSet configset;
 
 	/** edges[symbol] points to target of symbol */
 	@Nullable
@@ -148,7 +148,7 @@ public class DFAState {
 		}
 	}
 
-	public DFAState(ATNConfigSet configs, int minSymbol, int maxSymbol) {
+	public DFAState(@NotNull ATNConfigSet configs, int minSymbol, int maxSymbol) {
 		this.configset = configs;
 		this.minSymbol = minSymbol;
 		this.maxSymbol = maxSymbol;

@@ -693,11 +693,9 @@ public class TestPerformance extends BaseTest {
 			DFAState existing = dfa.states.get(proposed);
 			if ( existing!=null ) return existing;
 
-			DFAState newState = proposed;
-
-			newState.stateNumber = dfa.states.size();
 			configs.optimizeConfigs(this);
-			newState.configset = configs.clone(true);
+			DFAState newState = new DFAState(configs.clone(true), -1, -1);
+			newState.stateNumber = dfa.states.size();
 			dfa.states.put(newState, newState);
 			if ( debug ) System.out.println("adding new DFA state: "+newState);
 			return newState;

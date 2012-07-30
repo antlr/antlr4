@@ -707,7 +707,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		DFAState existing = dfa[mode].states.get(proposed);
 		if ( existing!=null ) return existing;
 
-		DFAState newState = proposed;
+		configs.optimizeConfigs(this);
+		DFAState newState = new DFAState(configs.clone(true), 0, MAX_DFA_EDGE);
 
 		ATNConfig firstConfigWithRuleStopState = null;
 		for (ATNConfig c : configs) {
@@ -725,8 +726,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		newState.stateNumber = dfa[mode].states.size();
-		configs.optimizeConfigs(this);
-		newState.configset = configs.clone(true);
 		dfa[mode].states.put(newState, newState);
 		return newState;
 	}

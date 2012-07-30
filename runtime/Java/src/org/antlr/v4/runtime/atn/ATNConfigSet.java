@@ -450,6 +450,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	public void markExplicitSemanticContext() {
+		ensureWritable();
 		hasSemanticContext = true;
 	}
 
@@ -458,7 +459,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	public void setConflictingAlts(BitSet conflictingAlts) {
-		//ensureWritable(); <-- these do end up set after the DFAState is created, but set to a distinct value
+		ensureWritable();
 		this.conflictingAlts = conflictingAlts;
 	}
 
