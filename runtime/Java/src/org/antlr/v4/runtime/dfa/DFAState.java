@@ -77,7 +77,8 @@ public class DFAState {
 	public boolean isAcceptState = false;
 
 	/** if accept state, what ttype do we match or alt do we predict?
-	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null.
+	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null or
+	 *  isCtxSensitive.
 	 */
 	public int prediction;
 

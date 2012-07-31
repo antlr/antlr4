@@ -476,6 +476,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATN_failover++;
 
 		ATNConfigSet previous = s0.configs;
+		DFAState previousD = s0;
 		DFAState D;
 		ATNConfigSet fullCtxSet;
 
@@ -505,15 +506,23 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// will get error no matter what.
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
+			DFAState D2 = new DFAState(reach);
+//			if ( dfa.states.get(previousD)==null ) {  always ok it seems; previousD always exists
+//				System.err.println("-----------------------------------------");
+//			}
 			D = addDFAEdge(dfa, previous, t, reach); // always adding edge even if to a conflict state
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 				D.isAcceptState = true;
 				D.configs.uniqueAlt = predictedAlt;
 				D.prediction = predictedAlt;
+				D2.isAcceptState = true;
+				D2.configs.uniqueAlt = predictedAlt;
+				D2.prediction = predictedAlt;
 			}
 			else {
 				D.configs.conflictingAlts = getConflictingAlts(reach, false);
+				D2.configs.conflictingAlts = D.configs.conflictingAlts;
 				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
 //						int k = input.index() - startIndex + 1; // how much input we used
@@ -527,16 +536,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												D.configs.conflictingAlts, D.configs);
 							}
 							D.isAcceptState = true;
+							D2.isAcceptState = true;
 							predictedAlt = resolveToMinAlt(D, D.configs.conflictingAlts);
 						}
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-							predictionCtx = getCachedContext(predictionCtx);
-							Integer predI = D.contextToPredictedAlt.get(predictionCtx);
-							if ( predI!=null ) {
-								return predI;
-							}
+							// don't look up context in cache now since we're just creating state D
 							loopsSimulateTailRecursion = true;
 							ATNConfigSet s0_closure =
 								computeStartState(dfa.atnStartState,
@@ -551,9 +556,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 																D.configs.conflictingAlts.getMinElement(),
 																greedy);
 							// not accept state: isCtxSensitive
+							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
+							predictionCtx = getCachedContext(predictionCtx);
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
-							D.prediction = predictedAlt = fullCtxSet.uniqueAlt;
+							D.prediction = predictedAlt = fullCtxSet.uniqueAlt; // TODO: why set prediction?
+							D.prediction = ATN.INVALID_ALT_NUMBER;
 							D.contextToPredictedAlt.put(predictionCtx, predictedAlt);
+							D2.isCtxSensitive = true; // always force DFA to ATN simulate
+							D2.prediction = predictedAlt = fullCtxSet.uniqueAlt; // TODO: why set prediction?
+							D2.prediction = ATN.INVALID_ALT_NUMBER;
+							D2.contextToPredictedAlt.put(predictionCtx, predictedAlt);
+							//addDFAEdge(dfa, previous, t, reach);
 							return predictedAlt; // all done with preds, etc...
 						}
 					}
@@ -564,6 +577,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						int exitAlt = 2;
 						D.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
 						D.prediction = predictedAlt = exitAlt;
+						D2.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
+						D2.prediction = predictedAlt = exitAlt;
 					}
 				}
 			}
@@ -575,12 +590,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// reaches end via .* means nothing after.
 					D.isAcceptState = true;
 					D.prediction = predictedAlt = exitAlt;
+					D2.isAcceptState = true;
+					D2.prediction = predictedAlt = exitAlt;
 				}
 				else {// if we reached end of rule via exit branch and decision nongreedy, we matched
 					if ( configWithAltAtStopState(reach, exitAlt) ) {
 						if ( debug ) System.out.println("nongreedy at stop state for exit branch");
 						D.isAcceptState = true;
 						D.prediction = predictedAlt = exitAlt;
+						D2.isAcceptState = true;
+						D2.prediction = predictedAlt = exitAlt;
 					}
 				}
 			}
@@ -596,7 +615,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					int stopIndex = input.index();
 					input.seek(startIndex);
 					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
-					D.prediction = ATN.INVALID_ALT_NUMBER;
+					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
+					D2.prediction = ATN.INVALID_ALT_NUMBER;
+					//addDFAEdge(dfa, previous, t, reach);
 					switch (alts.size()) {
 					case 0:
 						throw noViableAlt(input, outerContext, D.configs, startIndex);
@@ -614,9 +635,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 			}
 
+			//addDFAEdge(dfa, previous, t, reach);
 			if ( D.isAcceptState ) return predictedAlt;
 
 			previous = reach;
+			previousD = D;
 			input.consume();
 			t = input.LA(1);
 		}
@@ -885,8 +908,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		IntervalSet predictions = new IntervalSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
-			if ( pair.pred==null ) {
-				System.err.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+			if ( pair.pred==null ) { // TODO: can't be null, can it?
 				predictions.add(pair.alt);
 				if (!complete) {
 					break;
@@ -1233,8 +1255,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 Regardless of what goes on for the other states, this is
 	 sufficient to force us to add this new state to the ATN-to-DFA work list.
 
-	 TODO: split into "has nonconflict config--add to work list" and getambigalts
-	 functions
+	 TODO: split into "has nonconflict config--add to work list" and getambigalts functions
+
+	 TODO: now we know contexts are merged, can we optimize?  Use big int -> config array?
 	 */
 	@Nullable
 	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs, boolean fullCtx) {
@@ -1448,6 +1471,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 								  int t,
 								  @NotNull ATNConfigSet q)
 	{
+		// TODO: how can from ever be new? oh, the first time into execATN;
+		// wait: shouldn't that be s0
 		DFAState from = addDFAState(dfa, p);
 		DFAState to = addDFAState(dfa, q);
 		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
