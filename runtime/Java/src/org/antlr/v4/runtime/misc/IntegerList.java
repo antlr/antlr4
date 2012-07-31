@@ -259,10 +259,14 @@ public class IntegerList {
 	}
 
 	public final int binarySearch(int key) {
-		return Arrays.binarySearch(_data, key);
+		return Arrays.binarySearch(_data, 0, _size, key);
 	}
 
 	public final int binarySearch(int fromIndex, int toIndex, int key) {
+		if (fromIndex < 0 || toIndex < 0 || fromIndex > _size || toIndex > _size) {
+			throw new IndexOutOfBoundsException();
+		}
+
 		return Arrays.binarySearch(_data, fromIndex, toIndex, key);
 	}
 
