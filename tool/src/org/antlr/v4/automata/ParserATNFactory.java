@@ -58,41 +58,6 @@ import java.util.List;
  *  No side-effects. It builds an ATN object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
-    class TailEpsilonRemover extends ATNVisitor {
-        @Override
-        public void visitState(ATNState p) {
-            if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 ) {
-                ATNState q = p.transition(0).target;
-				if ( p.transition(0) instanceof RuleTransition ) {
-					q = ((RuleTransition)p.transition(0)).followState;
-				}
-				if ( q.getClass() == ATNState.class ) {
-					// we have p-x->q for x in {rule, action, pred, token, ...}
-					// if edge out of q is single epsilon to block end
-					// we can strip epsilon p-x->q-eps->r
-					Transition trans = q.transition(0);
-					if ( q.getNumberOfTransitions()==1 && trans.isEpsilon() &&
-					     !(trans instanceof ActionTransition) ) {
-						ATNState r = trans.target;
-						if ( r instanceof BlockEndState ||
-							r instanceof PlusLoopbackState ||
-							r instanceof StarLoopbackState )
-						{
-							// skip over q
-							if ( p.transition(0) instanceof RuleTransition ) {
-								((RuleTransition)p.transition(0)).followState = r;
-							}
-							else {
-								p.transition(0).target = r;
-							}
-							atn.removeState(q);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	@NotNull
 	public final Grammar g;
 
@@ -373,7 +338,7 @@ public class ParserATNFactory implements ATNFactory {
 			epsilon(alt.right, end);
 			// no back link in ATN so must walk entire alt to see if we can
 			// strip out the epsilon to 'end' state
-			TailEpsilonRemover opt = new TailEpsilonRemover();
+			TailEpsilonRemover opt = new TailEpsilonRemover(atn);
 			opt.visit(alt.left);
 		}
 		Handle h = new Handle(start, end);
