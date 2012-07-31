@@ -76,6 +76,7 @@ public class ParserATNFactory implements ATNFactory {
 		atn.maxTokenType = g.getMaxTokenType();
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
+		ATNOptimizer.optimize(g, atn);
 		return atn;
 	}
 

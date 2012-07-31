@@ -104,6 +104,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			}
 		}
 
+		ATNOptimizer.optimize(g, atn);
 		return atn;
 	}
 
