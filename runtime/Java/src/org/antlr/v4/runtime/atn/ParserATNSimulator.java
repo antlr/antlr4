@@ -521,7 +521,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				D2.prediction = predictedAlt;
 			}
 			else {
-				D.configs.conflictingAlts = getConflictingAlts(reach, false);
+				D.configs.conflictingAlts = getConflictingAlts(reach);
 				D2.configs.conflictingAlts = D.configs.conflictingAlts;
 				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
@@ -537,7 +537,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							}
 							D.isAcceptState = true;
 							D2.isAcceptState = true;
-							predictedAlt = resolveToMinAlt(D, D.configs.conflictingAlts);
+							D.prediction = D.configs.conflictingAlts.getMinElement();
+							D2.prediction = D2.configs.conflictingAlts.getMinElement();
+							if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
+							predictedAlt = D.prediction;
 						}
 						else {
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
@@ -611,6 +614,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				int nalts = decState.getNumberOfTransitions();
 				List<DFAState.PredPrediction> predPredictions =
 					predicateDFAState(D, D.configs, outerContext, nalts);
+				// TODO: get rid of side-effects? sets predicted 2x
+				predicateDFAState(D2, D2.configs, outerContext, nalts); // alters D
 				if ( predPredictions!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
@@ -685,7 +690,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			reach.uniqueAlt = getUniqueAlt(reach);
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
-			reach.conflictingAlts = getConflictingAlts(reach, fullCtx);
+			reach.conflictingAlts = getConflictingAlts(reach);
 			if ( reach.conflictingAlts!=null ) break;
 			previous = reach;
 			input.consume();
@@ -1260,7 +1265,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 TODO: now we know contexts are merged, can we optimize?  Use big int -> config array?
 	 */
 	@Nullable
-	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs, boolean fullCtx) {
+	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs) {
 		if ( debug ) System.out.println("### check ambiguous  "+configs);
 //		System.out.println("getConflictingAlts; set size="+configs.size());
 		// First get a list of configurations for each state.
@@ -1367,13 +1372,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return conflictingAlts;
 	}
 
-	protected int resolveToMinAlt(@NotNull DFAState D, IntervalSet conflictingAlts) {
-		// kill dead alts so we don't chase them ever
-//		killAlts(conflictingAlts, D.configset);
-		D.prediction = conflictingAlts.getMinElement();
-		if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
-		return D.prediction;
-	}
+//	protected int resolveToMinAlt(@NotNull DFAState D, IntervalSet conflictingAlts) {
+//		// kill dead alts so we don't chase them ever
+////		killAlts(conflictingAlts, D.configset);
+//		D.prediction = conflictingAlts.getMinElement();
+//		if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
+//		return D.prediction;
+//	}
 
 	protected int resolveNongreedyToExitBranch(@NotNull ATNConfigSet reach,
 											   @NotNull IntervalSet conflictingAlts)
