@@ -193,11 +193,6 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	@Override
-	public Handle tree(GrammarAST node, List<Handle> els) {
-		throw new UnsupportedOperationException("^(...) not allowed in non-tree grammar");
-	}
-
 	/** Not valid for non-lexers */
 	@Override
 	public Handle range(GrammarAST a, GrammarAST b) {
