@@ -31,8 +31,11 @@
 package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.Grammar;
+
+import java.util.List;
 
 /**
  *
@@ -41,6 +44,30 @@ import org.antlr.v4.tool.Grammar;
 public class ATNOptimizer {
 
 	public static void optimize(@NotNull Grammar g, @NotNull ATN atn) {
+		optimizeStates(atn);
+	}
+
+	private static void optimizeStates(ATN atn) {
+		List<ATNState> states = atn.states;
+
+		int current = 0;
+		for (int i = 0; i < states.size(); i++) {
+			ATNState state = states.get(i);
+			if (state == null) {
+				continue;
+			}
+
+			if (i != current) {
+				state.stateNumber = current;
+				states.set(current, state);
+				states.set(i, null);
+			}
+
+			current++;
+		}
+
+		System.out.println("ATN optimizer removed " + (states.size() - current) + " null states.");
+		states.subList(current, states.size()).clear();
 	}
 
 	private ATNOptimizer() {
