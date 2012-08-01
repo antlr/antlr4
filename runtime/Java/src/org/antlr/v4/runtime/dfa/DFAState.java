@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,7 +109,7 @@ public class DFAState {
 	public List<PredPrediction> predicates;
 
 	public Map<PredictionContext,Integer> contextToPredictedAlt =
-		new HashMap<PredictionContext, Integer>();
+		Collections.synchronizedMap(new HashMap<PredictionContext, Integer>());
 
 	/** Map a predicate to a predicted alternative */
 	public static class PredPrediction {

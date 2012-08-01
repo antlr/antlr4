@@ -42,8 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DFA {
 	/** A set of all DFA states. Use Map so we can get old state back
@@ -59,12 +57,6 @@ public class DFA {
 	/** From which ATN state did we create this DFA? */
 	@NotNull
 	public final DecisionState atnStartState;
-
-	/** Each DFA has a multi-reader, single-writer lock */
-	protected final ReentrantReadWriteLock readWriteLock =
-		new ReentrantReadWriteLock();
-	public final Lock read  = readWriteLock.readLock();
-	public final Lock write = readWriteLock.writeLock();
 
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 	 *  from predictATN() for retry.

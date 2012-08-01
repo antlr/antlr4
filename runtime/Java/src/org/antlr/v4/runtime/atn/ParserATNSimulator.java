@@ -200,30 +200,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
 		if ( dfa.s0==null ) { // recheck
-			dfa.write.lock();
-			try {
-				if ( dfa.s0==null ) { // recheck
-					return predictATN(dfa, input, outerContext);
-				}
-				// fall through; another thread set dfa.s0 while we waited for lock
+			if ( dfa.s0==null ) { // recheck
+				return predictATN(dfa, input, outerContext);
 			}
-			finally {
-				dfa.write.unlock();
-			}
+			// fall through; another thread set dfa.s0 while we waited for lock
 		}
 
 		// We can start with an existing DFA
 		int m = input.mark();
 		int index = input.index();
 		try {
-			dfa.read.lock();
-			try {
-				int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
-				return alt;
-			}
-			finally {
-				dfa.read.unlock();
-			}
+			int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
+			return alt;
 		}
 		finally {
 			input.seek(index);
@@ -294,35 +282,29 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( s.isCtxSensitive && !SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
-				dfa.read.unlock();
-				dfa.write.lock();
-				try {
-					PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
+				PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
+				synchronized (sharedContextCache) {
 					predictionCtx = getCachedContext(predictionCtx);
-					Integer predI = s.contextToPredictedAlt.get(predictionCtx);
-					if ( predI!=null ) {
-						return predI; // ha! quick exit :)
-					}
-					boolean loopsSimulateTailRecursion = true;
-					boolean fullCtx = true;
-					ATNConfigSet s0_closure =
-						computeStartState(dfa.atnStartState, outerContext,
-										  greedy, loopsSimulateTailRecursion,
-										  fullCtx);
-					retry_with_context_from_dfa++;
-					ATNConfigSet fullCtxSet =
-						execATNWithFullContext(dfa, s, s0_closure,
-											   input, startIndex,
-											   outerContext,
-											   ATN.INVALID_ALT_NUMBER,
-											   greedy);
-					s.contextToPredictedAlt.put(predictionCtx, fullCtxSet.uniqueAlt);
-					return fullCtxSet.uniqueAlt;
 				}
-				finally {
-					dfa.read.lock();    // get read lock again
-					dfa.write.unlock(); // now release write lock
+				Integer predI = s.contextToPredictedAlt.get(predictionCtx);
+				if ( predI!=null ) {
+					return predI; // ha! quick exit :)
 				}
+				boolean loopsSimulateTailRecursion = true;
+				boolean fullCtx = true;
+				ATNConfigSet s0_closure =
+					computeStartState(dfa.atnStartState, outerContext,
+									  greedy, loopsSimulateTailRecursion,
+									  fullCtx);
+				retry_with_context_from_dfa++;
+				ATNConfigSet fullCtxSet =
+					execATNWithFullContext(dfa, s, s0_closure,
+										   input, startIndex,
+										   outerContext,
+										   ATN.INVALID_ALT_NUMBER,
+										   greedy);
+				s.contextToPredictedAlt.put(predictionCtx, fullCtxSet.uniqueAlt);
+				return fullCtxSet.uniqueAlt;
 			}
 			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
@@ -353,26 +335,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 										   " at DFA state "+s.stateNumber);
 				}
 
-				dfa.read.unlock();
-				dfa.write.lock();
 				// recheck; another thread might have added edge
 				if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-					try {
-						alt = execATN(dfa, s, input, startIndex, outerContext);
-						// this adds edge even if next state is accept for
-						// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-						// TODO: This next stuff kills edge, but extra states remain. :(
-						if ( s.isAcceptState && alt!=-1 ) {
-							DFAState d = s.edges[input.LA(1)+1];
-							if ( d.isAcceptState && d.prediction==s.prediction ) {
-								// we can carve it out.
-								s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
-							}
+					alt = execATN(dfa, s, input, startIndex, outerContext);
+					// this adds edge even if next state is accept for
+					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
+					// TODO: This next stuff kills edge, but extra states remain. :(
+					if ( s.isAcceptState && alt!=-1 ) {
+						DFAState d = s.edges[input.LA(1)+1];
+						if ( d.isAcceptState && d.prediction==s.prediction ) {
+							// we can carve it out.
+							s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
 						}
-					}
-					finally {
-						dfa.read.lock();    // get read lock again
-						dfa.write.unlock(); // now release write lock
 					}
 					if ( dfa_debug ) {
 						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
@@ -395,10 +369,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				t = input.LA(1);
 			}
 		}
-//		if ( acceptState==null ) {
-//			if ( debug ) System.out.println("!!! no viable alt in dfa");
-//			return -1;
-//		}
 
 		// Before jumping to prediction, check to see if there are
 		// disambiguating predicates to evaluate
@@ -509,6 +479,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			DFAState D = new DFAState(reach);
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+				// NO CONFLICT, UNIQUE PREDICTED ALT
 				D.isAcceptState = true;
 				D.configs.uniqueAlt = predictedAlt;
 				D.prediction = predictedAlt;
@@ -517,12 +488,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				D.configs.conflictingAlts = getConflictingAlts(reach);
 				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
-//						int k = input.index() - startIndex + 1; // how much input we used
-//						System.out.println("used k="+k);
+						// CONFLICT, GREEDY (TYPICAL SITUATION)
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
 							 !D.configs.dipsIntoOuterContext ||         // didn't fall out of rule
 							 SLL )                                      // not forcing SLL only
 						{
+							// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
 							if ( !D.configs.hasSemanticContext ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(),
 												D.configs.conflictingAlts, D.configs);
@@ -533,6 +504,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							predictedAlt = D.prediction;
 						}
 						else {
+							// SLL CONFLICT; RETRY WITH FULL LL CONTEXT
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
 							// don't look up context in cache now since we're just creating state D
 							loopsSimulateTailRecursion = true;
@@ -550,16 +522,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 																greedy);
 							// not accept state: isCtxSensitive
 							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-							predictionCtx = getCachedContext(predictionCtx);
+							synchronized (sharedContextCache) {
+								predictionCtx = getCachedContext(predictionCtx);
+							}
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
 							predictedAlt = fullCtxSet.uniqueAlt;
 							D.prediction = ATN.INVALID_ALT_NUMBER;
-							D.contextToPredictedAlt.put(predictionCtx, predictedAlt);
+							// TODO: have to cache pred list to test also
+							D.contextToPredictedAlt.put(predictionCtx, predictedAlt); // CACHE
 							addDFAEdge(dfa, previousD, t, D);
 							return predictedAlt; // all done with preds, etc...
 						}
 					}
 					else {
+						// CONFLICT, NONGREEDY (ATYPICAL SITUATION)
 						// upon ambiguity for nongreedy, default to exit branch to avoid inf loop
 						// this handles case where we find ambiguity that stops DFA construction
 						// before a config hits rule stop state. Was leaving prediction blank.
@@ -594,11 +570,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				int nalts = decState.getNumberOfTransitions();
 				// Update DFA so reach becomes accept state with (predicate,alt)
 				// pairs if preds found for conflicting alts
-				IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configs);
-				SemanticContext[] altToPred = getPredsForAmbigAlts(conflictingAlts, D.configs, nalts);
-				if ( altToPred!=null ) {
-					D.predicates = getPredicatePredictions(conflictingAlts, altToPred);
-				}
+				IntervalSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(D.configs);
+				SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, D.configs, nalts);
+				D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
 				D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
 
 				if ( D.predicates!=null ) {
@@ -1324,7 +1298,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return ambigAlts;
 	}
 
-	protected IntervalSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
+	protected IntervalSet getConflictingAltsOrUniqueAlt(ATNConfigSet configs) {
 		IntervalSet conflictingAlts;
 		if ( configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER ) {
 			conflictingAlts = IntervalSet.of(configs.uniqueAlt);
@@ -1462,21 +1436,27 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( from.edges==null ) {
 			from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
 		}
-		from.edges[t+1] = to; // connect
+		synchronized (dfa) {
+			from.edges[t+1] = to; // connect
+		}
 		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
 	}
 
 	/** Add D if not there and return D. Return previous if already present. */
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
-		DFAState existing = dfa.states.get(D);
-		if ( existing!=null ) return existing;
+		synchronized (dfa) {
+			DFAState existing = dfa.states.get(D);
+			if ( existing!=null ) return existing;
 
-		D.stateNumber = dfa.states.size();
-		D.configs.optimizeConfigs(this);
-		D.configs.setReadonly(true);
-		dfa.states.put(D, D);
-		if ( debug ) System.out.println("adding new DFA state: "+D);
-		return D;
+			D.stateNumber = dfa.states.size();
+			synchronized (sharedContextCache) {
+				D.configs.optimizeConfigs(this);
+			}
+			D.configs.setReadonly(true);
+			dfa.states.put(D, D);
+			if ( debug ) System.out.println("adding new DFA state: "+D);
+			return D;
+		}
 	}
 
 	/** See comment on LexerInterpreter.addDFAState. */
