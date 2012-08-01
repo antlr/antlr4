@@ -71,7 +71,9 @@ public class DFAState {
 
 	public ATNConfigSet configs = new ATNConfigSet();
 
-	/** edges[symbol] points to target of symbol */
+	/** edges[symbol] points to target of symbol. Shift up by 1 so (-1)
+	 *  EOF maps to edges[0].
+	 */
 	@Nullable
 	public DFAState[] edges;
 
