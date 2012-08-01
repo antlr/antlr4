@@ -50,5 +50,10 @@ public class RuleTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return RULE;
+	}
+
+	@Override
 	public boolean isEpsilon() { return true; }
 }

@@ -50,6 +50,11 @@ public class PredicateTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return PREDICATE;
+	}
+
+	@Override
 	public boolean isEpsilon() { return true; }
 
     public SemanticContext.Predicate getPredicate() {

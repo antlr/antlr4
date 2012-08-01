@@ -48,6 +48,11 @@ public class ActionTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return ACTION;
+	}
+
+	@Override
 	public boolean isEpsilon() {
 		return true; // we are to be ignored by analysis 'cept for predicates
 	}

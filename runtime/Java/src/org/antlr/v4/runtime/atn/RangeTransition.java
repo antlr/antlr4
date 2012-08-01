@@ -43,6 +43,11 @@ public class RangeTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return RANGE;
+	}
+
+	@Override
 	@NotNull
 	public IntervalSet label() { return IntervalSet.of(from, to); }
 

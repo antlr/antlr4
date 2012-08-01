@@ -39,6 +39,11 @@ public class NotSetTransition extends SetTransition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return NOT_SET;
+	}
+
+	@Override
 	public String toString() {
 		return '~'+super.toString();
 	}

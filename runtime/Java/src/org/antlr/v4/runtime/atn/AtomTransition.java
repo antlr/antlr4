@@ -43,6 +43,11 @@ public class AtomTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return ATOM;
+	}
+
+	@Override
 	@NotNull
 	public IntervalSet label() { return IntervalSet.of(label); }
 

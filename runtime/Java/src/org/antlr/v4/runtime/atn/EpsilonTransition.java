@@ -35,6 +35,11 @@ public class EpsilonTransition extends Transition {
 	public EpsilonTransition(@NotNull ATNState target) { super(target); }
 
 	@Override
+	public int getSerializationType() {
+		return EPSILON;
+	}
+
+	@Override
 	public boolean isEpsilon() { return true; }
 
 	@Override
