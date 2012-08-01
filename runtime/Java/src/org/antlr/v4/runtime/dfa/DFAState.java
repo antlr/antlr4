@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +78,8 @@ public class DFAState {
 	public boolean isAcceptState = false;
 
 	/** if accept state, what ttype do we match or alt do we predict?
-	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null.
+	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null or
+	 *  isCtxSensitive.
 	 */
 	public int prediction;
 
@@ -107,7 +109,7 @@ public class DFAState {
 	public List<PredPrediction> predicates;
 
 	public Map<PredictionContext,Integer> contextToPredictedAlt =
-		new HashMap<PredictionContext, Integer>();
+		Collections.synchronizedMap(new HashMap<PredictionContext, Integer>());
 
 	/** Map a predicate to a predicted alternative */
 	public static class PredPrediction {

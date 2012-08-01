@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -271,13 +272,11 @@ public class TestATNInterpreter extends BaseTest {
 								int expected)
 	{
 		ATN lexatn = createATN(lg);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,null,null);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,new DFA[1],null);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
-		semanticProcess(lg);
 		g.importVocab(lg);
-		semanticProcess(g);
 
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();

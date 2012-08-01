@@ -164,22 +164,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		try {
 			DFA dfa = decisionToDFA[mode];
 			if ( dfa.s0==null ) {
-				dfa.write.lock();
-				try {
-					return matchATN(input);
-				}
-				finally {
-					dfa.write.unlock();
-				}
+				return matchATN(input);
 			}
 			else {
-				dfa.read.lock();
-				try {
-					return execDFA(input, dfa.s0);
-				}
-				finally {
-					dfa.read.unlock();
-				}
+				return execDFA(input, dfa.s0);
 			}
 		}
 		finally {

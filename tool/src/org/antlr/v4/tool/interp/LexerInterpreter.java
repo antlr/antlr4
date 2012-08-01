@@ -38,6 +38,8 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenFactory;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.tool.LexerGrammar;
 
 public class LexerInterpreter implements TokenSource {
@@ -48,6 +50,10 @@ public class LexerInterpreter implements TokenSource {
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
 
+	protected static final DFA[] _decisionToDFA = new DFA[1];
+	protected static final PredictionContextCache _sharedContextCache =
+		new PredictionContextCache();
+
 	public LexerInterpreter(LexerGrammar g, String inputString) {
 		this(g);
 		setInput(inputString);
@@ -56,7 +62,7 @@ public class LexerInterpreter implements TokenSource {
 	public LexerInterpreter(LexerGrammar g) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		interp = new LexerATNSimulator(g.atn,null,null);
+		interp = new LexerATNSimulator(g.atn,_decisionToDFA,_sharedContextCache);
 	}
 
 	public void setInput(String inputString) {

@@ -9,19 +9,14 @@ import java.util.Map;
  *  both lexers and parsers.
  */
 public class PredictionContextCache {
-	protected String name;
 	protected Map<PredictionContext, PredictionContext> cache =
 		new HashMap<PredictionContext, PredictionContext>();
-
-	public PredictionContextCache() {
-		this.name = name;
-	}
 
 	/** Add a context to the cache and return it. If the context already exists,
 	 *  return that one instead and do not add a new context to the cache.
 	 *  Protect shared cache from unsafe thread access.
 	 */
-	public synchronized PredictionContext add(PredictionContext ctx) {
+	public PredictionContext add(PredictionContext ctx) {
 		if ( ctx==PredictionContext.EMPTY ) return PredictionContext.EMPTY;
 		PredictionContext existing = cache.get(ctx);
 		if ( existing!=null ) {
@@ -32,11 +27,11 @@ public class PredictionContextCache {
 		return ctx;
 	}
 
-	public synchronized PredictionContext get(PredictionContext ctx) {
+	public PredictionContext get(PredictionContext ctx) {
 		return cache.get(ctx);
 	}
 
-	public synchronized int size() {
+	public int size() {
 		return cache.size();
 	}
 }
