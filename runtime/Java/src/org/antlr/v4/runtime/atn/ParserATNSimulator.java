@@ -552,7 +552,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
 							predictionCtx = getCachedContext(predictionCtx);
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
-							D.prediction = predictedAlt = fullCtxSet.uniqueAlt; // TODO: why set prediction?
+							predictedAlt = fullCtxSet.uniqueAlt;
 							D.prediction = ATN.INVALID_ALT_NUMBER;
 							D.contextToPredictedAlt.put(predictionCtx, predictedAlt);
 							addDFAEdge(dfa, previousD, t, D);
@@ -590,17 +590,21 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			if ( D.isAcceptState && D.configs.hasSemanticContext ) {
 				// We need to test all predicates, even in DFA states that
-				// uniquely predict alternative. We can only get a conflict
-				// when we're sure that it's an ambiguity not conflict.
+				// uniquely predict alternative.
 				int nalts = decState.getNumberOfTransitions();
-				List<DFAState.PredPrediction> predPredictions =
-					predicateDFAState(D, D.configs, outerContext, nalts);
-				// TODO: get rid of side-effects? sets predicted 2x
-				predicateDFAState(D, D.configs, outerContext, nalts); // alters D
-				if ( predPredictions!=null ) {
+				// Update DFA so reach becomes accept state with (predicate,alt)
+				// pairs if preds found for conflicting alts
+				IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(D.configs);
+				SemanticContext[] altToPred = getPredsForAmbigAlts(conflictingAlts, D.configs, nalts);
+				if ( altToPred!=null ) {
+					D.predicates = getPredicatePredictions(conflictingAlts, altToPred);
+				}
+				D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+
+				if ( D.predicates!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					IntervalSet alts = evalSemanticContext(predPredictions, outerContext, true);
+					IntervalSet alts = evalSemanticContext(D.predicates, outerContext, true);
 					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
 					addDFAEdge(dfa, previousD, t, D);
 					switch (alts.size()) {
@@ -787,26 +791,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return trans.target;
 		}
 		return null;
-	}
-
-	/** collect and set D's semantic context */
-	public List<DFAState.PredPrediction> predicateDFAState(DFAState D,
-														   ATNConfigSet configs,
-														   RuleContext outerContext,
-														   int nalts)
-	{
-		IntervalSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
-		if ( debug ) System.out.println("predicateDFAState "+D);
-		SemanticContext[] altToPred = getPredsForAmbigAlts(conflictingAlts, configs, nalts);
-		// altToPred[uniqueAlt] is now our validating predicate (if any)
-		List<DFAState.PredPrediction> predPredictions = null;
-		if ( altToPred!=null ) {
-			// Update DFA so reach becomes accept state with predicate
-			predPredictions = getPredicatePredictions(conflictingAlts, altToPred);
-			D.predicates = predPredictions;
-			D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
-		}
-		return predPredictions;
 	}
 
 	public SemanticContext[] getPredsForAmbigAlts(@NotNull IntervalSet ambigAlts,
