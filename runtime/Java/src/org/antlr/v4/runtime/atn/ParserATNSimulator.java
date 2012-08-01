@@ -475,8 +475,29 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// will get error no matter what.
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
+
 			// create new target state; we'll add to DFA after it's complete
 			DFAState D = new DFAState(reach);
+
+			// It's often the case that D will already exist in the DFA
+			// and so it's a waste to compute all of the fields over the next
+			// big chunk of code. However, I tried inserting the following
+			// short circuit, but it didn't have much effect. I
+			// figured that this would be a big impact for multi threading,
+			// but it also didn't see much of an impact.
+//			synchronized (dfa) {
+//				DFAState existing = dfa.states.get(D);
+//				if ( existing!=null ) {
+//					addDFAEdge(dfa, previousD, t, existing);
+//					if ( existing.isAcceptState ) return existing.prediction;
+//					previous = D.configs;
+//					previousD = D;
+//					input.consume();
+//					t = input.LA(1);
+//					continue;
+//				}
+//			}
+
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 				// NO CONFLICT, UNIQUE PREDICTED ALT
