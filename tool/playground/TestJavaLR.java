@@ -120,6 +120,13 @@ class TestJavaLR {
 					javaFiles.addAll(files);
 				}
 				doFiles(javaFiles);
+
+//				DOTGenerator gen = new DOTGenerator(null);
+//				String dot = gen.getDOT(JavaLRParser._decisionToDFA[112], false);
+//				System.out.println(dot);
+//				dot = gen.getDOT(JavaLRParser._decisionToDFA[81], false);
+//				System.out.println(dot);
+
 				if ( x2 ) {
 					System.gc();
 					System.out.println("waiting for 1st pass");

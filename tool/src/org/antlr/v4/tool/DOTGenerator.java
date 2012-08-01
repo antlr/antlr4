@@ -139,6 +139,9 @@ public class DOTGenerator {
 		if ( s.isAcceptState ) {
 			buf.append("=>").append(s.prediction);
 		}
+		if ( s.isCtxSensitive ) {
+			buf.append("^");
+		}
 		if ( grammar!=null && grammar.tool.verbose_dfa ) {
 			Set<Integer> alts = s.getAltSet();
 			if ( alts!=null ) {
