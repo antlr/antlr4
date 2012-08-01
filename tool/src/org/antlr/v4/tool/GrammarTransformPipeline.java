@@ -358,12 +358,14 @@ public class GrammarTransformPipeline {
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
-nextLit:
+		nextLit:
 		for (String lit : stringLiterals) {
 			// if lexer already has a rule for literal, continue
-			for (Pair<GrammarAST,GrammarAST> pair : litAliases) {
-				GrammarAST litAST = pair.b;
-				if ( lit.equals(litAST.getText()) ) continue nextLit;
+			if ( litAliases!=null ) {
+				for (Pair<GrammarAST,GrammarAST> pair : litAliases) {
+					GrammarAST litAST = pair.b;
+					if ( lit.equals(litAST.getText()) ) continue nextLit;
+				}
 			}
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
 			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
