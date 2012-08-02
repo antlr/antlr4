@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
-public class RangeTransition extends Transition {
+public final class RangeTransition extends Transition {
 	public final int from;
 	public final int to;
 

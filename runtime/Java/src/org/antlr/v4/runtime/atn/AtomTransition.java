@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 /** TODO: make all transitions sets? no, should remove set edges */
-public class AtomTransition extends Transition {
+public final class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
 	public final int label;
 
