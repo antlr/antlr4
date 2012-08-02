@@ -1428,24 +1428,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return false;
 	}
 
-//	@NotNull
-//	protected DFAState addDFAEdge(@NotNull DFA dfa,
-//								  @NotNull DFAState from,
-//								  @NotNull ATNConfigSet p,
-//								  int t,
-//								  @NotNull ATNConfigSet q,
-//								  @NotNull DFAState to)
-//	{
-//		// TODO: how can from ever be new? oh, the first time into execATN;
-//		// wait: shouldn't that be s0
-////		DFAState from = addDFAState(dfa, p);
-////		DFAState to = addDFAState(dfa, q);
-//		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
-////		addDFAEdge(from, t, to);
-//		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
-//		return to;
-//	}
-
 	protected void addDFAEdge(@NotNull DFA dfa,
 							  @Nullable DFAState from,
 							  int t,
@@ -1453,7 +1435,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		if ( from==null || t < -1 || to == null ) return;
-		to = addDFAState(dfa, to);
+		to = addDFAState(dfa, to); // used existing if possible not incoming
 		if ( from.edges==null ) {
 			from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
 		}
@@ -1479,23 +1461,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return D;
 		}
 	}
-
-	/** See comment on LexerInterpreter.addDFAState. */
-//	@NotNull
-//	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
-//		DFAState proposed = new DFAState(configs);
-//		DFAState existing = dfa.states.get(proposed);
-//		if ( existing!=null ) return existing;
-//
-//		DFAState newState = proposed;
-//		newState.stateNumber = dfa.states.size();
-//		configs.optimizeConfigs(this);
-//		configs.setReadonly(true);
-//		newState.configs = configs;
-//		dfa.states.put(newState, newState);
-//		if ( debug ) System.out.println("adding new DFA state: "+newState);
-//		return newState;
-//	}
 
 	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
