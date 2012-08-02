@@ -706,11 +706,14 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
 		if (t < 0 || t > MAX_DFA_EDGE) return; // Only track edges within the DFA bounds
-		if ( p.edges==null ) {
-			//  make room for tokens 1..n and -1 masquerading as index 0
-			p.edges = new DFAState[MAX_DFA_EDGE+1]; // TODO: make adaptive
+		DFA dfa = decisionToDFA[mode];
+		synchronized (dfa) {
+			if ( p.edges==null ) {
+				//  make room for tokens 1..n and -1 masquerading as index 0
+				p.edges = new DFAState[MAX_DFA_EDGE+1]; // TODO: make adaptive
+			}
+			p.edges[t] = q; // connect
 		}
-		p.edges[t] = q; // connect
 	}
 
 	/** Add a new DFA state if there isn't one with this set of
@@ -724,11 +727,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( configs.hasSemanticContext ) return null;
 
 		DFAState proposed = new DFAState(configs);
-		DFAState existing = decisionToDFA[mode].states.get(proposed);
-		if ( existing!=null ) return existing;
-
-		DFAState newState = proposed;
-
 		ATNConfig firstConfigWithRuleStopState = null;
 		for (ATNConfig c : configs) {
 			if ( c.state instanceof RuleStopState )	{
@@ -738,18 +736,26 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		if ( firstConfigWithRuleStopState!=null ) {
-			newState.isAcceptState = true;
-			newState.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
-			newState.lexerActionIndex =
+			proposed.isAcceptState = true;
+			proposed.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
+			proposed.lexerActionIndex =
 				((LexerATNConfig)firstConfigWithRuleStopState).lexerActionIndex;
-			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
+			proposed.prediction = atn.ruleToTokenType[proposed.lexerRuleIndex];
 		}
 
-		newState.stateNumber = decisionToDFA[mode].states.size();
-		configs.setReadonly(true);
-		newState.configs = configs;
-		decisionToDFA[mode].states.put(newState, newState);
-		return newState;
+		DFA dfa = decisionToDFA[mode];
+		synchronized (dfa) {
+			DFAState existing = dfa.states.get(proposed);
+			if ( existing!=null ) return existing;
+
+			DFAState newState = proposed;
+
+			newState.stateNumber = dfa.states.size();
+			configs.setReadonly(true);
+			newState.configs = configs;
+			decisionToDFA[mode].states.put(newState, newState);
+			return newState;
+		}
 	}
 
 	@Nullable

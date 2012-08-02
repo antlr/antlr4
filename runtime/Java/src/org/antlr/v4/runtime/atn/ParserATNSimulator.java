@@ -283,9 +283,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( s.isCtxSensitive && !SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-				synchronized (sharedContextCache) {
-					predictionCtx = getCachedContext(predictionCtx);
-				}
+				predictionCtx = getCachedContext(predictionCtx);
 				Integer predI = s.contextToPredictedAlt.get(predictionCtx);
 				if ( predI!=null ) {
 					return predI; // ha! quick exit :)
@@ -543,9 +541,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 																greedy);
 							// not accept state: isCtxSensitive
 							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-							synchronized (sharedContextCache) {
-								predictionCtx = getCachedContext(predictionCtx);
-							}
+							predictionCtx = getCachedContext(predictionCtx);
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
 							predictedAlt = fullCtxSet.uniqueAlt;
 							D.prediction = ATN.INVALID_ALT_NUMBER;
@@ -1436,10 +1432,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		if ( from==null || t < -1 || to == null ) return;
 		to = addDFAState(dfa, to); // used existing if possible not incoming
-		if ( from.edges==null ) {
-			from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
-		}
 		synchronized (dfa) {
+			if ( from.edges==null ) {
+				from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
+			}
 			from.edges[t+1] = to; // connect
 		}
 		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
