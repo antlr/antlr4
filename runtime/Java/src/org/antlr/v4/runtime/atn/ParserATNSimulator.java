@@ -686,8 +686,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// pairs if preds found for conflicting alts
 				IntervalSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(D.configs);
 				SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, D.configs, nalts);
-				D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
-				D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+				if ( altToPred!=null ) {
+					D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
+					D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+				}
 
 				if ( D.predicates!=null ) {
 					int stopIndex = input.index();
