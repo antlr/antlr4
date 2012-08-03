@@ -282,12 +282,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( s.isCtxSensitive && !SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
-				PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-				predictionCtx = getCachedContext(predictionCtx);
-				Integer predI = s.contextToPredictedAlt.get(predictionCtx);
-				if ( predI!=null ) {
-					return predI; // ha! quick exit :)
-				}
 				boolean loopsSimulateTailRecursion = true;
 				boolean fullCtx = true;
 				ATNConfigSet s0_closure =
@@ -301,7 +295,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 										   outerContext,
 										   ATN.INVALID_ALT_NUMBER,
 										   greedy);
-				s.contextToPredictedAlt.put(predictionCtx, fullCtxSet.uniqueAlt);
 				return fullCtxSet.uniqueAlt;
 			}
 			if ( s.isAcceptState ) {
@@ -540,13 +533,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 																D.configs.conflictingAlts.getMinElement(),
 																greedy);
 							// not accept state: isCtxSensitive
-							PredictionContext predictionCtx = PredictionContext.fromRuleContext(outerContext);
-							predictionCtx = getCachedContext(predictionCtx);
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
 							predictedAlt = fullCtxSet.uniqueAlt;
 							D.prediction = ATN.INVALID_ALT_NUMBER;
-							// TODO: have to cache pred list to test also
-							D.contextToPredictedAlt.put(predictionCtx, predictedAlt); // CACHE
 							addDFAEdge(dfa, previousD, t, D);
 							return predictedAlt; // all done with preds, etc...
 						}
@@ -810,7 +799,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		int nPredAlts = 0;
-		for (int i = 0; i < n; i++) {
+		for (int i = 1; i < n; i++) {
 			if (altToPred[i] == null) {
 				altToPred[i] = SemanticContext.NONE;
 			}

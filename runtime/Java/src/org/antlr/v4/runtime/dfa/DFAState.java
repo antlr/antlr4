@@ -31,15 +31,11 @@ package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /** A DFA state represents a set of possible ATN configurations.
@@ -109,9 +105,6 @@ public class DFAState {
 	 */
 	@Nullable
 	public List<PredPrediction> predicates;
-
-	public Map<PredictionContext,Integer> contextToPredictedAlt =
-		Collections.synchronizedMap(new HashMap<PredictionContext, Integer>());
 
 	/** Map a predicate to a predicted alternative */
 	public static class PredPrediction {
