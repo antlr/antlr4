@@ -72,23 +72,37 @@ import java.util.Set;
  problem.  The closure routine only considers the rule invocation
  stack created during prediction beginning in the decision rule.  For
  example, if prediction occurs without invoking another rule's
- ATN, there are no context stacks in the configurations. When this
- leads to a conflict, we don't know if it's an ambiguity or a
- weakness in the strong LL(*) parsing strategy (versus full
- LL(*)).
+ ATN, there are no context stacks in the configurations.
+ When lack of context leads to a conflict, we don't know if it's
+ an ambiguity or a weakness in the strong LL(*) parsing strategy
+ (versus full LL(*)).
 
- So, we simply rewind and retry the ATN simulation again, this time
- using full outer context without adding to the DFA. Configuration context
- stacks will be the full invocation stack from the start rule. If
+ When SLL yields a configuration set with conflict, we rewind the
+ input and retry the ATN simulation, this time using
+ full outer context without adding to the DFA. Configuration context
+ stacks will be the full invocation stacks from the start rule. If
  we get a conflict using full context, then we can definitively
  say we have a true ambiguity for that input sequence. If we don't
  get a conflict, it implies that the decision is sensitive to the
  outer context. (It is not context-sensitive in the sense of
- context sensitive grammars.) We create a special DFA accept state
- that maps rule context to a predicted alternative. That is the
- only modification needed to handle full LL(*) vs SLL(*) prediction.
+ context-sensitive grammars.)
 
- So, the strategy is complex because we bounce back and forth from
+ The next time we reach this DFA state with an SLL conflict, through
+ DFA simulation, we will again retry the ATN simulation using full
+ context mode. This is slow because we can't save the results and have
+ to "interpret" the ATN each time we get that input. We could cache
+ results from full context to predicted alternative easily and that
+ saves a lot of time but doesn't work in presence of predicates. The set
+ of visible predicates from the ATN start state changes depending on
+ the context, because closure can fall off the end of a rule. I tried
+ to cache tuples (stack context, semantic context, predicted alt) but
+ it was slower than interpreting and much more complicated. Also
+ required a huge amount of memory. The goal is not to create the
+ world's fastest parser anyway. I'd like to keep this algorithm
+ simple. By launching multiple threads, we can improve the speed of
+ parsing across a large number of files.
+
+ This strategy is complex because we bounce back and forth from
  the ATN to the DFA, simultaneously performing predictions and
  extending the DFA according to previously unseen input
  sequences.
@@ -112,15 +126,109 @@ import java.util.Set;
  at the '}'. In the 2nd case it should stop at the ';'. Both cases
  should stay within the entry rule and not dip into the outer context.
 
- When we are forced to do full context parsing, I mark the DFA state
- with isCtxSensitive=true when we reach conflict in SLL prediction.
- Any further DFA simulation that reaches that state will
- launch an ATN simulation to get the prediction, without updating the
- DFA or storing any context information.
+ PREDICATES
 
- Predicates can be tested during SLL mode when we are sure that
- the conflicted state is a true ambiguity not an unknown conflict.
- This only happens with the special context circumstances mentioned above.
+ Predicates are always evaluated if present in either SLL or LL both.
+ SLL and LL simulation deals with predicates differently. SLL collects
+ predicates as it performs closure operations like ANTLR v3 did. It
+ delays predicate evaluation until it reaches and accept state. This
+ allows us to cache the SLL ATN simulation whereas, if we had evaluated
+ predicates on-the-fly during closure, the DFA state configuration sets
+ would be different and we couldn't build up a suitable DFA.
+
+ When building a DFA accept state during ATN simulation, we evaluate
+ any predicates and return the sole semantically valid alternative. If
+ there is more than 1 alternative, we report an ambiguity. If there are
+ 0 alternatives, we throw an exception. Alternatives without predicates
+ act like they have true predicates. The simple way to think about it
+ is to strip away all alternatives with false predicates and choose the
+ minimum alternative that remains.
+
+ When we start in the DFA and reach an accept state that's predicated,
+ we test those and return the minimum semantically viable
+ alternative. If no alternatives are viable, we throw an exception.  We
+ don't report ambiguities in the DFA, but I'm not sure why anymore.
+
+ During full LL ATN simulation, closure always evaluates predicates and
+ on-the-fly. This is crucial to reducing the configuration set size
+ during closure. It hits a landmine when parsing with the Java grammar,
+ for example, without this on-the-fly evaluation.
+
+ SHARING DFA
+
+ All instances of the same parser share the same decision DFAs through
+ a static field. Each instance gets its own ATN simulator but they
+ share the same decisionToDFA field. They also share a
+ PredictionContextCache object that makes sure that all
+ PredictionContext objects are shared among the DFA states. This makes
+ a big size difference.
+
+ THREAD SAFETY
+
+ The parser ATN simulator locks on the decisionDFA field when it adds a
+ new DFA object to that array. addDFAEdge locks on the DFA for the
+ current decision when setting the edges[] field.  addDFAState locks on
+ the DFA for the current decision when looking up a DFA state to see if
+ it already exists.  We must make sure that all requests to add DFA
+ states that are equivalent result in the same shared DFA object. This
+ is because lots of threads will be trying to update the DFA at
+ once. The addDFAState method also locks inside the DFA lock but this
+ time on the shared context cache when it rebuilds the configurations'
+ PredictionContext objects using cached subgraphs/nodes. No other
+ locking occurs, even during DFA simulation. This is safe as long as we
+ can guarantee that all threads referencing s.edge[t] get the same
+ physical target DFA state, or none.  Once into the DFA, the DFA
+ simulation does not reference the dfa.state map. It follows the
+ edges[] field to new targets.  The DFA simulator will either find
+ dfa.edges to be null, to be non-null and dfa.edges[t] null, or
+ dfa.edges[t] to be non-null. The addDFAEdge method could be racing to
+ set the field but in either case the DFA simulator works; if null, and
+ requests ATN simulation.  It could also race trying to get
+ dfa.edges[t], but either way it will work because it's not doing a
+ test and set operation.
+
+ Starting with SLL then failing to combined SLL/LL
+
+ Sam pointed out that if SLL does not give a syntax error, then there
+ is no point in doing full LL, which is slower. We only have to try LL
+ if we get a syntax error.  For maximum speed, Sam starts the parser
+ with pure SLL mode:
+
+     parser.getInterpreter().setSLL(true);
+
+ and with the bail error strategy:
+
+     parser.setErrorHandler(new BailErrorStrategy());
+
+ If it does not get a syntax error, then we're done. If it does get a
+ syntax error, we need to retry with the combined SLL/LL strategy.
+
+ The reason this works is as follows.  If there are no SLL conflicts
+ then the grammar is SLL for sure. If there is an SLL conflict, the
+ full LL analysis must yield a set of ambiguous alternatives that is no
+ larger than the SLL set. If the LL set is a singleton, then the
+ grammar is LL but not SLL. If the LL set is the same size as the SLL
+ set, the decision is SLL. If the LL set has size > 1, then that
+ decision is truly ambiguous on the current input. If the LL set is
+ smaller, then the SLL conflict resolution might choose an alternative
+ that the full LL would rule out as a possibility based upon better
+ context information. If that's the case, then the SLL parse will
+ definitely get an error because the full LL analysis says it's not
+ viable. If SLL conflict resolution chooses an alternative within the
+ LL set, them both SLL and LL would choose the same alternative because
+ they both choose the minimum of multiple conflicting alternatives.
+
+ Let's say we have a set of SLL conflicting alternatives {1, 2, 3} and
+ a smaller LL set called s. If s is {2, 3}, then SLL parsing will get
+ an error because SLL will pursue alternative 1. If s is {1, 2} or {1,
+ 3} then both SLL and LL will choose the same alternative because
+ alternative one is the minimum of either set. If s is {2} or {3} then
+ SLL will get a syntax error. If s is {1} then SLL will succeed.
+
+ Of course, if the input is invalid, then we will get an error for sure
+ in both SLL and LL parsing. Erroneous input will therefore require 2
+ passes over the input.
+
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean debug = false;
@@ -845,7 +953,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
-	 *  pairs that win. A {@code null} predicate indicates an alt containing an
+	 *  pairs that win. A {@code NONE} predicate indicates an alt containing an
 	 *  unpredicated config which behaves as "always true." If !complete
 	 *  then we stop at the first predicate that evaluates to true. This
 	 *  includes pairs with null predicates.
@@ -856,12 +964,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		IntervalSet predictions = new IntervalSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
-			if ( pair.pred==null ) { // TODO: can't be null, can it?
+			if ( pair.pred==SemanticContext.NONE ) {
 				predictions.add(pair.alt);
 				if (!complete) {
 					break;
 				}
-
 				continue;
 			}
 

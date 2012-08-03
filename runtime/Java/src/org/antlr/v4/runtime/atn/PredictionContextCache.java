@@ -3,10 +3,9 @@ package org.antlr.v4.runtime.atn;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Used to cache PredictionContext objects. Its use for both the shared
- *  context cash associated with contacts in DFA states as well as the
- *  transient cash used for adaptivePredict().  This cache can be used for
- *  both lexers and parsers.
+/** Used to cache PredictionContext objects. Its used for the shared
+ *  context cash associated with contexts in DFA states. This cache
+ *  can be used for both lexers and parsers.
  */
 public class PredictionContextCache {
 	protected Map<PredictionContext, PredictionContext> cache =
