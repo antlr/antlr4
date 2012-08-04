@@ -103,10 +103,21 @@ import java.util.Set;
  simple. By launching multiple threads, we can improve the speed of
  parsing across a large number of files.
 
- This strategy is complex because we bounce back and forth from
- the ATN to the DFA, simultaneously performing predictions and
- extending the DFA according to previously unseen input
- sequences.
+ There is no strict ordering between the amount of input used by
+ SLL vs LL, which makes it really hard to build a cache for full
+ context. Let's say that we have input A B C that leads to an SLL
+ conflict with full context X.  That implies that using X we
+ might only use A B but we could also use A B C D to resolve
+ conflict.  Input A B C D could predict alternative 1 in one
+ position in the input and A B C E could predict alternative 2 in
+ another position in input.  The conflicting SLL configurations
+ could still be non-unique in the full context prediction, which
+ would lead us to requiring more input than the original A B C.	To
+ make a	prediction cache work, we have to track	the exact input	used
+ during the previous prediction. That amounts to a cache that maps X
+ to a specific DFA for that context.
+
+ AVOIDING FULL CONTEXT PREDICTION
 
  We avoid doing full context retry when the outer context is empty,
  we did not dip into the outer context by falling off the end of the
@@ -263,6 +274,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
 	 *  isn't synchronized but we're ok since two threads shouldn't reuse same
 	 *  parser/atnsim object because it can only handle one input at a time.
+	 *  This maps graphs a and b to merged result c. (a,b)->c. We can avoid
+	 *  the merge if we ever see a and b again.  Note that (b,a)->c should
+	 *  also be examined during cache lookup.
 	 */
 	protected DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache;
 

@@ -156,8 +156,18 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		boolean rootIsWildcard,
 		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
+		if ( mergeCache!=null ) {
+			PredictionContext previous = mergeCache.get(a,b);
+			if ( previous!=null ) return previous;
+			previous = mergeCache.get(b,a);
+			if ( previous!=null ) return previous;
+		}
+
 		PredictionContext rootMerge = mergeRoot(a, b, rootIsWildcard);
-		if ( rootMerge!=null ) return rootMerge;
+		if ( rootMerge!=null ) {
+			if ( mergeCache!=null ) mergeCache.put(a, b, rootMerge);
+			return rootMerge;
+		}
 
 		if ( a.invokingState==b.invokingState ) { // a == b
 			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard, mergeCache);
@@ -169,6 +179,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			// of those graphs.  dup a, a' points at merged array
 			// new joined parent so create new singleton pointing to it, a'
 			PredictionContext a_ = new SingletonPredictionContext(parent, a.invokingState);
+			if ( mergeCache!=null ) mergeCache.put(a, b, a_);
 			return a_;
 		}
 		else { // a != b payloads differ
@@ -190,6 +201,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				}
 				PredictionContext[] parents = {singleParent, singleParent};
 				PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
+				if ( mergeCache!=null ) mergeCache.put(a, b, a_);
 				return a_;
 			}
 			// parents differ and can't merge them. Just pack together
@@ -203,6 +215,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				parents = new PredictionContext[] {b.parent, a.parent};
 			}
 			PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
+			if ( mergeCache!=null ) mergeCache.put(a, b, a_);
 			return a_;
 		}
 	}
@@ -247,6 +260,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	{
 		if ( mergeCache!=null ) {
 			PredictionContext previous = mergeCache.get(a,b);
+			if ( previous!=null ) return previous;
+			previous = mergeCache.get(b,a);
 			if ( previous!=null ) return previous;
 		}
 
