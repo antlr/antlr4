@@ -97,9 +97,9 @@ public class DFAState {
 	 *  on-the-fly. If this is not null, then this.prediction is
 	 *  ATN.INVALID_ALT_NUMBER.
 	 *
-	 *  We only treat these as disambiguating predicates when we found a
-	 *  conflict during SLL prediction where the use of context indicates
-	 *  that it's a true ambiguity.
+	 *  We only use these for non isCtxSensitive but conflicting states. That
+	 *  means we know from the context (it's $ or we don't dip into outer
+	 *  ctx) that it's an ambiguity not a conflict.
 	 *
 	 *  This list is computed by predicateDFAState() in ATN simulator.
 	 */
