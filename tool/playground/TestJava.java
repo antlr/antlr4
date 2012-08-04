@@ -127,7 +127,7 @@ class TestJava {
 				parser.setTokenStream(tokens);
 
 				if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
-				if ( SLL ) parser.getInterpreter().SLL = true;
+				if ( SLL ) parser.getInterpreter().setSLL(true);
 				// start parsing at the compilationUnit rule
 				ParserRuleContext<Token> tree = parser.compilationUnit();
 				if ( showTree ) tree.inspect(parser);

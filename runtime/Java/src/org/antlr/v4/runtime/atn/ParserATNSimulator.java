@@ -236,6 +236,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
+	public static final boolean SLL_loopsSimulateTailRecursion = true;
+
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
@@ -250,7 +252,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public final DFA[] decisionToDFA;
 
 	/** Do only local context prediction (SLL(k) style). */
-	public boolean SLL = false;
+	protected boolean SLL = false;
 
 	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
 	protected TokenStream _input;
@@ -339,7 +341,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 		DecisionState decState = atn.getDecisionState(dfa.decision);
 		boolean greedy = decState.isGreedy;
-		boolean loopsSimulateTailRecursion = false;
+		boolean loopsSimulateTailRecursion = SLL_loopsSimulateTailRecursion;
 		boolean fullCtx = false;
 		ATNConfigSet s0_closure =
 			computeStartState(dfa.atnStartState,
@@ -556,7 +558,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		boolean greedy = decState.isGreedy;
 
 		while (true) { // while more work
-			boolean loopsSimulateTailRecursion = false;
+			boolean loopsSimulateTailRecursion = SLL_loopsSimulateTailRecursion;
 //			System.out.println("REACH "+getLookaheadName(input));
 			ATNConfigSet reach = computeReachSet(previous, t,
 												 greedy,
@@ -1114,7 +1116,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( config.reachesIntoOuterContext>0 ) {
 				configs.dipsIntoOuterContext = true;
 			}
-            if ( debug ) System.out.println("added config "+configs);
+//            if ( debug ) System.out.println("added config "+configs);
         }
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {

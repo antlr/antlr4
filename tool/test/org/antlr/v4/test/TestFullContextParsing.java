@@ -239,8 +239,6 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("pass.\n", found);
 
 		String expecting =
-			"line 1:4 reportAttemptingFullContext d=1, input='a(i)<-'\n" +
-			"line 1:7 reportContextSensitivity d=1, input='a(i)<-x'\n" +
 			"line 1:3 reportAttemptingFullContext d=3, input='a(i)'\n" +
 			"line 1:7 reportAmbiguity d=3: ambigAlts={2..3}, input='a(i)<-x'\n";
 		assertEquals(expecting, this.stderrDuringParse);

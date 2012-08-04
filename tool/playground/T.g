@@ -1,10 +1,19 @@
 grammar T;
 
-s : x B ;
-x : A B | A | A ;
-s2 : x B ;
+s:   expr_or_assign* ;
+ 
+expr_or_assign
+    :   expr '++'
+    |   expr    
+    ;
+   
+expr : expr_primary ('<-' ID)? ;
+ 
+expr_primary
+    : '(' ID ')'
+    | ID '(' ID ')'
+    | ID
+    ;
 
-
-A : 'a';
-B : 'b' ;
-WS : [ \t\n\r]+ -> channel(HIDDEN) ;
+ID  : [a-z]+ ;
+WS : [ \t\r\n]+ -> skip ;

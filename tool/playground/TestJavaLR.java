@@ -260,7 +260,7 @@ class TestJavaLR {
 			JavaLRParser parser = new JavaLRParser(tokens);
 			if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
 			if ( bail ) parser.setErrorHandler(new BailErrorStrategy());
-			if ( SLL ) parser.getInterpreter().SLL = true;
+			if ( SLL ) parser.getInterpreter().setSLL(true);
 
 			// start parsing at the compilationUnit rule
 			ParserRuleContext<Token> t = parser.compilationUnit();
