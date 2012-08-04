@@ -39,11 +39,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 
+import javax.print.PrintException;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,21 +63,21 @@ import java.util.List;
  *        [input-filename(s)]
  */
 public class TestRig {
+	static String grammarName;
+	static String startRuleName;
+	static List<String> inputFiles = new ArrayList<String>();
+	static boolean printTree = false;
+	static boolean gui = false;
+	static String psFile = null;
+	static boolean showTokens = false;
+	static boolean trace = false;
+	static boolean diagnostics = false;
+	static String encoding = null;
+	static boolean SLL = false;
 
 	public static final String LEXER_START_RULE_NAME = "tokens";
 
 	public static void main(String[] args) throws Exception {
-		String grammarName;
-		String startRuleName;
-		List<String> inputFiles = new ArrayList<String>();
-		boolean printTree = false;
-		boolean gui = false;
-		String psFile = null;
-		boolean showTokens = false;
-		boolean trace = false;
-		boolean diagnostics = false;
-		String encoding = null;
-		boolean SLL = false;
 
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
@@ -159,6 +162,19 @@ public class TestRig {
 		Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 		Parser parser = parserCtor.newInstance((TokenStream)null);
 
+		if ( inputFiles.size()==0 ) {
+			InputStream is = System.in;
+			Reader r;
+			if ( encoding!=null ) {
+				r = new InputStreamReader(is, encoding);
+			}
+			else {
+				r = new InputStreamReader(is);
+			}
+
+			process(lexer, parserClass, parser, is, r);
+			return;
+		}
 		for (String inputFile : inputFiles) {
 			InputStream is = System.in;
 			if ( inputFile!=null ) {
@@ -175,57 +191,61 @@ public class TestRig {
 			if ( inputFiles.size()>1 ) {
 				System.err.println(inputFile);
 			}
+			process(lexer, parserClass, parser, is, r);
+		}
+	}
+
+	static void process(Lexer lexer, Class parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
+		try {
+			ANTLRInputStream input = new ANTLRInputStream(r);
+			lexer.setInputStream(input);
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+			tokens.fill();
+
+			if ( showTokens ) {
+				for (Object tok : tokens.getTokens()) {
+					System.out.println(tok);
+				}
+			}
+
+			if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
+
+
+			if ( diagnostics ) parser.addErrorListener(new DiagnosticErrorListener());
+
+			if ( printTree || gui || psFile!=null ) {
+				parser.setBuildParseTree(true);
+			}
+
+			if ( SLL ) {
+				parser.getInterpreter().setSLL(true);
+			}
+
+			parser.setTokenStream(tokens);
+			parser.setTrace(trace);
+
 			try {
-				ANTLRInputStream input = new ANTLRInputStream(r);
-				lexer.setInputStream(input);
-				CommonTokenStream tokens = new CommonTokenStream(lexer);
+				Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
+				ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
 
-				tokens.fill();
-
-				if ( showTokens ) {
-					for (Object tok : tokens.getTokens()) {
-						System.out.println(tok);
-					}
+				if ( printTree ) {
+					System.out.println(tree.toStringTree(parser));
 				}
-
-				if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
-
-
-				if ( diagnostics ) parser.addErrorListener(new DiagnosticErrorListener());
-
-				if ( printTree || gui || psFile!=null ) {
-					parser.setBuildParseTree(true);
+				if ( gui ) {
+					tree.inspect(parser);
 				}
-
-				if ( SLL ) {
-					parser.getInterpreter().setSLL(true);
-				}
-
-				parser.setTokenStream(tokens);
-				parser.setTrace(trace);
-
-				try {
-					Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-					ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
-
-					if ( printTree ) {
-						System.out.println(tree.toStringTree(parser));
-					}
-					if ( gui ) {
-						tree.inspect(parser);
-					}
-					if ( psFile!=null ) {
-						tree.save(parser, psFile); // Generate postscript
-					}
-				}
-				catch (NoSuchMethodException nsme) {
-					System.err.println("No method for rule "+startRuleName+" or it has arguments");
+				if ( psFile!=null ) {
+					tree.save(parser, psFile); // Generate postscript
 				}
 			}
-			finally {
-				if ( r!=null ) r.close();
-				if ( is!=null ) is.close();
+			catch (NoSuchMethodException nsme) {
+				System.err.println("No method for rule "+startRuleName+" or it has arguments");
 			}
+		}
+		finally {
+			if ( r!=null ) r.close();
+			if ( is!=null ) is.close();
 		}
 	}
 }
