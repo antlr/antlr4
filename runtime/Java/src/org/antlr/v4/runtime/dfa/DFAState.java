@@ -130,10 +130,11 @@ public class DFAState {
 	 *  DFA state.
 	 */
 	public Set<Integer> getAltSet() {
-		// TODO (sam): what to do when configs==null?
 		Set<Integer> alts = new HashSet<Integer>();
-		for (ATNConfig c : configs) {
-			alts.add(c.alt);
+		if ( configs!=null ) {
+			for (ATNConfig c : configs) {
+				alts.add(c.alt);
+			}
 		}
 		if ( alts.isEmpty() ) return null;
 		return alts;
@@ -142,10 +143,12 @@ public class DFAState {
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	@Override
 	public int hashCode() {
-		// TODO (sam): what to do when configs==null?
-		int h = 0;
-		for (ATNConfig c : configs) {
-			h += c.alt;
+		int h = 7;
+		if ( configs!=null ) {
+			for (ATNConfig c : configs) {
+				h = h * 31 ^ c.alt;
+				h = h * 31 ^ c.state.stateNumber;
+			}
 		}
 		return h;
 	}
