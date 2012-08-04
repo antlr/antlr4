@@ -277,4 +277,23 @@ public class TestParseErrors extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	@Test public void testNoViableAltAvoidance() throws Exception {
+		// "a." matches 'a' to rule e but then realizes '.' won't match.
+		// previously would cause noviablealt. now prediction pretends to
+		// have "a' predict 2nd alt of e. Will get syntax error later so
+		// let it get farther.
+		String grammar =
+			"grammar T;\n" +
+			"s : e '!' ;\n" +
+			"e : 'a' 'b'\n" +
+			"  | 'a'\n" +
+			"  ;\n" +
+			"DOT : '.' ;\n" +
+			"WS : [ \\t\\r\\n]+ -> skip;\n";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a.", false);
+		String expecting =
+				"exec stderrVacuum: line 1:1 mismatched input '.' expecting '!'";
+		String result = stderrDuringParse;
+		assertEquals(expecting, result);
+	}
 }

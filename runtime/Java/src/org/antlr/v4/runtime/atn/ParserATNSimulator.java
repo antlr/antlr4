@@ -441,13 +441,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 									  greedy, loopsSimulateTailRecursion,
 									  fullCtx);
 				retry_with_context_from_dfa++;
-				ATNConfigSet fullCtxSet =
-					execATNWithFullContext(dfa, s, s0_closure,
-										   input, startIndex,
-										   outerContext,
-										   ATN.INVALID_ALT_NUMBER,
-										   greedy);
-				return fullCtxSet.uniqueAlt;
+				int alt = execATNWithFullContext(dfa, s, s0_closure,
+												 input, startIndex,
+												 outerContext,
+												 ATN.INVALID_ALT_NUMBER,
+												 greedy);
+				return alt;
 			}
 			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
@@ -609,13 +608,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( reach==null ) {
 				// TODO: if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
-				// at least for LL decision. Full LL doesn't dip into outer
+				// at least for SLL decision. Full LL doesn't dip into outer
 				// so don't need special case.
 				// We will get an error no matter what so delay until after
 				// decision; better error message. Also, no reachable target
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
+				int alt = getAltThatFinishedDecisionEntryRule(previousD.configs);
+				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
+					// return w/o altering DFA
+					return alt;
+				}
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
 
@@ -680,14 +684,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												  loopsSimulateTailRecursion,
 												  true);
 							// we have write lock already, no need to relock
-							fullCtxSet = execATNWithFullContext(dfa, D, s0_closure,
-																input, startIndex,
-																outerContext,
-																D.configs.conflictingAlts.getMinElement(),
-																greedy);
+							predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
+																  input, startIndex,
+																  outerContext,
+																  D.configs.conflictingAlts.getMinElement(),
+																  greedy);
 							// not accept state: isCtxSensitive
 							D.isCtxSensitive = true; // always force DFA to ATN simulate
-							predictedAlt = fullCtxSet.uniqueAlt;
 							D.prediction = ATN.INVALID_ALT_NUMBER;
 							addDFAEdge(dfa, previousD, t, D);
 							return predictedAlt; // all done with preds, etc...
@@ -775,13 +778,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	// comes back with reach.uniqueAlt set to a valid alt
-	public ATNConfigSet execATNWithFullContext(DFA dfa,
-											   DFAState D, // how far we got before failing over
-											   @NotNull ATNConfigSet s0,
-											   @NotNull TokenStream input, int startIndex,
-											   ParserRuleContext<?> outerContext,
-											   int SLL_min_alt, // todo: is this in D as min ambig alts?
-											   boolean greedy)
+	public int execATNWithFullContext(DFA dfa,
+									  DFAState D, // how far we got before failing over
+									  @NotNull ATNConfigSet s0,
+									  @NotNull TokenStream input, int startIndex,
+									  ParserRuleContext<?> outerContext,
+									  int SLL_min_alt, // todo: is this in D as min ambig alts?
+									  boolean greedy)
 	{
 		// caller must have write lock on dfa
 		retry_with_context++;
@@ -810,6 +813,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
+				int alt = getAltThatFinishedDecisionEntryRule(previous);
+				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
+					return alt;
+				}
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
 			reach.uniqueAlt = getUniqueAlt(reach);
@@ -827,7 +834,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( reach.uniqueAlt == SLL_min_alt ) {
 				retry_with_context_predicts_same_as_alt++;
 			}
-			return reach;
+			return reach.uniqueAlt;
 		}
 
 		// We do not check predicates here because we have checked them
@@ -836,9 +843,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		// must have conflict
 		reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
 
-		reach.uniqueAlt = reach.conflictingAlts.getMinElement();
-
-		return reach;
+		return reach.conflictingAlts.getMinElement();
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
@@ -1018,6 +1023,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
 		return pairs;
+	}
+
+	public int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
+		IntervalSet alts = new IntervalSet();
+		for (ATNConfig c : configs) {
+			if ( c.reachesIntoOuterContext>0 ) alts.add(c.alt);
+		}
+		if ( alts.size()==0 ) return ATN.INVALID_ALT_NUMBER;
+		return alts.getMinElement();
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
