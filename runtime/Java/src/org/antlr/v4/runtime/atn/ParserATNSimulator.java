@@ -836,7 +836,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = false;
-			closure(reachIntermediate, reach, collectPredicates, greedy, useContext, hasMoreContext, contextCache);
+			final boolean loopsSimulateTailRecursion = useContext;
+			closure(reachIntermediate, reach, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache);
 			stepIntoGlobal = reach.getDipsIntoOuterContext();
 
 			if (useContext && stepIntoGlobal) {
@@ -947,7 +948,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = true;
-			closure(reachIntermediate, configs, collectPredicates, greedy, useContext, hasMoreContext, contextCache);
+			final boolean loopsSimulateTailRecursion = useContext;
+			closure(reachIntermediate, configs, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
 			DFAState next = addDFAState(dfa, configs);
