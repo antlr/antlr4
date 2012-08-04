@@ -32,6 +32,7 @@ package org.antlr.v4.semantics;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -151,9 +152,13 @@ public class SemanticPipeline {
 			if ( def.getType()== ANTLRParser.ID ) G.defineTokenName(def.getText());
 		}
 
-		// DEFINE TOKEN TYPES FOR NONFRAGMENT RULES
+		/* Define token types for nonfragment rules which do not include a 'type(...)'
+		 * or 'more' lexer command.
+		 */
 		for (Rule r : g.rules.values()) {
-			if ( !r.isFragment() ) G.defineTokenName(r.name);
+			if ( !r.isFragment() && !hasTypeOrMoreCommand(r) ) {
+				G.defineTokenName(r.name);
+			}
 		}
 
 		// FOR ALL X : 'xxx'; RULES, DEFINE 'xxx' AS TYPE X
@@ -164,6 +169,34 @@ public class SemanticPipeline {
 			}
 		}
 
+	}
+
+	boolean hasTypeOrMoreCommand(@NotNull Rule r) {
+		GrammarAST ast = r.ast;
+		if (ast == null) {
+			return false;
+		}
+
+		GrammarAST altActionAst = (GrammarAST)ast.getFirstDescendantWithType(ANTLRParser.LEXER_ALT_ACTION);
+		if (altActionAst == null) {
+			// the rule isn't followed by any commands
+			return false;
+		}
+
+		// first child is the alt itself, subsequent are the actions
+		for (int i = 1; i < altActionAst.getChildCount(); i++) {
+			GrammarAST node = (GrammarAST)altActionAst.getChild(i);
+			if (node.getType() == ANTLRParser.LEXER_ACTION_CALL) {
+				if ("type".equals(node.getChild(0).getText())) {
+					return true;
+				}
+			}
+			else if ("more".equals(node.getText())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	void assignTokenTypes(Grammar g, List<GrammarAST> tokensDefs,
