@@ -31,8 +31,13 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.NotNull;
 
-public class EpsilonTransition extends Transition {
+public final class EpsilonTransition extends Transition {
 	public EpsilonTransition(@NotNull ATNState target) { super(target); }
+
+	@Override
+	public int getSerializationType() {
+		return EPSILON;
+	}
 
 	@Override
 	public boolean isEpsilon() { return true; }

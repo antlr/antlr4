@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  *  may have to combine a bunch of them as it collects predicates from
  *  multiple ATN configurations into a single DFA state.
  */
-public class PredicateTransition extends Transition {
+public final class PredicateTransition extends Transition {
 	public final int ruleIndex;
 	public final int predIndex;
 	public final boolean isCtxDependent;  // e.g., $i ref in pred
@@ -47,6 +47,11 @@ public class PredicateTransition extends Transition {
 		this.ruleIndex = ruleIndex;
 		this.predIndex = predIndex;
 		this.isCtxDependent = isCtxDependent;
+	}
+
+	@Override
+	public int getSerializationType() {
+		return PREDICATE;
 	}
 
 	@Override
