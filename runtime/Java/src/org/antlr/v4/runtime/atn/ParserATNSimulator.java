@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -236,7 +237,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
-	public static final boolean SLL_loopsSimulateTailRecursion = true;
+	/** Should we simulate tail recursion for loops in SLL mode? Costs
+	 *  about 10% in time to turn on so let's leave off. Full LL turns
+	 *  it on for sure.
+	 */
+	public static final boolean SLL_loopsSimulateTailRecursion = false;
 
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
@@ -253,6 +258,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	/** Do only local context prediction (SLL(k) style). */
 	protected boolean SLL = false;
+
+	/** Each prediction operation uses a cache for merge of prediction contexts.
+	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
+	 *  isn't synchronized but we're ok since two threads shouldn't reuse same
+	 *  parser/atnsim object because it can only handle one input at a time.
+	 */
+	protected DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache;
 
 	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
 	protected TokenStream _input;
@@ -290,6 +302,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 								   " exec LA(1)=="+ getLookaheadName(input)+
 								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
+		mergeCache = new DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext>();
 		_input = input;
 		_startIndex = input.index();
 		_outerContext = outerContext;
@@ -311,7 +324,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		// But, do we still need an initial state?
 		if ( dfa.s0==null ) { // recheck
 			if ( dfa.s0==null ) { // recheck
-				return predictATN(dfa, input, outerContext);
+				try {
+					return predictATN(dfa, input, outerContext);
+				}
+				finally {
+					mergeCache = null; // wack cache after each prediction
+				}
 			}
 			// fall through; another thread set dfa.s0 while we waited for lock
 		}
@@ -320,10 +338,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		int m = input.mark();
 		int index = input.index();
 		try {
-			int alt = execDFA(dfa, dfa.s0, input, index, outerContext);
-			return alt;
+			return execDFA(dfa, dfa.s0, input, index, outerContext);
 		}
 		finally {
+			mergeCache = null; // wack cache after each prediction
 			input.seek(index);
 			input.release(m);
 		}
@@ -624,6 +642,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							D.prediction = D.configs.conflictingAlts.getMinElement();
 							if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
 							predictedAlt = D.prediction;
+							// Falls through to check predicates below
 						}
 						else {
 							// SLL CONFLICT; RETRY WITH FULL LL CONTEXT
@@ -688,8 +707,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// pairs if preds found for conflicting alts
 				IntervalSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(D.configs);
 				SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, D.configs, nalts);
-				D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
-				D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+				if ( altToPred!=null ) {
+					D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
+					D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+				}
+				else {
+					// There are preds in configs but they might go away
+					// when OR'd together like {p}? || NONE == NONE. If neither
+					// alt has preds, resolve to min alt
+					D.prediction = altsToCollectPredsFrom.getMinElement();
+				}
 
 				if ( D.predicates!=null ) {
 					int stopIndex = input.index();
@@ -807,7 +834,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					intermediate.add(new ATNConfig(c, target));
+					intermediate.add(new ATNConfig(c, target), mergeCache);
 				}
 			}
 		}
@@ -818,12 +845,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			// It can only have one alternative; just add to result
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
-			reach = new ATNConfigSet(intermediate, null);
+			reach = new ATNConfigSet(intermediate);
 		}
 		else if ( ParserATNSimulator.getUniqueAlt(intermediate)==1 ) {
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
-			reach = new ATNConfigSet(intermediate, null);
+			reach = new ATNConfigSet(intermediate);
 		}
 		else {
 			for (ATNConfig c : intermediate) {
@@ -888,7 +915,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												  int nalts)
 	{
 		// REACH=[1|1|[]|0:0, 1|2|[]|0:1]
-
 		/* altToPred starts as an array of all null contexts. The entry at index i
 		 * corresponds to alternative i. altToPred[i] may have one of three values:
 		 *   1. null: no ATNConfig c is found such that c.alt==i
@@ -900,8 +926,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		 *
 		 * From this, it is clear that NONE||anything==NONE.
 		 */
-		SemanticContext[] altToPred = new SemanticContext[nalts +1];
-		int n = altToPred.length;
+		SemanticContext[] altToPred = new SemanticContext[nalts + 1];
 		for (ATNConfig c : configs) {
 			if ( ambigAlts.contains(c.alt) ) {
 				altToPred[c.alt] = SemanticContext.or(altToPred[c.alt], c.semanticContext);
@@ -909,7 +934,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		int nPredAlts = 0;
-		for (int i = 1; i < n; i++) {
+		for (int i = 1; i <= nalts; i++) {
 			if (altToPred[i] == null) {
 				altToPred[i] = SemanticContext.NONE;
 			}
@@ -1033,7 +1058,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// don't see past end of a rule for any nongreedy decision
 				if ( debug ) System.out.println("NONGREEDY at stop state of "+
 												getRuleName(config.state.ruleIndex));
-				configs.add(config);
+				configs.add(config, mergeCache);
 				return;
 			}
 			// We hit rule end. If we have context info, use it
@@ -1085,7 +1110,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				LoopEndState end = (LoopEndState)config.state;
 				// pop all the way back until we don't see the loopback state anymore
 				config.context = config.context.popAll(end.loopBackStateNumber,
-													   configs.fullCtx);
+													   configs.fullCtx,
+													   mergeCache);
 				if ( debug ) System.out.println(" becomes "+config.context);
 			}
 		}
@@ -1107,7 +1133,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.state;
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
-            configs.add(config);
+            configs.add(config, mergeCache);
 			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}

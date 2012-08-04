@@ -1,5 +1,7 @@
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
+
 import java.util.Iterator;
 
 public class SingletonPredictionContext extends PredictionContext {
@@ -49,11 +51,13 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public PredictionContext popAll(int invokingState,
-									boolean fullCtx)
+	public PredictionContext popAll(
+		int invokingState,
+		boolean fullCtx,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( invokingState == this.invokingState ) {
-			return parent.popAll(invokingState, fullCtx);
+			return parent.popAll(invokingState, fullCtx, mergeCache);
 		}
 		return this;
 	}

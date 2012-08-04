@@ -1,5 +1,7 @@
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
+
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -123,8 +125,10 @@ public class ArrayPredictionContext extends PredictionContext {
 	 *  elements from this context and merge into new context.
 	 */
 	@Override
-	public PredictionContext popAll(int invokingState,
-									boolean fullCtx)
+	public PredictionContext popAll(
+		int invokingState,
+		boolean fullCtx,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		int index = Arrays.binarySearch(this.invokingStates, invokingState);
 		if ( index < 0 ) {
@@ -132,7 +136,7 @@ public class ArrayPredictionContext extends PredictionContext {
 		}
 
 		PredictionContext newCtx =
-			this.parents[index].popAll(invokingState, fullCtx);
+			this.parents[index].popAll(invokingState, fullCtx, mergeCache);
 		for (int i = 0; i < this.invokingStates.length; i++) {
 			if (i == index) continue;
 			PredictionContext next;
@@ -144,7 +148,7 @@ public class ArrayPredictionContext extends PredictionContext {
 													  this.invokingStates[i]);
 			}
 			boolean rootIsWildcard = fullCtx;
-			newCtx = merge(newCtx, next, rootIsWildcard);
+			newCtx = merge(newCtx, next, rootIsWildcard, mergeCache);
 		}
 
 		return newCtx;

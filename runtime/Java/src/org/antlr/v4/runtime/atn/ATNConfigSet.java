@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.ArrayList;
@@ -297,7 +298,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 	public ATNConfigSet() { this(true); }
 
-	public ATNConfigSet(ATNConfigSet old, PredictionContextCache contextCache) {
+	public ATNConfigSet(ATNConfigSet old) {
 		this(old.fullCtx);
 		addAll(old);
 		this.uniqueAlt = old.uniqueAlt;
@@ -306,12 +307,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.dipsIntoOuterContext = old.dipsIntoOuterContext;
 	}
 
+	@Override
+	public boolean add(ATNConfig config) {
+		return add(config, null);
+	}
+
 	/** Adding a new config means merging contexts with existing configs for
 	 *  (s, i, pi, _)
 	 *  We use (s,i,pi) as key
 	 */
-	@Override
-	public boolean add(ATNConfig config) {
+	public boolean add(
+		ATNConfig config,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
+	{
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
@@ -324,7 +332,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		// a previous (s,i,pi,_), merge with it and save result
 		boolean rootIsWildcard = !fullCtx;
 		PredictionContext merged =
-			PredictionContext.merge(existing.context, config.context, rootIsWildcard);
+			PredictionContext.merge(existing.context, config.context, rootIsWildcard, mergeCache);
 		// no need to check for existing.context, config.context in cache
 		// since only way to create new graphs is "call rule" and here. We
 		// cache at both places.

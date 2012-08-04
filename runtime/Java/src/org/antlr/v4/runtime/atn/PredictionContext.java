@@ -2,6 +2,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -64,15 +65,15 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int getInvokingState(int index);
 
-//	public abstract int findInvokingState(int invokingState);
-
 	/** This means only the EMPTY context is in set */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}
 
-	public abstract PredictionContext popAll(int invokingState,
-											 boolean fullCtx);
+	public abstract PredictionContext popAll(
+		int invokingState,
+		boolean fullCtx,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache);
 
 	@Override
 	public int compareTo(PredictionContext o) { // used for toDotString to print nodes in order
@@ -117,15 +118,17 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 //	}
 
 	// dispatch
-	public static PredictionContext merge(PredictionContext a, PredictionContext b,
-										  boolean rootIsWildcard)
+	public static PredictionContext merge(
+		PredictionContext a, PredictionContext b,
+		boolean rootIsWildcard,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( (a==null&&b==null) || a==b || a.equals(b) ) return a; // share same graph if both same
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
 								   (SingletonPredictionContext)b,
-								   rootIsWildcard);
+								   rootIsWildcard, mergeCache);
 		}
 
 		// At least one of a or b is array
@@ -143,19 +146,21 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			b = new ArrayPredictionContext((SingletonPredictionContext)b);
 		}
 		return mergeArrays((ArrayPredictionContext) a, (ArrayPredictionContext) b,
-						   rootIsWildcard);
+						   rootIsWildcard, mergeCache);
 	}
 
 	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
-	public static PredictionContext mergeSingletons(SingletonPredictionContext a,
-													SingletonPredictionContext b,
-													boolean rootIsWildcard)
+	public static PredictionContext mergeSingletons(
+		SingletonPredictionContext a,
+		SingletonPredictionContext b,
+		boolean rootIsWildcard,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		PredictionContext rootMerge = mergeRoot(a, b, rootIsWildcard);
 		if ( rootMerge!=null ) return rootMerge;
 
 		if ( a.invokingState==b.invokingState ) { // a == b
-			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard);
+			PredictionContext parent = merge(a.parent, b.parent, rootIsWildcard, mergeCache);
 			// if parent is same as existing a or b parent or reduced to a parent, return it
 			if ( parent == a.parent ) return a; // ax + bx = ax, if a=b
 			if ( parent == b.parent ) return b; // ax + bx = bx, if a=b
@@ -234,10 +239,17 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	}
 
 	// http://www.antlr.org/wiki/download/attachments/32014352/array-merge.png
-	public static PredictionContext mergeArrays(ArrayPredictionContext a,
-												ArrayPredictionContext b,
-												boolean rootIsWildcard)
+	public static PredictionContext mergeArrays(
+		ArrayPredictionContext a,
+		ArrayPredictionContext b,
+		boolean rootIsWildcard,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
+		if ( mergeCache!=null ) {
+			PredictionContext previous = mergeCache.get(a,b);
+			if ( previous!=null ) return previous;
+		}
+
 		// merge sorted payloads a + b => M
 		int i = 0; // walks a
 		int j = 0; // walks b
@@ -265,7 +277,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				}
 				else { // ax+ay -> a'[x,y]
 					PredictionContext mergedParent =
-						merge(a_parent, b_parent, rootIsWildcard);
+						merge(a_parent, b_parent, rootIsWildcard, mergeCache);
 					mergedParents[k] = mergedParent;
 					mergedInvokingStates[k] = payload;
 				}
@@ -313,6 +325,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				if ( n == 1 ) { // for just one merged element, return singleton top
 					PredictionContext a_ = new SingletonPredictionContext(mergedParents[0],
 																		  mergedInvokingStates[0]);
+					if ( mergeCache!=null ) mergeCache.put(a,b,a_);
 					return a_;
 				}
 				mergedParents = Arrays.copyOf(mergedParents, n);
@@ -325,11 +338,18 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		// if we created same array as a or b, return that instead
 		// TODO: track whether this is possible above during merge sort for speed
-		if ( M.equals(a) ) return a;
-		if ( M.equals(b) ) return b;
+		if ( M.equals(a) ) {
+			if ( mergeCache!=null ) mergeCache.put(a,b,a);
+			return a;
+		}
+		if ( M.equals(b) ) {
+			if ( mergeCache!=null ) mergeCache.put(a,b,b);
+			return b;
+		}
 
 		combineCommonParents(mergedParents);
 
+		if ( mergeCache!=null ) mergeCache.put(a,b,M);
 		return M;
 	}
 
