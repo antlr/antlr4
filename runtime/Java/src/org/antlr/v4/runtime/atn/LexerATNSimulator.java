@@ -462,7 +462,8 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	@Nullable
 	public ATNState getReachableTarget(Transition trans, int t) {
-		if ( trans instanceof AtomTransition ) {
+		switch (trans.getSerializationType()) {
+		case Transition.ATOM:
 			AtomTransition at = (AtomTransition)trans;
 			if ( at.label == t ) {
 				if ( debug ) {
@@ -471,8 +472,10 @@ public class LexerATNSimulator extends ATNSimulator {
 
 				return at.target;
 			}
-		}
-		else if ( trans.getClass() == RangeTransition.class ) {
+
+			return null;
+
+		case Transition.RANGE:
 			RangeTransition rt = (RangeTransition)trans;
 			if ( t>=rt.from && t<=rt.to ) {
 				if ( debug ) {
@@ -481,24 +484,44 @@ public class LexerATNSimulator extends ATNSimulator {
 
 				return rt.target;
 			}
-		}
-		else if ( trans instanceof SetTransition ) {
+
+			return null;
+
+		case Transition.SET:
 			SetTransition st = (SetTransition)trans;
-			boolean not = trans instanceof NotSetTransition;
-			if ( (!not && st.set.contains(t)) ||
-				 (not && !st.set.contains(t) && t!=CharStream.EOF) ) // ~set doesn't not match EOF
-			{
+			if ( st.set.contains(t) ) {
 				if ( debug ) {
-					System.out.format("match %sset %s\n", not ? "~" : "", st.set.toString(true));
+					System.out.format("match set %s\n", st.set.toString(true));
 				}
 
 				return st.target;
 			}
+
+			return null;
+
+		case Transition.NOT_SET:
+			NotSetTransition nst = (NotSetTransition)trans;
+			if (!nst.set.contains(t) && t!=CharStream.EOF) // ~set doesn't not match EOF
+			{
+				if ( debug ) {
+					System.out.format("match ~set %s\n", nst.set.toString(true));
+				}
+
+				return nst.target;
+			}
+
+			return null;
+
+		case Transition.WILDCARD:
+			if (t != CharStream.EOF) {
+				return trans.target;
+			}
+
+			return null;
+
+		default:
+			return null;
 		}
-		else if ( trans instanceof WildcardTransition && t!=CharStream.EOF ) {
-			return trans.target;
-		}
-		return null;
 	}
 
 	/** Delete configs for alt following ci. Closure is unmodified; copy returned. */
@@ -591,51 +614,55 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull ATNConfigSet configs)
 	{
 		ATNState p = config.state;
+
 		LexerATNConfig c = null;
-		if ( t.getClass() == RuleTransition.class ) {
-			PredictionContext newContext =
-				new SingletonPredictionContext(config.context, p.stateNumber);
-			c = new LexerATNConfig(config, t.target, newContext);
-		}
-		else if ( t.getClass() == PredicateTransition.class ) {
-			if (recog == null) {
-				System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
-			}
+		switch (t.getSerializationType()) {
+			case Transition.RULE:
+				PredictionContext newContext =
+					new SingletonPredictionContext(config.context, p.stateNumber);
+				c = new LexerATNConfig(config, t.target, newContext);
+				break;
+			case Transition.PREDICATE:
+//				if (recog == null) {
+//					System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
+//				}
 
-			/*  Track traversing semantic predicates. If we traverse,
-			    we cannot add a DFA state for this "reach" computation
-				because the DFA would not test the predicate again in the
-				future. Rather than creating collections of semantic predicates
-				like v3 and testing them on prediction, v4 will test them on the
-				fly all the time using the ATN not the DFA. This is slower but
-				semantically it's not used that often. One of the key elements to
-				this predicate mechanism is not adding DFA states that see
-				predicates immediately afterwards in the ATN. For example,
+				/*  Track traversing semantic predicates. If we traverse,
+				 we cannot add a DFA state for this "reach" computation
+				 because the DFA would not test the predicate again in the
+				 future. Rather than creating collections of semantic predicates
+				 like v3 and testing them on prediction, v4 will test them on the
+				 fly all the time using the ATN not the DFA. This is slower but
+				 semantically it's not used that often. One of the key elements to
+				 this predicate mechanism is not adding DFA states that see
+				 predicates immediately afterwards in the ATN. For example,
 
-				a : ID {p1}? | ID {p2}? ;
+				 a : ID {p1}? | ID {p2}? ;
 
-				should create the start state for rule 'a' (to save start state
-				competition), but should not create target of ID state. The
-				collection of ATN states the following ID references includes
-				states reached by traversing predicates. Since this is when we
-				test them, we cannot cash the DFA state target of ID.
-			*/
-			PredicateTransition pt = (PredicateTransition)t;
-			if ( debug ) {
-				System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
-			}
-			configs.hasSemanticContext = true;
-			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
-				c = new LexerATNConfig(config, t.target, pt.getPredicate());
-			}
+				 should create the start state for rule 'a' (to save start state
+				 competition), but should not create target of ID state. The
+				 collection of ATN states the following ID references includes
+				 states reached by traversing predicates. Since this is when we
+				 test them, we cannot cash the DFA state target of ID.
+			 */
+				PredicateTransition pt = (PredicateTransition)t;
+				if ( debug ) {
+					System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
+				}
+				configs.hasSemanticContext = true;
+				if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
+					c = new LexerATNConfig(config, t.target, pt.getPredicate());
+				}
+				break;
+			// ignore actions; just exec one per rule upon accept
+			case Transition.ACTION:
+				c = new LexerATNConfig(config, t.target, ((ActionTransition)t).actionIndex);
+				break;
+			case Transition.EPSILON:
+				c = new LexerATNConfig(config, t.target);
+				break;
 		}
-		// ignore actions; just exec one per rule upon accept
-		else if ( t.getClass() == ActionTransition.class ) {
-			c = new LexerATNConfig(config, t.target, ((ActionTransition)t).actionIndex);
-		}
-		else if ( t.isEpsilon() ) {
-			c = new LexerATNConfig(config, t.target);
-		}
+
 		return c;
 	}
 

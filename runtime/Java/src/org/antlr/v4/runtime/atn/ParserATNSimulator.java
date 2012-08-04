@@ -911,27 +911,44 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	@Nullable
 	public ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
-		if ( trans instanceof AtomTransition ) {
+		switch (trans.getSerializationType()) {
+		case Transition.ATOM:
 			AtomTransition at = (AtomTransition)trans;
 			if ( at.label == ttype ) {
 				return at.target;
 			}
-		}
-		else if ( trans instanceof SetTransition ) {
+			return null;
+
+		case Transition.SET:
 			SetTransition st = (SetTransition)trans;
-			boolean not = trans instanceof NotSetTransition;
-			if ( !not && st.set.contains(ttype) || not && !st.set.contains(ttype) ) {
+			if ( st.set.contains(ttype) ) {
 				return st.target;
 			}
-		}
-		else if ( trans instanceof RangeTransition ) { // TODO: can't happen in parser, right? remove
+			return null;
+
+		case Transition.NOT_SET:
+			NotSetTransition nst = (NotSetTransition)trans;
+			if ( !nst.set.contains(ttype) ) {
+				return nst.target;
+			}
+			return null;
+
+		case Transition.RANGE:
 			RangeTransition rt = (RangeTransition)trans;
-			if ( ttype>=rt.from && ttype<=rt.to ) return rt.target;
+			if ( ttype>=rt.from && ttype<=rt.to ) {
+				return rt.target;
+			}
+			return null;
+
+		case Transition.WILDCARD:
+			if (ttype != Token.EOF) {
+				return trans.target;
+			}
+			return null;
+
+		default:
+			return null;
 		}
-		else if ( trans instanceof WildcardTransition && ttype!=Token.EOF ) {
-			return trans.target;
-		}
-		return null;
 	}
 
 	public SemanticContext[] getPredsForAmbigAlts(@NotNull IntervalSet ambigAlts,
@@ -1214,22 +1231,25 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 									  boolean inContext,
 									  boolean fullCtx)
 	{
-		if ( t instanceof RuleTransition ) {
+		switch (t.getSerializationType()) {
+		case Transition.RULE:
 			return ruleTransition(config, t);
-		}
-		else if ( t instanceof PredicateTransition ) {
+
+		case Transition.PREDICATE:
 			return predTransition(config, (PredicateTransition)t,
 								  collectPredicates,
 								  inContext,
 								  fullCtx);
-		}
-		else if ( t instanceof ActionTransition ) {
+
+		case Transition.ACTION:
 			return actionTransition(config, (ActionTransition)t);
-		}
-		else if ( t.isEpsilon() ) {
+
+		case Transition.EPSILON:
 			return new ATNConfig(config, t.target);
+
+		default:
+			return null;
 		}
-		return null;
 	}
 
 	@NotNull
