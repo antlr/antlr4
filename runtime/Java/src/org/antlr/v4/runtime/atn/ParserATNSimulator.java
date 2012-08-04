@@ -91,17 +91,21 @@ import java.util.Set;
  The next time we reach this DFA state with an SLL conflict, through
  DFA simulation, we will again retry the ATN simulation using full
  context mode. This is slow because we can't save the results and have
- to "interpret" the ATN each time we get that input. We could cache
- results from full context to predicted alternative easily and that
- saves a lot of time but doesn't work in presence of predicates. The set
- of visible predicates from the ATN start state changes depending on
- the context, because closure can fall off the end of a rule. I tried
- to cache tuples (stack context, semantic context, predicted alt) but
- it was slower than interpreting and much more complicated. Also
+ to "interpret" the ATN each time we get that input.
+
+ CACHING FULL CONTEXT PREDICTIONS
+
+ We could cache results from full context to predicted
+ alternative easily and that saves a lot of time but doesn't work
+ in presence of predicates. The set of visible predicates from
+ the ATN start state changes depending on the context, because
+ closure can fall off the end of a rule. I tried to cache
+ tuples (stack context, semantic context, predicted alt) but it
+ was slower than interpreting and much more complicated. Also
  required a huge amount of memory. The goal is not to create the
  world's fastest parser anyway. I'd like to keep this algorithm
- simple. By launching multiple threads, we can improve the speed of
- parsing across a large number of files.
+ simple. By launching multiple threads, we can improve the speed
+ of parsing across a large number of files.
 
  There is no strict ordering between the amount of input used by
  SLL vs LL, which makes it really hard to build a cache for full
@@ -116,6 +120,10 @@ import java.util.Set;
  make a	prediction cache work, we have to track	the exact input	used
  during the previous prediction. That amounts to a cache that maps X
  to a specific DFA for that context.
+
+ Something should be done for left-recursive expression predictions.
+ They are likely LL(1) + pred eval. Easier to do the whole SLL unless
+ error and retry with full LL thing Sam does.
 
  AVOIDING FULL CONTEXT PREDICTION
 
@@ -215,20 +223,22 @@ import java.util.Set;
  If it does not get a syntax error, then we're done. If it does get a
  syntax error, we need to retry with the combined SLL/LL strategy.
 
- The reason this works is as follows.  If there are no SLL conflicts
- then the grammar is SLL for sure. If there is an SLL conflict, the
- full LL analysis must yield a set of ambiguous alternatives that is no
- larger than the SLL set. If the LL set is a singleton, then the
- grammar is LL but not SLL. If the LL set is the same size as the SLL
+ The reason this works is as follows.  If there are no SLL
+ conflicts then the grammar is SLL for sure, at least for that
+ input set. If there is an SLL conflict, the full LL analysis
+ must yield a set of ambiguous alternatives that is no larger
+ than the SLL set. If the LL set is a singleton, then the grammar
+ is LL but not SLL. If the LL set is the same size as the SLL
  set, the decision is SLL. If the LL set has size > 1, then that
- decision is truly ambiguous on the current input. If the LL set is
- smaller, then the SLL conflict resolution might choose an alternative
- that the full LL would rule out as a possibility based upon better
- context information. If that's the case, then the SLL parse will
- definitely get an error because the full LL analysis says it's not
- viable. If SLL conflict resolution chooses an alternative within the
- LL set, them both SLL and LL would choose the same alternative because
- they both choose the minimum of multiple conflicting alternatives.
+ decision is truly ambiguous on the current input. If the LL set
+ is smaller, then the SLL conflict resolution might choose an
+ alternative that the full LL would rule out as a possibility
+ based upon better context information. If that's the case, then
+ the SLL parse will definitely get an error because the full LL
+ analysis says it's not viable. If SLL conflict resolution
+ chooses an alternative within the LL set, them both SLL and LL
+ would choose the same alternative because they both choose the
+ minimum of multiple conflicting alternatives.
 
  Let's say we have a set of SLL conflicting alternatives {1, 2, 3} and
  a smaller LL set called s. If s is {2, 3}, then SLL parsing will get
@@ -645,7 +655,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						// CONFLICT, GREEDY (TYPICAL SITUATION)
 						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
 							 !D.configs.dipsIntoOuterContext ||         // didn't fall out of rule
-							 SLL )                                      // not forcing SLL only
+							 SLL )                                      // forcing SLL only
 						{
 							// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
 							if ( !D.configs.hasSemanticContext ) {
