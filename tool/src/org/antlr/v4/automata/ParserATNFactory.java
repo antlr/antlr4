@@ -103,7 +103,14 @@ public class ParserATNFactory implements ATNFactory {
 
 	public int currentOuterAlt;
 
-	public ParserATNFactory(@NotNull Grammar g) { this.g = g; atn = new ATN(); }
+	public ParserATNFactory(@NotNull Grammar g) {
+		if (g == null) {
+			throw new NullPointerException("g");
+		}
+
+		this.g = g;
+		this.atn = new ATN();
+	}
 
 	@Override
 	public ATN createATN() {
@@ -288,7 +295,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during prediction
-	 *  if actionIndex < 0.  Only forced are executed during prediction.
+	 *  if actionIndex &lt; 0.  Only forced are executed during prediction.
 	 */
 	@Override
 	public Handle action(ActionAST action) {
@@ -323,7 +330,7 @@ public class ParserATNFactory implements ATNFactory {
 	 *  begin/end.
 	 *
 	 *  Special case: if just a list of tokens/chars/sets, then collapse
-	 *  to a single edge'd o-set->o graph.
+	 *  to a single edged o-set->o graph.
 	 *
 	 *  TODO: Set alt number (1..n) in the states?
 	 */
