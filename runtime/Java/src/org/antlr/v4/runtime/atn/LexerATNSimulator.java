@@ -503,7 +503,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	/** Delete configs for alt following ci. Closure is unmodified; copy returned. */
 	public ATNConfigSet deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
-		ATNConfigSet dup = new ATNConfigSet(closure, null);
+		ATNConfigSet dup = new ATNConfigSet(closure);
 		int j=ci+1;
 		while ( j < dup.size() ) {
 			ATNConfig c = dup.get(j);
