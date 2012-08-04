@@ -171,9 +171,10 @@ public class SemanticPipeline {
 					G.defineTokenAlias(nameAST.getText(), litAST.getText());
 				}
 				else {
-					g.tool.errMgr.grammarError(ErrorType.ALIAS_REASSIGNMENT,
-											   g.fileName, nameAST.token,
-											   litAST.getText(), nameAST.getText());
+					// oops two literal defs in two rules (within or across
+					// modes). Remove literal in either case so it's not
+					// found by parser.
+					G.stringLiteralToTypeMap.remove(litAST.getText());
 				}
 			}
 		}
