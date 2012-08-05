@@ -1164,7 +1164,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.print("Loop end; pop, stack=" + config.context);
 				LoopEndState end = (LoopEndState)config.state;
 				// pop all the way back until we don't see the loopback state anymore
-				config.context = config.context.popAll(end.loopBackStateNumber,
+				int loopBackStateNumber = end.loopBackState.stateNumber;
+				config.context = config.context.popAll(loopBackStateNumber,
 													   configs.fullCtx,
 													   mergeCache);
 				if ( debug ) System.out.println(" becomes "+config.context);

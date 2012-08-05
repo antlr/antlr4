@@ -100,7 +100,7 @@ public class ATNSerializer {
 			}
 			data.add(s.getStateType());
 			data.add(s.ruleIndex);
-			if ( s.getStateType() == ATNState.LOOP_END ) data.add(((LoopEndState)s).loopBackStateNumber);
+			if ( s.getStateType() == ATNState.LOOP_END ) data.add(((LoopEndState)s).loopBackState.stateNumber);
 			nedges += s.getNumberOfTransitions();
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);

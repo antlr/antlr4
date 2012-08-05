@@ -448,7 +448,7 @@ public class ParserATNFactory implements ATNFactory {
 		atn.defineDecisionState(loop);
 		LoopEndState end = newState(LoopEndState.class, plusAST);
 		blkStart.loopBackState = loop;
-		end.loopBackStateNumber = loop.stateNumber;
+		end.loopBackState = loop;
 
 		plusAST.atnState = blkStart;
 		epsilon(blkEnd, loop);		// blk can see loop back
@@ -491,7 +491,7 @@ public class ParserATNFactory implements ATNFactory {
 		LoopEndState end = newState(LoopEndState.class, starAST);
 		StarLoopbackState loop = newState(StarLoopbackState.class, starAST);
 		entry.loopBackState = loop;
-		end.loopBackStateNumber = loop.stateNumber;
+		end.loopBackState = loop;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
 		entry.isGreedy = isGreedy(blkAST);
