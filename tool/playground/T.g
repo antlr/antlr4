@@ -1,5 +1,6 @@
 grammar T;
 
-s : (A | B) ;
-A : ('a'|'c');
+s : A | B ;
+x : (A|B);
+A : 'a'|'c';
 B : 'b' ;
