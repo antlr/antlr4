@@ -64,7 +64,10 @@ boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);
 }
-	:	{!inContext("RULE")}? // if not rule block and > 1 alt
+	:	{inContext("RULE")}? // top-level: rule block and > 1 alt
+		^(BLOCK ^(ALT setElement[inLexer]) ( ^(ALT setElement[inLexer]) )+)
+		-> ^(BLOCK<BlockAST>[$BLOCK.token] ^(ALT<AltAST>[$BLOCK.token,"ALT"] ^(SET[$BLOCK.token, "SET"] setElement+)))
+	|	{!inContext("RULE")}? // if not rule block and > 1 alt
 		^(BLOCK ^(ALT setElement[inLexer]) ( ^(ALT setElement[inLexer]) )+)
 		-> ^(SET[$BLOCK.token, "SET"] setElement+)
 	;

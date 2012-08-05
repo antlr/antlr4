@@ -56,6 +56,7 @@ public class AltAST extends GrammarAST {
 	public AltAST(Token t) { super(t); }
 	public AltAST(int type) { super(type); }
 	public AltAST(int type, Token t) { super(type, t); }
+	public AltAST(int type, Token t, String text) { super(type,t,text); }
 
 	@Override
 	public Tree dupNode() { return new AltAST(this); }
