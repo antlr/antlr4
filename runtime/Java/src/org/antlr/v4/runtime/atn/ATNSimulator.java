@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,7 @@ public abstract class ATNSimulator {
 		//
 		// STATES
 		//
+		List<Pair<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Pair<LoopEndState, Integer>>();
 		int nstates = toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
 			int stype = toInt(data[p++]);
@@ -75,9 +77,15 @@ public abstract class ATNSimulator {
 			ATNState s = stateFactory(stype, i);
 			s.ruleIndex = toInt(data[p++]);
 			if ( stype == ATNState.LOOP_END ) { // special case
-				((LoopEndState)s).loopBackStateNumber = toInt(data[p++]);
+				int loopBackStateNumber = toInt(data[p++]);
+				loopBackStateNumbers.add(new Pair<LoopEndState, Integer>((LoopEndState)s, loopBackStateNumber));
 			}
 			atn.addState(s);
+		}
+
+		// delay the assignment of loop back states until we know all the state instances have been initialized
+		for (Pair<LoopEndState, Integer> pair : loopBackStateNumbers) {
+			pair.a.loopBackState = atn.states.get(pair.b);
 		}
 
 		//

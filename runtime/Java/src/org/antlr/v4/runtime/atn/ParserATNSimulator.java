@@ -987,7 +987,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( debug ) System.out.println("Loop end; pop, stack=" + config.context);
 				RuleContext p = config.context;
 				LoopEndState end = (LoopEndState) config.state;
-				while ( !p.isEmpty() && p.invokingState == end.loopBackStateNumber ) {
+				int loopBackStateNumber = end.loopBackState.stateNumber;
+				while ( !p.isEmpty() && p.invokingState == loopBackStateNumber ) {
 					p = config.context = config.context.parent; // "pop"
 				}
 			}

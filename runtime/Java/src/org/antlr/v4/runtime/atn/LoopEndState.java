@@ -31,5 +31,5 @@ package org.antlr.v4.runtime.atn;
 
 /** Mark the end of a * or + loop */
 public class LoopEndState extends ATNState {
-	public int loopBackStateNumber;
+	public ATNState loopBackState;
 }
