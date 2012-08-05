@@ -74,9 +74,6 @@ public interface ATNFactory {
 
 	Handle charSetLiteral(GrammarAST charSetAST);
 
-
-	Handle tree(GrammarAST node, List<Handle> els);
-
 	Handle range(GrammarAST a, GrammarAST b);
 
 	/** For a non-lexer, just build a simple token reference atom.

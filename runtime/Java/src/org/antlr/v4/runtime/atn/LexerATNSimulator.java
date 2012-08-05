@@ -449,7 +449,8 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	@Nullable
 	public ATNState getReachableTarget(Transition trans, int t) {
-		if ( trans instanceof AtomTransition ) {
+		switch (trans.getSerializationType()) {
+		case Transition.ATOM:
 			AtomTransition at = (AtomTransition)trans;
 			if ( at.label == t ) {
 				if ( debug ) {
@@ -458,8 +459,10 @@ public class LexerATNSimulator extends ATNSimulator {
 
 				return at.target;
 			}
-		}
-		else if ( trans.getClass() == RangeTransition.class ) {
+
+			return null;
+
+		case Transition.RANGE:
 			RangeTransition rt = (RangeTransition)trans;
 			if ( t>=rt.from && t<=rt.to ) {
 				if ( debug ) {
@@ -468,24 +471,44 @@ public class LexerATNSimulator extends ATNSimulator {
 
 				return rt.target;
 			}
-		}
-		else if ( trans instanceof SetTransition ) {
+
+			return null;
+			
+		case Transition.SET:
 			SetTransition st = (SetTransition)trans;
-			boolean not = trans instanceof NotSetTransition;
-			if ( (!not && st.set.contains(t)) ||
-				 (not && !st.set.contains(t) && t!=CharStream.EOF) ) // ~set doesn't not match EOF
-			{
+			if ( st.set.contains(t) ) {
 				if ( debug ) {
-					System.out.format("match %sset %s\n", not ? "~" : "", st.set.toString(true));
+					System.out.format("match set %s\n", st.set.toString(true));
 				}
 
 				return st.target;
 			}
+
+			return null;
+
+		case Transition.NOT_SET:
+			NotSetTransition nst = (NotSetTransition)trans;
+			if (!nst.set.contains(t) && t!=CharStream.EOF) // ~set doesn't not match EOF
+			{
+				if ( debug ) {
+					System.out.format("match ~set %s\n", nst.set.toString(true));
+				}
+
+				return nst.target;
+			}
+
+			return null;
+			
+		case Transition.WILDCARD:
+			if (t != CharStream.EOF) {
+				return trans.target;
+			}
+			
+			return null;
+			
+		default:
+			return null;
 		}
-		else if ( trans instanceof WildcardTransition && t!=CharStream.EOF ) {
-			return trans.target;
-		}
-		return null;
 	}
 
 	public void deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
@@ -573,13 +596,16 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull ATNConfigSet configs)
 	{
 		ATNState p = config.getState();
-		ATNConfig c = null;
-		if ( t.getClass() == RuleTransition.class ) {
+		ATNConfig c;
+
+		switch (t.getSerializationType()) {
+		case Transition.RULE:
 			PredictionContext newContext =
 				config.getContext().getChild(p.stateNumber);
 			c = config.transform(t.target, newContext);
-		}
-		else if ( t.getClass() == PredicateTransition.class ) {
+			break;
+			
+		case Transition.PREDICATE:
 			if (recog == null) {
 				System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
 			}
@@ -610,14 +636,26 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
 				c = config.transform(t.target, pt.getPredicate());
 			}
-		}
-		// ignore actions; just exec one per rule upon accept
-		else if ( t.getClass() == ActionTransition.class ) {
+			else {
+				c = null;
+			}
+			
+			break;
+			
+		case Transition.ACTION:
+			// ignore actions; just exec one per rule upon accept
 			c = config.transform(t.target, ((ActionTransition)t).actionIndex);
-		}
-		else if ( t.isEpsilon() ) {
+			break;
+			
+		case Transition.EPSILON:
 			c = config.transform(t.target);
+			break;
+
+		default:
+			c = null;
+			break;
 		}
+
 		return c;
 	}
 

@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
+  Copyright (c) 2012 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -29,33 +29,53 @@
 
 package org.antlr.v4.automata;
 
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
-
-/** A simple visitor that walks everywhere it can go starting from s,
- *  without going into an infinite cycle. Override and implement
- *  visitState() to provide functionality.
+/**
+ *
+ * @author Terence Parr
  */
-public class ATNVisitor {
-	public void visit(@NotNull ATNState s) {
-		visit_(s, new HashSet<Integer>());
+public class TailEpsilonRemover extends ATNVisitor {
+	@NotNull
+	private final ATN _atn;
+
+	public TailEpsilonRemover(@NotNull ATN atn) {
+		this._atn = atn;
 	}
 
-	public void visit_(@NotNull ATNState s, @NotNull Set<Integer> visited) {
-		if ( !visited.add(s.stateNumber) ) return;
-		visited.add(s.stateNumber);
-
-		visitState(s);
-		int n = s.getNumberOfTransitions();
-		for (int i=0; i<n; i++) {
-			Transition t = s.transition(i);
-			visit_(t.target, visited);
+	@Override
+	public void visitState(@NotNull ATNState p) {
+		if (p.getClass() == ATNState.class && p.getNumberOfTransitions() == 1) {
+			ATNState q = p.transition(0).target;
+			if (p.transition(0) instanceof RuleTransition) {
+				q = ((RuleTransition) p.transition(0)).followState;
+			}
+			if (q.getClass() == ATNState.class) {
+				// we have p-x->q for x in {rule, action, pred, token, ...}
+				// if edge out of q is single epsilon to block end
+				// we can strip epsilon p-x->q-eps->r
+				Transition trans = q.transition(0);
+				if (q.getNumberOfTransitions() == 1 && trans.isEpsilon() && !(trans instanceof ActionTransition)) {
+					ATNState r = trans.target;
+					if (r instanceof BlockEndState || r instanceof PlusLoopbackState || r instanceof StarLoopbackState) {
+						// skip over q
+						if (p.transition(0) instanceof RuleTransition) {
+							((RuleTransition) p.transition(0)).followState = r;
+						} else {
+							p.transition(0).target = r;
+						}
+						_atn.removeState(q);
+					}
+				}
+			}
 		}
 	}
-
-	public void visitState(@NotNull ATNState s) { }
 }

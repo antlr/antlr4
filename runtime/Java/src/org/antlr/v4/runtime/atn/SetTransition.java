@@ -47,6 +47,11 @@ public class SetTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return SET;
+	}
+
+	@Override
 	@NotNull
 	public IntervalSet label() { return set; }
 

@@ -138,6 +138,10 @@ public class ATNState {
 		transitions.set(i, e);
 	}
 
+	public Transition removeTransition(int index) {
+		return transitions.remove(index);
+	}
+
 	public int getStateType() {
 		return serializationTypes.get(this.getClass());
 	}

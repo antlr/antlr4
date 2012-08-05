@@ -100,7 +100,7 @@ public abstract class Transition {
 		this.target = target;
 	}
 
-	public int getSerializationType() { return 0; }
+	public abstract int getSerializationType();
 
 	/** Are we epsilon, action, sempred? */
 	public boolean isEpsilon() { return false; }

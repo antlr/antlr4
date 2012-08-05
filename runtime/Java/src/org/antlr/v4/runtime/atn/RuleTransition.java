@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.NotNull;
 
 /** */
-public class RuleTransition extends Transition {
+public final class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */
 	public final int ruleIndex;     // no Rule object at runtime
 
@@ -47,6 +47,11 @@ public class RuleTransition extends Transition {
 		super(ruleStart);
 		this.ruleIndex = ruleIndex;
 		this.followState = followState;
+	}
+
+	@Override
+	public int getSerializationType() {
+		return RULE;
 	}
 
 	@Override
