@@ -1,10 +1,5 @@
-lexer grammar T;
+grammar T;
 
-RBRACE : '}' ;
-
-mode Action;
-
-END_ACTION
-    :   '}' -> popMode
-    ;
-
+s : (A | B) ;
+A : ('a'|'c');
+B : 'b' ;
