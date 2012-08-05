@@ -23,7 +23,6 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 @members {
 public String currentRuleName;
 public GrammarAST currentAlt;
-public Set<String> rewriteElems = new HashSet<String>();
 public Grammar g;
 public BlockSetTransformer(TreeNodeStream input, Grammar g) {
     this(input, new RecognizerSharedState());
@@ -40,7 +39,7 @@ topdown
 
 setAlt
 	:	{inContext("RULE BLOCK")}?
-		ALT {currentAlt = $start; rewriteElems.clear();}
+		ALT {currentAlt = $start;}
 	;
 
 // (BLOCK (ALT (+ (BLOCK (ALT INT) (ALT ID)))))
@@ -74,8 +73,7 @@ setElement[boolean inLexer]
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);
 }
-	:	{!rewriteElems.contains($start.getText())}?
-		(	a=STRING_LITERAL {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
+	:	(	a=STRING_LITERAL {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
 		|	{!inLexer}?=> TOKEN_REF
 		|	{inLexer}?=>  ^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
 			{CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1 &&
