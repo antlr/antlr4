@@ -57,7 +57,7 @@ public class ATNOptimizer {
 
 	public static void optimize(@NotNull Grammar g, @NotNull ATN atn) {
 		optimizeSets(g, atn);
-//		optimizeStates(atn); // TODO leads to class cast exception
+		optimizeStates(atn);
 	}
 
 	private static void optimizeSets(Grammar g, ATN atn) {
