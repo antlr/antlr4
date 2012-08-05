@@ -1,3 +1,5 @@
-parser grammar T;
+grammar T;
 
-s : A | B ;
+s : (A | B) ;
+A : ('a'|'c');
+B : 'b' ;
