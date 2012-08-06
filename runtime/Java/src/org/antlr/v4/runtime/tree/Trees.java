@@ -97,16 +97,16 @@ public class Trees {
 
 	public static String getNodeText(Tree t, Parser recog) {
 		if ( recog!=null ) {
-			if ( t instanceof ParseTree.RuleNode ) {
-				int ruleIndex = ((ParseTree.RuleNode)t).getRuleContext().getRuleIndex();
+			if ( t instanceof RuleNode ) {
+				int ruleIndex = ((RuleNode)t).getRuleContext().getRuleIndex();
 				String ruleName = recog.getRuleNames()[ruleIndex];
 				return ruleName;
 			}
-			else if ( t instanceof ParseTree.ErrorNodeImpl) {
+			else if ( t instanceof ErrorNodeImpl) {
 				return t.toString();
 			}
-			else if ( t instanceof ParseTree.TerminalNode) {
-				Object symbol = ((ParseTree.TerminalNode<?>)t).getSymbol();
+			else if ( t instanceof TerminalNode) {
+				Object symbol = ((TerminalNode<?>)t).getSymbol();
 				if (symbol instanceof Token) {
 					String s = ((Token)symbol).getText();
 					return s;

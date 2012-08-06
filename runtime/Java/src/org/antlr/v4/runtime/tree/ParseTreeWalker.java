@@ -37,15 +37,15 @@ public class ParseTreeWalker {
 
     @SuppressWarnings("unchecked")
     public <Symbol extends Token> void walk(ParseTreeListener<Symbol> listener, ParseTree t) {
-		if ( t instanceof ParseTree.ErrorNodeImpl) {
-			listener.visitErrorNode((ParseTree.ErrorNode<Symbol>)t);
+		if ( t instanceof ErrorNodeImpl) {
+			listener.visitErrorNode((ErrorNode<Symbol>)t);
 			return;
 		}
-		else if ( t instanceof ParseTree.TerminalNode) {
-			listener.visitTerminal((ParseTree.TerminalNode<Symbol>)t);
+		else if ( t instanceof TerminalNode) {
+			listener.visitTerminal((TerminalNode<Symbol>)t);
 			return;
 		}
-		ParseTree.RuleNode r = (ParseTree.RuleNode)t;
+		RuleNode r = (RuleNode)t;
         enterRule(listener, r);
         int n = r.getChildCount();
         for (int i = 0; i<n; i++) {
@@ -59,14 +59,14 @@ public class ParseTreeWalker {
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected <Symbol extends Token> void enterRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+    protected <Symbol extends Token> void enterRule(ParseTreeListener<Symbol> listener, RuleNode r) {
 		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
     }
 
-    protected <Symbol extends Token> void exitRule(ParseTreeListener<Symbol> listener, ParseTree.RuleNode r) {
+    protected <Symbol extends Token> void exitRule(ParseTreeListener<Symbol> listener, RuleNode r) {
 		@SuppressWarnings("unchecked")
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);

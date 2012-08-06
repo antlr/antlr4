@@ -30,35 +30,61 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
-/** An interface to access the tree of RuleContext objects created
- *  during a parse that makes the data structure look like a simple parse tree.
- *  This node represents both internal nodes, rule invocations,
- *  and leaf nodes, token matches.
- *
- *  The payload is either a token or a context object.
- */
-public interface ParseTree extends SyntaxTree {
-	// the following methods narrow the return type; they are not additional methods
+public class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symbol> {
+	public Symbol symbol;
+	public ParseTree parent;
+	/** Which ATN node matched this token? */
+	public int s;
+	public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
+
 	@Override
-	ParseTree getParent();
+	public ParseTree getChild(int i) {return null;}
+
 	@Override
-	ParseTree getChild(int i);
+	public Symbol getSymbol() {return symbol;}
 
-	/** The ParseTreeVisitor needs a double dispatch method */
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+	@Override
+	public ParseTree getParent() { return parent; }
 
-	/** Return the combined text of all leaf nodes. Does not get any
-	 *  off-channel tokens (if any) so won't return whitespace and
-	 *  comments if they are sent to parser on hidden channel.
-	 */
-	public String getText();
+	@Override
+	public Symbol getPayload() { return symbol; }
 
-	/** Specialize toStringTree so that it can print out more information
-	 * 	based upon the parser.
-	 */
-	public String toStringTree(Parser parser);
+	@Override
+	public Interval getSourceInterval() {
+		if ( symbol ==null ) return Interval.INVALID;
+
+		return new Interval(symbol.getStartIndex(), symbol.getStopIndex());
+	}
+
+	@Override
+	public int getChildCount() { return 0; }
+
+	@Override
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+		return visitor.visitTerminal(this);
+	}
+
+	@Override
+	public String getText() { return symbol.getText(); }
+
+	@Override
+	public String toStringTree(Parser parser) {
+		return toString();
+	}
+
+	public boolean isErrorNode() { return this instanceof ErrorNode; }
+
+	@Override
+	public String toString() {
+			if ( symbol.getType() == Token.EOF ) return "<EOF>";
+			return symbol.getText();
+	}
+
+	@Override
+	public String toStringTree() {
+		return toString();
+	}
 }

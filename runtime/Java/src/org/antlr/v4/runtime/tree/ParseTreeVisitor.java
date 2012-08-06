@@ -17,7 +17,7 @@ public class ParseTreeVisitor<T> {
 	 *  care about some nodes.  The {@link ParserRuleContext#accept} method
 	 *  walks all children by default; i.e., calls this method.
 	 */
-	public T visitChildren(ParseTree.RuleNode node) {
+	public T visitChildren(RuleNode node) {
 		T result = null;
 		int n = node.getChildCount();
 		for (int i=0; i<n; i++) {
@@ -27,6 +27,6 @@ public class ParseTreeVisitor<T> {
 		return result;
 	}
 
-	public T visitTerminal(ParseTree.TerminalNode<? extends Token> node) { return null; }
-	public T visitErrorNode(ParseTree.ErrorNode<? extends Token> node) { return null; }
+	public T visitTerminal(TerminalNode<? extends Token> node) { return null; }
+	public T visitErrorNode(ErrorNode<? extends Token> node) { return null; }
 }
