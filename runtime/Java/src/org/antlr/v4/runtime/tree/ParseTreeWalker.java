@@ -36,15 +36,15 @@ public class ParseTreeWalker {
     public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
 
     public <Symbol extends Token> void walk(ParseTreeListener<? super Symbol> listener, ParseTree<Symbol> t) {
-		if ( t instanceof ParseTree.ErrorNode ) {
-			listener.visitErrorNode((ParseTree.ErrorNode<Symbol>)t);
+		if ( t instanceof ErrorNode ) {
+			listener.visitErrorNode((ErrorNode<Symbol>)t);
 			return;
 		}
-		else if ( t instanceof ParseTree.TerminalNode ) {
-			listener.visitTerminal((ParseTree.TerminalNode<Symbol>)t);
+		else if ( t instanceof TerminalNode ) {
+			listener.visitTerminal((TerminalNode<Symbol>)t);
 			return;
 		}
-		ParseTree.RuleNode<Symbol> r = (ParseTree.RuleNode<Symbol>)t;
+		RuleNode<Symbol> r = (RuleNode<Symbol>)t;
         enterRule(listener, r);
         int n = r.getChildCount();
         for (int i = 0; i<n; i++) {
@@ -58,13 +58,13 @@ public class ParseTreeWalker {
 	 *  First we trigger the generic and then the rule specific.
 	 *  We to them in reverse order upon finishing the node.
 	 */
-    protected <Symbol extends Token> void enterRule(ParseTreeListener<? super Symbol> listener, ParseTree.RuleNode<Symbol> r) {
+    protected <Symbol extends Token> void enterRule(ParseTreeListener<? super Symbol> listener, RuleNode<Symbol> r) {
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
     }
 
-    protected <Symbol extends Token> void exitRule(ParseTreeListener<? super Symbol> listener, ParseTree.RuleNode<Symbol> r) {
+    protected <Symbol extends Token> void exitRule(ParseTreeListener<? super Symbol> listener, RuleNode<Symbol> r) {
 		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
 		ctx.exitRule(listener);
 		listener.exitEveryRule(ctx);

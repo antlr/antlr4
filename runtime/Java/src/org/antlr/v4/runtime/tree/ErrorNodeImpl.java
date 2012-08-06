@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
-  Copyright (c) 2012 Terence Parr
+  Copyright (c) 2011 Terence Parr
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,25 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
-/** {@code T} is return type of {@code visit} methods. Use {@link Void} for no return type.
- *
- * @author Sam Harwell
+/** Represents a token that was consumed during resynchronization
+ *  rather than during a valid match operation. For example,
+ *  we will create this kind of a node during single token insertion
+ *  and deletion as well as during "consume until error recovery set"
+ *  upon no viable alternative exceptions.
  */
-public interface ParseTreeVisitor<Symbol, Result> {
+public class ErrorNodeImpl<Symbol> extends
+	TerminalNodeImpl<Symbol>
+	implements ErrorNode<Symbol>
+{
+	public ErrorNodeImpl(Symbol token) {
+		super(token);
+	}
 
-	Result visit(ParseTree<? extends Symbol> ctx);
-
-	/** Visit all rule, non-leaf children. This returns value returned from last
-	 *  child visited, losing all computations from first n-1 children.  Works
-	 *  fine for contexts with one child then.
-	 *  Handy if you are just walking the tree with a visitor and only
-	 *  care about some nodes.  The {@link ParserRuleContext#accept} method
-	 *  walks all children by default; i.e., calls this method.
-	 */
-	Result visitChildren(RuleNode<? extends Symbol> node);
-
-	Result visitTerminal(TerminalNode<? extends Symbol> node);
-
-	Result visitErrorNode(ErrorNode<? extends Symbol> node);
-
+	@Override
+	public <T> T accept(ParseTreeVisitor<? super Symbol, ? extends T> visitor) {
+		return visitor.visitErrorNode(this);
+	}
 }

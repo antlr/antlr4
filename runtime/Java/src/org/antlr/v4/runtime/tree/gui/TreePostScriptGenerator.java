@@ -36,7 +36,7 @@ import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 
 import java.awt.*;
@@ -129,7 +129,7 @@ public class TreePostScriptGenerator {
 		// for debugging, turn this on to see boundingbox of nodes
 		//doc.rect(box.x, box.y, box.width, box.height);
 		// make error nodes from parse tree red by default
-		if ( t instanceof ParseTree.ErrorNode ) {
+		if ( t instanceof ErrorNode ) {
 			doc.highlight(box.x, box.y, box.width, box.height);
 		}
 		double x = box.x+nodeWidthPadding;

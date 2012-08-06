@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
@@ -58,7 +59,7 @@ import java.io.IOException;
  *
  *  @see ParserRuleContext
  */
-public class RuleContext<Symbol> implements ParseTree.RuleNode<Symbol> {
+public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	/** What context invoked this rule? */
 	public RuleContext<Symbol> parent;
 

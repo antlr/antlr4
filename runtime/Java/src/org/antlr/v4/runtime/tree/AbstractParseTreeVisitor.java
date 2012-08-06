@@ -35,7 +35,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	}
 
 	@Override
-	public Result visitChildren(ParseTree.RuleNode<? extends Symbol> node) {
+	public Result visitChildren(RuleNode<? extends Symbol> node) {
 		Result result = null;
 		int n = node.getChildCount();
 		for (int i=0; i<n; i++) {
@@ -46,12 +46,12 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	}
 
 	@Override
-	public Result visitTerminal(ParseTree.TerminalNode<? extends Symbol> node) {
+	public Result visitTerminal(TerminalNode<? extends Symbol> node) {
 		return null;
 	}
 
 	@Override
-	public Result visitErrorNode(ParseTree.ErrorNode<? extends Symbol> node) {
+	public Result visitErrorNode(ErrorNode<? extends Symbol> node) {
 		return null;
 	}
 }

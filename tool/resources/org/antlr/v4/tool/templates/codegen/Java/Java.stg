@@ -44,7 +44,8 @@ BaseListenerFile(file, header) ::= <<
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.ErrorNode;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
@@ -53,8 +54,8 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 
 	@Override public void enterEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
 	@Override public void exitEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParseTree.TerminalNode\<? extends <InputSymbolType()>\> node) { }
-	@Override public void visitErrorNode(ParseTree.ErrorNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitTerminal(TerminalNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitErrorNode(ErrorNode\<? extends <InputSymbolType()>\> node) { }
 }
 >>
 

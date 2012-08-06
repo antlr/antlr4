@@ -36,8 +36,9 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 
 		@Override
-		public void visitErrorNode(ParseTree.ErrorNode<? extends Token> node) {
+		public void visitErrorNode(ErrorNode<? extends Token> node) {
 			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
@@ -65,7 +66,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 
 		@Override
-		public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {
+		public void visitTerminal(TerminalNode<? extends Token> node) {
 			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
@@ -78,11 +79,11 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
 
 		@Override
-		public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {
+		public void visitTerminal(TerminalNode<? extends Token> node) {
 		}
 
 		@Override
-		public void visitErrorNode(ParseTree.ErrorNode<? extends Token> node) {
+		public void visitErrorNode(ErrorNode<? extends Token> node) {
 		}
 
 		@Override
@@ -350,7 +351,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
 //				System.out.println("consume in error recovery mode for "+o);
-				ParseTree.ErrorNode<Symbol> node = _ctx.addErrorNode(o);
+				ErrorNode<Symbol> node = _ctx.addErrorNode(o);
 				if (_parseListeners != null) {
 					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
 						listener.visitErrorNode(node);
@@ -358,7 +359,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 				}
 			}
 			else {
-				ParseTree.TerminalNode<Symbol> node = _ctx.addChild(o);
+				TerminalNode<Symbol> node = _ctx.addChild(o);
 				if (_parseListeners != null) {
 					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
 						listener.visitTerminal(node);

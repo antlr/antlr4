@@ -36,7 +36,7 @@ import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
@@ -187,10 +187,10 @@ public class TreeViewer extends JComponent {
 		Rectangle2D.Double box = getBoundsOfNode(tree);
 		// draw the box in the background
 		if ( isHighlighted(tree) || boxColor!=null ||
-			 tree instanceof ParseTree.ErrorNode )
+			 tree instanceof ErrorNode )
 		{
 			if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
-			else if ( tree instanceof ParseTree.ErrorNode ) g.setColor(LIGHT_RED);
+			else if ( tree instanceof ErrorNode ) g.setColor(LIGHT_RED);
 			else g.setColor(boxColor);
 			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 							(int) box.height - 1, arcSize, arcSize);
