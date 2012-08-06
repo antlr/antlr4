@@ -102,7 +102,7 @@ public class Trees {
 				String ruleName = recog.getRuleNames()[ruleIndex];
 				return ruleName;
 			}
-			else if ( t instanceof ErrorNodeImpl) {
+			else if ( t instanceof ErrorNode) {
 				return t.toString();
 			}
 			else if ( t instanceof TerminalNode) {
