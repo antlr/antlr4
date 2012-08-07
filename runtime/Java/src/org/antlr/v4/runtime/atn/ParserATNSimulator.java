@@ -1765,8 +1765,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 
-		configs.optimizeConfigs(this);
-		configs.setConflictingAlts(getConflictingAlts(configs));
+		if (!configs.isReadOnly()) {
+			configs.optimizeConfigs(this);
+			configs.setConflictingAlts(getConflictingAlts(configs));
+		}
+
 		DFAState newState = new DFAState(configs.clone(true), -1, atn.maxTokenType);
 		newState.stateNumber = dfa.states.size();
 		dfa.states.put(newState, newState);
