@@ -105,18 +105,26 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if (readonly) {
 			this.mergedConfigs = null;
 			this.unmerged = null;
-		} else {
+		} else if (!set.isReadOnly()) {
 			this.mergedConfigs = new HashMap<Long, ATNConfig>(set.mergedConfigs);
 			this.unmerged = new ArrayList<ATNConfig>(set.unmerged);
+		} else {
+			this.mergedConfigs = new HashMap<Long, ATNConfig>(set.configs.size());
+			this.unmerged = new ArrayList<ATNConfig>();
 		}
 
 		this.configs = new ArrayList<ATNConfig>(set.configs);
 
 		this.dipsIntoOuterContext = set.dipsIntoOuterContext;
 		this.hasSemanticContext = set.hasSemanticContext;
-		this.uniqueAlt = set.uniqueAlt;
-		this.conflictingAlts = set.conflictingAlts;
 		this.outermostConfigSet = set.outermostConfigSet;
+
+		if (readonly || !set.isReadOnly()) {
+			this.uniqueAlt = set.uniqueAlt;
+			this.conflictingAlts = set.conflictingAlts;
+		}
+
+		// if (!readonly && set.isReadOnly()) -> addAll is called from clone()
 	}
 
 	public boolean isReadOnly() {
@@ -157,7 +165,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	public ATNConfigSet clone(boolean readonly) {
-		return new ATNConfigSet(this, readonly);
+		ATNConfigSet copy = new ATNConfigSet(this, readonly);
+		if (!readonly && this.isReadOnly()) {
+			copy.addAll(this.configs);
+		}
+
+		return copy;
 	}
 
 	@Override
