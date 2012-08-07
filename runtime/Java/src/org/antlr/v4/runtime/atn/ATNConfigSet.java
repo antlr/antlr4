@@ -28,7 +28,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -60,7 +58,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * This map is only used for optimizing the process of adding configs to the set,
 	 * and is {@code null} for read-only sets stored in the DFA.
 	 */
-	private final Map<Long, ATNConfig> mergedConfigs;
+	private final HashMap<Long, ATNConfig> mergedConfigs;
 	/**
 	 * This is an "overflow" list holding configs which cannot be merged with one
 	 * of the configs in {@link #mergedConfigs} but have a colliding key. This
@@ -70,11 +68,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * This list is only used for optimizing the process of adding configs to the set,
 	 * and is {@code null} for read-only sets stored in the DFA.
 	 */
-	private final List<ATNConfig> unmerged;
+	private final ArrayList<ATNConfig> unmerged;
 	/**
 	 * This is a list of all configs in this set.
 	 */
-	private final List<ATNConfig> configs;
+	private final ArrayList<ATNConfig> configs;
 
 	private int uniqueAlt;
 	private BitSet conflictingAlts;
@@ -101,19 +99,20 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		this.uniqueAlt = ATN.INVALID_ALT_NUMBER;
 	}
 
+	@SuppressWarnings("unchecked")
 	private ATNConfigSet(ATNConfigSet set, boolean readonly) {
 		if (readonly) {
 			this.mergedConfigs = null;
 			this.unmerged = null;
 		} else if (!set.isReadOnly()) {
-			this.mergedConfigs = new HashMap<Long, ATNConfig>(set.mergedConfigs);
-			this.unmerged = new ArrayList<ATNConfig>(set.unmerged);
+			this.mergedConfigs = (HashMap<Long, ATNConfig>)set.mergedConfigs.clone();
+			this.unmerged = (ArrayList<ATNConfig>)set.unmerged.clone();
 		} else {
 			this.mergedConfigs = new HashMap<Long, ATNConfig>(set.configs.size());
 			this.unmerged = new ArrayList<ATNConfig>();
 		}
 
-		this.configs = new ArrayList<ATNConfig>(set.configs);
+		this.configs = (ArrayList<ATNConfig>)set.configs.clone();
 
 		this.dipsIntoOuterContext = set.dipsIntoOuterContext;
 		this.hasSemanticContext = set.hasSemanticContext;
