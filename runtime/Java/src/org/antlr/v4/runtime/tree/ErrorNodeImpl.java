@@ -29,33 +29,24 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Token;
 
-/** An interface to access the tree of RuleContext objects created
- *  during a parse that makes the data structure look like a simple parse tree.
- *  This node represents both internal nodes, rule invocations,
- *  and leaf nodes, token matches.
- *
- *  The payload is either a token or a context object.
+/** Represents a token that was consumed during resynchronization
+ *  rather than during a valid match operation. For example,
+ *  we will create this kind of a node during single token insertion
+ *  and deletion as well as during "consume until error recovery set"
+ *  upon no viable alternative exceptions.
  */
-public interface ParseTree extends SyntaxTree {
-	// the following methods narrow the return type; they are not additional methods
+public class ErrorNodeImpl<Symbol extends Token> extends
+	TerminalNodeImpl<Symbol>
+	implements ErrorNode<Symbol>
+{
+	public ErrorNodeImpl(Symbol token) {
+		super(token);
+	}
+
 	@Override
-	ParseTree getParent();
-	@Override
-	ParseTree getChild(int i);
-
-	/** The ParseTreeVisitor needs a double dispatch method */
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
-
-	/** Return the combined text of all leaf nodes. Does not get any
-	 *  off-channel tokens (if any) so won't return whitespace and
-	 *  comments if they are sent to parser on hidden channel.
-	 */
-	public String getText();
-
-	/** Specialize toStringTree so that it can print out more information
-	 * 	based upon the parser.
-	 */
-	public String toStringTree(Parser parser);
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+		return visitor.visitErrorNode(this);
+	}
 }
