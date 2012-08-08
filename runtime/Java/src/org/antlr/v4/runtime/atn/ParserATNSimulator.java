@@ -352,9 +352,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( dfa==null ) {
 				DecisionState startState = atn.decisionToState.get(decision);
 				decisionToDFA[decision] = dfa = new DFA(startState, decision);
-				if (useContext) {
-					dfa.setContextSensitive(true);
-				}
 			}
 
 			return predictATN(dfa, input, outerContext, useContext);
@@ -388,11 +385,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return new SimulatorState<Symbol>(outerContext, dfa.s0, false, outerContext);
 		}
 
-		dfa.setContextSensitive(true);
-
 		RuleContext<Symbol> remainingContext = outerContext;
 		assert outerContext != null;
-		DFAState s0 = dfa.s0;
+		DFAState s0 = dfa.s0full;
 		while (remainingContext != null && s0 != null && s0.isCtxSensitive) {
 			s0 = s0.getContextTarget(getInvokingState(remainingContext));
 			if (remainingContext.isEmpty()) {
@@ -565,7 +560,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 
 					input.seek(startIndex);
-					dfa.setContextSensitive(true);
 					return adaptivePredict(input, dfa.decision, outerContext, true);
 				}
 			}
@@ -730,7 +724,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							}
 
 							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-							dfa.setContextSensitive(true);
 							SimulatorState<Symbol> fullContextState = computeStartState(dfa, outerContext, true);
 							reportAttemptingFullContext(dfa, fullContextState, startIndex, ambigIndex);
 							input.seek(startIndex);
@@ -881,7 +874,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											ParserRuleContext<Symbol> globalContext,
 											boolean useContext)
 	{
-		DFAState s0 = dfa.s0;
+		DFAState s0 = useContext ? dfa.s0full : dfa.s0;
 		if (s0 != null) {
 			if (!useContext) {
 				return new SimulatorState<Symbol>(globalContext, s0, useContext, globalContext);
@@ -954,7 +947,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			DFAState next = addDFAState(dfa, configs);
 			if (s0 == null) {
-				dfa.s0 = next;
+				if (useContext) {
+					dfa.s0full = next;
+				} else {
+					dfa.s0 = next;
+				}
 			}
 			else {
 				s0.setContextTarget(previousContext, next);
