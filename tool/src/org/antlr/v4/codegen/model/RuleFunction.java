@@ -170,7 +170,19 @@ public class RuleFunction extends OutputModelObject {
 			FrequencySet<String> altFreq = getElementFrequenciesForAlt(ast);
 			for (GrammarAST t : refs) {
 				String refLabelName = t.getText();
-				if ( altFreq.count(t.getText())>1 ) needsList.add(refLabelName);
+				if (needsList.contains(refLabelName)) {
+					continue;
+				}
+
+				if ( altFreq.count(t.getText())>1 ) {
+					needsList.add(refLabelName);
+				}
+				else {
+					boolean inLoop = t.hasAncestor(CLOSURE) || t.hasAncestor(POSITIVE_CLOSURE);
+					if (inLoop) {
+						needsList.add(refLabelName);
+					}
+				}
 			}
 		}
 		Set<Decl> decls = new HashSet<Decl>();
