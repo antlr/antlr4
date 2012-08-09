@@ -114,6 +114,7 @@ public class GrammarTransformPipeline {
 
     /** Utility visitor that sets grammar ptr in each node */
 	public static void setGrammarPtr(final Grammar g, GrammarAST tree) {
+		if ( tree==null ) return;
 		// ensure each node has pointer to surrounding grammar
 		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
 		v.visit(tree, new TreeVisitorAction() {
